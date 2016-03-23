@@ -1,0 +1,13 @@
+bowtie2_path = "/package/bowtie2-2.2.6/bowtie2"
+cutadapt_dir = "source /package/cutadapt-1.8.1/bin/"
+deepTools2_dir = "/package/deeptools-2.2.0/bin/"
+fastqc_path = "/package/FastQC-0.11.3/bin/fastqc"
+macs2_activate = "/package/MACS2-2.1.0-20150731/bin/activate"
+macs2_path = "/package/MACS2-2.1.0-20150731/bin/macs2"
+qualimap_path = "/package/qualimap-2.2/qualimap"
+picard_path = "/package/picard-tools-1.136/picard.jar"
+R_dir = "/package/R-3.2.3/bin/"
+rseqc_path = "/package/RSeQC-2.6.1/bin/"
+samtools_path = "/package/samtools-1.3/bin/samtools"
+trim_galore_path = "/package/trim_galore_v0.4.0/bin/trim_galore"
+workflow_tools = os.path.join(workflow.overwrite_config["maindir"],"shared","tools")

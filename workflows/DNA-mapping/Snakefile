@@ -1,0 +1,50 @@
+# import glob
+import os
+
+
+# ## useful for debugging: show internal variables
+# for w in dir(workflow):
+#    print(w)
+#    print(getattr(workflow, w))
+#    print("#"*80)
+
+
+## Include scripts #############################################################
+maindir = workflow.overwrite_config["maindir"]      # main workflow directory
+
+include: os.path.join(maindir, "shared", "paths.py")        # shared files
+include: os.path.join(os.path.dirname(workflow.snakefile), "internals.snakefile")   # paths to executables
+include: os.path.join(maindir, "shared", "load_organisms.snakefile")    # loading organism indices, GTF, etc.
+
+
+## conditional or optional rule output files ###################################
+def do_TrimGalore(trim):
+    if trim:
+        return( expand("TrimGalore/{sample}{read}.fastq.gz", sample=samples, read=reads) +
+                expand("FastQC_on_TrimGalore/{sample}{read}_fastqc.html", sample=samples, read=reads) )
+    else:
+        return([])
+
+
+def do_InsertSizeMetrics(paired):
+    if paired:
+        return( expand("InsertSizeMetrics/{sample}.mean.txt", sample=samples) )
+    else:
+        return([])
+
+
+## main rule ###################################################################
+rule all:
+    input:
+        ##expand("FASTQ/{sample}{read}.fastq.gz", sample=samples, read=reads),
+        expand("FastQC/{sample}{read}_fastqc.html", sample=samples, read=reads),
+        do_TrimGalore(trim),
+        expand("Bowtie2/{sample}.bam.bai", sample=samples),
+        expand("AlignmentSummaryMetrics/{sample}.AlignmentSummaryMetrics.txt", sample=samples),
+        do_InsertSizeMetrics(paired),
+        expand("Qualimap/{sample}.bamqc.html", sample=samples),
+        expand("Qualimap/{sample}.bamqc.txt", sample=samples),
+
+
+## rules #######################################################################
+include: os.path.join(os.path.dirname(workflow.snakefile), "rules.snakefile")

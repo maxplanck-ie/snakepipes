@@ -1,0 +1,5 @@
+genome_size = "2150570000"
+genome_fasta = "/data/repository/organisms/GRCm38_ensembl/genome_fasta/genome.fa"
+genome_2bit = "/data/repository/organisms/GRCm38_ensembl/genome_fasta/genome.2bit"
+Bowtie2Index = "/data/repository/organisms/GRCm38_ensembl/BowtieIndex/genome"
+genes_bed = "/data/repository/organisms/GRCm38_ensembl/gencode/m5/genes.bed"

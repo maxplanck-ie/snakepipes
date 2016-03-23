@@ -1,0 +1,31 @@
+#indir: /data/manke/kilpert/Vogel/H3K79me2/new_mapping
+indir: /data/manke/kilpert/Vogel/H3K79me2/new_mapping/chip-seq_workflow/indir/
+outdir: ./outdir/
+genome: mm10
+downsampling: 500000
+email: kilpert@ie-freiburg.mpg.de
+# verbose: True
+# reads:
+#   - _R1
+#   - _R2
+# ext: .fastq.gz
+# get_from: indir
+
+samples:
+  - ChIP: K79_1
+    Input: K79_1_Input
+
+  - ChIP: K79_2
+    Input: K79_2_Input
+
+  - ChIP: K4_C_1
+    Input: K4_C_1_Input
+
+  - ChIP: K4_C_2
+    Input: K4_C_2_Input
+
+  - ChIP: K4_R_1
+    Input: K4_R_1_Input
+
+  - ChIP: K4_R_2
+    Input: K4_R_2_Input
