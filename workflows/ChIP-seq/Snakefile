@@ -34,6 +34,13 @@ def do_InsertSizeMetrics(paired):
         return([])
 
 
+def do_PEFragmentSize(paired):
+    if paired:
+        return( expand("PEFragmentSize/{sample}.PEFragmentSize.png", sample=samples) )
+    else:
+        return([])
+
+
 ## main rule ###################################################################
 rule all:
     input:
@@ -59,7 +66,7 @@ rule all:
         "correlation/heatmap_genome_Pearson.png",
         "correlation/heatmap_genome_Spearman.png",
         "correlation/PCA_genome.png",
-        expand("PEFragmentSize/{sample}.PEFragmentSize.png", sample=samples),
+        do_PEFragmentSize(paired),
         ##"heatmap/matrix.genes.gz",
         "heatmap/heatmap.genes.png",
         "heatmap/profile.genes.png",
@@ -276,20 +283,21 @@ rule plotPCA:
 
 
 ## bamPEFragmentSize ###########################################################
-rule bamPEFragmentSize:
-    input:
-        bam = "Bowtie2/{sample}.bam",
-        bai = "Bowtie2/{sample}.bam.bai",
-    output:
-        png = "PEFragmentSize/{sample}.PEFragmentSize.png",
-        txt = "PEFragmentSize/{sample}.PEFragmentSize.txt"
-    benchmark:  "PEFragmentSize/.benchmark/deepTools_bamPEFragmentSize.{sample}.benchmark"
-    threads: 2
-    shell:  os.path.join(deepTools2_dir,"bamPEFragmentSize") + " -p {threads} "
-            "--histogram {output.png} "
-            "--plotTitle 'Histogram of paired-end fragment sizes' "
-            "{input.bam} "
-            "| tee {output.txt} "
+if paired:
+    rule bamPEFragmentSize:
+        input:
+            bam = "Bowtie2/{sample}.bam",
+            bai = "Bowtie2/{sample}.bam.bai",
+        output:
+            png = "PEFragmentSize/{sample}.PEFragmentSize.png",
+            txt = "PEFragmentSize/{sample}.PEFragmentSize.txt"
+        benchmark:  "PEFragmentSize/.benchmark/deepTools_bamPEFragmentSize.{sample}.benchmark"
+        threads: 2
+        shell:  os.path.join(deepTools2_dir,"bamPEFragmentSize") + " -p {threads} "
+                "--histogram {output.png} "
+                "--plotTitle 'Histogram of paired-end fragment sizes' "
+                "{input.bam} "
+                "| tee {output.txt} "
 
 
 ## heatmap ####################################################################
@@ -361,8 +369,8 @@ rule plotCoverage:
 
 
 ## End #########################################################################
-onsuccess:
-    print("Workflow finished, no error")
+## onsuccess:
+##     print("Workflow finished successfully.")
 
 
 ## benchmark ###################################################################
