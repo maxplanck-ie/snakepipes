@@ -45,4 +45,5 @@ rule rMATS_paired_bam:
                 "-gtf {input.gtf} "
                 "-bi {params.bowtieIndexBase} "
                 "-o {params.outdir} "
-                "-len 50 -t paired -analysis U -c 0.0001 -libType fr-firststrand " )
+                "-len 50 -t paired -analysis U -c 0.0001 -libType fr-firststrand "
+                "2>&1 | tee {log} " )
