@@ -36,3 +36,6 @@ plotCoverage:
 
 Qualimap_bamqc:
   n : 10
+
+rMATS_paired_bam:
+  n : 4
