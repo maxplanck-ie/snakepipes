@@ -1,20 +1,15 @@
 #!/usr/bin/env python3
 
-__version__ = "0.0.1"
+__version__ = "0.1.0"
 
 __description__ = """
 DNA-mapping workflow v{version} - MPI-IE workflow for DNA-mapping
-Fabian Kilpert
-March 23, 2016
+Fabian Kilpert, Andreas Richter
+June 15, 2016
 
 Usage example:
     DNA-mapping
 """.format(version=__version__)
-
-
-## Defaults
-max_jobs = 6
-local_cores = 32
 
 
 import argparse
@@ -32,19 +27,22 @@ def parse_args():
     """
 
     parser = argparse.ArgumentParser(
-    prog=sys.argv[0],
-    formatter_class=argparse.RawDescriptionHelpFormatter, description=textwrap.dedent(__description__))
+        prog=sys.argv[0],
+        formatter_class=argparse.RawDescriptionHelpFormatter, description=textwrap.dedent(__description__)
+    )
 
     ## optional
     parser.add_argument("-g", "--genome", dest="genome", required=True, help="genome acronym of target organism (e.g. mm10)")
     parser.add_argument("-c", "--configfile", dest="configfile", help="configuration file (config.yaml)", default=None)
-    parser.add_argument("-i", "--input-dir", dest="indir", help="input dir containing (FASTQ)", default=None)
+    parser.add_argument("-i", "--input-dir", dest="indir", help="input directory containing the FASTQ files", default=None)
     parser.add_argument("-o", "--output-dir", dest="outdir", help="output directory", default=None)
-    parser.add_argument("-j", "--jobs", dest="max_jobs", metavar="INT", help="maximum number of simultaneous grid engine jobs (default: '%(default)s')", type=int, default=max_jobs)
-    parser.add_argument("-r", "--rerun-incomplete", dest="rerun_incomplete", action="store_true", default=False, help="rerun incomplete files only")
-    parser.add_argument("-F", "--forceall", dest="forceall", action="store_true", default=False, help="Force rerun")
-    parser.add_argument("--downsample", dest="downsample", metavar="INT", help="downsample reads from the head of each FASTQ file", default=None)
-    parser.add_argument("--trim", dest="trim", action="store_true", default=False, help="Trim with TrimGalore")
+    parser.add_argument("-j", "--jobs", dest="max_jobs", metavar="INT", help="maximum number of concurrently submitted grid engine jobs (default: '%(default)s')", type=int, default=999)
+    parser.add_argument("-r", "--rerun-incomplete", dest="rerun_incomplete", action="store_true", default=False, help="rerun all jobs with incomplete output files")
+    parser.add_argument("-F", "--forceall", dest="forceall", action="store_true", default=False, help="force full rerun")
+    parser.add_argument("--downsample", dest="downsample", metavar="INT", help="downsample the given number of reads from the head of each FASTQ file", type=int, default=None)
+    parser.add_argument("--trim", dest="trim", action="store_true", default=False, help="trim reads with TrimGalore")
+    parser.add_argument("--fastqc", dest="fastqc", action="store_true", default=False, help="run FastQC read quality control")
+    parser.add_argument("--bw-binsize", dest="bw_binsize", metavar="INT", help="bin size of output files in bigWig format (default: '%(default)s')", type=int, default=10)
     parser.add_argument("-v", "--verbose", dest="verbose", action="store_true", default=False, help="verbose output")
 
     ## positional
@@ -76,18 +74,23 @@ def parse_args():
     except:
         args.downsample = None
 
+    try:
+        args.bw_binsize = int(args.bw_binsize)
+    except:
+        args.bw_binsize = None
+
     return args
 
 
 def main():
     args = parse_args()
 
-    ## Require shared biosnake directory
+    ## Require shared snakemake workflow directory
     this_script_dir = os.path.dirname(os.path.realpath(__file__))
 
     main_dir_path = os.path.join(os.path.dirname(os.path.dirname(this_script_dir)))
     if not os.path.isdir(main_dir_path):
-        print("Error! Shared biosnake directory NOT available at:", main_dir_path)
+        print("Error! Shared snakemake workflow directory is NOT available at:", main_dir_path)
         exit(1)
 
     ## Output directory + log directory
@@ -96,32 +99,36 @@ def main():
 
     ## required
     user_configs = "--config maindir={main_dir_path} indir={indir} genome={genome}".format(
-                                main_dir_path=main_dir_path,
-                                indir=args.indir,
-                                genome=args.genome).split()
+                                main_dir_path = main_dir_path,
+                                indir = args.indir,
+                                genome = args.genome).split()
+
     ## optional
     if args.downsample:
         user_configs += ["downsample={}".format(args.downsample)]
     if args.trim:
         user_configs += ["trim=True"]
+    if args.fastqc:
+        user_configs += ["fastqc=True"]
+    if args.bw_binsize:
+        user_configs += ["bw_binsize={}".format(args.bw_binsize)]
 
-    snakemake_module_load = "module load snakemake &&".split()
+
+    snakemake_module_load = "module load snakemake slurm &&".split()
     snakemake_cmd = """
-                    snakemake {user_configs} -p --local-cores {local_cores} --jobs {max_jobs} --directory {outdir} --snakefile {snakefile} --cluster-config {cluster_config} --cluster 'qsub -pe smp {{cluster.n}} -o {cluster_logs_dir} -e {cluster_logs_dir}' --jobname '{{rulename}}.{{jobid}}.snakejob'
-                    """.format( user_configs=" ".join(user_configs),
-                                snakefile=os.path.join(this_script_dir, "Snakefile"),
-                                local_cores = local_cores,
-                                max_jobs=args.max_jobs,
-                                cluster_config=os.path.join(main_dir_path,"shared","cluster.yaml"),
-                                indir=args.indir,
-                                outdir=args.outdir,
-                                cluster_logs_dir=os.path.abspath(cluster_logs_dir),
-                                genome=args.genome,
-                                main_dir_path=main_dir_path,
-                                configfile=args.configfile).split()
+                    snakemake --snakefile {snakefile} --jobs {max_jobs} {user_configs} --directory {outdir} --cluster 'SlurmEasy --threads {{threads}} --log {cluster_logs_dir}' --jobname '{{rulename}}.{{jobid}}.snakejob'
+                    """.format( snakefile = os.path.join(this_script_dir, "Snakefile"),
+                                max_jobs = args.max_jobs,
+                                user_configs = " ".join(user_configs),
+                                outdir = args.outdir,
+                                cluster_logs_dir = os.path.abspath(cluster_logs_dir)
+                              ).split()
 
     if args.configfile:
         snakemake_cmd += ["--configfile", args.configfile]
+
+    if args.verbose:
+        snakemake_cmd.append("--printshellcmds")
 
     if args.rerun_incomplete:
         snakemake_cmd.append("--rerun-incomplete")

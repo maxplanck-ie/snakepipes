@@ -28,7 +28,7 @@ rule plotFingerprint:
     params:
         binsize = 25,
         fragment_length = default_fragment_length     # Relevant for single-end paired_read_ext only!
-    log:    "plotFingerprint/log/{sample}.log"
+    log:    "plotFingerprint/logs/{sample}.log"
     benchmark:  "plotFingerprint/.benchmark/deepTools_plotFingerprint.{sample}.benchmark"
     threads : 30
     run:

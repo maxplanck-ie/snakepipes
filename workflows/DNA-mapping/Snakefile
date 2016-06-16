@@ -9,42 +9,102 @@ import os
 #    print("#"*80)
 
 
-## Include scripts #############################################################
-maindir = workflow.overwrite_config["maindir"]      # main workflow directory
+### include scripts ############################################################
+################################################################################
+# main directory of all snakemake workflows
+#maindir = workflow.overwrite_config["maindir"]
+maindir = "/home/arichter/projects/snakemake/snakemake_workflows/"
 
-include: os.path.join(maindir, "shared", "paths.py")        # shared files
-include: os.path.join(os.path.dirname(workflow.snakefile), "internals.snakefile")   # paths to executables
-include: os.path.join(maindir, "shared", "load_organisms.snakefile")    # loading organism indices, GTF, etc.
+# include tool paths
+include: os.path.join(maindir, "shared", "paths.py")
+# include global variables and functions
+include: os.path.join(workflow.basedir, "internals.snakefile")
+# load organism-specific data, i.e. genome indices, annotation, etc.
+include: os.path.join(maindir, "shared", "load_organism_data.py")
 
 
-## conditional or optional rule output files ###################################
-def do_TrimGalore(trim):
-    if trim:
-        return( expand("TrimGalore/{sample}{read}.fastq.gz", sample=samples, read=reads) +
-                expand("FastQC_on_TrimGalore/{sample}{read}_fastqc.html", sample=samples, read=reads) )
+### include modules of other snakefiles ########################################
+################################################################################
+# FASTQ: either downsample FASTQ files or create symlinks
+if downsample:
+    include: os.path.join(maindir, "shared", "rules", "FASTQ_downsample.snakefile")
+else:
+    include: os.path.join(maindir, "shared", "rules", "FASTQ_symlink.snakefile")
+
+# FastQC
+if fastqc:
+    include: os.path.join(maindir, "shared", "rules", "FastQC.snakefile")
+
+# TrimGalore
+if trim:
+    include: os.path.join(maindir, "shared", "rules", "TrimGalore.snakefile")
+
+# Bowtie2 and Picard MarkDuplicates
+include: os.path.join(maindir, "shared", "rules", "Bowtie2_and_MarkDuplicates.snakefile")
+
+# Picard CollectAlignmentSummaryMetrics and CollectInsertSizeMetrics
+include: os.path.join(maindir, "shared", "rules", "Picard_qc.snakefile")
+
+# deepTools
+include: os.path.join(maindir, "shared", "rules", "deepTools.snakefile")
+
+# Qualimap BAM QC
+include: os.path.join(maindir, "shared", "rules", "Qualimap_bamqc.snakefile")
+
+
+### conditional/optional rules #################################################
+################################################################################
+def run_FastQC(fastqc):
+    if fastqc:
+        return( expand("FastQC/{sample}{read}_fastqc.html", sample=samples, read=reads) )
     else:
         return([])
 
+def run_TrimGalore(trim):
+    if trim and fastqc:
+        return( expand("FastQC_on_TrimGalore/{sample}{read}_fastqc.html", sample=samples, read=reads) )
+    elif trim:
+        return( expand("FASTQ_TrimGalore/{sample}{read}.fastq.gz", sample=samples, read=reads) )
+    else:
+        return([])
 
-def do_InsertSizeMetrics(paired):
+def run_CollectInsertSizeMetrics(paired):
     if paired:
-        return( expand("InsertSizeMetrics/{sample}.mean.txt", sample=samples) )
+        return( expand("Picard_qc/InsertSizeMetrics/{sample}.insert_size_metrics.txt", sample=samples) )
     else:
         return([])
 
 
-## main rule ###################################################################
+### main rule ##################################################################
+################################################################################
 rule all:
     input:
-        ##expand("FASTQ/{sample}{read}.fastq.gz", sample=samples, read=reads),
-        expand("FastQC/{sample}{read}_fastqc.html", sample=samples, read=reads),
-        do_TrimGalore(trim),
+    # TODO: add optional BAM filtering by quality, duplicates and secondary alignments after mapping and duplicate marking
+        expand("FASTQ/{sample}{read}.fastq.gz", sample=samples, read=reads),
+        run_FastQC(fastqc),
+        run_TrimGalore(trim),
         expand("Bowtie2/{sample}.bam.bai", sample=samples),
-        expand("AlignmentSummaryMetrics/{sample}.AlignmentSummaryMetrics.txt", sample=samples),
-        do_InsertSizeMetrics(paired),
-        expand("Qualimap/{sample}.bamqc.html", sample=samples),
-        expand("Qualimap/{sample}.bamqc.txt", sample=samples),
-
-
-## rules #######################################################################
-include: os.path.join(os.path.dirname(workflow.snakefile), "rules.snakefile")
+        expand("Picard_qc/AlignmentSummaryMetrics/{sample}.alignment_summary_metrics.txt", sample=samples),
+        run_CollectInsertSizeMetrics(paired),
+        expand("bamCoverage/{sample}.SeqDepthNorm.bw", sample=samples),
+        expand("deepTools_qc/computeGCBias/{sample}.GCBias.png", sample=samples),
+        "deepTools_qc/plotCoverage/read_coverage.png",
+        "deepTools_qc/plotCorrelation/correlation.pearson.read_coverage.heatmap.png",
+        "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage.heatmap.png",
+        "deepTools_qc/plotPCA/PCA.read_coverage.png",
+        expand("Qualimap_qc/{sample}.bamqc_report.html", sample=samples),
+        expand("Qualimap_qc/{sample}.bamqc_results.txt", sample=samples),
+    run:
+        print("\n--- Workflow parameter ---------------------------------------------------------")
+        print("Indir:", indir)
+        print("Infiles:", infiles)
+        print("Samples:", samples)
+        print("Paired:", paired)
+        print("Reads:", reads)
+        print("Genome:", genome)
+        print("Downsample:", downsample)
+        print("Trim:", trim)
+        print("FastQC:", fastqc)
+        print("BigWig bin size:", bw_binsize)
+        print("FastQ directory for mapping:", fastq_dir)
+        print("-" * 80, "\n")

@@ -2,14 +2,14 @@ import glob
 import os
 
 
-## Functions ###################################################################
+### Functions ##################################################################
 
 def get_sample_names(infiles):
     """
-    Get sample names without extensions
+    Get sample names without file extensions
     """
     s = []
-    for x in sorted(glob.glob(os.path.join(indir, '*'+ext))):
+    for x in infiles:
         x = os.path.basename(x).replace(ext,"")
         try:
             x = x.replace(reads[0],"").replace(reads[1],"")
@@ -21,7 +21,7 @@ def get_sample_names(infiles):
 
 def is_paired(infiles):
     """
-    Check for paired input files
+    Check for paired-end input files
     """
     paired = False
     infiles_dic = {}
@@ -38,34 +38,38 @@ def is_paired(infiles):
                 infiles_dic[bname].append(infile)
     if infiles_dic and max([len(x) for x in infiles_dic.values()]) == 2:
         paired = True
+    # TODO: raise exception if single-end and paired-end files are mixed
     return(paired)
 
 
-def get_from_file(a, infile):
+def get_fragment_length(infile):
     """
+    Return median insert size from a metrics file created by
+    Picard CollectInsertSizeMetrics
     Read 2 column text file, grep line by 1st column, return 2nd
     """
-    b = None
-    with open(infile,"r") as f:
+    with open(infile, "r") as f:
         for line in f:
             line = line.strip()
-            if line.startswith(a):
+            if line.startswith("MEDIAN_INSERT_SIZE"):
                 try:
-                    b = line.split()[1]
+                    median = next(f).split()[0]
+                    return(median)
                 except:
-                    b = ""
-                break
-    return(b)
+                    print("Error! File", infile, "is NOT a proper Picard CollectInsertSizeMetrics metrics file.\n")
+                    exit(1)
+    # no match in infile
+    print("Error! File", infile, "is not a proper Picard CollectInsertSizeMetrics metrics file.")
+    exit(1)
 
-
-## Variable defaults ###########################################################
+### Variable defaults ##########################################################
 
 try:
     indir = config["indir"]
 except:
     indir = os.getcwd()
 
-## paired reads extensions
+## paired-end read name extension
 try:
     reads = config["reads"]
 except:
@@ -77,7 +81,7 @@ try:
 except:
     ext = ".fastq.gz"
 
-## Downsample (number of reads)
+## downsampling - number of reads
 try:
     downsample = int(config["downsample"])
 except:
@@ -99,10 +103,23 @@ except:
     fragment_length = 200
 
 try:
-    if config["trim"] == "True":
+    if config["trim"] == True:
         trim = True
+        fastq_dir = "FASTQ_TrimGalore"
+    else:
+        trim = False
+        fastq_dir = "FASTQ"
 except:
     trim = False
+    fastq_dir = "FASTQ"
+
+try:
+    if config["fastqc"] == True:
+        fastqc = True
+    else:
+        fastqc = False
+except:
+    fastqc = False
 
 try:
     trim_galore_opts = config["trim_galore_opts"]
@@ -110,15 +127,9 @@ except:
     trim_galore_opts = "--stringency 2"
 
 try:
-    binsize = int(config["binsize"])
+    bw_binsize = int(config["bw_binsize"])
 except:
-    binsize = 25
-
-## Default input directory for the mapping program
-if trim:
-    fastq_dir = "TrimGalore"
-else:
-    fastq_dir = "FASTQ"
+    bw_binsize = 10
 
 
 infiles = sorted(glob.glob(os.path.join(indir, '*'+ext)))
@@ -128,10 +139,3 @@ paired = is_paired(infiles)
 
 if not paired:
     reads = [""]
-
-
-################################################################################
-# print("Indir:", indir)
-# print("Infiles:", infiles)
-# print("Samples:", samples)
-# print("Downsample:", downsample)

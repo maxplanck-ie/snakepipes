@@ -14,7 +14,7 @@ import os
 maindir = workflow.overwrite_config["maindir"]      # main workflow directory
 
 include: os.path.join(maindir, "shared", "paths.py")        # shared files
-include: os.path.join(os.path.dirname(workflow.snakefile), "internals.snakefile")   # paths to executables
+include: os.path.join(workflow.basedir, "internals.snakefile")   # paths to executables
 include: os.path.join(maindir, "shared", "load_organisms.snakefile")    # loading organism indices, GTF, etc.
 
 
@@ -44,6 +44,7 @@ def do_PEFragmentSize(paired):
 ## main rule ###################################################################
 rule all:
     input:
+        # TODO: use better snakemake sub-workflows instead
         ## DNA-mapping files ###################################################
         ##expand("FASTQ/{sample}{read}.fastq.gz", sample=samples, read=reads),
         expand("FastQC/{sample}{read}_fastqc.html", sample=samples, read=reads),
@@ -116,7 +117,7 @@ rule plotFingerprint:
     params:
         binsize = binsize,
         fragment_length = fragment_length     # Relevant for single-end paired_read_ext only!
-    log:    "plotFingerprint/log/{sample}.log"
+    log:    "plotFingerprint/logs/{sample}.log"
     benchmark:  "plotFingerprint/.benchmark/deepTools_plotFingerprint.{sample}.benchmark"
     threads : 30
     run:
@@ -130,47 +131,47 @@ rule plotFingerprint:
                 "2>&1 | tee {log} " )
 
 
-## bigWig coverage #############################################################
-if paired:
-    rule bamCoverage:
-        input:
-            bam = "Bowtie2/{sample}.bam",
-            bai = "Bowtie2/{sample}.bam.bai",
-            mean_file = "InsertSizeMetrics/{sample}.mean.txt"
-        output: "bigWig/{sample}.bw"
-        threads: 30
-        params:
-            binsize = binsize,
-            fragment_length = fragment_length     # Relevant for single-end reads only!
-        log:    "bigWig/log/{sample}.log"
-        benchmark:  "bigWig/.benchmark/deepTools_bamCoverage.{sample}.benchmark"
-        run:
-            try:
-                fragment_length = int(get_from_file("mean", input["mean_file"]))
-            except:
-                fragment_length = fragment_length
-            shell( os.path.join(deepTools2_dir,"bamCoverage") + " -p {threads} "
-                "-b {input.bam} -o {output} "
-                "--binSize={params.binsize} "
-                "--extendReads {params.fragment_length} "
-                "2>&1 | tee {log} " )
-else:
-    rule bamCoverage:
-        input:
-            bam = "Bowtie2/{sample}.bam",
-            bai = "Bowtie2/{sample}.bam.bai"
-        output: "bigWig/{sample}.bw"
-        threads: 30
-        params:
-            binsize = binsize,
-            fragment_length = fragment_length     # Relevant for single-end reads only!
-        log:    "bigWig/log/{sample}.log"
-        benchmark:  "bigWig/.benchmark/deepTools_bamCoverage.{sample}.benchmark"
-        shell:  os.path.join(deepTools2_dir,"bamCoverage") + " -p {threads} "
-                "-b {input.bam} -o {output} "
-                "--binSize={params.binsize} "
-                "--extendReads {params.fragment_length} "
-                "2>&1 | tee {log} "
+# ## bigWig coverage #############################################################
+# if paired:
+#     rule bamCoverage:
+#         input:
+#             bam = "Bowtie2/{sample}.bam",
+#             bai = "Bowtie2/{sample}.bam.bai",
+#             mean_file = "InsertSizeMetrics/{sample}.mean.txt"
+#         output: "bigWig/{sample}.bw"
+#         threads: 30
+#         params:
+#             binsize = binsize,
+#             fragment_length = fragment_length     # Relevant for single-end reads only!
+#         log:    "bigWig/logs/{sample}.log"
+#         benchmark:  "bigWig/.benchmark/deepTools_bamCoverage.{sample}.benchmark"
+#         run:
+#             try:
+#                 fragment_length = int(get_from_file("mean", input["mean_file"]))
+#             except:
+#                 fragment_length = fragment_length
+#             shell( os.path.join(deepTools2_dir,"bamCoverage") + " -p {threads} "
+#                 "-b {input.bam} -o {output} "
+#                 "--binSize={params.binsize} "
+#                 "--extendReads {params.fragment_length} "
+#                 "2>&1 | tee {log} " )
+# else:
+#     rule bamCoverage:
+#         input:
+#             bam = "Bowtie2/{sample}.bam",
+#             bai = "Bowtie2/{sample}.bam.bai"
+#         output: "bigWig/{sample}.bw"
+#         threads: 30
+#         params:
+#             binsize = binsize,
+#             fragment_length = fragment_length     # Relevant for single-end reads only!
+#         log:    "bigWig/logs/{sample}.log"
+#         benchmark:  "bigWig/.benchmark/deepTools_bamCoverage.{sample}.benchmark"
+#         shell:  os.path.join(deepTools2_dir,"bamCoverage") + " -p {threads} "
+#                 "-b {input.bam} -o {output} "
+#                 "--binSize={params.binsize} "
+#                 "--extendReads {params.fragment_length} "
+#                 "2>&1 | tee {log} "
 
 
 ## bigWig log2ratio ############################################################
@@ -182,7 +183,7 @@ rule bamCompare:
     params:
         binsize = binsize,
         fragment_length = fragment_length     # Relevant for single-end reads only!
-    log:    "log2ratio/log/{sample}.log"
+    log:    "log2ratio/logs/{sample}.log"
     benchmark:  "log2ratio/.benchmark/deepTools_bamCompare_log2ratio.{sample}.benchmark"
     threads: 30
     run:
@@ -195,91 +196,91 @@ rule bamCompare:
                 "2>&1 | tee {log} " )
 
 
-## correlation #################################################################
-rule multiBamSummary_genome:
-    input:
-        bam = [expand("Bowtie2/{sample}.bam", sample=samples)],
-        bai = [expand("Bowtie2/{sample}.bam.bai", sample=samples)]
-    output: "correlation/read_coverages_bins.npz"
-    log:    "correlation/log/read_coverages_bins.log"
-    benchmark:  "correlation/.benchmark/deepTools_multiBamSummary.benchmark"
-    params:
-        labels=samples
-    threads: 20
-    shell:  os.path.join(deepTools2_dir,"multiBamSummary") + " bins -p {threads} "
-            "--bamfiles {input.bam} --outFileName {output} "
-            "--labels {params.labels}"
-            "2>&1 | tee {log} "
-
-
-## plotCorrelation: scatterplot
-rule plotCorrelation_scatterplot_genome_Pearson:
-    input:  "correlation/read_coverages_bins.npz"
-    output:
-        png = "correlation/scatterplot_genome_Pearson.png",
-        tsv = "correlation/scatterplot_genome_Pearson.tsv"
-    log:    "correlation/log/plotCorrelation_scatterplot_genome_Pearson.log"
-    benchmark:  "correlation/.benchmark/deepTools_plotCorrelation_scatterplot_Pearson.genome.benchmark"
-    shell:  os.path.join(deepTools2_dir,"plotCorrelation") + " --skipZeros "
-            "-in {input} --corMethod pearson --whatToPlot scatterplot "
-            "--plotTitle 'Pearson correlation scatterplot (genome)' "
-            "-o {output.png} --outFileCorMatrix {output.tsv} "
-            "2>&1 | tee {log} "
-
-
-rule plotCorrelation_scatterplot_genome_Spearman:
-    input:  "correlation/read_coverages_bins.npz"
-    output:
-        png = "correlation/scatterplot_genome_Spearman.png",
-        tsv = "correlation/scatterplot_genome_Spearman.tsv"
-    log:    "correlation/log/plotCorrelation_scatterplot_genome_Spearman.log"
-    benchmark:  "correlation/.benchmark/deepTools_plotCorrelation_scatterplot_Spearman.genome.benchmark"
-    shell:  os.path.join(deepTools2_dir,"plotCorrelation") + " --skipZeros "
-            "-in {input} --corMethod spearman --whatToPlot scatterplot "
-            "--plotTitle 'Spearman correlation scatterplot (genome)' "
-            "-o {output.png} --outFileCorMatrix {output.tsv} "
-            "2>&1 | tee {log} "
-
-
-## plotCorrelation: heatmap
-rule plotCorrelation_heatmap_genome_Pearson:
-    input:  "correlation/read_coverages_bins.npz"
-    output:
-        png = "correlation/heatmap_genome_Pearson.png",
-        tsv = "correlation/heatmap_genome_Pearson.tsv"
-    log:    "correlation/log/plotCorrelation_heatmap_genome_Pearson.log"
-    benchmark:  "correlation/.benchmark/deepTools_plotCorrelation_heatmap_Pearson.genome.benchmark"
-    shell:  os.path.join(deepTools2_dir,"plotCorrelation") + " --skipZeros --colorMap RdYlBu --plotNumbers "
-            "-in {input} --corMethod pearson --whatToPlot heatmap "
-            "--plotTitle 'Pearson correlation heatmap (genome)' "
-            "-o {output.png} --outFileCorMatrix {output.tsv} "
-            "2>&1 | tee {log} "
-
-
-rule plotCorrelation_heatmap_genome_Spearman:
-    input:  "correlation/read_coverages_bins.npz"
-    output:
-        png = "correlation/heatmap_genome_Spearman.png",
-        tsv = "correlation/heatmap_genome_Spearman.tsv"
-    log:    "correlation/log/plotCorrelation_heatmap_genome_Spearman.log"
-    benchmark:  "correlation/.benchmark/deepTools_plotCorrelation_heatmap_Spearman.genome.benchmark"
-    shell:  os.path.join(deepTools2_dir,"plotCorrelation") + " --skipZeros --colorMap RdYlBu --plotNumbers "
-            "-in {input} --corMethod spearman --whatToPlot heatmap "
-            "--plotTitle 'Spearman correlation heatmap (genome)' "
-            "-o {output.png} --outFileCorMatrix {output.tsv} "
-            "2>&1 | tee {log} "
-
-
-## plotPCA
-rule plotPCA:
-    input:  "correlation/read_coverages_bins.npz"
-    output: "correlation/PCA_genome.png"
-    log:    "correlation/log/plotPCA_genome.log"
-    benchmark:  "correlation/.benchmark/deepTools_plotPCA.benchmark"
-    shell:  os.path.join(deepTools2_dir,"plotPCA") + " -T 'PCA of read counts' "
-            "-in {input} "
-            "-o {output} "
-            "2>&1 | tee {log} "
+# ## correlation #################################################################
+# rule multiBamSummary_genome:
+#     input:
+#         bam = [expand("Bowtie2/{sample}.bam", sample=samples)],
+#         bai = [expand("Bowtie2/{sample}.bam.bai", sample=samples)]
+#     output: "correlation/read_coverages_bins.npz"
+#     log:    "correlation/logs/read_coverages_bins.log"
+#     benchmark:  "correlation/.benchmark/deepTools_multiBamSummary.benchmark"
+#     params:
+#         labels=samples
+#     threads: 20
+#     shell:  os.path.join(deepTools2_dir,"multiBamSummary") + " bins -p {threads} "
+#             "--bamfiles {input.bam} --outFileName {output} "
+#             "--labels {params.labels}"
+#             "2>&1 | tee {log} "
+#
+#
+# ## plotCorrelation: scatterplot
+# rule plotCorrelation_scatterplot_genome_Pearson:
+#     input:  "correlation/read_coverages_bins.npz"
+#     output:
+#         png = "correlation/scatterplot_genome_Pearson.png",
+#         tsv = "correlation/scatterplot_genome_Pearson.tsv"
+#     log:    "correlation/logs/plotCorrelation_scatterplot_genome_Pearson.log"
+#     benchmark:  "correlation/.benchmark/deepTools_plotCorrelation_scatterplot_Pearson.genome.benchmark"
+#     shell:  os.path.join(deepTools2_dir,"plotCorrelation") + " --skipZeros "
+#             "-in {input} --corMethod pearson --whatToPlot scatterplot "
+#             "--plotTitle 'Pearson correlation scatterplot (genome)' "
+#             "-o {output.png} --outFileCorMatrix {output.tsv} "
+#             "2>&1 | tee {log} "
+#
+#
+# rule plotCorrelation_scatterplot_genome_Spearman:
+#     input:  "correlation/read_coverages_bins.npz"
+#     output:
+#         png = "correlation/scatterplot_genome_Spearman.png",
+#         tsv = "correlation/scatterplot_genome_Spearman.tsv"
+#     log:    "correlation/logs/plotCorrelation_scatterplot_genome_Spearman.log"
+#     benchmark:  "correlation/.benchmark/deepTools_plotCorrelation_scatterplot_Spearman.genome.benchmark"
+#     shell:  os.path.join(deepTools2_dir,"plotCorrelation") + " --skipZeros "
+#             "-in {input} --corMethod spearman --whatToPlot scatterplot "
+#             "--plotTitle 'Spearman correlation scatterplot (genome)' "
+#             "-o {output.png} --outFileCorMatrix {output.tsv} "
+#             "2>&1 | tee {log} "
+#
+#
+# ## plotCorrelation: heatmap
+# rule plotCorrelation_heatmap_genome_Pearson:
+#     input:  "correlation/read_coverages_bins.npz"
+#     output:
+#         png = "correlation/heatmap_genome_Pearson.png",
+#         tsv = "correlation/heatmap_genome_Pearson.tsv"
+#     log:    "correlation/logs/plotCorrelation_heatmap_genome_Pearson.log"
+#     benchmark:  "correlation/.benchmark/deepTools_plotCorrelation_heatmap_Pearson.genome.benchmark"
+#     shell:  os.path.join(deepTools2_dir,"plotCorrelation") + " --skipZeros --colorMap RdYlBu --plotNumbers "
+#             "-in {input} --corMethod pearson --whatToPlot heatmap "
+#             "--plotTitle 'Pearson correlation heatmap (genome)' "
+#             "-o {output.png} --outFileCorMatrix {output.tsv} "
+#             "2>&1 | tee {log} "
+#
+#
+# rule plotCorrelation_heatmap_genome_Spearman:
+#     input:  "correlation/read_coverages_bins.npz"
+#     output:
+#         png = "correlation/heatmap_genome_Spearman.png",
+#         tsv = "correlation/heatmap_genome_Spearman.tsv"
+#     log:    "correlation/logs/plotCorrelation_heatmap_genome_Spearman.log"
+#     benchmark:  "correlation/.benchmark/deepTools_plotCorrelation_heatmap_Spearman.genome.benchmark"
+#     shell:  os.path.join(deepTools2_dir,"plotCorrelation") + " --skipZeros --colorMap RdYlBu --plotNumbers "
+#             "-in {input} --corMethod spearman --whatToPlot heatmap "
+#             "--plotTitle 'Spearman correlation heatmap (genome)' "
+#             "-o {output.png} --outFileCorMatrix {output.tsv} "
+#             "2>&1 | tee {log} "
+#
+#
+# ## plotPCA
+# rule plotPCA:
+#     input:  "correlation/read_coverages_bins.npz"
+#     output: "correlation/PCA_genome.png"
+#     log:    "correlation/logs/plotPCA_genome.log"
+#     benchmark:  "correlation/.benchmark/deepTools_plotPCA.benchmark"
+#     shell:  os.path.join(deepTools2_dir,"plotPCA") + " -T 'PCA of read counts' "
+#             "-in {input} "
+#             "-o {output} "
+#             "2>&1 | tee {log} "
 
 
 ## bamPEFragmentSize ###########################################################
@@ -308,7 +309,7 @@ rule computeMatrix_genes:
     output: "heatmap/matrix.genes.gz"
     params:
         binsize = binsize
-    log:    "heatmap/log/computeMatrix_genes.log"
+    log:    "heatmap/logs/computeMatrix_genes.log"
     benchmark:  "heatmap/.benchmark/deepTools_computeMatrix.genes.benchmark"
     threads: 30
     shell:  os.path.join(deepTools2_dir,"computeMatrix") + " scale-regions -q -p {threads} "
@@ -325,7 +326,7 @@ rule plotHeatmap_genes:
     output: "heatmap/heatmap.genes.png"
     params:
         label = [g[0] for g in groups]
-    log:    "heatmap/log/plotHeatmap_genes.log"
+    log:    "heatmap/logs/plotHeatmap_genes.log"
     benchmark:  "heatmap/.benchmark/deepTools_plotHeatmap.genes.benchmark"
     shell:  os.path.join(deepTools2_dir,"plotHeatmap") + " --heatmapWidth=5 "
             "--samplesLabel {params.label} "
@@ -339,7 +340,7 @@ rule plotProfile_genes:
     output: "heatmap/profile.genes.png"
     params:
         label = [g[0] for g in groups]
-    log:    "heatmap/log/plotProfile_genes.log"
+    log:    "heatmap/logs/plotProfile_genes.log"
     benchmark:  "heatmap/.benchmark/deepTools_plotProfile.genes.benchmark"
     shell:  os.path.join(deepTools2_dir,"plotProfile") + " "
             "--plotType=fill --perGroup --samplesLabel {params.label} "
@@ -348,24 +349,24 @@ rule plotProfile_genes:
             "2>&1 | tee {log} "
 
 
-## plotCoverage ################################################################
-rule plotCoverage:
-    input:
-        bam = [expand("Bowtie2/{sample}.bam", sample=samples)],
-        bai = [expand("Bowtie2/{sample}.bam.bai", sample=samples)],
-    output: "coverage/coverage.png"
-    log:    "coverage/log/plotCoverage.log"
-    benchmark:  "coverage/.benchmark/deepTools_plotCoverage.benchmark"
-    params:
-        labels=samples
-    threads: 10
-    shell:  os.path.join(deepTools2_dir,"plotCoverage") + " -p {threads} "
-            "-n 1000000 --ignoreDuplicates "
-            "--skipZeros "
-            "--plotTitle 'Genome coverage' "
-            "--bamfiles {input.bam} --plotFile {output} "
-            "--labels {params.labels}"
-            "2>&1 | tee {log} "
+# ## plotCoverage ################################################################
+# rule plotCoverage:
+#     input:
+#         bam = [expand("Bowtie2/{sample}.bam", sample=samples)],
+#         bai = [expand("Bowtie2/{sample}.bam.bai", sample=samples)],
+#     output: "coverage/coverage.png"
+#     log:    "coverage/logs/plotCoverage.log"
+#     benchmark:  "coverage/.benchmark/deepTools_plotCoverage.benchmark"
+#     params:
+#         labels=samples
+#     threads: 10
+#     shell:  os.path.join(deepTools2_dir,"plotCoverage") + " -p {threads} "
+#             "-n 1000000 --ignoreDuplicates "
+#             "--skipZeros "
+#             "--plotTitle 'Genome coverage' "
+#             "--bamfiles {input.bam} --plotFile {output} "
+#             "--labels {params.labels}"
+#             "2>&1 | tee {log} "
 
 
 ## End #########################################################################

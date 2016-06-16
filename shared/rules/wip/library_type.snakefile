@@ -21,7 +21,7 @@ if paired:
         threads: 4
         benchmark:  "library_type/.benchmark/library_type_Bowtie2.{sample}.benchmark"
         shell:  bowtie2_path+" -p {threads} "
-                "-x "+Bowtie2Index+" -1 {input.r1} -2 {input.r2} 2> {output.align_summary} | "
+                "-x "+bowtie2_index+" -1 {input.r1} -2 {input.r2} 2> {output.align_summary} | "
                 ""+samtools_path+" view -Sb - | "
                 ""+samtools_path+" sort -O bam -m 2G -@ 2 -T {params.tmpprefix} - > {output.accepted_hits} "
 else:
@@ -35,7 +35,7 @@ else:
         threads: 4
         benchmark:  "library_type/.benchmark/library_type_Bowtie2.{sample}.benchmark"
         shell:  bowtie2_path+" -p {threads} "
-                "-x "+Bowtie2Index+" -U {input} 2> {output.align_summary} | "
+                "-x "+bowtie2_index+" -U {input} 2> {output.align_summary} | "
                 ""+samtools_path+" view -Sb - | "
                 ""+samtools_path+" sort -O bam -m 2G -@ 2 -T {params.tmpprefix} - > {output.accepted_hits} "
 
@@ -46,7 +46,7 @@ rule library_type_RSeQC_infer_experiment:
         bed = genes_bed
     output: "library_type/{sample}.infer_experiment.txt"
     benchmark:  "library_type/.benchmark/library_type_RSeQC_infer_experiment.{sample}.benchmark"
-    log:    "library_type/log/{sample}.library_type_RSeQC_infer_experiment.log"
+    log:    "library_type/logs/{sample}.library_type_RSeQC_infer_experiment.log"
     shell:  "bash "+os.path.join(rseqc_path, "activate")+" && "
             ""+os.path.join(rseqc_path,"infer_experiment.py")+" -i {input.bam} -r {input.bed} >{output} 2>{log} "
 
@@ -54,7 +54,7 @@ rule library_type_RSeQC_infer_experiment:
 rule library_type:
     input:  [os.path.join("library_type",x+".infer_experiment.txt") for x in samples]
     output: "library_type/library_type.txt"
-    log:    "library_type/log/library_type.log"
+    log:    "library_type/logs/library_type.log"
     run:
         input = " ".join(input)
         ##print(input)

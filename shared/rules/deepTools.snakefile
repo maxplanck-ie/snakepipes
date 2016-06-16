@@ -1,0 +1,203 @@
+### deepTools bamCoverage ######################################################
+
+rule bamCoverage:
+    input:
+        bam = "Bowtie2/{sample}.bam",
+        bai = "Bowtie2/{sample}.bam.bai"
+    output:
+        "bamCoverage/{sample}.SeqDepthNorm.bw"
+    params:
+        bw_binsize = bw_binsize,
+        genome_size = int(genome_size),
+        read_extension = "--extendReads" if paired else "--extendReads "+fragment_length
+    log:
+        "bamCoverage/logs/bamCoverage.{sample}.log"
+    benchmark:
+        "bamCoverage/.benchmark/bamCoverage.{sample}.benchmark"
+    threads: 24
+    shell:
+        deepTools_path+"bamCoverage "
+        "-b {input.bam} "
+        "-o {output} "
+        "--binSize {params.bw_binsize} "
+        "-p {threads} "
+        "--normalizeTo1x {params.genome_size} "
+        "{params.read_extension} "
+        "&> {log}"
+
+
+### deepTools computeGCBias ####################################################
+
+rule computeGCBias:
+    input:
+        bam = "Bowtie2/{sample}.bam",
+        bai = "Bowtie2/{sample}.bam.bai",
+        # for single-end samples, use BAM file as dummy input file dependency
+        insert_size_metrics = "Picard_qc/InsertSizeMetrics/{sample}.insert_size_metrics.txt" if paired else "Bowtie2/{sample}.bam"
+    output:
+        png = "deepTools_qc/computeGCBias/{sample}.GCBias.png",
+        tsv = "deepTools_qc/computeGCBias/{sample}.GCBias.freq.tsv"
+    params:
+        fragment_length = fragment_length,
+        genome_size = int(genome_size),
+        genome_2bit = genome_2bit
+    log:
+        "deepTools_qc/logs/computeGCBias.{sample}.log"
+    benchmark:
+        "deepTools_qc/.benchmark/computeGCBias.{sample}.benchmark"
+    threads: 24
+    run:
+        median_fragment_length = get_fragment_length(input.insert_size_metrics) if paired else fragment_length
+        shell(
+            deepTools_path+"computeGCBias "
+            "-b {input.bam} "
+            "--biasPlot {output.png} "
+            "--GCbiasFrequenciesFile {output.tsv} "
+            "--effectiveGenomeSize {params.genome_size} "
+            "--genome {params.genome_2bit} "
+            "--fragmentLength "+median_fragment_length+" "
+            "-p {threads} "
+            "&> {log}"
+        )
+
+
+## multiBamSummary #################################################################
+
+rule multiBamSummary:
+    input:
+        bams = expand("Bowtie2/{sample}.bam", sample=samples),
+        bais = expand("Bowtie2/{sample}.bam.bai", sample=samples)
+    output:
+        "deepTools_qc/multiBamSummary/read_coverage.bins.npz"
+    params:
+        labels = " ".join(samples),
+        blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed else "",
+        read_extension = "--extendReads" if paired else "--extendReads "+fragment_length
+    log:
+        "deepTools_qc/logs/multiBamSummary.log"
+    benchmark:
+        "deepTools_qc/.benchmark/multiBamSummary.benchmark"
+    threads: 24
+    shell:
+        deepTools_path+"multiBamSummary bins "
+        "-b {input.bams} "
+        "-o {output} "
+        "--labels {params.labels} "
+        "--binSize 1000 "
+        "{params.blacklist} "
+        "-p {threads} "
+        "{params.read_extension} "
+        "&> {log}"
+
+
+### deepTools plotCorrelation ##################################################
+
+# Pearson: heatmap, scatterplot and correlation matrix
+rule plotCorrelation_pearson:
+    input:
+        "deepTools_qc/multiBamSummary/read_coverage.bins.npz"
+    output:
+        heatpng = "deepTools_qc/plotCorrelation/correlation.pearson.read_coverage.heatmap.png",
+        scatterpng = "deepTools_qc/plotCorrelation/correlation.pearson.read_coverage.scatterplot.png",
+        tsv = "deepTools_qc/plotCorrelation/correlation.pearson.read_coverage.tsv"
+    log:
+        "deepTools_qc/logs/plotCorrelation_pearson.log"
+    benchmark:
+        "deepTools_qc/.benchmark/plotCorrelation_pearson.benchmark"
+    shell:
+        deepTools_path+"plotCorrelation "
+        "-in {input} "
+        "-o {output.heatpng} "
+        "--corMethod pearson "
+        "--whatToPlot heatmap "
+        "--skipZeros "
+        "--plotTitle 'Pearson correlation of fragment coverage' "
+        "--outFileCorMatrix {output.tsv} "
+        "--colorMap coolwarm "
+        "--plotNumbers "
+        "&> {log} && "
+        +deepTools_path+"plotCorrelation "
+        "-in {input} "
+        "-o {output.scatterpng} "
+        "--corMethod pearson "
+        "--whatToPlot scatterplot "
+        "--plotTitle 'Pearson correlation of fragment coverage' "
+        "&>> {log}"
+
+# Spearman: heatmap, scatterplot and correlation matrix
+rule plotCorrelation_spearman:
+    input:
+        "deepTools_qc/multiBamSummary/read_coverage.bins.npz"
+    output:
+        heatpng = "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage.heatmap.png",
+        scatterpng = "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage.scatterplot.png",
+        tsv = "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage.tsv"
+    log:
+        "deepTools_qc/logs/plotCorrelation_spearman.log"
+    benchmark:
+        "deepTools_qc/.benchmark/plotCorrelation_spearman.benchmark"
+    shell:
+        deepTools_path+"plotCorrelation "
+        "-in {input} "
+        "-o {output.heatpng} "
+        "--corMethod spearman "
+        "--whatToPlot heatmap "
+        "--skipZeros "
+        "--plotTitle 'Spearman correlation of fragment coverage' "
+        "--outFileCorMatrix {output.tsv} "
+        "--colorMap coolwarm "
+        "--plotNumbers "
+        "&> {log} && "
+        +deepTools_path+"plotCorrelation "
+        "-in {input} "
+        "-o {output.scatterpng} "
+        "--corMethod spearman "
+        "--whatToPlot scatterplot "
+        "--plotTitle 'Spearman correlation of fragment coverage' "
+        "&>> {log}"
+
+
+### deepTools plotCoverage #####################################################
+
+rule plotCoverage:
+    input:
+        bams = expand("Bowtie2/{sample}.bam", sample=samples),
+        bais = expand("Bowtie2/{sample}.bam.bai", sample=samples)
+    output:
+        "deepTools_qc/plotCoverage/read_coverage.png"
+    params:
+        labels = " ".join(samples),
+        read_extension = "--extendReads" if paired else "--extendReads "+fragment_length
+    log:
+        "deepTools_qc/logs/plotCoverage.log"
+    benchmark:
+        "deepTools_qc/.benchmark/plotCoverage.benchmark"
+    threads: 24
+    shell:
+        deepTools_path+"plotCoverage "
+        "-b {input.bams} "
+        "-o {output} "
+        "--labels {params.labels} "
+        "--plotTitle 'Genome fragment coverage without duplicates' "
+        "-p {threads} "
+        "{params.read_extension} "
+        "--ignoreDuplicates "
+        "&> {log}"
+
+
+### deepTools plotPCA ##########################################################
+rule plotPCA:
+    input:
+        "deepTools_qc/multiBamSummary/read_coverage.bins.npz"
+    output:
+        "deepTools_qc/plotPCA/PCA.read_coverage.png"
+    log:
+        "deepTools_qc/logs/plotPCA.log"
+    benchmark:
+        "deepTools_qc/.benchmark/plotPCA.benchmark"
+    shell:
+        deepTools_path+"plotPCA "
+            "-in {input} "
+            "-o {output} "
+            " -T 'PCA of fragment coverage' "
+            "&> {log}"

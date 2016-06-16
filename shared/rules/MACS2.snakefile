@@ -26,7 +26,7 @@ if paired:
             description = "{sample}",
             fragment_length = fragment_length,
             genome_size = genome_size
-        log:    "MACS2/log/{sample}.log"
+        log:    "MACS2/logs/{sample}.log"
         benchmark:  "MACS2/.benchmark/MACS2.{sample}.benchmark"
         run:
             try:
@@ -50,7 +50,7 @@ else:
             description = "{sample}",
             fragment_length = fragment_length,
             genome_size = genome_size
-        log:    "MACS2/log/{sample}.log"
+        log:    "MACS2/logs/{sample}.log"
         benchmark:  "MACS2/.benchmark/MACS2.{sample}.benchmark"
         run:
             input_str = " -c ".join(input)

@@ -1,0 +1,17 @@
+## Please comment out and adjust configuration variables if their default values are
+## not appropriate for your input data
+
+## paired-end read name extension
+# reads: ["_R1", "_R2"]
+
+## FASTQ file extension
+# ext: ".fastq.gz"
+
+## Mate orientation in paired-end experiments (default is for Illumina sequencing)
+# mate_orientation: "--fr"
+
+## Median/mean fragment length
+# fragment_length: 200
+
+## Options to TrimGalore
+# trim_galore_opts: "--stringency 2"

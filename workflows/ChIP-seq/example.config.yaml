@@ -1,9 +1,11 @@
+## Please comment out and adjust configuration variables if their default values are
+## not appropriate for your input data
+
 #indir: /data/manke/kilpert/Vogel/H3K79me2/new_mapping
 indir: /data/manke/kilpert/Vogel/H3K79me2/new_mapping/chip-seq_workflow/indir/
 outdir: ./outdir/
 genome: mm10
 downsampling: 500000
-email: kilpert@ie-freiburg.mpg.de
 # verbose: True
 # reads:
 #   - _R1

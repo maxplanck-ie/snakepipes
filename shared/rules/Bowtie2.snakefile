@@ -12,7 +12,7 @@ rule Bowtie2:
     benchmark:  "Bowtie2/.benchmark/Bowtie2.{sample}.benchmark"
     shell:  bowtie2_path+" -p {threads} {params.bowtie_opts} "
             "--rg DS:{params.tmpprefix} --rg SM:{params.tmpprefix} --rg-id mpi-ie --rg CN:deep_sequencing_unit --rg PL:illumina "
-            "-x "+Bowtie2Index+" -1 {input.r1} -2 {input.r2} 2> {output.align_summary} | "
+            "-x "+bowtie2_index+" -1 {input.r1} -2 {input.r2} 2> {output.align_summary} | "
             ""+samtools_path+" view -Sb - | "
             ""+samtools_path+" sort -O bam -m 2G -@ 2 -T {params.tmpprefix} - > {output.accepted_hits} "
 
