@@ -12,8 +12,7 @@ import os
 ### include scripts ############################################################
 ################################################################################
 # main directory of all snakemake workflows
-#maindir = workflow.overwrite_config["maindir"]
-maindir = "/home/arichter/projects/snakemake/snakemake_workflows/"
+maindir = workflow.overwrite_config["maindir"]
 
 # include tool paths
 include: os.path.join(maindir, "shared", "paths.py")
