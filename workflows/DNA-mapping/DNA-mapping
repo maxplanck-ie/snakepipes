@@ -138,7 +138,7 @@ def main():
             snakemake_cmd.append("--forceall")
 
     if not args.local:
-            snakemake_cmd.append("--cluster 'SlurmEasy --threads {{threads}} --log {cluster_logs_dir}' --jobname '{{rulename}}.{{jobid}}.snakejob'")
+            snakemake_cmd += ["--cluster 'SlurmEasy --threads {threads} --log", cluster_logs_dir, "--name DNA-mapping.snakemake'"]
 
     snakemake_log = "2>&1 | tee -a {}/LOG".format(args.outdir).split()
 
