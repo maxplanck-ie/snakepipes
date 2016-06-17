@@ -1,23 +1,27 @@
 version 0.1.0 - June 15, 2016:
 
 shared/:
-* shared/cluster.yaml removed as not required when taking {threads} parameter from each rule
-* shared/debugging.snakefile removed as not used by pipeline
-* renamed shared/load_organisms.snakefile to shared/load_organism_data.py
-* defined (effective) genome size as (genome length)-(number of 'N's), added additional files to genome data in shared/organisms/
-* shared/rules/deepTools.snakefiles:
+- shared/cluster.yaml removed as not required when taking {threads} parameter from each rule
+- shared/debugging.snakefile removed as not used by pipeline
+- renamed shared/load_organisms.snakefile to shared/load_organism_data.py
+- defined (effective) genome size as (genome length)-(number of 'N's), added additional files to genome data in shared/organisms/
+- shared/rules/deepTools.snakefiles:
   - added file as one common snakefile for all deepTools rules
   - moved rules from computeGCBias.snakefile and all deepTools rules from workflows/ChIP-seq/Snakefile
 
 workflows/:
-* workflows/ChIP-seq/ChIP-seq + workflows/DNA-mapping/DNA-mapping + workflows/rMATS/rMATS.sh:
+- workflows/ChIP-seq/ChIP-seq + workflows/DNA-mapping/DNA-mapping + workflows/rMATS/rMATS.sh:
   - removed --local-cores parameter as there are no local snakemake rules used
   - simplified cluster submission by taking {threads} parameter from rule definition
   - added --fastqc and --bw-binsize parameters
-* workflows/DNA-mapping/Snakefile:
+- workflows/DNA-mapping/Snakefile:
   - moved includes of module snakefiles from rules.snakefile to main snakefile to simplify structure
   - renamed functions do_TrimGalore(trim) and do_InsertSizeMetrics(paired)
   - several minor changes
-* workflows/DNA-mapping/example.config.yaml added
-* workflows/DNA-mapping/internals.snakefile: added function get_fragment_length() to parse median insert size from Picard output
-* workflows/DNA-mapping/rules.snakefile removed as includes of module snakefiles were moved to main snakefile
+- workflows/DNA-mapping/example.config.yaml added
+- workflows/DNA-mapping/internals.snakefile: added function get_fragment_length() to parse median insert size from Picard output
+- workflows/DNA-mapping/rules.snakefile removed as includes of module snakefiles were moved to main snakefile
+
+version 0.1.1 - June 17, 2016:
+- add option to run workflow locally instead of cluster submission
+- minor changes
