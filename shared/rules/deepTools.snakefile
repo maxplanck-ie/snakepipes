@@ -14,7 +14,7 @@ rule bamCoverage:
         "bamCoverage/logs/bamCoverage.{sample}.log"
     benchmark:
         "bamCoverage/.benchmark/bamCoverage.{sample}.benchmark"
-    threads: 24
+    threads: 32
     shell:
         deepTools_path+"bamCoverage "
         "-b {input.bam} "
@@ -77,7 +77,7 @@ rule multiBamSummary:
         "deepTools_qc/logs/multiBamSummary.log"
     benchmark:
         "deepTools_qc/.benchmark/multiBamSummary.benchmark"
-    threads: 24
+    threads: 32
     shell:
         deepTools_path+"multiBamSummary bins "
         "-b {input.bams} "
@@ -172,7 +172,7 @@ rule plotCoverage:
         "deepTools_qc/logs/plotCoverage.log"
     benchmark:
         "deepTools_qc/.benchmark/plotCoverage.benchmark"
-    threads: 24
+    threads: 32
     shell:
         deepTools_path+"plotCoverage "
         "-b {input.bams} "
