@@ -36,7 +36,8 @@ def parse_args():
     parser.add_argument("-c", "--configfile", dest="configfile", help="configuration file (config.yaml)", default=None)
     parser.add_argument("-i", "--input-dir", dest="indir", help="input directory containing the FASTQ files", default=None)
     parser.add_argument("-o", "--output-dir", dest="outdir", help="output directory", default=None)
-    parser.add_argument("-j", "--jobs", dest="max_jobs", metavar="INT", help="maximum number of concurrently submitted grid engine jobs (default: '%(default)s')", type=int, default=999)
+    parser.add_argument("-j", "--jobs", dest="max_jobs", metavar="INT", help="maximum number of concurrently submitted Slurm jobs / cores if workflow is run locally (default: '%(default)s')", type=int, default=10)
+    parser.add_argument("--local", dest="local", action="store_true", default=False, help="run workflow locally (default: jobs are submitted to Slurm queue)")
     parser.add_argument("-r", "--rerun-incomplete", dest="rerun_incomplete", action="store_true", default=False, help="rerun all jobs with incomplete output files")
     parser.add_argument("-F", "--forceall", dest="forceall", action="store_true", default=False, help="force full rerun")
     parser.add_argument("--downsample", dest="downsample", metavar="INT", help="downsample the given number of reads from the head of each FASTQ file", type=int, default=None)
@@ -116,7 +117,7 @@ def main():
 
     snakemake_module_load = "module load snakemake slurm &&".split()
     snakemake_cmd = """
-                    snakemake --snakefile {snakefile} --jobs {max_jobs} {user_configs} --directory {outdir} --cluster 'SlurmEasy --threads {{threads}} --log {cluster_logs_dir}' --jobname '{{rulename}}.{{jobid}}.snakejob'
+                    snakemake --snakefile {snakefile} --jobs {max_jobs} {user_configs} --directory {outdir}
                     """.format( snakefile = os.path.join(this_script_dir, "Snakefile"),
                                 max_jobs = args.max_jobs,
                                 user_configs = " ".join(user_configs),
@@ -135,6 +136,9 @@ def main():
 
     if args.forceall:
             snakemake_cmd.append("--forceall")
+
+    if not args.local:
+            snakemake_cmd.append("--cluster 'SlurmEasy --threads {{threads}} --log {cluster_logs_dir}' --jobname '{{rulename}}.{{jobid}}.snakejob'")
 
     snakemake_log = "2>&1 | tee -a {}/LOG".format(args.outdir).split()
 
