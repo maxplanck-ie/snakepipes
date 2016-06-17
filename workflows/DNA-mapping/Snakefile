@@ -24,11 +24,8 @@ include: os.path.join(maindir, "shared", "load_organism_data.py")
 
 ### include modules of other snakefiles ########################################
 ################################################################################
-# FASTQ: either downsample FASTQ files or create symlinks
-if downsample:
-    include: os.path.join(maindir, "shared", "rules", "FASTQ_downsample.snakefile")
-else:
-    include: os.path.join(maindir, "shared", "rules", "FASTQ_symlink.snakefile")
+# FASTQ: either downsample FASTQ files or create symlinks to input files
+include: os.path.join(maindir, "shared", "rules", "FASTQ.snakefile")
 
 # FastQC
 if fastqc:
@@ -93,17 +90,22 @@ rule all:
         "deepTools_qc/plotPCA/PCA.read_coverage.png",
         expand("Qualimap_qc/{sample}.bamqc_report.html", sample=samples),
         expand("Qualimap_qc/{sample}.bamqc_results.txt", sample=samples)
-    run:
-        print("\n--- Workflow parameter ---------------------------------------------------------")
-        print("Indir:", indir)
-        print("Infiles:", infiles)
-        print("Samples:", samples)
-        print("Paired:", paired)
-        print("Reads:", reads)
-        print("Genome:", genome)
-        print("Downsample:", downsample)
-        print("Trim:", trim)
-        print("FastQC:", fastqc)
-        print("BigWig bin size:", bw_binsize)
-        print("FastQ directory for mapping:", fastq_dir)
-        print("-" * 80, "\n")
+
+
+### Execute after workflow finished ############################################
+################################################################################
+onsuccess:
+    print("\n--- Workflow finished successfully! --------------------------------------------\n")
+    print("--- Workflow parameter ---------------------------------------------------------")
+    print("Indir:", indir)
+    print("Infiles:", infiles)
+    print("Samples:", samples)
+    print("Paired:", paired)
+    print("Reads:", reads)
+    print("Genome:", genome)
+    print("Downsample:", downsample)
+    print("Trim:", trim)
+    print("FastQC:", fastqc)
+    print("FastQ directory for mapping:", fastq_dir)
+    print("BigWig bin size:", bw_binsize)
+    print("-" * 80, "\n")
