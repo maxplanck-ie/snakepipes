@@ -25,3 +25,7 @@ workflows/:
 version 0.1.1 - June 17, 2016:
 - add option to run workflow locally instead of cluster submission
 - minor changes
+
+
+version ...
+- shared/rules/FASTQ.snakefiles replaces FASTQ_symlink.snakefile and FASTQ_downsample.snakefile
