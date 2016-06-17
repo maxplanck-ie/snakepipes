@@ -102,8 +102,14 @@ try:
 except:
     fragment_length = 200
 
+# IMPORTANT: When using snakemake with argument --config key=True, the
+# string "True" is assigned to variable "key". Assigning a boolean value
+# does not seem to be possible. Therefore, --config key=False will also
+# return the boolean value True as bool("False") gives True.
+# In contrast, within a configuration file config.yaml, assigment of boolean
+# values is possible.
 try:
-    if config["trim"] == True:
+    if config["trim"]:
         trim = True
         fastq_dir = "FASTQ_TrimGalore"
     else:
@@ -113,8 +119,14 @@ except:
     trim = False
     fastq_dir = "FASTQ"
 
+# IMPORTANT: When using snakemake with argument --config key=True, the
+# string "True" is assigned to variable "key". Assigning a boolean value
+# does not seem to be possible. Therefore, --config key=False will also
+# return the boolean value True as bool("False") gives True.
+# In contrast, within a configuration file config.yaml, assigment of boolean
+# values is possible.
 try:
-    if config["fastqc"] == True:
+    if config["fastqc"]:
         fastqc = True
     else:
         fastqc = False

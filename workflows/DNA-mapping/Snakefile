@@ -12,7 +12,7 @@ import os
 ### include scripts ############################################################
 ################################################################################
 # main directory of all snakemake workflows
-maindir = workflow.overwrite_config["maindir"]
+maindir = config["maindir"]
 
 # include tool paths
 include: os.path.join(maindir, "shared", "paths.py")
@@ -92,7 +92,7 @@ rule all:
         "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage.heatmap.png",
         "deepTools_qc/plotPCA/PCA.read_coverage.png",
         expand("Qualimap_qc/{sample}.bamqc_report.html", sample=samples),
-        expand("Qualimap_qc/{sample}.bamqc_results.txt", sample=samples),
+        expand("Qualimap_qc/{sample}.bamqc_results.txt", sample=samples)
     run:
         print("\n--- Workflow parameter ---------------------------------------------------------")
         print("Indir:", indir)

@@ -15,3 +15,19 @@
 
 ## Options to TrimGalore
 # trim_galore_opts: "--stringency 2"
+
+
+## The following configuration variables can only be set via this configuration
+## file when calling snakemake directly, i.e. without using the wrapper script
+## DNA-mapping.
+## example call: snakemake --snakefile snakemake_workflows/workflows/DNA-mapping/Snakefile
+##                         --cores 32
+##                         --configfile snakemake_workflows/workflows/DNA-mapping/example.config.yaml
+##                         --directory output-dir
+# maindir: /home/arichter/projects/snakemake/snakemake_workflows/
+# indir: /rapidus/data/arichter/snakemake_test/51_Hf12_SFTR_RD_run1/input/
+# genome: hs37d5
+# downsample: 50000
+# trim: True
+# fastqc: True
+# bw_binsize: 10
