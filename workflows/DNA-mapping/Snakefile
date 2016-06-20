@@ -2,11 +2,9 @@
 import os
 
 
-# ## useful for debugging: show internal variables
-# for w in dir(workflow):
-#    print(w)
-#    print(getattr(workflow, w))
-#    print("#"*80)
+### output configuration for debugging #########################################
+################################################################################
+print("config: {}\n".format(config))
 
 
 ### include scripts ############################################################

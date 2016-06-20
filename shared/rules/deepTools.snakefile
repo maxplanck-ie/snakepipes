@@ -9,7 +9,7 @@ rule bamCoverage:
     params:
         bw_binsize = bw_binsize,
         genome_size = int(genome_size),
-        read_extension = "--extendReads" if paired else "--extendReads "+fragment_length
+        read_extension = "--extendReads" if paired else "--extendReads "+str(fragment_length)
     log:
         "bamCoverage/logs/bamCoverage.{sample}.log"
     benchmark:
@@ -55,13 +55,13 @@ rule computeGCBias:
             "--GCbiasFrequenciesFile {output.tsv} "
             "--effectiveGenomeSize {params.genome_size} "
             "--genome {params.genome_2bit} "
-            "--fragmentLength "+median_fragment_length+" "
+            "--fragmentLength "+str(median_fragment_length)+" "
             "-p {threads} "
             "&> {log}"
         )
 
 
-## multiBamSummary #################################################################
+### multiBamSummary ############################################################
 
 rule multiBamSummary:
     input:
@@ -72,7 +72,7 @@ rule multiBamSummary:
     params:
         labels = " ".join(samples),
         blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed else "",
-        read_extension = "--extendReads" if paired else "--extendReads "+fragment_length
+        read_extension = "--extendReads" if paired else "--extendReads "+str(fragment_length)
     log:
         "deepTools_qc/logs/multiBamSummary.log"
     benchmark:
@@ -167,7 +167,7 @@ rule plotCoverage:
         "deepTools_qc/plotCoverage/read_coverage.png"
     params:
         labels = " ".join(samples),
-        read_extension = "--extendReads" if paired else "--extendReads "+fragment_length
+        read_extension = "--extendReads" if paired else "--extendReads "+str(fragment_length)
     log:
         "deepTools_qc/logs/plotCoverage.log"
     benchmark:
