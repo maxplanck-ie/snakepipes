@@ -18,7 +18,8 @@ if paired:
             bowtie2_path+"bowtie2 "
             "-x "+bowtie2_index+" -1 {input.r1} -2 {input.r2} "
             "{params.bowtie_opts} {params.mate_orientation} "
-            "--rg-id {wildcards.sample} --rg CN:mpi-ie_deep_sequencing_unit --rg DS:{wildcards.sample} --rg PL:ILLUMINA --rg SM:{wildcards.sample} "
+            "--rg-id {wildcards.sample} --rg CN:mpi-ie_deep_sequencing_unit "
+            "--rg DS:{wildcards.sample} --rg PL:ILLUMINA --rg SM:{wildcards.sample} "
             "-p {threads} "
             "2> {output.align_summary} | "
             ""+samtools_path+"samtools view -Sb - | "
@@ -39,10 +40,11 @@ else:
             bowtie2_path+"bowtie2 "
                 "-x "+bowtie2_index+" -U {input} "
                 "{params.bowtie_opts} "
-                "--rg-id {wildcards.sample} --rg CN:mpi-ie_deep_sequencing_unit --rg DS:{wildcards.sample} --rg PL:ILLUMINA --rg SM:{wildcards.sample} "
+                "--rg-id {wildcards.sample} --rg CN:mpi-ie_deep_sequencing_unit "
+                "--rg DS:{wildcards.sample} --rg PL:ILLUMINA --rg SM:{wildcards.sample} "
                 "-p {threads} "
                 "2> {output.align_summary} | "
-                ""+samtools_path+"samtools view -Sb - | "
+                ""+samtools_path+"samtools view -Sbu - | "
                 ""+samtools_path+"samtools sort -m 2G -T {wildcards.sample} -@ 2 -O bam - > {output.bam}"
 
 
@@ -71,12 +73,25 @@ rule MarkDuplicates:
             "&> {log} "
 
 
+### samtools_filter ############################################################
+
+rule samtools_filter:
+    input:
+        "Bowtie2/{sample}.bam"
+    output:
+        "filtered_bam/{sample}.nodup.bam"
+    benchmark:
+        "filtered_bam/.benchmark/samtools_filter.{sample}.benchmark"
+    shell:
+        samtools_path+"samtools view -b -F 1024 {input} > {output}"
+
+
 ### samtools_index #############################################################
 
 rule samtools_index:
     input:
-        "Bowtie2/{sample}.bam"
+        "{sample}.bam"
     output:
-        "Bowtie2/{sample}.bam.bai"
+        "{sample}.bam.bai"
     shell:
         samtools_path+"samtools index {input}"
