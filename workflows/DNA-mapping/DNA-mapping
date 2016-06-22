@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 
-__version__ = "0.1.1"
+__version__ = "0.2.0"
 
 __description__ = """
 DNA-mapping workflow v{version} - MPI-IE workflow for DNA mapping
 Fabian Kilpert, Andreas Richter
-June 17, 2016
+June 22, 2016
 
 usage example:
     DNA-mapping -g mm10 -i input-dir -o output-dir
@@ -43,6 +43,9 @@ def parse_args():
     parser.add_argument("--downsample", dest="downsample", metavar="INT", help="downsample the given number of reads from the head of each FASTQ file", type=int, default=None)
     parser.add_argument("--trim", dest="trim", action="store_true", default=False, help="trim reads with TrimGalore")
     parser.add_argument("--fastqc", dest="fastqc", action="store_true", default=False, help="run FastQC read quality control")
+    parser.add_argument("--dedup", dest="dedup", action="store_true", default=False, help="retain only de-duplicated reads/read pairs (given single-/paired-end data)")
+    parser.add_argument("--properpairs", dest="properpairs", action="store_true", default=False, help="retain only reads mapping in proper pairs")
+    parser.add_argument("--mapq", dest="mapq", metavar="INT", help="retain only reads with at least the given mapping quality (default: '%(default)s')", type=int, default=0)
     parser.add_argument("--bw-binsize", dest="bw_binsize", metavar="INT", help="bin size of output files in bigWig format (default: '%(default)s')", type=int, default=10)
     parser.add_argument("-v", "--verbose", dest="verbose", action="store_true", default=False, help="verbose output")
 
@@ -75,11 +78,6 @@ def parse_args():
     except:
         args.downsample = None
 
-    try:
-        args.bw_binsize = int(args.bw_binsize)
-    except:
-        args.bw_binsize = None
-
     return args
 
 
@@ -99,9 +97,10 @@ def main():
     subprocess.call("[ -d {cluster_logs_dir} ] || mkdir -p {cluster_logs_dir}".format(cluster_logs_dir=cluster_logs_dir), shell=True)
 
     ## required
-    user_configs = "--config maindir={main_dir_path} indir={indir} genome={genome}".format(
+    user_configs = "--config maindir={main_dir_path} indir={indir} outdir={outdir} genome={genome}".format(
                                 main_dir_path = main_dir_path,
                                 indir = args.indir,
+                                outdir = args.outdir,
                                 genome = args.genome).split()
 
     ## optional
@@ -111,6 +110,12 @@ def main():
         user_configs += ["trim=True"]
     if args.fastqc:
         user_configs += ["fastqc=True"]
+    if args.dedup:
+        user_configs += ["dedup=True"]
+    if args.properpairs:
+        user_configs += ["properpairs=True"]
+    if args.mapq:
+        user_configs += ["mapq={}".format(args.mapq)]
     if args.bw_binsize:
         user_configs += ["bw_binsize={}".format(args.bw_binsize)]
 

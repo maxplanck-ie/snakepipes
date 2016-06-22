@@ -33,8 +33,8 @@ if fastqc:
 if trim:
     include: os.path.join(maindir, "shared", "rules", "TrimGalore.snakefile")
 
-# Bowtie2 and Picard MarkDuplicates
-include: os.path.join(maindir, "shared", "rules", "Bowtie2_and_MarkDuplicates.snakefile")
+# Bowtie2 mapping, duplicate marking, BAM filtering and indexing
+include: os.path.join(maindir, "shared", "rules", "Bowtie2_bam_filtering.snakefile")
 
 # Picard CollectAlignmentSummaryMetrics and CollectInsertSizeMetrics
 include: os.path.join(maindir, "shared", "rules", "Picard_qc.snakefile")
@@ -50,21 +50,27 @@ include: os.path.join(maindir, "shared", "rules", "Qualimap_bamqc.snakefile")
 ################################################################################
 def run_FastQC(fastqc):
     if fastqc:
-        return( expand("FastQC/{sample}{read}_fastqc.html", sample=samples, read=reads) )
+        return( expand("FastQC/{sample}{read}_fastqc.html", sample = samples, read = reads) )
     else:
         return([])
 
-def run_TrimGalore(trim):
+def run_TrimGalore(trim, fastqc):
     if trim and fastqc:
-        return( expand("FastQC_on_TrimGalore/{sample}{read}_fastqc.html", sample=samples, read=reads) )
+        return( expand("FastQC_on_TrimGalore/{sample}{read}_fastqc.html", sample = samples, read = reads) )
     elif trim:
-        return( expand("FASTQ_TrimGalore/{sample}{read}.fastq.gz", sample=samples, read=reads) )
+        return( expand("FASTQ_TrimGalore/{sample}{read}.fastq.gz", sample = samples, read = reads) )
     else:
         return([])
 
 def run_CollectInsertSizeMetrics(paired):
     if paired:
-        return( expand("Picard_qc/InsertSizeMetrics/{sample}.insert_size_metrics.txt", sample=samples) )
+        return( expand("Picard_qc/InsertSizeMetrics/{sample}.insert_size_metrics.txt", sample = samples) )
+    else:
+        return([])
+
+def run_bamCoverage_filtered(dedup, properpairs, mapq):
+    if (dedup or properpairs or mapq > 0):
+        return( expand("bamCoverage/{sample}.filtered.seq_depth_norm.bw", sample = samples) )
     else:
         return([])
 
@@ -73,21 +79,22 @@ def run_CollectInsertSizeMetrics(paired):
 ################################################################################
 rule all:
     input:
-    # TODO: add optional BAM filtering by quality, duplicates and secondary alignments after mapping and duplicate marking
-        expand("FASTQ/{sample}{read}.fastq.gz", sample=samples, read=reads),
+        expand("FASTQ/{sample}{read}.fastq.gz", sample = samples, read = reads),
         run_FastQC(fastqc),
-        run_TrimGalore(trim),
-        expand("Bowtie2/{sample}.bam.bai", sample=samples),
-        expand("Picard_qc/AlignmentSummaryMetrics/{sample}.alignment_summary_metrics.txt", sample=samples),
+        run_TrimGalore(trim, fastqc),
+        expand("Bowtie2/{sample}.bam.bai", sample = samples),
+        expand("filtered_bam/{sample}.filtered.bam.bai", sample = samples),
+        expand("Picard_qc/AlignmentSummaryMetrics/{sample}.alignment_summary_metrics.txt", sample = samples),
         run_CollectInsertSizeMetrics(paired),
-        expand("bamCoverage/{sample}.SeqDepthNorm.bw", sample=samples),
-        expand("deepTools_qc/computeGCBias/{sample}.GCBias.png", sample=samples),
+        expand("bamCoverage/{sample}.seq_depth_norm.bw", sample = samples),
+        run_bamCoverage_filtered(dedup, properpairs, mapq),
+        expand("deepTools_qc/computeGCBias/{sample}.GCBias.png", sample = samples),
         "deepTools_qc/plotCoverage/read_coverage.png",
         "deepTools_qc/plotCorrelation/correlation.pearson.read_coverage.heatmap.png",
         "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage.heatmap.png",
         "deepTools_qc/plotPCA/PCA.read_coverage.png",
-        expand("Qualimap_qc/{sample}.bamqc_report.html", sample=samples),
-        expand("Qualimap_qc/{sample}.bamqc_results.txt", sample=samples)
+        expand("Qualimap_qc/{sample}.bamqc_report.html", sample = samples),
+        expand("Qualimap_qc/{sample}.bamqc_results.txt", sample = samples)
 
 
 ### Execute after workflow finished ############################################
@@ -95,15 +102,19 @@ rule all:
 onsuccess:
     print("\n--- Workflow finished successfully! --------------------------------------------\n")
     print("--- Workflow parameter ---------------------------------------------------------")
-    print("Indir:", indir)
-    print("Infiles:", infiles)
+    print("Input directory:", indir)
+    print("Input files:", infiles)
+    print("Output directory:", outdir)
     print("Samples:", samples)
-    print("Paired:", paired)
-    print("Reads:", reads)
+    print("Paired-end reads:", paired)
+    print("Read extension:", reads)
     print("Genome:", genome)
     print("Downsample:", downsample)
-    print("Trim:", trim)
+    print("Trimming:", trim)
     print("FastQC:", fastqc)
-    print("FastQ directory for mapping:", fastq_dir)
+    print("Input directory for mapping:", fastq_dir)
+    print("De-duplicate reads/read pairs:", dedup)
+    print("Retain only proper pairs:", properpairs)
+    print("Minimum mapping quality:", mapq)
     print("BigWig bin size:", bw_binsize)
     print("-" * 80, "\n")
