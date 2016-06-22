@@ -5,7 +5,35 @@ rule bamCoverage:
         bam = "Bowtie2/{sample}.bam",
         bai = "Bowtie2/{sample}.bam.bai"
     output:
-        "bamCoverage/{sample}.SeqDepthNorm.bw"
+        "bamCoverage/{sample}.seq_depth_norm.bw"
+    params:
+        bw_binsize = bw_binsize,
+        genome_size = int(genome_size),
+        read_extension = "--extendReads" if paired else "--extendReads "+str(fragment_length)
+    log:
+        "bamCoverage/logs/bamCoverage.{sample}.log"
+    benchmark:
+        "bamCoverage/.benchmark/bamCoverage.{sample}.benchmark"
+    threads: 32
+    shell:
+        deepTools_path+"bamCoverage "
+        "-b {input.bam} "
+        "-o {output} "
+        "--binSize {params.bw_binsize} "
+        "-p {threads} "
+        "--normalizeTo1x {params.genome_size} "
+        "{params.read_extension} "
+        "&> {log}"
+
+
+### deepTools bamCoverage on filtered BAM files ################################
+
+rule bamCoverage_filtered:
+    input:
+        bam = "filtered_bam/{sample}.filtered.bam",
+        bai = "filtered_bam/{sample}.filtered.bam.bai"
+    output:
+        "bamCoverage/{sample}.filtered.seq_depth_norm.bw"
     params:
         bw_binsize = bw_binsize,
         genome_size = int(genome_size),
@@ -30,10 +58,12 @@ rule bamCoverage:
 
 rule computeGCBias:
     input:
-        bam = "Bowtie2/{sample}.bam",
-        bai = "Bowtie2/{sample}.bam.bai",
+        bam = "filtered_bam/{sample}.filtered.bam",
+        bai = "filtered_bam/{sample}.filtered.bam.bai",
         # for single-end samples, use BAM file as dummy input file dependency
-        insert_size_metrics = "Picard_qc/InsertSizeMetrics/{sample}.insert_size_metrics.txt" if paired else "Bowtie2/{sample}.bam"
+        insert_size_metrics =
+            "Picard_qc/InsertSizeMetrics/{sample}.insert_size_metrics.txt" if paired
+            else "filtered_bam/{sample}.filtered.bam"
     output:
         png = "deepTools_qc/computeGCBias/{sample}.GCBias.png",
         tsv = "deepTools_qc/computeGCBias/{sample}.GCBias.freq.tsv"
@@ -47,7 +77,7 @@ rule computeGCBias:
         "deepTools_qc/.benchmark/computeGCBias.{sample}.benchmark"
     threads: 24
     run:
-        median_fragment_length = get_fragment_length(input.insert_size_metrics) if paired else fragment_length
+        median_fragment_length = get_fragment_length(input.insert_size_metrics) if paired else params.fragment_length
         shell(
             deepTools_path+"computeGCBias "
             "-b {input.bam} "
@@ -61,12 +91,12 @@ rule computeGCBias:
         )
 
 
-### multiBamSummary ############################################################
+### deepTools multiBamSummary ##################################################
 
 rule multiBamSummary:
     input:
-        bams = expand("Bowtie2/{sample}.bam", sample=samples),
-        bais = expand("Bowtie2/{sample}.bam.bai", sample=samples)
+        bams = expand("filtered_bam/{sample}.filtered.bam", sample=samples),
+        bais = expand("filtered_bam/{sample}.filtered.bam.bai", sample=samples)
     output:
         "deepTools_qc/multiBamSummary/read_coverage.bins.npz"
     params:
@@ -161,8 +191,8 @@ rule plotCorrelation_spearman:
 
 rule plotCoverage:
     input:
-        bams = expand("Bowtie2/{sample}.bam", sample=samples),
-        bais = expand("Bowtie2/{sample}.bam.bai", sample=samples)
+        bams = expand("filtered_bam/{sample}.filtered.bam", sample=samples),
+        bais = expand("filtered_bam/{sample}.filtered.bam.bai", sample=samples)
     output:
         "deepTools_qc/plotCoverage/read_coverage.png"
     params:
