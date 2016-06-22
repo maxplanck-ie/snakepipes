@@ -2,7 +2,7 @@
 
 rule Qualimap_bamqc:
     input:
-        "filtered_bam/{sample}.bam"
+        "filtered_bam/{sample}.filtered.bam"
     output:
         txt = "Qualimap_qc/{sample}/genome_results.txt",
         html = "Qualimap_qc/{sample}/qualimapReport.html"
