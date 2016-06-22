@@ -1,8 +1,8 @@
-## Qualimap bamqc #############################################################
+### Qualimap bamqc #############################################################
 
 rule Qualimap_bamqc:
     input:
-        bam = "Bowtie2/{sample}.bam"
+        "filtered_bam/{sample}.bam"
     output:
         txt = "Qualimap_qc/{sample}/genome_results.txt",
         html = "Qualimap_qc/{sample}/qualimapReport.html"
@@ -19,8 +19,8 @@ rule Qualimap_bamqc:
         # unset DISPLAY environment variable as Java VM might fail otherwise
         "unset DISPLAY && "
         ""+qualimap_path+"qualimap bamqc "
-        "--java-mem-size=4G "
-        "--bam {input.bam} "
+        "--java-mem-size=8G "
+        "--bam {input} "
         "--paint-chromosome-limits "
         "{params.collect_overlap_pairs} "
         "-nt {threads} "

@@ -74,16 +74,45 @@ rule MarkDuplicates:
 
 
 ### samtools_filter ############################################################
+# When modifying the rule samtools_filter, double-check wether the function
+# update_filter() has to be modified concordantly
 
 rule samtools_filter:
     input:
         "Bowtie2/{sample}.bam"
     output:
-        "filtered_bam/{sample}.nodup.bam"
+        bam = "filtered_bam/{sample}.filtered.bam",
+        # if no filter is specified, use BAM file as dummy input file dependency
+        filter_file = "filtered_bam/{sample}.filter" if (dedup or properpairs or mapq > 0) else "filtered_bam/{sample}.filtered.bam"
+    params:
+        dedup = dedup,
+        properpairs = properpairs,
+        mapq = mapq
+    log:
+        "filtered_bam/logs/samtools_filter.{sample}.log"
     benchmark:
         "filtered_bam/.benchmark/samtools_filter.{sample}.benchmark"
-    shell:
-        samtools_path+"samtools view -b -F 1024 {input} > {output}"
+    run:
+        # string with samtools view parameters for filtering
+        filter = ""
+        if params.dedup:
+            filter += "-F 1024 "
+        if params.properpairs:
+            filter += "-f 2 "
+        if params.mapq > 0:
+            filter += "-q {params.mapq}"
+
+        if filter:
+            shell(
+                samtools_path+"samtools view "
+                "-b "+filter+" {input} > {output.bam} "
+                "2> {log} "
+                "&& echo 'samtools view arguments: "+filter+"' > {output.filter_file}"
+            )
+        else:
+            shell(
+                "( [ -f {output.bam} ] || ln -s -r {input} {output.bam} ) && touch -h {output.bam}"
+            )
 
 
 ### samtools_index #############################################################
