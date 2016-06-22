@@ -13,7 +13,7 @@ rule Qualimap_bamqc:
         "Qualimap_qc/logs/Qualimap_bamqc.{sample}.log"
     benchmark:
         "Qualimap_qc/.benchmark/Qualimap_bamqc.{sample}.benchmark"
-    threads: 24
+    threads: 16
     shell:
         "export PATH="+R_path+":$PATH && "
         # unset DISPLAY environment variable as Java VM might fail otherwise
