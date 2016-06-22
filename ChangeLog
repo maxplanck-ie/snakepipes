@@ -23,9 +23,11 @@ workflows/:
 - workflows/DNA-mapping/rules.snakefile removed as includes of module snakefiles were moved to main snakefile
 
 version 0.1.1 - June 17, 2016:
-- add option to run workflow locally instead of cluster submission
-- minor changes
-
-
-version ...
+- added option to run workflow locally instead of cluster submission
 - shared/rules/FASTQ.snakefiles replaces FASTQ_symlink.snakefile and FASTQ_downsample.snakefile
+- several small changes
+
+version 0.2.0 - June 22, 2016:
+- added filtering option to filter BAM files for duplication, proper pairs and MAPQ
+- add variable outdir to configuration
+- many small changes
