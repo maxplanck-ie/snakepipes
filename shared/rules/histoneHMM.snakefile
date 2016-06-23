@@ -24,8 +24,8 @@ rule histoneHMM:
         "&> {log}"
 
 
-### compress and index GFF result file from histoneHMM for usage with IGV
-### compress txt result files to save space
+### compress and index GFF result file from histoneHMM for usage with IGV ######
+### compress txt result files to save space ####################################
 rule histoneHMM_out_gz:
     input:
         gff = "histoneHMM/{sample}.filtered.histoneHMM-regions.gff",
