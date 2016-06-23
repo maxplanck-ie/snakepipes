@@ -1,33 +1,30 @@
 ## Please comment out and adjust configuration variables if their default values are
 ## not appropriate for your input data
 
-#indir: /data/manke/kilpert/Vogel/H3K79me2/new_mapping
-indir: /data/manke/kilpert/Vogel/H3K79me2/new_mapping/chip-seq_workflow/indir/
-outdir: ./outdir/
-genome: mm10
-downsampling: 500000
+## Median/mean fragment length
+# fragment_length: 200
+
+
+## The following configuration variables can only be set via this configuration
+## file when calling snakemake directly, i.e. without using the wrapper script
+## DNA-mapping.
+## example call: snakemake --snakefile snakemake_workflows/workflows/DNA-mapping/Snakefile
+##                         --cores 32
+##                         --configfile snakemake_workflows/workflows/DNA-mapping/example.config.yaml
+##                         --directory output-dir
+maindir: /home/arichter/projects/snakemake/snakemake_workflows/
+indir: /rapidus/data/arichter/snakemake_test/51_Hf12_SFTR_RD_run1/output/
+genome: hs37d5
+chip_dict:
+  51_Hf12_SFTR_RD_H3K27ac_F:
+    control: 51_Hf12_SFTR_RD_Input_F
+    broad: True
+#  51_Hf12_SFTR_RD_H3K27me_F:
+#    control: False
+#    broad: False
+paired: True
+fragment_length: 200
+# bw_binsize: 10
+
+
 # verbose: True
-# reads:
-#   - _R1
-#   - _R2
-# ext: .fastq.gz
-# get_from: indir
-
-samples:
-  - ChIP: K79_1
-    Input: K79_1_Input
-
-  - ChIP: K79_2
-    Input: K79_2_Input
-
-  - ChIP: K4_C_1
-    Input: K4_C_1_Input
-
-  - ChIP: K4_C_2
-    Input: K4_C_2_Input
-
-  - ChIP: K4_R_1
-    Input: K4_R_1_Input
-
-  - ChIP: K4_R_2
-    Input: K4_R_2_Input
