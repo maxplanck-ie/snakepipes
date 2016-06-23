@@ -74,26 +74,29 @@ rule computeGCBias:
         genome_2bit = genome_2bit,
         blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed
                     else "",
-        median_fragment_length =
-            lambda wildcards: get_fragment_length("Picard_qc/InsertSizeMetrics/"+wildcards.sample+".filtered.insert_size_metrics.txt") if paired
-            else fragment_length
     log:
         "deepTools_qc/logs/computeGCBias.{sample}.filtered.log"
     benchmark:
         "deepTools_qc/.benchmark/computeGCBias.{sample}.filtered.benchmark"
     threads: 16
-    shell:
-        deepTools_path+"computeGCBias "
-        "-b {input.bam} "
-        "--biasPlot {output.png} "
-        "--GCbiasFrequenciesFile {output.tsv} "
-        "--effectiveGenomeSize {params.genome_size} "
-        "--genome {params.genome_2bit} "
-        "--fragmentLength {params.median_fragment_length} "
-        "--sampleSize 10000000 " # very long runtime with default sample size
-        "{params.blacklist} "
-        "-p {threads} "
-        "&> {log}"
+    run:
+        if paired:
+            median_fragment_length = get_fragment_length("Picard_qc/InsertSizeMetrics/{sample}.filtered.insert_size_metrics.txt")
+        else:
+            median_fragment_length = params.fragment_length
+        shell(
+            deepTools_path+"computeGCBias "
+            "-b {input.bam} "
+            "--biasPlot {output.png} "
+            "--GCbiasFrequenciesFile {output.tsv} "
+            "--effectiveGenomeSize {params.genome_size} "
+            "--genome {params.genome_2bit} "
+            "--fragmentLength "+median_fragment_length+
+            "--sampleSize 10000000 " # very long runtime with default sample size
+            "{params.blacklist} "
+            "-p {threads} "
+            "&> {log}"
+        )
 
 
 ### deepTools multiBamSummary ##################################################
