@@ -31,8 +31,10 @@ def parse_args():
         formatter_class=argparse.RawDescriptionHelpFormatter, description=textwrap.dedent(__description__)
     )
 
+
+    ## positional/required
+    parser.add_argument("genome", metavar="GENOME", help="genome acronym of target organism (supported: 'dm6', 'hs37d5', 'mm9', 'mm10')")
     ## optional
-    parser.add_argument("-g", "--genome", dest="genome", required=True, help="genome acronym of target organism (supported: 'dm6', 'hs37d5', 'mm9', 'mm10')")
     parser.add_argument("-c", "--configfile", dest="configfile", help="configuration file (config.yaml)", default=None)
     parser.add_argument("-i", "--input-dir", dest="indir", help="input directory containing the FASTQ files, either paired-end OR single-end data (default: '.')", default=None)
     parser.add_argument("-o", "--output-dir", dest="outdir", help="output directory (default: '.')", default=None)
@@ -49,8 +51,6 @@ def parse_args():
     parser.add_argument("--bw-binsize", dest="bw_binsize", metavar="INT", help="bin size of output files in bigWig format (default: '%(default)s')", type=int, default=10)
     parser.add_argument("-v", "--verbose", dest="verbose", action="store_true", default=False, help="verbose output")
 
-    ## positional
-    ## None
 
     args = parser.parse_args()
 
@@ -96,14 +96,14 @@ def main():
     cluster_logs_dir = os.path.join(args.outdir, "cluster_logs")
     subprocess.call("[ -d {cluster_logs_dir} ] || mkdir -p {cluster_logs_dir}".format(cluster_logs_dir=cluster_logs_dir), shell=True)
 
-    ## required
+    ## required config variables
     user_configs = "--config maindir={main_dir_path} indir={indir} outdir={outdir} genome={genome}".format(
                                 main_dir_path = main_dir_path,
                                 indir = args.indir,
                                 outdir = args.outdir,
                                 genome = args.genome).split()
 
-    ## optional
+    ## optional config variables
     if args.downsample:
         user_configs += ["downsample={}".format(args.downsample)]
     if args.trim:
@@ -147,7 +147,7 @@ def main():
     if not args.local:
             snakemake_cmd += ["--cluster 'SlurmEasy --threads {threads} --log", cluster_logs_dir, "--name {rule}.snakemake'"]
 
-    snakemake_log = "2>&1 | tee -a {}/LOG".format(args.outdir).split()
+    snakemake_log = "2>&1 | tee -a {}/DNA-mapping.log".format(args.outdir).split()
 
     cmd = " ".join(snakemake_module_load + snakemake_cmd + snakemake_log)
 
@@ -155,7 +155,7 @@ def main():
         print("\n", cmd, "\n")
 
     ## Write snakemake_cmd to log file
-    with open(os.path.join(args.outdir,"LOG"),"w") as f:
+    with open(os.path.join(args.outdir,"DNA-mapping.log"),"w") as f:
         f.write(" ".join(sys.argv)+"\n\n")
         f.write(cmd+"\n\n")
 
