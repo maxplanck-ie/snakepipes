@@ -8,7 +8,7 @@ Fabian Kilpert, Andreas Richter
 June 22, 2016
 
 usage example:
-    DNA-mapping -g mm10 -i input-dir -o output-dir
+    DNA-mapping -i input-dir -o output-dir mm10
 """.format(version=__version__)
 
 
