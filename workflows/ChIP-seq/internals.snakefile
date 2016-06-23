@@ -78,6 +78,7 @@ for chip_sample, value in chip_dict.items():
 control_samples = list(sorted(control_samples))
 chip_samples_w_ctrl = list(sorted(chip_samples_w_ctrl))
 chip_samples_wo_ctrl = list(sorted(chip_samples_wo_ctrl))
-all_samples = control_samples + chip_samples_w_ctrl + chip_samples_wo_ctrl
+chip_samples = sorted(chip_samples_w_ctrl + chip_samples_wo_ctrl)
+all_samples = sorted(control_samples + chip_samples)
 
 # TODO: do consistency check whether BAM files and .bam.bai index files of all samples given in chip_dict exist
