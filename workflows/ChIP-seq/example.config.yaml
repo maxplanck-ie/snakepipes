@@ -1,20 +1,20 @@
-## Please comment out and adjust configuration variables if their default values are
-## not appropriate for your input data
-
-## Median/mean fragment length
-# fragment_length: 200
-
-
-## The following configuration variables can only be set via this configuration
-## file when calling snakemake directly, i.e. without using the wrapper script
-## DNA-mapping.
-## example call: snakemake --snakefile snakemake_workflows/workflows/DNA-mapping/Snakefile
-##                         --cores 32
-##                         --configfile snakemake_workflows/workflows/DNA-mapping/example.config.yaml
-##                         --directory output-dir
-maindir: /home/arichter/projects/snakemake/snakemake_workflows/
-indir: /rapidus/data/arichter/snakemake_test/51_Hf12_SFTR_RD_run1/output/
-genome: hs37d5
+################################################################################
+# Please specify all ChIP samples plus their matching control/chromatin input
+# sample.
+# Specify for each ChIP sample whether the IP target results in broad/mixed-type
+# enrichment (most histone marks, e.g. H3K4me1, H3K36me3, H3K9me3, H3K27me3)
+# or not. In the latter case, the enrichment is instead punctuate/narrow
+# (e.g. TFs, active histone marks as H3K27ac or H3K4me3).
+#
+# Example:
+# chip_dict:
+#   mysample.H3K27ac:
+#     control: mysample.Input
+#     broad: False
+#   mysample.H3K27me:
+#     control: False
+#     broad: True
+################################################################################
 chip_dict:
   51_Hf12_SFTR_RD_H3K27ac_F:
     control: 51_Hf12_SFTR_RD_Input_F
@@ -22,9 +22,36 @@ chip_dict:
 #  51_Hf12_SFTR_RD_H3K27me_F:
 #    control: False
 #    broad: False
-paired: True
-fragment_length: 200
+
+
+
+################################################################################
+# Please comment out and adjust the following configuration variables if their
+# default values are not appropriate for your input data
+# ################################################################################
+## Median/mean fragment length (default: 200)
+# fragment_length: 200
+
+
+
+################################################################################
+# The following configuration variables can only be set via this configuration
+# file when calling snakemake directly, i.e. without using the wrapper script
+# ChIP-seq. When calling the script ChIP-seq, the values set below are ignored.
+# example call: snakemake --snakefile /path/to/snakemake_workflows/workflows/ChIP-seq/Snakefile
+#                         --cores 32
+#                         --configfile /path/to/snakemake_workflows/workflows/ChIP-seq/example.config.yaml
+#                         --directory /path/to/outputdir
+################################################################################
+## Snakemake workflow directory
+# maindir: /path/to/snakemake_workflows/
+## Input directory with FASTQ files
+# indir: /path/to/inputdir/
+## Genome acronym
+# genome: hs37d5
+## Input data is paired-end
+# paired: True
+## Bin size of output files in bigWig format
 # bw_binsize: 10
-
-
+##  Verbose output
 # verbose: True
