@@ -10,12 +10,18 @@ print("config: {}\n".format(config))
 ### include scripts ############################################################
 ################################################################################
 # main directory of all snakemake workflows
-maindir = config["maindir"]
+try:
+    maindir = config["maindir"]
+except:
+    print("ERROR: Variable 'maindir' has not been set by Snakemake "
+          "parameter --config or in the configuration.yaml file.")
+    exit(1)
 
 # include tool paths
 include: os.path.join(maindir, "shared", "paths.py")
 # include global variables and functions
 include: os.path.join(workflow.basedir, "internals.snakefile")
+include: os.path.join(maindir, "shared", "common_functions.py")
 # load organism-specific data, i.e. genome indices, annotation, etc.
 include: os.path.join(maindir, "shared", "load_organism_data.py")
 
@@ -39,8 +45,8 @@ include: os.path.join(maindir, "shared", "rules", "Bowtie2_bam_filtering.snakefi
 # Picard CollectAlignmentSummaryMetrics and CollectInsertSizeMetrics
 include: os.path.join(maindir, "shared", "rules", "Picard_qc.snakefile")
 
-# deepTools
-include: os.path.join(maindir, "shared", "rules", "deepTools.snakefile")
+# deepTools QC
+include: os.path.join(maindir, "shared", "rules", "deepTools_qc.snakefile")
 
 # Qualimap BAM QC
 include: os.path.join(maindir, "shared", "rules", "Qualimap_bamqc.snakefile")
@@ -75,6 +81,41 @@ def run_bamCoverage_filtered(dedup, properpairs, mapq):
         return([])
 
 
+### execute before workflow starts #############################################
+################################################################################
+onstart:
+    if "verbose" in config and config["verbose"]:
+        print("--- Workflow parameter ---------------------------------------------------------")
+        print("Input directory:", indir)
+        print("Input files:", infiles)
+        print("Output directory:", outdir)
+        print("Samples:", samples)
+        print("Paired-end reads:", paired)
+        print("Read extension:", reads)
+        print("Genome:", genome)
+        print("Downsample:", downsample)
+        print("Trimming:", trim)
+        print("FastQC:", fastqc)
+        print("Input directory for mapping:", fastq_dir)
+        print("De-duplicate reads/read pairs:", dedup)
+        print("Retain only proper pairs:", properpairs)
+        print("Minimum mapping quality:", mapq)
+        print("BigWig bin size:", bw_binsize)
+        print("-" * 80, "\n")
+
+        print("--- Genome ---------------------------------------------------------------------")
+        print("Genome:", genome)
+        print("Effective genome size:", genome_size)
+        print("Genome FASTA:", genome_fasta)
+        print("Genome index:", genome_index)
+        print("Genome 2bit:", genome_2bit)
+        print("Bowtie2 index:", bowtie2_index)
+        print("Gene annotation BED:", genes_bed)
+        print("Gene annotation GTF:", genes_gtf)
+        print("Blacklist regions BED:", blacklist_bed)
+        print("-" * 80, "\n")
+
+
 ### main rule ##################################################################
 ################################################################################
 rule all:
@@ -97,24 +138,8 @@ rule all:
         expand("Qualimap_qc/{sample}.filtered.bamqc_results.txt", sample = samples)
 
 
-### Execute after workflow finished ############################################
+### execute after workflow finished ############################################
 ################################################################################
 onsuccess:
-    print("\n--- Workflow finished successfully! --------------------------------------------\n")
-    print("--- Workflow parameter ---------------------------------------------------------")
-    print("Input directory:", indir)
-    print("Input files:", infiles)
-    print("Output directory:", outdir)
-    print("Samples:", samples)
-    print("Paired-end reads:", paired)
-    print("Read extension:", reads)
-    print("Genome:", genome)
-    print("Downsample:", downsample)
-    print("Trimming:", trim)
-    print("FastQC:", fastqc)
-    print("Input directory for mapping:", fastq_dir)
-    print("De-duplicate reads/read pairs:", dedup)
-    print("Retain only proper pairs:", properpairs)
-    print("Minimum mapping quality:", mapq)
-    print("BigWig bin size:", bw_binsize)
-    print("-" * 80, "\n")
+    if "verbose" in config and config["verbose"]:
+        print("\n--- Workflow finished successfully! --------------------------------------------\n")

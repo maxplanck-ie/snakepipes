@@ -89,7 +89,7 @@ def main():
 
     main_dir_path = os.path.join(os.path.dirname(os.path.dirname(this_script_dir)))
     if not os.path.isdir(main_dir_path):
-        print("Error! Shared snakemake workflow directory is NOT available at:", main_dir_path)
+        print("ERROR: Shared snakemake workflow directory is NOT available at:", main_dir_path)
         exit(1)
 
     ## Output directory + log directory
@@ -118,6 +118,8 @@ def main():
         user_configs += ["mapq={}".format(args.mapq)]
     if args.bw_binsize:
         user_configs += ["bw_binsize={}".format(args.bw_binsize)]
+    if args.verbose:
+        user_configs += ["verbose=True"]
 
 
     snakemake_module_load = "module load snakemake slurm &&".split()
@@ -164,7 +166,7 @@ def main():
     try:
         p.wait()
     except:
-        print("\nWarning: Snakemake terminated!!!")
+        print("\nWARNING: Snakemake terminated!!!")
         if p.returncode != 0:
             if p.returncode:
                 print("Returncode:", p.returncode)
