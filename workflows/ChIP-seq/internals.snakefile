@@ -39,6 +39,11 @@ except:
     genome = None
 
 try:
+    paired = config["paired"]
+except:
+    paired = False
+
+try:
     bw_binsize = int(config["bw_binsize"])
 except:
     bw_binsize = 10
@@ -47,11 +52,6 @@ try:
     fragment_length = int(config["fragment_length"])
 except:
     fragment_length = 200
-
-try:
-    paired = config["paired"]
-except:
-    paired = False
 
 
 ### Initialization #############################################################
