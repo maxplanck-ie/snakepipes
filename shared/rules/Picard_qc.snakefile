@@ -11,7 +11,7 @@ rule CollectAlignmentSummaryMetrics:
         "Picard_qc/logs/CollectAlignmentSummaryMetrics.{sample}.filtered.log"
     benchmark:
         "Picard_qc/.benchmark/CollectAlignmentSummaryMetrics.{sample}.filtered.benchmark"
-    threads: 2 # Java performs parallel garbage collection
+    threads: 4 # Java performs parallel garbage collection
     shell:
         "java -Xmx4g -jar "+picard_path+"picard.jar CollectAlignmentSummaryMetrics "
             "REFERENCE_SEQUENCE={params.genome} "
@@ -33,7 +33,7 @@ if paired:
             "Picard_qc/logs/CollectInsertSizeMetrics.{sample}.filtered.log"
         benchmark:
             "Picard_qc/.benchmark/CollectInsertSizeMetrics.{sample}.filtered.benchmark"
-        threads: 2 # Java performs parallel garbage collection
+        threads: 4 # Java performs parallel garbage collection
         shell:
             "export PATH="+R_path+":$PATH && "
             "java -Xmx4g -jar "+picard_path+"picard.jar CollectInsertSizeMetrics "

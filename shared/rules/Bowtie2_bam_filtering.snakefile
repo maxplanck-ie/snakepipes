@@ -60,7 +60,7 @@ rule MarkDuplicates:
         "Picard_qc/logs/MarkDuplicates.{sample}.log"
     benchmark:
         "Picard_qc/.benchmark/MarkDuplicates.{sample}.benchmark"
-    threads: 2 # Java performs parallel garbage collection
+    threads: 4 # Java performs parallel garbage collection
     shell:
         "java -Xmx8g -jar "+picard_path+"picard.jar MarkDuplicates "
             "MAX_FILE_HANDLES=1000 "
