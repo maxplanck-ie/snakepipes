@@ -43,27 +43,6 @@ def is_paired(infiles):
     return(paired)
 
 
-def get_fragment_length(infile):
-    """
-    Return median insert size from a metrics file created by
-    Picard CollectInsertSizeMetrics
-    Read 2 column text file, grep line by 1st column, return 2nd
-    """
-    with open(infile, "r") as f:
-        for line in f:
-            line = line.strip()
-            if line.startswith("MEDIAN_INSERT_SIZE"):
-                try:
-                    median = next(f).split()[0]
-                    return int(median)
-                except:
-                    print("Error! File", infile, "is NOT a proper Picard CollectInsertSizeMetrics metrics file.\n")
-                    exit(1)
-    # no match in infile
-    print("Error! File", infile, "is not a proper Picard CollectInsertSizeMetrics metrics file.")
-    exit(1)
-
-
 # When modifying the function update_filter(), double-check wether the rule
 # samtools_filter has to be modified concordantly
 def update_filter(samples):
@@ -93,7 +72,7 @@ def update_filter(samples):
                 # remove symlink if filtering options have been specified
                 if filter:
                     cmd = "rm -f "+filtered_bam+" "+filtered_bai
-                    print("\nWarning: Filtering options changed.\n"
+                    print("\nWARNING: Filtering options changed.\n"
                           "Removing files:", filtered_bam, filtered_bai)
                     subprocess.call(cmd, shell=True)
             # file sample.filter exists, i.e. filtering was done previously
@@ -105,7 +84,7 @@ def update_filter(samples):
                     # then remove filtered files
                     if not current_filter == old_filter:
                         cmd = "rm -f "+filtered_bam+" "+filtered_bai+" "+filter_file
-                        print("\nWarning: Filtering options changed.\n"
+                        print("\nWARNING: Filtering options changed.\n"
                               "Removing files:", filtered_bam, filtered_bai, filter_file)
                         subprocess.call(cmd, shell=True)
 
