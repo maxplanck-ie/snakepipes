@@ -5,7 +5,7 @@ shared/:
 - shared/debugging.snakefile removed as not used by pipeline
 - renamed shared/load_organisms.snakefile to shared/load_organism_data.py
 - defined (effective) genome size as (genome length)-(number of 'N's), added additional files to genome data in shared/organisms/
-- shared/rules/deepTools.snakefiles:
+- shared/rules/deepTools_qc.snakefiles:
   - added file as one common snakefile for all deepTools rules
   - moved rules from computeGCBias.snakefile and all deepTools rules from workflows/ChIP-seq/Snakefile
 
