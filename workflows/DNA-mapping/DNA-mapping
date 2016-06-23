@@ -34,7 +34,7 @@ def parse_args():
     ## optional
     parser.add_argument("-g", "--genome", dest="genome", required=True, help="genome acronym of target organism (supported: 'dm6', 'hs37d5', 'mm9', 'mm10')")
     parser.add_argument("-c", "--configfile", dest="configfile", help="configuration file (config.yaml)", default=None)
-    parser.add_argument("-i", "--input-dir", dest="indir", help="input directory containing the FASTQ files (default: '.')", default=None)
+    parser.add_argument("-i", "--input-dir", dest="indir", help="input directory containing the FASTQ files, either paired-end OR single-end data (default: '.')", default=None)
     parser.add_argument("-o", "--output-dir", dest="outdir", help="output directory (default: '.')", default=None)
     parser.add_argument("-j", "--jobs", dest="max_jobs", metavar="INT", help="maximum number of concurrently submitted Slurm jobs / cores if workflow is run locally (default: '%(default)s')", type=int, default=8)
     parser.add_argument("--local", dest="local", action="store_true", default=False, help="run workflow locally (default: jobs are submitted to Slurm queue)")
@@ -43,7 +43,7 @@ def parse_args():
     parser.add_argument("--downsample", dest="downsample", metavar="INT", help="downsample the given number of reads from the head of each FASTQ file", type=int, default=None)
     parser.add_argument("--trim", dest="trim", action="store_true", default=False, help="trim reads with TrimGalore")
     parser.add_argument("--fastqc", dest="fastqc", action="store_true", default=False, help="run FastQC read quality control")
-    parser.add_argument("--dedup", dest="dedup", action="store_true", default=False, help="retain only de-duplicated reads/read pairs (given single-/paired-end data)")
+    parser.add_argument("--dedup", dest="dedup", action="store_true", default=False, help="retain only de-duplicated reads/read pairs (given single-/paired-end data), recommended for ChIP-seq data")
     parser.add_argument("--properpairs", dest="properpairs", action="store_true", default=False, help="retain only reads mapping in proper pairs")
     parser.add_argument("--mapq", dest="mapq", metavar="INT", help="retain only reads with at least the given mapping quality (default: '%(default)s')", type=int, default=0)
     parser.add_argument("--bw-binsize", dest="bw_binsize", metavar="INT", help="bin size of output files in bigWig format (default: '%(default)s')", type=int, default=10)
@@ -143,7 +143,7 @@ def main():
             snakemake_cmd.append("--forceall")
 
     if not args.local:
-            snakemake_cmd += ["--cluster 'SlurmEasy --threads {threads} --log", cluster_logs_dir, "--name DNA-mapping.snakemake'"]
+            snakemake_cmd += ["--cluster 'SlurmEasy --threads {threads} --log", cluster_logs_dir, "--name {rule}.snakemake'"]
 
     snakemake_log = "2>&1 | tee -a {}/LOG".format(args.outdir).split()
 

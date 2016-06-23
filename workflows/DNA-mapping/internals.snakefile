@@ -231,6 +231,7 @@ try:
 except:
     bw_binsize = 10
 
+
 ### Initialization #############################################################
 
 infiles = sorted(glob.glob(os.path.join(indir, '*'+ext)))

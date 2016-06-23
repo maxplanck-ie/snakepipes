@@ -64,7 +64,7 @@ def run_TrimGalore(trim, fastqc):
 
 def run_CollectInsertSizeMetrics(paired):
     if paired:
-        return( expand("Picard_qc/InsertSizeMetrics/{sample}.insert_size_metrics.txt", sample = samples) )
+        return( expand("Picard_qc/InsertSizeMetrics/{sample}.filtered.insert_size_metrics.txt", sample = samples) )
     else:
         return([])
 
@@ -84,17 +84,17 @@ rule all:
         run_TrimGalore(trim, fastqc),
         expand("Bowtie2/{sample}.bam.bai", sample = samples),
         expand("filtered_bam/{sample}.filtered.bam.bai", sample = samples),
-        expand("Picard_qc/AlignmentSummaryMetrics/{sample}.alignment_summary_metrics.txt", sample = samples),
+        expand("Picard_qc/AlignmentSummaryMetrics/{sample}.filtered.alignment_summary_metrics.txt", sample = samples),
         run_CollectInsertSizeMetrics(paired),
         expand("bamCoverage/{sample}.seq_depth_norm.bw", sample = samples),
         run_bamCoverage_filtered(dedup, properpairs, mapq),
-        expand("deepTools_qc/computeGCBias/{sample}.GCBias.png", sample = samples),
+        expand("deepTools_qc/computeGCBias/{sample}.filtered.GCBias.png", sample = samples),
         "deepTools_qc/plotCoverage/read_coverage.png",
         "deepTools_qc/plotCorrelation/correlation.pearson.read_coverage.heatmap.png",
         "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage.heatmap.png",
         "deepTools_qc/plotPCA/PCA.read_coverage.png",
-        expand("Qualimap_qc/{sample}.bamqc_report.html", sample = samples),
-        expand("Qualimap_qc/{sample}.bamqc_results.txt", sample = samples)
+        expand("Qualimap_qc/{sample}.filtered.bamqc_report.html", sample = samples),
+        expand("Qualimap_qc/{sample}.filtered.bamqc_results.txt", sample = samples)
 
 
 ### Execute after workflow finished ############################################

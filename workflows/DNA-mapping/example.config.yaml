@@ -1,5 +1,7 @@
-## Please comment out and adjust configuration variables if their default values are
-## not appropriate for your input data
+"""
+Please comment out and adjust the following configuration variables if their
+default values are not appropriate for your input data
+"""
 
 ## paired-end read name extension
 # reads: ["_R1", "_R2"]
@@ -17,17 +19,23 @@
 # trim_galore_opts: "--stringency 2"
 
 
-## The following configuration variables can only be set via this configuration
-## file when calling snakemake directly, i.e. without using the wrapper script
-## DNA-mapping.
-## example call: snakemake --snakefile snakemake_workflows/workflows/DNA-mapping/Snakefile
-##                         --cores 32
-##                         --configfile snakemake_workflows/workflows/DNA-mapping/example.config.yaml
-##                         --directory output-dir
+"""
+The following configuration variables can only be set via this configuration
+file when calling snakemake directly, i.e. without using the wrapper script
+DNA-mapping. When calling the script DNA-mapping, their values set below
+are ignored.
+example call: snakemake --snakefile snakemake_workflows/workflows/DNA-mapping/Snakefile
+                        --cores 32
+                        --configfile snakemake_workflows/workflows/DNA-mapping/example.config.yaml
+                        --directory output-dir
+"""
 # maindir: /home/arichter/projects/snakemake/snakemake_workflows/
 # indir: /rapidus/data/arichter/snakemake_test/51_Hf12_SFTR_RD_run1/input/
 # genome: hs37d5
 # downsample: 50000
 # trim: True
 # fastqc: True
+# dedup: True
+# properpairs: True
+# mapq: 1
 # bw_binsize: 10
