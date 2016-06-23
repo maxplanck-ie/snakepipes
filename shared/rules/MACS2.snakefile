@@ -34,7 +34,10 @@ rule MACS2:
     benchmark:
         "MACS2/.benchmark/MACS2.{chip_sample}.filtered.benchmark"
     run:
-        median_fragment_length = get_fragment_length(input.insert_size_metrics) if params.paired else params.fragment_length
+        if params.paired:
+            median_fragment_length = get_fragment_length(input.insert_size_metrics)
+        else:
+            median_fragment_length = params.fragment_length
         model = "--nomodel --extsize "+str(median_fragment_length) if params.paired else "--extsize "+str(median_fragment_length)
         shell(
             macs2_path+"macs2 callpeak "
@@ -81,27 +84,28 @@ rule MACS2_peak_qc:
     params:
         peaks =
             lambda wildcards: "MACS2/{sample}.filtered.BAM_peaks.broadPeak" if is_broad(wildcards.sample)
-            else "MACS2/{sample}.filtered.BAM_peaks.narrowPeak"
+            else "MACS2/{sample}.filtered.BAM_peaks.narrowPeak",
+        genome_index = genome_index
     log:
         "MACS2/logs/MACS2_peak_qc.{sample}.filtered.log"
     benchmark:
         "MACS2/.benchmark/MACS2_peak_qc.{sample}.filtered.benchmark"
     run:
         # get the number of mapped reads from Picard CollectAlignmentSummaryMetrics output
-        cmd = "egrep '^PAIR|UNPAIRED' "+input.aln_metrics+" | cut -f 6"
+        cmd = "egrep '^PAIR|UNPAIRED' {input.aln_metrics} | cut -f 6"
         mapped_reads = int(subprocess.check_output( cmd, shell=True).decode())
 
         # calculate the number of alignments overlapping the peaks
         # exclude reads flagged as unmapped (unmapped reads will be reported when using -L)
-        cmd = samtools_path+"samtools view -c -F 4 -L "+params.peaks+" "+input.bam
+        cmd = samtools_path+"samtools view -c -F 4 -L {params.peaks} {input.bam}"
         reads_in_peaks = int(subprocess.check_output( cmd, shell=True).decode())
 
         # calculate Fraction of Reads In Peaks
         frip = reads_in_peaks / mapped_reads
 
         # compute peak genome coverage
-        cmd = ("sort -k 1,1 "+params.peaks+" | "+
-               bedtools_path+"genomeCoverageBed -i - -g "+genome_index+" | "+
+        cmd = ("sort -k 1,1 {params.peaks} | "+
+               bedtools_path+"genomeCoverageBed -i - -g {params.genome_index} | "+
                "grep -P 'genome\t1' | cut -f 5"
               )
         genomecov = float(subprocess.check_output( cmd, shell=True).decode())

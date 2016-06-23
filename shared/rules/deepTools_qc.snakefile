@@ -69,6 +69,7 @@ rule computeGCBias:
         png = "deepTools_qc/computeGCBias/{sample}.filtered.GCBias.png",
         tsv = "deepTools_qc/computeGCBias/{sample}.filtered.GCBias.freq.tsv"
     params:
+        paired = paired,
         fragment_length = fragment_length,
         genome_size = int(genome_size),
         genome_2bit = genome_2bit,
@@ -80,8 +81,8 @@ rule computeGCBias:
         "deepTools_qc/.benchmark/computeGCBias.{sample}.filtered.benchmark"
     threads: 16
     run:
-        if paired:
-            median_fragment_length = get_fragment_length("Picard_qc/InsertSizeMetrics/{sample}.filtered.insert_size_metrics.txt")
+        if params.paired:
+            median_fragment_length = get_fragment_length(input.insert_size_metrics)
         else:
             median_fragment_length = params.fragment_length
         shell(
@@ -91,7 +92,7 @@ rule computeGCBias:
             "--GCbiasFrequenciesFile {output.tsv} "
             "--effectiveGenomeSize {params.genome_size} "
             "--genome {params.genome_2bit} "
-            "--fragmentLength "+median_fragment_length+
+            "--fragmentLength "+str(median_fragment_length)+" "
             "--sampleSize 10000000 " # very long runtime with default sample size
             "{params.blacklist} "
             "-p {threads} "

@@ -8,7 +8,8 @@ rule histoneHMM:
         "histoneHMM/{sample}.filtered.histoneHMM-em-posterior.txt",
         "histoneHMM/{sample}.filtered.histoneHMM.txt"
     params:
-        prefix = "histoneHMM/{sample}.filtered.histoneHMM"
+        prefix = "histoneHMM/{sample}.filtered.histoneHMM",
+        genome_index = genome_index
     log:
         "histoneHMM/logs/histoneHMM.{sample}.filtered.log"
     benchmark:
@@ -17,7 +18,7 @@ rule histoneHMM:
       "export R_LIBS_USER="+R_libs_path+" &&"+
       R_path+"Rscript "+histoneHMM_path+"histoneHMM_call_regions.R "
         "-b 750 "
-        "-c "+genome_index+" "
+        "-c {params.genome_index} "
         "-o {params.prefix} "
         "-P 0.1 "
         "{input} "
