@@ -82,8 +82,8 @@ rule samtools_filter:
         "Bowtie2/{sample}.bam"
     output:
         bam = "filtered_bam/{sample}.filtered.bam",
-        # if no filter is specified, use BAM file as dummy input file dependency
-        filter_file = "filtered_bam/{sample}.filter" if (dedup or properpairs or mapq > 0) else "filtered_bam/{sample}.filtered.bam"
+        filter_file = "filtered_bam/{sample}.filter" if (dedup or properpairs or mapq > 0)
+                      else []
     params:
         dedup = dedup,
         properpairs = properpairs,

@@ -9,7 +9,8 @@ rule bamCoverage:
     params:
         bw_binsize = bw_binsize,
         genome_size = int(genome_size),
-        read_extension = "--extendReads" if paired else "--extendReads "+str(fragment_length)
+        read_extension = "--extendReads" if paired
+                         else "--extendReads "+str(fragment_length)
     log:
         "bamCoverage/logs/bamCoverage.{sample}.log"
     benchmark:
@@ -37,7 +38,8 @@ rule bamCoverage_filtered:
     params:
         bw_binsize = bw_binsize,
         genome_size = int(genome_size),
-        read_extension = "--extendReads" if paired else "--extendReads "+str(fragment_length)
+        read_extension = "--extendReads" if paired
+                         else "--extendReads "+str(fragment_length)
     log:
         "bamCoverage/logs/bamCoverage.{sample}.filtered.log"
     benchmark:
@@ -60,35 +62,38 @@ rule computeGCBias:
     input:
         bam = "filtered_bam/{sample}.filtered.bam",
         bai = "filtered_bam/{sample}.filtered.bam.bai",
-        # for single-end samples, use BAM file as dummy input file dependency
         insert_size_metrics =
             "Picard_qc/InsertSizeMetrics/{sample}.filtered.insert_size_metrics.txt" if paired
-            else "filtered_bam/{sample}.filtered.bam"
+            else []
     output:
         png = "deepTools_qc/computeGCBias/{sample}.filtered.GCBias.png",
         tsv = "deepTools_qc/computeGCBias/{sample}.filtered.GCBias.freq.tsv"
     params:
         fragment_length = fragment_length,
         genome_size = int(genome_size),
-        genome_2bit = genome_2bit
+        genome_2bit = genome_2bit,
+        blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed
+                    else "",
+        median_fragment_length =
+            lambda wildcards: get_fragment_length("Picard_qc/InsertSizeMetrics/"+wildcards.sample+".filtered.insert_size_metrics.txt") if paired
+            else fragment_length
     log:
         "deepTools_qc/logs/computeGCBias.{sample}.filtered.log"
     benchmark:
         "deepTools_qc/.benchmark/computeGCBias.{sample}.filtered.benchmark"
     threads: 16
-    run:
-        median_fragment_length = get_fragment_length(input.insert_size_metrics) if paired else params.fragment_length
-        shell(
-            deepTools_path+"computeGCBias "
-            "-b {input.bam} "
-            "--biasPlot {output.png} "
-            "--GCbiasFrequenciesFile {output.tsv} "
-            "--effectiveGenomeSize {params.genome_size} "
-            "--genome {params.genome_2bit} "
-            "--fragmentLength "+str(median_fragment_length)+" "
-            "-p {threads} "
-            "&> {log}"
-        )
+    shell:
+        deepTools_path+"computeGCBias "
+        "-b {input.bam} "
+        "--biasPlot {output.png} "
+        "--GCbiasFrequenciesFile {output.tsv} "
+        "--effectiveGenomeSize {params.genome_size} "
+        "--genome {params.genome_2bit} "
+        "--fragmentLength {params.median_fragment_length} "
+        "--sampleSize 10000000 " # very long runtime with default sample size
+        "{params.blacklist} "
+        "-p {threads} "
+        "&> {log}"
 
 
 ### deepTools multiBamSummary ##################################################
@@ -101,8 +106,10 @@ rule multiBamSummary:
         "deepTools_qc/multiBamSummary/read_coverage.bins.npz"
     params:
         labels = " ".join(samples),
-        blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed else "",
-        read_extension = "--extendReads" if paired else "--extendReads "+str(fragment_length)
+        blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed
+                    else "",
+        read_extension = "--extendReads" if paired
+                         else "--extendReads "+str(fragment_length)
     log:
         "deepTools_qc/logs/multiBamSummary.log"
     benchmark:
@@ -197,7 +204,8 @@ rule plotCoverage:
         "deepTools_qc/plotCoverage/read_coverage.png"
     params:
         labels = " ".join(samples),
-        read_extension = "--extendReads" if paired else "--extendReads "+str(fragment_length)
+        read_extension = "--extendReads" if paired
+                         else "--extendReads "+str(fragment_length)
     log:
         "deepTools_qc/logs/plotCoverage.log"
     benchmark:
