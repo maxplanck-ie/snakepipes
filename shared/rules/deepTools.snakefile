@@ -14,7 +14,7 @@ rule bamCoverage:
         "bamCoverage/logs/bamCoverage.{sample}.log"
     benchmark:
         "bamCoverage/.benchmark/bamCoverage.{sample}.benchmark"
-    threads: 32
+    threads: 16
     shell:
         deepTools_path+"bamCoverage "
         "-b {input.bam} "
@@ -39,10 +39,10 @@ rule bamCoverage_filtered:
         genome_size = int(genome_size),
         read_extension = "--extendReads" if paired else "--extendReads "+str(fragment_length)
     log:
-        "bamCoverage/logs/bamCoverage.{sample}.log"
+        "bamCoverage/logs/bamCoverage.{sample}.filtered.log"
     benchmark:
-        "bamCoverage/.benchmark/bamCoverage.{sample}.benchmark"
-    threads: 32
+        "bamCoverage/.benchmark/bamCoverage.{sample}.filtered.benchmark"
+    threads: 16
     shell:
         deepTools_path+"bamCoverage "
         "-b {input.bam} "
@@ -62,20 +62,20 @@ rule computeGCBias:
         bai = "filtered_bam/{sample}.filtered.bam.bai",
         # for single-end samples, use BAM file as dummy input file dependency
         insert_size_metrics =
-            "Picard_qc/InsertSizeMetrics/{sample}.insert_size_metrics.txt" if paired
+            "Picard_qc/InsertSizeMetrics/{sample}.filtered.insert_size_metrics.txt" if paired
             else "filtered_bam/{sample}.filtered.bam"
     output:
-        png = "deepTools_qc/computeGCBias/{sample}.GCBias.png",
-        tsv = "deepTools_qc/computeGCBias/{sample}.GCBias.freq.tsv"
+        png = "deepTools_qc/computeGCBias/{sample}.filtered.GCBias.png",
+        tsv = "deepTools_qc/computeGCBias/{sample}.filtered.GCBias.freq.tsv"
     params:
         fragment_length = fragment_length,
         genome_size = int(genome_size),
         genome_2bit = genome_2bit
     log:
-        "deepTools_qc/logs/computeGCBias.{sample}.log"
+        "deepTools_qc/logs/computeGCBias.{sample}.filtered.log"
     benchmark:
-        "deepTools_qc/.benchmark/computeGCBias.{sample}.benchmark"
-    threads: 24
+        "deepTools_qc/.benchmark/computeGCBias.{sample}.filtered.benchmark"
+    threads: 16
     run:
         median_fragment_length = get_fragment_length(input.insert_size_metrics) if paired else params.fragment_length
         shell(
@@ -107,7 +107,7 @@ rule multiBamSummary:
         "deepTools_qc/logs/multiBamSummary.log"
     benchmark:
         "deepTools_qc/.benchmark/multiBamSummary.benchmark"
-    threads: 32
+    threads: 24
     shell:
         deepTools_path+"multiBamSummary bins "
         "-b {input.bams} "
@@ -202,7 +202,7 @@ rule plotCoverage:
         "deepTools_qc/logs/plotCoverage.log"
     benchmark:
         "deepTools_qc/.benchmark/plotCoverage.benchmark"
-    threads: 32
+    threads: 24
     shell:
         deepTools_path+"plotCoverage "
         "-b {input.bams} "

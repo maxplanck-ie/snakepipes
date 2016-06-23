@@ -57,6 +57,6 @@ rule FastQC_on_TrimGalore:
         "FastQC_on_TrimGalore/logs/FastQC_on_TrimGalore.{sample}{read}.log"
     benchmark:
         "FastQC_on_TrimGalore/.benchmark/FastQC_on_TrimGalore.{sample}{read}.benchmark"
-    threads: 24
+    threads: 2
     shell:
         fastqc_path+"fastqc -o FastQC_on_TrimGalore {input} &> {log}"

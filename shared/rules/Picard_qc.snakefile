@@ -4,13 +4,13 @@ rule CollectAlignmentSummaryMetrics:
     input:
         "filtered_bam/{sample}.filtered.bam"
     output:
-        "Picard_qc/AlignmentSummaryMetrics/{sample}.alignment_summary_metrics.txt"
+        "Picard_qc/AlignmentSummaryMetrics/{sample}.filtered.alignment_summary_metrics.txt"
     params:
         genome = genome_fasta  # reference genome FASTA sequence
     log:
-        "Picard_qc/logs/CollectAlignmentSummaryMetrics.{sample}.log"
+        "Picard_qc/logs/CollectAlignmentSummaryMetrics.{sample}.filtered.log"
     benchmark:
-        "Picard_qc/.benchmark/CollectAlignmentSummaryMetrics.{sample}.benchmark"
+        "Picard_qc/.benchmark/CollectAlignmentSummaryMetrics.{sample}.filtered.benchmark"
     threads: 2 # Java performs parallel garbage collection
     shell:
         "java -Xmx4g -jar "+picard_path+"picard.jar CollectAlignmentSummaryMetrics "
@@ -27,12 +27,12 @@ if paired:
         input:
             "filtered_bam/{sample}.filtered.bam"
         output:
-            txt = "Picard_qc/InsertSizeMetrics/{sample}.insert_size_metrics.txt",
-            pdf = "Picard_qc/InsertSizeMetrics/{sample}.insert_size_histogram.pdf"
+            txt = "Picard_qc/InsertSizeMetrics/{sample}.filtered.insert_size_metrics.txt",
+            pdf = "Picard_qc/InsertSizeMetrics/{sample}.filtered.insert_size_histogram.pdf"
         log:
-            "Picard_qc/logs/CollectInsertSizeMetrics.{sample}.log"
+            "Picard_qc/logs/CollectInsertSizeMetrics.{sample}.filtered.log"
         benchmark:
-            "Picard_qc/.benchmark/CollectInsertSizeMetrics.{sample}.benchmark"
+            "Picard_qc/.benchmark/CollectInsertSizeMetrics.{sample}.filtered.benchmark"
         threads: 2 # Java performs parallel garbage collection
         shell:
             "export PATH="+R_path+":$PATH && "
