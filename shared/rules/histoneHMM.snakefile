@@ -33,8 +33,10 @@ rule histoneHMM_out_gz:
         txt = "histoneHMM/{sample}.filtered.histoneHMM.txt"
     output:
         gff = "histoneHMM/{sample}.filtered.histoneHMM-regions.gff.gz",
-        post = "histoneHMM/{sample}.filtered.histoneHMM-em-posterior.txt.gz",
-        txt = "histoneHMM/{sample}.filtered.histoneHMM.txt.gz"
+        # touch output files as their modification date must more recent than
+        # the modification date of the input files
+        post = touch("histoneHMM/{sample}.filtered.histoneHMM-em-posterior.txt.gz"),
+        txt = touch("histoneHMM/{sample}.filtered.histoneHMM.txt.gz")
     log:
         "histoneHMM/logs/histoneHMM_out_gz.{sample}.filtered.log"
     benchmark:
