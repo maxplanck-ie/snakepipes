@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 
 __description__ = """
 ChIP-seq workflow v{version} - MPI-IE workflow for ChIP-seq analysis
 Fabian Kilpert, Andreas Richter
-June 23, 2016
+June 24, 2016
 
 Usage example:
     ChIP-seq -i input-dir -o output-dir mm10 config.yaml
@@ -123,10 +123,10 @@ def main():
         snakemake_cmd.append("--rerun-incomplete")
 
     if args.forceall:
-            snakemake_cmd.append("--forceall")
+        snakemake_cmd.append("--forceall")
 
     if not args.local:
-            snakemake_cmd += ["--cluster 'SlurmEasy --threads {threads} --log", cluster_logs_dir, "--name {rule}.snakemake'"]
+        snakemake_cmd += ["--cluster 'SlurmEasy --threads {threads} --log", cluster_logs_dir, "--name {rule}.snakemake'"]
 
     snakemake_log = "2>&1 | tee -a {}/ChIP-seq.log".format(args.outdir).split()
 

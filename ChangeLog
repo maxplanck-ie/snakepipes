@@ -1,33 +1,37 @@
-version 0.1.0 - June 15, 2016:
+version 0.0.1 - March 23, 2016 - Fabian Kilpert
+- initial version
 
-shared/:
-- shared/cluster.yaml removed as not required when taking {threads} parameter from each rule
-- shared/debugging.snakefile removed as not used by pipeline
-- renamed shared/load_organisms.snakefile to shared/load_organism_data.py
-- defined (effective) genome size as (genome length)-(number of 'N's), added additional files to genome data in shared/organisms/
-- shared/rules/deepTools_qc.snakefiles:
-  - added file as one common snakefile for all deepTools rules
-  - moved rules from computeGCBias.snakefile and all deepTools rules from workflows/ChIP-seq/Snakefile
+version 0.1.0 - June 15, 2016 - Andreas Richter
+- added --fastqc and --bw-binsize parameters to DNA-mapping wrapper script
+- additional organisms are now supported by adding new genome.py files
+- defined (effective) genome size as (genome length)-(number of 'N's) in genome.py files
+- simplified cluster submission by taking 'threads' parameter from rule definition, removed cluster.yaml
+- added DNA-mapping example configuration yaml file
+- added function get_fragment_length() to DNA-mapping internals.snakefile to parse median insert size from Picard output
+- added deepTools_qc.snakefile as one common snakefile for all deepTools rules,
+    moved all deepTools rules from ChIP-seq Snakefile and computeGCBias.snakefile
+- moved include statements of module snakefiles from rules.snakefile to DNA-mapping Snakefile to simplify structure, removed rules.snakefile
+- renamed functions do_TrimGalore(trim) and do_InsertSizeMetrics(paired) in DNA-mapping Snakefile
+- renamed load_organisms.snakefile to load_organism_data.py
+- removed debugging.snakefile as it was not used by any pipeline
+- removed --local-cores parameter from all wrapper scripts as there are no local snakemake rules defined
+- many small other changes
 
-workflows/:
-- workflows/ChIP-seq/ChIP-seq + workflows/DNA-mapping/DNA-mapping + workflows/rMATS/rMATS.sh:
-  - removed --local-cores parameter as there are no local snakemake rules used
-  - simplified cluster submission by taking {threads} parameter from rule definition
-  - added --fastqc and --bw-binsize parameters
-- workflows/DNA-mapping/Snakefile:
-  - moved includes of module snakefiles from rules.snakefile to main snakefile to simplify structure
-  - renamed functions do_TrimGalore(trim) and do_InsertSizeMetrics(paired)
-  - several minor changes
-- workflows/DNA-mapping/example.config.yaml added
-- workflows/DNA-mapping/internals.snakefile: added function get_fragment_length() to parse median insert size from Picard output
-- workflows/DNA-mapping/rules.snakefile removed as includes of module snakefiles were moved to main snakefile
-
-version 0.1.1 - June 17, 2016:
+version 0.1.1 - June 17, 2016 - Andreas Richter
 - added option to run workflow locally instead of cluster submission
-- shared/rules/FASTQ.snakefiles replaces FASTQ_symlink.snakefile and FASTQ_downsample.snakefile
+- FASTQ.snakefile replaces FASTQ_symlink.snakefile and FASTQ_downsample.snakefile
 - several small changes
 
-version 0.2.0 - June 22, 2016:
+version 0.2.0 - June 22, 2016 - Andreas Richter
 - added filtering option to filter BAM files for duplication, proper pairs and MAPQ
-- add variable outdir to configuration
+- added variable 'outdir' to configuration
+- many small changes
+
+version 0.3.0 - June 24, 2016 - Andreas Richter
+- rewrote ChIP-seq workflow completely including wrapper script ChIP-seq
+- added histoneHMM for calling broadly enriched regions
+- added MACS2 peak quality controls
+- revised example.config.yaml files
+- moved function get_fragment_length() to common_functions.py
+- positional instead of required optional command line arguments
 - many small changes
