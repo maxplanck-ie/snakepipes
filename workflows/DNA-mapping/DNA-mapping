@@ -49,6 +49,7 @@ def parse_args():
     parser.add_argument("--properpairs", dest="properpairs", action="store_true", default=False, help="retain only reads mapping in proper pairs")
     parser.add_argument("--mapq", dest="mapq", metavar="INT", help="retain only reads with at least the given mapping quality (default: '%(default)s')", type=int, default=0)
     parser.add_argument("--bw-binsize", dest="bw_binsize", metavar="INT", help="bin size of output files in bigWig format (default: '%(default)s')", type=int, default=10)
+    parser.add_argument("--gcbias", dest="gcbias", action="store_true", default=False, help="run computeGCBias quality control (long runtime!)")
     parser.add_argument("-v", "--verbose", dest="verbose", action="store_true", default=False, help="verbose output")
 
 
@@ -118,6 +119,8 @@ def main():
         user_configs += ["mapq={}".format(args.mapq)]
     if args.bw_binsize:
         user_configs += ["bw_binsize={}".format(args.bw_binsize)]
+    if args.gcbias:
+        user_configs += ["gcbias=True"]
     if args.verbose:
         user_configs += ["verbose=True"]
 

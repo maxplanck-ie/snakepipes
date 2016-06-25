@@ -63,7 +63,7 @@ rule computeGCBias:
         bam = "filtered_bam/{sample}.filtered.bam",
         bai = "filtered_bam/{sample}.filtered.bam.bai",
         insert_size_metrics =
-            "Picard_qc/InsertSizeMetrics/{sample}.filtered.insert_size_metrics.txt" if paired
+            "Picard_qc/InsertSizeMetrics/{sample}.insert_size_metrics.txt" if paired
             else []
     output:
         png = "deepTools_qc/computeGCBias/{sample}.filtered.GCBias.png",

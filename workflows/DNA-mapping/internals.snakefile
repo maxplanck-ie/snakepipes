@@ -210,6 +210,20 @@ try:
 except:
     bw_binsize = 10
 
+# IMPORTANT: When using snakemake with argument --config key=True, the
+# string "True" is assigned to variable "key". Assigning a boolean value
+# does not seem to be possible. Therefore, --config key=False will also
+# return the boolean value True as bool("False") gives True.
+# In contrast, within a configuration file config.yaml, assigment of boolean
+# values is possible.
+try:
+    if config["gcbias"]:
+        gcbias = True
+    else:
+        gcbias = False
+except:
+    gcbias = False
+
 
 ### Initialization #############################################################
 

@@ -50,5 +50,7 @@
 # mapq: 1
 ## Bin size of output files in bigWig format
 # bw_binsize: 10
+## Run computeGCBias quality control
+# gcbias: False
 ##  Verbose output
 # verbose: True
