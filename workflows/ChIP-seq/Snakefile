@@ -43,7 +43,7 @@ include: os.path.join(maindir, "shared", "rules", "histoneHMM.snakefile")
 onstart:
     if "verbose" in config and config["verbose"]:
         print("--- Workflow parameter ---------------------------------------------------------")
-        print("Working directory:", workdir)
+        print("Working directory:", workingdir)
         print("All samples:", all_samples)
         print("Paired-end reads:", paired)
         print("Genome:", genome)
@@ -67,14 +67,14 @@ onstart:
 ################################################################################
 rule all:
     input:
-        "deepTools_ChIP/plotFingerprint/fingerprint.png",
-        "deepTools_ChIP/plotEnrichment/signal_erichment.gene_features.png",
-        expand("deepTools_ChIP/bamCompare/{chip_sample}.filtered.log2ratio.over_input.bw", chip_sample = chip_samples_w_ctrl),
+        #"deepTools_ChIP/plotFingerprint/fingerprint.png",
+        #"deepTools_ChIP/plotEnrichment/signal_erichment.gene_features.png",
+        #expand("deepTools_ChIP/bamCompare/{chip_sample}.filtered.log2ratio.over_input.bw", chip_sample = chip_samples_w_ctrl),
         expand("MACS2/{chip_sample}.filtered.BAM_peaks.xls", chip_sample = chip_samples),
-        expand("MACS2/{chip_sample}.filtered.BAM_peaks.qc.txt", chip_sample = chip_samples),
+    #    expand("MACS2/{chip_sample}.filtered.BAM_peaks.qc.txt", chip_sample = chip_samples),
         # run histoneHMM broad enrichment calling only for samples annotated as 'broad'
-        expand("histoneHMM/{chip_sample}.filtered.histoneHMM-regions.gff.gz",
-                chip_sample = [s for s in chip_samples if is_broad(s)] )
+        #expand("histoneHMM/{chip_sample}.filtered.histoneHMM-regions.gff.gz",
+    #            chip_sample = [s for s in chip_samples if is_broad(s)] )
 #       "heatmap/heatmap.genes.png",
 #       "heatmap/profile.genes.png",
 
@@ -83,7 +83,7 @@ rule all:
 ################################################################################
 onsuccess:
     if "verbose" in config and config["verbose"]:
-        print("\n--- Workflow finished successfully! --------------------------------------------\n")
+        print("\n--- ChIP-seq workflow finished successfully! -----------------------------------\n")
 
 
 # ## heatmap ####################################################################

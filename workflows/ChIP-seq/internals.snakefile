@@ -24,9 +24,9 @@ def is_broad(sample):
 ### Variable defaults ##########################################################
 
 try:
-    workdir = config["workdir"]
+    workingdir = config["workingdir"]
 except:
-    workdir = os.getcwd()
+    workingdir = os.getcwd()
 
 try:
     genome = config["genome"]
