@@ -10,7 +10,7 @@ rule MACS2:
             lambda wildcards: "filtered_bam/"+get_control(wildcards.chip_sample)+".filtered.bam" if get_control(wildcards.chip_sample)
             else [],
         insert_size_metrics =
-            "Picard_qc/InsertSizeMetrics/{chip_sample}.filtered.insert_size_metrics.txt" if paired
+            "Picard_qc/InsertSizeMetrics/{chip_sample}.insert_size_metrics.txt" if paired
             else []
     output:
         peaks = "MACS2/{chip_sample}.filtered.BAM_peaks.xls",
@@ -28,7 +28,8 @@ rule MACS2:
             else "",
         control_param =
             lambda wildcards: "-c filtered_bam/"+get_control(wildcards.chip_sample)+".filtered.bam" if get_control(wildcards.chip_sample)
-            else ""
+            else "",
+        sample_name = {chip_sample}
     log:
         "MACS2/logs/MACS2.{chip_sample}.filtered.log"
     benchmark:
@@ -50,7 +51,7 @@ rule MACS2:
             # therefore superior to MACS2 mate 1-based duplicate detection
             "--keep-dup all "
             "--outdir MACS2 "
-            "--name {chip_sample}.filtered.BAM "
+            "--name {params.sample_name}.filtered.BAM "
             +model+" "
             "{params.broad_calling} "
             "&> {log}"
@@ -66,7 +67,7 @@ rule MACS2:
                 # MACS2 should be called on already filtered, e.g. duplicate-free, BAM files
                 "--keep-dup all "
                 "--outdir MACS2 "
-                "--name {chip_sample}.filtered.BAMPE "
+                "--name {params.sample_name}.filtered.BAMPE "
                 "{params.broad_calling} "
                 "&> {log}.BAMPE"
             )
@@ -77,7 +78,7 @@ rule MACS2:
 rule MACS2_peak_qc:
     input:
         bam = "filtered_bam/{sample}.filtered.bam",
-        aln_metrics = "Picard_qc/AlignmentSummaryMetrics/{sample}.filtered.alignment_summary_metrics.txt",
+        aln_metrics = "Picard_qc/AlignmentSummaryMetrics/{sample}.alignment_summary_metrics.txt",
         xls = "MACS2/{sample}.filtered.BAM_peaks.xls"
     output:
         qc = "MACS2/{sample}.filtered.BAM_peaks.qc.txt"
