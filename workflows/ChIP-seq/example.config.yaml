@@ -45,8 +45,6 @@ chip_dict:
 ################################################################################
 ## Snakemake workflow directory
 # maindir: /path/to/snakemake_workflows/
-## Input directory with FASTQ files
-# indir: /path/to/inputdir/
 ## Genome acronym
 # genome: hs37d5
 ## Input data is paired-end

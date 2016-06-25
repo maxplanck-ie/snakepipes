@@ -43,8 +43,7 @@ include: os.path.join(maindir, "shared", "rules", "histoneHMM.snakefile")
 onstart:
     if "verbose" in config and config["verbose"]:
         print("--- Workflow parameter ---------------------------------------------------------")
-        print("Input directory:", indir)
-        print("Output directory:", outdir)
+        print("Working directory:", workdir)
         print("All samples:", all_samples)
         print("Paired-end reads:", paired)
         print("Genome:", genome)
