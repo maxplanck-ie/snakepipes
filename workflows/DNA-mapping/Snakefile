@@ -149,4 +149,4 @@ rule all:
 ################################################################################
 onsuccess:
     if "verbose" in config and config["verbose"]:
-        print("\n--- Workflow finished successfully! --------------------------------------------\n")
+        print("\n--- DNA mapping workflow finished successfully! --------------------------------\n")
