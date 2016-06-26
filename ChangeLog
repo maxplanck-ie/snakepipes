@@ -35,3 +35,17 @@ version 0.3.0 - June 24, 2016 - Andreas Richter
 - moved function get_fragment_length() to common_functions.py
 - positional instead of required optional command line arguments
 - many small changes
+
+version 0.3.1 - June 25, 2016 - Andreas Richter
+- run Picard quality control on unfiltered BAM files
+- added --gcbias parameter to DNA-mapping wrapper script to run computeGCBias optionally
+- replaced --input-dir and --output-dir by --working-dir parameter in ChIP-seq
+  wrapper script to specify the working directory, which is output directory of
+  the pipeline and must also contain the DNA-mapping pipeline output files
+- bugfixes
+
+version 0.3.2 - June 27, 2016 - Andreas Richter
+- added generation of QC reports for all samples to ChIP-seq pipeline
+- added consistency check for ChIP-seq pipeline whether all required input files exist for all samples
+- added peak count to MACS2 peak quality controls
+
