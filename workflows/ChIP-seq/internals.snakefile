@@ -10,6 +10,7 @@ def get_control(sample):
     else:
         return False
 
+
 def is_broad(sample):
     """
     Return True if given ChIP-seq sample is annotated as sample with
@@ -19,6 +20,14 @@ def is_broad(sample):
         return chip_dict[sample]['broad']
     else:
         return False
+
+
+def is_chip(sample):
+    """
+    Return True if a given sample is a ChIP-seq sample
+    Else return False
+    """
+    return (sample in chip_samples)
 
 
 ### Variable defaults ##########################################################
@@ -61,13 +70,15 @@ control_samples = set()
 chip_samples_w_ctrl = set()
 chip_samples_wo_ctrl = set()
 for chip_sample, value in chip_dict.items():
-    if value['control']:
+    # set control to False if not specified or set to False
+    if 'control' not in chip_dict[chip_sample] or not value['control']:
+        chip_dict[chip_sample]['control'] = False
+        chip_samples_wo_ctrl.add(chip_sample)
+    else:
         control_samples.add(value['control'])
         chip_samples_w_ctrl.add(chip_sample)
-    else:
-        chip_samples_wo_ctrl.add(chip_sample)
     # set broad to False if not specified or set to False
-    if not value['broad']:
+    if 'broad' not in chip_dict[chip_sample] or not value['broad']:
         chip_dict[chip_sample]['broad'] = False
 
 control_samples = list(sorted(control_samples))
@@ -76,4 +87,20 @@ chip_samples_wo_ctrl = list(sorted(chip_samples_wo_ctrl))
 chip_samples = sorted(chip_samples_w_ctrl + chip_samples_wo_ctrl)
 all_samples = sorted(control_samples + chip_samples)
 
-# TODO: do consistency check whether BAM files and .bam.bai index files of all samples given in chip_dict exist
+# consistency check whether all required files exist for all samples
+for sample in all_samples:
+    req_files = [
+        os.path.join(workingdir, "filtered_bam/"+sample+".filtered.bam"),
+        os.path.join(workingdir, "filtered_bam/"+sample+".filtered.bam.bai"),
+        os.path.join(workingdir, "Picard_qc/MarkDuplicates/"+sample+".mark_duplicates_metrics.txt"),
+        os.path.join(workingdir, "Picard_qc/AlignmentSummaryMetrics/"+sample+".alignment_summary_metrics.txt")
+    ]
+    if paired:
+        req_files.append(os.path.join(workingdir, "Picard_qc/InsertSizeMetrics/"+sample+".insert_size_metrics.txt"))
+
+    # check for all samples whether all required files exist
+    for file in req_files:
+        if not os.path.isfile(file):
+            print('ERROR: Required file "{}" for sample "{}" specified in '
+                  'configuration file is NOT available.'.format(file, sample))
+            exit(1)
