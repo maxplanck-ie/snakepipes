@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 
-__version__ = "0.3.0"
+__version__ = "0.3.2"
 
 __description__ = """
 DNA-mapping workflow v{version} - MPI-IE workflow for DNA mapping
 Fabian Kilpert, Andreas Richter
-June 24, 2016
+June 27, 2016
 
 usage example:
     DNA-mapping -i input-dir -o output-dir mm10

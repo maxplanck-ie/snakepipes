@@ -1,3 +1,3 @@
-ChIP-seq workflow v0.3.0 - MPI-IE workflow for ChIP-seq analysis
+ChIP-seq workflow v0.3.2 - MPI-IE workflow for ChIP-seq analysis
 Fabian Kilpert, Andreas Richter
-June 24, 2016
+June 27, 2016
