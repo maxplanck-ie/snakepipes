@@ -77,7 +77,7 @@ def main():
 
     ## Require configuration file (config.yaml)
     if not os.path.isfile(args.configfile):
-        print("ERROR: Configuration file is NOT available at:", main_dir_path)
+        print("ERROR: Configuration file is NOT available at:", args.configfile)
         exit(1)
 
 
