@@ -1,4 +1,4 @@
-ChIP-seq workflow v0.3.2 - MPI-IE workflow for ChIP-seq analysis
+ChIP-seq workflow v0.3.2.1 - MPI-IE workflow for ChIP-seq analysis
 Fabian Kilpert, Andreas Richter
 June 27, 2016
 
@@ -11,9 +11,9 @@ A **typical ChIP-seq analysis of human samples** starting from paired-end FASTQ 
     my_H3K27ac_sample_R1.fastq.gz  my_H3K27me3_sample_R1.fastq.gz  my_Input_sample_R1.fastq.gz
     my_H3K27ac_sample_R2.fastq.gz  my_H3K27me3_sample_R2.fastq.gz  my_Input_sample_R2.fastq.gz
     $
-    $ /data/manke/repository/scripts/snakemake_workflows/snakemake_workflows_0.3.2/DNA-mapping hs37d5 \
+    $ /data/manke/repository/scripts/snakemake_workflows/snakemake_workflows_0.3.2.1/DNA-mapping hs37d5 \
           -i /path/to/input-dir -o /path/to/output-dir --dedup && \
-      /data/manke/repository/scripts/snakemake_workflows/snakemake_workflows_0.3.2/ChIP-seq hs37d5 chip-seq.config.yaml \
+      /data/manke/repository/scripts/snakemake_workflows/snakemake_workflows_0.3.2.1/ChIP-seq hs37d5 chip-seq.config.yaml \
           -d /path/to/outputdir
 
 All individual jobs of the workflow will be submitted to the Slurm queue. To run the workflow locally, use the parameter `--local` for local mode and the parameter `-j 48` to specify the number of available CPU cores (here: 48).
@@ -41,12 +41,12 @@ A **configuration file is required for the ChIP-seq workflow** and should adhere
 ## DNA mapping pipeline ##
 ### Usage ###
 
-    $ /data/manke/repository/scripts/snakemake_workflows/snakemake_workflows_0.3.2/DNA-mapping -h
+    $ /data/manke/repository/scripts/snakemake_workflows/snakemake_workflows_0.3.2.1/DNA-mapping -h
 
 
 ### Configuration file ###
 
-    $ cat /data/manke/repository/scripts/snakemake_workflows/snakemake_workflows_0.3.2/workflows/DNA-mapping/example.config.yaml
+    $ cat /data/manke/repository/scripts/snakemake_workflows/snakemake_workflows_0.3.2.1/workflows/DNA-mapping/example.config.yaml
 
     ################################################################################
     # Please comment out and adjust the following configuration variables if their
@@ -134,12 +134,12 @@ When enabling read trimming with TrimGalore, additional directories will be gene
 ## ChIP-seq pipeline ##
 ### Usage ###
 
-    $ /data/manke/repository/scripts/snakemake_workflows/snakemake_workflows_0.3.2/ChIP-seq -h
+    $ /data/manke/repository/scripts/snakemake_workflows/snakemake_workflows_0.3.2.1/ChIP-seq -h
 
 
 ### Configuration file ###
 
-    $ cat /data/manke/repository/scripts/snakemake_workflows/snakemake_workflows_0.3.2/workflows/ChIP-seq/example.config.yaml
+    $ cat /data/manke/repository/scripts/snakemake_workflows/snakemake_workflows_0.3.2.1/workflows/ChIP-seq/example.config.yaml
     ################################################################################
     # Please specify all ChIP samples plus their matching control/chromatin input
     # sample.
@@ -241,7 +241,7 @@ The tool `histoneHMM` will only be run if at least one sample is annotated as br
 
 Further organisms can be supported by adding a genome configuration file `my_organism.py` in the following style to the `snakemake_workflows` directory:
 
-    $ cat /data/manke/repository/scripts/snakemake_workflows/snakemake_workflows_0.3.2/shared/organisms/hs37d5.py
+    $ cat /data/manke/repository/scripts/snakemake_workflows/snakemake_workflows_0.3.2.1/shared/organisms/hs37d5.py
 
     genome_size = 2900338458
     genome_fasta = "/data/repository/organisms/hs37d5_ensembl/genome_fasta/genome.fa"
