@@ -8,21 +8,20 @@
 #
 # Example:
 # chip_dict:
-#   mysample.H3K27ac:
-#     control: mysample.Input
+#   my_H3K27ac_sample:
+#     control: my_Input_sample
 #     broad: False
-#   mysample.H3K27me:
-#     control: False
+#   my_H3K27me3_sample:
+#     control: my_Input_sample
 #     broad: True
 ################################################################################
 chip_dict:
-  51_Hf12_SFTR_RD_H3K27ac_F:
-    control: 51_Hf12_SFTR_RD_Input_F
+  my_H3K27ac_sample:
+    control: my_Input_sample
+    broad: False
+  my_H3K27me3_sample:
+    control: my_Input_sample
     broad: True
-#  51_Hf12_SFTR_RD_H3K27me_F:
-#    control: False
-#    broad: False
-
 
 
 ################################################################################
