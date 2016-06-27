@@ -49,3 +49,6 @@ version 0.3.2 - June 27, 2016 - Andreas Richter
 - added consistency check for ChIP-seq pipeline whether all required input files exist for all samples
 - added peak count to MACS2 peak quality controls
 
+version 0.3.2.1 - June 27, 2016 - Andreas Richter
+- added documentation to README.md
+- moved R library
