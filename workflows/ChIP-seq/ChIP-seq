@@ -8,7 +8,7 @@ Fabian Kilpert, Andreas Richter
 June 27, 2016
 
 Usage example:
-    ChIP-seq -i input-dir -o output-dir mm10 config.yaml
+    ChIP-seq -d working-dir mm10 config.yaml
 """.format(version=__version__)
 
 
