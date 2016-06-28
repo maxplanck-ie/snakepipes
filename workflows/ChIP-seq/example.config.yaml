@@ -14,6 +14,8 @@
 #   my_H3K27me3_sample:
 #     control: my_Input_sample
 #     broad: True
+#
+# IMPORTANT: Use only whitespace, but NO TAB indentation in this YAML file!
 ################################################################################
 chip_dict:
   my_H3K27ac_sample:
@@ -28,7 +30,7 @@ chip_dict:
 # Please comment out and adjust the following configuration variables if their
 # default values are not appropriate for your input data
 # ################################################################################
-## Median/mean fragment length (default: 200)
+## Median/mean fragment length, only relevant for single-end data (default: 200)
 # fragment_length: 200
 
 

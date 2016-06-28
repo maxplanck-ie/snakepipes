@@ -12,7 +12,7 @@
 ## (default "--fr" is appropriate for Illumina sequencing)
 # mate_orientation: "--fr"
 
-## Median/mean fragment length (default: 200)
+## Median/mean fragment length, only relevant for single-end data (default: 200)
 # fragment_length: 200
 
 ## Options to TrimGalore (default: "--stringency 2")

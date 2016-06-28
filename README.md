@@ -18,7 +18,7 @@ A **typical ChIP-seq analysis of human samples** starting from paired-end FASTQ 
 
 All individual jobs of the workflow will be submitted to the Slurm queue. To run the workflow locally, use the parameter `--local` for local mode and the parameter `-j 48` to specify the number of available CPU cores (here: 48).
 
-A **configuration file is required for the ChIP-seq workflow** and should adhere to the following style:
+A **configuration file is required for the ChIP-seq workflow** and should adhere to the following style (IMPORTANT: Use only whitespace, but NO TAB indentation in this file:
 
     $ cat chip-seq.config.yaml
     ################################################################################
@@ -28,6 +28,8 @@ A **configuration file is required for the ChIP-seq workflow** and should adhere
     # enrichment (most histone marks, e.g. H3K4me1, H3K36me3, H3K9me3, H3K27me3)
     # or not. In the latter case, the enrichment is instead punctuate/narrow
     # (e.g. TFs, active histone marks as H3K27ac or H3K4me3).
+    #
+    # IMPORTANT: Use only whitespace, but NO TAB indentation in this YAML file!
     ################################################################################
     chip_dict:
       my_H3K27ac_sample:
@@ -62,7 +64,7 @@ A **configuration file is required for the ChIP-seq workflow** and should adhere
     ## (default "--fr" is appropriate for Illumina sequencing)
     # mate_orientation: "--fr"
 
-    ## Median/mean fragment length (default: 200)
+    ## Median/mean fragment length, only relevant for single-end data (default: 200)
     # fragment_length: 200
 
     ## Options to TrimGalore (default: "--stringency 2")
@@ -147,6 +149,8 @@ When enabling read trimming with TrimGalore, additional directories will be gene
     # enrichment (most histone marks, e.g. H3K4me1, H3K36me3, H3K9me3, H3K27me3)
     # or not. In the latter case, the enrichment is instead punctuate/narrow
     # (e.g. TFs, active histone marks as H3K27ac or H3K4me3).
+    #
+    # IMPORTANT: Use only whitespace, but NO TAB indentation in this YAML file!
     ################################################################################
     chip_dict:
       my_H3K27ac_sample:
@@ -160,7 +164,7 @@ When enabling read trimming with TrimGalore, additional directories will be gene
     # Please comment out and adjust the following configuration variables if their
     # default values are not appropriate for your input data
     # ################################################################################
-    ## Median/mean fragment length (default: 200)
+    ## Median/mean fragment length, only relevant for single-end data (default: 200)
     # fragment_length: 200
 
     ################################################################################
