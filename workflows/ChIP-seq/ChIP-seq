@@ -113,7 +113,7 @@ def main():
                                 configfile = args.configfile,
                                 workingdir = args.workingdir,
                                 cluster_logs_dir = os.path.abspath(cluster_logs_dir),
-                                unlock=unlockstring,
+                                unlockstring=unlockstring,
                               ).split()
 
     if args.verbose:
