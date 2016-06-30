@@ -98,12 +98,12 @@ for infile in infiles:
             if line.startswith('Fraction of reads explained by other combinations: '):
                 value = float(line.replace('Fraction of reads explained by other combinations: ',''))
                 if value >= 0.2:
-                    print("Error! A larger fraction %s of reads is explained by uncommon strand combinations!".format(value))
+                    print("ERROR: A larger fraction %s of reads is explained by uncommon strand combinations!".format(value))
                     print (infile)
                     exit(1)
 
         if len(strands.keys()) != 2:
-            print("Error! Unclear strand-specificity in:")
+            print("ERROR: Unclear strand-specificity in:")
             print(infile)
             exit(1)
 

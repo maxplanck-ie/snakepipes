@@ -13,7 +13,7 @@ import os
 maindir = workflow.overwrite_config["maindir"]      # main workflow directory
 
 include: os.path.join(maindir, "shared", "paths.py")        # shared files
-include: os.path.join(os.path.dirname(workflow.snakefile), "internals.snakefile")   # paths to executables
+include: os.path.join(workflow.basedir, "internals.snakefile")   # paths to executables
 include: os.path.join(maindir, "shared", "load_organisms.snakefile")    # loading organism indices, GTF, etc.
 
 print("Outdir:", workflow.overwrite_workdir)
@@ -31,11 +31,11 @@ rule rMATS_paired_bam:
         bam_control = expand("TopHat2/{sample}.bam", sample=samples_control),
         gtf = gtf
     output: "rMATS/summary.txt"
-    log:    "rMATS/log/rMATS.log"
+    log:    "rMATS/logs/rMATS.log"
     benchmark:  "rMATS/.benchmark/rMATS.benchmark"
     params :
         outdir = "rMATS",
-        bowtieIndexBase = Bowtie2Index
+        bowtieIndexBase = bowtie2_index
     threads: 4
     run:
         bam_treatment = ",".join(input.bam_treatment)

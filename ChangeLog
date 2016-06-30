@@ -1,0 +1,54 @@
+version 0.0.1 - March 23, 2016 - Fabian Kilpert
+- initial version
+
+version 0.1.0 - June 15, 2016 - Andreas Richter
+- added --fastqc and --bw-binsize parameters to DNA-mapping wrapper script
+- additional organisms are now supported by adding new genome.py files
+- defined (effective) genome size as (genome length)-(number of 'N's) in genome.py files
+- simplified cluster submission by taking 'threads' parameter from rule definition, removed cluster.yaml
+- added DNA-mapping example configuration yaml file
+- added function get_fragment_length() to DNA-mapping internals.snakefile to parse median insert size from Picard output
+- added deepTools_qc.snakefile as one common snakefile for all deepTools rules,
+    moved all deepTools rules from ChIP-seq Snakefile and computeGCBias.snakefile
+- moved include statements of module snakefiles from rules.snakefile to DNA-mapping Snakefile to simplify structure, removed rules.snakefile
+- renamed functions do_TrimGalore(trim) and do_InsertSizeMetrics(paired) in DNA-mapping Snakefile
+- renamed load_organisms.snakefile to load_organism_data.py
+- removed debugging.snakefile as it was not used by any pipeline
+- removed --local-cores parameter from all wrapper scripts as there are no local snakemake rules defined
+- many small other changes
+
+version 0.1.1 - June 17, 2016 - Andreas Richter
+- added option to run workflow locally instead of cluster submission
+- FASTQ.snakefile replaces FASTQ_symlink.snakefile and FASTQ_downsample.snakefile
+- several small changes
+
+version 0.2.0 - June 22, 2016 - Andreas Richter
+- added filtering option to filter BAM files for duplication, proper pairs and MAPQ
+- added variable 'outdir' to configuration
+- many small changes
+
+version 0.3.0 - June 24, 2016 - Andreas Richter
+- rewrote ChIP-seq workflow completely including wrapper script ChIP-seq
+- added histoneHMM for calling broadly enriched regions
+- added MACS2 peak quality controls
+- revised example.config.yaml files
+- moved function get_fragment_length() to common_functions.py
+- positional instead of required optional command line arguments
+- many small changes
+
+version 0.3.1 - June 25, 2016 - Andreas Richter
+- run Picard quality control on unfiltered BAM files
+- added --gcbias parameter to DNA-mapping wrapper script to run computeGCBias optionally
+- replaced --input-dir and --output-dir by --working-dir parameter in ChIP-seq
+  wrapper script to specify the working directory, which is output directory of
+  the pipeline and must also contain the DNA-mapping pipeline output files
+- bugfixes
+
+version 0.3.2 - June 27, 2016 - Andreas Richter
+- added generation of QC reports for all samples to ChIP-seq pipeline
+- added consistency check for ChIP-seq pipeline whether all required input files exist for all samples
+- added peak count to MACS2 peak quality controls
+
+version 0.3.2.1 - June 27, 2016 - Andreas Richter
+- added documentation to README.md
+- moved R library

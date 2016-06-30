@@ -2,381 +2,146 @@
 import os
 
 
-# ## useful for debugging: show internal variables
-# for w in dir(workflow):
-#    print(w)
-#    print(getattr(workflow, w))
-#    print("#"*80)
+### output configuration for debugging #########################################
+################################################################################
+print("config: {}\n".format(config))
 
 
-## Include scripts #############################################################
+### include scripts ############################################################
+################################################################################
+# main directory of all snakemake workflows
+try:
+    maindir = config["maindir"]
+except:
+    print("ERROR: Variable 'maindir' has not been set by Snakemake "
+          "parameter --config or in the configuration.yaml file.")
+    exit(1)
 
-maindir = workflow.overwrite_config["maindir"]      # main workflow directory
-
-include: os.path.join(maindir, "shared", "paths.py")        # shared files
-include: os.path.join(os.path.dirname(workflow.snakefile), "internals.snakefile")   # paths to executables
-include: os.path.join(maindir, "shared", "load_organisms.snakefile")    # loading organism indices, GTF, etc.
-
-
-## conditional or optional rule output files ###################################
-def do_TrimGalore(trim):
-    if trim:
-        return( expand("TrimGalore/{sample}{read}.fastq.gz", sample=samples, read=reads) +
-                expand("FastQC_on_TrimGalore/{sample}{read}_fastqc.html", sample=samples, read=reads) )
-    else:
-        return([])
-
-
-def do_InsertSizeMetrics(paired):
-    if paired:
-        return( expand("InsertSizeMetrics/{sample}.mean.txt", sample=samples) )
-    else:
-        return([])
+# include tool paths
+include: os.path.join(maindir, "shared", "paths.py")
+# include global variables and functions
+include: os.path.join(workflow.basedir, "internals.snakefile")
+include: os.path.join(maindir, "shared", "common_functions.py")
+# load organism-specific data, i.e. genome indices, annotation, etc.
+include: os.path.join(maindir, "shared", "load_organism_data.py")
 
 
-def do_PEFragmentSize(paired):
-    if paired:
-        return( expand("PEFragmentSize/{sample}.PEFragmentSize.png", sample=samples) )
-    else:
-        return([])
+### include modules of other snakefiles ########################################
+################################################################################
+# deepTools ChIP
+include: os.path.join(maindir, "shared", "rules", "deepTools_ChIP.snakefile")
 
-
-## main rule ###################################################################
-rule all:
-    input:
-        ## DNA-mapping files ###################################################
-        ##expand("FASTQ/{sample}{read}.fastq.gz", sample=samples, read=reads),
-        expand("FastQC/{sample}{read}_fastqc.html", sample=samples, read=reads),
-        do_TrimGalore(trim),
-        expand("Bowtie2/{sample}.bam.bai", sample=samples),
-        expand("AlignmentSummaryMetrics/{sample}.AlignmentSummaryMetrics.txt", sample=samples),
-        do_InsertSizeMetrics(paired),
-        expand("Qualimap/{sample}.bamqc.html", sample=samples),
-        expand("Qualimap/{sample}.bamqc.txt", sample=samples),
-
-        ## ChIP-seq files ######################################################
-        ##expand("GCBias/{sample}.GCBias.png", sample=samples),
-        expand("MACS2/{sample}_peaks.xls", sample=[g[0] for g in groups]),
-        expand("plotFingerprint/{sample}.plotFingerprint.png", sample=[g[0] for g in groups]),
-        expand("bigWig/{sample}.bw", sample=samples),
-        expand("log2ratio/{sample}.log2ratio.bw", sample=[g[0] for g in groups]),
-        ##"correlation/read_coverages_bins.npz"
-        "correlation/scatterplot_genome_Pearson.png",
-        "correlation/scatterplot_genome_Spearman.png",
-        "correlation/heatmap_genome_Pearson.png",
-        "correlation/heatmap_genome_Spearman.png",
-        "correlation/PCA_genome.png",
-        do_PEFragmentSize(paired),
-        ##"heatmap/matrix.genes.gz",
-        "heatmap/heatmap.genes.png",
-        "heatmap/profile.genes.png",
-        "coverage/coverage.png",
-
-
-## entire DNA-mapping workflow !!! #############################################
-include: os.path.join(maindir, "workflows", "DNA-mapping", "rules.snakefile")
-
-
-## computeGCBias ###############################################################
-##include: os.path.join(maindir, "shared", "rules", "computeGCBias.snakefile")
-
-
-## MACS2 #######################################################################
+# MACS2 and MACS2 peak QC
 include: os.path.join(maindir, "shared", "rules", "MACS2.snakefile")
 
+# histoneHMM
+include: os.path.join(maindir, "shared", "rules", "histoneHMM.snakefile")
 
-## deepTools: fingerprint ######################################################
-def generate_paired_bam_from_aligned_files(wildcards):
-    chip = wildcards.sample
-    inpt = None # corresponding input name
-    for g in groups:
-        if chip == g[0]:
-            inpt = g[1]
-            break
-    ##print(chip, inpt)
-    return( expand("Bowtie2/{sample}.bam", sample=(chip,inpt)) )
+# QC report for all samples
+include: os.path.join(maindir, "shared", "rules", "ChIP_qc_report.snakefile")
 
 
-def generate_paired_bai_from_aligned_files(wildcards):
-    chip = wildcards.sample
-    inpt = None # corresponding input name
-    for g in groups:
-        if chip == g[0]:
-            inpt = g[1]
-            break
-    ##print(chip, inpt)
-    return( expand("Bowtie2/{sample}.bam.bai", sample=(chip,inpt)) )
+### execute before workflow starts #############################################
+################################################################################
+onstart:
+    if "verbose" in config and config["verbose"]:
+        print("--- Workflow parameter ---------------------------------------------------------")
+        print("Working directory:", workingdir)
+        print("All samples:", all_samples)
+        print("Paired-end reads:", paired)
+        print("Genome:", genome)
+        print("BigWig bin size:", bw_binsize)
+        print("-" * 80, "\n")
+
+        print("--- Genome ---------------------------------------------------------------------")
+        print("Genome:", genome)
+        print("Effective genome size:", genome_size)
+        print("Genome FASTA:", genome_fasta)
+        print("Genome index:", genome_index)
+        print("Genome 2bit:", genome_2bit)
+        print("Bowtie2 index:", bowtie2_index)
+        print("Gene annotation BED:", genes_bed)
+        print("Gene annotation GTF:", genes_gtf)
+        print("Blacklist regions BED:", blacklist_bed)
+        print("-" * 80, "\n")
 
 
-rule plotFingerprint:
+### main rule ##################################################################
+################################################################################
+rule all:
     input:
-        bam = generate_paired_bam_from_aligned_files,
-        bai = generate_paired_bai_from_aligned_files
-    output: "plotFingerprint/{sample}.plotFingerprint.png"
-    params:
-        binsize = binsize,
-        fragment_length = fragment_length     # Relevant for single-end paired_read_ext only!
-    log:    "plotFingerprint/log/{sample}.log"
-    benchmark:  "plotFingerprint/.benchmark/deepTools_plotFingerprint.{sample}.benchmark"
-    threads : 30
-    run:
-        input = " ".join(input["bam"])
-        ##print("joined input:", input)
-        shell(  os.path.join(deepTools2_dir,"plotFingerprint") + " -p {threads} "
-                "-b {input} "
-                "--binSize={params.binsize} "
-                "--extendReads {params.fragment_length} "
-                "--plotFile {output} "
-                "2>&1 | tee {log} " )
+        "deepTools_ChIP/plotFingerprint/fingerprint.png",
+        "deepTools_ChIP/plotEnrichment/signal_erichment.gene_features.png",
+        expand("deepTools_ChIP/bamCompare/{chip_sample}.filtered.log2ratio.over_input.bw", chip_sample = chip_samples_w_ctrl),
+        expand("MACS2/{chip_sample}.filtered.BAM_peaks.xls", chip_sample = chip_samples),
+        expand("MACS2/{chip_sample}.filtered.BAM_peaks.qc.txt", chip_sample = chip_samples),
+        # run histoneHMM broad enrichment calling only for samples annotated as 'broad'
+        expand("histoneHMM/{chip_sample}.filtered.histoneHMM-regions.gff.gz",
+                chip_sample = [s for s in chip_samples if is_broad(s)] ),
+        "QC_report/qc_report.all_samples.tsv"
+#       "heatmap/heatmap.genes.png",
+#       "heatmap/profile.genes.png",
 
 
-## bigWig coverage #############################################################
-if paired:
-    rule bamCoverage:
-        input:
-            bam = "Bowtie2/{sample}.bam",
-            bai = "Bowtie2/{sample}.bam.bai",
-            mean_file = "InsertSizeMetrics/{sample}.mean.txt"
-        output: "bigWig/{sample}.bw"
-        threads: 30
-        params:
-            binsize = binsize,
-            fragment_length = fragment_length     # Relevant for single-end reads only!
-        log:    "bigWig/log/{sample}.log"
-        benchmark:  "bigWig/.benchmark/deepTools_bamCoverage.{sample}.benchmark"
-        run:
-            try:
-                fragment_length = int(get_from_file("mean", input["mean_file"]))
-            except:
-                fragment_length = fragment_length
-            shell( os.path.join(deepTools2_dir,"bamCoverage") + " -p {threads} "
-                "-b {input.bam} -o {output} "
-                "--binSize={params.binsize} "
-                "--extendReads {params.fragment_length} "
-                "2>&1 | tee {log} " )
-else:
-    rule bamCoverage:
-        input:
-            bam = "Bowtie2/{sample}.bam",
-            bai = "Bowtie2/{sample}.bam.bai"
-        output: "bigWig/{sample}.bw"
-        threads: 30
-        params:
-            binsize = binsize,
-            fragment_length = fragment_length     # Relevant for single-end reads only!
-        log:    "bigWig/log/{sample}.log"
-        benchmark:  "bigWig/.benchmark/deepTools_bamCoverage.{sample}.benchmark"
-        shell:  os.path.join(deepTools2_dir,"bamCoverage") + " -p {threads} "
-                "-b {input.bam} -o {output} "
-                "--binSize={params.binsize} "
-                "--extendReads {params.fragment_length} "
-                "2>&1 | tee {log} "
+### execute after workflow finished ############################################
+################################################################################
+onsuccess:
+    if "verbose" in config and config["verbose"]:
+        print("\n--- ChIP-seq workflow finished successfully! -----------------------------------\n")
 
 
-## bigWig log2ratio ############################################################
-rule bamCompare:
-    input:
-        bam = generate_paired_bam_from_aligned_files,
-        bai = generate_paired_bai_from_aligned_files
-    output: "log2ratio/{sample}.log2ratio.bw"
-    params:
-        binsize = binsize,
-        fragment_length = fragment_length     # Relevant for single-end reads only!
-    log:    "log2ratio/log/{sample}.log"
-    benchmark:  "log2ratio/.benchmark/deepTools_bamCompare_log2ratio.{sample}.benchmark"
-    threads: 30
-    run:
-        input = " -b2 ".join(input["bam"])
-        shell(  os.path.join(deepTools2_dir,"bamCompare") + " -p {threads} "
-                "-b1 {input} "
-                "-o {output} "
-                "--binSize={params.binsize} "
-                "--extendReads {params.fragment_length} "
-                "2>&1 | tee {log} " )
-
-
-## correlation #################################################################
-rule multiBamSummary_genome:
-    input:
-        bam = [expand("Bowtie2/{sample}.bam", sample=samples)],
-        bai = [expand("Bowtie2/{sample}.bam.bai", sample=samples)]
-    output: "correlation/read_coverages_bins.npz"
-    log:    "correlation/log/read_coverages_bins.log"
-    benchmark:  "correlation/.benchmark/deepTools_multiBamSummary.benchmark"
-    params:
-        labels=samples
-    threads: 20
-    shell:  os.path.join(deepTools2_dir,"multiBamSummary") + " bins -p {threads} "
-            "--bamfiles {input.bam} --outFileName {output} "
-            "--labels {params.labels}"
-            "2>&1 | tee {log} "
-
-
-## plotCorrelation: scatterplot
-rule plotCorrelation_scatterplot_genome_Pearson:
-    input:  "correlation/read_coverages_bins.npz"
-    output:
-        png = "correlation/scatterplot_genome_Pearson.png",
-        tsv = "correlation/scatterplot_genome_Pearson.tsv"
-    log:    "correlation/log/plotCorrelation_scatterplot_genome_Pearson.log"
-    benchmark:  "correlation/.benchmark/deepTools_plotCorrelation_scatterplot_Pearson.genome.benchmark"
-    shell:  os.path.join(deepTools2_dir,"plotCorrelation") + " --skipZeros "
-            "-in {input} --corMethod pearson --whatToPlot scatterplot "
-            "--plotTitle 'Pearson correlation scatterplot (genome)' "
-            "-o {output.png} --outFileCorMatrix {output.tsv} "
-            "2>&1 | tee {log} "
-
-
-rule plotCorrelation_scatterplot_genome_Spearman:
-    input:  "correlation/read_coverages_bins.npz"
-    output:
-        png = "correlation/scatterplot_genome_Spearman.png",
-        tsv = "correlation/scatterplot_genome_Spearman.tsv"
-    log:    "correlation/log/plotCorrelation_scatterplot_genome_Spearman.log"
-    benchmark:  "correlation/.benchmark/deepTools_plotCorrelation_scatterplot_Spearman.genome.benchmark"
-    shell:  os.path.join(deepTools2_dir,"plotCorrelation") + " --skipZeros "
-            "-in {input} --corMethod spearman --whatToPlot scatterplot "
-            "--plotTitle 'Spearman correlation scatterplot (genome)' "
-            "-o {output.png} --outFileCorMatrix {output.tsv} "
-            "2>&1 | tee {log} "
-
-
-## plotCorrelation: heatmap
-rule plotCorrelation_heatmap_genome_Pearson:
-    input:  "correlation/read_coverages_bins.npz"
-    output:
-        png = "correlation/heatmap_genome_Pearson.png",
-        tsv = "correlation/heatmap_genome_Pearson.tsv"
-    log:    "correlation/log/plotCorrelation_heatmap_genome_Pearson.log"
-    benchmark:  "correlation/.benchmark/deepTools_plotCorrelation_heatmap_Pearson.genome.benchmark"
-    shell:  os.path.join(deepTools2_dir,"plotCorrelation") + " --skipZeros --colorMap RdYlBu --plotNumbers "
-            "-in {input} --corMethod pearson --whatToPlot heatmap "
-            "--plotTitle 'Pearson correlation heatmap (genome)' "
-            "-o {output.png} --outFileCorMatrix {output.tsv} "
-            "2>&1 | tee {log} "
-
-
-rule plotCorrelation_heatmap_genome_Spearman:
-    input:  "correlation/read_coverages_bins.npz"
-    output:
-        png = "correlation/heatmap_genome_Spearman.png",
-        tsv = "correlation/heatmap_genome_Spearman.tsv"
-    log:    "correlation/log/plotCorrelation_heatmap_genome_Spearman.log"
-    benchmark:  "correlation/.benchmark/deepTools_plotCorrelation_heatmap_Spearman.genome.benchmark"
-    shell:  os.path.join(deepTools2_dir,"plotCorrelation") + " --skipZeros --colorMap RdYlBu --plotNumbers "
-            "-in {input} --corMethod spearman --whatToPlot heatmap "
-            "--plotTitle 'Spearman correlation heatmap (genome)' "
-            "-o {output.png} --outFileCorMatrix {output.tsv} "
-            "2>&1 | tee {log} "
-
-
-## plotPCA
-rule plotPCA:
-    input:  "correlation/read_coverages_bins.npz"
-    output: "correlation/PCA_genome.png"
-    log:    "correlation/log/plotPCA_genome.log"
-    benchmark:  "correlation/.benchmark/deepTools_plotPCA.benchmark"
-    shell:  os.path.join(deepTools2_dir,"plotPCA") + " -T 'PCA of read counts' "
-            "-in {input} "
-            "-o {output} "
-            "2>&1 | tee {log} "
-
-
-## bamPEFragmentSize ###########################################################
-if paired:
-    rule bamPEFragmentSize:
-        input:
-            bam = "Bowtie2/{sample}.bam",
-            bai = "Bowtie2/{sample}.bam.bai",
-        output:
-            png = "PEFragmentSize/{sample}.PEFragmentSize.png",
-            txt = "PEFragmentSize/{sample}.PEFragmentSize.txt"
-        benchmark:  "PEFragmentSize/.benchmark/deepTools_bamPEFragmentSize.{sample}.benchmark"
-        threads: 2
-        shell:  os.path.join(deepTools2_dir,"bamPEFragmentSize") + " -p {threads} "
-                "--histogram {output.png} "
-                "--plotTitle 'Histogram of paired-end fragment sizes' "
-                "{input.bam} "
-                "| tee {output.txt} "
-
-
-## heatmap ####################################################################
-rule computeMatrix_genes:
-    input:
-        bw = [expand("log2ratio/{sample}.log2ratio.bw", sample=[g[0] for g in groups])],
-        bed = genes_bed
-    output: "heatmap/matrix.genes.gz"
-    params:
-        binsize = binsize
-    log:    "heatmap/log/computeMatrix_genes.log"
-    benchmark:  "heatmap/.benchmark/deepTools_computeMatrix.genes.benchmark"
-    threads: 30
-    shell:  os.path.join(deepTools2_dir,"computeMatrix") + " scale-regions -q -p {threads} "
-            "--skipZeros --binSize={params.binsize} "
-            "--upstream=1000 --downstream=1000 --regionBodyLength=2000 "
-            "-S {input.bw} -R {input.bed} "
-            ##"-S {input.bw} -R <(cat {input.bed} | grep -v PATCH) "
-            "-out {output} "
-            "2>&1 | tee {log} "
-
-
-rule plotHeatmap_genes:
-    input:  "heatmap/matrix.genes.gz"
-    output: "heatmap/heatmap.genes.png"
-    params:
-        label = [g[0] for g in groups]
-    log:    "heatmap/log/plotHeatmap_genes.log"
-    benchmark:  "heatmap/.benchmark/deepTools_plotHeatmap.genes.benchmark"
-    shell:  os.path.join(deepTools2_dir,"plotHeatmap") + " --heatmapWidth=5 "
-            "--samplesLabel {params.label} "
-            "-m {input} "
-            "-out {output} "
-            "2>&1 | tee {log} "
-
-
-rule plotProfile_genes:
-    input:  "heatmap/matrix.genes.gz"
-    output: "heatmap/profile.genes.png"
-    params:
-        label = [g[0] for g in groups]
-    log:    "heatmap/log/plotProfile_genes.log"
-    benchmark:  "heatmap/.benchmark/deepTools_plotProfile.genes.benchmark"
-    shell:  os.path.join(deepTools2_dir,"plotProfile") + " "
-            "--plotType=fill --perGroup --samplesLabel {params.label} "
-            "-m {input} "
-            "-out {output} "
-            "2>&1 | tee {log} "
-
-
-## plotCoverage ################################################################
-rule plotCoverage:
-    input:
-        bam = [expand("Bowtie2/{sample}.bam", sample=samples)],
-        bai = [expand("Bowtie2/{sample}.bam.bai", sample=samples)],
-    output: "coverage/coverage.png"
-    log:    "coverage/log/plotCoverage.log"
-    benchmark:  "coverage/.benchmark/deepTools_plotCoverage.benchmark"
-    params:
-        labels=samples
-    threads: 10
-    shell:  os.path.join(deepTools2_dir,"plotCoverage") + " -p {threads} "
-            "-n 1000000 --ignoreDuplicates "
-            "--skipZeros "
-            "--plotTitle 'Genome coverage' "
-            "--bamfiles {input.bam} --plotFile {output} "
-            "--labels {params.labels}"
-            "2>&1 | tee {log} "
-
-
-## End #########################################################################
-## onsuccess:
-##     print("Workflow finished successfully.")
-
-
-## benchmark ###################################################################
-## rule benchmark:
-##     output: "benchmark/benchmark.tsv"
-
-
-## benchmark ###################################################################
-##for f in $(find . -name "*.benchmark" -type f); do seconds=$(cat $f | awk 'NR==2' | cut -f1); bname=$(basename $f | sed 's/.benchmark//'); echo -e "$bname\t$seconds" ; done
+# ## heatmap ####################################################################
+# rule computeMatrix_genes:
+#     input:
+#         bw = [expand("log2ratio/{sample}.log2ratio.bw", sample=[g[0] for g in groups])],
+#         bed = genes_bed
+#     output: "heatmap/matrix.genes.gz"
+#     params:
+#         binsize = binsize
+#     log:    "heatmap/logs/computeMatrix_genes.log"
+#     benchmark:  "heatmap/.benchmark/deepTools_computeMatrix.genes.benchmark"
+#     threads: 30
+#     shell:  os.path.join(deepTools2_dir,"computeMatrix") + " scale-regions -q -p {threads} "
+#             "--skipZeros --binSize={params.binsize} "
+#             "--upstream=1000 --downstream=1000 --regionBodyLength=2000 "
+#             "-S {input.bw} -R {input.bed} "
+#             ##"-S {input.bw} -R <(cat {input.bed} | grep -v PATCH) "
+#             "-out {output} "
+#             "2>&1 | tee {log} "
+#
+#
+# rule plotHeatmap_genes:
+#     input:  "heatmap/matrix.genes.gz"
+#     output: "heatmap/heatmap.genes.png"
+#     params:
+#         label = [g[0] for g in groups]
+#     log:    "heatmap/logs/plotHeatmap_genes.log"
+#     benchmark:  "heatmap/.benchmark/deepTools_plotHeatmap.genes.benchmark"
+#     shell:  os.path.join(deepTools2_dir,"plotHeatmap") + " --heatmapWidth=5 "
+#             "--samplesLabel {params.label} "
+#             "-m {input} "
+#             "-out {output} "
+#             "2>&1 | tee {log} "
+#
+#
+# rule plotProfile_genes:
+#     input:  "heatmap/matrix.genes.gz"
+#     output: "heatmap/profile.genes.png"
+#     params:
+#         label = [g[0] for g in groups]
+#     log:    "heatmap/logs/plotProfile_genes.log"
+#     benchmark:  "heatmap/.benchmark/deepTools_plotProfile.genes.benchmark"
+#     shell:  os.path.join(deepTools2_dir,"plotProfile") + " "
+#             "--plotType=fill --perGroup --samplesLabel {params.label} "
+#             "-m {input} "
+#             "-out {output} "
+#             "2>&1 | tee {log} "
+#
+#
+# ## benchmark ###################################################################
+# ## rule benchmark:
+# ##     output: "benchmark/benchmark.tsv"
+#
+#
+# ## benchmark ###################################################################
+# ##for f in $(find . -name "*.benchmark" -type f); do seconds=$(cat $f | awk 'NR==2' | cut -f1); bname=$(basename $f | sed 's/.benchmark//'); echo -e "$bname\t$seconds" ; done

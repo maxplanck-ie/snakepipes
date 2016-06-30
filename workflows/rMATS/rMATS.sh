@@ -6,9 +6,7 @@ snakefile="/home/kilpert/git/snakemake_workflows/workflows/rMATS/Snakefile"
 
 user_configs="--config maindir=$main_dir_path indir=$indir genome=$genome subproject_names=$subproject_names"
 
-local_cores="4"
-max_jobs="10"
 
 module load snakemake
 
-snakemake $user_configs -p --local-cores $local_cores --jobs $max_jobs --directory $outdir --snakefile $snakefile --cluster-config $main_dir_path/shared/cluster.yaml --cluster 'qsub -pe {smp cluster.n} -o $cluster_logs_dir -e $cluster_logs_dir' --jobname '{rulename}.{jobid}.snakejob'
+snakemake $user_configs -p --directory $outdir --snakefile $snakefile --cluster 'SlurmEasy --threads {threads} --log {cluster_logs_dir}' --jobs 999 --jobname '{rulename}.{jobid}.snakejob'
