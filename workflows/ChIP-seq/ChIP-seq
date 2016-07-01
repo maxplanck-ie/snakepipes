@@ -11,6 +11,11 @@ Usage example:
     ChIP-seq -d working-dir mm10 config.yaml
 """.format(version=__version__)
 
+## Dependencies from DNA-mapping workflow
+## OUTDIR/filtered_bam
+##       /Picard_qc/AlignmentSummaryMetrics
+##                 /MarkDuplicates
+##                 /InsertSizeMetrics
 
 import argparse
 import os
