@@ -40,8 +40,7 @@ def parse_args():
     parser.add_argument("-o", "--output-dir", dest="outdir", help="output directory (default: '.')", default=None)
     parser.add_argument("-j", "--jobs", dest="max_jobs", metavar="INT", help="maximum number of concurrently submitted Slurm jobs / cores if workflow is run locally (default: '%(default)s')", type=int, default=8)
     parser.add_argument("--local", dest="local", action="store_true", default=False, help="run workflow locally (default: jobs are submitted to Slurm queue)")
-    parser.add_argument("-r", "--rerun-incomplete", dest="rerun_incomplete", action="store_true", default=False, help="rerun all jobs with incomplete output files")
-    parser.add_argument("-F", "--forceall", dest="forceall", action="store_true", default=False, help="force full rerun")
+    parser.add_argument("--snakemake_options", dest="snakemake_options", metavar="STR", type=str, help="Snakemake options to be passed directly to snakemake, e.g. use --snakemake_options='--dryrun --rerun-incomplete --unlock --forceall'. (default: '%(default)s')", default="")
     parser.add_argument("--downsample", dest="downsample", metavar="INT", help="downsample the given number of reads from the head of each FASTQ file", type=int, default=None)
     parser.add_argument("--trim", dest="trim", action="store_true", default=False, help="trim reads with TrimGalore")
     parser.add_argument("--fastqc", dest="fastqc", action="store_true", default=False, help="run FastQC read quality control")
@@ -50,7 +49,6 @@ def parse_args():
     parser.add_argument("--mapq", dest="mapq", metavar="INT", help="retain only reads with at least the given mapping quality (default: '%(default)s')", type=int, default=0)
     parser.add_argument("--bw-binsize", dest="bw_binsize", metavar="INT", help="bin size of output files in bigWig format (default: '%(default)s')", type=int, default=10)
     parser.add_argument("--gcbias", dest="gcbias", action="store_true", default=False, help="run computeGCBias quality control (long runtime!)")
-    parser.add_argument("--unlock", dest="unlock", action="store_true", default=False, help="Unlock output directory locked by Snakemake (in case of aborted workflow)!")
     parser.add_argument("-v", "--verbose", dest="verbose", action="store_true", default=False, help="verbose output")
 
 
@@ -125,20 +123,15 @@ def main():
     if args.verbose:
         user_configs += ["verbose=True"]
 
-    if args.unlock:
-        unlockstring = "--unlock"
-    else:
-        unlockstring = ""
-
     snakemake_module_load = "module load snakemake slurm &&".split()
     snakemake_cmd = """
-                    snakemake {unlock} --snakefile {snakefile} --jobs {max_jobs} {user_configs} --directory {outdir}
+                    snakemake {snakemake_options} --snakefile {snakefile} --jobs {max_jobs} {user_configs} --directory {outdir}
                     """.format( snakefile = os.path.join(this_script_dir, "Snakefile"),
                                 max_jobs = args.max_jobs,
                                 user_configs = " ".join(user_configs),
                                 outdir = args.outdir,
                                 cluster_logs_dir = os.path.abspath(cluster_logs_dir),
-                                unlock=unlockstring,
+                                snakemake_options=args.snakemake_options,
                               ).split()
 
     if args.configfile:
@@ -146,12 +139,6 @@ def main():
 
     if args.verbose:
         snakemake_cmd.append("--printshellcmds")
-
-    if args.rerun_incomplete:
-        snakemake_cmd.append("--rerun-incomplete")
-
-    if args.forceall:
-        snakemake_cmd.append("--forceall")
 
     if not args.local:
         snakemake_cmd += ["--cluster 'SlurmEasy --threads {threads} --log", cluster_logs_dir, "--name {rule}.snakemake'"]
