@@ -1,6 +1,6 @@
-### deepTools bamCompare #######################################################
+### deepTools bamCompare log2ratio #######################################################
 
-rule bamCompare:
+rule bamCompare_log2:
     input:
         chip_bam = "filtered_bam/{chip_sample}.filtered.bam",
         chip_bai = "filtered_bam/{chip_sample}.filtered.bam.bai",
@@ -28,6 +28,35 @@ rule bamCompare:
         "{params.read_extension} "
         "&> {log}"
 
+### deepTools bamCompare substract #######################################################
+
+rule bamCompare_substract:
+    input:
+        chip_bam = "filtered_bam/{chip_sample}.filtered.bam",
+        chip_bai = "filtered_bam/{chip_sample}.filtered.bam.bai",
+        control_bam = lambda wildcards: "filtered_bam/"+get_control(wildcards.chip_sample)+".filtered.bam",
+        control_bai = lambda wildcards: "filtered_bam/"+get_control(wildcards.chip_sample)+".filtered.bam.bai",
+    output:
+        "deepTools_ChIP/bamCompare/{chip_sample}.filtered.substract.input.bw"
+    params:
+        bw_binsize = bw_binsize,
+        read_extension = "--extendReads" if paired
+                         else "--extendReads "+str(fragment_length)
+    log:
+        "deepTools_ChIP/logs/bamCompare.{chip_sample}.filtered.log"
+    benchmark:
+        "deepTools_ChIP/.benchmark/bamCompare.{chip_sample}.filtered.benchmark"
+    threads: 16
+    shell:
+        deepTools_path+"bamCompare "
+        "-b1 {input.chip_bam} "
+        "-b2 {input.control_bam} "
+        "-o {output} "
+        "--ratio substract "
+        "--binSize {params.bw_binsize} "
+        "-p {threads} "
+        "{params.read_extension} "
+        "&> {log}"
 
 ### deepTools plotEnrichment ###################################################
 
