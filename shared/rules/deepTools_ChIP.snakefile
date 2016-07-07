@@ -13,7 +13,7 @@ rule bamCompare_log2:
         read_extension = "--extendReads" if paired
                          else "--extendReads "+str(fragment_length)
     log:
-        "deepTools_ChIP/logs/bamCompare.{chip_sample}.filtered.log"
+        "deepTools_ChIP/logs/bamCompare.log2ratio.{chip_sample}.filtered.log"
     benchmark:
         "deepTools_ChIP/.benchmark/bamCompare.{chip_sample}.filtered.benchmark"
     threads: 16
@@ -30,7 +30,7 @@ rule bamCompare_log2:
 
 ### deepTools bamCompare subtract #######################################################
 
-rule bamCompare_substract:
+rule bamCompare_subtract:
     input:
         chip_bam = "filtered_bam/{chip_sample}.filtered.bam",
         chip_bai = "filtered_bam/{chip_sample}.filtered.bam.bai",
@@ -43,7 +43,7 @@ rule bamCompare_substract:
         read_extension = "--extendReads" if paired
                          else "--extendReads "+str(fragment_length)
     log:
-        "deepTools_ChIP/logs/bamCompare.{chip_sample}.filtered.log"
+        "deepTools_ChIP/logs/bamCompare.subtract.{chip_sample}.filtered.log"
     benchmark:
         "deepTools_ChIP/.benchmark/bamCompare.{chip_sample}.filtered.benchmark"
     threads: 16
