@@ -55,6 +55,7 @@ rule bamCoverage_filtered:
         "{params.read_extension} "
         "&> {log}"
 
+# TODO: include blacklist!? use deeptools bam filtering options?
 
 ### deepTools computeGCBias ####################################################
 

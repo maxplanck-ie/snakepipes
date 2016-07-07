@@ -28,7 +28,7 @@ rule bamCompare_log2:
         "{params.read_extension} "
         "&> {log}"
 
-### deepTools bamCompare substract #######################################################
+### deepTools bamCompare subtract #######################################################
 
 rule bamCompare_substract:
     input:
@@ -37,7 +37,7 @@ rule bamCompare_substract:
         control_bam = lambda wildcards: "filtered_bam/"+get_control(wildcards.chip_sample)+".filtered.bam",
         control_bai = lambda wildcards: "filtered_bam/"+get_control(wildcards.chip_sample)+".filtered.bam.bai",
     output:
-        "deepTools_ChIP/bamCompare/{chip_sample}.filtered.substract.input.bw"
+        "deepTools_ChIP/bamCompare/{chip_sample}.filtered.subtract.input.bw"
     params:
         bw_binsize = bw_binsize,
         read_extension = "--extendReads" if paired
@@ -52,7 +52,7 @@ rule bamCompare_substract:
         "-b1 {input.chip_bam} "
         "-b2 {input.control_bam} "
         "-o {output} "
-        "--ratio substract "
+        "--ratio subtract "
         "--binSize {params.bw_binsize} "
         "-p {threads} "
         "{params.read_extension} "
