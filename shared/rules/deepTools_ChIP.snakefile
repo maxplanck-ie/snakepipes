@@ -10,6 +10,7 @@ rule bamCompare_log2:
         "deepTools_ChIP/bamCompare/{chip_sample}.filtered.log2ratio.over_input.bw"
     params:
         bw_binsize = bw_binsize,
+        genome_size = genome_size,
         read_extension = "--extendReads" if paired
                          else "--extendReads "+str(fragment_length),
         blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed
@@ -25,6 +26,7 @@ rule bamCompare_log2:
         "-b2 {input.control_bam} "
         "-o {output} "
         "--ratio log2 "
+        "--normalizeTo1x {params.genome_size} "
         "--binSize {params.bw_binsize} "
         "-p {threads} "
         "{params.read_extension} "
@@ -43,7 +45,8 @@ rule bamCompare_subtract:
         "deepTools_ChIP/bamCompare/{chip_sample}.filtered.subtract.input.bw"
     params:
         bw_binsize = bw_binsize,
-        read_extension = "--extendReads" if paired
+        genome_size = genome_size,
+        read_extension = "	" if paired
                          else "--extendReads "+str(fragment_length),
         blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed
                          else "",
@@ -58,6 +61,7 @@ rule bamCompare_subtract:
         "-b2 {input.control_bam} "
         "-o {output} "
         "--ratio subtract "
+        "--normalizeTo1x {params.genome_size} "
         "--binSize {params.bw_binsize} "
         "-p {threads} "
         "{params.read_extension} "
