@@ -39,7 +39,9 @@ rule bamCoverage_filtered:
         bw_binsize = bw_binsize,
         genome_size = int(genome_size),
         read_extension = "--extendReads" if paired
-                         else "--extendReads "+str(fragment_length)
+                         else "--extendReads "+str(fragment_length),
+        blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed
+                    else "",
     log:
         "bamCoverage/logs/bamCoverage.{sample}.filtered.log"
     benchmark:
@@ -53,6 +55,7 @@ rule bamCoverage_filtered:
         "-p {threads} "
         "--normalizeTo1x {params.genome_size} "
         "{params.read_extension} "
+        "{params.blacklist} "
         "&> {log}"
 
 # TODO: include blacklist!? use deeptools bam filtering options?

@@ -11,7 +11,9 @@ rule bamCompare_log2:
     params:
         bw_binsize = bw_binsize,
         read_extension = "--extendReads" if paired
-                         else "--extendReads "+str(fragment_length)
+                         else "--extendReads "+str(fragment_length),
+        blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed
+                    else "",
     log:
         "deepTools_ChIP/logs/bamCompare.log2ratio.{chip_sample}.filtered.log"
     benchmark:
@@ -26,6 +28,7 @@ rule bamCompare_log2:
         "--binSize {params.bw_binsize} "
         "-p {threads} "
         "{params.read_extension} "
+        "{params.blacklist} "
         "&> {log}"
 
 ### deepTools bamCompare subtract #######################################################
@@ -41,7 +44,9 @@ rule bamCompare_subtract:
     params:
         bw_binsize = bw_binsize,
         read_extension = "--extendReads" if paired
-                         else "--extendReads "+str(fragment_length)
+                         else "--extendReads "+str(fragment_length),
+        blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed
+                         else "",
     log:
         "deepTools_ChIP/logs/bamCompare.subtract.{chip_sample}.filtered.log"
     benchmark:
@@ -56,6 +61,7 @@ rule bamCompare_subtract:
         "--binSize {params.bw_binsize} "
         "-p {threads} "
         "{params.read_extension} "
+        "{params.blacklist} "
         "&> {log}"
 
 ### deepTools plotEnrichment ###################################################
@@ -89,10 +95,10 @@ rule plotEnrichment:
         "--outRawCounts {output.tsv} "
         "--variableScales "
 # TODO: include blacklist parameter once the bug causing on error in plotEnrichment is fixed
-#        "{params.blacklist} "
+        "{params.blacklist} "
         "-p {threads} "
 # TODO: include read extension parameter once the bug causing on error in plotEnrichment is fixed
-#        "{params.read_extension} "
+        "{params.read_extension} "
         "--ignoreDuplicates "
         "&> {log}"
 
