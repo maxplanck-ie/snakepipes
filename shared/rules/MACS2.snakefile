@@ -1,76 +1,115 @@
 import subprocess
 
 
+# MACS2 should be called on already filtered, e.g. duplicate-free, BAM files
+# for paired-end BAM files, Picard MarkDuplicates is fragment-based and
+# therefore superior to MACS2 mate 1-based duplicate detection
+
+
 ### MACS2 peak calling #########################################################
 
-rule MACS2:
-    input:
-        chip = "filtered_bam/{chip_sample}.filtered.bam",
-        control =
-            lambda wildcards: "filtered_bam/"+get_control(wildcards.chip_sample)+".filtered.bam" if get_control(wildcards.chip_sample)
-            else [],
-        insert_size_metrics =
-            "Picard_qc/InsertSizeMetrics/{chip_sample}.insert_size_metrics.txt" if paired
-            else []
-    output:
-        peaks = "MACS2/{chip_sample}.filtered.BAM_peaks.xls",
-        peaksPE = "MACS2/{chip_sample}.filtered.BAMPE_peaks.xls" if paired
-                  else []
-    params:
-        fragment_length = fragment_length,
-        paired = paired,
-        genome_size = int(genome_size),
-        # TODO: test BAMPE mode and activate BAMPE for paired-end data and BAMPE for single-end data
-        # if results of BAMPE and BAM are in good agreement for paired-end data
-        # does BAMPE mode really extends each read pair or does it only estimate a mean fragment size? the latter would be no advantage over BAM mode
-        # format = "-f BAMPE" if paired else "-f BAM"
-        broad_calling =
-            lambda wildcards: "--broad" if is_broad(wildcards.chip_sample)
-            else "",
-        control_param =
-            lambda wildcards: "-c filtered_bam/"+get_control(wildcards.chip_sample)+".filtered.bam" if get_control(wildcards.chip_sample)
-            else "",
-    log:
-        "MACS2/logs/MACS2.{chip_sample}.filtered.log"
-    benchmark:
-        "MACS2/.benchmark/MACS2.{chip_sample}.filtered.benchmark"
-    run:
-        if params.paired:
-            median_fragment_length = get_fragment_length(input.insert_size_metrics)
-        else:
-            median_fragment_length = params.fragment_length
-        model = "--nomodel --extsize "+str(median_fragment_length) if params.paired else "--extsize "+str(median_fragment_length)
-        shell(
+
+if paired:
+    rule MACS2:
+        input:
+            chip = "filtered_bam/{chip_sample}.filtered.bam",
+            control =
+                lambda wildcards: "filtered_bam/"+get_control(wildcards.chip_sample)+".filtered.bam" if get_control(wildcards.chip_sample)
+                else [],
+            insert_size_metrics =
+                "Picard_qc/InsertSizeMetrics/{chip_sample}.insert_size_metrics.txt" if paired
+                else []
+        output:
+            peaks = "MACS2/{chip_sample}.filtered.BAM_peaks.xls",
+            peaksPE = "MACS2/{chip_sample}.filtered.BAMPE_peaks.xls" if paired
+                      else []
+        params:
+            fragment_length = fragment_length,
+            paired = paired,
+            genome_size = int(genome_size),
+            # TODO: test BAMPE mode and activate BAMPE for paired-end data and BAMPE for single-end data
+            # if results of BAMPE and BAM are in good agreement for paired-end data
+            # does BAMPE mode really extends each read pair or does it only estimate a mean fragment size? the latter would be no advantage over BAM mode
+            # format = "-f BAMPE" if paired else "-f BAM"
+            broad_calling =
+                lambda wildcards: "--broad" if is_broad(wildcards.chip_sample)
+                else "",
+            control_param =
+                lambda wildcards: "-c filtered_bam/"+get_control(wildcards.chip_sample)+".filtered.bam" if get_control(wildcards.chip_sample)
+                else "",
+        log:
+            "MACS2/logs/MACS2.{chip_sample}.filtered.log"
+        benchmark:
+            "MACS2/.benchmark/MACS2.{chip_sample}.filtered.benchmark"
+        run:
+            if params.paired:
+                median_fragment_length = get_fragment_length(input.insert_size_metrics)
+            else:
+                median_fragment_length = params.fragment_length
+            model = "--nomodel --extsize "+str(median_fragment_length) if params.paired else "--extsize "+str(median_fragment_length)
+            shell(
+                macs2_path+"macs2 callpeak "
+                "-t {input.chip} "
+                "{params.control_param} "
+                "-f BAM "
+                "-g {params.genome_size} "
+                "--keep-dup all "
+                "--outdir MACS2 "
+                "--name {wildcards.chip_sample}.filtered.BAM "
+                +model+" "
+                "{params.broad_calling} "
+                "&> {log}"
+            )
+            # also run MACS2 in paired-end mode BAMPE for comparison with single-end mode
+            if params.paired:
+                shell(
+                    macs2_path+"macs2 callpeak "
+                    "-t {input.chip} "
+                    "{params.control_param} "
+                    "-f BAMPE "
+                    "-g {params.genome_size} "
+                    # MACS2 should be called on already filtered, e.g. duplicate-free, BAM files
+                    "--keep-dup all "
+                    "--outdir MACS2 "
+                    "--name {wildcards.chip_sample}.filtered.BAMPE "
+                    "{params.broad_calling} "
+                    "&> {log}.BAMPE"
+                )
+else:
+    rule MACS2:
+        input:
+            chip = "filtered_bam/{chip_sample}.filtered.bam",
+            control =
+                lambda wildcards: "filtered_bam/"+get_control(wildcards.chip_sample)+".filtered.bam" if get_control(wildcards.chip_sample)
+                else [],
+        output:
+            peaks = "MACS2/{chip_sample}.filtered.BAM_peaks.xls",
+        params:
+            fragment_length = fragment_length,
+            genome_size = int(genome_size),
+            broad_calling =
+                lambda wildcards: "--broad" if is_broad(wildcards.chip_sample)
+                else "",
+            control_param =
+                lambda wildcards: "-c filtered_bam/"+get_control(wildcards.chip_sample)+".filtered.bam" if get_control(wildcards.chip_sample)
+                else "",
+        log:
+            "MACS2/logs/MACS2.{chip_sample}.filtered.log"
+        benchmark:
+            "MACS2/.benchmark/MACS2.{chip_sample}.filtered.benchmark"
+        shell:
             macs2_path+"macs2 callpeak "
             "-t {input.chip} "
             "{params.control_param} "
             "-f BAM "
             "-g {params.genome_size} "
-            # MACS2 should be called on already filtered, e.g. duplicate-free, BAM files
-            # for paired-end BAM files, Picard MarkDuplicates is fragment-based and
-            # therefore superior to MACS2 mate 1-based duplicate detection
             "--keep-dup all "
             "--outdir MACS2 "
             "--name {wildcards.chip_sample}.filtered.BAM "
-            +model+" "
+            "--nomodel --extsize {params.fragment_length} "
             "{params.broad_calling} "
             "&> {log}"
-        )
-        # also run MACS2 in paired-end mode BAMPE for comparison with single-end mode
-        if params.paired:
-            shell(
-                macs2_path+"macs2 callpeak "
-                "-t {input.chip} "
-                "{params.control_param} "
-                "-f BAMPE "
-                "-g {params.genome_size} "
-                # MACS2 should be called on already filtered, e.g. duplicate-free, BAM files
-                "--keep-dup all "
-                "--outdir MACS2 "
-                "--name {wildcards.chip_sample}.filtered.BAMPE "
-                "{params.broad_calling} "
-                "&> {log}.BAMPE"
-            )
+
 
 
 ### MACS2 peak quality control #################################################
