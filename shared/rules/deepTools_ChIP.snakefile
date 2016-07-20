@@ -29,6 +29,38 @@ rule bamCompare:
         "&> {log}"
 
 
+### deepTools plotFingerprint ##################################################
+
+rule plotFingerprint:
+    input:
+        bams = expand("filtered_bam/{sample}.filtered.bam", sample = all_samples),
+        bais = expand("filtered_bam/{sample}.filtered.bam.bai", sample = all_samples)
+    output:
+        "deepTools_ChIP/plotFingerprint/plotFingerprint.png"
+    params:
+        labels = " ".join(all_samples),
+        blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed
+                    else "",
+        read_extension = "--extendReads" if paired
+                         else "--extendReads "+str(fragment_length)
+    log:
+        "deepTools_ChIP/logs/plotFingerprint.log"
+    benchmark:
+        "deepTools_ChIP/.benchmark/plotFingerprint.benchmark"
+    threads: 24
+    shell:
+        deepTools_path+"plotFingerprint "
+        "-b {input.bams} "
+        "--plotFile {output} "
+        "--labels {params.labels} "
+        "--plotTitle 'Cumulative read counts per bin without duplicates' "
+        "{params.blacklist} "
+        "-p {threads} "
+        "{params.read_extension} "
+        "--ignoreDuplicates "
+        "&> {log}"
+
+
 ### deepTools plotEnrichment ###################################################
 
 rule plotEnrichment:
@@ -36,8 +68,8 @@ rule plotEnrichment:
         bams = expand("filtered_bam/{sample}.filtered.bam", sample = all_samples),
         bais = expand("filtered_bam/{sample}.filtered.bam.bai", sample = all_samples)
     output:
-        png = "deepTools_ChIP/plotEnrichment/signal_erichment.gene_features.png",
-        tsv = "deepTools_ChIP/plotEnrichment/signal_erichment.gene_features.tsv"
+        png = "deepTools_ChIP/plotEnrichment/plotEnrichment.gene_features.png",
+        tsv = "deepTools_ChIP/plotEnrichment/plotEnrichment.gene_features.tsv"
     params:
         genes_gtf = genes_gtf,
         labels = " ".join(all_samples),
@@ -64,37 +96,5 @@ rule plotEnrichment:
         "-p {threads} "
 # TODO: include read extension parameter once the bug causing on error in plotEnrichment is fixed
 #        "{params.read_extension} "
-        "--ignoreDuplicates "
-        "&> {log}"
-
-
-### deepTools plotFingerprint ##################################################
-
-rule plotFingerprint:
-    input:
-        bams = expand("filtered_bam/{sample}.filtered.bam", sample = all_samples),
-        bais = expand("filtered_bam/{sample}.filtered.bam.bai", sample = all_samples)
-    output:
-        "deepTools_ChIP/plotFingerprint/fingerprint.png"
-    params:
-        labels = " ".join(all_samples),
-        blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed
-                    else "",
-        read_extension = "--extendReads" if paired
-                         else "--extendReads "+str(fragment_length)
-    log:
-        "deepTools_ChIP/logs/plotFingerprint.log"
-    benchmark:
-        "deepTools_ChIP/.benchmark/plotFingerprint.benchmark"
-    threads: 24
-    shell:
-        deepTools_path+"plotFingerprint "
-        "-b {input.bams} "
-        "--plotFile {output} "
-        "--labels {params.labels} "
-        "--plotTitle 'Cumulative read counts per bin without duplicates' "
-        "{params.blacklist} "
-        "-p {threads} "
-        "{params.read_extension} "
         "--ignoreDuplicates "
         "&> {log}"
