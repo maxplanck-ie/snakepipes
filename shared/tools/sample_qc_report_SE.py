@@ -88,7 +88,10 @@ except:
 # get peak qc from MACS2_peak_qc output #######################################
 try:
     with open(infile_MACS2_qc_txt) as f:
-        peak_count, frip, peak_genome_coverage = f.readlines()[1].split()
+        columns = map( lambda x: float(x), f.readlines()[1].split() )
+        peak_count = int(columns[0])
+        frip = round(float(columns[1]),3)
+        peak_genome_coverage = round(columns[2],3)
 except:
     peak_count = "NA"
     frip = "NA"
@@ -104,12 +107,14 @@ print "{sample_name}\t{total_reads}\t{mapped_reads}\t{fmapped_reads:.3f}\t{dup_m
     total_reads=total_reads,
     mapped_reads=mapped_reads,
     fmapped_reads=fmapped_reads,
+
     dup_mapped_reads=dup_mapped_reads,
     fdup_mapped_reads=fdup_mapped_reads,
     dupfree_mapped_reads=dupfree_mapped_reads,
     fdupfree_mapped_reads=fdupfree_mapped_reads,
     fhq_mapped_reads=fhq_mapped_reads,
     fragment_size=fragment_size,
+
     peak_count=peak_count,
     frip=frip,
     peak_genome_coverage=peak_genome_coverage)
