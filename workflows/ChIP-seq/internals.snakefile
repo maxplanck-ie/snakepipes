@@ -43,7 +43,10 @@ except:
     genome = None
 
 try:
-    paired = config["paired"]
+    if config["paired"] == "True":
+        paired = True
+    else:
+        paired = False
 except:
     paired = False
 
