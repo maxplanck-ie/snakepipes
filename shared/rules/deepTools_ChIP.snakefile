@@ -75,8 +75,8 @@ rule plotEnrichment:
         bams = expand("filtered_bam/{sample}.filtered.bam", sample = all_samples),
         bais = expand("filtered_bam/{sample}.filtered.bam.bai", sample = all_samples)
     output:
-        png = "deepTools_ChIP/plotEnrichment/signal_erichment.gene_features.png",
-        tsv = "deepTools_ChIP/plotEnrichment/signal_erichment.gene_features.tsv"
+        png = "deepTools_ChIP/plotEnrichment/plotEnrichment.gene_features.png",
+        tsv = "deepTools_ChIP/plotEnrichment/plotEnrichment.gene_features.tsv",
     params:
         genes_gtf = genes_gtf,
         labels = " ".join(all_samples),
@@ -107,14 +107,14 @@ rule plotEnrichment:
         "&> {log}"
 
 
-### deepTools plotFingerprint ##################################################
+### deepTools plotFingerprint (all files) ######################################
 
 rule plotFingerprint:
     input:
         bams = expand("filtered_bam/{sample}.filtered.bam", sample = all_samples),
         bais = expand("filtered_bam/{sample}.filtered.bam.bai", sample = all_samples)
     output:
-        "deepTools_ChIP/plotFingerprint/fingerprint.png"
+        "deepTools_ChIP/plotFingerprint/plotFingerprint.png"
     params:
         labels = " ".join(all_samples),
         blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed
