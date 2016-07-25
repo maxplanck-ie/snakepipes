@@ -17,7 +17,7 @@ rule bamCompare_log2:
     log:
         "deepTools_ChIP/logs/bamCompare.log2ratio.{chip_sample}.filtered.log"
     benchmark:
-        "deepTools_ChIP/.benchmark/bamCompare.{chip_sample}.filtered.benchmark"
+        "deepTools_ChIP/.benchmark/bamCompare.log2ratio.{chip_sample}.filtered.benchmark"
     threads: 16
     shell:
         deepTools_path+"bamCompare "
@@ -32,6 +32,7 @@ rule bamCompare_log2:
         "{params.blacklist} "
         "&> {log}"
 
+
 ### deepTools bamCompare subtract #######################################################
 
 rule bamCompare_subtract:
@@ -45,14 +46,14 @@ rule bamCompare_subtract:
     params:
         bw_binsize = bw_binsize,
         genome_size = genome_size,
-        read_extension = "	" if paired
+        read_extension = "--extendReads" if paired
                          else "--extendReads "+str(fragment_length),
         blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed
                          else "",
     log:
         "deepTools_ChIP/logs/bamCompare.subtract.{chip_sample}.filtered.log"
     benchmark:
-        "deepTools_ChIP/.benchmark/bamCompare.{chip_sample}.filtered.benchmark"
+        "deepTools_ChIP/.benchmark/bamCompare.subtract.{chip_sample}.filtered.benchmark"
     threads: 16
     shell:
         deepTools_path+"bamCompare "
@@ -67,6 +68,7 @@ rule bamCompare_subtract:
         "{params.read_extension} "
         "{params.blacklist} "
         "&> {log}"
+
 
 ### deepTools plotEnrichment ###################################################
 
