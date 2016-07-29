@@ -11,7 +11,7 @@ if paired:
             macs2_xls = lambda wildcards: "MACS2/"+wildcards.sample+".filtered.BAM_peaks.xls" if is_chip(wildcards.sample)
                 else []
         output:
-            tsv = temp("QC_report/{sample}.qc_report.tsv")
+            tsv = "QC_report/{sample}.qc_report.tsv"
         log:
             "QC_report/logs/qc_report.{sample}.log"
         benchmark:
