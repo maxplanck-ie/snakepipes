@@ -103,7 +103,7 @@ except:
 
 ## Output to stdout ###########################################################
 print "{sample_name}\t{total_reads}\t{mapped_reads}\t{fmapped_reads:.3f}\t{dup_mapped_reads}\t{fdup_mapped_reads}\t{dupfree_mapped_reads}\t{fdupfree_mapped_reads}\t{fhq_mapped_reads:.3f}\t{fragment_size}\t{peak_count}\t{frip}\t{peak_genome_coverage}".format(
-    sample_name=os.path.basename(infile_AlignmentSummaryMetrics).split(".")[0],
+    sample_name=os.path.basename(infile_AlignmentSummaryMetrics).split(".alignment_summary_metrics.txt")[0],
     total_reads=total_reads,
     mapped_reads=mapped_reads,
     fmapped_reads=fmapped_reads,
