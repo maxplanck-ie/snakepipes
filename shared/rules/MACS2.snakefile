@@ -150,7 +150,7 @@ rule MACS2_peak_qc:
         # compute peak genome coverage
         cmd = ("sort -k 1,1 "+params.peaks+" | "+
                bedtools_path+"genomeCoverageBed -i - -g "+params.genome_index+" | "+
-               "grep -P 'genome\t1' | cut -f 5"
+               "grep -P '^genome\t1' | cut -f 5"
               )
         genomecov = float(subprocess.check_output( cmd, shell=True).decode())
 
