@@ -43,53 +43,6 @@ def is_paired(infiles):
     return(paired)
 
 
-# When modifying the function update_filter(), double-check wether the rule
-# samtools_filter has to be modified concordantly
-def update_filter(samples):
-    """
-    Ensure that only the specified filters are applied
-    If filtered BAM and sample.filter files exist already, check that they
-    fully agree with the specified filtering options
-    """
-    # string with samtools view parameters for filtering
-    filter = ""
-    if dedup:
-        filter += "-F 1024 "
-    if properpairs:
-        filter += "-f 2 "
-    if mapq > 0:
-        filter += "-q "+str(mapq)+" "
-
-    for sample in samples:
-        filtered_bam = os.path.join(outdir, "filtered_bam/"+sample+".filtered.bam")
-        filtered_bai = filtered_bam+".bai"
-        # filtered BAM file index sample.filtered.bam.bai exists already
-        if os.path.isfile(filtered_bai):
-            filter_file = filtered_bam.replace(".filtered.bam",".filter")
-            # file sample.filter does not exist, i.e. sample.filtered.bam is
-            # symlink to Bowtie2 output BAM file (without any filtering)
-            if not os.path.isfile(filter_file):
-                # remove symlink if filtering options have been specified
-                if filter:
-                    cmd = "rm -f "+filtered_bam+" "+filtered_bai
-                    print("\nWARNING: Filtering options changed.\n"
-                          "Removing files:", filtered_bam, filtered_bai)
-                    subprocess.call(cmd, shell=True)
-            # file sample.filter exists, i.e. filtering was done previously
-            else:
-                with open(filter_file, "r") as f:
-                    old_filter = f.readline().strip()
-                    current_filter = ("samtools view arguments: "+filter).strip()
-                    # if specified filtering options differ from previous ones,
-                    # then remove filtered files
-                    if not current_filter == old_filter:
-                        cmd = "rm -f "+filtered_bam+" "+filtered_bai+" "+filter_file
-                        print("\nWARNING: Filtering options changed.\n"
-                              "Removing files:", filtered_bam, filtered_bai, filter_file)
-                        subprocess.call(cmd, shell=True)
-
-    return
-
 
 ### Variable defaults ##########################################################
 
@@ -131,11 +84,6 @@ try:
 except:
     mate_orientation = "--fr"
 
-try:
-    fragment_length = int(config["fragment_length"])
-except:
-    fragment_length = 200
-
 # IMPORTANT: When using snakemake with argument --config key=True, the
 # string "True" is assigned to variable "key". Assigning a boolean value
 # does not seem to be possible. Therefore, --config key=False will also
@@ -153,52 +101,11 @@ except:
     trim = False
     fastq_dir = "FASTQ"
 
-# IMPORTANT: When using snakemake with argument --config key=True, the
-# string "True" is assigned to variable "key". Assigning a boolean value
-# does not seem to be possible. Therefore, --config key=False will also
-# return the boolean value True as bool("False") gives True.
-# In contrast, within a configuration file config.yaml, assigment of boolean
-# values is possible.
-try:
-    if config["fastqc"]:
-        fastqc = True
-    else:
-        fastqc = False
-except:
-    fastqc = False
-
 try:
     trim_galore_opts = config["trim_galore_opts"]
 except:
     trim_galore_opts = "--stringency 2"
 
-# IMPORTANT: When using snakemake with argument --config key=True, the
-# string "True" is assigned to variable "key". Assigning a boolean value
-# does not seem to be possible. Therefore, --config key=False will also
-# return the boolean value True as bool("False") gives True.
-# In contrast, within a configuration file config.yaml, assigment of boolean
-# values is possible.
-try:
-    if config["dedup"]:
-        dedup = True
-    else:
-        dedup = False
-except:
-    dedup = False
-
-# IMPORTANT: When using snakemake with argument --config key=True, the
-# string "True" is assigned to variable "key". Assigning a boolean value
-# does not seem to be possible. Therefore, --config key=False will also
-# return the boolean value True as bool("False") gives True.
-# In contrast, within a configuration file config.yaml, assigment of boolean
-# values is possible.
-try:
-    if config["properpairs"]:
-        properpairs = True
-    else:
-        properpairs = False
-except:
-    properpairs = False
 
 try:
     mapq = int(config["mapq"])
@@ -210,19 +117,6 @@ try:
 except:
     bw_binsize = 10
 
-# IMPORTANT: When using snakemake with argument --config key=True, the
-# string "True" is assigned to variable "key". Assigning a boolean value
-# does not seem to be possible. Therefore, --config key=False will also
-# return the boolean value True as bool("False") gives True.
-# In contrast, within a configuration file config.yaml, assigment of boolean
-# values is possible.
-try:
-    if config["gcbias"]:
-        gcbias = True
-    else:
-        gcbias = False
-except:
-    gcbias = False
 
 
 ### Initialization #############################################################
@@ -234,8 +128,3 @@ paired = is_paired(infiles)
 
 if not paired:
     reads = [""]
-
-# ensure that only the specified filters are applied to all files
-# delete already filtered BAM files if they were generated with different
-# filtering parameters in previous runs
-update_filter(samples)
