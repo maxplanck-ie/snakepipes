@@ -30,6 +30,7 @@ include: os.path.join(maindir, "shared", "load_organism_data.py")
 ################################################################################
 # FASTQ: either downsample FASTQ files or create symlinks to input files
 include: os.path.join(maindir, "shared", "rules", "FASTQ.snakefile")
+include: os.path.join(maindir, "shared", "rules", "scRNAseq.snakefile")
 
 # TrimGalore
 if trim:
@@ -111,6 +112,7 @@ onstart:
 rule all:
     input:
         expand("FASTQ/{sample}{read}.fastq.gz", sample = samples, read = reads),
+        expand("FASTQ_barcoded/{sample}.barcoded.fastq.gz", sample = samples),
 #        run_FastQC(fastqc),
 #        run_TrimGalore(trim, fastqc),
 #        expand("Bowtie2/{sample}.bam.bai", sample = samples),
