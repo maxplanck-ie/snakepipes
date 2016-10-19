@@ -31,11 +31,11 @@
 #                         --directory /path/to/outputdir
 ################################################################################
 ## Snakemake workflow directory
-# maindir: /path/to/snakemake_workflows/
+maindir: /home/heyne/install/snakemake_workflows/scRNAseq
 ## Input directory with FASTQ files
-# indir: /path/to/inputdir/
+indir: /home/heyne/projects/scRNAseq/fastq_head/
 ## Genome acronym
-# genome: hs37d5
+genome: mm10
 ## Number of reads to downsample from the head of each FASTQ file
 # downsample: 50000
 ## Trim reads with TrimGalore

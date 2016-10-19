@@ -122,8 +122,11 @@ def main():
 #        user_configs += ["gcbias=True"]
     if args.verbose:
         user_configs += ["verbose=True"]
-
-    snakemake_module_load = "module load snakemake slurm &&".split()
+	
+	## MPI
+    #snakemake_module_load = "module load snakemake slurm &&".split()
+    ## laptop
+    snakemake_module_load = " ".split()
     snakemake_cmd = """
                     snakemake {snakemake_options} --latency-wait 30 --snakefile {snakefile} --jobs {max_jobs} {user_configs} --directory {outdir}
                     """.format( snakefile = os.path.join(this_script_dir, "Snakefile"),
