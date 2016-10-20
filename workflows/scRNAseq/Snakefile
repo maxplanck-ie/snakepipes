@@ -58,8 +58,6 @@ if trim:
 #        return([])
 
 def run_TrimGalore(trim, fastqc):
-#    if trim and fastqc:
-#        return( expand("FastQC_on_TrimGalore/{sample}{read}_fastqc.html", sample = samples, read = reads) )
     if trim:
         return( expand("FASTQ_TrimGalore/{sample}{read}.fastq.gz", sample = samples, read = reads) )
     else:
@@ -92,6 +90,7 @@ onstart:
         print("Input directory for mapping:", fastq_dir)
         print("Minimum mapping quality:", mapq)
         print("BigWig bin size:", bw_binsize)
+        print("Barcode pattern:", barcode_pattern)
         print("-" * 80, "\n")
 
         print("--- Genome ---------------------------------------------------------------------")
@@ -113,8 +112,8 @@ rule all:
     input:
         expand("FASTQ/{sample}{read}.fastq.gz", sample = samples, read = reads),
         expand("FASTQ_barcoded/{sample}.barcoded.fastq.gz", sample = samples),
+        run_TrimGalore(trim, fastqc),
 #        run_FastQC(fastqc),
-#        run_TrimGalore(trim, fastqc),
 #        expand("Bowtie2/{sample}.bam.bai", sample = samples),
 #        expand("filtered_bam/{sample}.filtered.bam.bai", sample = samples),
 #        expand("Picard_qc/AlignmentSummaryMetrics/{sample}.alignment_summary_metrics.txt", sample = samples),

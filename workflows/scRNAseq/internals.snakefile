@@ -117,6 +117,10 @@ try:
 except:
     bw_binsize = 10
 
+try:
+    barcode_pattern = config["barcode_pattern"]
+except:
+    barcode_pattern = "NNNNNNXXXXXX"
 
 
 ### Initialization #############################################################
@@ -128,3 +132,16 @@ paired = is_paired(infiles)
 
 if not paired:
     reads = [""]
+
+### barcode pattern extraction
+pattern = re.compile("[N]+")
+UMI_offset = pattern.search(barcode_pattern).start() + 1 
+UMI_length = pattern.search(barcode_pattern).end() - UMI_offset + 1
+
+pattern = re.compile("[X]+")
+CELLI_offset = pattern.search(barcode_pattern).start() + 1
+CELLI_length = pattern.search(barcode_pattern).end() - CELLI_offset + 1 
+
+
+print("UMI_LEN:",UMI_length,"  UMI_offset:",UMI_offset,"\n")
+print("CELLI_LEN:",CELLI_length,"  CELLI_offset:",CELLI_offset,"\n")
