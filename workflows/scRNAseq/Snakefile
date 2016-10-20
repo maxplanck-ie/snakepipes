@@ -57,9 +57,9 @@ if trim:
 #    else:
 #        return([])
 
-def run_TrimGalore(trim, fastqc):
+def run_TrimGalore(trim):
     if trim:
-        return( expand("FASTQ_TrimGalore/{sample}{read}.fastq.gz", sample = samples, read = reads) )
+        return( expand("FASTQ_TrimGalore/{sample}.fastq.gz", sample = samples) )
     else:
         return([])
 
@@ -75,7 +75,7 @@ def run_bamCoverage():
 
 ### execute before workflow starts #############################################
 ################################################################################
-onstart:
+onstart:    
     if "verbose" in config and config["verbose"]:
         print("--- Workflow parameter ---------------------------------------------------------")
         print("Input directory:", indir)
@@ -111,8 +111,8 @@ onstart:
 rule all:
     input:
         expand("FASTQ/{sample}{read}.fastq.gz", sample = samples, read = reads),
-        expand("FASTQ_barcoded/{sample}.barcoded.fastq.gz", sample = samples),
-        run_TrimGalore(trim, fastqc),
+        expand("FASTQ_barcoded/{sample}.fastq.gz", sample = samples),
+        run_TrimGalore(trim),
 #        run_FastQC(fastqc),
 #        expand("Bowtie2/{sample}.bam.bai", sample = samples),
 #        expand("filtered_bam/{sample}.filtered.bam.bai", sample = samples),
@@ -134,3 +134,5 @@ rule all:
 onsuccess:
     if "verbose" in config and config["verbose"]:
         print("\n--- scRNAseq-mapcount workflow finished successfully! --------------------------------\n")
+    print("Paired-end reads:", paired)
+    print("Read extension:", reads)    

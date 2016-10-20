@@ -2,10 +2,10 @@
 
 rule fastq_barcode:
         input:
-            R1 = fastq_dir+"/{sample}"+reads[0]+".fastq.gz",
-            R2 = fastq_dir+"/{sample}"+reads[1]+".fastq.gz"
+            R1 = "FASTQ/{sample}"+reads[0]+".fastq.gz",
+            R2 = "FASTQ/{sample}"+reads[1]+".fastq.gz"
         output:
-            R2_barcoded = "FASTQ_barcoded/{sample}.barcoded.fastq.gz"
+            R2_barcoded = "FASTQ_barcoded/{sample}.fastq.gz"
         params:
             UMI_length = UMI_length,
             UMI_offset = UMI_offset,
@@ -47,6 +47,3 @@ rule fastq_barcode:
 				}}; 
 			if (NR%8==0 || NR%8>5) print $0}}' | pigz -p 2 > {output.R2_barcoded}
             """
-        run: 
-            paired = False,
-            reads = [""]

@@ -109,8 +109,8 @@ def main():
         user_configs += ["downsample={}".format(args.downsample)]
     if args.barcode_pattern:
         user_configs += ["barcode_pattern={}".format(args.barcode_pattern)]
-#    if args.trim:
-#        user_configs += ["trim=True"]
+    if args.trim:
+        user_configs += ["trim=True"]
 #    if args.fastqc:
 #        user_configs += ["fastqc=True"]
 #    if args.dedup:

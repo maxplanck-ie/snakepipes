@@ -94,12 +94,14 @@ try:
     if config["trim"]:
         trim = True
         fastq_dir = "FASTQ_TrimGalore"
+        fastq_indir_trim = "FASTQ_barcoded"
+        print("here")
     else:
         trim = False
-        fastq_dir = "FASTQ"
+        fastq_dir = "FASTQ_barcoded"
 except:
     trim = False
-    fastq_dir = "FASTQ"
+    fastq_dir = "FASTQ_barcoded"
 
 try:
     trim_galore_opts = config["trim_galore_opts"]
@@ -128,10 +130,17 @@ except:
 infiles = sorted(glob.glob(os.path.join(indir, '*'+ext)))
 samples = get_sample_names(infiles)
 
-paired = is_paired(infiles)
+if not is_paired(infiles):
+        print("scRNA-seq needs currently paired read data!")
+        exit(1)
 
-if not paired:
-    reads = [""]
+## After barcode transfer to R2 we have only single end data / R2
+paired = False
+
+#paired = is_paired(infiles)
+
+#if not paired:
+#    reads = [""]
 
 ### barcode pattern extraction
 pattern = re.compile("[N]+")
