@@ -3,8 +3,8 @@
 if paired:
     rule TrimGalore:
         input:
-            r1 = "FASTQ/{sample}"+reads[0]+".fastq.gz",
-            r2 = "FASTQ/{sample}"+reads[1]+".fastq.gz"
+            r1 = fastq_indir_trim+"/{sample}"+reads[0]+".fastq.gz",
+            r2 = fastq_indir_trim+"/{sample}"+reads[1]+".fastq.gz"
         output:
             r1 = "FASTQ_TrimGalore/{sample}"+reads[0]+".fastq.gz",
             r2 = "FASTQ_TrimGalore/{sample}"+reads[1]+".fastq.gz"
@@ -27,7 +27,7 @@ if paired:
 else:
     rule TrimGalore:
         input:
-            "FASTQ/{sample}.fastq.gz"
+            fastq_indir_trim+"/{sample}.fastq.gz"
         output:
             "FASTQ_TrimGalore/{sample}.fastq.gz"
         params:

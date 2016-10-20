@@ -146,6 +146,7 @@ try:
     if config["trim"]:
         trim = True
         fastq_dir = "FASTQ_TrimGalore"
+        fastq_indir_trim = "FASTQ"
     else:
         trim = False
         fastq_dir = "FASTQ"
