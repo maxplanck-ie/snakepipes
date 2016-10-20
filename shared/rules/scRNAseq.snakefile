@@ -10,11 +10,35 @@ rule fastq_barcode:
             UMI_length = 6,
             CELLI_length = 6
         benchmark:
-            "fastq_barcoded/.benchmark/fastq_barcoded.{sample}.benchmark"
+            "FASTQ_barcoded/.benchmark/fastq_barcoded.{sample}.benchmark"
         threads: 2
         shell:"""
-            paste <(paste - - - - < <(zcat {input.R1}))   <(paste - - - - < <(zcat {input.R2}))  | \
+            paste <(paste - - - - < <(zcat {input.R1}))   <(paste - - - - < <(zcat {input.R2})) | \
             tr '\t' '\n' | \
-            awk -v CBAR_LEN={params.CELLI_length} -v UMI_LEN={params.UMI_length} \ 
-            '{{print $0}}' | pigz -p 2 > {output.R2_barcoded}
+            awk -v CBAR_LEN={params.CELLI_length} -v UMI_LEN={params.UMI_length} ' \
+           	BEGIN{{
+				for(n=0;n<256;n++) 
+					phred33[sprintf("%c",n)]=n-33
+ 			}}
+			{{
+			if (NR%8==2) 
+		 		{{CB=substr($0,UMI_LEN+1,CBAR_LEN);
+	 			UMI=substr($0,1,UMI_LEN);
+	 			TAIL=substr($0,CBAR_LEN+UMI_LEN+1);
+	 			NUMT=gsub(/T/,"#",TAIL);
+			}} 
+			if (NR%8==4) 
+				{{split(substr($0,UMI_LEN+1,CBAR_LEN),CBQA,"");
+	 			split(substr($0,1,UMI_LEN),UMIQA,""); 
+	 			QUAL_UMI=0; QUAL_CB=0;
+ 	 			for (i=1;i<=length(UMIQA);i++)
+					{{QUAL_UMI+=phred33[UMIQA[i]]}}; 
+	 			for (i=1;i<=length(CBQA);i++)
+					{{QUAL_CB+=phred33[CBQA[i]]}};
+				}}; 
+			OFS=" ";
+			if (NR%8==5) 
+				{{$1=$1":SC:"CB":"sprintf("%.0f",QUAL_CB/CBAR_LEN)":UMI:"UMI":"sprintf("%.0f",QUAL_UMI/UMI_LEN)":"NUMT":"length(TAIL);print $0;
+				}}; 
+			if (NR%8==0 || NR%8>5) print $0}}' | pigz -p 2 > {output.R2_barcoded}
             """

@@ -42,6 +42,7 @@ def parse_args():
     parser.add_argument("--local", dest="local", action="store_true", default=False, help="run workflow locally (default: jobs are submitted to Slurm queue)")
     parser.add_argument("--snakemake_options", dest="snakemake_options", metavar="STR", type=str, help="Snakemake options to be passed directly to snakemake, e.g. use --snakemake_options='--dryrun --rerun-incomplete --unlock --forceall'. (default: '%(default)s')", default="")
     parser.add_argument("--downsample", dest="downsample", metavar="INT", help="downsample the given number of reads from the head of each FASTQ file", type=int, default=None)
+    parser.add_argument("--barcode_pattern", dest="barcode_pattern", metavar="STR", help="Defines the cell barcode and UMI order and length", type=str, default="NNNNNNXXXXXX")
 #    parser.add_argument("--trim", dest="trim", action="store_true", default=False, help="trim reads with TrimGalore")
 #    parser.add_argument("--fastqc", dest="fastqc", action="store_true", default=False, help="run FastQC read quality control")
 #    parser.add_argument("--dedup", dest="dedup", action="store_true", default=False, help="retain only de-duplicated reads/read pairs (given single-/paired-end data), recommended for ChIP-seq data")
@@ -106,6 +107,7 @@ def main():
     ## optional config variables
     if args.downsample:
         user_configs += ["downsample={}".format(args.downsample)]
+    
 #    if args.trim:
 #        user_configs += ["trim=True"]
 #    if args.fastqc:
