@@ -45,5 +45,21 @@ rule fastq_barcode:
 			if (NR%8==5) 
 				{{$1=$1":SC:"CB":"sprintf("%.0f",QUAL_CB/CBAR_LEN)":UMI:"UMI":"sprintf("%.0f",QUAL_UMI/UMI_LEN)":"NUMT":"length(TAIL);print $0;
 				}}; 
-			if (NR%8==0 || NR%8>5) print $0}}' | pigz -p 2 > {output.R2_barcoded}
+			if (NR%8==0 || NR%8>5) print $0}}' | pigz -c -p 2 > {output.R2_barcoded}
             """
+
+rule sc_hisat2_genomic:
+    input:
+        read_barcoded = fastq_dir+"/{sample}"+".fastq.gz"
+    output:
+        bam = "HISAT2_genomic/{sample}.bam"
+    threads: 20
+    shell: 
+        hisat2_path + " --rna-strandness F -k 5"
+        " -x " + hisat2_index + ""
+        " -U " + {input.read_barcoded}+ ""
+        " --known-splicesite-infile " + known_splicesites + ""
+        " --no-unal -p " + {threads} + " --reorder | "
+        "grep -P '^@ | NH:i:1\b' | "
+        ""+samtools_path + "samtools view -F256 -Sb - | "
+        ""+samtools_path + "samtools sort -@5 -m 2G - " {output.bam}
