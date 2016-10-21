@@ -95,7 +95,6 @@ try:
         trim = True
         fastq_dir = "FASTQ_TrimGalore"
         fastq_indir_trim = "FASTQ_barcoded"
-        print("here")
     else:
         trim = False
         fastq_dir = "FASTQ_barcoded"

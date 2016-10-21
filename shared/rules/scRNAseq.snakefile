@@ -48,18 +48,25 @@ rule fastq_barcode:
 			if (NR%8==0 || NR%8>5) print $0}}' | pigz -c -p 2 > {output.R2_barcoded}
             """
 
+#### HISAT2 genomic mapping
 rule sc_hisat2_genomic:
     input:
-        read_barcoded = fastq_dir+"/{sample}"+".fastq.gz"
+        read_barcoded = fastq_dir+"/{sample}"+".fastq.gz",
+        temp_dir = os.getenv("TMPDIR", outdir)
     output:
-        bam = "HISAT2_genomic/{sample}.bam"
+        bam = "HISAT2_genomic/{sample}.bam",
+        align_summary = "HISAT2_genomic/{sample}.HISAT2_genomic_summary.txt",
     threads: 20
     shell: 
-        hisat2_path + " --rna-strandness F -k 5"
+        "mkdir -p {input.temp"hisat2_path + " --rna-strandness F -k 5"
         " -x " + hisat2_index + ""
-        " -U " + {input.read_barcoded}+ ""
+        " -U {input.read_barcoded} "
         " --known-splicesite-infile " + known_splicesites + ""
-        " --no-unal -p " + {threads} + " --reorder | "
-        "grep -P '^@ | NH:i:1\b' | "
+        " --no-unal -p {threads} --reorder 2> {output.align_summary} | "
+        "grep -P '^@|NH:i:1\b' | "
         ""+samtools_path + "samtools view -F256 -Sb - | "
-        ""+samtools_path + "samtools sort -@5 -m 2G - " {output.bam}
+        ""+samtools_path + "samtools sort -T {input.temp_dir}/{wildcards.sample} -@5 -m 2G -O bam - > {output.bam}"
+        
+#### count reads/UMIs per gene
+
+#rule sc_get_counts_genomic
