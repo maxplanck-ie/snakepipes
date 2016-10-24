@@ -1,4 +1,5 @@
 ### add barcodes from R1 to R2 #########
+from xdiagnose.utils.processes import shell
 
 rule fastq_barcode:
         input:
@@ -58,7 +59,7 @@ rule sc_hisat2_genomic:
         align_summary = "HISAT2_genomic/{sample}.HISAT2_genomic_summary.txt",
     threads: 20
     shell: 
-        "mkdir -p {input.temp"hisat2_path + " --rna-strandness F -k 5"
+        "mkdir -p {input.temp_dir} && " + hisat2_path + " --rna-strandness F -k 5"
         " -x " + hisat2_index + ""
         " -U {input.read_barcoded} "
         " --known-splicesite-infile " + known_splicesites + ""
@@ -68,5 +69,19 @@ rule sc_hisat2_genomic:
         ""+samtools_path + "samtools sort -T {input.temp_dir}/{wildcards.sample} -@5 -m 2G -O bam - > {output.bam}"
         
 #### count reads/UMIs per gene
-
-#rule sc_get_counts_genomic
+rule make_bed12_from_gtf:
+    input: genes_gtf
+    output: "annotations/genes.bed"
+    run:    if provided_bed != None:
+                shell("cp " + provided_bed + " annotations/genes.bed")
+            else:
+                
+    
+    
+rule sc_get_counts_genomic:
+    input: bam = "HISAT2_genomic/{sample}.bam",
+            bed12 = "/data/repository/organisms/GRCm38_ensembl/gencode/m9/genes.bed"
+    
+    output: Counts/{sample}.counts
+    shell: 
+        bedtools_path + "/intersectBed -a {input.bam} -b <(cat {input.bed12} | grep -v -e "PATCH" -e "CHR" ) -split -bed -wao -s -f 0.9 | awk -v map_f=/data/repository/organisms/GRCm38_ensembl/gencode/m9/transcript2gene.txt 'BEGIN{while (getline < map_f) MAP[$1]=$2}{if ($13!="."){$16=MAP[$16]; OFS="\t";print $0}}' | /package/bedtools2-2.25.0/bin/groupBy -g 4 -c 16,11 -o distinct | less
