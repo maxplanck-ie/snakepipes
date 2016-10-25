@@ -24,7 +24,7 @@ if paired:
             "-p {threads} "
             "2> {output.align_summary} | "
             ""+samtools_path+"samtools view -Sb - | "
-            ""+samtools_path+"samtools sort -m 2G -T {params.tempdir}/{wildcards.sample} -@ 2 -O bam - > {output.bam}"
+            ""+samtools_path+"samtools sort -m 2G -T {params.tempdir}{wildcards.sample} -@ 2 -O bam - > {output.bam}"
 else:
     rule Bowtie2:
         input:
@@ -33,7 +33,8 @@ else:
             align_summary = "Bowtie2/{sample}.Bowtie2_summary.txt",
             bam = temp("Bowtie2/{sample}.sorted.bam")
         params:
-            bowtie_opts = ""
+            bowtie_opts = "",
+            tempdir = temp_path
         benchmark:
             "Bowtie2/.benchmark/Bowtie2.{sample}.benchmark"
         threads: 24
@@ -46,7 +47,7 @@ else:
                 "-p {threads} "
                 "2> {output.align_summary} | "
                 ""+samtools_path+"samtools view -Sbu - | "
-                ""+samtools_path+"samtools sort -m 2G -T {wildcards.sample} -@ 2 -O bam - > {output.bam}"
+                ""+samtools_path+"samtools sort -m 2G -T {params.tempdir}{wildcards.sample} -@ 2 -O bam - > {output.bam}"
 
 
 ### Picard MarkDuplicates ######################################################
