@@ -10,7 +10,8 @@ if paired:
             bam = temp("Bowtie2/{sample}.sorted.bam")
         params:
             bowtie_opts = "-X 1000",
-            mate_orientation = mate_orientation
+            mate_orientation = mate_orientation,
+            tempdir = temp_path
         benchmark:
             "Bowtie2/.benchmark/Bowtie2.{sample}.benchmark"
         threads: 24
@@ -23,7 +24,7 @@ if paired:
             "-p {threads} "
             "2> {output.align_summary} | "
             ""+samtools_path+"samtools view -Sb - | "
-            ""+samtools_path+"samtools sort -m 2G -T {wildcards.sample} -@ 2 -O bam - > {output.bam}"
+            ""+samtools_path+"samtools sort -m 2G -T {params.tempdir}/{wildcards.sample} -@ 2 -O bam - > {output.bam}"
 else:
     rule Bowtie2:
         input:

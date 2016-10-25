@@ -1,6 +1,6 @@
 # import glob
 import os
-
+import subprocess
 
 ### output configuration for debugging #########################################
 ################################################################################
@@ -25,6 +25,7 @@ include: os.path.join(maindir, "shared", "common_functions.py")
 # load organism-specific data, i.e. genome indices, annotation, etc.
 include: os.path.join(maindir, "shared", "load_organism_data.py")
 
+temp_path = "/data/extended/"
 
 ### include modules of other snakefiles ########################################
 ################################################################################
@@ -87,6 +88,18 @@ def run_computeGCBias(gcbias):
         return([])
 
 
+if "tempdir" in config:
+    temp_path = config["tempdir"]
+
+
+
+try: 
+    output = subprocess.check_output("mktemp -d -p "+temp_path+"/ tmp.snakemake.XXXXXXXX",shell=True,stderr=subprocess.STDOUT)
+    temp_path = output;
+except subprocess.CalledProcessError:
+    print("Default temp path failed("+temp_path+")! Use "+outdir+" instead!")
+    temp_path = outdir 
+
 ### execute before workflow starts #############################################
 ################################################################################
 onstart:
@@ -108,6 +121,7 @@ onstart:
         print("Minimum mapping quality:", mapq)
         print("BigWig bin size:", bw_binsize)
         print("ComputeGCBias:", gcbias)
+        print("Temp path: ",temp_path)
         print("-" * 80, "\n")
 
         print("--- Genome ---------------------------------------------------------------------")
