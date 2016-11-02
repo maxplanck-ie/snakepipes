@@ -24,12 +24,12 @@ def get_fragment_length(infile):
 
 ########### Temp dir setup ###############
 
-if "tempdir" in config:
-    temp_path = config["tempdir"]+"/"
+#if "tempdir" in config:
+#    temp_path = config["tempdir"]+"/"
 
-try: 
-    output = subprocess.check_output("mktemp -d -p "+temp_path+"/ tmp.snakemake.XXXXXXXX",shell=True,stderr=subprocess.STDOUT)
-    temp_path = output.decode().rstrip()+"/";
-except subprocess.CalledProcessError:
-    print("Failed to create temp dir under default temp path prefix ("+temp_path+")! Use "+outdir+" instead!")
-    temp_path = outdir+"/"
+#try: 
+#    output = subprocess.check_output("mktemp -d -p "+temp_path+"/ tmp.snakemake.XXXXXXXX",shell=True,stderr=subprocess.STDOUT)
+#    temp_path = output.decode().rstrip()+"/";
+#except subprocess.CalledProcessError:
+#    print("Failed to create temp dir under default temp path prefix ("+temp_path+")! Use "+outdir+" instead!")
+#    temp_path = outdir+"/"

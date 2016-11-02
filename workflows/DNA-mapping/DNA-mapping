@@ -19,7 +19,7 @@ import subprocess
 import sys
 import textwrap
 import time
-
+import shutil
 
 def parse_args():
     """
@@ -49,6 +49,7 @@ def parse_args():
     parser.add_argument("--mapq", dest="mapq", metavar="INT", help="retain only reads with at least the given mapping quality (default: '%(default)s')", type=int, default=0)
     parser.add_argument("--bw-binsize", dest="bw_binsize", metavar="INT", help="bin size of output files in bigWig format (default: '%(default)s')", type=int, default=10)
     parser.add_argument("--gcbias", dest="gcbias", action="store_true", default=False, help="run computeGCBias quality control (long runtime!)")
+    parser.add_argument("--tempdir", dest="tempdir", type=str, help="used prefix path for temporary directory created via mktemp. Created temp dir gets exported as $TMPDIR and is removed at the end of this wrapper! (default: '/data/extended/')", default="/data/extended/")
     parser.add_argument("-v", "--verbose", dest="verbose", action="store_true", default=False, help="verbose output")
 
 
@@ -81,13 +82,24 @@ def parse_args():
     return args
 
 
+def make_temp_dir(tempdir,fallback_dir):
+    try: 
+        output = subprocess.check_output("mktemp -d -p "+tempdir+"/ tmp.snakemake.XXXXXXXX",shell=True,stderr=subprocess.STDOUT)
+        temp_path = output.decode().rstrip()+"/";
+    except subprocess.CalledProcessError:
+        print("Failed to create temp dir under temp path prefix ("+tempdir+")! Use "+fallback_dir+" instead!")
+        temp_path = fallback_dir+"/"
+    return temp_path
+
+
 def main():
     args = parse_args()
 
     ## Require shared snakemake workflow directory
     this_script_dir = os.path.dirname(os.path.realpath(__file__))
-
+   
     main_dir_path = os.path.join(os.path.dirname(os.path.dirname(this_script_dir)))
+
     if not os.path.isdir(main_dir_path):
         print("ERROR: Shared snakemake workflow directory is NOT available at:", main_dir_path)
         exit(1)
@@ -145,8 +157,17 @@ def main():
 
     snakemake_log = "2>&1 | tee -a {}/DNA-mapping.log".format(args.outdir).split()
 
-    cmd = " ".join("export TEMPDIR=/var/tmp/ && " + snakemake_module_load + snakemake_cmd + snakemake_log)
-    #cmd = " ".join("export TEMPDIR='/var/tmp/' && snakemake_cmd + snakemake_log)
+    ## exports: make sure environment contains necessary $TMPDIR variable and create TMPDIR accrodingly, 
+    ## on SLURM cluster $TMPDIR is set and created by SlurmEasy 
+    snakemake_exports = ""
+    temp_path = ""
+    if args.local:
+        temp_path = make_temp_dir(args.tempdir, args.outdir)
+        snakemake_exports += "export TMPDIR="+temp_path+" && "
+    
+    snakemake_exports = snakemake_exports.split()
+
+    cmd = " ".join(snakemake_exports + snakemake_module_load + snakemake_cmd + snakemake_log)
 
     if args.verbose:
         print("\n", cmd, "\n")
@@ -177,8 +198,11 @@ def main():
             # job_ids = subprocess.check_output("""ls {cluster_logs_dir} | awk -F "." '{{print $NF}}' | sed 's/e\|o//' | sort -u""".format(cluster_logs_dir=cluster_logs_dir), shell=True).split()
             # for job_id in job_ids:
             #     subprocess.call( "qdel {} 2>&1 >/dev/null".format(str(job_id)), shell="bash" )
-
-
+    if (temp_path != "" and os.path.exists(temp_path)):
+        shutil.rmtree(temp_path, ignore_errors=True)
+        if args.verbose: 
+            print("Temp directory removed ("+temp_path+")!\n")
+            
 if __name__ == "__main__":
     #print "Args:", sys.argv
     main()
