@@ -128,8 +128,8 @@ def main():
     if args.verbose:
         user_configs += ["verbose=True"]
 
-    #snakemake_module_load = "module load snakemake slurm &&".split()
-    snakemake_module_load = "".split()
+    snakemake_module_load = "module load snakemake slurm &&".split()
+    
     snakemake_cmd = """
                     snakemake {snakemake_options} --latency-wait 30 --snakefile {snakefile} --jobs {max_jobs} {user_configs} --directory {outdir}
                     """.format( snakefile = os.path.join(this_script_dir, "Snakefile"),
@@ -187,6 +187,8 @@ def main():
             # job_ids = subprocess.check_output("""ls {cluster_logs_dir} | awk -F "." '{{print $NF}}' | sed 's/e\|o//' | sort -u""".format(cluster_logs_dir=cluster_logs_dir), shell=True).split()
             # for job_id in job_ids:
             #     subprocess.call( "qdel {} 2>&1 >/dev/null".format(str(job_id)), shell="bash" )
+    
+    ## remove temp dir
     if (temp_path != "" and os.path.exists(temp_path)):
         shutil.rmtree(temp_path, ignore_errors=True)
         if args.verbose: 
