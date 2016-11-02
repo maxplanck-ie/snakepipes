@@ -145,7 +145,8 @@ def main():
 
     snakemake_log = "2>&1 | tee -a {}/DNA-mapping.log".format(args.outdir).split()
 
-    cmd = " ".join(snakemake_module_load + snakemake_cmd + snakemake_log)
+    cmd = " ".join("export TEMPDIR=/var/tmp/ && " + snakemake_module_load + snakemake_cmd + snakemake_log)
+    #cmd = " ".join("export TEMPDIR='/var/tmp/' && snakemake_cmd + snakemake_log)
 
     if args.verbose:
         print("\n", cmd, "\n")

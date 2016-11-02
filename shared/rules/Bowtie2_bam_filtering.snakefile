@@ -16,15 +16,16 @@ if paired:
             "Bowtie2/.benchmark/Bowtie2.{sample}.benchmark"
         threads: 24
         shell:
-            bowtie2_path+"bowtie2 "
-            "-x "+bowtie2_index+" -1 {input.r1} -2 {input.r2} "
-            "{params.bowtie_opts} {params.mate_orientation} "
-            "--rg-id {wildcards.sample} --rg CN:mpi-ie_deep_sequencing_unit "
-            "--rg DS:{wildcards.sample} --rg PL:ILLUMINA --rg SM:{wildcards.sample} "
-            "-p {threads} "
-            "2> {output.align_summary} | "
-            ""+samtools_path+"samtools view -Sb - | "
-            ""+samtools_path+"samtools sort -m 2G -T {params.tempdir}{wildcards.sample} -@ 2 -O bam - > {output.bam}"
+        	"echo $TEMPDIR;"
+#            bowtie2_path+"bowtie2 "
+#            "-x "+bowtie2_index+" -1 {input.r1} -2 {input.r2} "
+#            "{params.bowtie_opts} {params.mate_orientation} "
+#            "--rg-id {wildcards.sample} --rg CN:mpi-ie_deep_sequencing_unit "
+#            "--rg DS:{wildcards.sample} --rg PL:ILLUMINA --rg SM:{wildcards.sample} "
+#            "-p {threads} "
+#            "2> {output.align_summary} | "
+#            ""+samtools_path+"samtools view -Sb - | "
+#            ""+samtools_path+"samtools sort -m 2G -T $TEMPDIR{params.tempdir}{wildcards.sample} -@ 2 -O bam - > {output.bam}"
 else:
     rule Bowtie2:
         input:
