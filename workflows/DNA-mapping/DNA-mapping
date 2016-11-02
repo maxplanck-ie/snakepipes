@@ -21,6 +21,9 @@ import textwrap
 import time
 import shutil
 
+sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))))+"/shared/")
+import common_functions
+
 def parse_args():
     """
     Parse arguments from the command line.
@@ -82,16 +85,6 @@ def parse_args():
     return args
 
 
-def make_temp_dir(tempdir,fallback_dir):
-    try: 
-        output = subprocess.check_output("mktemp -d -p "+tempdir+"/ tmp.snakemake.XXXXXXXX",shell=True,stderr=subprocess.STDOUT)
-        temp_path = output.decode().rstrip()+"/";
-    except subprocess.CalledProcessError:
-        print("Failed to create temp dir under temp path prefix ("+tempdir+")! Use "+fallback_dir+" instead!")
-        temp_path = fallback_dir+"/"
-    return temp_path
-
-
 def main():
     args = parse_args()
 
@@ -135,7 +128,8 @@ def main():
     if args.verbose:
         user_configs += ["verbose=True"]
 
-    snakemake_module_load = "module load snakemake slurm &&".split()
+    #snakemake_module_load = "module load snakemake slurm &&".split()
+    snakemake_module_load = "".split()
     snakemake_cmd = """
                     snakemake {snakemake_options} --latency-wait 30 --snakefile {snakefile} --jobs {max_jobs} {user_configs} --directory {outdir}
                     """.format( snakefile = os.path.join(this_script_dir, "Snakefile"),
@@ -153,19 +147,14 @@ def main():
         snakemake_cmd.append("--printshellcmds")
 
     if not args.local:
-        snakemake_cmd += ["--cluster 'SlurmEasy --threads {threads} --log", cluster_logs_dir, "--name {rule}.snakemake'"]
+        snakemake_cmd += ["--cluster 'SlurmEasy -k -v --threads {threads} --log", cluster_logs_dir, "--name {rule}.snakemake'"]
 
     snakemake_log = "2>&1 | tee -a {}/DNA-mapping.log".format(args.outdir).split()
 
-    ## exports: make sure environment contains necessary $TMPDIR variable and create TMPDIR accrodingly, 
-    ## on SLURM cluster $TMPDIR is set and created by SlurmEasy 
-    snakemake_exports = ""
-    temp_path = ""
-    if args.local:
-        temp_path = make_temp_dir(args.tempdir, args.outdir)
-        snakemake_exports += "export TMPDIR="+temp_path+" && "
-    
-    snakemake_exports = snakemake_exports.split()
+    ## create local temp dir and add this path to environment as $TMPDIR variable 
+    ## on SLURM: $TMPDIR is set, created and removed by SlurmEasy on cluster node 
+    temp_path = common_functions.make_temp_dir(args.tempdir, args.outdir)
+    snakemake_exports = ("export TMPDIR="+temp_path+" && ").split()
 
     cmd = " ".join(snakemake_exports + snakemake_module_load + snakemake_cmd + snakemake_log)
 
