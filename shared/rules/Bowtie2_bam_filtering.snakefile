@@ -15,7 +15,6 @@ if paired:
             "Bowtie2/.benchmark/Bowtie2.{sample}.benchmark"
         threads: 24
         shell:
-#        	"echo $TMPDIR; ls -la $TMPDIR;"
             bowtie2_path+"bowtie2 "
             "-x "+bowtie2_index+" -1 {input.r1} -2 {input.r2} "
             "{params.bowtie_opts} {params.mate_orientation} "
@@ -33,8 +32,7 @@ else:
             align_summary = "Bowtie2/{sample}.Bowtie2_summary.txt",
             bam = temp("Bowtie2/{sample}.sorted.bam")
         params:
-            bowtie_opts = "",
-            tempdir = temp_path
+            bowtie_opts = ""
         benchmark:
             "Bowtie2/.benchmark/Bowtie2.{sample}.benchmark"
         threads: 24
@@ -47,7 +45,7 @@ else:
                 "-p {threads} "
                 "2> {output.align_summary} | "
                 ""+samtools_path+"samtools view -Sbu - | "
-                ""+samtools_path+"samtools sort -m 2G -T {params.tempdir}{wildcards.sample} -@ 2 -O bam - > {output.bam}"
+                ""+samtools_path+"samtools sort -m 2G -T ${{TMPDIR}}{wildcards.sample} -@ 2 -O bam - > {output.bam}"
 
 
 ### Picard MarkDuplicates ######################################################
