@@ -148,7 +148,7 @@ def main():
         snakemake_cmd.append("--printshellcmds")
 
     if not args.local:
-        snakemake_cmd += ["--cluster 'SlurmEasy -k -v --threads {threads} --log", cluster_logs_dir, "--name {rule}.snakemake'"]
+        snakemake_cmd += ["--cluster 'SlurmEasy --threads {threads} --log", cluster_logs_dir, "--name {rule}.snakemake'"]
 
     snakemake_log = "2>&1 | tee -a {}/DNA-mapping.log".format(args.outdir).split()
 

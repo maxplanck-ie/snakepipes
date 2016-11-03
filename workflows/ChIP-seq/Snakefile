@@ -52,7 +52,12 @@ onstart:
         print("Genome:", genome)
         print("BigWig bin size:", bw_binsize)
         print("-" * 80, "\n")
-
+        
+        print("--- Environment ----------------------------------------------------------------")
+        print("$TMPDIR: ",os.getenv('TMPDIR', ""))
+        print("$HOSTNAME: ",os.getenv('HOSTNAME', ""))
+        print("-" * 80, "\n")
+        
         print("--- Genome ---------------------------------------------------------------------")
         print("Genome:", genome)
         print("Effective genome size:", genome_size)

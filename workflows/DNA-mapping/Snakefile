@@ -111,7 +111,8 @@ onstart:
         print("BigWig bin size:", bw_binsize)
         print("ComputeGCBias:", gcbias)
         print("-" * 80, "\n")
-        print("--- Environment ---------------------------------------------------------------------")
+        
+        print("--- Environment ----------------------------------------------------------------")
         print("$TMPDIR: ",os.getenv('TMPDIR', ""))
         print("$HOSTNAME: ",os.getenv('HOSTNAME', ""))
         print("-" * 80, "\n")

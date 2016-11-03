@@ -57,17 +57,11 @@ if trim:
 #    else:
 #        return([])
 
-def run_TrimGalore(trim):
+def run_Trimming(trim):
     if trim:
-        return( expand("FASTQ_TrimGalore/{sample}.fastq.gz", sample = samples) )
+        return( expand(fastq_dir+"/{sample}{read}.fastq.gz", sample = samples, read = reads) )
     else:
         return([])
-
-#def run_CollectInsertSizeMetrics(paired):
-#    if paired:
-#        return( expand("Picard_qc/InsertSizeMetrics/{sample}.insert_size_metrics.txt", sample = samples) )
-#    else:
-#        return([])
 
 def run_bamCoverage():
     return( expand("bamCoverage/{sample}.coverage.bw", sample = samples) )
@@ -92,7 +86,12 @@ onstart:
         print("BigWig bin size:", bw_binsize)
         print("Barcode pattern:", barcode_pattern)
         print("-" * 80, "\n")
-
+        
+        print("--- Environment ----------------------------------------------------------------")
+        print("$TMPDIR: ",os.getenv('TMPDIR', ""))
+        print("$HOSTNAME: ",os.getenv('HOSTNAME', ""))
+        print("-" * 80, "\n")
+        
         print("--- Genome ---------------------------------------------------------------------")
         print("Genome:", genome)
         print("Effective genome size:", genome_size)
@@ -112,7 +111,7 @@ rule all:
     input:
         expand("FASTQ/{sample}{read}.fastq.gz", sample = samples, read = reads),
         expand("FASTQ_barcoded/{sample}.fastq.gz", sample = samples),
-        run_TrimGalore(trim),
+        run_Trimming(trim),
         expand("HISAT2_genomic/{sample}.bam", sample = samples),
 #        run_FastQC(fastqc),
 #        expand("Bowtie2/{sample}.bam.bai", sample = samples),
