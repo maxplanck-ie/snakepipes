@@ -10,7 +10,7 @@ if paired:
             bam = temp("Bowtie2/{sample}.sorted.bam")
         params:
             bowtie_opts = "-X 1000",
-            mate_orientation = mate_orientation,
+            mate_orientation = mate_orientation
         benchmark:
             "Bowtie2/.benchmark/Bowtie2.{sample}.benchmark"
         threads: 24
