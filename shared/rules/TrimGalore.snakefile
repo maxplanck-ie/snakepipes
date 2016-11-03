@@ -17,7 +17,7 @@ if paired:
             "FASTQ_Cutadapt/.benchmark/Cutadapt.{sample}.benchmark"
         shell:
             cutadapt_path+"cutadapt "
-                "-f fastq -e 0.1 -q 20 -O 2 -a AGATCGGAAGAGC -A AGATCGGAAGAGC "
+                "-f fastq -e 0.1 -q 20 -O 2 --trim-n --minimum-length 25 -a AGATCGGAAGAGC -A AGATCGGAAGAGC "
                 "-o ${{TMPDIR}}{params.tmp1} -p ${{TMPDIR}}{params.tmp2} " 
                 "{input.r1} {input.r2} "
                 "&> {log} "
@@ -37,7 +37,7 @@ else:
             "FASTQ_Cutadapt/.benchmark/Cutadapt.{sample}.benchmark"
         shell:
             cutadapt_path+"cutadapt "
-                "-f fastq -e 0.1 -q 20 -O 2 -a AGATCGGAAGAGC "
+                "-f fastq -e 0.1 -q 20 -O 2 --trim-n --minimum-length 25 -a AGATCGGAAGAGC "
                 "-o ${{TMPDIR}}{params.tmp} " 
                 "{input.r1} "
                 "&> {log} "
