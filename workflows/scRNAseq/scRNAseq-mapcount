@@ -19,7 +19,10 @@ import subprocess
 import sys
 import textwrap
 import time
+import shutil
 
+sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))))+"/shared/")
+import common_functions
 
 def parse_args():
     """
@@ -50,6 +53,7 @@ def parse_args():
 #    parser.add_argument("--mapq", dest="mapq", metavar="INT", help="retain only reads with at least the given mapping quality (default: '%(default)s')", type=int, default=0)
 #    parser.add_argument("--bw-binsize", dest="bw_binsize", metavar="INT", help="bin size of output files in bigWig format (default: '%(default)s')", type=int, default=10)
 #    parser.add_argument("--gcbias", dest="gcbias", action="store_true", default=False, help="run computeGCBias quality control (long runtime!)")
+    parser.add_argument("--tempdir", dest="tempdir", type=str, help="used prefix path for temporary directory created via mktemp. Created temp dir gets exported as $TMPDIR and is removed at the end of this wrapper! (default: '/data/extended/')", default="/data/extended/")
     parser.add_argument("-v", "--verbose", dest="verbose", action="store_true", default=False, help="verbose output")
 
 
@@ -110,7 +114,7 @@ def main():
     if args.barcode_pattern:
         user_configs += ["barcode_pattern={}".format(args.barcode_pattern)]
     if args.trim:
-        user_configs += ["trim=True"]
+        user_configs += ["trim={}".format(args.trim)]
 #    if args.fastqc:
 #        user_configs += ["fastqc=True"]
 #    if args.dedup:
@@ -151,7 +155,12 @@ def main():
 
     snakemake_log = "2>&1 | tee -a {}/scRNAseq-mapcount.log".format(args.outdir).split()
 
-    cmd = " ".join(snakemake_module_load + snakemake_cmd + snakemake_log)
+    ## create local temp dir and add this path to environment as $TMPDIR variable 
+    ## on SLURM: $TMPDIR is set, created and removed by SlurmEasy on cluster node 
+    temp_path = common_functions.make_temp_dir(args.tempdir, args.outdir)
+    snakemake_exports = ("export TMPDIR="+temp_path+" && ").split()
+
+    cmd = " ".join(snakemake_exports + snakemake_module_load + snakemake_cmd + snakemake_log)
 
     if args.verbose:
         print("\n", cmd, "\n")
@@ -182,8 +191,13 @@ def main():
             # job_ids = subprocess.check_output("""ls {cluster_logs_dir} | awk -F "." '{{print $NF}}' | sed 's/e\|o//' | sort -u""".format(cluster_logs_dir=cluster_logs_dir), shell=True).split()
             # for job_id in job_ids:
             #     subprocess.call( "qdel {} 2>&1 >/dev/null".format(str(job_id)), shell="bash" )
-
-
+    
+    ## remove temp dir
+    if (temp_path != "" and os.path.exists(temp_path)):
+        shutil.rmtree(temp_path, ignore_errors=True)
+        if args.verbose: 
+            print("Temp directory removed ("+temp_path+")!\n")
+            
 if __name__ == "__main__":
     #print "Args:", sys.argv
     main()

@@ -90,6 +90,10 @@ except:
 # return the boolean value True as bool("False") gives True.
 # In contrast, within a configuration file config.yaml, assigment of boolean
 # values is possible.
+fastq_dir = ""
+fastq_indir_trim = ""
+trim = False
+
 try:
     if config["trim"] == "trimgalore":
         trim = True
@@ -134,8 +138,8 @@ infiles = sorted(glob.glob(os.path.join(indir, '*'+ext)))
 samples = get_sample_names(infiles)
 
 if not is_paired(infiles):
-        print("scRNA-seq needs currently paired read data!")
-        exit(1)
+    print("scRNA-seq needs currently paired read data!")
+    exit(1)
 
 ## After barcode transfer to R2 we have only single end data / R2
 paired = False

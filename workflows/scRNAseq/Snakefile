@@ -59,7 +59,7 @@ if trim:
 
 def run_Trimming(trim):
     if trim:
-        return( expand(fastq_dir+"/{sample}{read}.fastq.gz", sample = samples, read = reads) )
+        return( expand(fastq_dir+"/{sample}.fastq.gz", sample = samples) )
     else:
         return([])
 
@@ -82,6 +82,7 @@ onstart:
         print("Downsample:", downsample)
         print("Trimming:", trim)
         print("Input directory for mapping:", fastq_dir)
+        print("Input directory for trimming:", fastq_indir_trim)
         print("Minimum mapping quality:", mapq)
         print("BigWig bin size:", bw_binsize)
         print("Barcode pattern:", barcode_pattern)
@@ -104,7 +105,7 @@ onstart:
         print("Blacklist regions BED:", blacklist_bed)
         print("-" * 80, "\n")
 
-
+        print(samples)
 ### main rule ##################################################################
 ################################################################################
 rule all:
