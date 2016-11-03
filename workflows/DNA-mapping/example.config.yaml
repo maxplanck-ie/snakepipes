@@ -19,6 +19,7 @@
 # trim_galore_opts: "--stringency 2"
 
 
+
 ################################################################################
 # The following configuration variables can only be set via this configuration
 # file when calling snakemake directly, i.e. without using the wrapper script
