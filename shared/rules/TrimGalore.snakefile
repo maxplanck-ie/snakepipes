@@ -29,7 +29,7 @@ else:
         output:
             r1 = "FASTQ_Cutadapt/{sample}.fastq.gz",
         params:
-            tmp = "FASTQ_Cutadapt/{sample}.fq.gz",
+            tmp = "{sample}.fq.gz",
             opts = trim_galore_opts
         log:
             "FASTQ_Cutadapt/logs/Cutadapt.{sample}.log"
@@ -41,7 +41,7 @@ else:
                 "-o ${{TMPDIR}}{params.tmp} " 
                 "{input.r1} "
                 "&> {log} "
-                "&& (mv ${{TMPDIR}}{params.tmp} {output.r1}; mv ${{TMPDIR}}{params.tmp} {output.r1}; touch {output.r1})"
+                "&& (mv ${{TMPDIR}}{params.tmp} {output.r1}; touch {output.r1})"
 
 if paired:
     rule TrimGalore:
