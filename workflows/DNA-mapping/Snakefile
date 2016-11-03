@@ -26,7 +26,6 @@ include: os.path.join(maindir, "shared", "common_functions.py")
 include: os.path.join(maindir, "shared", "load_organism_data.py")
 
 
-
 ### include modules of other snakefiles ########################################
 ################################################################################
 # FASTQ: either downsample FASTQ files or create symlinks to input files
@@ -51,7 +50,6 @@ include: os.path.join(maindir, "shared", "rules", "deepTools_qc.snakefile")
 
 # Qualimap BAM QC
 include: os.path.join(maindir, "shared", "rules", "Qualimap_bamqc.snakefile")
-
 
 
 ### conditional/optional rules #################################################

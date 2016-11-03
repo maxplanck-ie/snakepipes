@@ -45,7 +45,6 @@ def parse_args():
     parser.add_argument("--local", dest="local", action="store_true", default=False, help="run workflow locally (default: jobs are submitted to Slurm queue)")
     parser.add_argument("--snakemake_options", dest="snakemake_options", metavar="STR", type=str, help="Snakemake options to be passed directly to snakemake, e.g. use --snakemake_options='--dryrun --rerun-incomplete --unlock --forceall'. (default: '%(default)s')", default="")
     parser.add_argument("--downsample", dest="downsample", metavar="INT", help="downsample the given number of reads from the head of each FASTQ file", type=int, default=None)
-    #parser.add_argument("--trim", dest="trim", action="store_true", default=False, help="trim reads with TrimGalore")
     parser.add_argument("--trim", dest="trim", choices=['cutadapt', 'trimgalore'], default=None, help="trim reads with Cutadapt or TrimGalore. Default: no Trimming!")
     parser.add_argument("--fastqc", dest="fastqc", action="store_true", default=False, help="run FastQC read quality control")
     parser.add_argument("--dedup", dest="dedup", action="store_true", default=False, help="retain only de-duplicated reads/read pairs (given single-/paired-end data), recommended for ChIP-seq data")
@@ -91,9 +90,8 @@ def main():
 
     ## Require shared snakemake workflow directory
     this_script_dir = os.path.dirname(os.path.realpath(__file__))
-   
-    main_dir_path = os.path.join(os.path.dirname(os.path.dirname(this_script_dir)))
 
+    main_dir_path = os.path.join(os.path.dirname(os.path.dirname(this_script_dir)))
     if not os.path.isdir(main_dir_path):
         print("ERROR: Shared snakemake workflow directory is NOT available at:", main_dir_path)
         exit(1)
@@ -130,7 +128,6 @@ def main():
         user_configs += ["verbose=True"]
 
     snakemake_module_load = "module load snakemake slurm &&".split()
-    
     snakemake_cmd = """
                     snakemake {snakemake_options} --latency-wait 30 --snakefile {snakefile} --jobs {max_jobs} {user_configs} --directory {outdir}
                     """.format( snakefile = os.path.join(this_script_dir, "Snakefile"),

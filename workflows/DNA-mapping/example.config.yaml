@@ -18,7 +18,6 @@
 ## Options to TrimGalore (default: "--stringency 2")
 # trim_galore_opts: "--stringency 2"
 
-#temp_path: /data/extended
 
 ################################################################################
 # The following configuration variables can only be set via this configuration
