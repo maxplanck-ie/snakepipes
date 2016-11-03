@@ -1,7 +1,7 @@
 # path names must end with "/" and not include the name of the executable
 bedtools_path="/package/bedtools2-2.25.0/bin/"
 bowtie2_path = "/package/bowtie2-2.2.8/bin/"
-cutadapt_path = "/package/cutadapt-1.8.1/bin/"
+cutadapt_path = "/package/cutadapt-1.9.1/bin/"
 deepTools_path = "/package/deeptools-2.3.5/bin/"
 fastqc_path = "/package/FastQC-0.11.3/bin/"
 histoneHMM_path = "/data/manke/repository/scripts/snakemake_workflows/R/x86_64-pc-linux-gnu-library/3.2/histoneHMM/bin/"
