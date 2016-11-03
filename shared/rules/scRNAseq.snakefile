@@ -68,6 +68,7 @@ rule sc_hisat2_genomic:
          ""+samtools_path + "samtools view -F256 -Sb - | "
          ""+samtools_path + "samtools sort -T {input.temp_dir}/{wildcards.sample} -@5 -m 2G -O bam - > {output.bam}"
          
+         
 #### count reads/UMIs per gene
 #rule make_bed12_from_gtf:
 #    input: genes_gtf
