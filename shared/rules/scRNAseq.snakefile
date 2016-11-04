@@ -53,20 +53,19 @@ rule fastq_barcode:
 rule sc_hisat2_genomic:
      input:
          read_barcoded = fastq_dir+"/{sample}"+".fastq.gz",
-         temp_dir = os.getenv("TMPDIR", outdir)
      output:
          bam = "HISAT2_genomic/{sample}.bam",
          align_summary = "HISAT2_genomic/{sample}.HISAT2_genomic_summary.txt",
      threads: 20
      shell: 
-         "mkdir -p {input.temp_dir} && " + hisat2_path + "hisat2 --rna-strandness F -k 5"
+         hisat2_path + "hisat2 --rna-strandness F -k 5"
          " -x " + hisat2_index + ""
          " -U {input.read_barcoded} "
          " --known-splicesite-infile " + known_splicesites + ""
          " --no-unal -p {threads} --reorder 2> {output.align_summary} | "
          "grep -P '^@|NH:i:1\b' | "
          ""+samtools_path + "samtools view -F256 -Sb - | "
-         ""+samtools_path + "samtools sort -T {input.temp_dir}/{wildcards.sample} -@5 -m 2G -O bam - > {output.bam}; touch {output.align_summary}"
+         ""+samtools_path + "samtools sort -T ${{TMPDIR}}{wildcards.sample} -@5 -m 2G -O bam - > {output.bam}; touch {output.align_summary}"
          
          
 #### count reads/UMIs per gene
