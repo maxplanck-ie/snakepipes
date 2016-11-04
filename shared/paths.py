@@ -16,4 +16,5 @@ hisat2_path = "/package/hisat2-2.0.4/"
 samtools_path="/package/samtools-1.3.1/bin/"
 tabix_path="/package/tabix-1.2.1/"
 trim_galore_path = "/package/trim_galore_v0.4.0/bin/"
+UCSC_tools_path="/package/UCSCtools/"
 workflow_tools = os.path.join(maindir,"shared","tools")
