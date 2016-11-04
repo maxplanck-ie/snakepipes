@@ -202,10 +202,10 @@ def main():
             #     subprocess.call( "qdel {} 2>&1 >/dev/null".format(str(job_id)), shell="bash" )
     
     ## remove temp dir
-    if (temp_path != "" and os.path.exists(temp_path)):
-        shutil.rmtree(temp_path, ignore_errors=True)
-        if args.verbose: 
-            print("Temp directory removed ("+temp_path+")!\n")
+#     if (temp_path != "" and os.path.exists(temp_path)):
+#         shutil.rmtree(temp_path, ignore_errors=True)
+#         if args.verbose: 
+#             print("Temp directory removed ("+temp_path+")!\n")
             
 if __name__ == "__main__":
     #print "Args:", sys.argv
