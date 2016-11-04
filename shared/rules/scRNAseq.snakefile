@@ -86,7 +86,7 @@ rule create_annotation:
         bed_annot = "Annotation/genes.annotated.bed"
     shell:
         "join -t $'\t' -o auto --check-order -1 4 -2 2 "
-        "<("+UCSC_tools_path+"gtfToGenePred {input.gtf} /dev/stdout | "+UCSC_tools_path+"genePredToBed /dev/stdin /dev/stdout | tr " " "\t" | sort -k4)"
+        "<("+UCSC_tools_path+"gtfToGenePred {input.gtf} /dev/stdout | "+UCSC_tools_path+"""genePredToBed /dev/stdin /dev/stdout | tr " " "\t" | sort -k4) """
         """ <(cat {input.gtf} | awk '$3=="transcript"{{print $0}}' | tr -d "\";") > {output.bed_annot}"""
 #         """ <(cat {input.gtf} | awk '$3=="transcript"{{print $0}}' | tr -d "\";" | """
 #         """ awk '{pos=match($0,"tag.basic"); if (pos==0) basic="full"; else basic="basic"; """
