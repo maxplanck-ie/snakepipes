@@ -118,7 +118,7 @@ rule sc_get_counts_genomic:
         counts = "Counts/{sample}.rbar.counts"
     shell: 
         bedtools_path+
-        """ intersectBed -a {input.bam} -b <(cat {input.bed} | cut -f1-12) """
+        """intersectBed -a {input.bam} -b <(cat {input.bed} | cut -f1-12) """
         """ -split -bed -wo -s -nonamecheck > {output.counts} """ 
         
 #        """ awk -v map_f=gencode.M9.full.table 'BEGIN{while (getline < map_f) {MAP[$2]=$1;MAP2[$2]=$4}}{if ($13!="."){OFS="\t";print $0,MAP[$16],MAP2[$16]"__chr"$1}}' | /package/bedtools2-2.25.0/bin/groupBy -g 4 -c 26,27,16,5,25 -o distinct,distinct,distinct,collapse,mean | awk -v map_f=/data/pospisilik/group/heyne/scRNAseq/sagar/celseq_barcodes.192.txt 'BEGIN{while (getline < map_f) {CELL[$2]=$1;COUNTS[$1]=0}}{pos=match($1,":SC:");split(substr($1,pos+1),BC,":"); num=split($2,GENES,",");if ( (num==1 && BC[2] in CELL) ) {if (!($3 in ALL) || !(BC[5] in ALL[$3])){for (i=1; i<=192;i++) ALL[$3][BC[5]][i]=0;} ALL[$3][BC[5]][CELL[BC[2]]] += 1}}END{for (i in ALL){for (k in ALL[i]){printf i" "k" "; for (j=1;j<=192;j++){ printf ALL[i][k][j]" ";} printf "\n"}}}' > test.cout.csv
