@@ -136,6 +136,11 @@ try:
 except:
 	barcode_file = workflow.basedir+"/celseq_barcodes.192.txt"
     
+try:
+	transcripts_exclude = config["transcripts_exclude"]
+except:
+	transcripts_exclude = "miRNA|misc_RNA|snRNA|snoRNA|scaRNA|sRNA|scRNA|rRNA|pseudogene|3prime_overlapping_ncRNA|processed_transcript"
+    
 ### Initialization #############################################################
 
 infiles = sorted(glob.glob(os.path.join(indir, '*'+ext)))
