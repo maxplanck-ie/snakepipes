@@ -66,7 +66,7 @@ rule sc_hisat2_genomic:
          " --no-unal -p {threads} --reorder 2> {output.align_summary} | "
          "grep -P '^@|NH:i:1\b' | "
          ""+samtools_path + "samtools view -F256 -Sb - | "
-         ""+samtools_path + "samtools sort -T {input.temp_dir}/{wildcards.sample} -@5 -m 2G -O bam - > {output.bam}"
+         ""+samtools_path + "samtools sort -T {input.temp_dir}/{wildcards.sample} -@5 -m 2G -O bam - > {output.bam}; touch {output.align_summary}"
          
          
 #### count reads/UMIs per gene
@@ -82,8 +82,8 @@ rule create_annotation:
     input: 
         gtf = genes_gtf
     output: 
-        #bed12 = "Annotation/genes.bed12.bed",
-        bed_annot = "Annotation/genes.annotated.bed"
+        bed_annot = "Annotation/genes.annotated.bed",
+        bed12 = "Annotation/genes.bed12.bed"
     shell:
         "join -t $'\t' -o auto --check-order -1 4 -2 2 "
         "<("+UCSC_tools_path+"gtfToGenePred {input.gtf} /dev/stdout | "+UCSC_tools_path+"""genePredToBed /dev/stdin /dev/stdout | tr " " "\\t" | sort -k4) """
@@ -100,7 +100,8 @@ rule create_annotation:
          """ OFS="\\t"; print tid,tna,gid,gna,"gencode",basic,tt,gt,tsl,lvl}}' | """
          """ tr " " "\\t" | sort -k2) | """
          """ awk '{{$13=$13"\\t"$1; $4=$4"\\t"$1; OFS="\\t";print $0}}' | """
-         """ cut --complement -f 1,14,16,18,20 > {output.bed_annot}"""
+         """ cut --complement -f 1,14,16,18,20 > {output.bed_annot}; """
+         """ cut -f1-12 {output.bed_annot} > {output.bed12}"""
     
 rule sc_get_counts_genomic:
     input:
@@ -109,8 +110,8 @@ rule sc_get_counts_genomic:
     output: 
         "Counts/{sample}.rbar.counts"
     shell: 
-        #bedtools_path #+ "/intersectBed -a {input.bam} -b <(cat {input.bed12} | grep -v -e "PATCH" -e "CHR" ) -split -bed -wao -s -f 0.9 | awk -v map_f=/data/repository/organisms/GRCm38_ensembl/gencode/m9/transcript2gene.txt 'BEGIN{while (getline < map_f) MAP[$1]=$2}{if ($13!="."){$16=MAP[$16]; OFS="\t";print $0}}' | /package/bedtools2-2.25.0/bin/groupBy -g 4 -c 16,11 -o distinct | less
         """"echo "get counts """
         #bedtools_path+"intersectBed -a {input.bam} -b <(cat /data/repository/organisms/GRCm38_ensembl/gencode/m9/genes.bed | grep -v -e "PATCH" -e "CHR" ) -split -bed  -wo -s | awk -v map_f=gencode.M9.full.table 'BEGIN{while (getline < map_f) {MAP[$2]=$1;MAP2[$2]=$4}}{if ($13!="."){OFS="\t";print $0,MAP[$16],MAP2[$16]"__chr"$1}}' | /package/bedtools2-2.25.0/bin/groupBy -g 4 -c 26,27,16,5,25 -o distinct,distinct,distinct,collapse,mean | awk -v map_f=/data/pospisilik/group/heyne/scRNAseq/sagar/celseq_barcodes.192.txt 'BEGIN{while (getline < map_f) {CELL[$2]=$1;COUNTS[$1]=0}}{pos=match($1,":SC:");split(substr($1,pos+1),BC,":"); num=split($2,GENES,",");if ( (num==1 && BC[2] in CELL) ) {if (!($3 in ALL) || !(BC[5] in ALL[$3])){for (i=1; i<=192;i++) ALL[$3][BC[5]][i]=0;} ALL[$3][BC[5]][CELL[BC[2]]] += 1}}END{for (i in ALL){for (k in ALL[i]){printf i" "k" "; for (j=1;j<=192;j++){ printf ALL[i][k][j]" ";} printf "\n"}}}' > test.cout.csv
 ## zcat 14wks_Eed_WT_1.umi.fastq.gz | /package/hisat2-2.0.4/hisat2 --rna-strandness F -k 5 -x /data/repository/organisms/GRCm38_ensembl/HISAT2Index/genome -U - --no-unal -p 16 --reorder | grep -P '^@|NH:i:1\b' | samtools view -F256 -Sb - | /package/bedtools2-2.25.0/bin/intersectBed -a - -b <(cat /data/repository/organisms/GRCm38_ensembl/gencode/m9/genes.bed| grep -v -e "PATCH" -e "CHR" ) -split -bed  -wo -s | awk -v map_f=gencode.M9.full.table 'BEGIN{while (getline < map_f) {MAP[$2]=$1;MAP2[$2]=$4}}{if ($13!="."){OFS="\t";print $0,MAP[$16],MAP2[$16]"__chr"$1}}' | /package/bedtools2-2.25.0/bin/groupBy -g 4 -c 26,27,16,5,25 -o distinct,distinct,distinct,collapse,mean | awk -v map_f=/data/pospisilik/group/heyne/scRNAseq/sagar/celseq_barcodes.192.txt 'BEGIN{while (getline < map_f) {CELL[$2]=$1;COUNTS[$1]=0}}{pos=match($1,":SC:");split(substr($1,pos+1),BC,":"); num=split($2,GENES,",");if ( (num==1 && BC[2] in CELL) ) {if (!($3 in ALL)){for (i=1; i<=192;i++) ALL[$3][i]=0;} ALL[$3][CELL[BC[2]]] += 1}}END{for (i in ALL){printf i" "; for (j=1;j<=192;j++){ printf ALL[i][j]" ";} printf "\n"}}' | less
 ## cat test.bam | /package/bedtools2-2.25.0/bin/intersectBed -a - -b <(cat /data/repository/organisms/GRCm38_ensembl/gencode/m9/genes.bed| grep -v -e "PATCH" -e "CHR" ) -split -bed  -wo -s | awk -v map_f=gencode.M9.full.table 'BEGIN{while (getline < map_f) {MAP[$2]=$1;MAP2[$2]=$4}}{if ($13!="."){OFS="\t";print $0,MAP[$16],MAP2[$16]"__chr"$1}}' | /package/bedtools2-2.25.0/bin/groupBy -g 4 -c 26,27,16,5,25 -o distinct,distinct,distinct,collapse,mean | awk -v map_f=/data/pospisilik/group/heyne/scRNAseq/sagar/celseq_barcodes.192.txt 'BEGIN{while (getline < map_f) {CELL[$2]=$1;COUNTS[$1]=0}}{pos=match($1,":SC:");split(substr($1,pos+1),BC,":"); num=split($2,GENES,",");if ( (num==1 && BC[2] in CELL) ) {if (!($3 in ALL) || !(BC[5] in ALL[$3])){for (i=1; i<=192;i++) ALL[$3][BC[5]][i]=0;} ALL[$3][BC[5]][CELL[BC[2]]] += 1}}END{for (i in ALL){for (k in ALL[i]){printf i" "k" "; for (j=1;j<=192;j++){ printf ALL[i][k][j]" ";} printf "\n"}}}' > test.cout.csv
+#bedtools_path #+ "/intersectBed -a {input.bam} -b <(cat {input.bed12} | grep -v -e "PATCH" -e "CHR" ) -split -bed -wao -s -f 0.9 | awk -v map_f=/data/repository/organisms/GRCm38_ensembl/gencode/m9/transcript2gene.txt 'BEGIN{while (getline < map_f) MAP[$1]=$2}{if ($13!="."){$16=MAP[$16]; OFS="\t";print $0}}' | /package/bedtools2-2.25.0/bin/groupBy -g 4 -c 16,11 -o distinct | less

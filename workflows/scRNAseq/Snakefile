@@ -115,6 +115,7 @@ rule all:
         expand("FASTQ_barcoded/{sample}.fastq.gz", sample = samples),
         run_Trimming(trim),
         expand("HISAT2_genomic/{sample}.bam", sample = samples),
+        
         "Annotation/genes.annotated.bed",
 #        run_FastQC(fastqc),
 #        expand("Bowtie2/{sample}.bam.bai", sample = samples),
