@@ -131,7 +131,10 @@ try:
 except:
     barcode_pattern = "NNNNNNXXXXXX"
 
-
+try:
+	barcode_file = config["barcode_file"]
+except:
+	barcode_file = 
 ### Initialization #############################################################
 
 infiles = sorted(glob.glob(os.path.join(indir, '*'+ext)))
