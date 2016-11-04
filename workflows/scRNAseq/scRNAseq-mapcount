@@ -85,12 +85,6 @@ def parse_args():
         args.downsample = int(args.downsample)
     except:
         args.downsample = None
-        
-    try:
-        args.barcode_file = os.path.abspath(args.barcode_file)
-    except:
-        args.barcode_file = None
-        
 
     return args
 
@@ -140,15 +134,15 @@ def main():
         user_configs += ["verbose=True"]
 	
     if args.barcode_file:
-        try:
-            args.barcode_file = os.path.abspath(args.barcode_file)
-        except:
-            print("Barcode file not found! {}".format(args.barcode_file))
+        if os.path.exists(os.path.abspath(args.barcode_file)):
+            user_configs += ["barcode_file={}".format(args.barcode_file)]
+        else:
+            print("\nBarcode file not found! {}\n".format(args.barcode_file))
             exit(1)
 	## MPI
-    #snakemake_module_load = "module load snakemake slurm &&".split()
+    snakemake_module_load = "module load snakemake slurm &&".split()
     ## laptop
-    snakemake_module_load = " ".split()
+    #snakemake_module_load = " ".split()
     snakemake_cmd = """
                     snakemake {snakemake_options} --latency-wait 30 --snakefile {snakefile} --jobs {max_jobs} {user_configs} --directory {outdir}
                     """.format( snakefile = os.path.join(this_script_dir, "Snakefile"),

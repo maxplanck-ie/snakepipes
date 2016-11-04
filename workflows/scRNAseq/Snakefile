@@ -86,6 +86,7 @@ onstart:
         print("Minimum mapping quality:", mapq)
         print("BigWig bin size:", bw_binsize)
         print("Barcode pattern:", barcode_pattern)
+        print("Barcode file:", barcode_file)
         print("-" * 80, "\n")
         
         print("--- Environment ----------------------------------------------------------------")

@@ -134,7 +134,8 @@ except:
 try:
 	barcode_file = config["barcode_file"]
 except:
-	barcode_file = 
+	barcode_file = workflow.basedir+"/celseq_barcodes.192.txt"
+    
 ### Initialization #############################################################
 
 infiles = sorted(glob.glob(os.path.join(indir, '*'+ext)))
