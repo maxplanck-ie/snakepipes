@@ -139,7 +139,7 @@ except:
 try:
 	transcripts_exclude = config["transcripts_exclude"]
 except:
-	transcripts_exclude = "full|miRNA|misc_RNA|snRNA|snoRNA|scaRNA|sRNA|scRNA|rRNA|pseudogene|3prime_overlapping_ncRNA|processed_transcript"
+	transcripts_exclude = "full|decay|miRNA|misc_RNA|snRNA|snoRNA|scaRNA|sRNA|scRNA|rRNA|pseudogene|3prime_overlapping_ncRNA|processed_transcript"
     
 ### Initialization #############################################################
 
