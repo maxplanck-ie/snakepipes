@@ -63,9 +63,9 @@ rule sc_hisat2_genomic:
          " -U {input.read_barcoded} "
          " --known-splicesite-infile " + known_splicesites + ""
          " --no-unal -p {threads} --reorder 2> {output.align_summary} | "
-         "grep -P '^@|NH:i:1\b' | "
+         "grep -P '^@|NH:i:1\\b' | "
          ""+samtools_path + "samtools view -F256 -Sb - | "
-         ""+samtools_path + "samtools sort -T ${{TMPDIR}}{wildcards.sample} -@5 -m 2G -O bam - > {output.bam}; touch {output.align_summary}"
+         ""+samtools_path + "samtools sort -T ${{TMPDIR}}{wildcards.sample} -@5 -m 2G -O bam - > {output.bam}"
          
          
 #### count reads/UMIs per gene
