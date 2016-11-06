@@ -115,7 +115,7 @@ rule sc_get_counts_genomic:
         bam = "HISAT2_genomic/{sample}.bam",
         bed = "Annotation/genes.filtered.bed"
     output: 
-        counts = "Counts/{sample}.rbar.counts"
+        counts = "Counts/{sample}.rbar.counts",
         counts_summary = "Counts/{sample}.rbar.counts_summary.txt"
     params:
         map_tab = "Annotation/genes.filtered.bed",
