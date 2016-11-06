@@ -116,7 +116,7 @@ rule all:
         run_Trimming(trim),
         expand("HISAT2_genomic/{sample}.bam", sample = samples),
         "Annotation/genes.filtered.bed",
-        expand("Counts/{sample}.rbar.counts",sample = samples)
+        expand("Counts/{sample}.rbar.counts",sample = samples),
 #        run_FastQC(fastqc),
 #        expand("Bowtie2/{sample}.bam.bai", sample = samples),
 #        expand("filtered_bam/{sample}.filtered.bam.bai", sample = samples),
