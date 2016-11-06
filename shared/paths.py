@@ -1,5 +1,5 @@
 # path names must end with "/" and not include the name of the executable
-bedtools_path="/package/bedtools2-2.26.0/bin/"
+bedtools_path="/package/bedtools2-2.25.0/bin/"
 bowtie2_path = "/package/bowtie2-2.2.8/bin/"
 cutadapt_path = "/package/cutadapt-1.9.1/bin/"
 deepTools_path = "/package/deeptools-2.3.5/bin/"
