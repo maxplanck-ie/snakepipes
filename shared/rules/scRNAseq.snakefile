@@ -123,7 +123,7 @@ rule sc_get_counts_genomic:
     shell: 
         bedtools_path+
         """intersectBed -a {input.bam} -b <(cat {input.bed} | cut -f1-12) """
-        """ -split -bed -wo -s -nonamecheck | """ 
+        """ -split -bed -wao -s -nonamecheck | """ 
         """ awk -v map_f={input.bed} """
         """  'BEGIN{{while (getline < map_f) {{MAP[$13]=$15;MAP2[$13]=$16}} }}"""
         """  {{if ($13!="."){{ OFS="\\t"; print $0,MAP[$16],MAP2[$16]"__chr"$1; ass+=1}} else notass+=1; }} """
