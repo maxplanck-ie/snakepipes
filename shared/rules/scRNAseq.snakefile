@@ -129,7 +129,7 @@ rule sc_get_counts_genomic:
         """  {{if ($13!="."){{ OFS="\\t"; print $0,MAP[$16],MAP2[$16]"__chr"$1; ass+=1}} else notass+=1; }} """
         """ END{{sum="ASSIGNED:\\t"ass"\\nNOT ASSIGNED:\\t"notass"\\t"(notass/(ass+notass))"\\nALL:\\t"ass+notass; """
         """  print sum >"/dev/stderr"}} ' 2>{output.counts_summary} | """
-        bedtools_path+
+        +bedtools_path+
         """groupBy -g 4 -c 26,27,16,5,25 -o distinct,distinct,distinct,collapse,mean | """
         """ awk -v map_f={params.bc_file} """
         """  'BEGIN{{ """
