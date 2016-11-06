@@ -46,6 +46,7 @@ def parse_args():
     parser.add_argument("--snakemake_options", dest="snakemake_options", metavar="STR", type=str, help="Snakemake options to be passed directly to snakemake, e.g. use --snakemake_options='--dryrun --rerun-incomplete --unlock --forceall'. (default: '%(default)s')", default="")
     parser.add_argument("--downsample", dest="downsample", metavar="INT", help="downsample the given number of reads from the head of each FASTQ file", type=int, default=None)
     parser.add_argument("--barcode_pattern", dest="barcode_pattern", metavar="STR", help="Defines the cell barcode and UMI order and length at the 5' end of R1 (Cel-seq protocol). 'N' defines UMI/random positions, X defines fixed positions; Default 'NNNNNNXXXXXX'", type=str, default="NNNNNNXXXXXX")
+    parser.add_argument("--transcripts_exclude", dest="transcripts_exclude", metavar="STR", help="Keywords from gencode annotation that get removed from list of all transcripts", type=str, default=None)
     parser.add_argument("--cell_barcode_file", dest="barcode_file", metavar="STR", help="2-column file with cell-index (1st col) and barcode (2nd col). Default will use CelSeq@MPI-IE file with 192 barcodes. (Default: None)", type=str, default=None) 
     parser.add_argument("--trim", dest="trim", choices=['cutadapt', 'trimgalore'], default=None, help="trim reads with Cutadapt or TrimGalore. Default: no Trimming!")
     parser.add_argument("--tempdir", dest="tempdir", type=str, help="used prefix path for temporary directory created via mktemp. Created temp dir gets exported as $TMPDIR and is removed at the end of this wrapper! (default: '/data/extended/')", default="/data/extended/")
@@ -118,12 +119,8 @@ def main():
         user_configs += ["barcode_pattern={}".format(args.barcode_pattern)]
     if args.trim:
         user_configs += ["trim={}".format(args.trim)]
-#    if args.fastqc:
-#        user_configs += ["fastqc=True"]
-#    if args.dedup:
-#        user_configs += ["dedup=True"]
-#    if args.properpairs:
-#        user_configs += ["properpairs=True"]
+    if args.transcripts_exclude:
+        user_configs += ["transcripts_exclude={}".format(args.transcripts_exclude)]
 #    if args.mapq:
 #        user_configs += ["mapq={}".format(args.mapq)]
 #    if args.bw_binsize:
