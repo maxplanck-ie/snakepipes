@@ -65,7 +65,8 @@ rule sc_hisat2_genomic:
          " --no-unal -p {threads} --reorder 2> {output.align_summary} | "
          "grep -P '^@|NH:i:1\\b' | "
          ""+samtools_path + "samtools view -F256 -Sb - | "
-         ""+samtools_path + "samtools sort -T ${{TMPDIR}}{wildcards.sample} -@5 -m 2G -O bam - > {output.bam}"
+         ""+samtools_path + "samtools sort -T ${{TMPDIR}}{wildcards.sample} -@5 -m 2G -O bam - > {output.bam}; "
+         ""+samtools_path + "samtools index {output.bam} "
          
          
 #### count reads/UMIs per gene
@@ -121,6 +122,7 @@ rule sc_get_counts_genomic:
     params:
         map_tab = "Annotation/genes.filtered.bed",
         bc_file = barcode_file
+    threads: 10
     shell: 
         bedtools_path+
         """intersectBed -a {input.bam} -b <(cat {input.bed} | cut -f1-12) """
