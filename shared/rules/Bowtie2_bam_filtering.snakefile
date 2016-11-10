@@ -23,7 +23,7 @@ if paired:
             "-p {threads} "
             "2> {output.align_summary} | "
             ""+samtools_path+"samtools view -Sb - | "
-            ""+samtools_path+"samtools sort -m 2G -T {wildcards.sample} -@ 2 -O bam - > {output.bam}"
+            ""+samtools_path+"samtools sort -m 2G -T ${{TMPDIR}}{wildcards.sample} -@ 2 -O bam - > {output.bam}"
 else:
     rule Bowtie2:
         input:
@@ -45,7 +45,7 @@ else:
                 "-p {threads} "
                 "2> {output.align_summary} | "
                 ""+samtools_path+"samtools view -Sbu - | "
-                ""+samtools_path+"samtools sort -m 2G -T {wildcards.sample} -@ 2 -O bam - > {output.bam}"
+                ""+samtools_path+"samtools sort -m 2G -T ${{TMPDIR}}{wildcards.sample} -@ 2 -O bam - > {output.bam}"
 
 
 ### Picard MarkDuplicates ######################################################
