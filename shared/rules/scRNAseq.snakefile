@@ -101,7 +101,7 @@ rule create_annotation:
          """ awk '{{$13=$13"\\t"$1; $4=$4"\\t"$1; OFS="\\t";print $0}}' | """
          """ cut --complement -f 1,14,16,18,20 > {output.bed_annot} """
          
-rule filter_annotation:
+rule filter_exclude_annotation:
     input:
         bed_annot = "Annotation/genes.annotated.bed",    
     output:
@@ -110,6 +110,16 @@ rule filter_annotation:
         exclude_pattern =  transcripts_exclude  
     shell:
         """ cat {input.bed_annot} | grep -v -P "{params.exclude_pattern}" > {output.bed_filtered}; """ 
+
+# rule filter_include_annotation:
+#     input:
+#         bed_annot = "Annotation/genes.annotated.bed",    
+#     output:
+#         bed_filtered = "Annotation/genes.filtered.bed"
+#     params: 
+#         exclude_pattern =  transcripts_include  
+#     shell:
+#         """ cat {input.bed_annot} | grep -P "{params.exclude_pattern}" > {output.bed_filtered}; """ 
 
 
 rule sc_get_counts_genomic:
