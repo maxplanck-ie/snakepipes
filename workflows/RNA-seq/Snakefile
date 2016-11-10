@@ -31,9 +31,9 @@ include: os.path.join(maindir, "shared", "load_organism_data.py")
 # FASTQ: either downsample FASTQ files or create symlinks to input files
 include: os.path.join(maindir, "shared", "rules", "FASTQ.snakefile")
 
-# # FastQC
-# if fastqc:
-#     include: os.path.join(maindir, "shared", "rules", "FastQC.snakefile")
+# FastQC
+if fastqc:
+    include: os.path.join(maindir, "shared", "rules", "FastQC.snakefile")
 
 # # TrimGalore
 # if trim:
@@ -107,7 +107,7 @@ onstart:
         print("De-duplicate reads/read pairs:", dedup)
         print("Retain only proper pairs:", properpairs)
         print("Minimum mapping quality:", mapq)
-        print("BigWig bin size:", bw_binsize)
+        print("bigWig bin size:", bw_binsize)
         print("-" * 80, "\n")
 
         print("--- Environment ----------------------------------------------------------------")
@@ -132,9 +132,9 @@ onstart:
 ################################################################################
 rule all:
     input:
-        expand("FASTQ/{sample}{read}.fastq.gz", sample = samples, read = reads)
+        expand("FASTQ/{sample}{read}.fastq.gz", sample = samples, read = reads),
+        run_FastQC(fastqc),
 
-        # run_FastQC(fastqc),
         # run_Trimming(trim, fastqc),
         # expand("Bowtie2/{sample}.bam.bai", sample = samples),
         # expand("filtered_bam/{sample}.filtered.bam.bai", sample = samples),
