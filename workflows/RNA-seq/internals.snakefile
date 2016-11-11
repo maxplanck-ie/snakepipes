@@ -149,6 +149,17 @@ try:
 except:
     fragment_length = 200
 
+try:
+    transcripts_include = config["transcripts_include"]
+except:
+    transcripts_include = None
+
+try:
+    transcripts_exclude = config["transcripts_exclude"]
+except:
+    transcripts_exclude = None
+
+
 # IMPORTANT: When using snakemake with argument --config key=True, the
 # string "True" is assigned to variable "key". Assigning a boolean value
 # does not seem to be possible. Therefore, --config key=False will also

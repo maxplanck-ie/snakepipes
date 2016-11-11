@@ -42,6 +42,15 @@ if trim:
 # HISAT2
 include: os.path.join(maindir, "shared", "rules", "HISAT2.snakefile")
 
+# Salmon
+include: os.path.join(maindir, "shared", "rules", "create_annotation.snakefile")
+if transcripts_include:
+    include: os.path.join(maindir, "shared", "rules", "filter_include_annotation.snakefile")
+if transcripts_exclude:
+    include: os.path.join(maindir, "shared", "rules", "filter_include_annotation.snakefile")
+
+
+
 # # Bowtie2 mapping, duplicate marking, BAM filtering and indexing
 # include: os.path.join(maindir, "shared", "rules", "Bowtie2_bam_filtering.snakefile")
 #
@@ -70,6 +79,7 @@ def run_Trimming(trim, fastqc):
         return( expand(fastq_dir+"/{sample}{read}.fastq.gz", sample = samples, read = reads) )
     else:
         return([])
+
 
 # def run_CollectInsertSizeMetrics(paired):
 #     if paired:
@@ -112,6 +122,8 @@ onstart:
         print("Retain only proper pairs:", properpairs)
         print("Minimum mapping quality:", mapq)
         print("bigWig bin size:", bw_binsize)
+        print("transcripts_include:", transcripts_include)
+        print("transcripts_exclude:", transcripts_exclude)
         print("-" * 80, "\n")
 
         print("--- Environment ----------------------------------------------------------------")
@@ -140,6 +152,8 @@ rule all:
         run_FastQC(fastqc),
         run_Trimming(trim, fastqc),
         expand("HISAT2/{sample}.bam.bai", sample = samples),
+        "Annotation/genes.annotated.bed",
+        "Annotation/genes.filtered.bed",
 
         # expand("Bowtie2/{sample}.bam.bai", sample = samples),
         # expand("filtered_bam/{sample}.filtered.bam.bai", sample = samples),
