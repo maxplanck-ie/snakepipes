@@ -102,7 +102,7 @@ onstart:
         print("Samples:", samples)
         print("Paired-end reads:", paired)
         print("Read extension:", reads)
-        print("Read orientation:", read_orientation)
+        print("Library type:", library_type)
         print("Genome:", genome)
         print("Downsample:", downsample)
         print("Trimming:", trim)

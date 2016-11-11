@@ -127,11 +127,6 @@ except:
     genome = None
 
 try:
-    read_orientation = config["read_orientation"]
-except:
-    read_orientation = "--fr"
-
-try:
     fragment_length = int(config["fragment_length"])
 except:
     fragment_length = 200
@@ -225,6 +220,23 @@ paired = is_paired(infiles)
 
 if not paired:
     reads = [""]
+
+if paired:
+    try:
+        library_type = config["library_type"]
+    except:
+        library_type = "RF"
+else:
+    try:
+        library_type = config["library_type"]
+    except:
+        library_type = "R"
+
+if library_type == "unstranded":
+    rna_strandness = ""
+else:
+    rna_strandness = "--rna-strandness " + library_type
+
 
 # ensure that only the specified filters are applied to all files
 # delete already filtered BAM files if they were generated with different
