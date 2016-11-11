@@ -14,7 +14,7 @@ if paired:
             alconc = "HISAT2/{sample}.al-conc.fastq.gz"
         params:
             hisat_opts = "",
-            library_type = library_type
+            rna_strandness = rna_strandness
         benchmark:
             "HISAT2/.benchmark/HISAT2.{sample}.benchmark"
         threads: 8
@@ -22,7 +22,7 @@ if paired:
             hisat2_path+"hisat2 "
             "-p {threads} "
             "{params.hisat_opts} "
-            "--rna-strandness {params.library_type} "
+            "{params.rna_strandness} "
             "-x "+hisat2_index+" "
             "-1 {input.r1} -2 {input.r2} "
             "--novel-splicesite-outfile {output.splice} "

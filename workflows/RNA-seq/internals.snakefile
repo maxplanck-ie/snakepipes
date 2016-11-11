@@ -91,6 +91,19 @@ def update_filter(samples):
     return
 
 
+def convert_library_type (paired, from_library_type, from_prg, to_prg,
+                            rscript=os.path.join(workflow_tools,"library_type.R"),
+                            tsv=os.path.join(workflow_tools,"library_type.tsv")):
+    """ Converts the library to e.g. from 2 (featureCounts) to RF (HISAT2) """
+    if paired:
+        lib_str = "PE"
+    else:
+        lib_str = "SE"
+
+    return( subprocess.check_output("Rscript {} {} {} {} {} {}".format(
+        rscript, tsv, lib_str, from_library_type, from_prg, to_prg), shell=True).decode() )
+
+
 ### Variable defaults ##########################################################
 
 try:
@@ -108,6 +121,11 @@ try:
     reads = config["reads"]
 except:
     reads = ["_R1", "_R2"]
+
+try:
+    library_type = config["library_type"]
+except:
+    library_type = "2"
 
 ## FASTQ file extension
 try:
@@ -221,22 +239,12 @@ paired = is_paired(infiles)
 if not paired:
     reads = [""]
 
-if paired:
-    try:
-        library_type = config["library_type"]
-    except:
-        library_type = "RF"
-else:
-    try:
-        library_type = config["library_type"]
-    except:
-        library_type = "R"
-
-if library_type == "unstranded":
+## rna-strandness for HISAT2
+rna_strandness = convert_library_type(paired, library_type, "featureCounts", "HISAT2")
+if rna_strandness == "NA":
     rna_strandness = ""
 else:
-    rna_strandness = "--rna-strandness " + library_type
-
+    rna_strandness = "--rna-strandness "+rna_strandness
 
 # ensure that only the specified filters are applied to all files
 # delete already filtered BAM files if they were generated with different
