@@ -49,6 +49,7 @@ def parse_args():
     parser.add_argument("--fastqc", dest="fastqc", action="store_true", default=False, help="run FastQC read quality control")
     parser.add_argument("--properpairs", dest="properpairs", action="store_true", default=False, help="retain only reads mapping in proper pairs")
     parser.add_argument("--mapq", dest="mapq", metavar="INT", help="retain only reads with at least the given mapping quality (default: '%(default)s')", type=int, default=0)
+    parser.add_argument("--read_orientation", dest="read_orientation", metavar="", help="Read orientation for HISAT2, e.g. '--fr', '--rf', '-ff'  (default: '%(default)s')", type=str, default="--fr")
     parser.add_argument("--bw-binsize", dest="bw_binsize", metavar="INT", help="bin size of output files in bigWig format (default: '%(default)s')", type=int, default=10)
     parser.add_argument("--tempdir", dest="tempdir", type=str, help="used prefix path for temporary directory created via mktemp. Created temp dir gets exported as $TMPDIR and is removed at the end of this wrapper! (default: '/data/extended/')", default="/data/extended/")
     parser.add_argument("-v", "--verbose", dest="verbose", action="store_true", default=False, help="verbose output")
@@ -114,6 +115,8 @@ def main():
         user_configs += ["fastqc=True"]
     if args.properpairs:
         user_configs += ["properpairs=True"]
+    if args.read_orientation:
+        user_configs += ["read_orientation={}".format(args.read_orientation)]
     if args.mapq:
         user_configs += ["mapq={}".format(args.mapq)]
     if args.bw_binsize:

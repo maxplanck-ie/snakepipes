@@ -8,29 +8,30 @@ if paired:
         output:
             align_summary = "HISAT2/{sample}.HISAT2_summary.txt",
             bam = "HISAT2/{sample}.bam",
-            #splice = "HISAT2/{sample}.splice_sites.txt",
+            splice = "HISAT2/{sample}.splice_sites.txt",
             met = "HISAT2/{sample}.metrics.txt",
-            #unconc = "HISAT2/{sample}.un-conc.fastq.gz",
-            #alconc = "HISAT2/{sample}.al-conc.fastq.gz"
+            unconc = "HISAT2/{sample}.un-conc.fastq.gz",
+            alconc = "HISAT2/{sample}.al-conc.fastq.gz"
         params:
             hisat_opts = "",
-            mate_orientation = mate_orientation
+            read_orientation = read_orientation
         benchmark:
             "HISAT2/.benchmark/HISAT2.{sample}.benchmark"
         threads: 8
         shell:
             hisat2_path+"hisat2 "
             "-p {threads} "
-            "{params.hisat_opts} {params.mate_orientation} "
+            "{params.hisat_opts} {params.read_orientation} "
             "-x "+hisat2_index+" "
             "-1 {input.r1} -2 {input.r2} "
-            #"--novel-splicesite-outfile {output.splice} "
+            "--novel-splicesite-outfile {output.splice} "
             "--met-file {output.met} "
-            #"--un-conc-gz {output.unconc} "
-            #"--al-conc-gz {output.alconc} "
+            "--un-conc-gz {output.unconc} "
+            "--al-conc-gz {output.alconc} "
             "2> {output.align_summary} | "
             ""+samtools_path+"samtools view -Sb - | "
-            ""+samtools_path+"samtools sort -m 2G -T ${{TMPDIR}}{wildcards.sample} -@ 2 -O bam - > {output.bam}"
+            ""+samtools_path+"samtools sort -m 2G -T ${{TMPDIR}}{wildcards.sample} -@ 2 -O bam - > {output.bam} "
+            "&& touch {output.unconc} {output.alconc} "
 else:
     pass
     # rule HISAT2:
@@ -58,7 +59,7 @@ else:
 
 ### samtools_index #############################################################
 
-rule HISAT2_samtools_index:
+rule HISAT2_BAM_index:
     input:
         "HISAT2/{sample}.bam"
     output:

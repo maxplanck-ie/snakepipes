@@ -127,9 +127,9 @@ except:
     genome = None
 
 try:
-    mate_orientation = config["mate_orientation"]
+    read_orientation = config["read_orientation"]
 except:
-    mate_orientation = "--fr"
+    read_orientation = "--fr"
 
 try:
     fragment_length = int(config["fragment_length"])
