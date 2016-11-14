@@ -150,14 +150,9 @@ except:
     fragment_length = 200
 
 try:
-    transcripts_include = config["transcripts_include"]
+    filter_annotation = config["filter_annotation"]
 except:
-    transcripts_include = None
-
-try:
-    transcripts_exclude = config["transcripts_exclude"]
-except:
-    transcripts_exclude = None
+    filter_annotation = "''"
 
 
 # IMPORTANT: When using snakemake with argument --config key=True, the

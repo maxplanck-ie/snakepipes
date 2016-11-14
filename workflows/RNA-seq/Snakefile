@@ -42,12 +42,10 @@ if trim:
 # HISAT2
 include: os.path.join(maindir, "shared", "rules", "HISAT2.snakefile")
 
+## filtered annotation (GTF)
+include: os.path.join(maindir, "shared", "rules", "filter_annotation.snakefile")
+
 # Salmon
-include: os.path.join(maindir, "shared", "rules", "create_annotation.snakefile")
-if transcripts_include:
-    include: os.path.join(maindir, "shared", "rules", "filter_include_annotation.snakefile")
-if transcripts_exclude:
-    include: os.path.join(maindir, "shared", "rules", "filter_include_annotation.snakefile")
 
 
 
@@ -122,8 +120,7 @@ onstart:
         print("Retain only proper pairs:", properpairs)
         print("Minimum mapping quality:", mapq)
         print("bigWig bin size:", bw_binsize)
-        print("transcripts_include:", transcripts_include)
-        print("transcripts_exclude:", transcripts_exclude)
+        print("filter annotation:", filter_annotation)
         print("-" * 80, "\n")
 
         print("--- Environment ----------------------------------------------------------------")
