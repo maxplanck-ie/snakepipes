@@ -49,6 +49,7 @@ def parse_args():
     parser.add_argument("--snakemake_options", dest="snakemake_options", metavar="STR", type=str, help="Snakemake options to be passed directly to snakemake, e.g. use --snakemake_options='--dryrun --rerun-incomplete --unlock --forceall'. (default: '%(default)s')", default="")
     parser.add_argument("--single-end", dest="singleend", action="store_true", default=False, help="input data is single-end, not paired-end (the default)")
     parser.add_argument("--bw-binsize", dest="bw_binsize", metavar="INT", help="bin size of output files in bigWig format (default: '%(default)s')", type=int, default=10)
+    parser.add_argument("--tempdir", dest="tempdir", type=str, help="used prefix path for temporary directory created via mktemp. Created temp dir gets exported as $TMPDIR and is removed at the end of this wrapper! (default: '/data/extended/')", default="/data/extended/")
     parser.add_argument("-v", "--verbose", dest="verbose", action="store_true", default=False, help="verbose output")
 
     args = parser.parse_args()
@@ -126,7 +127,7 @@ def main():
 
     ## create local temp dir and add this path to environment as $TMPDIR variable 
     ## on SLURM: $TMPDIR is set, created and removed by SlurmEasy on cluster node 
-    temp_path = common_functions.make_temp_dir(args.tempdir, args.outdir)
+    temp_path = common_functions.make_temp_dir(args.tempdir, args.workingdir)
     snakemake_exports = ("export TMPDIR="+temp_path+" && ").split()
 
     cmd = " ".join(snakemake_exports + snakemake_module_load + snakemake_cmd + snakemake_log)
