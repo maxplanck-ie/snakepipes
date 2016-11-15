@@ -103,7 +103,7 @@ rule create_annotation:
          
 rule filter_exclude_annotation:
     input:
-        bed_annot = "Annotation/genes.annotated.bed",    
+        bed_annot = "Annotation/genes.annotated.bed",
     output:
         bed_filtered = "Annotation/genes.filtered.bed"
     params: 
