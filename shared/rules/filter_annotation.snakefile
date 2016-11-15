@@ -54,4 +54,4 @@ rule filter_annotation_bed:
     params:
         pattern =  filter_annotation
     shell:
-        """ cat {input.bed_annot} | grep {params.pattern} > {output.bed_filtered} """
+        "cat {input.bed_annot} | grep {params.pattern} > {output.bed_filtered} "

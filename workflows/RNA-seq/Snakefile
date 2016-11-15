@@ -1,26 +1,12 @@
 # import glob
 import os
 import subprocess
-
-### output configuration for debugging #########################################
-################################################################################
-## print("config: {}\n".format(config))
+import yaml
 
 
-### include scripts ############################################################
-################################################################################
-# main directory of all snakemake workflows
-try:
-    maindir = config["maindir"]
-except:
-    print("ERROR: Variable 'maindir' has not been set by Snakemake "
-          "parameter --config or in the configuration.yaml file.")
-    exit(1)
-
-# include tool paths
-include: os.path.join(maindir, "shared", "paths.py")
-# include global variables and functions
+### include ####################################################################
 include: os.path.join(workflow.basedir, "internals.snakefile")
+include: os.path.join(maindir, "shared", "paths.py")
 include: os.path.join(maindir, "shared", "common_functions.py")
 # load organism-specific data, i.e. genome indices, annotation, etc.
 include: os.path.join(maindir, "shared", "load_organism_data.py")
@@ -28,14 +14,14 @@ include: os.path.join(maindir, "shared", "load_organism_data.py")
 
 ### include modules of other snakefiles ########################################
 ################################################################################
-# FASTQ: either downsample FASTQ files or create symlinks to input files
+## FASTQ: either downsample FASTQ files or create symlinks to input files
 include: os.path.join(maindir, "shared", "rules", "FASTQ.snakefile")
 
-# FastQC
+## FastQC
 if fastqc:
     include: os.path.join(maindir, "shared", "rules", "FastQC.snakefile")
 
-# TrimGalore
+## TrimGalore
 if trim:
     include: os.path.join(maindir, "shared", "rules", "TrimGalore.snakefile")
 
@@ -45,23 +31,23 @@ include: os.path.join(maindir, "shared", "rules", "HISAT2.snakefile")
 ## filtered annotation (GTF)
 include: os.path.join(maindir, "shared", "rules", "filter_annotation.snakefile")
 
-# Salmon
+## Salmon
 include: os.path.join(maindir, "shared", "rules", "Salmon.snakefile")
 
 
-# # Bowtie2 mapping, duplicate marking, BAM filtering and indexing
-# include: os.path.join(maindir, "shared", "rules", "Bowtie2_bam_filtering.snakefile")
-#
-# # Picard CollectAlignmentSummaryMetrics and CollectInsertSizeMetrics
-# include: os.path.join(maindir, "shared", "rules", "Picard_qc.snakefile")
-#
-# # deepTools QC
-# include: os.path.join(maindir, "shared", "rules", "deepTools_qc.snakefile")
-#
-# # Qualimap BAM QC
-# include: os.path.join(maindir, "shared", "rules", "Qualimap_bamqc.snakefile")
-
-
+# # # # Bowtie2 mapping, duplicate marking, BAM filtering and indexing
+# # # include: os.path.join(maindir, "shared", "rules", "Bowtie2_bam_filtering.snakefile")
+# # #
+# # # # Picard CollectAlignmentSummaryMetrics and CollectInsertSizeMetrics
+# # # include: os.path.join(maindir, "shared", "rules", "Picard_qc.snakefile")
+# # #
+# # # # deepTools QC
+# # # include: os.path.join(maindir, "shared", "rules", "deepTools_qc.snakefile")
+# # #
+# # # # Qualimap BAM QC
+# # # include: os.path.join(maindir, "shared", "rules", "Qualimap_bamqc.snakefile")
+# #
+# #
 ### conditional/optional rules #################################################
 ################################################################################
 def run_FastQC(fastqc):
@@ -79,31 +65,31 @@ def run_Trimming(trim, fastqc):
         return([])
 
 
-# def run_CollectInsertSizeMetrics(paired):
-#     if paired:
-#         return( expand("Picard_qc/InsertSizeMetrics/{sample}.insert_size_metrics.txt", sample = samples) )
-#     else:
-#         return([])
-#
-# def run_bamCoverage_filtered(dedup, properpairs, mapq):
-#     if (dedup or properpairs or mapq > 0):
-#         return( expand("bamCoverage/{sample}.filtered.seq_depth_norm.bw", sample = samples) )
-#     else:
-#         return([])
-#
-# def run_computeGCBias(gcbias):
-#     if gcbias:
-#         return( expand("deepTools_qc/computeGCBias/{sample}.filtered.GCBias.png", sample = samples) )
-#     else:
-#         return([])
+# # # def run_CollectInsertSizeMetrics(paired):
+# # #     if paired:
+# # #         return( expand("Picard_qc/InsertSizeMetrics/{sample}.insert_size_metrics.txt", sample = samples) )
+# # #     else:
+# # #         return([])
+# # #
+# # # def run_bamCoverage_filtered(dedup, properpairs, mapq):
+# # #     if (dedup or properpairs or mapq > 0):
+# # #         return( expand("bamCoverage/{sample}.filtered.seq_depth_norm.bw", sample = samples) )
+# # #     else:
+# # #         return([])
+# # #
+# # # def run_computeGCBias(gcbias):
+# # #     if gcbias:
+# # #         return( expand("deepTools_qc/computeGCBias/{sample}.filtered.GCBias.png", sample = samples) )
+# # #     else:
+# # #         return([])
 
 
-### execute before workflow starts #############################################
+### execute before  starts #####################################################
 ################################################################################
 onstart:
     if "verbose" in config and config["verbose"]:
         print()
-        print("--- Workflow parameter ---------------------------------------------------------")
+        print("--- Parameters -----------------------------------------------------------------")
         print("Input directory:", indir)
         print("Input files:", infiles)
         print("Output directory:", outdir)
@@ -116,16 +102,8 @@ onstart:
         print("Trimming:", trim)
         print("FastQC:", fastqc)
         print("Input directory for mapping:", fastq_dir)
-        print("De-duplicate reads/read pairs:", dedup)
-        print("Retain only proper pairs:", properpairs)
-        print("Minimum mapping quality:", mapq)
-        print("bigWig bin size:", bw_binsize)
         print("filter annotation:", filter_annotation)
-        print("-" * 80, "\n")
-
-        print("--- Environment ----------------------------------------------------------------")
-        print("$TMPDIR: ",os.getenv('TMPDIR', ""))
-        print("$HOSTNAME: ",os.getenv('HOSTNAME', ""))
+        print("Salmon index options:", salmon_index_options)
         print("-" * 80, "\n")
 
         print("--- Genome ---------------------------------------------------------------------")
@@ -137,7 +115,11 @@ onstart:
         print("Bowtie2 index:", bowtie2_index)
         print("Gene annotation BED:", genes_bed)
         print("Gene annotation GTF:", genes_gtf)
-        print("Blacklist regions BED:", blacklist_bed)
+        print("-" * 80, "\n")
+
+        print("--- Environment ----------------------------------------------------------------")
+        print("$TMPDIR: ",os.getenv('TMPDIR', ""))
+        print("$HOSTNAME: ",os.getenv('HOSTNAME', ""))
         print("-" * 80, "\n")
 
 
@@ -152,25 +134,27 @@ rule all:
         "Annotation/genes.annotated.bed",
         "Annotation/genes.filtered.bed",
         "Salmon/transcripts.fa",
+        "Salmon/SalmonIndex/sa.bin",
+        expand("Salmon/transcripts_quant/Salmon.quant.{sample}.log", sample=samples),
+# #
+# #         # expand("Bowtie2/{sample}.bam.bai", sample = samples),
+# #         # expand("filtered_bam/{sample}.filtered.bam.bai", sample = samples),
+# #         # expand("Picard_qc/AlignmentSummaryMetrics/{sample}.alignment_summary_metrics.txt", sample = samples),
+# #         # expand("Picard_qc/MarkDuplicates/{sample}.mark_duplicates_metrics.txt", sample = samples),
+# #         # run_CollectInsertSizeMetrics(paired),
+# #         # expand("bamCoverage/{sample}.seq_depth_norm.bw", sample = samples),
+# #         # run_bamCoverage_filtered(dedup, properpairs, mapq),
+# #         # run_computeGCBias(gcbias),
+# #         # "deepTools_qc/plotCoverage/read_coverage.png",
+# #         # "deepTools_qc/plotCorrelation/correlation.pearson.read_coverage.heatmap.png",
+# #         # "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage.heatmap.png",
+# #         # "deepTools_qc/plotPCA/PCA.read_coverage.png",
+# #         # expand("Qualimap_qc/{sample}.filtered.bamqc_report.html", sample = samples),
+# #         # expand("Qualimap_qc/{sample}.filtered.bamqc_results.txt", sample = samples)
 
-        # expand("Bowtie2/{sample}.bam.bai", sample = samples),
-        # expand("filtered_bam/{sample}.filtered.bam.bai", sample = samples),
-        # expand("Picard_qc/AlignmentSummaryMetrics/{sample}.alignment_summary_metrics.txt", sample = samples),
-        # expand("Picard_qc/MarkDuplicates/{sample}.mark_duplicates_metrics.txt", sample = samples),
-        # run_CollectInsertSizeMetrics(paired),
-        # expand("bamCoverage/{sample}.seq_depth_norm.bw", sample = samples),
-        # run_bamCoverage_filtered(dedup, properpairs, mapq),
-        # run_computeGCBias(gcbias),
-        # "deepTools_qc/plotCoverage/read_coverage.png",
-        # "deepTools_qc/plotCorrelation/correlation.pearson.read_coverage.heatmap.png",
-        # "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage.heatmap.png",
-        # "deepTools_qc/plotPCA/PCA.read_coverage.png",
-        # expand("Qualimap_qc/{sample}.filtered.bamqc_report.html", sample = samples),
-        # expand("Qualimap_qc/{sample}.filtered.bamqc_results.txt", sample = samples)
 
-
-### execute after workflow finished ############################################
+### execute after  finished ####################################################
 ################################################################################
 onsuccess:
     if "verbose" in config and config["verbose"]:
-        print("\n--- DNA mapping workflow finished successfully! --------------------------------\n")
+        print("\n--- DNA mapping  finished successfully! ----------------------------------------\n")

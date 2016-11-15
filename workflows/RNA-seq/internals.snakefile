@@ -2,6 +2,49 @@ import glob
 import os
 import subprocess
 
+#print(vars(workflow))
+#print("CONFIG:", config)
+# print("overwrite_configfile:", workflow.overwrite_configfile)
+
+## Load defaults.yaml with default parameters
+with open(os.path.join(workflow.basedir, "defaults.yaml"), "r") as f:
+    defaults = yaml.load(f)
+
+
+##print("\n--- defaults.yaml --------------------------------------------------------------")
+##for k,v in sorted(defaults.items()):
+##    print("{}: {}".format(k,v))
+##print
+
+
+## Load .config.yaml with basic configuration settings from wrapper ############
+def merge_dicts(x, y):
+    z = x.copy()
+    z.update(y)
+    return(z)
+
+try:
+    if workflow.overwrite_configfile:
+        pass # automatically uses snakemake config file (--configfile)
+    else:
+        ## or use config file from the output dir
+        with open(os.path.join(workflow.workdir_init, "config.yaml"), "r") as f:
+            config = yaml.load(f)
+    config = merge_dicts(defaults, config)
+except:
+    config = defaults
+
+
+## Main variables ##############################################################
+maindir = os.path.dirname(os.path.dirname(workflow.basedir))
+verbose = config["verbose"]
+
+if verbose:
+    print("\n--- config ----------------------------------------------------------------")
+    for k,v in sorted(config.items()):
+        print("{}: {}".format(k,v))
+    print()
+
 
 ### Functions ##################################################################
 
@@ -43,196 +86,49 @@ def is_paired(infiles):
     return(paired)
 
 
-# When modifying the function update_filter(), double-check if the rule
-# samtools_filter has to be modified concordantly
-def update_filter(samples):
-    """
-    Ensure that only the specified filters are applied
-    If filtered BAM and sample.filter files exist already, check that they
-    fully agree with the specified filtering options
-    """
-    # string with samtools view parameters for filtering
-    filter = ""
-    if dedup:
-        filter += "-F 1024 "
-    if properpairs:
-        filter += "-f 2 "
-    if mapq > 0:
-        filter += "-q "+str(mapq)+" "
-
-    for sample in samples:
-        filtered_bam = os.path.join(outdir, "filtered_bam/"+sample+".filtered.bam")
-        filtered_bai = filtered_bam+".bai"
-        # filtered BAM file index sample.filtered.bam.bai exists already
-        if os.path.isfile(filtered_bai):
-            filter_file = filtered_bam.replace(".filtered.bam",".filter")
-            # file sample.filter does not exist, i.e. sample.filtered.bam is
-            # symlink to Bowtie2 output BAM file (without any filtering)
-            if not os.path.isfile(filter_file):
-                # remove symlink if filtering options have been specified
-                if filter:
-                    cmd = "rm -f "+filtered_bam+" "+filtered_bai
-                    print("\nWARNING: Filtering options changed.\n"
-                          "Removing files:", filtered_bam, filtered_bai)
-                    subprocess.call(cmd, shell=True)
-            # file sample.filter exists, i.e. filtering was done previously
-            else:
-                with open(filter_file, "r") as f:
-                    old_filter = f.readline().strip()
-                    current_filter = ("samtools view arguments: "+filter).strip()
-                    # if specified filtering options differ from previous ones,
-                    # then remove filtered files
-                    if not current_filter == old_filter:
-                        cmd = "rm -f "+filtered_bam+" "+filtered_bai+" "+filter_file
-                        print("\nWARNING: Filtering options changed.\n"
-                              "Removing files:", filtered_bam, filtered_bai, filter_file)
-                        subprocess.call(cmd, shell=True)
-
-    return
-
-
 def convert_library_type (paired, from_library_type, from_prg, to_prg,
-                            rscript=os.path.join(workflow_tools,"library_type.R"),
-                            tsv=os.path.join(workflow_tools,"library_type.tsv")):
+                            rscript=os.path.join(maindir, "shared", "tools", "library_type.R"),
+                            tsv=os.path.join(maindir, "shared", "tools", "library_type.tsv")):
     """ Converts the library to e.g. from 2 (featureCounts) to RF (HISAT2) """
     if paired:
         lib_str = "PE"
     else:
         lib_str = "SE"
 
-    return( subprocess.check_output("Rscript {} {} {} {} {} {}".format(
-        rscript, tsv, lib_str, from_library_type, from_prg, to_prg), shell=True).decode() )
+    cmd = ("Rscript {} {} {} {} {} {}".format(rscript, tsv, lib_str, from_library_type, from_prg, to_prg) )
+    ##print("\n"+cmd)
+
+    return( subprocess.check_output(cmd, shell=True).decode() )
 
 
-### Variable defaults ##########################################################
+## Variable defaults ##########################################################
 
-try:
-    indir = config["indir"]
-except:
-    indir = os.getcwd()
-
-try:
-    outdir = config["outdir"]
-except:
-    outdir = os.getcwd()
-
-## paired-end read name extension
-try:
-    reads = config["reads"]
-except:
-    reads = ["_R1", "_R2"]
-
-try:
-    library_type = config["library_type"]
-except:
-    library_type = "2"
-
-## FASTQ file extension
-try:
-    ext = config["ext"]
-except:
-    ext = ".fastq.gz"
-
-## downsampling - number of reads
-try:
-    downsample = int(config["downsample"])
-except:
-    downsample = None
-
-try:
-    genome = config["genome"]
-except:
-    genome = None
-
-try:
-    fragment_length = int(config["fragment_length"])
-except:
-    fragment_length = 200
-
-try:
-    filter_annotation = config["filter_annotation"]
-except:
+indir = config["indir"]
+outdir = config["outdir"]
+reads = config["reads"]
+library_type = config["library_type"]
+ext = config["ext"]
+downsample = config["downsample"]
+genome = config["genome"]
+fragment_length = config["fragment_length"]
+filter_annotation = config["filter_annotation"]
+if not filter_annotation:
     filter_annotation = "''"
+salmon_index_options = config["salmon_index_options"]
+trim_galore_opts = config["trim_galore_opts"]
+fastqc = config["fastqc"]
 
-
-# IMPORTANT: When using snakemake with argument --config key=True, the
-# string "True" is assigned to variable "key". Assigning a boolean value
-# does not seem to be possible. Therefore, --config key=False will also
-# return the boolean value True as bool("False") gives True.
-# In contrast, within a configuration file config.yaml, assigment of boolean
-# values is possible.
-try:
-    if config["trim"] == "trimgalore":
-        trim = True
-        fastq_dir = "FASTQ_TrimGalore"
-        fastq_indir_trim = "FASTQ"
-    elif config["trim"] == "cutadapt":
-        trim = True
-        fastq_dir = "FASTQ_Cutadapt"
-        fastq_indir_trim = "FASTQ"
-    else:
-        trim = False
-        fastq_dir = "FASTQ"
-except:
+if config["trim"] == "trimgalore":
+    trim = True
+    fastq_dir = "FASTQ_TrimGalore"
+    fastq_indir_trim = "FASTQ"
+elif config["trim"] == "cutadapt":
+    trim = True
+    fastq_dir = "FASTQ_Cutadapt"
+    fastq_indir_trim = "FASTQ"
+else:
     trim = False
     fastq_dir = "FASTQ"
-
-# IMPORTANT: When using snakemake with argument --config key=True, the
-# string "True" is assigned to variable "key". Assigning a boolean value
-# does not seem to be possible. Therefore, --config key=False will also
-# return the boolean value True as bool("False") gives True.
-# In contrast, within a configuration file config.yaml, assigment of boolean
-# values is possible.
-try:
-    if config["fastqc"]:
-        fastqc = True
-    else:
-        fastqc = False
-except:
-    fastqc = False
-
-try:
-    trim_galore_opts = config["trim_galore_opts"]
-except:
-    trim_galore_opts = "--stringency 2"
-
-# IMPORTANT: When using snakemake with argument --config key=True, the
-# string "True" is assigned to variable "key". Assigning a boolean value
-# does not seem to be possible. Therefore, --config key=False will also
-# return the boolean value True as bool("False") gives True.
-# In contrast, within a configuration file config.yaml, assigment of boolean
-# values is possible.
-try:
-    if config["dedup"]:
-        dedup = True
-    else:
-        dedup = False
-except:
-    dedup = False
-
-# IMPORTANT: When using snakemake with argument --config key=True, the
-# string "True" is assigned to variable "key". Assigning a boolean value
-# does not seem to be possible. Therefore, --config key=False will also
-# return the boolean value True as bool("False") gives True.
-# In contrast, within a configuration file config.yaml, assigment of boolean
-# values is possible.
-try:
-    if config["properpairs"]:
-        properpairs = True
-    else:
-        properpairs = False
-except:
-    properpairs = False
-
-try:
-    mapq = int(config["mapq"])
-except:
-    mapq = 0
-
-try:
-    bw_binsize = int(config["bw_binsize"])
-except:
-    bw_binsize = 10
 
 
 ### Initialization #############################################################
@@ -251,8 +147,3 @@ if rna_strandness == "NA":
     rna_strandness = ""
 else:
     rna_strandness = "--rna-strandness "+rna_strandness
-
-# ensure that only the specified filters are applied to all files
-# delete already filtered BAM files if they were generated with different
-# filtering parameters in previous runs
-update_filter(samples)
