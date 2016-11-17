@@ -38,19 +38,6 @@ include: os.path.join(maindir, "shared", "rules", "Salmon.snakefile")
 include: os.path.join(maindir, "shared", "rules", "deepTools_RNA.snakefile")
 
 
-# # # # Bowtie2 mapping, duplicate marking, BAM filtering and indexing
-# # # include: os.path.join(maindir, "shared", "rules", "Bowtie2_bam_filtering.snakefile")
-# # #
-# # # # Picard CollectAlignmentSummaryMetrics and CollectInsertSizeMetrics
-# # # include: os.path.join(maindir, "shared", "rules", "Picard_qc.snakefile")
-# # #
-# # # # deepTools QC
-# # # include: os.path.join(maindir, "shared", "rules", "deepTools_qc.snakefile")
-# # #
-# # # # Qualimap BAM QC
-# # # include: os.path.join(maindir, "shared", "rules", "Qualimap_bamqc.snakefile")
-# #
-# #
 ### conditional/optional rules #################################################
 ################################################################################
 def run_FastQC(fastqc):
@@ -66,25 +53,6 @@ def run_Trimming(trim, fastqc):
         return( expand(fastq_dir+"/{sample}{read}.fastq.gz", sample = samples, read = reads) )
     else:
         return([])
-
-
-# # # def run_CollectInsertSizeMetrics(paired):
-# # #     if paired:
-# # #         return( expand("Picard_qc/InsertSizeMetrics/{sample}.insert_size_metrics.txt", sample = samples) )
-# # #     else:
-# # #         return([])
-# # #
-# # # def run_bamCoverage_filtered(dedup, properpairs, mapq):
-# # #     if (dedup or properpairs or mapq > 0):
-# # #         return( expand("bamCoverage/{sample}.filtered.seq_depth_norm.bw", sample = samples) )
-# # #     else:
-# # #         return([])
-# # #
-# # # def run_computeGCBias(gcbias):
-# # #     if gcbias:
-# # #         return( expand("deepTools_qc/computeGCBias/{sample}.filtered.GCBias.png", sample = samples) )
-# # #     else:
-# # #         return([])
 
 
 ### execute before  starts #####################################################
@@ -148,20 +116,6 @@ rule all:
         "deepTools_qc/plotCorrelation/correlation.pearson.bed_coverage.heatmap.png",
         "deepTools_qc/plotCorrelation/correlation.spearman.bed_coverage.heatmap.png",
         "deepTools_qc/plotPCA/PCA.bed_coverage.png",
-
-
-# #         # expand("Picard_qc/AlignmentSummaryMetrics/{sample}.alignment_summary_metrics.txt", sample = samples),
-# #         # expand("Picard_qc/MarkDuplicates/{sample}.mark_duplicates_metrics.txt", sample = samples),
-# #         # run_CollectInsertSizeMetrics(paired),
-# #         # expand("bamCoverage/{sample}.seq_depth_norm.bw", sample = samples),
-# #         # run_bamCoverage_filtered(dedup, properpairs, mapq),
-# #         # run_computeGCBias(gcbias),
-# #         # "deepTools_qc/plotCoverage/read_coverage.png",
-# #         # "deepTools_qc/plotCorrelation/correlation.pearson.read_coverage.heatmap.png",
-# #         # "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage.heatmap.png",
-# #         # "deepTools_qc/plotPCA/PCA.read_coverage.png",
-# #         # expand("Qualimap_qc/{sample}.filtered.bamqc_report.html", sample = samples),
-# #         # expand("Qualimap_qc/{sample}.filtered.bamqc_results.txt", sample = samples)
 
 
 ### execute after  finished ####################################################
