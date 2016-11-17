@@ -141,7 +141,9 @@ rule all:
         expand("Salmon/{sample}/quant.sf", sample=samples),
         "Salmon/TPM.tsv",
         "Salmon/counts.tsv",
-        expand("bamCoverage/{sample}.RPKM.bw", sample = samples),
+        expand("BW/{sample}.RPKM.bw", sample = samples),
+        "deepTools_qc/plotEnrichment/plotEnrichment.png",
+        "deepTools_qc/plotEnrichment/plotEnrichment.tsv",
 
 
 
