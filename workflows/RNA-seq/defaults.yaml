@@ -4,6 +4,7 @@ configfile:
 downsample: 
 ext: .fastq.gz
 fastqc: False
+featurecounts_options: -C -Q 10 --primary
 filter_annotation: 
 fragment_length: 200
 genome: dm6

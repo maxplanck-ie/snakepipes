@@ -46,6 +46,7 @@ def parse_args(defaults):
     parser.add_argument("--local", dest="local", action="store_true", help="run workflow locally (default: '%(default)s')", default=defaults["local"])
     parser.add_argument("--snakemake_options", dest="snakemake_options", metavar="STR", type=str, help="Snakemake options to be passed directly to snakemake, e.g. use --snakemake_options='--dryrun --rerun-incomplete --unlock --forceall'. (default: '%(default)s')", default=defaults["snakemake_options"])
     parser.add_argument("--salmon_index_options", dest="salmon_index_options", metavar="STR", type=str, help="Salmon index options, e.g. '--type fmd' (default: '%(default)s')", default=defaults["salmon_index_options"])
+    parser.add_argument("--featurecounts_options", dest="featurecounts_options", metavar="STR", type=str, help="featureCounts option string. The options '-p -B' are always used for paired-end data (default: '%(default)s')", default=defaults["featurecounts_options"])
     parser.add_argument("--downsample", dest="downsample", metavar="INT", help="downsample the given number of reads from the head of each FASTQ file (default: '%(default)s')", type=int, default=defaults["downsample"])
     parser.add_argument("--trim", dest="trim", choices=['cutadapt', 'trimgalore'], help="trim reads with Cutadapt or TrimGalore. (default: '%(default)s')", default=defaults["trim"])
     parser.add_argument("--fastqc", dest="fastqc", action="store_true", help="run FastQC read quality control (default: '%(default)s')", default=defaults["fastqc"])

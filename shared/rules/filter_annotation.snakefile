@@ -78,4 +78,4 @@ rule annotation_bed2saf:
     params:
         pattern =  filter_annotation
     shell:
-        "echo -e 'GeneID\tChr\tStart\tEnd\tStrand' > {output} && grep {params.pattern} {input} | awk -F '\t' '{{print $16, $1, $2, $3, $6}}' >> {output} "
+        """echo -e 'GeneID\tChr\tStart\tEnd\tStrand' > {output} && grep {params.pattern} {input} | awk 'BEGIN{{OFS="\t"}}{{print $16, $1, $2, $3, $6}}' >> {output} """

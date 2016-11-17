@@ -37,6 +37,9 @@ include: os.path.join(maindir, "shared", "rules", "Salmon.snakefile")
 ## bamCoverage_RPKM
 include: os.path.join(maindir, "shared", "rules", "deepTools_RNA.snakefile")
 
+## featureCounts
+include: os.path.join(maindir, "shared", "rules", "featureCounts.snakefile")
+
 
 ### conditional/optional rules #################################################
 ################################################################################
@@ -117,6 +120,7 @@ rule all:
         "deepTools_qc/plotCorrelation/correlation.pearson.bed_coverage.heatmap.png",
         "deepTools_qc/plotCorrelation/correlation.spearman.bed_coverage.heatmap.png",
         "deepTools_qc/plotPCA/PCA.bed_coverage.png",
+        expand("featureCounts/{sample}/counts.txt", sample=samples),
 
 
 ### execute after  finished ####################################################
