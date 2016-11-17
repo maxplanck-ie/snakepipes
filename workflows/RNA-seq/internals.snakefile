@@ -147,3 +147,5 @@ if rna_strandness == "NA":
     rna_strandness = ""
 else:
     rna_strandness = "--rna-strandness "+rna_strandness
+
+salmon_libtype = convert_library_type(paired, library_type, "featureCounts", "Salmon")

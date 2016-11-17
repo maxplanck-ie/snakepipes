@@ -26,10 +26,11 @@ if paired:
         benchmark:
             "Salmon/.benchmark/SalmonQuant.{sample}.benchmark"
         params:
-            outdir = "Salmon/{sample}"
+            outdir = "Salmon/{sample}",
+            libtype = salmon_libtype,
         threads: 8
         shell:
-            salmon_path+" quant -p {threads} -i Salmon/SalmonIndex -l a -1 {input.r1} -2 {input.r2} -o {params.outdir}"
+            salmon_path+" quant -p {threads} -i Salmon/SalmonIndex -l {params.libtype} -1 {input.r1} -2 {input.r2} -o {params.outdir}"
 
 else:
     rule SalmonQuant:
@@ -41,10 +42,11 @@ else:
         benchmark:
             "Salmon/.benchmark/SalmonQuant.{sample}.benchmark"
         params:
-            outdir = "Salmon/{sample}"
+            outdir = "Salmon/{sample}",
+            libtype = salmon_libtype,
         threads: 8
         shell:
-            salmon_path+" quant -p {threads} -i Salmon/SalmonIndex -l a -r {input.fastq} -o {params.outdir}"
+            salmon_path+" quant -p {threads} -i Salmon/SalmonIndex -l {params.libtype} -r {input.fastq} -o {params.outdir}"
 
 
 rule Salmon_get_TPMs:
