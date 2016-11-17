@@ -8,10 +8,10 @@ if paired:
         output:
             align_summary = "HISAT2/{sample}.HISAT2_summary.txt",
             bam = "HISAT2/{sample}.bam",
-            splice = "HISAT2/{sample}.splice_sites.txt",
-            met = "HISAT2/{sample}.metrics.txt",
-            unconc = "HISAT2/{sample}.un-conc.fastq.gz",
-            alconc = "HISAT2/{sample}.al-conc.fastq.gz"
+            splice = "HISAT2/{sample}/splice_sites.txt",
+            met = "HISAT2/{sample}/metrics.txt",
+            unconc = "HISAT2/{sample}/un-conc.fastq.gz",
+            alconc = "HISAT2/{sample}/al-conc.fastq.gz"
         params:
             hisat_opts = "",
             rna_strandness = rna_strandness
@@ -40,10 +40,10 @@ else:
         output:
             align_summary = "HISAT2/{sample}.HISAT2_summary.txt",
             bam = "HISAT2/{sample}.bam",
-            splice = "HISAT2/{sample}.splice_sites.txt",
-            met = "HISAT2/{sample}.metrics.txt",
-            un = "HISAT2/{sample}.un.fastq.gz",
-            al = "HISAT2/{sample}.al.fastq.gz"
+            splice = "HISAT2/{sample}/splice_sites.txt",
+            met = "HISAT2/{sample}/metrics.txt",
+            un = "HISAT2/{sample}/un.fastq.gz",
+            al = "HISAT2/{sample}/al.fastq.gz"
         params:
             hisat_opts = "",
             rna_strandness = rna_strandness
