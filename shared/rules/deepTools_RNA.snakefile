@@ -137,3 +137,22 @@ rule plotCorrelation_bed_spearman:
         "--whatToPlot scatterplot "
         "--plotTitle 'Spearman correlation of region coverage' "
         "&>> {log}"
+
+
+
+### deepTools plotPCA ##########################################################
+rule plotPCA:
+    input:
+        "deepTools_qc/multiBigwigSummary/coverage.bed.npz"
+    output:
+        "deepTools_qc/plotPCA/PCA.bed_coverage.png"
+    log:
+        "deepTools_qc/logs/plotPCA.log"
+    benchmark:
+        "deepTools_qc/.benchmark/plotPCA.benchmark"
+    shell:
+        deepTools_path+"plotPCA "
+            "-in {input} "
+            "-o {output} "
+            " -T 'PCA of fragment coverage' "
+            "&> {log}"
