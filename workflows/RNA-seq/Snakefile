@@ -105,6 +105,7 @@ rule all:
         "Annotation/genes.annotated.bed",
         "Annotation/genes.filtered.bed",
         "Annotation/genes_filtered.fa",
+        "Annotation/genes.filtered.saf",
         "Salmon/SalmonIndex/sa.bin",
         expand("Salmon/{sample}/quant.sf", sample=samples),
         "Salmon/TPM.tsv",

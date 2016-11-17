@@ -68,3 +68,14 @@ rule annotation_bed2fasta:
     threads: 1
     shell:
         bedtools_path+"bedtools getfasta -fi {input.genome_fasta} -bed {input.bed} -fo {output} "
+
+
+rule annotation_bed2saf:
+    input:
+        bed_annot = "Annotation/genes.annotated.bed"
+    output:
+        bed_filtered = "Annotation/genes.filtered.saf"
+    params:
+        pattern =  filter_annotation
+    shell:
+        "echo -e 'GeneID\tChr\tStart\tEnd\tStrand' > {output} && grep {params.pattern} {input} | awk -F '\t' '{{print $16, $1, $2, $3, $6}}' >> {output} "
