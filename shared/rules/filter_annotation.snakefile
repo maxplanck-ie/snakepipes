@@ -55,3 +55,16 @@ rule filter_annotation_bed:
         pattern =  filter_annotation
     shell:
         "cat {input.bed_annot} | grep {params.pattern} > {output.bed_filtered} "
+
+
+rule annotation_bed2fasta:
+    input:
+        bed = "Annotation/genes.filtered.bed",
+        genome_fasta = genome_fasta
+    output:
+        "Annotation/genes_filtered.fa"
+    benchmark:
+        "Annotation/.benchmark/annotation_bed2fasta.benchmark"
+    threads: 1
+    shell:
+        bedtools_path+"bedtools getfasta -fi {input.genome_fasta} -bed {input.bed} -fo {output} "

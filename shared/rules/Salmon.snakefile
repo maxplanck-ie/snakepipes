@@ -1,19 +1,7 @@
-rule transcripts_bed2fasta:
-    input:
-        bed = "Annotation/genes.filtered.bed",
-        genome_fasta = genome_fasta
-    output:
-        "Salmon/transcripts.fa"
-    benchmark:
-        "Salmon/.benchmark/Salmon.transcripts_bed2fasta.benchmark"
-    threads: 1
-    shell:
-        bedtools_path+"bedtools getfasta -fi {input.genome_fasta} -bed {input.bed} -fo {output} "
-
-
+## Salmon Index
 rule SalmonIndex:
     input:
-        "Salmon/transcripts.fa"
+        "Annotation/genes_filtered.fa"  ## transcripts
     output:
         "Salmon/SalmonIndex/sa.bin"
     benchmark:
@@ -25,6 +13,7 @@ rule SalmonIndex:
     shell:
         salmon_path+" index -p {threads} -t {input} -i Salmon/SalmonIndex {params.salmon_index_options} &> {log} && touch {output}"
 
+
 ## Salmon quant
 if paired:
     rule SalmonQuant:
@@ -33,14 +22,14 @@ if paired:
             r2 = fastq_dir+"/{sample}"+reads[1]+".fastq.gz",
             bin = "Salmon/SalmonIndex/sa.bin"
         output:
-            "Salmon/transcripts_quant/Salmon.quant.{sample}.log"
+            "Salmon/{sample}/quant.sf"
         benchmark:
-            "Salmon/.benchmark/Salmon.quant.{sample}.benchmark"
+            "Salmon/.benchmark/SalmonQuant.{sample}.benchmark"
         params:
-            outdir = "Salmon/transcripts_quant/{sample}"
+            outdir = "Salmon/{sample}"
         threads: 8
         shell:
-            salmon_path+" quant -p {threads} -i Salmon/SalmonIndex -l a -1 {input.r1} -2 {input.r2} -o {params.outdir} &> {output}"
+            salmon_path+" quant -p {threads} -i Salmon/SalmonIndex -l a -1 {input.r1} -2 {input.r2} -o {params.outdir}"
 
 else:
     rule SalmonQuant:
@@ -48,11 +37,51 @@ else:
             fastq = fastq_dir+"/{sample}.fastq.gz",
             bin = "Salmon/SalmonIndex/sa.bin"
         output:
-            "Salmon/transcripts_quant/Salmon.quant.{sample}.log"
+            "Salmon/{sample}/quant.sf"
         benchmark:
-            "Salmon/.benchmark/Salmon.quant.{sample}.benchmark"
+            "Salmon/.benchmark/SalmonQuant.{sample}.benchmark"
         params:
-            outdir = "Salmon/transcripts_quant/{sample}"
+            outdir = "Salmon/{sample}"
         threads: 8
         shell:
-            salmon_path+" quant -p {threads} -i Salmon/SalmonIndex -l a -r {input} -o {params.outdir} &> {output}"
+            salmon_path+" quant -p {threads} -i Salmon/SalmonIndex -l a -r {input.fastq} -o {params.outdir}"
+
+
+rule Salmon_get_TPMs:
+    input:
+        "Salmon/{sample}/quant.sf"
+    output:
+        temp("Salmon/{sample}.TPM.tsv")
+    shell:
+        "tail -n +2 {input} | cut -f4 > {output}"
+
+
+rule Salmon_merge_TPMs:
+    input:
+        expand("Salmon/{sample}.TPM.tsv", sample=samples)
+    output:
+        "Salmon/TPM.tsv"
+    params:
+        "\t".join(samples)
+    shell:
+        "echo '{params}' > {output} && paste {input} >> {output}"
+
+
+rule Salmon_get_counts:
+    input:
+        "Salmon/{sample}/quant.sf"
+    output:
+        temp("Salmon/{sample}.counts.tsv")
+    shell:
+        "tail -n +2 {input} | cut -f5 > {output}"
+
+
+rule Salmon_merge_counts:
+    input:
+        expand("Salmon/{sample}.counts.tsv", sample=samples)
+    output:
+        "Salmon/counts.tsv"
+    params:
+        "\t".join(samples)
+    shell:
+        "echo '{params}' > {output} && paste {input} >> {output}"
