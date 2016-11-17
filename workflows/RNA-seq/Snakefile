@@ -34,6 +34,9 @@ include: os.path.join(maindir, "shared", "rules", "filter_annotation.snakefile")
 ## Salmon
 include: os.path.join(maindir, "shared", "rules", "Salmon.snakefile")
 
+## bamCoverage_RPKM
+include: os.path.join(maindir, "shared", "rules", "deepTools_RNA.snakefile")
+
 
 # # # # Bowtie2 mapping, duplicate marking, BAM filtering and indexing
 # # # include: os.path.join(maindir, "shared", "rules", "Bowtie2_bam_filtering.snakefile")
@@ -136,13 +139,12 @@ rule all:
         "Annotation/genes_filtered.fa",
         "Salmon/SalmonIndex/sa.bin",
         expand("Salmon/{sample}/quant.sf", sample=samples),
-        #expand("Salmon/{sample}.TPM.tsv", sample=samples),
         "Salmon/TPM.tsv",
         "Salmon/counts.tsv",
+        expand("bamCoverage/{sample}.RPKM.bw", sample = samples),
 
-# #
-# #         # expand("Bowtie2/{sample}.bam.bai", sample = samples),
-# #         # expand("filtered_bam/{sample}.filtered.bam.bai", sample = samples),
+
+
 # #         # expand("Picard_qc/AlignmentSummaryMetrics/{sample}.alignment_summary_metrics.txt", sample = samples),
 # #         # expand("Picard_qc/MarkDuplicates/{sample}.mark_duplicates_metrics.txt", sample = samples),
 # #         # run_CollectInsertSizeMetrics(paired),
