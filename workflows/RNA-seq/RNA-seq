@@ -129,7 +129,7 @@ def main():
     if not args.local:
         snakemake_cmd += ["--cluster 'SlurmEasy --threads {threads} --log", args.cluster_logs_dir, "--name {rule}.snakemake'"]
 
-    snakemake_log = "2>&1 | tee -a {}/DNA-mapping.log".format(args.outdir).split()
+    snakemake_log = "2>&1 | tee -a {}/RNA-seq.log".format(args.outdir).split()
 
     ## create local temp dir and add this path to environment as $TMPDIR variable
     ## on SLURM: $TMPDIR is set, created and removed by SlurmEasy on cluster node
@@ -142,7 +142,7 @@ def main():
         print("\n", cmd, "\n")
 
     ## Write snakemake_cmd to log file
-    with open(os.path.join(args.outdir,"DNA-mapping.log"),"w") as f:
+    with open(os.path.join(args.outdir,"RNA-seq.log"),"w") as f:
         f.write(" ".join(sys.argv)+"\n\n")
         f.write(cmd+"\n\n")
 

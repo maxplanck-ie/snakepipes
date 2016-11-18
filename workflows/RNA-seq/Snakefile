@@ -109,11 +109,17 @@ rule all:
         "Annotation/genes.filtered.bed",
         "Annotation/genes_filtered.fa",
         "Annotation/genes.filtered.saf",
+
         "Salmon/SalmonIndex/sa.bin",
         expand("Salmon/{sample}/quant.sf", sample=samples),
+        expand("Salmon/{sample}/quant.genes.sf", sample=samples),
         expand("Salmon/{sample}.quant.sf", sample=samples),
+        expand("Salmon/{sample}.quant.genes.sf", sample=samples),
         "Salmon/TPM.tsv",
+        "Salmon/TPM.genes.tsv",
         "Salmon/counts.tsv",
+        "Salmon/counts.genes.tsv",
+
         expand("BW/{sample}.RPKM.bw", sample = samples),
         "deepTools_qc/plotEnrichment/plotEnrichment.png",
         "deepTools_qc/plotEnrichment/plotEnrichment.tsv",

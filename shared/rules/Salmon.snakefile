@@ -22,7 +22,8 @@ if paired:
             r2 = fastq_dir+"/{sample}"+reads[1]+".fastq.gz",
             bin = "Salmon/SalmonIndex/sa.bin"
         output:
-            "Salmon/{sample}/quant.sf"
+            quant = "Salmon/{sample}/quant.sf",
+            quant_genes = "Salmon/{sample}/quant.genes.sf"
         benchmark:
             "Salmon/.benchmark/SalmonQuant.{sample}.benchmark"
         params:
@@ -31,15 +32,21 @@ if paired:
             gtf = genes_gtf,
         threads: 8
         shell:
-            salmon_path+"salmon quant -p {threads} -g {params.gtf} -i Salmon/SalmonIndex -l {params.libtype} -1 {input.r1} -2 {input.r2} -o {params.outdir}"
-
+            salmon_path+"salmon quant "
+            "-p {threads} "
+            "-g {params.gtf} "
+            "-i Salmon/SalmonIndex "
+            "-l {params.libtype} "
+            "-1 {input.r1} -2 {input.r2} "
+            "-o {params.outdir} "
 else:
     rule SalmonQuant:
         input:
             fastq = fastq_dir+"/{sample}.fastq.gz",
             bin = "Salmon/SalmonIndex/sa.bin"
         output:
-            "Salmon/{sample}/quant.sf"
+            quant = "Salmon/{sample}/quant.sf",
+            quant_genes = "Salmon/{sample}/quant.genes.sf"
         benchmark:
             "Salmon/.benchmark/SalmonQuant.{sample}.benchmark"
         params:
@@ -48,16 +55,28 @@ else:
             gtf = genes_gtf,
         threads: 8
         shell:
-            salmon_path+"salmon quant -p {threads} -g {params.gtf} -i Salmon/SalmonIndex -l {params.libtype} -r {input.fastq} -o {params.outdir}"
+            salmon_path+"salmon quant "
+            "-p {threads} "
+            "-g {params.gtf} "
+            "-i Salmon/SalmonIndex "
+            "-l {params.libtype} "
+            "-r {input.fastq} "
+            "-o {params.outdir} "
 
 
 rule Salmon_symlinks:
     input:
-        expand("Salmon/{sample}/quant.sf", sample=samples)
+        quant = "Salmon/{sample}/quant.sf",
+        quant_genes = "Salmon/{sample}/quant.genes.sf"
     output:
-        "Salmon/{sample}.quant.sf"
+        quant = "Salmon/{sample}.quant.sf",
+        quant_genes = "Salmon/{sample}.quant.genes.sf"
+    params:
+        quant = "{sample}/quant.sf",
+        quant_genes = "{sample}/quant.genes.sf"
     shell:
-        "( [ -f {output} ] || ln -s -r {input} {output} ) && touch -h {output}"
+        "ln -s -f {params.quant} {output.quant} && touch -h {output.quant}; "
+        "ln -s -f {params.quant_genes} {output.quant_genes} && touch -h {output.quant_genes} "
 
 
 rule Salmon_TPM:
@@ -73,6 +92,19 @@ rule Salmon_TPM:
         R_path+"Rscript "+os.path.join(maindir, "shared", "tools", "merge_count_tables.R")+" Name TPM {output} {input} "
 
 
+rule Salmon_genes_TPM:
+    input:
+        expand("Salmon/{sample}.quant.genes.sf", sample=samples)
+    output:
+        "Salmon/TPM.genes.tsv"
+    benchmark:
+        "Salmon/.benchmark/Salmon_genes_TPM.benchmark"
+    log:
+        "Salmon/Salmon_genes_TPM.log"
+    shell:
+        R_path+"Rscript "+os.path.join(maindir, "shared", "tools", "merge_count_tables.R")+" Name TPM {output} {input} "
+
+
 rule Salmon_counts:
     input:
         expand("Salmon/{sample}.quant.sf", sample=samples)
@@ -84,3 +116,16 @@ rule Salmon_counts:
         "Salmon/Salmon_counts.log"
     shell:
         R_path+"Rscript "+os.path.join(maindir, "shared", "tools", "merge_count_tables.R")+" Name NumReads {output} {input} "
+
+
+rule Salmon_genes_counts:
+    input:
+        expand("Salmon/{sample}.quant.genes.sf", sample=samples)
+    output:
+        "Salmon/counts.genes.tsv"
+    benchmark:
+        "Salmon/.benchmark/Salmon_genes_counts.benchmark"
+    log:
+        "Salmon/Salmon_genes_counts.log"
+    shell:
+        R_path+"Rscript "+os.path.join(maindir, "shared", "tools", "merge_count_tables.R")+" Name TPM {output} {input} "
