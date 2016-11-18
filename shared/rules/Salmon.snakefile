@@ -28,9 +28,10 @@ if paired:
         params:
             outdir = "Salmon/{sample}",
             libtype = salmon_libtype,
+            gtf = genes_gtf,
         threads: 8
         shell:
-            salmon_path+"salmon quant -p {threads} -i Salmon/SalmonIndex -l {params.libtype} -1 {input.r1} -2 {input.r2} -o {params.outdir}"
+            salmon_path+"salmon quant -p {threads} -g {params.gtf} -i Salmon/SalmonIndex -l {params.libtype} -1 {input.r1} -2 {input.r2} -o {params.outdir}"
 
 else:
     rule SalmonQuant:
@@ -44,14 +45,15 @@ else:
         params:
             outdir = "Salmon/{sample}",
             libtype = salmon_libtype,
+            gtf = genes_gtf,
         threads: 8
         shell:
-            salmon_path+"salmon quant -p {threads} -i Salmon/SalmonIndex -l {params.libtype} -r {input.fastq} -o {params.outdir}"
+            salmon_path+"salmon quant -p {threads} -g {params.gtf} -i Salmon/SalmonIndex -l {params.libtype} -r {input.fastq} -o {params.outdir}"
 
 
 rule Salmon_symlinks:
     input:
-        expand("Salmon/{sample}.quant.sf", sample=samples)
+        expand("Salmon/{sample}/quant.sf", sample=samples)
     output:
         "Salmon/{sample}.quant.sf"
     shell:
@@ -82,26 +84,3 @@ rule Salmon_counts:
         "Salmon/Salmon_counts.log"
     shell:
         R_path+"Rscript "+os.path.join(maindir, "shared", "tools", "merge_count_tables.R")+" Name NumReads {output} {input} "
-
-
-#
-# rule Salmon_merge_TPMs:
-#     input:
-#         expand("Salmon/{sample}.TPM.tsv", sample=samples)
-#     output:
-#         "Salmon/TPM.tsv"
-#     params:
-#         "\t".join(samples)
-#     shell:
-#         "echo '{params}' > {output} && paste {input} >> {output}"
-
-
-# rule Salmon_merge_counts:
-#     input:
-#         expand("Salmon/{sample}.counts.tsv", sample=samples)
-#     output:
-#         "Salmon/counts.tsv"
-#     params:
-#         "\t".join(samples)
-#     shell:
-#         "echo '{params}' > {output} && paste {input} >> {output}"
