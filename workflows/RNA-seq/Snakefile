@@ -111,6 +111,7 @@ rule all:
         "Annotation/genes.filtered.saf",
         "Salmon/SalmonIndex/sa.bin",
         expand("Salmon/{sample}/quant.sf", sample=samples),
+        expand("Salmon/{sample}.quant.sf", sample=samples),
         "Salmon/TPM.tsv",
         "Salmon/counts.tsv",
         expand("BW/{sample}.RPKM.bw", sample = samples),
@@ -120,7 +121,8 @@ rule all:
         "deepTools_qc/plotCorrelation/correlation.pearson.bed_coverage.heatmap.png",
         "deepTools_qc/plotCorrelation/correlation.spearman.bed_coverage.heatmap.png",
         "deepTools_qc/plotPCA/PCA.bed_coverage.png",
-        expand("featureCounts/{sample}/counts.txt", sample=samples),
+        expand("featureCounts/{sample}.counts.txt", sample=samples),
+        "featureCounts/counts.tsv",
 
 
 ### execute after  finished ####################################################

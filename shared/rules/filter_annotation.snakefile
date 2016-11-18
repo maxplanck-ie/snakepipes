@@ -48,11 +48,11 @@ elif genome.startswith(("dm")):
 
 rule filter_annotation_bed:
     input:
-        bed_annot = "Annotation/genes.annotated.bed",
+        bed_annot = "Annotation/genes.annotated.bed"
     output:
         bed_filtered = "Annotation/genes.filtered.bed"
     params:
-        pattern =  filter_annotation
+        pattern = filter_annotation
     shell:
         "cat {input.bed_annot} | grep {params.pattern} > {output.bed_filtered} "
 
@@ -67,7 +67,7 @@ rule annotation_bed2fasta:
         "Annotation/.benchmark/annotation_bed2fasta.benchmark"
     threads: 1
     shell:
-        bedtools_path+"bedtools getfasta -fi {input.genome_fasta} -bed {input.bed} -fo {output} "
+        bedtools_path+"bedtools getfasta -fi {input.genome_fasta} -bed {input.bed} -fo {output} -name "
 
 
 rule annotation_bed2saf:

@@ -11,7 +11,7 @@ rule SalmonIndex:
     log: "Salmon/SalmonIndex/SalmonIndex.log"
     threads: 8
     shell:
-        salmon_path+" index -p {threads} -t {input} -i Salmon/SalmonIndex {params.salmon_index_options} &> {log} && touch {output}"
+        salmon_path+"salmon index -p {threads} -t {input} -i Salmon/SalmonIndex {params.salmon_index_options} &> {log} && touch {output}"
 
 
 ## Salmon quant
@@ -30,7 +30,7 @@ if paired:
             libtype = salmon_libtype,
         threads: 8
         shell:
-            salmon_path+" quant -p {threads} -i Salmon/SalmonIndex -l {params.libtype} -1 {input.r1} -2 {input.r2} -o {params.outdir}"
+            salmon_path+"salmon quant -p {threads} -i Salmon/SalmonIndex -l {params.libtype} -1 {input.r1} -2 {input.r2} -o {params.outdir}"
 
 else:
     rule SalmonQuant:
@@ -46,44 +46,62 @@ else:
             libtype = salmon_libtype,
         threads: 8
         shell:
-            salmon_path+" quant -p {threads} -i Salmon/SalmonIndex -l {params.libtype} -r {input.fastq} -o {params.outdir}"
+            salmon_path+"salmon quant -p {threads} -i Salmon/SalmonIndex -l {params.libtype} -r {input.fastq} -o {params.outdir}"
 
 
-rule Salmon_get_TPMs:
+rule Salmon_symlinks:
     input:
-        "Salmon/{sample}/quant.sf"
+        expand("Salmon/{sample}.quant.sf", sample=samples)
     output:
-        temp("Salmon/{sample}.TPM.tsv")
+        "Salmon/{sample}.quant.sf"
     shell:
-        "tail -n +2 {input} | cut -f4 > {output}"
+        "( [ -f {output} ] || ln -s -r {input} {output} ) && touch -h {output}"
 
 
-rule Salmon_merge_TPMs:
+rule Salmon_TPM:
     input:
-        expand("Salmon/{sample}.TPM.tsv", sample=samples)
+        expand("Salmon/{sample}.quant.sf", sample=samples)
     output:
         "Salmon/TPM.tsv"
-    params:
-        "\t".join(samples)
+    benchmark:
+        "Salmon/.benchmark/Salmon_TPM.benchmark"
+    log:
+        "Salmon/Salmon_TPM.log"
     shell:
-        "echo '{params}' > {output} && paste {input} >> {output}"
+        R_path+"Rscript "+os.path.join(maindir, "shared", "tools", "merge_count_tables.R")+" Name TPM {output} {input} "
 
 
-rule Salmon_get_counts:
+rule Salmon_counts:
     input:
-        "Salmon/{sample}/quant.sf"
-    output:
-        temp("Salmon/{sample}.counts.tsv")
-    shell:
-        "tail -n +2 {input} | cut -f5 > {output}"
-
-
-rule Salmon_merge_counts:
-    input:
-        expand("Salmon/{sample}.counts.tsv", sample=samples)
+        expand("Salmon/{sample}.quant.sf", sample=samples)
     output:
         "Salmon/counts.tsv"
-    params:
-        "\t".join(samples)
+    benchmark:
+        "Salmon/.benchmark/Salmon_counts.benchmark"
+    log:
+        "Salmon/Salmon_counts.log"
     shell:
-        "echo '{params}' > {output} && paste {input} >> {output}"
+        R_path+"Rscript "+os.path.join(maindir, "shared", "tools", "merge_count_tables.R")+" Name NumReads {output} {input} "
+
+
+#
+# rule Salmon_merge_TPMs:
+#     input:
+#         expand("Salmon/{sample}.TPM.tsv", sample=samples)
+#     output:
+#         "Salmon/TPM.tsv"
+#     params:
+#         "\t".join(samples)
+#     shell:
+#         "echo '{params}' > {output} && paste {input} >> {output}"
+
+
+# rule Salmon_merge_counts:
+#     input:
+#         expand("Salmon/{sample}.counts.tsv", sample=samples)
+#     output:
+#         "Salmon/counts.tsv"
+#     params:
+#         "\t".join(samples)
+#     shell:
+#         "echo '{params}' > {output} && paste {input} >> {output}"
