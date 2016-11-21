@@ -1,0 +1,23 @@
+bw_binsize: 50
+cluster_logs_dir: .
+configfile: 
+downsample: 
+ext: .fastq.gz
+fastqc: False
+featurecounts_options: -C -Q 10 --primary
+filter_annotation: 
+fragment_length: 200
+genome: dm6
+indir: .
+library_type: 2
+local: False
+max_jobs: 8
+outdir: .
+reads: ["_R1", "_R2"]
+salmon_index_options: --type quasi -k 31
+snakemake_options: ''
+tempdir: /data/extended/
+trim: 
+trim_galore_opts: --stringency 2
+verbose: False
+
