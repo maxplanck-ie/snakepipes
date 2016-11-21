@@ -23,17 +23,18 @@ def get_fragment_length(infile):
     exit(1)
 
 
-def make_temp_dir(tempdir,fallback_dir):
-    try: 
+def make_temp_dir(tempdir, fallback_dir, verbose=False):
+    try:
         output = subprocess.check_output("mktemp -d -p "+tempdir+"/ tmp.snakemake.XXXXXXXX",shell=True,stderr=subprocess.STDOUT)
         temp_path = output.decode().rstrip()+"/";
     except subprocess.CalledProcessError:
-        try: 
+        try:
             print("\nFailed to create temp dir under temp path prefix ("+tempdir+")! Try fallback: "+fallback_dir+"/ ...")
             output = subprocess.check_output("mktemp -d -p "+fallback_dir+"/ tmp.snakemake.XXXXXXXX",shell=True,stderr=subprocess.STDOUT)
             temp_path = output.decode().rstrip()+"/";
         except subprocess.CalledProcessError:
             print("\nAlso failed to create temp dir under fallback prefix ("+fallback_dir+"/)!")
             exit(1)
-    print("\ntemp dir created: "+temp_path)
+    if verbose:
+        print("\ntemp dir created: "+temp_path)
     return temp_path
