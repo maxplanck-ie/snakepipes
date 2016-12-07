@@ -56,9 +56,10 @@ rule sc_hisat2_genomic:
      output:
          bam = "HISAT2_genomic/{sample}.bam",
          align_summary = "HISAT2_genomic/{sample}.HISAT2_genomic_summary.txt",
+     params:  hisat2_opts = "--pen-cansplice 3 --mp 4,2"
      threads: 20
      shell: 
-         hisat2_path + "hisat2 --rna-strandness F -k 5"
+         hisat2_path + "hisat2 {params.hisat2_opts} --rna-strandness F -k 5"
          " -x " + hisat2_index + ""
          " -U {input.read_barcoded} "
          " --known-splicesite-infile " + known_splicesites + ""
