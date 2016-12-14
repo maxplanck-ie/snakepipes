@@ -100,8 +100,8 @@ rule create_annotation:
          """ OFS="\\t"; print tid,tna,gid,gna,"gencode",basic,tt,gt,tsl,lvl}}' | """
          """ tr " " "\\t" | sort -k2) | """
          """ awk '{{$13=$13"\\t"$1; $4=$4"\\t"$1; OFS="\\t";print $0}}' | """
-         """ cut --complement -f 1,14,16,18,20 > {output.bed_annot} """
-         
+         """ cut --complement -f 1,14,16,18,20 > {output.bed_annot}; """
+    
 rule filter_exclude_annotation:
     input:
         bed_annot = "Annotation/genes.annotated.bed",
@@ -111,6 +111,18 @@ rule filter_exclude_annotation:
         exclude_pattern =  transcripts_exclude  
     shell:
         """ cat {input.bed_annot} | grep -v -P "{params.exclude_pattern}" > {output.bed_filtered}; """ 
+
+rule filtered_BED_to_gtf:
+    input: 
+        bed = "Annotation/genes.filtered.bed"
+    output: 
+        gtf = "Annotation/genes.filtered.gtf"
+    shell:
+        ""+UCSC_tools_path+"""bedToGenePred {input.bed} stdout | awk -v map_f={input.bed} \ """
+        """ 'BEGIN{while (getline < map_f) MAP[$13]=$15}{OFS="\t";print $0,"0",MAP[$1]}' | """
+        ""+UCSC_tools_path+"""genePredToGtf file stdin stdout | """ 
+        """ awk -v map_f={input.bed} 'BEGIN{while (getline < map_f) MAP[$15]=$16}{t=$18;gsub("[\";]","",t);\ """
+        """ print $0,"gene_name2 \""MAP[t]"\""}' > {output.gtf} """
 
 # rule filter_include_annotation:
 #     input:
@@ -123,6 +135,15 @@ rule filter_exclude_annotation:
 #         """ cat {input.bed_annot} | grep -P "{params.exclude_pattern}" > {output.bed_filtered}; """ 
 
 
+# rule sc_feature_counts_genomic:
+#     input:
+#         bam = "HISAT2_genomic/{sample}.bam",
+#         gtf = "Annotation/genes.filtered.gtf"
+#     output:
+#     threads: 10
+#     shell:
+    
+
 rule sc_get_counts_genomic:
     input:
         bam = "HISAT2_genomic/{sample}.bam",
@@ -131,53 +152,14 @@ rule sc_get_counts_genomic:
         counts = "Counts/{sample}.cout.csv",
         counts_summary = "Counts/{sample}.cout_summary.txt"
     params:
-        map_tab = "Annotation/genes.filtered.bed",
-        bc_file = barcode_file
-    threads: 10
-    shell: 
-        bedtools_path+
-        """intersectBed -a {input.bam} -b <(cat {input.bed} | cut -f1-12) """
-        """ -split -bed -wao -s -nonamecheck | """ 
-        """ awk -v map_f={input.bed} """
-        """  'BEGIN{{while (getline < map_f) {{MAP[$13]=$15;MAP2[$13]=$16}} }}"""
-        """  {{OFS="\\t";if ($13!=".") print $0,MAP[$16],MAP2[$16]"__chr"$1; else print $0,"NA","NA"; }} ' | """
-#        """ END{{sum="ASSIGNED:\\t"ass"\\nNOT ASSIGNED:\\t"notass"\\t"(notass/(ass+notass))"\\nALL:\\t"ass+notass; """
-#        """  print sum >"/dev/stderr"}} ' 2>{output.counts_summary} | """
-        +bedtools_path+
-        """groupBy -g 4 -c 26,27,16,5,25 -o distinct,distinct,distinct,collapse,mean | """
-        """ awk -v map_f={params.bc_file} """
-        """ 'BEGIN{{while(getline<map_f) {{CELL[$2]=$1; num_cells+=1 }};}} """
-        """ {{pos=match($1,":SC:"); split(substr($1,pos+1),BC,":"); num=split($2,GENES,","); """
-        """  if ( $2!="NA" && num==1 && BC[2] in CELL) {{ """
-        """   if (!($3 in ALL) || !(BC[5] in ALL[$3])) {{ """
-        """    for (i=1; i<=num_cells;i++) ALL[$3][BC[5]][i]=0;}} """
-        """   ALL[$3][BC[5]][CELL[BC[2]]] += 1; feat_uniq+=1 """
-        """  }} """
-        """ if (num>1) feat_multi+=1; """ 
-        """ if ($2!="NA"){{ """
-        """  if (BC[2] in CELL) feat_cell+=1; else feat_nocell+=1;"""
-        """ }} else {{"""
-        """  if (BC[2] in CELL) nofeat_cell+=1; else nofeat_nocell+=1;}} """
-        """ }} """
-        """ END{{ """
-        """  printf "GENEID\\tRBAR"; for (n=1;n<=num_cells;n++) printf "\\t"n; printf "\\n"; """
-        """  for (i in ALL) {{ """
-        """   for (k in ALL[i]) {{ """
-        """     printf i"\\t"k"\\t"; """
-        """     for (j=1;j<=num_cells;j++) {{printf ALL[i][k][j]"\\t";}} """
-        """     printf "\\n" """
-        """   }} """
-        """  }} """
-        """ sum_reads = feat_cell + feat_nocell + nofeat_cell + nofeat_nocell; """
-        """ sum  = "FEATURE_UNIQUE\\t"feat_uniq"\\t"(feat_uniq/sum_reads)"\\n"; """
-        """ sum = sum"FEATURE_MULTI\\t"feat_multi"\\t"(feat_multi/sum_reads)"\\n"; """
-        """ sum = sum"FEATURE_CELL\\t"feat_cell"\\t"(feat_cell/sum_reads)"\\n"; """
-        """ sum = sum"FEATURE_NOCELL\\t"feat_nocell"\\t"(feat_nocell/sum_reads)"\\n"; """
-        """ sum = sum"NOFEATURE_CELL\\t"nofeat_cell"\\t"(nofeat_cell/sum_reads)"\\n"; """
-        """ sum = sum"NOFEATURE_NOCELL\\t"nofeat_nocell"\\t"(nofeat_nocell/sum_reads)"\\n"; """
-        """ sum = sum"NUM_READS\\t"sum_reads; """
-        """ print sum > "/dev/stderr" """
-        """ }}' 2>{output.counts_summary} 1> {output.counts} """
+        count_script = workflow.basedir+"/scRNAseq_bam_genomic_feature_count.sh",
+        bc_file = barcode_file,
+        bedtools = bedtools_path,
+        samtools = samtools_path
+    threads: 5
+    shell: """
+        {params.count_script} {input.bam} {input.bed} {params.bc_file} {params.bedtools} {params.samtools} 1>{output.counts} 2>{output.counts_summary}
+    """
 
 rule scale_counts:
     input:
