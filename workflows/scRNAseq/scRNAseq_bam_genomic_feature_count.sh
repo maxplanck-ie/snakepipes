@@ -1,6 +1,6 @@
 #!/bin/bash
 
-## example call
+## example call:
 ## scRNAse_bam_genomic_feature_count.sh B6_11wks_1.bam genes.filtered.bed celseq_barcodes.192.txt /package/bedtools2-2.25.0/bin/ /package/samtools/bin/
 
 bam=$1
