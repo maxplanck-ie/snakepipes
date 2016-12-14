@@ -122,7 +122,7 @@ rule filtered_BED_to_gtf:
         """ 'BEGIN{{while (getline < map_f) MAP[$13]=$15}} {{OFS="\\t";print $0,"0",MAP[$1]}}' | """
         ""+UCSC_tools_path+"""genePredToGtf file stdin stdout | """ 
         """ awk -v map_f={input.bed} 'BEGIN{{while (getline < map_f) MAP[$15]=$16}} {{t=$18;gsub("[\\";]","",t); """
-        """ print $0,"gene_name2 \""MAP[t]"\""}}' > {output.gtf} """
+        """ print $0,"gene_name2 \\""MAP[t]"\\""}}' > {output.gtf} """
 
 # rule filter_include_annotation:
 #     input:
