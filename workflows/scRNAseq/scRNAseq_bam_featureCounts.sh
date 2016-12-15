@@ -43,7 +43,7 @@ BEGIN{
 		feat_uniq+=1;                         ## only stats
 	}
 	if (BC[2] in CELL) {                        ## only stats
-		if ($2=="NA") cell_nofeat+=1;
+		if ($2=="*") cell_nofeat+=1;
 			else
 				if (num>1) cell_multi+=1;
 	} else nocell+=1;
