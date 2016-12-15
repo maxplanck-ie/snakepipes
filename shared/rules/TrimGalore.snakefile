@@ -1,6 +1,4 @@
-
 ### cutadapt #################################################################
-
 if paired:
     rule cutadapt:
         input:
@@ -32,14 +30,14 @@ else:
             r1 = "FASTQ_Cutadapt/{sample}.fastq.gz",
         params:
             tmp = "{sample}.fq.gz",
-            opts = trim_galore_opts
+            opts = ""
         log:
             "FASTQ_Cutadapt/logs/Cutadapt.{sample}.log"
         benchmark:
             "FASTQ_Cutadapt/.benchmark/Cutadapt.{sample}.benchmark"
         shell:
             cutadapt_path+"cutadapt "
-                "-f fastq -e 0.1 -q 20 -O 2 --trim-n --minimum-length 25 -a AGATCGGAAGAGC {params.opts}"
+                "-f fastq -e 0.1 -q 20 -O 2 --trim-n --minimum-length 25 -a AGATCGGAAGAGC -a A{{30}} "
                 "-o ${{TMPDIR}}{params.tmp} " 
                 "{input.r1} "
                 "&> {log} "

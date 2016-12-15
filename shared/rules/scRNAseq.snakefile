@@ -119,13 +119,26 @@ rule filtered_BED_to_gtf:
         bed = "Annotation/genes.filtered.bed"
     output: 
         gtf = "Annotation/genes.filtered.gtf"
-    shell:
-        ""+UCSC_tools_path+"""bedToGenePred {input.bed} stdout | awk -v map_f={input.bed} """
-        """ 'BEGIN{{while (getline < map_f) MAP[$13]=$15}} {{OFS="\\t";print $0,"0",MAP[$1]}}' | """
-        ""+UCSC_tools_path+"""genePredToGtf file stdin stdout | """ 
-        """ awk -v map_f={input.bed} 'BEGIN{{while (getline < map_f) MAP[$15]=$16}} {{t=$18;gsub("[\\";]","",t); """
-        """ print $0,"gene_name2 \\""MAP[t]"\\""}}' > {output.gtf} """
-
+    params: 
+        ucsc = UCSC_tools_path
+    shell:"""
+        {params.ucsc}bedToGenePred {input.bed} stdout | awk -v map_f={input.bed} \
+        'BEGIN{{while (getline < map_f) MAP[$13]=$15}} {{OFS="\\t";print $0,"0",MAP[$1]}}' |
+        {params.ucsc}genePredToGtf file stdin stdout |
+        grep -v "CDS" | 
+        awk -v map_f={input.bed} \
+        'BEGIN{{while (getline < map_f) MAP[$15]=$16}}
+        {{pos=match($0,"gene_name[[:space:]]*[^[:space:]]*"); 
+        gna=substr($0,RSTART,RLENGTH); 
+        pre=substr($0,1,RSTART-1); 
+        match(gna,"gene_name[[:space:]\\";]+([^[:space:]\\";]*)",a); 
+        print pre"gene_name \\""MAP[a[1]]"\\";"}}' > {output.gtf}
+        """
+        
+#        awk -v map_f={input.bed} 'BEGIN{{while (getline < map_f) MAP[$15]=$16}} {{t=$18;gsub("[\\";]","",t);
+ #        print $0,"gene_name2 \\""MAP[t]"\\""}}' > {output.gtf}
+        
+         
 # rule filter_include_annotation:
 #     input:
 #         bed_annot = "Annotation/genes.annotated.bed",    
