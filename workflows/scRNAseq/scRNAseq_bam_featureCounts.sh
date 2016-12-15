@@ -38,14 +38,14 @@ BEGIN{
 	pos=match($1,":SC:");                       ## get startpos of precious barcode info from readname
 	split(substr($1,pos+1),BC,":");             ## split on ":" to separate all info and stor in array "BC"
 	num=split($3,GENES,",");                    ## get number of features a read overlaps by splitting on ","
-	if ( $3!="*" && num==1 && BC[2] in CELL) { ## if unique feature and a "valid" cell barcode then count it
+	if ( $3!="*" && num==1 && BC[2] in CELL) {  ## if unique feature and a "valid" cell barcode then count it
 		ALL[$6][BC[5]][CELL[BC[2]]] += 1;     ## $3 is single GENEID if num==1
 		feat_uniq+=1;                         ## only stats
 	}
 	if (BC[2] in CELL) {                        ## only stats
 		if ($2~"NoFeatures") cell_nofeat+=1;
 			else 
-			 if ($2~"Unassigned_Ambiguity") cell_multi+=1;
+			 if ($2~"Unassigned_Ambiguity") cell_multi+=1; else if ($2~"Assigned") feat_uniq1+=1;    
 	} else nocell+=1;
 }
 END{
@@ -64,8 +64,8 @@ END{
 			printf "\n";
 		}
 	}
-	sum_reads = feat_uniq + cell_nofeat + cell_multi + nocell;
-	sum = "FEATURE_UNIQUE\t"feat_uniq"\t"(feat_uniq/sum_reads*100)"\n";
+	sum_reads = feat_uniq1 + cell_nofeat + cell_multi + nocell;
+	sum = "FEATURE_UNIQUE\t"feat_uniq1"\t"(feat_uniq1/sum_reads*100)"\n";
 	sum = sum"FEATURE_MULTI\t"cell_multi"\t"(cell_multi/sum_reads*100)"\n";
 	sum = sum"CELL_NOFEATURE\t"cell_nofeat"\t"(cell_nofeat/sum_reads*100)"\n";
 	sum = sum"NOCELL\t"nocell"\t"(nocell/sum_reads*100)"\n";
