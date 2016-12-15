@@ -78,7 +78,7 @@ rule sc_hisat2_genomic:
 #                shell("cp " + provided_bed + " annotations/genes.bed")
 #            else:
                 
-## make statdard annotation
+## make standard annotation
 rule create_annotation:
     input: 
         gtf = genes_gtf
@@ -102,6 +102,7 @@ rule create_annotation:
          """ awk '{{$13=$13"\\t"$1; $4=$4"\\t"$1; OFS="\\t";print $0}}' | """
          """ cut --complement -f 1,14,16,18,20 > {output.bed_annot}; """
     
+
 rule filter_exclude_annotation:
     input:
         bed_annot = "Annotation/genes.annotated.bed",
@@ -111,6 +112,7 @@ rule filter_exclude_annotation:
         exclude_pattern =  transcripts_exclude  
     shell:
         """ cat {input.bed_annot} | grep -v -P "{params.exclude_pattern}" > {output.bed_filtered}; """ 
+
 
 rule filtered_BED_to_gtf:
     input: 

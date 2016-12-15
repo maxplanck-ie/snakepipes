@@ -113,7 +113,7 @@ except:
 try:
     trim_galore_opts = config["trim_galore_opts"]
 except:
-    trim_galore_opts = "--stringency 2"
+    trim_galore_opts = "-a \"A{30}\""
 
 
 try:
