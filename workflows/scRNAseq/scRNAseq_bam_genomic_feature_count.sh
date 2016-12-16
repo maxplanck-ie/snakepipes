@@ -64,6 +64,18 @@ awk '{
 		last=$4; if ($13!=".") { GID[$26]=$25; TID[$16]=$16; GNA[$27]=$27; no_ol=0;} else no_ol=1;
 	} 
 	else { GID[$26]=$25; TID[$16]=$16; GNA[$27]=$27; no_ol=0;} 
+}
+END{
+	if (no_ol==0) { 
+		printf last"\t"; 
+		for (i in GID) printf i","; 
+		printf"\t";
+		for (i in GNA) printf i",";
+		printf "\t"; 
+		for (i in TID) printf i","; 
+		printf"\n"; 
+	} else if (no_ol==1)
+		print last"\tNA\tNA\t.";
 }' | sed 's/,\t/\t/g' | sed 's/,$//' | 
 ## we now use awk(above)  instaed groupBy as groupBy uses huge amount of memory for big files!!!
 #${bedtools}groupBy -g 4 -c 26,27,16,5,25 -o distinct,distinct,distinct,distinct,mean |
