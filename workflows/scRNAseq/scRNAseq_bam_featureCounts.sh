@@ -14,6 +14,7 @@ bam_path=$(realpath $bam)
 
 mkdir -p $tmp
 cd $tmp
+rm *.bam.featureCounts
 
 ${fc_path}featureCounts -a $gtf_path -s 1 -R -d 25 -F "GTF" -o $out $bam_path 
 
@@ -73,4 +74,4 @@ END{
 	print sum > "/dev/stderr";                  ## prints stats to stderr
 }' 
 
-cd $curr
+#cd $curr
