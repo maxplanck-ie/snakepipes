@@ -79,7 +79,7 @@ rule sc_STAR_genomic:
     output:
         bam = "STAR_genomic/{sample}.bam"
     params:
-        mapper_opts = "--sjdbOverhang 100 --twopassMode Basic"
+        opts = "--sjdbOverhang 100 --twopassMode Basic"
     threads:
         20
     shell:
