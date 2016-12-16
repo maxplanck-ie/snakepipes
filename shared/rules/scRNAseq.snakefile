@@ -71,7 +71,7 @@ rule sc_hisat2_genomic:
          
 rule sc_STAR_genomic:
     input:
-        read_barcoded = fastq_dir+"/{sample}"+".fastq.gz"
+        read_barcoded = fastq_dir+"/{sample}"+".fastq.gz",
         gtf = "Annotation/genes.filtered.gtf"
     output:
         bam = "STAR_genomic/{sample}.bam"
