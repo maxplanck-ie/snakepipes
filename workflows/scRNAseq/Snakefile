@@ -84,7 +84,6 @@ onstart:
         print("Trimming:", trim)
         print("Input directory for mapping:", fastq_dir)
         print("Input directory for trimming:", fastq_indir_trim)
-        print("Minimum mapping quality:", mapq)
         print("BigWig bin size:", bw_binsize)
         print("Barcode pattern:", barcode_pattern)
         print("Barcode file:", barcode_file)
