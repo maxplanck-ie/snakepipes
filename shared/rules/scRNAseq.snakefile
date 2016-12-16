@@ -127,15 +127,19 @@ rule create_annotation:
          
 #        """ OFS="\\t"; print tid,tna,gid,gna,tt,gt,"gencode",basic,tsl,lvl}}' | """    
 
-rule filter_exclude_annotation:
+rule filter_annotation:
     input:
         bed_annot = "Annotation/genes.annotated.bed",
     output:
         bed_filtered = "Annotation/genes.filtered.bed"
-    params: 
-        exclude_pattern =  transcripts_exclude  
+    params:
+        pattern = filter_annotation
     shell:
-        """ cat {input.bed_annot} | grep -v -P "{params.exclude_pattern}" > {output.bed_filtered}; """ 
+        "cat {input.bed_annot} | grep {params.pattern} > {output.bed_filtered} "
+
+#    shell:
+ #       """ cat {input.bed_annot} | grep -v -P "{params.exclude_pattern}" > {output.bed_filtered}; """ 
+  
 
 
 rule filtered_BED_to_gtf:

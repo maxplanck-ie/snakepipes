@@ -117,11 +117,6 @@ except:
 
 
 try:
-    mapq = int(config["mapq"])
-except:
-    mapq = 0
-
-try:
     bw_binsize = int(config["bw_binsize"])
 except:
     bw_binsize = 10
@@ -136,11 +131,16 @@ try:
 except:
 	barcode_file = workflow.basedir+"/celseq_barcodes.192.txt"
     
+#try:
+#	transcripts_exclude = config["transcripts_exclude"]
+#except:
+#	transcripts_exclude = "full|decay|miRNA|misc_RNA|snRNA|snoRNA|scaRNA|sRNA|scRNA|rRNA|pseudogene|3prime_overlapping_ncRNA|processed_transcript"
+
 try:
-	transcripts_exclude = config["transcripts_exclude"]
+	filter_annotation = config["filter_annotation"]
 except:
-	transcripts_exclude = "full|decay|miRNA|misc_RNA|snRNA|snoRNA|scaRNA|sRNA|scRNA|rRNA|pseudogene|3prime_overlapping_ncRNA|processed_transcript"
-	
+    filter_annotation = "''"
+
     
 ### Initialization #############################################################
 
