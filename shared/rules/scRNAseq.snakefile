@@ -51,43 +51,48 @@ rule fastq_barcode:
 
 ### HISAT2 genomic mapping
 rule sc_hisat2_genomic:
-     input:
-         read_barcoded = fastq_dir+"/{sample}"+".fastq.gz",
-     output:
-         bam = "HISAT2_genomic/{sample}.bam",
-         align_summary = "HISAT2_genomic/{sample}.HISAT2_genomic_summary.txt",
-     params:  hisat2_opts = "--pen-cansplice 3 --mp 4,2"
-     threads: 20
-     shell: 
-         hisat2_path + "hisat2 {params.hisat2_opts} --rna-strandness F -k 5"
-         " -x " + hisat2_index + ""
-         " -U {input.read_barcoded} "
-         " --known-splicesite-infile " + known_splicesites + ""
-         " --no-unal -p {threads} --reorder 2> {output.align_summary} | "
-         "grep -P '^@|NH:i:1\\b' | "
-         ""+samtools_path + "samtools view -F256 -Sb - | "
-         ""+samtools_path + "samtools sort -T ${{TMPDIR}}{wildcards.sample} -@5 -m 2G -O bam - > {output.bam}; "
-         ""+samtools_path + "samtools index {output.bam} "
-         
+    input:
+        read_barcoded = fastq_dir+"/{sample}.fastq.gz",
+    output:
+        bam = "HISAT2_genomic/{sample}.bam",
+        align_summary = "HISAT2_genomic/{sample}.HISAT2_genomic_summary.txt",
+    params:
+        hisat2_opts = "--pen-cansplice 3 --mp 4,2"
+    threads:
+        20
+    shell: 
+        hisat2_path + "hisat2 {params.hisat2_opts} --rna-strandness F -k 5"
+        " -x " + hisat2_index + ""
+        " -U {input.read_barcoded} "
+        " --known-splicesite-infile " + known_splicesites + ""
+        " --no-unal -p {threads} --reorder 2> {output.align_summary} | "
+        "grep -P '^@|NH:i:1\\b' | "
+        ""+samtools_path + "samtools view -F256 -Sb - | "
+        ""+samtools_path + "samtools sort -T ${{TMPDIR}}{wildcards.sample} -@5 -m 2G -O bam - > {output.bam}; "
+        ""+samtools_path + "samtools index {output.bam} "
+        
+## STAR genomic mapping 
 rule sc_STAR_genomic:
     input:
-        read_barcoded = fastq_dir+"/{sample}"+".fastq.gz",
+        read_barcoded = fastq_dir+"/{sample}.fastq.gz",
         gtf = "Annotation/genes.filtered.gtf"
     output:
         bam = "STAR_genomic/{sample}.bam"
     params:
-        mapper_opts = ""
+        mapper_opts = "--sjdbOverhang 100 --twopassMode Basic"
     threads:
         20
     shell:
         star_path + "STAR --genomeDir "+star_index + ""
         " --runThreadN {threads} --readFilesIn {input.read_barcoded} "
         " --readFilesCommand zcat --outFileNamePrefix ${{TMPDIR}}{wildcards.sample}. " 
-        " --sjdbGTFfile {input.gtf} --sjdbOverhang 100 -twopassMode Basic --outStd SAM | "
+        " --sjdbGTFfile {input.gtf} {params.opts} --outStd SAM | "
         " grep -P '^@|NH:i:1\\b' | "
         "" + samtools_path + "samtools sort -T ${{TMPDIR}}tmp_{wildcards.sample} -@5 -m 2G -O bam - > {output.bam}; "
         "" + samtools_path + "samtools index {output.bam}; "
         " cp ${{TMPDIR}}{wildcards.sample}.Log.final.out STAR_genomic/ "
+
+
 #### count reads/UMIs per gene
 #rule make_bed12_from_gtf:
 #    input: genes_gtf
@@ -115,10 +120,11 @@ rule create_annotation:
          """ pos=match($0,"transcript_id.[^[:space:]]*"); tid=substr($0,RSTART,RLENGTH); """
          """ pos=match($0,"transcript_name.[^[:space:]]*"); tna=substr($0,RSTART,RLENGTH); """
          """ pos=match($0,"gene_name.[^[:space:]]*"); gna=substr($0,RSTART,RLENGTH); """
-         """ OFS="\\t"; print tid,tna,gid,gna,"gencode",basic,tt,gt,tsl,lvl}}' | """
+#        """ OFS="\\t"; print tid,tna,gid,gna,tt,gt,"gencode",basic,tsl,lvl}}' | """
+         """ OFS="\\t"; print tid,tna,tt,gid,gna,gt,"gencode",basic,tsl,lvl}}' | """         
          """ tr " " "\\t" | sort -k2) | """
          """ awk '{{$13=$13"\\t"$1; $4=$4"\\t"$1; OFS="\\t";print $0}}' | """
-         """ cut --complement -f 1,14,16,18,20 > {output.bed_annot}; """
+         """ cut --complement -f 1,14,16,18,20,22,24 > {output.bed_annot}; """
     
 
 rule filter_exclude_annotation:
@@ -140,12 +146,14 @@ rule filtered_BED_to_gtf:
     params: 
         ucsc = UCSC_tools_path
     shell:"""
-        {params.ucsc}bedToGenePred {input.bed} stdout | awk -v map_f={input.bed} \
-        'BEGIN{{while (getline < map_f) MAP[$13]=$15}} {{OFS="\\t";print $0,"0",MAP[$1]}}' |
+        {params.ucsc}bedToGenePred {input.bed} stdout | awk -v map_f={input.bed} '
+        #BEGIN{{while (getline < map_f) MAP[$13]=$15}} {{OFS="\\t";print $0,"0",MAP[$1]}}' |
+        BEGIN{{while (getline < map_f) MAP[$13]=$16}} {{OFS="\\t";print $0,"0",MAP[$1]}}' |
         {params.ucsc}genePredToGtf file stdin stdout |
         grep -v "CDS" | 
-        awk -v map_f={input.bed} \
-        'BEGIN{{while (getline < map_f) MAP[$15]=$16}}
+        awk -v map_f={input.bed} '
+        #BEGIN{{while (getline < map_f) MAP[$15]=$16}}
+        BEGIN{{while (getline < map_f) MAP[$16]=$17}}
         {{pos=match($0,"gene_name[[:space:]]*[^[:space:]]*"); 
         gna=substr($0,RSTART,RLENGTH); 
         pre=substr($0,1,RSTART-1); 
@@ -189,10 +197,13 @@ rule sc_get_counts_genomic:
         bc_file = barcode_file,
         bedtools = bedtools_path,
         samtools = samtools_path
-    threads: 5
-    shell: """
-        {params.count_script} {input.bam} {input.bed} {params.bc_file} {params.bedtools} {params.samtools} 1>{output.counts} 2>{output.counts_summary}
-    """
+    threads:
+        5
+    shell: 
+        """
+            {params.count_script} {input.bam} {input.bed} {params.bc_file} {params.bedtools} {params.samtools} 1>{output.counts} 2>{output.counts_summary}
+        """
+
 
 rule scale_counts:
     input:
@@ -209,6 +220,7 @@ rule scale_counts:
         """{params.count_script} -bl={params.UMI_length} -in={input.counts} """
         """ -outc={output.coutc} -outb={output.coutb} -outt={output.coutt} 2>&1 1>{output.log} """
 
+
 rule combine_sample_counts:
     input:
         expand("Counts/{sample}.coutt.csv",sample = samples)
@@ -219,6 +231,7 @@ rule combine_sample_counts:
         split = 1
     shell:
         R_path+"""Rscript {params.merge_script} Counts/ {output.merged_matrix} {params.split} """
+
 
 ## zcat 14wks_Eed_WT_1.umi.fastq.gz | /package/hisat2-2.0.4/hisat2 --rna-strandness F -k 5 -x /data/repository/organisms/GRCm38_ensembl/HISAT2Index/genome -U - --no-unal -p 16 --reorder | grep -P '^@|NH:i:1\b' | samtools view -F256 -Sb - | /package/bedtools2-2.25.0/bin/intersectBed -a - -b <(cat /data/repository/organisms/GRCm38_ensembl/gencode/m9/genes.bed| grep -v -e "PATCH" -e "CHR" ) -split -bed  -wo -s | awk -v map_f=gencode.M9.full.table 'BEGIN{while (getline < map_f) {MAP[$2]=$1;MAP2[$2]=$4}}{if ($13!="."){OFS="\t";print $0,MAP[$16],MAP2[$16]"__chr"$1}}' | /package/bedtools2-2.25.0/bin/groupBy -g 4 -c 26,27,16,5,25 -o distinct,distinct,distinct,collapse,mean | awk -v map_f=/data/pospisilik/group/heyne/scRNAseq/sagar/celseq_barcodes.192.txt 'BEGIN{while (getline < map_f) {CELL[$2]=$1;COUNTS[$1]=0}}{pos=match($1,":SC:");split(substr($1,pos+1),BC,":"); num=split($2,GENES,",");if ( (num==1 && BC[2] in CELL) ) {if (!($3 in ALL)){for (i=1; i<=192;i++) ALL[$3][i]=0;} ALL[$3][CELL[BC[2]]] += 1}}END{for (i in ALL){printf i" "; for (j=1;j<=192;j++){ printf ALL[i][j]" ";} printf "\n"}}' | less
 ##     cat test.bam | /package/bedtools2-2.25.0/bin/intersectBed -a - -b <(cat /data/repository/organisms/GRCm38_ensembl/gencode/m9/genes.bed | grep -v -e "PATCH" -e "CHR" ) -split -bed  -wo -s | awk -v map_f=gencode.M9.full.table 'BEGIN{while (getline < map_f) {MAP[$2]=$1;MAP2[$2]=$4}}{if ($13!="."){OFS="\t";print $0,MAP[$16],MAP2[$16]"__chr"$1}}' | /package/bedtools2-2.25.0/bin/groupBy -g 4 -c 26,27,16,5,25 -o distinct,distinct,distinct,collapse,mean | awk -v map_f=/data/pospisilik/group/heyne/scRNAseq/sagar/celseq_barcodes.192.txt 'BEGIN{while (getline < map_f) {CELL[$2]=$1;COUNTS[$1]=0}}{pos=match($1,":SC:");split(substr($1,pos+1),BC,":"); num=split($2,GENES,",");if ( (num==1 && BC[2] in CELL) ) {if (!($3 in ALL) || !(BC[5] in ALL[$3])){for (i=1; i<=192;i++) ALL[$3][BC[5]][i]=0;} ALL[$3][BC[5]][CELL[BC[2]]] += 1}}END{for (i in ALL){for (k in ALL[i]){printf i" "k" "; for (j=1;j<=192;j++){ printf ALL[i][k][j]" ";} printf "\n"}}}' > test.cout.csv

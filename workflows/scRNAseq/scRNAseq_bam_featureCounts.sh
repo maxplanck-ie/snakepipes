@@ -12,8 +12,8 @@ curr=$(pwd)
 gtf_path=$(realpath $gtf)
 bam_path=$(realpath $bam)
 
-## current version of featureCounts under /package writes out -R file tu currDir and not to path provided with -o
-## is fixed in more recent version of subread!
+## current version of featureCounts under /package/subread... writes out -R file to currDir instead to path provided with -o
+## this is fixed in more recent version of subread! We have to install it! :-)
 mkdir -p $tmp
 cd $tmp
 rm *.bam.featureCounts
@@ -25,8 +25,7 @@ cat *.bam.featureCounts | awk -v map_f=<(cat $gtf_path | tr " " "\t" | tr -d "\"
 {OFS="\t";
 if ($3 in MAP) print $0,MAP[$3]; else print $0,"NA","NA";
 }' |
-#END {print "noFEAT",nofeat; print "Ass",ass_feat; print "Amb",feat_amb;}' 
-## SN7001180:281:C99CMACXX:2:1203:1365:44875:SC:ACTCGA:37:UMI:ATTCCT:35:36:38      Unassigned_NoFeatures   *       *
+## SN7001180:281:C99CMACXX:2:1203:1365:44875:SC:ACTCGA:37:UMI:ATTCCT:35:36:38      Unassigned_NoFeatures   *       *	NA	NA
 ## SN7001180:281:C99CMACXX:2:1306:16709:23741:SC:AGCTAG:37:UMI:TGGAGA:35:22:38     Assigned        ENSMUSG00000025907.14   *
 ## SN7001180:281:C99CMACXX:2:2302:19826:45553:SC:AGCTAG:37:UMI:TGGAGA:35:34:38     Assigned        ENSMUSG00000025907.14   *
 ## SN7001180:281:C99CMACXX:2:1211:18877:23349:SC:GACAAC:37:UMI:TGTCCG:35:27:38	Unassigned_Ambiguity	*	Number_Of_Overlapped_Genes=2
@@ -38,7 +37,7 @@ BEGIN{
 	}
 }
 {
-	pos=match($1,":SC:");                       ## get startpos of precious barcode info from readname
+	pos=match($1,":SC:");                       ## get barcode startpos (":SC:"") from readname
 	split(substr($1,pos+1),BC,":");             ## split on ":" to separate all info and stor in array "BC"
 	num=split($3,GENES,",");                    ## get number of features a read overlaps by splitting on ","
 	if ( $3!="*" && num==1 && BC[2] in CELL) {  ## if unique feature and a "valid" cell barcode then count it

@@ -1,4 +1,4 @@
-## make statdard annotation
+## make standard annotation
 
 if genome.startswith(("hg","mm")):
     rule create_annotation_bed:

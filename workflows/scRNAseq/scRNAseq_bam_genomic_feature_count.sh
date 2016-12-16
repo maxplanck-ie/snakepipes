@@ -32,9 +32,10 @@ ${bedtools}intersectBed \
 ## 1	4491569	4491619	SN7001180:281:C99CMACXX:2:2201:15070:4540:SC:GTGACA:37:UMI:ATCTTA:35:30:38	60	-	4491569	4491619	0,0,0	1	50,	0,	1	4491389	4497354	ENSMUST00000192650.
 ##
 ## we use awk to add gene_name and gene_name_chr, we get this info from bed file columns: 13(transcript_id),15(gene_id),16(gene_name)
+## we use awk to add gene_name and gene_name_chr, we get this info from bed file columns: 13(transcript_id),16(gene_id),17(gene_name)
 ## new col 26: gene-id mapped from pipe output col 16 (transcript-id)
 ## new col 27: gene_name_chr
-awk -v map_f=$bed 'BEGIN{while (getline < map_f) {MAP[$13]=$15;MAP2[$13]=$16} } 
+awk -v map_f=$bed 'BEGIN{while (getline < map_f) {MAP[$13]=$16;MAP2[$13]=$17} } 
 {OFS="\t";if ($13!=".") print $0,MAP[$16],MAP2[$16]"__chr"$1; else print $0,"NA","NA"; } ' |
 ## 
 ## output is like:
