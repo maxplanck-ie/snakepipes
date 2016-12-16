@@ -31,6 +31,7 @@ include: os.path.join(maindir, "shared", "load_organism_data.py")
 # FASTQ: either downsample FASTQ files or create symlinks to input files
 include: os.path.join(maindir, "shared", "rules", "FASTQ.snakefile")
 include: os.path.join(maindir, "shared", "rules", "scRNAseq.snakefile")
+include: os.path.join(maindir, "shared", "rules", "FastQC.snakefile")
 
 # TrimGalore
 if trim:
