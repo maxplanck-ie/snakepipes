@@ -102,66 +102,66 @@ rule sc_STAR_genomic:
 #            else:
                 
 ## make standard annotation
-rule create_annotation:
-    input: 
-        gtf = genes_gtf
-    output: 
-        bed_annot = "Annotation/genes.annotated.bed"
-    shell:
-        "join -t $'\t' -o auto --check-order -1 4 -2 2 "
-        "<("+UCSC_tools_path+"gtfToGenePred -ignoreGroupsWithoutExons {input.gtf} /dev/stdout | "+UCSC_tools_path+"""genePredToBed /dev/stdin /dev/stdout | tr " " "\\t" | sort -k4) """
-         """ <(cat {input.gtf} | awk '$3=="transcript"{{print $0}}' | tr -d "\\";" | """
-         """ awk '{{pos=match($0,"tag.basic"); if (pos==0) basic="full"; else basic="basic"; """
-         """ pos=match($0,"gene_type.[^[:space:]]+"); gt=substr($0,RSTART,RLENGTH); """
-         """ pos=match($0,"transcript_type.[^[:space:]]+");tt=substr($0,RSTART,RLENGTH); """
-         """ pos=match($0,"transcript_support_level.[^[:space:]]+"); if (pos!=0) tsl=substr($0,RSTART,RLENGTH);else tsl="transcript_support_level NA"; """
-         """ pos=match($0,"[[:space:]]level.[^[:space:]]*"); lvl=substr($0,RSTART,RLENGTH); """
-         """ pos=match($0,"gene_id.[^[:space:]]*"); gid=substr($0,RSTART,RLENGTH); """
-         """ pos=match($0,"transcript_id.[^[:space:]]*"); tid=substr($0,RSTART,RLENGTH); """
-         """ pos=match($0,"transcript_name.[^[:space:]]*"); tna=substr($0,RSTART,RLENGTH); """
-         """ pos=match($0,"gene_name.[^[:space:]]*"); gna=substr($0,RSTART,RLENGTH); """
-         """ OFS="\\t"; print tid,tna,tt,gid,gna,gt,"gencode",basic,tsl,lvl}}' | """         
-         """ tr " " "\\t" | sort -k2) | """
-         """ awk '{{$13=$13"\\t"$1; $4=$4"\\t"$1; OFS="\\t";print $0}}' | """
-         """ cut --complement -f 1,14,16,18,20,22,24 > {output.bed_annot}; """
+# rule create_annotation:
+#     input: 
+#         gtf = genes_gtf
+#     output: 
+#         bed_annot = "Annotation/genes.annotated.bed"
+#     shell:
+#         "join -t $'\t' -o auto --check-order -1 4 -2 2 "
+#         "<("+UCSC_tools_path+"gtfToGenePred -ignoreGroupsWithoutExons {input.gtf} /dev/stdout | "+UCSC_tools_path+"""genePredToBed /dev/stdin /dev/stdout | tr " " "\\t" | sort -k4) """
+#          """ <(cat {input.gtf} | awk '$3=="transcript"{{print $0}}' | tr -d "\\";" | """
+#          """ awk '{{pos=match($0,"tag.basic"); if (pos==0) basic="full"; else basic="basic"; """
+#          """ pos=match($0,"gene_type.[^[:space:]]+"); gt=substr($0,RSTART,RLENGTH); """
+#          """ pos=match($0,"transcript_type.[^[:space:]]+");tt=substr($0,RSTART,RLENGTH); """
+#          """ pos=match($0,"transcript_support_level.[^[:space:]]+"); if (pos!=0) tsl=substr($0,RSTART,RLENGTH);else tsl="transcript_support_level NA"; """
+#          """ pos=match($0,"[[:space:]]level.[^[:space:]]*"); lvl=substr($0,RSTART,RLENGTH); """
+#          """ pos=match($0,"gene_id.[^[:space:]]*"); gid=substr($0,RSTART,RLENGTH); """
+#          """ pos=match($0,"transcript_id.[^[:space:]]*"); tid=substr($0,RSTART,RLENGTH); """
+#          """ pos=match($0,"transcript_name.[^[:space:]]*"); tna=substr($0,RSTART,RLENGTH); """
+#          """ pos=match($0,"gene_name.[^[:space:]]*"); gna=substr($0,RSTART,RLENGTH); """
+#          """ OFS="\\t"; print tid,tna,tt,gid,gna,gt,"gencode",basic,tsl,lvl}}' | """         
+#          """ tr " " "\\t" | sort -k2) | """
+#          """ awk '{{$13=$13"\\t"$1; $4=$4"\\t"$1; OFS="\\t";print $0}}' | """
+#          """ cut --complement -f 1,14,16,18,20,22,24 > {output.bed_annot}; """
          
 #        """ OFS="\\t"; print tid,tna,gid,gna,tt,gt,"gencode",basic,tsl,lvl}}' | """    
 
-rule filter_annotation:
-    input:
-        bed_annot = "Annotation/genes.annotated.bed",
-    output:
-        bed_filtered = "Annotation/genes.filtered.bed"
-    params:
-        pattern = filter_annotation
-    shell:
-        "cat {input.bed_annot} | grep {params.pattern} > {output.bed_filtered} "
+# rule filter_annotation:
+#     input:
+#         bed_annot = "Annotation/genes.annotated.bed",
+#     output:
+#         bed_filtered = "Annotation/genes.filtered.bed"
+#     params:
+#         pattern = filter_annotation
+#     shell:
+#         "cat {input.bed_annot} | grep {params.pattern} > {output.bed_filtered} "
 
 #    shell:
  #       """ cat {input.bed_annot} | grep -v -P "{params.exclude_pattern}" > {output.bed_filtered}; """ 
   
 
 
-rule filtered_BED_to_gtf:
-    input: 
-        bed = "Annotation/genes.filtered.bed"
-    output: 
-        gtf = "Annotation/genes.filtered.gtf"
-    params: 
-        ucsc = UCSC_tools_path
-    shell:"""
-        {params.ucsc}bedToGenePred {input.bed} stdout | awk -v map_f={input.bed} '
-        BEGIN{{while (getline < map_f) MAP[$13]=$16}} {{OFS="\\t";print $0,"0",MAP[$1]}}' |
-        {params.ucsc}genePredToGtf file stdin stdout |
-        grep -v "CDS" | 
-        awk -v map_f={input.bed} '
-        BEGIN{{while (getline < map_f) MAP[$16]=$17}}
-        {{pos=match($0,"gene_name[[:space:]]*[^[:space:]]*"); 
-        gna=substr($0,RSTART,RLENGTH); 
-        pre=substr($0,1,RSTART-1); 
-        match(gna,"gene_name[[:space:]\\";]+([^[:space:]\\";]*)",a); 
-        print pre"gene_name \\""MAP[a[1]]"\\";"}}' > {output.gtf}
-        """
+# rule filtered_BED_to_gtf:
+#     input: 
+#         bed = "Annotation/genes.filtered.bed"
+#     output: 
+#         gtf = "Annotation/genes.filtered.gtf"
+#     params: 
+#         ucsc = UCSC_tools_path
+#     shell:"""
+#         {params.ucsc}bedToGenePred {input.bed} stdout | awk -v map_f={input.bed} '
+#         BEGIN{{while (getline < map_f) MAP[$13]=$16}} {{OFS="\\t";print $0,"0",MAP[$1]}}' |
+#         {params.ucsc}genePredToGtf file stdin stdout |
+#         grep -v "CDS" | 
+#         awk -v map_f={input.bed} '
+#         BEGIN{{while (getline < map_f) MAP[$16]=$17}}
+#         {{pos=match($0,"gene_name[[:space:]]*[^[:space:]]*"); 
+#         gna=substr($0,RSTART,RLENGTH); 
+#         pre=substr($0,1,RSTART-1); 
+#         match(gna,"gene_name[[:space:]\\";]+([^[:space:]\\";]*)",a); 
+#         print pre"gene_name \\""MAP[a[1]]"\\";"}}' > {output.gtf}
+#         """
         
 #        awk -v map_f={input.bed} 'BEGIN{{while (getline < map_f) MAP[$15]=$16}} {{t=$18;gsub("[\\";]","",t);
  #        print $0,"gene_name2 \\""MAP[t]"\\""}}' > {output.gtf}
@@ -189,7 +189,7 @@ rule filtered_BED_to_gtf:
 
 rule sc_get_counts_genomic:
     input:
-        bam = "HISAT2_genomic/{sample}.bam",
+        bam = "STAR_genomic/{sample}.bam",
         bed = "Annotation/genes.filtered.bed"
     output: 
         counts = "Counts/{sample}.cout.csv",

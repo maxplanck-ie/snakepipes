@@ -32,6 +32,7 @@ include: os.path.join(maindir, "shared", "load_organism_data.py")
 include: os.path.join(maindir, "shared", "rules", "FASTQ.snakefile")
 include: os.path.join(maindir, "shared", "rules", "scRNAseq.snakefile")
 include: os.path.join(maindir, "shared", "rules", "FastQC.snakefile")
+include: os.path.join(maindir, "shared", "rules", "filter_annotation.snakefile")
 
 # TrimGalore
 if trim:

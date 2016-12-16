@@ -79,3 +79,25 @@ rule annotation_bed2saf:
         pattern =  filter_annotation
     shell:
         """echo -e 'GeneID\tChr\tStart\tEnd\tStrand' > {output} && grep {params.pattern} {input} | awk 'BEGIN{{OFS="\t"}}{{print $16, $1, $2, $3, $6}}' >> {output} """
+
+rule annotation_bed2gtf:
+    input: 
+        bed = "Annotation/genes.filtered.bed"
+    output: 
+        gtf = "Annotation/genes.filtered.gtf"
+    params: 
+        ucsc = UCSC_tools_path
+    shell:
+    	"""
+        {params.ucsc}bedToGenePred {input.bed} stdout | awk -v map_f={input.bed} '
+        BEGIN{{while (getline < map_f) MAP[$13]=$16}} {{OFS="\\t";print $0,"0",MAP[$1]}}' |
+        {params.ucsc}genePredToGtf file stdin stdout |
+        grep -v "CDS" | 
+        awk -v map_f={input.bed} '
+        BEGIN{{while (getline < map_f) MAP[$16]=$17}}
+        {{pos=match($0,"gene_name[[:space:]]*[^[:space:]]*"); 
+        gna=substr($0,RSTART,RLENGTH); 
+        pre=substr($0,1,RSTART-1); 
+        match(gna,"gene_name[[:space:]\\";]+([^[:space:]\\";]*)",a); 
+        print pre"gene_name \\""MAP[a[1]]"\\";"}}' > {output.gtf}
+        """
