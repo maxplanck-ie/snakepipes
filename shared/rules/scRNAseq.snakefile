@@ -70,7 +70,7 @@ rule sc_hisat2_genomic:
          ""+samtools_path + "samtools index {output.bam} "
          
 rule sc_STAR_genomic:
-    input:,y,m
+    input:
         read_barcoded = fastq_dir+"/{sample}"+".fastq.gz",
         gtf = "Annotation/genes.filtered.gtf"
     output:
