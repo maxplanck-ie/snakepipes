@@ -114,7 +114,7 @@ rule all:
         expand("FASTQ/{sample}{read}.fastq.gz", sample = samples, read = reads),
         expand("FASTQ_barcoded/{sample}.fastq.gz", sample = samples),
         run_Trimming(trim),
-        expand("FASTQC/{sample}_fastqc.html", sample = samples)
+        expand("FASTQC/{sample}_fastqc.html", sample = samples),
         #expand("HISAT2_genomic/{sample}.bam", sample = samples),
         expand("STAR_genomic/{sample}.bam", sample = samples),
         "Annotation/genes.filtered.bed",
