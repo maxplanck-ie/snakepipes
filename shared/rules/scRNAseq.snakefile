@@ -69,7 +69,25 @@ rule sc_hisat2_genomic:
          ""+samtools_path + "samtools sort -T ${{TMPDIR}}{wildcards.sample} -@5 -m 2G -O bam - > {output.bam}; "
          ""+samtools_path + "samtools index {output.bam} "
          
-         
+rule sc_STAR_genomic:
+    input:
+        read_barcoded = fastq_dir+"/{sample}"+".fastq.gz"
+        gtf = "Annotation/genes.filtered.gtf"
+    output:
+        bam = "STAR_genomic/{sample}.bam"
+    params:
+        mapper_opts = ""
+    threads:
+        20
+    shell:
+        star_path + "STAR --genomeDir "+star_index + ""
+        " --runThreadN {threads} --readFilesIn {input.read_barcoded} "
+        " --readFilesCommand zcat --outFileNamePrefix {{TMPDIR}}{wildcards.sample} " 
+        " --sjdbGTFfile {input.gtf} --sjdbOverhang 100 -twopassMode Basic --outStd SAM | "
+        " grep -P '^@|NH:i:1\\b' | "
+        "" + samtools_path + "samtools sort -T ${{TMPDIR}}tmp_{wildcards.sample} -@5 -m 2G -O bam - > {output.bam}; "
+        "" + samtools_path + "samtools index {output.bam}; "
+        " cp ${{TMPDIR}}{wildcards.sample}.Log.final.out STAR_genomic/ "
 #### count reads/UMIs per gene
 #rule make_bed12_from_gtf:
 #    input: genes_gtf

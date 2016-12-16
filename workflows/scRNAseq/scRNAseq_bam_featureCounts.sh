@@ -12,6 +12,8 @@ curr=$(pwd)
 gtf_path=$(realpath $gtf)
 bam_path=$(realpath $bam)
 
+## current version of featureCounts under /package writes out -R file tu currDir and not to path provided with -o
+## is fixed in more recent version of subread!
 mkdir -p $tmp
 cd $tmp
 rm *.bam.featureCounts
