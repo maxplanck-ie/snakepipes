@@ -120,12 +120,12 @@ rule create_annotation:
          """ pos=match($0,"transcript_id.[^[:space:]]*"); tid=substr($0,RSTART,RLENGTH); """
          """ pos=match($0,"transcript_name.[^[:space:]]*"); tna=substr($0,RSTART,RLENGTH); """
          """ pos=match($0,"gene_name.[^[:space:]]*"); gna=substr($0,RSTART,RLENGTH); """
-#        """ OFS="\\t"; print tid,tna,gid,gna,tt,gt,"gencode",basic,tsl,lvl}}' | """
          """ OFS="\\t"; print tid,tna,tt,gid,gna,gt,"gencode",basic,tsl,lvl}}' | """         
          """ tr " " "\\t" | sort -k2) | """
          """ awk '{{$13=$13"\\t"$1; $4=$4"\\t"$1; OFS="\\t";print $0}}' | """
          """ cut --complement -f 1,14,16,18,20,22,24 > {output.bed_annot}; """
-    
+         
+#        """ OFS="\\t"; print tid,tna,gid,gna,tt,gt,"gencode",basic,tsl,lvl}}' | """    
 
 rule filter_exclude_annotation:
     input:
@@ -147,12 +147,10 @@ rule filtered_BED_to_gtf:
         ucsc = UCSC_tools_path
     shell:"""
         {params.ucsc}bedToGenePred {input.bed} stdout | awk -v map_f={input.bed} '
-        #BEGIN{{while (getline < map_f) MAP[$13]=$15}} {{OFS="\\t";print $0,"0",MAP[$1]}}' |
         BEGIN{{while (getline < map_f) MAP[$13]=$16}} {{OFS="\\t";print $0,"0",MAP[$1]}}' |
         {params.ucsc}genePredToGtf file stdin stdout |
         grep -v "CDS" | 
         awk -v map_f={input.bed} '
-        #BEGIN{{while (getline < map_f) MAP[$15]=$16}}
         BEGIN{{while (getline < map_f) MAP[$16]=$17}}
         {{pos=match($0,"gene_name[[:space:]]*[^[:space:]]*"); 
         gna=substr($0,RSTART,RLENGTH); 
