@@ -98,8 +98,8 @@ rule sc_bam_featureCounts_genomic:
         bam = "STAR_genomic/{sample}.bam",
         gtf = "Annotation/genes.filtered.gtf"
     output:
-        counts = "Counts/{sample}.fc.cout.csv",
-        counts_summary = "Counts/{sample}.fc.cout_summary.txt"
+        counts = "Counts/{sample}.cout.csv",
+        counts_summary = "Counts/{sample}.cout_summary.txt"
     params:
         count_script = workflow.basedir+"/scRNAseq_bam_featureCounts.sh",
         bc_file = barcode_file,
@@ -111,24 +111,24 @@ rule sc_bam_featureCounts_genomic:
         {params.count_script} {input.bam} {input.gtf} {params.bc_file} {wildcards.sample} {params.fc_path} ${{TMPDIR}} 1>{output.counts} 2>{output.counts_summary}
         """
 
-rule sc_get_counts_genomic:
-    input:
-        bam = "STAR_genomic/{sample}.bam",
-        bed = "Annotation/genes.filtered.bed"
-    output: 
-        counts = "Counts/{sample}.cout.csv",
-        counts_summary = "Counts/{sample}.cout_summary.txt"
-    params:
-        count_script = workflow.basedir+"/scRNAseq_bam_genomic_feature_count.sh",
-        bc_file = barcode_file,
-        bedtools = bedtools_path,
-        samtools = samtools_path
-    threads:
-        5
-    shell: 
-        """
-            {params.count_script} {input.bam} {input.bed} {params.bc_file} {params.bedtools} {params.samtools} 1>{output.counts} 2>{output.counts_summary}
-        """
+# rule sc_get_counts_genomic:
+#     input:
+#         bam = "STAR_genomic/{sample}.bam",
+#         bed = "Annotation/genes.filtered.bed"
+#     output: 
+#         counts = "Counts/{sample}.cout.csv",
+#         counts_summary = "Counts/{sample}.cout_summary.txt"
+#     params:
+#         count_script = workflow.basedir+"/scRNAseq_bam_genomic_feature_count.sh",
+#         bc_file = barcode_file,
+#         bedtools = bedtools_path,
+#         samtools = samtools_path
+#     threads:
+#         5
+#     shell: 
+#         """
+#             {params.count_script} {input.bam} {input.bed} {params.bc_file} {params.bedtools} {params.samtools} 1>{output.counts} 2>{output.counts_summary}
+#         """
 
 
 rule scale_counts:
