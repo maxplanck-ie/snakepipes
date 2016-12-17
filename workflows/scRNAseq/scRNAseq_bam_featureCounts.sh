@@ -6,6 +6,7 @@ bc_file=$3
 out=$4
 fc_path=$5
 tmp=$6
+threads=$7
 
 curr=$(pwd)
 
@@ -19,7 +20,7 @@ mkdir -p $tmp
 cd $tmp
 rm *.bam.featureCounts
 
-${fc_path}featureCounts -a $gtf_path -s 1 -R -d 25 -F "GTF" -o _tmp_$out $bam_path 
+${fc_path}featureCounts -a $gtf_path -T $threads -s 1 -R -d 25 -F "GTF" -o _tmp_$out $bam_path 
 
 cat *.bam.featureCounts | awk -v map_f=<(cat $gtf_path | tr " " "\t" | tr -d "\";" | awk '{print $10,$18,$18"__chr"$1}') \
 'BEGIN{while (getline < map_f) { MAP[$1]=$2"\t"$3; } }
