@@ -126,7 +126,7 @@ rule annot:
     input:
         "Annotation/genes.filtered.bed",
         "Annotation/genes.filtered.gtf",
-        "Results/QC_report.all_samples.txt"
+        "Results/QC_report.all_samples.txt",
         
 #        run_FastQC(fastqc),
 #        expand("Bowtie2/{sample}.bam.bai", sample = samples),
