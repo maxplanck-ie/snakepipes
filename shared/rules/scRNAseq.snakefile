@@ -161,10 +161,10 @@ rule combine_sample_counts:
 
 rule sc_QC_metrics:
     input:
-        expand("Counts/{sample}.coutb.csv",sample = samples)
+        expand("Counts/{sample}.coutb.csv",sample = samples),
         expand("Counts/{sample}.coutc.csv",sample = samples)
     output:
-        summary = "Results/QC_report.all_samples.tsv"
+        summary = "Results/QC_report.all_samples.tsv",
         summary_nice = "Results/QC_report.all_samples.txt"
     shell:
         ""+workflow.basedir+"/scRNAseq_QC_metrics.sh "+outdir+" 1>{output.summary};"
