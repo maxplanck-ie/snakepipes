@@ -159,6 +159,19 @@ rule combine_sample_counts:
         R_path+"""Rscript {params.merge_script} Counts/ {output.merged_matrix} {params.split} """
 
 
+rule sc_QC_metrics:
+    input:
+        expand("Counts/{sample}.coutb.csv",sample = samples)
+        expand("Counts/{sample}.coutc.csv",sample = samples)
+    output:
+        summary = "Results/QC_report.all_samples.tsv"
+        summary_nice = "Results/QC_report.all_samples.txt"
+    shell:
+        ""+workflow.basedir+"/scRNAseq_QC_metrics.sh "+outdir+" 1>{output.summary};"
+        "cat {output.summary} | column -t > {output.summary_nice}"
+
+
+
 ## zcat 14wks_Eed_WT_1.umi.fastq.gz | /package/hisat2-2.0.4/hisat2 --rna-strandness F -k 5 -x /data/repository/organisms/GRCm38_ensembl/HISAT2Index/genome -U - --no-unal -p 16 --reorder | grep -P '^@|NH:i:1\b' | samtools view -F256 -Sb - | /package/bedtools2-2.25.0/bin/intersectBed -a - -b <(cat /data/repository/organisms/GRCm38_ensembl/gencode/m9/genes.bed| grep -v -e "PATCH" -e "CHR" ) -split -bed  -wo -s | awk -v map_f=gencode.M9.full.table 'BEGIN{while (getline < map_f) {MAP[$2]=$1;MAP2[$2]=$4}}{if ($13!="."){OFS="\t";print $0,MAP[$16],MAP2[$16]"__chr"$1}}' | /package/bedtools2-2.25.0/bin/groupBy -g 4 -c 26,27,16,5,25 -o distinct,distinct,distinct,collapse,mean | awk -v map_f=/data/pospisilik/group/heyne/scRNAseq/sagar/celseq_barcodes.192.txt 'BEGIN{while (getline < map_f) {CELL[$2]=$1;COUNTS[$1]=0}}{pos=match($1,":SC:");split(substr($1,pos+1),BC,":"); num=split($2,GENES,",");if ( (num==1 && BC[2] in CELL) ) {if (!($3 in ALL)){for (i=1; i<=192;i++) ALL[$3][i]=0;} ALL[$3][CELL[BC[2]]] += 1}}END{for (i in ALL){printf i" "; for (j=1;j<=192;j++){ printf ALL[i][j]" ";} printf "\n"}}' | less
 ##     cat test.bam | /package/bedtools2-2.25.0/bin/intersectBed -a - -b <(cat /data/repository/organisms/GRCm38_ensembl/gencode/m9/genes.bed | grep -v -e "PATCH" -e "CHR" ) -split -bed  -wo -s | awk -v map_f=gencode.M9.full.table 'BEGIN{while (getline < map_f) {MAP[$2]=$1;MAP2[$2]=$4}}{if ($13!="."){OFS="\t";print $0,MAP[$16],MAP2[$16]"__chr"$1}}' | /package/bedtools2-2.25.0/bin/groupBy -g 4 -c 26,27,16,5,25 -o distinct,distinct,distinct,collapse,mean | awk -v map_f=/data/pospisilik/group/heyne/scRNAseq/sagar/celseq_barcodes.192.txt 'BEGIN{while (getline < map_f) {CELL[$2]=$1;COUNTS[$1]=0}}{pos=match($1,":SC:");split(substr($1,pos+1),BC,":"); num=split($2,GENES,",");if ( (num==1 && BC[2] in CELL) ) {if (!($3 in ALL) || !(BC[5] in ALL[$3])){for (i=1; i<=192;i++) ALL[$3][BC[5]][i]=0;} ALL[$3][BC[5]][CELL[BC[2]]] += 1}}END{for (i in ALL){for (k in ALL[i]){printf i" "k" "; for (j=1;j<=192;j++){ printf ALL[i][k][j]" ";} printf "\n"}}}' > test.cout.csv
 #bedtools_path #+ "/intersectBed -a {input.bam} -b <(cat {input.bed12} | grep -v -e "PATCH" -e "CHR" ) -split -bed -wao -s -f 0.9 | awk -v map_f=/data/repository/organisms/GRCm38_ensembl/gencode/m9/transcript2gene.txt 'BEGIN{while (getline < map_f) MAP[$1]=$2}{if ($13!="."){$16=MAP[$16]; OFS="\t";print $0}}' | /package/bedtools2-2.25.0/bin/groupBy -g 4 -c 16,11 -o distinct | less

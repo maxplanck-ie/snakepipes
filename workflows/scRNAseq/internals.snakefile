@@ -124,18 +124,13 @@ except:
 try:
     barcode_pattern = config["barcode_pattern"]
 except:
-    barcode_pattern = "NNNNNNXXXXXX"
+    barcode_pattern = ""
 
 try:
 	barcode_file = config["barcode_file"]
 except:
 	barcode_file = workflow.basedir+"/celseq_barcodes.192.txt"
     
-#try:
-#	transcripts_exclude = config["transcripts_exclude"]
-#except:
-#	transcripts_exclude = "full|decay|miRNA|misc_RNA|snRNA|snoRNA|scaRNA|sRNA|scRNA|rRNA|pseudogene|3prime_overlapping_ncRNA|processed_transcript"
-
 try:
 	filter_annotation = config["filter_annotation"]
 except:
@@ -154,20 +149,27 @@ if not is_paired(infiles):
 ## After barcode transfer to R2 we have only single end data / R2
 paired = False
 
-#paired = is_paired(infiles)
-
 #if not paired:
 #    reads = [""]
 
 ### barcode pattern extraction
 pattern = re.compile("[N]+")
-UMI_offset = pattern.search(barcode_pattern).start() + 1 
-UMI_length = pattern.search(barcode_pattern).end() - UMI_offset + 1
+
+if pattern.search(barcode_pattern) is not None:
+	UMI_offset = pattern.search(barcode_pattern).start() + 1 
+	UMI_length = pattern.search(barcode_pattern).end() - UMI_offset + 1
+else:
+	print("Provided barcode pattern does not contain any 'N'! Exit...\n")
+	exit(1)
 
 pattern = re.compile("[X]+")
-CELLI_offset = pattern.search(barcode_pattern).start() + 1
-CELLI_length = pattern.search(barcode_pattern).end() - CELLI_offset + 1 
 
+if pattern.search(barcode_pattern) is not None:
+	CELLI_offset = pattern.search(barcode_pattern).start() + 1
+	CELLI_length = pattern.search(barcode_pattern).end() - CELLI_offset + 1 
+else:
+	print("Provided barcode pattern does not contain any 'X'! Exit...\n")
+	exit(1)
 
 print("UMI_LEN:",UMI_length,"  UMI_offset:",UMI_offset,"\n")
 print("CELLI_LEN:",CELLI_length,"  CELLI_offset:",CELLI_offset,"\n")

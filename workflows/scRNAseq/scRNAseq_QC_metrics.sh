@@ -18,7 +18,9 @@ paste <(cat $dir/Results/QC/*coutc*.cellsum) <(cat $dir/Results/QC/*coutb*.cells
 
 cat  $dir/Results/all_samples.cellsum_coutc_countb.tsv | awk '{if (NR==1) last=$1; \
    if ($1==last) {sum1+=$3; sum2+=$6;} else {print last,sum1,sum2,sum2/sum1,sum1/96,sum2/96; sum1=0; sum2=0}; last=$1} \
-   END{print last,sum1,sum2,sum2/sum1,sum1/96,sum2/96;}' > $dir/Results/QC_report.all_samples.tsv
+   END{print last,sum1,sum2,sum2/sum1,sum1/96,sum2/96;}' 
 
-cat $dir/Results/QC_report.all_samples.tsv | column -t > $dir/Results/QC_report.all_samples.txt
+#> $dir/Results/QC_report.all_samples.tsv
+
+#cat $dir/Results/QC_report.all_samples.tsv | column -t > $dir/Results/QC_report.all_samples.txt
 
