@@ -100,7 +100,7 @@ def main():
 
     defaults = {'barcode_file' : this_script_dir+"/celseq_barcodes.192.txt",
                 'barcode_pattern' : "NNNNNNXXXXXX",
-                'filter_annotation' : "\'-v -P 'full|decay|miRNA|misc_RNA|snRNA|snoRNA|scaRNA|sRNA|scRNA|rRNA|pseudogene|3prime_overlapping_ncRNA|processed_transcript'\'",
+                'filter_annotation' : "-v -P 'full|decay|miRNA|misc_RNA|snRNA|snoRNA|scaRNA|sRNA|scRNA|rRNA|pseudogene|3prime_overlapping_ncRNA|processed_transcript'",
                 'tempdir' : "/data/extended/",
                 'snakemake_options' : "",
                 'trim_options' : "-a A{{30}}"
@@ -135,7 +135,7 @@ def main():
         user_configs += ["trim_options=\"{}\"".format(args.trim_options)]
         
     if args.filter_annotation:
-        user_configs += ['filter_annotation=\'{}\''.format(args.filter_annotation)]
+        user_configs += ['filter_annotation=\"{}\"'.format(args.filter_annotation)]
 #    if args.mapq:
 #        user_configs += ["mapq={}".format(args.mapq)]
 #    if args.bw_binsize:
