@@ -20,6 +20,7 @@ import sys
 import textwrap
 import time
 import shutil
+import json
 
 sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))))+"/shared/")
 import common_functions
@@ -118,7 +119,7 @@ def main():
     subprocess.call("[ -d {cluster_logs_dir} ] || mkdir -p {cluster_logs_dir}".format(cluster_logs_dir=cluster_logs_dir), shell=True)
 
     ## required config variables
-    user_configs = "--config maindir={main_dir_path} indir={indir} outdir={outdir} genome={genome}".format(
+    user_configs = "maindir={main_dir_path} indir={indir} outdir={outdir} genome={genome}".format(
                                 main_dir_path = main_dir_path,
                                 indir = args.indir,
                                 outdir = args.outdir,
@@ -134,7 +135,7 @@ def main():
         user_configs += ["trim_options=\"{}\"".format(args.trim_options)]
         
     if args.filter_annotation:
-        user_configs += ["filter_annotation=\"{}\"".format(args.filter_annotation)]
+        user_configs += ['filter_annotation=\"{}\"'.format(args.filter_annotation)]
 #    if args.mapq:
 #        user_configs += ["mapq={}".format(args.mapq)]
 #    if args.bw_binsize:
@@ -151,13 +152,14 @@ def main():
             print("\nBarcode file not found! {}\n".format(args.barcode_file))
             exit(1)
 	## MPI
-    snakemake_module_load = "module load snakemake slurm &&".split()
+    #snakemake_module_load = "module load snakemake slurm &&".split()
     ## laptop
-    #snakemake_module_load = " ".split()
+    snakemake_module_load = " ".split()
     snakemake_cmd = """
-                    snakemake {snakemake_options} --latency-wait 30 --snakefile {snakefile} --jobs {max_jobs} {user_configs} --directory {outdir}
+                    snakemake {snakemake_options} --latency-wait 30 --snakefile {snakefile} --jobs {max_jobs} --config {user_configs} --directory {outdir}
                     """.format( snakefile = os.path.join(this_script_dir, "Snakefile"),
                                 max_jobs = args.max_jobs,
+                                #user_configs = " ".join(user_configs),
                                 user_configs = " ".join(user_configs),
                                 outdir = args.outdir,
                                 cluster_logs_dir = os.path.abspath(cluster_logs_dir),
