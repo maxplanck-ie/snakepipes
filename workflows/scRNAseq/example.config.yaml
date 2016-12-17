@@ -16,7 +16,7 @@
 # fragment_length: 200
 
 ## Options to TrimGalore (default: "--stringency 2")
-# trim_galore_opts: "--stringency 2"
+# trim_options: "--stringency 2"
 
 
 

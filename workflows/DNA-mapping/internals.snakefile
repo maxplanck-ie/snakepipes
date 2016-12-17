@@ -173,9 +173,9 @@ except:
     fastqc = False
 
 try:
-    trim_galore_opts = config["trim_galore_opts"]
+    trim_options = config["trim_options"]
 except:
-    trim_galore_opts = "--stringency 2"
+    trim_options = "--stringency 2"
 
 # IMPORTANT: When using snakemake with argument --config key=True, the
 # string "True" is assigned to variable "key". Assigning a boolean value

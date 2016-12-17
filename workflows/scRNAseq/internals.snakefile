@@ -111,9 +111,9 @@ except:
     fastq_dir = "FASTQ_barcoded"
 
 try:
-    trim_galore_opts = config["trim_galore_opts"]
+    trim_options = config["trim_options"]
 except:
-    trim_galore_opts = "-a \"A{{30}}\""
+    trim_options = ""
 
 
 try:

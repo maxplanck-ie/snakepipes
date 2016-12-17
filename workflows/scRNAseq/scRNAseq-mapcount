@@ -47,9 +47,9 @@ def parse_args(defaults):
     parser.add_argument("--downsample", dest="downsample", metavar="INT", help="downsample the given number of reads from the head of each FASTQ file", type=int, default=None)
     parser.add_argument("--barcode_pattern", dest="barcode_pattern", metavar="STR", help="Defines the cell barcode and UMI order and length at the 5' end of R1 (Cel-seq protocol). 'N' defines UMI/random positions, X defines fixed positions; (default '%(default)s')", type=str, default=defaults["barcode_pattern"])
     parser.add_argument("--filter_annotation", dest="filter_annotation", metavar="STR", type=str, help="filter annotation GTF by grep for feature counting, e.g. use --filter_annotation='-v pseudogene'; (default: '%(default)s')", default=defaults["filter_annotation"])
-#    parser.add_argument("--transcripts_exclude", dest="transcripts_exclude", metavar="STR", help="Keywords from gencode annotation that get removed from list of all transcripts", type=str, default=None)
     parser.add_argument("--cell_barcode_file", dest="barcode_file", metavar="STR", help="2-column file with cell-index (1st col) and barcode (2nd col). Default will use CelSeq@MPI-IE file with 192 barcodes. (default: '%(default)s')", type=str, default= defaults["barcode_file"])
     parser.add_argument("--trim", dest="trim", choices=['cutadapt', 'trimgalore'], default=None, help="trim reads with Cutadapt or TrimGalore. Default: no Trimming!")
+    parser.add_argument("--trim_options", dest="trim_options", metavar="STR", type=str, help="Options passed to the selected trimmer, e.g. use --trim_options='-a{30}' for polyA trimming with cutadapt (default: '%(default)s')", default=defaults["trim_options"])
     parser.add_argument("--tempdir", dest="tempdir", type=str, help="used prefix path for temporary directory created via mktemp. Created temp dir gets exported as $TMPDIR and is removed at the end of this wrapper! (default: '%(default)s')", default=defaults["tempdir"])
     parser.add_argument("-v", "--verbose", dest="verbose", action="store_true", default=False, help="verbose output")
 
@@ -101,7 +101,8 @@ def main():
                 'barcode_pattern' : "NNNNNNXXXXXX",
                 'filter_annotation' : "-v -P 'full|decay|miRNA|misc_RNA|snRNA|snoRNA|scaRNA|sRNA|scRNA|rRNA|pseudogene|3prime_overlapping_ncRNA|processed_transcript'",
                 'tempdir' : "/data/extended/",
-                'snakemake_options' : ""
+                'snakemake_options' : "",
+                'trim_options' : "-a A{30}"
     }
     
     args = parse_args(defaults)
@@ -130,6 +131,8 @@ def main():
         user_configs += ["barcode_pattern={}".format(args.barcode_pattern)]
     if args.trim:
         user_configs += ["trim={}".format(args.trim)]
+        user_configs += ["trim_options=\"{}\"".format(args.trim_options)]
+        
     if args.filter_annotation:
         user_configs += ["filter_annotation=\"{}\"".format(args.filter_annotation)]
 #    if args.mapq:
