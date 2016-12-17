@@ -121,12 +121,13 @@ rule all:
         expand("STAR_genomic/{sample}.bam", sample = samples),
         expand("Counts/{sample}.cout.csv",sample = samples),
         #expand("Counts/{sample}.coutt.csv",sample = samples),
-        "Results/all_samples.gencode_genomic.coutt_merged.csv"
+        "Results/all_samples.gencode_genomic.coutt_merged.csv",
+        "Results/QC_report.all_samples.txt",
 rule annot:
     input:
         "Annotation/genes.filtered.bed",
         "Annotation/genes.filtered.gtf",
-        "Results/QC_report.all_samples.txt",
+        
         
 #        run_FastQC(fastqc),
 #        expand("Bowtie2/{sample}.bam.bai", sample = samples),
