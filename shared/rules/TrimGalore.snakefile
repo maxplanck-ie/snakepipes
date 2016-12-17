@@ -30,8 +30,7 @@ else:
         output:
             r1 = "FASTQ_Cutadapt/{sample}.fastq.gz",
         params:
-            tmp = "{sample}.fq.gz",
-            opts = trim_options
+            tmp = "{sample}.fq.gz"
         log:
             "FASTQ_Cutadapt/logs/Cutadapt.{sample}.log"
         benchmark:
@@ -39,7 +38,7 @@ else:
         shell:
             cutadapt_path+"cutadapt "
                 "-f fastq -e 0.1 -q 20 -O 2 --trim-n --minimum-length 25 -a AGATCGGAAGAGC "
-                "{params.opts} "
+                ""+trim_options+" "
                 "-o ${{TMPDIR}}{params.tmp} " 
                 "{input.r1} "
                 "&> {log} "
