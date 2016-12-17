@@ -93,14 +93,23 @@ rule sc_STAR_genomic:
         " cp ${{TMPDIR}}{wildcards.sample}.Log.final.out STAR_genomic/ "
 
 
-# rule sc_feature_counts_genomic:
-#     input:
-#         bam = "HISAT2_genomic/{sample}.bam",
-#         gtf = "Annotation/genes.filtered.gtf"
-#     output:
-#     threads: 10
-#     shell:
-    
+rule sc_bam_featureCounts_genomic:
+    input:
+        bam = "STAR_genomic/{sample}.bam",
+        gtf = "Annotation/genes.filtered.gtf"
+    output:
+        counts = "Counts/{sample}.fc.cout.csv",
+        counts_summary = "Counts/{sample}.fc.cout_summary.txt"
+    params:
+        count_script = workflow.basedir+"/scRNAseq_bam_featureCounts.sh",
+        bc_file = barcode_file,
+        fc_path = feature_counts_path
+    threads: 
+        5
+    shell:
+        """
+        {params.count_script} {input.bam} {input.gtf} {params.bc_file} {wildcars.sample} {params.fc_path} ${{TMPDIR}} 1>{output.counts} 2>{output.counts_summary}
+        """
 
 rule sc_get_counts_genomic:
     input:

@@ -11,6 +11,7 @@ curr=$(pwd)
 
 gtf_path=$(realpath $gtf)
 bam_path=$(realpath $bam)
+#out_path=$(realpath $out)
 
 ## current version of featureCounts under /package/subread... writes out -R file to currDir instead to path provided with -o
 ## this is fixed in more recent version of subread! We have to install it! :-)
@@ -18,7 +19,7 @@ mkdir -p $tmp
 cd $tmp
 rm *.bam.featureCounts
 
-${fc_path}featureCounts -a $gtf_path -s 1 -R -d 25 -F "GTF" -o $out $bam_path 
+${fc_path}featureCounts -a $gtf_path -s 1 -R -d 25 -F "GTF" -o _tmp_$out $bam_path 
 
 cat *.bam.featureCounts | awk -v map_f=<(cat $gtf_path | tr " " "\t" | tr -d "\";" | awk '{print $10,$18,$18"__chr"$1}') \
 'BEGIN{while (getline < map_f) { MAP[$1]=$2"\t"$3; } }
@@ -41,8 +42,8 @@ BEGIN{
 	split(substr($1,pos+1),BC,":");             ## split on ":" to separate all info and stor in array "BC"
 	num=split($3,GENES,",");                    ## get number of features a read overlaps by splitting on ","
 	if ( $3!="*" && num==1 && BC[2] in CELL) {  ## if unique feature and a "valid" cell barcode then count it
-		ALL[$6][BC[5]][CELL[BC[2]]] += 1;     ## $3 is single GENEID if num==1
-		feat_uniq+=1;                         ## only stats
+		ALL[$6][BC[5]][CELL[BC[2]]] += 1;   ## $3 is single GENEID if num==1
+		feat_uniq+=1;                       ## only stats
 	}
 	if (BC[2] in CELL) {                        ## only stats
 		if ($2~"NoFeatures") cell_nofeat+=1;
@@ -51,14 +52,14 @@ BEGIN{
 	} else nocell+=1;
 }
 END{
-	printf "GENEID\tRBAR";                      ## mimic Dominics output format
-	for (n=1;n<=num_cells;n++)                  ## header line  
+	printf "GENEID\tRBAR";                        ## mimic Dominics output format
+	for (n=1;n<=num_cells;n++)                    ## header line  
 		printf "\t"n;
 	printf "\n";
-	for (i in ALL) {                            ## iterate over all genes
+	for (i in ALL) {                              ## iterate over all genes
 		for (k in ALL[i]) {                   ## and all UMIs
 			printf i"\t"k;
-			for (j=1;j<=num_cells;j++) {    ## and all cells
+			for (j=1;j<=num_cells;j++) {  ## and all cells
 				if (j in ALL[i][k])
 					printf "\t"ALL[i][k][j];
 				else printf "\t0";
