@@ -115,14 +115,14 @@ rule all:
         expand("FASTQ/{sample}{read}.fastq.gz", sample = samples, read = reads),
         expand("FASTQ_barcoded/{sample}.fastq.gz", sample = samples),
         run_Trimming(trim),
-        expand("FastQC/{sample}_fastqc.html", sample = samples),
+    #    expand("FastQC/{sample}_fastqc.html", sample = samples),
         #expand("HISAT2_genomic/{sample}.bam", sample = samples),
         expand("STAR_genomic/{sample}.bam", sample = samples),
         "Annotation/genes.filtered.bed",
         "Annotation/genes.filtered.gtf",
-        expand("Counts/{sample}.fc.cout.csv",sample = samples),
-        expand("Counts/{sample}.coutt.csv",sample = samples),
-        "Results/all_samples.gencode_genomic.coutt_merged.csv"
+    #    expand("Counts/{sample}.fc.cout.csv",sample = samples),
+    #    expand("Counts/{sample}.coutt.csv",sample = samples),
+    #    "Results/all_samples.gencode_genomic.coutt_merged.csv"
 #        run_FastQC(fastqc),
 #        expand("Bowtie2/{sample}.bam.bai", sample = samples),
 #        expand("filtered_bam/{sample}.filtered.bam.bai", sample = samples),
