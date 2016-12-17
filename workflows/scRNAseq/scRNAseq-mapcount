@@ -135,7 +135,7 @@ def main():
         user_configs += ["trim_options={}".format(args.trim_options)]
         
     if args.filter_annotation:
-        user_configs += ['filter_annotation={}'.format(args.filter_annotation)]
+        user_configs += ["filter_annotation=\"{}\"".format(args.filter_annotation)]
 #    if args.mapq:
 #        user_configs += ["mapq={}".format(args.mapq)]
 #    if args.bw_binsize:
