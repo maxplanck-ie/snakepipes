@@ -110,6 +110,7 @@ onstart:
         print(samples)
 ### main rule ##################################################################
 ################################################################################
+localrules: annot
 rule all:
     input:
         expand("FASTQ/{sample}{read}.fastq.gz", sample = samples, read = reads),
@@ -118,11 +119,16 @@ rule all:
         expand("FastQC/{sample}_fastqc.html", sample = samples),
         #expand("HISAT2_genomic/{sample}.bam", sample = samples),
         expand("STAR_genomic/{sample}.bam", sample = samples),
-        "Annotation/genes.filtered.bed",
-        "Annotation/genes.filtered.gtf",
+#        "Annotation/genes.filtered.bed",
+#        "Annotation/genes.filtered.gtf",
         expand("Counts/{sample}.fc.cout.csv",sample = samples),
         expand("Counts/{sample}.coutt.csv",sample = samples),
         "Results/all_samples.gencode_genomic.coutt_merged.csv"
+rule annot:
+    input:
+        "Annotation/genes.filtered.bed",
+        "Annotation/genes.filtered.gtf",
+
 #        run_FastQC(fastqc),
 #        expand("Bowtie2/{sample}.bam.bai", sample = samples),
 #        expand("filtered_bam/{sample}.filtered.bam.bai", sample = samples),
