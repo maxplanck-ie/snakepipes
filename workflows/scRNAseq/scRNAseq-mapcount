@@ -136,12 +136,7 @@ def main():
         
     if args.filter_annotation:
         user_configs += ['filter_annotation=\"{}\"'.format(args.filter_annotation)]
-#    if args.mapq:
-#        user_configs += ["mapq={}".format(args.mapq)]
-#    if args.bw_binsize:
-#        user_configs += ["bw_binsize={}".format(args.bw_binsize)]
-#    if args.gcbias:
-#        user_configs += ["gcbias=True"]
+
     if args.verbose:
         user_configs += ["verbose=True"]
 	
