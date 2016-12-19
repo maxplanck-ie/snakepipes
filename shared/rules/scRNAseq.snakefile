@@ -85,12 +85,12 @@ rule sc_STAR_genomic:
     shell:
         star_path + "STAR --genomeDir "+star_index + ""
         " --runThreadN {threads} --readFilesIn {input.read_barcoded} "
-        " --readFilesCommand zcat --outFileNamePrefix ${{TMPDIR}}{wildcards.sample}. " 
+        " --readFilesCommand zcat --outFileNamePrefix ${{TMPDIR}}/{wildcards.sample}. " 
         " --sjdbGTFfile {input.gtf} {params.opts} --outStd SAM | "
         " grep -P '^@|NH:i:1\\b' | "
         "" + samtools_path + "samtools sort -T ${{TMPDIR}}tmp_{wildcards.sample} -@5 -m 2G -O bam - > {output.bam}; "
         "" + samtools_path + "samtools index {output.bam}; "
-        " cp ${{TMPDIR}}{wildcards.sample}.Log.final.out STAR_genomic/ "
+        " cp ${{TMPDIR}}/{wildcards.sample}.Log.final.out STAR_genomic/;"
 
 
 rule sc_bam_featureCounts_genomic:
@@ -144,7 +144,7 @@ rule scale_counts:
         UMI_length = UMI_length
     shell:
         """{params.count_script} -bl={params.UMI_length} -in={input.counts} """
-        """ -outc={output.coutc} -outb={output.coutb} -outt={output.coutt} 2>&1 1>{output.log} """
+        """ -outc={output.coutc} -outb={output.coutb} -outt={output.coutt} &>{output.log} """
 
 
 rule combine_sample_counts:

@@ -5,7 +5,8 @@ import os
 ### output configuration for debugging #########################################
 ################################################################################
 print("config: {}\n".format(config))
-
+print("$TMPDIR: ",os.getenv('TMPDIR', ""))
+print("$HOSTNAME: ",os.getenv('HOSTNAME', ""))
 
 ### include scripts ############################################################
 ################################################################################
@@ -120,7 +121,7 @@ rule all:
         #expand("HISAT2_genomic/{sample}.bam", sample = samples),
         expand("STAR_genomic/{sample}.bam", sample = samples),
         expand("Counts/{sample}.cout.csv",sample = samples),
-        #expand("Counts/{sample}.coutt.csv",sample = samples),
+        expand("Counts/{sample}.coutt.csv",sample = samples),
         "Results/all_samples.gencode_genomic.coutt_merged.csv",
         "Results/QC_report.all_samples.txt",
 rule annot:

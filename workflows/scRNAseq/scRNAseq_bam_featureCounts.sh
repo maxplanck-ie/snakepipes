@@ -75,6 +75,6 @@ END{
 	sum = sum"NOCELL\t"nocell"\t"(nocell/sum_reads*100)"\n";
 	sum = sum"NUM_READS\t"sum_reads"\t100.0";
 	print sum > "/dev/stderr";                  ## prints stats to stderr
-}' 
+}'
 
 #cd $curr
