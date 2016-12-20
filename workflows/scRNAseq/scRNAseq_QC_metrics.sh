@@ -3,7 +3,7 @@
 dir_in=$1
 dir_out=$2
 
-dir=$(realpath $dir)
+dir_in=$(realpath $dir_in)
 
 mkdir -p $dir_out/data
 
