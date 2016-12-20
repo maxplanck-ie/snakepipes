@@ -123,7 +123,7 @@ rule all:
         expand("Counts/{sample}.cout.csv",sample = samples),
         expand("Counts/{sample}.coutt.csv",sample = samples),
         "Results/all_samples.gencode_genomic.coutt_merged.csv",
-        "Results/QC_report.all_samples.txt",
+        "QC_report/QC_report.all_samples.tsv",
 rule annot:
     input:
         "Annotation/genes.filtered.bed",
