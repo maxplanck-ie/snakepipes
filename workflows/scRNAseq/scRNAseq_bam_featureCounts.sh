@@ -1,12 +1,20 @@
 #!/bin/bash
 
-bam=$1
-gtf=$2
-bc_file=$3
-out=$4
-fc_path=$5
-tmp=$6
-threads=$7
+## example call:
+## scRNAseq_bam_featureCounts.sh test.sorted.bam genes.filtered.gtf celseq_barcodes.192.txt test.txt /package/subread-1.5.0-p1/bin/ tmp_fc 5 1>MySample.cout.csv 2>MySample.cout_summary.txt
+
+bam=$1	## mapping for 96 cells
+gtf=$2	## gene annotation
+bc_file=$3	## celSeq cell barcode file
+out=$4	## just used for featureCounts as ouput name
+fc_path=$5	## path to fc like "/package/subread-1.5.0-p1/bin/"
+tmp=$6	## used as working dir for featureCounts due to -R issue
+threads=$7	## for featureCOunts only
+
+
+## gtf is expected as 
+# 3	stdin	exon	108107280	108109316	.	-	.	gene_id "ENSMUSG00000000001.4"; transcript_id "ENSMUST00000000001.4"; exon_number "1"; exon_id "ENSMUST00000000001.4.1"; gene_name "Gnai3";
+# 3	stdin	exon	108109403	108109612	.	-	.	gene_id "ENSMUSG00000000001.4"; transcript_id "ENSMUST00000000001.4"; exon_number "2"; exon_id "ENSMUST00000000001.4.2"; gene_name "
 
 curr=$(pwd)
 
@@ -14,24 +22,29 @@ gtf_path=$(realpath $gtf)
 bam_path=$(realpath $bam)
 #out_path=$(realpath $out)
 
-## current version of featureCounts under /package/subread... writes out -R file to currDir instead to path provided with -o
+## current version of featureCounts under /package/subread-1.5.0-p1/ writes out -R file to currDir instead to path provided with -o
 ## this is fixed in more recent version of subread! We have to install it! :-)
 mkdir -p $tmp
 cd $tmp
-rm *.bam.featureCounts
+rm *.bam.featureCounts		## I'm too lazy the get the full correct name later on, so make sure we have only the file we want
 
 ${fc_path}featureCounts -a $gtf_path -T $threads -s 1 -R -d 25 -F "GTF" -o _tmp_$out $bam_path 
 
+## add gene_id (gtf col 10), gene_name (gtf col 18) to featureCounts output, last col is gene_name + chromosome
 cat *.bam.featureCounts | awk -v map_f=<(cat $gtf_path | tr " " "\t" | tr -d "\";" | awk '{print $10,$18,$18"__chr"$1}') \
 'BEGIN{while (getline < map_f) { MAP[$1]=$2"\t"$3; } }
 {OFS="\t";
 if ($3 in MAP) print $0,MAP[$3]; else print $0,"NA","NA";
 }' |
+## Output here is like:
 ## SN7001180:281:C99CMACXX:2:1203:1365:44875:SC:ACTCGA:37:UMI:ATTCCT:35:36:38      Unassigned_NoFeatures   *       *	NA	NA
-## SN7001180:281:C99CMACXX:2:1306:16709:23741:SC:AGCTAG:37:UMI:TGGAGA:35:22:38     Assigned        ENSMUSG00000025907.14   *
-## SN7001180:281:C99CMACXX:2:2302:19826:45553:SC:AGCTAG:37:UMI:TGGAGA:35:34:38     Assigned        ENSMUSG00000025907.14   *
-## SN7001180:281:C99CMACXX:2:1211:18877:23349:SC:GACAAC:37:UMI:TGTCCG:35:27:38	Unassigned_Ambiguity	*	Number_Of_Overlapped_Genes=2
-## SN7001180:281:C99CMACXX:2:2202:2909:75663:SC:GACAAC:37:UMI:TGTCCG:35:30:38	Unassigned_Ambiguity	*	Number_Of_Overlapped_Genes=2
+## SN7001180:281:C99CMACXX:2:2212:8564:84823:SC:ACGTGA:37:UMI:CGCCAG:35:35:38	Assigned	ENSMUSG00000103377.1	*	Gm37180	Gm37180__chr1
+## SN7001180:281:C99CMACXX:2:1211:18877:23349:SC:GACAAC:37:UMI:TGTCCG:35:27:38	Unassigned_Ambiguity	*	Number_Of_Overlapped_Genes=2	NA	NA
+##
+## now we can count by getting the cellbarcode and UMI from readname
+## put all in big matrix in awk and write out to stdout to caputure this later
+## summary stats are printed to stderr
+##
 awk -v map_f=$bc_file ' \
 BEGIN{
 	while(getline<map_f) {                      ## read in cell barcodes

@@ -1,11 +1,18 @@
 #!/usr/bin/perl -w -s
 
-use FindBin;
-use lib $FindBin::Bin;
-use tools;
+#use FindBin;
+#use lib $FindBin::Bin;
+#use tools;
 
 if (scalar @ARGV == 1){
     die "usage: -bl=4 -in=aggr_counts.csv (comma separated list) -outc=READ_COUNTS.csv -outb=BARCODE_COUNTS.cvs -outt=TRANSCRIPT_COUNTS.csv\n" if $ARGV[0] eq "help";
+}
+
+## to make script independent from tools.pm we copy the only needed min function 
+sub min {
+ my $a = shift;
+ my $b = shift;
+ return $a < $b ? $a : $b;
 }
 
 $bl = 4 if !$bl;
