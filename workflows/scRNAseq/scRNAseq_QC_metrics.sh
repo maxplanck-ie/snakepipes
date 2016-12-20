@@ -7,7 +7,7 @@ dir=$(realpath $dir)
 
 mkdir -p $dir_out/data
 
-for i in  $dir_in/*11wks_1*cout{b,c}.csv; do 
+for i in  $dir_in/*cout{b,c}.csv; do 
  out=$(echo $i | sed 's/.*\///'); 
 	echo $out 1>&2;
  cat $i | awk -v file=$out '{if (NR==1) {next;}; for (i=2;i<=NF;i++) COUNTS[i-1]+=$i;} \
