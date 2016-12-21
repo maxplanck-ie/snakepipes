@@ -143,6 +143,11 @@ except:
 # In contrast, within a configuration file config.yaml, assigment of boolean
 # values is possible.
 try:
+    trim_options = config["trim_options"]
+except:
+    trim_options = "--stringency 2"
+
+try:
     if config["trim"] == "trimgalore":
         trim = True
         fastq_dir = "FASTQ_TrimGalore"
@@ -151,6 +156,7 @@ try:
         trim = True
         fastq_dir = "FASTQ_Cutadapt"
         fastq_indir_trim = "FASTQ"
+        trim_options = ""
     else:
         trim = False
         fastq_dir = "FASTQ"
@@ -172,10 +178,6 @@ try:
 except:
     fastqc = False
 
-try:
-    trim_options = config["trim_options"]
-except:
-    trim_options = "--stringency 2"
 
 # IMPORTANT: When using snakemake with argument --config key=True, the
 # string "True" is assigned to variable "key". Assigning a boolean value

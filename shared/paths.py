@@ -2,7 +2,7 @@
 bedtools_path="/package/bedtools2-2.25.0/bin/"
 bowtie2_path = "/package/bowtie2-2.2.8/bin/"
 cutadapt_path = "/package/cutadapt-1.9.1/bin/"
-deepTools_path = "/package/deeptools-2.3.5/bin/"
+deepTools_path = "/package/deeptools-2.4.1/bin/"
 fastqc_path = "/package/FastQC-0.11.3/bin/"
 feature_counts_path = "/package/subread-1.5.0-p1/bin/"
 hisat2_path = "/package/hisat2-2.0.4/"
