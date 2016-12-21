@@ -1,5 +1,4 @@
 ### add barcodes from R1 to R2 #########
-#from xdiagnose.utils.processes import shell
 
 rule fastq_barcode:
         input:
@@ -12,8 +11,6 @@ rule fastq_barcode:
             UMI_offset = UMI_offset,
             CELLI_length = CELLI_length,
             CELLI_offset = CELLI_offset
-        benchmark:
-            "FASTQ_barcoded/.benchmark/fastq_barcoded.{sample}.benchmark"
         threads: 2
         shell:"""
             paste <(paste - - - - < <(zcat {input.R1}))   <(paste - - - - < <(zcat {input.R2})) | \
