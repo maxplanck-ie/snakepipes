@@ -38,7 +38,7 @@ cat *.bam.featureCounts | awk -v map_f=$gtf_path \
 	while (getline < map_f) {
 		match($0,"gene_id[[:space:]\";]+([^[:space:]\";]+)",gid)
 		match($0,"gene_name[[:space:]\";]+([^[:space:]\";]+)",gna)
-		MAP[gid]=gna"\t"gna"__chr"$1; 
+		MAP[gid[1]]=gna[1]"\t"gna[1]"__chr"$1; 
 	} 
 }
 {OFS="\t";
