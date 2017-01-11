@@ -15,7 +15,7 @@ rule histoneHMM:
     benchmark:
         "histoneHMM/.benchmark/histoneHMM.{sample}.filtered.benchmark"
     shell:
-      "export R_LIBS_USER="+R_libs_path+" &&"+
+      "export R_LIBS_USER="+R_libs_path+" && "+
       R_path+"Rscript "+histoneHMM_path+"histoneHMM_call_regions.R "
         "-b 750 "
         "-c {params.genome_index} "
