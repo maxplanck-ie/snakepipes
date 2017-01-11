@@ -1,3 +1,5 @@
 DESeq2
 RColorBrewer
 gplots
+optparse
+Rsamtools
