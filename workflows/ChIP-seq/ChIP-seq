@@ -129,6 +129,7 @@ def main():
     ## create local temp dir and add this path to environment as $TMPDIR variable
     ## on SLURM: $TMPDIR is set, created and removed by SlurmEasy on cluster node
     temp_path = common_functions.make_temp_dir(args.tempdir, args.outdir)
+    
     snakemake_exports = ("export TMPDIR="+temp_path+" && ").split()
 
     cmd = " ".join(snakemake_exports + snakemake_module_load + snakemake_cmd + snakemake_log)
