@@ -34,6 +34,7 @@ if paired:
         shell:
             salmon_path+"salmon quant "
             "-p {threads} "
+            "--numBootstraps 50 "
             "-g {params.gtf} "
             "-i Salmon/SalmonIndex "
             "-l {params.libtype} "
@@ -57,6 +58,7 @@ else:
         shell:
             salmon_path+"salmon quant "
             "-p {threads} "
+            "--numBootstraps 50 "
             "-g {params.gtf} "
             "-i Salmon/SalmonIndex "
             "-l {params.libtype} "
@@ -129,3 +131,20 @@ rule Salmon_genes_counts:
         "Salmon/Salmon_genes_counts.log"
     shell:
         R_path+"Rscript "+os.path.join(maindir, "shared", "tools", "merge_count_tables.R")+" Name TPM {output} {input} "
+
+
+## Prepare Salmon output for Sleuth
+rule Salmon_wasabi:
+    input:
+        "Salmon/{sample}/quant.sf"
+    output:
+        "Salmon/{sample}/abundance.h5"
+    params:
+        "Salmon/{sample}"
+    benchmark:
+        "Salmon/.benchmark/Salmon_wasabi.benchmark"
+    shell:
+        "export R_LIBS_USER="+R_libs_path+" && "
+        "cat "+os.path.join(workflow_tools,"wasabi.R")+" | "
+        ""+os.path.join(R_path,"R")+" --vanilla --args "
+        "{params}; "

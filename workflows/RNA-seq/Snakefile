@@ -44,6 +44,9 @@ include: os.path.join(maindir, "shared", "rules", "featureCounts.snakefile")
 if sample_info:
     include: os.path.join(maindir, "shared", "rules", "DESeq2.snakefile")
 
+## Sleuth (on Salmon)
+include: os.path.join(maindir, "shared", "rules", "sleuth.snakefile")
+
 
 ### conditional/optional rules #################################################
 ################################################################################
@@ -120,14 +123,14 @@ rule all:
         "Annotation/genes.filtered.saf",
 
         "Salmon/SalmonIndex/sa.bin",
-        expand("Salmon/{sample}/quant.sf", sample=samples),
-        expand("Salmon/{sample}/quant.genes.sf", sample=samples),
         expand("Salmon/{sample}.quant.sf", sample=samples),
         expand("Salmon/{sample}.quant.genes.sf", sample=samples),
         "Salmon/TPM.tsv",
         "Salmon/TPM.genes.tsv",
         "Salmon/counts.tsv",
         "Salmon/counts.genes.tsv",
+        expand("Salmon/{sample}/abundance.h5", sample=samples),
+        "sleuth/so.rds",
 
         expand("BW/{sample}.RPKM.bw", sample = samples),
         "deepTools_qc/plotEnrichment/plotEnrichment.png",

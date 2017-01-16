@@ -3,3 +3,8 @@ RColorBrewer
 gplots
 optparse
 Rsamtools
+devtools
+COMBINE-lab/wasabi
+rhdf5
+shiny
+biomaRt
