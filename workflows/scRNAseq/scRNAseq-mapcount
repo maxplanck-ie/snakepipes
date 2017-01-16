@@ -20,11 +20,12 @@ import sys
 import textwrap
 import time
 import shutil
+import json
 
 sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))))+"/shared/")
 import common_functions
 
-def parse_args():
+def parse_args(defaults):
     """
     Parse arguments from the command line.
     """
@@ -43,13 +44,14 @@ def parse_args():
     parser.add_argument("-o", "--output-dir", dest="outdir", help="output directory (default: '.')", default=None)
     parser.add_argument("-j", "--jobs", dest="max_jobs", metavar="INT", help="maximum number of concurrently submitted Slurm jobs / cores if workflow is run locally (default: '%(default)s')", type=int, default=8)
     parser.add_argument("--local", dest="local", action="store_true", default=False, help="run workflow locally (default: jobs are submitted to Slurm queue)")
-    parser.add_argument("--snakemake_options", dest="snakemake_options", metavar="STR", type=str, help="Snakemake options to be passed directly to snakemake, e.g. use --snakemake_options='--dryrun --rerun-incomplete --unlock --forceall'. (default: '%(default)s')", default="")
+    parser.add_argument("--snakemake_options", dest="snakemake_options", metavar="STR", type=str, help="Snakemake options to be passed directly to snakemake, e.g. use --snakemake_options='--dryrun --rerun-incomplete --unlock --forceall'. (default: '%(default)s')", default=defaults["snakemake_options"])
     parser.add_argument("--downsample", dest="downsample", metavar="INT", help="downsample the given number of reads from the head of each FASTQ file", type=int, default=None)
-    parser.add_argument("--barcode_pattern", dest="barcode_pattern", metavar="STR", help="Defines the cell barcode and UMI order and length at the 5' end of R1 (Cel-seq protocol). 'N' defines UMI/random positions, X defines fixed positions; Default 'NNNNNNXXXXXX'", type=str, default="NNNNNNXXXXXX")
-    parser.add_argument("--transcripts_exclude", dest="transcripts_exclude", metavar="STR", help="Keywords from gencode annotation that get removed from list of all transcripts", type=str, default=None)
-    parser.add_argument("--cell_barcode_file", dest="barcode_file", metavar="STR", help="2-column file with cell-index (1st col) and barcode (2nd col). Default will use CelSeq@MPI-IE file with 192 barcodes. (Default: None)", type=str, default=None) 
+    parser.add_argument("--barcode_pattern", dest="barcode_pattern", metavar="STR", help="Defines the cell barcode and UMI order and length at the 5' end of R1 (Cel-seq protocol). 'N' defines UMI/random positions, X defines fixed positions; (default '%(default)s')", type=str, default=defaults["barcode_pattern"])
+    parser.add_argument("--filter_annotation", dest="filter_annotation", metavar="STR", type=str, help="filter annotation GTF by grep for feature counting, e.g. use --filter_annotation='-v pseudogene'; (default: '%(default)s')", default=defaults["filter_annotation"])
+    parser.add_argument("--cell_barcode_file", dest="barcode_file", metavar="STR", help="2-column file with cell-index (1st col) and barcode (2nd col). Default will use CelSeq@MPI-IE file with 192 barcodes. (default: '%(default)s')", type=str, default= defaults["barcode_file"])
     parser.add_argument("--trim", dest="trim", choices=['cutadapt', 'trimgalore'], default=None, help="trim reads with Cutadapt or TrimGalore. Default: no Trimming!")
-    parser.add_argument("--tempdir", dest="tempdir", type=str, help="used prefix path for temporary directory created via mktemp. Created temp dir gets exported as $TMPDIR and is removed at the end of this wrapper! (default: '/data/extended/')", default="/data/extended/")
+    parser.add_argument("--trim_options", dest="trim_options", metavar="STR", type=str, help="Options passed to the selected trimmer, e.g. use --trim_options='-a A{30}' for polyA trimming with cutadapt (default: '%(default)s')", default=defaults["trim_options"])
+    parser.add_argument("--tempdir", dest="tempdir", type=str, help="used prefix path for temporary directory created via mktemp. Created temp dir gets exported as $TMPDIR and is removed at the end of this wrapper! (default: '%(default)s')", default=defaults["tempdir"])
     parser.add_argument("-v", "--verbose", dest="verbose", action="store_true", default=False, help="verbose output")
 
 #    parser.add_argument("--fastqc", dest="fastqc", action="store_true", default=False, help="run FastQC read quality control")
@@ -91,10 +93,21 @@ def parse_args():
 
 
 def main():
-    args = parse_args()
-
+    
+    
     ## Require shared snakemake workflow directory
     this_script_dir = os.path.dirname(os.path.realpath(__file__))
+
+    defaults = {'barcode_file' : this_script_dir+"/celseq_barcodes.192.txt",
+                'barcode_pattern' : "NNNNNNXXXXXX",
+                'filter_annotation' : "'-v -P \\\"full|decay|miRNA|misc_RNA|snRNA|snoRNA|scaRNA|sRNA|scRNA|rRNA|pseudogene|3prime_overlapping_ncRNA|processed_transcript\\\"'",
+                'tempdir' : "/data/extended/",
+                'snakemake_options' : "",
+                'trim_options' : "'-a A{{30}}'"
+    }
+    
+    args = parse_args(defaults)
+
 
     main_dir_path = os.path.join(os.path.dirname(os.path.dirname(this_script_dir)))
     if not os.path.isdir(main_dir_path):
@@ -106,7 +119,7 @@ def main():
     subprocess.call("[ -d {cluster_logs_dir} ] || mkdir -p {cluster_logs_dir}".format(cluster_logs_dir=cluster_logs_dir), shell=True)
 
     ## required config variables
-    user_configs = "--config maindir={main_dir_path} indir={indir} outdir={outdir} genome={genome}".format(
+    user_configs = "maindir={main_dir_path} indir={indir} outdir={outdir} genome={genome}".format(
                                 main_dir_path = main_dir_path,
                                 indir = args.indir,
                                 outdir = args.outdir,
@@ -119,14 +132,11 @@ def main():
         user_configs += ["barcode_pattern={}".format(args.barcode_pattern)]
     if args.trim:
         user_configs += ["trim={}".format(args.trim)]
-    if args.transcripts_exclude:
-        user_configs += ["transcripts_exclude={}".format(args.transcripts_exclude)]
-#    if args.mapq:
-#        user_configs += ["mapq={}".format(args.mapq)]
-#    if args.bw_binsize:
-#        user_configs += ["bw_binsize={}".format(args.bw_binsize)]
-#    if args.gcbias:
-#        user_configs += ["gcbias=True"]
+        user_configs += ['trim_options=\"{}\"'.format(args.trim_options)]
+        
+    if args.filter_annotation:
+        user_configs += ['filter_annotation=\"{}\"'.format(args.filter_annotation)]
+
     if args.verbose:
         user_configs += ["verbose=True"]
 	
@@ -141,7 +151,7 @@ def main():
     ## laptop
     #snakemake_module_load = " ".split()
     snakemake_cmd = """
-                    snakemake {snakemake_options} --latency-wait 30 --snakefile {snakefile} --jobs {max_jobs} {user_configs} --directory {outdir}
+                    snakemake {snakemake_options} --latency-wait 30 --snakefile {snakefile} --jobs {max_jobs} --config {user_configs} --directory {outdir}
                     """.format( snakefile = os.path.join(this_script_dir, "Snakefile"),
                                 max_jobs = args.max_jobs,
                                 user_configs = " ".join(user_configs),

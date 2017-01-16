@@ -1,4 +1,4 @@
-### TrimGalore #################################################################
+### cutadapt #################################################################
 if paired:
     rule cutadapt:
         input:
@@ -9,8 +9,7 @@ if paired:
             r2 = "FASTQ_Cutadapt/{sample}"+reads[1]+".fastq.gz"
         params:
             tmp1 = "{sample}"+reads[0]+".fq.gz",
-            tmp2 = "{sample}"+reads[1]+".fq.gz",
-            opts = trim_galore_opts
+            tmp2 = "{sample}"+reads[1]+".fq.gz"
         log:
             "FASTQ_Cutadapt/logs/Cutadapt.{sample}.log"
         benchmark:
@@ -19,6 +18,7 @@ if paired:
             cutadapt_path+"cutadapt "
                 "-f fastq -e 0.1 -q 20 -O 2 --trim-n --minimum-length 25 -a AGATCGGAAGAGC -A AGATCGGAAGAGC "
                 "-o ${{TMPDIR}}{params.tmp1} -p ${{TMPDIR}}{params.tmp2} " 
+                ""+trim_options+" "
                 "{input.r1} {input.r2} "
                 "&> {log} "
                 "&& (mv ${{TMPDIR}}{params.tmp1} {output.r1}; mv ${{TMPDIR}}{params.tmp2} {output.r2}; touch {output.r1} {output.r2})"
@@ -29,8 +29,7 @@ else:
         output:
             r1 = "FASTQ_Cutadapt/{sample}.fastq.gz",
         params:
-            tmp = "{sample}.fq.gz",
-            opts = trim_galore_opts
+            tmp = "{sample}.fq.gz"
         log:
             "FASTQ_Cutadapt/logs/Cutadapt.{sample}.log"
         benchmark:
@@ -38,10 +37,14 @@ else:
         shell:
             cutadapt_path+"cutadapt "
                 "-f fastq -e 0.1 -q 20 -O 2 --trim-n --minimum-length 25 -a AGATCGGAAGAGC "
+                ""+trim_options+" "
                 "-o ${{TMPDIR}}{params.tmp} " 
                 "{input.r1} "
                 "&> {log} "
                 "&& (mv ${{TMPDIR}}{params.tmp} {output.r1}; touch {output.r1})"
+
+
+### TrimGalore #################################################################
 
 if paired:
     rule TrimGalore:
@@ -54,7 +57,7 @@ if paired:
         params:
             tmp1 = "FASTQ_TrimGalore/{sample}"+reads[0]+"_val_1.fq.gz",
             tmp2 = "FASTQ_TrimGalore/{sample}"+reads[1]+"_val_2.fq.gz",
-            opts = trim_galore_opts
+            opts = trim_options
         log:
             "FASTQ_TrimGalore/logs/TrimGalore.{sample}.log"
         benchmark:
@@ -75,7 +78,7 @@ else:
             "FASTQ_TrimGalore/{sample}.fastq.gz"
         params:
             tmp = "FASTQ_TrimGalore/{sample}_trimmed.fq.gz",
-            opts = trim_galore_opts
+            opts = trim_options
         log:
             "FASTQ_TrimGalore/logs/TrimGalore.{sample}.log"
         benchmark:
