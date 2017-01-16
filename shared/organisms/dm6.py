@@ -4,6 +4,7 @@ genome_index = "/data/repository/organisms/dm6_ensembl/genome_fasta/genome.fa.fa
 genome_2bit = "/data/repository/organisms/dm6_ensembl/genome_fasta/genome.2bit"
 bowtie2_index = "/data/repository/organisms/dm6_ensembl/BowtieIndex/genome"
 hisat2_index = "/data/repository/organisms/dm6_ensembl/HISAT2Index/genome"
+star_index = "/data/repository/organisms/dm6_ensembl/STARIndex/"
 genes_bed = "/data/repository/organisms/dm6_ensembl/Ensembl/release-79/genes.bed"
 genes_gtf = "/data/repository/organisms/dm6_ensembl/Ensembl/release-79/genes.gtf"
 blacklist_bed = ""

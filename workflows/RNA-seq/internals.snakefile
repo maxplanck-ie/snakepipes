@@ -115,7 +115,7 @@ filter_annotation = config["filter_annotation"]
 if not filter_annotation:
     filter_annotation = "''"
 salmon_index_options = config["salmon_index_options"]
-trim_galore_opts = config["trim_galore_opts"]
+trim_options = config["trim_options"]
 fastqc = config["fastqc"]
 sample_info = config["sample_info"]
 

@@ -10,3 +10,18 @@ rule FastQC:
     threads: 2
     shell:
         fastqc_path+"fastqc -o FastQC {input} &> {log}"
+        
+
+rule FastQC_singleEnd:
+    input:
+        fastq_dir+"/{sample}.fastq.gz"
+    output:
+        "FastQC/{sample}_fastqc.html"
+    log:
+        "FastQC/logs/FastQC.{sample}.log"
+    benchmark:
+        "FastQC/.benchmark/FastQC.{sample}.benchmark"
+    threads: 2
+    shell:
+        fastqc_path+"fastqc -o FastQC {input} &> {log}"
+        

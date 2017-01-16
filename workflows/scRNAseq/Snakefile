@@ -5,7 +5,8 @@ import os
 ### output configuration for debugging #########################################
 ################################################################################
 print("config: {}\n".format(config))
-
+print("$TMPDIR: ",os.getenv('TMPDIR', ""))
+print("$HOSTNAME: ",os.getenv('HOSTNAME', ""))
 
 ### include scripts ############################################################
 ################################################################################
@@ -31,6 +32,8 @@ include: os.path.join(maindir, "shared", "load_organism_data.py")
 # FASTQ: either downsample FASTQ files or create symlinks to input files
 include: os.path.join(maindir, "shared", "rules", "FASTQ.snakefile")
 include: os.path.join(maindir, "shared", "rules", "scRNAseq.snakefile")
+include: os.path.join(maindir, "shared", "rules", "FastQC.snakefile")
+include: os.path.join(maindir, "shared", "rules", "filter_annotation.snakefile")
 
 # TrimGalore
 if trim:
@@ -83,7 +86,6 @@ onstart:
         print("Trimming:", trim)
         print("Input directory for mapping:", fastq_dir)
         print("Input directory for trimming:", fastq_indir_trim)
-        print("Minimum mapping quality:", mapq)
         print("BigWig bin size:", bw_binsize)
         print("Barcode pattern:", barcode_pattern)
         print("Barcode file:", barcode_file)
@@ -109,15 +111,25 @@ onstart:
         print(samples)
 ### main rule ##################################################################
 ################################################################################
+localrules: annot
 rule all:
     input:
         expand("FASTQ/{sample}{read}.fastq.gz", sample = samples, read = reads),
         expand("FASTQ_barcoded/{sample}.fastq.gz", sample = samples),
         run_Trimming(trim),
-        expand("HISAT2_genomic/{sample}.bam", sample = samples),
+        expand("FastQC/{sample}_fastqc.html", sample = samples),
+        #expand("HISAT2_genomic/{sample}.bam", sample = samples),
+        expand("STAR_genomic/{sample}.bam", sample = samples),
+        expand("Counts/{sample}.cout.csv",sample = samples),
+        expand("Counts/{sample}.coutt.csv",sample = samples),
+        "Results/all_samples.gencode_genomic.coutt_merged.csv",
+        "QC_report/QC_report.all_samples.tsv",
+rule annot:
+    input:
         "Annotation/genes.filtered.bed",
-        #expand("Counts/{sample}.coutt.csv",sample = samples)
-        "Results/all_samples.gencode_genomic.coutt_merged.csv"
+        "Annotation/genes.filtered.gtf",
+        
+        
 #        run_FastQC(fastqc),
 #        expand("Bowtie2/{sample}.bam.bai", sample = samples),
 #        expand("filtered_bam/{sample}.filtered.bam.bai", sample = samples),
