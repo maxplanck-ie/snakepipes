@@ -41,4 +41,4 @@ if paired:
                 "INPUT={input} "
                 "OUTPUT={output.txt} "
                 "VALIDATION_STRINGENCY=LENIENT "
-                "&> {log} "
+                "&> {log} && exit 0"
