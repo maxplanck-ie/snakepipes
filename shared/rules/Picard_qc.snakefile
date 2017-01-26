@@ -27,18 +27,20 @@ if paired:
         input:
             "Bowtie2/{sample}.bam"
         output:
-            txt = "Picard_qc/InsertSizeMetrics/{sample}.insert_size_metrics.txt",
-            pdf = "Picard_qc/InsertSizeMetrics/{sample}.insert_size_histogram.pdf"
+            txt = "Picard_qc/InsertSizeMetrics/{sample}.insert_size_metrics.txt"
         log:
             "Picard_qc/logs/CollectInsertSizeMetrics.{sample}.log"
         benchmark:
             "Picard_qc/.benchmark/CollectInsertSizeMetrics.{sample}.benchmark"
         threads: 4 # Java performs parallel garbage collection
+        params:
+            pdf = "Picard_qc/InsertSizeMetrics/{sample}.insert_size_histogram.pdf"
         shell:
             "export PATH="+R_path+":$PATH && "
             "java -Xmx4g -jar "+picard_path+"picard.jar CollectInsertSizeMetrics "
-                "HISTOGRAM_FILE={output.pdf} "
+                "HISTOGRAM_FILE={params.pdf} "
                 "INPUT={input} "
                 "OUTPUT={output.txt} "
                 "VALIDATION_STRINGENCY=LENIENT "
-                "&> {log} && exit 0"
+                "&> {log} "
+                "&& ( [ -f {params.pdf} ] || "+os.path.join(R_path, "Rscript")+" "+os.path.join(maindir, "shared", "tools", "CollectInsertSizeMetrics_histogram.R")+" {output.txt} ) "
