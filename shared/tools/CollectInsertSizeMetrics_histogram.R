@@ -8,10 +8,9 @@ dname = dirname(infile)
 lines = readLines(infile)
 s = lines[grep("## HISTOGRAM", lines)+1:length(lines)]
 d<-read.delim(textConnection(s), header=T, sep="\t", strip.white=TRUE)
-d
 
 read_orientations = colnames(d)[2:length(colnames(d))]
-read_orientations
+#read_orientations
 
 generate_histogram <- function(read_orientation) {
   x = d$insert_size
