@@ -1,5 +1,11 @@
 import subprocess
 
+def isFloat(string):
+    try:
+        float(string)
+        return True
+    except ValueError:
+        return False
 
 # MACS2 should be called on already filtered, e.g. duplicate-free, BAM files
 # for paired-end BAM files, Picard MarkDuplicates is fragment-based and
@@ -152,7 +158,11 @@ rule MACS2_peak_qc:
                bedtools_path+"genomeCoverageBed -i - -g "+params.genome_index+" | "+
                "grep -P '^genome\t1' | cut -f 5"
               )
-        genomecov = float(subprocess.check_output( cmd, shell=True).decode())
+        res=subprocess.check_output( cmd, shell=True).decode()
+        genomecov=0
+        if isFloat(res): 
+        	genomecov=float(res)
+        #genomecov = float(subprocess.check_output( cmd, shell=True).decode())
 
         # write peak-based QC metrics to output file
         with open(output.qc, "w") as f:
