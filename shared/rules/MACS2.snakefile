@@ -162,8 +162,7 @@ rule MACS2_peak_qc:
         genomecov=0
         if isFloat(res): 
         	genomecov=float(res)
-        #genomecov = float(subprocess.check_output( cmd, shell=True).decode())
-
+ 
         # write peak-based QC metrics to output file
         with open(output.qc, "w") as f:
             f.write("peak_count\tFRiP\tpeak_genome_coverage\n"
