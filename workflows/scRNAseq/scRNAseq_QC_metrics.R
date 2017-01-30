@@ -9,6 +9,7 @@
 require(ggplot2)
 require(dplyr)
 require(scales)
+require(gtools)
 
 args <- commandArgs(trailingOnly=TRUE)
 
@@ -29,6 +30,9 @@ sc_dat = read.csv(data_file,header = T,sep = "\t",stringsAsFactors = F)
 
 sc_dat$sample <- gsub(".*/","",sc_dat$sample)
 sc_dat$sample <- gsub(".coutc.csv$","",sc_dat$sample)
+
+sc_dat$sample <- factor(sc_dat$sample)
+sc_dat$sample <- mixedsort(levels(factor(sc_dat$sample)))
 
 png(file=paste(data_file,".reads_UMI_plot.png",sep=""),width=1500,height=1500)
 ggplot(dat=sc_dat,aes(x=(cell_reads),y=(cell_transcripts),color=sample))+geom_point(size=3,alpha=0.8) + 
