@@ -99,7 +99,7 @@ ggplot(sc_dat,aes(x=x,y=y,fill=cell_transcripts))+
 		facet_wrap(~sample,ncol = 4,scales = "free") + 
 		#scale_fill_gradient2(low="red",mid="blue",high="cyan",limits=c(min(sc_dat$cell_transcripts),max(sc_dat$cell_transcripts)),midpoint=mean(sc_dat$cell_transcripts,trim=0.05)) + 
 		scale_fill_gradientn(colors=c("red","blue","cyan"),
-				values=rescale(c(0,median(sc_dat$cell_transcripts),max(sc_dat$cell_transcripts)-5000)),
+				values=rescale(c(0,median(sc_dat$cell_transcripts),max(sc_dat$cell_transcripts))),
 				limits=c(0,max(sc_dat$cell_transcripts)),space = "Lab") +
 		coord_fixed() + 
 		theme_minimal() + 
