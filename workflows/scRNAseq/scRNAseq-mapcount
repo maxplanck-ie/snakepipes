@@ -51,6 +51,7 @@ def parse_args(defaults):
     parser.add_argument("--cell_barcode_file", dest="barcode_file", metavar="STR", help="2-column file with cell-index (1st col) and barcode (2nd col). Default will use CelSeq@MPI-IE file with 192 barcodes. (default: '%(default)s')", type=str, default= defaults["barcode_file"])
     parser.add_argument("--trim", dest="trim", choices=['cutadapt', 'trimgalore'], default=None, help="trim reads with Cutadapt or TrimGalore. Default: no Trimming!")
     parser.add_argument("--trim_options", dest="trim_options", metavar="STR", type=str, help="Options passed to the selected trimmer, e.g. use --trim_options='-a A{30}' for polyA trimming with cutadapt (default: '%(default)s')", default=defaults["trim_options"])
+    parser.add_argument("--bw-binsize", dest="bw_binsize", metavar="INT", help="bin size of output files in bigWig format (default: '%(default)s')", type=int, default=defaults["bw_binsize"])
     parser.add_argument("--tempdir", dest="tempdir", type=str, help="used prefix path for temporary directory created via mktemp. Created temp dir gets exported as $TMPDIR and is removed at the end of this wrapper! (default: '%(default)s')", default=defaults["tempdir"])
     parser.add_argument("-v", "--verbose", dest="verbose", action="store_true", default=False, help="verbose output")
 
@@ -58,7 +59,6 @@ def parse_args(defaults):
 #    parser.add_argument("--dedup", dest="dedup", action="store_true", default=False, help="retain only de-duplicated reads/read pairs (given single-/paired-end data), recommended for ChIP-seq data")
 #    parser.add_argument("--properpairs", dest="properpairs", action="store_true", default=False, help="retain only reads mapping in proper pairs")
 #    parser.add_argument("--mapq", dest="mapq", metavar="INT", help="retain only reads with at least the given mapping quality (default: '%(default)s')", type=int, default=0)
-#    parser.add_argument("--bw-binsize", dest="bw_binsize", metavar="INT", help="bin size of output files in bigWig format (default: '%(default)s')", type=int, default=10)
 #    parser.add_argument("--gcbias", dest="gcbias", action="store_true", default=False, help="run computeGCBias quality control (long runtime!)")
 
 
@@ -103,7 +103,8 @@ def main():
                 'filter_annotation' : "'-v -P \\\"full|decay|miRNA|misc_RNA|snRNA|snoRNA|scaRNA|sRNA|scRNA|rRNA|pseudogene|3prime_overlapping_ncRNA|processed_transcript\\\"'",
                 'tempdir' : "/data/extended/",
                 'snakemake_options' : "",
-                'trim_options' : "'-a A{{30}}'"
+                'trim_options' : "'-a A{{30}}'",
+                'bw_binsize' : "10"
     }
     
     args = parse_args(defaults)
@@ -146,6 +147,10 @@ def main():
         else:
             print("\nBarcode file not found! {}\n".format(args.barcode_file))
             exit(1)
+     
+    if args.bw_binsize:
+    	user_configs += ["bw_binsize={}".format(args.bw_binsize)]
+    	
 	## MPI
     snakemake_module_load = "module load snakemake slurm &&".split()
     ## laptop

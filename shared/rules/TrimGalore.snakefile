@@ -36,7 +36,7 @@ else:
             "FASTQ_Cutadapt/.benchmark/Cutadapt.{sample}.benchmark"
         shell:
             cutadapt_path+"cutadapt "
-                "-f fastq -e 0.1 -q 20 -O 2 --trim-n --minimum-length 25 -a AGATCGGAAGAGC "
+                "-f fastq -e 0.1 -q 16 -O 3 --trim-n --minimum-length 30 -a AGATCGGAAGAGC "
                 ""+trim_options+" "
                 "-o ${{TMPDIR}}{params.tmp} " 
                 "{input.r1} "
