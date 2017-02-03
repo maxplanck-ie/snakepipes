@@ -118,6 +118,7 @@ salmon_index_options = config["salmon_index_options"]
 trim_options = config["trim_options"]
 fastqc = config["fastqc"]
 sample_info = config["sample_info"]
+de_prg = config["de_prg"]
 
 if config["trim"] == "trimgalore":
     trim = True
