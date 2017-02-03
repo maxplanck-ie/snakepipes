@@ -18,6 +18,6 @@ salmon_index_options: --type quasi -k 31
 snakemake_options: ''
 tempdir: /data/extended/
 trim: 
-trim_options: --stringency 2
+trim_options: ''
 verbose: False
-
+de_prg: salmon
