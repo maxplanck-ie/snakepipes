@@ -17,7 +17,7 @@ if paired:
         shell:
             cutadapt_path+"cutadapt "
                 ""+trim_options+" "
-                "-f fastq -e 0.1 -q 20 -O 2 --trim-n --minimum-length 25 -a AGATCGGAAGAGC -A AGATCGGAAGAGC "
+                "-f fastq -e 0.1 -q 20 -O 3 --trim-n --minimum-length 25 -a AGATCGGAAGAGC -A AGATCGGAAGAGC "
                 "-o ${{TMPDIR}}{params.tmp1} -p ${{TMPDIR}}{params.tmp2} "
                 "{input.r1} {input.r2} "
                 "&> {log} "
@@ -37,8 +37,8 @@ else:
         shell:
             cutadapt_path+"cutadapt "
                 ""+trim_options+" "
-                "-f fastq -e 0.1 -q 20 -O 2 --trim-n --minimum-length 25 -a AGATCGGAAGAGC "
-                "-o ${{TMPDIR}}{params.tmp} " 
+                "-f fastq -e 0.1 -q 20 -O 3 --trim-n --minimum-length 25 -a AGATCGGAAGAGC "
+                "-o ${{TMPDIR}}{params.tmp} "
                 "{input.r1} "
                 "&> {log} "
                 "&& (mv ${{TMPDIR}}{params.tmp} {output.r1}; touch {output.r1})"
