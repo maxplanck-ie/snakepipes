@@ -38,6 +38,7 @@ def parse_args(defaults):
 
     ## positional/required
     parser.add_argument("genome", metavar="GENOME", help="genome acronym of target organism (supported: 'dm6', 'hs37d5', 'mm9', 'mm10')")
+    parser.add_argument("genome", metavar="GENOME", help="genome acronym of target organism (supported: 'dm6', 'hs37d5', 'mm9', 'mm10')")
     ## optional
     parser.add_argument("-c", "--configfile", dest="configfile", help="configuration file (config.yaml)", default=None)
     parser.add_argument("-i", "--input-dir", dest="indir", help="input directory containing the FASTQ files, either paired-end OR single-end data (default: '.')", default=None)

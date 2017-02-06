@@ -16,10 +16,10 @@ for i in  $dir_in/*cout{b,c}.csv; do
 done
 
 ## with header!
-paste <(echo -e "sample\tcell\tcell_reads"; cat $dir_out/data/*coutc*.cellsum | sort -k1 -V ) <(echo -e "sample2\tcell2\tcell_transcripts"; cat $dir_out/data/*coutb*.cellsum |  sort -k1 -V) > $dir_out/all_samples.cellsum_coutc_countb.tsv
+paste <(echo -e "sample\tcell\tcell_reads"; cat $dir_out/data/*coutc*.cellsum | sort -k1 -V ) <(echo -e "sample2\tcell2\tcell_transcripts"; cat $dir_out/data/*coutb*.cellsum |  sort -k1 -V) > $dir_out/all_samples.cellsum_coutc_coutb.tsv
 
 ## summary per sample/lib
-cat  $dir_out/all_samples.cellsum_coutc_countb.tsv | awk '{if (NR<=2) last=$1; \
+cat  $dir_out/all_samples.cellsum_coutc_coutb.tsv | awk '{if (NR<=2) last=$1; \
    if ($1==last) {sum1+=$3; sum2+=$6;} else {print last,sum1,sum2,sum2/sum1,sum1/96,sum2/96; sum1=0; sum2=0}; last=$1} \
    END{print last,sum1,sum2,sum2/sum1,sum1/96,sum2/96;}'
 

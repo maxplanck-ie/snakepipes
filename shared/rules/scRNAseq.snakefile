@@ -163,7 +163,7 @@ rule sc_QC_metrics:
     output:
         summary = "QC_report/QC_report.all_samples.tsv",
         summary_nice = "QC_report/QC_report.all_samples.txt",
-        sc_dat = "QC_report/all_samples.cellsum_coutc_countb.tsv"
+        sc_dat = "QC_report/all_samples.cellsum_coutc_coutb.tsv"
     params: 
         in_dir = outdir+"/Counts/",
         out_dir = outdir+"/QC_report/",
