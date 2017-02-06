@@ -115,7 +115,7 @@ def main():
 
     snakemake_module_load = "module load snakemake slurm &&".split()
     snakemake_cmd = """
-                    snakemake {snakemake_options} --latency-wait 120 --snakefile {snakefile} --jobs {max_jobs} --directory {outdir}
+                    snakemake {snakemake_options} --latency-wait 300 --snakefile {snakefile} --jobs {max_jobs} --directory {outdir}
                     """.format( snakefile = os.path.join(args.this_script_dir, "Snakefile"),
                                 max_jobs = args.max_jobs,
                                 outdir = args.outdir,
