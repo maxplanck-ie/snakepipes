@@ -5,10 +5,10 @@ library("biomaRt")
 args = commandArgs(trailingOnly=TRUE)
 
 ## Debug only !!!
-# t2g_file = "/home/kilpert/git/snakemake_workflows/shared/organisms/dm6.t2g"
-# sample_info_file = "/data/processing/kilpert/test/rna-seq-qc/data/Iovino_SE/sampleInfo.tsv"
-# indir = "/data/processing/kilpert/test/snakemake-workflows/RNA-seq/output_SE_1M/Salmon"
-# outdir = "/data/processing/kilpert/test/snakemake-workflows/RNA-seq/output_SE_1M/sleuth"
+## t2g_file = "snakemake_workflows/shared/organisms/dm6.t2g"
+## sample_info_file = "sampleInfo.tsv"
+## indir = "Salmon"
+## outdir = "sleuth"
 
 sample_info_file = args[[1]]
 indir = args[[2]]
@@ -22,11 +22,12 @@ getwd()
 sample_info = read.table(sample_info_file, header=T)
 colnames(sample_info) = c("sample", "condition")
 print(sample_info)
+sample_info$sample
 
 sample_id = list.dirs(file.path(indir), recursive=F, full.names=F)
 sample_id = sort(sample_id[grep(".benchmark|SalmonIndex", sample_id, invert=T)])
+sample_id = intersect(sample_info$sample, sample_id) # get only those sample that are defined in the sampleInfo!
 sample_id
-length(sample_id)
 
 salmon_dirs = sapply(sample_id, function(id) file.path(indir, id))
 salmon_dirs
