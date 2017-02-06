@@ -9,6 +9,7 @@
 require(ggplot2)
 require(dplyr)
 require(scales)
+require(gtools)
 
 args <- commandArgs(trailingOnly=TRUE)
 
@@ -29,6 +30,8 @@ sc_dat = read.csv(data_file,header = T,sep = "\t",stringsAsFactors = F)
 
 sc_dat$sample <- gsub(".*/","",sc_dat$sample)
 sc_dat$sample <- gsub(".coutc.csv$","",sc_dat$sample)
+
+sc_dat$sample <- factor(sc_dat$sample, levels = unique(sc_dat$sample))
 
 png(file=paste(data_file,".reads_UMI_plot.png",sep=""),width=1500,height=1500)
 ggplot(dat=sc_dat,aes(x=(cell_reads),y=(cell_transcripts),color=sample))+geom_point(size=3,alpha=0.8) + 
@@ -64,10 +67,13 @@ png(file=paste(data_file,".plate_cTPM.png",sep=""),width=1000,height=height)
 ggplot(sc_dat,aes(x=x,y=y,fill=cTPM_zscore))+ 
 		geom_tile() + 
 		facet_wrap(~sample,ncol = 4,scales = "free") + 
-		scale_fill_gradient2(low="red",mid="blue",limits=c(-4.5,2.5),high="cyan" ) + 
+		scale_fill_gradient2(low="red",mid="blue",limits=c(-3,3),high="cyan" ) + 
 		coord_fixed() + 
 		theme_minimal() +
-		theme(strip.text.x = element_text(size = 18, colour = "black",face="bold"))
+		theme(strip.text.x = element_text(size = 18, colour = "black",face="bold")) +
+		ggtitle(paste("cell z-score of norm. transcripts per cell (cTPM)")) + 
+		theme(plot.title = element_text(color="black", size=22, face="bold",hjust = 0.5))
+
 		
 dev.off()
 
@@ -76,10 +82,12 @@ png(file=paste(data_file,".plate_cRPM.png",sep=""),width=1000,height=height)
 ggplot(sc_dat,aes(x=x,y=y,fill=cRPM_zscore))+ 
 		geom_tile() + 
 		facet_wrap(~sample,ncol = 4,scales = "free") + 
-		scale_fill_gradient2(low="red",mid="blue",limits=c(-4.5,2.5),high="cyan" ) + 
+		scale_fill_gradient2(low="red",mid="blue",limits=c(-3,3),high="cyan" ) + 
 		coord_fixed() + 
 		theme_minimal() +
-		theme(strip.text.x = element_text(size = 18, colour = "black",face="bold"))
+		theme(strip.text.x = element_text(size = 18, colour = "black",face="bold")) +
+		ggtitle(paste("cell z-score of norm. reads per cell (cRPM)")) + 
+		theme(plot.title = element_text(color="black", size=22, face="bold",hjust = 0.5))
 
 dev.off()
 
@@ -91,7 +99,7 @@ ggplot(sc_dat,aes(x=x,y=y,fill=cell_transcripts))+
 		facet_wrap(~sample,ncol = 4,scales = "free") + 
 		#scale_fill_gradient2(low="red",mid="blue",high="cyan",limits=c(min(sc_dat$cell_transcripts),max(sc_dat$cell_transcripts)),midpoint=mean(sc_dat$cell_transcripts,trim=0.05)) + 
 		scale_fill_gradientn(colors=c("red","blue","cyan"),
-				values=rescale(c(0,3000,max(sc_dat$cell_transcripts))),
+				values=rescale(c(0,median(sc_dat$cell_transcripts),max(sc_dat$cell_transcripts))),
 				limits=c(0,max(sc_dat$cell_transcripts)),space = "Lab") +
 		coord_fixed() + 
 		theme_minimal() + 
@@ -99,7 +107,11 @@ ggplot(sc_dat,aes(x=x,y=y,fill=cell_transcripts))+
 				axis.text = element_text(size = 10, colour = "grey"),
 				axis.ticks.y = element_blank(),
 				plot.background = element_rect(fill = "black"),
-				panel.grid = element_blank() )
+				panel.grid = element_blank() ) +
+        ggtitle(paste("Total number of transcripts per cell \n","red color < median (n=",median(sc_dat$cell_transcripts),") > blue clolor",sep = "")) + 
+		theme(plot.title = element_text(color="white", size=22, face="bold",hjust = 0.5)) + 
+		theme(legend.title = element_text(colour="grey90", size=16, face="bold")) + 
+		theme(legend.text = element_text(colour="grey90", size = 16, face = "bold"))
 
 dev.off()
 
