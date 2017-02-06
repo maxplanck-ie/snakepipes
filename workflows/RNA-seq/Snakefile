@@ -21,7 +21,7 @@ include: os.path.join(maindir, "shared", "rules", "FASTQ.snakefile")
 if fastqc:
     include: os.path.join(maindir, "shared", "rules", "FastQC.snakefile")
 
-## TrimGalore
+## Salmon
 if trim:
     include: os.path.join(maindir, "shared", "rules", "TrimGalore.snakefile")
 
@@ -32,7 +32,12 @@ include: os.path.join(maindir, "shared", "rules", "HISAT2.snakefile")
 include: os.path.join(maindir, "shared", "rules", "filter_annotation.snakefile")
 
 ## Salmon
-include: os.path.join(maindir, "shared", "rules", "Salmon.snakefile")
+if "mapping-free" in mode:
+    include: os.path.join(maindir, "shared", "rules", "Salmon.snakefile")
+
+## Sleuth (on Salmon)
+if sample_info:
+    include: os.path.join(maindir, "shared", "rules", "sleuth.snakefile")
 
 ## bamCoverage_RPKM
 include: os.path.join(maindir, "shared", "rules", "deepTools_RNA.snakefile")
@@ -44,17 +49,16 @@ include: os.path.join(maindir, "shared", "rules", "featureCounts.snakefile")
 if sample_info:
     include: os.path.join(maindir, "shared", "rules", "DESeq2.snakefile")
 
-## Sleuth (on Salmon)
-include: os.path.join(maindir, "shared", "rules", "sleuth.snakefile")
-
 
 ### conditional/optional rules #################################################
 ################################################################################
+
 def run_FastQC(fastqc):
     if fastqc:
         return( expand("FastQC/{sample}{read}_fastqc.html", sample = samples, read = reads) )
     else:
         return([])
+
 
 def run_Trimming(trim, fastqc):
     if trim and fastqc:
@@ -64,11 +68,55 @@ def run_Trimming(trim, fastqc):
     else:
         return([])
 
-def run_DESeq2(sample_info):
-    if sample_info:
-        return( ["DESeq2/DESeq2.session_info.txt", "DESeq2_Salmon/DESeq2.session_info.txt"] )
+
+def run_mapping_free():
+    if "mapping-free" in mode:
+        file_list = [
+        "Salmon/SalmonIndex/sa.bin",
+        expand("Salmon/{sample}.quant.sf", sample=samples),
+        expand("Salmon/{sample}.quant.genes.sf", sample=samples),
+        "Salmon/TPM.tsv",
+        "Salmon/TPM.genes.tsv",
+        "Salmon/counts.tsv",
+        "Salmon/counts.genes.tsv",
+        expand("Salmon/{sample}/abundance.h5", sample=samples),
+        ]
+        if sample_info:
+            file_list.append( ["DESeq2_Salmon/DESeq2.session_info.txt", "sleuth/so.rds",] )
+        return(file_list)
     else:
         return([])
+
+
+def run_mapping():
+    if "mapping" in mode:
+        file_list = [
+        expand("HISAT2/{sample}.bam.bai", sample = samples),
+        expand("featureCounts/{sample}.counts.txt", sample=samples),
+        "featureCounts/counts.tsv",
+        ]
+        if sample_info:
+            file_list.append( ["DESeq2/DESeq2.session_info.txt"] )
+        return(file_list)
+    else:
+        return([])
+
+
+def run_deeptools_qc():
+    if "deepTools_qc" in mode:
+        file_list = [
+        expand("BW/{sample}.RPKM.bw", sample = samples),
+        "deepTools_qc/plotEnrichment/plotEnrichment.png",
+        "deepTools_qc/plotEnrichment/plotEnrichment.tsv",
+        "deepTools_qc/multiBigwigSummary/coverage.bed.npz",
+        "deepTools_qc/plotCorrelation/correlation.pearson.bed_coverage.heatmap.png",
+        "deepTools_qc/plotCorrelation/correlation.spearman.bed_coverage.heatmap.png",
+        "deepTools_qc/plotPCA/PCA.bed_coverage.png",
+        ]
+        return(file_list)
+    else:
+        return([])
+
 
 ### execute before  starts #####################################################
 ################################################################################
@@ -76,6 +124,7 @@ onstart:
     if "verbose" in config and config["verbose"]:
         print()
         print("--- Parameters -----------------------------------------------------------------")
+        print("Mode:", mode)
         print("Input directory:", indir)
         print("Input files:", infiles)
         print("Output directory:", outdir)
@@ -90,6 +139,7 @@ onstart:
         print("Input directory for mapping:", fastq_dir)
         print("filter annotation:", filter_annotation)
         print("Salmon index options:", salmon_index_options)
+        print("Sample info:", sample_info)
         print("-" * 80, "\n")
 
         print("--- Genome ---------------------------------------------------------------------")
@@ -116,37 +166,19 @@ rule all:
         expand("FASTQ/{sample}{read}.fastq.gz", sample = samples, read = reads),
         run_FastQC(fastqc),
         run_Trimming(trim, fastqc),
-        expand("HISAT2/{sample}.bam.bai", sample = samples),
+
         "Annotation/genes.annotated.bed",
         "Annotation/genes.filtered.bed",
-        "Annotation/genes_filtered.fa",
-        "Annotation/genes.filtered.saf",
+        "Annotation/genes.filtered.fa",
+        "Annotation/genes.filtered.saf",    # this file is used for featureCounts later on!
 
-        "Salmon/SalmonIndex/sa.bin",
-        expand("Salmon/{sample}.quant.sf", sample=samples),
-        expand("Salmon/{sample}.quant.genes.sf", sample=samples),
-        "Salmon/TPM.tsv",
-        "Salmon/TPM.genes.tsv",
-        "Salmon/counts.tsv",
-        "Salmon/counts.genes.tsv",
-        expand("Salmon/{sample}/abundance.h5", sample=samples),
-        "sleuth/so.rds",
-
-        expand("BW/{sample}.RPKM.bw", sample = samples),
-        "deepTools_qc/plotEnrichment/plotEnrichment.png",
-        "deepTools_qc/plotEnrichment/plotEnrichment.tsv",
-        "deepTools_qc/multiBigwigSummary/coverage.bed.npz",
-        "deepTools_qc/plotCorrelation/correlation.pearson.bed_coverage.heatmap.png",
-        "deepTools_qc/plotCorrelation/correlation.spearman.bed_coverage.heatmap.png",
-        "deepTools_qc/plotPCA/PCA.bed_coverage.png",
-        expand("featureCounts/{sample}.counts.txt", sample=samples),
-        "featureCounts/counts.tsv",
-
-        run_DESeq2(sample_info),
+        run_mapping_free(),            # Salmon
+        run_mapping(),                 # classical mapping + counting
+        run_deeptools_qc(),
 
 
 ### execute after  finished ####################################################
 ################################################################################
 onsuccess:
     if "verbose" in config and config["verbose"]:
-        print("\n--- DNA mapping  finished successfully! ----------------------------------------\n")
+        print("\n--- RNA-seq workflow finished successfully! ------------------------------------\n")
