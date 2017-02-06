@@ -1,6 +1,7 @@
 import glob
 import os
 import subprocess
+import re
 
 #print(vars(workflow))
 #print("CONFIG:", config)
@@ -118,7 +119,8 @@ salmon_index_options = config["salmon_index_options"]
 trim_options = config["trim_options"]
 fastqc = config["fastqc"]
 sample_info = config["sample_info"]
-de_prg = config["de_prg"]
+mode = list(map( str.strip, re.split(',|;', config["mode"]) ))
+
 
 if config["trim"] == "trimgalore":
     trim = True
