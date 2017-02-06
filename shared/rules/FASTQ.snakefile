@@ -10,7 +10,7 @@ if downsample:
             "FASTQ/.benchmark/FASTQ_downsample.{sample}{read}.benchmark"
         threads: 4
         shell:
-            "bash %s {threads} %i {input} {output.fq_sampl}" % (os.path.join(workflow_tools,"fastq_head.sh"), int(config["downsample"])) +""
+            "bash %s {threads} %i {input} {output.fq_sampl}" % (os.path.join(workflow_tools,"fastq_head.sh"), int(config["downsample"])) + " "
             "&& ( [ -f {output.fq_symlink} ] || ln -s -r {output.fq_sampl} {output.fq_symlink} ) && touch -h {output.fq_symlink}"
 #  create symlinks to input files
 else:
