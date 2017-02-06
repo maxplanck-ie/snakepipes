@@ -1,7 +1,7 @@
 ## Salmon Index
 rule SalmonIndex:
     input:
-        "Annotation/genes_filtered.fa"  ## transcripts
+        "Annotation/genes.filtered.fa"  ## transcripts
     output:
         "Salmon/SalmonIndex/sa.bin"
     benchmark:
