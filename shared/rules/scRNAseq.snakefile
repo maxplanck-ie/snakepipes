@@ -84,7 +84,7 @@ rule sc_STAR_genomic:
         " --runThreadN {threads} --readFilesIn {input.read_barcoded} "
         " --readFilesCommand zcat --outFileNamePrefix ${{TMPDIR}}/{wildcards.sample}. " 
         " --sjdbGTFfile {input.gtf} {params.opts} --outStd SAM | "
-        " grep -P '^@|NH:i:1\\b' | "
+        #" grep -P '^@|NH:i:1\\b' | "
         "" + samtools_path + "samtools sort -T ${{TMPDIR}}tmp_{wildcards.sample} -@5 -m 2G -O bam - > {output.bam}; "
         "" + samtools_path + "samtools index {output.bam}; "
         " cp ${{TMPDIR}}/{wildcards.sample}.Log.final.out STAR_genomic/;"
