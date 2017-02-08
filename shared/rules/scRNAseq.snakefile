@@ -96,7 +96,8 @@ rule sc_bam_featureCounts_genomic:
         gtf = "Annotation/genes.filtered.gtf"
     output:
         counts = "Counts/{sample}.cout.csv",
-        counts_summary = "Counts/{sample}.cout_summary.txt"
+        counts_summary = "Counts/{sample}.cout_summary.txt",
+        cell_summary = "Counts/{sample}.cout_summary.cells.txt"
     params:
         count_script = workflow.basedir+"/scRNAseq_bam_featureCounts.sh",
         bc_file = barcode_file,
@@ -106,6 +107,7 @@ rule sc_bam_featureCounts_genomic:
     shell:
         """
         {params.count_script} {input.bam} {input.gtf} {params.bc_file} {wildcards.sample} {params.fc_path} ${{TMPDIR}} {threads} 1>{output.counts} 2>{output.counts_summary}
+        cat {output.counts_summary} | sed -n -e '/#idx/,$p' > {output.cell_summary} 
         """
 
 # rule sc_get_counts_genomic:

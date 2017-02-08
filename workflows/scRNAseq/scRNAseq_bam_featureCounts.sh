@@ -63,15 +63,17 @@ BEGIN{
 {
 	pos=match($1,":SC:");                       ## get barcode startpos (":SC:"") from readname
 	split(substr($1,pos+1),BC,":");             ## split on ":" to separate all info and stor in array "BC"
-	if ( $3!="*" && BC[2] in CELL) {  ## if unique feature and a "valid" cell barcode then count it
-		ALL[$6][BC[5]][CELL[BC[2]]] += 1;   ## $3 is single GENEID if num==1
-		feat_uniq+=1;                       ## only stats
-	}
-	if (BC[2] in CELL) {                        ## only stats
-		if ($2~"NoFeatures") cell_nofeat[CELL[BC[2]] += 1;
-		else if ($2~"Multimapping") cell_multimap[CELL[BC[2]] += 1;
-		else if ($2~"Unassigned_Ambiguity") cell_multifeat[CELL[BC[2]] +=1 ;
-		else if ($2~"Assigned") feat_uniq[CELL[BC[2]] += 1;    
+#	if ( $3!="*" && BC[2] in CELL) {  		## if unique feature and a "valid" cell barcode then count it
+#		ALL[$6][BC[5]][CELL[BC[2]]] += 1;   ## $3 is single GENEID if num==1
+#		feat_uniq+=1;                       ## only stats
+#	}
+	if (BC[2] in CELL) {
+		if ($2~"Assigned" && $3 != "*") {
+			ALL[$6][BC[5]][CELL[BC[2]]] += 1;
+			cell_uniqfeat[CELL[BC[2]]] += 1; }    
+		else if ($2~"NoFeatures") cell_nofeat[CELL[BC[2]]] += 1;
+		else if ($2~"Multimapping") cell_multimap[CELL[BC[2]]] += 1;
+		else if ($2~"Unassigned_Ambiguity") cell_multifeat[CELL[BC[2]]] +=1 ;
 	} else nocell+=1;
 }
 END{
@@ -83,27 +85,41 @@ END{
 		for (k in ALL[i]) {                   ## and all UMIs
 			printf i"\t"k;
 			for (j=1;j<=num_cells;j++) {  ## and all cells
-				if (j in ALL[i][k])
+				if (j in ALL[i][k]){
 					printf "\t"ALL[i][k][j];
+					cell_UMI[j] += 1;
+				}
 				else printf "\t0";
 			}
 			printf "\n";
 		}
 	}
+
+	print "#idx\tNOFEAT\tMULTIMAP\tMULTIFEAT\tUNIQFEAT\tUMI" > "/dev/stderr";
 	for (j=1;j<=num_cells;j++) {
-		if (j in ALL[i][k])
-					printf "\t"ALL[i][k][j];
-				else printf "\t0";
+		out = ""j;
+		if ( j in cell_nofeat) out = out"\t"cell_nofeat[j]; else out = out"\t0";
+		if ( j in cell_multimap) out = out"\t"cell_multimap[j]; else out = out"\t0";
+		if ( j in cell_multifeat) out = out"\t"cell_multifeat[j]; else out = out"\t0";
+		if ( j in cell_uniqfeat) out = out"\t"cell_uniqfeat[j]; else out = out"\t0";
+		if ( j in cell_UMI) out = out"\t"cell_UMI[j]; else out = out"\t0";
+		print out > "/dev/stderr";
+
+		ALLcell_nofeat += cell_nofeat[j];
+		ALLcell_multimap += cell_multimap[j];
+		ALLcell_multifeat += cell_multifeat[j];
+		ALLcell_uniqfeat += cell_uniqfeat[j];
+		ALLcell_UMI += cell_UMI[j];
 	}
-			
 
-
-	sum_reads = feat_uniq1 + cell_nofeat + cell_multi + nocell;
-	sum = "FEATURE_UNIQUE\t"feat_uniq1"\t"(feat_uniq1/sum_reads*100)"\n";
-	sum = sum"FEATURE_MULTI\t"cell_multi"\t"(cell_multi/sum_reads*100)"\n";
-	sum = sum"CELL_NOFEATURE\t"cell_nofeat"\t"(cell_nofeat/sum_reads*100)"\n";
-	sum = sum"NOCELL\t"nocell"\t"(nocell/sum_reads*100)"\n";
-	sum = sum"NUM_READS\t"sum_reads"\t100.0";
+	sum_reads = ALLcell_uniqfeat + ALLcell_nofeat + ALLcell_multifeat + ALLcell_multimap + nocell;
+	sum = "#FEATURE_UNIQUE\t"ALLcell_uniqfeat"\t"(ALLcell_uniqfeat/sum_reads*100)"\n";
+	sum = sum"#UMI\t"ALLcell_UMI"\t"(ALLcell_UMI/sum_reads*100)"\n";
+	sum = sum"#READS_MULTIMAP\t"ALLcell_multimap"\t"(ALLcell_multimap/sum_reads*100)"\n";
+	sum = sum"#FEATURE_MULTI\t"ALLcell_multifeat"\t"(ALLcell_multifeat/sum_reads*100)"\n";
+	sum = sum"#CELL_NOFEATURE\t"ALLcell_nofeat"\t"(ALLcell_nofeat/sum_reads*100)"\n";
+	sum = sum"#NOCELL\t"nocell"\t"(nocell/sum_reads*100)"\n";
+	sum = sum"#NUM_READS\t"sum_reads"\t100.0";
 	print sum > "/dev/stderr";                  ## prints stats to stderr
 }'
 
