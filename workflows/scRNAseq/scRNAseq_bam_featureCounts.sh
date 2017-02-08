@@ -68,9 +68,10 @@ BEGIN{
 		feat_uniq+=1;                       ## only stats
 	}
 	if (BC[2] in CELL) {                        ## only stats
-		if ($2~"NoFeatures") cell_nofeat+=1;
-			else 
-			 if ($2~"Unassigned_Ambiguity") cell_multi+=1; else if ($2~"Assigned") feat_uniq1+=1;    
+		if ($2~"NoFeatures") cell_nofeat[CELL[BC[2]] += 1;
+		else if ($2~"Multimapping") cell_multimap[CELL[BC[2]] += 1;
+		else if ($2~"Unassigned_Ambiguity") cell_multifeat[CELL[BC[2]] +=1 ;
+		else if ($2~"Assigned") feat_uniq[CELL[BC[2]] += 1;    
 	} else nocell+=1;
 }
 END{
@@ -89,6 +90,14 @@ END{
 			printf "\n";
 		}
 	}
+	for (j=1;j<=num_cells;j++) {
+		if (j in ALL[i][k])
+					printf "\t"ALL[i][k][j];
+				else printf "\t0";
+	}
+			
+
+
 	sum_reads = feat_uniq1 + cell_nofeat + cell_multi + nocell;
 	sum = "FEATURE_UNIQUE\t"feat_uniq1"\t"(feat_uniq1/sum_reads*100)"\n";
 	sum = sum"FEATURE_MULTI\t"cell_multi"\t"(cell_multi/sum_reads*100)"\n";
