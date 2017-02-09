@@ -6,7 +6,7 @@
 bam=$1		## mapping for 96 cells
 gtf=$2		## gene annotation
 bc_file=$3	## celSeq cell barcode file
-out=$4		## just used for featureCounts as ouput name, NOT a directory or path
+out=$4		## sample name, used for featureCounts as ouput name, NOT a directory or path
 fc_path=$5	## path to fc like "/package/subread-1.5.0-p1/bin/"
 tmp=$6		## will be created by this script, used as working dir for featureCounts due to -R issue
 threads=$7	## for featureCOunts only
@@ -24,12 +24,12 @@ tmp_path=$(realpath $tmp)
 
 ## current version of featureCounts under /package/subread-1.5.0-p1/ writes out -R file to currDir instead to path provided with -o
 ## this is fixed in more recent version of subread! We have to install it! :-)
-mkdir -p $tmp_path
-cd $tmp_path
-rm *.bam.featureCounts		## I'm too lazy the get the full correct name later on, so make sure we have only the file we want
+mkdir -p $tmp_path 1>&2
+cd $tmp_path 1>&2
+rm *.bam.featureCounts 1>&2		## I'm too lazy the get the full correct name later on, so make sure we have only the file we want
 
 ## call featureCounts
-${fc_path}featureCounts -a $gtf_path -T $threads -s 1 -R -d 25 -F "GTF" -o _tmp_$out $bam_path 
+${fc_path}featureCounts -a $gtf_path -T $threads -s 1 -R -d 25 -F "GTF" -o _tmp_$out $bam_path 1>&2
 
 ## add gene_id (gtf col 10), gene_name (gtf col 18) to featureCounts output, last col is gene_name + chromosome
 ## <(cat $gtf_path | tr " " "\t" | tr -d "\";" | awk '{print $10,$18,$18"__chr"$1}') \
@@ -54,7 +54,7 @@ if ($3 in MAP) print $0,MAP[$3]; else print $0,"NA","NA";
 ## put all in big matrix in awk and write to stdout to caputure this later
 ## summary stats are printed to stderr
 ##
-awk -v map_f=$bc_file ' \
+awk -v map_f=$bc_file -v sample=$out ' \
 BEGIN{
 	while(getline<map_f) {                      ## read in cell barcodes
 		CELL[$2]=$1; num_cells+=1;
@@ -95,9 +95,9 @@ END{
 		}
 	}
 
-	print "#idx\tNOFEAT\tMULTIMAP\tMULTIFEAT\tUNIQFEAT\tUMI" > "/dev/stderr";
+	print "#sample\tidx\tNOFEAT\tMULTIMAP\tMULTIFEAT\tUNIQFEAT\tUMI" > "/dev/stderr";
 	for (j=1;j<=num_cells;j++) {
-		out = ""j;
+		out = sample"\t"j;
 		if ( j in cell_nofeat) out = out"\t"cell_nofeat[j]; else out = out"\t0";
 		if ( j in cell_multimap) out = out"\t"cell_multimap[j]; else out = out"\t0";
 		if ( j in cell_multifeat) out = out"\t"cell_multifeat[j]; else out = out"\t0";
