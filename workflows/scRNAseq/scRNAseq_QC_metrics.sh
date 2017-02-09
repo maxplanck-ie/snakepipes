@@ -9,6 +9,7 @@ mkdir -p $dir_out/data
 
 for i in  $dir_in/*cout{b,c}.csv; do 
  out=$(echo $i | sed 's/.*\///'); 
+ out2=$(echo $out | sed 's/\.csv$//');
 	echo $out 1>&2;
  cat $i | awk -v file=$out '{if (NR==1) {next;}; for (i=2;i<=NF;i++) COUNTS[i-1]+=$i;} \
   END{for (i=1;i<=192;i++){if (i<=96) sum1+=COUNTS[i];else sum2+=COUNTS[i];} if (sum1>sum2) offset=1; else offset=97; \

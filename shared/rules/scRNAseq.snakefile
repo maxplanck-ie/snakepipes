@@ -106,7 +106,7 @@ rule sc_bam_featureCounts_genomic:
         5
     shell:
         """
-        {params.count_script} {input.bam} {input.gtf} {params.bc_file} {wildcards.sample} {params.fc_path} ${{TMPDIR}} {threads} 1>{output.counts} 2>{output.counts_summary}
+        {params.count_script} {input.bam} {input.gtf} {params.bc_file} {wildcards.sample} {params.fc_path} ${{TMPDIR}} {threads} 1>{output.counts} 2>{output.counts_summary};
         cat {output.counts_summary} | sed -n -e '/#idx/,$p' > {output.cell_summary} 
         """
 
