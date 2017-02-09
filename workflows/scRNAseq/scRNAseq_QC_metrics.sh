@@ -3,21 +3,36 @@
 dir_in=$1
 dir_out=$2
 
-dir_in=$(realpath $dir_in)
+dir_in=$(readlink -m $dir_in)
 
 mkdir -p $dir_out/data
 
+#for i in  $dir_in/*cout{b,c}.csv; do 
+# out=$(echo $i | sed 's/.*\///'); 
+# out2=$(echo $out | sed 's/\.csv$//');
+#	echo $out 1>&2;
+# cat $i | awk -v file=$out '{if (NR==1) {next;}; for (i=2;i<=NF;i++) COUNTS[i-1]+=$i;} \
+#  END{for (i=1;i<=192;i++){if (i<=96) sum1+=COUNTS[i];else sum2+=COUNTS[i];} if (sum1>sum2) offset=1; else offset=97; \
+#      for (i=offset;i<offset+96;i++) {OFS="\t";print file,i,COUNTS[i];sum+=COUNTS[i];}}' >$dir_out/data/$out.cellsum;
+#done
+
 for i in  $dir_in/*cout{b,c}.csv; do 
- out=$(echo $i | sed 's/.*\///'); 
- out2=$(echo $out | sed 's/\.csv$//');
-	echo $out 1>&2;
- cat $i | awk -v file=$out '{if (NR==1) {next;}; for (i=2;i<=NF;i++) COUNTS[i-1]+=$i;} \
-  END{for (i=1;i<=192;i++){if (i<=96) sum1+=COUNTS[i];else sum2+=COUNTS[i];} if (sum1>sum2) offset=1; else offset=97; \
-      for (i=offset;i<offset+96;i++) {OFS="\t";print file,i,COUNTS[i];sum+=COUNTS[i];}}' >$dir_out/data/$out.cellsum;
+ out=$(echo $i | sed 's/.*\///');
+ echo $out 1>&2;
+ cat $i | awk -v file=$out '{
+	if (NR==1) {cells = NF-1; next;}; 
+	for (i=2;i<=NF;i++) COUNTS[i-1]+=$i;
+ }
+ END{
+	match(file,"([^[:space:]\\.]+)\\.([^[:space:]\\.]+).csv",name)
+	for (i=1;i<=cells;i++) {
+		OFS="\t";print name[1],i,COUNTS[i];
+	}
+ }' > $dir_out/data/$out.cellsum;
 done
 
 ## with header!
-paste <(echo -e "sample\tcell\tcell_reads"; cat $dir_out/data/*coutc*.cellsum | sort -k1 -V ) <(echo -e "sample2\tcell2\tcell_transcripts"; cat $dir_out/data/*coutb*.cellsum |  sort -k1 -V) > $dir_out/all_samples.cellsum_coutc_coutb.tsv
+paste <(echo -e "sample\tcell\tcell_reads"; cat $dir_out/data/*coutc*.cellsum | sort -k1,1 -k2,2 -k3,3n -V ) <(echo -e "sample2\tcell2\tcell_transcripts"; cat $dir_out/data/*coutb*.cellsum |  sort -k1,1 -k2,2 -k3,3n -V) > $dir_out/all_samples.cellsum_coutc_coutb.tsv
 
 ## summary per sample/lib
 cat  $dir_out/all_samples.cellsum_coutc_coutb.tsv | awk '{if (NR<=2) last=$1; \
