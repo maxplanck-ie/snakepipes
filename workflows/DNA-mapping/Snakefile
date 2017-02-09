@@ -108,8 +108,9 @@ onstart:
         print("Minimum mapping quality:", mapq)
         print("BigWig bin size:", bw_binsize)
         print("ComputeGCBias:", gcbias)
+        print("Bowtie opts:",bowtie_opts)
         print("-" * 80, "\n")
-        
+
         print("--- Environment ----------------------------------------------------------------")
         print("$TMPDIR: ",os.getenv('TMPDIR', ""))
         print("$HOSTNAME: ",os.getenv('HOSTNAME', ""))
