@@ -86,6 +86,15 @@ def run_computeGCBias(gcbias):
     else:
         return([])
 
+def run_deepTools_qc():
+    file_list = ["deepTools_qc/plotCoverage/read_coverage.png"]
+    if len(samples) > 1 :
+        file_list.append( [
+        "deepTools_qc/plotCorrelation/correlation.pearson.read_coverage.heatmap.png",
+        "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage.heatmap.png",
+        "deepTools_qc/plotPCA/PCA.read_coverage.png" ] )
+    return (file_list)
+
 
 ### execute before workflow starts #############################################
 ################################################################################
@@ -144,10 +153,7 @@ rule all:
         expand("bamCoverage/{sample}.seq_depth_norm.bw", sample = samples),
         run_bamCoverage_filtered(dedup, properpairs, mapq),
         run_computeGCBias(gcbias),
-        "deepTools_qc/plotCoverage/read_coverage.png",
-        "deepTools_qc/plotCorrelation/correlation.pearson.read_coverage.heatmap.png",
-        "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage.heatmap.png",
-        "deepTools_qc/plotPCA/PCA.read_coverage.png",
+        run_deepTools_qc(),
         expand("Qualimap_qc/{sample}.filtered.bamqc_report.html", sample = samples),
         expand("Qualimap_qc/{sample}.filtered.bamqc_results.txt", sample = samples)
 
