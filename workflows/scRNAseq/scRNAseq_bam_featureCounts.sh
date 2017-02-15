@@ -5,11 +5,11 @@
 
 bam=$1		## mapping for 96 cells
 gtf=$2		## gene annotation
-bc_file=$3	## celSeq cell barcode file
+bc_file=$3		## celSeq cell barcode file
 out=$4		## sample name, used for featureCounts as ouput name, NOT a directory or path
-fc_path=$5	## path to fc like "/package/subread-1.5.0-p1/bin/"
+fc_path=$5		## path to fc like "/package/subread-1.5.0-p1/bin/"
 tmp=$6		## will be created by this script, used as working dir for featureCounts due to -R issue
-threads=$7	## for featureCOunts only
+threads=$7		## for featureCOunts only
 
 
 ## gtf is expected in this format, we use only gene_id and gene_name
