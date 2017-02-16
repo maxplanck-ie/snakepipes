@@ -95,7 +95,7 @@ END{
 		}
 	}
 
-	print "#sample\tidx\tNOFEAT\tMULTIMAP\tMULTIFEAT\tUNIQFEAT\tUMI" > "/dev/stderr";
+	print "sample\tidx\tREADS_NOFEAT\tREADS_MULTIMAP\tREADS_MULTIFEAT\tREADS_UNIQFEAT\tUMI" > "/dev/stderr";
 	for (j=1;j<=num_cells;j++) {
 		out = sample"\t"j;
 		if ( j in cell_nofeat) out = out"\t"cell_nofeat[j]; else out = out"\t0";
@@ -113,13 +113,13 @@ END{
 	}
 
 	sum_reads = ALLcell_uniqfeat + ALLcell_nofeat + ALLcell_multifeat + ALLcell_multimap + nocell;
-	sum = "#FEATURE_UNIQUE\t"ALLcell_uniqfeat"\t"(ALLcell_uniqfeat/sum_reads*100)"\n";
-	sum = sum"#UMI\t"ALLcell_UMI"\t"(ALLcell_UMI/sum_reads*100)"\n";
-	sum = sum"#READS_MULTIMAP\t"ALLcell_multimap"\t"(ALLcell_multimap/sum_reads*100)"\n";
-	sum = sum"#FEATURE_MULTI\t"ALLcell_multifeat"\t"(ALLcell_multifeat/sum_reads*100)"\n";
-	sum = sum"#CELL_NOFEATURE\t"ALLcell_nofeat"\t"(ALLcell_nofeat/sum_reads*100)"\n";
-	sum = sum"#NOCELL\t"nocell"\t"(nocell/sum_reads*100)"\n";
-	sum = sum"#NUM_READS\t"sum_reads"\t100.0";
+	sum = "#LIBREADS_UNIQFEAT\t"ALLcell_uniqfeat"\t"(ALLcell_uniqfeat/sum_reads*100)"\n";
+	sum = sum"#LIB_UMI\t"ALLcell_UMI"\t"(ALLcell_UMI/sum_reads*100)"\n";
+	sum = sum"#LIBREADS_MULTIMAP\t"ALLcell_multimap"\t"(ALLcell_multimap/sum_reads*100)"\n";
+	sum = sum"#LIBREADS_MULTIFEAT\t"ALLcell_multifeat"\t"(ALLcell_multifeat/sum_reads*100)"\n";
+	sum = sum"#LIBREADS_NOFEAT\t"ALLcell_nofeat"\t"(ALLcell_nofeat/sum_reads*100)"\n";
+	sum = sum"#LIBREADS_NOCELL\t"nocell"\t"(nocell/sum_reads*100)"\n";
+	sum = sum"#LIBREADS_TOTAL\t"sum_reads"\t100.0";
 	print sum > "/dev/stderr";                  ## prints stats to stderr
 }'
 

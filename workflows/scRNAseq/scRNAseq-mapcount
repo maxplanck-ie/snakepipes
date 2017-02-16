@@ -109,8 +109,7 @@ def main():
     }
     
     args = parse_args(defaults)
-
-
+    
     main_dir_path = os.path.join(os.path.dirname(os.path.dirname(this_script_dir)))
     if not os.path.isdir(main_dir_path):
         print("ERROR: Shared snakemake workflow directory is NOT available at:", main_dir_path)

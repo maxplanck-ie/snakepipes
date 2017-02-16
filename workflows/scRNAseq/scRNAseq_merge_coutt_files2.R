@@ -129,8 +129,9 @@ for (i in 1:length(dat$file)) {
 	## get all cell names for current sample/library/coutt file
 	## empty if no cells (sample not present in cell_names_path) or all cells (cell_names_path = NULL) wanted
 	subset <- cell_names[cell_names$sample==dat[i,"name"],]
- 
-	if ( is.null(subset) & !is.null(cell_names_path) ){
+ 	
+	if 	(is.data.frame(subset) && nrow(subset)==0) { subset <- NULL }
+	if ( is.null(subset) && !is.null(cell_names_path) ){
 		print(paste(dat[i,"name"]," ignored, nothing found in cell_names file for that sample!"))
 		next
 	}
@@ -143,7 +144,7 @@ for (i in 1:length(dat$file)) {
   	
   	s1=sum(colSums(tmp[,2:97]))
   	s2=sum(colSums(tmp[,98:193]))
-  	if (is_split_library & s1 > s2) { print("use 1st half"); print(s1); tmp<-tmp[,c(1,seq(2,97))]; cell_idx_offset = 0} else {print(" use 2nd half"); print(s2);tmp<-tmp[,-c(seq(2,97))];cell_idx_offset = 96}
+  	if (is_split_library & s1 > s2) { print("use 1st half"); print(s1); print(s2); tmp<-tmp[,c(1,seq(2,97))]; cell_idx_offset = 0} else {print(" use 2nd half"); print(s2); print(s1); tmp<-tmp[,-c(seq(2,97))];cell_idx_offset = 96}
   	
   	cell_names_tmp <- rbind(cell_names_tmp,data.frame(sample="test",plate=((i-1) %/% libs_per_plate)+1, library = ((i-1) %% libs_per_plate)+1, cell_idx=seq(1+cell_idx_offset,ncol(tmp)-1+cell_idx_offset),cell_name=colnames(tmp)[2:ncol(tmp)]))
  

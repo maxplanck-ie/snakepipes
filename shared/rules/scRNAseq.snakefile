@@ -107,8 +107,10 @@ rule sc_bam_featureCounts_genomic:
     shell:
         """
         {params.count_script} {input.bam} {input.gtf} {params.bc_file} {wildcards.sample} {params.fc_path} ${{TMPDIR}} {threads} 1>{output.counts} 2>{output.counts_summary};
-        cat {output.counts_summary} | sed -n -e '/#idx/,$p' > {output.cell_summary} 
+
+        cat {output.counts_summary} | sed -n -e '/sample.idx.READS/,/#LIB/{{/#LIB/d;p}}' > {output.cell_summary} 
         """
+#sed -n -e '/sample.idx/,$p'
 
 # rule sc_get_counts_genomic:
 #     input:
@@ -119,7 +121,7 @@ rule sc_bam_featureCounts_genomic:
 #         counts_summary = "Counts/{sample}.cout_summary.txt"
 #     params:
 #         count_script = workflow.basedir+"/scRNAseq_bam_genomic_feature_count.sh",
-#         bc_file = barcode_file,
+#         bc_file = barcode_file,    
 #         bedtools = bedtools_path,
 #         samtools = samtools_path
 #     threads:
@@ -148,14 +150,16 @@ rule scale_counts:
 
 rule combine_sample_counts:
     input:
-        expand("Counts/{sample}.coutt.csv",sample = samples)
+        expand("Counts/{sample}.coutt.csv",sample = samples),
+        sample_cell_names = cell_names
     output:
-        merged_matrix = "Results/all_samples.gencode_genomic.coutt_merged.csv"
+        merged_matrix = "Results/all_samples.gencode_genomic.coutt_merged.csv",
+        used_cell_names_file = "Results/all_samples.used_cells.tsv"
     params:
         merge_script = workflow.basedir+"/scRNAseq_merge_coutt_files2.R",
-        split = 1
+        split = "True"
     shell:
-        R_path+"""Rscript {params.merge_script} Counts/ {output.merged_matrix} {params.split} """
+        R_path+"""Rscript {params.merge_script} Counts/ {output.merged_matrix} {output.used_cell_names_file} {params.split} {input.sample_cell_names} """
 
 
 rule sc_QC_metrics:
