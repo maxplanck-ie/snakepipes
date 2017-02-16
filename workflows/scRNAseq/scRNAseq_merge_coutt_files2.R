@@ -104,7 +104,7 @@ if (all(c("cell_prefix","cell_idx_start") %in% names(cell_names))) {
 		as.data.frame()
 }
 
-print(cell_names)
+#print(cell_names)
 
 alldata=data.frame(GENEID=NA)
 ## defaults in case no cell names are provided, ie. all cell from each sample/library are used
@@ -138,7 +138,8 @@ for (i in 1:length(dat$file)) {
   	cell_names_tmp <- rbind(cell_names_tmp,data.frame(sample="test",plate=((i-1) %/% libs_per_plate)+1, library = ((i-1) %% libs_per_plate)+1, cell_idx=seq(1+cell_idx_offset,ncol(tmp)-1+cell_idx_offset),cell_name=colnames(tmp)[2:ncol(tmp)]))
  
   } else {
-	print(sum(colSums(tmp[!(seq(2,ncol(tmp)) %in% (min(subset$cell_idx)+1):(max(subset$cell_idx)+1))])))
+  	print(sum(colSums(tmp[,c((min(subset$cell_idx)+1):(max(subset$cell_idx)+1))])))
+  	print(sum(colSums(tmp[,-c(1, (min(subset$cell_idx)+1):(max(subset$cell_idx)+1))])))
   	rownames(subset) <- subset$cell_idx
   	colnames(tmp)[(min(subset$cell_idx)+1):(max(subset$cell_idx)+1)] <- sapply(colnames(tmp)[(min(subset$cell_idx)+1):(max(subset$cell_idx)+1)], function(x,t) paste0(subset[sub("X","",x),"cell_name"],collapse = "_"),t=subset,simplify="array")
   	tmp <- tmp[,c(1,(min(subset$cell_idx)+1):(max(subset$cell_idx)+1))]
