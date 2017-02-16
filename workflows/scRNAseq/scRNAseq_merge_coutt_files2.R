@@ -85,8 +85,20 @@ if (is.null(cell_names_path)){
 	## cell_names_path is given as directory, use all *.csv files for cell names
 	print(paste("Read in all csv files with cell_names from path",cell_names_path))
 	files <- list.files(cell_names_path, pattern=".csv")
+	
+	if (len(files) == 0){
+		print(paste("no csv files found under",cell_names_path))
+		stop(1)
+	}
+	
 	for (f in files) {
 		dat <- read.csv(f, header=T, sep="\t", stringsAsFactors = F)
+		
+		if (!all(c("sample","cell_name") %in% names(dat))) {
+			print("required columns not found!")
+			stop(1)
+		}
+		
 		cell_names <- rbind(cell_names, dat)
 	}
 } else {
@@ -103,8 +115,6 @@ if (all(c("cell_prefix","cell_idx_start") %in% names(cell_names))) {
 		arrange(plate,library,cell_idx_start) %>% 
 		as.data.frame()
 }
-
-#print(cell_names)
 
 alldata=data.frame(GENEID=NA)
 ## defaults in case no cell names are provided, ie. all cell from each sample/library are used
@@ -138,13 +148,11 @@ for (i in 1:length(dat$file)) {
   	cell_names_tmp <- rbind(cell_names_tmp,data.frame(sample="test",plate=((i-1) %/% libs_per_plate)+1, library = ((i-1) %% libs_per_plate)+1, cell_idx=seq(1+cell_idx_offset,ncol(tmp)-1+cell_idx_offset),cell_name=colnames(tmp)[2:ncol(tmp)]))
  
   } else {
-  	print(sum(colSums(tmp[,c((min(subset$cell_idx)+1):(max(subset$cell_idx)+1))])))
-  	print(sum(colSums(tmp[,-c(1, (min(subset$cell_idx)+1):(max(subset$cell_idx)+1))])))
-  	rownames(subset) <- subset$cell_idx
+	print(sum(colSums(tmp[,c((min(subset$cell_idx)+1):(max(subset$cell_idx)+1))])))
+	print(sum(colSums(tmp[,-c(1, (min(subset$cell_idx)+1):(max(subset$cell_idx)+1))])))
+	rownames(subset) <- subset$cell_idx
   	colnames(tmp)[(min(subset$cell_idx)+1):(max(subset$cell_idx)+1)] <- sapply(colnames(tmp)[(min(subset$cell_idx)+1):(max(subset$cell_idx)+1)], function(x,t) paste0(subset[sub("X","",x),"cell_name"],collapse = "_"),t=subset,simplify="array")
   	tmp <- tmp[,c(1,(min(subset$cell_idx)+1):(max(subset$cell_idx)+1))]
-	
-	
   }
   
   alldata<-merge(alldata,tmp,by="GENEID",all=T)

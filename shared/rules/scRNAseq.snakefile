@@ -152,7 +152,7 @@ rule combine_sample_counts:
     output:
         merged_matrix = "Results/all_samples.gencode_genomic.coutt_merged.csv"
     params:
-        merge_script = workflow.basedir+"/scRNAseq_merge_coutt_files.R",
+        merge_script = workflow.basedir+"/scRNAseq_merge_coutt_files2.R",
         split = 1
     shell:
         R_path+"""Rscript {params.merge_script} Counts/ {output.merged_matrix} {params.split} """
