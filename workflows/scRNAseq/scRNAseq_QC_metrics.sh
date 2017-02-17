@@ -28,7 +28,8 @@ if test -z "$(find $dir_in/ -maxdepth 1 -name '*.featureCounts_summary.txt')"; t
 	 }
  	END{
 		#match(sample,"([^[:space:]\\.]+)\\.([^[:space:]\\.]+).csv",name)
-		if (type~"coutc") print "sample\ncell_idx\tREADS_UNIQFEAT"		
+		if (type~"coutc") print "sample\ncell_idx\tREADS_UNIQFEAT"; 
+		else 	print "sample\ncell_idx\tUMI"; 	
 		for (i=1;i<=cells;i++) {
 			OFS="\t";print sample,i,COUNTS[i];
 		}
