@@ -97,7 +97,7 @@ END{
 		}
 	}
 
-	print "sample\tidx\tREADS_NOFEAT\tREADS_NOUMI\tREADS_MULTIMAP\tREADS_MULTIFEAT\tREADS_UNIQFEAT\tUMI" > "/dev/stderr";
+	print "sample\tcell_idx\tREADS_NOFEAT\tREADS_NOUMI\tREADS_MULTIMAP\tREADS_MULTIFEAT\tREADS_UNIQFEAT\tUMI" > "/dev/stderr";
 	for (j=1;j<=num_cells;j++) {
 		out = sample"\t"j;
 		if ( j in cell_nofeat) out = out"\t"cell_nofeat[j]; else out = out"\t0";
