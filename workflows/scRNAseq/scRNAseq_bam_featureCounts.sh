@@ -5,11 +5,11 @@
 
 bam=$1		## mapping for 96 cells
 gtf=$2		## gene annotation
-bc_file=$3		## celSeq cell barcode file
-out=$4		## sample name, used for featureCounts as ouput name, NOT a directory or path
-fc_path=$5		## path to fc like "/package/subread-1.5.0-p1/bin/"
+bc_file=$3	## celSeq cell barcode file
+sample_name=$4	## sample name, used for featureCounts as ouput name, NOT a directory or path
+fc_path=$5	## path to fc like "/package/subread-1.5.0-p1/bin/"
 tmp=$6		## will be created by this script, used as working dir for featureCounts due to -R issue
-threads=$7		## for featureCOunts only
+threads=$7	## for featureCOunts only
 
 
 ## gtf is expected in this format, we use only gene_id and gene_name
@@ -24,12 +24,13 @@ tmp_path=$(realpath $tmp)
 
 ## current version of featureCounts under /package/subread-1.5.0-p1/ writes out -R file to currDir instead to path provided with -o
 ## this is fixed in more recent version of subread! We have to install it! :-)
-mkdir -p $tmp_path 1>&2
-cd $tmp_path 1>&2
-rm *.bam.featureCounts 1>&2		## I'm too lazy the get the full correct name later on, so make sure we have only the file we want
+mkdir -p $tmp_path 1>&2 
+tmp_dir=$(mktemp -d --tmpdir=$tmp_path)
+cd $tmp_dir 1>&2
+#rm *.bam.featureCounts 1>&2		## I'm too lazy the get the full correct name later on, so make sure we have only the file we want
 
 ## call featureCounts
-${fc_path}featureCounts -a $gtf_path -T $threads -s 1 -R -d 25 -F "GTF" -o _tmp_$out $bam_path 1>&2
+${fc_path}featureCounts -a $gtf_path -T $threads -s 1 -R -d 25 -F "GTF" -o _tmp_$sample_name $bam_path 1>&2
 
 ## add gene_id (gtf col 10), gene_name (gtf col 18) to featureCounts output, last col is gene_name + chromosome
 ## <(cat $gtf_path | tr " " "\t" | tr -d "\";" | awk '{print $10,$18,$18"__chr"$1}') \
@@ -54,7 +55,7 @@ if ($3 in MAP) print $0,MAP[$3]; else print $0,"NA","NA";
 ## put all in big matrix in awk and write to stdout to caputure this later
 ## summary stats are printed to stderr
 ##
-awk -v map_f=$bc_file -v sample=$out ' \
+awk -v map_f=$bc_file -v sample=$sample_name ' \
 BEGIN{
 	while(getline<map_f) {                      ## read in cell barcodes
 		CELL[$2]=$1; num_cells+=1;
@@ -68,7 +69,8 @@ BEGIN{
 #		feat_uniq+=1;                       ## only stats
 #	}
 	if (BC[2] in CELL) {
-		if ($2~"Assigned" && $3 != "*") {
+		if (BC[5]~"N") cell_noumi[CELL[BC[2]]] += 1;
+		else if ($2~"Assigned" && $3 != "*") {
 			ALL[$6][BC[5]][CELL[BC[2]]] += 1;
 			cell_uniqfeat[CELL[BC[2]]] += 1; }    
 		else if ($2~"NoFeatures") cell_nofeat[CELL[BC[2]]] += 1;
@@ -95,10 +97,11 @@ END{
 		}
 	}
 
-	print "sample\tidx\tREADS_NOFEAT\tREADS_MULTIMAP\tREADS_MULTIFEAT\tREADS_UNIQFEAT\tUMI" > "/dev/stderr";
+	print "sample\tidx\tREADS_NOFEAT\tREADS_NOUMI\tREADS_MULTIMAP\tREADS_MULTIFEAT\tREADS_UNIQFEAT\tUMI" > "/dev/stderr";
 	for (j=1;j<=num_cells;j++) {
 		out = sample"\t"j;
 		if ( j in cell_nofeat) out = out"\t"cell_nofeat[j]; else out = out"\t0";
+		if ( j in cell_noumi) out = out"\t"cell_noumi[j]; else out = out"\t0";
 		if ( j in cell_multimap) out = out"\t"cell_multimap[j]; else out = out"\t0";
 		if ( j in cell_multifeat) out = out"\t"cell_multifeat[j]; else out = out"\t0";
 		if ( j in cell_uniqfeat) out = out"\t"cell_uniqfeat[j]; else out = out"\t0";
@@ -106,20 +109,24 @@ END{
 		print out > "/dev/stderr";
 
 		ALLcell_nofeat += cell_nofeat[j];
+                ALLcell_noumi += cell_noumi[j];
 		ALLcell_multimap += cell_multimap[j];
 		ALLcell_multifeat += cell_multifeat[j];
 		ALLcell_uniqfeat += cell_uniqfeat[j];
 		ALLcell_UMI += cell_UMI[j];
 	}
 
-	sum_reads = ALLcell_uniqfeat + ALLcell_nofeat + ALLcell_multifeat + ALLcell_multimap + nocell;
+	sum_reads = ALLcell_uniqfeat + ALLcell_nofeat + ALLcell_noumi + ALLcell_multifeat + ALLcell_multimap + nocell;
 	sum = "#LIBREADS_UNIQFEAT\t"ALLcell_uniqfeat"\t"(ALLcell_uniqfeat/sum_reads*100)"\n";
-	sum = sum"#LIB_UMI\t"ALLcell_UMI"\t"(ALLcell_UMI/sum_reads*100)"\n";
 	sum = sum"#LIBREADS_MULTIMAP\t"ALLcell_multimap"\t"(ALLcell_multimap/sum_reads*100)"\n";
 	sum = sum"#LIBREADS_MULTIFEAT\t"ALLcell_multifeat"\t"(ALLcell_multifeat/sum_reads*100)"\n";
+	sum = sum"#LIBREADS_NOUMI\t"ALLcell_noumi"\t"(ALLcell_noumi/sum_reads*100)"\n";	
 	sum = sum"#LIBREADS_NOFEAT\t"ALLcell_nofeat"\t"(ALLcell_nofeat/sum_reads*100)"\n";
 	sum = sum"#LIBREADS_NOCELL\t"nocell"\t"(nocell/sum_reads*100)"\n";
 	sum = sum"#LIBREADS_TOTAL\t"sum_reads"\t100.0";
+	sum = sum"#LIB_UMI\t"ALLcell_UMI"\t"(ALLcell_UMI/sum_reads*100)"\n";
 	print sum > "/dev/stderr";                  ## prints stats to stderr
-}'
+}' 
+
+#2> >(tee >(grep "^#" | tr -d "#" > test_sum.txt) >(grep -v "^#" > test_cell.txt))
 

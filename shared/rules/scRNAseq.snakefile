@@ -96,12 +96,13 @@ rule sc_bam_featureCounts_genomic:
         gtf = "Annotation/genes.filtered.gtf"
     output:
         counts = "Counts/{sample}.cout.csv",
-        counts_summary = "Counts/{sample}.cout_summary.txt",
-        cell_summary = "Counts/{sample}.cout_summary.cells.txt"
+        counts_summary = "Counts/{sample}.featureCounts_summary.txt",
+        #cell_summary = "Counts/{sample}.cout_summary.cells.txt"
     params:
         count_script = workflow.basedir+"/scRNAseq_bam_featureCounts.sh",
         bc_file = barcode_file,
-        fc_path = feature_counts_path
+        fc_path = feature_counts_path,
+        qc_path = "QC_report/data"
     threads: 
         5
     shell:
