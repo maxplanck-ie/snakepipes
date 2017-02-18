@@ -42,6 +42,7 @@ if (length(files) == 0){
 }
 
 print(files)
+sc_dat <- NULL
 
 for (f in files) {
 	dat <- read.csv(f, header=T, sep="\t", stringsAsFactors = F)
