@@ -44,7 +44,7 @@ if test -z "$(find $dir_in/ -maxdepth 1 -name '*.featureCounts_summary.txt')"; t
 else 
 
   for i in $dir_in/*.featureCounts_summary.txt; do
-    out=$(cat $i | awk '{if (NR==2) print $1}');
+    out=$(echo $i | sed 's/.*\///' | sed 's/\.featureCounts_summary.txt//');
     cat $i | sed -n -e '/sample.cell_idx.READS/,/#LIB/{{/#LIB/d;p}}' > $dir_out/data/$out.cellsum;
   done
 fi
