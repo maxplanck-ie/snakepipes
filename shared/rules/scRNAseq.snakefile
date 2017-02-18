@@ -166,8 +166,8 @@ rule sc_QC_metrics:
     output:
         summary = "QC_report/QC_report.all_samples.tsv",
 #        summary_nice = "QC_report/QC_report.all_samples.txt",
-    #    cell_sum = "QC_report/data/{sample}.cellsum"
- #       sc_dat = "QC_report/all_samples.cellsum_coutc_coutb.tsv"
+#        cell_sum = "QC_report/data/{sample}.cellsum"
+#        sc_dat = "QC_report/all_samples.cellsum_coutc_coutb.tsv"
     params: 
         in_dir = outdir+"/Counts/",
         cellsum_dir = "QC_report/data/",
@@ -176,7 +176,6 @@ rule sc_QC_metrics:
         out_prefix = "QC_report/QC_report.all_samples."
     shell:
         ""+workflow.basedir+"/scRNAseq_QC_metrics.sh {params.in_dir} {params.out_dir} 1>{output.summary};"
-#        "cat {output.summary} | column -t > {output.summary_nice};"
         ""+R_path+"Rscript {params.plot_script} {params.cellsum_dir} {params.out_prefix};"
 
 
