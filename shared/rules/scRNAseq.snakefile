@@ -162,20 +162,20 @@ rule combine_sample_counts:
 
 rule sc_QC_metrics:
     input:
-        expand("Counts/{sample}.coutb.csv",sample = samples),
-        expand("Counts/{sample}.coutc.csv",sample = samples)
+        expand("Counts/{sample}.featureCounts_summary.txt",sample = samples)
     output:
         summary = "QC_report/QC_report.all_samples.tsv",
-        summary_nice = "QC_report/QC_report.all_samples.txt",
-        sc_dat = "QC_report/all_samples.cellsum_coutc_coutb.tsv"
+#        summary_nice = "QC_report/QC_report.all_samples.txt",
+        cell_sum = "QC_report/data/{sample}.cellsum"
+ #       sc_dat = "QC_report/all_samples.cellsum_coutc_coutb.tsv"
     params: 
         in_dir = outdir+"/Counts/",
         out_dir = outdir+"/QC_report/",
         plot_script = workflow.basedir+"/scRNAseq_QC_metrics.R"
     shell:
         ""+workflow.basedir+"/scRNAseq_QC_metrics.sh {params.in_dir} {params.out_dir} 1>{output.summary};"
-        "cat {output.summary} | column -t > {output.summary_nice};"
-        ""+R_path+"Rscript {params.plot_script} {output.sc_dat};"
+#        "cat {output.summary} | column -t > {output.summary_nice};"
+#        ""+R_path+"Rscript {params.plot_script} {output.sc_dat};"
 
 
 rule bamCoverage_RPKM:
