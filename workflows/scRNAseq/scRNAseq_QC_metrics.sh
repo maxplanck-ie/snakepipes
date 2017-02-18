@@ -45,7 +45,7 @@ else
 
   for i in $dir_in/*.featureCounts_summary.txt; do
     out=$(cat $i | awk '{if (NR==2) print $1}');
-    cat $i | sed -n -e '/sample.idx.READS/,/#LIB/{{/#LIB/d;p}}' > $dir_out/data/$out.cellsum;
+    cat $i | sed -n -e '/sample.cell_idx.READS/,/#LIB/{{/#LIB/d;p}}' > $dir_out/data/$out.cellsum;
   done
 fi
 
