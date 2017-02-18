@@ -125,13 +125,13 @@ dev.off()
 
 png(file=paste(out_prefix,".plate_abs_transcripts.png",sep=""),width=1000,height=height)
 
-ggplot(sc_dat,aes(x=x,y=y,fill=cell_transcripts))+ 
+ggplot(sc_dat,aes(x=x,y=y,fill=UMI))+ 
 		geom_tile() + 
 		facet_wrap(~sample,ncol = 4,scales = "free") + 
 		#scale_fill_gradient2(low="red",mid="blue",high="cyan",limits=c(min(sc_dat$cell_transcripts),max(sc_dat$cell_transcripts)),midpoint=mean(sc_dat$cell_transcripts,trim=0.05)) + 
 		scale_fill_gradientn(colors=c("red","blue","cyan"),
-				values=rescale(c(0,median(sc_dat$cell_transcripts),max(sc_dat$cell_transcripts))),
-				limits=c(0,max(sc_dat$cell_transcripts)),space = "Lab") +
+				values=rescale(c(0,median(sc_dat$UMI),max(sc_dat$UMI))),
+				limits=c(0,max(sc_dat$UMI)),space = "Lab") +
 		coord_fixed() + 
 		theme_minimal() + 
 		theme(	strip.text.x = element_text(size = 17, colour = "white",face="bold"),
@@ -139,7 +139,7 @@ ggplot(sc_dat,aes(x=x,y=y,fill=cell_transcripts))+
 				axis.ticks.y = element_blank(),
 				plot.background = element_rect(fill = "black"),
 				panel.grid = element_blank() ) +
-        ggtitle(paste("Total number of transcripts per cell \n","red color < median (n=",median(sc_dat$cell_transcripts),") > blue clolor",sep = "")) + 
+        ggtitle(paste("Total number of transcripts per cell \n","red color < median (n=",median(sc_dat$UMI),") > blue clolor",sep = "")) + 
 		theme(plot.title = element_text(color="white", size=22, face="bold",hjust = 0.5)) + 
 		theme(legend.title = element_text(colour="grey90", size=16, face="bold")) + 
 		theme(legend.text = element_text(colour="grey90", size = 16, face = "bold"))
