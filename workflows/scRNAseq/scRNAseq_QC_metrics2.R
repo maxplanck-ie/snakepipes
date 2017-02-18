@@ -36,7 +36,7 @@ if (!is.na(args[2])) {
 
 files <- list.files(cellsum_path, pattern=".cellsum")
 
-if (len(files) == 0){
+if (length(files) == 0){
 	print(paste("no csv files found under",cellsum_path))
 	stop(1)
 }

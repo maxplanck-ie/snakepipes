@@ -86,7 +86,7 @@ if (is.null(cell_names_path)){
 	print(paste("Read in all csv files with cell_names from path",cell_names_path))
 	files <- list.files(cell_names_path, pattern=".csv")
 	
-	if (len(files) == 0){
+	if (length(files) == 0){
 		print(paste("no csv files found under",cell_names_path))
 		stop(1)
 	}
