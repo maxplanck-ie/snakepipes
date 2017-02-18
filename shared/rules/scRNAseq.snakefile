@@ -130,7 +130,7 @@ rule sc_bam_featureCounts_genomic:
 #         """
 
 
-rule scale_counts:
+rule extract_scale_counts:
     input:
         counts = "Counts/{sample}.cout.csv"
     output:
@@ -141,9 +141,10 @@ rule scale_counts:
     params:
         count_script = workflow.basedir+"/extract_counts_rb.pl",
         UMI_length = UMI_length
+    log: "Counts/logs/extract_counts.{sample}.log"
     shell:
         """{params.count_script} -bl={params.UMI_length} -in={input.counts} """
-        """ -outc={output.coutc} -outb={output.coutb} -outt={output.coutt} &>{output.log} """
+        """ -outc={output.coutc} -outb={output.coutb} -outt={output.coutt} &>{log} """
 
 
 rule combine_sample_counts:

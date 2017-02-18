@@ -123,8 +123,8 @@ END{
 	sum = sum"#LIBREADS_NOUMI\t"ALLcell_noumi"\t"(ALLcell_noumi/sum_reads*100)"\n";	
 	sum = sum"#LIBREADS_NOFEAT\t"ALLcell_nofeat"\t"(ALLcell_nofeat/sum_reads*100)"\n";
 	sum = sum"#LIBREADS_NOCELL\t"nocell"\t"(nocell/sum_reads*100)"\n";
-	sum = sum"#LIBREADS_TOTAL\t"sum_reads"\t100.0";
-	sum = sum"#LIB_UMI\t"ALLcell_UMI"\t"(ALLcell_UMI/sum_reads*100)"\n";
+	sum = sum"#LIBREADS_TOTAL\t"sum_reads"\t100.0\n";
+	sum = sum"#LIB_UMI\t"ALLcell_UMI"\t"(ALLcell_UMI/sum_reads*100);
 	print sum > "/dev/stderr";                  ## prints stats to stderr
 }' 
 
