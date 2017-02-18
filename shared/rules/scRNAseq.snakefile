@@ -136,8 +136,7 @@ rule extract_scale_counts:
     output:
         coutt = "Counts/{sample}.coutt.csv",
         coutb = "Counts/{sample}.coutb.csv",
-        coutc = "Counts/{sample}.coutc.csv",
-        log = "Counts/{sample}.extract_log.txt",
+        coutc = "Counts/{sample}.coutc.csv"
     params:
         count_script = workflow.basedir+"/extract_counts_rb.pl",
         UMI_length = UMI_length
