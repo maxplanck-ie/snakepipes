@@ -41,7 +41,7 @@ if (length(files) == 0){
 	stop(1)
 }
 
-print(f)
+print(files)
 
 for (f in files) {
 	dat <- read.csv(f, header=T, sep="\t", stringsAsFactors = F)
