@@ -163,7 +163,7 @@ rule combine_sample_counts:
 rule sc_QC_metrics:
     input:
         in_dir = outdir+"/Counts/",
-        #expand("Counts/{sample}.featureCounts_summary.txt",sample = samples)
+        expand("Counts/{sample}.featureCounts_summary.txt",sample = samples)
     output:
         summary = "QC_report/QC_report.all_samples.tsv",
 #        summary_nice = "QC_report/QC_report.all_samples.txt",
