@@ -175,6 +175,7 @@ print("UMI_LEN:",UMI_length,"  UMI_offset:",UMI_offset,"\n")
 print("CELLI_LEN:",CELLI_length,"  CELLI_offset:",CELLI_offset,"\n")
 
 
-cell_names = config["cell_names"]
+cell_names = os.path.abspath(config["cell_names"])
 cell_names_new = re.sub(".[^\.]*$", "",os.path.basename(cell_names))
+print(cell_names)
 print(cell_names_new)
