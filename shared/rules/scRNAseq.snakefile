@@ -96,21 +96,18 @@ rule sc_bam_featureCounts_genomic:
         gtf = "Annotation/genes.filtered.gtf"
     output:
         counts = "Counts/{sample}.cout.csv",
-        counts_summary = "Counts/{sample}.featureCounts_summary.txt",
-        #cell_summary = "Counts/{sample}.cout_summary.cells.txt"
+        counts_summary = "Counts/{sample}.featureCounts_summary.txt"
     params:
         count_script = workflow.basedir+"/scRNAseq_bam_featureCounts.sh",
         bc_file = barcode_file,
-        fc_path = feature_counts_path,
-        qc_path = "QC_report/data"
+        fc_path = feature_counts_path
     threads: 
         5
     shell:
         """
-        {params.count_script} {input.bam} {input.gtf} {params.bc_file} {wildcards.sample} {params.fc_path} ${{TMPDIR}} {threads} 1>{output.counts} 2>{output.counts_summary};
-
-        cat {output.counts_summary} | sed -n -e '/sample.idx.READS/,/#LIB/{{/#LIB/d;p}}' > {output.cell_summary} 
+        {params.count_script} {input.bam} {input.gtf} {params.bc_file} {wildcards.sample} {params.fc_path} ${{TMPDIR}} {threads} 1>{output.counts} 2>{output.counts_summary};       
         """
+ #cat {output.counts_summary} | sed -n -e '/sample.idx.READS/,/#LIB/{{/#LIB/d;p}}' > {output.cell_summary}
 #sed -n -e '/sample.idx/,$p'
 
 # rule sc_get_counts_genomic:
@@ -152,15 +149,15 @@ rule scale_counts:
 rule combine_sample_counts:
     input:
         expand("Counts/{sample}.coutt.csv",sample = samples),
-        sample_cell_names = cell_names
     output:
         merged_matrix = "Results/all_samples.gencode_genomic.coutt_merged.csv",
         used_cell_names_file = "Results/all_samples.used_cells.tsv"
     params:
         merge_script = workflow.basedir+"/scRNAseq_merge_coutt_files2.R",
-        split = "True"
+        split = "True",
+        sample_cell_names = cell_names
     shell:
-        R_path+"""Rscript {params.merge_script} Counts/ {output.merged_matrix} {output.used_cell_names_file} {params.split} {input.sample_cell_names} """
+        R_path+"""Rscript {params.merge_script} Counts/ {output.merged_matrix} {output.used_cell_names_file} {params.split} {params.sample_cell_names} """
 
 
 rule sc_QC_metrics:
