@@ -125,7 +125,7 @@ def main():
                                 indir = args.indir,
                                 outdir = args.outdir,
                                 genome = args.genome,
-                                cell_names = args.cell_names).split()
+                                cell_names = os.path.abspath(args.cell_names)).split()
 
     ## optional config variables
     if args.downsample:
