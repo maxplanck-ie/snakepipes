@@ -170,12 +170,14 @@ rule sc_QC_metrics:
  #       sc_dat = "QC_report/all_samples.cellsum_coutc_coutb.tsv"
     params: 
         in_dir = outdir+"/Counts/",
+        cellsum_dir = "QC_report/data/",
         out_dir = outdir+"/QC_report/",
-        plot_script = workflow.basedir+"/scRNAseq_QC_metrics.R"
+        plot_script = workflow.basedir+"/scRNAseq_QC_metrics2.R",
+        out_prefix = "QC_report/QC_report.all_samples."
     shell:
         ""+workflow.basedir+"/scRNAseq_QC_metrics.sh {params.in_dir} {params.out_dir} 1>{output.summary};"
 #        "cat {output.summary} | column -t > {output.summary_nice};"
-#        ""+R_path+"Rscript {params.plot_script} {output.sc_dat};"
+        ""+R_path+"Rscript {params.plot_script} {params.cellsum_dir} {params.out_prefix};"
 
 
 rule bamCoverage_RPKM:
