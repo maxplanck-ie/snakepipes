@@ -34,12 +34,14 @@ if (!is.na(args[2])) {
 
 ###############################################################################
 
-files <- list.files(cellsum_path, pattern=".cellsum")
+files <- list.files(cellsum_path, pattern=".cellsum",full.names=T)
 
 if (length(files) == 0){
 	print(paste("no csv files found under",cellsum_path))
 	stop(1)
 }
+
+print(f)
 
 for (f in files) {
 	dat <- read.csv(f, header=T, sep="\t", stringsAsFactors = F)
