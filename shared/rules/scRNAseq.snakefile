@@ -164,9 +164,9 @@ rule sc_QC_metrics:
     input:
         expand("Counts/{sample}.featureCounts_summary.txt",sample=samples)
     output:
-        summary = "QC_report/QC_report.all_samples.tsv",
 #        summary_nice = "QC_report/QC_report.all_samples.txt",
-        cell_sum = "QC_report/data/{sample}.cellsum"
+        summary = "QC_report/QC_report.all_samples.tsv"
+        #cell_sum = "QC_report/data/{sample}.cellsum"
 #        sc_dat = "QC_report/all_samples.cellsum_coutc_coutb.tsv"
     params: 
         in_dir = outdir+"/Counts/",
@@ -175,7 +175,7 @@ rule sc_QC_metrics:
         plot_script = workflow.basedir+"/scRNAseq_QC_metrics2.R",
         out_prefix = "QC_report/QC_report.all_samples.",
     shell:
-        ""+workflow.basedir+"/scRNAseq_QC_metrics.sh {params.in_dir} {params.out_dir} 1>{output.summary};"
+        ""+workflow.basedir+"/scRNAseq_QC_metrics.sh {params.in_dir} {params.out_dir} >{output.summary};"
         ""+R_path+"Rscript {params.plot_script} {params.cellsum_dir} {params.out_prefix};"
 
 
