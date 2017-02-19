@@ -138,15 +138,25 @@ for (i in 1:length(dat$file)) {
 	
   tmp <- read.csv(dat$file[i],sep="\t",header=T)
   
-  ## all cells 
+  ## rename all cells 
   if (is.null(subset)){
   	colnames(tmp)[2:ncol(tmp)]<-sapply(colnames(tmp)[2:ncol(tmp)], function(x,t) paste0(t,sub("X","_",x)),t=dat$name[i],simplify="array")
   	
-  	s1=sum(colSums(tmp[,2:97]))
-  	s2=sum(colSums(tmp[,98:193]))
-  	if (is_split_library & s1 > s2) { print("use 1st half"); print(s1); print(s2); tmp<-tmp[,c(1,seq(2,97))]; cell_idx_offset = 0} else {print(" use 2nd half"); print(s2); print(s1); tmp<-tmp[,-c(seq(2,97))];cell_idx_offset = 96}
+	if (is_split_library){
+  		s1=sum(colSums(tmp[,2:97]))
+  		s2=sum(colSums(tmp[,98:193]))
+  		if (s1 > s2) { 
+			print("use 1st half"); print(s1); print(s2); 
+			tmp<-tmp[,c(1,seq(2,97))]; 
+			cell_idx_offset = 0} 
+		else {
+			print(" use 2nd half"); print(s2); print(s1); 
+			tmp<-tmp[,-c(seq(2,97))];
+			cell_idx_offset = 96
+		}
+	}
   	
-  	cell_names_tmp <- rbind(cell_names_tmp,data.frame(sample="test",plate=((i-1) %/% libs_per_plate)+1, library = ((i-1) %% libs_per_plate)+1, cell_idx=seq(1+cell_idx_offset,ncol(tmp)-1+cell_idx_offset),cell_name=colnames(tmp)[2:ncol(tmp)]))
+	cell_names_tmp <- rbind(cell_names_tmp,data.frame(sample="test",plate=((i-1) %/% libs_per_plate)+1, library = ((i-1) %% libs_per_plate)+1, cell_idx=seq(1+cell_idx_offset,ncol(tmp)-1+cell_idx_offset),cell_name=colnames(tmp)[2:ncol(tmp)]))
  
   } else {
 	print(sum(colSums(tmp[,c((min(subset$cell_idx)+1):(max(subset$cell_idx)+1))])))
