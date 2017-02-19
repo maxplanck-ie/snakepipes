@@ -154,8 +154,8 @@ rule combine_sample_counts:
         used_cell_names_file = "Results/all_samples.used_cells.tsv"
     params:
         merge_script = workflow.basedir+"/scRNAseq_merge_coutt_files2.R",
-        split = "True",
-        sample_cell_names = cell_names
+        split = split_lib,
+        sample_cell_names = cell_names if (cell_names != None) else ""
     shell:
         R_path+"""Rscript {params.merge_script} Counts/ {output.merged_matrix} {output.used_cell_names_file} {params.split} {params.sample_cell_names} """
 

@@ -84,6 +84,7 @@ try:
 except:
     mate_orientation = "--fr"
 
+
 # IMPORTANT: When using snakemake with argument --config key=True, the
 # string "True" is assigned to variable "key". Assigning a boolean value
 # does not seem to be possible. Therefore, --config key=False will also
@@ -136,21 +137,29 @@ try:
 except:
     filter_annotation = "''"
 
-    
+try:
+	cell_names = config["cell_names"]
+except: 
+	cell_names = None
+	
+split_lib = config['split_lib']
+
 ### Initialization #############################################################
+
+if (cell_names != None and os.path.isfile(cell_names)==False):
+	print("cell names file dowes not exist! Exit...\n")
+	exit(1)
 
 infiles = sorted(glob.glob(os.path.join(indir, '*'+ext)))
 samples = get_sample_names(infiles)
 
+## we just check if we have correctly paired fastq files
 if not is_paired(infiles):
-    print("scRNA-seq needs currently paired read data!")
+    print("This workflow requires paired-end read data!")
     exit(1)
 
 ## After barcode transfer to R2 we have only single end data / R2
 paired = False
-
-#if not paired:
-#    reads = [""]
 
 ### barcode pattern extraction
 pattern = re.compile("[N]+")
@@ -174,8 +183,4 @@ else:
 print("UMI_LEN:",UMI_length,"  UMI_offset:",UMI_offset,"\n")
 print("CELLI_LEN:",CELLI_length,"  CELLI_offset:",CELLI_offset,"\n")
 
-
-cell_names = config["cell_names"]
 #cell_names_new = re.sub(".[^\.]*$", "",cell_names)
-#print(cell_names)
-#print(cell_names_new)
