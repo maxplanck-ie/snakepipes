@@ -161,9 +161,9 @@ def main():
     user_configs += ["split_lib={}".format(args.split_lib)]
     
 	## MPI
-    #snakemake_module_load = "module load snakemake slurm &&".split()
+    snakemake_module_load = "module load snakemake slurm &&".split()
     ## laptop
-    snakemake_module_load = " ".split()
+    #snakemake_module_load = " ".split()
     snakemake_cmd = """
                     snakemake {snakemake_options} --latency-wait 120 --snakefile {snakefile} --jobs {max_jobs} --config {user_configs} --directory {outdir}
                     """.format( snakefile = os.path.join(this_script_dir, "Snakefile"),
