@@ -124,6 +124,7 @@ rule all:
         expand("Counts/{sample}.coutt.csv",sample = samples),
         expand("Counts/{sample}.featureCounts_summary.txt",sample = samples),
         "Results/all_samples.gencode_genomic.coutt_merged.csv",
+        "QC_report/data/{sample}.cellsum"
         "QC_report/QC_report.all_samples.tsv",
         #expand("Tracks/{sample}.Coverage.bw", sample = samples),
         #"deepTools_qc/plotEnrichment/plotEnrichment.png",
