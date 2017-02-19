@@ -141,14 +141,14 @@ for (i in 1:length(dat$file)) {
   ## rename all cells 
   if (is.null(subset)){
   	colnames(tmp)[2:ncol(tmp)]<-sapply(colnames(tmp)[2:ncol(tmp)], function(x,t) paste0(t,sub("X","_",x)),t=dat$name[i],simplify="array")
-  	
+  	cell_idx_offset = 0;
 	if (is_split_library){
   		s1=sum(colSums(tmp[,2:97]))
   		s2=sum(colSums(tmp[,98:193]))
   		if (s1 > s2) { 
 			print("use 1st half"); print(s1); print(s2); 
 			tmp<-tmp[,c(1,seq(2,97))]; 
-			cell_idx_offset = 0} 
+			cell_idx_offset = 0 } 
 		else {
 			print(" use 2nd half"); print(s2); print(s1); 
 			tmp<-tmp[,-c(seq(2,97))];
