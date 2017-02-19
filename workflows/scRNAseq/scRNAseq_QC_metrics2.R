@@ -13,8 +13,6 @@ require(gtools)
 
 args <- commandArgs(trailingOnly=TRUE)
 
-
-
 ## path with all the *.coutt.csv files that should be combined
 cellsum_path <- NULL
 if (!is.na(args[1])) {
@@ -29,6 +27,26 @@ if (!is.na(args[2])) {
 } else {
 	print("output prefix param missing! Exit...\n")
 	quit(1)
+}
+
+## Are only 96 cells instead of 192 are used per samples? 
+## This is ignored if cell_names_path is provided!
+is_split_library = FALSE
+
+if (!is.na(args[3])) {
+	is_split_library <- as.logical(args[3]) 
+} else {
+	print("Is split library boolean param is missing! Exit...\n")
+	stop(1)
+}
+
+## path to cell_names file 
+cell_names_path = NULL
+if (!is.na(args[4])) {
+	cell_names_path <- args[4] 
+} else {
+	print("Cell names file param missing!\n Use all cells from found coutt files!")
+#  quit(1)
 }
 
 

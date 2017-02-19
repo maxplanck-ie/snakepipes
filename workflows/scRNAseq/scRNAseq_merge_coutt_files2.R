@@ -156,7 +156,7 @@ for (i in 1:length(dat$file)) {
 		}
 	}
   	
-	cell_names_tmp <- rbind(cell_names_tmp,data.frame(sample="test",plate=((i-1) %/% libs_per_plate)+1, library = ((i-1) %% libs_per_plate)+1, cell_idx=seq(1+cell_idx_offset,ncol(tmp)-1+cell_idx_offset),cell_name=colnames(tmp)[2:ncol(tmp)]))
+	cell_names_tmp <- rbind(cell_names_tmp,data.frame(sample=dat$name[i],plate=((i-1) %/% libs_per_plate)+1, library = ((i-1) %% libs_per_plate)+1, cell_idx=seq(1+cell_idx_offset,ncol(tmp)-1+cell_idx_offset),cell_name=colnames(tmp)[2:ncol(tmp)]))
  
   } else {
 	print(sum(colSums(tmp[,c((min(subset$cell_idx)+1):(max(subset$cell_idx)+1))])))
