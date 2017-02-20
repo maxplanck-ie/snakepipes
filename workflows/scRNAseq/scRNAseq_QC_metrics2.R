@@ -82,6 +82,14 @@ sc_dat$sample <- factor(sc_dat$sample, levels = unique(sc_dat$sample))
 
 #sc_dat$sample <- factor(sc_dat$sample, levels = unique(sc_dat$sample))
 
+
+if (!is.null(cell_names_path)){
+  cell_names <- read.csv(cell_names_path, header=T, sep="\t", stringsAsFactors = F)
+  sc_dat <- merge(sc_dat,cell_names[,c("sample","cell_idx","library","plate")],by.x = c("sample","cell_idx"),by.y = c("sample","cell_idx"))
+}
+
+str(sc_dat)
+
 png(file=paste(out_prefix,".reads_UMI_plot.png",sep=""),width=1500,height=1500)
 ggplot(dat=sc_dat,aes(x=(READS_UNIQFEAT),y=(UMI),color=sample))+geom_point(size=3,alpha=0.8) + 
 	facet_wrap(~sample,ncol=4)+
@@ -115,9 +123,12 @@ png(file=paste(out_prefix,".plate_cUPM.png",sep=""),width=1000,height=height)
 
 ggplot(sc_dat,aes(x=x,y=y,fill=cUPM_zscore))+ 
 		geom_tile() + 
-		facet_wrap(~sample,ncol = 4,scales = "free") + 
+		#facet_wrap(~sample,ncol = 4,scales = "free") + 
+    facet_grid(plate~library,scales = "free") + 
 		scale_fill_gradient2(low="red",mid="blue",limits=c(-3,3),high="cyan" ) + 
 		coord_fixed() + 
+    scale_y_continuous(breaks=-seq(1,15,2),labels = as.character(seq(2,16,2))) +
+    scale_x_continuous(breaks=seq(2,(max(sc_dat$cell_idx-1)%/%16)+1,2),labels = as.character(seq(2,(max(sc_dat$cell_idx-1)%/%16)+1,2))) +
 		theme_minimal() +
 		theme(strip.text.x = element_text(size = 18, colour = "black",face="bold")) +
 		ggtitle(paste("cell z-score of norm. transcripts per cell (cUPM)")) + 
@@ -133,6 +144,8 @@ ggplot(sc_dat,aes(x=x,y=y,fill=cRPM_zscore))+
 		facet_wrap(~sample,ncol = 4,scales = "free") + 
 		scale_fill_gradient2(low="red",mid="blue",limits=c(-3,3),high="cyan" ) + 
 		coord_fixed() + 
+    scale_y_continuous(breaks=-seq(1,15,2),labels = as.character(seq(2,16,2))) +
+    scale_x_continuous(breaks=seq(2,(max(sc_dat$cell_idx-1)%/%16)+1,2),labels = as.character(seq(2,(max(sc_dat$cell_idx-1)%/%16)+1,2))) +
 		theme_minimal() +
 		theme(strip.text.x = element_text(size = 18, colour = "black",face="bold")) +
 		ggtitle(paste("cell z-score of norm. reads per cell (cRPM)")) + 
@@ -150,7 +163,9 @@ ggplot(sc_dat,aes(x=x,y=y,fill=UMI))+
 		scale_fill_gradientn(colors=c("red","blue","cyan"),
 				values=rescale(c(0,median(sc_dat$UMI),max(sc_dat$UMI))),
 				limits=c(0,max(sc_dat$UMI)),space = "Lab") +
-		coord_fixed() + 
+		coord_fixed() +
+    scale_y_continuous(breaks=-seq(1,15,2),labels = as.character(seq(2,16,2))) +
+    scale_x_continuous(breaks=seq(2,(max(sc_dat$cell_idx-1)%/%16)+1,2),labels = as.character(seq(2,(max(sc_dat$cell_idx-1)%/%16)+1,2))) +
 		theme_minimal() + 
 		theme(	strip.text.x = element_text(size = 17, colour = "white",face="bold"),
 				axis.text = element_text(size = 10, colour = "grey"),
