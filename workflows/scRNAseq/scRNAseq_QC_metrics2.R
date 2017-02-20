@@ -124,11 +124,11 @@ png(file=paste(out_prefix,".plate_cUPM.png",sep=""),width=1000,height=height)
 ggplot(sc_dat,aes(x=x,y=y,fill=cUPM_zscore))+ 
 		geom_tile() + 
 		#facet_wrap(~sample,ncol = 4,scales = "free") + 
-    facet_grid(plate~library,scales = "free") + 
+    	facet_grid(plate~library,scales = "free") + 
 		scale_fill_gradient2(low="red",mid="blue",limits=c(-3,3),high="cyan" ) + 
 		coord_fixed() + 
-    scale_y_continuous(breaks=-seq(1,15,2),labels = as.character(seq(2,16,2))) +
-    scale_x_continuous(breaks=seq(2,(max(sc_dat$cell_idx-1)%/%16)+1,2),labels = as.character(seq(2,(max(sc_dat$cell_idx-1)%/%16)+1,2))) +
+    	scale_y_continuous(breaks=-seq(1,15,2),labels = as.character(seq(2,16,2))) +
+    	scale_x_continuous(breaks=seq(2,(max(sc_dat$cell_idx-1)%/%16)+1,2),labels = as.character(seq(2,(max(sc_dat$cell_idx-1)%/%16)+1,2))) +
 		theme_minimal() +
 		theme(strip.text.x = element_text(size = 18, colour = "black",face="bold")) +
 		ggtitle(paste("cell z-score of norm. transcripts per cell (cUPM)")) + 
