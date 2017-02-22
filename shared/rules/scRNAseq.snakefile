@@ -83,7 +83,7 @@ rule sc_STAR_genomic:
         star_path + "STAR --genomeDir "+star_index + ""
         " --runThreadN {threads} --readFilesIn {input.read_barcoded} "
         " --readFilesCommand zcat --outFileNamePrefix ${{TMPDIR}}/{wildcards.sample}. " 
-        " --sjdbGTFfile {input.gtf} {params.opts} --outStd SAM | "
+        " --sjdbGTFfile {input.gtf} {params.opts} --outStd SAM --outSAMunmapped Within | "
         #" grep -P '^@|NH:i:1\\b' | "
         "" + samtools_path + "samtools sort -T ${{TMPDIR}}tmp_{wildcards.sample} -@5 -m 2G -O bam - > {output.bam}; "
         "" + samtools_path + "samtools index {output.bam}; "
@@ -162,22 +162,21 @@ rule combine_sample_counts:
 
 rule sc_QC_metrics:
     input:
-        expand("Counts/{sample}.featureCounts_summary.txt",sample=samples)
+        expand("Counts/{sample}.featureCounts_summary.txt",sample=samples),
+        cell_names_merged = "Results/all_samples.used_cells.tsv"
     output:
 #        summary_nice = "QC_report/QC_report.all_samples.txt",
-        summary = "QC_report/QC_report.all_samples.tsv"
-        #cell_sum = "QC_report/data/{sample}.cellsum"
-#        sc_dat = "QC_report/all_samples.cellsum_coutc_coutb.tsv"
+        summary = "QC_report/QC_report.all_samples.libstats_reads.tsv"
     params: 
         in_dir = outdir+"/Counts/",
         cellsum_dir = "QC_report/data/",
         out_dir = outdir+"/QC_report/",
         plot_script = workflow.basedir+"/scRNAseq_QC_metrics2.R",
-        out_prefix = "QC_report/QC_report.all_samples.",
+        out_prefix = "QC_report/QC_report.all_samples",
         split = split_lib
     shell:
         ""+workflow.basedir+"/scRNAseq_QC_metrics.sh {params.in_dir} {params.out_dir} >{output.summary};"
-        ""+R_path+"Rscript {params.plot_script} {params.cellsum_dir} {params.out_prefix} {params.split};"
+        ""+R_path+"Rscript {params.plot_script} {params.cellsum_dir} {params.out_prefix} {params.split} {input.cell_names_merged};"
 
 
 rule bamCoverage_RPKM:

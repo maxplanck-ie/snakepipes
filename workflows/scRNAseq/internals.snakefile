@@ -142,7 +142,7 @@ try:
 except: 
 	cell_names = None
 	
-split_lib = config['split_lib']
+split_lib = config["split_lib"]
 
 ### Initialization #############################################################
 

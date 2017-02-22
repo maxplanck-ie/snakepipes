@@ -46,7 +46,8 @@ else
   for i in $dir_in/*.featureCounts_summary.txt; do
     out=$(echo $i | sed 's/.*\///' | sed 's/\.featureCounts_summary.txt//');
     cat $i | sed -n -e '/sample.cell_idx.READS/,/#LIB/{{/#LIB/d;p}}' > $dir_out/data/$out.cellsum;
-  done
+    cat $i | grep "^#LIB" | tr -d "#" | sed -e 's/^/'$out'\t/' > $dir_out/data/$out.libsum;
+   done
 fi
 
 ## with header!

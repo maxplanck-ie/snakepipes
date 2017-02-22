@@ -68,6 +68,8 @@ BEGIN{
 #		ALL[$6][BC[5]][CELL[BC[2]]] += 1;   ## $3 is single GENEID if num==1
 #		feat_uniq+=1;                       ## only stats
 #	}
+	nocell_unmap=0;
+	nocell_map=0;
 	if (BC[2] in CELL) {
 		if (BC[5]~"N") cell_noumi[CELL[BC[2]]] += 1;
 		else if ($2~"Assigned" && $3 != "*") {
@@ -75,8 +77,10 @@ BEGIN{
 			cell_uniqfeat[CELL[BC[2]]] += 1; }    
 		else if ($2~"NoFeatures") cell_nofeat[CELL[BC[2]]] += 1;
 		else if ($2~"Multimapping") cell_multimap[CELL[BC[2]]] += 1;
-		else if ($2~"Unassigned_Ambiguity") cell_multifeat[CELL[BC[2]]] +=1 ;
-	} else nocell+=1;
+		else if ($2~"Unassigned_Ambiguity") cell_multifeat[CELL[BC[2]]] +=1;
+		else if ($2~"Unassigned_Unmapped") cell_unmap[CELL[BC[2]]] +=1 ;
+	} else if ($2~"Unassigned_Unmapped") nocell_unmap+=1; 
+	else nocell_map+=1;
 }
 END{
 	printf "GENEID\tRBAR";                        ## mimic Dominics output format
@@ -97,9 +101,10 @@ END{
 		}
 	}
 
-	print "sample\tcell_idx\tREADS_NOFEAT\tREADS_NOUMI\tREADS_MULTIMAP\tREADS_MULTIFEAT\tREADS_UNIQFEAT\tUMI" > "/dev/stderr";
+	print "sample\tcell_idx\tREADS_UNMAP\tREADS_NOFEAT\tREADS_NOUMI\tREADS_MULTIMAP\tREADS_MULTIFEAT\tREADS_UNIQFEAT\tUMI" > "/dev/stderr";
 	for (j=1;j<=num_cells;j++) {
 		out = sample"\t"j;
+		if ( j in cell_unmap) out = out"\t"cell_unmap[j]; else out = out"\t0";
 		if ( j in cell_nofeat) out = out"\t"cell_nofeat[j]; else out = out"\t0";
 		if ( j in cell_noumi) out = out"\t"cell_noumi[j]; else out = out"\t0";
 		if ( j in cell_multimap) out = out"\t"cell_multimap[j]; else out = out"\t0";
@@ -108,23 +113,28 @@ END{
 		if ( j in cell_UMI) out = out"\t"cell_UMI[j]; else out = out"\t0";
 		print out > "/dev/stderr";
 
+		ALLcell_unmap += cell_unmap[j];
 		ALLcell_nofeat += cell_nofeat[j];
-                ALLcell_noumi += cell_noumi[j];
+            ALLcell_noumi += cell_noumi[j];
 		ALLcell_multimap += cell_multimap[j];
 		ALLcell_multifeat += cell_multifeat[j];
 		ALLcell_uniqfeat += cell_uniqfeat[j];
 		ALLcell_UMI += cell_UMI[j];
 	}
 
-	sum_reads = ALLcell_uniqfeat + ALLcell_nofeat + ALLcell_noumi + ALLcell_multifeat + ALLcell_multimap + nocell;
-	sum = "#LIBREADS_UNIQFEAT\t"ALLcell_uniqfeat"\t"(ALLcell_uniqfeat/sum_reads*100)"\n";
+	sum_reads = ALLcell_uniqfeat + ALLcell_nofeat + ALLcell_noumi + ALLcell_multifeat + ALLcell_multimap + nocell_map;
+	sum_reads_all = sum_reads + nocell_nomap + Allcell_unmap;
+	sum = "#LIBREADS_UMI\t"ALLcell_UMI"\t"(ALLcell_UMI/sum_reads*100)"\n";
+	sum = sum"#LIBREADS_UNIQFEAT\t"ALLcell_uniqfeat"\t"(ALLcell_uniqfeat/sum_reads*100)"\n";
 	sum = sum"#LIBREADS_MULTIMAP\t"ALLcell_multimap"\t"(ALLcell_multimap/sum_reads*100)"\n";
 	sum = sum"#LIBREADS_MULTIFEAT\t"ALLcell_multifeat"\t"(ALLcell_multifeat/sum_reads*100)"\n";
 	sum = sum"#LIBREADS_NOUMI\t"ALLcell_noumi"\t"(ALLcell_noumi/sum_reads*100)"\n";	
 	sum = sum"#LIBREADS_NOFEAT\t"ALLcell_nofeat"\t"(ALLcell_nofeat/sum_reads*100)"\n";
-	sum = sum"#LIBREADS_NOCELL\t"nocell"\t"(nocell/sum_reads*100)"\n";
-	sum = sum"#LIBREADS_TOTAL\t"sum_reads"\t100.0\n";
-	sum = sum"#LIB_UMI\t"ALLcell_UMI"\t"(ALLcell_UMI/sum_reads*100);
+	sum = sum"#LIBREADS_NOCELL\t"nocell_map"\t"(nocell_map/sum_reads*100)"\n";
+	sum = sum"#LIBREADS_MAPTOTAL\t"sum_reads"\t100.0\n";
+	sum = sum"#LIBREADS_UNMAPCELL\t"ALLcell_unmap"\t"(ALLcell_unmap/sum_reads_all*100)"\n";
+	sum = sum"#LIBREADS_UNMAP\t"nocell_unmap"\t"(nocell_unmap/sum_reads_all*100)"\n";
+	sum = sum"#LIBREADS_TOTAL\t"sum_reads_all"\t100.0";
 	print sum > "/dev/stderr";                  ## prints stats to stderr
 }' 
 
