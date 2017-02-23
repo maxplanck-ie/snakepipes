@@ -64,6 +64,8 @@ BEGIN{
 	nocell_map=0;
 }
 {
+	if ($1 in READS_SEEN) next;
+	
 	pos=match($1,":SC:");                       ## get barcode startpos (":SC:"") from readname
 	split(substr($1,pos+1),BC,":");             ## split on ":" to separate all info and stor in array "BC"
 
@@ -73,14 +75,13 @@ BEGIN{
 			ALL[$6][BC[5]][CELL[BC[2]]] += 1;       ## $3 is single GENEID if num==1
 			cell_uniqfeat[CELL[BC[2]]] += 1; }      ## only stats
 		else if ($2~"NoFeatures") cell_nofeat[CELL[BC[2]]] += 1;
-		else if ($2~"MultiMapping" && !($1 in READS_SEEN)) {
-			cell_multimap[CELL[BC[2]]] += 1;
-			READS_SEEN[$1];		
-		}			
+		else if ($2~"MultiMapping") cell_multimap[CELL[BC[2]]] += 1;			
 		else if ($2~"Unassigned_Ambiguity") cell_multifeat[CELL[BC[2]]] +=1;
 		else if ($2~"Unassigned_Unmapped") cell_unmap[CELL[BC[2]]] +=1 ;
 	} else if ($2~"Unassigned_Unmapped") nocell_unmap+=1; 
 	else nocell_map+=1;
+
+	if ($2!~"Unassigned_Unmapped") READS_SEEN[$1];
 }
 END{
 	printf "GENEID\tRBAR";                        ## mimic Dominics output format
