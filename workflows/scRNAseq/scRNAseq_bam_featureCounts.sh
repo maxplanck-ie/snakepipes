@@ -76,7 +76,7 @@ BEGIN{
 			ALL[$6][BC[5]][CELL[BC[2]]] += 1;
 			cell_uniqfeat[CELL[BC[2]]] += 1; }    
 		else if ($2~"NoFeatures") cell_nofeat[CELL[BC[2]]] += 1;
-		else if ($2~"Multimapping") cell_multimap[CELL[BC[2]]] += 1;
+		else if ($2~"MultiMapping") cell_multimap[CELL[BC[2]]] += 1;
 		else if ($2~"Unassigned_Ambiguity") cell_multifeat[CELL[BC[2]]] +=1;
 		else if ($2~"Unassigned_Unmapped") cell_unmap[CELL[BC[2]]] +=1 ;
 	} else if ($2~"Unassigned_Unmapped") nocell_unmap+=1; 
@@ -123,7 +123,7 @@ END{
 	}
 
 	sum_reads = ALLcell_uniqfeat + ALLcell_nofeat + ALLcell_noumi + ALLcell_multifeat + ALLcell_multimap + nocell_map;
-	sum_reads_all = sum_reads + nocell_nomap + Allcell_unmap;
+	sum_reads_all = sum_reads + nocell_unmap + ALLcell_unmap;
 	sum = "#LIBREADS_UMI\t"ALLcell_UMI"\t"(ALLcell_UMI/sum_reads*100)"\n";
 	sum = sum"#LIBREADS_UNIQFEAT\t"ALLcell_uniqfeat"\t"(ALLcell_uniqfeat/sum_reads*100)"\n";
 	sum = sum"#LIBREADS_MULTIMAP\t"ALLcell_multimap"\t"(ALLcell_multimap/sum_reads*100)"\n";
