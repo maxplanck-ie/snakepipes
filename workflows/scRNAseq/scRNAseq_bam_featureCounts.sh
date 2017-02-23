@@ -60,21 +60,18 @@ BEGIN{
 	while(getline<map_f) {                      ## read in cell barcodes
 		CELL[$2]=$1; num_cells+=1;
 	}
+	nocell_unmap=0;
+	nocell_map=0;
 }
 {
 	pos=match($1,":SC:");                       ## get barcode startpos (":SC:"") from readname
 	split(substr($1,pos+1),BC,":");             ## split on ":" to separate all info and stor in array "BC"
-#	if ( $3!="*" && BC[2] in CELL) {  		## if unique feature and a "valid" cell barcode then count it
-#		ALL[$6][BC[5]][CELL[BC[2]]] += 1;   ## $3 is single GENEID if num==1
-#		feat_uniq+=1;                       ## only stats
-#	}
-	nocell_unmap=0;
-	nocell_map=0;
-	if (BC[2] in CELL) {
-		if (BC[5]~"N") cell_noumi[CELL[BC[2]]] += 1;
-		else if ($2~"Assigned" && $3 != "*") {
-			ALL[$6][BC[5]][CELL[BC[2]]] += 1;
-			cell_uniqfeat[CELL[BC[2]]] += 1; }    
+
+	if (BC[2] in CELL) {					## valid cell barcode
+		if (BC[5]~"N") cell_noumi[CELL[BC[2]]] += 1;    ## UMIs with N are also not considered later on
+		else if ($2~"Assigned" && $3 != "*") {          ## if unique feature then count it
+			ALL[$6][BC[5]][CELL[BC[2]]] += 1;       ## $3 is single GENEID if num==1
+			cell_uniqfeat[CELL[BC[2]]] += 1; }      ## only stats
 		else if ($2~"NoFeatures") cell_nofeat[CELL[BC[2]]] += 1;
 		else if ($2~"MultiMapping") cell_multimap[CELL[BC[2]]] += 1;
 		else if ($2~"Unassigned_Ambiguity") cell_multifeat[CELL[BC[2]]] +=1;
@@ -115,7 +112,7 @@ END{
 
 		ALLcell_unmap += cell_unmap[j];
 		ALLcell_nofeat += cell_nofeat[j];
-            ALLcell_noumi += cell_noumi[j];
+            	ALLcell_noumi += cell_noumi[j];
 		ALLcell_multimap += cell_multimap[j];
 		ALLcell_multifeat += cell_multifeat[j];
 		ALLcell_uniqfeat += cell_uniqfeat[j];

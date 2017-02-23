@@ -98,16 +98,11 @@ if (length(files) != 0){
 }
 
 
-
 sc_dat$sample <- factor(sc_dat$sample, levels = unique(sc_dat$sample))
 #sc_dat = read.csv(data_file,header = T,sep = "\t",stringsAsFactors = F)
-
 #sc_dat$sample <- gsub(".*/","",sc_dat$sample)
 #sc_dat$sample <- gsub(".coutc.csv$","",sc_dat$sample)
-
 #sc_dat$sample <- factor(sc_dat$sample, levels = unique(sc_dat$sample))
-
-
 
 
 if (!is.null(cell_names_path)){
