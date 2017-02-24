@@ -81,7 +81,7 @@ BEGIN{
 	} else if ($2~"Unassigned_Unmapped") nocell_unmap+=1; 
 	else nocell_map+=1;
 
-	if ($2!~"Unassigned_Unmapped") READS_SEEN[$1];
+	if ($2!~"Unassigned_Unmapped") READS_SEEN[$1];	## only for unmapped reads it is safe to ignore this check 
 }
 END{
 	printf "GENEID\tRBAR";                        ## mimic Dominics output format
