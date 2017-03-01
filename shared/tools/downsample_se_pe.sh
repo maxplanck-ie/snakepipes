@@ -1,30 +1,36 @@
 #!/usr/bin/bash
 
-## Usage: bash reservoir_downsample_se_pe.sh 1000 10 a.fastq.gz a.downsampled.fastq.gz b.fastq.gz b.downsampled.fastq.gz
+## Usage: bash downsample_se_pe.sh 1000 10 a.fastq.gz a.downsampled.fastq.gz b.fastq.gz b.downsampled.fastq.gz
 
 num_reads=$1
 threads=$2
 R1=$3
 R1_out=$4
 R2=$5
-R3_out=$6
+R2_out=$6
 
 seed=12345
 
 ## check for paired or single end mode
 paired=false
-if [ -n "$R2" ] && [ -n "$R2_out"]; then
+if [ -z "$R1" ] || [ -z "$R1_out" ]; then
+	echo -e "\nPlease provide R1 input file and R1 output filename!\n"
+	echo "usage: downsample_se_pe.sh 1000 10 a.fastq.gz a.downsampled.fastq.gz (single end)"
+	echo "or"
+	echo -e "(paired end) downsample_se_pe.sh 1000 10 a.fastq.gz a.downsampled.fastq.gz b.fastq.gz b.downsampled.fastq.gz\n"
+	exit 1;
+elif [ -n "$R2" ] && [ -n "$R2_out" ]; then
 	paired=true
-elif ( [ -z "$R2" ] && [ -n "$R2_out"] ) || ( [ -n "$R2" ] && [ -z "$R2_out"] ) ; then
+elif ( ( [ -z "$R2" ] && [ -n "$R2_out" ] ) || ( [ -n "$R2" ] && [ -z "$R2_out" ] ) ); then
 	echo "Please provide for R2 either both input and output file or leave both empty!"
-	exit(1)
+	exit 1;
 fi
 
 ## check for pigz
 tmp=$(which pigz)
 if [ -z "$tmp" ]; then
 	echo "Pigz needs to be installed!"
-	exit(1)
+	exit 1;
 fi
 
 ##############################################################################
@@ -63,19 +69,19 @@ EOF
 ## do the work
 if [ "$paired" == true ]; then
 	## paired end
+	echo -e "\nDownsampling fastq files to $num_reads reads in paired-end mode..." > /dev/stderr
 	paste <(pigz -p2 -dc ${R1} | sed '/^$/d' | paste -d "\t" - - - - ) <(pigz -p2 -dc ${R2} | sed '/^$/d' | paste -d "\t" - - - - ) \
 	| awk -v n=${num_reads} -v s=$seed "$reservoir_sampling" \
-	| tee >(cut -f1,2,3,4 | sed 's/\t/\n/g' | pigz -p ${threads} -9 > ${R1_out}) >(cut -f5,6,7,8 | sed 's/\t/\n/g' | pigz -p ${threads} -9 > ${R2_out}) \
-	| awk '{if $1}' >/dev/null
+	| tee >(cut -f1,2,3,4 | sed 's/\t/\n/g' | pigz -p $(($threads/2>2?$threads/2:2)) -9 > ${R1_out}) >(cut -f5,6,7,8 | sed 's/\t/\n/g' | pigz -p $(($threads/2>2?$threads/2:2)) -9 > ${R2_out}) \
+	| cut -f1,5 | tr " " "\t" | awk '{if ($1!=$3) print $0,"Read names in paired-end fastq files are out of sync!"; system("exit"); }' > /dev/stderr
 else
 	## single end
-	pigz -p2 -dc ${R1} | sed '/^$/d' | paste -d "\t" - - - - | awk -v n=${num_reads} -v s=${seed} "$reservoir_sampling" | sed 's/\t/\n/g' | pigz -9 > ${R1_out}
+	echo -e "\nDownsampling fastq file to $num_reads reads in single-end mode..." > /dev/stderr
+	pigz -p2 -dc ${R1} | sed '/^$/d' | paste -d "\t" - - - - | awk -v n=${num_reads} -v s=${seed} "$reservoir_sampling" | sed 's/\t/\n/g' | pigz -p $threads -9 > ${R1_out}
 fi
 
 
-
-
-## END
+################ END
 
 
 
