@@ -37,7 +37,7 @@ else:
         shell:
             cutadapt_path+"cutadapt "
                 ""+trim_options+" "
-                "-f fastq -e 0.1 -q 20 -O 3 --trim-n --minimum-length 25 -a AGATCGGAAGAGC "
+                "-f fastq -e 0.1 -q 16 -O 3 --trim-n --minimum-length 25 -a AGATCGGAAGAGC "
                 "-o ${{TMPDIR}}{params.tmp} "
                 "{input.r1} "
                 "&> {log} "
