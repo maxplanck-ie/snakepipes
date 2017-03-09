@@ -69,11 +69,11 @@ EOF
 ## do the work
 if [ "$paired" == true ]; then
 	## paired end
-	echo -e "\nDownsampling fastq files to $num_reads reads in paired-end mode..." > /dev/stderr
+	echo -e "\nDownsampling fastq files to $num_reads reads in paired-end mode..." > /dev/stderr;
 	paste <(pigz -p2 -dc ${R1} | sed '/^$/d' | paste -d "\t" - - - - ) <(pigz -p2 -dc ${R2} | sed '/^$/d' | paste -d "\t" - - - - ) \
 	| awk -v n=${num_reads} -v s=$seed "$reservoir_sampling" \
 	| tee >(cut -f1,2,3,4 | sed 's/\t/\n/g' | pigz -p $(($threads/2>2?$threads/2:2)) -9 > ${R1_out}) >(cut -f5,6,7,8 | sed 's/\t/\n/g' | pigz -p $(($threads/2>2?$threads/2:2)) -9 > ${R2_out}) \
-	| cut -f1,5 | tr " " "\t" | awk '{if ($1!=$3) print $0,"Read names in paired-end fastq files are out of sync!"; system("exit"); }' > /dev/stderr
+	| cut -f1,5 | tr " " "\t" | awk '{if ($1!=$3) print $0,"Read names in paired-end fastq files are out of sync!"; }'
 else
 	## single end
 	echo -e "\nDownsampling fastq file to $num_reads reads in single-end mode..." > /dev/stderr
