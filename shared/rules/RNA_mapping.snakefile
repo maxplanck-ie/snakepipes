@@ -15,6 +15,7 @@ if mapping_prg == "HISAT2":
                 unconc = mapping_prg+"/{sample}/un-conc.fastq.gz",
                 alconc = mapping_prg+"/{sample}/al-conc.fastq.gz"
             params:
+                input_splice = known_splicesites,
                 hisat_options = config["hisat_options"],
                 rna_strandness = rna_strandness
             benchmark:
@@ -26,6 +27,7 @@ if mapping_prg == "HISAT2":
                 "{params.hisat_options} "
                 "{params.rna_strandness} "
                 "-x "+hisat2_index+" "
+                "--known-splicesite-infile {params.input_splice} "
                 "-1 {input.r1} -2 {input.r2} "
                 "--novel-splicesite-outfile {output.splice} "
                 "--met-file {output.met} "
@@ -47,6 +49,7 @@ if mapping_prg == "HISAT2":
                 un = mapping_prg+"/{sample}/un.fastq.gz",
                 al = mapping_prg+"/{sample}/al.fastq.gz"
             params:
+                input_splice = known_splicesites,
                 hisat_options = config["hisat_options"],
                 rna_strandness = rna_strandness
             benchmark:
@@ -58,6 +61,7 @@ if mapping_prg == "HISAT2":
                 "{params.hisat_options} "
                 "{params.rna_strandness} "
                 "-x "+hisat2_index+" "
+                "--known-splicesite-infile {params.input_splice} "
                 "-U {input} "
                 "--novel-splicesite-outfile {output.splice} "
                 "--met-file {output.met} "
