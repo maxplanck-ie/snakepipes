@@ -22,3 +22,7 @@ trim_options: ''
 verbose: False
 mode: mapping-free
 sample_info: ''
+mapping_prg: STAR
+star_options: ''
+hisat_options: ''
+

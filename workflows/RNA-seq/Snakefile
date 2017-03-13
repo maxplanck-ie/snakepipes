@@ -26,7 +26,7 @@ if trim:
     include: os.path.join(maindir, "shared", "rules", "TrimGalore.snakefile")
 
 # HISAT2
-include: os.path.join(maindir, "shared", "rules", "HISAT2.snakefile")
+include: os.path.join(maindir, "shared", "rules", "RNA_mapping.snakefile")
 
 ## filtered annotation (GTF)
 include: os.path.join(maindir, "shared", "rules", "filter_annotation.snakefile")
@@ -91,7 +91,7 @@ def run_mapping_free():
 def run_mapping():
     if "mapping" in mode:
         file_list = [
-        expand("HISAT2/{sample}.bam.bai", sample = samples),
+        expand(mapping_prg+"/{sample}.bam.bai", sample = samples),
         expand("featureCounts/{sample}.counts.txt", sample=samples),
         "featureCounts/counts.tsv",
         ]
@@ -140,6 +140,7 @@ onstart:
         print("filter annotation:", filter_annotation)
         print("Salmon index options:", salmon_index_options)
         print("Sample info:", sample_info)
+        print("Mapping program:", mapping_prg)
         print("-" * 80, "\n")
 
         print("--- Genome ---------------------------------------------------------------------")

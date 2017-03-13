@@ -120,6 +120,7 @@ trim_options = config["trim_options"]
 fastqc = config["fastqc"]
 sample_info = config["sample_info"]
 mode = list(map( str.strip, re.split(',|;', config["mode"]) ))
+mapping_prg = config["mapping_prg"]
 
 
 if config["trim"] == "trimgalore":
