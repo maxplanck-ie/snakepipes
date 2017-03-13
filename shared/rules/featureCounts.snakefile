@@ -1,7 +1,7 @@
 if paired:
     rule featureCounts:
         input:
-            bam = "HISAT2/{sample}.bam",
+            bam = mapping_prg+"/{sample}.bam",
             saf = "Annotation/genes.filtered.saf",
         output:
             "featureCounts/{sample}.counts.txt"
@@ -22,7 +22,7 @@ if paired:
 else:
     rule featureCounts:
         input:
-            bam = "HISAT2/{sample}.bam",
+            bam = mapping_prg+"/{sample}.bam",
             saf = "Annotation/genes.filtered.saf",
         output:
             "featureCounts/{sample}.counts.txt"
