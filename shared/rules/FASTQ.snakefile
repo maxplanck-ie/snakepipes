@@ -37,7 +37,7 @@ if downsample:
                 num_reads = config["downsample"]
             benchmark:
                 "FASTQ/.benchmark/FASTQ_downsample.{sample}.benchmark"
-            threads: 20
+            threads: 10
             shell:
                 os.path.join(workflow_tools,"downsample_se_pe.sh")+" {params.num_reads} {threads} {input.r1} {output.r1_sampl} {input.r2} {output.r2_sampl}"
                 " && ( ( [ -f {output.r1_symlink} ] && [ -f {output.r2_symlink} ] ) || ( ln -s -r {output.r1_sampl} {output.r1_symlink} && ln -s -r {output.r2_sampl} {output.r2_symlink} ) ) && touch -h {output.r1_symlink} {output.r2_symlink} "
@@ -63,5 +63,5 @@ else:
         shell:
             "( [ -f {output} ] || ln -s -r {input} {output} ) && touch -h {output}"
 
-#   
+#
 #            "( [ -f {output} ] || ln -s -r {input} {output} ) && touch -h {output}"
