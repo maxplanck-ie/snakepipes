@@ -4,7 +4,7 @@ __version__ = "0.0.2"
 
 __description__ = """
 RNA-seq workflow v{version} - MPI-IE workflow for RNA mapping and analysis
-Fabian Kilpert,
+Fabian Kilpert
 March 13, 2017
 
 usage example:
