@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 
-__version__ = "0.3.2.1"
+__version__ = "0.3.3"
 
 __description__ = """
 DNA-mapping workflow v{version} - MPI-IE workflow for DNA mapping
-Fabian Kilpert, Andreas Richter
-June 27, 2016
+Fabian Kilpert, Andreas Richter, Steffen Heyne
+March 15, 2017
 
 usage example:
     DNA-mapping -i input-dir -o output-dir mm10
@@ -20,11 +20,12 @@ import sys
 import textwrap
 import time
 import shutil
+import yaml
 
 sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))))+"/shared/")
 import common_functions
 
-def parse_args():
+def parse_args(defaults):
     """
     Parse arguments from the command line.
     """
@@ -38,23 +39,24 @@ def parse_args():
     ## positional/required
     parser.add_argument("genome", metavar="GENOME", help="genome acronym of target organism (supported: 'dm6', 'hs37d5', 'mm9', 'mm10')")
     ## optional
-    parser.add_argument("-c", "--configfile", dest="configfile", help="configuration file (config.yaml)", default=None)
-    parser.add_argument("-i", "--input-dir", dest="indir", help="input directory containing the FASTQ files, either paired-end OR single-end data (default: '.')", default=None)
-    parser.add_argument("-o", "--output-dir", dest="outdir", help="output directory (default: '.')", default=None)
-    parser.add_argument("-j", "--jobs", dest="max_jobs", metavar="INT", help="maximum number of concurrently submitted Slurm jobs / cores if workflow is run locally (default: '%(default)s')", type=int, default=8)
-    parser.add_argument("--local", dest="local", action="store_true", default=False, help="run workflow locally (default: jobs are submitted to Slurm queue)")
-    parser.add_argument("--snakemake_options", dest="snakemake_options", metavar="STR", type=str, help="Snakemake options to be passed directly to snakemake, e.g. use --snakemake_options='--dryrun --rerun-incomplete --unlock --forceall'. (default: '%(default)s')", default="")
-    parser.add_argument("--downsample", dest="downsample", metavar="INT", help="downsample the given number of reads from the head of each FASTQ file", type=int, default=None)
-    parser.add_argument("--trim", dest="trim", choices=['cutadapt', 'trimgalore'], default=None, help="trim reads with Cutadapt or TrimGalore. Default: no Trimming!")
-    parser.add_argument("--fastqc", dest="fastqc", action="store_true", default=False, help="run FastQC read quality control")
-    parser.add_argument("--dedup", dest="dedup", action="store_true", default=False, help="retain only de-duplicated reads/read pairs (given single-/paired-end data), recommended for ChIP-seq data")
-    parser.add_argument("--properpairs", dest="properpairs", action="store_true", default=False, help="retain only reads mapping in proper pairs")
-    parser.add_argument("--mapq", dest="mapq", metavar="INT", help="retain only reads with at least the given mapping quality (default: '%(default)s')", type=int, default=0)
-    parser.add_argument("--bw-binsize", dest="bw_binsize", metavar="INT", help="bin size of output files in bigWig format (default: '%(default)s')", type=int, default=10)
-    parser.add_argument("--gcbias", dest="gcbias", action="store_true", default=False, help="run computeGCBias quality control (long runtime!)")
-    parser.add_argument("--tempdir", dest="tempdir", type=str, help="used prefix path for temporary directory created via mktemp. Created temp dir gets exported as $TMPDIR and is removed at the end of this wrapper! (default: '/data/extended/')", default="/data/extended/")
-    parser.add_argument("-v", "--verbose", dest="verbose", action="store_true", default=False, help="verbose output")
-
+    parser.add_argument("-c", "--configfile", dest="configfile", help="configuration file: config.yaml (default: '%(default)s')", default=defaults["configfile"])
+    parser.add_argument("-i", "--input-dir", dest="indir", help="input directory containing the FASTQ files, either paired-end OR single-end data (default: '%(default)s')", default=defaults["indir"])
+    parser.add_argument("-o", "--output-dir", dest="outdir", help="output directory (default: '%(default)s')", default=defaults["outdir"])
+    parser.add_argument("-j", "--jobs", dest="max_jobs", metavar="INT", help="maximum number of concurrently submitted Slurm jobs / cores if workflow is run locally (default: '%(default)s')", type=int, default=defaults["max_jobs"])
+    parser.add_argument("--local", dest="local", action="store_true", default=False, help="run workflow locally; default: jobs are submitted to Slurm queue (default: '%(default)s')")
+    parser.add_argument("--snakemake_options", dest="snakemake_options", metavar="STR", type=str, help="Snakemake options to be passed directly to snakemake, e.g. use --snakemake_options='--dryrun --rerun-incomplete --unlock --forceall'. (default: '%(default)s')", default=defaults["snakemake_options"])
+    parser.add_argument("--downsample", dest="downsample", metavar="INT", help="downsample the given number of reads from the head of each FASTQ file (default: '%(default)s')", type=int, default=defaults["downsample"])
+    parser.add_argument("--trim_prg", dest="trim_prg", choices=['cutadapt', 'trimgalore'], help="trimming program: Cutadapt or TrimGalore (default: '%(default)s')", default=defaults["trim_prg"])
+    parser.add_argument("--trim", dest="trim", action="store_true", help="activate trimming (default: '%(default)s')", default=defaults["trim"])
+    parser.add_argument("--qualimap", dest="qualimap", action="store_true", help="activate Qualimap (default: '%(default)s')", default=defaults["qualimap"])
+    parser.add_argument("--fastqc", dest="fastqc", action="store_true", help="run FastQC read quality control (default: '%(default)s')", default=defaults["fastqc"])
+    parser.add_argument("--dedup", dest="dedup", action="store_true", help="retain only de-duplicated reads/read pairs (given single-/paired-end data), recommended for ChIP-seq data (default: '%(default)s')", default=defaults["dedup"])
+    parser.add_argument("--properpairs", dest="properpairs", action="store_true", help="retain only reads mapping in proper pairs (default: '%(default)s')", default=defaults["properpairs"])
+    parser.add_argument("--mapq", dest="mapq", metavar="INT", help="retain only reads with at least the given mapping quality (default: '%(default)s')", type=int, default=defaults["mapq"])
+    parser.add_argument("--bw-binsize", dest="bw_binsize", metavar="INT", help="bin size of output files in bigWig format (default: '%(default)s')", type=int, default=defaults["bw_binsize"])
+    parser.add_argument("--gcbias", dest="gcbias", action="store_true", help="run computeGCBias quality control (long runtime!) (default: '%(default)s')", default=defaults["gcbias"])
+    parser.add_argument("--tempdir", dest="tempdir", type=str, help="used prefix path for temporary directory created via mktemp. Created temp dir gets exported as $TMPDIR and is removed at the end of this wrapper! (default: '%(default)s')", default=defaults["tempdir"])
+    parser.add_argument("-v", "--verbose", dest="verbose", action="store_true", help="verbose output (default: '%(default)s')", default=defaults["verbose"])
 
     args = parser.parse_args()
 
@@ -81,60 +83,42 @@ def parse_args():
         args.downsample = int(args.downsample)
     except:
         args.downsample = None
+        
+    args.cluster_logs_dir = os.path.join(args.outdir, "cluster_logs")
 
     return args
 
 
 def main():
-    args = parse_args()
 
-    ## Require shared snakemake workflow directory
+    ## basic paths
     this_script_dir = os.path.dirname(os.path.realpath(__file__))
-
     main_dir_path = os.path.join(os.path.dirname(os.path.dirname(this_script_dir)))
-    if not os.path.isdir(main_dir_path):
-        print("ERROR: Shared snakemake workflow directory is NOT available at:", main_dir_path)
-        exit(1)
+
+    ## defaults
+    with open(os.path.join(this_script_dir, "defaults.yaml"), "r") as f:
+        defaults = yaml.load(f)
+
+    ## get command line arguments
+    args = parse_args(defaults)
+
+    args.this_script_dir = this_script_dir
+    args.main_dir_path = main_dir_path
 
     ## Output directory + log directory
-    cluster_logs_dir = os.path.join(args.outdir, "cluster_logs")
-    subprocess.call("[ -d {cluster_logs_dir} ] || mkdir -p {cluster_logs_dir}".format(cluster_logs_dir=cluster_logs_dir), shell=True)
+    subprocess.call("[ -d {cluster_logs_dir} ] || mkdir -p {cluster_logs_dir}".format(cluster_logs_dir=args.cluster_logs_dir), shell=True)
 
-    ## required config variables
-    user_configs = "--config maindir={main_dir_path} indir={indir} outdir={outdir} genome={genome}".format(
-                                main_dir_path = main_dir_path,
-                                indir = args.indir,
-                                outdir = args.outdir,
-                                genome = args.genome).split()
-
-    ## optional config variables
-    if args.downsample:
-        user_configs += ["downsample={}".format(args.downsample)]
-    if args.trim:
-        user_configs += ["trim={}".format(args.trim)]
-    if args.fastqc:
-        user_configs += ["fastqc=True"]
-    if args.dedup:
-        user_configs += ["dedup=True"]
-    if args.properpairs:
-        user_configs += ["properpairs=True"]
-    if args.mapq:
-        user_configs += ["mapq={}".format(args.mapq)]
-    if args.bw_binsize:
-        user_configs += ["bw_binsize={}".format(args.bw_binsize)]
-    if args.gcbias:
-        user_configs += ["gcbias=True"]
-    if args.verbose:
-        user_configs += ["verbose=True"]
+    ## save args to configs.yaml in outdir
+    with open(os.path.join(args.outdir,'config.yaml'), 'w') as f:
+        yaml.dump(vars(args), f, default_flow_style=False)
 
     snakemake_module_load = "module load snakemake slurm &&".split()
     snakemake_cmd = """
-                    snakemake {snakemake_options} --latency-wait 120 --snakefile {snakefile} --jobs {max_jobs} {user_configs} --directory {outdir}
-                    """.format( snakefile = os.path.join(this_script_dir, "Snakefile"),
+                    snakemake {snakemake_options} --latency-wait 300 --snakefile {snakefile} --jobs {max_jobs} --directory {outdir}
+                    """.format( snakefile = os.path.join(args.this_script_dir, "Snakefile"),
                                 max_jobs = args.max_jobs,
-                                user_configs = " ".join(user_configs),
                                 outdir = args.outdir,
-                                cluster_logs_dir = os.path.abspath(cluster_logs_dir),
+                                cluster_logs_dir = os.path.abspath(args.cluster_logs_dir),
                                 snakemake_options=args.snakemake_options,
                               ).split()
 
@@ -145,13 +129,13 @@ def main():
         snakemake_cmd.append("--printshellcmds")
 
     if not args.local:
-        snakemake_cmd += ["--cluster 'SlurmEasy --threads {threads} --log", cluster_logs_dir, "--name {rule}.snakemake'"]
+        snakemake_cmd += ["--cluster 'SlurmEasy --threads {threads} --log", args.cluster_logs_dir, "--name {rule}.snakemake'"]
 
-    snakemake_log = "2>&1 | tee -a {}/DNA-mapping.log".format(args.outdir).split()
+    snakemake_log = "2>&1 | tee -a {}/RNA-seq.log".format(args.outdir).split()
 
-    ## create local temp dir and add this path to environment as $TMPDIR variable 
-    ## on SLURM: $TMPDIR is set, created and removed by SlurmEasy on cluster node 
-    temp_path = common_functions.make_temp_dir(args.tempdir, args.outdir)
+    ## create local temp dir and add this path to environment as $TMPDIR variable
+    ## on SLURM: $TMPDIR is set, created and removed by SlurmEasy on cluster node
+    temp_path = common_functions.make_temp_dir(args.tempdir, args.outdir, args.verbose)
     snakemake_exports = ("export TMPDIR="+temp_path+" && ").split()
 
     cmd = " ".join(snakemake_exports + snakemake_module_load + snakemake_cmd + snakemake_log)
@@ -160,7 +144,7 @@ def main():
         print("\n", cmd, "\n")
 
     ## Write snakemake_cmd to log file
-    with open(os.path.join(args.outdir,"DNA-mapping.log"),"w") as f:
+    with open(os.path.join(args.outdir,"RNA-seq.log"),"w") as f:
         f.write(" ".join(sys.argv)+"\n\n")
         f.write(cmd+"\n\n")
 
@@ -185,13 +169,13 @@ def main():
             # job_ids = subprocess.check_output("""ls {cluster_logs_dir} | awk -F "." '{{print $NF}}' | sed 's/e\|o//' | sort -u""".format(cluster_logs_dir=cluster_logs_dir), shell=True).split()
             # for job_id in job_ids:
             #     subprocess.call( "qdel {} 2>&1 >/dev/null".format(str(job_id)), shell="bash" )
-    
+
     ## remove temp dir
     if (temp_path != "" and os.path.exists(temp_path)):
         shutil.rmtree(temp_path, ignore_errors=True)
-        if args.verbose: 
-            print("Temp directory removed ("+temp_path+")!\n")
-            
+        if args.verbose:
+            print("temp dir removed: "+temp_path+"\n")
+
 if __name__ == "__main__":
     #print "Args:", sys.argv
     main()

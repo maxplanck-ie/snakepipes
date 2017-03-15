@@ -1,6 +1,52 @@
 import glob
 import os
 import subprocess
+import re
+
+#print(vars(workflow))
+#print("CONFIG:", config)
+# print("overwrite_configfile:", workflow.overwrite_configfile)
+
+
+## Load defaults.yaml with default parameters ##################################
+
+with open(os.path.join(workflow.basedir, "defaults.yaml"), "r") as f:
+    defaults = yaml.load(f)
+
+##print("\n--- defaults.yaml --------------------------------------------------------------")
+##for k,v in sorted(defaults.items()):
+##    print("{}: {}".format(k,v))
+##print
+
+
+## Load .config.yaml with basic configuration settings from wrapper
+def merge_dicts(x, y):
+    z = x.copy()
+    z.update(y)
+    return(z)
+
+try:
+    if workflow.overwrite_configfile:
+        pass # automatically uses snakemake config file (--configfile)
+    else:
+        ## or use config file from the output dir
+        with open(os.path.join(workflow.workdir_init, "config.yaml"), "r") as f:
+            config = yaml.load(f)
+    config = merge_dicts(defaults, config)
+except:
+    config = defaults
+
+
+## Main variables ##############################################################
+
+maindir = os.path.dirname(os.path.dirname(workflow.basedir))
+verbose = config["verbose"]
+
+if verbose:
+    print("\n--- config ----------------------------------------------------------------")
+    for k,v in sorted(config.items()):
+        print("{}: {}".format(k,v))
+    print()
 
 
 ### Functions ##################################################################
@@ -93,149 +139,19 @@ def update_filter(samples):
 
 ### Variable defaults ##########################################################
 
-try:
-    indir = config["indir"]
-except:
-    indir = os.getcwd()
+## Import from config into global name space! DANGEROUS!!!
+for k,v in config.items():
+    globals()[k] = v
 
-try:
-    outdir = config["outdir"]
-except:
-    outdir = os.getcwd()
 
-## paired-end read name extension
-try:
-    reads = config["reads"]
-except:
-    reads = ["_R1", "_R2"]
-
-## FASTQ file extension
-try:
-    ext = config["ext"]
-except:
-    ext = ".fastq.gz"
-
-## downsampling - number of reads
-try:
-    downsample = int(config["downsample"])
-except:
-    downsample = None
-
-try:
-    genome = config["genome"]
-except:
-    genome = None
-
-try:
-    mate_orientation = config["mate_orientation"]
-except:
-    mate_orientation = "--fr"
-
-try:
-    fragment_length = int(config["fragment_length"])
-except:
-    fragment_length = 200
-
-try:
-    bowtie_opts = config["bowtie_opts"]
-except:
-    bowtie_opts = ""
-    
-
-# IMPORTANT: When using snakemake with argument --config key=True, the
-# string "True" is assigned to variable "key". Assigning a boolean value
-# does not seem to be possible. Therefore, --config key=False will also
-# return the boolean value True as bool("False") gives True.
-# In contrast, within a configuration file config.yaml, assigment of boolean
-# values is possible.
-try:
-    trim_options = config["trim_options"]
-except:
-    trim_options = "--stringency 2"
-
-try:
-    if config["trim"] == "trimgalore":
-        trim = True
+## trim
+fastq_dir = "FASTQ"
+if trim:
+    fastq_indir_trim = "FASTQ"
+    if trim_prg == "trimgalore":
         fastq_dir = "FASTQ_TrimGalore"
-        fastq_indir_trim = "FASTQ"
-    elif config["trim"] == "cutadapt":
-        trim = True
+    elif trim_prg == "cutadapt":
         fastq_dir = "FASTQ_Cutadapt"
-        fastq_indir_trim = "FASTQ"
-        trim_options = ""
-    else:
-        trim = False
-        fastq_dir = "FASTQ"
-except:
-    trim = False
-    fastq_dir = "FASTQ"
-
-# IMPORTANT: When using snakemake with argument --config key=True, the
-# string "True" is assigned to variable "key". Assigning a boolean value
-# does not seem to be possible. Therefore, --config key=False will also
-# return the boolean value True as bool("False") gives True.
-# In contrast, within a configuration file config.yaml, assigment of boolean
-# values is possible.
-try:
-    if config["fastqc"]:
-        fastqc = True
-    else:
-        fastqc = False
-except:
-    fastqc = False
-
-
-# IMPORTANT: When using snakemake with argument --config key=True, the
-# string "True" is assigned to variable "key". Assigning a boolean value
-# does not seem to be possible. Therefore, --config key=False will also
-# return the boolean value True as bool("False") gives True.
-# In contrast, within a configuration file config.yaml, assigment of boolean
-# values is possible.
-try:
-    if config["dedup"]:
-        dedup = True
-    else:
-        dedup = False
-except:
-    dedup = False
-
-# IMPORTANT: When using snakemake with argument --config key=True, the
-# string "True" is assigned to variable "key". Assigning a boolean value
-# does not seem to be possible. Therefore, --config key=False will also
-# return the boolean value True as bool("False") gives True.
-# In contrast, within a configuration file config.yaml, assigment of boolean
-# values is possible.
-try:
-    if config["properpairs"]:
-        properpairs = True
-    else:
-        properpairs = False
-except:
-    properpairs = False
-
-try:
-    mapq = int(config["mapq"])
-except:
-    mapq = 0
-
-try:
-    bw_binsize = int(config["bw_binsize"])
-except:
-    bw_binsize = 10
-
-# IMPORTANT: When using snakemake with argument --config key=True, the
-# string "True" is assigned to variable "key". Assigning a boolean value
-# does not seem to be possible. Therefore, --config key=False will also
-# return the boolean value True as bool("False") gives True.
-# In contrast, within a configuration file config.yaml, assigment of boolean
-# values is possible.
-try:
-    if config["gcbias"]:
-        gcbias = True
-    else:
-        gcbias = False
-except:
-    gcbias = False
 
 
 ### Initialization #############################################################
