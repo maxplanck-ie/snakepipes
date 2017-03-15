@@ -1,0 +1,17 @@
+bw_binsize: 10
+configfile:
+dedup: false
+downsample:
+fastqc: false
+gcbias: false
+genome: 
+indir: .
+local: false
+mapq: 0
+max_jobs: 5
+outdir: .
+properpairs: true
+snakemake_options: ''
+tempdir: /data/extended/
+trim: cutadapt
+verbose: false
