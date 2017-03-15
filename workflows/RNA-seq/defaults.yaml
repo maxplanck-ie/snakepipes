@@ -1,4 +1,4 @@
-bw_binsize: 50
+bw_binsize: 25
 cluster_logs_dir: .
 configfile:
 downsample:
