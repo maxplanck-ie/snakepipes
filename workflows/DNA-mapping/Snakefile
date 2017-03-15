@@ -1,26 +1,11 @@
 # import glob
 import os
 import subprocess
+import yaml
 
-### output configuration for debugging #########################################
-################################################################################
-print("config: {}\n".format(config))
-
-
-### include scripts ############################################################
-################################################################################
-# main directory of all snakemake workflows
-try:
-    maindir = config["maindir"]
-except:
-    print("ERROR: Variable 'maindir' has not been set by Snakemake "
-          "parameter --config or in the configuration.yaml file.")
-    exit(1)
-
-# include tool paths
-include: os.path.join(maindir, "shared", "paths.py")
-# include global variables and functions
+### include ####################################################################
 include: os.path.join(workflow.basedir, "internals.snakefile")
+include: os.path.join(maindir, "shared", "paths.py")
 include: os.path.join(maindir, "shared", "common_functions.py")
 # load organism-specific data, i.e. genome indices, annotation, etc.
 include: os.path.join(maindir, "shared", "load_organism_data.py")
@@ -95,6 +80,13 @@ def run_deepTools_qc():
         "deepTools_qc/plotPCA/PCA.read_coverage.png" ] )
     return (file_list)
 
+def run_Qualimap():
+    file_list = []
+    if qualimap:
+        file_list += expand("Qualimap_qc/{sample}.filtered.bamqc_report.html", sample = samples)
+        file_list += expand("Qualimap_qc/{sample}.filtered.bamqc_results.txt", sample = samples)
+    return (file_list)
+
 
 ### execute before workflow starts #############################################
 ################################################################################
@@ -154,8 +146,7 @@ rule all:
         run_bamCoverage_filtered(dedup, properpairs, mapq),
         run_computeGCBias(gcbias),
         run_deepTools_qc(),
-        expand("Qualimap_qc/{sample}.filtered.bamqc_report.html", sample = samples),
-        expand("Qualimap_qc/{sample}.filtered.bamqc_results.txt", sample = samples)
+        run_Qualimap(),
 
 
 ### execute after workflow finished ############################################
