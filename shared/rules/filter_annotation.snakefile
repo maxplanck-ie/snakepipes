@@ -54,7 +54,7 @@ rule filter_annotation_bed:
     params:
         pattern = filter_annotation
     shell:
-        "cat {input.bed_annot} | grep {params.pattern} > {output.bed_filtered} "
+        "cat {input.bed_annot} | grep '{params.pattern}' > {output.bed_filtered} "
 
 
 rule annotation_bed2fasta:
@@ -78,7 +78,7 @@ rule annotation_bed2saf:
     params:
         pattern =  filter_annotation
     shell:
-        """echo -e 'GeneID\tChr\tStart\tEnd\tStrand' > {output} && grep {params.pattern} {input} | awk 'BEGIN{{OFS="\t"}}{{print $16, $1, $2, $3, $6}}' >> {output} """
+        """echo -e 'GeneID\tChr\tStart\tEnd\tStrand' > {output} && grep '{params.pattern}' {input} | awk 'BEGIN{{OFS="\t"}}{{print $16, $1, $2, $3, $6}}' >> {output} """
 
 rule annotation_bed2gtf:
     input:
