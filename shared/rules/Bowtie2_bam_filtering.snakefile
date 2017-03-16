@@ -7,7 +7,7 @@ if paired:
             r2 = fastq_dir+"/{sample}"+reads[1]+".fastq.gz"
         output:
             align_summary = "Bowtie2/{sample}.Bowtie2_summary.txt",
-            bam = temp("Bowtie2/{sample}.sorted.bam")
+            bam = "Bowtie2/{sample}.sorted.bam"
         params:
             bowtie_opts = bowtie_opts,
             mate_orientation = mate_orientation
@@ -31,7 +31,7 @@ else:
             fastq_dir+"/{sample}.fastq.gz"
         output:
             align_summary = "Bowtie2/{sample}.Bowtie2_summary.txt",
-            bam = temp("Bowtie2/{sample}.sorted.bam")
+            bam = "Bowtie2/{sample}.sorted.bam"
         params:
             bowtie_opts = bowtie_opts
         benchmark:
@@ -57,6 +57,10 @@ rule MarkDuplicates:
     output:
         bam = "Bowtie2/{sample}.bam",
         txt = "Picard_qc/MarkDuplicates/{sample}.mark_duplicates_metrics.txt"
+    params:
+        tmp = "Bowtie2/{sample}.markdup.bam",
+        bam_sorted = "{sample}.sorted.bam",
+        bam2 = "{sample}.bam"
     log:
         "Picard_qc/logs/MarkDuplicates.{sample}.log"
     benchmark:
@@ -64,14 +68,19 @@ rule MarkDuplicates:
     threads: 4 # Java performs parallel garbage collection
     shell:
         "java -Xmx8g -jar "+picard_path+"picard.jar MarkDuplicates "
-            "MAX_FILE_HANDLES=1000 "
-            "INPUT={input} "
-            "OUTPUT={output.bam} "
-            "METRICS_FILE={output.txt} "
-            "ASSUME_SORTED=true "
-            "VERBOSITY=WARNING "
-            "VALIDATION_STRINGENCY=LENIENT "
-            "&> {log} "
+        "MAX_FILE_HANDLES=1000 "
+        "INPUT={input} "
+        "OUTPUT={params.tmp} "
+        "METRICS_FILE={output.txt} "
+        "ASSUME_SORTED=true "
+        "VERBOSITY=WARNING "
+        "VALIDATION_STRINGENCY=LENIENT "
+        "&> {log} "
+        "&& rm Bowtie2/{params.bam_sorted} "
+        "&& rm -f {output.bam}.bai "
+        "&& mv {params.tmp} {output.bam} "
+        "&& ln -sf {params.bam2} Bowtie2/{params.bam_sorted} "
+        "&& touch Bowtie2/{params.bam_sorted} && touch {output.bam}"
 
 
 ### samtools_filter ############################################################
