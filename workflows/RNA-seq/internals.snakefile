@@ -104,36 +104,24 @@ def convert_library_type (paired, from_library_type, from_prg, to_prg,
 
 ## Variable defaults ##########################################################
 
-indir = config["indir"]
-outdir = config["outdir"]
-reads = config["reads"]
-library_type = config["library_type"]
-ext = config["ext"]
-downsample = config["downsample"]
-genome = config["genome"]
-fragment_length = config["fragment_length"]
-filter_annotation = config["filter_annotation"]
+## Import from config into global name space! DANGEROUS!!!
+for k,v in config.items():
+    globals()[k] = v
+
+
+mode = list(map( str.strip, re.split(',|;', config["mode"]) ))
+
 if not filter_annotation:
     filter_annotation = "''"
-salmon_index_options = config["salmon_index_options"]
-trim_options = config["trim_options"]
-fastqc = config["fastqc"]
-sample_info = config["sample_info"]
-mode = list(map( str.strip, re.split(',|;', config["mode"]) ))
-mapping_prg = config["mapping_prg"]
 
-
-if config["trim"] == "trimgalore":
-    trim = True
-    fastq_dir = "FASTQ_TrimGalore"
+## trim
+fastq_dir = "FASTQ"
+if trim:
     fastq_indir_trim = "FASTQ"
-elif config["trim"] == "cutadapt":
-    trim = True
-    fastq_dir = "FASTQ_Cutadapt"
-    fastq_indir_trim = "FASTQ"
-else:
-    trim = False
-    fastq_dir = "FASTQ"
+    if trim_prg == "trimgalore":
+        fastq_dir = "FASTQ_TrimGalore"
+    elif trim_prg == "cutadapt":
+        fastq_dir = "FASTQ_Cutadapt"
 
 
 ### Initialization #############################################################
