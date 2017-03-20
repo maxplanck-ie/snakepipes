@@ -53,7 +53,8 @@ def parse_args(defaults):
     parser.add_argument("--salmon_index_options", dest="salmon_index_options", metavar="STR", type=str, help="Salmon index options, e.g. '--type fmd' (default: '%(default)s')", default=defaults["salmon_index_options"])
     parser.add_argument("--featurecounts_options", dest="featurecounts_options", metavar="STR", type=str, help="featureCounts option string. The options '-p -B' are always used for paired-end data (default: '%(default)s')", default=defaults["featurecounts_options"])
     parser.add_argument("--downsample", dest="downsample", metavar="INT", help="downsample the given number of reads randomly from each FASTQ file (default: '%(default)s')", type=int, default=defaults["downsample"])
-    parser.add_argument("--trim", dest="trim", choices=['cutadapt', 'trimgalore'], help="trim reads with Cutadapt or TrimGalore. (default: '%(default)s')", default=defaults["trim"])
+    parser.add_argument("--trim_prg", dest="trim_prg", choices=['cutadapt', 'trimgalore'], help="trimming program: Cutadapt or TrimGalore (default: '%(default)s')", default=defaults["trim_prg"])
+    parser.add_argument("--trim", dest="trim", action="store_true", help="activate trimming (default: '%(default)s')", default=defaults["trim"])
     parser.add_argument("--trim_options", dest="trim_options", metavar="STR", type=str, help="Additional option string for trimming program of choice. (default: '%(default)s')", default=defaults["trim_options"])
     parser.add_argument("--fastqc", dest="fastqc", action="store_true", help="run FastQC read quality control (default: '%(default)s')", default=defaults["fastqc"])
     parser.add_argument("--library_type", dest="library_type", metavar="", help="user provided library type strand specificity. featurCounts style: 0, 1, 2 (Illumina TruSeq); default: '%(default)s')", type=int, default=defaults["library_type"])
@@ -65,7 +66,8 @@ def parse_args(defaults):
     args = parser.parse_args()
 
     ## Variable sanity checking
-    ## None
+    if args.mode is str:
+        args.mode = list(map( str.strip, re.split(',|;', args.mode) ))
 
     ## correction to variables
     try:

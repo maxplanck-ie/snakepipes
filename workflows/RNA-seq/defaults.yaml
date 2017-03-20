@@ -17,7 +17,8 @@ reads: ["_R1","_R2"]
 salmon_index_options: --type quasi -k 31
 snakemake_options: ''
 tempdir: /data/extended/
-trim:
+trim: false
+trim_prg: cutadapt
 trim_options: ''
 verbose: False
 mode: mapping-free
