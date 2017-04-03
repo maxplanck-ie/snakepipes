@@ -2,7 +2,7 @@ bw_binsize: 25
 cluster_logs_dir: .
 configfile:
 downsample:
-ext: .fastq.gz
+ext: '.fastq.gz'
 fastqc: False
 featurecounts_options: -C -Q 10 --primary
 filter_annotation:
