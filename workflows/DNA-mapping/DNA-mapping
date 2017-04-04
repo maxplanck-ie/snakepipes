@@ -25,6 +25,7 @@ import yaml
 sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))))+"/shared/")
 import common_functions
 
+
 def parse_args(defaults):
     """
     Parse arguments from the command line.
@@ -89,6 +90,12 @@ def parse_args(defaults):
     return args
 
 
+def merge_dicts(x, y):
+    z = x.copy()
+    z.update(y)
+    return(z)
+
+
 def main():
 
     ## basic paths
@@ -104,26 +111,32 @@ def main():
 
     args.this_script_dir = this_script_dir
     args.main_dir_path = main_dir_path
+    
+    ## merge configuration dicts
+    config = defaults   # 1) form defaults.yaml
+    if args.configfile:
+        with open(args.configfile, "r") as f:
+            user_config = yaml.load(f)
+        config = merge_dicts(config, user_config) # 2) form user_config.yaml
+    config = merge_dicts(config, vars(args)) # 3) from wrapper parameters
 
     ## Output directory + log directory
     subprocess.call("[ -d {cluster_logs_dir} ] || mkdir -p {cluster_logs_dir}".format(cluster_logs_dir=args.cluster_logs_dir), shell=True)
-
-    ## save args to configs.yaml in outdir
+    
+    ## save to configs.yaml in outdir
     with open(os.path.join(args.outdir,'config.yaml'), 'w') as f:
-        yaml.dump(vars(args), f, default_flow_style=False)
+        yaml.dump(config, f, default_flow_style=False)
 
     snakemake_module_load = "module load snakemake slurm &&".split()
     snakemake_cmd = """
-                    snakemake {snakemake_options} --latency-wait 300 --snakefile {snakefile} --jobs {max_jobs} --directory {outdir}
+                    snakemake {snakemake_options} --latency-wait 300 --snakefile {snakefile} --jobs {max_jobs} --directory {outdir} --configfile {configfile}
                     """.format( snakefile = os.path.join(args.this_script_dir, "Snakefile"),
                                 max_jobs = args.max_jobs,
                                 outdir = args.outdir,
                                 cluster_logs_dir = os.path.abspath(args.cluster_logs_dir),
-                                snakemake_options=args.snakemake_options,
+                                snakemake_options = args.snakemake_options,
+                                configfile = os.path.join(args.outdir,'config.yaml'),
                               ).split()
-
-    if args.configfile:
-        snakemake_cmd += ["--configfile", args.configfile]
 
     if args.verbose:
         snakemake_cmd.append("--printshellcmds")
@@ -175,6 +188,7 @@ def main():
         shutil.rmtree(temp_path, ignore_errors=True)
         if args.verbose:
             print("temp dir removed: "+temp_path+"\n")
+
 
 if __name__ == "__main__":
     #print "Args:", sys.argv

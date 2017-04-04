@@ -4,49 +4,12 @@ import subprocess
 import re
 
 #print(vars(workflow))
-#print("CONFIG:", config)
-# print("overwrite_configfile:", workflow.overwrite_configfile)
-
-
-## Load defaults.yaml with default parameters ##################################
-
-with open(os.path.join(workflow.basedir, "defaults.yaml"), "r") as f:
-    defaults = yaml.load(f)
-
-##print("\n--- defaults.yaml --------------------------------------------------------------")
-##for k,v in sorted(defaults.items()):
-##    print("{}: {}".format(k,v))
-##print
-
-
-## Load .config.yaml with basic configuration settings from wrapper
-def merge_dicts(x, y):
-    z = x.copy()
-    z.update(y)
-    return(z)
-
-try:
-    if workflow.overwrite_configfile:
-        pass # automatically uses snakemake config file (--configfile)
-    else:
-        ## or use config file from the output dir
-        with open(os.path.join(workflow.workdir_init, "config.yaml"), "r") as f:
-            config = yaml.load(f)
-    config = merge_dicts(defaults, config)
-except:
-    config = defaults
 
 
 ## Main variables ##############################################################
 
 maindir = os.path.dirname(os.path.dirname(workflow.basedir))
 verbose = config["verbose"]
-
-if verbose:
-    print("\n--- config ----------------------------------------------------------------")
-    for k,v in sorted(config.items()):
-        print("{}: {}".format(k,v))
-    print()
 
 
 ### Functions ##################################################################
@@ -139,9 +102,12 @@ def update_filter(samples):
 
 ### Variable defaults ##########################################################
 
-## Import from config into global name space! DANGEROUS!!!
-for k,v in config.items():
-    globals()[k] = v
+print("\n--- config ---------------------------------------------------------------------")
+for k,v in sorted(config.items()):
+    globals()[k] = v    ## Import from config into global name space! DANGEROUS!!!
+    if verbose:
+        print("{}: {}".format(k,v))
+print()
 
 
 ## trim
