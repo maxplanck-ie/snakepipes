@@ -1,26 +1,11 @@
 # import glob
 import os
+import subprocess
+import yaml
 
-
-### output configuration for debugging #########################################
-################################################################################
-## print("config: {}\n".format(config))
-
-
-### include scripts ############################################################
-################################################################################
-# main directory of all snakemake workflows
-try:
-    maindir = config["maindir"]
-except:
-    print("ERROR: Variable 'maindir' has not been set by Snakemake "
-          "parameter --config or in the configuration.yaml file.")
-    exit(1)
-
-# include tool paths
-include: os.path.join(maindir, "shared", "paths.py")
-# include global variables and functions
+### include ####################################################################
 include: os.path.join(workflow.basedir, "internals.snakefile")
+include: os.path.join(maindir, "shared", "paths.py")
 include: os.path.join(maindir, "shared", "common_functions.py")
 # load organism-specific data, i.e. genome indices, annotation, etc.
 include: os.path.join(maindir, "shared", "load_organism_data.py")
@@ -46,18 +31,15 @@ include: os.path.join(maindir, "shared", "rules", "ChIP_qc_report.snakefile")
 onstart:
     if "verbose" in config and config["verbose"]:
         print("--- Workflow parameter ---------------------------------------------------------")
-        print("Working directory:", workingdir)
         print("All samples:", all_samples)
-        print("Paired-end reads:", paired)
-        print("Genome:", genome)
-        print("BigWig bin size:", bw_binsize)
+        print("paired:", paired)
         print("-" * 80, "\n")
-        
+
         print("--- Environment ----------------------------------------------------------------")
         print("$TMPDIR: ",os.getenv('TMPDIR', ""))
         print("$HOSTNAME: ",os.getenv('HOSTNAME', ""))
         print("-" * 80, "\n")
-        
+
         print("--- Genome ---------------------------------------------------------------------")
         print("Genome:", genome)
         print("Effective genome size:", genome_size)
