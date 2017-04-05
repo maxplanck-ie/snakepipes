@@ -92,10 +92,10 @@ def run_Qualimap():
 ################################################################################
 onstart:
     if "verbose" in config and config["verbose"]:
-        print("--- Workflow parameter ---------------------------------------------------------")
-        print("Samples:", samples)
+        print("--- Workflow parameters --------------------------------------------------------")
+        print("samples:", samples)
         print("paired:", paired)
-        print("Read extension:", reads)
+        print("read extension:", reads)
         print("-" * 80, "\n")
 
         print("--- Environment ----------------------------------------------------------------")
