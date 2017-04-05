@@ -32,9 +32,7 @@ onstart:
     if "verbose" in config and config["verbose"]:
         print("--- Workflow parameter ---------------------------------------------------------")
         print("All samples:", all_samples)
-        print("Paired-end reads:", paired)
-        print("Genome:", genome)
-        print("BigWig bin size:", bw_binsize)
+        print("paired:", paired)
         print("-" * 80, "\n")
 
         print("--- Environment ----------------------------------------------------------------")
