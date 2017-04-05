@@ -1,3 +1,18 @@
+import glob
+import os
+import subprocess
+import re
+import yaml
+
+#print(vars(workflow))
+
+
+## Main variables ##############################################################
+
+maindir = os.path.dirname(os.path.dirname(workflow.basedir))
+verbose = config["verbose"]
+
+
 ### Functions ##################################################################
 
 def get_control(sample):
@@ -32,15 +47,12 @@ def is_chip(sample):
 
 ### Variable defaults ##########################################################
 
-try:
-    workingdir = config["workingdir"]
-except:
-    workingdir = os.getcwd()
-
-try:
-    genome = config["genome"]
-except:
-    genome = None
+print("\n--- config ---------------------------------------------------------------------")
+for k,v in sorted(config.items()):
+    globals()[k] = v    ## Import from config into global name space! DANGEROUS!!!
+    if verbose:
+        print("{}: {}".format(k,v))
+print()
 
 try:
     if config["paired"] == "True":
@@ -50,22 +62,16 @@ try:
 except:
     paired = False
 
-try:
-    bw_binsize = int(config["bw_binsize"])
-except:
-    bw_binsize = 10
-
-try:
-    fragment_length = int(config["fragment_length"])
-except:
-    fragment_length = 200
-
 
 ### Initialization #############################################################
 
 # TODO: catch exception if ChIP-seq samples are not unique
 # read ChIP-seq dictionary from config.yaml:
 # { ChIP1: { control: Input1, broad: True }, ChIP2: { control: Input2, broad: false }
+
+with open(config["samples_config"], "r") as f:
+    config["chip_dict"] = yaml.load(f)["chip_dict"]
+
 chip_dict = config["chip_dict"]
 
 # create unique sets of control samples, ChIP samples with and without control

@@ -1,0 +1,12 @@
+bw_binsize: 25
+configfile:
+fragment_length: 200
+genome:
+local: false
+max_jobs: 5
+outdir: .
+singleend: false
+snakemake_options: ''
+tempdir: /data/extended/
+verbose: false
+workingdir: .
