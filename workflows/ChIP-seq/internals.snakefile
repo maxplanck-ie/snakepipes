@@ -54,10 +54,6 @@ for k,v in sorted(config.items()):
         print("{}: {}".format(k,v))
 print()
 
-if singleend == False:
-	paired = True
-else:
-	paired = False
 
 ### Initialization #############################################################
 

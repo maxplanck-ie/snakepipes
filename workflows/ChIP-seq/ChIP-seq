@@ -49,7 +49,7 @@ def parse_args(defaults):
     parser.add_argument("-j", "--jobs", dest="max_jobs", metavar="INT", help="maximum number of concurrently submitted Slurm jobs / cores if workflow is run locally (default: '%(default)s')", type=int, default=defaults["max_jobs"])
     parser.add_argument("--local", dest="local", action="store_true", help="run workflow locally; default: jobs are submitted to Slurm queue (default: '%(default)s')", default=defaults["local"])
     parser.add_argument("--snakemake_options", dest="snakemake_options", metavar="STR", type=str, help="Snakemake options to be passed directly to snakemake, e.g. use --snakemake_options='--dryrun --rerun-incomplete --unlock --forceall'. (default: '%(default)s')", default="")
-    parser.add_argument("--single-end", dest="singleend", action="store_true", help="input data is single-end, not paired-end (default: '%(default)s')", default=defaults["singleend"])
+    parser.add_argument("--single-end", dest="paired", action="store_false", help="input data is single-end, not paired-end (default: '%(default)s')", default=defaults["paired"])
     parser.add_argument("--bw-binsize", dest="bw_binsize", metavar="INT", help="bin size of output files in bigWig format (default: '%(default)s')", type=int, default=defaults["bw_binsize"])
     parser.add_argument("--tempdir", dest="tempdir", type=str, help="used prefix path for temporary directory created via mktemp. Created temp dir gets exported as $TMPDIR and is removed at the end of this wrapper! (default: '%(default)s')", default=defaults["tempdir"])
     parser.add_argument("-v", "--verbose", dest="verbose", action="store_true", help="verbose output (default: '%(default)s')", default=defaults["verbose"])
@@ -125,7 +125,7 @@ def main():
 
     ## save to configs.yaml in outdir
     with open(os.path.join(args.outdir,'ChIP-seq.config.yaml'), 'w') as f:
-        yaml.dump(config, f, default_flow_style=False)
+        yaml.dump(config, f, default_flow_style=True)
 
     snakemake_module_load = "module load snakemake slurm &&".split()
     snakemake_cmd = """

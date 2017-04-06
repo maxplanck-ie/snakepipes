@@ -5,7 +5,7 @@ genome:
 local: false
 max_jobs: 5
 outdir: .
-singleend: false
+paired: true
 tempdir: /data/extended/
 verbose: false
 workingdir: .
