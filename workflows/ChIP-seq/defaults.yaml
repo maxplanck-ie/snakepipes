@@ -6,7 +6,6 @@ local: false
 max_jobs: 5
 outdir: .
 singleend: false
-snakemake_options: ''
 tempdir: /data/extended/
 verbose: false
 workingdir: .
