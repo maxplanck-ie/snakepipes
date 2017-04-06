@@ -54,14 +54,10 @@ for k,v in sorted(config.items()):
         print("{}: {}".format(k,v))
 print()
 
-try:
-    if config["paired"] == "True":
-        paired = True
-    else:
-        paired = False
-except:
-    paired = False
-
+if singleend == False:
+	paired = True
+else:
+	paired = False
 
 ### Initialization #############################################################
 
