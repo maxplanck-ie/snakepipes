@@ -125,7 +125,7 @@ def main():
     
     ## save to configs.yaml in outdir
     with open(os.path.join(args.outdir,'config.yaml'), 'w') as f:
-        yaml.dump(config, f, default_flow_style=False)
+        yaml.dump(config, f, default_flow_style=True)
 
     snakemake_module_load = "module load snakemake slurm &&".split()
     snakemake_cmd = """
@@ -144,7 +144,7 @@ def main():
     if not args.local:
         snakemake_cmd += ["--cluster 'SlurmEasy --threads {threads} --log", args.cluster_logs_dir, "--name {rule}.snakemake'"]
 
-    snakemake_log = "2>&1 | tee -a {}/RNA-seq.log".format(args.outdir).split()
+    snakemake_log = "2>&1 | tee -a {}/DNA-mapping.log".format(args.outdir).split()
 
     ## create local temp dir and add this path to environment as $TMPDIR variable
     ## on SLURM: $TMPDIR is set, created and removed by SlurmEasy on cluster node

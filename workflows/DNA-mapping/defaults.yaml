@@ -20,5 +20,5 @@ ext: .fastq.gz
 mate_orientation: '--fr'
 fragment_length: 200
 bowtie_opts: ''
-trim_options: '--stringency 2'
+trim_options: ''
 qualimap: false
