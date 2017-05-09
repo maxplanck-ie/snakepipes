@@ -8,10 +8,12 @@ rule SalmonIndex:
         "Salmon/.benchmark/Salmon.index.benchmark"
     params:
         salmon_index_options = salmon_index_options
+        sasamp = 2
+
     log: "Salmon/SalmonIndex/SalmonIndex.log"
     threads: 8
     shell:
-        salmon_path+"salmon index -p {threads} -t {input} -i Salmon/SalmonIndex {params.salmon_index_options} &> {log} && touch {output}"
+        salmon_path+"salmon index --sasamp {params.sasamp} -p {threads} -t {input} -i Salmon/SalmonIndex {params.salmon_index_options} &> {log} && touch {output}"
 
 
 ## Salmon quant
