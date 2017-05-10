@@ -1,0 +1,22 @@
+./RNA-seq -i ./sandbox/RNAseq_fastq/ -o /home/rauer/projects/snakemake_workflows/sandbox mm10 -m mapping -j 10 --trim --fastqc --snakemake_options=--rerun-incomplete --DE /data/manke/group/rauer/pospisilikgroup/170314_J00182_0022_AHJ23NBBXX_lanes1_2_3_4_5_6_7/sample_kdvswt.tsv
+
+export TMPDIR=/data/extended/tmp.snakemake.LRuafBqQ/ && module load snakemake slurm && snakemake --rerun-incomplete --latency-wait 300 --snakefile /home/rauer/projects/snakemake_workflows/workflows/RNA-seq/Snakefile --jobs 10 --directory /home/rauer/projects/snakemake_workflows/sandbox --configfile /home/rauer/projects/snakemake_workflows/sandbox/config.yaml --cluster 'SlurmEasy --threads {threads} --log /home/rauer/projects/snakemake_workflows/sandbox/cluster_logs --name {rule}.snakemake' 2>&1 | tee -a /home/rauer/projects/snakemake_workflows/sandbox/RNA-seq.log
+
+Provided cluster nodes: 10
+Job counts:
+	count	jobs
+	1	DESeq2
+	1	all
+	2
+rule DESeq2:
+	input: featureCounts/counts.tsv, /data/manke/group/rauer/pospisilikgroup/170314_J00182_0022_AHJ23NBBXX_lanes1_2_3_4_5_6_7/sample_kdvswt.tsv
+	output: DESeq2/DESeq2.session_info.txt
+	log: DESeq2/DESeq2.log
+	benchmark: DESeq2/.benchmark/DESeq2.featureCounts.benchmark
+1 of 2 steps (50%) done
+localrule all:
+	input: FASTQ/MomD9_23_R1.fastq.gz, FASTQ/MomD9_24_R1.fastq.gz, FASTQ/MomD9_25_R1.fastq.gz, FASTQ/MomD9_26_R1.fastq.gz, FASTQ/MomD9_32_R1.fastq.gz, FASTQ/MomD9_33_R1.fastq.gz, FASTQ/MomD9_34_R1.fastq.gz, FASTQ/MomD9_36_R1.fastq.gz, FASTQ/MomD9_37_R1.fastq.gz, FASTQ/MomD9_38_R1.fastq.gz, FASTQ/MomD9_23_R2.fastq.gz, FASTQ/MomD9_24_R2.fastq.gz, FASTQ/MomD9_25_R2.fastq.gz, FASTQ/MomD9_26_R2.fastq.gz, FASTQ/MomD9_32_R2.fastq.gz, FASTQ/MomD9_33_R2.fastq.gz, FASTQ/MomD9_34_R2.fastq.gz, FASTQ/MomD9_36_R2.fastq.gz, FASTQ/MomD9_37_R2.fastq.gz, FASTQ/MomD9_38_R2.fastq.gz, FastQC/MomD9_23_R1_fastqc.html, FastQC/MomD9_24_R1_fastqc.html, FastQC/MomD9_25_R1_fastqc.html, FastQC/MomD9_26_R1_fastqc.html, FastQC/MomD9_32_R1_fastqc.html, FastQC/MomD9_33_R1_fastqc.html, FastQC/MomD9_34_R1_fastqc.html, FastQC/MomD9_36_R1_fastqc.html, FastQC/MomD9_37_R1_fastqc.html, FastQC/MomD9_38_R1_fastqc.html, FastQC/MomD9_23_R2_fastqc.html, FastQC/MomD9_24_R2_fastqc.html, FastQC/MomD9_25_R2_fastqc.html, FastQC/MomD9_26_R2_fastqc.html, FastQC/MomD9_32_R2_fastqc.html, FastQC/MomD9_33_R2_fastqc.html, FastQC/MomD9_34_R2_fastqc.html, FastQC/MomD9_36_R2_fastqc.html, FastQC/MomD9_37_R2_fastqc.html, FastQC/MomD9_38_R2_fastqc.html, FastQC_trimmed/MomD9_23_R1_fastqc.html, FastQC_trimmed/MomD9_24_R1_fastqc.html, FastQC_trimmed/MomD9_25_R1_fastqc.html, FastQC_trimmed/MomD9_26_R1_fastqc.html, FastQC_trimmed/MomD9_32_R1_fastqc.html, FastQC_trimmed/MomD9_33_R1_fastqc.html, FastQC_trimmed/MomD9_34_R1_fastqc.html, FastQC_trimmed/MomD9_36_R1_fastqc.html, FastQC_trimmed/MomD9_37_R1_fastqc.html, FastQC_trimmed/MomD9_38_R1_fastqc.html, FastQC_trimmed/MomD9_23_R2_fastqc.html, FastQC_trimmed/MomD9_24_R2_fastqc.html, FastQC_trimmed/MomD9_25_R2_fastqc.html, FastQC_trimmed/MomD9_26_R2_fastqc.html, FastQC_trimmed/MomD9_32_R2_fastqc.html, FastQC_trimmed/MomD9_33_R2_fastqc.html, FastQC_trimmed/MomD9_34_R2_fastqc.html, FastQC_trimmed/MomD9_36_R2_fastqc.html, FastQC_trimmed/MomD9_37_R2_fastqc.html, FastQC_trimmed/MomD9_38_R2_fastqc.html, Annotation/genes.annotated.bed, Annotation/genes.filtered.bed, Annotation/genes.filtered.fa, Annotation/genes.filtered.saf, STAR/MomD9_23.bam.bai, STAR/MomD9_24.bam.bai, STAR/MomD9_25.bam.bai, STAR/MomD9_26.bam.bai, STAR/MomD9_32.bam.bai, STAR/MomD9_33.bam.bai, STAR/MomD9_34.bam.bai, STAR/MomD9_36.bam.bai, STAR/MomD9_37.bam.bai, STAR/MomD9_38.bam.bai, featureCounts/MomD9_23.counts.txt, featureCounts/MomD9_24.counts.txt, featureCounts/MomD9_25.counts.txt, featureCounts/MomD9_26.counts.txt, featureCounts/MomD9_32.counts.txt, featureCounts/MomD9_33.counts.txt, featureCounts/MomD9_34.counts.txt, featureCounts/MomD9_36.counts.txt, featureCounts/MomD9_37.counts.txt, featureCounts/MomD9_38.counts.txt, featureCounts/counts.tsv, DESeq2/DESeq2.session_info.txt
+
+--- config ---------------------------------------------------------------------
+
+2 of 2 steps (100%) done
