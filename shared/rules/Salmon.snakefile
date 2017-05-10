@@ -7,7 +7,7 @@ rule SalmonIndex:
     benchmark:
         "Salmon/.benchmark/Salmon.index.benchmark"
     params:
-        salmon_index_options = salmon_index_options
+        salmon_index_options = salmon_index_options,
         sasamp = 2
 
     log: "Salmon/SalmonIndex/SalmonIndex.log"
