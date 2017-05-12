@@ -2,7 +2,7 @@
 rule sleuth_Salmon:
     input:
         quant_files = expand("Salmon/{sample}/abundance.h5", sample=samples),
-        t2g = t2g,
+        t2g = 'Annotation/genes.filtered.t2g',
         sample_info = sample_info
     output:
         "sleuth/so.rds"
@@ -23,3 +23,5 @@ rule sleuth_Salmon:
         "{params.fdr} "
         "{input.t2g} "
         ") 2>&1 | tee {log}"
+
+## sleuth (on Salmon)

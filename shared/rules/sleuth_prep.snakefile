@@ -4,7 +4,7 @@ rule sleuth_prep:
         genes_gtf
     output:
         # DEseq2 path
-        t2g
+        'sleuth/'+genome+.'t2g'
     benchmark:
         "sleuth/.benchmark/sleuth_prep.Salmon.benchmark"
     log: "sleuth/sleuth_prep.log"

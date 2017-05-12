@@ -8,7 +8,7 @@ rule SalmonIndex:
         "Salmon/.benchmark/Salmon.index.benchmark"
     params:
         salmon_index_options = salmon_index_options,
-        sasamp = 2
+        sasamp = 1
 
     log: "Salmon/SalmonIndex/SalmonIndex.log"
     threads: 8

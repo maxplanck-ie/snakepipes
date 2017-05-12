@@ -37,7 +37,6 @@ if "mapping-free" in mode:
 
 ## Sleuth (on Salmon)
 if sample_info:
-    include: os.path.join(maindir, "shared", "rules", "sleuth_prep.snakefile")
     include: os.path.join(maindir, "shared", "rules", "sleuth.snakefile")
 
 ## bamCoverage_RPKM
