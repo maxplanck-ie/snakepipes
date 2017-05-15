@@ -1,3 +1,7 @@
+# internal tools
+workflow_tools = os.path.join(maindir,"shared","tools")
+
+# external tools
 # path names must end with "/" and not include the name of the executable
 bedtools_path="/package/bedtools2-2.25.0/bin/"
 bowtie2_path = "/package/bowtie2-2.2.8/bin/"
@@ -21,4 +25,3 @@ samtools_path="/package/samtools-1.3.1/bin/"
 tabix_path="/package/tabix-1.2.1/"
 trim_galore_path = "/package/trim_galore_v0.4.0/bin/"
 UCSC_tools_path="/package/UCSCtools/"
-workflow_tools = os.path.join(maindir,"shared","tools")
