@@ -3,5 +3,6 @@
 /.idea
 sandbox
 RNAseq_mapping-free
+/.snakemake
 /.gitignore
 __pychache__
