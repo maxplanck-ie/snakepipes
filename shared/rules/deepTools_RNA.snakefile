@@ -1,7 +1,7 @@
 rule bamCoverage_RPKM:
     input:
-        bam = "HISAT2/{sample}.bam",
-        bai = "HISAT2/{sample}.bam.bai"
+        bam = mapping_prg+"/{sample}.bam",
+        bai = mapping_prg+"/{sample}.bam.bai"
     output:
         "BW/{sample}.RPKM.bw"
     params:
@@ -23,8 +23,8 @@ rule bamCoverage_RPKM:
 
 rule plotEnrichment:
     input:
-        bam = expand("HISAT2/{sample}.bam", sample=samples),
-        bai = expand("HISAT2/{sample}.bam.bai", sample=samples),
+        bam = expand(mapping_prg+"/{sample}.bam", sample=samples),
+        bai = expand(mapping_prg+"/{sample}.bam.bai", sample=samples),
         bed = "Annotation/genes.filtered.bed",
     output:
         png = "deepTools_qc/plotEnrichment/plotEnrichment.png",
