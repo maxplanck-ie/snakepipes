@@ -11,7 +11,7 @@ rule fastq_barcode:
             UMI_offset = UMI_offset,
             CELLI_length = CELLI_length,
             CELLI_offset = CELLI_offset
-        threads: 2
+        threads: 8
         shell:"""
             paste <(paste - - - - < <(zcat {input.R1}))   <(paste - - - - < <(zcat {input.R2})) | \
             tr '\t' '\n' | \
@@ -43,7 +43,7 @@ rule fastq_barcode:
 			if (NR%8==5) 
 				{{$1=$1":SC:"CB":"sprintf("%.0f",QUAL_CB/CBAR_LEN)":UMI:"UMI":"sprintf("%.0f",QUAL_UMI/UMI_LEN)":"NUMT":"length(TAIL);print $0;
 				}}; 
-			if (NR%8==0 || NR%8>5) print $0}}' | pigz -c -p 2 > {output.R2_barcoded}
+			if (NR%8==0 || NR%8>5) print $0}}' | pigz -c -p 8 > {output.R2_barcoded}
             """
 
 ### HISAT2 genomic mapping

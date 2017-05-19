@@ -10,14 +10,13 @@ if paired:
         params:
             tmp1 = "{sample}"+reads[0]+".fq.gz",
             tmp2 = "{sample}"+reads[1]+".fq.gz",
-             opts = trim_options
         log:
             "FASTQ_Cutadapt/logs/Cutadapt.{sample}.log"
         benchmark:
             "FASTQ_Cutadapt/.benchmark/Cutadapt.{sample}.benchmark"
         shell:
             cutadapt_path+"cutadapt "
-                "{params.opts} "
+                ""+trim_options+" "
                 "-f fastq -e 0.1 -q 16 -O 3 --trim-n --minimum-length 25 -a AGATCGGAAGAGC -A AGATCGGAAGAGC "
                 "-o ${{TMPDIR}}{params.tmp1} -p ${{TMPDIR}}{params.tmp2} "
                 "{input.r1} {input.r2} "
@@ -30,15 +29,14 @@ else:
         output:
             r1 = "FASTQ_Cutadapt/{sample}.fastq.gz",
         params:
-            tmp = "{sample}.fq.gz",
-            opts = trim_options
+            tmp = "{sample}.fq.gz"
         log:
             "FASTQ_Cutadapt/logs/Cutadapt.{sample}.log"
         benchmark:
             "FASTQ_Cutadapt/.benchmark/Cutadapt.{sample}.benchmark"
         shell:
             cutadapt_path+"cutadapt "
-                "{params.opts} "
+                ""+trim_options+" "
                 "-f fastq -e 0.1 -q 16 -O 3 --trim-n --minimum-length 25 -a AGATCGGAAGAGC "
                 "-o ${{TMPDIR}}{params.tmp} "
                 "{input.r1} "
