@@ -1,3 +1,9 @@
 /.project
 /.pydevproject
 /.idea
+sandbox
+RNAseq_mapping-free
+/.snakemake
+/.gitignore
+__pychache__
+/.benchmark

@@ -19,7 +19,7 @@ t2g_file = args[[5]]
 setwd(outdir)
 getwd()
 
-sample_info = read.table(sample_info_file, header=T)
+sample_info = read.table(sample_info_file, header=T)[,1:2]
 colnames(sample_info) = c("sample", "condition")
 print(sample_info)
 sample_info$sample
@@ -44,15 +44,15 @@ print(s2c)
 # mart <- biomaRt::useMart(biomart = "ENSEMBL_MART_ENSEMBL",
 #                          dataset = "dmelanogaster_gene_ensembl",
 #                          host = 'ensembl.org')
-# 
+#
 # t2g <- biomaRt::getBM(attributes = c("ensembl_transcript_id", "ensembl_gene_id",
 #                                      "external_gene_name"), mart = mart)
-# 
+#
 # t2g <- dplyr::rename(t2g, target_id = ensembl_transcript_id,
 #                      ens_gene = ensembl_gene_id, ext_gene = external_gene_name)
-# 
+#
 # write.table(t2g, "dm6.t2g", col.names=T, row.names=F, sep="\t", quote=F)
-# 
+#
 ################################################################################
 
 ## get gene names / symbol names
@@ -64,7 +64,7 @@ tryCatch( { t2g = read.table(t2g_file, header=T) },
 
 if (exists("t2g")) {
   head(t2g)
-  
+
   ## add gene names
   so <- sleuth_prep(s2c, ~ condition, target_mapping = t2g)
 } else {
@@ -74,10 +74,10 @@ if (exists("t2g")) {
 
 ## model expression responding on condition
 so = sleuth_fit(so)
- 
+
 # ## fit reduced model (not depending on any factor)
 # so <- sleuth_fit(so, ~1, 'reduced')
-# 
+#
 # ## likelihood ratio test (LRT) between models to get transcripts affected by condition.
 # ## Usually considered more stringent than Wald test. No fold change!
 # so <- sleuth_lrt(so, 'reduced', 'full')
@@ -101,7 +101,7 @@ so = readRDS("so.rds")
 
 write(c("library(sleuth)",
         "so = readRDS('so.rds')",
-        "sleuth_live(so)"), 
+        "sleuth_live(so)"),
       file="sleuth_live.R")
 
 png("MA-plot.png")

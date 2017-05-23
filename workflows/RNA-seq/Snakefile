@@ -5,8 +5,10 @@ import yaml
 
 
 ### include ####################################################################
-include: os.path.join(workflow.basedir, "internals.snakefile")
+maindir = os.path.dirname(os.path.dirname(workflow.basedir))
 include: os.path.join(maindir, "shared", "paths.py")
+include: os.path.join(workflow.basedir, "internals.snakefile")
+
 include: os.path.join(maindir, "shared", "common_functions.py")
 # load organism-specific data, i.e. genome indices, annotation, etc.
 include: os.path.join(maindir, "shared", "load_organism_data.py")

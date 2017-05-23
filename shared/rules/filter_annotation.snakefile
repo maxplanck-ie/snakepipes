@@ -56,6 +56,14 @@ rule filter_annotation_bed:
     shell:
         "cat {input.bed_annot} | grep {params.pattern} > {output.bed_filtered} "
 
+rule annotation_bed2t2g:
+    input:
+        bed_annot = 'Annotation/genes.filtered.bed'
+    output:
+        'Annotation/genes.filtered.t2g'
+    shell:
+        "cat {input.bed_annot} | cut -f 13-14,16 | awk '{{OFS=\"\t\"; print $1, $3, $2}}' > {output}"
+
 
 rule annotation_bed2fasta:
     input:
