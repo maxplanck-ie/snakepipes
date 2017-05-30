@@ -41,7 +41,7 @@ def parse_args(defaults):
     )
 
     ## positional/required
-    parser.add_argument("genome", metavar="GENOME", help="genome acronym of target organism (supported: 'dm6', 'hs37d5', 'mm9', 'mm10')")
+    parser.add_argument("genome", metavar="GENOME", help="genome acronym of target organism (supported: 'dm6', 'hs37d5', 'mm9', 'mm10', 'SchizoSPombe_ASM294v2')")
     parser.add_argument("samples_config", metavar="SAMPLESCONFIG", help="configuration file ('samples.yaml') with sample annotation")
     ## optional
     parser.add_argument("-c", "--configfile", dest="configfile", help="user configuration file: config.yaml (default: '%(default)s')", default=defaults["configfile"])
