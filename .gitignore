@@ -1,3 +1,4 @@
+
 /.project
 /.pydevproject
 /.idea
@@ -7,3 +8,5 @@ RNAseq_mapping-free
 /.gitignore
 __pychache__
 /.benchmark
+runRNAseq.sh
+*tmp*
