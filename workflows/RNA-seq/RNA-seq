@@ -130,7 +130,7 @@ def main():
 
     ## save to configs.yaml in outdir
     with open(os.path.join(args.outdir,'config.yaml'), 'w') as f:
-        yaml.dump(config, f, default_flow_style=False)
+        yaml.dump(config, f, default_flow_style=None)
 
     snakemake_module_load = "module load snakemake slurm &&".split()
     snakemake_cmd = """
