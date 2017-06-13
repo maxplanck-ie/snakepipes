@@ -4,9 +4,15 @@ import subprocess
 import yaml
 
 ### include ####################################################################
-include: os.path.join(workflow.basedir, "internals.snakefile")
-include: os.path.join(maindir, "shared", "paths.py")
+maindir = os.path.dirname(os.path.dirname(workflow.basedir))
+#sys.path.append(os.path.join(maindir, "shared"))
+
 include: os.path.join(maindir, "shared", "common_functions.py")
+include: os.path.join(workflow.basedir, "internals.snakefile")
+
+
+include: os.path.join(maindir, "shared", "paths.py")
+
 # load organism-specific data, i.e. genome indices, annotation, etc.
 include: os.path.join(maindir, "shared", "load_organism_data.py")
 
@@ -120,19 +126,19 @@ onstart:
 ################################################################################
 rule all:
     input:
-        expand("FASTQ/{sample}{read}.fastq.gz", sample = samples, read = reads),
-        run_FastQC(fastqc),
-        run_Trimming(trim, fastqc),
-        expand("Bowtie2/{sample}.bam.bai", sample = samples),
-        expand("filtered_bam/{sample}.filtered.bam.bai", sample = samples),
-        expand("Picard_qc/AlignmentSummaryMetrics/{sample}.alignment_summary_metrics.txt", sample = samples),
-        expand("Picard_qc/MarkDuplicates/{sample}.mark_duplicates_metrics.txt", sample = samples),
-        run_CollectInsertSizeMetrics(paired),
-        expand("bamCoverage/{sample}.seq_depth_norm.bw", sample = samples),
-        run_bamCoverage_filtered(dedup, properpairs, mapq),
-        run_computeGCBias(gcbias),
-        run_deepTools_qc(),
-        run_Qualimap(),
+#         expand("FASTQ/{sample}{read}.fastq.gz", sample = samples, read = reads),
+#         run_FastQC(fastqc),
+#         run_Trimming(trim, fastqc),
+#         expand("Bowtie2/{sample}.bam.bai", sample = samples),
+#         expand("filtered_bam/{sample}.filtered.bam.bai", sample = samples),
+#         expand("Picard_qc/AlignmentSummaryMetrics/{sample}.alignment_summary_metrics.txt", sample = samples),
+#         expand("Picard_qc/MarkDuplicates/{sample}.mark_duplicates_metrics.txt", sample = samples),
+#         run_CollectInsertSizeMetrics(paired),
+#         expand("bamCoverage/{sample}.seq_depth_norm.bw", sample = samples),
+#         run_bamCoverage_filtered(dedup, properpairs, mapq),
+#         run_computeGCBias(gcbias),
+#         run_deepTools_qc(),
+#         run_Qualimap(),
 
 
 ### execute after workflow finished ############################################

@@ -1,6 +1,16 @@
 # import glob
 import os
 
+### include ####################################################################
+################################################################################
+maindir = os.path.dirname(os.path.dirname(workflow.basedir))
+include: os.path.join(maindir, "shared", "paths.py")
+include: os.path.join(workflow.basedir, "internals.snakefile")
+
+include: os.path.join(maindir, "shared", "common_functions.py")
+# load organism-specific data, i.e. genome indices, annotation, etc.
+include: os.path.join(maindir, "shared", "load_organism_data.py")
+
 
 ### output configuration for debugging #########################################
 ################################################################################
@@ -8,28 +18,9 @@ print("config: {}\n".format(config))
 print("$TMPDIR: ",os.getenv('TMPDIR', ""))
 print("$HOSTNAME: ",os.getenv('HOSTNAME', ""))
 
-### include scripts ############################################################
-################################################################################
-# main directory of all snakemake workflows
-try:
-    maindir = config["maindir"]
-except:
-    print("ERROR: Variable 'maindir' has not been set by Snakemake "
-          "parameter --config or in the configuration.yaml file.")
-    exit(1)
-
-# include tool paths
-include: os.path.join(maindir, "shared", "paths.py")
-# include global variables and functions
-include: os.path.join(workflow.basedir, "internals.snakefile")
-include: os.path.join(maindir, "shared", "common_functions.py")
-# load organism-specific data, i.e. genome indices, annotation, etc.
-include: os.path.join(maindir, "shared", "load_organism_data.py")
-
 
 ### include modules of other snakefiles ########################################
 ################################################################################
-# FASTQ: either downsample FASTQ files or create symlinks to input files
 include: os.path.join(maindir, "shared", "rules", "FASTQ.snakefile")
 include: os.path.join(maindir, "shared", "rules", "scRNAseq.snakefile")
 include: os.path.join(maindir, "shared", "rules", "FastQC.snakefile")
@@ -39,26 +30,8 @@ include: os.path.join(maindir, "shared", "rules", "filter_annotation.snakefile")
 if trim:
     include: os.path.join(maindir, "shared", "rules", "TrimGalore.snakefile")
 
-# Bowtie2 mapping, duplicate marking, BAM filtering and indexing
-#include: os.path.join(maindir, "shared", "rules", "Bowtie2_bam_filtering.snakefile")
-
-# Picard CollectAlignmentSummaryMetrics and CollectInsertSizeMetrics
-#include: os.path.join(maindir, "shared", "rules", "Picard_qc.snakefile")
-
-# deepTools QC
-#include: os.path.join(maindir, "shared", "rules", "deepTools_qc.snakefile")
-
-# Qualimap BAM QC
-#include: os.path.join(maindir, "shared", "rules", "Qualimap_bamqc.snakefile")
-
-
 ### conditional/optional rules #################################################
 ################################################################################
-#def run_FastQC(fastqc):
-#    if fastqc:
-#        return( expand("FastQC/{sample}{read}_fastqc.html", sample = samples, read = reads) )
-#    else:
-#        return([])
 
 def run_Trimming(trim):
     if trim:

@@ -3,8 +3,6 @@ import os
 import subprocess
 import re
 
-#print(vars(workflow))
-
 
 ## Main variables ##############################################################
 verbose = config["verbose"]

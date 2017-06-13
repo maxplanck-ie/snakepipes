@@ -4,12 +4,8 @@ import subprocess
 import re
 import yaml
 
-#print(vars(workflow))
-
 
 ## Main variables ##############################################################
-
-maindir = os.path.dirname(os.path.dirname(workflow.basedir))
 verbose = config["verbose"]
 
 

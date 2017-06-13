@@ -3,6 +3,10 @@ import os
 import subprocess
 
 
+## Main variables ##############################################################
+verbose = config["verbose"]
+
+
 ### Functions ###################################################################
 
 def get_sample_names(infiles):
