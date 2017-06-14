@@ -3,8 +3,36 @@
 import subprocess
 import os
 import re
+import yaml
 
-def get_sample_names(infiles):
+def load_configfile(configfile,verbose):
+    with open(configfile, "r") as f:
+        config = yaml.load(f)
+
+    if verbose:
+        print("\n--- config ---------------------------------------------------------------------")
+    for k,v in sorted(config.items()):
+        #globals()[k] = v    ## Import from config into global name space! DANGEROUS!!!
+        if verbose:
+            print("{}: {}".format(k,v))
+            
+    return config
+
+
+def load_organism_data(maindir,genome):
+    if os.path.isfile(os.path.join(maindir, "shared", "organisms", genome+".py")): 
+        with open(os.path.join(maindir, "shared", "organisms", genome+".py"), "r") as f:
+            organism = yaml.load(f)
+    elif os.path.isfile(genome): 
+        with open(genome, "r") as f:
+            organism = yaml.load(f)
+    else:
+        print("ERROR: Organism-specific configuration file NOT found for:", genome, "\n")
+        exit(1)
+    return organism
+
+
+def get_sample_names(infiles,ext,reads):
     """
     Get sample names without file extensions
     """
@@ -19,7 +47,7 @@ def get_sample_names(infiles):
     return(sorted(list(set(s))))
 
 
-def is_paired(infiles):
+def is_paired(infiles,ext,reads):
     """
     Check for paired-end input files
     """

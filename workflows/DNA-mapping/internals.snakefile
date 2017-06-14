@@ -1,16 +1,10 @@
-import glob
 import os
 import subprocess
-import re
-
 
 ## Main variables ##############################################################
-#verbose = config["verbose"]
 
 
 ### Functions ##################################################################
-
-
 
 # When modifying the function update_filter(), double-check wether the rule
 # samtools_filter has to be modified concordantly
@@ -62,13 +56,6 @@ def update_filter(samples):
 
 ### Variable defaults ##########################################################
 
-print("\n--- config ---------------------------------------------------------------------")
-for k,v in sorted(config.items()):
-    globals()[k] = v    ## Import from config into global name space! DANGEROUS!!!
-    if config["verbose"]:
-        print("{}: {}".format(k,v))
-print()
-
 ## trim
 fastq_dir = "FASTQ"
 if trim:
@@ -80,11 +67,6 @@ if trim:
 
 
 ### Initialization #############################################################
-
-infiles = sorted(glob.glob(os.path.join(indir, '*'+ext)))
-samples = get_sample_names(infiles)
-
-paired = is_paired(infiles)
 
 if not paired:
     reads = [""]

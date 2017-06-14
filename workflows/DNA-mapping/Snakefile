@@ -1,20 +1,26 @@
-# import glob
 import os
 import subprocess
 import yaml
+import glob
 
 ### include ####################################################################
 maindir = os.path.dirname(os.path.dirname(workflow.basedir))
-#sys.path.append(os.path.join(maindir, "shared"))
+sys.path.append(os.path.join(maindir, "shared"))
 
-include: os.path.join(maindir, "shared", "common_functions.py")
+import common_functions as cf
+
+globals().update(cf.load_configfile(workflow.overwrite_configfile,config["verbose"]))
+globals().update(cf.load_organism_data(maindir,genome))
+
+infiles = sorted(glob.glob(os.path.join(indir, '*'+ext)))
+samples = cf.get_sample_names(infiles,ext,reads)
+paired = cf.is_paired(infiles,ext,reads)
+
+
 include: os.path.join(workflow.basedir, "internals.snakefile")
-
-
 include: os.path.join(maindir, "shared", "paths.py")
-
 # load organism-specific data, i.e. genome indices, annotation, etc.
-include: os.path.join(maindir, "shared", "load_organism_data.py")
+#include: os.path.join(maindir, "shared", "load_organism_data.py")
 
 
 ### include modules of other snakefiles ########################################
@@ -102,6 +108,7 @@ onstart:
         print("samples:", samples)
         print("paired:", paired)
         print("read extension:", reads)
+        print("fastq dir:", fastq_dir)
         print("-" * 80, "\n")
 
         print("--- Environment ----------------------------------------------------------------")
