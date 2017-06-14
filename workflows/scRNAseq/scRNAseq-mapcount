@@ -14,13 +14,14 @@ usage example:
 
 import argparse
 import os
-import signal
+#import signal
 import subprocess
 import sys
 import textwrap
 import time
 import shutil
-import json
+#import json
+import yaml
 
 sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))))+"/shared/")
 import common_functions as cf
@@ -40,7 +41,7 @@ def parse_args(defaults):
     parser.add_argument("genome", metavar="GENOME", help="genome acronym of target organism (supported: 'dm6', 'hs37d5', 'mm9', 'mm10')")
     parser.add_argument("cell_names", metavar="CELL_NAMES", nargs='?', help="either tab-sep. file with cell name ranges or directory with *.csv files hat contain cell names and plate/library information for all fastq files!")
     ## optional
-    parser.add_argument("-c", "--configfile", dest="configfile", help="configuration file (config.yaml)", default=defaults["configfile"])
+    parser.add_argument("-c", "--configfile", dest="configfile", help="configuration file ('%(default)s')", default=defaults["configfile"])
     parser.add_argument("-i", "--input-dir", dest="indir", help="input directory containing the FASTQ files, either paired-end OR single-end data (default: '.')", default=defaults["indir"])
     parser.add_argument("-o", "--output-dir", dest="outdir", help="output directory (default: '.')", default=defaults["outdir"])
     parser.add_argument("-j", "--jobs", dest="max_jobs", metavar="INT", help="maximum number of concurrently submitted Slurm jobs / cores if workflow is run locally (default: '%(default)s')", type=int, default=defaults["max_jobs"])
@@ -64,11 +65,7 @@ def parse_args(defaults):
 #    parser.add_argument("--gcbias", dest="gcbias", action="store_true", default=False, help="run computeGCBias quality control (long runtime!)")
 
 
-
     args = parser.parse_args()
-
-    ## Variable sanity checking
-    ## None
 
     ## correction to variables
     try:
@@ -93,6 +90,21 @@ def parse_args(defaults):
 
     args.cluster_logs_dir = os.path.join(args.outdir, "cluster_logs")
 
+    if os.path.exists(os.path.abspath(args.barcode_file)):
+        args.barcode_file = os.path.abspath(args.barcode_file)
+    elif os.path.exists(os.path.join(os.path.dirname(os.path.realpath(__file__)),args.barcode_file)):
+        args.barcode_file = os.path.join(os.path.dirname(os.path.realpath(__file__)),args.barcode_file)
+    else: 
+        print("\nBarcode file not found! {}\n".format(args.barcode_file))
+        exit(1)
+
+    if args.cell_names:
+        if os.path.exists(os.path.abspath(args.cell_names)):
+            args.cell_names = os.path.abspath(args.cell_names)
+        else:
+            print("\nCell_names file not found! {}\n".format(args.cell_names))
+            exit(1)
+            
     return args
 
 
@@ -164,47 +176,40 @@ def main():
    #                             ).split() #os.path.abspath(args.cell_names)).split()
 
     ## optional config variables
-    if args.downsample:
-        user_configs += ["downsample={}".format(args.downsample)]
-    if args.barcode_pattern:
-        user_configs += ["barcode_pattern={}".format(args.barcode_pattern)]
-    if args.trim:
-        user_configs += ["trim={}".format(args.trim)]
-        user_configs += ['trim_options=\"{}\"'.format(args.trim_options)]
+#    if args.downsample:
+#        user_configs += ["downsample={}".format(args.downsample)]
+#    if args.barcode_pattern:
+#        user_configs += ["barcode_pattern={}".format(args.barcode_pattern)]
+#    if args.trim:
+#        user_configs += ["trim={}".format(args.trim)]
+#        user_configs += ['trim_options=\"{}\"'.format(args.trim_options)]
         
-    if args.filter_annotation:
-        user_configs += ['filter_annotation=\"{}\"'.format(args.filter_annotation)]
+ #   if args.filter_annotation:
+ #       user_configs += ['filter_annotation=\"{}\"'.format(args.filter_annotation)]
 
-    if args.verbose:
-        user_configs += ["verbose=True"]
+ #   if args.verbose:
+ #       user_configs += ["verbose=True"]
 	
-    if args.barcode_file:
-        if os.path.exists(os.path.abspath(args.barcode_file)):
-            user_configs += ["barcode_file={}".format(args.barcode_file)]
-        else:
-            print("\nBarcode file not found! {}\n".format(args.barcode_file))
-            exit(1)
      
-    if args.bw_binsize:
-    	user_configs += ["bw_binsize={}".format(args.bw_binsize)]
+ #   if args.bw_binsize:
+ #   	user_configs += ["bw_binsize={}".format(args.bw_binsize)]
     
-    if args.cell_names:
-        user_configs += ["cell_names={}".format(os.path.abspath(args.cell_names))]
     
-    user_configs += ["split_lib={}".format(args.split_lib)]
+  #  user_configs += ["split_lib={}".format(args.split_lib)]
     
 	## MPI
-    snakemake_module_load = "module load snakemake slurm &&".split()
+    #snakemake_module_load = "module load snakemake slurm &&".split()
     ## laptop
-    #snakemake_module_load = " ".split()
+    snakemake_module_load = " ".split()
+    
     snakemake_cmd = """
-                    snakemake {snakemake_options} --latency-wait 120 --snakefile {snakefile} --jobs {max_jobs} --config {user_configs} --directory {outdir}
+                    snakemake {snakemake_options} --latency-wait 300 --snakefile {snakefile} --jobs {max_jobs} --directory {outdir} --configfile {configfile}
                     """.format( snakefile = os.path.join(this_script_dir, "Snakefile"),
                                 max_jobs = args.max_jobs,
-                                user_configs = " ".join(user_configs),
                                 outdir = args.outdir,
-                                cluster_logs_dir = os.path.abspath(cluster_logs_dir),
+                                cluster_logs_dir = os.path.abspath(args.cluster_logs_dir),
                                 snakemake_options=args.snakemake_options,
+                                configfile = os.path.join(args.outdir,'config.yaml'),
                               ).split()
 
     if args.configfile:
@@ -220,7 +225,7 @@ def main():
 
     ## create local temp dir and add this path to environment as $TMPDIR variable 
     ## on SLURM: $TMPDIR is set, created and removed by SlurmEasy on cluster node 
-    temp_path = common_functions.make_temp_dir(args.tempdir, args.outdir)
+    temp_path = cf.make_temp_dir(args.tempdir, args.outdir)
     snakemake_exports = ("export TMPDIR="+temp_path+" && ").split()
 
     cmd = " ".join(snakemake_exports + snakemake_module_load + snakemake_cmd + snakemake_log)

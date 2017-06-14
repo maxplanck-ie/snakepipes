@@ -61,9 +61,6 @@ def parse_args(defaults):
 
     args = parser.parse_args()
 
-    ## Variable sanity checking
-    ## None
-
     ## correction to variables
     try:
         args.indir = os.path.abspath(args.indir)
