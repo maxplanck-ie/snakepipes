@@ -52,3 +52,12 @@ version 0.3.2 - June 27, 2016 - Andreas Richter
 version 0.3.2.1 - June 27, 2016 - Andreas Richter
 - added documentation to README.md
 - moved R library
+
+version 0.4 - 2016 - Fabian Kilpert, Steffen Heyne
+
+version 0.5 - 2017 - Steffen Heyne, Fabian Kilpert, Michael Rauer
+- scRNAseq workflow added
+- using yaml config files, all wrappers write out a config yaml that is than 
+  used by the snakemake file
+- better handling and usage of common_functions 
+- convert genome config files to yaml, function to load genome information

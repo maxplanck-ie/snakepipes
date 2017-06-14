@@ -6,7 +6,6 @@ import yaml
 
 
 ## Main variables ##############################################################
-verbose = config["verbose"]
 
 
 ### Functions ##################################################################
@@ -42,15 +41,6 @@ def is_chip(sample):
 
 
 ### Variable defaults ##########################################################
-
-print("\n--- config ---------------------------------------------------------------------")
-for k,v in sorted(config.items()):
-    globals()[k] = v    ## Import from config into global name space! DANGEROUS!!!
-    if verbose:
-        print("{}: {}".format(k,v))
-print()
-
-
 ### Initialization #############################################################
 
 # TODO: catch exception if ChIP-seq samples are not unique

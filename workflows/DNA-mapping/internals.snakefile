@@ -8,7 +8,7 @@ import subprocess
 
 # When modifying the function update_filter(), double-check wether the rule
 # samtools_filter has to be modified concordantly
-def update_filter(samples):
+def update_filter(samples,dedup,properpairs,mapq):
     """
     Ensure that only the specified filters are applied
     If filtered BAM and sample.filter files exist already, check that they
@@ -68,10 +68,14 @@ if trim:
 
 ### Initialization #############################################################
 
+infiles = sorted(glob.glob(os.path.join(indir, '*'+ext)))
+samples = cf.get_sample_names(infiles,ext,reads)
+paired = cf.is_paired(infiles,ext,reads)
+
 if not paired:
     reads = [""]
 
 # ensure that only the specified filters are applied to all files
 # delete already filtered BAM files if they were generated with different
 # filtering parameters in previous runs
-update_filter(samples)
+update_filter(samples,dedup,properpairs,mapq)

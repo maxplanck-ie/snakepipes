@@ -5,31 +5,53 @@ import os
 import re
 import yaml
 
+def merge_dicts(x, y):
+    z = x.copy()
+    z.update(y)
+    return(z)
+
 def load_configfile(configfile,verbose):
     with open(configfile, "r") as f:
         config = yaml.load(f)
 
     if verbose:
         print("\n--- config ---------------------------------------------------------------------")
-    for k,v in sorted(config.items()):
-        #globals()[k] = v    ## Import from config into global name space! DANGEROUS!!!
-        if verbose:
+        print("config file: {}".format(configfile))
+        for k,v in sorted(config.items()):
             print("{}: {}".format(k,v))
-            
+        print("-" * 80, "\n")
+        
     return config
 
 
-def load_organism_data(maindir,genome):
-    if os.path.isfile(os.path.join(maindir, "shared", "organisms", genome+".py")): 
-        with open(os.path.join(maindir, "shared", "organisms", genome+".py"), "r") as f:
+def load_organism_data(genome,maindir):
+    if os.path.isfile(os.path.join(maindir, "shared", "organisms", genome+".yaml")): 
+        with open(os.path.join(maindir, "shared", "organisms", genome+".yaml"), "r") as f:
             organism = yaml.load(f)
     elif os.path.isfile(genome): 
         with open(genome, "r") as f:
             organism = yaml.load(f)
     else:
-        print("ERROR: Organism-specific configuration file NOT found for:", genome, "\n")
+        print("ERROR: Genome configuration file NOT found for:", genome, "\n")
         exit(1)
     return organism
+
+
+def load_paths(pathfile,maindir,verbose):
+    with open(pathfile, "r") as f:
+        paths = yaml.load(f)
+    
+    ## add path to tools dir
+    paths["workflow_tools"] = os.path.join(maindir,"shared","tools")
+    
+    if verbose:
+        print("\n--- paths ---------------------------------------------------------------------")
+        for k,v in sorted(paths.items()):
+            print("{}: {}".format(k,v))
+        print("-" * 80, "\n")
+        print("\n")    
+    
+    return paths
 
 
 def get_sample_names(infiles,ext,reads):

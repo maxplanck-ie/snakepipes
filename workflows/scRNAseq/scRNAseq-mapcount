@@ -23,7 +23,7 @@ import shutil
 import json
 
 sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))))+"/shared/")
-import common_functions
+import common_functions as cf
 
 def parse_args(defaults):
     """
@@ -40,20 +40,20 @@ def parse_args(defaults):
     parser.add_argument("genome", metavar="GENOME", help="genome acronym of target organism (supported: 'dm6', 'hs37d5', 'mm9', 'mm10')")
     parser.add_argument("cell_names", metavar="CELL_NAMES", nargs='?', help="either tab-sep. file with cell name ranges or directory with *.csv files hat contain cell names and plate/library information for all fastq files!")
     ## optional
-    parser.add_argument("-c", "--configfile", dest="configfile", help="configuration file (config.yaml)", default=None)
-    parser.add_argument("-i", "--input-dir", dest="indir", help="input directory containing the FASTQ files, either paired-end OR single-end data (default: '.')", default=None)
-    parser.add_argument("-o", "--output-dir", dest="outdir", help="output directory (default: '.')", default=None)
-    parser.add_argument("-j", "--jobs", dest="max_jobs", metavar="INT", help="maximum number of concurrently submitted Slurm jobs / cores if workflow is run locally (default: '%(default)s')", type=int, default=8)
-    parser.add_argument("--local", dest="local", action="store_true", default=False, help="run workflow locally (default: jobs are submitted to Slurm queue)")
+    parser.add_argument("-c", "--configfile", dest="configfile", help="configuration file (config.yaml)", default=defaults["configfile"])
+    parser.add_argument("-i", "--input-dir", dest="indir", help="input directory containing the FASTQ files, either paired-end OR single-end data (default: '.')", default=defaults["indir"])
+    parser.add_argument("-o", "--output-dir", dest="outdir", help="output directory (default: '.')", default=defaults["outdir"])
+    parser.add_argument("-j", "--jobs", dest="max_jobs", metavar="INT", help="maximum number of concurrently submitted Slurm jobs / cores if workflow is run locally (default: '%(default)s')", type=int, default=defaults["max_jobs"])
+    parser.add_argument("--local", dest="local", action="store_true", default=defaults["local"], help="run workflow locally (default: jobs are submitted to Slurm queue)")
     parser.add_argument("--snakemake_options", dest="snakemake_options", metavar="STR", type=str, help="Snakemake options to be passed directly to snakemake, e.g. use --snakemake_options='--dryrun --rerun-incomplete --unlock --forceall'. (default: '%(default)s')", default=defaults["snakemake_options"])
     parser.add_argument("--tempdir", dest="tempdir", type=str, help="used prefix path for temporary directory created via mktemp. Created temp dir gets exported as $TMPDIR and is removed at the end of this wrapper! (default: '%(default)s')", default=defaults["tempdir"])
-    parser.add_argument("-v", "--verbose", dest="verbose", action="store_true", default=False, help="verbose output")
-    parser.add_argument("--downsample", dest="downsample", metavar="INT", help="downsample the given number of reads from the head of each FASTQ file", type=int, default=None)
-    parser.add_argument("--trim", dest="trim", choices=['cutadapt'], default=None, help="trim reads with Cutadapt or TrimGalore. Default: no Trimming!")
+    parser.add_argument("-v", "--verbose", dest="verbose", action="store_true", default=defaults["verbose"], help="verbose output")
+    parser.add_argument("--downsample", dest="downsample", metavar="INT", help="downsample the given number of reads from the head of each FASTQ file", type=int, default=defaults["downsample"])
+    parser.add_argument("--trim", dest="trim", action="store_true", default=defaults["trim"], help="Activate trimming with Cutadapt. Default: no Trimming!")
     parser.add_argument("--trim_options", dest="trim_options", metavar="STR", type=str, help="Options passed to the selected trimmer, e.g. use --trim_options='-a A{30}' for polyA trimming with cutadapt (default: '%(default)s')", default=defaults["trim_options"])
     parser.add_argument("--cell_barcode_file", dest="barcode_file", metavar="STR", help="2-column file with cell-index (1st col) and barcode (2nd col). Default will use CelSeq@MPI-IE file with 192 barcodes. (default: '%(default)s')", type=str, default= defaults["barcode_file"])
     parser.add_argument("--barcode_pattern", dest="barcode_pattern", metavar="STR", help="Defines the cell barcode and UMI order and length at the 5' end of R1 (Cel-seq protocol). 'N' defines UMI/random positions, X defines fixed positions; (default '%(default)s')", type=str, default=defaults["barcode_pattern"])
-    parser.add_argument("--split_lib", dest="split_lib", action="store_true", help="Set this option if only 96 out of 192 barcodes were used per sample.",default=False)
+    parser.add_argument("--split_lib", dest="split_lib", action="store_true", help="Set this option if only 96 out of 192 barcodes were used per sample.",default=defaults["split_lib"])
     parser.add_argument("--filter_annotation", dest="filter_annotation", metavar="STR", type=str, help="filter annotation GTF by grep for feature counting, e.g. use --filter_annotation='-v pseudogene'; (default: '%(default)s')", default=defaults["filter_annotation"])
     parser.add_argument("--bw-binsize", dest="bw_binsize", metavar="INT", help="bin size of output files in bigWig format (default: '%(default)s')", type=int, default=defaults["bw_binsize"])
  
@@ -91,46 +91,77 @@ def parse_args(defaults):
     except:
         args.downsample = None
 
+    args.cluster_logs_dir = os.path.join(args.outdir, "cluster_logs")
+
     return args
 
 
 def main():
     
+     ## basic paths
+    this_script_dir = os.path.dirname(os.path.realpath(__file__))
+    main_dir_path = os.path.join(os.path.dirname(os.path.dirname(this_script_dir)))
+
+    ## defaults
+    with open(os.path.join(this_script_dir, "defaults.yaml"), "r") as f:
+        defaults = yaml.load(f)
+
+    ## get command line arguments
+    args = parse_args(defaults)
+
+    args.this_script_dir = this_script_dir
+    args.main_dir_path = main_dir_path
+    
+    ## merge configuration dicts
+    config = defaults   # 1) form defaults.yaml
+    if args.configfile:
+        with open(args.configfile, "r") as f:
+            user_config = yaml.load(f)
+        config = cf.merge_dicts(config, user_config) # 2) form user_config.yaml
+    config = cf.merge_dicts(config, vars(args)) # 3) from wrapper parameters
+
+###########
+    
     
     ## Require shared snakemake workflow directory
-    this_script_dir = os.path.dirname(os.path.realpath(__file__))
+#    this_script_dir = os.path.dirname(os.path.realpath(__file__))
 
-    defaults = {'barcode_file' : this_script_dir+"/celseq_barcodes.192.txt",
-                'barcode_pattern' : "NNNNNNXXXXXX",
-                'filter_annotation' : "-v -P pseudogene",
-                'tempdir' : "/data/extended/",
-                'snakemake_options' : "",
-                'trim_options' : "'-a A{{30}}'",
-                'bw_binsize' : "10",
-                'split_lib' : False,
-                'cell_names' : None
-    }
+#    defaults = {'barcode_file' : this_script_dir+"/celseq_barcodes.192.txt",
+#                'barcode_pattern' : "NNNNNNXXXXXX",
+#                'filter_annotation' : "-v -P pseudogene",
+#                'tempdir' : "/data/extended/",
+#                'snakemake_options' : "",
+#                'trim_options' : "'-a A{{30}}'",
+#                'bw_binsize' : "10",
+#                'split_lib' : False,
+ #               'cell_names' : None
+ #   }
     
     #'filter_annotation' : "'-v -P \\\"full|decay|miRNA|misc_RNA|snRNA|snoRNA|scaRNA|sRNA|scRNA|rRNA|pseudogene|3prime_overlapping_ncRNA|processed_transcript\\\"'",
     
-    args = parse_args(defaults)
+    #args = parse_args(defaults)
     
-    main_dir_path = os.path.join(os.path.dirname(os.path.dirname(this_script_dir)))
-    if not os.path.isdir(main_dir_path):
-        print("ERROR: Shared snakemake workflow directory is NOT available at:", main_dir_path)
-        exit(1)
+   # main_dir_path = os.path.join(os.path.dirname(os.path.dirname(this_script_dir)))
+   # if not os.path.isdir(main_dir_path):
+   #     print("ERROR: Shared snakemake workflow directory is NOT available at:", main_dir_path)
+   #     exit(1)
+
+
 
     ## Output directory + log directory
-    cluster_logs_dir = os.path.join(args.outdir, "cluster_logs")
-    subprocess.call("[ -d {cluster_logs_dir} ] || mkdir -p {cluster_logs_dir}".format(cluster_logs_dir=cluster_logs_dir), shell=True)
+    subprocess.call("[ -d {cluster_logs_dir} ] || mkdir -p {cluster_logs_dir}".format(cluster_logs_dir=args.cluster_logs_dir), shell=True)
+
+    ## save to configs.yaml in outdir
+    with open(os.path.join(args.outdir,'config.yaml'), 'w') as f:
+        yaml.dump(config, f, default_flow_style=None)
 
     ## required config variables
-    user_configs = "maindir={main_dir_path} indir={indir} outdir={outdir} genome={genome} ".format(
-                                main_dir_path = main_dir_path,
-                                indir = args.indir,
-                                outdir = args.outdir,
-                                genome = args.genome
-                                ).split() #os.path.abspath(args.cell_names)).split()
+   # user_configs = "maindir={main_dir_path} indir={indir} outdir={outdir} genome={genome} ".format(
+   #                             main_dir_path = main_dir_path,
+   #                             indir = args.indir,
+   #                             outdir = args.outdir,
+   #                             genome = args.genome
+   #                             ).split() #os.path.abspath(args.cell_names)).split()
 
     ## optional config variables
     if args.downsample:

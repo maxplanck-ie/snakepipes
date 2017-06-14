@@ -1,30 +1,27 @@
 import os
 import subprocess
-import yaml
 import glob
 
-### include ####################################################################
+
+### snakemake_workflows initialization ########################################
 maindir = os.path.dirname(os.path.dirname(workflow.basedir))
 sys.path.append(os.path.join(maindir, "shared"))
 
 import common_functions as cf
 
+# load tool paths
+globals().update(cf.load_paths(os.path.join(maindir, "shared", "paths.yaml"),maindir,config["verbose"]))
+# load config file
 globals().update(cf.load_configfile(workflow.overwrite_configfile,config["verbose"]))
-globals().update(cf.load_organism_data(maindir,genome))
-
-infiles = sorted(glob.glob(os.path.join(indir, '*'+ext)))
-samples = cf.get_sample_names(infiles,ext,reads)
-paired = cf.is_paired(infiles,ext,reads)
-
-
-include: os.path.join(workflow.basedir, "internals.snakefile")
-include: os.path.join(maindir, "shared", "paths.py")
 # load organism-specific data, i.e. genome indices, annotation, etc.
-#include: os.path.join(maindir, "shared", "load_organism_data.py")
+globals().update(cf.load_organism_data(genome,maindir))
 
+# do workflow specific stuff now 
+include: os.path.join(workflow.basedir, "internals.snakefile")
 
 ### include modules of other snakefiles ########################################
 ################################################################################
+
 # FASTQ: either downsample FASTQ files or create symlinks to input files
 include: os.path.join(maindir, "shared", "rules", "FASTQ.snakefile")
 
@@ -133,19 +130,18 @@ onstart:
 ################################################################################
 rule all:
     input:
-#         expand("FASTQ/{sample}{read}.fastq.gz", sample = samples, read = reads),
-#         run_FastQC(fastqc),
-#         run_Trimming(trim, fastqc),
-#         expand("Bowtie2/{sample}.bam.bai", sample = samples),
-#         expand("filtered_bam/{sample}.filtered.bam.bai", sample = samples),
-#         expand("Picard_qc/AlignmentSummaryMetrics/{sample}.alignment_summary_metrics.txt", sample = samples),
-#         expand("Picard_qc/MarkDuplicates/{sample}.mark_duplicates_metrics.txt", sample = samples),
-#         run_CollectInsertSizeMetrics(paired),
-#         expand("bamCoverage/{sample}.seq_depth_norm.bw", sample = samples),
-#         run_bamCoverage_filtered(dedup, properpairs, mapq),
-#         run_computeGCBias(gcbias),
-#         run_deepTools_qc(),
-#         run_Qualimap(),
+        expand("FASTQ/{sample}{read}.fastq.gz", sample = samples, read = reads),
+        run_FastQC(fastqc),
+        expand("Bowtie2/{sample}.bam.bai", sample = samples),
+        expand("filtered_bam/{sample}.filtered.bam.bai", sample = samples),
+        expand("Picard_qc/AlignmentSummaryMetrics/{sample}.alignment_summary_metrics.txt", sample = samples),
+        expand("Picard_qc/MarkDuplicates/{sample}.mark_duplicates_metrics.txt", sample = samples),
+        run_CollectInsertSizeMetrics(paired),
+        expand("bamCoverage/{sample}.seq_depth_norm.bw", sample = samples),
+        run_bamCoverage_filtered(dedup, properpairs, mapq),
+        run_computeGCBias(gcbias),
+        run_deepTools_qc(),
+        run_Qualimap(),
 
 
 ### execute after workflow finished ############################################

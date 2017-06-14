@@ -1,0 +1,23 @@
+barcode_file: "celseq_barcodes.192.txt"
+barcode_pattern: "NNNNNNXXXXXX"
+filter_annotation: "-v -P pseudogene"
+tempdir: "/data/extended/"
+snakemake_options: ""
+bw_binsize: "10"
+split_lib: False
+cell_names: None
+trim: false
+trim_prg: cutadapt
+trim_options: "'-a A{{30}}'"
+configfile:
+downsample:
+ext: '.fastq.gz'
+genome:
+indir: .
+library_type: 2
+local: False
+max_jobs: 5
+outdir: .
+reads: ["_R1","_R2"]
+verbose: False
+cell_names: 
