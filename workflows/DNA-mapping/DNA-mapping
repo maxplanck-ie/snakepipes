@@ -76,11 +76,6 @@ def parse_args(defaults):
         args.configfile = os.path.abspath(args.configfile)
     except:
         args.configfile = None
-
-    try:
-        args.downsample = int(args.downsample)
-    except:
-        args.downsample = None
         
     args.cluster_logs_dir = os.path.join(args.outdir, "cluster_logs")
 

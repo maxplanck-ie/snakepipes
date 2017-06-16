@@ -85,20 +85,9 @@ def parse_args(defaults):
     except:
         args.configfile = None
 
-    try:
-        args.downsample = int(args.downsample)
-    except:
-        args.downsample = None
-
     args.cluster_logs_dir = os.path.join(args.outdir, "cluster_logs")
 
     return args
-
-
-def merge_dicts(x, y):
-    z = x.copy()
-    z.update(y)
-    return(z)
 
 
 def main():
@@ -122,8 +111,8 @@ def main():
     if args.configfile:
         with open(args.configfile, "r") as f:
             user_config = yaml.load(f)
-        config = merge_dicts(config, user_config) # 2) form user_config.yaml
-    config = merge_dicts(config, vars(args)) # 3) from wrapper parameters
+        config = cf.merge_dicts(config, user_config) # 2) form user_config.yaml
+    config = cf.merge_dicts(config, vars(args)) # 3) from wrapper parameters
 
     ## Output directory + log directory
     subprocess.call("[ -d {cluster_logs_dir} ] || mkdir -p {cluster_logs_dir}".format(cluster_logs_dir=args.cluster_logs_dir), shell=True)

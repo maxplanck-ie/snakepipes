@@ -13,14 +13,15 @@ def merge_dicts(x, y):
 def load_configfile(configfile,verbose):
     with open(configfile, "r") as f:
         config = yaml.load(f)
-
+#    for k,v in sorted(config.items()):
+#        if v != False and str(v or '') == '':
+#            config[k] = None
     if verbose:
         print("\n--- config ---------------------------------------------------------------------")
         print("config file: {}".format(configfile))
         for k,v in sorted(config.items()):
             print("{}: {}".format(k,v))
         print("-" * 80, "\n")
-        
     return config
 
 
@@ -48,8 +49,7 @@ def load_paths(pathfile,maindir,verbose):
         print("\n--- paths ---------------------------------------------------------------------")
         for k,v in sorted(paths.items()):
             print("{}: {}".format(k,v))
-        print("-" * 80, "\n")
-        print("\n")    
+        print("-" * 80, "\n")    
     
     return paths
 

@@ -1,24 +1,25 @@
-bw_binsize: 25
+genome:
+indir: .
+outdir: .
 configfile:
-downsample:
 ext: '.fastq.gz'
+reads: ["_R1","_R2"]
+tempdir: /data/extended/
+local: False
+max_jobs: 5
+snakemake_options: ""
+verbose: False
+downsample:
+trim: False
+trim_prg: cutadapt
+trim_options: ''
+bw_binsize: 25
 fastqc: False
 featurecounts_options: -C -Q 10 --primary
 filter_annotation:
 fragment_length: 200
-genome:
-indir: .
 library_type: 2
-local: False
-max_jobs: 5
-outdir: .
-reads: ["_R1","_R2"]
 salmon_index_options: --type quasi -k 31
-tempdir: /data/extended/
-trim: false
-trim_prg: cutadapt
-trim_options: ''
-verbose: False
 mode: mapping-free
 sample_info: ''
 mapping_prg: STAR
