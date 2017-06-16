@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 
-__version__ = "0.0.2"
+__version__ = "0.5"
 
 __description__ = """
 RNA-seq workflow v{version} - MPI-IE workflow for RNA mapping and analysis
-Fabian Kilpert
+Fabian Kilpert, Steffen Heyne
 March 13, 2017
 
 usage example:
@@ -24,7 +24,7 @@ import yaml
 
 
 sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))))+"/shared/")
-import common_functions
+import common_functions as cf
 
 def parse_args(defaults):
     """
@@ -49,7 +49,7 @@ def parse_args(defaults):
     parser.add_argument("--star_options", dest="star_options", metavar="STR", help="STAR option string, e.g.: '--twopassMode Basic' (default: '%(default)s')", type=str, default=defaults["star_options"])
     parser.add_argument("--hisat_options", dest="hisat_options", metavar="STR", help="HISAT2 option string (default: '%(default)s')", type=str, default=defaults["hisat_options"])
     parser.add_argument("--local", dest="local", action="store_true", help="run workflow locally (default: '%(default)s')", default=defaults["local"])
-    parser.add_argument("--snakemake_options", dest="snakemake_options", metavar="STR", type=str, help="Snakemake options to be passed directly to snakemake, e.g. use --snakemake_options='--dryrun --rerun-incomplete --unlock --forceall'. (default: '%(default)s')", default='')
+    parser.add_argument("--snakemake_options", dest="snakemake_options", metavar="STR", type=str, help="Snakemake options to be passed directly to snakemake, e.g. use --snakemake_options='--dryrun --rerun-incomplete --unlock --forceall'. (default: '%(default)s')", default=defaults["snakemake_options"])
     parser.add_argument("--salmon_index_options", dest="salmon_index_options", metavar="STR", type=str, help="Salmon index options, e.g. '--type fmd' (default: '%(default)s')", default=defaults["salmon_index_options"])
     parser.add_argument("--featurecounts_options", dest="featurecounts_options", metavar="STR", type=str, help="featureCounts option string. The options '-p -B' are always used for paired-end data (default: '%(default)s')", default=defaults["featurecounts_options"])
     parser.add_argument("--downsample", dest="downsample", metavar="INT", help="downsample the given number of reads randomly from each FASTQ file (default: '%(default)s')", type=int, default=defaults["downsample"])
@@ -128,7 +128,7 @@ def main():
                                 max_jobs = args.max_jobs,
                                 outdir = args.outdir,
                                 cluster_logs_dir = os.path.abspath(args.cluster_logs_dir),
-                                snakemake_options=args.snakemake_options,
+                                snakemake_options=str(args.snakemake_options or ''),
                                 configfile = os.path.join(args.outdir,'config.yaml'),
                               ).split()
 
@@ -142,7 +142,7 @@ def main():
 
     ## create local temp dir and add this path to environment as $TMPDIR variable
     ## on SLURM: $TMPDIR is set, created and removed by SlurmEasy on cluster node
-    temp_path = common_functions.make_temp_dir(args.tempdir, args.outdir, args.verbose)
+    temp_path = cf.make_temp_dir(args.tempdir, args.outdir, args.verbose)
     snakemake_exports = ("export TMPDIR="+temp_path+" && ").split()
 
     cmd = " ".join(snakemake_exports + snakemake_module_load + snakemake_cmd + snakemake_log)
@@ -183,6 +183,6 @@ def main():
         if args.verbose:
             print("temp dir removed: "+temp_path+"\n")
 
+
 if __name__ == "__main__":
-    #print "Args:", sys.argv
     main()

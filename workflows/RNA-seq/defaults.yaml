@@ -7,7 +7,7 @@ reads: ["_R1","_R2"]
 tempdir: /data/extended/
 local: False
 max_jobs: 5
-snakemake_options: ""
+snakemake_options:
 verbose: False
 downsample:
 trim: False

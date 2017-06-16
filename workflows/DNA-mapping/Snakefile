@@ -1,6 +1,4 @@
 import os
-import subprocess
-import glob
 
 
 ### snakemake_workflows initialization ########################################
@@ -29,7 +27,7 @@ include: os.path.join(maindir, "shared", "rules", "FASTQ.snakefile")
 if fastqc:
     include: os.path.join(maindir, "shared", "rules", "FastQC.snakefile")
 
-# TrimGalore
+# trimming
 if trim:
     include: os.path.join(maindir, "shared", "rules", "TrimGalore.snakefile")
 
@@ -56,7 +54,8 @@ def run_FastQC(fastqc):
 
 def run_Trimming(trim, fastqc):
     if trim and fastqc:
-        return( expand("FastQC_trimmed/{sample}{read}_fastqc.html", sample = samples, read = reads) )
+        return( expand(fastq_dir+"/{sample}{read}.fastq.gz", sample = samples, read = reads) + 
+                expand("FastQC_trimmed/{sample}{read}_fastqc.html", sample = samples, read = reads) )
     elif trim:
         return( expand(fastq_dir+"/{sample}{read}.fastq.gz", sample = samples, read = reads) )
     else:
@@ -132,16 +131,17 @@ rule all:
     input:
         expand("FASTQ/{sample}{read}.fastq.gz", sample = samples, read = reads),
         run_FastQC(fastqc),
-        expand("Bowtie2/{sample}.bam.bai", sample = samples),
-        expand("filtered_bam/{sample}.filtered.bam.bai", sample = samples),
-        expand("Picard_qc/AlignmentSummaryMetrics/{sample}.alignment_summary_metrics.txt", sample = samples),
-        expand("Picard_qc/MarkDuplicates/{sample}.mark_duplicates_metrics.txt", sample = samples),
-        run_CollectInsertSizeMetrics(paired),
-        expand("bamCoverage/{sample}.seq_depth_norm.bw", sample = samples),
-        run_bamCoverage_filtered(dedup, properpairs, mapq),
-        run_computeGCBias(gcbias),
-        run_deepTools_qc(),
-        run_Qualimap(),
+        run_Trimming(trim, fastqc),
+#        expand("Bowtie2/{sample}.bam.bai", sample = samples),
+#        expand("filtered_bam/{sample}.filtered.bam.bai", sample = samples),
+#        expand("Picard_qc/AlignmentSummaryMetrics/{sample}.alignment_summary_metrics.txt", sample = samples),
+#        expand("Picard_qc/MarkDuplicates/{sample}.mark_duplicates_metrics.txt", sample = samples),
+#        run_CollectInsertSizeMetrics(paired),
+#        expand("bamCoverage/{sample}.seq_depth_norm.bw", sample = samples),
+#        run_bamCoverage_filtered(dedup, properpairs, mapq),
+#        run_computeGCBias(gcbias),
+#        run_deepTools_qc(),
+#        run_Qualimap(),
 
 
 ### execute after workflow finished ############################################

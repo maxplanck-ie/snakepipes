@@ -1,5 +1,6 @@
 import os
 
+
 ### snakemake_workflows initialization ########################################
 maindir = os.path.dirname(os.path.dirname(workflow.basedir))
 sys.path.append(os.path.join(maindir, "shared"))
@@ -67,7 +68,8 @@ def run_FastQC(fastqc):
 
 def run_Trimming(trim, fastqc):
     if trim and fastqc:
-        return( expand("FastQC_trimmed/{sample}{read}_fastqc.html", sample = samples, read = reads) )
+        return( expand(fastq_dir+"/{sample}{read}.fastq.gz", sample = samples, read = reads) + 
+                expand("FastQC_trimmed/{sample}{read}_fastqc.html", sample = samples, read = reads) )
     elif trim:
         return( expand(fastq_dir+"/{sample}{read}.fastq.gz", sample = samples, read = reads) )
     else:

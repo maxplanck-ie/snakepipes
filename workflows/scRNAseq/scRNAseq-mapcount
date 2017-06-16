@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-__version__ = "0.1"
+__version__ = "0.5"
 
 __description__ = """
 single cell RNA-seq mapping and counting workflow v{version} - MPI-IE workflow for scRNA-seq
@@ -14,13 +14,11 @@ usage example:
 
 import argparse
 import os
-#import signal
 import subprocess
 import sys
 import textwrap
 import time
 import shutil
-#import json
 import yaml
 
 sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))))+"/shared/")
@@ -47,7 +45,7 @@ def parse_args(defaults):
     parser.add_argument("-j", "--jobs", dest="max_jobs", metavar="INT", help="maximum number of concurrently submitted Slurm jobs / cores if workflow is run locally (default: '%(default)s')", type=int, default=defaults["max_jobs"])
     parser.add_argument("-v", "--verbose", dest="verbose", action="store_true", default=defaults["verbose"], help="verbose output")
     parser.add_argument("--local", dest="local", action="store_true", default=defaults["local"], help="run workflow locally (default: jobs are submitted to Slurm queue)")
-    parser.add_argument("--snakemake_options", dest="snakemake_options", metavar="STR", type=str, help="Snakemake options to be passed directly to snakemake, e.g. use --snakemake_options='--dryrun --rerun-incomplete --unlock --forceall'. (default: '%(default)s')", default=defaults["snakemake_options"])
+    parser.add_argument("--snakemake_options", dest="snakemake_options", metavar="STR", help="Snakemake options to be passed directly to snakemake, e.g. use --snakemake_options='--dryrun --rerun-incomplete --unlock --forceall'. (default: '%(default)s')", default=defaults["snakemake_options"])
     parser.add_argument("--tempdir", dest="tempdir", type=str, help="used prefix path for temporary directory created via mktemp. Created temp dir gets exported as $TMPDIR and is removed at the end of this wrapper! (default: '%(default)s')", default=defaults["tempdir"])
     parser.add_argument("--downsample", dest="downsample", metavar="INT", help="downsample the given number of reads from the head of each FASTQ file", type=int, default=defaults["downsample"])
     parser.add_argument("--trim", dest="trim", action="store_true", default=defaults["trim"], help="Activate trimming with Cutadapt. Default: no Trimming!")
@@ -121,34 +119,9 @@ def main():
         config = cf.merge_dicts(config, user_config) # 2) form user_config.yaml
     config = cf.merge_dicts(config, vars(args)) # 3) from wrapper parameters
 
-###########
-    
-    
-    ## Require shared snakemake workflow directory
-#    this_script_dir = os.path.dirname(os.path.realpath(__file__))
-
-#    defaults = {'barcode_file' : this_script_dir+"/celseq_barcodes.192.txt",
-#                'barcode_pattern' : "NNNNNNXXXXXX",
-#                'filter_annotation' : "-v -P pseudogene",
-#                'tempdir' : "/data/extended/",
-#                'snakemake_options' : "",
-#                'trim_options' : "'-a A{{30}}'",
-#                'bw_binsize' : "10",
-#                'split_lib' : False,
- #               'cell_names' : None
- #   }
     
     #'filter_annotation' : "'-v -P \\\"full|decay|miRNA|misc_RNA|snRNA|snoRNA|scaRNA|sRNA|scRNA|rRNA|pseudogene|3prime_overlapping_ncRNA|processed_transcript\\\"'",
     
-    #args = parse_args(defaults)
-    
-   # main_dir_path = os.path.join(os.path.dirname(os.path.dirname(this_script_dir)))
-   # if not os.path.isdir(main_dir_path):
-   #     print("ERROR: Shared snakemake workflow directory is NOT available at:", main_dir_path)
-   #     exit(1)
-
-
-
     ## Output directory + log directory
     subprocess.call("[ -d {cluster_logs_dir} ] || mkdir -p {cluster_logs_dir}".format(cluster_logs_dir=args.cluster_logs_dir), shell=True)
 
@@ -156,40 +129,10 @@ def main():
     with open(os.path.join(args.outdir,'config.yaml'), 'w') as f:
         yaml.dump(config, f, default_flow_style=None)
 
-    ## required config variables
-   # user_configs = "maindir={main_dir_path} indir={indir} outdir={outdir} genome={genome} ".format(
-   #                             main_dir_path = main_dir_path,
-   #                             indir = args.indir,
-   #                             outdir = args.outdir,
-   #                             genome = args.genome
-   #                             ).split() #os.path.abspath(args.cell_names)).split()
-
-    ## optional config variables
-#    if args.downsample:
-#        user_configs += ["downsample={}".format(args.downsample)]
-#    if args.barcode_pattern:
-#        user_configs += ["barcode_pattern={}".format(args.barcode_pattern)]
-#    if args.trim:
-#        user_configs += ["trim={}".format(args.trim)]
-#        user_configs += ['trim_options=\"{}\"'.format(args.trim_options)]
-        
- #   if args.filter_annotation:
- #       user_configs += ['filter_annotation=\"{}\"'.format(args.filter_annotation)]
-
- #   if args.verbose:
- #       user_configs += ["verbose=True"]
-	
-     
- #   if args.bw_binsize:
- #   	user_configs += ["bw_binsize={}".format(args.bw_binsize)]
-    
-    
-  #  user_configs += ["split_lib={}".format(args.split_lib)]
-    
 	## MPI
-    #snakemake_module_load = "module load snakemake slurm &&".split()
+    snakemake_module_load = "module load snakemake slurm &&".split()
     ## laptop
-    snakemake_module_load = " ".split()
+    #snakemake_module_load = " ".split()
     
     snakemake_cmd = """
                     snakemake {snakemake_options} --latency-wait 300 --snakefile {snakefile} --jobs {max_jobs} --directory {outdir} --configfile {configfile}
@@ -197,7 +140,7 @@ def main():
                                 max_jobs = args.max_jobs,
                                 outdir = args.outdir,
                                 cluster_logs_dir = os.path.abspath(args.cluster_logs_dir),
-                                snakemake_options=args.snakemake_options,
+                                snakemake_options=str(args.snakemake_options or ''),
                                 configfile = os.path.join(args.outdir,'config.yaml'),
                               ).split()
 
@@ -208,7 +151,7 @@ def main():
         snakemake_cmd.append("--printshellcmds")
 
     if not args.local:
-        snakemake_cmd += ["--cluster 'SlurmEasy --threads {threads} --log", cluster_logs_dir, "--name {rule}.snakemake'"]
+        snakemake_cmd += ["--cluster 'SlurmEasy --threads {threads} --log", args.cluster_logs_dir, "--name {rule}.snakemake'"]
 
     snakemake_log = "2>&1 | tee -a {}/scRNAseq-mapcount.log".format(args.outdir).split()
 
@@ -254,7 +197,7 @@ def main():
         shutil.rmtree(temp_path, ignore_errors=True)
         if args.verbose: 
             print("Temp directory removed ("+temp_path+")!\n")
+
             
 if __name__ == "__main__":
-    #print "Args:", sys.argv
     main()

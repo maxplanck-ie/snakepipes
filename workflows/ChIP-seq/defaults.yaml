@@ -9,3 +9,4 @@ paired: true
 tempdir: /data/extended/
 verbose: false
 workingdir: .
+snakemake_options:

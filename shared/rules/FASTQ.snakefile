@@ -34,7 +34,7 @@ if downsample:
                 r1_symlink = "FASTQ/{sample}"+reads[0]+".fastq.gz",
                 r2_symlink = "FASTQ/{sample}"+reads[1]+".fastq.gz"
             params:
-                num_reads = config["downsample"]
+                num_reads = downsample
             benchmark:
                 "FASTQ/.benchmark/FASTQ_downsample.{sample}.benchmark"
             threads: 10
@@ -50,7 +50,7 @@ if downsample:
                 fq_symlink = "FASTQ/{sample}.fastq.gz"
             threads: 12
             params:
-                num_reads = config["downsample"]
+                num_reads = downsample
             shell:
                 os.path.join(workflow_tools,"downsample_se_pe.sh")+" {params.num_reads} {threads} {input} {output.fq_sampl} "
                 " && ( [ -f {output} ] || ( ln -s -r {output.fq_sampl} {output.fq_symlink} ) ) && touch -h {output.fq_symlink}"

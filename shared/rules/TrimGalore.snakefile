@@ -10,13 +10,14 @@ if paired:
         params:
             tmp1 = "{sample}"+reads[0]+".fq.gz",
             tmp2 = "{sample}"+reads[1]+".fq.gz",
+            opts = ''#str(trim_options or '')
         log:
             "FASTQ_Cutadapt/logs/Cutadapt.{sample}.log"
         benchmark:
             "FASTQ_Cutadapt/.benchmark/Cutadapt.{sample}.benchmark"
         shell:
             cutadapt_path+"cutadapt "
-                ""+trim_options+" "
+                "{params.opts} "
                 "-f fastq -e 0.1 -q 16 -O 3 --trim-n --minimum-length 25 -a AGATCGGAAGAGC -A AGATCGGAAGAGC "
                 "-o ${{TMPDIR}}{params.tmp1} -p ${{TMPDIR}}{params.tmp2} "
                 "{input.r1} {input.r2} "
@@ -29,14 +30,15 @@ else:
         output:
             r1 = "FASTQ_Cutadapt/{sample}.fastq.gz",
         params:
-            tmp = "{sample}.fq.gz"
+            tmp = "{sample}.fq.gz",
+            opts = str(trim_options or '') #'-a A{\'30\'}' #
         log:
             "FASTQ_Cutadapt/logs/Cutadapt.{sample}.log"
         benchmark:
             "FASTQ_Cutadapt/.benchmark/Cutadapt.{sample}.benchmark"
         shell:
             cutadapt_path+"cutadapt "
-                ""+trim_options+" "
+                "{params.opts} "
                 "-f fastq -e 0.1 -q 16 -O 3 --trim-n --minimum-length 25 -a AGATCGGAAGAGC "
                 "-o ${{TMPDIR}}{params.tmp} "
                 "{input.r1} "
@@ -57,7 +59,7 @@ if paired:
         params:
             tmp1 = "FASTQ_TrimGalore/{sample}"+reads[0]+"_val_1.fq.gz",
             tmp2 = "FASTQ_TrimGalore/{sample}"+reads[1]+"_val_2.fq.gz",
-            opts = trim_options
+            opts = str(trim_options or '')
         log:
             "FASTQ_TrimGalore/logs/TrimGalore.{sample}.log"
         benchmark:
@@ -80,7 +82,7 @@ else:
             "FASTQ_TrimGalore/{sample}.fastq.gz"
         params:
             tmp = "FASTQ_TrimGalore/{sample}_trimmed.fq.gz",
-            opts = trim_options
+            opts = str(trim_options or '')
         log:
             "FASTQ_TrimGalore/logs/TrimGalore.{sample}.log"
         benchmark:

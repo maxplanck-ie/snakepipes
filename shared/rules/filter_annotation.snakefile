@@ -52,7 +52,7 @@ rule filter_annotation_bed:
     output:
         bed_filtered = "Annotation/genes.filtered.bed"
     params:
-        pattern = filter_annotation
+        pattern = str(filter_annotation or '')
     shell:
         "cat {input.bed_annot} | grep {params.pattern} > {output.bed_filtered} "
 

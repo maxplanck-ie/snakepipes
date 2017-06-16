@@ -7,13 +7,13 @@ reads: ["_R1","_R2"]
 tempdir: /data/extended/
 local: False
 max_jobs: 5
-snakemake_options: ""
+snakemake_options:
 verbose: False
 downsample:
 trim: False
 trim_prg: cutadapt
-trim_options: "'-a A{{30}}'"
-filter_annotation: "-v -P pseudogene"
+trim_options:
+filter_annotation: "-v -P 'decay|pseudogene' "
 barcode_file:
 barcode_pattern: "NNNNNNXXXXXX"
 split_lib: False
