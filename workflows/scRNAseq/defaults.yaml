@@ -12,7 +12,7 @@ verbose: False
 downsample:
 trim: False
 trim_prg: cutadapt
-trim_options:
+trim_options: -a A{'30'}
 filter_annotation: "-v -P 'decay|pseudogene' "
 barcode_file:
 barcode_pattern: "NNNNNNXXXXXX"

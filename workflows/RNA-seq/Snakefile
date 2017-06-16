@@ -110,7 +110,7 @@ def run_mapping():
 
 
 def run_deeptools_qc():
-    if "deepTools_qc" in mode:
+    if "deeptools_qc" in mode:
         file_list = [
         expand("BW/{sample}.RPKM.bw", sample = samples),
         "deepTools_qc/plotEnrichment/plotEnrichment.png",

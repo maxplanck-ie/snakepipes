@@ -24,11 +24,6 @@ if trim:
 	elif trim_prg == "cutadapt":
 		fastq_dir = "FASTQ_Cutadapt"
 
-#try:
-#	filter_annotation = config["filter_annotation"]
-#except:
-#    filter_annotation = "''"
-	
 
 ### Initialization #############################################################
 

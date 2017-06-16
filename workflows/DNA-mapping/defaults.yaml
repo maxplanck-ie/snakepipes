@@ -1,25 +1,25 @@
-bw_binsize: 25
-configfile:
-dedup: false
-downsample:
-fastqc: false
-gcbias: false
-genome: 
+genome:
 indir: .
-local: false
-mapq: 0
+outdir: .
+configfile:
+ext: '.fastq.gz'
+reads: ["_R1","_R2"]
+tempdir: /data/extended/
+local: False
 max_jobs: 5
 snakemake_options:
-outdir: .
-properpairs: false
-tempdir: /data/extended/
+verbose: False
+downsample:
 trim: False
 trim_prg: cutadapt
-verbose: false
-reads: ["_R1", "_R2"]
-ext: .fastq.gz
+trim_options:
+bw_binsize: 25
+dedup: false
+fastqc: false
+gcbias: false
+mapq: 0
+properpairs: false
 mate_orientation: --fr
 fragment_length: 200
-bowtie_opts: ''
-trim_options:
+bowtie_opts:
 qualimap: false

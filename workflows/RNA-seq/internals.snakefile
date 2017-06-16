@@ -26,9 +26,9 @@ def convert_library_type (paired, from_library_type, from_prg, to_prg,
 ## Variable defaults ##########################################################
 
 mode = list(map( str.strip, re.split(',|;', config["mode"]) ))
+mode = [element.lower() for element in mode]
 
-if not filter_annotation:
-    filter_annotation = "''"
+print(mode)
 
 ## trim
 fastq_dir = "FASTQ"

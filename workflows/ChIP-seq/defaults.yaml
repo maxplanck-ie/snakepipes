@@ -1,12 +1,12 @@
-bw_binsize: 25
-configfile:
-fragment_length: 200
 genome:
+workingdir: .
+outdir: .
+configfile:
+tempdir: /data/extended/
 local: false
 max_jobs: 5
-outdir: .
-paired: true
-tempdir: /data/extended/
-verbose: false
-workingdir: .
 snakemake_options:
+verbose: false
+paired: true
+bw_binsize: 25
+fragment_length: 200

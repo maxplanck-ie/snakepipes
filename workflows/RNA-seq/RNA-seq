@@ -87,6 +87,13 @@ def parse_args(defaults):
 
     args.cluster_logs_dir = os.path.join(args.outdir, "cluster_logs")
 
+    if args.sample_info:
+        if os.path.exists(os.path.abspath(args.sample_info)):
+            args.cell_names = os.path.abspath(args.sample_info)
+        else:
+            print("\nSample info file not found! (--DE {})\n".format(args.sample_info))
+            exit(1)
+            
     return args
 
 
@@ -121,7 +128,8 @@ def main():
     with open(os.path.join(args.outdir,'config.yaml'), 'w') as f:
         yaml.dump(config, f, default_flow_style=None)
 
-    snakemake_module_load = "module load snakemake slurm &&".split()
+    #snakemake_module_load = "module load snakemake slurm &&".split()
+    snakemake_module_load = " ".split()
     snakemake_cmd = """
                     snakemake {snakemake_options} --latency-wait 300 --snakefile {snakefile} --jobs {max_jobs} --directory {outdir} --configfile {configfile}
                     """.format( snakefile = os.path.join(args.this_script_dir, "Snakefile"),

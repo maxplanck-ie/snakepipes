@@ -3,7 +3,7 @@ indir: .
 outdir: .
 configfile:
 ext: '.fastq.gz'
-reads: ["_R1","_R2"]
+reads: [_R1,_R2]
 tempdir: /data/extended/
 local: False
 max_jobs: 5
@@ -12,7 +12,7 @@ verbose: False
 downsample:
 trim: False
 trim_prg: cutadapt
-trim_options: ''
+trim_options:
 bw_binsize: 25
 fastqc: False
 featurecounts_options: -C -Q 10 --primary
@@ -20,8 +20,8 @@ filter_annotation:
 fragment_length: 200
 library_type: 2
 salmon_index_options: --type quasi -k 31
-mode: mapping-free
-sample_info: ''
+mode: mapping-free,deepTools_qc
+sample_info:
 mapping_prg: STAR
-star_options: ''
-hisat_options: ''
+star_options:
+hisat_options:
