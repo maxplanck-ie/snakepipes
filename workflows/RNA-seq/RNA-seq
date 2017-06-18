@@ -21,7 +21,7 @@ import textwrap
 import time
 import shutil
 import yaml
-
+import re
 
 sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))))+"/shared/")
 import common_functions as cf
@@ -64,10 +64,6 @@ def parse_args(defaults):
     parser.add_argument("-v", "--verbose", dest="verbose", action="store_true", help="verbose output (default: '%(default)s')", default=defaults["verbose"])
 
     args = parser.parse_args()
-
-    ## Variable sanity checking
-    if args.mode is str:
-        args.mode = list(map( str.strip, re.split(',|;', args.mode) ))
 
     ## correction to variables
     try:
@@ -116,17 +112,16 @@ def main():
     ## merge configuration dicts
     config = defaults   # 1) form defaults.yaml
     if args.configfile:
-        with open(args.configfile, "r") as f:
-            user_config = yaml.load(f)
+        user_config = cf.load_configfile(args.configfile,False)
         config = cf.merge_dicts(config, user_config) # 2) form user_config.yaml
-    config = cf.merge_dicts(config, vars(args)) # 3) from wrapper parameters
-
+    config_wrap = cf.config_diff(vars(args),defaults) # 3) from wrapper parameters
+    config = cf.merge_dicts(config, config_wrap) 
+    
     ## Output directory + log directory
     subprocess.call("[ -d {cluster_logs_dir} ] || mkdir -p {cluster_logs_dir}".format(cluster_logs_dir=args.cluster_logs_dir), shell=True)
 
     ## save to configs.yaml in outdir
-    with open(os.path.join(args.outdir,'config.yaml'), 'w') as f:
-        yaml.dump(config, f, default_flow_style=None)
+    cf.write_configfile(os.path.join(args.outdir,'config.yaml'),config)
 
     #snakemake_module_load = "module load snakemake slurm &&".split()
     snakemake_module_load = " ".split()

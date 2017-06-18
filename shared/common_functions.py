@@ -13,9 +13,7 @@ def merge_dicts(x, y):
 def load_configfile(configfile,verbose):
     with open(configfile, "r") as f:
         config = yaml.load(f)
-#    for k,v in sorted(config.items()):
-#        if v != False and str(v or '') == '':
-#            config[k] = None
+
     if verbose:
         print("\n--- config ---------------------------------------------------------------------")
         print("config file: {}".format(configfile))
@@ -23,6 +21,23 @@ def load_configfile(configfile,verbose):
             print("{}: {}".format(k,v))
         print("-" * 80, "\n")
     return config
+
+
+def write_configfile(configfile,config):
+    with open(configfile, 'w') as f:
+        yaml.dump(config, f, default_flow_style=None)
+
+
+## returns all key-value pairs that are different from dict1 to dict2
+def config_diff(dict1,dict2):
+    diff = {}
+    for k in dict1:
+        if k in dict2:
+            if dict1[k] != dict2[k]:
+                diff[k] = dict1[k]
+        else:
+            diff[k] = dict1[k]
+    return diff
 
 
 def load_organism_data(genome,maindir):

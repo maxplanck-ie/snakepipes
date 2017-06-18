@@ -114,11 +114,10 @@ def main():
     ## merge configuration dicts
     config = defaults   # 1) form defaults.yaml
     if args.configfile:
-        with open(args.configfile, "r") as f:
-            user_config = yaml.load(f)
+        user_config = cf.load_configfile(args.configfile,False)
         config = cf.merge_dicts(config, user_config) # 2) form user_config.yaml
-    config = cf.merge_dicts(config, vars(args)) # 3) from wrapper parameters
-
+    config_wrap = cf.config_diff(vars(args),defaults) # 3) from wrapper parameters
+    config = cf.merge_dicts(config, config_wrap) 
     
     #'filter_annotation' : "'-v -P \\\"full|decay|miRNA|misc_RNA|snRNA|snoRNA|scaRNA|sRNA|scRNA|rRNA|pseudogene|3prime_overlapping_ncRNA|processed_transcript\\\"'",
     
@@ -126,8 +125,7 @@ def main():
     subprocess.call("[ -d {cluster_logs_dir} ] || mkdir -p {cluster_logs_dir}".format(cluster_logs_dir=args.cluster_logs_dir), shell=True)
 
     ## save to configs.yaml in outdir
-    with open(os.path.join(args.outdir,'config.yaml'), 'w') as f:
-        yaml.dump(config, f, default_flow_style=None)
+    cf.write_configfile(os.path.join(args.outdir,'config.yaml'),config)
 
 	## MPI
     snakemake_module_load = "module load snakemake slurm &&".split()
