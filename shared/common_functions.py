@@ -51,7 +51,6 @@ def config_diff(dict1,dict2):
                 diff[k] = dict1[k]
         else:
             diff[k] = dict1[k]
-    print(diff)
     return diff
 
 
