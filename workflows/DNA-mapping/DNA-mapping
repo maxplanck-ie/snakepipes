@@ -21,6 +21,7 @@ import textwrap
 import time
 import shutil
 import yaml
+from pprint import pprint 
 
 sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))))+"/shared/")
 import common_functions as cf
@@ -35,9 +36,7 @@ def parse_args(defaults):
         prog=sys.argv[0],
         formatter_class=argparse.RawDescriptionHelpFormatter, description=textwrap.dedent(__description__)
     )
-    
-    print(type(defaults["snakemake_options"]))
-
+        
     ## positional/required
     parser.add_argument("genome", metavar="GENOME", help="genome acronym of target organism (supported: 'dm6', 'hs37d5', 'mm9', 'mm10', 'SchizoSPombe_ASM294v2')")
     ## optional
@@ -90,9 +89,8 @@ def main():
     main_dir_path = os.path.join(os.path.dirname(os.path.dirname(this_script_dir)))
 
     ## defaults
-    with open(os.path.join(this_script_dir, "defaults.yaml"), "r") as f:
-        defaults = yaml.load(f)
-
+    defaults = cf.load_configfile(os.path.join(this_script_dir, "defaults.yaml"),False)
+    
     ## get command line arguments
     args = parse_args(defaults)
 
@@ -102,6 +100,7 @@ def main():
     
     ## merge configuration dicts
     config = defaults   # 1) form defaults.yaml
+    
     if args.configfile:
         user_config = cf.load_configfile(args.configfile,False)
         config = cf.merge_dicts(config, user_config) # 2) form user_config.yaml

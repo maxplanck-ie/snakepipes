@@ -26,6 +26,7 @@ import textwrap
 import time
 import shutil
 import yaml
+from pprint import pprint 
 
 sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))))+"/shared/")
 import common_functions as cf
@@ -88,8 +89,7 @@ def main():
     main_dir_path = os.path.join(os.path.dirname(os.path.dirname(this_script_dir)))
 
     ## defaults
-    with open(os.path.join(this_script_dir, "defaults.yaml"), "r") as f:
-        defaults = yaml.load(f)
+    defaults = cf.load_configfile(os.path.join(this_script_dir, "defaults.yaml"),False)
 
     ## get command line arguments
     args = parse_args(defaults)
@@ -104,6 +104,7 @@ def main():
         exit(1)
 
     ## merge configuration dicts
+    
     config = defaults   # 1) form defaults.yaml
     if args.configfile:
         user_config = cf.load_configfile(args.configfile,False)
@@ -116,7 +117,7 @@ def main():
 
     ## save to configs.yaml in outdir
     cf.write_configfile(os.path.join(args.outdir,'ChIP-seq.config.yaml'),config)
-
+    
     snakemake_module_load = "module load snakemake slurm &&".split()
     snakemake_cmd = """
                     snakemake {snakemake_options} --latency-wait 300 --snakefile {snakefile} --jobs {max_jobs} --directory {workingdir} --configfile {configfile}

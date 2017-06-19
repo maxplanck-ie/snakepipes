@@ -102,8 +102,7 @@ def main():
     main_dir_path = os.path.join(os.path.dirname(os.path.dirname(this_script_dir)))
 
     ## defaults
-    with open(os.path.join(this_script_dir, "defaults.yaml"), "r") as f:
-        defaults = yaml.load(f)
+    defaults = cf.load_configfile(os.path.join(this_script_dir, "defaults.yaml"),False)
 
     ## get command line arguments
     args = parse_args(defaults)

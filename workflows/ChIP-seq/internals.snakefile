@@ -51,6 +51,7 @@ with open(config["samples_config"], "r") as f:
     config["chip_dict"] = yaml.load(f)["chip_dict"]
 
 chip_dict = config["chip_dict"]
+cf.write_configfile(os.path.join(outdir,"chip_samples.yaml"),chip_dict)
 
 # create unique sets of control samples, ChIP samples with and without control
 control_samples = set()
