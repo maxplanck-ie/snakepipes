@@ -1,6 +1,14 @@
 ################################################################################
-# Please comment out and adjust the following configuration variables if their
-# default values are not appropriate for your input data
+# This file is the default configuration of the DNA-mapping workflow!
+#
+# In order to adjust some parameters, please either use the wrapper script
+# (eg. /path/to/snakemake_workflows/workflows/DNA-mapping/DNA-mapping)
+# or save a copy of this file, modify necessary parameters and then provide 
+# this file to the wrapper or snakmake via '--configfile' option 
+# (see below how to call the snakefile directly)
+#
+# Own parameters will be loaded during snakefile executiuon as well and hence 
+# can be used in new/extended snakemake rules as well
 ################################################################################
 ## paired-end read name extension (default: ["_R1", "_R2"])
 # reads: ["_R1", "_R2"]
@@ -15,42 +23,50 @@
 ## Median/mean fragment length, only relevant for single-end data (default: 200)
 # fragment_length: 200
 
-## Options to TrimGalore (default: "--stringency 2")
+## Options for trimming
+# trim: true
+# trim_prg: trimgalore
 # trim_options: "--stringency 2"
 
-
-
-################################################################################
-# The following configuration variables can only be set via this configuration
-# file when calling snakemake directly, i.e. without using the wrapper script
-# DNA-mapping. When calling the script DNA-mapping, the values set below are
-# ignored.
-# example call: snakemake --snakefile /path/to/snakemake_workflows/workflows/DNA-mapping/Snakefile
-#                         --cores 32
-#                         --configfile /path/to/snakemake_workflows/workflows/DNA-mapping/example.config.yaml
-#                         --directory /path/to/outputdir
-################################################################################
-## Snakemake workflow directory
-# maindir: /path/to/snakemake_workflows/
 ## Input directory with FASTQ files
 # indir: /path/to/inputdir/
+
 ## Genome acronym
 # genome: hs37d5
-## Number of reads to downsample from the head of each FASTQ file
+
+## Number of reads to downsample from each FASTQ file
 # downsample: 50000
-## Trim reads with TrimGalore
-# trim: True
+
 ## Run FASTQC read quality control
 # fastqc: True
+
 ## Retain only de-duplicated reads/read pairs
 # dedup: True
+
 ## Retain only reads mapping in proper pairs
 # properpairs: True
+
 ## Retain only reads with at least the given mapping quality
 # mapq: 1
+
 ## Bin size of output files in bigWig format
 # bw_binsize: 10
+
 ## Run computeGCBias quality control
 # gcbias: False
+
 ##  Verbose output
 # verbose: True
+
+################################################################################
+# Call snakemake directly, i.e. without using the wrapper script:
+#
+# Please save a copy of this config yaml file and provide an adjusted config 
+# via '--configfile' parameter!
+# example call: 
+#
+# snakemake --snakefile /path/to/snakemake_workflows/workflows/DNA-mapping/Snakefile
+#           --configfile /path/to/snakemake_workflows/workflows/DNA-mapping/example.config.yaml
+#           --directory /path/to/outputdir
+#           --cores 32
+################################################################################

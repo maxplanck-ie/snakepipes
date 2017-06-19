@@ -32,20 +32,6 @@ chip_dict:
 # ################################################################################
 ## Median/mean fragment length, only relevant for single-end data (default: 200)
 # fragment_length: 200
-
-
-
-################################################################################
-# The following configuration variables can only be set via this configuration
-# file when calling snakemake directly, i.e. without using the wrapper script
-# ChIP-seq. When calling the script ChIP-seq, the values set below are ignored.
-# example call: snakemake --snakefile /path/to/snakemake_workflows/workflows/ChIP-seq/Snakefile
-#                         --cores 32
-#                         --configfile /path/to/snakemake_workflows/workflows/ChIP-seq/example.config.yaml
-#                         --directory /path/to/outputdir
-################################################################################
-## Snakemake workflow directory
-# maindir: /path/to/snakemake_workflows/
 ## Genome acronym
 # genome: hs37d5
 ## Input data is paired-end
@@ -54,3 +40,13 @@ chip_dict:
 # bw_binsize: 10
 ##  Verbose output
 # verbose: True
+
+################################################################################
+# Calling snakemake directly, i.e. without using the wrapper script:
+# example call: 
+# snakemake --snakefile /path/to/snakemake_workflows/workflows/ChIP-seq/Snakefile
+#           --configfile /path/to/snakemake_workflows/workflows/ChIP-seq/example.config.yaml
+#           --directory /path/to/outputdir
+#           --cores 32
+################################################################################
+
