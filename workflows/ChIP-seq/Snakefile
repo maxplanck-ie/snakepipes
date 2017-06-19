@@ -12,7 +12,7 @@ globals().update(cf.load_paths(os.path.join(maindir, "shared", "paths.yaml"),mai
 # load config file
 globals().update(cf.load_configfile(workflow.overwrite_configfile,config["verbose"]))
 # load organism-specific data, i.e. genome indices, annotation, etc.
-globals().update(cf.load_organism_data(genome,maindir))
+globals().update(cf.load_organism_data(genome,maindir,config["verbose"]))
 
 # do workflow specific stuff now 
 include: os.path.join(workflow.basedir, "internals.snakefile")

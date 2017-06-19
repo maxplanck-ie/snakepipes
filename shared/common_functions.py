@@ -5,17 +5,30 @@ import os
 import re
 import yaml
 
+
 def merge_dicts(x, y):
     z = x.copy()
     z.update(y)
     return(z)
 
-def load_configfile(configfile,verbose):
+
+## this is a pure sanity fucntion to avoid obvious mailfunction during snakefile execution
+## because we load yaml/path/genome configs directly into global namespace!
+def sanity_dict_clean(myDict): 
+    unwanted_keys = ['maindir','workflow']
+    for k in unwanted_keys:
+        if k in myDict: del myDict[k]
+    return myDict
+
+
+def load_configfile(configfile,verbose,info='Config'):
     with open(configfile, "r") as f:
         config = yaml.load(f)
 
+    config = sanity_dict_clean(config)
+
     if verbose:
-        print("\n--- config ---------------------------------------------------------------------")
+        print("\n--- "+info+" ---------------------------------------------------------------------")
         print("config file: {}".format(configfile))
         for k,v in sorted(config.items()):
             print("{}: {}".format(k,v))
@@ -40,13 +53,11 @@ def config_diff(dict1,dict2):
     return diff
 
 
-def load_organism_data(genome,maindir):
+def load_organism_data(genome,maindir,verbose):
     if os.path.isfile(os.path.join(maindir, "shared", "organisms", genome+".yaml")): 
-        with open(os.path.join(maindir, "shared", "organisms", genome+".yaml"), "r") as f:
-            organism = yaml.load(f)
+        organism = load_configfile(os.path.join(maindir, "shared", "organisms", genome+".yaml"),verbose,"Genome")
     elif os.path.isfile(genome): 
-        with open(genome, "r") as f:
-            organism = yaml.load(f)
+        organism = load_configfile(genome,verbose,"Genome (user)")
     else:
         print("ERROR: Genome configuration file NOT found for:", genome, "\n")
         exit(1)
@@ -54,8 +65,7 @@ def load_organism_data(genome,maindir):
 
 
 def load_paths(pathfile,maindir,verbose):
-    with open(pathfile, "r") as f:
-        paths = yaml.load(f)
+    paths = load_configfile(pathfile,False)
     
     ## add path to tools dir
     paths["workflow_tools"] = os.path.join(maindir,"shared","tools")

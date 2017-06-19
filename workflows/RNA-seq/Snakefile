@@ -12,7 +12,7 @@ globals().update(cf.load_paths(os.path.join(maindir, "shared", "paths.yaml"),mai
 # load config file
 globals().update(cf.load_configfile(workflow.overwrite_configfile,config["verbose"]))
 # load organism-specific data, i.e. genome indices, annotation, etc.
-globals().update(cf.load_organism_data(genome,maindir))
+globals().update(cf.load_organism_data(genome,maindir,config["verbose"]))
 
 # do workflow specific stuff now 
 include: os.path.join(workflow.basedir, "internals.snakefile")
@@ -135,18 +135,10 @@ onstart:
         print("samples:", samples)
         print("paired:", paired)
         print("read extension:", reads)
+        print("fastq dir:", fastq_dir)
         print("filter annotation:", filter_annotation)
-        print("-" * 80, "\n")
-
-        print("--- Genome ---------------------------------------------------------------------")
-        print("Genome:", genome)
-        print("Effective genome size:", genome_size)
-        print("Genome FASTA:", genome_fasta)
-        print("Genome index:", genome_index)
-        print("Genome 2bit:", genome_2bit)
-        print("Bowtie2 index:", bowtie2_index)
-        print("Gene annotation BED:", genes_bed)
-        print("Gene annotation GTF:", genes_gtf)
+        print("RNA strandness:", rna_strandness)
+        print("Salmon libtype:", salmon_libtype)
         print("-" * 80, "\n")
 
         print("--- Environment ----------------------------------------------------------------")

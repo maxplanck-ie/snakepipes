@@ -57,6 +57,3 @@ if pattern.search(barcode_pattern) is not None:
 else:
 	print("Provided barcode pattern does not contain any 'X'! Exit...\n")
 	exit(1)
-
-print("UMI_LEN:",UMI_length,"  UMI_offset:",UMI_offset,"\n")
-print("CELLI_LEN:",CELLI_length,"  CELLI_offset:",CELLI_offset,"\n")

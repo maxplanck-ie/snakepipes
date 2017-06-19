@@ -97,7 +97,7 @@ def parse_args(defaults):
 
 def main():
     
-     ## basic paths
+    ## basic paths only used in wrapper
     this_script_dir = os.path.dirname(os.path.realpath(__file__))
     main_dir_path = os.path.join(os.path.dirname(os.path.dirname(this_script_dir)))
 
@@ -108,6 +108,7 @@ def main():
     ## get command line arguments
     args = parse_args(defaults)
 
+    ## we also add these paths to config, although we dont use them in the Snakefile
     args.this_script_dir = this_script_dir
     args.main_dir_path = main_dir_path
     
