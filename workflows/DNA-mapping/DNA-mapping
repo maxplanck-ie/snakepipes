@@ -100,7 +100,6 @@ def main():
     
     ## merge configuration dicts
     config = defaults   # 1) form defaults.yaml
-    
     if args.configfile:
         user_config = cf.load_configfile(args.configfile,False)
         config = cf.merge_dicts(config, user_config) # 2) form user_config.yaml
@@ -113,7 +112,8 @@ def main():
     ## save to configs.yaml in outdir
     cf.write_configfile(os.path.join(args.outdir,'config.yaml'),config)
     
-    snakemake_module_load = "module load snakemake slurm &&".split()
+    #snakemake_module_load = "module load snakemake slurm &&".split()
+    snakemake_module_load = "".split()
     snakemake_cmd = """
                     snakemake {snakemake_options} --latency-wait 300 --snakefile {snakefile} --jobs {max_jobs} --directory {outdir} --configfile {configfile}
                     """.format( snakefile = os.path.join(args.this_script_dir, "Snakefile"),

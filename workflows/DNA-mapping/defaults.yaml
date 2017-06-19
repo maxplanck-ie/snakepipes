@@ -15,7 +15,7 @@ indir: .
 outdir: .
 configfile:
 local: False
-max_jobs: 5
+max_jobs: 2
 snakemake_options:
 verbose: False
 tempdir: /data/extended/
