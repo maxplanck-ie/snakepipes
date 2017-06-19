@@ -104,7 +104,6 @@ def main():
         exit(1)
 
     ## merge configuration dicts
-    
     config = defaults   # 1) form defaults.yaml
     if args.configfile:
         user_config = cf.load_configfile(args.configfile,False)

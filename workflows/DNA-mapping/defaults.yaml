@@ -24,8 +24,8 @@ tempdir: /data/extended/
 genome:
 ## FASTQ file extension (default: ".fastq.gz")
 ext: .fastq.gz
-## paired-end read name extension (default: ["_R1", "_R2"])
-reads: ['_R1', '_R2']
+## paired-end read name extension (default: ['_R1', "_R2"])
+reads: [_R1, _R2]
 ## Number of reads to downsample from each FASTQ file
 downsample:
 ## Options for trimming

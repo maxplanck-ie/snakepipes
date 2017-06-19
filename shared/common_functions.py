@@ -3,6 +3,7 @@
 import subprocess
 import os
 import re
+#import ruamel.yaml as yaml
 import yaml
 
 
@@ -39,7 +40,7 @@ def load_configfile(configfile,verbose,info='Config'):
 
 def write_configfile(configfile,config):
     with open(configfile, 'w') as f:
-        yaml.dump(config, f, default_flow_style=False,default_style=None,line_break=None)
+        yaml.dump(config, f, default_flow_style=False)
 
 
 ## returns all key-value pairs that are different from dict1 to dict2
