@@ -10,7 +10,7 @@ if paired:
         params:
             tmp1 = "{sample}"+reads[0]+".fq.gz",
             tmp2 = "{sample}"+reads[1]+".fq.gz",
-            opts = ''#str(trim_options or '')
+            opts = str(trim_options or '')
         log:
             "FASTQ_Cutadapt/logs/Cutadapt.{sample}.log"
         benchmark:
@@ -31,7 +31,7 @@ else:
             r1 = "FASTQ_Cutadapt/{sample}.fastq.gz",
         params:
             tmp = "{sample}.fq.gz",
-            opts = str(trim_options or '') #'-a A{\'30\'}' #
+            opts = str(trim_options or '')
         log:
             "FASTQ_Cutadapt/logs/Cutadapt.{sample}.log"
         benchmark:
