@@ -57,7 +57,12 @@ version 0.4 - 2016 - Fabian Kilpert, Steffen Heyne
 
 version 0.5 - 2017 - Steffen Heyne, Fabian Kilpert, Michael Rauer
 - scRNAseq workflow added
-- using yaml config files, all wrappers write out a config yaml that is than 
-  used by the snakemake file
-- better handling and usage of common_functions 
-- convert genome config files to yaml, function to load genome information
+- using yaml config files all over, ie. 
+	1) all wrappers write out a config yaml
+	2) Snakefile configuration only depends on provided '--configfile' 
+- better handling and and more usage of common_functions 
+- all genome config files converted to yaml, function to load genome information
+- path config file converted to yaml
+- bugfix: only provided wrapper arguments overwrite either defaults or configfile options, before
+  a not provided wrapper option (but in config file provided) would be overwritten by default,
+  now there is true hierachy: defaults->configfile->wrapper !
