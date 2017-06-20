@@ -134,11 +134,7 @@ def main():
     ## save to configs.yaml in outdir
     cf.write_configfile(os.path.join(args.outdir,'config.yaml'),config)
 
-	## MPI
     snakemake_module_load = "module load snakemake slurm &&".split()
-    ## laptop
-    #snakemake_module_load = " ".split()
-    
     snakemake_cmd = """
                     snakemake {snakemake_options} --latency-wait 300 --snakefile {snakefile} --jobs {max_jobs} --directory {outdir} --configfile {configfile}
                     """.format( snakefile = os.path.join(this_script_dir, "Snakefile"),
