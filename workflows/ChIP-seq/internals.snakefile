@@ -46,12 +46,18 @@ def is_chip(sample):
 # TODO: catch exception if ChIP-seq samples are not unique
 # read ChIP-seq dictionary from config.yaml:
 # { ChIP1: { control: Input1, broad: True }, ChIP2: { control: Input2, broad: false }
+#config["chip_dict"] = {}
+chip_dict = {}
+with open(samples_config, "r") as f:
+    chip_dict_tmp = yaml.load(f)
+    if "chip_dict" in chip_dict_tmp and chip_dict_tmp["chip_dict"] :
+        chip_dict = chip_dict_tmp["chip_dict"]
+    else:
+        print("\n  Error! Sample config has empty or no 'chip_dict' entry! ("+config["samples_config"]+") !!!\n\n")
+        exit(1)
+    del chip_dict_tmp
 
-with open(config["samples_config"], "r") as f:
-    config["chip_dict"] = yaml.load(f)["chip_dict"]
-
-chip_dict = config["chip_dict"]
-cf.write_configfile(os.path.join(outdir,"chip_samples.yaml"),chip_dict)
+cf.write_configfile(os.path.join("chip_samples.yaml"),chip_dict)
 
 # create unique sets of control samples, ChIP samples with and without control
 control_samples = set()

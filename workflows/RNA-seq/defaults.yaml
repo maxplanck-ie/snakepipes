@@ -10,15 +10,15 @@
 # Own parameters will be loaded during snakefile executiuon as well and hence 
 # can be used in new/extended snakemake rules!
 ################################################################################
-## General workflow paramters
-indir: .
-outdir: .
+## General/Snakemake parameters, only used/set by wrapper or in Snakemake cmdl, but not in Snakefile 
+outdir:
 configfile:
 local: False
 max_jobs: 5
 snakemake_options:
-verbose: False
 tempdir: /data/extended/
+## directory with fastq files
+indir:
 ## preconfigured target genomes (mm9,mm10,dm3,...) , see /path/to/snakemake_workflows/shared/organisms/
 ## Value can be also path to your own genome config file!
 genome:
@@ -45,6 +45,7 @@ salmon_index_options: --type quasi -k 31
 mapping_prg: STAR
 star_options:
 hisat_options:
+verbose: False
 ################################################################################
 # Call snakemake directly, i.e. without using the wrapper script:
 #

@@ -25,7 +25,7 @@ def update_filter(samples,dedup,properpairs,mapq):
         filter += "-q "+str(mapq)+" "
 
     for sample in samples:
-        filtered_bam = os.path.join(outdir, "filtered_bam/"+sample+".filtered.bam")
+        filtered_bam = os.path.join("filtered_bam",sample+".filtered.bam")
         filtered_bai = filtered_bam+".bai"
         # filtered BAM file index sample.filtered.bam.bai exists already
         if os.path.isfile(filtered_bai):
@@ -69,10 +69,15 @@ if trim:
 
 ### Initialization #############################################################
 
-infiles = sorted(glob.glob(os.path.join(indir, '*'+ext)))
+infiles = sorted(glob.glob(os.path.join(str(indir or ''), '*'+ext)))
 samples = cf.get_sample_names(infiles,ext,reads)
 paired = cf.is_paired(infiles,ext,reads)
+del infiles
 
+if not samples:
+    print("\n  Error! NO samples found in dir "+str(indir or '')+"!!!\n\n")
+    exit(1)
+    
 if not paired:
     reads = [""]
 

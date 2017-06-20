@@ -48,7 +48,6 @@ onstart:
         print("--- Workflow parameter ---------------------------------------------------------")
         print("Input directory:", indir)
         print("Input files:", infiles)
-        print("Output directory:", outdir)
         print("Samples:", samples)
         print("Paired-end reads:", paired)
         print("Read extension:", reads)

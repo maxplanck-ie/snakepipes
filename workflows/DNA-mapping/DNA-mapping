@@ -42,11 +42,11 @@ def parse_args(defaults):
     optional = parser._action_groups.pop() # Edited this line
 
     ## positional/required
-    parser.add_argument("genome", metavar="GENOME", help="genome acronym of target organism (supported: 'dm6', 'hs37d5', 'mm9', 'mm10', 'SchizoSPombe_ASM294v2')")
+    parser.add_argument("genome", metavar="GENOME", help="genome acronym of target organism (supported: 'dm3', 'dm6', 'hs37d5', 'mm9', 'mm10', 'SchizoSPombe_ASM294v2')")
     
     required = parser.add_argument_group('required arguments')
-    required.add_argument("-i", "--input-dir", dest="indir", help="input directory containing the FASTQ files, either paired-end OR single-end data (default: '%(default)s')", default=defaults["indir"],required=True)
-    required.add_argument("-o", "--output-dir", dest="outdir", help="output directory (default: '%(default)s')", default=defaults["outdir"],required=True)
+    required.add_argument("-i", "--input-dir", dest="indir", help="input directory containing the FASTQ files, either paired-end OR single-end data",required=True)
+    required.add_argument("-o", "--output-dir", dest="outdir", help="output directory",required=True)
  
     general = parser.add_argument_group('general arguments')
     general.add_argument("-h", "--help", action="help", help="show this help message and exit")
@@ -72,23 +72,19 @@ def parse_args(defaults):
 
     args = parser.parse_args()
 
-    ## correction to variables
-    try:
-        args.indir = os.path.abspath(args.indir)
-    except:
-        args.indir = os.path.abspath(os.getcwd())
-
-    try:
-        args.outdir = os.path.abspath(args.outdir)
-    except:
-        args.outdir = os.path.abspath(os.getcwd())
-
-    try:
-        args.configfile = os.path.abspath(args.configfile)
-    except:
-        args.configfile = None
-        
+    args.outdir = os.path.abspath(args.outdir)      
     args.cluster_logs_dir = os.path.join(args.outdir, "cluster_logs")
+
+    ## checks for parameters necessary in wrapper
+    if os.path.exists(args.indir):
+        args.indir = os.path.abspath(args.indir)
+    else:
+        print("\nError! Input dir not found! ({})\n".format(args.indir))
+        exit(1)
+
+    if args.configfile and not os.path.exists(args.configfile):
+        print("\nError! Provided configfile (-c) not found! ({})\n".format(args.configfile))
+        exit(1)
 
     return args
 

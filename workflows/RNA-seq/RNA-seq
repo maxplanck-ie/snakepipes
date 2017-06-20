@@ -33,20 +33,31 @@ def parse_args(defaults):
 
     parser = argparse.ArgumentParser(
         prog=os.path.basename(sys.argv[0]),
-        formatter_class=argparse.RawDescriptionHelpFormatter, description=textwrap.dedent(__description__)
+        formatter_class=argparse.RawDescriptionHelpFormatter, 
+        description=textwrap.dedent(__description__),
+        add_help=False
     )
 
+    optional = parser._action_groups.pop() # Edited this line
+
     ## positional/required
-    parser.add_argument("genome", metavar="GENOME", help="genome acronym of target organism (supported: 'dm6', 'hs37d5', 'mm9', 'mm10', 'SchizoSPombe_ASM294v2')")
+    parser.add_argument("genome", metavar="GENOME", help="genome acronym of target organism (supported: 'dm3', 'dm6', 'hs37d5', 'mm9', 'mm10', 'SchizoSPombe_ASM294v2')")
+    
+    required = parser.add_argument_group('required arguments')
+    required.add_argument("-i", "--input-dir", dest="indir", help="input directory containing the FASTQ files, either paired-end OR single-end data",required=True)
+    required.add_argument("-o", "--output-dir", dest="outdir", help="output directory",required=True)
+ 
+    general = parser.add_argument_group('general arguments')
+    general.add_argument("-h", "--help", action="help", help="show this help message and exit")
+    general.add_argument("-v", "--verbose", dest="verbose", action="store_true", help="verbose output (default: '%(default)s')", default=defaults["verbose"])
+    general.add_argument("-c", "--configfile", dest="configfile", help="configuration file: config.yaml (default: '%(default)s')", default=defaults["configfile"])
+    general.add_argument("-j", "--jobs", dest="max_jobs", metavar="INT", help="maximum number of concurrently submitted Slurm jobs / cores if workflow is run locally (default: '%(default)s')", type=int, default=defaults["max_jobs"])
+    general.add_argument("--local", dest="local", action="store_true", default=False, help="run workflow locally; default: jobs are submitted to Slurm queue (default: '%(default)s')")
+    general.add_argument("--snakemake_options", dest="snakemake_options", metavar="STR", type=str, help="Snakemake options to be passed directly to snakemake, e.g. use --snakemake_options='--dryrun --rerun-incomplete --unlock --forceall'. (default: '%(default)s')", default=defaults["snakemake_options"])
+    general.add_argument("--tempdir", dest="tempdir", type=str, help="used prefix path for temporary directory created via mktemp. Created temp dir gets exported as $TMPDIR and is removed at the end of this wrapper! (default: '%(default)s')", default=defaults["tempdir"])
+ 
     ## optional
-    parser.add_argument("-c", "--configfile", dest="configfile", help="configuration file (default: '%(default)s')", default=defaults["configfile"])
-    parser.add_argument("-i", "--input-dir", dest="indir", help="input directory containing the FASTQ files, either paired-end OR single-end data (default: '%(default)s')", default=defaults["indir"])
-    parser.add_argument("-o", "--output-dir", dest="outdir", help="output directory (default: '%(default)s')", default=defaults["outdir"])
-    parser.add_argument("-j", "--jobs", dest="max_jobs", metavar="INT", help="maximum number of concurrently submitted Slurm jobs / cores if workflow is run locally (default: '%(default)s')", type=int, default=defaults["max_jobs"])
-    parser.add_argument("-v", "--verbose", dest="verbose", action="store_true", help="verbose output (default: '%(default)s')", default=defaults["verbose"])
-    parser.add_argument("--local", dest="local", action="store_true", help="run workflow locally (default: '%(default)s')", default=defaults["local"])
-    parser.add_argument("--snakemake_options", dest="snakemake_options", metavar="STR", type=str, help="Snakemake options to be passed directly to snakemake, e.g. use --snakemake_options='--dryrun --rerun-incomplete --unlock --forceall'. (default: '%(default)s')", default=defaults["snakemake_options"])
-    parser.add_argument("--tempdir", dest="tempdir", type=str, help="used prefix path for temporary directory created via mktemp. Created temp dir gets exported as $TMPDIR and is removed at the end of this wrapper! (default: '%(default)s')", default=defaults["tempdir"])
+    parser._action_groups.append(optional)       
     parser.add_argument("-m", "--mode", dest="mode", help="workflow running modes (available: 'mapping-free, mapping, deepTools_qc') (default: '%(default)s')", default=defaults["mode"]) 
     parser.add_argument("--downsample", dest="downsample", metavar="INT", help="downsample the given number of reads randomly from each FASTQ file (default: '%(default)s')", type=int, default=defaults["downsample"])
     parser.add_argument("--trim_prg", dest="trim_prg", choices=['cutadapt', 'trimgalore'], help="trimming program: Cutadapt or TrimGalore (default: '%(default)s')", default=defaults["trim_prg"])
@@ -64,31 +75,30 @@ def parse_args(defaults):
     parser.add_argument("--bw-binsize", dest="bw_binsize", metavar="INT", help="bin size of output files in bigWig format (default: '%(default)s')", type=int, default=defaults["bw_binsize"])
 
     args = parser.parse_args()
-
-    ## correction to variables
-    try:
-        args.indir = os.path.abspath(args.indir)
-    except:
-        args.indir = os.path.abspath(os.getcwd())
-
-    try:
-        args.outdir = os.path.abspath(args.outdir)
-    except:
-        args.outdir = os.path.abspath(os.getcwd())
-
-    try:
-        args.configfile = os.path.abspath(args.configfile)
-    except:
-        args.configfile = None
-
+    
+    args.outdir = os.path.abspath(args.outdir)
     args.cluster_logs_dir = os.path.join(args.outdir, "cluster_logs")
+    
+    ## checks for parameters necessary in wrapper
+    if os.path.exists(args.indir):
+        args.indir = os.path.abspath(args.indir)
+    else:
+        print("\nError! Input dir (-i) not found! ({})\n".format(args.indir))
+        exit(1)
 
+    if args.configfile and not os.path.exists(args.configfile):
+        print("\nError! Provided configfile (-c) not found! ({})\n".format(args.configfile))
+        exit(1)
+ 
     if args.sample_info:
         if os.path.exists(os.path.abspath(args.sample_info)):
             args.cell_names = os.path.abspath(args.sample_info)
         else:
             print("\nSample info file not found! (--DE {})\n".format(args.sample_info))
             exit(1)
+ 
+    args.outdir = os.path.abspath(args.outdir)
+    args.cluster_logs_dir = os.path.join(args.outdir, "cluster_logs")
             
     return args
 

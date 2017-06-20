@@ -10,22 +10,24 @@
 # Own parameters will be loaded during snakefile executiuon as well and hence 
 # can be used in new/extended snakemake rules!
 ################################################################################
-## General workflow paramters
-genome:
-workingdir: .
-outdir: .
+## General/Snakemake parameters, only used/set by wrapper or in Snakemake cmdl, but not in Snakefile 
 configfile:
 tempdir: /data/extended/
 local: false
 max_jobs: 5
 snakemake_options:
-verbose: false
+## workingdir need to be required DNA-mapping output dir, 'outdir' is set to workingdir internally
+workingdir:
+## preconfigured target genomes (mm9,mm10,dm3,...) , see /path/to/snakemake_workflows/shared/organisms/
+## Value can be also path to your own genome config file!
+genome:
 ## paired end data?
 paired: true
 ## Bin size of output files in bigWig format
 bw_binsize: 25
 ## Median/mean fragment length, only relevant for single-end data (default: 200)
 fragment_length: 200
+verbose: false
 ################################################################################
 # Call snakemake directly, i.e. without using the wrapper script:
 #
