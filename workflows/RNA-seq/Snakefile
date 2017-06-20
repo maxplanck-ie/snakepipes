@@ -139,6 +139,7 @@ onstart:
         print("filter annotation:", filter_annotation)
         print("RNA strandness:", rna_strandness)
         print("Salmon libtype:", salmon_libtype)
+        print("Sample info:", sample_info)
         print("-" * 80, "\n")
 
         print("--- Environment ----------------------------------------------------------------")

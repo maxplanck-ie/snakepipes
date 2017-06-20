@@ -56,3 +56,8 @@ else:
     rna_strandness = "--rna-strandness "+rna_strandness
 
 salmon_libtype = convert_library_type(paired, library_type, "featureCounts", "Salmon")
+
+## Require configuration file (samples.yaml)
+if sample_info and not os.path.isfile(sample_info):
+    print("ERROR: Cannot find sample info file! ("+sample_info+")\n")
+    exit(1)

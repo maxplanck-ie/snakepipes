@@ -81,12 +81,11 @@ def parse_args(defaults):
         print("\nError! Provided configfile (-c) not found! ({})\n".format(args.configfile))
         exit(1)
         
-    if args.samples_config:
-        if os.path.exists(os.path.abspath(args.samples_config)):
-            args.samples_config = os.path.abspath(args.samples_config)
-        else:
-            print("\nError! Sample config file not found! ({})\n".format(args.samples_config))
-            exit(1)
+    if os.path.exists(os.path.abspath(args.samples_config)):
+        args.samples_config = os.path.abspath(args.samples_config)
+    else:
+        print("\nError! Sample config file not found! ({})\n".format(args.samples_config))
+        exit(1)
         
     return args
 
@@ -106,11 +105,6 @@ def main():
     ## we also add these paths to config, although we dont use them in the Snakefile 
     args.this_script_dir = this_script_dir
     args.main_dir_path = main_dir_path
-
-    ## Require configuration file (samples.yaml)
-    if not os.path.isfile(args.samples_config):
-        print("ERROR: Samples file is NOT available at:", args.samples_config)
-        exit(1)
 
     ## merge configuration dicts
     config = defaults   # 1) form defaults.yaml

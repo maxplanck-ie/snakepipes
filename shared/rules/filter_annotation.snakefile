@@ -1,6 +1,7 @@
 ## make standard annotation
 
-if genome.startswith(("hg","mm")):
+#if genome.startswith(("hs","hg","mm")):
+if genes_gtf.lower().find("gencode") >=0:
     rule create_annotation_bed:
         input:
             gtf = genes_gtf
@@ -23,7 +24,8 @@ if genome.startswith(("hg","mm")):
             """ tr " " "\\t" | sort | uniq | sort -k2) | """
             """ awk '{{$13=$13"\\t"$1; $4=$4"\\t"$1; OFS="\\t";print $0}}' | """
             """ cut --complement -f 1,14,16,18,20,22,24 > {output.bed_annot} """
-elif genome.startswith(("dm")):
+#elif genome.startswith(("dm")):
+elif genes_gtf.lower().find("ensembl")>=0:
     rule create_annotation_bed:
         input:
             gtf = genes_gtf
@@ -44,7 +46,9 @@ elif genome.startswith(("dm")):
             """ tr " " "\\t" | sort -k2) | """
             """ awk '{{$13=$13"\\t"$1; $4=$4"\\t"$1; OFS="\\t";print $0}}' | """
             """ cut --complement -f 1,14,16,18,20,22,24 > {output.bed_annot} """
-
+else:
+    print("unsupported gtf file!")
+    exit(1)
 
 rule filter_annotation_bed:
     input:
@@ -58,7 +62,7 @@ rule filter_annotation_bed:
 
 rule annotation_bed2t2g:
     input:
-        bed_annot = 'Annotation/genes.filtered.bed'
+        bed_annot = 'Annotation/genes.filtered.bed' 
     output:
         'Annotation/genes.filtered.t2g'
     shell:

@@ -92,7 +92,7 @@ def parse_args(defaults):
  
     if args.sample_info:
         if os.path.exists(os.path.abspath(args.sample_info)):
-            args.cell_names = os.path.abspath(args.sample_info)
+            args.sample_info = os.path.abspath(args.sample_info)
         else:
             print("\nSample info file not found! (--DE {})\n".format(args.sample_info))
             exit(1)

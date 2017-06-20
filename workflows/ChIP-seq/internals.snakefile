@@ -47,6 +47,12 @@ def is_chip(sample):
 # read ChIP-seq dictionary from config.yaml:
 # { ChIP1: { control: Input1, broad: True }, ChIP2: { control: Input2, broad: false }
 #config["chip_dict"] = {}
+
+## Require configuration file (samples.yaml)
+if not os.path.isfile(samples_config):
+    print("ERROR: Cannot find samples file ("+samples_config+")")
+    exit(1)
+
 chip_dict = {}
 with open(samples_config, "r") as f:
     chip_dict_tmp = yaml.load(f)
