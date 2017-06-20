@@ -47,7 +47,7 @@ def parse_args(defaults):
     parser.add_argument("--local", dest="local", action="store_true", default=defaults["local"], help="run workflow locally (default: jobs are submitted to Slurm queue)")
     parser.add_argument("--snakemake_options", dest="snakemake_options", metavar="STR", help="Snakemake options to be passed directly to snakemake, e.g. use --snakemake_options='--dryrun --rerun-incomplete --unlock --forceall'. (default: '%(default)s')", default=defaults["snakemake_options"])
     parser.add_argument("--tempdir", dest="tempdir", type=str, help="used prefix path for temporary directory created via mktemp. Created temp dir gets exported as $TMPDIR and is removed at the end of this wrapper! (default: '%(default)s')", default=defaults["tempdir"])
-    parser.add_argument("--downsample", dest="downsample", metavar="INT", help="downsample the given number of reads from the head of each FASTQ file", type=int, default=defaults["downsample"])
+    parser.add_argument("--downsample", dest="downsample", metavar="INT", help="downsample the given number of reads randomly from of each FASTQ file", type=int, default=defaults["downsample"])
     parser.add_argument("--trim", dest="trim", action="store_true", default=defaults["trim"], help="Activate trimming with Cutadapt. Default: no Trimming!")
     parser.add_argument("--trim_options", dest="trim_options", metavar="STR", type=str, help="Options passed to the selected trimmer, e.g. use --trim_options='-a A{30}' for polyA trimming with cutadapt (default: '%(default)s')", default=defaults["trim_options"])
     parser.add_argument("--cell_barcode_file", dest="barcode_file", metavar="STR", help="2-column file with cell-index (1st col) and barcode (2nd col). Default will use internal CelSeq2@MPI-IE file with 192 barcodes. (default: '%(default)s')", type=str, default= defaults["barcode_file"])
@@ -137,13 +137,9 @@ def main():
                     """.format( snakefile = os.path.join(this_script_dir, "Snakefile"),
                                 max_jobs = args.max_jobs,
                                 outdir = args.outdir,
-                                cluster_logs_dir = os.path.abspath(args.cluster_logs_dir),
                                 snakemake_options=str(args.snakemake_options or ''),
                                 configfile = os.path.join(args.outdir,'config.yaml'),
                               ).split()
-
-    if args.configfile:
-        snakemake_cmd += ["--configfile", args.configfile]
 
     if args.verbose:
         snakemake_cmd.append("--printshellcmds")
