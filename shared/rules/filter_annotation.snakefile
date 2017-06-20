@@ -52,7 +52,7 @@ rule filter_annotation_bed:
     output:
         bed_filtered = "Annotation/genes.filtered.bed"
     params:
-        pattern = str(filter_annotation or '')
+        pattern = str(filter_annotation or '\'\'')
     shell:
         "cat {input.bed_annot} | grep {params.pattern} > {output.bed_filtered} "
 
@@ -84,7 +84,7 @@ rule annotation_bed2saf:
     output:
         bed_filtered = "Annotation/genes.filtered.saf"
     params:
-        pattern =  filter_annotation
+        pattern =  str(filter_annotation or '\'\'')
     shell:
         """echo -e 'GeneID\tChr\tStart\tEnd\tStrand' > {output} && grep {params.pattern} {input} | awk 'BEGIN{{OFS="\t"}}{{print $16, $1, $2, $3, $6}}' >> {output} """
 
