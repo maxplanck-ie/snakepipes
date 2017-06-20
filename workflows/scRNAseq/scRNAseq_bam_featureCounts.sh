@@ -22,19 +22,15 @@ gtf_path=$(realpath $gtf)
 bam_path=$(realpath $bam)
 tmp_path=$(realpath $tmp)
 
-## current version of featureCounts under /package/subread-1.5.0-p1/ writes out -R file to currDir instead to path provided with -o
-## this is fixed in more recent version of subread! We have to install it! :-)
 mkdir -p $tmp_path 1>&2 
 tmp_dir=$(mktemp -d --tmpdir=$tmp_path)
-cd $tmp_dir 1>&2
-#rm *.bam.featureCounts 1>&2		## I'm too lazy the get the full correct name later on, so make sure we have only the file we want
 
 ## call featureCounts
-${fc_path}featureCounts -a $gtf_path -T $threads -s 1 -R -d 25 -F "GTF" -o _tmp_$sample_name $bam_path 1>&2
+${fc_path}featureCounts -a $gtf_path -T $threads -s 1 -R -F "GTF" --tmpDir ${tmp_dir} -o ${tmp_dir}/_tmp_$sample_name $bam_path 1>&2
 
 ## add gene_id (gtf col 10), gene_name (gtf col 18) to featureCounts output, last col is gene_name + chromosome
 ## <(cat $gtf_path | tr " " "\t" | tr -d "\";" | awk '{print $10,$18,$18"__chr"$1}') \
-cat *.bam.featureCounts | awk -v map_f=$gtf_path \
+cat ${tmp_dir}/${sample_name}.bam.featureCounts | awk -v map_f=$gtf_path \
 'BEGIN{
 	while (getline < map_f) {
 		match($0,"gene_id[[:space:]\";]+([^[:space:]\";]+)",gid)
