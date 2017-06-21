@@ -56,13 +56,16 @@ version 0.3.2.1 - June 27, 2016 - Andreas Richter
 version 0.4 - 2016 - Fabian Kilpert, Steffen Heyne
 
 version 0.5 - 2017 - Steffen Heyne, Fabian Kilpert, Michael Rauer
+- major cleanup and refactoring of wrappers and code structure (but not rules)
 - scRNAseq workflow added
 - using yaml config files all over, ie. 
 	1) all wrappers write out a config yaml
 	2) Snakefile configuration only depends on provided '--configfile' 
 - better handling and and more usage of common_functions 
 - all genome config files converted to yaml, function to load genome information
-- path config file converted to yaml
+- paths config file converted to yaml
+- eliminate organism specific t2g and symbol files, they are now created by rule from gtf
+- check that sleuth is only run if replicates are available 
 - bugfix: only provided wrapper arguments overwrite either defaults or configfile options, before
   a not provided wrapper option (but in config file provided) would be overwritten by default,
   now there is true hierachy: defaults->configfile->wrapper !
