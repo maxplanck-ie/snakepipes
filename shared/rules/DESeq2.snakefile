@@ -11,15 +11,15 @@
 rule DESeq2:
     input:
         counts_table = "featureCounts/counts.tsv",
-        sample_info = sample_info
+        sample_info = sample_info,
+        symbol_file = "Annotation/genes.filtered.symbol" #get_symbol_file
     output:
         "DESeq2/DESeq2.session_info.txt"
     benchmark:
         "DESeq2/.benchmark/DESeq2.featureCounts.benchmark"
     params:
         outdir = "DESeq2",
-        fdr = 0.05,
-        symbol_file = "Annotation/genes.filtered.symbol" #get_symbol_file
+        fdr = 0.05
     log: "DESeq2/DESeq2.log"
     shell:
         "( cd {params.outdir} && export R_LIBS_USER="+R_libs_path+" && "
@@ -28,7 +28,7 @@ rule DESeq2:
         "{input.sample_info} "
         "../{input.counts_table} "
         "{params.fdr} "
-        "{params.symbol_file} "
+        "{input.symbol_file} "
         ") 2>&1 | tee {log}"
 
 
@@ -36,15 +36,15 @@ rule DESeq2:
 rule DESeq2_Salmon:
     input:
         counts_table = "Salmon/counts.genes.tsv",
-        sample_info = sample_info
+        sample_info = sample_info,
+        symbol_file = "Annotation/genes.filtered.symbol" #get_symbol_file
     output:
         "DESeq2_Salmon/DESeq2.session_info.txt"
     benchmark:
         "DESeq2_Salmon/.benchmark/DESeq2.Salmon.benchmark"
     params:
         outdir = "DESeq2_Salmon",
-        fdr = 0.05,
-        symbol_file = "Annotation/genes.filtered.symbol" #get_symbol_file
+        fdr = 0.05
     log: "DESeq2_Salmon/DESeq2.log"
     shell:
         "( cd {params.outdir} && export R_LIBS_USER="+R_libs_path+" && "
@@ -53,5 +53,5 @@ rule DESeq2_Salmon:
         "{input.sample_info} "
         "../{input.counts_table} "
         "{params.fdr} "
-        "{params.symbol_file} "
+        "{input.symbol_file} "
         ") 2>&1 | tee {log}"

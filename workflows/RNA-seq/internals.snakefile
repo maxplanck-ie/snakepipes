@@ -59,18 +59,18 @@ if not paired:
     reads = [""]
 
 ## rna-strandness for HISAT2
-#rna_strandness = convert_library_type(paired, library_type, "featureCounts", "HISAT2")
-#if rna_strandness == "NA":
-#    rna_strandness = ""
-#else:
-#    rna_strandness = "--rna-strandness "+rna_strandness
+rna_strandness = convert_library_type(paired, library_type, "featureCounts", "HISAT2")
+if rna_strandness == "NA":
+    rna_strandness = ""
+else:
+    rna_strandness = "--rna-strandness "+rna_strandness
 
-#salmon_libtype = convert_library_type(paired, library_type, "featureCounts", "Salmon")
-salmon_libtype = ""
+salmon_libtype = convert_library_type(paired, library_type, "featureCounts", "Salmon")
+
 ## Require configuration file (samples.yaml)
 if sample_info and not os.path.isfile(sample_info):
     print("ERROR: Cannot find sample info file! ("+sample_info+")\n")
     exit(1)
 
 if sample_info and not check_replicates(sample_info):
-    print("\nWarning! Sleuth cannot be invoked without replicates! Do only DESeq2!!!\n")
+    print("\nWarning! Sleuth cannot be invoked without replicates! Only DESeq2 is used...\n")
