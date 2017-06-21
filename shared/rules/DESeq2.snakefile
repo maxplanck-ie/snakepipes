@@ -1,10 +1,10 @@
 ## If a symbol file is available
-def get_symbol_file(wildcards):
-    symbol_file = os.path.join(maindir, "shared", "organisms", genome+".symbol")
-    if os.path.isfile(symbol_file):
-        return(symbol_file)
-    else:
-        return("")
+#def get_symbol_file(wildcards):
+#    symbol_file = os.path.join(maindir, "shared", "organisms", genome+".symbol")
+#    if os.path.isfile(symbol_file):
+#        return(symbol_file)
+#    else:
+#        return("")
 
 
 ## DESeq2 (on featureCounts)
@@ -19,7 +19,7 @@ rule DESeq2:
     params:
         outdir = "DESeq2",
         fdr = 0.05,
-        symbol_file = get_symbol_file
+        symbol_file = "Annotation/genes.filtered.symbol" #get_symbol_file
     log: "DESeq2/DESeq2.log"
     shell:
         "( cd {params.outdir} && export R_LIBS_USER="+R_libs_path+" && "
@@ -44,7 +44,7 @@ rule DESeq2_Salmon:
     params:
         outdir = "DESeq2_Salmon",
         fdr = 0.05,
-        symbol_file = get_symbol_file
+        symbol_file = "Annotation/genes.filtered.symbol" #get_symbol_file
     log: "DESeq2_Salmon/DESeq2.log"
     shell:
         "( cd {params.outdir} && export R_LIBS_USER="+R_libs_path+" && "

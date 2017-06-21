@@ -86,10 +86,13 @@ def run_mapping_free():
         "Salmon/TPM.genes.tsv",
         "Salmon/counts.tsv",
         "Salmon/counts.genes.tsv",
-        expand("Salmon/{sample}/abundance.h5", sample=samples),
-        ]
+        expand("Salmon/{sample}/abundance.h5", sample=samples) ]
+        
         if sample_info:
-            file_list.append( ["DESeq2_Salmon/DESeq2.session_info.txt", "sleuth/so.rds",] )
+            file_list.append( ["DESeq2_Salmon/DESeq2.session_info.txt"]) 
+        if sample_info and check_replicates(sample_info):
+            file_list.append( ["sleuth/so.rds"] )
+        
         return(file_list)
     else:
         return([])

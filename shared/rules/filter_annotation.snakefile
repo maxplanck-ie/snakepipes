@@ -46,9 +46,7 @@ elif genes_gtf.lower().find("ensembl")>=0:
             """ tr " " "\\t" | sort -k2) | """
             """ awk '{{$13=$13"\\t"$1; $4=$4"\\t"$1; OFS="\\t";print $0}}' | """
             """ cut --complement -f 1,14,16,18,20,22,24 > {output.bed_annot} """
-else:
-    print("unsupported gtf file!")
-    exit(1)
+## else the gtf format is not supported!!!
 
 rule filter_annotation_bed:
     input:
@@ -68,6 +66,13 @@ rule annotation_bed2t2g:
     shell:
         "cat {input.bed_annot} | cut -f 13-14,16 | awk '{{OFS=\"\t\"; print $1, $3, $2}}' > {output}"
 
+rule annotation_bed2symbol:
+    input:
+        bed_annot = 'Annotation/genes.filtered.bed' 
+    output:
+        'Annotation/genes.filtered.symbol'
+    shell:
+        "cat {input.bed_annot} | cut -f 16,17 | sort | uniq | awk '{{OFS=\"\t\"; print $1, $2}}' > {output}"
 
 rule annotation_bed2fasta:
     input:
