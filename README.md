@@ -263,7 +263,7 @@ The tool `histoneHMM` will only be run if at least one sample is annotated as br
 
 Further organisms can be supported by adding a genome configuration file `my_organism.yaml` in the following style to the `snakemake_workflows` directory:
 
-    $ cat /snakemake_workflows/shared/organisms/hs37d5.py
+    $ cat /snakemake_workflows/shared/organisms/hs37d5.yaml
 
 	genome_size: 2900338458
 	genome_fasta: "/data/repository/organisms/hs37d5_ensembl/genome_fasta/genome.fa"
@@ -277,4 +277,4 @@ Further organisms can be supported by adding a genome configuration file `my_org
 	genes_gtf: "/data/repository/organisms/hs37d5_ensembl/gencode/release_19/genes.gtf"
 	blacklist_bed: "/data/repository/organisms/hs37d5_ensembl/ENCODE/hs37d5_extended_Encode-blacklist.bed"
 
-If no blacklist regions are available for your organism of interest, please set `blacklist_bed: `.
+If no blacklist regions are available for your organism of interest, leave it empty `blacklist_bed: `
