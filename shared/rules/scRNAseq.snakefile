@@ -155,7 +155,7 @@ rule combine_sample_counts:
     params:
         merge_script = workflow.basedir+"/scRNAseq_merge_coutt_files2.R",
         split = split_lib,
-        sample_cell_names = cell_names if (cell_names != None) else ""
+        sample_cell_names = str(cell_names or '')
     shell:
         R_path+"""Rscript {params.merge_script} Counts/ {output.merged_matrix} {output.used_cell_names_file} {params.split} {params.sample_cell_names} """
 
@@ -185,7 +185,7 @@ rule bamCoverage_RPKM:
     output:
         "Tracks/{sample}.Coverage.bw"
     params:
-        bw_binsize = config["bw_binsize"]
+        bw_binsize = bw_binsize
     log:
         "Tracks/logs/bamCoverage_Coverage.{sample}.log"
     benchmark:

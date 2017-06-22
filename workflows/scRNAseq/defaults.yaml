@@ -1,8 +1,8 @@
 ################################################################################  
-# This file is the default configuration of the ChIP-seq workflow!
+# This file is the default configuration of the scRNA-seq workflow!
 #
 # In order to adjust some parameters, please either use the wrapper script
-# (eg. /path/to/snakemake_workflows/workflows/ChIP-seq/ChIP-seq)
+# (eg. /path/to/snakemake_workflows/workflows/scRNAseq/scRNAseq-mapcount)
 # or save a copy of this file, modify necessary parameters and then provide 
 # this file to the wrapper or snakmake via '--configfile' option 
 # (see below how to call the snakefile directly)
@@ -11,23 +11,36 @@
 # can be used in new/extended snakemake rules!
 ################################################################################
 ## General/Snakemake parameters, only used/set by wrapper or in Snakemake cmdl, but not in Snakefile 
+outdir:
 configfile:
-tempdir: /data/extended/
-local: false
+local: False
 max_jobs: 5
 snakemake_options:
-## workingdir need to be required DNA-mapping output dir, 'outdir' is set to workingdir internally
-workingdir:
+tempdir: /data/extended/
+## directory with fastq files
+indir:
 ## preconfigured target genomes (mm9,mm10,dm3,...) , see /path/to/snakemake_workflows/shared/organisms/
 ## Value can be also path to your own genome config file!
 genome:
-## paired end data?
-paired: true
-## Bin size of output files in bigWig format
-bw_binsize: 25
-## Median/mean fragment length, only relevant for single-end data (default: 200)
-fragment_length: 200
-verbose: false
+## FASTQ file extension (default: ".fastq.gz")
+ext: '.fastq.gz'
+## paired-end read name extension (default: ["_R1", "_R2"])
+reads: ["_R1","_R2"]
+## Number of reads to downsample from each FASTQ file
+downsample:
+## Options for trimming
+trim: False
+trim_prg: cutadapt
+trim_options: -a A{'30'}
+## further options
+filter_annotation: "-v -P 'decay|pseudogene' "
+barcode_file:
+barcode_pattern: "NNNNNNXXXXXX"
+split_lib: False
+cell_names:
+library_type: 2
+bw_binsize: 10
+verbose: False
 ################################################################################
 # Call snakemake directly, i.e. without using the wrapper script:
 #
@@ -35,8 +48,8 @@ verbose: false
 # via '--configfile' parameter!
 # example call: 
 #
-# snakemake --snakefile /path/to/snakemake_workflows/workflows/ChIP-seq/Snakefile
-#           --configfile /path/to/snakemake_workflows/workflows/ChIP-seq/defaults.yaml
+# snakemake --snakefile /path/to/snakemake_workflows/workflows/scRNAseq/Snakefile
+#           --configfile /path/to/snakemake_workflows/workflows/scRNAseq/defaults.yaml
 #           --directory /path/to/outputdir
 #           --cores 32
 ################################################################################

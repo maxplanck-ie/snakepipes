@@ -49,7 +49,7 @@ if paired:
             "MACS2/.benchmark/MACS2.{chip_sample}.filtered.benchmark"
         run:
             if params.paired:
-                median_fragment_length = get_fragment_length(input.insert_size_metrics)
+                median_fragment_length = cf.get_fragment_length(input.insert_size_metrics)
             else:
                 median_fragment_length = params.fragment_length
             model = "--nomodel --extsize "+str(median_fragment_length) if params.paired else "--extsize "+str(median_fragment_length)

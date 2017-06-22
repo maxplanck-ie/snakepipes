@@ -1,6 +1,7 @@
 ## make standard annotation
 
-if genome.startswith(("hg","mm")):
+#if genome.startswith(("hs","hg","mm")):
+if genes_gtf.lower().find("gencode") >=0:
     rule create_annotation_bed:
         input:
             gtf = genes_gtf
@@ -23,7 +24,8 @@ if genome.startswith(("hg","mm")):
             """ tr " " "\\t" | sort | uniq | sort -k2) | """
             """ awk '{{$13=$13"\\t"$1; $4=$4"\\t"$1; OFS="\\t";print $0}}' | """
             """ cut --complement -f 1,14,16,18,20,22,24 > {output.bed_annot} """
-elif genome.startswith(("dm")):
+#elif genome.startswith(("dm")):
+elif genes_gtf.lower().find("ensembl")>=0:
     rule create_annotation_bed:
         input:
             gtf = genes_gtf
@@ -44,7 +46,7 @@ elif genome.startswith(("dm")):
             """ tr " " "\\t" | sort -k2) | """
             """ awk '{{$13=$13"\\t"$1; $4=$4"\\t"$1; OFS="\\t";print $0}}' | """
             """ cut --complement -f 1,14,16,18,20,22,24 > {output.bed_annot} """
-
+## else the gtf format is not supported!!!
 
 rule filter_annotation_bed:
     input:
@@ -52,18 +54,25 @@ rule filter_annotation_bed:
     output:
         bed_filtered = "Annotation/genes.filtered.bed"
     params:
-        pattern = filter_annotation
+        pattern = str(filter_annotation or '\'\'')
     shell:
         "cat {input.bed_annot} | grep {params.pattern} > {output.bed_filtered} "
 
 rule annotation_bed2t2g:
     input:
-        bed_annot = 'Annotation/genes.filtered.bed'
+        bed_annot = 'Annotation/genes.filtered.bed' 
     output:
         'Annotation/genes.filtered.t2g'
     shell:
         "cat {input.bed_annot} | cut -f 13-14,16 | awk '{{OFS=\"\t\"; print $1, $3, $2}}' > {output}"
 
+rule annotation_bed2symbol:
+    input:
+        bed_annot = 'Annotation/genes.filtered.bed' 
+    output:
+        'Annotation/genes.filtered.symbol'
+    shell:
+        "cat {input.bed_annot} | cut -f 16,17 | sort | uniq | awk '{{OFS=\"\t\"; print $1, $2}}' > {output}"
 
 rule annotation_bed2fasta:
     input:
@@ -84,7 +93,7 @@ rule annotation_bed2saf:
     output:
         bed_filtered = "Annotation/genes.filtered.saf"
     params:
-        pattern =  filter_annotation
+        pattern =  str(filter_annotation or '\'\'')
     shell:
         """echo -e 'GeneID\tChr\tStart\tEnd\tStrand' > {output} && grep {params.pattern} {input} | awk 'BEGIN{{OFS="\t"}}{{print $16, $1, $2, $3, $6}}' >> {output} """
 

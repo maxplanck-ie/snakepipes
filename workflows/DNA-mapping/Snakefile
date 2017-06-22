@@ -1,18 +1,25 @@
-# import glob
 import os
-import subprocess
-import yaml
 
-### include ####################################################################
-include: os.path.join(workflow.basedir, "internals.snakefile")
-include: os.path.join(maindir, "shared", "paths.py")
-include: os.path.join(maindir, "shared", "common_functions.py")
+
+### snakemake_workflows initialization ########################################
+maindir = os.path.dirname(os.path.dirname(workflow.basedir))
+sys.path.append(os.path.join(maindir, "shared"))
+
+import common_functions as cf
+
+# load tool paths
+globals().update(cf.load_paths(os.path.join(maindir, "shared", "paths.yaml"),maindir,config["verbose"]))
+# load config file
+globals().update(cf.load_configfile(workflow.overwrite_configfile,config["verbose"]))
 # load organism-specific data, i.e. genome indices, annotation, etc.
-include: os.path.join(maindir, "shared", "load_organism_data.py")
+globals().update(cf.load_organism_data(genome,maindir,config["verbose"]))
 
+# do workflow specific stuff now 
+include: os.path.join(workflow.basedir, "internals.snakefile")
 
 ### include modules of other snakefiles ########################################
 ################################################################################
+
 # FASTQ: either downsample FASTQ files or create symlinks to input files
 include: os.path.join(maindir, "shared", "rules", "FASTQ.snakefile")
 
@@ -20,7 +27,7 @@ include: os.path.join(maindir, "shared", "rules", "FASTQ.snakefile")
 if fastqc:
     include: os.path.join(maindir, "shared", "rules", "FastQC.snakefile")
 
-# TrimGalore
+# trimming
 if trim:
     include: os.path.join(maindir, "shared", "rules", "TrimGalore.snakefile")
 
@@ -47,7 +54,8 @@ def run_FastQC(fastqc):
 
 def run_Trimming(trim, fastqc):
     if trim and fastqc:
-        return( expand("FastQC_trimmed/{sample}{read}_fastqc.html", sample = samples, read = reads) )
+        return( expand(fastq_dir+"/{sample}{read}.fastq.gz", sample = samples, read = reads) + 
+                expand("FastQC_trimmed/{sample}{read}_fastqc.html", sample = samples, read = reads) )
     elif trim:
         return( expand(fastq_dir+"/{sample}{read}.fastq.gz", sample = samples, read = reads) )
     else:
@@ -96,25 +104,13 @@ onstart:
         print("samples:", samples)
         print("paired:", paired)
         print("read extension:", reads)
+        print("fastq dir:", fastq_dir)
         print("-" * 80, "\n")
 
         print("--- Environment ----------------------------------------------------------------")
         print("$TMPDIR: ",os.getenv('TMPDIR', ""))
         print("$HOSTNAME: ",os.getenv('HOSTNAME', ""))
         print("-" * 80, "\n")
-
-        print("--- Genome ---------------------------------------------------------------------")
-        print("Genome:", genome)
-        print("Effective genome size:", genome_size)
-        print("Genome FASTA:", genome_fasta)
-        print("Genome index:", genome_index)
-        print("Genome 2bit:", genome_2bit)
-        print("Bowtie2 index:", bowtie2_index)
-        print("Gene annotation BED:", genes_bed)
-        print("Gene annotation GTF:", genes_gtf)
-        print("Blacklist regions BED:", blacklist_bed)
-        print("-" * 80, "\n")
-
 
 ### main rule ##################################################################
 ################################################################################

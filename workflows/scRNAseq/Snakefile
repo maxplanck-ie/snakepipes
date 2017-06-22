@@ -1,35 +1,24 @@
-# import glob
 import os
 
+### snakemake_workflows initialization ########################################
+maindir = os.path.dirname(os.path.dirname(workflow.basedir))
+sys.path.append(os.path.join(maindir, "shared"))
 
-### output configuration for debugging #########################################
-################################################################################
-print("config: {}\n".format(config))
-print("$TMPDIR: ",os.getenv('TMPDIR', ""))
-print("$HOSTNAME: ",os.getenv('HOSTNAME', ""))
+import common_functions as cf
 
-### include scripts ############################################################
-################################################################################
-# main directory of all snakemake workflows
-try:
-    maindir = config["maindir"]
-except:
-    print("ERROR: Variable 'maindir' has not been set by Snakemake "
-          "parameter --config or in the configuration.yaml file.")
-    exit(1)
-
-# include tool paths
-include: os.path.join(maindir, "shared", "paths.py")
-# include global variables and functions
-include: os.path.join(workflow.basedir, "internals.snakefile")
-include: os.path.join(maindir, "shared", "common_functions.py")
+# load tool paths
+globals().update(cf.load_paths(os.path.join(maindir, "shared", "paths.yaml"),maindir,config["verbose"]))
+# load config file
+globals().update(cf.load_configfile(workflow.overwrite_configfile,config["verbose"]))
 # load organism-specific data, i.e. genome indices, annotation, etc.
-include: os.path.join(maindir, "shared", "load_organism_data.py")
+globals().update(cf.load_organism_data(genome,maindir,config["verbose"]))
+
+# do workflow specific stuff now 
+include: os.path.join(workflow.basedir, "internals.snakefile")
 
 
 ### include modules of other snakefiles ########################################
 ################################################################################
-# FASTQ: either downsample FASTQ files or create symlinks to input files
 include: os.path.join(maindir, "shared", "rules", "FASTQ.snakefile")
 include: os.path.join(maindir, "shared", "rules", "scRNAseq.snakefile")
 include: os.path.join(maindir, "shared", "rules", "FastQC.snakefile")
@@ -39,26 +28,8 @@ include: os.path.join(maindir, "shared", "rules", "filter_annotation.snakefile")
 if trim:
     include: os.path.join(maindir, "shared", "rules", "TrimGalore.snakefile")
 
-# Bowtie2 mapping, duplicate marking, BAM filtering and indexing
-#include: os.path.join(maindir, "shared", "rules", "Bowtie2_bam_filtering.snakefile")
-
-# Picard CollectAlignmentSummaryMetrics and CollectInsertSizeMetrics
-#include: os.path.join(maindir, "shared", "rules", "Picard_qc.snakefile")
-
-# deepTools QC
-#include: os.path.join(maindir, "shared", "rules", "deepTools_qc.snakefile")
-
-# Qualimap BAM QC
-#include: os.path.join(maindir, "shared", "rules", "Qualimap_bamqc.snakefile")
-
-
 ### conditional/optional rules #################################################
 ################################################################################
-#def run_FastQC(fastqc):
-#    if fastqc:
-#        return( expand("FastQC/{sample}{read}_fastqc.html", sample = samples, read = reads) )
-#    else:
-#        return([])
 
 def run_Trimming(trim):
     if trim:
@@ -77,7 +48,6 @@ onstart:
         print("--- Workflow parameter ---------------------------------------------------------")
         print("Input directory:", indir)
         print("Input files:", infiles)
-        print("Output directory:", outdir)
         print("Samples:", samples)
         print("Paired-end reads:", paired)
         print("Read extension:", reads)
@@ -89,26 +59,18 @@ onstart:
         print("BigWig bin size:", bw_binsize)
         print("Barcode pattern:", barcode_pattern)
         print("Barcode file:", barcode_file)
+        print("UMI_LEN:",UMI_length)
+        print("UMI_offset:",UMI_offset)
+        print("CELLI_LEN:",CELLI_length)
+        print("CELLI_offset:",CELLI_offset)
+
         print("-" * 80, "\n")
         
         print("--- Environment ----------------------------------------------------------------")
         print("$TMPDIR: ",os.getenv('TMPDIR', ""))
         print("$HOSTNAME: ",os.getenv('HOSTNAME', ""))
         print("-" * 80, "\n")
-        
-        print("--- Genome ---------------------------------------------------------------------")
-        print("Genome:", genome)
-        print("Effective genome size:", genome_size)
-        print("Genome FASTA:", genome_fasta)
-        print("Genome index:", genome_index)
-        print("Genome 2bit:", genome_2bit)
-        print("Bowtie2 index:", bowtie2_index)
-        print("Gene annotation BED:", genes_bed)
-        print("Gene annotation GTF:", genes_gtf)
-        print("Blacklist regions BED:", blacklist_bed)
-        print("-" * 80, "\n")
 
-        print(samples)
 ### main rule ##################################################################
 ################################################################################
 localrules: annot
@@ -117,8 +79,8 @@ rule all:
         expand("FASTQ/{sample}{read}.fastq.gz", sample = samples, read = reads),
         expand("FASTQ_barcoded/{sample}.fastq.gz", sample = samples),
         run_Trimming(trim),
-        expand("FastQC/{sample}_fastqc.html", sample = samples),
-        #expand("HISAT2_genomic/{sample}.bam", sample = samples),
+        expand("FastQC/{sample}{read}_fastqc.html", sample = samples, read=reads),
+        expand("FastQC_trimmed/{sample}_fastqc.html", sample = samples),
         expand("STAR_genomic/{sample}.bam", sample = samples),
         expand("Counts/{sample}.cout.csv",sample = samples),
         expand("Counts/{sample}.coutt.csv",sample = samples),
@@ -132,22 +94,6 @@ rule annot:
     input:
         "Annotation/genes.filtered.bed",
         "Annotation/genes.filtered.gtf",
-        
-        
-#        run_FastQC(fastqc),
-#        expand("Bowtie2/{sample}.bam.bai", sample = samples),
-#        expand("filtered_bam/{sample}.filtered.bam.bai", sample = samples),
-#        expand("Picard_qc/AlignmentSummaryMetrics/{sample}.alignment_summary_metrics.txt", sample = samples),
-#        expand("Picard_qc/MarkDuplicates/{sample}.mark_duplicates_metrics.txt", sample = samples),
-#        run_CollectInsertSizeMetrics(paired),
-#        expand("bamCoverage/{sample}.seq_depth_norm.bw", sample = samples),
-#        run_bamCoverage_filtered(dedup, properpairs, mapq),
-#        "deepTools_qc/plotCoverage/read_coverage.png",
-#        "deepTools_qc/plotCorrelation/correlation.pearson.read_coverage.heatmap.png",
-#        "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage.heatmap.png",
-#        "deepTools_qc/plotPCA/PCA.read_coverage.png",
-#        expand("Qualimap_qc/{sample}.filtered.bamqc_report.html", sample = samples),
-#        expand("Qualimap_qc/{sample}.filtered.bamqc_results.txt", sample = samples)
 
 
 ### execute after workflow finished ############################################

@@ -9,7 +9,7 @@ if paired:
             align_summary = "Bowtie2/{sample}.Bowtie2_summary.txt",
             bam = temp("Bowtie2/{sample}.sorted.bam")
         params:
-            bowtie_opts = bowtie_opts,
+            bowtie_opts = str(bowtie_opts or ''),
             mate_orientation = mate_orientation
         benchmark:
             "Bowtie2/.benchmark/Bowtie2.{sample}.benchmark"
@@ -33,7 +33,7 @@ else:
             align_summary = "Bowtie2/{sample}.Bowtie2_summary.txt",
             bam = temp("Bowtie2/{sample}.sorted.bam")
         params:
-            bowtie_opts = bowtie_opts
+            bowtie_opts = str(bowtie_opts or '')
         benchmark:
             "Bowtie2/.benchmark/Bowtie2.{sample}.benchmark"
         threads: 24
