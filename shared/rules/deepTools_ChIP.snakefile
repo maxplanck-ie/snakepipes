@@ -116,13 +116,17 @@ rule plotFingerprint:
         bams = expand("filtered_bam/{sample}.filtered.bam", sample = all_samples),
         bais = expand("filtered_bam/{sample}.filtered.bam.bai", sample = all_samples)
     output:
-        "deepTools_ChIP/plotFingerprint/plotFingerprint.png"
+        metrics = "deepTools_ChIP/plotFingerprint/plotFingerprint.metrics.txt"
     params:
         labels = " ".join(all_samples),
         blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed
                     else "",
         read_extension = "--extendReads" if paired
-                         else "--extendReads "+str(fragment_length)
+                         else "--extendReads "+str(fragment_length),
+        png = "--plotFile deepTools_ChIP/plotFingerprint/plotFingerprint.png" if (len(all_samples)<=20)
+              else "",
+        jsd = "--JSDsample filtered_bam/"+control_samples[0]+".filtered.bam" if (len(control_samples)>0)
+            else ""
     log:
         "deepTools_ChIP/logs/plotFingerprint.log"
     benchmark:
@@ -131,11 +135,13 @@ rule plotFingerprint:
     shell:
         deepTools_path+"plotFingerprint "
         "-b {input.bams} "
-        "--plotFile {output} "
         "--labels {params.labels} "
         "--plotTitle 'Cumulative read counts per bin without duplicates' "
-        "{params.blacklist} "
-        "-p {threads} "
-        "{params.read_extension} "
         "--ignoreDuplicates "
+        "--outQualityMetrics {output.metrics} "
+        "-p {threads} "
+        "{params.blacklist} "
+        "{params.png} "
+        "{params.read_extension} "
+        "{params.jsd} "
         "&> {log}"
