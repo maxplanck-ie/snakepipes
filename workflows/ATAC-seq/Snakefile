@@ -1,14 +1,22 @@
-# import glob
-import os
-import subprocess
-import yaml
 
-### include ####################################################################
-include: os.path.join(workflow.basedir, "internals.snakefile")
-include: os.path.join(maindir, "shared", "paths.py")
-include: os.path.join(maindir, "shared", "common_functions.py")
+import os
+
+
+### snakemake_workflows initialization ########################################
+maindir = os.path.dirname(os.path.dirname(workflow.basedir))
+sys.path.append(os.path.join(maindir, "shared"))
+
+import common_functions as cf
+
+# load tool paths
+globals().update(cf.load_paths(os.path.join(maindir, "shared", "paths.yaml"),maindir,config["verbose"]))
+# load config file
+globals().update(cf.load_configfile(workflow.overwrite_configfile,config["verbose"]))
 # load organism-specific data, i.e. genome indices, annotation, etc.
-include: os.path.join(maindir, "shared", "load_organism_data.py")
+globals().update(cf.load_organism_data(genome,maindir,config["verbose"]))
+
+# do workflow specific stuff now
+include: os.path.join(workflow.basedir, "internals.snakefile")
 
 
 ### include modules of other snakefiles ########################################
@@ -36,13 +44,8 @@ include: os.path.join(maindir, "shared", "rules", "deepTools_qc.snakefile")
 # Qualimap BAM QC
 include: os.path.join(maindir, "shared", "rules", "Qualimap_bamqc.snakefile")
 
-# Read fragments separations
-
-# read adjustment
-
-# deeptools_ATAC_qc (eg coverage tracks)
-
-# Peak calling
+# ATAC-seq open chromatin
+include: os.path.join(maindir, "shared", "rules", "ATAC.snakefile")
 
 
 ### conditional/optional rules #################################################
@@ -55,7 +58,8 @@ def run_FastQC(fastqc):
 
 def run_Trimming(trim, fastqc):
     if trim and fastqc:
-        return( expand("FastQC_trimmed/{sample}{read}_fastqc.html", sample = samples, read = reads) )
+        return( expand(fastq_dir+"/{sample}{read}.fastq.gz", sample = samples, read = reads) +
+                expand("FastQC_trimmed/{sample}{read}_fastqc.html", sample = samples, read = reads) )
     elif trim:
         return( expand(fastq_dir+"/{sample}{read}.fastq.gz", sample = samples, read = reads) )
     else:
@@ -100,29 +104,18 @@ def run_Qualimap():
 ################################################################################
 onstart:
     if "verbose" in config and config["verbose"]:
+        print('config[verbose]:', config['verbose'])
         print("--- Workflow parameters --------------------------------------------------------")
         print("samples:", samples)
         print("paired:", paired)
         print("read extension:", reads)
+        print("maximum insert size (Bowtie2 -X):", insert_size_max)
         print("-" * 80, "\n")
 
         print("--- Environment ----------------------------------------------------------------")
         print("$TMPDIR: ",os.getenv('TMPDIR', ""))
         print("$HOSTNAME: ",os.getenv('HOSTNAME', ""))
         print("-" * 80, "\n")
-
-        print("--- Genome ---------------------------------------------------------------------")
-        print("Genome:", genome)
-        print("Effective genome size:", genome_size)
-        print("Genome FASTA:", genome_fasta)
-        print("Genome index:", genome_index)
-        print("Genome 2bit:", genome_2bit)
-        print("Bowtie2 index:", bowtie2_index)
-        print("Gene annotation BED:", genes_bed)
-        print("Gene annotation GTF:", genes_gtf)
-        print("Blacklist regions BED:", blacklist_bed)
-        print("-" * 80, "\n")
-
 
 ### main rule ##################################################################
 ################################################################################
@@ -141,9 +134,21 @@ rule all:
         run_computeGCBias(gcbias),
         run_deepTools_qc(),
         run_Qualimap(),
-        ## add results of fragment separations
-        ## add deeptools_ATAC_qc
-        ## add results of peak calling
+        # #
+        # # ## prepare for ATAC peak calling
+        # # # 1) sort by query
+        # # # 2) convert bam to bedpe
+        # # # 3) filter fragments
+        expand("peaks_openChromatin/{sample}.filtered.sorted.bam", sample = samples),
+        expand("peaks_openChromatin/{sample}.all.bedpe", sample = samples),
+        expand("peaks_openChromatin/{sample}.openchrom.bedpe", sample = samples),
+        expand("peaks_openChromatin/{sample}.all.fragdistr", sample=samples),
+        # #
+        # # ## perform peak calling
+        expand("peaks_openChromatin/openchromatin_{sample}_peaks.narrowPeak", sample = samples),
+        expand('peaks_openChromatin/openchromatin_{sample}_treat_pileup.bdg', sample = samples),
+        expand('peaks_openChromatin/openchromatin_{sample}_control_lambda.bdg', sample = samples),
+        expand("peaks_openChromatin/openchromatin_{sample}_{condition}.bw", sample = samples, condition = ('control_lambda','treat_pileup'))
 
 
 
@@ -151,4 +156,4 @@ rule all:
 ################################################################################
 onsuccess:
     if "verbose" in config and config["verbose"]:
-        print("\n--- DNA mapping workflow finished successfully! --------------------------------\n")
+        print("\n--- ATAC OpenChrom workflow finished successfully! --------------------------------\n")
