@@ -16,7 +16,7 @@ if mapping_prg == "HISAT2":
                 alconc = mapping_prg+"/{sample}/al-conc.fastq.gz"
             params:
                 input_splice = known_splicesites,
-                hisat_options = config["hisat_options"],
+                hisat_options = str(hisat_options or ''),
                 rna_strandness = rna_strandness
             benchmark:
                 mapping_prg+"/.benchmark/HISAT2.{sample}.benchmark"
@@ -50,7 +50,7 @@ if mapping_prg == "HISAT2":
                 al = mapping_prg+"/{sample}/al.fastq.gz"
             params:
                 input_splice = known_splicesites,
-                hisat_options = config["hisat_options"],
+                hisat_options = str(hisat_options or ''),
                 rna_strandness = rna_strandness
             benchmark:
                 mapping_prg+"/.benchmark/HISAT2.{sample}.benchmark"
@@ -82,7 +82,7 @@ elif mapping_prg == "STAR":
             output:
                 bam = mapping_prg+"/{sample}.bam"
             params:
-                star_options = config["star_options"],
+                star_options = str(star_options or ''),
                 gtf = genes_gtf,
                 index = star_index,
                 prefix = mapping_prg+"/{sample}/{sample}.",
@@ -110,7 +110,7 @@ elif mapping_prg == "STAR":
             output:
                 bam = mapping_prg+"/{sample}.bam"
             params:
-                star_options = config["star_options"],
+                star_options = str(star_options or ''),
                 gtf = genes_gtf,
                 index = star_index,
                 prefix = mapping_prg+"/{sample}/{sample}.",

@@ -15,7 +15,7 @@ if paired:
 else:
     rule FastQC_singleEnd:
         input:
-            fastq_dir+"/{sample}.fastq.gz"
+            "FASTQ/{sample}.fastq.gz"
         output:
             "FastQC/{sample}_fastqc.html"
         log:

@@ -56,14 +56,14 @@ print(s2c)
 ################################################################################
 
 ## get gene names / symbol names
-tryCatch( { t2g = read.table(t2g_file, header=T) },
+tryCatch( { t2g = read.table(t2g_file, header=F) },
           error = function(e) { print("No t2g file available!") },
           finally = {}
 )
 
-
 if (exists("t2g")) {
-  head(t2g)
+ 	colnames(t2g) <- c("target_id","ens_gene","ext_gene")
+	str(t2g)
 
   ## add gene names
   so <- sleuth_prep(s2c, ~ condition, target_mapping = t2g)

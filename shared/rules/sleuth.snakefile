@@ -21,7 +21,7 @@ rule sleuth_Salmon:
         "../{params.indir} "
         "../{params.outdir} "
         "{params.fdr} "
-        "{input.t2g} "
+        "../{input.t2g} "
         ") 2>&1 | tee {log}"
 
 ## sleuth (on Salmon)
