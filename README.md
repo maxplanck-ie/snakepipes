@@ -1,9 +1,15 @@
-ChIP-seq workflow v0.4 - MPI-IE workflow for ChIP-seq analysis
+MPI-IE Snakemake workflows
 
 Fabian Kilpert, Andreas Richter, Steffen Heyne
 
-June, 2017
+2016-2017
 
+## Workflows ##
+
+- DNA-mapping
+- ChIP-seq
+- RNA-seq
+- scRNA-seq
 
 ## Quick start ##
 
