@@ -1,15 +1,21 @@
-# import glob
 import os
-import subprocess
-import yaml
 
-### include ####################################################################
-include: os.path.join(workflow.basedir, "internals.snakefile")
-include: os.path.join(maindir, "shared", "paths.py")
-include: os.path.join(maindir, "shared", "common_functions.py")
+
+### snakemake_workflows initialization ########################################
+maindir = os.path.dirname(os.path.dirname(workflow.basedir))
+sys.path.append(os.path.join(maindir, "shared"))
+
+import common_functions as cf
+
+# load tool paths
+globals().update(cf.load_paths(os.path.join(maindir, "shared", "paths.yaml"),maindir,config["verbose"]))
+# load config file
+globals().update(cf.load_configfile(workflow.overwrite_configfile,config["verbose"]))
 # load organism-specific data, i.e. genome indices, annotation, etc.
-include: os.path.join(maindir, "shared", "load_organism_data.py")
+globals().update(cf.load_organism_data(genome,maindir,config["verbose"]))
 
+# do workflow specific stuff now 
+include: os.path.join(workflow.basedir, "internals.snakefile")
 
 ### include modules of other snakefiles ########################################
 ################################################################################
@@ -31,7 +37,10 @@ include: os.path.join(maindir, "shared", "rules", "ChIP_qc_report.snakefile")
 onstart:
     if "verbose" in config and config["verbose"]:
         print("--- Workflow parameter ---------------------------------------------------------")
-        print("All samples:", all_samples)
+        #print("All samples:", all_samples)
+        print("control samples:", control_samples)
+        print("ChIP samples w ctrl:", chip_samples_w_ctrl)
+        print("ChIP samples wo ctrl:", chip_samples_wo_ctrl)
         print("paired:", paired)
         print("-" * 80, "\n")
 

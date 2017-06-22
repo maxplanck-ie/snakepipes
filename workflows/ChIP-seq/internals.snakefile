@@ -4,13 +4,8 @@ import subprocess
 import re
 import yaml
 
-#print(vars(workflow))
-
 
 ## Main variables ##############################################################
-
-maindir = os.path.dirname(os.path.dirname(workflow.basedir))
-verbose = config["verbose"]
 
 
 ### Functions ##################################################################
@@ -46,25 +41,29 @@ def is_chip(sample):
 
 
 ### Variable defaults ##########################################################
-
-print("\n--- config ---------------------------------------------------------------------")
-for k,v in sorted(config.items()):
-    globals()[k] = v    ## Import from config into global name space! DANGEROUS!!!
-    if verbose:
-        print("{}: {}".format(k,v))
-print()
-
-
 ### Initialization #############################################################
 
 # TODO: catch exception if ChIP-seq samples are not unique
 # read ChIP-seq dictionary from config.yaml:
 # { ChIP1: { control: Input1, broad: True }, ChIP2: { control: Input2, broad: false }
+#config["chip_dict"] = {}
 
-with open(config["samples_config"], "r") as f:
-    config["chip_dict"] = yaml.load(f)["chip_dict"]
+## Require configuration file (samples.yaml)
+if not os.path.isfile(samples_config):
+    print("ERROR: Cannot find samples file ("+samples_config+")")
+    exit(1)
 
-chip_dict = config["chip_dict"]
+chip_dict = {}
+with open(samples_config, "r") as f:
+    chip_dict_tmp = yaml.load(f)
+    if "chip_dict" in chip_dict_tmp and chip_dict_tmp["chip_dict"] :
+        chip_dict = chip_dict_tmp["chip_dict"]
+    else:
+        print("\n  Error! Sample config has empty or no 'chip_dict' entry! ("+config["samples_config"]+") !!!\n\n")
+        exit(1)
+    del chip_dict_tmp
+
+cf.write_configfile(os.path.join("chip_samples.yaml"),chip_dict)
 
 # create unique sets of control samples, ChIP samples with and without control
 control_samples = set()

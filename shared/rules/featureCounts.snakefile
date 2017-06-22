@@ -10,7 +10,7 @@ if paired:
             opts = config["featurecounts_options"],
         log:
             "featureCounts/{sample}.log"
-        threads: 4
+        threads: 8
         shell:
             feature_counts_path+"featureCounts "
             "-p -B {params.opts} "
@@ -18,6 +18,7 @@ if paired:
             "-s {params.libtype} "
             "-F SAF -a {input.saf} "
             "-o {output} "
+            "--tmpDir ${{TMPDIR}} "
             "{input.bam} &>> {log} "
 else:
     rule featureCounts:
@@ -31,7 +32,7 @@ else:
             opts = config["featurecounts_options"],
         log:
             "featureCounts/{sample}.log"
-        threads: 4
+        threads: 8
         shell:
             feature_counts_path+"featureCounts "
             "{params.opts} "
@@ -39,6 +40,7 @@ else:
             "-s {params.libtype} "
             "-F SAF -a {input.saf} "
             "-o {output} "
+            "--tmpDir ${{TMPDIR}} "
             "{input.bam} &>> {log} "
 
 
