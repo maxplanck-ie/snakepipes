@@ -2,9 +2,9 @@ if paired:
     rule featureCounts_allele:
         input:
             saf = "Annotation/genes.filtered.saf",
-            bam = mapping_prg+"/{sample}.allele_flagged.bam",
-            allele1 = mapping_prg+"/{sample}.genome1.bam",
-            allele2 = mapping_prg+"/{sample}.genome2.bam"
+            bam = mapping_prg+"/{sample}_nsorted.allele_flagged.bam",
+            allele1 = mapping_prg+"/{sample}_nsorted.genome1.bam",
+            allele2 = mapping_prg+"/{sample}_nsorted.genome2.bam"
         output:
             'featureCounts/{sample}_allelic_counts.txt'
         params:
@@ -14,7 +14,7 @@ if paired:
             "featureCounts/{sample}.log"
         threads: 8
         shell:
-            feature_counts_path+" featureCounts"
+            feature_counts_path+"featureCounts"
             " -p -B {params.opts}"
             " -T {threads}"
             " -s {params.libtype}"
@@ -26,9 +26,9 @@ else:
     rule featureCounts_allele:
         input:
             saf = "Annotation/genes.filtered.saf",
-            bam = mapping_prg+"/{sample}.allele_flagged.bam",
-            allele1 = mapping_prg+"/{sample}.genome1.bam",
-            allele2 = mapping_prg+"/{sample}.genome2.bam"
+            bam = mapping_prg+"/{sample}_nsorted.allele_flagged.bam",
+            allele1 = mapping_prg+"/{sample}_nsorted.genome1.bam",
+            allele2 = mapping_prg+"/{sample}_nsorted.genome2.bam"
         output:
             'featureCounts/{sample}_allelic_counts.txt'
         params:

@@ -23,15 +23,15 @@ def convert_library_type (paired, from_library_type, from_prg, to_prg,
     return( subprocess.check_output(cmd, shell=True).decode() )
 
 ## returns true if there are at least 2 replicates per conditions
-def check_replicates(sample_info_file):
-    ret = subprocess.check_output(
-            "cat "+sample_info_file+"| awk '{if (NR==1){ col=0; for (i=1;i<=NF;i++) if ($i~\"condition\") col=i} else print $col}' | sort | uniq -c | awk '{if ($1>1) ok++}END{if (NR>1 && ok>=NR) print \"REPLICATES_OK\"}'",
-            shell=True).decode()
+#def check_replicates(sample_info_file):
+#    ret = subprocess.check_output(
+#            "cat "+sample_info_file+"| awk '{if (NR==1){ col=0; for (i=1;i<=NF;i++) if ($i~\"condition\") col=i} else print $col}' | sort | uniq -c | awk '{if ($1>1) ok++}END{if (NR>1 && ok>=NR) print \"REPLICATES_OK\"}'",
+#            shell=True).decode()
 
-    if ret.find("REPLICATES_OK") >=0:
-        return True
-    else:
-        return False
+#    if ret.find("REPLICATES_OK") >=0:
+#        return True
+#    else:
+#        return False
 
 ## Variable defaults ##########################################################
 
@@ -68,9 +68,9 @@ else:
 #salmon_libtype = convert_library_type(paired, library_type, "featureCounts", "Salmon")
 
 ## Require configuration file (samples.yaml)
-if sample_info and not os.path.isfile(sample_info):
-    print("ERROR: Cannot find sample info file! ("+sample_info+")\n")
-    exit(1)
+#if sample_info and not os.path.isfile(sample_info):
+#    print("ERROR: Cannot find sample info file! ("+sample_info+")\n")
+#    exit(1)
 
-if sample_info and not check_replicates(sample_info):
-    print("\nWarning! Sleuth cannot be invoked without replicates! Only DESeq2 is used...\n")
+#if sample_info and not check_replicates(sample_info):
+#    print("\nWarning! Sleuth cannot be invoked without replicates! Only DESeq2 is used...\n")

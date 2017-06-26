@@ -3,8 +3,8 @@
 __version__ = "0.5"
 
 __description__ = """
-RNA-seq workflow v{version} - MPI-IE workflow for RNA mapping and analysis
-Fabian Kilpert, Steffen Heyne
+RNA-seq workflow v{version} - MPI-IE workflow for allele-Specific RNA mapping and analysis
+Vivek Bhardwaj
 March 13, 2017
 
 usage example:
@@ -41,7 +41,7 @@ def parse_args(defaults):
     optional = parser._action_groups.pop() # Edited this line
 
     ## positional/required
-    parser.add_argument("genome", metavar="GENOME", help="genome acronym of target organism (supported: 'dm3', 'dm6', 'hs37d5', 'mm9', 'mm10', 'SchizoSPombe_ASM294v2')")
+    parser.add_argument("genome", metavar="GENOME", help="genome acronym of target organism (supported: 'mm10')")
 
     required = parser.add_argument_group('required arguments')
     required.add_argument("-i", "--input-dir", dest="indir", help="input directory containing the FASTQ files, either paired-end OR single-end data",required=True)
@@ -65,14 +65,16 @@ def parse_args(defaults):
     parser.add_argument("--trim_options", dest="trim_options", metavar="STR", type=str, help="Additional option string for trimming program of choice. (default: '%(default)s')", default=defaults["trim_options"])
     parser.add_argument("--fastqc", dest="fastqc", action="store_true", help="run FastQC read quality control (default: '%(default)s')", default=defaults["fastqc"])
     parser.add_argument("--library_type", dest="library_type", metavar="", help="user provided library type strand specificity. featurCounts style: 0, 1, 2 (Illumina TruSeq); default: '%(default)s')", type=int, default=defaults["library_type"])
-    #parser.add_argument("--mapping_prg", dest="mapping_prg", metavar="STR", help="Program used for mapping: STAR or HISAT2 (default: '%(default)s')", type=str, default=defaults["mapping_prg"])
+    parser.add_argument("--mapping_prg", dest="mapping_prg", metavar="STR", help="Program used for mapping: STAR or HISAT2 (default: '%(default)s')", type=str, default=defaults["mapping_prg"])
     parser.add_argument("--star_options", dest="star_options", metavar="STR", help="STAR option string, e.g.: '--twopassMode Basic' (default: '%(default)s')", type=str, default=defaults["star_options"])
     #parser.add_argument("--hisat_options", dest="hisat_options", metavar="STR", help="HISAT2 option string (default: '%(default)s')", type=str, default=defaults["hisat_options"])
     #parser.add_argument("--salmon_index_options", dest="salmon_index_options", metavar="STR", type=str, help="Salmon index options, e.g. '--type fmd' (default: '%(default)s')", default=defaults["salmon_index_options"])
     parser.add_argument("--featurecounts_options", dest="featurecounts_options", metavar="STR", type=str, help="featureCounts option string. The options '-p -B' are always used for paired-end data (default: '%(default)s')", default=defaults["featurecounts_options"])
-    parser.add_argument("--filter_annotation", dest="filter_annotation", metavar="STR", type=str, help="filter annotation GTF by grep for use with Salmon, e.g. use --filter_annotation='-v pseudogene'; default: '%(default)s')", default=defaults["filter_annotation"])
-    parser.add_argument("--DE", dest="sample_info", help="Information on samples (required for DE analysis); see 'snakemake_workflows/shared/tools/sampleInfo.example.tsv' for example. IMPORTANT: The first entry defines which group of samples are control. By this, the order of comparison and likewise the sign of values can be changed! (default: '%(default)s')", default=defaults["sample_info"])
+    #parser.add_argument("--filter_annotation", dest="filter_annotation", metavar="STR", type=str, help="filter annotation GTF by grep for use with Salmon, e.g. use --filter_annotation='-v pseudogene'; default: '%(default)s')", default=defaults["filter_annotation"])
+    #parser.add_argument("--DE", dest="sample_info", help="Information on samples (required for DE analysis); see 'snakemake_workflows/shared/tools/sampleInfo.example.tsv' for example. IMPORTANT: The first entry defines which group of samples are control. By this, the order of comparison and likewise the sign of values can be changed! (default: '%(default)s')", default=defaults["sample_info"])
     parser.add_argument("--bw-binsize", dest="bw_binsize", metavar="INT", help="bin size of output files in bigWig format (default: '%(default)s')", type=int, default=defaults["bw_binsize"])
+    parser.add_argument("--SNPfile", dest="snp_file", metavar="STR", help="Fine containing SNP locations (default: '%(default)s')", type=str, default=defaults["snp_file"])
+
 
     args = parser.parse_args()
 
@@ -90,12 +92,12 @@ def parse_args(defaults):
         print("\nError! Provided configfile (-c) not found! ({})\n".format(args.configfile))
         exit(1)
 
-    if args.sample_info:
-        if os.path.exists(os.path.abspath(args.sample_info)):
-            args.sample_info = os.path.abspath(args.sample_info)
-        else:
-            print("\nSample info file not found! (--DE {})\n".format(args.sample_info))
-            exit(1)
+#    if args.sample_info:
+#        if os.path.exists(os.path.abspath(args.sample_info)):
+#            args.sample_info = os.path.abspath(args.sample_info)
+#        else:
+#            print("\nSample info file not found! (--DE {})\n".format(args.sample_info))
+#            exit(1)
 
     args.outdir = os.path.abspath(args.outdir)
     args.cluster_logs_dir = os.path.join(args.outdir, "cluster_logs")
@@ -149,7 +151,7 @@ def main():
     if not args.local:
         snakemake_cmd += ["--cluster 'SlurmEasy --mem-per-cpu 12G --threads {threads} --log", args.cluster_logs_dir, "--name {rule}.snakemake'"]
 
-    snakemake_log = "2>&1 | tee -a {}/RNA-seq.log".format(args.outdir).split()
+    snakemake_log = "2>&1 | tee -a {}/Allele-specific_RNA-seq.log".format(args.outdir).split()
 
     ## create local temp dir and add this path to environment as $TMPDIR variable
     ## on SLURM: $TMPDIR is set, created and removed by SlurmEasy on cluster node

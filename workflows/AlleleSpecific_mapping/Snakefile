@@ -31,18 +31,24 @@ if fastqc:
 if trim:
     include: os.path.join(maindir, "shared", "rules", "TrimGalore.snakefile")
 
+## Allele mapping
+include: os.path.join(maindir, "shared", "rules", "RNA_mapping_allelic.snakefile")
+## SNPsplit
+include: os.path.join(maindir, "shared", "rules", "SNPsplit.snakefile")
+## featureCounts_allelic
+include: os.path.join(maindir, "shared", "rules", "featureCounts_allelic.snakefile")
+
 ## filtered annotation (GTF)
 include: os.path.join(maindir, "shared", "rules", "filter_annotation.snakefile")
 
 ## bamCoverage_RPKM
 include: os.path.join(maindir, "shared", "rules", "deepTools_RNA.snakefile")
 
-## featureCounts
-#include: os.path.join(maindir, "shared", "rules", "featureCounts.snakefile")
+
 
 ## DESeq2
-if sample_info:
-    include: os.path.join(maindir, "shared", "rules", "DESeq2.snakefile")
+#if sample_info:
+#    include: os.path.join(maindir, "shared", "rules", "DESeq2.snakefile")
 
 
 ### conditional/optional rules #################################################
@@ -64,16 +70,15 @@ def run_Trimming(trim, fastqc):
     else:
         return([])
 
-
 def run_mapping():
     if "mapping" in mode:
         file_list = [
         expand(mapping_prg+"/{sample}.bam.bai", sample = samples),
-        expand("featureCounts/{sample}.counts.txt", sample=samples),
-        "featureCounts/counts.tsv",
+        expand("featureCounts/{sample}_allelic_counts.txt", sample=samples),
+        "featureCounts/allelic_counts.txt",
         ]
-        if sample_info:
-            file_list.append( ["DESeq2/DESeq2.session_info.txt"] )
+#        if sample_info:
+#            file_list.append( ["DESeq2/DESeq2.session_info.txt"] )
         return(file_list)
     else:
         return([])
@@ -108,7 +113,7 @@ onstart:
         print("fastq dir:", fastq_dir)
         print("filter annotation:", filter_annotation)
         print("RNA strandness:", rna_strandness)
-        print("Sample info:", sample_info)
+        #print("Sample info:", sample_info)
         print("-" * 80, "\n")
 
         print("--- Environment ----------------------------------------------------------------")
@@ -124,13 +129,10 @@ rule all:
         expand("FASTQ/{sample}{read}.fastq.gz", sample = samples, read = reads),
         run_FastQC(fastqc),
         run_Trimming(trim, fastqc),
-
         "Annotation/genes.annotated.bed",
         "Annotation/genes.filtered.bed",
         "Annotation/genes.filtered.fa",
         "Annotation/genes.filtered.saf",    # this file is used for featureCounts later on!
-
-        run_mapping_free(),            # Salmon
         run_mapping(),                 # classical mapping + counting
         run_deeptools_qc(),
 

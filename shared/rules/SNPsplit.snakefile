@@ -11,10 +11,10 @@ rule snp_split:
         snp = snp_file,
         sam = mapping_prg+"/{sample}_nsorted.bam"
     output:
-        bam = mapping_prg+"/{sample}.allele_flagged.bam",
-        allele1 = mapping_prg+"/{sample}.genome1.bam",
-        allele2 = mapping_prg+"/{sample}.genome2.bam",
-        unassigned = mapping_prg+"/{sample}.unassigned.bam"
+        bam = mapping_prg+"/{sample}_nsorted.allele_flagged.bam",
+        allele1 = mapping_prg+"/{sample}_nsorted.genome1.bam",
+        allele2 = mapping_prg+"/{sample}_nsorted.genome2.bam",
+        unassigned = mapping_prg+"/{sample}_nsorted.unassigned.bam"
     params:
         paired = SNPparam
     log:
@@ -23,6 +23,7 @@ rule snp_split:
         SNPsplit_path + "SNPsplit"
         " {params.paired} --no_sort --samtools_path "+samtools_path+"samtools"
         " --snp_file {input.snp} {input.sam} 2> {log}"
+        "&& mv {}"
 
 rule bamsort:
     input:
