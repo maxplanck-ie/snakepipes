@@ -1,16 +1,16 @@
-################################################################################  
+################################################################################
 # This file is the default configuration of the RNA-seq workflow!
 #
 # In order to adjust some parameters, please either use the wrapper script
 # (eg. /path/to/snakemake_workflows/workflows/RNA-seq/RNA-seq)
-# or save a copy of this file, modify necessary parameters and then provide 
-# this file to the wrapper or snakmake via '--configfile' option 
+# or save a copy of this file, modify necessary parameters and then provide
+# this file to the wrapper or snakmake via '--configfile' option
 # (see below how to call the snakefile directly)
 #
-# Own parameters will be loaded during snakefile executiuon as well and hence 
+# Own parameters will be loaded during snakefile executiuon as well and hence
 # can be used in new/extended snakemake rules!
 ################################################################################
-## General/Snakemake parameters, only used/set by wrapper or in Snakemake cmdl, but not in Snakefile 
+## General/Snakemake parameters, only used/set by wrapper or in Snakemake cmdl, but not in Snakefile
 outdir:
 configfile:
 local: False
@@ -32,7 +32,7 @@ downsample:
 trim: False
 trim_prg: cutadapt
 trim_options:
-## further options 
+## further options
 mode: mapping-free,deepTools_qc
 sample_info:
 bw_binsize: 25
@@ -46,12 +46,14 @@ mapping_prg: STAR
 star_options:
 hisat_options:
 verbose: False
+# for allele-spcific mapping
+snp_file: '/data/akhtar/bhardwaj/2017_allelespecific_analysis/alleleSpecific_pipeline/snp_genome/all_CAST_EiJ_SNPs_129S1_SvImJ_reference.based_on_GRCm38.txt'
 ################################################################################
 # Call snakemake directly, i.e. without using the wrapper script:
 #
-# Please save a copy of this config yaml file and provide an adjusted config 
+# Please save a copy of this config yaml file and provide an adjusted config
 # via '--configfile' parameter!
-# example call: 
+# example call:
 #
 # snakemake --snakefile /path/to/snakemake_workflows/workflows/RNA-seq/Snakefile
 #           --configfile /path/to/snakemake_workflows/workflows/RNA-seq/defaults.yaml

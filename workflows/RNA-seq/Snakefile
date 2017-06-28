@@ -14,8 +14,23 @@ globals().update(cf.load_configfile(workflow.overwrite_configfile,config["verbos
 # load organism-specific data, i.e. genome indices, annotation, etc.
 globals().update(cf.load_organism_data(genome,maindir,config["verbose"]))
 
-# do workflow specific stuff now 
+# mapping defaults
 include: os.path.join(workflow.basedir, "internals.snakefile")
+
+# do workflow specific stuff now
+if "alleleSpecific-mapping" in mode:
+    ## mapping rules
+    include: os.path.join(maindir, "shared", "rules", "RNA_mapping_allelic.snakefile")
+    ## SNPsplit
+    include: os.path.join(maindir, "shared", "rules", "SNPsplit.snakefile")
+    ## featureCounts_allelic
+    include: os.path.join(maindir, "shared", "rules", "featureCounts_allelic.snakefile")
+else:
+    # HISAT2/STAR
+    include: os.path.join(maindir, "shared", "rules", "RNA_mapping.snakefile")
+    ## filtered annotation (GTF)
+    include: os.path.join(maindir, "shared", "rules", "filter_annotation.snakefile")
+
 
 
 ### include modules of other snakefiles ########################################
@@ -27,22 +42,16 @@ include: os.path.join(maindir, "shared", "rules", "FASTQ.snakefile")
 if fastqc:
     include: os.path.join(maindir, "shared", "rules", "FastQC.snakefile")
 
-## Salmon
+## Trim
 if trim:
     include: os.path.join(maindir, "shared", "rules", "TrimGalore.snakefile")
-
-# HISAT2
-include: os.path.join(maindir, "shared", "rules", "RNA_mapping.snakefile")
-
-## filtered annotation (GTF)
-include: os.path.join(maindir, "shared", "rules", "filter_annotation.snakefile")
 
 ## Salmon
 if "mapping-free" in mode:
     include: os.path.join(maindir, "shared", "rules", "Salmon.snakefile")
 
 ## Sleuth (on Salmon)
-if sample_info:
+if "mapping-free" in mode and sample_info:
     include: os.path.join(maindir, "shared", "rules", "sleuth.snakefile")
 
 ## bamCoverage_RPKM
@@ -68,7 +77,7 @@ def run_FastQC(fastqc):
 
 def run_Trimming(trim, fastqc):
     if trim and fastqc:
-        return( expand(fastq_dir+"/{sample}{read}.fastq.gz", sample = samples, read = reads) + 
+        return( expand(fastq_dir+"/{sample}{read}.fastq.gz", sample = samples, read = reads) +
                 expand("FastQC_trimmed/{sample}{read}_fastqc.html", sample = samples, read = reads) )
     elif trim:
         return( expand(fastq_dir+"/{sample}{read}.fastq.gz", sample = samples, read = reads) )
@@ -87,12 +96,12 @@ def run_mapping_free():
         "Salmon/counts.tsv",
         "Salmon/counts.genes.tsv",
         expand("Salmon/{sample}/abundance.h5", sample=samples) ]
-        
+
         if sample_info:
-            file_list.append( ["DESeq2_Salmon/DESeq2.session_info.txt"]) 
+            file_list.append( ["DESeq2_Salmon/DESeq2.session_info.txt"])
         if sample_info and check_replicates(sample_info):
             file_list.append( ["sleuth/so.rds"] )
-        
+
         return(file_list)
     else:
         return([])
@@ -111,6 +120,18 @@ def run_mapping():
     else:
         return([])
 
+def run_allelesp_mapping():
+    if "alleleSpecific-mapping" in mode:
+        file_list = [
+        expand(mapping_prg+"/{sample}.bam.bai", sample = samples),
+        expand("featureCounts/{sample}_allelic_counts.txt", sample=samples),
+        "featureCounts/allelic_counts.txt",
+        ]
+        if sample_info:
+            file_list.append( ["DESeq2/DESeq2.session_info.txt"] )
+        return(file_list)
+    else:
+        return([])
 
 def run_deeptools_qc():
     if "deeptools_qc" in mode:
@@ -166,6 +187,7 @@ rule all:
 
         run_mapping_free(),            # Salmon
         run_mapping(),                 # classical mapping + counting
+        run_allelesp_mapping(),        # alleleSpecific-mapping
         run_deeptools_qc(),
 
 
