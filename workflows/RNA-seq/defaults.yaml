@@ -47,7 +47,8 @@ star_options:
 hisat_options:
 verbose: False
 # for allele-spcific mapping
-snp_file: '/data/akhtar/bhardwaj/2017_allelespecific_analysis/alleleSpecific_pipeline/snp_genome/all_CAST_EiJ_SNPs_129S1_SvImJ_reference.based_on_GRCm38.txt'
+snp_file:
+Nmasked_index: 
 ################################################################################
 # Call snakemake directly, i.e. without using the wrapper script:
 #

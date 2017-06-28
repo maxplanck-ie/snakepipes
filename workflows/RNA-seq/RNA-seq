@@ -30,7 +30,6 @@ def parse_args(defaults):
     """
     Parse arguments from the command line.
     """
-
     parser = argparse.ArgumentParser(
         prog=os.path.basename(sys.argv[0]),
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -38,7 +37,7 @@ def parse_args(defaults):
         add_help=False
     )
 
-    optional = parser._action_groups.pop() # Edited this line
+    #optional = parser._action_groups.pop() # Edited this line
 
     ## positional/required
     parser.add_argument("genome",
@@ -55,7 +54,7 @@ def parse_args(defaults):
                          dest="outdir",
                          required=True,
                          help="output directory")
-    ## optional args
+    ## general args
     general = parser.add_argument_group('general arguments')
     general.add_argument("-h", "--help",
                          action="help",
@@ -82,8 +81,8 @@ def parse_args(defaults):
     general.add_argument("--local",
                         dest="local",
                         action="store_true",
-                        default=False,
-                        help="run workflow locally; default: jobs are submitted to Slurm queue (default: '%(default)s')")
+                        help="run workflow locally; default: jobs are submitted to Slurm queue (default: '%(default)s')",
+                        default=False)
 
     general.add_argument("--snakemake_options",
                          dest="snakemake_options",
@@ -91,7 +90,7 @@ def parse_args(defaults):
                          help="Snakemake options to be passed directly to snakemake,"
                               " e.g. use --snakemake_options='--dryrun --rerun-incomplete --unlock --forceall'."
                               " (default: '%(default)s')",
-                              default=defaults["snakemake_options"])
+                        default=defaults["snakemake_options"])
 
     general.add_argument("--tempdir",
                          dest="tempdir",
@@ -101,129 +100,159 @@ def parse_args(defaults):
                          default=defaults["tempdir"])
 
     ## optional
-    parser._action_groups.append(optional)
-    parser.add_argument("-m", "--mode",
-                        dest="mode",
-                        help="workflow running modes (available: 'mapping-free, mapping, alleleSpecific-mapping, deepTools_qc')"
-                        " (default: '%(default)s')",
-                        default=defaults["mode"])
+    optional = parser.add_argument_group('Optional arguments')
+    optional.add_argument("-m", "--mode",
+    					dest="mode",
+    					help="workflow running modes (available: 'mapping-free, mapping, alleleSpecific-mapping, deepTools_qc')"
+    					" (default: '%(default)s')",
+    					default=defaults["mode"])
 
-    parser.add_argument("--downsample",
-                        dest="downsample",
-                        metavar="INT",
-                        help="downsample the given number of reads randomly from each FASTQ file (default: '%(default)s')",
-                        type=int,
-                        default=defaults["downsample"])
-    parser.add_argument("--trim_prg",
-                        dest="trim_prg",
-                        choices=['cutadapt', 'trimgalore'],
-                        help="trimming program: Cutadapt or TrimGalore (default: '%(default)s')",
-                        default=defaults["trim_prg"])
-    parser.add_argument("--trim",
-                        dest="trim",
-                        action="store_true",
-                        help="activate trimming (default: '%(default)s')",
-                        default=defaults["trim"])
-    parser.add_argument("--trim_options",
-                        dest="trim_options",
-                        metavar="STR",
-                        type=str,
-                        help="Additional option string for trimming program of choice. (default: '%(default)s')",
-                        default=defaults["trim_options"])
-    parser.add_argument("--fastqc",
-                        dest="fastqc",
-                        action="store_true",
-                        help="run FastQC read quality control (default: '%(default)s')",
-                        default=defaults["fastqc"])
-    parser.add_argument("--library_type",
-                        dest="library_type",
-                        metavar="",
-                        help="user provided library type strand specificity. featurCounts style: 0, 1, 2 (Illumina TruSeq); default: '%(default)s')",
-                        type=int,
-                        default=defaults["library_type"])
-    parser.add_argument("--mapping_prg",
-                        dest="mapping_prg",
-                        metavar="STR",
-                        help="Program used for mapping: STAR or HISAT2 (default: '%(default)s')",
-                        type=str,
-                        default=defaults["mapping_prg"])
-    parser.add_argument("--star_options",
-                        dest="star_options",
-                        metavar="STR",
-                        help="STAR option string, e.g.: '--twopassMode Basic' (default: '%(default)s')",
-                        type=str,
-                        default=defaults["star_options"])
-    parser.add_argument("--hisat_options",
-                        dest="hisat_options",
-                        metavar="STR",
-                        help="HISAT2 option string (default: '%(default)s')",
-                        type=str,
-                        default=defaults["hisat_options"])
-    parser.add_argument("--salmon_index_options",
-                        dest="salmon_index_options",
-                        metavar="STR",
-                        type=str,
-                        help="Salmon index options, e.g. '--type fmd' (default: '%(default)s')",
-                        default=defaults["salmon_index_options"])
-    parser.add_argument("--featurecounts_options",
-                        dest="featurecounts_options",
-                        metavar="STR",
-                        type=str,
-                        help="featureCounts option string. The options '-p -B'"
-                             " are always used for paired-end data (default: '%(default)s')",
-                        default=defaults["featurecounts_options"])
-    parser.add_argument("--filter_annotation",
-                        dest="filter_annotation",
-                        metavar="STR",
-                        type=str,
-                        help="filter annotation GTF by grep for use with Salmon, e.g."
-                             " use --filter_annotation='-v pseudogene'; default: '%(default)s')",
-                        default=defaults["filter_annotation"])
-    parser.add_argument("--DE",
-                        dest="sample_info",
-                        help="Information on samples (required for DE analysis); see "
-                             "'snakemake_workflows/shared/tools/sampleInfo.example.tsv' for example."
-                             " IMPORTANT: The first entry defines which group of samples are control. "
-                             " By this, the order of comparison and likewise the sign of values can be changed! (default: '%(default)s')",
-                        default=defaults["sample_info"])
-    parser.add_argument("--bw-binsize",
-                        dest="bw_binsize",
-                        metavar="INT",
-                        help="bin size of output files in bigWig format (default: '%(default)s')",
-                        type=int,
-                        default=defaults["bw_binsize"])
-    parser.add_argument("--SNPfile",
-                        dest="snp_file",
-                        metavar="STR",
-                        help="Fine containing SNP locations (default: '%(default)s')",
-                        type=str,
-                        default=defaults["snp_file"])
+    optional.add_argument("--downsample",
+    					dest="downsample",
+    					metavar="INT",
+    					help="downsample the given number of reads randomly from each FASTQ file (default: '%(default)s')",
+    					type=int,
+    					default=defaults["downsample"])
+    optional.add_argument("--trim_prg",
+    					dest="trim_prg",
+    					choices=['cutadapt', 'trimgalore'],
+    					help="trimming program: Cutadapt or TrimGalore (default: '%(default)s')",
+    					default=defaults["trim_prg"])
+    optional.add_argument("--trim",
+    					dest="trim",
+    					action="store_true",
+    					help="activate trimming (default: '%(default)s')",
+    					default=defaults["trim"])
+    optional.add_argument("--trim_options",
+    					dest="trim_options",
+    					metavar="STR",
+    					type=str,
+    					help="Additional option string for trimming program of choice. (default: '%(default)s')",
+    					default=defaults["trim_options"])
+    optional.add_argument("--fastqc",
+    					dest="fastqc",
+    					action="store_true",
+    					help="run FastQC read quality control (default: '%(default)s')",
+    					default=defaults["fastqc"])
+    optional.add_argument("--library_type",
+    					dest="library_type",
+    					metavar="",
+    					help="user provided library type strand specificity. featurCounts style: 0, 1, 2 (Illumina TruSeq); default: '%(default)s')",
+    					type=int,
+    					default=defaults["library_type"])
+    optional.add_argument("--mapping_prg",
+    					dest="mapping_prg",
+    					metavar="STR",
+    					help="Program used for mapping: STAR or HISAT2 (default: '%(default)s')",
+    					type=str,
+    					default=defaults["mapping_prg"])
+    optional.add_argument("--star_options",
+    					dest="star_options",
+    					metavar="STR",
+    					help="STAR option string, e.g.: '--twopassMode Basic' (default: '%(default)s')",
+    					type=str,
+    					default=defaults["star_options"])
+    optional.add_argument("--hisat_options",
+    					dest="hisat_options",
+    					metavar="STR",
+    					help="HISAT2 option string (default: '%(default)s')",
+    					type=str,
+    					default=defaults["hisat_options"])
+    optional.add_argument("--salmon_index_options",
+    					dest="salmon_index_options",
+    					metavar="STR",
+    					type=str,
+    					help="Salmon index options, e.g. '--type fmd' (default: '%(default)s')",
+    					default=defaults["salmon_index_options"])
+    optional.add_argument("--featurecounts_options",
+    					dest="featurecounts_options",
+    					metavar="STR",
+    					type=str,
+    					help="featureCounts option string. The options '-p -B'"
+    						 " are always used for paired-end data (default: '%(default)s')",
+    					default=defaults["featurecounts_options"])
+    optional.add_argument("--filter_annotation",
+    					dest="filter_annotation",
+    					metavar="STR",
+    					type=str,
+    					help="filter annotation GTF by grep for use with Salmon, e.g."
+    						 " use --filter_annotation='-v pseudogene'; default: '%(default)s')",
+    					default=defaults["filter_annotation"])
+    optional.add_argument("--DE",
+    					dest="sample_info",
+    					help="Information on samples (required for DE analysis); see "
+    						 "'snakemake_workflows/shared/tools/sampleInfo.example.tsv' for example."
+    						 " IMPORTANT: The first entry defines which group of samples are control. "
+    						 " By this, the order of comparison and likewise the sign of values can be changed! (default: '%(default)s')",
+    					default=defaults["sample_info"])
+    optional.add_argument("--bw-binsize",
+    					dest="bw_binsize",
+    					metavar="INT",
+    					help="bin size of output files in bigWig format (default: '%(default)s')",
+    					type=int,
+    					default=defaults["bw_binsize"])
 
+    snpargs = parser.add_argument_group('allele-specific mapping arguments')
+    snpargs.add_argument("--VCFfile",
+                        metavar="STR",
+                        help="VCF file to create N-masked genomes (default: 'None')",
+                        default='',
+                        type=str)
+    snpargs.add_argument("--genomes",
+                        dest="genomes",
+                        metavar="STR",
+                        help="Name or ID of SNP strains separated by comma (default: '')",
+                        default='',
+                        type=str)
+    snpargs.add_argument("--SNPfile",
+                        metavar="STR",
+                        help="File containing SNP locations (default: '')",
+                        default='',
+                        type=str)
+    snpargs.add_argument("--Nmasked_index",
+                        metavar="STR",
+                        help="N-masked index of the reference genome (default: '')",
+                        default='',
+                        type=str)
     args = parser.parse_args()
-
     args.outdir = os.path.abspath(args.outdir)
     args.cluster_logs_dir = os.path.join(args.outdir, "cluster_logs")
 
-    ## checks for parameters necessary in wrapper
+## checks for parameters necessary in wrapper
+# 1. Dir path
     if os.path.exists(args.indir):
         args.indir = os.path.abspath(args.indir)
     else:
         print("\nError! Input dir (-i) not found! ({})\n".format(args.indir))
         exit(1)
-
+# 2. config file
     if args.configfile and not os.path.exists(args.configfile):
         print("\nError! Provided configfile (-c) not found! ({})\n".format(args.configfile))
         exit(1)
-
+# 3. Sample info file
     if args.sample_info:
         if os.path.exists(os.path.abspath(args.sample_info)):
             args.sample_info = os.path.abspath(args.sample_info)
         else:
             print("\nSample info file not found! (--DE {})\n".format(args.sample_info))
             exit(1)
+# 4. Allele-specific mapping files
+    if "alleleSpecific-mapping" in args.mode:
+        if args.VCFfile is '' and args.SNPfile is '':
+            print("\nError! Please specify either VCF file or SNP file for Allele-specific mapping! ({})\n")
+            exit(1)
+        else:
+            if not os.path.exists(args.VCFfile) and not os.path.exists(args.SNPfile):
+                print("\nError! VCFfile/SNPfile not found for Allele-specific mapping! ({})\n")
+                exit(1)
 
-    args.outdir = os.path.abspath(args.outdir)
-    args.cluster_logs_dir = os.path.join(args.outdir, "cluster_logs")
+        if args.Nmasked_index is '' and args.genome is '':
+            print("\nError! Please specify either an n-masked index file or genome IDs for Allele-specific mapping! ({})\n")
+            exit(1)
+        else:
+            if not os.path.exists(args.Nmasked_index):
+                print("\nError! n-masked index file not found for Allele-specific mapping! ({})\n")
+                exit(1)
 
     return args
 

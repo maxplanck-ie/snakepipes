@@ -14,11 +14,17 @@ globals().update(cf.load_configfile(workflow.overwrite_configfile,config["verbos
 # load organism-specific data, i.e. genome indices, annotation, etc.
 globals().update(cf.load_organism_data(genome,maindir,config["verbose"]))
 
+#
+
 # mapping defaults
 include: os.path.join(workflow.basedir, "internals.snakefile")
 
 # do workflow specific stuff now
 if "alleleSpecific-mapping" in mode:
+    # Updated global vars if mode = "alleleSpecific-mapping"
+    star_index_allelic = Nmasked_index#"/data/akhtar/bhardwaj/2017_allelespecific_analysis/alleleSpecific_pipeline/snp_genome/star_Nmasked"
+    # for allele-spcific mapping
+    snp_file = SNPfile#'/data/akhtar/bhardwaj/2017_allelespecific_analysis/alleleSpecific_pipeline/snp_genome/all_CAST_EiJ_SNPs_129S1_SvImJ_reference.based_on_GRCm38.txt'
     ## mapping rules
     include: os.path.join(maindir, "shared", "rules", "RNA_mapping_allelic.snakefile")
     ## SNPsplit
