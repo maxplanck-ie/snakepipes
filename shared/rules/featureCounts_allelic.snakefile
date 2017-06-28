@@ -53,4 +53,4 @@ rule merge_featureCounts:
     output:
         "featureCounts/allelic_counts.txt"
     shell:
-        R_path + " Rscript "+os.path.join(maindir, "shared", "tools", "merge_featureCounts.R")+" {output} {input}"
+        R_path + "Rscript "+os.path.join(maindir, "shared", "tools", "merge_featureCounts.R")+" {output} {input}"

@@ -23,7 +23,6 @@ rule snp_split:
         SNPsplit_path + "SNPsplit"
         " {params.paired} --no_sort --samtools_path "+samtools_path+"samtools"
         " --snp_file {input.snp} {input.sam} 2> {log}"
-        "&& mv {}"
 
 rule bamsort:
     input:
