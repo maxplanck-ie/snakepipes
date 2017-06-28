@@ -15,7 +15,7 @@ def merge_dicts(x, y):
 
 ## this is a pure sanity fucntion to avoid obvious mailfunction during snakefile execution
 ## because we load yaml/path/genome configs directly into global namespace!
-def sanity_dict_clean(myDict): 
+def sanity_dict_clean(myDict):
     unwanted_keys = ['maindir','workflow']
     for k in unwanted_keys:
         if k in myDict: del myDict[k]
@@ -55,9 +55,9 @@ def config_diff(dict1,dict2):
 
 
 def load_organism_data(genome,maindir,verbose):
-    if os.path.isfile(os.path.join(maindir, "shared", "organisms", genome+".yaml")): 
+    if os.path.isfile(os.path.join(maindir, "shared", "organisms", genome+".yaml")):
         organism = load_configfile(os.path.join(maindir, "shared", "organisms", genome+".yaml"),verbose,"Genome")
-    elif os.path.isfile(genome): 
+    elif os.path.isfile(genome):
         organism = load_configfile(genome,verbose,"Genome (user)")
     else:
         print("ERROR: Genome configuration file NOT found for:", genome, "\n")
@@ -67,16 +67,16 @@ def load_organism_data(genome,maindir,verbose):
 
 def load_paths(pathfile,maindir,verbose):
     paths = load_configfile(pathfile,False)
-    
+
     ## add path to tools dir
     paths["workflow_tools"] = os.path.join(maindir,"shared","tools")
-    
+
     if verbose:
         print("\n--- paths ---------------------------------------------------------------------")
         for k,v in sorted(paths.items()):
             print("{}: {}".format(k,v))
-        print("-" * 80, "\n")    
-    
+        print("-" * 80, "\n")
+
     return paths
 
 
@@ -154,3 +154,29 @@ def make_temp_dir(tempdir, fallback_dir, verbose=False):
     if verbose:
         print("\ntemp dir created: "+temp_path)
     return temp_path
+
+
+def checkAlleleParams(args):
+    ## first some sanity checks
+    if "allelic-mapping" in args.mode:
+        if not os.path.exists(args.SNPfile):
+            # if no SNPfile, check for a VCF file
+            if os.path.exists(args.VCFfile):
+                # check for strain ID
+                if args.strains is '':
+                    print("\nError! Please specify strain ID to extract from given VCF file for Allele-specific mapping! ({})\n".format(args.VCFfile))
+                    exit(1)
+                else:
+                    allele_mode = 'create_and_map'
+            else:
+                print("\nError! Please specify either VCF file or SNP file for Allele-specific mapping! \n")
+                exit(1)
+        ## If SNP file is present, check whether genome index also exists
+        elif not os.path.exists(args.Nmasked_index):
+            print("\nError! Please specify an n-masked index file for Allele-specific mapping! \n")
+            exit(1)
+        else:
+            allele_mode = 'map_only'
+    else:
+        allele_mode = None
+    return(allele_mode)

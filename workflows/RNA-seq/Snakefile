@@ -14,17 +14,21 @@ globals().update(cf.load_configfile(workflow.overwrite_configfile,config["verbos
 # load organism-specific data, i.e. genome indices, annotation, etc.
 globals().update(cf.load_organism_data(genome,maindir,config["verbose"]))
 
-#
-
 # mapping defaults
 include: os.path.join(workflow.basedir, "internals.snakefile")
 
 # do workflow specific stuff now
-if "alleleSpecific-mapping" in mode:
-    # Updated global vars if mode = "alleleSpecific-mapping"
-    star_index_allelic = Nmasked_index#"/data/akhtar/bhardwaj/2017_allelespecific_analysis/alleleSpecific_pipeline/snp_genome/star_Nmasked"
-    # for allele-spcific mapping
-    snp_file = SNPfile#'/data/akhtar/bhardwaj/2017_allelespecific_analysis/alleleSpecific_pipeline/snp_genome/all_CAST_EiJ_SNPs_129S1_SvImJ_reference.based_on_GRCm38.txt'
+if "allelic-mapping" in mode:
+    # Updated global vars if mode = "allelic-mapping"
+    if allele_mode == 'create_and_map':
+        if len(strains) == 1:
+            allele_hybrid = ('single')
+        elif len(strains) == 2:
+            allele_hybrid = ('dual')
+        include: os.path.join(maindir, "shared", "rules", "masked_genomeIndex.snakefile")
+    elif allele_mode == 'map_only':
+        star_index_allelic = Nmasked_index
+        snp_file = SNPfile
     ## mapping rules
     include: os.path.join(maindir, "shared", "rules", "RNA_mapping_allelic.snakefile")
     ## SNPsplit
@@ -69,8 +73,10 @@ include: os.path.join(maindir, "shared", "rules", "featureCounts.snakefile")
 ## DESeq2
 if sample_info:
     include: os.path.join(maindir, "shared", "rules", "DESeq2.snakefile")
-
-
+#
+print(strains[0])
+print(strains[1])
+print(allele_mode)
 ### conditional/optional rules #################################################
 ################################################################################
 
@@ -126,8 +132,18 @@ def run_mapping():
     else:
         return([])
 
+def make_nmasked_genome():
+    if "allelic-mapping" in mode:
+        file_list = [
+                'snp_genome/129S1_SvImJ_CAST_EiJ_dual_hybrid.genome_preparation_report.txt',# change
+                'snp_genome/star_Nmasked/Genome',
+                ]
+        return(file_list)
+    else:
+        return([])
+
 def run_allelesp_mapping():
-    if "alleleSpecific-mapping" in mode:
+    if "allelic-mapping" in mode:
         file_list = [
         expand(mapping_prg+"/{sample}.bam.bai", sample = samples),
         expand("featureCounts/{sample}_allelic_counts.txt", sample=samples),
@@ -193,7 +209,7 @@ rule all:
 
         run_mapping_free(),            # Salmon
         run_mapping(),                 # classical mapping + counting
-        run_allelesp_mapping(),        # alleleSpecific-mapping
+        run_allelesp_mapping(),        # allelic-mapping
         run_deeptools_qc(),
 
 

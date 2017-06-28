@@ -103,7 +103,7 @@ def parse_args(defaults):
     optional = parser.add_argument_group('Optional arguments')
     optional.add_argument("-m", "--mode",
     					dest="mode",
-    					help="workflow running modes (available: 'mapping-free, mapping, alleleSpecific-mapping, deepTools_qc')"
+    					help="workflow running modes (available: 'mapping-free, mapping, allelic-mapping, deepTools_qc')"
     					" (default: '%(default)s')",
     					default=defaults["mode"])
 
@@ -198,8 +198,8 @@ def parse_args(defaults):
                         help="VCF file to create N-masked genomes (default: 'None')",
                         default='',
                         type=str)
-    snpargs.add_argument("--genomes",
-                        dest="genomes",
+    snpargs.add_argument("--strains",
+                        dest="strains",
                         metavar="STR",
                         help="Name or ID of SNP strains separated by comma (default: '')",
                         default='',
@@ -217,6 +217,8 @@ def parse_args(defaults):
     args = parser.parse_args()
     args.outdir = os.path.abspath(args.outdir)
     args.cluster_logs_dir = os.path.join(args.outdir, "cluster_logs")
+    # heck for Allele-specific mapping mode
+    args.allele_mode = cf.checkAlleleParams(args)
 
 ## checks for parameters necessary in wrapper
 # 1. Dir path
@@ -236,23 +238,6 @@ def parse_args(defaults):
         else:
             print("\nSample info file not found! (--DE {})\n".format(args.sample_info))
             exit(1)
-# 4. Allele-specific mapping files
-    if "alleleSpecific-mapping" in args.mode:
-        if args.VCFfile is '' and args.SNPfile is '':
-            print("\nError! Please specify either VCF file or SNP file for Allele-specific mapping! ({})\n")
-            exit(1)
-        else:
-            if not os.path.exists(args.VCFfile) and not os.path.exists(args.SNPfile):
-                print("\nError! VCFfile/SNPfile not found for Allele-specific mapping! ({})\n")
-                exit(1)
-
-        if args.Nmasked_index is '' and args.genome is '':
-            print("\nError! Please specify either an n-masked index file or genome IDs for Allele-specific mapping! ({})\n")
-            exit(1)
-        else:
-            if not os.path.exists(args.Nmasked_index):
-                print("\nError! n-masked index file not found for Allele-specific mapping! ({})\n")
-                exit(1)
 
     return args
 
