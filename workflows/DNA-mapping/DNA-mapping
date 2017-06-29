@@ -5,7 +5,7 @@ __version__ = "0.5"
 __description__ = """
 DNA-mapping workflow v{version} - MPI-IE workflow for DNA mapping
 Fabian Kilpert, Andreas Richter, Steffen Heyne
-March 15, 2017
+June, 2017
 
 usage example:
     DNA-mapping -i input-dir -o output-dir mm10

@@ -5,7 +5,7 @@ __version__ = "0.5"
 __description__ = """
 RNA-seq workflow v{version} - MPI-IE workflow for RNA mapping and analysis
 Fabian Kilpert, Steffen Heyne
-March 13, 2017
+June, 2017
 
 usage example:
     RNA-seq -i input-dir -o output-dir mm10
