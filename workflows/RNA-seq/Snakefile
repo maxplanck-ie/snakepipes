@@ -22,10 +22,15 @@ if "allelic-mapping" in mode:
     # Updated global vars if mode = "allelic-mapping"
     if allele_mode == 'create_and_map':
         if len(strains) == 1:
-            allele_hybrid = ('single')
+            allele_hybrid = 'single'
+            snp_file = "snp_genome/all_SNPs_" + strains[0] + "_" + genome + ".txt.gz "
+
         elif len(strains) == 2:
-            allele_hybrid = ('dual')
+            allele_hybrid = 'dual'
+            snp_file = "snp_genome/all_" + strains[1] + "_SNPs_" + strains[0] + "_reference.based_on_" + genome + ".txt"
         include: os.path.join(maindir, "shared", "rules", "masked_genomeIndex.snakefile")
+        star_index_allelic = "snp_genome/star_Nmasked/Genome"
+
     elif allele_mode == 'map_only':
         star_index_allelic = Nmasked_index
         snp_file = SNPfile
@@ -38,8 +43,8 @@ if "allelic-mapping" in mode:
 else:
     # HISAT2/STAR
     include: os.path.join(maindir, "shared", "rules", "RNA_mapping.snakefile")
-    ## filtered annotation (GTF)
-    include: os.path.join(maindir, "shared", "rules", "filter_annotation.snakefile")
+    ## featureCounts
+    include: os.path.join(maindir, "shared", "rules", "featureCounts.snakefile")
 
 
 
@@ -56,6 +61,9 @@ if fastqc:
 if trim:
     include: os.path.join(maindir, "shared", "rules", "TrimGalore.snakefile")
 
+## filtered annotation (GTF)
+include: os.path.join(maindir, "shared", "rules", "filter_annotation.snakefile")
+
 ## Salmon
 if "mapping-free" in mode:
     include: os.path.join(maindir, "shared", "rules", "Salmon.snakefile")
@@ -66,9 +74,6 @@ if "mapping-free" in mode and sample_info:
 
 ## bamCoverage_RPKM
 include: os.path.join(maindir, "shared", "rules", "deepTools_RNA.snakefile")
-
-## featureCounts
-include: os.path.join(maindir, "shared", "rules", "featureCounts.snakefile")
 
 ## DESeq2
 if sample_info:
@@ -134,8 +139,9 @@ def run_mapping():
 
 def make_nmasked_genome():
     if "allelic-mapping" in mode:
+        genome1 = "snp_genome/" + strains[0] + '_SNP_filtering_report.txt'
         file_list = [
-                'snp_genome/129S1_SvImJ_CAST_EiJ_dual_hybrid.genome_preparation_report.txt',# change
+                genome1,
                 'snp_genome/star_Nmasked/Genome',
                 ]
         return(file_list)
@@ -210,6 +216,7 @@ rule all:
         run_mapping_free(),            # Salmon
         run_mapping(),                 # classical mapping + counting
         run_allelesp_mapping(),        # allelic-mapping
+        make_nmasked_genome(),
         run_deeptools_qc(),
 
 

@@ -4,8 +4,6 @@ from os.path import join, dirname
 
 GENOMEDIR = os.path.dirname(genome_fasta)
 BASENAME = genome
-print(GENOMEDIR)
-print(BASENAME)
 # define snpgenome_dir
 if allele_hybrid == "dual":
     SNPdir = "snp_genome/" + strains[0] + "_" + \
@@ -27,13 +25,17 @@ if allele_hybrid == 'dual':
                             BASENAME + "_N-masked"
         params:
             strain1 = strains[0],
-            strain2 = strains[1]
+            strain2 = strains[1],
+            SNPpath = os.path.abspath(VCFfile)
         log: "snp_genome/SNPsplit_createSNPgenome.log"
         shell:
-            SNPsplit_path +"SNPsplit_genome_preparation"
+            " ( [ -d snp_genome ] || mkdir -p snp_genome ) && cd snp_genome &&"
+            #" ln -s {para} . &&"
+            " " + SNPsplit_path +"SNPsplit_genome_preparation"
             " --dual_hybrid --genome_build {BASENAME} "
-            " --reference_genome {input.genome} --vcf_file {input.snps}"
+            " --reference_genome {input.genome} --vcf_file {params.SNPpath}"
             " --strain {params.strain1} --strain2 {params.strain2}"
+            "&& cd ../"
 else:
     rule snpgenome:
         input:
@@ -46,15 +48,19 @@ else:
             strain1 = strains[0]
         log: "snp_genome/SNPsplit_createSNPgenome.log"
         shell:
-            SNPsplit_path +"SNPsplit_genome_preparation"
+            " ( [ -d snp_genome ] || mkdir -p snp_genome ) && cd snp_genome &&"
+            " ln -s {input.snps} . &&"
+            " " + SNPsplit_path +"SNPsplit_genome_preparation"
             " --genome_build {BASENAME} "
             " --reference_genome {input.genome} --vcf_file {input.snps}"
             " --strain {params.strain1}"
+            "&& cd ../"
 
 if mapping_prg == "STAR":
+    #seqIDs, = glob_wildcards(SNPdir + "/{file}")
     rule star_index:
         input:
-            genome = expand(SNPdir + '/{file}', file = INFILES)
+            genome = SNPdir
         output:
             index = "snp_genome/star_Nmasked/Genome"
         log:
@@ -68,7 +74,7 @@ if mapping_prg == "STAR":
             shell("/package/STAR-2.5.2b/bin/STAR"
                   " --runThreadN {threads}"
                   " --runMode genomeGenerate"
-                  " --genomeDir " + "star_Nmasked"
+                  " --genomeDir " + "snp_genome/star_Nmasked"
                   " --genomeFastaFiles {input.genome}"
                   " --sjdbGTFfile {params.gtf}"
                   " > {log} 2>&1")
