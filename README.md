@@ -263,7 +263,7 @@ The tool `histoneHMM` will only be run if at least one sample is annotated as br
 
 Further organisms can be supported by adding a genome configuration file `my_organism.yaml` in the following style to the `snakemake_workflows` directory:
 
-    $ cat /snakemake_workflows/shared/organisms/hs37d5.yaml
+    $ cat snakemake_workflows/shared/organisms/hs37d5.yaml
 
 	genome_size: 2900338458
 	genome_fasta: "/SOMEPATH/hs37d5_ensembl/genome_fasta/genome.fa"
