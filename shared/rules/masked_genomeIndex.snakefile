@@ -57,10 +57,10 @@ else:
             "&& cd ../"
 
 if mapping_prg == "STAR":
-    #seqIDs, = glob_wildcards(SNPdir + "/{file}")
     rule star_index:
         input:
             genome = SNPdir
+            #genome = expand(SNPdir + "/{sample}", sample=glob_wildcards(SNPdir + "{sample,[^/]+}.fa"))#SNPdir + "/*.fa"
         output:
             index = "snp_genome/star_Nmasked/Genome"
         log:
@@ -69,14 +69,13 @@ if mapping_prg == "STAR":
             10
         params:
             gtf=genes_gtf
-        run:
-            # Write stderr and stdout to the log file.
-            shell("/package/STAR-2.5.2b/bin/STAR"
-                  " --runThreadN {threads}"
-                  " --runMode genomeGenerate"
-                  " --genomeDir " + "snp_genome/star_Nmasked"
-                  " --genomeFastaFiles {input.genome}"
-                  " --sjdbGTFfile {params.gtf}"
-                  " > {log} 2>&1")
+        shell:
+            "/package/STAR-2.5.2b/bin/STAR"
+            " --runThreadN {threads}"
+            " --runMode genomeGenerate"
+            " --genomeDir " + "snp_genome/star_Nmasked"
+            " --genomeFastaFiles {input.genome}/*.fa"
+            " --sjdbGTFfile {params.gtf}"
+            " > {log} 2>&1"
 else:
     print("Only STAR is implemented for allele-specific mapping")
