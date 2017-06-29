@@ -79,10 +79,7 @@ include: os.path.join(maindir, "shared", "rules", "deepTools_RNA.snakefile")
 ## DESeq2
 if sample_info:
     include: os.path.join(maindir, "shared", "rules", "DESeq2.snakefile")
-#
-print(strains[0])
-print(strains[1])
-print(allele_mode)
+
 ### conditional/optional rules #################################################
 ################################################################################
 
@@ -139,7 +136,7 @@ def run_mapping():
         return([])
 
 def make_nmasked_genome():
-    if "allelic-mapping" in mode:
+    if allele_mode == 'create_and_map':
         genome1 = "snp_genome/" + strains[0] + '_SNP_filtering_report.txt'
         file_list = [
                 genome1,
