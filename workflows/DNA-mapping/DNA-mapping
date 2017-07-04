@@ -42,7 +42,7 @@ def parse_args(defaults):
     optional = parser._action_groups.pop() # Edited this line
 
     ## positional/required
-    parser.add_argument("genome", metavar="GENOME", help="genome acronym of target organism (supported: 'dm3', 'dm6', 'hs37d5', 'mm9', 'mm10', 'SchizoSPombe_ASM294v2')")
+    parser.add_argument("genome", metavar="GENOME", help="genome acronym of target organism (supported: 'dm3', 'dm6', 'hs37d5', 'mm9', 'mm10', 'SchizoSPombe_ASM294v2') or file path to your own genome config!")
 
     required = parser.add_argument_group('required arguments')
     required.add_argument("-i", "--input-dir", dest="indir", help="input directory containing the FASTQ files, either paired-end OR single-end data",required=True)
@@ -68,7 +68,7 @@ def parse_args(defaults):
     parser.add_argument("--properpairs", dest="properpairs", action="store_true", help="retain only reads mapping in proper pairs (default: '%(default)s')", default=defaults["properpairs"])
     parser.add_argument("--mapq", dest="mapq", metavar="INT", help="retain only reads with at least the given mapping quality (default: '%(default)s')", type=int, default=defaults["mapq"])
     parser.add_argument("--bw-binsize", dest="bw_binsize", metavar="INT", help="bin size of output files in bigWig format (default: '%(default)s')", type=int, default=defaults["bw_binsize"])
-    parser.add_argument("--insert-size", dest="insert_size_max", metavar="INT", help="Maximum insert size allowed during mapping (default: '%(default)s')", type=int, default=1000)
+    parser.add_argument("--insert-size", dest="insert_size_max", metavar="INT", help="Maximum insert size allowed during mapping, MPI-IE default is 1000nt (default: '%(default)s')", type=int, default=defaults["insert_size_max"])
     parser.add_argument("--gcbias", dest="gcbias", action="store_true", help="run computeGCBias quality control (long runtime!) (default: '%(default)s')", default=defaults["gcbias"])
 
     args = parser.parse_args()
