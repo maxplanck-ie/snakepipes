@@ -14,7 +14,7 @@ globals().update(cf.load_configfile(workflow.overwrite_configfile,config["verbos
 # load organism-specific data, i.e. genome indices, annotation, etc.
 globals().update(cf.load_organism_data(genome,maindir,config["verbose"]))
 
-# do workflow specific stuff now 
+# do workflow specific stuff now
 include: os.path.join(workflow.basedir, "internals.snakefile")
 
 ### include modules of other snakefiles ########################################
@@ -54,7 +54,7 @@ def run_FastQC(fastqc):
 
 def run_Trimming(trim, fastqc):
     if trim and fastqc:
-        return( expand(fastq_dir+"/{sample}{read}.fastq.gz", sample = samples, read = reads) + 
+        return( expand(fastq_dir+"/{sample}{read}.fastq.gz", sample = samples, read = reads) +
                 expand("FastQC_trimmed/{sample}{read}_fastqc.html", sample = samples, read = reads) )
     elif trim:
         return( expand(fastq_dir+"/{sample}{read}.fastq.gz", sample = samples, read = reads) )
@@ -104,11 +104,8 @@ onstart:
         print("samples:", samples)
         print("paired:", paired)
         print("read extension:", reads)
-<<<<<<< HEAD
         print("fastq dir:", fastq_dir)
-=======
         print("maximum insert size (Bowtie2 -X):", insert_size_max)
->>>>>>> 7637e51... [New] Set maximum insert size
         print("-" * 80, "\n")
 
         print("--- Environment ----------------------------------------------------------------")

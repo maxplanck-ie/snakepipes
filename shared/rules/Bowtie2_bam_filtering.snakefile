@@ -9,7 +9,7 @@ if paired:
             align_summary = "Bowtie2/{sample}.Bowtie2_summary.txt",
             bam = temp("Bowtie2/{sample}.sorted.bam")
         params:
-            bowtie_opts = bowtie_opts,
+            bowtie_opts = str(bowtie_opts or ''),
             mate_orientation = mate_orientation,
             insert_size_max = insert_size_max
         benchmark:
