@@ -79,6 +79,7 @@ def run_Trimming(trim, fastqc):
 def run_mapping_free():
     if "mapping-free" in mode:
         file_list = [
+        "Annotation/genes.filtered.fa",
         "Salmon/SalmonIndex/sa.bin",
         expand("Salmon/{sample}.quant.sf", sample=samples),
         expand("Salmon/{sample}.quant.genes.sf", sample=samples),
@@ -161,7 +162,6 @@ rule all:
 
         "Annotation/genes.annotated.bed",
         "Annotation/genes.filtered.bed",
-        "Annotation/genes.filtered.fa",
         "Annotation/genes.filtered.saf",    # this file is used for featureCounts later on!
 
         run_mapping_free(),            # Salmon

@@ -5,7 +5,7 @@ __version__ = "0.5"
 __description__ = """
 DNA-mapping workflow v{version} - MPI-IE workflow for DNA mapping
 Fabian Kilpert, Andreas Richter, Steffen Heyne
-March 15, 2017
+June, 2017
 
 usage example:
     DNA-mapping -i input-dir -o output-dir mm10
@@ -118,7 +118,7 @@ def main():
     
     ## save to configs.yaml in outdir
     cf.write_configfile(os.path.join(args.outdir,'config.yaml'),config)
-    
+
     snakemake_module_load = "module load snakemake slurm &&".split()
     snakemake_cmd = """
                     snakemake {snakemake_options} --latency-wait 300 --snakefile {snakefile} --jobs {max_jobs} --directory {outdir} --configfile {configfile}

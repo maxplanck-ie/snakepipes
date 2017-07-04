@@ -119,7 +119,7 @@ def main():
 
     ## save to configs.yaml in outdir
     cf.write_configfile(os.path.join(args.outdir,'ChIP-seq.config.yaml'),config)
-    
+
     snakemake_module_load = "module load snakemake slurm &&".split()
     snakemake_cmd = """
                     snakemake {snakemake_options} --latency-wait 300 --snakefile {snakefile} --jobs {max_jobs} --directory {workingdir} --configfile {configfile}

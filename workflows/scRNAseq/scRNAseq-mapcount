@@ -5,7 +5,7 @@ __version__ = "0.5"
 __description__ = """
 single cell RNA-seq mapping and counting workflow v{version} - MPI-IE workflow for scRNA-seq
 Steffen Heyne, Dominic Gruen
-October, 2016
+June, 2017
 
 usage example:
     scRNAseq-mapcount -i input-dir -o output-dir mm10
