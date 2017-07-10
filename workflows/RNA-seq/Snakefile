@@ -21,17 +21,14 @@ include: os.path.join(workflow.basedir, "internals.snakefile")
 if "allelic-mapping" in mode:
     # Updated global vars if mode = "allelic-mapping"
     if allele_mode == 'create_and_map':
+        star_index_allelic = 'snp_genome/star_Nmasked/Genome'
         if len(strains) == 1:
             allele_hybrid = 'single'
             snp_file = "snp_genome/all_SNPs_" + strains[0] + "_" + genome + ".txt.gz "
-
         elif len(strains) == 2:
             allele_hybrid = 'dual'
             snp_file = "snp_genome/all_" + strains[1] + "_SNPs_" + strains[0] + "_reference.based_on_" + genome + ".txt"
-
         include: os.path.join(maindir, "shared", "rules", "masked_genomeIndex.snakefile")
-        star_index_allelic = "snp_genome/star_Nmasked/Genome"
-
     elif allele_mode == 'map_only':
         star_index_allelic = Nmasked_index
         snp_file = SNPfile
@@ -47,8 +44,9 @@ else:
     ## featureCounts
     include: os.path.join(maindir, "shared", "rules", "featureCounts.snakefile")
 
-
-
+#print(mode)
+#print(allele_mode)
+#print(star_index_allelic)
 ### include modules of other snakefiles ########################################
 ################################################################################
 ## FASTQ: either downsample FASTQ files or create symlinks to input files
@@ -140,6 +138,7 @@ def make_nmasked_genome():
         genome1 = "snp_genome/" + strains[0] + '_SNP_filtering_report.txt'
         file_list = [
                 genome1,
+                snp_file,
                 'snp_genome/star_Nmasked/Genome',
                 ]
         return(file_list)

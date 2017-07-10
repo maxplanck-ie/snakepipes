@@ -6,7 +6,7 @@ if mapping_prg == "STAR":
                 r1 = fastq_dir+"/{sample}"+reads[0]+".fastq.gz",
                 r2 = fastq_dir+"/{sample}"+reads[1]+".fastq.gz"
             output:
-                bam = mapping_prg+"/{sample}_nsorted.bam"
+                mapping_prg+"/{sample}_nsorted.bam"
             params:
                 star_options = str(star_options or ''),
                 gtf = genes_gtf,
@@ -48,7 +48,7 @@ if mapping_prg == "STAR":
             input:
                 fastq_dir+"/{sample}.fastq.gz"
             output:
-                bam = mapping_prg+"/{sample}_nsorted.bam"
+                mapping_prg+"/{sample}_nsorted.bam"
             params:
                 star_options = str(star_options or ''),
                 gtf = genes_gtf,
