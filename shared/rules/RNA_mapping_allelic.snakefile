@@ -4,14 +4,15 @@ if mapping_prg == "STAR":
         rule STAR_allele:
             input:
                 r1 = fastq_dir+"/{sample}"+reads[0]+".fastq.gz",
-                r2 = fastq_dir+"/{sample}"+reads[1]+".fastq.gz"
+                r2 = fastq_dir+"/{sample}"+reads[1]+".fastq.gz",
+                index = star_index_allelic
             output:
                 mapping_prg+"/{sample}_nsorted.bam"
             params:
                 star_options = str(star_options or ''),
                 gtf = genes_gtf,
-                index = star_index_allelic,
                 prefix = mapping_prg+"/{sample}/{sample}.",
+                idx = os.path.dirname(star_index_allelic),
                 sample_dir = mapping_prg+"/{sample}"
             benchmark:
                 mapping_prg+"/.benchmark/STAR.{sample}.benchmark"
@@ -22,7 +23,7 @@ if mapping_prg == "STAR":
                 " "+star_path+"STAR"
                 " {params.star_options}"
                 " --runThreadN {threads}"
-                " --genomeDir {params.index}"
+                " --genomeDir {params.idx}"
                 " --sjdbGTFfile {params.gtf}"
                 " --sjdbOverhang 100"
                 " --readFilesCommand zcat"
@@ -46,13 +47,14 @@ if mapping_prg == "STAR":
     else:
         rule STAR_allele:
             input:
-                fastq_dir+"/{sample}.fastq.gz"
+                r1 = fastq_dir+"/{sample}.fastq.gz",
+                index = star_index_allelic
             output:
                 mapping_prg+"/{sample}_nsorted.bam"
             params:
                 star_options = str(star_options or ''),
                 gtf = genes_gtf,
-                index = star_index_allelic,
+                idx = os.path.dirname(star_index_allelic),
                 prefix = mapping_prg+"/{sample}/{sample}.",
                 sample_dir = mapping_prg+"/{sample}"
             benchmark:
@@ -64,7 +66,7 @@ if mapping_prg == "STAR":
                 " "+star_path+"STAR"
                 " {params.star_options}"
                 " --runThreadN {threads}"
-                " --genomeDir {params.index}"
+                " --genomeDir {params.idx}"
                 " --sjdbGTFfile {params.gtf}"
                 " --sjdbOverhang 100"
                 " --readFilesCommand zcat"
