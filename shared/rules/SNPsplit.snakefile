@@ -1,5 +1,4 @@
 
-## SNPFILE still not defined
 # SNPsplit rule
 if paired:
     SNPparam = '--paired'

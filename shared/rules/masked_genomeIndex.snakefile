@@ -15,8 +15,7 @@ else:
 if allele_hybrid == 'dual':
     rule create_snpgenome:
         input:
-            genome = GENOMEDIR#,
-            #snps = VCFfile
+            genome = GENOMEDIR
         output:
             genome1 = "snp_genome/" + strains[0] + '_SNP_filtering_report.txt',
             genome2 = "snp_genome/" + strains[1] + '_SNP_filtering_report.txt',
@@ -37,8 +36,7 @@ if allele_hybrid == 'dual':
 else:
     rule create_snpgenome:
         input:
-            genome = GENOMEDIR#,
-            #snps = VCFfile
+            genome = GENOMEDIR
         output:
             genome1 = "snp_genome/" + strains[0] + '_SNP_filtering_report.txt',
             snpgenome_dir = SNPdir,
