@@ -201,23 +201,23 @@ def parse_args(defaults):
     snpargs.add_argument("--strains",
                         dest="strains",
                         metavar="STR",
-                        help="Name or ID of SNP strains separated by comma (default: '')",
+                        help="Name or ID of SNP strains separated by comma (default: 'None')",
                         default='',
                         type=str)
     snpargs.add_argument("--SNPfile",
                         metavar="STR",
-                        help="File containing SNP locations (default: '')",
+                        help="File containing SNP locations (default: 'None')",
                         default='',
                         type=str)
     snpargs.add_argument("--Nmasked_index",
                         metavar="STR",
-                        help="N-masked index of the reference genome (default: '')",
+                        help="N-masked index of the reference genome (default: 'None')",
                         default='',
                         type=str)
     args = parser.parse_args()
     args.outdir = os.path.abspath(args.outdir)
     args.cluster_logs_dir = os.path.join(args.outdir, "cluster_logs")
-    # heck for Allele-specific mapping mode
+    # check for Allele-specific mapping mode
     args.allele_mode = cf.checkAlleleParams(args)
 
 ## checks for parameters necessary in wrapper

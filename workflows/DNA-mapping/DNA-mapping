@@ -103,6 +103,12 @@ def parse_args(defaults):
 
     ## optional
     parser._action_groups.append(optional)
+    optional.add_argument("-m", "--mode",
+                         dest="mode",
+                         help="workflow running modes (available: 'mapping, allelic-mapping')"
+                         " (default: '%(default)s')",
+                         default=defaults["mode"])
+
     parser.add_argument("--downsample",
                         dest="downsample",
                         metavar="INT",
@@ -166,18 +172,44 @@ def parse_args(defaults):
                         help="run computeGCBias quality control (long runtime!) (default: '%(default)s')",
                         default=defaults["gcbias"])
 
+    snpargs = parser.add_argument_group('allele-specific mapping arguments')
+    snpargs.add_argument("--VCFfile",
+                        metavar="STR",
+                        help="VCF file to create N-masked genomes (default: 'None')",
+                        default='',
+                        type=str)
+    snpargs.add_argument("--strains",
+                        dest="strains",
+                        metavar="STR",
+                        help="Name or ID of SNP strains separated by comma (default: 'None')",
+                        default='',
+                        type=str)
+    snpargs.add_argument("--SNPfile",
+                        metavar="STR",
+                        help="File containing SNP locations (default: 'None')",
+                        default='',
+                        type=str)
+    snpargs.add_argument("--Nmasked_index",
+                        metavar="STR",
+                        help="N-masked index of the reference genome (default: 'None')",
+                        default='',
+                        type=str)
+
     args = parser.parse_args()
 
     args.outdir = os.path.abspath(args.outdir)
     args.cluster_logs_dir = os.path.join(args.outdir, "cluster_logs")
+    # check for Allele-specific mapping mode
+    args.allele_mode = cf.checkAlleleParams(args)
 
-    ## checks for parameters necessary in wrapper
+## checks for parameters necessary in wrapper
+# 1. Dir path
     if os.path.exists(args.indir):
         args.indir = os.path.abspath(args.indir)
     else:
         print("\nError! Input dir not found! ({})\n".format(args.indir))
         exit(1)
-
+# 2. config file
     if args.configfile and not os.path.exists(args.configfile):
         print("\nError! Provided configfile (-c) not found! ({})\n".format(args.configfile))
         exit(1)

@@ -45,9 +45,6 @@ else:
     ## featureCounts
     include: os.path.join(maindir, "shared", "rules", "featureCounts.snakefile")
 
-#print(mode)
-#print(allele_mode)
-#print(star_index_allelic)
 ### include modules of other snakefiles ########################################
 ################################################################################
 ## FASTQ: either downsample FASTQ files or create symlinks to input files

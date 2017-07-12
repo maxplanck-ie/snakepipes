@@ -1,6 +1,6 @@
 
 from os.path import join, dirname
-
+import glob
 
 GENOMEDIR = os.path.dirname(genome_fasta)
 BASENAME = genome
@@ -12,6 +12,13 @@ if allele_hybrid == 'dual':
 else:
     SNPdir = "snp_genome/" + strains[0] + "_" + "_N-masked"
 
+def getref_fileList(dir):
+    fl = glob.glob(dir + "/*.fa")
+    flist = ','.join(flist)
+    return(fl)
+
+
+## Create masked genome
 if allele_hybrid == 'dual':
     rule create_snpgenome:
         input:
@@ -72,5 +79,24 @@ if mapping_prg == "STAR":
             " --genomeFastaFiles {input.snpgenome_dir}/*.fa"
             " --sjdbGTFfile {params.gtf}"
             " > {log} 2>&1"
+
+elif mapping_prg == "Bowtie2":
+    rule bowtie2_index:
+        input:
+            snpgenome_dir = SNPdir
+        output:
+            bowtie2_index_allelic
+        log:
+            "snp_genome/bowtie2_Nmasked/bowtie2.index.log"
+        threads: 10
+        params:
+            filelist = getref_fileList(SNPdir),
+            idxbase = "snp_genome/bowtie2_Nmasked/Genome"
+        shell:
+            "/package/bowtie2-2.3.2/bin/bowtie2-build"
+            " --threads {threads}"
+            " {params.filelist}"
+            " {params.idxbase}"
+            " > {log} 2>&1"
 else:
-    print("Only STAR is implemented for allele-specific mapping")
+    print("Only STAR and Bowtie2 are implemented for allele-specific mapping")
