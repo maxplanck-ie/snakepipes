@@ -90,6 +90,8 @@ rule all:
         expand("Tracks/{sample}.Coverage.bw", sample = samples),
         "deepTools_qc/plotEnrichment/plotEnrichment.png",
         "deepTools_qc/plotEnrichment/plotEnrichment.tsv",
+        "deepTools_qc/plotEnrichment/plotEnrichment.exons.png",
+        "deepTools_qc/plotEnrichment/plotEnrichment.exons.tsv",
 rule annot:
     input:
         "Annotation/genes.filtered.bed",
