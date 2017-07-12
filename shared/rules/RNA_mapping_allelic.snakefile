@@ -1,4 +1,5 @@
 
+## allelic mapping using STAR
 if mapping_prg == "STAR":
     if paired:
         rule STAR_allele:
@@ -7,7 +8,7 @@ if mapping_prg == "STAR":
                 r2 = fastq_dir+"/{sample}"+reads[1]+".fastq.gz",
                 index = star_index_allelic
             output:
-                mapping_prg+"/{sample}_nsorted.bam"
+                mapping_prg+"/{sample}.bam"
             params:
                 star_options = str(star_options or ''),
                 gtf = genes_gtf,
@@ -34,7 +35,7 @@ if mapping_prg == "STAR":
                 # Recommended settings for SNPsplit
                 " --alignEndsType EndToEnd"
                 " --outSAMattributes NH HI NM MD"
-                " --outSAMtype BAM Unsorted"
+                " --outSAMtype BAM SortedByCoordinate"
                 # Additional params added
                 " --outFilterMultimapNmax 20"
                 " --alignSJoverhangMin 8"
@@ -43,14 +44,14 @@ if mapping_prg == "STAR":
                 " --alignIntronMin 1"
                 " --alignIntronMax 1000000"
                 " --alignMatesGapMax 1000000"
-                "&& mv {params.prefix}Aligned.out.bam {output} "
+                " && mv {params.prefix}Aligned.sortedByCoord.out.bam {output} "
     else:
         rule STAR_allele:
             input:
                 r1 = fastq_dir+"/{sample}.fastq.gz",
                 index = star_index_allelic
             output:
-                mapping_prg+"/{sample}_nsorted.bam"
+                mapping_prg+"/{sample}.bam"
             params:
                 star_options = str(star_options or ''),
                 gtf = genes_gtf,
@@ -77,7 +78,7 @@ if mapping_prg == "STAR":
                 # Recommended settings for SNPsplit
                 " --alignEndsType EndToEnd"
                 " --outSAMattributes NH HI NM MD"
-                " --outSAMtype BAM Unsorted"
+                " --outSAMtype BAM SortedByCoordinate"
                 # Additional params added
                 " --outFilterMultimapNmax 20"
                 " --alignSJoverhangMin 8"
@@ -86,6 +87,18 @@ if mapping_prg == "STAR":
                 " --alignIntronMin 1"
                 " --alignIntronMax 1000000"
                 " --alignMatesGapMax 1000000"
-                "&& mv {params.prefix}Aligned.out.bam {output} "
+                " && mv {params.prefix}Aligned.sortedByCoord.out.bam {output}"
 else:
     print("Only STAR is implemented for Allele-specific mapping")
+
+
+
+
+#### INDEX the mapped files
+rule BAM_index:
+    input:
+        mapping_prg+"/{sample}.bam"
+    output:
+        mapping_prg+"/{sample}.bam.bai"
+    shell:
+        samtools_path+"samtools index {input}"

@@ -172,7 +172,7 @@ def checkAlleleParams(args):
                 print("\nError! Please specify either VCF file or SNP file for Allele-specific mapping! \n")
                 exit(1)
         ## If SNP file is present, check whether genome index also exists
-        elif not os.path.exists(args.Nmasked_index):
+        elif not os.path.exists(os.path.dirname(args.Nmasked_index)):
             print("\nError! Please specify an n-masked index file for Allele-specific mapping! \n")
             exit(1)
         else:

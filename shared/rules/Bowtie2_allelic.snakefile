@@ -1,0 +1,64 @@
+## get basename of the bt2 index
+import os
+import glob
+def getbw_idxbase(file):
+    base = os.path.basename(file)
+    idxbase = re.sub('.[0-9*].bt2','',base)
+    return(idxbase)
+
+### Bowtie2 ####################################################################
+if mapping_prg == "Bowtie2":
+    if paired:
+        rule Bowtie2_allele:
+            input:
+                r1 = fastq_dir+"/{sample}"+reads[0]+".fastq.gz",
+                r2 = fastq_dir+"/{sample}"+reads[1]+".fastq.gz",
+                index = bowtie2_index_allelic
+            output:
+                align_summary = mapping_prg+"/{sample}.Bowtie2_summary.txt",
+                bam = temp(mapping_prg+"/{sample}.sorted.bam")
+            params:
+                bowtie_opts = str(bowtie_opts or ''),
+                mate_orientation = mate_orientation,
+                idxbase = getbw_idxbase(bowtie2_index_allelic)
+            benchmark:
+                mapping_prg+"/.benchmark/Bowtie2.{sample}.benchmark"
+            threads: 24
+            shell:
+                bowtie2_path+"bowtie2"
+                " -X 1000"
+                " -x {input.idxbase} -1 {input.r1} -2 {input.r2}"
+                " {params.bowtie_opts} {params.mate_orientation}"
+                " --rg-id {wildcards.sample} --rg CN:mpi-ie_deep_sequencing_unit"
+                " --rg DS:{wildcards.sample} --rg PL:ILLUMINA --rg SM:{wildcards.sample}"
+                " -p {threads}"
+                " 2> {output.align_summary} |"
+                " "+samtools_path+"samtools view -Sb -o Bowtie2/{output.bam} -"
+                " "+samtools_path+"samtools sort -m 2G -T ${{TMPDIR}}{wildcards.sample} -@ 2 -O bam - > {output.bam}"
+    else:
+        rule Bowtie2_allele:
+            input:
+                r1 = fastq_dir+"/{sample}.fastq.gz",
+                index = bowtie2_index_allelic
+            output:
+                align_summary = mapping_prg+"/{sample}.Bowtie2_summary.txt",
+                bam = temp(mapping_prg+"/{sample}.sorted.bam")
+            params:
+                bowtie_opts = str(bowtie_opts or ''),
+                idxbase = getbw_idxbase(bowtie2_index_allelic)
+            benchmark:
+                mapping_prg+"/.benchmark/Bowtie2.{sample}.benchmark"
+            threads: 24
+            shell:
+                bowtie2_path+"bowtie2"
+                    " -x {input.idxbase} -U {input.r1}"
+                    " --reorder"
+                    " {params.bowtie_opts}"
+                    " --rg-id {wildcards.sample} --rg CN:mpi-ie_deep_sequencing_unit "
+                    " --rg DS:{wildcards.sample} --rg PL:ILLUMINA --rg SM:{wildcards.sample} "
+                    " -p {threads}"
+                    " 2> {output.align_summary} |"
+                    " "+samtools_path+"samtools view -Sbu -o Bowtie2/{output.bam} -"
+                    " "+samtools_path+"samtools sort -m 2G -T ${{TMPDIR}}{wildcards.sample} -@ 2 -O bam - > {output.bam}"
+else:
+    print("Only bowtie2 implemented")

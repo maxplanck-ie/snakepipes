@@ -2,7 +2,7 @@
 
 rule CollectAlignmentSummaryMetrics:
     input:
-        "Bowtie2/{sample}.bam"
+        mapping_prg+"/{sample}.bam"
     output:
         "Picard_qc/AlignmentSummaryMetrics/{sample}.alignment_summary_metrics.txt"
     params:
@@ -25,7 +25,7 @@ rule CollectAlignmentSummaryMetrics:
 if paired:
     rule CollectInsertSizeMetrics:
         input:
-            "Bowtie2/{sample}.bam"
+            mapping_prg+"/{sample}.bam"
         output:
             txt = "Picard_qc/InsertSizeMetrics/{sample}.insert_size_metrics.txt"
         log:

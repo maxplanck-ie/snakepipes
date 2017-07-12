@@ -201,6 +201,12 @@ def parse_args(defaults):
     args.cluster_logs_dir = os.path.join(args.outdir, "cluster_logs")
     # check for Allele-specific mapping mode
     args.allele_mode = cf.checkAlleleParams(args)
+    # convert file path to abspath
+    if args.allele_mode == "create_and_map":
+        args.VCFfile = os.path.abspath(args.VCFfile)
+    elif args.allele_mode == "map_only":
+        args.SNPfile = os.path.abspath(args.SNPfile)
+        args.Nmasked_index = os.path.abspath(args.Nmasked_index)
 
 ## checks for parameters necessary in wrapper
 # 1. Dir path
@@ -247,7 +253,7 @@ def main():
     ## save to configs.yaml in outdir
     cf.write_configfile(os.path.join(args.outdir,'config.yaml'),config)
 
-    snakemake_module_load = "module load snakemake slurm &&".split()
+    snakemake_module_load = "module load snakemake/3.12.0 slurm &&".split()
     snakemake_cmd = """
                     snakemake {snakemake_options} --latency-wait 300 --snakefile {snakefile} --jobs {max_jobs} --directory {outdir} --configfile {configfile}
                     """.format( snakefile = os.path.join(args.this_script_dir, "Snakefile"),

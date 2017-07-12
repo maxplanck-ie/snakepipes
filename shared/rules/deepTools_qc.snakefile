@@ -2,8 +2,8 @@
 
 rule bamCoverage:
     input:
-        bam = "Bowtie2/{sample}.bam",
-        bai = "Bowtie2/{sample}.bam.bai"
+        bam = mapping_prg+"/{sample}.bam",
+        bai = mapping_prg+"/{sample}.bam.bai"
     output:
         "bamCoverage/{sample}.seq_depth_norm.bw"
     params:
