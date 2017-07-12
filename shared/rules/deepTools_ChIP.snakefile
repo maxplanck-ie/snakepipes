@@ -100,10 +100,8 @@ rule plotEnrichment:
         "--plotTitle 'Sigal enrichment (fraction of reads) without duplicates' "
         "--outRawCounts {output.tsv} "
         "--variableScales "
-# TODO: include blacklist parameter once the bug causing on error in plotEnrichment is fixed
         "{params.blacklist} "
         "-p {threads} "
-# TODO: include read extension parameter once the bug causing on error in plotEnrichment is fixed
         "{params.read_extension} "
         "--ignoreDuplicates "
         "&> {log}"
