@@ -219,6 +219,12 @@ def parse_args(defaults):
     args.cluster_logs_dir = os.path.join(args.outdir, "cluster_logs")
     # check for Allele-specific mapping mode
     args.allele_mode = cf.checkAlleleParams(args)
+    # convert file path to abspath
+    if args.allele_mode == "create_and_map":
+        args.VCFfile = os.path.abspath(args.VCFfile)
+    elif args.allele_mode == "map_only":
+        args.SNPfile = os.path.abspath(args.SNPfile)
+        args.Nmasked_index = os.path.abspath(args.Nmasked_index)
 
 ## checks for parameters necessary in wrapper
 # 1. Dir path

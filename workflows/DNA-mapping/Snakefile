@@ -124,7 +124,7 @@ def make_nmasked_genome():
         file_list = [
                 genome1,
                 snp_file,
-                star_index_allelic,
+                bowtie2_index_allelic,
                 ]
         return(file_list)
     else:

@@ -14,7 +14,7 @@ else:
 
 def getref_fileList(dir):
     fl = glob.glob(dir + "/*.fa")
-    flist = ','.join(flist)
+    flist = ','.join(fl)
     return(fl)
 
 
