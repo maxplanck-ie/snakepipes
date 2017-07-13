@@ -20,10 +20,10 @@ include: os.path.join(workflow.basedir, "internals.snakefile")
 ### include modules of other snakefiles ########################################
 ################################################################################
 include: os.path.join(maindir, "shared", "rules", "FASTQ.snakefile")
+include: os.path.join(maindir, "shared", "rules", "RNA_mapping.snakefile")
 include: os.path.join(maindir, "shared", "rules", "scRNAseq.snakefile")
 include: os.path.join(maindir, "shared", "rules", "FastQC.snakefile")
 include: os.path.join(maindir, "shared", "rules", "filter_annotation.snakefile")
-include: os.path.join(maindir, "shared", "rules", "RNA_mapping.snakefile")
 include: os.path.join(maindir, "shared", "rules", "deepTools_RNA.snakefile")
 
 # TrimGalore
@@ -83,8 +83,8 @@ rule all:
         run_Trimming(trim),
         expand("FastQC/{sample}{read}_fastqc.html", sample = samples, read=reads),
         expand("FastQC_trimmed/{sample}_fastqc.html", sample = samples),
-        expand("STAR_genomic/{sample}.bam", sample = samples),
-        expand("STAR_genomic/{sample}.bam.bai", sample = samples),
+        expand(mapping_prg+"/{sample}.bam", sample = samples),
+        expand(mapping_prg+"/{sample}.bam.bai", sample = samples),
         expand("Counts/{sample}.cout.csv",sample = samples),
         expand("Counts/{sample}.coutt.csv",sample = samples),
         expand("Counts/{sample}.featureCounts_summary.txt",sample = samples),
