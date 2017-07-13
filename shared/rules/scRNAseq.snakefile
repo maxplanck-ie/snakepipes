@@ -288,8 +288,7 @@ rule plotEnrichment_exons:
         "--plotFile {output.png} "
         "--labels {params.labels} "
         "--plotTitle 'Fraction of reads in regions (exons only)' "
-        "--outRawCounts {output.tsv} "
-        "--variableScales "
+        "--outRawCounts {output.tsv} " #  "--variableScales "
         "--keepExons "
         "&> {log} "
 
