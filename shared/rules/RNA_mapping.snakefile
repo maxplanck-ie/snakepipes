@@ -102,7 +102,7 @@ elif mapping_prg.upper().find("STAR") >=0:
                 "--genomeDir {params.index} "
                 "--readFilesIn {input.r1} {input.r2} "
                 "--outFileNamePrefix {params.prefix} "
-                "--outTmpDir ${{TMPDIR}} "
+                "--outTmpDir ${{TMPDIR}}_tmp_star "
                 "&& mv {params.prefix}Aligned.sortedByCoord.out.bam {output} "
     else:
         rule STAR:
@@ -131,7 +131,7 @@ elif mapping_prg.upper().find("STAR") >=0:
                 "--genomeDir {params.index} "
                 "--readFilesIn {input} "
                 "--outFileNamePrefix {params.prefix} "
-                "--outTmpDir ${{TMPDIR}} "
+                "--outTmpDir ${{TMPDIR}}_tmp_star "
                 "&& mv {params.prefix}Aligned.sortedByCoord.out.bam {output} "
 
 
