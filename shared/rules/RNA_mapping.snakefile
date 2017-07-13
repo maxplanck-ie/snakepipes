@@ -91,7 +91,7 @@ elif mapping_prg.upper().find("STAR") >=0:
                 mapping_prg+"/.benchmark/STAR.{sample}.benchmark"
             threads: 12
             shell:
-                "( [ -d {params.sample_dir} ] || mkdir -p {params.sample_dir} ) && mkdir -p ${{TMPDIR}}_tmp_star &&"
+                "( [ -d {params.sample_dir} ] || mkdir -p {params.sample_dir} ) && mkdir -p ${{TMPDIR}}_tmp_star && "
                 "module load STAR && "
                 ""+star_path+"STAR "
                 "--runThreadN {threads} "
@@ -120,7 +120,7 @@ elif mapping_prg.upper().find("STAR") >=0:
                 mapping_prg+"/.benchmark/STAR.{sample}.benchmark"
             threads: 12
             shell:
-                "( [ -d {params.sample_dir} ] || mkdir -p {params.sample_dir} ) && "
+                "( [ -d {params.sample_dir} ] || mkdir -p {params.sample_dir} ) && mkdir -p ${{TMPDIR}}_tmp_star && "
                 "module load STAR && "
                 ""+star_path+"STAR "
                 "--runThreadN {threads} "
