@@ -90,7 +90,8 @@ rule all:
         expand("Counts/{sample}.featureCounts_summary.txt",sample = samples),
         "Results/all_samples.gencode_genomic.coutt_merged.csv",
         "QC_report/QC_report.all_samples.libstats_reads.tsv",
-        expand("Tracks/{sample}.Coverage.bw", sample = samples),
+        expand("Tracks/{sample}.coverage.bw", sample = samples),
+        expand("Tracks/{sample}.RPKM.bw", sample = samples),
         "deepTools_qc/plotEnrichment/plotEnrichment.png",
         "deepTools_qc/plotEnrichment/plotEnrichment.tsv",
 rule annot:

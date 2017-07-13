@@ -20,6 +20,27 @@ rule bamCoverage_RPKM:
         " --normalizeUsingRPKM "
         "&> {log}"
 
+rule bamCoverage_raw:
+    input:
+        bam = mapping_prg+"/{sample}.bam",
+        bai = mapping_prg+"/{sample}.bam.bai"
+    output:
+        "Tracks/{sample}.coverage.bw"
+    params:
+        bw_binsize = bw_binsize
+    log:
+        "Tracks/logs/bamCoverage_coverage.{sample}.log"
+    benchmark:
+        "Tracks/.benchmark/bamCoverage_coverage.{sample}.benchmark"
+    threads: 8
+    shell:
+        deepTools_path+"bamCoverage "
+        "-b {input.bam} "
+        "-o {output} "
+        "--binSize {params.bw_binsize} "
+        "-p {threads} "
+        "&> {log}"
+
 
 rule plotEnrichment:
     input:

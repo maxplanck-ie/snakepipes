@@ -214,13 +214,13 @@ rule sc_QC_metrics:
 #     input:
 #         bam = "STAR_genomic/{sample}.bam"
 #     output:
-#         "Tracks/{sample}.Coverage.bw"
+#         "Tracks/{sample}.coverage.bw"
 #     params:
 #         bw_binsize = bw_binsize
 #     log:
-#         "Tracks/logs/bamCoverage_Coverage.{sample}.log"
+#         "Tracks/logs/bamCoverage_coverage.{sample}.log"
 #     benchmark:
-#         "Tracks/.benchmark/bamCoverage_Coverage.{sample}.benchmark"
+#         "Tracks/.benchmark/bamCoverage_coverage.{sample}.benchmark"
 #     threads: 8
 #     shell:
 #         deepTools_path+"bamCoverage "
