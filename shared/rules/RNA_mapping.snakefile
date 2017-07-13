@@ -91,7 +91,7 @@ elif mapping_prg.upper().find("STAR") >=0:
                 mapping_prg+"/.benchmark/STAR.{sample}.benchmark"
             threads: 12
             shell:
-                "( [ -d {params.sample_dir} ] || mkdir -p {params.sample_dir} ) && mkdir -p ${{TMPDIR}} && "
+                "( [ -d {params.sample_dir} ] || mkdir -p {params.sample_dir} ) && "
                 "module load STAR && "
                 ""+star_path+"STAR "
                 "--runThreadN {threads} "
@@ -102,7 +102,7 @@ elif mapping_prg.upper().find("STAR") >=0:
                 "--genomeDir {params.index} "
                 "--readFilesIn {input.r1} {input.r2} "
                 "--outFileNamePrefix {params.prefix} "
-                "--outTmpDir ${{TMPDIR}}tmp_star/ "
+                "--outTmpDir ${{TMPDIR}}_tmp_star_{wildcard.sample}/ "
                 "&& mv {params.prefix}Aligned.sortedByCoord.out.bam {output} "
     else:
         rule STAR:
@@ -120,7 +120,7 @@ elif mapping_prg.upper().find("STAR") >=0:
                 mapping_prg+"/.benchmark/STAR.{sample}.benchmark"
             threads: 12
             shell:
-                "( [ -d {params.sample_dir} ] || mkdir -p {params.sample_dir} ) && mkdir -p ${{TMPDIR}} && "
+                "( [ -d {params.sample_dir} ] || mkdir -p {params.sample_dir} ) && "
                 "module load STAR && "
                 ""+star_path+"STAR "
                 "--runThreadN {threads} "
@@ -131,7 +131,7 @@ elif mapping_prg.upper().find("STAR") >=0:
                 "--genomeDir {params.index} "
                 "--readFilesIn {input} "
                 "--outFileNamePrefix {params.prefix} "
-                "--outTmpDir ${{TMPDIR}}tmp_star/ "
+                "--outTmpDir ${{TMPDIR}}_tmp_star_{wildcard.sample}/ "
                 "&& mv {params.prefix}Aligned.sortedByCoord.out.bam {output} "
 
 
