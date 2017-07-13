@@ -3,13 +3,13 @@ rule bamCoverage_RPKM:
         bam = mapping_prg+"/{sample}.bam",
         bai = mapping_prg+"/{sample}.bam.bai"
     output:
-        "BW/{sample}.RPKM.bw"
+        "Tracks/{sample}.RPKM.bw"
     params:
-        bw_binsize = config["bw_binsize"]
+        bw_binsize = bw_binsize
     log:
-        "BW/logs/bamCoverage_RPKM.{sample}.log"
+        "Tracks/logs/bamCoverage_RPKM.{sample}.log"
     benchmark:
-        "BW/.benchmark/bamCoverage_RPKM.{sample}.benchmark"
+        "Tracks/.benchmark/bamCoverage_RPKM.{sample}.benchmark"
     threads: 8
     shell:
         deepTools_path+"bamCoverage "
@@ -25,7 +25,8 @@ rule plotEnrichment:
     input:
         bam = expand(mapping_prg+"/{sample}.bam", sample=samples),
         bai = expand(mapping_prg+"/{sample}.bam.bai", sample=samples),
-        bed = "Annotation/genes.filtered.bed",
+        gtf = "Annotation/genes.filtered.gtf",
+        gtf2= "Annotation/genes.filtered.transcripts.gtf"
     output:
         png = "deepTools_qc/plotEnrichment/plotEnrichment.png",
         tsv = "deepTools_qc/plotEnrichment/plotEnrichment.tsv",
@@ -40,12 +41,11 @@ rule plotEnrichment:
         deepTools_path+"plotEnrichment "
         "-p {threads} "
         "-b {input.bam} "
-        "--BED {input.bed} "
+        "--BED {input.gtf} {input.gtf2} "
         "--plotFile {output.png} "
         "--labels {params.labels} "
         "--plotTitle 'Fraction of reads in regions' "
         "--outRawCounts {output.tsv} "
-        "--variableScales "
         "&> {log} "
 
 

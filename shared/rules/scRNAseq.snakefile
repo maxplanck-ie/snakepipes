@@ -92,41 +92,33 @@ rule fastq_barcode:
 #         " cp ${{TMPDIR}}/{wildcards.sample}.Log.final.out STAR_genomic/;"
 
 
-rule sc_STAR_genomic:
-    input:
-        read = fastq_dir + "/{sample}.fastq.gz"
-    output:
-        bam = mapping_prg + "/{sample}.bam"
-    params:
-        star_options = "--twopassMode Basic", #str(star_options or ''),
-        gtf = "Annotation/genes.filtered.gtf",
-        index = star_index,
-        prefix = mapping_prg + "/{sample}/{sample}.",
-        sample_dir = mapping_prg + "/{sample}"
-    benchmark:
-        mapping_prg + "/.benchmark/STAR_new.{sample}.benchmark",
-    threads: 20
-    shell:
-        "( [ -d {params.sample_dir} ] || mkdir -p {params.sample_dir} ) && "
-        "module load STAR && "
-        "" + star_path + "STAR "
-        "--runThreadN {threads} "
-        "{params.star_options} "
-        "--sjdbOverhang 100 "
-        "--readFilesCommand zcat --outSAMunmapped Within --outSAMtype BAM SortedByCoordinate "
-        "--sjdbGTFfile {params.gtf} "
-        "--genomeDir {params.index} "
-        "--readFilesIn {input.read} "
-        "--outFileNamePrefix {params.prefix} "
-        "&& mv {params.prefix}Aligned.sortedByCoord.out.bam {output.bam} "
-
-rule BAM_index:
-    input:
-        mapping_prg+"/{sample}.bam"
-    output:
-        mapping_prg+"/{sample}.bam.bai"
-    shell:
-        samtools_path+"samtools index {input}"
+# rule sc_STAR_genomic:
+#     input:
+#         read = fastq_dir + "/{sample}.fastq.gz",
+#         gtf = "Annotation/genes.filtered.gtf" 
+#     output:
+#         bam = mapping_prg + "/{sample}.bam"
+#     params:
+#         star_options = str(star_options or ''),
+#         index = star_index,
+#         prefix = mapping_prg + "/{sample}/{sample}.",
+#         sample_dir = mapping_prg + "/{sample}"
+#     benchmark:
+#         mapping_prg + "/.benchmark/STAR.{sample}.benchmark",
+#     threads: 20
+#     shell:
+#         "( [ -d {params.sample_dir} ] || mkdir -p {params.sample_dir} ) && "
+#         "module load STAR && "
+#         "" + star_path + "STAR "
+#         "--runThreadN {threads} "
+#         "{params.star_options} "
+#         "--sjdbOverhang 100 "
+#         "--readFilesCommand zcat --outSAMunmapped Within --outSAMtype BAM SortedByCoordinate "
+#         "--sjdbGTFfile {params.gtf} "
+#         "--genomeDir {params.index} "
+#         "--readFilesIn {input.read} "
+#         "--outFileNamePrefix {params.prefix} "
+#         "&& mv {params.prefix}Aligned.sortedByCoord.out.bam {output.bam} "
 
 
 rule sc_bam_featureCounts_genomic:
@@ -218,79 +210,52 @@ rule sc_QC_metrics:
         ""+R_path+"Rscript {params.plot_script} {params.cellsum_dir} {params.out_prefix} {params.split} {input.cell_names_merged};"
 
 
-rule bamCoverage_RPKM:
-    input:
-        bam = "STAR_genomic/{sample}.bam"
-    output:
-        "Tracks/{sample}.Coverage.bw"
-    params:
-        bw_binsize = bw_binsize
-    log:
-        "Tracks/logs/bamCoverage_Coverage.{sample}.log"
-    benchmark:
-        "Tracks/.benchmark/bamCoverage_Coverage.{sample}.benchmark"
-    threads: 8
-    shell:
-        deepTools_path+"bamCoverage "
-        "-b {input.bam} "
-        "-o {output} "
-        "--binSize {params.bw_binsize} "
-        "-p {threads} "
-        "&> {log}"
+# rule bamCoverage_RPKM:
+#     input:
+#         bam = "STAR_genomic/{sample}.bam"
+#     output:
+#         "Tracks/{sample}.Coverage.bw"
+#     params:
+#         bw_binsize = bw_binsize
+#     log:
+#         "Tracks/logs/bamCoverage_Coverage.{sample}.log"
+#     benchmark:
+#         "Tracks/.benchmark/bamCoverage_Coverage.{sample}.benchmark"
+#     threads: 8
+#     shell:
+#         deepTools_path+"bamCoverage "
+#         "-b {input.bam} "
+#         "-o {output} "
+#         "--binSize {params.bw_binsize} "
+#         "-p {threads} "
+#         "&> {log}"
 
 
-rule plotEnrichment:
-    input:
-        bam = expand("STAR_genomic/{sample}.bam", sample=samples),
-        bed = "Annotation/genes.filtered.bed"
-    output:
-        png = "deepTools_qc/plotEnrichment/plotEnrichment.png",
-        tsv = "deepTools_qc/plotEnrichment/plotEnrichment.tsv",
-    params:
-        labels = " ".join(samples),
-    log:
-        "deepTools_qc/logs/plotEnrichment.log"
-    benchmark:
-        "deepTools_qc/.benchmark/plotEnrichment.benchmark"
-    threads: 8
-    shell:
-        deepTools_path+"plotEnrichment "
-        "-p {threads} "
-        "-b {input.bam} "
-        "--BED {input.bed} "
-        "--plotFile {output.png} "
-        "--labels {params.labels} "
-        "--plotTitle 'Fraction of reads in regions (exons+introns)' "
-        "--outRawCounts {output.tsv} "
-        "--variableScales "
-        "&> {log} "
-
-rule plotEnrichment_exons:
-    input:
-        bam = expand("STAR_genomic/{sample}.bam", sample=samples),
-        gtf = "Annotation/genes.filtered.gtf",
-        gtf2= "Annotation/genes.filtered.transcripts.gtf"
-    output:
-        png = "deepTools_qc/plotEnrichment/plotEnrichment.exons.png",
-        tsv = "deepTools_qc/plotEnrichment/plotEnrichment.exons.tsv",
-    params:
-        labels = " ".join(samples),
-    log:
-        "deepTools_qc/logs/plotEnrichment.exons.log"
-    benchmark:
-        "deepTools_qc/.benchmark/plotEnrichment.exons.benchmark"
-    threads: 8
-    shell:
-        deepTools_path+"plotEnrichment "
-        "-p {threads} "
-        "-b {input.bam} "
-        "--BED {input.gtf} {input.gtf2} "
-        "--plotFile {output.png} "
-        "--labels {params.labels} "
-        "--plotTitle 'Fraction of reads in regions (exons only)' "
-        "--outRawCounts {output.tsv} " #  "--variableScales "
-        "--keepExons "
-        "&> {log} "
+# rule plotEnrichment:
+#     input:
+#         bam = expand(mapping_prg+"/{sample}.bam", sample=samples),
+#         gtf = "Annotation/genes.filtered.gtf",
+#         gtf2= "Annotation/genes.filtered.transcripts.gtf"
+#     output:
+#         png = "deepTools_qc/plotEnrichment/plotEnrichment.exons.png",
+#         tsv = "deepTools_qc/plotEnrichment/plotEnrichment.exons.tsv",
+#     params:
+#         labels = " ".join(samples),
+#     log:
+#         "deepTools_qc/logs/plotEnrichment.log"
+#     benchmark:
+#         "deepTools_qc/.benchmark/plotEnrichment.benchmark"
+#     threads: 8
+#     shell:
+#         deepTools_path+"plotEnrichment "
+#         "-p {threads} "
+#         "-b {input.bam} "
+#         "--BED {input.gtf} {input.gtf2} "
+#         "--plotFile {output.png} "
+#         "--labels {params.labels} "
+#         "--plotTitle 'Fraction of reads in regions' "
+#         "--outRawCounts {output.tsv} "
+#         "&> {log} "
 
 ## zcat 14wks_Eed_WT_1.umi.fastq.gz | /package/hisat2-2.0.4/hisat2 --rna-strandness F -k 5 -x /data/repository/organisms/GRCm38_ensembl/HISAT2Index/genome -U - --no-unal -p 16 --reorder | grep -P '^@|NH:i:1\b' | samtools view -F256 -Sb - | /package/bedtools2-2.25.0/bin/intersectBed -a - -b <(cat /data/repository/organisms/GRCm38_ensembl/gencode/m9/genes.bed| grep -v -e "PATCH" -e "CHR" ) -split -bed  -wo -s | awk -v map_f=gencode.M9.full.table 'BEGIN{while (getline < map_f) {MAP[$2]=$1;MAP2[$2]=$4}}{if ($13!="."){OFS="\t";print $0,MAP[$16],MAP2[$16]"__chr"$1}}' | /package/bedtools2-2.25.0/bin/groupBy -g 4 -c 26,27,16,5,25 -o distinct,distinct,distinct,collapse,mean | awk -v map_f=/data/pospisilik/group/heyne/scRNAseq/sagar/celseq_barcodes.192.txt 'BEGIN{while (getline < map_f) {CELL[$2]=$1;COUNTS[$1]=0}}{pos=match($1,":SC:");split(substr($1,pos+1),BC,":"); num=split($2,GENES,",");if ( (num==1 && BC[2] in CELL) ) {if (!($3 in ALL)){for (i=1; i<=192;i++) ALL[$3][i]=0;} ALL[$3][CELL[BC[2]]] += 1}}END{for (i in ALL){printf i" "; for (j=1;j<=192;j++){ printf ALL[i][j]" ";} printf "\n"}}' | less
 ##     cat test.bam | /package/bedtools2-2.25.0/bin/intersectBed -a - -b <(cat /data/repository/organisms/GRCm38_ensembl/gencode/m9/genes.bed | grep -v -e "PATCH" -e "CHR" ) -split -bed  -wo -s | awk -v map_f=gencode.M9.full.table 'BEGIN{while (getline < map_f) {MAP[$2]=$1;MAP2[$2]=$4}}{if ($13!="."){OFS="\t";print $0,MAP[$16],MAP2[$16]"__chr"$1}}' | /package/bedtools2-2.25.0/bin/groupBy -g 4 -c 26,27,16,5,25 -o distinct,distinct,distinct,collapse,mean | awk -v map_f=/data/pospisilik/group/heyne/scRNAseq/sagar/celseq_barcodes.192.txt 'BEGIN{while (getline < map_f) {CELL[$2]=$1;COUNTS[$1]=0}}{pos=match($1,":SC:");split(substr($1,pos+1),BC,":"); num=split($2,GENES,",");if ( (num==1 && BC[2] in CELL) ) {if (!($3 in ALL) || !(BC[5] in ALL[$3])){for (i=1; i<=192;i++) ALL[$3][BC[5]][i]=0;} ALL[$3][BC[5]][CELL[BC[2]]] += 1}}END{for (i in ALL){for (k in ALL[i]){printf i" "k" "; for (j=1;j<=192;j++){ printf ALL[i][k][j]" ";} printf "\n"}}}' > test.cout.csv

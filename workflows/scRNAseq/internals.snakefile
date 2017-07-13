@@ -25,7 +25,7 @@ if trim:
 		fastq_dir = "FASTQ_Cutadapt"
 
 mapping_prg = "STAR_genomic"
-#star_options = ''
+star_options = "--twopassMode Basic"
 
 ### Initialization #############################################################
 

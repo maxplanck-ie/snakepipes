@@ -23,6 +23,8 @@ include: os.path.join(maindir, "shared", "rules", "FASTQ.snakefile")
 include: os.path.join(maindir, "shared", "rules", "scRNAseq.snakefile")
 include: os.path.join(maindir, "shared", "rules", "FastQC.snakefile")
 include: os.path.join(maindir, "shared", "rules", "filter_annotation.snakefile")
+include: os.path.join(maindir, "shared", "rules", "RNA_mapping.snakefile")
+include: os.path.join(maindir, "shared", "rules", "deepTools_RNA.snakefile")
 
 # TrimGalore
 if trim:
@@ -91,8 +93,6 @@ rule all:
         expand("Tracks/{sample}.Coverage.bw", sample = samples),
         "deepTools_qc/plotEnrichment/plotEnrichment.png",
         "deepTools_qc/plotEnrichment/plotEnrichment.tsv",
-        "deepTools_qc/plotEnrichment/plotEnrichment.exons.png",
-        "deepTools_qc/plotEnrichment/plotEnrichment.exons.tsv",
 rule annot:
     input:
         "Annotation/genes.filtered.bed",
