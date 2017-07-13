@@ -86,7 +86,8 @@ elif mapping_prg.upper().find("STAR") >=0:
                 gtf = genes_gtf,
                 index = star_index,
                 prefix = mapping_prg+"/{sample}/{sample}.",
-                sample_dir = mapping_prg+"/{sample}"
+                sample_dir = mapping_prg+"/{sample}",
+                sample = wildcard.sample
             benchmark:
                 mapping_prg+"/.benchmark/STAR.{sample}.benchmark"
             threads: 12
@@ -102,7 +103,7 @@ elif mapping_prg.upper().find("STAR") >=0:
                 "--genomeDir {params.index} "
                 "--readFilesIn {input.r1} {input.r2} "
                 "--outFileNamePrefix {params.prefix} "
-                "--outTmpDir ${{TMPDIR}}_tmp_star_{wildcard.sample}/ "
+                "--outTmpDir ${{TMPDIR}}_tmp_star_{params.sample}/ "
                 "&& mv {params.prefix}Aligned.sortedByCoord.out.bam {output} "
     else:
         rule STAR:
@@ -116,6 +117,7 @@ elif mapping_prg.upper().find("STAR") >=0:
                 index = star_index,
                 prefix = mapping_prg+"/{sample}/{sample}.",
                 sample_dir = mapping_prg+"/{sample}"
+                sample = wildcard.sample
             benchmark:
                 mapping_prg+"/.benchmark/STAR.{sample}.benchmark"
             threads: 12
@@ -131,7 +133,7 @@ elif mapping_prg.upper().find("STAR") >=0:
                 "--genomeDir {params.index} "
                 "--readFilesIn {input} "
                 "--outFileNamePrefix {params.prefix} "
-                "--outTmpDir ${{TMPDIR}}_tmp_star_{wildcard.sample}/ "
+                "--outTmpDir ${{TMPDIR}}_tmp_star_{params.sample}/ "
                 "&& mv {params.prefix}Aligned.sortedByCoord.out.bam {output} "
 
 
