@@ -107,9 +107,9 @@ rule annotation_bed2gtf_transcripts:
         gtf_orig = genes_gtf
     shell:
         """
-        cat {params.gtf_orig} | awk -v map_f={input.bed} 'BEGIN{{while(getline<map_f) MAP[$13]=$14}} $3=="transcript" 
-        {{pos=match($0,"transcript_id[[:space:]\\";]+([^[:space:]\\";]*)",tid); 
-        if (tid[1] in MAP) print $0}}' > {output.gtf}
+        cat {params.gtf_orig} | awk -v map_f={input.bed} 'BEGIN{{while(getline<map_f) MAP[$13]=$14}}
+        {{if ($3!="transcript") next; pos=match($0,"transcript_id[[:space:]\\";]+([^[:space:]\\";]*)",tid); 
+        if (tid[1] in MAP) print $0}}'< > {output.gtf}
         """
 
 rule annotation_bed2gtf:

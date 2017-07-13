@@ -97,6 +97,8 @@ rule annot:
     input:
         "Annotation/genes.filtered.bed",
         "Annotation/genes.filtered.gtf",
+        "Annotation/genes.filtered.transcripts.gtf",
+        
 
 
 ### execute after workflow finished ############################################
