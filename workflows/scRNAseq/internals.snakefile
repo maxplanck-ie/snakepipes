@@ -24,6 +24,8 @@ if trim:
 	elif trim_prg == "cutadapt":
 		fastq_dir = "FASTQ_Cutadapt"
 
+mapping_prg = "STAR_genomic"
+#star_options = ''
 
 ### Initialization #############################################################
 

@@ -82,6 +82,7 @@ rule all:
         expand("FastQC/{sample}{read}_fastqc.html", sample = samples, read=reads),
         expand("FastQC_trimmed/{sample}_fastqc.html", sample = samples),
         expand("STAR_genomic/{sample}.bam", sample = samples),
+        expand("STAR_genomic/{sample}.bam.bai", sample = samples),
         expand("Counts/{sample}.cout.csv",sample = samples),
         expand("Counts/{sample}.coutt.csv",sample = samples),
         expand("Counts/{sample}.featureCounts_summary.txt",sample = samples),

@@ -97,6 +97,21 @@ rule annotation_bed2saf:
     shell:
         """echo -e 'GeneID\tChr\tStart\tEnd\tStrand' > {output} && grep {params.pattern} {input} | awk 'BEGIN{{OFS="\t"}}{{print $16, $1, $2, $3, $6}}' >> {output} """
 
+rule annotation_bed2gtf_transcripts:
+    input:
+        bed = "Annotation/genes.filtered.bed"
+    output:
+        gtf = "Annotation/genes.filtered.transcripts.gtf"
+    params:
+        ucsc = UCSC_tools_path,
+        gtf_orig = genes_gtf
+    shell:
+        """
+        cat {params.gtf_orig} | awk -v map_f={input.bed} 'BEGIN{{while(getline<map_f) MAP[$13]=$14}} $3=="transcript" 
+        {{pos=match($0,"transcript_id[[:space:]\\";]+([^[:space:]\\";]*)",tid); 
+        if (tid[1] in MAP) print $0}}' > {output.gtf}
+        """
+
 rule annotation_bed2gtf:
     input:
         bed = "Annotation/genes.filtered.bed"
@@ -108,7 +123,7 @@ rule annotation_bed2gtf:
     	"""
         {params.ucsc}bedToGenePred {input.bed} stdout | awk -v map_f={input.bed} '
         BEGIN{{while (getline < map_f) MAP[$13]=$16}} {{OFS="\\t";print $0,"0",MAP[$1]}}' |
-        {params.ucsc}genePredToGtf file stdin stdout |
+        {params.ucsc}genePredToGtf -utr file stdin stdout |
         grep -v "CDS" |
         awk -v map_f={input.bed} '
         BEGIN{{while (getline < map_f) MAP[$16]=$17}}
