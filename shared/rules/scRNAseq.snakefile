@@ -123,7 +123,7 @@ rule fastq_barcode:
 
 rule sc_bam_featureCounts_genomic:
     input:
-        bam = "STAR_genomic/{sample}.bam",
+        bam = mapping_prg+"/{sample}.bam",
         gtf = "Annotation/genes.filtered.gtf"
     output:
         counts = "Counts/{sample}.cout.csv",
