@@ -45,83 +45,9 @@ rule fastq_barcode:
 				}}; 
 			if (NR%8==0 || NR%8>5) print $0}}' | pigz -c -p 8 > {output.R2_barcoded}
             """
-
-# ### HISAT2 genomic mapping
-# rule sc_hisat2_genomic:
-#     input:
-#         read_barcoded = fastq_dir+"/{sample}.fastq.gz",
-#     output:
-#         bam = "HISAT2_genomic/{sample}.bam",
-#         align_summary = "HISAT2_genomic/{sample}.HISAT2_genomic_summary.txt",
-#     params:
-#         hisat2_opts = "--pen-cansplice 3 --mp 4,2"
-#     threads:    
-#         20
-#     shell: 
-#         hisat2_path + "hisat2 {params.hisat2_opts} --rna-strandness F -k 5"
-#         " -x " + hisat2_index + ""
-#         " -U {input.read_barcoded} "
-#         " --known-splicesite-infile " + known_splicesites + ""
-#         " --no-unal -p {threads} --reorder 2> {output.align_summary} | "
-#         "grep -P '^@|NH:i:1\\b' | "
-#         ""+samtools_path + "samtools view -F256 -Sb - | "
-#         ""+samtools_path + "samtools sort -T ${{TMPDIR}}{wildcards.sample} -@5 -m 2G -O bam - > {output.bam}; "
-#         ""+samtools_path + "samtools index {output.bam} "
-        
-## STAR genomic mapping 
-# rule sc_STAR_genomic:
-#     input:
-#         read_barcoded = fastq_dir+"/{sample}.fastq.gz",
-#         gtf = "Annotation/genes.filtered.gtf"
-#     output:
-#         bam = "STAR_genomic/{sample}.bam"
-#     params:
-#         opts = "--sjdbOverhang 100 --twopassMode Basic"
-#     benchmark:
-#         "STAR_genomic/.benchmark/STAR.{sample}.benchmark"
-#     threads:
-#         20
-#     shell:
-#         star_path + "STAR --genomeDir "+star_index + ""
-#         " --runThreadN {threads} --readFilesIn {input.read_barcoded} "
-#         " --readFilesCommand zcat --outFileNamePrefix ${{TMPDIR}}/{wildcards.sample}. " 
-#         " --sjdbGTFfile {input.gtf} {params.opts} --outStd SAM --outSAMunmapped Within | "
-#         #" grep -P '^@|NH:i:1\\b' | "
-#         "" + samtools_path + "samtools sort -T ${{TMPDIR}}tmp_{wildcards.sample} -@5 -m 2G -O bam - > {output.bam}; "
-#         "" + samtools_path + "samtools index {output.bam}; "
-#         " cp ${{TMPDIR}}/{wildcards.sample}.Log.final.out STAR_genomic/;"
-
-
-# rule sc_STAR_genomic:
-#     input:
-#         read = fastq_dir + "/{sample}.fastq.gz",
-#         gtf = "Annotation/genes.filtered.gtf" 
-#     output:
-#         bam = mapping_prg + "/{sample}.bam"
-#     params:
-#         star_options = str(star_options or ''),
-#         index = star_index,
-#         prefix = mapping_prg + "/{sample}/{sample}.",
-#         sample_dir = mapping_prg + "/{sample}"
-#     benchmark:
-#         mapping_prg + "/.benchmark/STAR.{sample}.benchmark",
-#     threads: 20
-#     shell:
-#         "( [ -d {params.sample_dir} ] || mkdir -p {params.sample_dir} ) && "
-#         "module load STAR && "
-#         "" + star_path + "STAR "
-#         "--runThreadN {threads} "
-#         "{params.star_options} "
-#         "--sjdbOverhang 100 "
-#         "--readFilesCommand zcat --outSAMunmapped Within --outSAMtype BAM SortedByCoordinate "
-#         "--sjdbGTFfile {params.gtf} "
-#         "--genomeDir {params.index} "
-#         "--readFilesIn {input.read} "
-#         "--outFileNamePrefix {params.prefix} "
-#         "&& mv {params.prefix}Aligned.sortedByCoord.out.bam {output.bam} "
-
-
-rule sc_bam_featureCounts_genomic:
+    
+    
+    rule sc_bam_featureCounts_genomic:
     input:
         bam = mapping_prg+"/{sample}.bam",
         gtf = "Annotation/genes.filtered.gtf"
@@ -188,25 +114,6 @@ rule sc_QC_metrics:
         ""+workflow.basedir+"/scRNAseq_QC_metrics.sh {params.in_dir} {params.out_dir} >{output.summary};"
         ""+R_path+"Rscript {params.plot_script} {params.cellsum_dir} {params.out_prefix} {params.split} {input.cell_names_merged};"
 
-
-# rule sc_get_counts_genomic:
-#     input:
-#         bam = "STAR_genomic/{sample}.bam",
-#         bed = "Annotation/genes.filtered.bed"
-#     output: 
-#         counts = "Counts/{sample}.cout.csv",
-#         counts_summary = "Counts/{sample}.cout_summary.txt"
-#     params:
-#         count_script = workflow.basedir+"/scRNAseq_bam_genomic_feature_count.sh",
-#         bc_file = barcode_file,    
-#         bedtools = bedtools_path,
-#         samtools = samtools_path
-#     threads:
-#         5
-#     shell: 
-#         """
-#             {params.count_script} {input.bam} {input.bed} {params.bc_file} {params.bedtools} {params.samtools} 1>{output.counts} 2>{output.counts_summary}
-#         """
 
 #cat {output.counts_summary} | sed -n -e '/sample.idx.READS/,/#LIB/{{/#LIB/d;p}}' > {output.cell_summary}
 #sed -n -e '/sample.idx/,$p'
