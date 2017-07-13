@@ -116,7 +116,7 @@ elif mapping_prg.upper().find("STAR") >=0:
                 gtf = genes_gtf,
                 index = star_index,
                 prefix = mapping_prg+"/{sample}/{sample}.",
-                sample_dir = mapping_prg+"/{sample}"
+                sample_dir = mapping_prg+"/{sample}",
                 sample = wildcard.sample
             benchmark:
                 mapping_prg+"/.benchmark/STAR.{sample}.benchmark"
