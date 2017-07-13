@@ -73,7 +73,7 @@ if mapping_prg.upper().find("HISAT2") >=0:
                 "&& touch {output.un} {output.al} "
 
 
-elif mapping_prg.upper().find("HISAT2") >=0:
+elif mapping_prg.upper().find("STAR") >=0:
     if paired:
         rule STAR:
             input:
