@@ -47,7 +47,7 @@ rule fastq_barcode:
             """
     
     
-    rule sc_bam_featureCounts_genomic:
+rule sc_bam_featureCounts_genomic:
     input:
         bam = mapping_prg+"/{sample}.bam",
         gtf = "Annotation/genes.filtered.gtf"

@@ -98,7 +98,7 @@ else:
                 "&& mv {params.tmp} {output}"
 
 
-### FastQC_on_TrimGalore #######################################################
+### FastQC_on_trimmed #######################################################
 
 rule FastQC_on_trimmed:
     input:
