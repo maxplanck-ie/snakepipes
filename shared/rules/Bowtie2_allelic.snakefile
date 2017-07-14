@@ -1,10 +1,11 @@
 ## get basename of the bt2 index
 import os
-import glob
+
 def getbw_idxbase(file):
     base = os.path.basename(file)
     idxbase = re.sub('.[0-9*].bt2','',base)
-    return(idxbase)
+    fpath = os.path.dirname(file) + "/" + idxbase
+    return(fpath)
 
 ### Bowtie2 ####################################################################
 if mapping_prg == "Bowtie2":
@@ -27,13 +28,13 @@ if mapping_prg == "Bowtie2":
             shell:
                 bowtie2_path+"bowtie2"
                 " -X 1000"
-                " -x {input.idxbase} -1 {input.r1} -2 {input.r2}"
+                " -x {params.idxbase} -1 {input.r1} -2 {input.r2}"
                 " {params.bowtie_opts} {params.mate_orientation}"
                 " --rg-id {wildcards.sample} --rg CN:mpi-ie_deep_sequencing_unit"
                 " --rg DS:{wildcards.sample} --rg PL:ILLUMINA --rg SM:{wildcards.sample}"
                 " -p {threads}"
                 " 2> {output.align_summary} |"
-                " "+samtools_path+"samtools view -Sb -o Bowtie2/{output.bam} -"
+                " "+samtools_path+"samtools view -Sb - |"
                 " "+samtools_path+"samtools sort -m 2G -T ${{TMPDIR}}{wildcards.sample} -@ 2 -O bam - > {output.bam}"
     else:
         rule Bowtie2_allele:
@@ -51,14 +52,14 @@ if mapping_prg == "Bowtie2":
             threads: 24
             shell:
                 bowtie2_path+"bowtie2"
-                    " -x {input.idxbase} -U {input.r1}"
+                    " -x {params.idxbase} -U {input.r1}"
                     " --reorder"
                     " {params.bowtie_opts}"
                     " --rg-id {wildcards.sample} --rg CN:mpi-ie_deep_sequencing_unit "
                     " --rg DS:{wildcards.sample} --rg PL:ILLUMINA --rg SM:{wildcards.sample} "
                     " -p {threads}"
                     " 2> {output.align_summary} |"
-                    " "+samtools_path+"samtools view -Sbu -o Bowtie2/{output.bam} -"
+                    " "+samtools_path+"samtools view -Sbu - |"
                     " "+samtools_path+"samtools sort -m 2G -T ${{TMPDIR}}{wildcards.sample} -@ 2 -O bam - > {output.bam}"
 else:
     print("Only bowtie2 implemented")

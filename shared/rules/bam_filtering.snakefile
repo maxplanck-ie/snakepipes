@@ -2,7 +2,7 @@
 
 rule MarkDuplicates:
     input:
-        expand(mapping_prg+"/{sample}.sorted.bam", sample = samples)
+        mapping_prg+"/{sample}.sorted.bam"
     output:
         bam = mapping_prg+"/{sample}.bam",
         txt = "Picard_qc/MarkDuplicates/{sample}.mark_duplicates_metrics.txt"
@@ -29,7 +29,7 @@ rule MarkDuplicates:
 
 rule samtools_filter:
     input:
-        expand(mapping_prg+"/{sample}.bam", sample = samples)
+        mapping_prg+"/{sample}.bam"
     output:
         bam = "filtered_bam/{sample}.filtered.bam",
         filter_file = "filtered_bam/{sample}.filter" if (dedup or properpairs or mapq > 0)

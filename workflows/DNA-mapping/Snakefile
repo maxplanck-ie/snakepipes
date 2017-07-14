@@ -124,7 +124,7 @@ def make_nmasked_genome():
         file_list = [
                 genome1,
                 snp_file,
-                bowtie2_index_allelic,
+                bowtie2_index_allelic
                 ]
         return(file_list)
     else:
@@ -132,8 +132,12 @@ def make_nmasked_genome():
 
 def run_allelesp_mapping():
     if "allelic-mapping" in mode:
+        allele_suffix = ['allele_flagged', 'genome1', 'genome2', 'unassigned']
         file_list = [
-        expand("allelic_bams/{sample}_allele_flagged.bam", sample = samples),
+        expand("allelic_bams/{sample}_{suffix}.sorted.bam", sample = samples,
+                        suffix = allele_suffix),
+        expand("allelic_bams/{sample}_{suffix}.sorted.bam.bai", sample = samples,
+                        suffix = allele_suffix)
         ]
         return(file_list)
     else:
@@ -155,6 +159,7 @@ onstart:
         print("$HOSTNAME: ",os.getenv('HOSTNAME', ""))
         print("-" * 80, "\n")
 #print(samples)
+
 ### main rule ##################################################################
 ################################################################################
 rule all:
@@ -162,19 +167,19 @@ rule all:
         expand("FASTQ/{sample}{read}.fastq.gz", sample = samples, read = reads),
         run_FastQC(fastqc),
         run_Trimming(trim, fastqc),
-        expand("Bowtie2/{sample}.bam", sample = samples),
-        expand("Bowtie2/{sample}.bam.bai", sample = samples),
+        expand(mapping_prg+"/{sample}.bam", sample = samples),
+        expand(mapping_prg+"/{sample}.bam.bai", sample = samples),
         expand("filtered_bam/{sample}.filtered.bam", sample = samples),
-        expand("Picard_qc/AlignmentSummaryMetrics/{sample}.alignment_summary_metrics.txt", sample = samples),
-        expand("Picard_qc/MarkDuplicates/{sample}.mark_duplicates_metrics.txt", sample = samples),
-        run_CollectInsertSizeMetrics(paired),
-        expand("bamCoverage/{sample}.seq_depth_norm.bw", sample = samples),
-        run_bamCoverage_filtered(dedup, properpairs, mapq),
-        run_computeGCBias(gcbias),
-        run_deepTools_qc(),
-        run_Qualimap(),
-        make_nmasked_genome(),
-        run_allelesp_mapping(),
+#        expand("Picard_qc/AlignmentSummaryMetrics/{sample}.alignment_summary_metrics.txt", sample = samples),
+#        expand("Picard_qc/MarkDuplicates/{sample}.mark_duplicates_metrics.txt", sample = samples),
+#        run_CollectInsertSizeMetrics(paired),
+#        expand("bamCoverage/{sample}.seq_depth_norm.bw", sample = samples),
+#        run_bamCoverage_filtered(dedup, properpairs, mapq),
+#        run_computeGCBias(gcbias),
+#        run_deepTools_qc(),
+#        run_Qualimap(),
+#        make_nmasked_genome(),
+        run_allelesp_mapping()
 
 
 ### execute after workflow finished ############################################
