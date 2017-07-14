@@ -6,30 +6,36 @@ else:
     SNPparam = ''
 
 ## get input bam depending on the mapping prog (use filtered bam in case of chip-seq data)
-if mapping_prg != "Bowtie2":
-    SNPbam_files = mapping_prg+"/{sample}.bam"
-    #SNPoutdir = mapping_prg
-    SNPoutfiles = expand(mapping_prg+"/{{sample}}.{suffix}.bam", suffix = ['allele_flagged', 'genome1', 'genome2', 'unassigned'])
-else:
-    SNPbam_files = "filtered_bam/{sample}.filtered.bam"
-    #SNPoutdir = "filtered_bam"
-    SNPoutfiles = expand("filtered_bam/{{sample}}.filtered.{suffix}.bam", suffix = ['allele_flagged', 'genome1', 'genome2', 'unassigned'])
-
-## define SNP splitting separately for single and dual hybrid genomes??
-rule snp_split:
-    input:
-        snp = snp_file,
-        bam = SNPbam_files
-    output:
-        SNPoutfiles
-    params:
-        paired = SNPparam
-    log:
-        "allelic_bams/{sample}_SNPsplit.log"
-    shell:
-        SNPsplit_path + "SNPsplit"
-        " {params.paired} --samtools_path "+samtools_path+"samtools"
-        " --snp_file {input.snp} {input.bam} 2> {log}"
+if mapping_prg == "Bowtie2":
+    rule snp_split:
+        input:
+            snp = snp_file,
+            bam = "filtered_bam/{sample}.filtered.bam"
+        output:
+            expand("filtered_bam/{{sample}}.filtered.{suffix}.bam", suffix = ['allele_flagged', 'genome1', 'genome2', 'unassigned'])
+        params:
+            paired = SNPparam
+        log:
+            "allelic_bams/{sample}_SNPsplit.log"
+        shell:
+            SNPsplit_path + "SNPsplit"
+            " {params.paired} --samtools_path "+samtools_path+"samtools"
+            " --snp_file {input.snp} {input.bam} 2> {log}"
+elif mapping_prg == "STAR":
+    rule snp_split:
+        input:
+            snp = snp_file,
+            bam = mapping_prg+"/{sample}.bam"
+        output:
+            expand(mapping_prg+"/{{sample}}.{suffix}.bam", suffix = ['allele_flagged', 'genome1', 'genome2', 'unassigned'])
+        params:
+            paired = SNPparam
+        log:
+            "allelic_bams/{sample}_SNPsplit.log"
+        shell:
+            SNPsplit_path + "SNPsplit"
+            " {params.paired} --samtools_path "+samtools_path+"samtools"
+            " --snp_file {input.snp} {input.bam} 2> {log}"
 
 # move the allele-specific bams to another folder
 if mapping_prg != "Bowtie2":

@@ -2,9 +2,9 @@ if paired:
     rule featureCounts_allele:
         input:
             saf = "Annotation/genes.filtered.saf",
-            bam = "allelic_bams/{sample}_allele_flagged.bam",
-            allele1 = "allelic_bams/{sample}_genome1.bam",
-            allele2 = "allelic_bams/{sample}_genome2.bam"
+            bam = "allelic_bams/{sample}.allele_flagged.sorted.bam",
+            allele1 = "allelic_bams/{sample}.genome1.sorted.bam",
+            allele2 = "allelic_bams/{sample}.genome2.sorted.bam"
         output:
             'featureCounts/{sample}_allelic_counts.txt'
         params:
@@ -26,9 +26,9 @@ else:
     rule featureCounts_allele:
         input:
             saf = "Annotation/genes.filtered.saf",
-            bam = "allelic_bams/{sample}_allele_flagged.bam",
-            allele1 = "allelic_bams/{sample}_genome1.bam",
-            allele2 = "allelic_bams/{sample}_genome2.bam"
+            bam = "allelic_bams/{sample}.allele_flagged.sorted.bam",
+            allele1 = "allelic_bams/{sample}.genome1.sorted.bam",
+            allele2 = "allelic_bams/{sample}.genome2.sorted.bam"
         output:
             'featureCounts/{sample}_allelic_counts.txt'
         params:
