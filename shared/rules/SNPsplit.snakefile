@@ -8,11 +8,11 @@ else:
 ## get input bam depending on the mapping prog (use filtered bam in case of chip-seq data)
 if mapping_prg != "Bowtie2":
     SNPbam_files = mapping_prg+"/{sample}.bam"
-    SNPoutdir = mapping_prg
+    #SNPoutdir = mapping_prg
     SNPoutfiles = expand(mapping_prg+"/{{sample}}.{suffix}.bam", suffix = ['allele_flagged', 'genome1', 'genome2', 'unassigned'])
 else:
     SNPbam_files = "filtered_bam/{sample}.filtered.bam"
-    SNPoutdir = "filtered_bam"
+    #SNPoutdir = "filtered_bam"
     SNPoutfiles = expand("filtered_bam/{{sample}}.filtered.{suffix}.bam", suffix = ['allele_flagged', 'genome1', 'genome2', 'unassigned'])
 
 ## define SNP splitting separately for single and dual hybrid genomes??
@@ -32,17 +32,26 @@ rule snp_split:
         " --snp_file {input.snp} {input.bam} 2> {log}"
 
 # move the allele-specific bams to another folder
-rule movebams:
-    input:
-        SNPoutdir+"/{sample}.filtered.{suffix}.bam"
-    output:
-        temp("allelic_bams/{sample}.filtered.{suffix}.bam")
-    shell:
-        "mv {input} {output}"
+if mapping_prg != "Bowtie2":
+    rule movebams:
+        input:
+            mapping_prg+"/{sample}.{suffix}.bam"
+        output:
+            "allelic_bams/{sample}.{suffix}.unsorted.bam"
+        shell:
+            "mv {input} {output}"
+else:
+    rule movebams:
+        input:
+            "filtered_bam/{sample}.filtered.{suffix}.bam"
+        output:
+            temp("allelic_bams/{sample}.{suffix}.unsorted.bam")
+        shell:
+            "mv {input} {output}"
 
 # sort them
 rule BAMsort_allelic:
-    input: "allelic_bams/{sample}.filtered.{suffix}.bam"
+    input: "allelic_bams/{sample}.{suffix}.unsorted.bam"
     output:
         "allelic_bams/{sample}.{suffix}.sorted.bam"
     threads:
