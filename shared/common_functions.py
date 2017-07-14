@@ -6,6 +6,19 @@ import re
 import yaml
 
 
+def convert_library_type (R_path, paired, from_library_type, from_prg, to_prg, rscript, tsv):
+    """ Converts the library to e.g. from 2 (featureCounts) to RF (HISAT2) """
+    if paired:
+        lib_str = "PE"
+    else:
+        lib_str = "SE"
+
+    cmd = ("{}Rscript {} {} {} {} {} {}".format(R_path, rscript, tsv, lib_str, from_library_type, from_prg, to_prg) )
+    ##print("\n"+cmd)
+
+    return( subprocess.check_output(cmd, shell=True).decode() )
+
+
 def merge_dicts(x, y):
     z = {}
     z = x.copy()

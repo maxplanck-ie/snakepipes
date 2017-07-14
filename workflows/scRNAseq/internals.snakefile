@@ -25,7 +25,10 @@ if trim:
 		fastq_dir = "FASTQ_Cutadapt"
 
 mapping_prg = "STAR_genomic"
-star_options = "--twopassMode Basic"
+#mapping_prg = "HISAT2_genomic"
+#star_options = "--twopassMode Basic"
+star_options = ""
+hisat_options = ""
 
 ### Initialization #############################################################
 
@@ -40,6 +43,14 @@ if not cf.is_paired(infiles,ext,reads):
 ## After barcode transfer to R2 we have only single end data / R2
 ## but we need to keep "reads" for rule fastq_barcode
 paired = False
+
+## rna-strandness for HISAT2
+rna_strandness = cf.convert_library_type(R_path, paired, library_type, "featureCounts", "HISAT2", os.path.join(maindir, "shared", "tools", "library_type.R"), os.path.join(maindir, "shared", "tools", "library_type.tsv"))
+if rna_strandness == "NA":
+    rna_strandness = ""
+else:
+    rna_strandness = "--rna-strandness "+rna_strandness
+
 
 ### barcode pattern extraction #################################################
 pattern = re.compile("[N]+")
