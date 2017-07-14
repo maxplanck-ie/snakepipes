@@ -8,8 +8,12 @@ else:
 ## get input bam depending on the mapping prog (use filtered bam in case of chip-seq data)
 if mapping_prg != "Bowtie2":
     SNPbam_files = mapping_prg+"/{sample}.bam"
+    SNPoutdir = mapping_prg
+    SNPoutfiles = expand(mapping_prg+"/{{sample}}.{suffix}.bam", suffix = ['allele_flagged', 'genome1', 'genome2', 'unassigned'])
 else:
     SNPbam_files = "filtered_bam/{sample}.filtered.bam"
+    SNPoutdir = "filtered_bam"
+    SNPoutfiles = expand("filtered_bam/{{sample}}.filtered.{suffix}.bam", suffix = ['allele_flagged', 'genome1', 'genome2', 'unassigned'])
 
 ## define SNP splitting separately for single and dual hybrid genomes??
 rule snp_split:
@@ -17,7 +21,7 @@ rule snp_split:
         snp = snp_file,
         bam = SNPbam_files
     output:
-         expand(mapping_prg+"/{{sample}}_{suffix}.bam", suffix = ['allele_flagged', 'genome1', 'genome2', 'unassigned'])
+        SNPoutfiles
     params:
         paired = SNPparam
     log:
@@ -30,28 +34,28 @@ rule snp_split:
 # move the allele-specific bams to another folder
 rule movebams:
     input:
-        mapping_prg+"/{sample}_{suffix}.bam"
+        SNPoutdir+"/{sample}.filtered.{suffix}.bam"
     output:
-        temp("allelic_bams/{sample}_{suffix}.bam")
+        temp("allelic_bams/{sample}.filtered.{suffix}.bam")
     shell:
-        "mv "+mapping_prg+"{input} {output}"
+        "mv {input} {output}"
 
 # sort them
 rule BAMsort_allelic:
-    input: "allelic_bams/{sample}_{suffix}.bam"
+    input: "allelic_bams/{sample}.filtered.{suffix}.bam"
     output:
-        "allelic_bams/{sample}_{suffix}.sorted.bam"
+        "allelic_bams/{sample}.{suffix}.sorted.bam"
     threads:
         12
-    log: "allelic_bams/{sample}_{suffix}.BAMsorting.log"
+    log: "allelic_bams/{sample}.{suffix}.BAMsorting.log"
     shell:
         samtools_path+"samtools sort -@ {threads} -T ${{TMPDIR}} -O bam -o {output} {input} 2> {log}"
 
 # index the sorted files
 rule BAMindex_allelic:
     input:
-        "allelic_bams/{sample}_{suffix}.sorted.bam"
+        "allelic_bams/{sample}.{suffix}.sorted.bam"
     output:
-        "allelic_bams/{sample}_{suffix}.sorted.bam.bai"
+        "allelic_bams/{sample}.{suffix}.sorted.bam.bai"
     shell:
         samtools_path+"samtools index {input}"

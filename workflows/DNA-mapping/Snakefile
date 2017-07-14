@@ -134,9 +134,9 @@ def run_allelesp_mapping():
     if "allelic-mapping" in mode:
         allele_suffix = ['allele_flagged', 'genome1', 'genome2', 'unassigned']
         file_list = [
-        expand("allelic_bams/{sample}_{suffix}.sorted.bam", sample = samples,
+        expand("allelic_bams/{sample}.{suffix}.sorted.bam", sample = samples,
                         suffix = allele_suffix),
-        expand("allelic_bams/{sample}_{suffix}.sorted.bam.bai", sample = samples,
+        expand("allelic_bams/{sample}.{suffix}.sorted.bam.bai", sample = samples,
                         suffix = allele_suffix)
         ]
         return(file_list)
@@ -170,15 +170,15 @@ rule all:
         expand(mapping_prg+"/{sample}.bam", sample = samples),
         expand(mapping_prg+"/{sample}.bam.bai", sample = samples),
         expand("filtered_bam/{sample}.filtered.bam", sample = samples),
-#        expand("Picard_qc/AlignmentSummaryMetrics/{sample}.alignment_summary_metrics.txt", sample = samples),
-#        expand("Picard_qc/MarkDuplicates/{sample}.mark_duplicates_metrics.txt", sample = samples),
-#        run_CollectInsertSizeMetrics(paired),
-#        expand("bamCoverage/{sample}.seq_depth_norm.bw", sample = samples),
-#        run_bamCoverage_filtered(dedup, properpairs, mapq),
-#        run_computeGCBias(gcbias),
-#        run_deepTools_qc(),
-#        run_Qualimap(),
-#        make_nmasked_genome(),
+        expand("Picard_qc/AlignmentSummaryMetrics/{sample}.alignment_summary_metrics.txt", sample = samples),
+        expand("Picard_qc/MarkDuplicates/{sample}.mark_duplicates_metrics.txt", sample = samples),
+        run_CollectInsertSizeMetrics(paired),
+        expand("bamCoverage/{sample}.seq_depth_norm.bw", sample = samples),
+        run_bamCoverage_filtered(dedup, properpairs, mapq),
+        run_computeGCBias(gcbias),
+        run_deepTools_qc(),
+        run_Qualimap(),
+        make_nmasked_genome(),
         run_allelesp_mapping()
 
 

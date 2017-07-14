@@ -1,4 +1,5 @@
 ### Picard CollectAlignmentSummaryMetrics ######################################
+## skip providing genome fasta if the mode is allele-specific
 
 rule CollectAlignmentSummaryMetrics:
     input:
@@ -6,7 +7,7 @@ rule CollectAlignmentSummaryMetrics:
     output:
         "Picard_qc/AlignmentSummaryMetrics/{sample}.alignment_summary_metrics.txt"
     params:
-        genome = genome_fasta  # reference genome FASTA sequence
+        genome =  lambda wildcards: 'null' if 'allelic-mapping' in mode else genome_fasta  # reference genome FASTA sequence
     log:
         "Picard_qc/logs/CollectAlignmentSummaryMetrics.{sample}.log"
     benchmark:
