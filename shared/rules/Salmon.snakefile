@@ -12,6 +12,7 @@ rule SalmonIndex:
 
     log: "Salmon/SalmonIndex/SalmonIndex.log"
     threads: 8
+    memory: 12000000000
     shell:
         salmon_path+"salmon index --sasamp {params.sasamp} -p {threads} -t {input} -i Salmon/SalmonIndex {params.salmon_index_options} &> {log} && touch {output}"
 
