@@ -26,8 +26,7 @@ if trim:
 
 mapping_prg = "STAR_genomic"
 #mapping_prg = "HISAT2_genomic"
-#star_options = "--twopassMode Basic"
-star_options = ""
+star_options = "--twopassMode Basic"
 hisat_options = ""
 
 ### Initialization #############################################################
