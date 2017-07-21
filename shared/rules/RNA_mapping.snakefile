@@ -1,7 +1,7 @@
 
 ### HISAT2 #####################################################################
 
-if mapping_prg == "HISAT2":
+if mapping_prg.upper().find("HISAT2") >=0:
     if paired:
         rule HISAT2:
             input:
@@ -73,7 +73,7 @@ if mapping_prg == "HISAT2":
                 "&& touch {output.un} {output.al} "
 
 
-elif mapping_prg == "STAR":
+elif mapping_prg.upper().find("STAR") >=0:
     if paired:
         rule STAR:
             input:
@@ -86,7 +86,7 @@ elif mapping_prg == "STAR":
                 gtf = genes_gtf,
                 index = star_index,
                 prefix = mapping_prg+"/{sample}/{sample}.",
-                sample_dir = mapping_prg+"/{sample}"
+                sample_dir = mapping_prg+"/{sample}",
             benchmark:
                 mapping_prg+"/.benchmark/STAR.{sample}.benchmark"
             threads: 12
@@ -102,6 +102,7 @@ elif mapping_prg == "STAR":
                 "--genomeDir {params.index} "
                 "--readFilesIn {input.r1} {input.r2} "
                 "--outFileNamePrefix {params.prefix} "
+                "--outTmpDir ${{TMPDIR}}_tmp_star_{wildcards.sample}/ "
                 "&& mv {params.prefix}Aligned.sortedByCoord.out.bam {output} "
     else:
         rule STAR:
@@ -114,7 +115,7 @@ elif mapping_prg == "STAR":
                 gtf = genes_gtf,
                 index = star_index,
                 prefix = mapping_prg+"/{sample}/{sample}.",
-                sample_dir = mapping_prg+"/{sample}"
+                sample_dir = mapping_prg+"/{sample}",
             benchmark:
                 mapping_prg+"/.benchmark/STAR.{sample}.benchmark"
             threads: 12
@@ -130,6 +131,7 @@ elif mapping_prg == "STAR":
                 "--genomeDir {params.index} "
                 "--readFilesIn {input} "
                 "--outFileNamePrefix {params.prefix} "
+                "--outTmpDir ${{TMPDIR}}_tmp_star_{wildcards.sample}/ "
                 "&& mv {params.prefix}Aligned.sortedByCoord.out.bam {output} "
 
 

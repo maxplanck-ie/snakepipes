@@ -65,7 +65,7 @@ def parse_args(defaults):
     parser.add_argument("--trim_options", dest="trim_options", metavar="STR", type=str, help="Additional option string for trimming program of choice. (default: '%(default)s')", default=defaults["trim_options"])
     parser.add_argument("--fastqc", dest="fastqc", action="store_true", help="run FastQC read quality control (default: '%(default)s')", default=defaults["fastqc"])
     parser.add_argument("--library_type", dest="library_type", metavar="", help="user provided library type strand specificity. featurCounts style: 0, 1, 2 (Illumina TruSeq); default: '%(default)s')", type=int, default=defaults["library_type"])
-    parser.add_argument("--mapping_prg", dest="mapping_prg", metavar="STR", help="Program used for mapping: STAR or HISAT2 (default: '%(default)s')", type=str, default=defaults["mapping_prg"])
+    parser.add_argument("--mapping_prg", dest="mapping_prg", choices=['STAR', 'HISAT2'], metavar="STR", help="Program used for mapping: STAR or HISAT2 (default: '%(default)s')", type=str, default=defaults["mapping_prg"])
     parser.add_argument("--star_options", dest="star_options", metavar="STR", help="STAR option string, e.g.: '--twopassMode Basic' (default: '%(default)s')", type=str, default=defaults["star_options"])
     parser.add_argument("--hisat_options", dest="hisat_options", metavar="STR", help="HISAT2 option string (default: '%(default)s')", type=str, default=defaults["hisat_options"])
     parser.add_argument("--salmon_index_options", dest="salmon_index_options", metavar="STR", type=str, help="Salmon index options, e.g. '--type fmd' (default: '%(default)s')", default=defaults["salmon_index_options"])
@@ -147,7 +147,7 @@ def main():
         snakemake_cmd.append("--printshellcmds")
 
     if not args.local:
-        snakemake_cmd += ["--cluster 'SlurmEasy --mem-per-cpu 12G --threads {threads} --log", args.cluster_logs_dir, "--name {rule}.snakemake'"]
+        snakemake_cmd += ["--cluster-config ",os.path.join(this_script_dir, "cluster.yaml")," --cluster 'SlurmEasy --mem-per-cpu {cluster.memory} --threads {threads} --log", args.cluster_logs_dir, "--name {rule}.snakemake'"]
 
     snakemake_log = "2>&1 | tee -a {}/RNA-seq.log".format(args.outdir).split()
 

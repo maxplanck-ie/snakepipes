@@ -3,13 +3,13 @@ rule bamCoverage_RPKM:
         bam = mapping_prg+"/{sample}.bam",
         bai = mapping_prg+"/{sample}.bam.bai"
     output:
-        "BW/{sample}.RPKM.bw"
+        "bamCoverage/{sample}.RPKM.bw"
     params:
-        bw_binsize = config["bw_binsize"]
+        bw_binsize = bw_binsize
     log:
-        "BW/logs/bamCoverage_RPKM.{sample}.log"
+        "bamCoverage/logs/bamCoverage_RPKM.{sample}.log"
     benchmark:
-        "BW/.benchmark/bamCoverage_RPKM.{sample}.benchmark"
+        "bamCoverage/.benchmark/bamCoverage_RPKM.{sample}.benchmark"
     threads: 8
     shell:
         deepTools_path+"bamCoverage "
@@ -20,12 +20,34 @@ rule bamCoverage_RPKM:
         " --normalizeUsingRPKM "
         "&> {log}"
 
+rule bamCoverage_raw:
+    input:
+        bam = mapping_prg+"/{sample}.bam",
+        bai = mapping_prg+"/{sample}.bam.bai"
+    output:
+        "bamCoverage/{sample}.coverage.bw"
+    params:
+        bw_binsize = bw_binsize
+    log:
+        "bamCoverage/logs/bamCoverage_coverage.{sample}.log"
+    benchmark:
+        "bamCoverage/.benchmark/bamCoverage_coverage.{sample}.benchmark"
+    threads: 8
+    shell:
+        deepTools_path+"bamCoverage "
+        "-b {input.bam} "
+        "-o {output} "
+        "--binSize {params.bw_binsize} "
+        "-p {threads} "
+        "&> {log}"
+
 
 rule plotEnrichment:
     input:
         bam = expand(mapping_prg+"/{sample}.bam", sample=samples),
         bai = expand(mapping_prg+"/{sample}.bam.bai", sample=samples),
-        bed = "Annotation/genes.filtered.bed",
+        gtf = "Annotation/genes.filtered.gtf",
+        gtf2= "Annotation/genes.filtered.transcripts.gtf"
     output:
         png = "deepTools_qc/plotEnrichment/plotEnrichment.png",
         tsv = "deepTools_qc/plotEnrichment/plotEnrichment.tsv",
@@ -40,18 +62,17 @@ rule plotEnrichment:
         deepTools_path+"plotEnrichment "
         "-p {threads} "
         "-b {input.bam} "
-        "--BED {input.bed} "
+        "--BED {input.gtf} {input.gtf2} "
         "--plotFile {output.png} "
         "--labels {params.labels} "
         "--plotTitle 'Fraction of reads in regions' "
         "--outRawCounts {output.tsv} "
-        "--variableScales "
         "&> {log} "
 
 
 rule multiBigwigSummary_bed:
     input:
-        bw = expand("BW/{sample}.RPKM.bw", sample=samples),
+        bw = expand("bamCoverage/{sample}.RPKM.bw", sample=samples),
         bed = "Annotation/genes.filtered.bed",
     output:
         "deepTools_qc/multiBigwigSummary/coverage.bed.npz"
