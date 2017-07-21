@@ -36,6 +36,8 @@ if "allelic-mapping" in mode:
     include: os.path.join(maindir, "shared", "rules", "Bowtie2_allelic.snakefile")
     ## SNPsplit
     include: os.path.join(maindir, "shared", "rules", "SNPsplit.snakefile")
+    # deepTools QC
+    include: os.path.join(maindir, "shared", "rules", "deepTools_qc_allelic.snakefile")
 else:
     # Bowtie2 mapping, duplicate marking, BAM filtering and indexing
     include: os.path.join(maindir, "shared", "rules", "Bowtie2.snakefile")
@@ -98,7 +100,11 @@ def run_bamCoverage_filtered(dedup, properpairs, mapq):
 
 def run_computeGCBias(gcbias):
     if gcbias:
-        return( expand("deepTools_qc/computeGCBias/{sample}.filtered.GCBias.png", sample = samples) )
+        file_list = expand("deepTools_qc/computeGCBias/{sample}.filtered.GCBias.png", sample = samples)
+        if 'allelic-mapping' in mode:
+            file_list.append(expand("deepTools_qc/computeGCBias/{sample}.{suffix}.GCBias.png",
+                                    sample = samples, suffix = ['genome1', 'genome2']))
+        return(file_list)
     else:
         return([])
 
@@ -109,6 +115,12 @@ def run_deepTools_qc():
         "deepTools_qc/plotCorrelation/correlation.pearson.read_coverage.heatmap.png",
         "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage.heatmap.png",
         "deepTools_qc/plotPCA/PCA.read_coverage.png" ] )
+        if 'allelic-mapping' in mode:
+            file_list.append( [
+            "deepTools_qc/plotCorrelation/correlation.pearson.read_coverage_allelic.heatmap.png",
+            "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage_allelic.heatmap.png",
+            "deepTools_qc/plotPCA/PCA.read_coverage_allelic.png" ] )
+
     return (file_list)
 
 def run_Qualimap():
@@ -137,7 +149,9 @@ def run_allelesp_mapping():
         expand("allelic_bams/{sample}.{suffix}.sorted.bam", sample = samples,
                         suffix = allele_suffix),
         expand("allelic_bams/{sample}.{suffix}.sorted.bam.bai", sample = samples,
-                        suffix = allele_suffix)
+                        suffix = allele_suffix),
+        expand("bamCoverage/{sample}.{suffix}.seq_depth_norm.bw", sample = samples,
+                        suffix = ['genome1', 'genome2'])
         ]
         return(file_list)
     else:
@@ -174,6 +188,7 @@ rule all:
         expand("Picard_qc/MarkDuplicates/{sample}.mark_duplicates_metrics.txt", sample = samples),
         run_CollectInsertSizeMetrics(paired),
         expand("bamCoverage/{sample}.seq_depth_norm.bw", sample = samples),
+        expand("bamCoverage/{sample}.filtered.seq_depth_norm.bw", sample = samples),
         run_bamCoverage_filtered(dedup, properpairs, mapq),
         run_computeGCBias(gcbias),
         run_deepTools_qc(),
