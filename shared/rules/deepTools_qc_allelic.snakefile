@@ -1,4 +1,4 @@
-import deeptools_cmds
+
 ### deepTools bamCoverage on allelic BAM files ################################
 
 rule bamCoverage_allelic:
@@ -6,7 +6,7 @@ rule bamCoverage_allelic:
         bam = "allelic_bams/{sample}.{suffix}.sorted.bam",
         bai = "allelic_bams/{sample}.{suffix}.sorted.bam.bai"
     output:
-        "bamCoverage/{sample}.{suffix}.seq_depth_norm.bw"
+        "bamCoverage/allele_specific/{sample}.{suffix}.seq_depth_norm.bw"
     params:
         bw_binsize = bw_binsize,
         genome_size = int(genome_size),
@@ -15,13 +15,13 @@ rule bamCoverage_allelic:
         blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed
                     else "",
     log:
-        "bamCoverage/logs/bamCoverage.{sample}.{suffix}.log"
+        "bamCoverage/allele_specific/logs/bamCoverage.{sample}.{suffix}.log"
     benchmark:
-        "bamCoverage/.benchmark/bamCoverage.{sample}.{suffix}.benchmark"
+        "bamCoverage/allele_specific/.benchmark/bamCoverage.{sample}.{suffix}.benchmark"
     threads: 16
     run:
-        cmd = bamcov_cmd() + " {params.blacklist}"
-        shell(cmd)
+        shell(bamcov_cmd()) #+ " {params.blacklist}")
+        #shell(cmd)
 
 ### deepTools computeGCBias ####################################################
 
@@ -68,7 +68,7 @@ rule plotCoverage_allelic:
         "deepTools_qc/.benchmark/plotCoverage_allelic.benchmark"
     threads: 24
     run:
-        plotCov_cmd()
+        shell(plotCov_cmd())
 
 ### deepTools multiBamSummary ##################################################
 
@@ -79,7 +79,7 @@ rule multiBamSummary_allelic:
     output:
         "deepTools_qc/multiBamSummary/read_coverage_allelic.bins.npz"
     params:
-        labels = " ".join(samples),
+        labels = " ".join(expand('{sample}.{suffix}', sample=samples, suffix = ['genome1', 'genome2']) ),
         blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed
                     else "",
         read_extension = "--extendReads" if paired
@@ -90,7 +90,7 @@ rule multiBamSummary_allelic:
         "deepTools_qc/.benchmark/multiBamSummary_allelic.benchmark"
     threads: 24
     run:
-        multiBamSum_cmd()
+        shell(multiBamSum_cmd())
 
 
 ### deepTools plotCorrelation ##################################################
@@ -108,7 +108,7 @@ rule plotCorrelation_pearson_allelic:
     benchmark:
         "deepTools_qc/.benchmark/plotCorrelation_pearson_allelic.benchmark"
     run:
-        plotCorr_cmd()
+        shell(plotCorr_cmd())
 
 # Spearman: heatmap, scatterplot and correlation matrix
 rule plotCorrelation_spearman_allelic:
@@ -123,7 +123,7 @@ rule plotCorrelation_spearman_allelic:
     benchmark:
         "deepTools_qc/.benchmark/plotCorrelation_spearman_allelic.benchmark"
     run:
-        plotCorrSP_cmd()
+        shell(plotCorrSP_cmd())
 
 ### deepTools plotPCA ##########################################################
 rule plotPCA_allelic:
@@ -136,4 +136,4 @@ rule plotPCA_allelic:
     benchmark:
         "deepTools_qc/.benchmark/plotPCA_allelic.benchmark"
     run:
-        plotPCA_cmd()
+        shell(plotPCA_cmd())

@@ -39,6 +39,8 @@ if "allelic-mapping" in mode:
     include: os.path.join(maindir, "shared", "rules", "SNPsplit.snakefile")
     ## featureCounts_allelic
     include: os.path.join(maindir, "shared", "rules", "featureCounts_allelic.snakefile")
+    # deepTools QC
+    include: os.path.join(maindir, "shared", "rules", "deepTools_RNA_allelic.snakefile")
 else:
     # HISAT2/STAR
     include: os.path.join(maindir, "shared", "rules", "RNA_mapping.snakefile")
@@ -68,6 +70,9 @@ if "mapping-free" in mode:
 ## Sleuth (on Salmon)
 if "mapping-free" in mode and sample_info:
     include: os.path.join(maindir, "shared", "rules", "sleuth.snakefile")
+
+# deeptools cmds
+include: os.path.join(maindir, "shared", "deeptools_cmds.snakefile")
 
 ## bamCoverage_RPKM
 include: os.path.join(maindir, "shared", "rules", "deepTools_RNA.snakefile")
@@ -152,6 +157,8 @@ def run_allelesp_mapping():
                         suffix = allele_suffix),
         expand("allelic_bams/{sample}.{suffix}.sorted.bam.bai", sample = samples,
                         suffix = allele_suffix),
+        expand("BW/allele_specific/{sample}.{suffix}.RPKM.bw", sample = samples,
+                        suffix = ['genome1', 'genome2']),
         expand("featureCounts/{sample}_allelic_counts.txt", sample=samples),
         "featureCounts/allelic_counts.txt"
         ]
@@ -172,6 +179,14 @@ def run_deeptools_qc():
         "deepTools_qc/plotCorrelation/correlation.spearman.bed_coverage.heatmap.png",
         "deepTools_qc/plotPCA/PCA.bed_coverage.png",
         ]
+        if 'allelic-mapping' in mode:
+            file_list.append( [
+                "deepTools_qc/plotEnrichment/plotEnrichment_allelic.png",
+                "deepTools_qc/plotEnrichment/plotEnrichment_allelic.tsv",
+                "deepTools_qc/multiBigwigSummary/coverage_allelic.bed.npz",
+                "deepTools_qc/plotCorrelation/correlation.pearson.bed_coverage_allelic.heatmap.png",
+                "deepTools_qc/plotCorrelation/correlation.spearman.bed_coverage_allelic.heatmap.png",
+                "deepTools_qc/plotPCA/PCA.bed_coverage_allelic.png" ])
         return(file_list)
     else:
         return([])
@@ -217,7 +232,7 @@ rule all:
         run_mapping(),                 # classical mapping + counting
         run_allelesp_mapping(),        # allelic-mapping
         make_nmasked_genome(),
-        run_deeptools_qc(),
+        run_deeptools_qc()
 
 
 ### execute after  finished ####################################################

@@ -1,4 +1,3 @@
-import deeptools_cmds
 
 ### deepTools bamCoverage ######################################################
 rule bamCoverage:
@@ -18,7 +17,7 @@ rule bamCoverage:
         "bamCoverage/.benchmark/bamCoverage.{sample}.benchmark"
     threads: 16
     run:
-        bamcov_cmd()
+        shell(bamcov_cmd())
 
 
 ### deepTools bamCoverage on filtered BAM files ################################
@@ -42,7 +41,7 @@ rule bamCoverage_filtered:
         "bamCoverage/.benchmark/bamCoverage.{sample}.filtered.benchmark"
     threads: 16
     run:
-        cmd = bamcov_cmd() + " {params.blacklist}"
+        cmd = (bamcov_cmd() + " {params.blacklist}")
         shell(cmd)
 
 # TODO: include blacklist!? use deeptools bam filtering options?
@@ -92,7 +91,7 @@ rule plotCoverage:
         "deepTools_qc/.benchmark/plotCoverage.benchmark"
     threads: 24
     run:
-        plotCov_cmd()
+        shell(plotCov_cmd())
 
 ### deepTools multiBamSummary ##################################################
 
@@ -114,7 +113,7 @@ rule multiBamSummary:
         "deepTools_qc/.benchmark/multiBamSummary.benchmark"
     threads: 24
     run:
-        multiBamSum_cmd()
+        shell(multiBamSum_cmd())
 
 
 ### deepTools plotCorrelation ##################################################
@@ -132,7 +131,7 @@ rule plotCorrelation_pearson:
     benchmark:
         "deepTools_qc/.benchmark/plotCorrelation_pearson.benchmark"
     run:
-        plotCorr_cmd()
+        shell(plotCorr_cmd('fragment'))
 
 # Spearman: heatmap, scatterplot and correlation matrix
 rule plotCorrelation_spearman:
@@ -147,7 +146,7 @@ rule plotCorrelation_spearman:
     benchmark:
         "deepTools_qc/.benchmark/plotCorrelation_spearman.benchmark"
     run:
-        plotCorrSP_cmd()
+        shell(plotCorrSP_cmd('fragment'))
 
 ### deepTools plotPCA ##########################################################
 rule plotPCA:
@@ -160,4 +159,4 @@ rule plotPCA:
     benchmark:
         "deepTools_qc/.benchmark/plotPCA.benchmark"
     run:
-        plotPCA_cmd()
+        shell(plotPCA_cmd('fragment'))

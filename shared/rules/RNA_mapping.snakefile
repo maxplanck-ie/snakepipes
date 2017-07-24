@@ -102,7 +102,7 @@ elif mapping_prg == "STAR":
                 "--genomeDir {params.index} "
                 "--readFilesIn {input.r1} {input.r2} "
                 "--outFileNamePrefix {params.prefix} "
-                "&& mv {params.prefix}Aligned.sortedByCoord.out.bam {output} "
+                "&& mv {params.prefix}Aligned.sortedByCoord.out.bam {output.bam} "
     else:
         rule STAR:
             input:
@@ -130,7 +130,7 @@ elif mapping_prg == "STAR":
                 "--genomeDir {params.index} "
                 "--readFilesIn {input} "
                 "--outFileNamePrefix {params.prefix} "
-                "&& mv {params.prefix}Aligned.sortedByCoord.out.bam {output} "
+                "&& mv {params.prefix}Aligned.sortedByCoord.out.bam {output.bam} "
 
 
 ### samtools_index #############################################################

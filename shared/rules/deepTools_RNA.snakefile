@@ -1,3 +1,4 @@
+
 rule bamCoverage_RPKM:
     input:
         bam = mapping_prg+"/{sample}.bam",
@@ -11,14 +12,8 @@ rule bamCoverage_RPKM:
     benchmark:
         "BW/.benchmark/bamCoverage_RPKM.{sample}.benchmark"
     threads: 8
-    shell:
-        deepTools_path+"bamCoverage "
-        "-b {input.bam} "
-        "-o {output} "
-        "--binSize {params.bw_binsize} "
-        "-p {threads} "
-        " --normalizeUsingRPKM "
-        "&> {log}"
+    run:
+        shell(bamcov_rpkm_cmd())
 
 
 rule plotEnrichment:
@@ -36,17 +31,8 @@ rule plotEnrichment:
     benchmark:
         "deepTools_qc/.benchmark/plotEnrichment.benchmark"
     threads: 8
-    shell:
-        deepTools_path+"plotEnrichment "
-        "-p {threads} "
-        "-b {input.bam} "
-        "--BED {input.bed} "
-        "--plotFile {output.png} "
-        "--labels {params.labels} "
-        "--plotTitle 'Fraction of reads in regions' "
-        "--outRawCounts {output.tsv} "
-        "--variableScales "
-        "&> {log} "
+    run:
+        shell(plotEnrich_cmd())
 
 
 rule multiBigwigSummary_bed:
@@ -62,19 +48,12 @@ rule multiBigwigSummary_bed:
     benchmark:
         "deepTools_qc/.benchmark/multiBigwigSummary.bed.benchmark"
     threads: 8
-    shell:
-        deepTools_path+"multiBigwigSummary BED-file "
-        "--BED {input.bed} "
-        "-b {input.bw} "
-        "-o {output} "
-        "--labels {params.labels} "
-        "--binSize 1000 "
-        "-p {threads} "
-        "&> {log} "
+    run:
+        shell(multiBWsum_bed_cmd())
 
 
 # Pearson: heatmap, scatterplot and correlation matrix
-rule plotCorrelation_bed_pearson:
+rule plotCorr_bed_pearson:
     input:
         "deepTools_qc/multiBigwigSummary/coverage.bed.npz"
     output:
@@ -85,29 +64,12 @@ rule plotCorrelation_bed_pearson:
         "deepTools_qc/logs/plotCorrelation_pearson.log"
     benchmark:
         "deepTools_qc/.benchmark/plotCorrelation_pearson.benchmark"
-    shell:
-        deepTools_path+"plotCorrelation "
-        "-in {input} "
-        "-o {output.heatpng} "
-        "--corMethod pearson "
-        "--whatToPlot heatmap "
-        "--skipZeros "
-        "--plotTitle 'Pearson correlation of region coverage' "
-        "--outFileCorMatrix {output.tsv} "
-        "--colorMap coolwarm "
-        "--plotNumbers "
-        "&> {log} && "
-        +deepTools_path+"plotCorrelation "
-        "-in {input} "
-        "-o {output.scatterpng} "
-        "--corMethod pearson "
-        "--whatToPlot scatterplot "
-        "--plotTitle 'Pearson correlation of region coverage' "
-        "&>> {log}"
+    run:
+        shell(plotCorr_cmd('gene'))
 
 
 # Spearman: heatmap, scatterplot and correlation matrix
-rule plotCorrelation_bed_spearman:
+rule plotCorr_bed_spearman:
     input:
         "deepTools_qc/multiBigwigSummary/coverage.bed.npz"
     output:
@@ -118,25 +80,8 @@ rule plotCorrelation_bed_spearman:
         "deepTools_qc/logs/plotCorrelation_spearman.log"
     benchmark:
         "deepTools_qc/.benchmark/plotCorrelation_spearman.benchmark"
-    shell:
-        deepTools_path+"plotCorrelation "
-        "-in {input} "
-        "-o {output.heatpng} "
-        "--corMethod spearman "
-        "--whatToPlot heatmap "
-        "--skipZeros "
-        "--plotTitle 'Spearman correlation of region coverage' "
-        "--outFileCorMatrix {output.tsv} "
-        "--colorMap coolwarm "
-        "--plotNumbers "
-        "&> {log} && "
-        +deepTools_path+"plotCorrelation "
-        "-in {input} "
-        "-o {output.scatterpng} "
-        "--corMethod spearman "
-        "--whatToPlot scatterplot "
-        "--plotTitle 'Spearman correlation of region coverage' "
-        "&>> {log}"
+    run:
+        shell(plotCorrSP_cmd('gene'))
 
 
 
@@ -150,9 +95,5 @@ rule plotPCA:
         "deepTools_qc/logs/plotPCA.log"
     benchmark:
         "deepTools_qc/.benchmark/plotPCA.benchmark"
-    shell:
-        deepTools_path+"plotPCA "
-            "-in {input} "
-            "-o {output} "
-            " -T 'PCA of fragment coverage' "
-            "&> {log}"
+    run:
+        shell(plotPCA_cmd('gene'))

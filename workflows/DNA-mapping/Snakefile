@@ -62,6 +62,9 @@ include: os.path.join(maindir, "shared", "rules", "bam_filtering.snakefile")
 # Picard CollectAlignmentSummaryMetrics and CollectInsertSizeMetrics
 include: os.path.join(maindir, "shared", "rules", "Picard_qc.snakefile")
 
+# deeptools cmds
+include: os.path.join(maindir, "shared", "deeptools_cmds.snakefile")
+
 # deepTools QC
 include: os.path.join(maindir, "shared", "rules", "deepTools_qc.snakefile")
 
@@ -150,7 +153,7 @@ def run_allelesp_mapping():
                         suffix = allele_suffix),
         expand("allelic_bams/{sample}.{suffix}.sorted.bam.bai", sample = samples,
                         suffix = allele_suffix),
-        expand("bamCoverage/{sample}.{suffix}.seq_depth_norm.bw", sample = samples,
+        expand("bamCoverage/allele_specific/{sample}.{suffix}.seq_depth_norm.bw", sample = samples,
                         suffix = ['genome1', 'genome2'])
         ]
         return(file_list)
