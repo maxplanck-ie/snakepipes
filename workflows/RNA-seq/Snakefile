@@ -116,8 +116,8 @@ def run_mapping():
 def run_deeptools_qc():
     if "deeptools_qc" in mode:
         file_list = [
-        expand("Tracks/{sample}.RPKM.bw", sample = samples),
-        expand("Tracks/{sample}.coverage.bw", sample = samples),
+        expand("bamCoverage/{sample}.RPKM.bw", sample = samples),
+        expand("bamCoverage/{sample}.coverage.bw", sample = samples),
         "deepTools_qc/plotEnrichment/plotEnrichment.png",
         "deepTools_qc/plotEnrichment/plotEnrichment.tsv",
         "deepTools_qc/multiBigwigSummary/coverage.bed.npz",
