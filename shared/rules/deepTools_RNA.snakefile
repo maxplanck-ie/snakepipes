@@ -35,7 +35,8 @@ rule plotEnrichment:
     input:
         bam = expand(mapping_prg+"/{sample}.bam", sample=samples),
         bai = expand(mapping_prg+"/{sample}.bam.bai", sample=samples),
-        bed = "Annotation/genes.filtered.bed",
+        gtf = "Annotation/genes.filtered.gtf",
+        gtf2= "Annotation/genes.filtered.transcripts.gtf"
     output:
         png = "deepTools_qc/plotEnrichment/plotEnrichment.png",
         tsv = "deepTools_qc/plotEnrichment/plotEnrichment.tsv",

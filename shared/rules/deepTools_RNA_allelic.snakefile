@@ -35,12 +35,13 @@ rule plotEnrichment_allelic:
     input:
         bam = expand("allelic_bams/{sample}.{suffix}.sorted.bam", sample=samples, suffix = ['genome1', 'genome2']),
         bai = expand("allelic_bams/{sample}.{suffix}.sorted.bam.bai", sample=samples, suffix = ['genome1', 'genome2']),
-        bed = "Annotation/genes.filtered.bed",
+        gtf = "Annotation/genes.filtered.gtf",
+        gtf2= "Annotation/genes.filtered.transcripts.gtf"
     output:
         png = "deepTools_qc/plotEnrichment/plotEnrichment_allelic.png",
-        tsv = "deepTools_qc/plotEnrichment/plotEnrichment_allelic.tsv",
+        tsv = "deepTools_qc/plotEnrichment/plotEnrichment_allelic.tsv"
     params:
-        labels = " ".join(expand('{sample}.{suffix}', sample=samples, suffix = ['genome1', 'genome2'])),
+        labels = " ".join(expand('{sample}.{suffix}', sample=samples, suffix = ['genome1', 'genome2']))
     log:
         "deepTools_qc/logs/plotEnrichment_allelic.log"
     benchmark:
@@ -53,7 +54,7 @@ rule plotEnrichment_allelic:
 rule multiBigwigSummary_bed_allelic:
     input:
         bw = expand("bamCoverage/allele_specific/{sample}.{suffix}.RPKM.bw", sample=samples, suffix = ['genome1', 'genome2']),
-        bed = "Annotation/genes.filtered.bed",
+        bed = "Annotation/genes.filtered.bed"
     output:
         "deepTools_qc/multiBigwigSummary/coverage_allelic.bed.npz"
     params:

@@ -57,7 +57,7 @@ def plotEnrich_cmd():
     return( (deepTools_path+"plotEnrichment "
         "-p {threads} "
         "-b {input.bam} "
-        "--BED {input.bed} "
+        "--BED {input.gtf} {input.gtf2} "
         "--plotFile {output.png} "
         "--labels {params.labels} "
         "--plotTitle 'Fraction of reads in regions' "
