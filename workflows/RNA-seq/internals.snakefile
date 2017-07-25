@@ -8,20 +8,6 @@ import re
 
 ### Functions ##################################################################
 
-def convert_library_type (paired, from_library_type, from_prg, to_prg,
-                            rscript=os.path.join(maindir, "shared", "tools", "library_type.R"),
-                            tsv=os.path.join(maindir, "shared", "tools", "library_type.tsv")):
-    """ Converts the library to e.g. from 2 (featureCounts) to RF (HISAT2) """
-    if paired:
-        lib_str = "PE"
-    else:
-        lib_str = "SE"
-
-    cmd = ("{}Rscript {} {} {} {} {} {}".format(R_path, rscript, tsv, lib_str, from_library_type, from_prg, to_prg) )
-    ##print("\n"+cmd)
-
-    return( subprocess.check_output(cmd, shell=True).decode() )
-
 ## returns true if there are at least 2 replicates per conditions
 def check_replicates(sample_info_file):
     ret = subprocess.check_output(
@@ -32,6 +18,7 @@ def check_replicates(sample_info_file):
         return True
     else:
         return False
+
 
 ## Variable defaults ##########################################################
 
@@ -61,13 +48,13 @@ if not paired:
     reads = [""]
 
 ## rna-strandness for HISAT2
-rna_strandness = convert_library_type(paired, library_type, "featureCounts", "HISAT2")
+rna_strandness = cf.convert_library_type(R_path, paired, library_type, "featureCounts", "HISAT2", os.path.join(maindir, "shared", "tools", "library_type.R"), os.path.join(maindir, "shared", "tools", "library_type.tsv"))
 if rna_strandness == "NA":
     rna_strandness = ""
 else:
     rna_strandness = "--rna-strandness "+rna_strandness
 
-salmon_libtype = convert_library_type(paired, library_type, "featureCounts", "Salmon")
+salmon_libtype = cf.convert_library_type(R_path, paired, library_type, "featureCounts", "Salmon", os.path.join(maindir, "shared", "tools", "library_type.R"), os.path.join(maindir, "shared", "tools", "library_type.tsv"))
 
 ## Require configuration file (samples.yaml)
 if sample_info and not os.path.isfile(sample_info):

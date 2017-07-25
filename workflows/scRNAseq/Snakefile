@@ -20,9 +20,11 @@ include: os.path.join(workflow.basedir, "internals.snakefile")
 ### include modules of other snakefiles ########################################
 ################################################################################
 include: os.path.join(maindir, "shared", "rules", "FASTQ.snakefile")
+include: os.path.join(maindir, "shared", "rules", "RNA_mapping.snakefile")
 include: os.path.join(maindir, "shared", "rules", "scRNAseq.snakefile")
 include: os.path.join(maindir, "shared", "rules", "FastQC.snakefile")
 include: os.path.join(maindir, "shared", "rules", "filter_annotation.snakefile")
+include: os.path.join(maindir, "shared", "rules", "deepTools_RNA.snakefile")
 
 # TrimGalore
 if trim:
@@ -33,14 +35,30 @@ if trim:
 
 def run_Trimming(trim):
     if trim:
-        return( expand(fastq_dir+"/{sample}.fastq.gz", sample = samples) )
+        file_list = [
+        expand(fastq_dir+"/{sample}.fastq.gz", sample = samples),
+        expand("FastQC_trimmed/{sample}_fastqc.html", sample = samples)
+        ]
+        return(file_list)
     else:
         return([])
 
 def run_bamCoverage():
     return( expand("bamCoverage/{sample}.coverage.bw", sample = samples) )
     
-
+def run_deeptools_qc():
+    file_list = [
+    expand("bamCoverage/{sample}.RPKM.bw", sample = samples),
+    expand("bamCoverage/{sample}.coverage.bw", sample = samples),
+    "deepTools_qc/plotEnrichment/plotEnrichment.png",
+    "deepTools_qc/plotEnrichment/plotEnrichment.tsv"]
+    if len(samples)>1:
+        file_list.append( ["deepTools_qc/multiBigwigSummary/coverage.bed.npz",
+                          "deepTools_qc/plotCorrelation/correlation.pearson.bed_coverage.heatmap.png",
+                          "deepTools_qc/plotCorrelation/correlation.spearman.bed_coverage.heatmap.png",
+                          "deepTools_qc/plotPCA/PCA.bed_coverage.png"] )
+    return(file_list)
+ 
 ### execute before workflow starts #############################################
 ################################################################################
 onstart:    
@@ -80,21 +98,20 @@ rule all:
         expand("FASTQ_barcoded/{sample}.fastq.gz", sample = samples),
         run_Trimming(trim),
         expand("FastQC/{sample}{read}_fastqc.html", sample = samples, read=reads),
-        expand("FastQC_trimmed/{sample}_fastqc.html", sample = samples),
-        expand("STAR_genomic/{sample}.bam", sample = samples),
+        expand(mapping_prg+"/{sample}.bam", sample = samples),
+        expand(mapping_prg+"/{sample}.bam.bai", sample = samples),
         expand("Counts/{sample}.cout.csv",sample = samples),
         expand("Counts/{sample}.coutt.csv",sample = samples),
         expand("Counts/{sample}.featureCounts_summary.txt",sample = samples),
         "Results/all_samples.gencode_genomic.coutt_merged.csv",
         "QC_report/QC_report.all_samples.libstats_reads.tsv",
-        expand("Tracks/{sample}.Coverage.bw", sample = samples),
-        "deepTools_qc/plotEnrichment/plotEnrichment.png",
-        "deepTools_qc/plotEnrichment/plotEnrichment.tsv",
+        run_deeptools_qc(),
 rule annot:
     input:
         "Annotation/genes.filtered.bed",
         "Annotation/genes.filtered.gtf",
-
+        "Annotation/genes.filtered.transcripts.gtf",
+        
 
 ### execute after workflow finished ############################################
 ################################################################################

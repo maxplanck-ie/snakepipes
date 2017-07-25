@@ -104,6 +104,7 @@ def run_Trimming(trim, fastqc):
 def run_mapping_free():
     if "mapping-free" in mode:
         file_list = [
+        "Annotation/genes.filtered.fa",
         "Salmon/SalmonIndex/sa.bin",
         expand("Salmon/{sample}.quant.sf", sample=samples),
         expand("Salmon/{sample}.quant.genes.sf", sample=samples),
@@ -171,22 +172,24 @@ def run_allelesp_mapping():
 def run_deeptools_qc():
     if "deeptools_qc" in mode:
         file_list = [
-        expand("BW/{sample}.RPKM.bw", sample = samples),
+        expand("bamCoverage/{sample}.RPKM.bw", sample = samples),
+        expand("bamCoverage/{sample}.coverage.bw", sample = samples),
         "deepTools_qc/plotEnrichment/plotEnrichment.png",
-        "deepTools_qc/plotEnrichment/plotEnrichment.tsv",
-        "deepTools_qc/multiBigwigSummary/coverage.bed.npz",
-        "deepTools_qc/plotCorrelation/correlation.pearson.bed_coverage.heatmap.png",
-        "deepTools_qc/plotCorrelation/correlation.spearman.bed_coverage.heatmap.png",
-        "deepTools_qc/plotPCA/PCA.bed_coverage.png",
-        ]
+        "deepTools_qc/plotEnrichment/plotEnrichment.tsv"]
+        if len(samples)>1:
+            file_list.append( ["deepTools_qc/multiBigwigSummary/coverage.bed.npz",
+                              "deepTools_qc/plotCorrelation/correlation.pearson.bed_coverage.heatmap.png",
+                              "deepTools_qc/plotCorrelation/correlation.spearman.bed_coverage.heatmap.png",
+                              "deepTools_qc/plotPCA/PCA.bed_coverage.png"] )
         if 'allelic-mapping' in mode:
             file_list.append( [
                 "deepTools_qc/plotEnrichment/plotEnrichment_allelic.png",
-                "deepTools_qc/plotEnrichment/plotEnrichment_allelic.tsv",
-                "deepTools_qc/multiBigwigSummary/coverage_allelic.bed.npz",
-                "deepTools_qc/plotCorrelation/correlation.pearson.bed_coverage_allelic.heatmap.png",
-                "deepTools_qc/plotCorrelation/correlation.spearman.bed_coverage_allelic.heatmap.png",
-                "deepTools_qc/plotPCA/PCA.bed_coverage_allelic.png" ])
+                "deepTools_qc/plotEnrichment/plotEnrichment_allelic.tsv"])
+		if len(samples)>1:
+		   file_list.append( ["deepTools_qc/multiBigwigSummary/coverage_allelic.bed.npz",
+		                      "deepTools_qc/plotCorrelation/correlation.pearson.bed_coverage_allelic.heatmap.png",
+                                      "deepTools_qc/plotCorrelation/correlation.spearman.bed_coverage_allelic.heatmap.png",
+                                      "deepTools_qc/plotPCA/PCA.bed_coverage_allelic.png" ])
         return(file_list)
     else:
         return([])
@@ -225,7 +228,6 @@ rule all:
 
         "Annotation/genes.annotated.bed",
         "Annotation/genes.filtered.bed",
-        "Annotation/genes.filtered.fa",
         "Annotation/genes.filtered.saf",    # this file is used for featureCounts later on!
 
         run_mapping_free(),            # Salmon

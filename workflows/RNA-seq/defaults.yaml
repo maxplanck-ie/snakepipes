@@ -42,6 +42,7 @@ filter_annotation:
 fragment_length: 200
 library_type: 2
 salmon_index_options: --type quasi -k 31
+## supported mappers: STAR HISAT2
 mapping_prg: STAR
 star_options:
 hisat_options:

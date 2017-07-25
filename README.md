@@ -263,18 +263,18 @@ The tool `histoneHMM` will only be run if at least one sample is annotated as br
 
 Further organisms can be supported by adding a genome configuration file `my_organism.yaml` in the following style to the `snakemake_workflows` directory:
 
-    $ cat /snakemake_workflows/shared/organisms/hs37d5.yaml
+    $ cat snakemake_workflows/shared/organisms/hs37d5.yaml
 
 	genome_size: 2900338458
-	genome_fasta: "/data/repository/organisms/hs37d5_ensembl/genome_fasta/genome.fa"
-	genome_index: "/data/repository/organisms/hs37d5_ensembl/genome_fasta/genome.fa.fai"
-	genome_2bit: "/data/repository/organisms/hs37d5_ensembl/genome_fasta/genome.2bit"
-	bowtie2_index: "/data/repository/organisms/hs37d5_ensembl/BowtieIndex/genome"
-	hisat2_index: "/data/repository/organisms/hs37d5_ensembl/HISAT2Index/genome"
-	known_splicesites: "/data/repository/organisms/hs37d5_ensembl/gencode/release_19/HISAT2/splice_sites.txt"
-	star_index: "/data/repository/organisms/hs37d5_ensembl/STARIndex/"
-	genes_bed: "/data/repository/organisms/hs37d5_ensembl/gencode/release_19/genes.bed"
-	genes_gtf: "/data/repository/organisms/hs37d5_ensembl/gencode/release_19/genes.gtf"
-	blacklist_bed: "/data/repository/organisms/hs37d5_ensembl/ENCODE/hs37d5_extended_Encode-blacklist.bed"
+	genome_fasta: "/SOMEPATH/hs37d5_ensembl/genome_fasta/genome.fa"
+	genome_index: "/SOMEPATH/hs37d5_ensembl/genome_fasta/genome.fa.fai"
+	genome_2bit: "/SOMEPATH/hs37d5_ensembl/genome_fasta/genome.2bit"
+	bowtie2_index: "/SOMEPATH/hs37d5_ensembl/BowtieIndex/genome"
+	hisat2_index: "/SOMEPATH/hs37d5_ensembl/HISAT2Index/genome"
+	known_splicesites: "/SOMEPATH/hs37d5_ensembl/gencode/release_19/HISAT2/splice_sites.txt"
+	star_index: "/SOMEPATH/hs37d5_ensembl/STARIndex/"
+	genes_bed: "/SOMEPATH/hs37d5_ensembl/gencode/release_19/genes.bed"
+	genes_gtf: "/SOMEPATH/hs37d5_ensembl/gencode/release_19/genes.gtf"
+	blacklist_bed: "/SOMEPATH/hs37d5_ensembl/ENCODE/hs37d5_extended_Encode-blacklist.bed"
 
 If no blacklist regions are available for your organism of interest, leave it empty `blacklist_bed: `
