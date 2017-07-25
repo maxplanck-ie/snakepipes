@@ -182,14 +182,13 @@ def run_deeptools_qc():
                               "deepTools_qc/plotCorrelation/correlation.spearman.bed_coverage.heatmap.png",
                               "deepTools_qc/plotPCA/PCA.bed_coverage.png"] )
         if 'allelic-mapping' in mode:
-            file_list.append( [
-                "deepTools_qc/plotEnrichment/plotEnrichment_allelic.png",
-                "deepTools_qc/plotEnrichment/plotEnrichment_allelic.tsv"])
-		if len(samples)>1:
-		   file_list.append( ["deepTools_qc/multiBigwigSummary/coverage_allelic.bed.npz",
-		                      "deepTools_qc/plotCorrelation/correlation.pearson.bed_coverage_allelic.heatmap.png",
-                                      "deepTools_qc/plotCorrelation/correlation.spearman.bed_coverage_allelic.heatmap.png",
-                                      "deepTools_qc/plotPCA/PCA.bed_coverage_allelic.png" ])
+            file_list.append(["deepTools_qc/plotEnrichment/plotEnrichment_allelic.png",
+                              "deepTools_qc/plotEnrichment/plotEnrichment_allelic.tsv"])
+            if len(samples)>1:
+                file_list.append( ["deepTools_qc/multiBigwigSummary/coverage_allelic.bed.npz",
+                                   "deepTools_qc/plotCorrelation/correlation.pearson.bed_coverage_allelic.heatmap.png",
+                                   "deepTools_qc/plotCorrelation/correlation.spearman.bed_coverage_allelic.heatmap.png",
+                                   "deepTools_qc/plotPCA/PCA.bed_coverage_allelic.png"] )
         return(file_list)
     else:
         return([])
