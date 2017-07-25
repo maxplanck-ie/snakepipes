@@ -292,7 +292,10 @@ def main():
         snakemake_cmd.append("--printshellcmds")
 
     if not args.local:
-        snakemake_cmd += ["--cluster 'SlurmEasy --mem-per-cpu 12G --threads {threads} --log", args.cluster_logs_dir, "--name {rule}.snakemake'"]
+        snakemake_cmd += ["--cluster-config ",
+                         os.path.join(this_script_dir, "cluster.yaml"),
+                         " --cluster 'SlurmEasy --mem-per-cpu {cluster.memory} --threads {threads} --log",
+                         args.cluster_logs_dir, "--name {rule}.snakemake'"]
 
     snakemake_log = "2>&1 | tee -a {}/RNA-seq.log".format(args.outdir).split()
 
