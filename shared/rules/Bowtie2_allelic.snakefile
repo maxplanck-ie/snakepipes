@@ -28,7 +28,7 @@ if mapping_prg == "Bowtie2":
             threads: 24
             shell:
                 bowtie2_path+"bowtie2"
-                " -X {params.isert_size_max}"
+                " -X {params.insert_size_max}"
                 " -x {params.idxbase} -1 {input.r1} -2 {input.r2}"
                 " {params.bowtie_opts} {params.mate_orientation}"
                 " --rg-id {wildcards.sample} --rg CN:mpi-ie_deep_sequencing_unit"
