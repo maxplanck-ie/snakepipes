@@ -21,13 +21,14 @@ if mapping_prg == "Bowtie2":
             params:
                 bowtie_opts = str(bowtie_opts or ''),
                 mate_orientation = mate_orientation,
+                insert_size_max = insert_size_max,
                 idxbase = getbw_idxbase(bowtie2_index_allelic)
             benchmark:
                 mapping_prg+"/.benchmark/Bowtie2.{sample}.benchmark"
             threads: 24
             shell:
                 bowtie2_path+"bowtie2"
-                " -X 1000"
+                " -X {params.isert_size_max}"
                 " -x {params.idxbase} -1 {input.r1} -2 {input.r2}"
                 " {params.bowtie_opts} {params.mate_orientation}"
                 " --rg-id {wildcards.sample} --rg CN:mpi-ie_deep_sequencing_unit"
