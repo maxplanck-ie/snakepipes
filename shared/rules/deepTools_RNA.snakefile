@@ -6,7 +6,7 @@ rule bamCoverage_RPKM:
     output:
         "bamCoverage/{sample}.RPKM.bw"
     params:
-        bw_binsize = config["bw_binsize"]
+        bw_binsize = bw_binsize
     log:
         "bamCoverage/logs/bamCoverage_RPKM.{sample}.log"
     benchmark:
