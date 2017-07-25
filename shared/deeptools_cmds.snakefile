@@ -2,6 +2,15 @@
 ################################################################################
 import os
 
+# bamCoverage RAW
+def bamcov_raw_cmd():
+    return(deepTools_path+"bamCoverage " +
+            "-b {input.bam} " +
+            "-o {output} " +
+            "--binSize {params.bw_binsize} " +
+            "-p {threads} " +
+            "&> {log}")
+
 # bamCoverage CHIP
 def bamcov_cmd():
     return(deepTools_path+"bamCoverage " +

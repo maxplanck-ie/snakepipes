@@ -15,6 +15,21 @@ rule bamCoverage_RPKM_allelic:
     run:
         shell(bamcov_rpkm_cmd())
 
+rule bamCoverage_raw_allelic:
+    input:
+        bam = "allelic_bams/{sample}.{suffix}.sorted.bam",
+        bai = "allelic_bams/{sample}.{suffix}.sorted.bam.bai"
+    output:
+        "bamCoverage/allele_specific/{sample}.{suffix}.coverage.bw"
+    params:
+        bw_binsize = bw_binsize
+    log:
+        "bamCoverage/allele_specificlogs/bamCoverage_coverage.{sample}.log"
+    benchmark:
+        "bamCoverage/allele_specific.benchmark/bamCoverage_coverage.{sample}.benchmark"
+    threads: 8
+    run:
+        shell(bamcov_raw_cmd())
 
 rule plotEnrichment_allelic:
     input:

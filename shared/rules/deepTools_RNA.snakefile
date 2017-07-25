@@ -15,6 +15,21 @@ rule bamCoverage_RPKM:
     run:
         shell(bamcov_rpkm_cmd())
 
+rule bamCoverage_raw:
+    input:
+        bam = mapping_prg+"/{sample}.bam",
+        bai = mapping_prg+"/{sample}.bam.bai"
+    output:
+        "bamCoverage/{sample}.coverage.bw"
+    params:
+        bw_binsize = bw_binsize
+    log:
+        "bamCoverage/logs/bamCoverage_coverage.{sample}.log"
+    benchmark:
+        "bamCoverage/.benchmark/bamCoverage_coverage.{sample}.benchmark"
+    threads: 8
+    run:
+        shell(bamcov_raw_cmd())
 
 rule plotEnrichment:
     input:
