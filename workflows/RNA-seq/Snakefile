@@ -158,7 +158,7 @@ def run_allelesp_mapping():
                         suffix = allele_suffix),
         expand("allelic_bams/{sample}.{suffix}.sorted.bam.bai", sample = samples,
                         suffix = allele_suffix),
-        expand("BW/allele_specific/{sample}.{suffix}.RPKM.bw", sample = samples,
+        expand("bamCoverage/allele_specific/{sample}.{suffix}.RPKM.bw", sample = samples,
                         suffix = ['genome1', 'genome2']),
         expand("featureCounts/{sample}_allelic_counts.txt", sample=samples),
         "featureCounts/allelic_counts.txt"

@@ -4,13 +4,13 @@ rule bamCoverage_RPKM_allelic:
         bam = "allelic_bams/{sample}.{suffix}.sorted.bam",
         bai = "allelic_bams/{sample}.{suffix}.sorted.bam.bai"
     output:
-        "BW/allele_specific/{sample}.{suffix}.RPKM.bw"
+        "bamCoverage/allele_specific/{sample}.{suffix}.RPKM.bw"
     params:
         bw_binsize = config["bw_binsize"]
     log:
-        "BW/allele_specific/logs/bamCoverage_RPKM.{sample}.{suffix}.log"
+        "bamCoverage/allele_specific/logs/bamCoverage_RPKM.{sample}.{suffix}.log"
     benchmark:
-        "BW/allele_specific/.benchmark/bamCoverage_RPKM.{sample}.{suffix}.benchmark"
+        "bamCoverage/allele_specific/.benchmark/bamCoverage_RPKM.{sample}.{suffix}.benchmark"
     threads: 8
     run:
         shell(bamcov_rpkm_cmd())
@@ -37,7 +37,7 @@ rule plotEnrichment_allelic:
 
 rule multiBigwigSummary_bed_allelic:
     input:
-        bw = expand("BW/allele_specific/{sample}.{suffix}.RPKM.bw", sample=samples, suffix = ['genome1', 'genome2']),
+        bw = expand("bamCoverage/allele_specific/{sample}.{suffix}.RPKM.bw", sample=samples, suffix = ['genome1', 'genome2']),
         bed = "Annotation/genes.filtered.bed",
     output:
         "deepTools_qc/multiBigwigSummary/coverage_allelic.bed.npz"

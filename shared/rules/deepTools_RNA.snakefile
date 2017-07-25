@@ -4,13 +4,13 @@ rule bamCoverage_RPKM:
         bam = mapping_prg+"/{sample}.bam",
         bai = mapping_prg+"/{sample}.bam.bai"
     output:
-        "BW/{sample}.RPKM.bw"
+        "bamCoverage/{sample}.RPKM.bw"
     params:
         bw_binsize = config["bw_binsize"]
     log:
-        "BW/logs/bamCoverage_RPKM.{sample}.log"
+        "bamCoverage/logs/bamCoverage_RPKM.{sample}.log"
     benchmark:
-        "BW/.benchmark/bamCoverage_RPKM.{sample}.benchmark"
+        "bamCoverage/.benchmark/bamCoverage_RPKM.{sample}.benchmark"
     threads: 8
     run:
         shell(bamcov_rpkm_cmd())
@@ -37,7 +37,7 @@ rule plotEnrichment:
 
 rule multiBigwigSummary_bed:
     input:
-        bw = expand("BW/{sample}.RPKM.bw", sample=samples),
+        bw = expand("bamCoverage/{sample}.RPKM.bw", sample=samples),
         bed = "Annotation/genes.filtered.bed",
     output:
         "deepTools_qc/multiBigwigSummary/coverage.bed.npz"
