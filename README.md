@@ -1,15 +1,16 @@
 MPI-IE Snakemake workflows
 
-Fabian Kilpert, Andreas Richter, Steffen Heyne
+Fabian Kilpert, Andreas Richter, Steffen Heyne, Michael Rauer, Vivek Bhardwaj
 
 2016-2017
 
 ## Workflows ##
 
 - DNA-mapping
-- ChIP-seq
-- RNA-seq
+- ChIP-seq (normal and allele-specific)
+- RNA-seq (normal and allele-specific)
 - scRNA-seq
+- ATAC-seq
 
 ## Quick start ##
 
@@ -63,14 +64,14 @@ A **configuration file is required for the ChIP-seq workflow** and should adhere
 	#
 	# In order to adjust some parameters, please either use the wrapper script
 	# (eg. /path/to/snakemake_workflows/workflows/DNA-mapping/DNA-mapping)
-	# or save a copy of this file, modify necessary parameters and then provide 
-	# this file to the wrapper or snakmake via '--configfile' option 
+	# or save a copy of this file, modify necessary parameters and then provide
+	# this file to the wrapper or snakmake via '--configfile' option
 	# (see below how to call the snakefile directly)
 	#
-	# Own parameters will be loaded during snakefile executiuon as well and hence 
+	# Own parameters will be loaded during snakefile executiuon as well and hence
 	# can be used in new/extended snakemake rules!
 	################################################################################
-	## General/Snakemake parameters, only used/set by wrapper or in Snakemake cmdl, but not in Snakefile 
+	## General/Snakemake parameters, only used/set by wrapper or in Snakemake cmdl, but not in Snakefile
 	outdir:
 	configfile:
 	local: False
@@ -115,9 +116,9 @@ A **configuration file is required for the ChIP-seq workflow** and should adhere
 	################################################################################
 	# Call snakemake directly, i.e. without using the wrapper script:
 	#
-	# Please save a copy of this config yaml file and provide an adjusted config 
+	# Please save a copy of this config yaml file and provide an adjusted config
 	# via '--configfile' parameter!
-	# example call: 
+	# example call:
 	#
 	# snakemake --snakefile /path/to/snakemake_workflows/workflows/DNA-mapping/Snakefile
 	#           --configfile /path/to/snakemake_workflows/workflows/DNA-mapping/defaults.yaml
@@ -168,14 +169,14 @@ When enabling read trimming, additional directories will be generated containing
 	#
 	# In order to adjust some parameters, please either use the wrapper script
 	# (eg. /path/to/snakemake_workflows/workflows/ChIP-seq/ChIP-seq)
-	# or save a copy of this file, modify necessary parameters and then provide 
-	# this file to the wrapper or snakmake via '--configfile' option 
+	# or save a copy of this file, modify necessary parameters and then provide
+	# this file to the wrapper or snakmake via '--configfile' option
 	# (see below how to call the snakefile directly)
 	#
-	# Own parameters will be loaded during snakefile executiuon as well and hence 
+	# Own parameters will be loaded during snakefile executiuon as well and hence
 	# can be used in new/extended snakemake rules!
 	################################################################################
-	## General/Snakemake parameters, only used/set by wrapper or in Snakemake cmdl, but not in Snakefile 
+	## General/Snakemake parameters, only used/set by wrapper or in Snakemake cmdl, but not in Snakefile
 	configfile:
 	tempdir: /data/extended/
 	local: false
@@ -196,9 +197,9 @@ When enabling read trimming, additional directories will be generated containing
 	################################################################################
 	# Call snakemake directly, i.e. without using the wrapper script:
 	#
-	# Please save a copy of this config yaml file and provide an adjusted config 
+	# Please save a copy of this config yaml file and provide an adjusted config
 	# via '--configfile' parameter!
-	# example call: 
+	# example call:
 	#
 	# snakemake --snakefile /path/to/snakemake_workflows/workflows/ChIP-seq/Snakefile
 	#           --configfile /path/to/snakemake_workflows/workflows/ChIP-seq/defaults.yaml
