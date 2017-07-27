@@ -20,7 +20,7 @@ include: os.path.join(workflow.basedir, "internals.snakefile")
 ### include modules of other snakefiles ########################################
 ################################################################################
 # deepTools ChIP
-include: os.path.join(maindir, "shared", "rules", "deepTools_ChIP.snakefile")
+# include: os.path.join(maindir, "shared", "rules", "deepTools_ChIP.snakefile")
 
 # ATAC-seq open chromatin
 include: os.path.join(maindir, "shared", "rules", "ATAC.snakefile")
@@ -33,8 +33,7 @@ onstart:
         print("--- Workflow parameters --------------------------------------------------------")
         print("samples:", samples)
         print("paired:", paired)
-        print("maximum insert size (Bowtie2 -X):", insert_size_max)
-        print("Nucleosomal Fragments cutoff: ", minNucleosomalFragmentSize)
+        print("ATAC fragment cutoff: ", atac_fragment_cutoff)
         print("-" * 80, "\n")
 
         print("--- Environment ----------------------------------------------------------------")
