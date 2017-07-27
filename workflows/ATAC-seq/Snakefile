@@ -1,4 +1,3 @@
-
 import os
 
 
@@ -18,98 +17,24 @@ globals().update(cf.load_organism_data(genome,maindir,config["verbose"]))
 # do workflow specific stuff now
 include: os.path.join(workflow.basedir, "internals.snakefile")
 
-
 ### include modules of other snakefiles ########################################
 ################################################################################
-# FASTQ: either downsample FASTQ files or create symlinks to input files
-include: os.path.join(maindir, "shared", "rules", "FASTQ.snakefile")
-
-# FastQC
-if fastqc:
-    include: os.path.join(maindir, "shared", "rules", "FastQC.snakefile")
-
-# TrimGalore
-if trim:
-    include: os.path.join(maindir, "shared", "rules", "TrimGalore.snakefile")
-
-# Bowtie2 mapping, duplicate marking, BAM filtering and indexing
-include: os.path.join(maindir, "shared", "rules", "Bowtie2_bam_filtering.snakefile")
-
-# Picard CollectAlignmentSummaryMetrics and CollectInsertSizeMetrics
-include: os.path.join(maindir, "shared", "rules", "Picard_qc.snakefile")
-
-# deepTools QC
-include: os.path.join(maindir, "shared", "rules", "deepTools_qc.snakefile")
-
-# Qualimap BAM QC
-include: os.path.join(maindir, "shared", "rules", "Qualimap_bamqc.snakefile")
+# deepTools ChIP
+include: os.path.join(maindir, "shared", "rules", "deepTools_ChIP.snakefile")
 
 # ATAC-seq open chromatin
 include: os.path.join(maindir, "shared", "rules", "ATAC.snakefile")
-
-
-### conditional/optional rules #################################################
-################################################################################
-def run_FastQC(fastqc):
-    if fastqc:
-        return( expand("FastQC/{sample}{read}_fastqc.html", sample = samples, read = reads) )
-    else:
-        return([])
-
-def run_Trimming(trim, fastqc):
-    if trim and fastqc:
-        return( expand(fastq_dir+"/{sample}{read}.fastq.gz", sample = samples, read = reads) +
-                expand("FastQC_trimmed/{sample}{read}_fastqc.html", sample = samples, read = reads) )
-    elif trim:
-        return( expand(fastq_dir+"/{sample}{read}.fastq.gz", sample = samples, read = reads) )
-    else:
-        return([])
-
-def run_CollectInsertSizeMetrics(paired):
-    if paired:
-        return( expand("Picard_qc/InsertSizeMetrics/{sample}.insert_size_metrics.txt", sample = samples) )
-    else:
-        return([])
-
-def run_bamCoverage_filtered(dedup, properpairs, mapq):
-    if (dedup or properpairs or mapq > 0):
-        return( expand("bamCoverage/{sample}.filtered.seq_depth_norm.bw", sample = samples) )
-    else:
-        return([])
-
-def run_computeGCBias(gcbias):
-    if gcbias:
-        return( expand("deepTools_qc/computeGCBias/{sample}.filtered.GCBias.png", sample = samples) )
-    else:
-        return([])
-
-def run_deepTools_qc():
-    file_list = ["deepTools_qc/plotCoverage/read_coverage.png"]
-    if len(samples) > 1 :
-        file_list.append( [
-        "deepTools_qc/plotCorrelation/correlation.pearson.read_coverage.heatmap.png",
-        "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage.heatmap.png",
-        "deepTools_qc/plotPCA/PCA.read_coverage.png" ] )
-    return (file_list)
-
-def run_Qualimap():
-    file_list = []
-    if qualimap:
-        file_list += expand("Qualimap_qc/{sample}.filtered.bamqc_report.html", sample = samples)
-        file_list += expand("Qualimap_qc/{sample}.filtered.bamqc_results.txt", sample = samples)
-    return (file_list)
 
 
 ### execute before workflow starts #############################################
 ################################################################################
 onstart:
     if "verbose" in config and config["verbose"]:
-        print('config[verbose]:', config['verbose'])
         print("--- Workflow parameters --------------------------------------------------------")
         print("samples:", samples)
         print("paired:", paired)
-        print("read extension:", reads)
         print("maximum insert size (Bowtie2 -X):", insert_size_max)
+        print("Nucleosomal Fragments cutoff: ", minNucleosomalFragmentSize)
         print("-" * 80, "\n")
 
         print("--- Environment ----------------------------------------------------------------")
@@ -117,23 +42,22 @@ onstart:
         print("$HOSTNAME: ",os.getenv('HOSTNAME', ""))
         print("-" * 80, "\n")
 
+        print("--- Genome ---------------------------------------------------------------------")
+        print("Genome:", genome)
+        print("Effective genome size:", genome_size)
+        print("Genome FASTA:", genome_fasta)
+        print("Genome index:", genome_index)
+        print("Genome 2bit:", genome_2bit)
+        print("Bowtie2 index:", bowtie2_index)
+        print("Gene annotation BED:", genes_bed)
+        print("Gene annotation GTF:", genes_gtf)
+        print("Blacklist regions BED:", blacklist_bed)
+        print("-" * 80, "\n")
+
 ### main rule ##################################################################
 ################################################################################
 rule all:
     input:
-        expand("FASTQ/{sample}{read}.fastq.gz", sample = samples, read = reads),
-        run_FastQC(fastqc),
-        run_Trimming(trim, fastqc),
-        expand("Bowtie2/{sample}.bam.bai", sample = samples),
-        expand("filtered_bam/{sample}.filtered.bam.bai", sample = samples),
-        expand("Picard_qc/AlignmentSummaryMetrics/{sample}.alignment_summary_metrics.txt", sample = samples),
-        expand("Picard_qc/MarkDuplicates/{sample}.mark_duplicates_metrics.txt", sample = samples),
-        run_CollectInsertSizeMetrics(paired),
-        expand("bamCoverage/{sample}.seq_depth_norm.bw", sample = samples),
-        run_bamCoverage_filtered(dedup, properpairs, mapq),
-        run_computeGCBias(gcbias),
-        run_deepTools_qc(),
-        run_Qualimap(),
         # #
         # # ## prepare for ATAC peak calling
         # # # 1) sort by query
