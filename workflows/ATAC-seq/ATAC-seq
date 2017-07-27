@@ -3,13 +3,12 @@
 __version__ = "0.0.1"
 
 __description__ = """
-DNA-mapping workflow v{version} - MPI-IE workflow for calling open chromatin
-from ATAC-seq
+DNA-mapping workflow v{version} - MPI-IE workflow for ATAC-seq Analysis
 Michael Rauer, Fabian Kilpert, Andreas Richter, Steffen Heyne
 Jue 21, 2017
 
 usage example:
-    ATAC-seq -i input-dir -o output-dir mm10
+    ATAC-seq -d workdir mm10
 """.format(version=__version__)
 
 
@@ -24,7 +23,7 @@ import shutil
 import yaml
 
 sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))))+"/shared/")
-import common_functions
+import common_functions as cf
 
 
 def parse_args(defaults):
@@ -34,61 +33,54 @@ def parse_args(defaults):
 
     parser = argparse.ArgumentParser(
         prog=sys.argv[0],
-        formatter_class=argparse.RawDescriptionHelpFormatter, description=textwrap.dedent(__description__)
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        description=textwrap.dedent(__description__),
+        add_help=False
     )
 
+    optional = parser._action_groups.pop() # Edited this line
 
     ## positional/required
-    parser.add_argument("genome", metavar="GENOME", help="genome acronym of target organism (supported: 'dm6', 'hs37d5', 'mm9', 'mm10', 'SchizoSPombe_ASM294v2') or file path to your own genome config!")
+    parser.add_argument("genome", metavar="GENOME", help="genome acronym of target organism (supported: 'dm3', 'dm6', 'hs37d5', 'mm9', 'mm10', 'SchizoSPombe_ASM294v2')")
+
+    required = parser.add_argument_group('required arguments')
+    required.add_argument("-d", "--working-dir", dest="workingdir", help="working directory is output directory and must contain DNA-mapping pipeline output files",required=True)
+
+    general = parser.add_argument_group('general arguments')
+    general.add_argument("-h", "--help", action="help", help="show this help message and exit")
+    general.add_argument("-v", "--verbose", dest="verbose", action="store_true", help="verbose output (default: '%(default)s')", default=defaults["verbose"])
+    general.add_argument("-c", "--configfile", dest="configfile", help="configuration file: config.yaml (default: '%(default)s')", default=defaults["configfile"])
+    general.add_argument("-j", "--jobs", dest="max_jobs", metavar="INT", help="maximum number of concurrently submitted Slurm jobs / cores if workflow is run locally (default: '%(default)s')", type=int, default=defaults["max_jobs"])
+    general.add_argument("--local", dest="local", action="store_true", default=False, help="run workflow locally; default: jobs are submitted to Slurm queue (default: '%(default)s')")
+    general.add_argument("--snakemake_options", dest="snakemake_options", metavar="STR", type=str, help="Snakemake options to be passed directly to snakemake, e.g. use --snakemake_options='--dryrun --rerun-incomplete --unlock --forceall'. (default: '%(default)s')", default=defaults["snakemake_options"])
+    general.add_argument("--tempdir", dest="tempdir", type=str, help="used prefix path for temporary directory created via mktemp. Created temp dir gets exported as $TMPDIR and is removed at the end of this wrapper! (default: '%(default)s')", default=defaults["tempdir"])
+
     ## optional
-    parser.add_argument("-c", "--configfile", dest="configfile", help="configuration file: config.yaml (default: '%(default)s')", default=defaults["configfile"])
-    parser.add_argument("-i", "--input-dir", dest="indir", help="input directory containing the FASTQ files, either paired-end OR single-end data (default: '%(default)s')", default=defaults["indir"])
-    parser.add_argument("-o", "--output-dir", dest="outdir", help="output directory (default: '%(default)s')", default=defaults["outdir"])
-    parser.add_argument("-j", "--jobs", dest="max_jobs", metavar="INT", help="maximum number of concurrently submitted Slurm jobs / cores if workflow is run locally (default: '%(default)s')", type=int, default=defaults["max_jobs"])
-    parser.add_argument("--local", dest="local", action="store_true", default=False, help="run workflow locally; default: jobs are submitted to Slurm queue (default: '%(default)s')")
-    parser.add_argument("--snakemake_options", dest="snakemake_options", metavar="STR", type=str, help="Snakemake options to be passed directly to snakemake, e.g. use --snakemake_options='--dryrun --rerun-incomplete --unlock --forceall'. (default: '%(default)s')", default='')
-    parser.add_argument("--downsample", dest="downsample", metavar="INT", help="downsample the given number of reads from the head of each FASTQ file (default: '%(default)s')", type=int, default=defaults["downsample"])
-    parser.add_argument("--trim_prg", dest="trim_prg", choices=['cutadapt', 'trimgalore'], help="trimming program: Cutadapt or TrimGalore (default: '%(default)s')", default=defaults["trim_prg"])
-    parser.add_argument("--trim", dest="trim", action="store_true", help="activate trimming (default: '%(default)s')", default=defaults["trim"])
-    parser.add_argument("--qualimap", dest="qualimap", action="store_true", help="activate Qualimap (default: '%(default)s')", default=defaults["qualimap"])
-    parser.add_argument("--fastqc", dest="fastqc", action="store_true", help="run FastQC read quality control (default: '%(default)s')", default=defaults["fastqc"])
-    parser.add_argument("--dedup", dest="dedup", action="store_true", help="retain only de-duplicated reads/read pairs (given single-/paired-end data), recommended for ChIP-seq data (default: '%(default)s')", default=defaults["dedup"])
-    parser.add_argument("--properpairs", dest="properpairs", action="store_true", help="retain only reads mapping in proper pairs (default: '%(default)s')", default=defaults["properpairs"])
-    parser.add_argument("--mapq", dest="mapq", metavar="INT", help="retain only reads with at least the given mapping quality (default: '%(default)s')", type=int, default=defaults["mapq"])
+    parser._action_groups.append(optional)
+    parser.add_argument("--single-end", dest="paired", action="store_false", help="input data is single-end, not paired-end (default: '%(default)s')", default=defaults["paired"])
     parser.add_argument("--bw-binsize", dest="bw_binsize", metavar="INT", help="bin size of output files in bigWig format (default: '%(default)s')", type=int, default=defaults["bw_binsize"])
-    parser.add_argument("--insert-size", dest="insert_size_max", metavar="INT", help="Maximum insert size allowed during mapping (default: '%(default)s')", type=int, default=1000)
-    parser.add_argument("--fragment-filter", dest="fragmentFilterThreshold", metavar="INT", help="Size threshold for filtering of nucleosomal fragments(default: '%(default)s')", type=int, default=defaults['fragmentFilterThreshold'])
-    parser.add_argument("--gcbias", dest="gcbias", action="store_true", help="run computeGCBias quality control (long runtime!) (default: '%(default)s')", default=defaults["gcbias"])
-    parser.add_argument("--tempdir", dest="tempdir", type=str, help="used prefix path for temporary directory created via mktemp. Created temp dir gets exported as $TMPDIR and is removed at the end of this wrapper! (default: '%(default)s')", default=defaults["tempdir"])
-    parser.add_argument("-v", "--verbose", dest="verbose", action="store_true", help="verbose output (default: '%(default)s')", default=defaults["verbose"])
+    parser.add_argument("--fragment-cutoff", dest="minNucleosomalFragmentSize", metavar="INT", help="Size threshold for filtering of nucleosomal fragments(default: '%(default)s')", type=int, default=defaults['minNucleosomalFragmentSize'])
 
     args = parser.parse_args()
 
-    ## Variable sanity checking
-    ## None
-
-    ## correction to variables
-    try:
-        args.indir = os.path.abspath(args.indir)
-    except:
-        args.indir = os.path.abspath(os.getcwd())
-
-    try:
-        args.outdir = os.path.abspath(args.outdir)
-    except:
-        args.outdir = os.path.abspath(os.getcwd())
-
-    try:
-        args.configfile = os.path.abspath(args.configfile)
-    except:
-        args.configfile = None
-
-    try:
-        args.downsample = int(args.downsample)
-    except:
-        args.downsample = None
-
+    ## checks for parameters necessary in wrapper
+    if os.path.exists(args.workingdir):
+        args.workingdir = os.path.abspath(args.workingdir)
+    else:
+        print("\nError! Working-dir (-d) dir not found! ({})\n".format(args.workingdir))
+        exit(1)
+    args.outdir = args.workingdir
     args.cluster_logs_dir = os.path.join(args.outdir, "cluster_logs")
+
+    if args.configfile and not os.path.exists(args.configfile):
+        print("\nError! Provided configfile (-c) not found! ({})\n".format(args.configfile))
+        exit(1)
+
+    if os.path.exists(os.path.abspath(args.samples_config)):
+        args.samples_config = os.path.abspath(args.samples_config)
+    else:
+        print("\nError! Sample config file not found! ({})\n".format(args.samples_config))
+        exit(1)
 
     return args
 
@@ -106,8 +98,7 @@ def main():
     main_dir_path = os.path.join(os.path.dirname(os.path.dirname(this_script_dir)))
 
     ## defaults
-    with open(os.path.join(this_script_dir, "defaults.yaml"), "r") as f:
-        defaults = yaml.load(f)
+    defaults = cf.load_configfile(os.path.join(this_script_dir, "defaults.yaml"),False)
 
     ## get command line arguments
     args = parse_args(defaults)
@@ -118,17 +109,16 @@ def main():
     ## merge configuration dicts
     config = defaults   # 1) form defaults.yaml
     if args.configfile:
-        with open(args.configfile, "r") as f:
-            user_config = yaml.load(f)
-        config = merge_dicts(config, user_config) # 2) form user_config.yaml
-    config = merge_dicts(config, vars(args)) # 3) from wrapper parameters
+        user_config = cf.load_configfile(args.configfile,False)
+        config = cf.merge_dicts(config, user_config) # 2) form user_config.yaml
+    config_wrap = cf.config_diff(vars(args),defaults) # 3) from wrapper parameters
+    config = cf.merge_dicts(config, config_wrap)
 
     ## Output directory + log directory
     subprocess.call("[ -d {cluster_logs_dir} ] || mkdir -p {cluster_logs_dir}".format(cluster_logs_dir=args.cluster_logs_dir), shell=True)
 
     ## save to configs.yaml in outdir
-    with open(os.path.join(args.outdir,'config.yaml'), 'w') as f:
-        yaml.dump(config, f, default_flow_style=True)
+    cf.write_configfile(os.path.join(args.outdir,'ATAC-seq.config.yaml'),config)
 
     snakemake_module_load = "module load snakemake slurm &&".split()
     snakemake_cmd = """
@@ -151,7 +141,7 @@ def main():
 
     ## create local temp dir and add this path to environment as $TMPDIR variable
     ## on SLURM: $TMPDIR is set, created and removed by SlurmEasy on cluster node
-    temp_path = common_functions.make_temp_dir(args.tempdir, args.outdir, args.verbose)
+    temp_path = cf.make_temp_dir(args.tempdir, args.outdir)
     snakemake_exports = ("export TMPDIR="+temp_path+" && ").split()
 
     cmd = " ".join(snakemake_exports + snakemake_module_load + snakemake_cmd + snakemake_log)
