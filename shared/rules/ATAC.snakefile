@@ -21,6 +21,8 @@ rule sortByName:
     shell:
         samtools_path+"samtools sort {params.byQuery} -@ {threads} {input} -o {output} &> {log}" ## TMPDIR (environment variable) for scratch usage
 
+
+## actually wrong fragment shifting
 rule reads2fragments:
     input:
         bam = "peaks_openChromatin/{sample}.filtered.sorted.bam"
@@ -38,7 +40,7 @@ rule filterFragments:
     output:
         bedpe="peaks_openChromatin/{sample}.openchrom.bedpe"
     params:
-        cutoff = fragmentFilterThreshold
+        cutoff = atac_fragment_cutoff
     shell:
         "cat {input} | "
         "awk -v cutoff={params.cutoff} -v OFS='\\t' \"{{ if(\$3-\$2 < cutoff) {{ print (\$0) }} }}\" > "

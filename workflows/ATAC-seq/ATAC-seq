@@ -59,7 +59,7 @@ def parse_args(defaults):
     parser._action_groups.append(optional)
     parser.add_argument("--single-end", dest="paired", action="store_false", help="input data is single-end, not paired-end (default: '%(default)s')", default=defaults["paired"])
     parser.add_argument("--bw-binsize", dest="bw_binsize", metavar="INT", help="bin size of output files in bigWig format (default: '%(default)s')", type=int, default=defaults["bw_binsize"])
-    parser.add_argument("--fragment-cutoff", dest="minNucleosomalFragmentSize", metavar="INT", help="Size threshold for filtering of nucleosomal fragments(default: '%(default)s')", type=int, default=defaults['minNucleosomalFragmentSize'])
+    parser.add_argument("--atac-fragment-cutoff", dest="atac_fragment_cutoff", metavar="INT", help="Size threshold for filtering of nucleosomal fragments(default: '%(default)s')", type=int, default=defaults['atac_fragment_cutoff'])
 
     args = parser.parse_args()
 
@@ -175,7 +175,7 @@ def main():
             # job_ids = subprocess.check_output("""ls {cluster_logs_dir} | awk -F "." '{{print $NF}}' | sed 's/e\|o//' | sort -u""".format(cluster_logs_dir=cluster_logs_dir), shell=True).split()
             # for job_id in job_ids:
             #     subprocess.call( "qdel {} 2>&1 >/dev/null".format(str(job_id)), shell="bash" )
-
+    
     ## remove temp dir
     if (temp_path != "" and os.path.exists(temp_path)):
         shutil.rmtree(temp_path, ignore_errors=True)
