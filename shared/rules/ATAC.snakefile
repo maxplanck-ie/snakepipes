@@ -7,13 +7,19 @@
 #         # step1 identify all chroms and produce bed, w/o mitochondrion
 #         samtools idxstats ATAC_S11.bam | cut -f 1 | grep 'mitochondrion'
 #         # step2 write reads according to bed file
-
+# rule link:
+#     input:
+#         "filtered_bam/{sample}.filtered.bam"
+#     output:
+#         "peaks_openChromatin/{sample}.filtered.bam"
+#     shell:
+#         "ln -s {input} {output}"
 
 rule sortByName:
     input:
-        bam = "filtered_bam/{sample}.filtered.bam"
+        "filtered_bam/{sample}.filtered.bam"
     output:
-        bam = "peaks_openChromatin/{sample}.filtered.sorted.bam"
+        "peaks_openChromatin/{sample}.filtered.sorted.bam"
     params:
         byQuery='-n'
     threads: 6
@@ -23,19 +29,19 @@ rule sortByName:
 
 rule reads2fragments:
     input:
-        bam = "peaks_openChromatin/{sample}.filtered.sorted.bam"
+        "peaks_openChromatin/{sample}.filtered.sorted.bam"
     output:
-        bedpe = "peaks_openChromatin/{sample}.all.bedpe"
+        "peaks_openChromatin/{sample}.all.bedpe"
     shell:
         "/package/bedtools2/bin/bedtools bamtobed -bedpe -i {input} | "
         "awk -v OFS='\\t' -v pos_offset=\"4\" -v neg_offset=\"5\" "
-        "'{{ print($1, $2 - pos_offset , $6 + neg_offset ) }} > {output}"
+        "'{{ print($1, $2 - pos_offset , $6 + neg_offset ) }}' > {output}"
 
 rule filterFragments:
     input:
-        bedpe="peaks_openChromatin/{sample}.all.bedpe"
+        "peaks_openChromatin/{sample}.all.bedpe"
     output:
-        bedpe="peaks_openChromatin/{sample}.openchrom.bedpe"
+        "peaks_openChromatin/{sample}.openchrom.bedpe"
     params:
         cutoff = atac_fragment_cutoff
     shell:
@@ -54,7 +60,7 @@ rule filterFragments:
 
 rule callOpenChromatin:
     input:
-        bedpe= "peaks_openChromatin/{sample}.openchrom.bedpe"
+        "peaks_openChromatin/{sample}.openchrom.bedpe"
     output:
         peaks='peaks_openChromatin/openchromatin_{sample}_peaks.narrowPeak',
         pileup='peaks_openChromatin/openchromatin_{sample}_treat_pileup.bdg',

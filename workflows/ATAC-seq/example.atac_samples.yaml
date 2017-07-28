@@ -6,16 +6,8 @@
 # or not. In the latter case, the enrichment is instead punctuate/narrow
 # (e.g. TFs, active histone marks as H3K27ac or H3K4me3).
 #
-# Example:
-# chip_dict:
-#   my_H3K27ac_sample:
-#     control: my_Input_sample
-#     broad: False
-#   my_H3K27me3_sample:
-#     control: my_Input_sample
-#     broad: True
-#
 # IMPORTANT: Use only whitespace, but NO TAB indentation in this YAML file!
 ################################################################################
 atac_dict:
-  ATAC_S12
+  ATAC_S12:
+    None

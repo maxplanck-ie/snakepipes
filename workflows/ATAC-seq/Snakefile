@@ -19,12 +19,15 @@ include: os.path.join(workflow.basedir, "internals.snakefile")
 
 ### include modules of other snakefiles ########################################
 ################################################################################
-# deepTools ChIP
-# include: os.path.join(maindir, "shared", "rules", "deepTools_ChIP.snakefile")
-
 # ATAC-seq open chromatin
 include: os.path.join(maindir, "shared", "rules", "ATAC.snakefile")
 
+# for sample in expand("filtered_bam/{sample}.filtered.bam", sample = samples):
+#     print(sample)
+#     if not os.path.isfile(sample):
+#         raise FileNotFoundError("The sample does not exist: ", sample)
+#     else:
+#         print ("Sample found")
 
 ### execute before workflow starts #############################################
 ################################################################################
@@ -57,22 +60,8 @@ onstart:
 ################################################################################
 rule all:
     input:
-        # #
-        # # ## prepare for ATAC peak calling
-        # # # 1) sort by query
-        # # # 2) convert bam to bedpe
-        # # # 3) filter fragments
-        expand("peaks_openChromatin/{sample}.filtered.sorted.bam", sample = samples),
-        expand("peaks_openChromatin/{sample}.all.bedpe", sample = samples),
-        expand("peaks_openChromatin/{sample}.openchrom.bedpe", sample = samples),
-        expand("peaks_openChromatin/{sample}.all.fragdistr", sample=samples),
-        # #
-        # # ## perform peak calling
-        expand("peaks_openChromatin/openchromatin_{sample}_peaks.narrowPeak", sample = samples),
-        expand('peaks_openChromatin/openchromatin_{sample}_treat_pileup.bdg', sample = samples),
-        expand('peaks_openChromatin/openchromatin_{sample}_control_lambda.bdg', sample = samples),
-        expand("peaks_openChromatin/openchromatin_{sample}_{condition}.bw", sample = samples, condition = ('control_lambda','treat_pileup'))
-
+        expand('peaks_openChromatin/{sample}.filtered.sorted.bam', sample = samples),
+        expand('peaks_openChromatin/openchromatin_{sample}_peaks.narrowPeak', sample = samples)
 ### execute after workflow finished ############################################
 ################################################################################
 onsuccess:

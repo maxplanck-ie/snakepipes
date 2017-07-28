@@ -14,11 +14,6 @@ import yaml
 
 ### Initialization #############################################################
 
-# TODO: catch exception if ChIP-seq samples are not unique
-# read ChIP-seq dictionary from config.yaml:
-# { ChIP1: { control: Input1, broad: True }, ChIP2: { control: Input2, broad: false }
-#config["atac_dict"] = {}
-
 ## Require configuration file (samples.yaml)
 if not os.path.isfile(samples_config):
     print("ERROR: Cannot find samples file ("+samples_config+")")
@@ -39,9 +34,7 @@ cf.write_configfile(os.path.join("atac_samples.yaml"),atac_dict)
 # create unique sets of control samples, ChIP samples with and without control
 
 
-samples = [x for x in [atac_dict]]
-
-
+samples = list([str(x) for x in list(atac_dict.keys())])
 
 # consistency check whether all required files exist for all samples
 for sample in samples:
