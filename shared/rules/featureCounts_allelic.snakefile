@@ -30,6 +30,6 @@ rule merge_featureCounts:
     input:
         expand("featureCounts/{sample}.allelic_counts.txt", sample=samples)
     output:
-        "featureCounts/counts_allelic.txt"
+        "featureCounts/counts_allelic.tsv"
     shell:
         R_path + "Rscript "+os.path.join(maindir, "shared", "tools", "merge_featureCounts.R")+" {output} {input}"
