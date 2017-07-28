@@ -140,7 +140,7 @@ def plotPCA_cmd(what):
             "&> {log}") )
 
 # plot Coverage
-def plotCov_cmd():
+def plotCoverage_cmd():
     return( (deepTools_path+"plotCoverage " +
                 "-b {input.bams} " +
                 "-o {output} " +

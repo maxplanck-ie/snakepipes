@@ -93,7 +93,7 @@ rule plotCoverage:
         "deepTools_qc/.benchmark/plotCoverage.benchmark"
     threads: 24
     run:
-        shell(plotCov_cmd())
+        shell(plotCoverage_cmd())
 
 ### deepTools multiBamSummary ##################################################
 
