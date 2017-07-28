@@ -29,10 +29,9 @@ rule reads2fragments:
     output:
         bedpe = "peaks_openChromatin/{sample}.all.bedpe"
     shell:
-            "/package/bedtools2/bin/bedtools bamtobed -bedpe -i {input} | cut -f 1,2,6 | "
-            "awk -v OFS='\\t' -v pos_offset=\"4\" -v neg_offset=\"5\" "
-            "'{{ if( $9 == \"+\" ) {{ print($1, $2 + pos_offset , $3 - neg_offset ) }} "
-            "else {{print($1, $2 - neg_offset , $3 + pos_offset) }} }}' > {output}"
+        "/package/bedtools2/bin/bedtools bamtobed -bedpe -i {input} | "
+        "awk -v OFS='\\t' -v pos_offset=\"4\" -v neg_offset=\"5\" "
+        "'{{ print($1, $2 - pos_offset , $6 + neg_offset ) }} > {output}"
 
 rule filterFragments:
     input:
