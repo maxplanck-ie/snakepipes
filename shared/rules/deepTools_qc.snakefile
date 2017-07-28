@@ -115,7 +115,7 @@ rule multiBamSummary:
         "deepTools_qc/.benchmark/multiBamSummary.benchmark"
     threads: 24
     run:
-        shell(multiBamSum_cmd())
+        shell(multiBamSummary_cmd())
 
 
 ### deepTools plotCorrelation ##################################################

@@ -90,7 +90,7 @@ rule multiBamSummary_allelic:
         "deepTools_qc/.benchmark/multiBamSummary_allelic.benchmark"
     threads: 24
     run:
-        shell(multiBamSum_cmd())
+        shell(multiBamSummary_cmd())
 
 
 ### deepTools plotCorrelation ##################################################

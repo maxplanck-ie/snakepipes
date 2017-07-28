@@ -67,7 +67,7 @@ def plotEnrich_cmd():
         "&> {log}") )
 
 # multiBAMsum ChIP
-def multiBamSum_cmd():
+def multiBamSummary_cmd():
     return( (deepTools_path+"multiBamSummary bins " +
                     "-b {input.bams} " +
                     "-o {output} " +
