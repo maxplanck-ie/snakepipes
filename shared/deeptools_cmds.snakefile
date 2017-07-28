@@ -19,6 +19,7 @@ def bamcov_cmd():
                 "--binSize {params.bw_binsize} " +
                 "-p {threads} " +
                 "--normalizeTo1x {params.genome_size} " +
+                "--ignoreForNormalization {params.ignore} " +
                 "{params.read_extension} " +
                 "&> {log}")
 
