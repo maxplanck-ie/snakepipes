@@ -45,13 +45,14 @@ rule filterFragments:
         "awk -v cutoff={params.cutoff} -v OFS='\\t' \"{{ if(\$3-\$2 < cutoff) {{ print (\$0) }} }}\" > "
         "{output}"
 
-rule fragmentSizeDistribution:
-    input:
-        "peaks_openChromatin/{sample}.all.bedpe"
-    output:
-        "peaks_openChromatin/{sample}.all.fragdistr"
-    shell:
-        "cat {input} | awk '{{ print($3 - $2) }}' | sort -h | uniq -c > {output}"
+## Should be done by ATAC_qc
+# rule fragmentSizeDistribution:
+#     input:
+#         "peaks_openChromatin/{sample}.all.bedpe"
+#     output:
+#         "peaks_openChromatin/{sample}.all.fragdistr"
+#     shell:
+#         "cat {input} | awk '{{ print($3 - $2) }}' | sort -h | uniq -c > {output}"
 
 rule callOpenChromatin:
     input:
@@ -81,13 +82,14 @@ rule callOpenChromatin:
             "{params.fileformat} {params.bandwidth} {params.qval_cutoff} {params.nomodel} {params.write_bdg} "
             "&> {log}"
 
-rule bedGraphToBigWig:
-    input:
-        "peaks_openChromatin/openchromatin_{sample}_{condition}.bdg"
-    output:
-        "peaks_openChromatin/openchromatin_{sample}_{condition}.bw"
-    params:
-        chromsize=genome_index
-    log: "peaks_openChromatin/logs/bedGraphToBigWig/openChromatin_{sample}_{condition}.log"
-    shell:
-        "/package/UCSCtools/bedGraphToBigWig {input} {params.chromsize} {output} &> {log}"
+## shoud be done by bamCoverage
+# rule bedGraphToBigWig:
+#     input:
+#         "peaks_openChromatin/openchromatin_{sample}_{condition}.bdg"
+#     output:
+#         "peaks_openChromatin/openchromatin_{sample}_{condition}.bw"
+#     params:
+#         chromsize=genome_index
+#     log: "peaks_openChromatin/logs/bedGraphToBigWig/openChromatin_{sample}_{condition}.log"
+#     shell:
+#         "/package/UCSCtools/bedGraphToBigWig {input} {params.chromsize} {output} &> {log}"
