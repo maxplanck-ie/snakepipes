@@ -44,9 +44,10 @@ if ( any(grepl("^[0-9]", sampleInfo$name)) ) {
 
 ## counts
 countdata <- read.table(countFilePath, header=TRUE)
+# check setup table
+checktable(alleleSpecific = allelic_info)
 
 ## now run DESeq wrapper
-checktable(alleleSpecific = allelic_info)
 seqout <- DESeq_basic(countdata, coldata = sampleInfo, fdr = fdr)
 
 DESeq_downstream(DEseqout = seqout, countdata, sampleInfo,
