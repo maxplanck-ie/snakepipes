@@ -9,21 +9,23 @@
 
 args = commandArgs(TRUE)
 
-source("DE_functions.R")
 
 ## re invented RNaseq workflow
 sampleInfoFilePath <- args[1]
 countFilePath <- args[2]
-geneNamesFilePath <- args[4]
 fdr <- as.numeric(args[3])
-topN <- as.numeric(args[5])
+geneNamesFilePath <- args[4]
+importfunc <- args[5]
 allelic_info <- args[6]
+topN <- 50
+## include functions
+source(importfunc)
 
 ## fix default FDR significance threshold
 if ( is.na(fdr) ) fdr <- 0.05
 
 ## fix default topN genes to plot
-if ( is.na(topN) ) topN = 50
+if ( is.na(topN) ) topN <- 50
 
 ## print the info
 cat(paste("Working dir:", getwd(), "\n"))

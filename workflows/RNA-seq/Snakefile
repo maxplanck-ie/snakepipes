@@ -153,7 +153,6 @@ def run_allelesp_mapping():
     if "allelic-mapping" in mode:
         allele_suffix = ['allele_flagged', 'genome1', 'genome2', 'unassigned']
         file_list = [
-        #expand(mapping_prg+"/{sample}.bam.bai", sample = samples),
         expand("allelic_bams/{sample}.{suffix}.sorted.bam", sample = samples,
                         suffix = allele_suffix),
         expand("allelic_bams/{sample}.{suffix}.sorted.bam.bai", sample = samples,
