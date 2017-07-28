@@ -160,8 +160,8 @@ def run_allelesp_mapping():
                         suffix = allele_suffix),
         expand("bamCoverage/allele_specific/{sample}.{suffix}.RPKM.bw", sample = samples,
                         suffix = ['genome1', 'genome2']),
-        expand("featureCounts/{sample}_allelic_counts.txt", sample=samples),
-        "featureCounts/allelic_counts.txt"
+        expand("featureCounts/{sample}.allelic_counts.txt", sample=samples),
+        "featureCounts/counts_allelic.txt"
         ]
         if sample_info:
             file_list.append( ["DESeq2/DESeq2.session_info.txt"] )

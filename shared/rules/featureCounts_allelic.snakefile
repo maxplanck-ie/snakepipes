@@ -8,7 +8,7 @@ rule featureCounts_allele:
         allele1 = "allelic_bams/{sample}.genome1.sorted.bam",
         allele2 = "allelic_bams/{sample}.genome2.sorted.bam"
     output:
-        'featureCounts/{sample}_allelic_counts.txt'
+        'featureCounts/{sample}.allelic_counts.txt'
     params:
         libtype = library_type,
         paired_opt = lambda wildcards: "-p -B " if paired else "",
@@ -28,8 +28,8 @@ rule featureCounts_allele:
 
 rule merge_featureCounts:
     input:
-        expand("featureCounts/{sample}_allelic_counts.txt", sample=samples)
+        expand("featureCounts/{sample}.allelic_counts.txt", sample=samples)
     output:
-        "featureCounts/allelic_counts.txt"
+        "featureCounts/counts_allelic.txt"
     shell:
         R_path + "Rscript "+os.path.join(maindir, "shared", "tools", "merge_featureCounts.R")+" {output} {input}"
