@@ -21,8 +21,6 @@ rule sortByName:
     shell:
         samtools_path+"samtools sort {params.byQuery} -@ {threads} {input} -o {output} &> {log}" ## TMPDIR (environment variable) for scratch usage
 
-
-## actually wrong fragment shifting
 rule reads2fragments:
     input:
         bam = "peaks_openChromatin/{sample}.filtered.sorted.bam"
