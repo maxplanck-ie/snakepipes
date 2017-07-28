@@ -73,8 +73,6 @@ rule all:
         expand('peaks_openChromatin/openchromatin_{sample}_control_lambda.bdg', sample = samples),
         expand("peaks_openChromatin/openchromatin_{sample}_{condition}.bw", sample = samples, condition = ('control_lambda','treat_pileup'))
 
-
-
 ### execute after workflow finished ############################################
 ################################################################################
 onsuccess:
