@@ -7,13 +7,6 @@
 #         # step1 identify all chroms and produce bed, w/o mitochondrion
 #         samtools idxstats ATAC_S11.bam | cut -f 1 | grep 'mitochondrion'
 #         # step2 write reads according to bed file
-# rule link:
-#     input:
-#         "filtered_bam/{sample}.filtered.bam"
-#     output:
-#         "peaks_openChromatin/{sample}.filtered.bam"
-#     shell:
-#         "ln -s {input} {output}"
 
 rule sortByName:
     input:
@@ -49,15 +42,6 @@ rule filterFragments:
         "awk -v cutoff={params.cutoff} -v OFS='\\t' \"{{ if(\$3-\$2 < cutoff) {{ print (\$0) }} }}\" > "
         "{output}"
 
-## Should be done by ATAC_qc
-# rule fragmentSizeDistribution:
-#     input:
-#         "peaks_openChromatin/{sample}.all.bedpe"
-#     output:
-#         "peaks_openChromatin/{sample}.all.fragdistr"
-#     shell:
-#         "cat {input} | awk '{{ print($3 - $2) }}' | sort -h | uniq -c > {output}"
-
 rule callOpenChromatin:
     input:
         "peaks_openChromatin/{sample}.openchrom.bedpe"
@@ -85,15 +69,3 @@ rule callOpenChromatin:
             "--outdir {params.directory} "
             "{params.fileformat} {params.bandwidth} {params.qval_cutoff} {params.nomodel} {params.write_bdg} "
             "&> {log}"
-
-## shoud be done by bamCoverage
-# rule bedGraphToBigWig:
-#     input:
-#         "peaks_openChromatin/openchromatin_{sample}_{condition}.bdg"
-#     output:
-#         "peaks_openChromatin/openchromatin_{sample}_{condition}.bw"
-#     params:
-#         chromsize=genome_index
-#     log: "peaks_openChromatin/logs/bedGraphToBigWig/openChromatin_{sample}_{condition}.log"
-#     shell:
-#         "/package/UCSCtools/bedGraphToBigWig {input} {params.chromsize} {output} &> {log}"
