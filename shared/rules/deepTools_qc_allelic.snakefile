@@ -10,6 +10,7 @@ rule bamCoverage_allelic:
     params:
         bw_binsize = bw_binsize,
         genome_size = int(genome_size),
+        ignore = "X Y M",
         read_extension = "--extendReads" if paired
                          else "--extendReads "+str(fragment_length),
         blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed
@@ -20,8 +21,8 @@ rule bamCoverage_allelic:
         "bamCoverage/allele_specific/.benchmark/bamCoverage.{sample}.{suffix}.benchmark"
     threads: 16
     run:
-        shell(bamcov_cmd()) #+ " {params.blacklist}")
-        #shell(cmd)
+        cmd = (bamcov_cmd() + " {params.blacklist}")
+        shell(cmd)
 
 ### deepTools computeGCBias ####################################################
 
