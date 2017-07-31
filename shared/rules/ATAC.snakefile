@@ -14,19 +14,19 @@ rule sortByName:
     input:
         "filtered_bam/{sample}.filtered.bam"
     output:
-        outdir_MACS2+"/{sample}.filtered.sorted.bam"
+        os.path.join(outdir_MACS2, "/{sample}.filtered.sorted.bam")
     params:
         byQuery='-n'
     threads: 6
-    log: outdir_MACS2+"/logs/sortByName/{sample}.log"
+    log: os.path.join(outdir_MACS2, "/logs/sortByName/{sample}.log")
     shell:
         samtools_path+"samtools sort {params.byQuery} -@ {threads} {input} -o {output} &> {log}" ## TMPDIR (environment variable) for scratch usage
 
 rule reads2fragments:
     input:
-        outdir_MACS2 + "/{sample}.filtered.sorted.bam"
+        os.path.join(outdir_MACS2, "/{sample}.filtered.sorted.bam")
     output:
-        outdir_MACS2 + "/{sample}.all.bedpe"
+        os.path.join(outdir_MACS2, "/{sample}.all.bedpe")
     shell:
         "/package/bedtools2/bin/bedtools bamtobed -bedpe -i {input} | "
         "awk -v OFS='\\t' -v pos_offset=\"4\" -v neg_offset=\"5\" "

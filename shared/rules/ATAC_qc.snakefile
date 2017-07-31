@@ -6,7 +6,7 @@ def isFloat(string):
         return False
 
 MACS2_qc_folder = 'MACS2_qc/'
-deeptools_ATAC = "deepTools_ATAC"
+deeptools_ATAC = "deeptools_ATAC"
 
 rule MACS2_peak_qc:
     input:
@@ -14,14 +14,14 @@ rule MACS2_peak_qc:
         aln_metrics = "Picard_qc/AlignmentSummaryMetrics/{sample}.alignment_summary_metrics.txt",
         xls = 'peaks_openChromatin/openchromatin_{sample}_peaks.xls'
     output:
-        qc = MACS2_qc_folder + "{sample}.filtered.BAM_peaks.qc.txt"
+        qc = os.path.join(MACS2_qc_folder, "{sample}.filtered.BAM_peaks.qc.txt")
     params:
-        peaks = 'peaks_openChromatin/openchromatin_{sample}_peaks.narrowPeak',
+        peaks = os.path.join(MACS2_qc_folder, '/openchromatin_{sample}_peaks.narrowPeak'),
         genome_index = genome_index
     log:
-        MACS2_qc_folder + "logs/MACS2_peak_qc.{sample}.filtered.log"
+        os.path.join(MACS2_qc_folder, "logs/MACS2_peak_qc.{sample}.filtered.log")
     benchmark:
-        MACS2_qc_folder + ".benchmark/MACS2_peak_qc.{sample}.filtered.benchmark"
+        os.path.join(MACS2_qc_folder, ".benchmark/MACS2_peak_qc.{sample}.filtered.benchmark")
     run:
         # get the number of peaks
         cmd = "cat "+params.peaks+" | wc -l"
@@ -54,34 +54,3 @@ rule MACS2_peak_qc:
             f.write("peak_count\tFRiP\tpeak_genome_coverage\n"
                     "{:d}\t{:.3f}\t{:.4f}\n".format(
                     peak_count, frip, genomecov))
-
-rule plotFingerprint:
-    input:
-        bams = expand("filtered_bam/{sample}.filtered.bam", sample = samples),
-        bais = expand("filtered_bam/{sample}.filtered.bam.bai", sample = samples)
-    output:
-        metrics = "deepTools_ATAC/plotFingerprint/plotFingerprint.metrics.txt"
-    params:
-        labels = " ".join(samples),
-        blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed
-                    else "",
-        read_extension = "--extendReads",
-        png = "--plotFile " + deeptools_ATAC + "/plotFingerprint/plotFingerprint.png" if (len(samples)<=20)
-              else ""
-    log:
-        deeptools_ATAC + "/logs/plotFingerprint.log"
-    benchmark:
-        deeptools_ATAC + "/.benchmark/plotFingerprint.benchmark"
-    threads: 24
-    shell:
-        deepTools_path+"plotFingerprint "
-        "-b {input.bams} "
-        "--labels {params.labels} "
-        "--plotTitle 'Cumulative read counts per bin without duplicates' "
-        "--ignoreDuplicates "
-        "--outQualityMetrics {output.metrics} "
-        "-p {threads} "
-        "{params.blacklist} "
-        "{params.png} "
-        "{params.read_extension} "
-        "&> {log}"
