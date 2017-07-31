@@ -19,6 +19,10 @@ include: os.path.join(workflow.basedir, "internals.snakefile")
 
 ### include modules of other snakefiles ########################################
 ################################################################################
+
+# ATAC QC open chromatin
+include: os.path.join(maindir, "shared", "rules", "ATAC_qc.snakefile")
+
 # ATAC-seq open chromatin
 include: os.path.join(maindir, "shared", "rules", "ATAC.snakefile")
 
@@ -61,7 +65,9 @@ onstart:
 rule all:
     input:
         expand('peaks_openChromatin/{sample}.filtered.sorted.bam', sample = samples),
-        expand('peaks_openChromatin/openchromatin_{sample}_peaks.narrowPeak', sample = samples)
+        expand('peaks_openChromatin/openchromatin_{sample}_peaks.narrowPeak', sample = samples),
+        "deepTools_ATAC/plotFingerprint/plotFingerprint.metrics.txt"
+
 ### execute after workflow finished ############################################
 ################################################################################
 onsuccess:
