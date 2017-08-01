@@ -1,4 +1,3 @@
-outdir_MACS2 = 'MACS2_openChromatin/'
 
 # rule filterMitochondrion:
 #     input:
@@ -14,19 +13,19 @@ rule sortByName:
     input:
         "filtered_bam/{sample}.filtered.bam"
     output:
-        os.path.join(outdir_MACS2, "/{sample}.filtered.sorted.bam")
+        os.path.join(outdir_MACS2, "{sample}.filtered.sorted.bam")
     params:
         byQuery='-n'
     threads: 6
-    log: os.path.join(outdir_MACS2, "/logs/sortByName/{sample}.log")
+    log: os.path.join(outdir_MACS2, "logs","sortByName","{sample}.log")
     shell:
         samtools_path+"samtools sort {params.byQuery} -@ {threads} {input} -o {output} &> {log}" ## TMPDIR (environment variable) for scratch usage
 
 rule reads2fragments:
     input:
-        os.path.join(outdir_MACS2, "/{sample}.filtered.sorted.bam")
+        os.path.join(outdir_MACS2, "{sample}.filtered.sorted.bam")
     output:
-        os.path.join(outdir_MACS2, "/{sample}.all.bedpe")
+        os.path.join(outdir_MACS2, "{sample}.all.bedpe")
     shell:
         "/package/bedtools2/bin/bedtools bamtobed -bedpe -i {input} | "
         "awk -v OFS='\\t' -v pos_offset=\"4\" -v neg_offset=\"5\" "
@@ -34,9 +33,9 @@ rule reads2fragments:
 
 rule filterFragments:
     input:
-        outdir_MACS2 + "/{sample}.all.bedpe"
+        os.path.join(outdir_MACS2, "{sample}.all.bedpe")
     output:
-        outdir_MACS2 + "/{sample}.openchrom.bedpe"
+        os.path.join(outdir_MACS2, "{sample}.openchrom.bedpe")
     params:
         cutoff = atac_fragment_cutoff
     shell:
@@ -46,11 +45,11 @@ rule filterFragments:
 
 rule callOpenChromatin:
     input:
-        outdir_MACS2 + "/{sample}.openchrom.bedpe"
+        os.path.join(outdir_MACS2, "{sample}.openchrom.bedpe")
     output:
-        peaks=outdir_MACS2 + '/openchromatin_{sample}_peaks.narrowPeak',
-        pileup=outdir_MACS2 + '/openchromatin_{sample}_treat_pileup.bdg',
-        ctrl=outdir_MACS2 + '/openchromatin_{sample}_control_lambda.bdg'
+        peaks = os.path.join(outdir_MACS2, 'openchromatin_{sample}_peaks.narrowPeak'),
+        pileup = os.path.join(outdir_MACS2, 'openchromatin_{sample}_treat_pileup.bdg'),
+        ctrl = os.path.join(outdir_MACS2, 'openchromatin_{sample}_control_lambda.bdg')
     params:
         directory = outdir_MACS2,
         genome=genome[0:2],
@@ -61,7 +60,7 @@ rule callOpenChromatin:
         write_bdg='--bdg',
         fileformat='--format BEDPE'
     threads: 6
-    log: outdir_MACS2 + "/logs/callOpenChromatin/{sample}_macs2.log"
+    log: os.path.join(outdir_MACS2, "/logs/callOpenChromatin/{sample}_macs2.log")
     shell: # or run:
         ## macs2
         macs2_path+"macs2 callpeak "
