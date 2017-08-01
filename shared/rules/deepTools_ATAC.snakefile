@@ -1,19 +1,20 @@
 deeptools_ATAC='deepTools_ATAC'
 
 
-rule bamCoverageCutsite:
-    input:
-        bam = "filtered_bam/{sample}.filtered.cutsites.bam",
-        bai = "filtered_bam/{sample}.filtered.cutsites.bam.bai"
-    output:
-        os.path.join(deeptools_ATAC, "{sample}.cutsites.bw")
-    params:
-        pass
-    log:
-        pass
-    benchmark:
-        pass
-    shell:
+# rule bamCoverageCutsite:
+#     input:
+#         bam = "filtered_bam/{sample}.filtered.cutsites.bam",
+#         bai = "filtered_bam/{sample}.filtered.cutsites.bam.bai"
+#     output:
+#         os.path.join(deeptools_ATAC, "{sample}.cutsites.bw")
+#     # params:
+#     #     pass
+#     log:
+#         pass
+#     benchmark:
+#         pass
+#     shell:
+#         pass
         # 1) convert bedpe to bam
         # 2) produce bw tracks
         # 3) remove bam
@@ -25,14 +26,10 @@ rule bamCoverageFragments:
     output:
         os.path.join(deeptools_ATAC, "{sample}.fragments.bw" )
     params:
-        bw_binsize = bw_binsize
-        genome_size = genome_size
+        bw_binsize = bw_binsize,
+        genome_size = genome_size,
         read_extension = "--extendReads"
     threads: 16
-    log:
-
-    benchmark:
-        pass
     shell:
         deepTools_path+"bamCoverage "
         "-b {input.bam} "
@@ -56,13 +53,13 @@ rule plotFingerprint:
         blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed
                     else "",
         read_extension = "--extendReads",
-        png = os.path.join("--plotFile ",  deeptools_ATAC ,
-         "/plotFingerprint/plotFingerprint.png") if (len(samples)<=20)
+        png = "--plotFile " +os.path.join(deeptools_ATAC ,
+         "plotFingerprint","plotFingerprint.png") if (len(samples)<=20)
               else ""
     log:
-        os.path.join(deeptools_ATAC, "/logs/plotFingerprint.log")
+        os.path.join(deeptools_ATAC, "logs","plotFingerprint.log")
     benchmark:
-        os.path.join(deeptools_ATAC, "/.benchmark/plotFingerprint.benchmark")
+        os.path.join(deeptools_ATAC, ".benchmark","plotFingerprint.benchmark")
     threads: 24
     shell:
         deepTools_path+"plotFingerprint "
