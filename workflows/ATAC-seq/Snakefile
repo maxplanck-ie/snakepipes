@@ -14,6 +14,8 @@ globals().update(cf.load_configfile(workflow.overwrite_configfile,config["verbos
 # load organism-specific data, i.e. genome indices, annotation, etc.
 globals().update(cf.load_organism_data(genome,maindir,config["verbose"]))
 
+outdir_MACS2 = 'MACS2_openChromatin/'
+
 # do workflow specific stuff now
 include: os.path.join(workflow.basedir, "internals.snakefile")
 
@@ -67,8 +69,8 @@ onstart:
 ################################################################################
 rule all:
     input:
-        expand('peaks_openChromatin/{sample}.filtered.sorted.bam', sample = samples),
-        expand('peaks_openChromatin/openchromatin_{sample}_peaks.narrowPeak', sample = samples),
+        expand(os.path.join(outdir_MACS2, '{sample}.filtered.sorted.bam'), sample = samples),
+        expand(os.path.join(outdir_MACS2, 'openchromatin_{sample}_peaks.narrowPeak'), sample = samples),
         "deepTools_ATAC/plotFingerprint/plotFingerprint.metrics.txt"
 
 ### execute after workflow finished ############################################
