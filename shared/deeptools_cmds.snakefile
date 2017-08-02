@@ -2,6 +2,20 @@
 ################################################################################
 import os
 
+## bamcompare
+def bamcompare_log2_cmd():
+    return(deepTools_path+"bamCompare " +
+    "-b1 {input.chip_bam} " +
+    "-b2 {input.control_bam} " +
+    "-o {output} " +
+    "--ratio log2 " +# ratio + " " +
+    "--scaleFactorsMethod readCount " +
+    "--binSize {params.bw_binsize} " +
+    "-p {threads} " +
+    "{params.read_extension} " +
+    "{params.blacklist} " +
+    "&> {log}")
+
 # bamCoverage RAW
 def bamcov_raw_cmd():
     return(deepTools_path+"bamCoverage " +
@@ -11,7 +25,7 @@ def bamcov_raw_cmd():
             "-p {threads} " +
             "&> {log}")
 
-# bamCoverage CHIP
+# bamCoverage DNA
 def bamcov_cmd():
     return(deepTools_path+"bamCoverage " +
                 "-b {input.bam} " +
@@ -32,7 +46,7 @@ def bamcov_rpkm_cmd():
             " --normalizeUsingRPKM "
             "&> {log}") )
 
-## computeGC bias (chIPseq)
+## computeGC bias (DNA)
 def gcbias_cmd():
             if params.paired:
                 median_fragment_length = cf.get_fragment_length(input.insert_size_metrics)
@@ -54,18 +68,49 @@ def gcbias_cmd():
 
 # plot Enrichment (RNAseq)
 def plotEnrich_cmd():
-    return( (deepTools_path+"plotEnrichment "
-        "-p {threads} "
-        "-b {input.bam} "
-        "--BED {input.gtf} {input.gtf2} "
-        "--plotFile {output.png} "
-        "--labels {params.labels} "
-        "--plotTitle 'Fraction of reads in regions' "
-        "--outRawCounts {output.tsv} "
-        "--variableScales "
+    return( (deepTools_path+"plotEnrichment " +
+        "-p {threads} " +
+        "-b {input.bam} " +
+        "--BED {input.gtf} {input.gtf2} " +
+        "--plotFile {output.png} " +
+        "--labels {params.labels} " +
+        "--plotTitle 'Fraction of reads in regions' " +
+        "--outRawCounts {output.tsv} " +
+        "--variableScales " +
         "&> {log}") )
 
-# multiBAMsum ChIP
+# plot Enrichment (ChIPSeq)
+def plotEnrich_chip_cmd():
+    return((deepTools_path+"plotEnrichment " +
+        "-b {input.bams} " +
+        "--BED {params.genes_gtf} " +
+        "--plotFile {output.png} " +
+        "--labels {params.labels} " +
+        "--plotTitle 'Sigal enrichment (fraction of reads) without duplicates' " +
+        "--outRawCounts {output.tsv} " +
+        "--variableScales " +
+        "{params.blacklist} " +
+        "-p {threads} " +
+        "{params.read_extension} " +
+        "--ignoreDuplicates " +
+        "&> {log}"))
+
+#plot fingerprint (ChIP-seq)
+def plotFingerprint_cmd():
+    return((deepTools_path+"plotFingerprint " +
+    "-b {input.bams} " +
+    "--labels {params.labels} " +
+    "--plotTitle 'Cumulative read counts per bin without duplicates' " +
+    "--ignoreDuplicates " +
+    "--outQualityMetrics {output.metrics} " +
+    "-p {threads} " +
+    "{params.blacklist} " +
+    "{params.png} " +
+    "{params.read_extension} " +
+    "{params.jsd} " +
+    "&> {log}"))
+
+# multiBAMsummary DNA
 def multiBamSum_cmd():
     return( (deepTools_path+"multiBamSummary bins " +
                     "-b {input.bams} " +
@@ -79,13 +124,13 @@ def multiBamSum_cmd():
 
 # multiBAMsum RNA
 def multiBWsum_bed_cmd():
-    return( (deepTools_path+"multiBigwigSummary BED-file "
-                "--BED {input.bed} "
-                "-b {input.bw} "
-                "-o {output} "
-                "--labels {params.labels} "
-                "--binSize 1000 "
-                "-p {threads} "
+    return( (deepTools_path+"multiBigwigSummary BED-file " +
+                "--BED {input.bed} " +
+                "-b {input.bw} " +
+                "-o {output} " +
+                "--labels {params.labels} " +
+                "--binSize 1000 " +
+                "-p {threads} " +
                 "&> {log} "))
 
 ## plot Corr (both)
@@ -135,7 +180,7 @@ def plotPCA_cmd(what):
     return( (deepTools_path+"plotPCA " +
             "-in {input} " +
             "-o {output} " +
-            "-T 'PCA of fragment coverage' " +
+            "-T 'PCA of "+what+" coverage' " +
             "&> {log}") )
 
 # plot Coverage
