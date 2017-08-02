@@ -108,7 +108,7 @@ rule plotCorrelation_pearson_allelic:
     benchmark:
         "deepTools_qc/.benchmark/plotCorrelation_pearson_allelic.benchmark"
     run:
-        shell(plotCorr_cmd())
+        shell(plotCorr_cmd('fragment'))
 
 # Spearman: heatmap, scatterplot and correlation matrix
 rule plotCorrelation_spearman_allelic:
@@ -123,7 +123,7 @@ rule plotCorrelation_spearman_allelic:
     benchmark:
         "deepTools_qc/.benchmark/plotCorrelation_spearman_allelic.benchmark"
     run:
-        shell(plotCorrSP_cmd())
+        shell(plotCorrSP_cmd('fragment'))
 
 ### deepTools plotPCA ##########################################################
 rule plotPCA_allelic:
@@ -136,4 +136,4 @@ rule plotPCA_allelic:
     benchmark:
         "deepTools_qc/.benchmark/plotPCA_allelic.benchmark"
     run:
-        shell(plotPCA_cmd())
+        shell(plotPCA_cmd('fragment'))
