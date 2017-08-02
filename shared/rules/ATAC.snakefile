@@ -26,8 +26,11 @@ rule reads2fragments:
         os.path.join(outdir_MACS2, "{sample}.filtered.sorted.bam")
     output:
         os.path.join(outdir_MACS2, "{sample}.all.bedpe")
+    params:
+        samtools_macs2filter="-f 2 -F 4 -F 8 -F 256 -F 512 -F 2048"
     shell:
-        "/package/bedtools2/bin/bedtools bamtobed -bedpe -i {input} | "
+        samtools_path + "samtools view -b {params.samtools_macs2filter} {input} |"
+        "/package/bedtools2/bin/bedtools bamtobed -bedpe -i - | "
         "awk -v OFS='\\t' -v pos_offset=\"4\" -v neg_offset=\"5\" "
         "'{{ print($1, $2 - pos_offset , $6 + neg_offset ) }}' > {output}"
 
@@ -42,6 +45,8 @@ rule filterFragments:
         "cat {input} | "
         "awk -v cutoff={params.cutoff} -v OFS='\\t' \"{{ if(\$3-\$2 < cutoff) {{ print (\$0) }} }}\" > "
         "{output}"
+
+# samtools view -b -f 2 -F 4 -F 8 -F 256 -F 512 -F 2048
 
 rule callOpenChromatin:
     input:
@@ -60,7 +65,7 @@ rule callOpenChromatin:
         write_bdg='--bdg',
         fileformat='--format BEDPE'
     threads: 6
-    log: os.path.join(outdir_MACS2, "/logs/callOpenChromatin/{sample}_macs2.log")
+    log: os.path.join(outdir_MACS2, "logs", "callOpenChromatin","{sample}_macs2.log")
     shell: # or run:
         ## macs2
         macs2_path+"macs2 callpeak "
