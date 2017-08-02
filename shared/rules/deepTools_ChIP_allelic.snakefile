@@ -1,6 +1,6 @@
 ### deepTools bamCompare log2ratio #######################################################
 
-rule bamCompare_log2_allelic:
+rule bamCompare_log2_genome1:
     input:
         chip_bam = "allelic_bams/{chip_sample}.genome1.sorted.bam",
         chip_bai = "allelic_bams/{chip_sample}.genome1.sorted.bam.bai",
@@ -22,7 +22,7 @@ rule bamCompare_log2_allelic:
     run:
         shell(bamcompare_log2_cmd())
 
-rule bamCompare_log2_allelic2:
+rule bamCompare_log2_genome2:
     input:
         chip_bam = "allelic_bams/{chip_sample}.genome2.sorted.bam",
         chip_bai = "allelic_bams/{chip_sample}.genome2.sorted.bam.bai",
