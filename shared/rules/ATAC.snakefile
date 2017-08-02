@@ -34,9 +34,20 @@ rule reads2fragments:
         "awk -v OFS='\\t' -v pos_offset=\"4\" -v neg_offset=\"5\" "
         "'{{ print($1, $2 - pos_offset , $6 + neg_offset ) }}' > {output}"
 
-rule filterFragments:
+rule filterChromosomes:
     input:
         os.path.join(outdir_MACS2, "{sample}.all.bedpe")
+    output:
+        os.path.join(outdir_MACS2, "{sample}.all_filtered.bedpe")
+    params:
+        chromlist = '^'+'(' + '|'.join( ('dmel_mitochondrion_genome', '3R','3L','2R', '2L', 'X', '4', 'Y') ) + ')' + '[[:space:]]' # dm6!
+    shell:
+        "egrep \'{params.chromlist}\' {input} > {output}"
+
+
+rule filterNucleosomalFragments:
+    input:
+        os.path.join(outdir_MACS2, "{sample}.all_filtered.bedpe")
     output:
         os.path.join(outdir_MACS2, "{sample}.openchrom.bedpe")
     params:
@@ -45,6 +56,7 @@ rule filterFragments:
         "cat {input} | "
         "awk -v cutoff={params.cutoff} -v OFS='\\t' \"{{ if(\$3-\$2 < cutoff) {{ print (\$0) }} }}\" > "
         "{output}"
+
 
 # samtools view -b -f 2 -F 4 -F 8 -F 256 -F 512 -F 2048
 
