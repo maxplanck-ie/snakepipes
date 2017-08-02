@@ -103,7 +103,7 @@ def main():
 
     ## get command line arguments
     args = parse_args(defaults)
-    
+
     args.this_script_dir = this_script_dir
     args.main_dir_path = main_dir_path
 
@@ -135,7 +135,7 @@ def main():
         snakemake_cmd.append("--printshellcmds")
 
     if not args.local:
-        snakemake_cmd += ["--cluster 'SlurmEasy --threads {threads} --log", args.cluster_logs_dir, "--name {rule}.snakemake'"]
+        snakemake_cmd += ["--cluster 'SlurmEasy --threads {threads} --log", args.cluster_logs_dir, str(config['slurm_options'] or '') , "--name {rule}.snakemake'"]
 
     snakemake_log = "2>&1 | tee -a {}/ATAC-seq.log".format(args.outdir).split()
 
