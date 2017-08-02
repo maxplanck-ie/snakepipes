@@ -9,7 +9,8 @@ rule bamCoverage:
     params:
         bw_binsize = bw_binsize,
         genome_size = int(genome_size),
-        ignore = "X Y M",
+        ignoreForNorm = "--ignoreForNormalization X Y M" if False
+                        else "",
         read_extension = "--extendReads" if paired
                          else "--extendReads "+str(fragment_length)
     log:
@@ -32,7 +33,8 @@ rule bamCoverage_filtered:
     params:
         bw_binsize = bw_binsize,
         genome_size = int(genome_size),
-        ignore = "X Y M",
+        ignoreForNorm = "--ignoreForNormalization X Y M" if False
+                        else "",
         read_extension = "--extendReads" if paired
                          else "--extendReads "+str(fragment_length),
         blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed
