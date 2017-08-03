@@ -42,6 +42,7 @@ rule samtools_filter:
         "filtered_bam/logs/samtools_filter.{sample}.log"
     benchmark:
         "filtered_bam/.benchmark/samtools_filter.{sample}.benchmark"
+    threads: 8
     run:
         # string with samtools view parameters for filtering
         filter = ""
@@ -54,7 +55,7 @@ rule samtools_filter:
 
         if filter:
             shell(
-                samtools_path+"samtools view "
+                samtools_path+"samtools view -@ {threads} "
                 "-b "+filter+" {input} > {output.bam} "
                 "2> {log} "
                 "&& echo 'samtools view arguments: "+filter+"' > {output.filter_file}"
@@ -75,7 +76,7 @@ rule samtools_index:
     shell:
         samtools_path+"samtools index {input}"
 
-rule samtools_index2:
+rule samtools_index_filtered:
     input:
         "filtered_bam/{sample}.bam"
     output:
