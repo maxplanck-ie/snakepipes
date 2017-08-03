@@ -99,31 +99,18 @@ def plotEnrich_chip_cmd():
 #plot fingerprint (ChIP-seq)
 def plotFingerprint_cmd():
     return((deepTools_path+"plotFingerprint " +
-    "-b {input.bams} " +
-    "--labels {params.labels} " +
-    "--plotTitle 'Cumulative read counts per bin without duplicates' " +
-    "--ignoreDuplicates " +
-    "--outQualityMetrics {output.metrics} " +
-    "-p {threads} " +
-    "{params.blacklist} " +
-    "{params.png} " +
-    "{params.read_extension} " +
-    "{params.jsd} " +
-    "&> {log}"))
+            "-b {input.bams} " +
+            "--labels {params.labels} " +
+            "--plotTitle 'Cumulative read counts per bin without duplicates' " +
+            "--ignoreDuplicates " +
+            "--outQualityMetrics {output.metrics} " +
+            "-p {threads} " +
+            "{params.blacklist} " +
+            "{params.png} " +
+            "{params.read_extension} " +
+            "{params.jsd} " +
+            "&> {log}"))
 
-# multiBAMsummary DNA
-def multiBamSum_cmd():
-=======
-    return( (deepTools_path+"plotEnrichment "
-        "-p {threads} "
-        "-b {input.bam} "
-        "--BED {input.gtf} {input.gtf2} "
-        "--plotFile {output.png} "
-        "--labels {params.labels} "
-        "--plotTitle 'Fraction of reads in regions' "
-        "--outRawCounts {output.tsv} "
-        "--variableScales "
-        "&> {log}") )
 
 # multiBAMsum ChIP
 def multiBamSummary_cmd():
