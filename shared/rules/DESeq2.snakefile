@@ -48,7 +48,9 @@ rule DESeq2_Salmon:
         "DESeq2_Salmon/.benchmark/DESeq2.Salmon.benchmark"
     params:
         outdir = "DESeq2_Salmon",
-        fdr = 0.05
+        fdr = 0.05,
+        importfunc = os.path.join(workflow_tools,"DE_functions.R"),
+        allele_info = 'FALSE'
     log: "DESeq2_Salmon/DESeq2.log"
     shell:
         "( cd {params.outdir} && export R_LIBS_USER="+R_libs_path+" && "
@@ -59,4 +61,5 @@ rule DESeq2_Salmon:
         "{params.fdr} "
         "{input.symbol_file} "
         "{params.importfunc} "
+        "{params.allele_info} "
         ") 2>&1 | tee {log}"
