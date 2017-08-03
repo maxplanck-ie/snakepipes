@@ -74,7 +74,7 @@ rule plotCorr_bed_pearson:
         "deepTools_qc/multiBigwigSummary/coverage.bed.npz"
     output:
         heatpng = "deepTools_qc/plotCorrelation/correlation.pearson.bed_coverage.heatmap.png",
-        scatterpng = "deepTools_qc/plotCorrelation/correlation.pearson.bed_coverage.scatterplot.png",
+        #scatterpng = "deepTools_qc/plotCorrelation/correlation.pearson.bed_coverage.scatterplot.png",
         tsv = "deepTools_qc/plotCorrelation/correlation.pearson.bed_coverage.tsv"
     log:
         "deepTools_qc/logs/plotCorrelation_pearson.log"
@@ -90,7 +90,7 @@ rule plotCorr_bed_spearman:
         "deepTools_qc/multiBigwigSummary/coverage.bed.npz"
     output:
         heatpng = "deepTools_qc/plotCorrelation/correlation.spearman.bed_coverage.heatmap.png",
-        scatterpng = "deepTools_qc/plotCorrelation/correlation.spearman.bed_coverage.scatterplot.png",
+        #scatterpng = "deepTools_qc/plotCorrelation/correlation.spearman.bed_coverage.scatterplot.png",
         tsv = "deepTools_qc/plotCorrelation/correlation.spearman.bed_coverage.tsv"
     log:
         "deepTools_qc/logs/plotCorrelation_spearman.log"
