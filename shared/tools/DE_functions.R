@@ -25,9 +25,7 @@ checktable <- function(alleleSpecific = FALSE) {
 DESeq_basic <- function(countdata, coldata, fdr) {
 	# Normal DESeq
 	print("Performing basic DESeq: test vs control")
-	rnasamp <- dplyr::select(countdata, ends_with("_all"))
-	colnames(rnasamp) <- gsub("(.*)_all", "\\1", colnames(rnasamp))
-	dds <- DESeq2::DESeqDataSetFromMatrix(countData = rnasamp,
+	dds <- DESeq2::DESeqDataSetFromMatrix(countData = countdata,
 							  colData = coldata, design = ~condition)
 	dds <- DESeq2::DESeq(dds)
 	ddr <- DESeq2::results(dds,alpha = fdr)
