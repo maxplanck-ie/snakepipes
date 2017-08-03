@@ -95,11 +95,11 @@ def run_CollectInsertSizeMetrics(paired):
     else:
         return([])
 
-def run_bamCoverage_filtered(dedup, properpairs, mapq):
-    if (dedup or properpairs or mapq > 0):
-        return( expand("bamCoverage/{sample}.filtered.seq_depth_norm.bw", sample = samples) )
-    else:
-        return([])
+# def run_bamCoverage_filtered(dedup, properpairs, mapq):
+#     if (dedup or properpairs or mapq > 0):
+#         return( expand("bamCoverage/{sample}.filtered.seq_depth_norm.bw", sample = samples) )
+#     else:
+#         return([])
 
 def run_computeGCBias(gcbias):
     if gcbias:
@@ -112,8 +112,10 @@ def run_computeGCBias(gcbias):
         return([])
 
 def run_deepTools_qc():
-    file_list = ["deepTools_qc/plotCoverage/read_coverage.png"]
-    if len(samples) > 1 :
+    file_list = []
+    if len(samples) <= 20:
+        file_list.append( ["deepTools_qc/plotCoverage/read_coverage.png"] )
+    if len(samples)>1 and len(samples)<=20:
         file_list.append( [
         "deepTools_qc/plotCorrelation/correlation.pearson.read_coverage.heatmap.png",
         "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage.heatmap.png",
@@ -193,7 +195,7 @@ rule all:
         run_CollectInsertSizeMetrics(paired),
         expand("bamCoverage/{sample}.seq_depth_norm.bw", sample = samples),
         expand("bamCoverage/{sample}.filtered.seq_depth_norm.bw", sample = samples),
-        run_bamCoverage_filtered(dedup, properpairs, mapq),
+        #run_bamCoverage_filtered(dedup, properpairs, mapq),
         run_computeGCBias(gcbias),
         run_deepTools_qc(),
         run_Qualimap(),
