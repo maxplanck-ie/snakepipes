@@ -19,6 +19,7 @@ def bamcov_cmd():
                 "--binSize {params.bw_binsize} " +
                 "-p {threads} " +
                 "--normalizeTo1x {params.genome_size} " +
+                "{params.ignoreForNorm} " +
                 "{params.read_extension} " +
                 "&> {log}")
 
@@ -66,7 +67,7 @@ def plotEnrich_cmd():
         "&> {log}") )
 
 # multiBAMsum ChIP
-def multiBamSum_cmd():
+def multiBamSummary_cmd():
     return( (deepTools_path+"multiBamSummary bins " +
                     "-b {input.bams} " +
                     "-o {output} " +
@@ -139,7 +140,7 @@ def plotPCA_cmd(what):
             "&> {log}") )
 
 # plot Coverage
-def plotCov_cmd():
+def plotCoverage_cmd():
     return( (deepTools_path+"plotCoverage " +
                 "-b {input.bams} " +
                 "-o {output} " +

@@ -10,6 +10,8 @@ rule bamCoverage_allelic:
     params:
         bw_binsize = bw_binsize,
         genome_size = int(genome_size),
+        ignoreForNorm = "--ignoreForNormalization X Y M" if False
+                 else "",
         read_extension = "--extendReads" if paired
                          else "--extendReads "+str(fragment_length),
         blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed
@@ -20,8 +22,8 @@ rule bamCoverage_allelic:
         "bamCoverage/allele_specific/.benchmark/bamCoverage.{sample}.{suffix}.benchmark"
     threads: 16
     run:
-        shell(bamcov_cmd()) #+ " {params.blacklist}")
-        #shell(cmd)
+        cmd = (bamcov_cmd() + " {params.blacklist}")
+        shell(cmd)
 
 ### deepTools computeGCBias ####################################################
 
@@ -68,7 +70,7 @@ rule plotCoverage_allelic:
         "deepTools_qc/.benchmark/plotCoverage_allelic.benchmark"
     threads: 24
     run:
-        shell(plotCov_cmd())
+        shell(plotCoverage_cmd())
 
 ### deepTools multiBamSummary ##################################################
 
@@ -90,7 +92,7 @@ rule multiBamSummary_allelic:
         "deepTools_qc/.benchmark/multiBamSummary_allelic.benchmark"
     threads: 24
     run:
-        shell(multiBamSum_cmd())
+        shell(multiBamSummary_cmd())
 
 
 ### deepTools plotCorrelation ##################################################
