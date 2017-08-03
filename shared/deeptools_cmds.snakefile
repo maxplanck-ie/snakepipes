@@ -101,14 +101,16 @@ def plotCorr_cmd(what):
                 "--outFileCorMatrix {output.tsv} " +
                 "--colorMap coolwarm " +
                 "--plotNumbers " +
-                "&> {log} && " +
-                deepTools_path+"plotCorrelation " +
-                "-in {input} " +
-                "-o {output.scatterpng} " +
-                "--corMethod pearson " +
-                "--whatToPlot scatterplot " +
-                "--plotTitle 'Pearson correlation of "+what+" coverage' " +
-                "&>> {log}") )
+                "&> {log}") ) 
+
+#                "&> {log} && " +
+#                deepTools_path+"plotCorrelation " +
+#                "-in {input} " +
+#                "-o {output.scatterpng} " +
+#                "--corMethod pearson " +
+#                "--whatToPlot scatterplot " +
+#                "--plotTitle 'Pearson correlation of "+what+" coverage' " +
+#                "&>> {log}") )
 
 ## plot Corr Spearman (both)
 def plotCorrSP_cmd(what):
@@ -122,14 +124,16 @@ def plotCorrSP_cmd(what):
         "--outFileCorMatrix {output.tsv} " +
         "--colorMap coolwarm " +
         "--plotNumbers " +
-        "&> {log} && " +
-        deepTools_path+"plotCorrelation " +
-        "-in {input} " +
-        "-o {output.scatterpng} " +
-        "--corMethod spearman " +
-        "--whatToPlot scatterplot " +
-        "--plotTitle 'Spearman correlation of "+what+" coverage' " +
-        "&>> {log}"))
+        "&> {log}"))
+
+#        "&> {log} && " +
+#        deepTools_path+"plotCorrelation " +
+#        "-in {input} " +
+#        "-o {output.scatterpng} " +
+#        "--corMethod spearman " +
+#        "--whatToPlot scatterplot " +
+#        "--plotTitle 'Spearman correlation of "+what+" coverage' " +
+#        "&>> {log}"))
 
 # plot PCA (both)
 def plotPCA_cmd(what):

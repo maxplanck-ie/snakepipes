@@ -128,7 +128,7 @@ rule plotCorrelation_pearson:
         "deepTools_qc/multiBamSummary/read_coverage.bins.npz"
     output:
         heatpng = "deepTools_qc/plotCorrelation/correlation.pearson.read_coverage.heatmap.png",
-        scatterpng = "deepTools_qc/plotCorrelation/correlation.pearson.read_coverage.scatterplot.png",
+#        scatterpng = "deepTools_qc/plotCorrelation/correlation.pearson.read_coverage.scatterplot.png",
         tsv = "deepTools_qc/plotCorrelation/correlation.pearson.read_coverage.tsv"
     log:
         "deepTools_qc/logs/plotCorrelation_pearson.log"
@@ -143,7 +143,7 @@ rule plotCorrelation_spearman:
         "deepTools_qc/multiBamSummary/read_coverage.bins.npz"
     output:
         heatpng = "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage.heatmap.png",
-        scatterpng = "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage.scatterplot.png",
+#        scatterpng = "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage.scatterplot.png",
         tsv = "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage.tsv"
     log:
         "deepTools_qc/logs/plotCorrelation_spearman.log"
