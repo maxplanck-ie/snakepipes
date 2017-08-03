@@ -2,6 +2,7 @@
 ################################################################################
 import os
 
+<<<<<<< HEAD
 ## bamcompare
 def bamcompare_log2_cmd():
     return(deepTools_path+"bamCompare " +
@@ -16,6 +17,8 @@ def bamcompare_log2_cmd():
     "{params.blacklist} " +
     "&> {log}")
 
+=======
+>>>>>>> 0d031db3eafd6a3ae5d5ba3c7d9242dbf3c28ef6
 # bamCoverage RAW
 def bamcov_raw_cmd():
     return(deepTools_path+"bamCoverage " +
@@ -25,7 +28,11 @@ def bamcov_raw_cmd():
             "-p {threads} " +
             "&> {log}")
 
+<<<<<<< HEAD
 # bamCoverage DNA
+=======
+# bamCoverage CHIP
+>>>>>>> 0d031db3eafd6a3ae5d5ba3c7d9242dbf3c28ef6
 def bamcov_cmd():
     return(deepTools_path+"bamCoverage " +
                 "-b {input.bam} " +
@@ -33,6 +40,10 @@ def bamcov_cmd():
                 "--binSize {params.bw_binsize} " +
                 "-p {threads} " +
                 "--normalizeTo1x {params.genome_size} " +
+<<<<<<< HEAD
+=======
+                "{params.ignoreForNorm} " +
+>>>>>>> 0d031db3eafd6a3ae5d5ba3c7d9242dbf3c28ef6
                 "{params.read_extension} " +
                 "&> {log}")
 
@@ -46,7 +57,11 @@ def bamcov_rpkm_cmd():
             " --normalizeUsingRPKM "
             "&> {log}") )
 
+<<<<<<< HEAD
 ## computeGC bias (DNA)
+=======
+## computeGC bias (chIPseq)
+>>>>>>> 0d031db3eafd6a3ae5d5ba3c7d9242dbf3c28ef6
 def gcbias_cmd():
             if params.paired:
                 median_fragment_length = cf.get_fragment_length(input.insert_size_metrics)
@@ -68,6 +83,7 @@ def gcbias_cmd():
 
 # plot Enrichment (RNAseq)
 def plotEnrich_cmd():
+<<<<<<< HEAD
     return( (deepTools_path+"plotEnrichment " +
         "-p {threads} " +
         "-b {input.bam} " +
@@ -112,6 +128,21 @@ def plotFingerprint_cmd():
 
 # multiBAMsummary DNA
 def multiBamSum_cmd():
+=======
+    return( (deepTools_path+"plotEnrichment "
+        "-p {threads} "
+        "-b {input.bam} "
+        "--BED {input.gtf} {input.gtf2} "
+        "--plotFile {output.png} "
+        "--labels {params.labels} "
+        "--plotTitle 'Fraction of reads in regions' "
+        "--outRawCounts {output.tsv} "
+        "--variableScales "
+        "&> {log}") )
+
+# multiBAMsum ChIP
+def multiBamSummary_cmd():
+>>>>>>> 0d031db3eafd6a3ae5d5ba3c7d9242dbf3c28ef6
     return( (deepTools_path+"multiBamSummary bins " +
                     "-b {input.bams} " +
                     "-o {output} " +
@@ -124,6 +155,7 @@ def multiBamSum_cmd():
 
 # multiBAMsum RNA
 def multiBWsum_bed_cmd():
+<<<<<<< HEAD
     return( (deepTools_path+"multiBigwigSummary BED-file " +
                 "--BED {input.bed} " +
                 "-b {input.bw} " +
@@ -131,6 +163,15 @@ def multiBWsum_bed_cmd():
                 "--labels {params.labels} " +
                 "--binSize 1000 " +
                 "-p {threads} " +
+=======
+    return( (deepTools_path+"multiBigwigSummary BED-file "
+                "--BED {input.bed} "
+                "-b {input.bw} "
+                "-o {output} "
+                "--labels {params.labels} "
+                "--binSize 1000 "
+                "-p {threads} "
+>>>>>>> 0d031db3eafd6a3ae5d5ba3c7d9242dbf3c28ef6
                 "&> {log} "))
 
 ## plot Corr (both)
@@ -145,6 +186,7 @@ def plotCorr_cmd(what):
                 "--outFileCorMatrix {output.tsv} " +
                 "--colorMap coolwarm " +
                 "--plotNumbers " +
+<<<<<<< HEAD
                 "&> {log} && " +
                 deepTools_path+"plotCorrelation " +
                 "-in {input} " +
@@ -153,6 +195,18 @@ def plotCorr_cmd(what):
                 "--whatToPlot scatterplot " +
                 "--plotTitle 'Pearson correlation of "+what+" coverage' " +
                 "&>> {log}") )
+=======
+                "&> {log}") ) 
+
+#                "&> {log} && " +
+#                deepTools_path+"plotCorrelation " +
+#                "-in {input} " +
+#                "-o {output.scatterpng} " +
+#                "--corMethod pearson " +
+#                "--whatToPlot scatterplot " +
+#                "--plotTitle 'Pearson correlation of "+what+" coverage' " +
+#                "&>> {log}") )
+>>>>>>> 0d031db3eafd6a3ae5d5ba3c7d9242dbf3c28ef6
 
 ## plot Corr Spearman (both)
 def plotCorrSP_cmd(what):
@@ -166,6 +220,7 @@ def plotCorrSP_cmd(what):
         "--outFileCorMatrix {output.tsv} " +
         "--colorMap coolwarm " +
         "--plotNumbers " +
+<<<<<<< HEAD
         "&> {log} && " +
         deepTools_path+"plotCorrelation " +
         "-in {input} " +
@@ -174,17 +229,37 @@ def plotCorrSP_cmd(what):
         "--whatToPlot scatterplot " +
         "--plotTitle 'Spearman correlation of "+what+" coverage' " +
         "&>> {log}"))
+=======
+        "&> {log}"))
+
+#        "&> {log} && " +
+#        deepTools_path+"plotCorrelation " +
+#        "-in {input} " +
+#        "-o {output.scatterpng} " +
+#        "--corMethod spearman " +
+#        "--whatToPlot scatterplot " +
+#        "--plotTitle 'Spearman correlation of "+what+" coverage' " +
+#        "&>> {log}"))
+>>>>>>> 0d031db3eafd6a3ae5d5ba3c7d9242dbf3c28ef6
 
 # plot PCA (both)
 def plotPCA_cmd(what):
     return( (deepTools_path+"plotPCA " +
             "-in {input} " +
             "-o {output} " +
+<<<<<<< HEAD
             "-T 'PCA of "+what+" coverage' " +
             "&> {log}") )
 
 # plot Coverage
 def plotCov_cmd():
+=======
+            "-T 'PCA of fragment coverage' " +
+            "&> {log}") )
+
+# plot Coverage
+def plotCoverage_cmd():
+>>>>>>> 0d031db3eafd6a3ae5d5ba3c7d9242dbf3c28ef6
     return( (deepTools_path+"plotCoverage " +
                 "-b {input.bams} " +
                 "-o {output} " +
