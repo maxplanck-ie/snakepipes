@@ -19,11 +19,7 @@ get_df <- function(infile) {
   if(isallelic(df) == TRUE) {
   print("Counts are allele-specific")
   df <- df[,c(1,7:9)]
-<<<<<<< HEAD
   colnames(df)[2:4] <- c(paste0(bname,"_all"), paste0(bname, "_genome", 1:2) )
-=======
-  colnames(df)[2:4] <- c(bname, paste(bname, "genome", 1:2, sep = "_") )
->>>>>>> fd100fe10ba6c94e7eca03dcf95223c113008485
   } else {
     df <- df[,c(1,7)]
     colnames(df)[2] = bname
