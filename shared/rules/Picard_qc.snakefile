@@ -14,8 +14,8 @@ rule filterFasta:
 
 
 ### Picard CollectAlignmentSummaryMetrics ######################################
-<<<<<<< HEAD
-## use filtered genome fasta if the mode is allele-specific
+
+# use filtered genome fasta if the mode is allele-specific
 
 rule CollectAlignmentSummaryMetrics:
     input:
@@ -23,19 +23,6 @@ rule CollectAlignmentSummaryMetrics:
         genome =  lambda wildcards: mapping_prg+"/genome_selectedChrs.fa" if 'allelic-mapping' in mode else genome_fasta
     output:
         "Picard_qc/AlignmentSummaryMetrics/{sample}.alignment_summary_metrics.txt"
-    #params:
-        #genome =  lambda wildcards: mapping_prg+"/genome_selectedChrs.fa" if 'allelic-mapping' in mode else genome_fasta  # reference genome FASTA sequence
-=======
-## skip providing genome fasta if the mode is allele-specific
-
-rule CollectAlignmentSummaryMetrics:
-    input:
-        mapping_prg+"/{sample}.bam"
-    output:
-        "Picard_qc/AlignmentSummaryMetrics/{sample}.alignment_summary_metrics.txt"
-    params:
-        genome =  lambda wildcards: 'null' if 'allelic-mapping' in mode else genome_fasta  # reference genome FASTA sequence
->>>>>>> 0d031db3eafd6a3ae5d5ba3c7d9242dbf3c28ef6
     log:
         "Picard_qc/logs/CollectAlignmentSummaryMetrics.{sample}.log"
     benchmark:
