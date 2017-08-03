@@ -1,16 +1,16 @@
-################################################################################  
+################################################################################
 # This file is the default configuration of the DNA-mapping workflow!
 #
 # In order to adjust some parameters, please either use the wrapper script
 # (eg. /path/to/snakemake_workflows/workflows/DNA-mapping/DNA-mapping)
-# or save a copy of this file, modify necessary parameters and then provide 
-# this file to the wrapper or snakmake via '--configfile' option 
+# or save a copy of this file, modify necessary parameters and then provide
+# this file to the wrapper or snakmake via '--configfile' option
 # (see below how to call the snakefile directly)
 #
-# Own parameters will be loaded during snakefile executiuon as well and hence 
+# Own parameters will be loaded during snakefile executiuon as well and hence
 # can be used in new/extended snakemake rules!
 ################################################################################
-## General/Snakemake parameters, only used/set by wrapper or in Snakemake cmdl, but not in Snakefile 
+## General/Snakemake parameters, only used/set by wrapper or in Snakemake cmdl, but not in Snakefile
 outdir:
 configfile:
 local: False
@@ -26,6 +26,9 @@ genome:
 ext: .fastq.gz
 ## paired-end read name extension (default: ['_R1', "_R2"])
 reads: [_R1, _R2]
+## mapping mode
+mode: mapping
+mapping_prg: Bowtie2
 ## Number of reads to downsample from each FASTQ file
 downsample:
 ## Options for trimming
@@ -57,9 +60,9 @@ verbose: False
 ################################################################################
 # Call snakemake directly, i.e. without using the wrapper script:
 #
-# Please save a copy of this config yaml file and provide an adjusted config 
+# Please save a copy of this config yaml file and provide an adjusted config
 # via '--configfile' parameter!
-# example call: 
+# example call:
 #
 # snakemake --snakefile /path/to/snakemake_workflows/workflows/DNA-mapping/Snakefile
 #           --configfile /path/to/snakemake_workflows/workflows/DNA-mapping/defaults.yaml

@@ -11,59 +11,14 @@ require("RColorBrewer")
 
 sessionInfo()
 
+# args 1 : design matrix (tsv)
+# args 2 : counts.txt
+# args 3  : FDR
+# args 4 : BioMart file with ensembl and symbol names
+# args 5 : top N genes to plot
+
 args = commandArgs(TRUE)
 print(args)
- 
-## For debugging only!!! #######################################################
-## setwd("output_dir")
-## args = c('setup_table.tsv',
-##          'counts.txt',
-##          '0.05',
-##          'species.gene_names')
-################################################################################
-
-plotVolcano <- function(res_obj, data=plot) {
-  # Volcano plot
-  xlim = c(-4,4)
-  ylim = c(0,20)
-  cex=c(0.3,0.5)
-  plotdata = data.frame(log2FoldChange=res_obj$log2FoldChange, padj=res_obj$padj )
-  plotdata = plotdata[!is.na(plotdata),]
-  plotdata$cex = cex[[1]]
-  plotdata$pch = 16
-  plotdata$col = "#525252"
-  plotdata$col[plotdata$padj<=fdr] = "#cd0000"
-  
-  plotdata$pch[plotdata$log2FoldChange<xlim[[1]]] = 5
-  plotdata$cex[plotdata$log2FoldChange<xlim[[1]]] = cex[[2]]
-  plotdata$log2FoldChange[plotdata$log2FoldChange<xlim[[1]]] = xlim[[1]]
-
-  plotdata$pch[plotdata$log2FoldChange>xlim[[2]]] = 5
-  plotdata$cex[plotdata$log2FoldChange>xlim[[2]]] = cex[[2]]
-  plotdata$log2FoldChange[plotdata$log2FoldChange>xlim[[2]]] = xlim[[2]]
-  
-  plotdata$pch[-log10(plotdata$padj) > ylim[[2]]] = 2
-  plotdata$cex[-log10(plotdata$padj) > ylim[[2]]] = cex[[2]]
-  plotdata$padj[-log10(plotdata$padj) > ylim[[2]]] = 10^-ylim[[2]]
-  
-  #head(plotdata)
-  #dim(plotdata)
-  plot(plotdata$log2FoldChange, -log10(plotdata$padj),
-       main=sprintf("Volcano plot\n(FDR: %.2f, up: %d, down: %d)",fdr,length(de_up[,1]),length(de_down[,1])),
-       xlab="log2-fold change",
-       ylab="-log10 q-value",
-       xlim=xlim,
-       ylim=ylim,
-       cex=plotdata$cex, pch=plotdata$pch,
-       col=plotdata$col)
-  abline(h=-log10(fdr), col=rgb(0,0,1,0.5), lwd=4)
-  abline(v=0, col=rgb(1,0,0,0.5), lwd=4)
-}
-
-################################################################################
-
-
-print("Running DESeq2 from rna-seq-qc...")
 
 ## FDR significance threshold
 fdr = as.numeric(args[3])
@@ -84,14 +39,23 @@ cat(paste("FDR:", fdr, "\n"))
 cat(paste("Gene names:", geneNamesFilePath, "\n"))
 cat(paste("Number of top N genes:", topN, "\n"))
 
+## For debugging only!!! #######################################################
+## setwd("output_dir")
+## args = c('setup_table.tsv',
+##          'counts.txt',
+##          '0.05',
+##          'species.gene_names')
+################################################################################
+
+print("Running DESeq2 from rna-seq-qc...")
 ## sampleInfo (setupt of the experiment)
 sampleInfo = read.table(sampleInfoFilePath, header=TRUE, stringsAsFactor=F)
 ## add X at the beginning of rows beginning with a number (makes it consistent to column names of of the count matrix!)
 if ( any(grepl("^[0-9]", sampleInfo$name)) ) {
-  sampleInfo[grepl("^[0-9]", sampleInfo$name),]$name = paste("X", sampleInfo[grepl("^[0-9]", sampleInfo$name),]$name, sep="")  
+  sampleInfo[grepl("^[0-9]", sampleInfo$name),]$name = paste("X", sampleInfo[grepl("^[0-9]", sampleInfo$name),]$name, sep="")
 }
 sampleInfo = DataFrame(as.data.frame(unclass(sampleInfo)))
-##sampleInfo = sampleInfo[order(sampleInfo$name, decreasing=F),]  # order by sample name
+# print sample names
 as.character(sampleInfo$name)
 
 ## count matrix (e.g. from DESeq or featureCounts)
@@ -120,16 +84,18 @@ if ( ! all(as.character(sampleInfo$name) == colnames(countdata)) ) {
   quit(save = "no", status = 1, runLast = FALSE)   # Exit 1
 }
 
-
+# create DEseq dds object
 dds = DESeqDataSetFromMatrix(
   countData = countdata,
   colData = sampleInfo,
   design = ~ condition)
+
+# print
 dds
 
 ## reorder conditions by sampleInfo
 if ( dds$condition[[1]] != levels(dds$condition)[[1]] ) {
-  dds$condition = relevel(dds$condition, as.character(dds$condition[[1]]) ) 
+  dds$condition = relevel(dds$condition, as.character(dds$condition[[1]]) )
 }
 
 colnames(dds) = sampleInfo$name
@@ -140,8 +106,8 @@ head(assay(dds))
 ## counts, scaling factors,...)
 info <- data.frame(row.names=sampleInfo$name)
 ################################################################################
-## counts per sample
-apply(assay(dds), 2, sum) 
+## counts per sample (not needed , use library sizes)
+apply(assay(dds), 2, sum)
 info$total_counts = apply(assay(dds), 2, sum)   # add to info
 info
 
@@ -157,7 +123,7 @@ sink("DESeq2.WARNINGS.txt"); warnings(); sink() # save warnings to file
 
 ## show size factors used for read count normalisation
 sizeFactors(dds)
-info$size_factors = sizeFactors(dds) 
+info$size_factors = sizeFactors(dds)
 info
 
 # save normalized counts to file
@@ -202,22 +168,62 @@ str(res)
 summary(res)
 dim(res)
 
+plotVolcano <- function(res_obj, data=plot) {
+  # Volcano plot
+  xlim = c(-4,4)
+  ylim = c(0,20)
+  cex=c(0.3,0.5)
+  plotdata = data.frame(log2FoldChange=res_obj$log2FoldChange, padj=res_obj$padj )
+  plotdata = plotdata[!is.na(plotdata),]
+  plotdata$cex = cex[[1]]
+  plotdata$pch = 16
+  plotdata$col = "#525252"
+  plotdata$col[plotdata$padj<=fdr] = "#cd0000"
+
+  plotdata$pch[plotdata$log2FoldChange<xlim[[1]]] = 5
+  plotdata$cex[plotdata$log2FoldChange<xlim[[1]]] = cex[[2]]
+  plotdata$log2FoldChange[plotdata$log2FoldChange<xlim[[1]]] = xlim[[1]]
+
+  plotdata$pch[plotdata$log2FoldChange>xlim[[2]]] = 5
+  plotdata$cex[plotdata$log2FoldChange>xlim[[2]]] = cex[[2]]
+  plotdata$log2FoldChange[plotdata$log2FoldChange>xlim[[2]]] = xlim[[2]]
+
+  plotdata$pch[-log10(plotdata$padj) > ylim[[2]]] = 2
+  plotdata$cex[-log10(plotdata$padj) > ylim[[2]]] = cex[[2]]
+  plotdata$padj[-log10(plotdata$padj) > ylim[[2]]] = 10^-ylim[[2]]
+
+  #head(plotdata)
+  #dim(plotdata)
+  plot(plotdata$log2FoldChange, -log10(plotdata$padj),
+       main=sprintf("Volcano plot\n(FDR: %.2f, up: %d, down: %d)",fdr,length(de_up[,1]),length(de_down[,1])),
+       xlab="log2-fold change",
+       ylab="-log10 q-value",
+       xlim=xlim,
+       ylim=ylim,
+       cex=plotdata$cex, pch=plotdata$pch,
+       col=plotdata$col)
+  abline(h=-log10(fdr), col=rgb(0,0,1,0.5), lwd=4)
+  abline(v=0, col=rgb(1,0,0,0.5), lwd=4)
+}
+
+################################################################################
+
 ################################################################################
 ## gene names dict if available
 ################################################################################
 
-if (file.exists(geneNamesFilePath)) { 
-  cat(paste("Gene names file found\n")) 
+if (file.exists(geneNamesFilePath)) {
+  cat(paste("Gene names file found\n"))
   #geneNames = read.csv(geneNamesFilePath, sep="\t", header=F, row.names=1, stringsAsFactors=FALSE)
   geneNames = read.csv(geneNamesFilePath, sep="\t", header=F, stringsAsFactors=FALSE)
   geneNames = geneNames[!duplicated(geneNames[,1]),]
   rownames(geneNames) = geneNames[,1]
   geneNames[,1] = NULL
   head(geneNames)
-  
+
   if (length( intersect( gsub("\\..*", "", res@rownames), rownames(geneNames) ) ) > 0) {
-    cat(paste("Names matching to IDs found\n")) 
-    
+    cat(paste("Names matching to IDs found\n"))
+
     ## make a dictionary
     gene_names_dic = geneNames[[1]]
     names(gene_names_dic) = rownames(geneNames)
@@ -230,7 +236,7 @@ id_to_gene_name = function(ids) {
   d = data.frame(IDs=gsub("\\..*", "", ids), gene_names=NA)
   d$gene_names = gene_names_dic[ as.character(d$IDs) ]
   head(d)
-  
+
   # some might be NAs; replace those by original ID
   d[which(is.na(d$gene_names)),]$gene_names = as.character(d[which(is.na(d$gene_names)),]$IDs)
   head(d)
@@ -242,7 +248,7 @@ gene_names_df <- function(obj) {
   if (dim(df)[[1]] > 0) {
     if ( exists("gene_names_dic") ) {
       df$gene_names = id_to_gene_name(rownames(df))
-    } 
+    }
   }
   return(df)
 }
@@ -329,7 +335,7 @@ ggsave(file=sprintf("Fig9.Density_plot.mean_read_counts.pdf"), width=7, height=6
 #      ylab="-log10 padj",
 #      cex=.4, col=rgb(0,0,0,.3))
 # abline(h=-log10(fdr), col="red", lwd=1)
-# 
+#
 # plot(metadata(res)$filterNumRej,
 #      type="b", ylab="number of rejections",
 #      xlab="quantiles of filter")
@@ -394,21 +400,21 @@ ggsave(file=sprintf("Fig6.PCA.pdf"), width=7, height=6)
 if (length(de_total[,1]) > 0) {
   d = data.frame(id=rownames(de_total), padj=de_total$padj)
   if ( length(rownames(d)) < topN ) topN = length(rownames(d))
-  
+
   d_topx_padj = d[order(d$padj, decreasing=F),][1:topN,]
   d_topx_padj
   plotdata = assay(rld)[as.character(d_topx_padj$id),]  # <- error
   plotdata
-  
+
   ## test
   setdiff( as.character(d_topx_padj$id), rownames(plotdata))
-  
+
   # rownames(plotdata) = sprintf("%s\n(%s)", colnames(rld), rld$condition) #paste(colnames(rld), rld$condition, sep="-")
   # colnames(plotdata) = sprintf("%s\n(%s)", colnames(rld), rld$condition) #paste(colnames(rld), rld$condition, sep="-")
-  
+
   if ( exists("gene_names_dic") ) rownames(plotdata) = id_to_gene_name(rownames(plotdata))  # exchange ids by gene names
   plotdata
-  
+
   pdf(sprintf("Fig7.gene_clustering_top%i_DE_genes.pdf",topN), pointsize = 9)
   heatmap.2(plotdata, scale="row", trace="none", dendrogram="column",
             col=colorRampPalette(rev(brewer.pal(9,"RdBu")))(255),
@@ -427,4 +433,3 @@ if ( file.exists("Rplots.pdf") ) { file.remove("Rplots.pdf") }
 sink("DESeq2.session_info.txt")
 sessionInfo()
 sink()
-

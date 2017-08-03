@@ -1,12 +1,13 @@
 ### Picard CollectAlignmentSummaryMetrics ######################################
+## skip providing genome fasta if the mode is allele-specific
 
 rule CollectAlignmentSummaryMetrics:
     input:
-        "Bowtie2/{sample}.bam"
+        mapping_prg+"/{sample}.bam"
     output:
         "Picard_qc/AlignmentSummaryMetrics/{sample}.alignment_summary_metrics.txt"
     params:
-        genome = genome_fasta  # reference genome FASTA sequence
+        genome =  lambda wildcards: 'null' if 'allelic-mapping' in mode else genome_fasta  # reference genome FASTA sequence
     log:
         "Picard_qc/logs/CollectAlignmentSummaryMetrics.{sample}.log"
     benchmark:
@@ -25,7 +26,7 @@ rule CollectAlignmentSummaryMetrics:
 if paired:
     rule CollectInsertSizeMetrics:
         input:
-            "Bowtie2/{sample}.bam"
+            mapping_prg+"/{sample}.bam"
         output:
             txt = "Picard_qc/InsertSizeMetrics/{sample}.insert_size_metrics.txt"
         log:

@@ -56,7 +56,10 @@ def update_filter(samples,dedup,properpairs,mapq):
 
 
 ### Variable defaults ##########################################################
-
+mode = list(map( str.strip, re.split(',|;', config["mode"]) ))
+mode = [element.lower() for element in mode]
+## genome names for allele-sp mapping
+strains = list(map( str.strip, re.split(',|;', config["strains"]) ))
 ## trim
 fastq_dir = "FASTQ"
 if trim:
@@ -77,7 +80,7 @@ del infiles
 if not samples:
     print("\n  Error! NO samples found in dir "+str(indir or '')+"!!!\n\n")
     exit(1)
-    
+
 if not paired:
     reads = [""]
 
