@@ -20,19 +20,8 @@ rule bamCompare_subtract:
     benchmark:
         "deepTools_ChIP/.benchmark/bamCompare.subtract.{chip_sample}.filtered.benchmark"
     threads: 16
-    shell:
-        deepTools_path+"bamCompare "
-        "-b1 {input.chip_bam} "
-        "-b2 {input.control_bam} "
-        "-o {output} "
-        "--ratio subtract "
-        "--scaleFactorsMethod readCount "
-        "--normalizeTo1x {params.genome_size} "
-        "--binSize {params.bw_binsize} "
-        "-p {threads} "
-        "{params.read_extension} "
-        "{params.blacklist} "
-        "&> {log}"
+    run:
+        shell(bamcompare_subtract_cmd())
 
 ### deepTools bamCompare log2ratio #######################################################
 

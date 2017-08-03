@@ -4,30 +4,44 @@ import os
 
 ## bamcompare
 def bamcompare_log2_cmd():
-    return(deepTools_path+"bamCompare " +
-    "-b1 {input.chip_bam} " +
-    "-b2 {input.control_bam} " +
-    "-o {output} " +
-    "--ratio log2 " +# ratio + " " +
-    "--scaleFactorsMethod readCount " +
-    "--binSize {params.bw_binsize} " +
-    "-p {threads} " +
-    "{params.read_extension} " +
-    "{params.blacklist} " +
-    "&> {log}")
+    return((deepTools_path+"bamCompare " +
+        "-b1 {input.chip_bam} " +
+        "-b2 {input.control_bam} " +
+        "-o {output} " +
+        "--ratio log2 " +
+        "--scaleFactorsMethod readCount " +
+        "--binSize {params.bw_binsize} " +
+        "-p {threads} " +
+        "{params.read_extension} " +
+        "{params.blacklist} " +
+        "&> {log}"))
 
+# bamcompare subtract
+def bamcompare_subtract_cmd():
+    return((deepTools_path+"bamCompare " +
+            "-b1 {input.chip_bam} " +
+            "-b2 {input.control_bam} " +
+            "-o {output} " +
+            "--ratio subtract " +
+            "--scaleFactorsMethod readCount " +
+            "--normalizeTo1x {params.genome_size} " +
+            "--binSize {params.bw_binsize} " +
+            "-p {threads} " +
+            "{params.read_extension} " +
+            "{params.blacklist} " +
+            "&> {log}"))
 # bamCoverage RAW
 def bamcov_raw_cmd():
-    return(deepTools_path+"bamCoverage " +
+    return((deepTools_path+"bamCoverage " +
             "-b {input.bam} " +
             "-o {output} " +
             "--binSize {params.bw_binsize} " +
             "-p {threads} " +
-            "&> {log}")
+            "&> {log}"))
 
 # bamCoverage CHIP
 def bamcov_cmd():
-    return(deepTools_path+"bamCoverage " +
+    return((deepTools_path+"bamCoverage " +
                 "-b {input.bam} " +
                 "-o {output} " +
                 "--binSize {params.bw_binsize} " +
@@ -35,7 +49,7 @@ def bamcov_cmd():
                 "--normalizeTo1x {params.genome_size} " +
                 "{params.ignoreForNorm} " +
                 "{params.read_extension} " +
-                "&> {log}")
+                "&> {log}"))
 
 ## bamCoverage RNAseq
 def bamcov_rpkm_cmd():
@@ -147,7 +161,7 @@ def plotCorr_cmd(what):
                 "--outFileCorMatrix {output.tsv} " +
                 "--colorMap coolwarm " +
                 "--plotNumbers " +
-                "&>> {log}") )
+                "&> {log}") )
 
 #                "&> {log} && " +
 #                deepTools_path+"plotCorrelation " +
