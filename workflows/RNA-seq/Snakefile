@@ -153,15 +153,14 @@ def run_allelesp_mapping():
     if "allelic-mapping" in mode:
         allele_suffix = ['allele_flagged', 'genome1', 'genome2', 'unassigned']
         file_list = [
-        #expand(mapping_prg+"/{sample}.bam.bai", sample = samples),
         expand("allelic_bams/{sample}.{suffix}.sorted.bam", sample = samples,
                         suffix = allele_suffix),
         expand("allelic_bams/{sample}.{suffix}.sorted.bam.bai", sample = samples,
                         suffix = allele_suffix),
         expand("bamCoverage/allele_specific/{sample}.{suffix}.RPKM.bw", sample = samples,
                         suffix = ['genome1', 'genome2']),
-        expand("featureCounts/{sample}_allelic_counts.txt", sample=samples),
-        "featureCounts/allelic_counts.txt"
+        expand("featureCounts/{sample}.allelic_counts.txt", sample=samples),
+        "featureCounts/counts_allelic.tsv"
         ]
         if sample_info:
             file_list.append( ["DESeq2/DESeq2.session_info.txt"] )
