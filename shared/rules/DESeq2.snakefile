@@ -59,7 +59,7 @@ rule DESeq2_Salmon:
         "{input.sample_info} "
         "../{input.counts_table} "
         "{params.fdr} "
-        "{input.symbol_file} "
+        "../{input.symbol_file} "
         "{params.importfunc} "
         "{params.allele_info} "
         ") 2>&1 | tee {log}"
