@@ -5,7 +5,7 @@ rule CSAW:
         macs2_output = expand("MACS2/{chip_sample}.filtered.BAM_peaks.xls", chip_sample = chip_samples),
         sample_info = sample_info,
         insert_size_metrics =
-            expand("Picard_qc/InsertSizeMetrics/{chip_sample}.insert_size_metrics.txt", chip_sample = chip_samples) if paired
+            "Picard_qc/InsertSizeMetrics/"+chip_samples[0]+".insert_size_metrics.txt" if paired
             else []
     output:
         "CSAW/CSAW.session_info.txt"
@@ -32,7 +32,7 @@ rule CSAW:
         "{input.sample_info} "
         "{params.fdr} "
         "{params.paired} "
-        "{params.fragment_length} "
+        +str(median_fragment_length)+" "
         "{params.window_size} "
         "{params.importfunc} "
         "{params.allele_info} "
