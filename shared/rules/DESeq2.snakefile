@@ -49,7 +49,7 @@ rule DESeq2_Salmon:
     params:
         outdir = "DESeq2_Salmon",
         fdr = 0.05,
-        importfunc = os.path.join(workflow_tools,"snakediff", "DE_functions.R"),
+        importfunc = os.path.join(workflow_tools,"snakediff", "R" ,"DE_functions.R"),
         allele_info = 'FALSE'
     log: "DESeq2_Salmon/DESeq2.log"
     shell:

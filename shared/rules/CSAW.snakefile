@@ -17,7 +17,7 @@ rule CSAW:
         paired = paired,
         fragment_length = fragment_length,
         window_size = window_size,
-        importfunc = os.path.join(workflow_tools,"snakediff","DB_functions.R"),
+        importfunc = os.path.join(workflow_tools,"snakediff", "R" , "DB_functions.R"),
         allele_info = allele_info
     log: "CSAW/CSAW.log"
     run:
