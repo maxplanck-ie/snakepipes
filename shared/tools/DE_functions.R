@@ -1,9 +1,17 @@
-## Usage: cat DESeq2.R | /package/R-3.2.0/bin/R --vanilla --quiet --args setup.tsv counts.txt 0.05 species.gene_names
-library(magrittr)
-library(dplyr)
-library(DESeq2)
-library(ggplot2)
-## 1st check: if names of the setup table are subset of the count matrix column names
+#### ~~~~ Functions to Run DESeq as part of SNAKEMAKE pipeline ~~~~ ####
+### (c) Vivek Bhardwaj (bhardwaj@ie-freiburg.mpg.de)
+
+
+#' Check if names of the setup table are subset of the count matrix column names
+#'
+#' @param alleleSpecific TRUE/FALSE is the design allele-specific?
+#'
+#' @return NA
+#' @export
+#'
+#' @examples
+#' 
+
 checktable <- function(alleleSpecific = FALSE) {
 
 	if(alleleSpecific) {
@@ -21,7 +29,19 @@ checktable <- function(alleleSpecific = FALSE) {
 
 }
 
-## DEseq basic
+#' DEseq basic
+#'
+#' @param countdata count file from featurecounts
+#' @param coldata sampleInfo file
+#' @param fdr fdr cutoff for DE
+#'
+#' @return A list of dds and ddr objects
+#' @export
+#'
+#' @examples
+#' 
+#' 
+
 DESeq_basic <- function(countdata, coldata, fdr) {
 	# Normal DESeq
 	print("Performing basic DESeq: test vs control")
@@ -34,7 +54,19 @@ DESeq_basic <- function(countdata, coldata, fdr) {
 
 }
 
-## DESeq allelic
+#' DESeq using allele-specific design
+#'
+#' @param countdata count file from featurecounts
+#' @param coldata sampleInfo file
+#' @param fdr fdr cutoff for DE
+#'
+#' @return A list of dds and ddr objects
+#' @export
+#'
+#' @examples
+#' 
+#' 
+
 DESeq_allelic <- function(countdata, coldata, fdr) {
 
 	# AlleleSpecific DEseq
@@ -57,7 +89,23 @@ DESeq_allelic <- function(countdata, coldata, fdr) {
 }
 
 
-## DESeq_downstream
+#' Plotting and annotation of DESeq outputs
+#'
+#' @param DEseqout output from DEseq_basic or DEseq_allelic wrapper
+#' @param countdata count file from featurecounts
+#' @param coldata sampleInfo file
+#' @param fdr fdr cutoff for DE
+#' @param outprefix prefix of output plots and files
+#' @param heatmap_topN top N genes to plot in the heatmap
+#' @param geneNamesFile tsv file with gene symbols corresponding to ensembl gene IDs
+#'
+#' @return DEseq results (.tsv) and plots (.pdf)
+#' @export
+#'
+#' @examples
+#' 
+#' 
+
 DESeq_downstream <- function(DEseqout,
 				     countdata,
 				     coldata,
@@ -132,7 +180,7 @@ DESeq_downstream <- function(DEseqout,
 
 	## PCA data
 	print("Preparing data: PCA")
-	PCAdata <- plotPCA(rld, intgroup = c("name", "condition"), returnData=TRUE)
+	PCAdata <- DESeq2::plotPCA(rld, intgroup = c("name", "condition"), returnData=TRUE)
 	percentVar <- round(100 * attr(PCAdata, "percentVar"))
 
 

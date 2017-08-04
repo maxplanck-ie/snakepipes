@@ -4,7 +4,7 @@
 # args 2 : counts.txt
 # args 3  : FDR
 # args 4 : ENSID --> gene symbol mapping file
-# args 5 : top N genes to plot
+# args 5 : path to DE_functions
 # args 6 : T/F whether or not the workflow is allele-sepecific
 
 args = commandArgs(TRUE)
