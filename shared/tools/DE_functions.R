@@ -101,6 +101,7 @@ DESeq_allelic <- function(countdata, coldata, fdr) {
 #'
 #' @return DEseq results (.tsv) and plots (.pdf)
 #' @export
+#' @import ggplot2
 #'
 #' @examples
 #'
