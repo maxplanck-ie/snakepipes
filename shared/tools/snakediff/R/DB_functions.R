@@ -170,11 +170,11 @@ tmmNormalize_chip <- function(chipCountObject, binsize, plotfile){
 		abline(h = all.dist, col = "red")
 	}
 	## MDS plot to check for replicate variability
-	#for (top in c(100, 500, 1000, 5000)) {
-	#	limma::plotMDS(adj.counts, main = top,
-	#			   col = as.numeric(chipCountObject$sampleInfo$condition),
-	#			   labels = as.numeric(chipCountObject$sampleInfo$name), top = top)
-	#}
+	for (top in c(100, 500, 1000, 5000)) {
+		limma::plotMDS(adj.counts, main = top,
+				   col = as.numeric(chipCountObject$sampleInfo$condition),
+				   labels = chipCountObject$sampleInfo$name, top = top)
+	}
 	dev.off()
 
 	## Return normfactors
