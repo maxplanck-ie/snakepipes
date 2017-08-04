@@ -1,7 +1,7 @@
 #### ~~~~ Functions to Run DESeq as part of SNAKEMAKE pipeline ~~~~ ####
 ### (c) Vivek Bhardwaj (bhardwaj@ie-freiburg.mpg.de)
 
-
+library(ggplot2)
 #' Check if names of the setup table are subset of the count matrix column names
 #'
 #' @param alleleSpecific TRUE/FALSE is the design allele-specific?
@@ -10,7 +10,7 @@
 #' @export
 #'
 #' @examples
-#' 
+#'
 
 checktable <- function(alleleSpecific = FALSE) {
 
@@ -39,8 +39,8 @@ checktable <- function(alleleSpecific = FALSE) {
 #' @export
 #'
 #' @examples
-#' 
-#' 
+#'
+#'
 
 DESeq_basic <- function(countdata, coldata, fdr) {
 	# Normal DESeq
@@ -64,8 +64,8 @@ DESeq_basic <- function(countdata, coldata, fdr) {
 #' @export
 #'
 #' @examples
-#' 
-#' 
+#'
+#'
 
 DESeq_allelic <- function(countdata, coldata, fdr) {
 
@@ -101,10 +101,11 @@ DESeq_allelic <- function(countdata, coldata, fdr) {
 #'
 #' @return DEseq results (.tsv) and plots (.pdf)
 #' @export
+#' @import ggplot2
 #'
 #' @examples
-#' 
-#' 
+#'
+#'
 
 DESeq_downstream <- function(DEseqout,
 				     countdata,
@@ -152,9 +153,9 @@ DESeq_downstream <- function(DEseqout,
 
 	## Expression density data (add mean and independent filtering threshold)
 	print("Preparing data: expression density")
-	toplot <- data.frame(counts(dds, normalized = T))
+	toplot <- data.frame(DESeq2::counts(dds, normalized = T))
 	toplot <- stack(toplot, select = colnames(toplot))
-	ind_filt_thres <- as.numeric(metadata(ddr)$filterThreshold)
+	ind_filt_thres <- as.numeric(S4Vectors::metadata(ddr)$filterThreshold)
 	# plotdata
 	pld <- ggplot(toplot, aes(values, colour = ind, alpha = 0.5)) +
 		geom_line(aes(color = ind), stat = "density", alpha = 0.5) +
@@ -170,7 +171,7 @@ DESeq_downstream <- function(DEseqout,
 
 	## Sample distances
 	print("Preparing data: sample distances")
-	sampleDists <- dist(t(assay(rld)))
+	sampleDists <- dist(t(SummarizedExperiment::assay(rld)))
 
 	## Euclidean sample distance heatmap
 	sampleDistMatrix <- as.matrix(sampleDists)
@@ -201,7 +202,7 @@ DESeq_downstream <- function(DEseqout,
 		}
 
 		d_topx_padj <- d[order(d$padj, decreasing = F),][1:heatmap_topN,]
-		heatmap_data <- assay(rld)[as.character(d_topx_padj$id),]
+		heatmap_data <- SummarizedExperiment::assay(rld)[as.character(d_topx_padj$id),]
 
 		## create another df to get the gene names
 		if (file.exists(geneNamesFile)) {
@@ -306,7 +307,7 @@ DESeq_downstream <- function(DEseqout,
 	## Write back diffExp output
 	write.table(ddr.df,file = paste0(outprefix, "_DEresults.tsv"),sep = "\t",quote = FALSE)
 	# write normalized counts
-	write.table(counts(dds, normalized = T),
+	write.table(DESeq2::counts(dds, normalized = T),
 			file = paste0(outprefix, "_counts_DESeq2.normalized.tsv"),
 					  sep = "\t", quote = FALSE, col.names = NA)
 	save(dds, ddr, file = paste0(outprefix,"_DESeq.Rdata"))

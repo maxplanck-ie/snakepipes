@@ -10,8 +10,6 @@
 # args 6 : allele-specific info
 # args 7 : path to DB_functions
 
-setwd("/data/processing3/bhardwaj/H4K16Chip_test/02_output")
-
 ## get Args
 args = commandArgs(TRUE)
 
@@ -24,7 +22,8 @@ importfunc <- args[6] #"~/programs/snakemake_workflows/shared/tools/DB_functions
 allelic_info <- as.logical(args[7])
 
 # include functions
-source(importfunc) 
+source(importfunc)
+library(GenomicRanges)
 ## fix default FDR significance threshold
 if ( is.na(fdr) ) fdr <- 0.05
 
@@ -43,21 +42,21 @@ sampleInfo <- read.table(sampleInfoFilePath, header = TRUE, colClasses = c("char
 
 ## is paired end? : define read params
 if(isTRUE(paired)) {
-	pe_param <- csaw::readParam(max.frag = 500, pe = "both")#, restrict = "X") 
+	pe_param <- csaw::readParam(max.frag = 500, pe = "both")#, restrict = "X")
 } else {
-	pe_param <- csaw::readParam(max.frag = 500, pe = "none") 
+	pe_param <- csaw::readParam(max.frag = 500, pe = "none")
 }
 
 ## Read data
-chip_object <- readfiles_chip(sampleInfo = sampleInfo, 
-					fragment_length = 75,
-					window_size = 150,
+chip_object <- readfiles_chip(sampleInfo = sampleInfo,
+					fragment_length = fraglength,
+					window_size = windowSize,
 					alleleSpecific = allelic_info,
 					pe.param = pe_param)
 
 ## make QC plot for one sample
-first_bam <- head(colData(chip_object$windowCounts)$bam.files, n = 1)
-last_bam <- tail(colData(chip_object$windowCounts)$bam.files, n = 1)
+first_bam <- head(SummarizedExperiment::colData(chip_object$windowCounts)$bam.files, n = 1)
+last_bam <- tail(SummarizedExperiment::colData(chip_object$windowCounts)$bam.files, n = 1)
 
 print(paste0("Making QC plots for first sample : ", first_bam))
 makeQCplots_chip(bam.file = first_bam, outplot = "CSAW/QCplots_first_sample.pdf", pe.param = pe_param)
@@ -80,7 +79,7 @@ allpeaks <- lapply(fnames, function(x) {
 	} else {
 		stop("MACS2 output doesn't exist. Nerither ", narrow, " , nor ", broad)
 	}
-		
+
 	bed.gr <- GRanges(seqnames = bed$V1, ranges = IRanges(start = bed$V2, end = bed$V3), name = bed$V4)
 	return(bed.gr)
 	})
