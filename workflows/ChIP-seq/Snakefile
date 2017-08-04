@@ -36,7 +36,10 @@ include: os.path.join(maindir, "shared", "deeptools_cmds.snakefile")
 
 # deeptools for allelic bams (if present)
 if os.path.isdir('allelic_bams') and os.listdir('allelic_bams') != []:
+    allele_info = 'TRUE'
     include: os.path.join(maindir, "shared", "rules", "deepTools_ChIP_allelic.snakefile")
+else:
+    allele_info = 'FALSE'
 
 def run_deepTools_allelic():
     if os.path.isdir('allelic_bams') and os.listdir('allelic_bams') != []:
