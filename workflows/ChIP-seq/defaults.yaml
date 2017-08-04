@@ -30,6 +30,8 @@ fragment_length: 200
 verbose: false
 # sampleInfo_DB
 sample_info:
+# window_size
+window_size: 150
 ################################################################################
 # Call snakemake directly, i.e. without using the wrapper script:
 #
