@@ -11,3 +11,7 @@ biomaRt
 csaw
 edgeR
 pheatmap
+limma
+GenomicAlignments
+GenomicFeatures
+rtracklayer

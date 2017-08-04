@@ -10,7 +10,7 @@
 #' @export
 #'
 #' @examples
-#' 
+#'
 
 checktable <- function(alleleSpecific = FALSE) {
 
@@ -39,8 +39,8 @@ checktable <- function(alleleSpecific = FALSE) {
 #' @export
 #'
 #' @examples
-#' 
-#' 
+#'
+#'
 
 DESeq_basic <- function(countdata, coldata, fdr) {
 	# Normal DESeq
@@ -64,8 +64,8 @@ DESeq_basic <- function(countdata, coldata, fdr) {
 #' @export
 #'
 #' @examples
-#' 
-#' 
+#'
+#'
 
 DESeq_allelic <- function(countdata, coldata, fdr) {
 
@@ -103,8 +103,8 @@ DESeq_allelic <- function(countdata, coldata, fdr) {
 #' @export
 #'
 #' @examples
-#' 
-#' 
+#'
+#'
 
 DESeq_downstream <- function(DEseqout,
 				     countdata,
@@ -152,7 +152,7 @@ DESeq_downstream <- function(DEseqout,
 
 	## Expression density data (add mean and independent filtering threshold)
 	print("Preparing data: expression density")
-	toplot <- data.frame(counts(dds, normalized = T))
+	toplot <- data.frame(DESeq2::counts(dds, normalized = T))
 	toplot <- stack(toplot, select = colnames(toplot))
 	ind_filt_thres <- as.numeric(metadata(ddr)$filterThreshold)
 	# plotdata
@@ -306,7 +306,7 @@ DESeq_downstream <- function(DEseqout,
 	## Write back diffExp output
 	write.table(ddr.df,file = paste0(outprefix, "_DEresults.tsv"),sep = "\t",quote = FALSE)
 	# write normalized counts
-	write.table(counts(dds, normalized = T),
+	write.table(DESeq2::counts(dds, normalized = T),
 			file = paste0(outprefix, "_counts_DESeq2.normalized.tsv"),
 					  sep = "\t", quote = FALSE, col.names = NA)
 	save(dds, ddr, file = paste0(outprefix,"_DESeq.Rdata"))
