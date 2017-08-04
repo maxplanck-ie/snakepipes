@@ -2,10 +2,10 @@
 ## CSAW for differential binding / allele-specific binding analysis
 rule CSAW:
     input:
-        macs2_output = expand("MACS2/{chip_sample}.filtered.BAM_peaks.narrowPeak", chip_sample = chip_samples),
+        macs2_output = expand("MACS2/{chip_sample}.filtered.BAM_peaks.xls", chip_sample = chip_samples),
         sample_info = sample_info,
         insert_size_metrics =
-            "Picard_qc/InsertSizeMetrics/{chip_sample}.insert_size_metrics.txt" if paired
+            expand("Picard_qc/InsertSizeMetrics/{chip_sample}.insert_size_metrics.txt", chip_sample = chip_samples) if paired
             else []
     output:
         "CSAW/CSAW.session_info.txt"
