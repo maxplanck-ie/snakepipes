@@ -1,16 +1,16 @@
-################################################################################  
+################################################################################
 # This file is the default configuration of the ChIP-seq workflow!
 #
 # In order to adjust some parameters, please either use the wrapper script
 # (eg. /path/to/snakemake_workflows/workflows/ChIP-seq/ChIP-seq)
-# or save a copy of this file, modify necessary parameters and then provide 
-# this file to the wrapper or snakmake via '--configfile' option 
+# or save a copy of this file, modify necessary parameters and then provide
+# this file to the wrapper or snakmake via '--configfile' option
 # (see below how to call the snakefile directly)
 #
-# Own parameters will be loaded during snakefile executiuon as well and hence 
+# Own parameters will be loaded during snakefile executiuon as well and hence
 # can be used in new/extended snakemake rules!
 ################################################################################
-## General/Snakemake parameters, only used/set by wrapper or in Snakemake cmdl, but not in Snakefile 
+## General/Snakemake parameters, only used/set by wrapper or in Snakemake cmdl, but not in Snakefile
 configfile:
 tempdir: /data/extended/
 local: false
@@ -28,12 +28,14 @@ bw_binsize: 25
 ## Median/mean fragment length, only relevant for single-end data (default: 200)
 fragment_length: 200
 verbose: false
+# sampleInfo_DB
+sample_info:
 ################################################################################
 # Call snakemake directly, i.e. without using the wrapper script:
 #
-# Please save a copy of this config yaml file and provide an adjusted config 
+# Please save a copy of this config yaml file and provide an adjusted config
 # via '--configfile' parameter!
-# example call: 
+# example call:
 #
 # snakemake --snakefile /path/to/snakemake_workflows/workflows/ChIP-seq/Snakefile
 #           --configfile /path/to/snakemake_workflows/workflows/ChIP-seq/defaults.yaml

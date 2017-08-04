@@ -70,7 +70,7 @@ rule plotCoverage_allelic:
         "deepTools_qc/.benchmark/plotCoverage_allelic.benchmark"
     threads: 24
     run:
-        shell(plotCoverage_cmd())
+         shell(plotCoverage_cmd())
 
 ### deepTools multiBamSummary ##################################################
 
@@ -94,7 +94,6 @@ rule multiBamSummary_allelic:
     run:
         shell(multiBamSummary_cmd())
 
-
 ### deepTools plotCorrelation ##################################################
 
 # Pearson: heatmap, scatterplot and correlation matrix
@@ -110,7 +109,7 @@ rule plotCorrelation_pearson_allelic:
     benchmark:
         "deepTools_qc/.benchmark/plotCorrelation_pearson_allelic.benchmark"
     run:
-        shell(plotCorr_cmd())
+        shell(plotCorr_cmd('fragment'))
 
 # Spearman: heatmap, scatterplot and correlation matrix
 rule plotCorrelation_spearman_allelic:
@@ -125,7 +124,7 @@ rule plotCorrelation_spearman_allelic:
     benchmark:
         "deepTools_qc/.benchmark/plotCorrelation_spearman_allelic.benchmark"
     run:
-        shell(plotCorrSP_cmd())
+        shell(plotCorrSP_cmd('fragment'))
 
 ### deepTools plotPCA ##########################################################
 rule plotPCA_allelic:
@@ -138,4 +137,5 @@ rule plotPCA_allelic:
     benchmark:
         "deepTools_qc/.benchmark/plotPCA_allelic.benchmark"
     run:
-        shell(plotPCA_cmd())
+        shell(plotPCA_cmd('fragment'))
+

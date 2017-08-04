@@ -1,13 +1,28 @@
+
+
+### Filter the genome fasta for selected chromsomes for picard if the mode is allele-specific
+rule filterFasta:
+    input:
+        bam = expand(mapping_prg+"/{sample}.bam", sample = samples[0]),
+        fasta = genome_fasta
+    output:
+        temp(mapping_prg+"/genome_selectedChrs.fa")
+    run:
+        shell("samtools view -H {input.bam}"
+              " | awk '$1 == \"@SQ\" {{print $2}}' | sed 's/SN://g' | sort -n > chrnames.txt")
+        shell("samtools faidx {input.fasta} `cat chrnames.txt ` > {output} && rm chrnames.txt")
+
+
 ### Picard CollectAlignmentSummaryMetrics ######################################
-## skip providing genome fasta if the mode is allele-specific
+
+# use filtered genome fasta if the mode is allele-specific
 
 rule CollectAlignmentSummaryMetrics:
     input:
-        mapping_prg+"/{sample}.bam"
+        bam = mapping_prg+"/{sample}.bam",
+        genome =  lambda wildcards: mapping_prg+"/genome_selectedChrs.fa" if 'allelic-mapping' in mode else genome_fasta
     output:
         "Picard_qc/AlignmentSummaryMetrics/{sample}.alignment_summary_metrics.txt"
-    params:
-        genome =  lambda wildcards: 'null' if 'allelic-mapping' in mode else genome_fasta  # reference genome FASTA sequence
     log:
         "Picard_qc/logs/CollectAlignmentSummaryMetrics.{sample}.log"
     benchmark:
@@ -15,8 +30,8 @@ rule CollectAlignmentSummaryMetrics:
     threads: 4 # Java performs parallel garbage collection
     shell:
         "java -Xmx4g -jar "+picard_path+"picard.jar CollectAlignmentSummaryMetrics "
-            "REFERENCE_SEQUENCE={params.genome} "
-            "INPUT={input} OUTPUT={output} "
+            "REFERENCE_SEQUENCE={input.genome} "
+            "INPUT={input.bam} OUTPUT={output} "
             "VALIDATION_STRINGENCY=LENIENT "
             "&> {log}"
 

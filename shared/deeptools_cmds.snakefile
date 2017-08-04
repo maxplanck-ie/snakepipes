@@ -2,18 +2,46 @@
 ################################################################################
 import os
 
+## bamcompare
+def bamcompare_log2_cmd():
+    return((deepTools_path+"bamCompare " +
+        "-b1 {input.chip_bam} " +
+        "-b2 {input.control_bam} " +
+        "-o {output} " +
+        "--ratio log2 " +
+        "--scaleFactorsMethod readCount " +
+        "--binSize {params.bw_binsize} " +
+        "-p {threads} " +
+        "{params.read_extension} " +
+        "{params.blacklist} " +
+        "&> {log}"))
+
+# bamcompare subtract
+def bamcompare_subtract_cmd():
+    return((deepTools_path+"bamCompare " +
+            "-b1 {input.chip_bam} " +
+            "-b2 {input.control_bam} " +
+            "-o {output} " +
+            "--ratio subtract " +
+            "--scaleFactorsMethod readCount " +
+            "--normalizeTo1x {params.genome_size} " +
+            "--binSize {params.bw_binsize} " +
+            "-p {threads} " +
+            "{params.read_extension} " +
+            "{params.blacklist} " +
+            "&> {log}"))
 # bamCoverage RAW
 def bamcov_raw_cmd():
-    return(deepTools_path+"bamCoverage " +
+    return((deepTools_path+"bamCoverage " +
             "-b {input.bam} " +
             "-o {output} " +
             "--binSize {params.bw_binsize} " +
             "-p {threads} " +
-            "&> {log}")
+            "&> {log}"))
 
 # bamCoverage CHIP
 def bamcov_cmd():
-    return(deepTools_path+"bamCoverage " +
+    return((deepTools_path+"bamCoverage " +
                 "-b {input.bam} " +
                 "-o {output} " +
                 "--binSize {params.bw_binsize} " +
@@ -21,7 +49,7 @@ def bamcov_cmd():
                 "--normalizeTo1x {params.genome_size} " +
                 "{params.ignoreForNorm} " +
                 "{params.read_extension} " +
-                "&> {log}")
+                "&> {log}"))
 
 ## bamCoverage RNAseq
 def bamcov_rpkm_cmd():
@@ -33,7 +61,7 @@ def bamcov_rpkm_cmd():
             " --normalizeUsingRPKM "
             "&> {log}") )
 
-## computeGC bias (chIPseq)
+## computeGC bias (DNA)
 def gcbias_cmd():
             if params.paired:
                 median_fragment_length = cf.get_fragment_length(input.insert_size_metrics)
@@ -55,16 +83,48 @@ def gcbias_cmd():
 
 # plot Enrichment (RNAseq)
 def plotEnrich_cmd():
-    return( (deepTools_path+"plotEnrichment "
-        "-p {threads} "
-        "-b {input.bam} "
-        "--BED {input.gtf} {input.gtf2} "
-        "--plotFile {output.png} "
-        "--labels {params.labels} "
-        "--plotTitle 'Fraction of reads in regions' "
-        "--outRawCounts {output.tsv} "
-        "--variableScales "
+    return( (deepTools_path+"plotEnrichment " +
+        "-p {threads} " +
+        "-b {input.bam} " +
+        "--BED {input.gtf} {input.gtf2} " +
+        "--plotFile {output.png} " +
+        "--labels {params.labels} " +
+        "--plotTitle 'Fraction of reads in regions' " +
+        "--outRawCounts {output.tsv} " +
+        "--variableScales " +
         "&> {log}") )
+
+# plot Enrichment (ChIPSeq)
+def plotEnrich_chip_cmd():
+    return((deepTools_path+"plotEnrichment " +
+        "-b {input.bams} " +
+        "--BED {params.genes_gtf} " +
+        "--plotFile {output.png} " +
+        "--labels {params.labels} " +
+        "--plotTitle 'Sigal enrichment (fraction of reads) without duplicates' " +
+        "--outRawCounts {output.tsv} " +
+        "--variableScales " +
+        "{params.blacklist} " +
+        "-p {threads} " +
+        "{params.read_extension} " +
+        "--ignoreDuplicates " +
+        "&> {log}"))
+
+#plot fingerprint (ChIP-seq)
+def plotFingerprint_cmd():
+    return((deepTools_path+"plotFingerprint " +
+            "-b {input.bams} " +
+            "--labels {params.labels} " +
+            "--plotTitle 'Cumulative read counts per bin without duplicates' " +
+            "--ignoreDuplicates " +
+            "--outQualityMetrics {output.metrics} " +
+            "-p {threads} " +
+            "{params.blacklist} " +
+            "{params.png} " +
+            "{params.read_extension} " +
+            "{params.jsd} " +
+            "&> {log}"))
+
 
 # multiBAMsum ChIP
 def multiBamSummary_cmd():
@@ -78,15 +138,15 @@ def multiBamSummary_cmd():
                     "{params.read_extension} " +
                     "&> {log}") )
 
-# multiBAMsum RNA
+# multiBWsum RNA
 def multiBWsum_bed_cmd():
-    return( (deepTools_path+"multiBigwigSummary BED-file "
-                "--BED {input.bed} "
-                "-b {input.bw} "
-                "-o {output} "
-                "--labels {params.labels} "
-                "--binSize 1000 "
-                "-p {threads} "
+    return( (deepTools_path+"multiBigwigSummary BED-file " +
+                "--BED {input.bed} " +
+                "-b {input.bw} " +
+                "-o {output} " +
+                "--labels {params.labels} " +
+                "--binSize 1000 " +
+                "-p {threads} " +
                 "&> {log} "))
 
 ## plot Corr (both)
@@ -101,7 +161,7 @@ def plotCorr_cmd(what):
                 "--outFileCorMatrix {output.tsv} " +
                 "--colorMap coolwarm " +
                 "--plotNumbers " +
-                "&> {log}") ) 
+                "&> {log}") )
 
 #                "&> {log} && " +
 #                deepTools_path+"plotCorrelation " +
@@ -111,6 +171,7 @@ def plotCorr_cmd(what):
 #                "--whatToPlot scatterplot " +
 #                "--plotTitle 'Pearson correlation of "+what+" coverage' " +
 #                "&>> {log}") )
+
 
 ## plot Corr Spearman (both)
 def plotCorrSP_cmd(what):
@@ -140,7 +201,7 @@ def plotPCA_cmd(what):
     return( (deepTools_path+"plotPCA " +
             "-in {input} " +
             "-o {output} " +
-            "-T 'PCA of fragment coverage' " +
+            "-T 'PCA of "+what+" coverage' " +
             "&> {log}") )
 
 # plot Coverage

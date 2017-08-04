@@ -14,7 +14,7 @@ globals().update(cf.load_configfile(workflow.overwrite_configfile,config["verbos
 # load organism-specific data, i.e. genome indices, annotation, etc.
 globals().update(cf.load_organism_data(genome,maindir,config["verbose"]))
 
-# do workflow specific stuff now 
+# do workflow specific stuff now
 include: os.path.join(workflow.basedir, "internals.snakefile")
 
 ### include modules of other snakefiles ########################################
@@ -31,6 +31,39 @@ include: os.path.join(maindir, "shared", "rules", "histoneHMM.snakefile")
 # QC report for all samples
 include: os.path.join(maindir, "shared", "rules", "ChIP_qc_report.snakefile")
 
+# deeptools cmds
+include: os.path.join(maindir, "shared", "deeptools_cmds.snakefile")
+
+# deeptools for allelic bams (if present)
+if os.path.isdir(os.path.join(workingdir,'allelic_bams') ) and os.listdir(os.path.join(workingdir,'allelic_bams') ) != []:
+    #print('allele-specific files detected')
+    allele_info = 'TRUE'
+    include: os.path.join(maindir, "shared", "rules", "deepTools_ChIP_allelic.snakefile")
+else:
+    allele_info = 'FALSE'
+
+# CSAW for differential binding (if sampleinfo specified)
+if sample_info:
+    include: os.path.join(maindir, "shared", "rules", "CSAW.snakefile")
+
+
+def run_deepTools_allelic():
+    if os.path.isdir('allelic_bams') and os.listdir('allelic_bams') != []:
+        file_list = expand("deepTools_ChIP/bamCompare/allele_specific/{chip_sample}.{suffix}.log2ratio.over_input.bw",
+                        chip_sample = chip_samples_w_ctrl, suffix = ['genome1', 'genome2'])
+        file_list.append( [
+        "deepTools_ChIP/plotEnrichment/plotEnrichment.gene_features_allelic.png",
+        "deepTools_ChIP/plotEnrichment/plotEnrichment.gene_features_allelic.tsv",
+        "deepTools_ChIP/plotFingerprint/plotFingerprint.metrics_allelic.txt" ] )
+        return(file_list)
+    else:
+        return([])
+
+def run_CSAW():
+    if sample_info:
+        return( ["CSAW/CSAW.session_info.txt"] )
+    else:
+        return([])
 
 ### execute before workflow starts #############################################
 ################################################################################
@@ -75,6 +108,10 @@ rule all:
         ## run histoneHMM broad enrichment calling only for samples annotated as *broad*
         expand("histoneHMM/{chip_sample}.filtered.histoneHMM-regions.gff.gz", chip_sample = [s for s in chip_samples if is_broad(s)]),
 
+        ## run deeptools-allelic only if dir "allelic_bams" present and non empty
+        run_deepTools_allelic(),
+        ## run csaw if asked for
+        run_CSAW(),
         expand("QC_report/{sample}.qc_report.tsv", sample = all_samples),
         "QC_report/qc_report.all_samples.tsv"
 
