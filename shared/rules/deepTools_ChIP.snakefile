@@ -97,4 +97,4 @@ rule plotFingerprint:
         "deepTools_ChIP/.benchmark/plotFingerprint.benchmark"
     threads: 24
     run:
-        shell(plotFingerprint_cmd)
+        shell(plotFingerprint_cmd())

@@ -55,7 +55,7 @@ rule plotEnrichment_allelic:
         tsv = "deepTools_ChIP/plotEnrichment/plotEnrichment.gene_features_allelic.tsv",
     params:
         genes_gtf = genes_gtf,
-        labels = " ".join(all_samples),
+        labels = " ".join(expand("{sample}_{suffix}", sample = all_samples, suffix = ['genome1', 'genome2'])),
         blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed
                     else "",
         read_extension = "--extendReads" if paired
@@ -92,4 +92,4 @@ rule plotFingerprint_allelic:
         "deepTools_ChIP/.benchmark/plotFingerprint_allelic.benchmark"
     threads: 24
     run:
-        shell(plotFingerprint_cmd)
+        shell(plotFingerprint_cmd())
