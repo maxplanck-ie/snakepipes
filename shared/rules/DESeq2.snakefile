@@ -20,7 +20,7 @@ rule DESeq2:
     params:
         outdir = "DESeq2",
         fdr = 0.05,
-        importfunc = os.path.join(workflow_tools,"snakediff", "DE_functions.R"),
+        importfunc = os.path.join(workflow_tools,"snakediff","R", "DE_functions.R"),
         allele_info = lambda wildcards : 'TRUE' if 'allelic-mapping' in mode else 'FALSE'
     log: "DESeq2/DESeq2.log"
     shell:

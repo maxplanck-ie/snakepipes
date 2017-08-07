@@ -49,6 +49,9 @@ countdata <- read.table(countFilePath, header=TRUE)
 # check setup table
 checktable(alleleSpecific = allelic_info)
 
+## grep the given columns
+countdata <- countdata[,colnames(countdata) %in% sampleInfo$name]
+
 ## now run DESeq wrapper
 seqout <- DESeq_basic(countdata, coldata = sampleInfo, fdr = fdr)
 
