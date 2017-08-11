@@ -1,6 +1,8 @@
 deeptools_ATAC='deepTools_ATAC'
-
-
+#
+### TODO: Plot coverage from cutsites,based on the shifted the 5' end of
+###         each fragment.
+#
 # rule bamCoverageCutsite:
 #     input:
 #         bam = "filtered_bam/{sample}.filtered.cutsites.bam",
