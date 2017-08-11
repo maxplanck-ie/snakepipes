@@ -16,7 +16,6 @@ configfile:
 local: False
 max_jobs: 5
 snakemake_options:
-slurm_options:
 tempdir: /data/extended/
 ## directory with fastq files
 indir:
