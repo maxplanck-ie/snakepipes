@@ -14,9 +14,38 @@ globals().update(cf.load_configfile(workflow.overwrite_configfile,config["verbos
 # load organism-specific data, i.e. genome indices, annotation, etc.
 globals().update(cf.load_organism_data(genome,maindir,config["verbose"]))
 
-# do workflow specific stuff now 
+# mapping defaults
 include: os.path.join(workflow.basedir, "internals.snakefile")
 
+# do workflow specific stuff now
+if "allelic-mapping" in mode:
+    # Updated global vars if mode = "allelic-mapping"
+    if allele_mode == 'create_and_map':
+        star_index_allelic = 'snp_genome/star_Nmasked/Genome'
+        if len(strains) == 1:
+            allele_hybrid = 'single'
+            snp_file = "snp_genome/all_SNPs_" + strains[0] + "_" + genome + ".txt.gz "
+        elif len(strains) == 2:
+            allele_hybrid = 'dual'
+            snp_file = "snp_genome/all_" + strains[1] + "_SNPs_" + strains[0] + "_reference.based_on_" + genome + ".txt"
+
+        include: os.path.join(maindir, "shared", "rules", "masked_genomeIndex.snakefile")
+    elif allele_mode == 'map_only':
+        star_index_allelic = Nmasked_index
+        snp_file = SNPfile
+    ## mapping rules
+    include: os.path.join(maindir, "shared", "rules", "RNA_mapping_allelic.snakefile")
+    ## SNPsplit
+    include: os.path.join(maindir, "shared", "rules", "SNPsplit.snakefile")
+    ## featureCounts_allelic
+    include: os.path.join(maindir, "shared", "rules", "featureCounts_allelic.snakefile")
+    # deepTools QC
+    include: os.path.join(maindir, "shared", "rules", "deepTools_RNA_allelic.snakefile")
+else:
+    # HISAT2/STAR
+    include: os.path.join(maindir, "shared", "rules", "RNA_mapping.snakefile")
+    ## featureCounts
+    include: os.path.join(maindir, "shared", "rules", "featureCounts.snakefile")
 
 ### include modules of other snakefiles ########################################
 ################################################################################
@@ -27,12 +56,9 @@ include: os.path.join(maindir, "shared", "rules", "FASTQ.snakefile")
 if fastqc:
     include: os.path.join(maindir, "shared", "rules", "FastQC.snakefile")
 
-## Salmon
+## Trim
 if trim:
     include: os.path.join(maindir, "shared", "rules", "TrimGalore.snakefile")
-
-# HISAT2
-include: os.path.join(maindir, "shared", "rules", "RNA_mapping.snakefile")
 
 ## filtered annotation (GTF)
 include: os.path.join(maindir, "shared", "rules", "filter_annotation.snakefile")
@@ -42,19 +68,18 @@ if "mapping-free" in mode:
     include: os.path.join(maindir, "shared", "rules", "Salmon.snakefile")
 
 ## Sleuth (on Salmon)
-if sample_info:
+if "mapping-free" in mode and sample_info:
     include: os.path.join(maindir, "shared", "rules", "sleuth.snakefile")
+
+# deeptools cmds
+include: os.path.join(maindir, "shared", "deeptools_cmds.snakefile")
 
 ## bamCoverage_RPKM
 include: os.path.join(maindir, "shared", "rules", "deepTools_RNA.snakefile")
 
-## featureCounts
-include: os.path.join(maindir, "shared", "rules", "featureCounts.snakefile")
-
 ## DESeq2
 if sample_info:
     include: os.path.join(maindir, "shared", "rules", "DESeq2.snakefile")
-
 
 ### conditional/optional rules #################################################
 ################################################################################
@@ -68,7 +93,7 @@ def run_FastQC(fastqc):
 
 def run_Trimming(trim, fastqc):
     if trim and fastqc:
-        return( expand(fastq_dir+"/{sample}{read}.fastq.gz", sample = samples, read = reads) + 
+        return( expand(fastq_dir+"/{sample}{read}.fastq.gz", sample = samples, read = reads) +
                 expand("FastQC_trimmed/{sample}{read}_fastqc.html", sample = samples, read = reads) )
     elif trim:
         return( expand(fastq_dir+"/{sample}{read}.fastq.gz", sample = samples, read = reads) )
@@ -88,12 +113,12 @@ def run_mapping_free():
         "Salmon/counts.tsv",
         "Salmon/counts.genes.tsv",
         expand("Salmon/{sample}/abundance.h5", sample=samples) ]
-        
+
         if sample_info:
-            file_list.append( ["DESeq2_Salmon/DESeq2.session_info.txt"]) 
+            file_list.append( ["DESeq2_Salmon/DESeq2.session_info.txt"])
         if sample_info and check_replicates(sample_info):
             file_list.append( ["sleuth/so.rds"] )
-        
+
         return(file_list)
     else:
         return([])
@@ -112,6 +137,36 @@ def run_mapping():
     else:
         return([])
 
+def make_nmasked_genome():
+    if allele_mode == 'create_and_map':
+        genome1 = "snp_genome/" + strains[0] + '_SNP_filtering_report.txt'
+        file_list = [
+                genome1,
+                snp_file,
+                star_index_allelic,
+                ]
+        return(file_list)
+    else:
+        return([])
+
+def run_allelesp_mapping():
+    if "allelic-mapping" in mode:
+        allele_suffix = ['allele_flagged', 'genome1', 'genome2', 'unassigned']
+        file_list = [
+        expand("allelic_bams/{sample}.{suffix}.sorted.bam", sample = samples,
+                        suffix = allele_suffix),
+        expand("allelic_bams/{sample}.{suffix}.sorted.bam.bai", sample = samples,
+                        suffix = allele_suffix),
+        expand("bamCoverage/allele_specific/{sample}.{suffix}.RPKM.bw", sample = samples,
+                        suffix = ['genome1', 'genome2']),
+        expand("featureCounts/{sample}.allelic_counts.txt", sample=samples),
+        "featureCounts/counts_allelic.tsv"
+        ]
+        if sample_info:
+            file_list.append( ["DESeq2/DESeq2.session_info.txt"] )
+        return(file_list)
+    else:
+        return([])
 
 def run_deeptools_qc():
     if "deeptools_qc" in mode:
@@ -125,6 +180,14 @@ def run_deeptools_qc():
                               "deepTools_qc/plotCorrelation/correlation.pearson.bed_coverage.heatmap.png",
                               "deepTools_qc/plotCorrelation/correlation.spearman.bed_coverage.heatmap.png",
                               "deepTools_qc/plotPCA/PCA.bed_coverage.png"] )
+        if 'allelic-mapping' in mode:
+            file_list.append(["deepTools_qc/plotEnrichment/plotEnrichment_allelic.png",
+                              "deepTools_qc/plotEnrichment/plotEnrichment_allelic.tsv"])
+            if len(samples)>1:
+                file_list.append( ["deepTools_qc/multiBigwigSummary/coverage_allelic.bed.npz",
+                                   "deepTools_qc/plotCorrelation/correlation.pearson.bed_coverage_allelic.heatmap.png",
+                                   "deepTools_qc/plotCorrelation/correlation.spearman.bed_coverage_allelic.heatmap.png",
+                                   "deepTools_qc/plotPCA/PCA.bed_coverage_allelic.png"] )
         return(file_list)
     else:
         return([])
@@ -167,7 +230,9 @@ rule all:
 
         run_mapping_free(),            # Salmon
         run_mapping(),                 # classical mapping + counting
-        run_deeptools_qc(),
+        run_allelesp_mapping(),        # allelic-mapping
+        make_nmasked_genome(),
+        run_deeptools_qc()
 
 
 ### execute after  finished ####################################################

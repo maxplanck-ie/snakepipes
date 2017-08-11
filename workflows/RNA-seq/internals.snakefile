@@ -24,6 +24,8 @@ def check_replicates(sample_info_file):
 
 mode = list(map( str.strip, re.split(',|;', config["mode"]) ))
 mode = [element.lower() for element in mode]
+## genome names for allele-sp mapping
+strains = list(map( str.strip, re.split(',|;', config["strains"]) ))
 
 ## trim
 fastq_dir = "FASTQ"

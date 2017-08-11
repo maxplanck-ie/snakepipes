@@ -1,38 +1,3 @@
-### deepTools bamCompare log2ratio #######################################################
-
-rule bamCompare_log2:
-    input:
-        chip_bam = "filtered_bam/{chip_sample}.filtered.bam",
-        chip_bai = "filtered_bam/{chip_sample}.filtered.bam.bai",
-        control_bam = lambda wildcards: "filtered_bam/"+get_control(wildcards.chip_sample)+".filtered.bam",
-        control_bai = lambda wildcards: "filtered_bam/"+get_control(wildcards.chip_sample)+".filtered.bam.bai",
-    output:
-        "deepTools_ChIP/bamCompare/{chip_sample}.filtered.log2ratio.over_input.bw"
-    params:
-        bw_binsize = bw_binsize,
-        read_extension = "--extendReads" if paired
-                         else "--extendReads "+str(fragment_length),
-        blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed
-                    else "",
-    log:
-        "deepTools_ChIP/logs/bamCompare.log2ratio.{chip_sample}.filtered.log"
-    benchmark:
-        "deepTools_ChIP/.benchmark/bamCompare.log2ratio.{chip_sample}.filtered.benchmark"
-    threads: 16
-    shell:
-        deepTools_path+"bamCompare "
-        "-b1 {input.chip_bam} "
-        "-b2 {input.control_bam} "
-        "-o {output} "
-        "--ratio log2 "
-        "--scaleFactorsMethod readCount "
-        "--binSize {params.bw_binsize} "
-        "-p {threads} "
-        "{params.read_extension} "
-        "{params.blacklist} "
-        "&> {log}"
-
-
 ### deepTools bamCompare subtract #######################################################
 
 rule bamCompare_subtract:
@@ -55,19 +20,32 @@ rule bamCompare_subtract:
     benchmark:
         "deepTools_ChIP/.benchmark/bamCompare.subtract.{chip_sample}.filtered.benchmark"
     threads: 16
-    shell:
-        deepTools_path+"bamCompare "
-        "-b1 {input.chip_bam} "
-        "-b2 {input.control_bam} "
-        "-o {output} "
-        "--ratio subtract "
-        "--scaleFactorsMethod readCount "
-        "--normalizeTo1x {params.genome_size} "
-        "--binSize {params.bw_binsize} "
-        "-p {threads} "
-        "{params.read_extension} "
-        "{params.blacklist} "
-        "&> {log}"
+    run:
+        shell(bamcompare_subtract_cmd())
+
+### deepTools bamCompare log2ratio #######################################################
+
+rule bamCompare_log2:
+    input:
+        chip_bam = "filtered_bam/{chip_sample}.filtered.bam",
+        chip_bai = "filtered_bam/{chip_sample}.filtered.bam.bai",
+        control_bam = lambda wildcards: "filtered_bam/"+get_control(wildcards.chip_sample)+".filtered.bam",
+        control_bai = lambda wildcards: "filtered_bam/"+get_control(wildcards.chip_sample)+".filtered.bam.bai",
+    output:
+        "deepTools_ChIP/bamCompare/{chip_sample}.filtered.log2ratio.over_input.bw"
+    params:
+        bw_binsize = bw_binsize,
+        read_extension = "--extendReads" if paired
+                         else "--extendReads "+str(fragment_length),
+        blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed
+                    else "",
+    log:
+        "deepTools_ChIP/logs/bamCompare.log2ratio.{chip_sample}.filtered.log"
+    benchmark:
+        "deepTools_ChIP/.benchmark/bamCompare.log2ratio.{chip_sample}.filtered.benchmark"
+    threads: 16
+    run:
+        shell(bamcompare_log2_cmd())
 
 
 ### deepTools plotEnrichment ###################################################
@@ -91,20 +69,8 @@ rule plotEnrichment:
     benchmark:
         "deepTools_ChIP/.benchmark/plotEnrichment.benchmark"
     threads: 24
-    shell:
-        deepTools_path+"plotEnrichment "
-        "-b {input.bams} "
-        "--BED {params.genes_gtf} "
-        "--plotFile {output.png} "
-        "--labels {params.labels} "
-        "--plotTitle 'Sigal enrichment (fraction of reads) without duplicates' "
-        "--outRawCounts {output.tsv} "
-        "--variableScales "
-        "{params.blacklist} "
-        "-p {threads} "
-        "{params.read_extension} "
-        "--ignoreDuplicates "
-        "&> {log}"
+    run:
+        shell(plotEnrich_chip_cmd())
 
 
 ### deepTools plotFingerprint (all files) ######################################
@@ -130,16 +96,5 @@ rule plotFingerprint:
     benchmark:
         "deepTools_ChIP/.benchmark/plotFingerprint.benchmark"
     threads: 24
-    shell:
-        deepTools_path+"plotFingerprint "
-        "-b {input.bams} "
-        "--labels {params.labels} "
-        "--plotTitle 'Cumulative read counts per bin without duplicates' "
-        "--ignoreDuplicates "
-        "--outQualityMetrics {output.metrics} "
-        "-p {threads} "
-        "{params.blacklist} "
-        "{params.png} "
-        "{params.read_extension} "
-        "{params.jsd} "
-        "&> {log}"
+    run:
+        shell(plotFingerprint_cmd())

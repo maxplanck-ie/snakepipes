@@ -8,3 +8,10 @@ COMBINE-lab/wasabi
 rhdf5
 shiny
 biomaRt
+csaw
+edgeR
+pheatmap
+limma
+GenomicAlignments
+GenomicFeatures
+rtracklayer

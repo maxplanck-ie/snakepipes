@@ -1,0 +1,323 @@
+#### ~~~~ Functions to Run CSAW as part of SNAKEMAKE pipeline ~~~~ ####
+### (c) Vivek Bhardwaj (bhardwaj@ie-freiburg.mpg.de)
+
+#' Read the Files and Count windows for ChIP-Seq Samples
+#'
+#' @param sampleInfo tsvfile with sample information
+#' @param fragment_length fragment length of sequencing
+#' @param window_size window size to count the reads in
+#' @param alleleSpecific TRUE/FALSE whether samples have to be compared with allele-specific design
+#' @param pe.param parameters to read bam files
+#' @return chipCountObject : a list with window counts and sampleinfo
+#' @export
+#' @examples
+#' readfiles_chip(csvFile = "testBAMs/testSampleSheet.csv", refAllele = "pat")
+#'
+readfiles_chip <- function(sampleInfo, fragment_length, window_size, alleleSpecific = FALSE, pe.param){
+
+	if( isTRUE(alleleSpecific) ) {
+		print("Mode : AlleleSpecific")
+		# make allele-specific model matrix for edgeR
+		design <- data.frame(name = rep(sampleInfo$name, each = 2),
+					   condition = factor(rep(sampleInfo$condition, each = 2)),
+					   allele = factor(rep(c("genome1", "genome2"), nrow(sampleInfo)) )
+					   )
+		design$allele <- relevel(design$allele, "genome1")
+		design$condition <- droplevels(design$condition)
+
+		if(length(unique(sampleInfo$condition)) == 1 ) {
+			# for 1 samples, use normal design
+			print("1 sample used : comparing genome2 to genome1")
+			designm <- model.matrix(~ allele, data = design)
+			designType <- "allele"
+
+		} else {
+			# for 1 sample, use interaction design
+			print(">1 samples used : comparing genome2 to genome1 blocking for different conditions")
+			designm <- model.matrix(~ allele + condition,data = design)
+			designType <- "blocking"
+		}
+
+		# define bam files to read
+		bam.files <- list.files("allelic_bams",
+						pattern = paste0(sampleInfo$name,".genome[1-2].sorted.bam$", collapse = "|"),
+						full.names = TRUE )
+	} else {
+		print("Mode : Differential Binding")
+		if(length(unique(sampleInfo$condition)) != 2 ) {
+			stop("only 2 conditions can be used for Differential binding analysis")
+		} else {
+			# make model matrix for differential binding
+			design <- data.frame(name = sampleInfo$name,
+						   condition = factor(sampleInfo$condition ) )
+
+			design$condition <- relevel(design$condition, "control")
+			designm <- model.matrix(~condition, data = design)
+			designType <- "condition"
+		}
+
+		# define bam files to read
+		bam.files <- list.files("filtered_bam",
+						pattern = paste0(sampleInfo$name,".filtered.bam$", collapse = "|"),
+						full.names = TRUE )
+	}
+	print(bam.files)
+	# readFiles using CSAW
+	message("Counting reads in windows")
+	counts <- csaw::windowCounts(bam.files = bam.files, param = pe.param, ext = fragment_length, spacing = window_size,  filter = 20)
+
+	# output
+	chipCountObject <- list(windowCounts = counts, sampleInfo = sampleInfo,
+					design = designm, designType = designType, pe.param = pe.param)
+	return(chipCountObject)
+}
+
+#' Make plots to select window size and pe-distance cutoffs
+#'
+#' @param bam.file bam file to use
+#' @param outplot path to output pdf
+#' @param pe.param parameters to read bam files
+#' @return QC plots as pdf
+#' @export
+#' @examples
+#' makeQCplots_chip(bam.file, outplot)
+#'
+
+makeQCplots_chip <- function(bam.file, outplot, pe.param){
+
+	## Histogram to check frag size cutoff
+	message("Checking fragment sizes")
+	fragsize <- csaw::getPESizes(bam.file)
+
+	## Checking cross-correlation
+	message("Checking strand cross-correlation")
+	max.delay <- 500
+	dedup.on <- csaw::readParam(dedup = TRUE, minq = 20)
+	CCF <- csaw::correlateReads(bam.file, max.delay, param = dedup.on)
+
+	## Choosing appropriate window size
+	message("Checking read distribution around putative peaks")
+	plotwc <- function(curbam){
+		windowed <- csaw::windowCounts(curbam, spacing = 50, param = pe.param, filter = 20)
+		rwsms <- rowSums(SummarizedExperiment::assay(windowed))
+		maxed <- csaw::findMaxima(SummarizedExperiment::rowRanges(windowed), range = 1000, metric = rwsms)
+		curbam.out <- csaw::profileSites(curbam, SummarizedExperiment::rowRanges(windowed)[maxed],
+							   param = pe.param, weight = 1/rwsms[maxed])
+		return(curbam.out)
+	}
+	collected <- plotwc(bam.file)
+	xranged <- as.integer(names(collected))
+
+	## plot
+	message("Plotting")
+	pdf(outplot)
+	# fragment sizes
+	hist(log10(fragsize$sizes),
+	     breaks = 50,
+	     xlab= " log10(Fragment sizes)",
+	     ylab = "Frequency",
+	     main = "fragment sizes",
+	     col = "steelblue")
+	abline(v = 400, col = "red",lwd = 3)
+
+	# cross correlation
+	plot(0:max.delay, CCF, type = "l", ylab = "CCF", xlab = "Delay (bp)", main = "PE-Cross-correlation")
+
+	# coverage in windows
+	plot(xranged, collected, type = "l", col = "blue", xlim = c(-1000, 1000), lwd = 2,
+	     xlab = "Distance (bp)", ylab = "Relative coverage per base")
+	abline(v = c(-150,200), col = "dodgerblue", lty = 2)
+	legend("topright", col = "dodgerblue", legend = "specified window size")
+
+	dev.off()
+
+}
+
+
+#' TMM normalize (get the normfactors out) using given window size
+#'
+#' @param chipCountObject output from readfiles_chip command
+#' @param binsize Size of bins to calculate the normalization factors
+#' @param plotfile file with output plots
+#' @return Normalized chipCountObject
+#' @export
+#' @examples
+#' tmmNormalize_chip(chipCountObject,binsize = 10000, plotfile = "TMM_normalizedCounts.pdf")
+#'
+
+tmmNormalize_chip <- function(chipCountObject, binsize, plotfile){
+
+
+	bam.files <- SummarizedExperiment::colData(chipCountObject$windowCounts)$bam.files
+	# Get norm factors
+	wider <- csaw::windowCounts(bam.files, bin = TRUE, width = binsize, param = chipCountObject$pe.param)
+	normfacs <- csaw::normOffsets(wider)
+	chipCountObject$normFactors <- normfacs
+
+	# get norm counts
+	adj.counts <- edgeR::cpm(csaw::asDGEList(wider), log = TRUE)
+	chipCountObject$background_logcpm <- adj.counts
+
+	# plot normalized counts
+	pdf(plotfile)
+	par(mfrow = c(3, 3), mar = c(5, 4, 2, 1.5))
+	for (i in 1:(length(bam.files) - 1)) {
+		cur.x <- adj.counts[,1]
+		cur.y <- adj.counts[,1 + i]
+		smoothScatter(x = (cur.x + cur.y)/2 + 6*log2(10), y = cur.x-cur.y, xlab = "A",
+				  ylab = "M", main = paste("1 vs", i+1))
+		all.dist <- diff(log2(normfacs[c(i + 1, 1)]))
+		abline(h = all.dist, col = "red")
+	}
+	## MDS plot to check for replicate variability
+	for (top in c(100, 500, 1000, 5000)) {
+		limma::plotMDS(adj.counts, main = top,
+				   col = as.numeric(chipCountObject$sampleInfo$condition),
+				   labels = chipCountObject$sampleInfo$name, top = top)
+	}
+	dev.off()
+
+	## Return normfactors
+	return(chipCountObject)
+}
+
+
+#' Test for Diff Bound windows using EdgeR (then merge windows into regions)
+#'
+#' @param chipCountObject output from tmmNormalize_chip
+#' @param plotfile file with output plots
+#' @param tfname which TF to extract results for (must match with the name in sampleInfo)
+#' @return chipResultObject with differentially bound regions
+#' @export
+#' @examples
+#' getDBregions_chip(chipCountObject,plotfile = NULL, tfname = "msl2")
+#'
+
+getDBregions_chip <- function(chipCountObject, plotfile = NULL, tfname){
+
+	# Make DGElist
+	y <- csaw::asDGEList(chipCountObject$windowCounts, norm.factors = chipCountObject$normFactors)
+	design <- chipCountObject$design
+	# Estimate dispersions
+	y <- edgeR::estimateDisp(y, design)
+	o <- order(y$AveLogCPM)
+	fit <- edgeR::glmQLFit(y, design, robust=TRUE)
+
+	# and plot dispersions
+	if(!(is.null(plotfile))){
+		pdf(plotfile)
+		par(mfrow = c(1,2))
+		plot(y$AveLogCPM[o], sqrt(y$trended.dispersion[o]), type = "l", lwd = 2,
+		     ylim = c(0, 1), xlab = expression("Ave."~Log[2]~"CPM"),
+		     ylab = ("Biological coefficient of variation"))
+		edgeR::plotQLDisp(fit)
+		dev.off()
+	}
+
+	### TEST for DB windows
+	# check design type
+	if(chipCountObject$designType != "condition") {
+		results <- edgeR::glmQLFTest(fit, coef = paste0("allelegenome2"))
+	} else {
+		results <- edgeR::glmQLFTest(fit, coef = paste0("condition",tfname))
+	}
+
+	# Merge DB windows into regions: Using quick and dirty method
+	merged <- csaw::mergeWindows(SummarizedExperiment::rowRanges(chipCountObject$windowCounts), tol = 100L)
+	# get combined test p-value for merged windows
+	tabcom <- csaw::combineTests(merged$id, results$table)
+
+	# Return all results
+	chipResultObject <- list(fit = fit, results = results, mergedRegions = merged, combinedPvalues = tabcom)
+	return(chipResultObject)
+}
+
+
+#' Annotate and print the output regions
+#'
+#' @param chipResultObject output from getDBregions_chip
+#' @param outfile_prefix name of output files
+#' @param fdrcutoff fdr cutoff to call significantly bound regions
+#' @return File with differentially bound regions
+#'
+#' @export
+#' @examples
+#' writeOutput_chip(chipResultObject, outfile_prefix)
+#'
+
+writeOutput_chip <- function(chipResultObject, outfile_prefix, fdrcutoff){
+	# get merged regions
+	merged <- chipResultObject$mergedRegions
+	tabcom <- chipResultObject$combinedPvalues
+	merged$region$score <- -10*log10(tabcom$FDR)
+	names(merged$region) <- paste0("region", 1:length(merged$region))
+	## export merged data
+	rtracklayer::export.bed(merged$region, paste0(outfile_prefix, "_allregions.bed"))
+	write.table(tabcom, file = paste0(outfile_prefix,"_scores.txt"),
+			row.names = FALSE, quote = FALSE, sep = "\t")
+
+	## export FDR significant data
+	is.sig <- tabcom$FDR <= fdrcutoff
+	test <- merged$region[is.sig]
+
+	if(length(test) > 0){
+		rtracklayer::export.bed(test, paste0(outfile_prefix,"_significant.bed"))
+	} else {
+		warning("output empty! please lower the fdr threshold.")
+	}
+}
+
+
+
+
+######################################  	UNUSED FUNCTIONS    ##########################################
+
+#' Filtering using global bg
+#'
+#' @param chipCountObject output from readfiles_chip
+#' @return Filtered chipCountObject
+#' @export
+#' @examples
+#' filterByInput_chip(chipCountObject,priorCount = 5)
+#'
+
+filterByGlobal_chip <- function(chipCountObject){
+	bin.size <- 2000L
+	countdat <- chipCountObject$windowCounts
+	binned <- windowCounts(SummarizedExperiment::colData(countdat)$bam.files, bin = TRUE,
+				     width = bin.size, param = chipCountObject$pe.param)
+
+	filter.stat <- filterWindows(countdat, background = binned, type = "global")
+	keep <- filter.stat$filter > log2(3)
+	print(sum(keep))
+	chipCountObject$windowCounts <-  countdat[keep,]
+	return(chipCountObject)
+}
+
+
+#' Filtering using Input windows
+#'
+#' @param chipCountObject output from readfiles_chip
+#' @param controlbam control bam file
+#' @param chipbam chip bam file
+#' @param priorCount Minimum count cutoff for windows
+#' @return Filtered chipCountObject
+#' @export
+#' @examples
+#' filterByInput_chip(chipCountObject,priorCount = 5)
+#'
+
+filterByInput_chip <- function(chipCountObject, controlbam, chipbam, priorCount = 5){
+	countdat <- chipCountObject$windowCounts
+	control <- countdat[,which(SummarizedExperiment::colData(countdat)$bam.files %in% controlbam)]
+	chip <- countdat[,which(SummarizedExperiment::colData(countdat)$bam.files %in% chipbam)]
+	# Filter chip by control counts
+	filter.stat <- csaw::filterWindows(chip, control, type = "control", prior.count = priorCount) # min count in window should be 5
+	keep <- filter.stat$filter > log2(3)
+	print(sum(keep))
+	countdat <- countdat[keep,] # now "countdat" contains both input and chip counts, but filtered
+
+	# return the same chipCountObject back, but this time filtered
+	chipCountObject$windowCounts <- countdat
+	return(chipCountObject)
+}

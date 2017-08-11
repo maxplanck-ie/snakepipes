@@ -17,6 +17,31 @@ globals().update(cf.load_organism_data(genome,maindir,config["verbose"]))
 # do workflow specific stuff now
 include: os.path.join(workflow.basedir, "internals.snakefile")
 
+if "allelic-mapping" in mode:
+    # Updated global vars if mode = "allelic-mapping"
+    if allele_mode == 'create_and_map':
+        bowtie2_index_allelic = 'snp_genome/bowtie2_Nmasked/Genome.1.bt2'
+        if len(strains) == 1:
+            allele_hybrid = 'single'
+            snp_file = "snp_genome/all_SNPs_" + strains[0] + "_" + genome + ".txt.gz "
+        elif len(strains) == 2:
+            allele_hybrid = 'dual'
+            snp_file = "snp_genome/all_" + strains[1] + "_SNPs_" + strains[0] + "_reference.based_on_" + genome + ".txt"
+
+        include: os.path.join(maindir, "shared", "rules", "masked_genomeIndex.snakefile")
+    elif allele_mode == 'map_only':
+        bowtie2_index_allelic = Nmasked_index
+        snp_file = SNPfile
+    ## mapping rules
+    include: os.path.join(maindir, "shared", "rules", "Bowtie2_allelic.snakefile")
+    ## SNPsplit
+    include: os.path.join(maindir, "shared", "rules", "SNPsplit.snakefile")
+    # deepTools QC
+    include: os.path.join(maindir, "shared", "rules", "deepTools_qc_allelic.snakefile")
+else:
+    # Bowtie2 mapping, duplicate marking, BAM filtering and indexing
+    include: os.path.join(maindir, "shared", "rules", "Bowtie2.snakefile")
+
 ### include modules of other snakefiles ########################################
 ################################################################################
 
@@ -31,11 +56,14 @@ if fastqc:
 if trim:
     include: os.path.join(maindir, "shared", "rules", "TrimGalore.snakefile")
 
-# Bowtie2 mapping, duplicate marking, BAM filtering and indexing
-include: os.path.join(maindir, "shared", "rules", "Bowtie2_bam_filtering.snakefile")
+# BAM filtering
+include: os.path.join(maindir, "shared", "rules", "bam_filtering.snakefile")
 
 # Picard CollectAlignmentSummaryMetrics and CollectInsertSizeMetrics
 include: os.path.join(maindir, "shared", "rules", "Picard_qc.snakefile")
+
+# deeptools cmds
+include: os.path.join(maindir, "shared", "deeptools_cmds.snakefile")
 
 # deepTools QC
 include: os.path.join(maindir, "shared", "rules", "deepTools_qc.snakefile")
@@ -67,25 +95,37 @@ def run_CollectInsertSizeMetrics(paired):
     else:
         return([])
 
-def run_bamCoverage_filtered(dedup, properpairs, mapq):
-    if (dedup or properpairs or mapq > 0):
-        return( expand("bamCoverage/{sample}.filtered.seq_depth_norm.bw", sample = samples) )
-    else:
-        return([])
+# def run_bamCoverage_filtered(dedup, properpairs, mapq):
+#     if (dedup or properpairs or mapq > 0):
+#         return( expand("bamCoverage/{sample}.filtered.seq_depth_norm.bw", sample = samples) )
+#     else:
+#         return([])
 
 def run_computeGCBias(gcbias):
     if gcbias:
-        return( expand("deepTools_qc/computeGCBias/{sample}.filtered.GCBias.png", sample = samples) )
+        file_list = expand("deepTools_qc/computeGCBias/{sample}.filtered.GCBias.png", sample = samples)
+        if 'allelic-mapping' in mode:
+            file_list.append(expand("deepTools_qc/computeGCBias/{sample}.{suffix}.GCBias.png",
+                                    sample = samples, suffix = ['genome1', 'genome2']))
+        return(file_list)
     else:
         return([])
 
 def run_deepTools_qc():
-    file_list = ["deepTools_qc/plotCoverage/read_coverage.png"]
-    if len(samples) > 1 :
+    file_list = []
+    if len(samples) <= 20:
+        file_list.append( ["deepTools_qc/plotCoverage/read_coverage.png"] )
+    if len(samples)>1 and len(samples)<=20:
         file_list.append( [
         "deepTools_qc/plotCorrelation/correlation.pearson.read_coverage.heatmap.png",
         "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage.heatmap.png",
         "deepTools_qc/plotPCA/PCA.read_coverage.png" ] )
+        if 'allelic-mapping' in mode:
+            file_list.append( [
+            "deepTools_qc/plotCorrelation/correlation.pearson.read_coverage_allelic.heatmap.png",
+            "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage_allelic.heatmap.png",
+            "deepTools_qc/plotPCA/PCA.read_coverage_allelic.png" ] )
+
     return (file_list)
 
 def run_Qualimap():
@@ -94,7 +134,33 @@ def run_Qualimap():
         file_list += expand("Qualimap_qc/{sample}.filtered.bamqc_report.html", sample = samples)
         file_list += expand("Qualimap_qc/{sample}.filtered.bamqc_results.txt", sample = samples)
     return (file_list)
+# allele specific
+def make_nmasked_genome():
+    if allele_mode == 'create_and_map':
+        genome1 = "snp_genome/" + strains[0] + '_SNP_filtering_report.txt'
+        file_list = [
+                genome1,
+                snp_file,
+                bowtie2_index_allelic
+                ]
+        return(file_list)
+    else:
+        return([])
 
+def run_allelesp_mapping():
+    if "allelic-mapping" in mode:
+        allele_suffix = ['allele_flagged', 'genome1', 'genome2', 'unassigned']
+        file_list = [
+        expand("allelic_bams/{sample}.{suffix}.sorted.bam", sample = samples,
+                        suffix = allele_suffix),
+        expand("allelic_bams/{sample}.{suffix}.sorted.bam.bai", sample = samples,
+                        suffix = allele_suffix),
+        expand("bamCoverage/allele_specific/{sample}.{suffix}.seq_depth_norm.bw", sample = samples,
+                        suffix = ['genome1', 'genome2'])
+        ]
+        return(file_list)
+    else:
+        return([])
 
 ### execute before workflow starts #############################################
 ################################################################################
@@ -112,6 +178,7 @@ onstart:
         print("$TMPDIR: ",os.getenv('TMPDIR', ""))
         print("$HOSTNAME: ",os.getenv('HOSTNAME', ""))
         print("-" * 80, "\n")
+#print(samples)
 
 ### main rule ##################################################################
 ################################################################################
@@ -120,16 +187,20 @@ rule all:
         expand("FASTQ/{sample}{read}.fastq.gz", sample = samples, read = reads),
         run_FastQC(fastqc),
         run_Trimming(trim, fastqc),
-        expand("Bowtie2/{sample}.bam.bai", sample = samples),
-        expand("filtered_bam/{sample}.filtered.bam.bai", sample = samples),
+        expand(mapping_prg+"/{sample}.bam", sample = samples),
+        expand(mapping_prg+"/{sample}.bam.bai", sample = samples),
+        expand("filtered_bam/{sample}.filtered.bam", sample = samples),
         expand("Picard_qc/AlignmentSummaryMetrics/{sample}.alignment_summary_metrics.txt", sample = samples),
         expand("Picard_qc/MarkDuplicates/{sample}.mark_duplicates_metrics.txt", sample = samples),
         run_CollectInsertSizeMetrics(paired),
         expand("bamCoverage/{sample}.seq_depth_norm.bw", sample = samples),
-        run_bamCoverage_filtered(dedup, properpairs, mapq),
+        expand("bamCoverage/{sample}.filtered.seq_depth_norm.bw", sample = samples),
+        #run_bamCoverage_filtered(dedup, properpairs, mapq),
         run_computeGCBias(gcbias),
         run_deepTools_qc(),
         run_Qualimap(),
+        make_nmasked_genome(),
+        run_allelesp_mapping()
 
 
 ### execute after workflow finished ############################################
