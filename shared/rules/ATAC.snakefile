@@ -1,3 +1,9 @@
+chromlist = {}
+
+chromlist['dm6'] = chromlist['dm3'] = ['dmel_mitochondrion_genome', '2R', '2L', '3R','3L', '4'] + ["X", 'Y']
+chromlist['mm9'] = chromlist['mm10'] = chromlist['GRCm38'] = ['MT'] + [str(x) for x in range(1,19)] + ["X", 'Y']
+chromlist['hs37d5'] = chromlist['GRCh37'] = ['MT'] +  [str(x) for x in range(1,22)] + ["X", 'Y']
+chromlist['GRCz10'] = ['MT'] + [str(x) for x in range(1,25)] + ["X", 'Y']
 
 # rule filterMitochondrion:
 #     input:
@@ -40,7 +46,7 @@ rule filterChromosomes:
     output:
         os.path.join(outdir_MACS2, "{sample}.all_filtered.bedpe")
     params:
-        chromlist = '^'+'(' + '|'.join( ('dmel_mitochondrion_genome', '3R','3L','2R', '2L', 'X', '4', 'Y') ) + ')' + '[[:space:]]' # dm6!
+        chromlist = '^'+'(' + '|'.join( (chromlist[genome]) ) + ')' + '[[:space:]]' # dm6!
     shell:
         "egrep \'{params.chromlist}\' {input} > {output}"
 
