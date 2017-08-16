@@ -46,7 +46,7 @@ rule filterChromosomes:
     output:
         os.path.join(outdir_MACS2, "{sample}.all_filtered.bedpe")
     params:
-        chromlist = '^'+'(' + '|'.join( (chromlist[genome]) ) + ')' + '[[:space:]]' # dm6!
+        chromlist = '^'+'(' + '|'.join( (chromlist[genome]) ) + ')' + '[[:space:]]'
     shell:
         "egrep \'{params.chromlist}\' {input} > {output}"
 
