@@ -98,7 +98,7 @@ chip_object <- tmmNormalize_chip(chip_object, binsize = 10000, plotfile = "CSAW/
 
 ## get DB regions
 print("Performing differential binding")
-chip_results <- getDBregions_chip(chip_object, plotfile = "CSAW/DiffBinding_modelfit.pdf", tfname = "test")
+chip_results <- getDBregions_chip(chip_object, plotfile = "CSAW/DiffBinding_modelfit.pdf")
 
 ## write output
 print("Writing output")

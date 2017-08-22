@@ -193,7 +193,7 @@ tmmNormalize_chip <- function(chipCountObject, binsize, plotfile){
 #' getDBregions_chip(chipCountObject,plotfile = NULL, tfname = "msl2")
 #'
 
-getDBregions_chip <- function(chipCountObject, plotfile = NULL, tfname){
+getDBregions_chip <- function(chipCountObject, plotfile = NULL){
 
 	# Make DGElist
 	y <- csaw::asDGEList(chipCountObject$windowCounts, norm.factors = chipCountObject$normFactors)
@@ -219,7 +219,7 @@ getDBregions_chip <- function(chipCountObject, plotfile = NULL, tfname){
 	if(chipCountObject$designType != "condition") {
 		results <- edgeR::glmQLFTest(fit, coef = paste0("allelegenome2"))
 	} else {
-		results <- edgeR::glmQLFTest(fit, coef = paste0("condition",tfname))
+		results <- edgeR::glmQLFTest(fit, coef = 2)
 	}
 
 	# Merge DB windows into regions: Using quick and dirty method
