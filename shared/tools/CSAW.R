@@ -77,7 +77,7 @@ allpeaks <- lapply(fnames, function(x) {
 	} else if (file.exists(broad)) {
 		bed <- read.delim(broad, header = FALSE)
 	} else {
-		stop("MACS2 output doesn't exist. Nerither ", narrow, " , nor ", broad)
+		stop("MACS2 output doesn't exist. Neither ", narrow, " , nor ", broad)
 	}
 
 	bed.gr <- GRanges(seqnames = bed$V1, ranges = IRanges(start = bed$V2, end = bed$V3), name = bed$V4)
