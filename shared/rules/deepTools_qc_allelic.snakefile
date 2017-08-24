@@ -10,8 +10,8 @@ rule bamCoverage_allelic:
     params:
         bw_binsize = bw_binsize,
         genome_size = int(genome_size),
-        ignoreForNorm = "--ignoreForNormalization X Y M" if False
-                 else "",
+        ignoreForNorm = "--ignoreForNormalization " + ignore_forNorm, #if False
+                 #else "",
         read_extension = "--extendReads" if paired
                          else "--extendReads "+str(fragment_length),
         blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed
@@ -138,4 +138,3 @@ rule plotPCA_allelic:
         "deepTools_qc/.benchmark/plotPCA_allelic.benchmark"
     run:
         shell(plotPCA_cmd('fragment'))
-

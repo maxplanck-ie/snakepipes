@@ -10,6 +10,7 @@ def bamcompare_log2_cmd():
         "-o {output} " +
         "--ratio log2 " +
         "--scaleFactorsMethod readCount " +
+        "{params.ignoreForNorm} " +
         "--binSize {params.bw_binsize} " +
         "-p {threads} " +
         "{params.read_extension} " +
@@ -25,6 +26,7 @@ def bamcompare_subtract_cmd():
             "--ratio subtract " +
             "--scaleFactorsMethod readCount " +
             "--normalizeTo1x {params.genome_size} " +
+            "{params.ignoreForNorm} " +
             "--binSize {params.bw_binsize} " +
             "-p {threads} " +
             "{params.read_extension} " +
