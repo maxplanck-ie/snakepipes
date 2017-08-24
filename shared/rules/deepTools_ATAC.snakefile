@@ -58,6 +58,7 @@ rule plotFingerprint:
         png = "--plotFile " +os.path.join(deeptools_ATAC ,
          "plotFingerprint","plotFingerprint.png") if (len(samples)<=20)
               else ""
+        jsdsample="--JSDsample " + samples[0]
     log:
         os.path.join(deeptools_ATAC, "logs","plotFingerprint.log")
     benchmark:
@@ -74,4 +75,5 @@ rule plotFingerprint:
         "{params.blacklist} "
         "{params.png} "
         "{params.read_extension} "
+        "{params.jsdsample} "
         "&> {log}"
