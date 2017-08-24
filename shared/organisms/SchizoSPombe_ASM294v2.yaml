@@ -9,3 +9,4 @@ star_index: "/data/repository/organisms/SchizoSPombe_ASM294v2_ensembl/STARIndex/
 genes_bed: "/data/repository/organisms/SchizoSPombe_ASM294v2_ensembl/Ensembl/release-35/genes.bed"
 genes_gtf: "/data/repository/organisms/SchizoSPombe_ASM294v2_ensembl/Ensembl/release-35/genes.gtf"
 blacklist_bed:
+ignore_forNorm: ""

@@ -9,3 +9,4 @@ star_index: "/data/repository/organisms/dm3_ensembl/STARIndex/"
 genes_bed: "/data/repository/organisms/dm3_ensembl/Ensembl/release-78/genes.bed"
 genes_gtf: "/data/repository/organisms/dm3_ensembl/Ensembl/release-78/genes.gtf"
 blacklist_bed:
+ignore_forNorm: "U Uextra X XHet YHet dmel_mitochondrion_genome"
