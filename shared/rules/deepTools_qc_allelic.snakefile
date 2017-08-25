@@ -35,8 +35,8 @@ rule computeGCBias_allelic:
             "Picard_qc/InsertSizeMetrics/{sample}.insert_size_metrics.txt" if paired
             else []
     output:
-        png = expand("deepTools_qc/computeGCBias/{{sample}}.{suffix}.GCBias.png", suffix = ['genome1', 'genome2']),
-        tsv = expand("deepTools_qc/computeGCBias/{{sample}}.{suffix}.GCBias.freq.tsv", suffix = ['genome1', 'genome2'])
+        png = "deepTools_qc/computeGCBias/{sample}.{suffix}.GCBias.png",
+        tsv = "deepTools_qc/computeGCBias/{sample}.{suffix}.GCBias.freq.tsv"
     params:
         paired = paired,
         fragment_length = fragment_length,
