@@ -81,6 +81,9 @@ include: os.path.join(maindir, "shared", "rules", "deepTools_RNA.snakefile")
 if sample_info:
     include: os.path.join(maindir, "shared", "rules", "DESeq2.snakefile")
 
+## MultiQC
+include: os.path.join(maindir, "shared", "rules", "multiQC.snakefile")
+
 ### conditional/optional rules #################################################
 ################################################################################
 
@@ -232,7 +235,8 @@ rule all:
         run_mapping(),                 # classical mapping + counting
         run_allelesp_mapping(),        # allelic-mapping
         make_nmasked_genome(),
-        run_deeptools_qc()
+        run_deeptools_qc(),
+        "multiQC/multiqc_report.html"
 
 
 ### execute after  finished ####################################################

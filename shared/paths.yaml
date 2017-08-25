@@ -25,3 +25,4 @@ R_libs_path: "/data/manke/repository/scripts/snakemake_workflows/R/x86_64-unknow
 histoneHMM_path: "/data/manke/repository/scripts/snakemake_workflows/R/x86_64-redhat-linux-gnu-library/3.3/histoneHMM/bin/"
 # please change the path to somewhere accesible
 SNPsplit_path: "/home/bhardwaj/programs/SNPsplit/"
+multiqc_path: "/package/MultiQC-1.2/bin/"
