@@ -31,13 +31,6 @@ include: os.path.join(maindir, "shared", "rules", "ATAC.snakefile")
 # ATAC-seq deeptools compounts
 include: os.path.join(maindir, "shared", "rules", "deepTools_ATAC.snakefile")
 
-# for sample in expand("filtered_bam/{sample}.filtered.bam", sample = samples):
-#     print(sample)
-#     if not os.path.isfile(sample):
-#         raise FileNotFoundError("The sample does not exist: ", sample)
-#     else:
-#         print ("Sample found")
-
 ### execute before workflow starts #############################################
 ################################################################################
 onstart:
