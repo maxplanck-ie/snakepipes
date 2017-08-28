@@ -1,9 +1,9 @@
 chromlist = {}
 
-chromlist['dm6'] = chromlist['dm3'] = ['dmel_mitochondrion_genome', '2R', '2L', '3R','3L', '4'] + ["X", 'Y']
-chromlist['mm9'] = chromlist['mm10'] = chromlist['GRCm38'] = ['MT'] + [str(x) for x in range(1,19)] + ["X", 'Y']
-chromlist['hs37d5'] = chromlist['GRCh37'] = ['MT'] +  [str(x) for x in range(1,22)] + ["X", 'Y']
-chromlist['GRCz10'] = ['MT'] + [str(x) for x in range(1,25)] + ["X", 'Y']
+chromlist['dm6'] = chromlist['dm3'] = ['2R', '2L', '3R','3L', '4'] + ["X", 'Y'] # + ['dmel_mitochondrion_genome']
+chromlist['mm9'] = chromlist['mm10'] = chromlist['GRCm38'] = [str(x) for x in range(1,20)] + ["X", 'Y'] # + ['MT']
+chromlist['hs37d5'] = chromlist['GRCh37'] = [str(x) for x in range(1,23)] + ["X", 'Y'] # + ['MT']
+chromlist['GRCz10'] = [str(x) for x in range(1,26)] # + ['MT']
 
 # rule filterMitochondrion:
 #     input:
