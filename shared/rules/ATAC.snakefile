@@ -64,7 +64,7 @@ rule filterNucleosomalFragments:
         "{output}"
 
 
-# samtools view -b -f 2 -F 4 -F 8 -F 256 -F 512 -F 2048
+# MACS2 BAMPE filter: samtools view -b -f 2 -F 4 -F 8 -F 256 -F 512 -F 2048
 
 rule callOpenChromatin:
     input:
@@ -91,5 +91,7 @@ rule callOpenChromatin:
             "--gsize {params.genome} "
             "--name {params.name} "
             "--outdir {params.directory} "
+            "--slocal 10000 "
+            "--nolambda "
             "{params.fileformat} {params.bandwidth} {params.qval_cutoff} {params.nomodel} {params.write_bdg} "
             "&> {log}"
