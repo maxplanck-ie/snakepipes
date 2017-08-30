@@ -49,7 +49,12 @@ rule computeGCBias_allelic:
         "deepTools_qc/.benchmark/computeGCBias.{sample}.{suffix}.benchmark"
     threads: 16
     run:
-        gcbias_cmd()
+        if params.paired:
+            median_fragment_length = cf.get_fragment_length(input.insert_size_metrics)
+        else:
+            median_fragment_length = params.fragment_length
+
+        shell(gcbias_cmd(median_fragment_length))
 
 ### deepTools plotCoverage #####################################################
 
