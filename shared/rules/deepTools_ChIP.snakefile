@@ -7,7 +7,7 @@ rule bamCompare_subtract:
         control_bam = lambda wildcards: "filtered_bam/"+get_control(wildcards.chip_sample)+".filtered.bam",
         control_bai = lambda wildcards: "filtered_bam/"+get_control(wildcards.chip_sample)+".filtered.bam.bai",
     output:
-        "deepTools_ChIP/bamCompare/{chip_sample}.filtered.subtract.input.bw"
+        "deepTools_ChIP/bamCompare/{chip_sample}.filtered.subtract.{control_name}.bw"
     params:
         bw_binsize = bw_binsize,
         genome_size = genome_size,
@@ -33,7 +33,7 @@ rule bamCompare_log2:
         control_bam = lambda wildcards: "filtered_bam/"+get_control(wildcards.chip_sample)+".filtered.bam",
         control_bai = lambda wildcards: "filtered_bam/"+get_control(wildcards.chip_sample)+".filtered.bam.bai",
     output:
-        "deepTools_ChIP/bamCompare/{chip_sample}.filtered.log2ratio.over_input.bw"
+        "deepTools_ChIP/bamCompare/{chip_sample}.filtered.log2ratio.over_{control_name}.bw"
     params:
         bw_binsize = bw_binsize,
         ignoreForNorm = "--ignoreForNormalization " + ignore_forNorm if ignore_forNorm else "",

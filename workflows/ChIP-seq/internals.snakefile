@@ -20,6 +20,18 @@ def get_control(sample):
     else:
         return False
 
+def get_control_name(sample):
+    """
+    Return control sample alias for a given ChIP-seq sample
+    Return False if given ChIP-seq sample has no control
+    """
+    if sample in chip_samples_w_ctrl:
+        if 'control_name' in chip_dict[sample] and chip_dict[sample]['control_name'] != None:
+            return(chip_dict[sample]['control_name'])
+        else:
+            return('Input')
+    else:
+        return False
 
 def is_broad(sample):
     """
@@ -82,6 +94,11 @@ for chip_sample, value in chip_dict.items():
         chip_dict[chip_sample]['broad'] = False
 
 control_samples = list(sorted(control_samples))
+# get a list of corresp control_names for chip samples
+control_names = []
+for chip_sample in chip_samples_w_ctrl:
+    control_names.append(get_control_name(chip_sample))
+
 chip_samples_w_ctrl = list(sorted(chip_samples_w_ctrl))
 chip_samples_wo_ctrl = list(sorted(chip_samples_wo_ctrl))
 chip_samples = sorted(chip_samples_w_ctrl + chip_samples_wo_ctrl)
