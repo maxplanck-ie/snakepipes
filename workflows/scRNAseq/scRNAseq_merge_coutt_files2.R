@@ -129,7 +129,7 @@ for (i in 1:length(dat$file)) {
 	## get all cell names for current sample/library/coutt file
 	## empty if no cells (sample not present in cell_names_path) or all cells (cell_names_path = NULL) wanted
 	subset <- cell_names[cell_names$sample==dat[i,"name"],]
- 	
+ 	print(subset)
 	if 	(is.data.frame(subset) && nrow(subset)==0) { subset <- NULL }
 	if ( is.null(subset) && !is.null(cell_names_path) ){
 		print(paste(dat[i,"name"]," ignored, nothing found in cell_names file for that sample!"))
