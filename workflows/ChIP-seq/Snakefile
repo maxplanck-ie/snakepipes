@@ -25,9 +25,6 @@ include: os.path.join(maindir, "shared", "rules", "deepTools_ChIP.snakefile")
 # MACS2 and MACS2 peak QC
 include: os.path.join(maindir, "shared", "rules", "MACS2.snakefile")
 
-# histoneHMM
-include: os.path.join(maindir, "shared", "rules", "histoneHMM.snakefile")
-
 # QC report for all samples
 include: os.path.join(maindir, "shared", "rules", "ChIP_qc_report.snakefile")
 
@@ -41,6 +38,10 @@ if os.path.isdir(os.path.join(workingdir,'allelic_bams') ) and os.listdir(os.pat
     include: os.path.join(maindir, "shared", "rules", "deepTools_ChIP_allelic.snakefile")
 else:
     allele_info = 'FALSE'
+
+# histoneHMM (if mode is not allele-specific)
+if allele_info == 'FALSE':
+    include: os.path.join(maindir, "shared", "rules", "histoneHMM.snakefile")
 
 # CSAW for differential binding (if sampleinfo specified)
 if sample_info:
