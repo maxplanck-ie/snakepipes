@@ -43,6 +43,14 @@ else:
 if allele_info == 'FALSE':
     include: os.path.join(maindir, "shared", "rules", "histoneHMM.snakefile")
 
+def run_histoneHMM(allele_info):
+    if allele_info == 'FALSE':
+        ## run histoneHMM broad enrichment calling only for samples annotated as *broad*
+        file_list = expand("histoneHMM/{chip_sample}.filtered.histoneHMM-regions.gff.gz", chip_sample = [s for s in chip_samples if is_broad(s)])
+    else:
+        file_list = []
+    return(file_list)
+
 # CSAW for differential binding (if sampleinfo specified)
 if sample_info:
     include: os.path.join(maindir, "shared", "rules", "CSAW.snakefile")
@@ -112,8 +120,6 @@ onstart:
         print("Ignore for normalization (bigwigs):", ignore_forNorm)
         print("-" * 80, "\n")
 
-print(chip_samples_w_ctrl)
-print(control_names)
 ### main rule ##################################################################
 ################################################################################
 rule all:
@@ -124,10 +130,8 @@ rule all:
         #expand("deepTools_ChIP/bamCompare/{chip_sample}.filtered.subtract.{control_name}.bw", chip_sample = chip_samples_w_ctrl, control_name = control_names),
         expand("MACS2/{chip_sample}.filtered.BAM_peaks.xls", chip_sample = chip_samples),
         expand("MACS2/{chip_sample}.filtered.BAM_peaks.qc.txt", chip_sample = chip_samples),
-
-        ## run histoneHMM broad enrichment calling only for samples annotated as *broad*
-        expand("histoneHMM/{chip_sample}.filtered.histoneHMM-regions.gff.gz", chip_sample = [s for s in chip_samples if is_broad(s)]),
-
+        # run histoneHMM if allelic_bams are absent (since it gives index error without allele_specific index)
+        run_histoneHMM(allele_info),
         ## run deeptools-allelic only if dir "allelic_bams" present and non empty
         run_deepTools_allelic(),
         ## run csaw if asked for
