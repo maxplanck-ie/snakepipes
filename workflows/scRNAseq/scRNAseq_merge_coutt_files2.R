@@ -84,7 +84,7 @@ if (is.null(cell_names_path)){
 } else if ( file.exists(cell_names_path) & file.info(cell_names_path)$isdir == TRUE ) {
 	## cell_names_path is given as directory, use all *.csv files for cell names
 	print(paste("Read in all csv files with cell_names from path",cell_names_path))
-	files <- list.files(cell_names_path, pattern=".csv")
+	files <- list.files(cell_names_path, pattern=".csv", full.names = TRUE)
 	
 	if (length(files) == 0){
 		print(paste("no csv files found under",cell_names_path))
