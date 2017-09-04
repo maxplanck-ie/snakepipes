@@ -1,10 +1,13 @@
 #### ~~~~ Functions to Run DESeq as part of SNAKEMAKE pipeline ~~~~ ####
 ### (c) Vivek Bhardwaj (bhardwaj@ie-freiburg.mpg.de)
 
-library(ggplot2)
 #' Check if names of the setup table are subset of the count matrix column names
 #'
+#' @param countdata data.frame with featurecounts output table
+#' @param sample_info sample info data frame from the samplesheet 
 #' @param alleleSpecific TRUE/FALSE is the design allele-specific?
+#' @param salmon_dir directory path for salmon output files
+#' @param tx2gene_annot transcript ID to gene ID annotation
 #'
 #' @return NA
 #' @export
@@ -12,21 +15,47 @@ library(ggplot2)
 #' @examples
 #'
 
-checktable <- function(alleleSpecific = FALSE) {
+checktable <- function(countdata = NA, sample_info = NA, alleleSpecific = FALSE, salmon_dir = NA, tx2gene_annot = NA) {
 
-	if(alleleSpecific) {
-		coln <- gsub("(.*)_(all|genome[1|2])", "\\1" , colnames(countdata) )
-	} else {
-		coln <- colnames(countdata)
-	}
+  ## check whether colnames are allele-specific
+  if(alleleSpecific) {
+    coln <- gsub("(.*)_(all|genome[1|2])", "\\1" , colnames(countdata) )
+  } else {
+    if(is.na(salmon_dir)) {
+      coln <- colnames(countdata)
+    }
+  }
 
-	if ( !all( is.element(sort(sampleInfo[,1]), sort(coln)) )) {
-		cat("Error! Count table column names and setup table names do NOT match!\n")
-		print(as.character(sampleInfo[,1]))
-		print(coln)
-		quit(save = "no", status = 1, runLast = FALSE)   # Exit 1
-	}
+  ## check files
+  if(!is.na(salmon_dir)) {
 
+    # mode = Salmon : check whether salmon output files exist in Salmon dir
+    files <- paste0(salmon_dir,"/",sample_info$name,".quant.sf")
+    filecheck <- file.exists(files)
+    if(!(all(filecheck == TRUE))) {
+      cat("Error! The following File(s) don't exist : ")
+      cat(paste(files[filecheck == FALSE], sep = "\n") )
+      quit(save = "no", status = 1, runLast = FALSE)   # Exit 1
+    } else {
+      print("Importing transcript abundances")
+      # import counts
+      countdata <- tximport::tximport(files, type = "salmon", tx2gene = tx2gene_annot)
+      print("reading_finished.")
+    }
+
+  } else {
+    # mode = Normal : check whether sample names in the samplesheet are also present in count table header
+    if ( !all( is.element(sort(sample_info[,1]), sort(coln)) )) {
+      cat("Error! Count table column names and setup table names do NOT match!\n")
+      print(as.character(sample_info[,1]))
+      print(coln)
+      quit(save = "no", status = 1, runLast = FALSE)   # Exit 1
+    } else {
+      countdata <- countdata[,colnames(countdata) %in% sample_info$name]
+    }
+
+  }
+  return(countdata)
 }
 
 #' DEseq basic
@@ -42,11 +71,18 @@ checktable <- function(alleleSpecific = FALSE) {
 #'
 #'
 
-DESeq_basic <- function(countdata, coldata, fdr) {
+DESeq_basic <- function(countdata, coldata, fdr, from_salmon = FALSE) {
 	# Normal DESeq
 	print("Performing basic DESeq: test vs control")
-	dds <- DESeq2::DESeqDataSetFromMatrix(countData = countdata,
-							  colData = coldata, design = ~condition)
+	if(isTRUE(from_salmon)) {
+	  print("Using input from tximport")
+		dds <- DESeq2::DESeqDataSetFromTximport(countdata,
+			                      colData = coldata, design = ~ condition)
+	} else {
+	  print("Using input from count table")
+		dds <- DESeq2::DESeqDataSetFromMatrix(countData = countdata,
+								  colData = coldata, design = ~condition)
+	}
 	dds <- DESeq2::DESeq(dds)
 	ddr <- DESeq2::results(dds,alpha = fdr)
 	output <- list(dds = dds, ddr = ddr)
