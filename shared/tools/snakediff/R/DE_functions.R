@@ -49,7 +49,6 @@ checktable <- function(countdata = NA, sample_info = NA, alleleSpecific = FALSE,
       print(as.character(sample_info[,1]))
       quit(save = "no", status = 1, runLast = FALSE)   # Exit 1
     } else {
-      print(coln)
       countdata <- countdata[,coln %in% sample_info$name]
     }
 
@@ -160,7 +159,6 @@ DESeq_downstream <- function(DEseqout,
 	ddr <- DEseqout$ddr
 	# Now prep files for outputs and plots
 	ddr.df <- as.data.frame(ddr)
-	print(head(ddr.df))
 	print("Adding Status: UP/DOWN")
 	# Add UP/DOWN status to ddr.df
 	ddr.df$Status <- ifelse(is.na(ddr.df$padj), "None",
