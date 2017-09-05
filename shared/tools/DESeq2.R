@@ -23,7 +23,6 @@ tx2gene_file <- args[7]
 if(file.exists(tx2gene_file)) {
   tximport <- TRUE
 } else {
-  stop(paste0("file ", tx2gene_file, " doesn't exist!") )
   tximport <- FALSE
 }
 
@@ -59,7 +58,7 @@ if ( any(grepl("^[0-9]", sampleInfo$name)) ) {
 
 ## ~~~~~~ 2. Check if data is in proper order  ~~~~~
 if(isTRUE(tximport)) {
-  ## Get data from salmon using TXIMPORT 
+  ## Get data from salmon using TXIMPORT
   ## get gene annotation
   tx2gene <- read.delim(tx2gene_file, header = FALSE)
   tx2gene <- tx2gene[c(1,2)]
