@@ -4,7 +4,7 @@
 #' Check if names of the setup table are subset of the count matrix column names
 #'
 #' @param countdata data.frame with featurecounts output table
-#' @param sample_info sample info data frame from the samplesheet 
+#' @param sample_info sample info data frame from the samplesheet
 #' @param alleleSpecific TRUE/FALSE is the design allele-specific?
 #' @param salmon_dir directory path for salmon output files
 #' @param tx2gene_annot transcript ID to gene ID annotation
@@ -40,7 +40,6 @@ checktable <- function(countdata = NA, sample_info = NA, alleleSpecific = FALSE,
       print("Importing transcript abundances")
       # import counts
       countdata <- tximport::tximport(files, type = "salmon", tx2gene = tx2gene_annot)
-      print("reading_finished.")
     }
 
   } else {
@@ -48,10 +47,10 @@ checktable <- function(countdata = NA, sample_info = NA, alleleSpecific = FALSE,
     if ( !all( is.element(sort(sample_info[,1]), sort(coln)) )) {
       cat("Error! Count table column names and setup table names do NOT match!\n")
       print(as.character(sample_info[,1]))
-      print(coln)
       quit(save = "no", status = 1, runLast = FALSE)   # Exit 1
     } else {
-      countdata <- countdata[,colnames(countdata) %in% sample_info$name]
+      print(coln)
+      countdata <- countdata[,coln %in% sample_info$name]
     }
 
   }
@@ -71,7 +70,7 @@ checktable <- function(countdata = NA, sample_info = NA, alleleSpecific = FALSE,
 #'
 #'
 
-DESeq_basic <- function(countdata, coldata, fdr, from_salmon = FALSE) {
+DESeq_basic <- function(countdata, coldata, fdr, alleleSpecific = FALSE, from_salmon = FALSE) {
 	# Normal DESeq
 	print("Performing basic DESeq: test vs control")
 	if(isTRUE(from_salmon)) {
@@ -80,8 +79,14 @@ DESeq_basic <- function(countdata, coldata, fdr, from_salmon = FALSE) {
 			                      colData = coldata, design = ~ condition)
 	} else {
 	  print("Using input from count table")
-		dds <- DESeq2::DESeqDataSetFromMatrix(countData = countdata,
-								  colData = coldata, design = ~condition)
+      if(isTRUE(alleleSpecific)) {
+          rnasamp <- dplyr::select(countdata, dplyr::ends_with("_all"))
+          dds <- DESeq2::DESeqDataSetFromMatrix(countData = rnasamp,
+  								  colData = coldata, design = ~condition)
+      } else {
+          dds <- DESeq2::DESeqDataSetFromMatrix(countData = countdata,
+  								  colData = coldata, design = ~condition)
+      }
 	}
 	dds <- DESeq2::DESeq(dds)
 	ddr <- DESeq2::results(dds,alpha = fdr)
@@ -107,7 +112,7 @@ DESeq_allelic <- function(countdata, coldata, fdr) {
 
 	# AlleleSpecific DEseq
 	print("Performing Allele-specific DESeq using Interaction design : Genome2 vs Genome1")
-	rnasamp <- dplyr::select(countdata, -ends_with("_all"))
+	rnasamp <- dplyr::select(countdata, -dplyr::ends_with("_all"))
 
 	# create alleleSpecific design matrix
 	design <- data.frame(name = colnames(rnasamp),
