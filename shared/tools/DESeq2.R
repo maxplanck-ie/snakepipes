@@ -17,7 +17,7 @@ countFilePath <- args[2]
 fdr <- as.numeric(args[3])
 geneNamesFilePath <- args[4]
 importfunc <- args[5]
-allelic_info <- args[6]
+allelic_info <- as.logical(args[6])
 ## if output is from salmon then tx2gene file should be present
 tx2gene_file <- args[7]
 if(file.exists(tx2gene_file)) {
@@ -78,7 +78,7 @@ seqout <- DESeq_basic(countdata, coldata = sampleInfo, fdr = fdr, alleleSpecific
 DESeq_downstream(DEseqout = seqout, countdata, sampleInfo,
 		     fdr = fdr, outprefix = "DEseq_basic", heatmap_topN = topN,
 		     geneNamesFile = geneNamesFilePath)
-
+print(allelic_info)
 ## Run allele-sepecific DESeq wrapper (if asked for)
 if (isTRUE(allelic_info)) {
 	seqout_allelic <- DESeq_allelic(countdata, coldata = sampleInfo, fdr = fdr)
