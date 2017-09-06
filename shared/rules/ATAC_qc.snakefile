@@ -5,7 +5,6 @@ def isFloat(string):
     except ValueError:
         return False
 
-MACS2_qc_folder = 'MACS2_qc/'
 deeptools_ATAC = "deeptools_ATAC"
 
 rule MACS2_peak_qc:
@@ -14,14 +13,14 @@ rule MACS2_peak_qc:
         aln_metrics = "Picard_qc/AlignmentSummaryMetrics/{sample}.alignment_summary_metrics.txt",
         xls = 'peaks_openChromatin/openchromatin_{sample}_peaks.xls'
     output:
-        qc = os.path.join(MACS2_qc_folder, "{sample}.filtered.BAM_peaks.qc.txt")
+        qc = os.path.join(outdir_ATACqc, "{sample}.filtered.BAM_peaks.qc.txt")
     params:
-        peaks = os.path.join(MACS2_qc_folder, '/openchromatin_{sample}_peaks.narrowPeak'),
+        peaks = os.path.join(outdir_ATACqc, '/openchromatin_{sample}_peaks.narrowPeak'),
         genome_index = genome_index
     log:
-        os.path.join(MACS2_qc_folder, "logs/MACS2_peak_qc.{sample}.filtered.log")
+        os.path.join(outdir_ATACqc, "logs/ATAC_qc.{sample}.filtered.log")
     benchmark:
-        os.path.join(MACS2_qc_folder, ".benchmark/MACS2_peak_qc.{sample}.filtered.benchmark")
+        os.path.join(outdir_ATACqc, ".benchmark/ATAC_qc.{sample}.filtered.benchmark")
     run:
         # get the number of peaks
         cmd = "cat "+params.peaks+" | wc -l"
