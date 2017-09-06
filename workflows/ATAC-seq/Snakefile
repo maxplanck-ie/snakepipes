@@ -15,6 +15,7 @@ globals().update(cf.load_configfile(workflow.overwrite_configfile,config["verbos
 globals().update(cf.load_organism_data(genome,maindir,config["verbose"]))
 
 outdir_MACS2 = 'MACS2_openChromatin/'
+outdir_ATACqc = 'MACS2_qc/'
 
 # do workflow specific stuff now
 include: os.path.join(workflow.basedir, "internals.snakefile")
@@ -64,6 +65,7 @@ rule all:
     input:
         expand(os.path.join(outdir_MACS2, '{sample}.filtered.sorted.bam'), sample = samples),
         expand(os.path.join(outdir_MACS2, 'openchromatin_{sample}_peaks.narrowPeak'), sample = samples),
+        expand(os.path.join(MACS2_qc_folder, "{sample}.filtered.BAM_peaks.qc.txt", sample = samples)
         "deepTools_ATAC/plotFingerprint/plotFingerprint.metrics.txt"
 
 ### execute after workflow finished ############################################
