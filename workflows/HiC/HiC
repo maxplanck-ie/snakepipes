@@ -178,11 +178,11 @@ def parse_args(defaults):
                         default=defaults["nbins_toMerge"])
 
     parser.add_argument("--findTADs_params",
-                        dest="tadparam",
+                        dest="tadparams",
                         type=str,
                         metavar="STR",
                         help="parameters for HiCFindTADs. (default: '%(default)s')",
-                        default=defaults["tadparam"])
+                        default=defaults["tadparams"])
 
     args = parser.parse_args()
 
