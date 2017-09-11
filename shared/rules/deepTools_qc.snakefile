@@ -9,8 +9,7 @@ rule bamCoverage:
     params:
         bw_binsize = bw_binsize,
         genome_size = int(genome_size),
-        ignoreForNorm = "--ignoreForNormalization X Y M" if False
-                        else "",
+        ignoreForNorm = "--ignoreForNormalization " + ignore_forNorm if ignore_forNorm else "",
         read_extension = "--extendReads" if paired
                          else "--extendReads "+str(fragment_length)
     log:
@@ -33,8 +32,7 @@ rule bamCoverage_filtered:
     params:
         bw_binsize = bw_binsize,
         genome_size = int(genome_size),
-        ignoreForNorm = "--ignoreForNormalization X Y M" if False
-                        else "",
+        ignoreForNorm = "--ignoreForNormalization " + ignore_forNorm if ignore_forNorm else "",
         read_extension = "--extendReads" if paired
                          else "--extendReads "+str(fragment_length),
         blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed
@@ -75,7 +73,12 @@ rule computeGCBias:
         "deepTools_qc/.benchmark/computeGCBias.{sample}.filtered.benchmark"
     threads: 16
     run:
-        gcbias_cmd()
+        if params.paired:
+            median_fragment_length = cf.get_fragment_length(input.insert_size_metrics)
+        else:
+            median_fragment_length = params.fragment_length
+
+        shell(gcbias_cmd(median_fragment_length))
 
 ### deepTools plotCoverage #####################################################
 

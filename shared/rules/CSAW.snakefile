@@ -8,7 +8,7 @@ rule CSAW:
             "Picard_qc/InsertSizeMetrics/"+chip_samples[0]+".insert_size_metrics.txt" if paired
             else []
     output:
-        "CSAW/CSAW.session_info.txt"
+        "CSAW/CSAW.session_info.txt", "CSAW/DiffBinding_analysis.Rdata"
     benchmark:
         "CSAW/.benchmark/CSAW.benchmark"
     params:
@@ -16,8 +16,8 @@ rule CSAW:
         fdr = 0.05,
         paired = paired,
         fragment_length = fragment_length,
-        window_size = 150,
-        importfunc = os.path.join(workflow_tools,"DB_functions.R"),
+        window_size = window_size,
+        importfunc = os.path.join(workflow_tools,"snakediff", "R" , "DB_functions.R"),
         allele_info = allele_info
     log: "CSAW/CSAW.log"
     run:

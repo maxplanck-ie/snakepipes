@@ -22,5 +22,5 @@ trim_galore_path: "/package/trim_galore_v0.4.4/"
 UCSC_tools_path: "/package/UCSCtools/"
 R_libs_path: "/data/manke/repository/scripts/snakemake_workflows/R/x86_64-unknown-linux-gnu-library/3.3/"
 histoneHMM_path: "/data/manke/repository/scripts/snakemake_workflows/R/x86_64-redhat-linux-gnu-library/3.3/histoneHMM/bin/"
-# please change the path to somewhere accessible
-SNPsplit_path: "/home/bhardwaj/programs/SNPsplit/"
+SNPsplit_path: "/package/SNPsplit-0.3.3/bin/"
+multiqc_path: "/package/MultiQC-1.2/bin/"

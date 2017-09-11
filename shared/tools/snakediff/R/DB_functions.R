@@ -100,8 +100,8 @@ makeQCplots_chip <- function(bam.file, outplot, pe.param){
 	plotwc <- function(curbam){
 		windowed <- csaw::windowCounts(curbam, spacing = 50, param = pe.param, filter = 20)
 		rwsms <- rowSums(SummarizedExperiment::assay(windowed))
-		maxed <- csaw::findMaxima(matrixStats::rowRanges(windowed), range = 1000, metric = rwsms)
-		curbam.out <- csaw::profileSites(curbam, matrixStats::rowRanges(windowed)[maxed],
+		maxed <- csaw::findMaxima(SummarizedExperiment::rowRanges(windowed), range = 1000, metric = rwsms)
+		curbam.out <- csaw::profileSites(curbam, SummarizedExperiment::rowRanges(windowed)[maxed],
 							   param = pe.param, weight = 1/rwsms[maxed])
 		return(curbam.out)
 	}
@@ -117,8 +117,8 @@ makeQCplots_chip <- function(bam.file, outplot, pe.param){
 	     xlab= " log10(Fragment sizes)",
 	     ylab = "Frequency",
 	     main = "fragment sizes",
-	     col = "steelblue") %>%
-		abline(v = 400, col = "red",lwd = 3)
+	     col = "steelblue")
+	abline(v = 400, col = "red",lwd = 3)
 
 	# cross correlation
 	plot(0:max.delay, CCF, type = "l", ylab = "CCF", xlab = "Delay (bp)", main = "PE-Cross-correlation")
@@ -148,7 +148,7 @@ makeQCplots_chip <- function(bam.file, outplot, pe.param){
 tmmNormalize_chip <- function(chipCountObject, binsize, plotfile){
 
 
-	bam.files <- colData(chipCountObject$windowCounts)$bam.files
+	bam.files <- SummarizedExperiment::colData(chipCountObject$windowCounts)$bam.files
 	# Get norm factors
 	wider <- csaw::windowCounts(bam.files, bin = TRUE, width = binsize, param = chipCountObject$pe.param)
 	normfacs <- csaw::normOffsets(wider)
@@ -173,7 +173,7 @@ tmmNormalize_chip <- function(chipCountObject, binsize, plotfile){
 	for (top in c(100, 500, 1000, 5000)) {
 		limma::plotMDS(adj.counts, main = top,
 				   col = as.numeric(chipCountObject$sampleInfo$condition),
-				   labels = as.numeric(chipCountObject$sampleInfo$name), top = top)
+				   labels = chipCountObject$sampleInfo$name, top = top)
 	}
 	dev.off()
 
@@ -193,7 +193,7 @@ tmmNormalize_chip <- function(chipCountObject, binsize, plotfile){
 #' getDBregions_chip(chipCountObject,plotfile = NULL, tfname = "msl2")
 #'
 
-getDBregions_chip <- function(chipCountObject, plotfile = NULL, tfname){
+getDBregions_chip <- function(chipCountObject, plotfile = NULL){
 
 	# Make DGElist
 	y <- csaw::asDGEList(chipCountObject$windowCounts, norm.factors = chipCountObject$normFactors)
@@ -219,11 +219,11 @@ getDBregions_chip <- function(chipCountObject, plotfile = NULL, tfname){
 	if(chipCountObject$designType != "condition") {
 		results <- edgeR::glmQLFTest(fit, coef = paste0("allelegenome2"))
 	} else {
-		results <- edgeR::glmQLFTest(fit, coef = paste0("condition",tfname))
+		results <- edgeR::glmQLFTest(fit, coef = 2)
 	}
 
 	# Merge DB windows into regions: Using quick and dirty method
-	merged <- csaw::mergeWindows(matrixStats::rowRanges(chipCountObject$windowCounts), tol = 100L)
+	merged <- csaw::mergeWindows(SummarizedExperiment::rowRanges(chipCountObject$windowCounts), tol = 100L)
 	# get combined test p-value for merged windows
 	tabcom <- csaw::combineTests(merged$id, results$table)
 
@@ -284,7 +284,7 @@ writeOutput_chip <- function(chipResultObject, outfile_prefix, fdrcutoff){
 filterByGlobal_chip <- function(chipCountObject){
 	bin.size <- 2000L
 	countdat <- chipCountObject$windowCounts
-	binned <- windowCounts(colData(countdat)$bam.files, bin = TRUE,
+	binned <- windowCounts(SummarizedExperiment::colData(countdat)$bam.files, bin = TRUE,
 				     width = bin.size, param = chipCountObject$pe.param)
 
 	filter.stat <- filterWindows(countdat, background = binned, type = "global")
@@ -309,8 +309,8 @@ filterByGlobal_chip <- function(chipCountObject){
 
 filterByInput_chip <- function(chipCountObject, controlbam, chipbam, priorCount = 5){
 	countdat <- chipCountObject$windowCounts
-	control <- countdat[,which(colData(countdat)$bam.files %in% controlbam)]
-	chip <- countdat[,which(colData(countdat)$bam.files %in% chipbam)]
+	control <- countdat[,which(SummarizedExperiment::colData(countdat)$bam.files %in% controlbam)]
+	chip <- countdat[,which(SummarizedExperiment::colData(countdat)$bam.files %in% chipbam)]
 	# Filter chip by control counts
 	filter.stat <- csaw::filterWindows(chip, control, type = "control", prior.count = priorCount) # min count in window should be 5
 	keep <- filter.stat$filter > log2(3)

@@ -44,7 +44,7 @@ def parse_args(defaults):
     ## positional/required
     parser.add_argument("genome",
                         metavar="GENOME",
-                        help="genome acronym of target organism (supported: 'dm3', 'dm6', 'hs37d5', 'mm9', 'mm10', 'SchizoSPombe_ASM294v2')")
+                        help="Genome acronym of target organism (supported: 'dm3', 'dm6', 'hs37d5', 'mm9', 'mm10', 'SchizoSPombe_ASM294v2')")
 
     required = parser.add_argument_group('required arguments')
     required.add_argument("-i", "--input-dir",
@@ -150,7 +150,8 @@ def parse_args(defaults):
     parser.add_argument("--dedup",
                         dest="dedup",
                         action="store_true",
-                        help="retain only de-duplicated reads/read pairs (given single-/paired-end data), recommended for ChIP-seq data (default: '%(default)s')",
+                        help="retain only de-duplicated reads/read pairs (given single-/paired-end data), "
+                        "recommended for ChIP-seq data (default: '%(default)s')",
                         default=defaults["dedup"])
 
     parser.add_argument("--properpairs",
@@ -162,7 +163,8 @@ def parse_args(defaults):
     parser.add_argument("--mapq",
                         dest="mapq",
                         metavar="INT",
-                        help="retain only reads with at least the given mapping quality (default: '%(default)s')",
+                        help="retain only reads with at least the given mapping quality. We recommend using"
+                        "mapq of 3 or more for ChIP-seq to remove all true multimapping reads. (default: '%(default)s')",
                         type=int,
                         default=defaults["mapq"])
 
@@ -172,11 +174,11 @@ def parse_args(defaults):
                         help="bin size of output files in bigWig format (default: '%(default)s')",
                         type=int,
                         default=defaults["bw_binsize"])
+
     parser.add_argument("--insert-size",
                         dest="insert_size_max",
                         metavar="INT",
-                        help="Maximum insert size allowed during mapping, MPI-IE default is "
-                        "1000nt (default: '%(default)s')",
+                        help="Maximum insert size allowed during mapping (default: '%(default)s')",
                         type=int,
                         default=defaults["insert_size_max"])
 

@@ -77,7 +77,7 @@ allpeaks <- lapply(fnames, function(x) {
 	} else if (file.exists(broad)) {
 		bed <- read.delim(broad, header = FALSE)
 	} else {
-		stop("MACS2 output doesn't exist. Nerither ", narrow, " , nor ", broad)
+		stop("MACS2 output doesn't exist. Neither ", narrow, " , nor ", broad)
 	}
 
 	bed.gr <- GRanges(seqnames = bed$V1, ranges = IRanges(start = bed$V2, end = bed$V3), name = bed$V4)
@@ -89,7 +89,7 @@ allpeaks <- Reduce(function(x,y) GenomicRanges::union(x,y), allpeaks)
 ## keep only these peaks for testing DB
 print(paste0("Filtering windows using MACS2 output : ", length(allpeaks) , " regions used (Union of peaks)"))
 
-keep <- overlapsAny(rowRanges(chip_object$windowCounts), allpeaks)
+keep <- overlapsAny(SummarizedExperiment::rowRanges(chip_object$windowCounts), allpeaks)
 chip_object$windowCounts <- chip_object$windowCounts[keep,]
 
 ## TMM normalize
@@ -98,7 +98,7 @@ chip_object <- tmmNormalize_chip(chip_object, binsize = 10000, plotfile = "CSAW/
 
 ## get DB regions
 print("Performing differential binding")
-chip_results <- getDBregions_chip(chip_object, plotfile = "CSAW/DiffBinding_modelfit.pdf", tfname = "test")
+chip_results <- getDBregions_chip(chip_object, plotfile = "CSAW/DiffBinding_modelfit.pdf")
 
 ## write output
 print("Writing output")

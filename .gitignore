@@ -10,3 +10,4 @@ __pychache__
 /.benchmark
 runRNAseq.sh
 *tmp*
+.Rproj.user

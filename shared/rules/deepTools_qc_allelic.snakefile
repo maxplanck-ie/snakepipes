@@ -10,8 +10,7 @@ rule bamCoverage_allelic:
     params:
         bw_binsize = bw_binsize,
         genome_size = int(genome_size),
-        ignoreForNorm = "--ignoreForNormalization X Y M" if False
-                 else "",
+        ignoreForNorm = "--ignoreForNormalization " + ignore_forNorm if ignore_forNorm else "",
         read_extension = "--extendReads" if paired
                          else "--extendReads "+str(fragment_length),
         blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed
@@ -35,8 +34,8 @@ rule computeGCBias_allelic:
             "Picard_qc/InsertSizeMetrics/{sample}.insert_size_metrics.txt" if paired
             else []
     output:
-        png = expand("deepTools_qc/computeGCBias/{{sample}}.{suffix}.GCBias.png", suffix = ['genome1', 'genome2']),
-        tsv = expand("deepTools_qc/computeGCBias/{{sample}}.{suffix}.GCBias.freq.tsv", suffix = ['genome1', 'genome2'])
+        png = "deepTools_qc/computeGCBias/{sample}.{suffix}.GCBias.png",
+        tsv = "deepTools_qc/computeGCBias/{sample}.{suffix}.GCBias.freq.tsv"
     params:
         paired = paired,
         fragment_length = fragment_length,
@@ -50,7 +49,12 @@ rule computeGCBias_allelic:
         "deepTools_qc/.benchmark/computeGCBias.{sample}.{suffix}.benchmark"
     threads: 16
     run:
-        gcbias_cmd()
+        if params.paired:
+            median_fragment_length = cf.get_fragment_length(input.insert_size_metrics)
+        else:
+            median_fragment_length = params.fragment_length
+
+        shell(gcbias_cmd(median_fragment_length))
 
 ### deepTools plotCoverage #####################################################
 
@@ -138,4 +142,3 @@ rule plotPCA_allelic:
         "deepTools_qc/.benchmark/plotPCA_allelic.benchmark"
     run:
         shell(plotPCA_cmd('fragment'))
-

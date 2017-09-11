@@ -15,3 +15,4 @@ limma
 GenomicAlignments
 GenomicFeatures
 rtracklayer
+tximport

@@ -71,6 +71,8 @@ include: os.path.join(maindir, "shared", "rules", "deepTools_qc.snakefile")
 # Qualimap BAM QC
 include: os.path.join(maindir, "shared", "rules", "Qualimap_bamqc.snakefile")
 
+## MultiQC
+include: os.path.join(maindir, "shared", "rules", "multiQC.snakefile")
 
 ### conditional/optional rules #################################################
 ################################################################################
@@ -200,7 +202,8 @@ rule all:
         run_deepTools_qc(),
         run_Qualimap(),
         make_nmasked_genome(),
-        run_allelesp_mapping()
+        run_allelesp_mapping(),
+        "multiQC/multiqc_report.html"
 
 
 ### execute after workflow finished ############################################

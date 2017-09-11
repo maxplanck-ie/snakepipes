@@ -10,6 +10,7 @@ def bamcompare_log2_cmd():
         "-o {output} " +
         "--ratio log2 " +
         "--scaleFactorsMethod readCount " +
+        "{params.ignoreForNorm} " +
         "--binSize {params.bw_binsize} " +
         "-p {threads} " +
         "{params.read_extension} " +
@@ -25,6 +26,7 @@ def bamcompare_subtract_cmd():
             "--ratio subtract " +
             "--scaleFactorsMethod readCount " +
             "--normalizeTo1x {params.genome_size} " +
+            "{params.ignoreForNorm} " +
             "--binSize {params.bw_binsize} " +
             "-p {threads} " +
             "{params.read_extension} " +
@@ -62,19 +64,15 @@ def bamcov_rpkm_cmd():
             "&> {log}") )
 
 ## computeGC bias (DNA)
-def gcbias_cmd():
-            if params.paired:
-                median_fragment_length = cf.get_fragment_length(input.insert_size_metrics)
-            else:
-                median_fragment_length = params.fragment_length
-            shell(
+def gcbias_cmd(fragment_length):
+            return(
                 (deepTools_path+"computeGCBias " +
                 "-b {input.bam} " +
                 "--biasPlot {output.png} " +
                 "--GCbiasFrequenciesFile {output.tsv} " +
                 "--effectiveGenomeSize {params.genome_size} " +
                 "--genome {params.genome_2bit} " +
-                "--fragmentLength "+str(median_fragment_length)+" " +
+                "--fragmentLength "+str(fragment_length)+" " +
                 "--sampleSize 10000000 " # very long runtime with default sample size
                 "{params.blacklist} " +
                 "-p {threads} " +

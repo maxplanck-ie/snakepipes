@@ -20,27 +20,30 @@ rule DESeq2:
     params:
         outdir = "DESeq2",
         fdr = 0.05,
-        importfunc = os.path.join(workflow_tools,"DE_functions.R"),
-        allele_info = lambda wildcards : 'TRUE' if 'allelic-mapping' in mode else 'FALSE'
+        importfunc = os.path.join(workflow_tools,"snakediff","R", "DE_functions.R"),
+        allele_info = lambda wildcards : 'TRUE' if 'allelic-mapping' in mode else 'FALSE',
+        tx2gene_file = 'NA'
     log: "DESeq2/DESeq2.log"
     shell:
         "( cd {params.outdir} && export R_LIBS_USER="+R_libs_path+" && "
         "cat "+os.path.join(workflow_tools,"DESeq2.R")+" | "
         ""+os.path.join(R_path,"R")+" --vanilla --args "
-        "{input.sample_info} "
-        "../{input.counts_table} "
-        "{params.fdr} "
-        "../{input.symbol_file} "
-        "{params.importfunc} "
-        "{params.allele_info} "
+        "{input.sample_info} " # 1
+        "../{input.counts_table} " # 2
+        "{params.fdr} " # 3
+        "../{input.symbol_file} " # 4
+        "{params.importfunc} " # 5
+        "{params.allele_info} " # 6
+        "{params.tx2gene_file} " # 7
         ") 2>&1 | tee {log}"
 
 
 ## DESeq2 (on Salmon)
 rule DESeq2_Salmon:
     input:
-        counts_table = "Salmon/counts.genes.tsv",
+        counts_table = "Salmon/counts.tsv",
         sample_info = sample_info,
+        tx2gene_file = "Annotation/genes.filtered.t2g",
         symbol_file = "Annotation/genes.filtered.symbol" #get_symbol_file
     output:
         "DESeq2_Salmon/DESeq2.session_info.txt"
@@ -49,17 +52,19 @@ rule DESeq2_Salmon:
     params:
         outdir = "DESeq2_Salmon",
         fdr = 0.05,
-        importfunc = os.path.join(workflow_tools,"DE_functions.R"),
-        allele_info = 'FALSE'
+        importfunc = os.path.join(workflow_tools,"snakediff", "R" ,"DE_functions.R"),
+        allele_info = 'FALSE',
+        tx2gene_file = "Annotation/genes.filtered.t2g"
     log: "DESeq2_Salmon/DESeq2.log"
     shell:
         "( cd {params.outdir} && export R_LIBS_USER="+R_libs_path+" && "
         "cat "+os.path.join(workflow_tools,"DESeq2.R")+" | "
         ""+os.path.join(R_path,"R")+" --vanilla --args "
-        "{input.sample_info} "
-        "../{input.counts_table} "
-        "{params.fdr} "
-        "../{input.symbol_file} "
-        "{params.importfunc} "
-        "{params.allele_info} "
+        "{input.sample_info} " # 1
+        "../{input.counts_table} " # 2
+        "{params.fdr} " # 3
+        "../{input.symbol_file} " # 4
+        "{params.importfunc} " # 5
+        "{params.allele_info} " # 6
+        "../{input.tx2gene_file} " # 7
         ") 2>&1 | tee {log}"

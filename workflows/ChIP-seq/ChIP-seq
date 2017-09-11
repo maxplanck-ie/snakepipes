@@ -96,14 +96,14 @@ def parse_args(defaults):
                         help="used prefix path for temporary directory created via mktemp. Created temp dir gets exported as $TMPDIR and is removed at the end of this wrapper! (default: '%(default)s')", default=defaults["tempdir"])
 
     ## optional
-    parser._action_groups.append(optional)
-    parser.add_argument("--single-end",
+    optional = parser.add_argument_group('optional arguments')
+    optional.add_argument("--single-end",
                         dest="paired",
                         action="store_false",
                         help="input data is single-end, not paired-end (default: '%(default)s')",
                         default=defaults["paired"])
 
-    parser.add_argument("--bw-binsize",
+    optional.add_argument("--bw-binsize",
                         dest="bw_binsize",
                         metavar="INT",
                         help="bin size of output files in bigWig format (default: '%(default)s')",
@@ -117,6 +117,15 @@ def parse_args(defaults):
     						 " IMPORTANT: The first entry defines which group of samples are control. "
     						 " By this, the order of comparison and likewise the sign of values can be changed! (default: '%(default)s')",
     					default=defaults["sample_info"])
+
+    optional.add_argument("--DB_windowSize",
+    					dest="window_size",
+    					help="Window size to counts reads in (If differential binding analysis required); "
+    						 "Default size is suitable for most transcription factors and sharp histone marks. "
+                             "Small window sizes (~20bp) should be used for very narrow transcription factor peaks, "
+                             "while large window sizes (~500 bp) should be used for broad marks (eg. H3K27me3) "
+                             "(default: '%(default)s')",
+    					default=defaults["window_size"])
 
     args = parser.parse_args()
 
