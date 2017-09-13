@@ -24,6 +24,7 @@ include: os.path.join(maindir, "shared", "rules", "RNA_mapping.snakefile")
 include: os.path.join(maindir, "shared", "rules", "scRNAseq.snakefile")
 include: os.path.join(maindir, "shared", "rules", "FastQC.snakefile")
 include: os.path.join(maindir, "shared", "rules", "filter_annotation.snakefile")
+include: os.path.join(maindir, "shared", "deeptools_cmds.snakefile")
 include: os.path.join(maindir, "shared", "rules", "deepTools_RNA.snakefile")
 
 # TrimGalore

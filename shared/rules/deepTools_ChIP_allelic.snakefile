@@ -7,9 +7,10 @@ rule bamCompare_log2_genome1:
         control_bam = lambda wildcards: "allelic_bams/"+get_control(wildcards.chip_sample)+".genome1.sorted.bam",
         control_bai = lambda wildcards: "allelic_bams/"+get_control(wildcards.chip_sample)+".genome1.sorted.bam.bai"
     output:
-        "deepTools_ChIP/bamCompare/allele_specific/{chip_sample}.genome1.log2ratio.over_input.bw"#, chip_sample = chip_samples, suffix = ['genome1', 'genome2'])
+        "deepTools_ChIP/bamCompare/allele_specific/{chip_sample}.genome1.log2ratio.over_{control_name}.bw"#, chip_sample = chip_samples, suffix = ['genome1', 'genome2'])
     params:
         bw_binsize = bw_binsize,
+        ignoreForNorm = "--ignoreForNormalization " + ignore_forNorm if ignore_forNorm else "",
         read_extension = "--extendReads" if paired
                          else "--extendReads "+str(fragment_length),
         blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed
@@ -29,9 +30,10 @@ rule bamCompare_log2_genome2:
         control_bam = lambda wildcards: "allelic_bams/"+get_control(wildcards.chip_sample)+".genome2.sorted.bam",
         control_bai = lambda wildcards: "allelic_bams/"+get_control(wildcards.chip_sample)+".genome2.sorted.bam.bai"
     output:
-        "deepTools_ChIP/bamCompare/allele_specific/{chip_sample}.genome2.log2ratio.over_input.bw"
+        "deepTools_ChIP/bamCompare/allele_specific/{chip_sample}.genome2.log2ratio.over_{control_name}.bw"
     params:
         bw_binsize = bw_binsize,
+        ignoreForNorm = "--ignoreForNormalization " + ignore_forNorm if ignore_forNorm else "",
         read_extension = "--extendReads" if paired
                          else "--extendReads "+str(fragment_length),
         blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed

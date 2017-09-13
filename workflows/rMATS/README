@@ -1,7 +1,0 @@
-Start workflow:
-
-bash rMATS.sh
-
-It works on rna-seq-qc output.
-
-Important! In addition, there must be a setup_table/ folder with setup_table.tsv.

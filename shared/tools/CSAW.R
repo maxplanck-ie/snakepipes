@@ -59,10 +59,10 @@ first_bam <- head(SummarizedExperiment::colData(chip_object$windowCounts)$bam.fi
 last_bam <- tail(SummarizedExperiment::colData(chip_object$windowCounts)$bam.files, n = 1)
 
 print(paste0("Making QC plots for first sample : ", first_bam))
-#makeQCplots_chip(bam.file = first_bam, outplot = "CSAW/QCplots_first_sample.pdf", pe.param = pe_param)
+makeQCplots_chip(bam.file = first_bam, outplot = "CSAW/QCplots_first_sample.pdf", pe.param = pe_param)
 
 print(paste0("Making QC plots for last sample : ", last_bam))
-#makeQCplots_chip(bam.file = last_bam, outplot = "CSAW/QCplots_last_sample.pdf", pe.param = pe_param)
+makeQCplots_chip(bam.file = last_bam, outplot = "CSAW/QCplots_last_sample.pdf", pe.param = pe_param)
 
 ## merge all peaks from the samples mentioned in sampleinfo to test
 # get files to read from MACS
@@ -77,7 +77,7 @@ allpeaks <- lapply(fnames, function(x) {
 	} else if (file.exists(broad)) {
 		bed <- read.delim(broad, header = FALSE)
 	} else {
-		stop("MACS2 output doesn't exist. Nerither ", narrow, " , nor ", broad)
+		stop("MACS2 output doesn't exist. Neither ", narrow, " , nor ", broad)
 	}
 
 	bed.gr <- GRanges(seqnames = bed$V1, ranges = IRanges(start = bed$V2, end = bed$V3), name = bed$V4)
@@ -98,7 +98,7 @@ chip_object <- tmmNormalize_chip(chip_object, binsize = 10000, plotfile = "CSAW/
 
 ## get DB regions
 print("Performing differential binding")
-chip_results <- getDBregions_chip(chip_object, plotfile = "CSAW/DiffBinding_modelfit.pdf", tfname = "test")
+chip_results <- getDBregions_chip(chip_object, plotfile = "CSAW/DiffBinding_modelfit.pdf")
 
 ## write output
 print("Writing output")

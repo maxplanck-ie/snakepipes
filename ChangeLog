@@ -58,15 +58,32 @@ version 0.4 - 2016 - Fabian Kilpert, Steffen Heyne
 version 0.5 - 2017 - Steffen Heyne, Fabian Kilpert, Michael Rauer
 - major cleanup and refactoring of wrappers and code structure (but not rules)
 - scRNAseq workflow added
-- using yaml config files all over, ie. 
+- using yaml config files all over, ie.
 	1) all wrappers write out a config yaml
 	2) Snakefile configuration only depends on provided '--configfile'
-- better handling and and more usage of common_functions 
+- better handling and and more usage of common_functions
 - all genome config files converted to yaml, function to load genome information
 - own genome file can be provided instead of only pre-configured ones
 - paths config file converted to yaml
 - eliminate organism specific t2g and symbol files, they are now created by rule from gtf
-- check that sleuth is only run if replicates are available 
+- check that sleuth is only run if replicates are available
 - bugfix: only provided wrapper arguments overwrite either defaults or configfile options, before
   a not provided wrapper option (but in config file provided) would be overwritten by default,
   now there is true hierachy: defaults->configfile->wrapper !
+
+
+version 0.6 (a.k.a RattleSnake) - Sept 2017 - Vivek Bhardwaj
+- MAJOR CHANGES:
+  - Allele-Specific mapping : Allele-specific DNA and RNA-mapping is now possible and both ChIP-Seq and RNA-seq pipeline can handle "allele_mapping" mode.
+  - Differential binding : Differential binding can be performed using CSAW, both normal and allele-specific.
+  - MultiQC : MultiQC summarizes QC results for DNA-mapping and RNA-mapping workflows.
+  - R package : New R package called snakediff contains all functions for differential binding and expression. The DE functions have been
+    transformed into clean and consistent layout, with docs.
+  - Deeptools commands : All deeptools commands now moved into common deeptools_cmds module, and are shared between functions.
+
+- MINOR CHANGES:
+  - Wrappers have been formatted for easier readability.
+  - chr X, Y, M and unmapped scaffolds are now ignored for normalization in bamCoverage (DNA-mapping) and bamCompare (Chip-Seq).
+  - bamCompare outputs are named with suffix <control>, instead of a static suffix "Input", this allows the workflow to run with different controls
+    eg. Input, H3 and keep results in same dir. However, MACS2 would still over-write the output files from previous run (needs fix).
+  -
