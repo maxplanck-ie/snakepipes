@@ -1,4 +1,5 @@
-### functions shared across workflows ##########################################
+#!/usr/bin/env python
+# functions shared across workflows ##########################################
 ################################################################################
 import subprocess
 import os
@@ -6,57 +7,58 @@ import re
 import yaml
 
 
-def convert_library_type (R_path, paired, from_library_type, from_prg, to_prg, rscript, tsv):
+def convert_library_type(R_path, paired, from_library_type, from_prg, to_prg, rscript, tsv):
     """ Converts the library to e.g. from 2 (featureCounts) to RF (HISAT2) """
     if paired:
         lib_str = "PE"
     else:
         lib_str = "SE"
 
-    cmd = ("{}Rscript {} {} {} {} {} {}".format(R_path, rscript, tsv, lib_str, from_library_type, from_prg, to_prg) )
-    ##print("\n"+cmd)
+    cmd = ("{}Rscript {} {} {} {} {} {}".format(R_path, rscript, tsv, lib_str, from_library_type, from_prg, to_prg))
+    # print("\n"+cmd)
 
-    return( subprocess.check_output(cmd, shell=True).decode() )
+    return subprocess.check_output(cmd, shell=True).decode()
 
 
 def merge_dicts(x, y):
     z = {}
     z = x.copy()
     z.update(y)
-    return(z)
+    return z
 
 
-## this is a pure sanity fucntion to avoid obvious mailfunction during snakefile execution
-## because we load yaml/path/genome configs directly into global namespace!
+# this is a pure sanity fucntion to avoid obvious mailfunction during snakefile execution
+# because we load yaml/path/genome configs directly into global namespace!
 def sanity_dict_clean(myDict):
-    unwanted_keys = ['maindir','workflow']
+    unwanted_keys = ['maindir', 'workflow']
     for k in unwanted_keys:
-        if k in myDict: del myDict[k]
+        if k in myDict:
+            del myDict[k]
     return myDict
 
 
-def load_configfile(configfile,verbose,info='Config'):
+def load_configfile(configfile, verbose, info='Config'):
     with open(configfile, "r") as f:
         config = yaml.load(f)
 
     config = sanity_dict_clean(config)
 
     if verbose:
-        print("\n--- "+info+" ---------------------------------------------------------------------")
+        print("\n--- " + info + " ---------------------------------------------------------------------")
         print("config file: {}".format(configfile))
-        for k,v in sorted(config.items()):
-            print("{}: {}".format(k,v))
+        for k, v in sorted(config.items()):
+            print("{}: {}".format(k, v))
         print("-" * 80, "\n")
     return config
 
 
-def write_configfile(configfile,config):
+def write_configfile(configfile, config):
     with open(configfile, 'w') as f:
         yaml.dump(config, f, default_flow_style=False)
 
 
-## returns all key-value pairs that are different from dict1 to dict2
-def config_diff(dict1,dict2):
+# returns all key-value pairs that are different from dict1 to dict2
+def config_diff(dict1, dict2):
     diff = {}
     for k in dict1:
         if k in dict2:
@@ -67,48 +69,47 @@ def config_diff(dict1,dict2):
     return diff
 
 
-def load_organism_data(genome,maindir,verbose):
-    if os.path.isfile(os.path.join(maindir, "shared", "organisms", genome+".yaml")):
-        organism = load_configfile(os.path.join(maindir, "shared", "organisms", genome+".yaml"),verbose,"Genome")
+def load_organism_data(genome, maindir, verbose):
+    if os.path.isfile(os.path.join(maindir, "shared", "organisms", genome + ".yaml")):
+        organism = load_configfile(os.path.join(maindir, "shared", "organisms", genome + ".yaml"), verbose, "Genome")
     elif os.path.isfile(genome):
-        organism = load_configfile(genome,verbose,"Genome (user)")
+        organism = load_configfile(genome, verbose, "Genome (user)")
     else:
-        print("ERROR: Genome configuration file NOT found for:", genome, "\n")
-        exit(1)
+        exit("ERROR: Genome configuration file NOT found for: {}\n".format(genome))
     return organism
 
 
-def load_paths(pathfile,maindir,verbose):
-    paths = load_configfile(pathfile,False)
+def load_paths(pathfile, maindir, verbose):
+    paths = load_configfile(pathfile, False)
 
-    ## add path to tools dir
-    paths["workflow_tools"] = os.path.join(maindir,"shared","tools")
+    # add path to tools dir
+    paths["workflow_tools"] = os.path.join(maindir, "shared", "tools")
 
     if verbose:
         print("\n--- paths ---------------------------------------------------------------------")
-        for k,v in sorted(paths.items()):
-            print("{}: {}".format(k,v))
+        for k, v in sorted(paths.items()):
+            print("{}: {}".format(k, v))
         print("-" * 80, "\n")
 
     return paths
 
 
-def get_sample_names(infiles,ext,reads):
+def get_sample_names(infiles, ext, reads):
     """
     Get sample names without file extensions
     """
     s = []
     for x in infiles:
-        x = os.path.basename(x).replace(ext,"")
+        x = os.path.basename(x).replace(ext, "")
         try:
-            x = x.replace(reads[0],"").replace(reads[1],"")
+            x = x.replace(reads[0], "").replace(reads[1], "")
         except:
             pass
         s.append(x)
-    return(sorted(list(set(s))))
+    return sorted(list(set(s)))
 
 
-def is_paired(infiles,ext,reads):
+def is_paired(infiles, ext, reads):
     """
     Check for paired-end input files
     """
@@ -116,11 +117,11 @@ def is_paired(infiles,ext,reads):
     infiles_dic = {}
     for infile in infiles:
         fname = os.path.basename(infile).replace(ext, "")
-        m = re.match("^(.+)("+reads[0]+"|"+reads[1]+")$", fname)
+        m = re.match("^(.+)(" + reads[0] + "|" + reads[1] + ")$", fname)
         if m:
-            ##print(m.group())
+            # print(m.group())
             bname = m.group(1)
-            ##print(bname)
+            # print(bname)
             if bname not in infiles_dic:
                 infiles_dic[bname] = [infile]
             else:
@@ -128,7 +129,7 @@ def is_paired(infiles,ext,reads):
     if infiles_dic and max([len(x) for x in infiles_dic.values()]) == 2:
         paired = True
     # TODO: raise exception if single-end and paired-end files are mixed
-    return(paired)
+    return paired
 
 
 def get_fragment_length(infile):
@@ -154,23 +155,23 @@ def get_fragment_length(infile):
 
 def make_temp_dir(tempdir, fallback_dir, verbose=False):
     try:
-        output = subprocess.check_output("mktemp -d -p "+tempdir+"/ tmp.snakemake.XXXXXXXX",shell=True,stderr=subprocess.STDOUT)
-        temp_path = output.decode().rstrip()+"/";
+        output = subprocess.check_output("mktemp -d -p " + tempdir + "/ tmp.snakemake.XXXXXXXX", shell=True, stderr=subprocess.STDOUT)
+        temp_path = output.decode().rstrip() + "/"
     except subprocess.CalledProcessError:
         try:
-            print("\nFailed to create temp dir under temp path prefix ("+tempdir+")! Try fallback: "+fallback_dir+"/ ...")
-            output = subprocess.check_output("mktemp -d -p "+fallback_dir+"/ tmp.snakemake.XXXXXXXX",shell=True,stderr=subprocess.STDOUT)
-            temp_path = output.decode().rstrip()+"/";
+            print("\nFailed to create temp dir under temp path prefix (" + tempdir + ")! Try fallback: " + fallback_dir + "/ ...")
+            output = subprocess.check_output("mktemp -d -p " + fallback_dir + "/ tmp.snakemake.XXXXXXXX", shell=True, stderr=subprocess.STDOUT)
+            temp_path = output.decode().rstrip() + "/"
         except subprocess.CalledProcessError:
-            print("\nAlso failed to create temp dir under fallback prefix ("+fallback_dir+"/)!")
+            print("\nAlso failed to create temp dir under fallback prefix (" + fallback_dir + "/)!")
             exit(1)
     if verbose:
-        print("\ntemp dir created: "+temp_path)
+        print("\ntemp dir created: " + temp_path)
     return temp_path
 
 
 def checkAlleleParams(args):
-    ## first some sanity checks
+    # first some sanity checks
     if "allelic-mapping" in args.mode:
         if not os.path.exists(args.SNPfile):
             # if no SNPfile, check for a VCF file
@@ -184,7 +185,7 @@ def checkAlleleParams(args):
             else:
                 print("\nError! Please specify either VCF file or SNP file for Allele-specific mapping! \n")
                 exit(1)
-        ## If SNP file is present, check whether genome index also exists
+        # If SNP file is present, check whether genome index also exists
         elif not os.path.exists(os.path.dirname(args.Nmasked_index)):
             print("\nError! Please specify an n-masked index file for Allele-specific mapping! \n")
             exit(1)
@@ -192,4 +193,4 @@ def checkAlleleParams(args):
             allele_mode = 'map_only'
     else:
         allele_mode = None
-    return(allele_mode)
+    return allele_mode

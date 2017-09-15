@@ -1,9 +1,5 @@
 MPI-IE Snakemake workflows
 
-Fabian Kilpert, Andreas Richter, Steffen Heyne, Michael Rauer, Vivek Bhardwaj
-
-2016-2017
-
 ## Workflows ##
 
 - DNA-mapping
