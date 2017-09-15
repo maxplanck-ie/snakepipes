@@ -73,7 +73,7 @@ if(isTRUE(tximport)) {
 }
 
 ## ~~~~~~~ 3. run DESeq wrapper ~~~~~~~~
-seqout <- DESeq_basic(countdata, coldata = sampleInfo, fdr = fdr, alleleSpecific = TRUE, from_salmon = tximport)
+seqout <- DESeq_basic(countdata, coldata = sampleInfo, fdr = fdr, alleleSpecific = allelic_info, from_salmon = tximport)
 
 DESeq_downstream(DEseqout = seqout, countdata, sampleInfo,
 		     fdr = fdr, outprefix = "DEseq_basic", heatmap_topN = topN,
