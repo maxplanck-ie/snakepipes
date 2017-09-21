@@ -18,6 +18,7 @@
 checktable <- function(countdata = NA, sample_info = NA, alleleSpecific = FALSE, salmon_dir = NA, tx2gene_annot = NA) {
 
   ## check whether colnames are allele-specific
+  print(paste0("Allele-specific counts? : ", alleleSpecific))
   if(alleleSpecific) {
     coln <- gsub("(.*)_(all|genome[1|2])", "\\1" , colnames(countdata) )
   } else {
@@ -49,7 +50,7 @@ checktable <- function(countdata = NA, sample_info = NA, alleleSpecific = FALSE,
       print(as.character(sample_info[,1]))
       quit(save = "no", status = 1, runLast = FALSE)   # Exit 1
     } else {
-      countdata <- countdata[,coln %in% sample_info$name]
+      countdata <- countdata[,sample_info$name]
     }
 
   }
