@@ -26,7 +26,6 @@ checktable <- function(countdata = NA, sample_info = NA, alleleSpecific = FALSE,
       coln <- colnames(countdata)
     }
   }
-
   ## check files
   if(!is.na(salmon_dir)) {
 
@@ -47,12 +46,19 @@ checktable <- function(countdata = NA, sample_info = NA, alleleSpecific = FALSE,
     # mode = Normal : check whether sample names in the samplesheet are also present in count table header
     if ( !all( is.element(sort(sample_info[,1]), sort(coln)) )) {
       cat("Error! Count table column names and setup table names do NOT match!\n")
+      print("Count table : ")
+      print(coln)
+      print("Setup table : ")
       print(as.character(sample_info[,1]))
       quit(save = "no", status = 1, runLast = FALSE)   # Exit 1
     } else {
-      countdata <- countdata[,sample_info$name]
+        if(alleleSpecific) {
+            coln_allelic <- paste(rep(sampleInfo$name, each  = 3), c("all","genome1", "genome2"), sep = "_" )
+            countdata <- countdata[,coln_allelic]
+        } else {
+            countdata <- countdata[,sampleInfo$name]
+        }
     }
-
   }
   return(countdata)
 }
