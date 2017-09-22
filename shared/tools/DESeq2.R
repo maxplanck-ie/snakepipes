@@ -1,4 +1,6 @@
-## Usage: cat DESeq2.R | /package/R-3.2.0/bin/R --vanilla --quiet --args setup.tsv counts.txt 0.05 species.gene_names
+#!/usr/bin/env Rscript
+
+## Usage: cat DESeq2.R | /package/R-3.2.0/bin/R --vanilla --quiet --args setup.tsv counts.txt 0.05 species.gene_names ..
 
 # args 1 : design matrix (tsv)
 # args 2 : counts.txt
