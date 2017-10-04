@@ -28,7 +28,7 @@ rule CSAW:
         shell(
         "( export R_LIBS_USER="+R_libs_path+" && "
         "cat "+os.path.join(workflow_tools,"CSAW.R")+" | "
-        ""+os.path.join(R_path,"R")+" --vanilla --args "
+        ""+os.path.join(R_path,"R")+" --vanilla --slave --args "
         "{input.sample_info} "
         "{params.fdr} "
         "{params.paired} "
