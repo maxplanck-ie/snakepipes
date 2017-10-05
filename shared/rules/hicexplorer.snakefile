@@ -63,7 +63,7 @@ if(RF_resolution is True):
              max_dist = MAX_RS_DISTANCE
         log:
            "HiC_matrices/logs/{sample}.log"
-        threads: 16
+        threads: 15
         shell:
             hicExplorer_path + "hicBuildMatrix -s {input.R1} {input.R2} "
             "-rs {input.bed} "
@@ -84,21 +84,20 @@ else:
             matrix = "HiC_matrices/{sample}_"+matrixFile_suffix+".h5",
             bam = "BWA/{sample}_R12_"+matrixFile_suffix+".bam"
         params:
+            QCfolder="HiC_matrices/QCplots/{sample}_QC/",
             bin_size = bin_size,
-            res_seq = get_restriction_seq(enzyme),
-            dang_seq = get_dangling_seq(enzyme),
             region = lambda wildcards: "--region " + restrict_region if restrict_region else "",
             min_dist = MIN_RS_DISTANCE,
             max_dist = MAX_RS_DISTANCE
         log:
            "HiC_matrices/logs/{sample}.log"
-        threads: 16
+        threads: 15
         shell:
             hicExplorer_path + "hicBuildMatrix -s {input.R1} {input.R2} "
             "-bs {params.bin_size} "
-            "--restrictionSequence {params.res_seq} "
             "--minDistance {params.min_dist} "
             "--maxDistance {params.max_dist} "
+            "--QCfolder {params.QCfolder} "
             "--threads {threads} "
             "{params.region} "
             "-b {output.bam} -o {output.matrix} &> {log}"
@@ -134,10 +133,19 @@ rule diagnostic_plot:
     shell:
         hicExplorer_path + "hicCorrectMatrix diagnostic_plot -m {input} -o {output}"
 
+## Correct matrices
+rule correct_matrix:
+    input:
+        "HiC_matrices/{sample}_"+matrixFile_suffix+".h5"
+    output:
+        "HiC_matrices/{sample}_"+matrixFile_suffix+".corrected.h5"
+    shell:
+        hicExplorer_path + "hicCorrectMatrix correct --filterThreshold -1 5 -m {input} -o {output}"
+
 ## Call TADs
 rule call_tads:
     input:
-        "HiC_matrices/{sample}_"+matrixFile_suffix+".h5"
+        "HiC_matrices/{sample}_"+matrixFile_suffix+".corrected.h5"
     output:
         "tads/{sample}_"+matrixFile_suffix+"_boundaries.bed"
     params:

@@ -247,7 +247,7 @@ def main():
         snakemake_cmd.append("--printshellcmds")
 
     if not args.local:
-        snakemake_cmd += ["--cluster 'SlurmEasy --threads {threads} --mem-per-cpu 200G --log", args.cluster_logs_dir, "--name {rule}.snakemake'"]
+        snakemake_cmd += ["--cluster 'SlurmEasy --threads {threads} --mem-per-cpu 10G --log", args.cluster_logs_dir, "--name {rule}.snakemake'"]
 
     snakemake_log = "2>&1 | tee -a {}/Hi-C.log".format(args.outdir).split()
 
