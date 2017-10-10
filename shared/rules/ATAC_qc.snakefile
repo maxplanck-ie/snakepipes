@@ -5,17 +5,15 @@ def isFloat(string):
     except ValueError:
         return False
 
-deeptools_ATAC = "deeptools_ATAC"
-
 rule MACS2_peak_qc:
     input:
         bam = "filtered_bam/{sample}.filtered.bam",
         aln_metrics = "Picard_qc/AlignmentSummaryMetrics/{sample}.alignment_summary_metrics.txt",
-        xls = 'peaks_openChromatin/openchromatin_{sample}_peaks.xls'
+        xls = os.path.join(outdir_MACS2, 'openchromatin_{sample}_peaks.xls')
     output:
         qc = os.path.join(outdir_ATACqc, "{sample}.filtered.BAM_peaks.qc.txt")
     params:
-        peaks = os.path.join(outdir_ATACqc, '/openchromatin_{sample}_peaks.narrowPeak'),
+        peaks = os.path.join(outdir_MACS2, '/openchromatin_{sample}_peaks.narrowPeak'),
         genome_index = genome_index
     log:
         os.path.join(outdir_ATACqc, "logs/ATAC_qc.{sample}.filtered.log")

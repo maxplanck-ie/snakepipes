@@ -72,7 +72,8 @@ rule callOpenChromatin:
     output:
         peaks = os.path.join(outdir_MACS2, 'openchromatin_{sample}_peaks.narrowPeak'),
         pileup = os.path.join(outdir_MACS2, 'openchromatin_{sample}_treat_pileup.bdg'),
-        ctrl = os.path.join(outdir_MACS2, 'openchromatin_{sample}_control_lambda.bdg')
+        ctrl = os.path.join(outdir_MACS2, 'openchromatin_{sample}_control_lambda.bdg'),
+        xls = os.path.join(outdir_MACS2, 'openchromatin_{sample}_peaks.xls')
     params:
         directory = outdir_MACS2,
         genome=genome[0:2],
