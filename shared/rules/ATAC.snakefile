@@ -4,10 +4,12 @@ rule reads2Frags:
     output:
         allFrags=os.path.join(outdir_MACS2, "{sample}.all.bedpe"),
         shortFrags=os.path.join(outdir_MACS2, "{sample}.short.bedpe")
-    threas: 8
+    params:
+        cutoff=atac_fragment_cutoff
+    threads: 6
     shell:
         samtools_path + "samtools sort -l 0 -n -@ {threads} {input} | "
-         + bedtools_path +"bedtools bamtobed -i - |"
+         + bedtools_path +"bedtools bamtobed -bedpe -i - |"
          "awk -v OFS='\\t' -v pos_offset=\"4\" -v neg_offset=\"5\" "
          "'{{ print($1, $2 - pos_offset , $6 + neg_offset ) }}' | tee \"{output.allFrags}\" |"
          "awk -v cutoff={params.cutoff} -v OFS='\\t' \"{{ if(\$3-\$2 < cutoff) {{ print (\$0) }} }}\" > "
@@ -16,16 +18,16 @@ rule reads2Frags:
 # MACS2 BAMPE filter: samtools view -b -f 2 -F 4 -F 8 -F 256 -F 512 -F 2048
 rule callOpenChromatin:
     input:
-        rules.reads2Frags.shortFrags
+        rules.reads2Frags.output.shortFrags
     output:
-        peaks = os.path.join(outdir_MACS2, 'openchromatin_{sample}_peaks.narrowPeak'),
-        pileup = os.path.join(outdir_MACS2, 'openchromatin_{sample}_treat_pileup.bdg'),
-        ctrl = os.path.join(outdir_MACS2, 'openchromatin_{sample}_control_lambda.bdg'),
-        xls = os.path.join(outdir_MACS2, 'openchromatin_{sample}_peaks.xls')
+        peaks = os.path.join(outdir_MACS2, '{sample}_peaks.narrowPeak'),
+        pileup = os.path.join(outdir_MACS2, '{sample}_treat_pileup.bdg'),
+        ctrl = os.path.join(outdir_MACS2, '{sample}_control_lambda.bdg'),
+        xls = os.path.join(outdir_MACS2, '{sample}_peaks.xls')
     params:
         directory = outdir_MACS2,
         genome=genome[0:2],
-        name='openchromatin_{sample}',
+        name='{sample}',
         bandwidth='--bw 25', # + bw_binsize
         qval_cutoff='--qvalue 0.01',
         nomodel='--nomodel',
