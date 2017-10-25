@@ -5,15 +5,19 @@ rule reads2Frags:
         allFrags=os.path.join(outdir_MACS2, "{sample}.all.bedpe"),
         shortFrags=os.path.join(outdir_MACS2, "{sample}.short.bedpe")
     params:
-        cutoff=atac_fragment_cutoff
+        cutoff=atac_fragment_cutoff,
+        chromosomelength=genome_index
     threads: 6
     shell:
-        samtools_path + "samtools sort -l 0 -n -@ {threads} {input} | "
-         + bedtools_path +"bedtools bamtobed -bedpe -i - |"
-         "awk -v OFS='\\t' -v pos_offset=\"4\" -v neg_offset=\"5\" "
-         "'{{ print($1, $2 - pos_offset , $6 + neg_offset ) }}' | tee \"{output.allFrags}\" |"
-         "awk -v cutoff={params.cutoff} -v OFS='\\t' \"{{ if(\$3-\$2 < cutoff) {{ print (\$0) }} }}\" > "
-         "{output.shortFrags}"
+        samtools_path + "samtools sort -l 0 -n -@ {threads} {input} | "         # sort by name
+        + bedtools_path +"bedtools bamtobed -bedpe -i - |"                      # convert to bedpe
+        "awk -v OFS='\\t' '{{ print($1, $2, $6) }}' | "                         # extract fragment to bed
+        # "awk -v OFS='\\t' -v pos_offset=\"4\" -v neg_offset=\"5\" "
+        # "'{{ print($1, $2 - pos_offset , $6 + neg_offset ) }}' | "
+        "tee \"{output.allFrags}\" |"                                           # redirect all fragments
+        "awk -v cutoff={params.cutoff} -v OFS='\\t' \"{{ if(\$3-\$2 < cutoff) {{ print (\$0) }} }}\""   # filter out nucleosomal fragments, i.e. length > cutoff
+        "  > {output.shortFrags}"
+
 
 # MACS2 BAMPE filter: samtools view -b -f 2 -F 4 -F 8 -F 256 -F 512 -F 2048
 rule callOpenChromatin:
