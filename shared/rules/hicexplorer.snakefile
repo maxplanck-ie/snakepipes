@@ -140,7 +140,7 @@ rule correct_matrix:
     output:
         "HiC_matrices/{sample}_"+matrixFile_suffix+".corrected.h5"
     shell:
-        hicExplorer_path + "hicCorrectMatrix correct --filterThreshold -1 5 -m {input} -o {output}"
+        hicExplorer_path + "hicCorrectMatrix correct --filterThreshold -1.2 4 -m {input} -o {output}"
 
 ## Call TADs
 rule call_tads:
