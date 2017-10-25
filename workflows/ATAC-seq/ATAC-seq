@@ -130,7 +130,7 @@ def main():
     with open(os.path.join(args.outdir,'config.yaml'), 'w') as f:
         yaml.dump(config, f, default_flow_style=True)
 
-    snakemake_module_load = "module load snakemake slurm &&".split()
+    snakemake_module_load = "module load snakemake/3.12.0 slurm &&".split()
     snakemake_cmd = """
                     snakemake {snakemake_options} --latency-wait 300 --snakefile {snakefile} --jobs {max_jobs} --directory {outdir} --configfile {configfile}
                     """.format( snakefile = os.path.join(args.this_script_dir, "Snakefile"),
