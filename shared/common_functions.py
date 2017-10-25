@@ -103,7 +103,7 @@ def get_sample_names(infiles, ext, reads):
         x = os.path.basename(x).replace(ext, "")
         try:
             x = x.replace(reads[0], "").replace(reads[1], "")
-        except:
+        except IndexError:
             pass
         s.append(x)
     return sorted(list(set(s)))
