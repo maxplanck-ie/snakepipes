@@ -145,7 +145,7 @@ def get_fragment_length(infile):
                 try:
                     median = next(f).split()[0]
                     return int(median)
-                except:
+                except TypeError:
                     print("ERROR: File", infile, "is NOT a proper Picard CollectInsertSizeMetrics metrics file.\n")
                     exit(1)
     # no match in infile
