@@ -23,7 +23,7 @@ import shutil
 import yaml
 import re
 
-sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))))+"/shared/")
+sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath('__file__')))))+"/shared/")
 import common_functions as cf
 
 def parse_args(defaults):
