@@ -26,12 +26,21 @@ import textwrap
 import time
 import shutil
 import yaml
+import inspect
 
-sys.path.append(os.path.abspath(__file__) + "../../shared/")
+
+#sys.path.append(os.path.abspath(inspect.getfile(inspect.currentframe())) + "../../shared/")
+sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(inspect.getfile(inspect.currentframe())))))+"/shared/")
+#sys.path.append(os.path.abspath(inspect.currentframe())+"../../shared/")
 #sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath('__file__')))))+"/shared/")
+
 import common_functions as cf
 
-def parse_args(defaults):
+def parse_args(defaults={"verbose":None,"configfile":None,"max_jobs":None,"snakemake_options":None,"tempdir":None,
+                         "paired":None,"bw_binsize":None,"sample_info":"","window_size":None}):
+
+#def parse_args(defaults=config):
+    
     """
     Parse arguments from the command line.
     """
@@ -40,7 +49,8 @@ def parse_args(defaults):
         prog=sys.argv[0],
         formatter_class=argparse.RawDescriptionHelpFormatter,
         description=textwrap.dedent(__description__),
-        add_help=False
+        add_help=False,
+        usage=""
     )
 
     optional = parser._action_groups.pop() # Edited this line
@@ -162,6 +172,7 @@ def parse_args(defaults):
 def main():
 
     ## basic paths only used in wrapper
+    #this_script_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
     this_script_dir = os.path.dirname(os.path.realpath(__file__))
     main_dir_path = os.path.join(os.path.dirname(os.path.dirname(this_script_dir)))
 
