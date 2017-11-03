@@ -54,11 +54,14 @@ for sample in samples:
                   'configuration file is NOT available.'.format(file, sample))
             exit(1)
 
-ignoreForPeaks = ignore_forNorm
+if not os.path.exists(outdir_MACS2):
+    os.makedirs(outdir_MACS2)
+
+ignoreForPeaks = ignore_forNorm.split(' ')
 if "X" in ignoreForPeaks:
     ignoreForPeaks.remove("X")
 ignoreForPeaksFile = os.path.join(outdir_MACS2,'Annotation_'+genome+"_chroms.grep_ignore")
 
-with open(ignoreForPeaksFile) as f:
+with open(ignoreForPeaksFile,'w') as f:
     for chrom in ignoreForPeaks:
         f.write('^'+chrom +'\n')
