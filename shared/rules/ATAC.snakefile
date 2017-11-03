@@ -19,10 +19,20 @@ rule reads2Frags:
         "  > {output.shortFrags}"
 
 
+rule filterShortContigs:
+    input:
+        rules.reads2Frags.output.shortFrags
+    output:
+        os.path.join(outdir_MACS2, "{sample}.short.filtered.bedpe")
+    params:
+        ignoreListFile=ignoreForPeaksFile
+    shell:
+        "cat {input} | grep -v -f {params.ignoreListFile} > {output}"
+
 # MACS2 BAMPE filter: samtools view -b -f 2 -F 4 -F 8 -F 256 -F 512 -F 2048
 rule callOpenChromatin:
     input:
-        rules.reads2Frags.output.shortFrags
+        rules.filterShortContigs.output
     output:
         peaks = os.path.join(outdir_MACS2, '{sample}_peaks.narrowPeak'),
         pileup = os.path.join(outdir_MACS2, '{sample}_treat_pileup.bdg'),
