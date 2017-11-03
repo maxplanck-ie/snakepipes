@@ -40,7 +40,7 @@ def parse_args(defaults={"verbose":None,"configfile":None,"max_jobs":None,"snake
                          "paired":None,"bw_binsize":None,"sample_info":"","window_size":None}):
 
 #def parse_args(defaults=config):
-    
+
     """
     Parse arguments from the command line.
     """
@@ -49,8 +49,7 @@ def parse_args(defaults={"verbose":None,"configfile":None,"max_jobs":None,"snake
         prog=sys.argv[0],
         formatter_class=argparse.RawDescriptionHelpFormatter,
         description=textwrap.dedent(__description__),
-        add_help=False,
-        usage=""
+        add_help=False
     )
 
     optional = parser._action_groups.pop() # Edited this line
@@ -63,7 +62,8 @@ def parse_args(defaults={"verbose":None,"configfile":None,"max_jobs":None,"snake
     required.add_argument("-d", "--working-dir",
                         dest="workingdir",
                         help="working directory is output directory and must contain DNA-mapping pipeline output files",
-                        required=True)
+                        required=False,
+                        default=".")
 
     general = parser.add_argument_group('general arguments')
     general.add_argument("-h", "--help",
