@@ -49,7 +49,7 @@ def parse_args(defaults={"verbose":None,"configfile":None,"max_jobs":None,"snake
         add_help=False
     )
 
-    optional = parser._action_groups.pop() # Edited this line
+    #optional = parser._action_groups.pop() # Edited this line
 
     ## positional/required
     parser.add_argument("genome", metavar="GENOME", help="genome acronym of target organism (supported: 'dm3', 'dm6', 'hs37d5', 'mm9', 'mm10', 'SchizoSPombe_ASM294v2')")

@@ -43,7 +43,7 @@ def parse_args(defaults={"verbose":None,"configfile":None,"max_jobs":None,"snake
         add_help=False
     )
 
-    optional = parser._action_groups.pop() # Edited this line
+    #optional = parser._action_groups.pop() # Edited this line
 
     ## positional/required
     parser.add_argument("genome",
@@ -106,7 +106,7 @@ def parse_args(defaults={"verbose":None,"configfile":None,"max_jobs":None,"snake
                         default=defaults["tempdir"])
 
     ## optional
-    parser._action_groups.append(optional)
+    optional = parser.add_argument_group('Optional arguments')
     optional.add_argument("-m", "--mode",
                          dest="mode",
                          help="workflow running modes (available: 'mapping, allelic-mapping')"
