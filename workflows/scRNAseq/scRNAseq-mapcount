@@ -20,11 +20,15 @@ import textwrap
 import time
 import shutil
 import yaml
+import inspect
 
-sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath('__file__')))))+"/shared/")
+sys.path.append(os.path.abspath(inspect.getfile(inspect.currentframe())) + "../../shared/")
 import common_functions as cf
 
-def parse_args(defaults):
+def parse_args(defaults={"verbose":None,"configfile":None,"max_jobs":None,"snakemake_options":None,"tempdir":None,
+                         "downsample":None, "trim":None, "trim_options":None, "cell_names":None,
+                        "filter_annotation":None, "barcode_file":None, "barcode_pattern":None, "split_lib": None,
+                         "bw_binsize":None, "mapq":None}):
     """
     Parse arguments from the command line.
     """
@@ -35,8 +39,6 @@ def parse_args(defaults):
         description=textwrap.dedent(__description__),
         add_help=False
     )
-
-    optional = parser._action_groups.pop() # Edited this line
 
     ## positional/required
     parser.add_argument("genome", metavar="GENOME", help="genome acronym of target organism (supported: 'dm3', 'dm6', 'hs37d5', 'mm9', 'mm10', 'SchizoSPombe_ASM294v2') or file path to your own genome config!")
@@ -56,7 +58,7 @@ def parse_args(defaults):
     general.add_argument("--tempdir", dest="tempdir", type=str, help="used prefix path for temporary directory created via mktemp. Created temp dir gets exported as $TMPDIR and is removed at the end of this wrapper! (default: '%(default)s')", default=defaults["tempdir"])
 
     ## optional
-    parser._action_groups.append(optional)
+    optional = parser.add_argument_group('Optional arguments')
     parser.add_argument("--downsample", dest="downsample", metavar="INT", help="downsample the given number of reads randomly from of each FASTQ file", type=int, default=defaults["downsample"])
     parser.add_argument("--trim", dest="trim", action="store_true", default=defaults["trim"], help="Activate trimming with Cutadapt. Default: no Trimming!")
     parser.add_argument("--trim_options", dest="trim_options", metavar="STR", type=str, help="Options passed to the selected trimmer, e.g. use --trim_options='-a A{30}' for polyA trimming with cutadapt (default: '%(default)s')", default=defaults["trim_options"])
@@ -67,8 +69,15 @@ def parse_args(defaults):
     parser.add_argument("--cell_names",dest="cell_names", metavar="STR",help="either tab-sep. file with cell name ranges or directory with *.csv files that contain cell names and plate/library information for all fastq files! (default: '%(default)s')",default=defaults["cell_names"])
     parser.add_argument("--bw-binsize", dest="bw_binsize", metavar="INT", help="bin size of output files in bigWig format (default: '%(default)s')", type=int, default=defaults["bw_binsize"])
 
+    return parser
 
-    args = parser.parse_args()
+
+def main():
+
+    ## defaults
+    defaults = cf.load_configfile(os.path.join(this_script_dir, "defaults.yaml"),False)
+    ## get command line arguments
+    args = parser.parse_args(defaults)
 
     args.outdir = os.path.abspath(args.outdir)
     args.cluster_logs_dir = os.path.join(args.outdir, "cluster_logs")
@@ -99,20 +108,10 @@ def parse_args(defaults):
             print("\nCell_names file not found! {}\n".format(args.cell_names))
             exit(1)
 
-    return args
-
-
-def main():
 
     ## basic paths only used in wrapper
     this_script_dir = os.path.dirname(os.path.realpath(__file__))
     main_dir_path = os.path.join(os.path.dirname(os.path.dirname(this_script_dir)))
-
-    ## defaults
-    defaults = cf.load_configfile(os.path.join(this_script_dir, "defaults.yaml"),False)
-
-    ## get command line arguments
-    args = parse_args(defaults)
 
     ## we also add these paths to config, although we dont use them in the Snakefile
     args.this_script_dir = this_script_dir
