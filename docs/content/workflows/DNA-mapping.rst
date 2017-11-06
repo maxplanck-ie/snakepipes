@@ -1,7 +1,7 @@
 .. _DNA-mapping:
 
-DNA-mapping pipeline
-====================
+DNA-mapping
+============
 
 Configuration file
 ------------------------
