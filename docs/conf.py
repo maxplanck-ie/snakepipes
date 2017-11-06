@@ -263,8 +263,8 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-  (master_doc, 'snakePipes.tex', u'snakePipes Documentation',
-   u'MPI-IE', 'manual'),
+   (master_doc, 'snakePipes.tex', u'snakePipes Documentation',
+     u'MPI-IE', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -307,9 +307,9 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  (master_doc, 'snakePipes', u'snakePipes Documentation',
-   author, 'snakePipes', 'One line description of project.',
-   'Miscellaneous'),
+    (master_doc, 'snakePipes', u'snakePipes Documentation',
+    author, 'snakePipes', 'One line description of project.',
+    'Miscellaneous'),
 ]
 
 # Documents to append as an appendix to all manuals.
