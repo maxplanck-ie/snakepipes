@@ -299,9 +299,7 @@ man_pages = [(master_doc, 'snakepipes', u'snakePipes Documentation', [author], 1
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'snakePipes', u'snakePipes Documentation',
-    author, 'snakePipes', 'One line description of project.',
-    'Miscellaneous'), ]
+    (master_doc, 'snakePipes', u'snakePipes Documentation', author, 'snakePipes', 'One line description of project.', 'Miscellaneous'), ]
 
 # Documents to append as an appendix to all manuals.
 # texinfo_appendices = []
