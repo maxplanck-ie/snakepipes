@@ -146,7 +146,7 @@ on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 
 if not on_rtd:  # only import and set the theme if we're building docs locally
     import sphinx_rtd_theme
-    html_theme = 'sphinx_rtd_theme'#'alabaster'#'sphinx_rtd_theme'
+    html_theme = 'sphinx_rtd_theme'  # 'alabaster' 'sphinx_rtd_theme'
     html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 
 # Theme options are theme-specific and customize the look and feel of a theme
@@ -244,17 +244,19 @@ htmlhelp_basename = 'snakePipesdoc'
 # -- Options for LaTeX output ---------------------------------------------
 
 latex_elements = {
-# The paper size ('letterpaper' or 'a4paper').
-# 'papersize': 'letterpaper',
 
-# The font size ('10pt', '11pt' or '12pt').
-# 'pointsize': '10pt',
+ # The paper size ('letterpaper' or 'a4paper').
+ # 'papersize': 'letterpaper',
 
-# Additional stuff for the LaTeX preamble.
-# 'preamble': '',
+ # The font size ('10pt', '11pt' or '12pt').
+ # 'pointsize': '10pt',
 
-# Latex figure (float) alignment
-# 'figure_align': 'htbp',
+ # Additional stuff for the LaTeX preamble.
+ # 'preamble': '',
+
+ # Latex figure (float) alignment
+ # 'figure_align': 'htbp',
+
 }
 
 # Grouping the document tree into LaTeX files. List of tuples
