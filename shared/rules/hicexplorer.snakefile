@@ -130,17 +130,23 @@ rule diagnostic_plot:
         "HiC_matrices/{sample}_"+matrixFile_suffix+".h5"
     output:
         "HiC_matrices/QCplots/{sample}_"+matrixFile_suffix+"_diagnostic_plot.pdf"
+    log:
+        "HiC_matrices/QCplots/{sample}_"+matrixFile_suffix+"_mad_threshold.out"
     shell:
-        hicExplorer_path + "hicCorrectMatrix diagnostic_plot -m {input} -o {output}"
+        hicExplorer_path + "hicCorrectMatrix diagnostic_plot -m {input} -o {output} > {log}"
 
 ## Correct matrices
 rule correct_matrix:
     input:
         "HiC_matrices/{sample}_"+matrixFile_suffix+".h5"
     output:
-        "HiC_matrices/{sample}_"+matrixFile_suffix+".corrected.h5"
+        "HiC_matrices_corrected/{sample}_"+matrixFile_suffix+".corrected.h5"
+    params:
+        thresholds = get_mad_score("HiC_matrices/QCplots/{sample}_"+matrixFile_suffix+"_mad_threshold.out")
+    log:
+        "HiC_matrices_corrected/logs/{sample}_"+matrixFile_suffix+".log"
     shell:
-        hicExplorer_path + "hicCorrectMatrix correct --filterThreshold -1.2 4 -m {input} -o {output}"
+        hicExplorer_path + "hicCorrectMatrix correct --filterThreshold {params.thresholds} -m {input} -o {output} >> {log} 2>&1"
 
 ## Call TADs
 rule call_tads:

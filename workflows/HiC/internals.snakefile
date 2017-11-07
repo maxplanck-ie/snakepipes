@@ -55,6 +55,13 @@ def get_merged_bins():
     else:
         return([])
 
+## get MAD thresholds for the matrix correction
+def get_mad_score(madfile):
+    with open(madfile) as md:
+        for line in md:
+            lower = float(line.split()[2])
+    upper = -(3*lower)
+    return([lower,upper])
 
 ## trim
 fastq_dir = "FASTQ"
