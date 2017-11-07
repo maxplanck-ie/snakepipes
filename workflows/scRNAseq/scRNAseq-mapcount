@@ -22,7 +22,7 @@ import shutil
 import yaml
 import inspect
 
-sys.path.append(os.path.abspath(os.path.dirname(inspect.getfile(inspect.currentframe()))) + "/shared/")
+sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(inspect.getfile(inspect.currentframe()) )))))+"/shared/")
 
 import common_functions as cf
 
