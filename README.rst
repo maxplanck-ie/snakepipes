@@ -25,7 +25,7 @@ Installation
 -------------
 
 Currently the workflows don't require installation of the scripts. Simply clone this github repository
-and modify the configuration files with your own paths.
+and modify the configuration files under `shared/organisms` and `shared/paths.yaml` with your own paths.
 
 Documentation
 --------------
