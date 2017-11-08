@@ -1,4 +1,6 @@
-## Usage: cat DESeq2.R | /package/R-3.2.0/bin/R --vanilla --quiet --args setup.tsv counts.txt 0.05 species.gene_names
+#!/usr/bin/env Rscript
+
+## Usage: cat DESeq2.R | /package/R-3.2.0/bin/R --vanilla --quiet --args setup.tsv counts.txt 0.05 species.gene_names ..
 
 # args 1 : design matrix (tsv)
 # args 2 : counts.txt
@@ -50,6 +52,8 @@ cat(paste("Salmon tx2gene file : ", tx2gene_file, "\n"))
 ## ~~~~~ 1. SETUP ~~~~~
 ## sampleInfo (setup of the experiment)
 sampleInfo <- read.table(sampleInfoFilePath, header = TRUE, stringsAsFactor = F)
+sampleInfo$condition <- as.factor(sampleInfo$condition)
+sampleInfo$condition <- relevel(sampleInfo$condition, ref = "control")
 
 ## add X at the beginning of rows beginning with a number (makes it consistent to column names of of the count matrix!)
 if ( any(grepl("^[0-9]", sampleInfo$name)) ) {
@@ -73,12 +77,12 @@ if(isTRUE(tximport)) {
 }
 
 ## ~~~~~~~ 3. run DESeq wrapper ~~~~~~~~
-seqout <- DESeq_basic(countdata, coldata = sampleInfo, fdr = fdr, alleleSpecific = TRUE, from_salmon = tximport)
+seqout <- DESeq_basic(countdata, coldata = sampleInfo, fdr = fdr, alleleSpecific = allelic_info, from_salmon = tximport)
 
 DESeq_downstream(DEseqout = seqout, countdata, sampleInfo,
 		     fdr = fdr, outprefix = "DEseq_basic", heatmap_topN = topN,
 		     geneNamesFile = geneNamesFilePath)
-print(allelic_info)
+
 ## Run allele-sepecific DESeq wrapper (if asked for)
 if (isTRUE(allelic_info)) {
 	seqout_allelic <- DESeq_allelic(countdata, coldata = sampleInfo, fdr = fdr)

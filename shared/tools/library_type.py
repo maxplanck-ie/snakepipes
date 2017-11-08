@@ -14,69 +14,59 @@ def convert_library_type(library_type, prog, paired):
 
     if prog == "TopHat2":
         new == library_type
-
-
     elif prog == "RSeQC":
-        if library_type == 'fr-firststrand' and paired==True:
+        if library_type == 'fr-firststrand' and paired:
             new = '"1+-,1-+,2++,2--"'
-        elif library_type == 'fr-secondstrand' and paired==True:
+        elif library_type == 'fr-secondstrand' and paired:
             new = '"1++,1--,2+-,2-+"'
-        elif library_type == 'fr-firststrand' and paired==False:
+        elif library_type == 'fr-firststrand' and paired is False:
             new = '"+-,-+"'
-        elif library_type == 'fr-secondstrand' and paired==False:
+        elif library_type == 'fr-secondstrand' and paired is False:
             new = '"++,--"'
         elif library_type == 'fr-unstranded':
             new = ''
         else:
             new = ''
-
-
     elif prog == "HISAT2":
-        if library_type == 'fr-firststrand' and paired==True:
+        if library_type == 'fr-firststrand' and paired:
             new = 'RF'
-        elif library_type == 'fr-secondstrand' and paired==True:
+        elif library_type == 'fr-secondstrand' and paired:
             new = 'FR'
-        elif library_type == 'fr-firststrand' and paired==False:
+        elif library_type == 'fr-firststrand' and paired is False:
             new = 'R'
-        elif library_type == 'fr-secondstrand' and paired==False:
+        elif library_type == 'fr-secondstrand' and paired is False:
             new = 'F'
         elif library_type == 'fr-unstranded':
             new = 'unstranded'
-
-
     elif prog == "htseq-count":
-        if library_type == 'fr-firststrand' and paired==True:
+        if library_type == 'fr-firststrand' and paired:
             new = 'reverse'
-        elif library_type == 'fr-secondstrand' and paired==True:
+        elif library_type == 'fr-secondstrand' and paired:
             new = 'yes'
-        elif library_type == 'fr-firststrand' and paired==False:
+        elif library_type == 'fr-firststrand' and paired is False:
             new = 'reverse'
-        elif library_type == 'fr-secondstrand' and paired==False:
+        elif library_type == 'fr-secondstrand' and paired is False:
             new = 'yes'
         elif library_type == 'fr-unstranded':
             new = 'no'
-
-
     elif prog == "featureCounts":
-        if library_type == 'fr-firststrand' and paired==True:
+        if library_type == 'fr-firststrand' and paired:
             new = '2'
-        elif library_type == 'fr-secondstrand' and paired==True:
+        elif library_type == 'fr-secondstrand' and paired:
             new = '1'
-        elif library_type == 'fr-firststrand' and paired==False:
+        elif library_type == 'fr-firststrand' and paired is False:
             new = '2'
-        elif library_type == 'fr-secondstrand' and paired==False:
+        elif library_type == 'fr-secondstrand' and paired is False:
             new = '1'
         elif library_type == 'fr-unstranded':
             new = '0'
-
     elif prog == "Bowtie2":
-        if library_type == 'fr-firststrand' and paired==True:
+        if library_type == 'fr-firststrand' and paired:
             new = '--fr'
-        elif library_type == 'fr-secondstrand' and paired==True:
+        elif library_type == 'fr-secondstrand' and paired:
             new = '--rf'
         else:
             new = ''
-
     return new
 
 
@@ -93,13 +83,13 @@ for infile in infiles:
                 paired = True
 
             if line.startswith('Fraction of reads explained by "'):
-                values = line.replace('Fraction of reads explained by "','').split('": ')
+                values = line.replace('Fraction of reads explained by "', '').split('": ')
                 strands[values[0]] = float(values[1])
             if line.startswith('Fraction of reads explained by other combinations: '):
-                value = float(line.replace('Fraction of reads explained by other combinations: ',''))
+                value = float(line.replace('Fraction of reads explained by other combinations: ', ''))
                 if value >= 0.2:
                     print("ERROR: A larger fraction %s of reads is explained by uncommon strand combinations!".format(value))
-                    print (infile)
+                    print(infile)
                     exit(1)
 
         if len(strands.keys()) != 2:
@@ -107,7 +97,7 @@ for infile in infiles:
             print(infile)
             exit(1)
 
-        threshold = 0.6      #min quotient threshold
+        threshold = 0.6  # min quotient threshold
 
         k = strands.keys()
         v = strands.values()
@@ -128,21 +118,16 @@ for infile in infiles:
         overall_paired.append(paired)
 
 
-## majority library_type
+# majority library_type
 paired = Counter(overall_paired).most_common()[0][0]
 library_type = Counter(overall_library_type).most_common()[0][0]
 
-
-##print library_type[0][0]
 
 if paired:
     print("library_type\tpaired-end")
 else:
     print("library_type\tsingle-end")
 
-##print("TopHat2\t{}".format(library_type))
-print("RSeQC\t{}".format(convert_library_type( library_type, 'RSeQC', paired ) ))
-##print("HISAT2\t{}".format(convert_library_type( library_type, 'HISAT2', paired ) ))
-##print("htseq-count\t{}".format(convert_library_type( library_type, 'htseq-count', paired ) ))
-print("Bowtie2\t{}".format(convert_library_type( library_type, 'Bowtie2', paired ) ))
-print("featureCounts\t{}".format(convert_library_type( library_type, 'featureCounts', paired ) ))
+print("RSeQC\t{}".format(convert_library_type(library_type, 'RSeQC', paired)))
+print("Bowtie2\t{}".format(convert_library_type(library_type, 'Bowtie2', paired)))
+print("featureCounts\t{}".format(convert_library_type(library_type, 'featureCounts', paired)))

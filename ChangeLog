@@ -86,4 +86,8 @@ version 0.6 (a.k.a RattleSnake) - Sept 2017 - Vivek Bhardwaj
   - chr X, Y, M and unmapped scaffolds are now ignored for normalization in bamCoverage (DNA-mapping) and bamCompare (Chip-Seq).
   - bamCompare outputs are named with suffix <control>, instead of a static suffix "Input", this allows the workflow to run with different controls
     eg. Input, H3 and keep results in same dir. However, MACS2 would still over-write the output files from previous run (needs fix).
-  -
+
+Version 0.6.1
+
+- MINOR CHANGES:
+  - The allele-specific option is no longer on by default (it was Vivek's fault)
