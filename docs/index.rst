@@ -14,6 +14,7 @@ Pipeline                            Description
 :ref:`ChIP-Seq`                 Use the DNA mapping output and run ChIP/Input normalization and peak calling
 :ref:`RNA-Seq`                  RNA-Seq workflow : From mapping to differential expression using DEseq2
 :ref:`scRNA-Seq`                Single-cell RNA-Seq workflow : From mapping to differential expression
+:ref:`HiC`                      Hi-C analysis workflow, from mapping to TAD calling
 =============================== ===========================================================================================
 
 Quick start
