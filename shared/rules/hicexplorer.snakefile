@@ -129,11 +129,10 @@ rule diagnostic_plot:
     input:
         "HiC_matrices/{sample}_"+matrixFile_suffix+".h5"
     output:
-        "HiC_matrices/QCplots/{sample}_"+matrixFile_suffix+"_diagnostic_plot.pdf"
-    log:
-        "HiC_matrices/QCplots/{sample}_"+matrixFile_suffix+"_mad_threshold.out"
+        plot = "HiC_matrices/QCplots/{sample}_"+matrixFile_suffix+"_diagnostic_plot.pdf",
+        mad = "HiC_matrices/QCplots/{sample}_"+matrixFile_suffix+"_mad_threshold.out"
     shell:
-        hicExplorer_path + "hicCorrectMatrix diagnostic_plot -m {input} -o {output} > {log}"
+        hicExplorer_path + "hicCorrectMatrix diagnostic_plot -m {input} -o {output.plot} > {output.mad}"
 
 ## Correct matrices
 rule correct_matrix:
