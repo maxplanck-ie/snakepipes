@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 
-__version__ = "0.5"
+__version__ = "0.6"
 
 __description__ = """
 single cell RNA-seq mapping and counting workflow v{version} - MPI-IE workflow for scRNA-seq
-Steffen Heyne, Dominic Gruen
-June, 2017
 
 usage example:
     scRNAseq-mapcount -i input-dir -o output-dir mm10

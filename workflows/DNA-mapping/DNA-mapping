@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 
-__version__ = "0.5"
+__version__ = "0.6"
 
 __description__ = """
 DNA-mapping workflow v{version} - MPI-IE workflow for DNA mapping
-Fabian Kilpert, Andreas Richter, Steffen Heyne
-June, 2017
 
 usage example:
     DNA-mapping -i input-dir -o output-dir mm10
@@ -24,8 +22,7 @@ import yaml
 import inspect
 
 sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(inspect.getfile(inspect.currentframe()) )))))+"/shared/")
-#sys.path.append(os.path.abspath(os.path.dirname(inspect.getfile(inspect.currentframe()))) + "/shared/")
-#sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(inspect.getfile(inspect.currentframe())))))+"/shared/")
+
 
 import common_functions as cf
 
