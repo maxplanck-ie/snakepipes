@@ -138,7 +138,8 @@ rule diagnostic_plot:
 ## Correct matrices
 rule correct_matrix:
     input:
-        "HiC_matrices/{sample}_"+matrixFile_suffix+".h5"
+        "HiC_matrices/{sample}_"+matrixFile_suffix+".h5",
+        "HiC_matrices/QCplots/{sample}_"+matrixFile_suffix+"_mad_threshold.out"
     output:
         "HiC_matrices_corrected/{sample}_"+matrixFile_suffix+".corrected.h5"
     params:
