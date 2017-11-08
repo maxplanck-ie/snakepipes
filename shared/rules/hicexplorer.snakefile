@@ -144,9 +144,11 @@ rule correct_matrix:
     log:
         "HiC_matrices_corrected/logs/{sample}_"+matrixFile_suffix+".log"
     run:
-        thresholds = get_mad_score("{input.mad}")
+        thresholds = get_mad_score(input.mad)
+        #print("Thresholds for matrix correction are %s".format(thresholds))
         shell(
-            hicExplorer_path + "hicCorrectMatrix correct --filterThreshold {params.thresholds} -m {input.matrix} -o {output} >> {log} 2>&1"
+            hicExplorer_path + "hicCorrectMatrix correct --filterThreshold " +
+            thresholds + " -m {input.matrix} -o {output} > {log} 2>&1"
             )
 
 
@@ -159,10 +161,12 @@ rule call_tads:
     params:
         prefix="tads/{sample}_"+matrixFile_suffix,
         parameters=tadparams
+    threads: 10
     log:
        "tads/logs/{sample}_findTADs.log"
     shell:
         hicExplorer_path + "hicFindTADs -m {input} "
         "{params.parameters} "# needs to be variable
         "--correctForMultipleTesting bonferroni "
-        "--outPrefix {params.prefix} > {log}"
+        "-p {threads} "
+        "--outPrefix {params.prefix} > {log} 2>&1"

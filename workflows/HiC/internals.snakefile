@@ -61,7 +61,8 @@ def get_mad_score(madfile):
         for line in md:
             lower = float(line.split()[2])
     upper = -(3*lower)
-    return([lower,upper])
+    cutoff = str(lower) + " " + str(upper)
+    return(cutoff)
 
 ## trim
 fastq_dir = "FASTQ"
