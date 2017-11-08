@@ -82,7 +82,6 @@ rule all:
         run_Trimming(trim, fastqc),
         expand(mapping_prg+"/{sample}{read}.bam", sample = samples, read = reads),
         expand(mapping_prg+"/{sample}{read}_sorted.bam.bai", sample = samples, read = reads),
-        #expand("filtered_bam/{sample}.filtered.bam", sample = samples),
         expand("HiC_matrices/{sample}_"+matrixFile_suffix+".h5", sample=samples),
         expand("HiC_matrices_corrected/{sample}_"+matrixFile_suffix+".corrected.h5", sample=samples),
         expand("HiC_matrices/QCplots/{sample}_"+matrixFile_suffix+"_diagnostic_plot.pdf", sample=samples),
