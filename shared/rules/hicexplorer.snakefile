@@ -162,4 +162,5 @@ rule call_tads:
     shell:
         hicExplorer_path + "hicFindTADs -m {input} "
         "{params.parameters} "# needs to be variable
+        "--correctForMultipleTesting bonferroni "
         "--outPrefix {params.prefix} > {log}"
