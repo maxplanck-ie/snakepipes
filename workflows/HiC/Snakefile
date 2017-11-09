@@ -81,7 +81,6 @@ rule all:
         run_FastQC(fastqc),
         run_Trimming(trim, fastqc),
         expand(mapping_prg+"/{sample}{read}.bam", sample = samples, read = reads),
-#        expand(mapping_prg+"/{sample}{read}_sorted.bam.bai", sample = samples, read = reads),
         expand("HiC_matrices/{sample}_"+matrixFile_suffix+".h5", sample=samples),
         expand("HiC_matrices/QCplots/{sample}_"+matrixFile_suffix+"_diagnostic_plot.pdf", sample=samples),
         expand("HiC_matrices/QCplots/{sample}_"+matrixFile_suffix+"_mad_threshold.out", sample=samples),

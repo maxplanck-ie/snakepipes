@@ -24,26 +24,6 @@ rule map_fastq_single_end:
         "-t {threads} " + bwa_index + " {input} 2>> {log} | "
         + samtools_path + "samtools view -Shb - > {output}"
 
-#rule sort_bam:
-#    input:
-#        "BWA/{sample}{read}.bam"
-#    output:
-#        "BWA/{sample}{read}_sorted.bam"
-#    params:
-#        prefix="BWA/_{sample}"
-#    threads: 10
-#    shell:
-#        samtools_path + "samtools sort {input} -@{threads} "
-#        "-m 4G -T ${{TMPDIR}}{wildcards.sample} -O bam -o {output}"
-
-#rule index_bam:
-#    input:
-#        "BWA/{sample}{read}_sorted.bam"
-#    output:
-#        "BWA/{sample}{read}_sorted.bam.bai"
-#    shell:
-#        samtools_path + "samtools index {input}"
-
 ## Make HiC Matrix
 if(RF_resolution is True):
     rule build_matrix:
