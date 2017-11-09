@@ -142,7 +142,7 @@ rule call_tads:
     output:
         "TADs/{sample}_"+matrixFile_suffix+"_boundaries.bed"
     params:
-        prefix="tads/{sample}_"+matrixFile_suffix,
+        prefix="TADs/{sample}_"+matrixFile_suffix,
         parameters=tadparams
     threads: 10
     log:
