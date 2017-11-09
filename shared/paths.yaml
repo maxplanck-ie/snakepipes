@@ -1,6 +1,10 @@
 # external tools
 # path names must end with "/" and not include the name of the executable
 # 'workflow_tools' is set on runtime (see common_functions.py:load_paths())
+# paths referring to a local folder
+R_libs_path: "/data/manke/repository/scripts/snakemake_workflows/R/x86_64-unknown-linux-gnu-library/3.3/"
+histoneHMM_path: "/data/manke/repository/scripts/snakemake_workflows/R/x86_64-redhat-linux-gnu-library/3.3/histoneHMM/bin/"
+# paths referring to /package/
 bedtools_path: "/package/bedtools2-2.25.0/bin/"
 bowtie2_path: "/package/bowtie2-2.2.8/bin/"
 cutadapt_path: "/package/cutadapt-1.9.1/bin/"
@@ -9,7 +13,6 @@ fastqc_path: "/package/FastQC-0.11.3/bin/"
 feature_counts_path: "/package/subread-1.5.2/bin/"
 hisat2_path: "/package/hisat2-2.0.4/"
 star_path: "/package/STAR-2.5.3a/bin/"
-histoneHMM_path: "/data/manke/repository/scripts/snakemake_workflows/R/x86_64-redhat-linux-gnu-library/3.3/histoneHMM/bin/"
 macs2_path: "/package/MACS2-2.1.1.20160309/bin/"
 qualimap_path: "/package/qualimap-2.2/"
 picard_path: "/package/picard-tools-1.136/"
@@ -20,9 +23,8 @@ sambamba_path: "/package/sambamba-0.6.6/bin/"
 tabix_path: "/package/tabix-1.2.1/"
 trim_galore_path: "/package/trim_galore_v0.4.4/"
 UCSC_tools_path: "/package/UCSCtools/"
-R_libs_path: "/data/manke/repository/scripts/snakemake_workflows/R/x86_64-unknown-linux-gnu-library/3.3/"
-histoneHMM_path: "/data/manke/repository/scripts/snakemake_workflows/R/x86_64-redhat-linux-gnu-library/3.3/histoneHMM/bin/"
 SNPsplit_path: "/package/SNPsplit-0.3.3/bin/"
 multiqc_path: "/package/MultiQC-1.2/bin/"
-hicExplorer_path: "/home/bhardwaj/programs/HiCExplorer/bin/"
 bwa_path: "/package/bwa-0.7.12/bin/"
+# paths referring to a conda installation (Temporary : in the future, all paths would be loaded from conda via module load)
+hicExplorer_path: "/package/anaconda3/envs/HiCExplorer-1.8/bin/"
