@@ -21,13 +21,19 @@ import textwrap
 import time
 import shutil
 import yaml
+import inspect
 
+sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(inspect.getfile(inspect.currentframe()) )))))+"/shared/")
+#sys.path.append(os.path.abspath(os.path.dirname(inspect.getfile(inspect.currentframe()))) + "/shared/")
+#sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(inspect.getfile(inspect.currentframe())))))+"/shared/")
 
-sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))))+"/shared/")
 import common_functions as cf
 
 
-def parse_args(defaults):
+def parse_args(defaults={"verbose":None,"configfile":None,"max_jobs":None,"snakemake_options":None,"tempdir":None,
+                         "mode":None, "downsample":None, "trim":None,"trim_prg":None,"trim_options":None, "fastqc":None,
+                         "qualimap":None, "dedup":None, "properpairs":None, "insert_size_max":None, "gcbias":None,
+                         "bw_binsize":None, "mapq":None}):
     """
     Parse arguments from the command line.
     """
@@ -39,7 +45,7 @@ def parse_args(defaults):
         add_help=False
     )
 
-    optional = parser._action_groups.pop() # Edited this line
+    #optional = parser._action_groups.pop() # Edited this line
 
     ## positional/required
     parser.add_argument("genome",
@@ -102,7 +108,7 @@ def parse_args(defaults):
                         default=defaults["tempdir"])
 
     ## optional
-    parser._action_groups.append(optional)
+    optional = parser.add_argument_group('Optional arguments')
     optional.add_argument("-m", "--mode",
                          dest="mode",
                          help="workflow running modes (available: 'mapping, allelic-mapping')"
@@ -211,7 +217,24 @@ def parse_args(defaults):
                         default='',
                         type=str)
 
+    return parser
+
+
+def main():
+
+    ## basic paths only used in wrapper
+    this_script_dir = os.path.dirname(os.path.realpath(__file__))
+    main_dir_path = os.path.join(os.path.dirname(os.path.dirname(this_script_dir)))
+
+    ## defaults
+    defaults = cf.load_configfile(os.path.join(this_script_dir, "defaults.yaml"),False)
+
+    ## get command line arguments
+    parser = parse_args(defaults)
     args = parser.parse_args()
+    ## we also add these paths to config, although we dont use them in the Snakefile
+    args.this_script_dir = this_script_dir
+    args.main_dir_path = main_dir_path
 
     args.outdir = os.path.abspath(args.outdir)
     args.cluster_logs_dir = os.path.join(args.outdir, "cluster_logs")
@@ -235,25 +258,6 @@ def parse_args(defaults):
     if args.configfile and not os.path.exists(args.configfile):
         print("\nError! Provided configfile (-c) not found! ({})\n".format(args.configfile))
         exit(1)
-
-    return args
-
-
-def main():
-
-    ## basic paths only used in wrapper
-    this_script_dir = os.path.dirname(os.path.realpath(__file__))
-    main_dir_path = os.path.join(os.path.dirname(os.path.dirname(this_script_dir)))
-
-    ## defaults
-    defaults = cf.load_configfile(os.path.join(this_script_dir, "defaults.yaml"),False)
-
-    ## get command line arguments
-    args = parse_args(defaults)
-
-    ## we also add these paths to config, although we dont use them in the Snakefile
-    args.this_script_dir = this_script_dir
-    args.main_dir_path = main_dir_path
 
     ## merge configuration dicts
     config = defaults   # 1) form defaults.yaml
