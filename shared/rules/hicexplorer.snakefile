@@ -24,29 +24,29 @@ rule map_fastq_single_end:
         "-t {threads} " + bwa_index + " {input} 2>> {log} | "
         + samtools_path + "samtools view -Shb - > {output}"
 
-rule sort_bam:
-    input:
-        "BWA/{sample}{read}.bam"
-    output:
-        "BWA/{sample}{read}_sorted.bam"
-    params:
-        prefix="BWA/_{sample}"
-    threads: 10
-    shell:
-        samtools_path + "samtools sort {input} -@{threads} "
-        "-m 4G -T ${{TMPDIR}}{wildcards.sample} -O bam -o {output}"
+#rule sort_bam:
+#    input:
+#        "BWA/{sample}{read}.bam"
+#    output:
+#        "BWA/{sample}{read}_sorted.bam"
+#    params:
+#        prefix="BWA/_{sample}"
+#    threads: 10
+#    shell:
+#        samtools_path + "samtools sort {input} -@{threads} "
+#        "-m 4G -T ${{TMPDIR}}{wildcards.sample} -O bam -o {output}"
 
-rule index_bam:
-    input:
-        "BWA/{sample}{read}_sorted.bam"
-    output:
-        "BWA/{sample}{read}_sorted.bam.bai"
-    shell:
-        samtools_path + "samtools index {input}"
+#rule index_bam:
+#    input:
+#        "BWA/{sample}{read}_sorted.bam"
+#    output:
+#        "BWA/{sample}{read}_sorted.bam.bai"
+#    shell:
+#        samtools_path + "samtools index {input}"
 
 ## Make HiC Matrix
 if(RF_resolution is True):
-    rule make_hic_matrix:
+    rule build_matrix:
         input:
             R1 = "BWA/{sample}_R1.bam",
             R2 = "BWA/{sample}_R2.bam",
@@ -76,7 +76,7 @@ if(RF_resolution is True):
             "{params.region} "
             "-b {output.bam} -o {output.matrix} &> {log}"
 else:
-    rule make_hic_matrix:
+    rule build_matrix:
         input:
             R1 = "BWA/{sample}_R1.bam",
             R2 = "BWA/{sample}_R2.bam"
@@ -142,13 +142,16 @@ rule correct_matrix:
     output:
         "HiC_matrices_corrected/{sample}_"+matrixFile_suffix+".corrected.h5"
     log:
-        "HiC_matrices_corrected/logs/{sample}_"+matrixFile_suffix+".log"
+        correct = "HiC_matrices_corrected/logs/{sample}_"+matrixFile_suffix+".log"
     run:
         thresholds = get_mad_score(input.mad)
-        #print("Thresholds for matrix correction are %s".format(thresholds))
+        f = open(log.correct, 'w')
+        f.write('Thresholds for matrix correction are : {} \n'. format(thresholds))
+        f.close()
+
         shell(
             hicExplorer_path + "hicCorrectMatrix correct --filterThreshold " +
-            thresholds + " -m {input.matrix} -o {output} > {log} 2>&1"
+            thresholds + " -m {input.matrix} -o {output} >> {log.correct} 2>&1"
             )
 
 
@@ -157,13 +160,13 @@ rule call_tads:
     input:
         "HiC_matrices_corrected/{sample}_"+matrixFile_suffix+".corrected.h5"
     output:
-        "tads/{sample}_"+matrixFile_suffix+"_boundaries.bed"
+        "TADs/{sample}_"+matrixFile_suffix+"_boundaries.bed"
     params:
         prefix="tads/{sample}_"+matrixFile_suffix,
         parameters=tadparams
     threads: 10
     log:
-       "tads/logs/{sample}_findTADs.log"
+       "TADs/logs/{sample}_findTADs.log"
     shell:
         hicExplorer_path + "hicFindTADs -m {input} "
         "{params.parameters} "# needs to be variable
