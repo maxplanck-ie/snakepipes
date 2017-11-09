@@ -3,8 +3,8 @@ MPI-IE Snakemake workflows : snakePipes
 ===========================================================
 
 .. image:: https://readthedocs.org/projects/snakepipes/badge/?version=latest
-   :target: http://snakepipes.readthedocs.io/en/latest/?badge=latest
-   :alt: Documentation Status
+    :target: http://snakepipes.readthedocs.io/en/latest/?badge=latest
+    :alt: Documentation Status
 
 .. image:: https://travis-ci.org/maxplanck-ie/snakemake_workflows.svg?branch=develop
     :target: https://travis-ci.org/maxplanck-ie/snakemake_workflows
