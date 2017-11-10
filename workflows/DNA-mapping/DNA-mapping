@@ -122,7 +122,8 @@ def parse_args(defaults={"verbose":None,"configfile":None,"max_jobs":None,"snake
     parser.add_argument("--trim",
                         dest="trim",
                         action="store_true",
-                        help="activate trimming (default: '%(default)s')",
+                        help="Activate fastq read trimming. If activated, Illumina adaptors are trimmed by default. "
+                        "Additional parameters can be specified under --trim_options (default: '%(default)s')",
                         default=defaults["trim"])
 
     parser.add_argument("--trim_prg",

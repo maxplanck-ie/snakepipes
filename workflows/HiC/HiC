@@ -3,7 +3,7 @@
 __version__ = "0.7"
 
 __description__ = """
-DNA-mapping workflow v{version} - MPI-IE workflow for Hi-C analysis
+Hi-C workflow v{version} - MPI-IE workflow for Hi-C analysis
 
 usage example:
     HiC -i input-dir -o output-dir mm10
@@ -113,7 +113,8 @@ def parse_args(defaults={"verbose":None,"configfile":None,"max_jobs":None,"snake
     optional.add_argument("--trim",
                         dest="trim",
                         action="store_true",
-                        help="activate trimming (default: '%(default)s')",
+                        help="Activate fastq read trimming. If activated, Illumina adaptors are trimmed by default. "
+                        "Additional parameters can be specified under --trim_options (default: '%(default)s')",
                         default=defaults["trim"])
 
     optional.add_argument("--trim_prg",

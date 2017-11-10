@@ -49,7 +49,7 @@ def parse_args(defaults):
     parser.add_argument("--snakemake_options", dest="snakemake_options", metavar="STR", type=str, help="Snakemake options to be passed directly to snakemake, e.g. use --snakemake_options='--dryrun --rerun-incomplete --unlock --forceall'. (default: '%(default)s')", default='')
     parser.add_argument("--downsample", dest="downsample", metavar="INT", help="downsample the given number of reads from the head of each FASTQ file (default: '%(default)s')", type=int, default=defaults["downsample"])
     parser.add_argument("--trim_prg", dest="trim_prg", choices=['cutadapt', 'trimgalore'], help="trimming program: Cutadapt or TrimGalore (default: '%(default)s')", default=defaults["trim_prg"])
-    parser.add_argument("--trim", dest="trim", action="store_true", help="activate trimming (default: '%(default)s')", default=defaults["trim"])
+    parser.add_argument("--trim", dest="trim", action="store_true", help="Activate fastq read trimming. If activated, Illumina adaptors are trimmed by default. Additional parameters can be specified under --trim_options (default: '%(default)s')", default=defaults["trim"])
     parser.add_argument("--qualimap", dest="qualimap", action="store_true", help="activate Qualimap (default: '%(default)s')", default=defaults["qualimap"])
     parser.add_argument("--fastqc", dest="fastqc", action="store_true", help="run FastQC read quality control (default: '%(default)s')", default=defaults["fastqc"])
     parser.add_argument("--dedup", dest="dedup", action="store_true", help="retain only de-duplicated reads/read pairs (given single-/paired-end data), recommended for ChIP-seq data (default: '%(default)s')", default=defaults["dedup"])
