@@ -3,8 +3,8 @@ snakePipes
 
 snakePipes are pipelines built using snakemake for the analysis of various sequencing datasets.
 
-The following is the list of pipelines available in snakePipes
----------------------------------------------------------------
+Below is the list of pipelines available in snakePipes
+-------------------------------------------------------
 
 
 =============================== ===========================================================================================
@@ -14,6 +14,7 @@ Pipeline                            Description
 :ref:`ChIP-Seq`                 Use the DNA mapping output and run ChIP/Input normalization and peak calling
 :ref:`RNA-Seq`                  RNA-Seq workflow : From mapping to differential expression using DEseq2
 :ref:`scRNA-Seq`                Single-cell RNA-Seq workflow : From mapping to differential expression
+:ref:`HiC`                      Hi-C analysis workflow, from mapping to TAD calling
 =============================== ===========================================================================================
 
 Quick start
@@ -86,7 +87,7 @@ Further organisms can be supported by adding a genome configuration file `my_org
 	blacklist_bed: "/SOMEPATH/hs37d5_ensembl/ENCODE/hs37d5_extended_Encode-blacklist.bed"
 
 
-If no blacklist regions are available for your organism of interest, leave it empty `blacklist_bed: `
+.. note:: If no blacklist regions are available for your organism of interest, leave `blacklist_bed:` empty
 
 
 Contents:
@@ -95,10 +96,13 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
+   content/setting_up.rst
    content/workflows/DNA-mapping.rst
    content/workflows/ChIP-seq.rst
    content/workflows/RNA-seq.rst
    content/workflows/scRNA-seq.rst
+   content/workflows/HiC.rst
+   ChangeLog.rst
 
 Citation
 ---------

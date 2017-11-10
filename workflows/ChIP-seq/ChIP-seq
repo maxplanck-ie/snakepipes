@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 
-__version__ = "0.5"
+__version__ = "0.6"
 
 __description__ = """
 ChIP-seq workflow v{version} - MPI-IE workflow for ChIP-seq analysis
-Fabian Kilpert, Andreas Richter, Steffen Heyne, Vivek Bhardwaj
-June, 2017
 
 Usage example:
     ChIP-seq -d working-dir mm10 samples.yaml

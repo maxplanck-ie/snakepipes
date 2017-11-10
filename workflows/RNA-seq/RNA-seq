@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 
-__version__ = "0.5"
+__version__ = "0.6"
 
 __description__ = """
 RNA-seq workflow v{version} - MPI-IE workflow for RNA mapping and analysis
-Fabian Kilpert, Steffen Heyne, Vivek Bhardwaj
-March 13, 2017
 
 usage example:
     RNA-seq -i input-dir -o output-dir mm10
@@ -126,7 +124,8 @@ def parse_args(defaults={"verbose":None,"configfile":None,"max_jobs":None,"snake
     optional.add_argument("--trim",
     					dest="trim",
     					action="store_true",
-    					help="activate trimming (default: '%(default)s')",
+    					help="Activate fastq read trimming. If activated, Illumina adaptors are trimmed by default. "
+                        "Additional parameters can be specified under --trim_options (default: '%(default)s')",
     					default=defaults["trim"])
     optional.add_argument("--trim_options",
     					dest="trim_options",
