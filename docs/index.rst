@@ -3,8 +3,8 @@ snakePipes
 
 snakePipes are pipelines built using snakemake for the analysis of various sequencing datasets.
 
-The following is the list of pipelines available in snakePipes
----------------------------------------------------------------
+Below is the list of pipelines available in snakePipes
+-------------------------------------------------------
 
 
 =============================== ===========================================================================================
@@ -87,7 +87,7 @@ Further organisms can be supported by adding a genome configuration file `my_org
 	blacklist_bed: "/SOMEPATH/hs37d5_ensembl/ENCODE/hs37d5_extended_Encode-blacklist.bed"
 
 
-If no blacklist regions are available for your organism of interest, leave it empty `blacklist_bed: `
+.. note:: If no blacklist regions are available for your organism of interest, leave `blacklist_bed:` empty
 
 
 Contents:
@@ -100,6 +100,8 @@ Contents:
    content/workflows/ChIP-seq.rst
    content/workflows/RNA-seq.rst
    content/workflows/scRNA-seq.rst
+   content/workflows/HiC.rst
+   ChangeLog.rst
 
 Citation
 ---------
