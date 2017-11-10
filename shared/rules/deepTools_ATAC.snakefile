@@ -1,48 +1,4 @@
 deeptools_ATAC='deepTools_ATAC'
-#
-### TODO: Plot coverage from cutsites,based on the shifted the 5' end of
-###         each fragment.
-#
-# rule bamCoverageCutsite:
-#     input:
-#         bam = "filtered_bam/{sample}.filtered.cutsites.bam",
-#         bai = "filtered_bam/{sample}.filtered.cutsites.bam.bai"
-#     output:
-#         os.path.join(deeptools_ATAC, "{sample}.cutsites.bw")
-#     # params:
-#     #     pass
-#     log:
-#         pass
-#     benchmark:
-#         pass
-#     shell:
-#         pass
-        # 1) convert bedpe to bam
-        # 2) produce bw tracks
-        # 3) remove bam
-
-rule bamCoverageFragments:
-    input:
-        bam = "filtered_bam/{sample}.filtered.bam",
-        bai = "filtered_bam/{sample}.filtered.bam"
-    output:
-        os.path.join(deeptools_ATAC, "{sample}.fragments.bw" )
-    params:
-        bw_binsize = bw_binsize,
-        genome_size = genome_size,
-        read_extension = "--extendReads"
-    threads: 16
-    shell:
-        deepTools_path+"bamCoverage "
-        "-b {input.bam} "
-        "-o {output} "
-        "--binSize {params.bw_binsize} "
-        "-p {threads} "
-        "--normalizeTo1x {params.genome_size} "
-        "{params.read_extension} "
-        "&> {log}"
-
-
 
 rule plotFingerprint:
     input:
