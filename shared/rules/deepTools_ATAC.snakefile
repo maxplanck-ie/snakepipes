@@ -21,16 +21,5 @@ rule plotFingerprint:
     benchmark:
         os.path.join(deeptools_ATAC, ".benchmark","plotFingerprint.benchmark")
     threads: 24
-    shell:
-        deepTools_path+"plotFingerprint "
-        "-b {input.bams} "
-        "--labels {params.labels} "
-        "--plotTitle 'Cumulative read counts per bin without duplicates' "
-        "--ignoreDuplicates "
-        "--outQualityMetrics {output.metrics} "
-        "-p {threads} "
-        "{params.blacklist} "
-        "{params.png} "
-        "{params.read_extension} "
-        "{params.jsd} "
-        "&> {log}"
+    run:
+        shell(plotFingerprint_cmd())
