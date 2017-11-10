@@ -96,6 +96,7 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
+   content/setting_up.rst
    content/workflows/DNA-mapping.rst
    content/workflows/ChIP-seq.rst
    content/workflows/RNA-seq.rst
