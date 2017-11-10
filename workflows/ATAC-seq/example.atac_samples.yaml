@@ -1,10 +1,5 @@
 ################################################################################
-# Please specify all ChIP samples plus their matching control/chromatin input
-# sample.
-# Specify for each ChIP sample whether the IP target results in broad/mixed-type
-# enrichment (most histone marks, e.g. H3K4me1, H3K36me3, H3K9me3, H3K27me3)
-# or not. In the latter case, the enrichment is instead punctuate/narrow
-# (e.g. TFs, active histone marks as H3K27ac or H3K4me3).
+# Please specify all ATAC samples
 #
 # IMPORTANT: Use only whitespace, but NO TAB indentation in this YAML file!
 ################################################################################
