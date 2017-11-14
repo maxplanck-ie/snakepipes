@@ -19,7 +19,6 @@ Workflows available
 - ChIP-seq (normal and allele-specific)
 - RNA-seq (normal and allele-specific)
 - scRNA-seq
-- ATAC-seq
 - Hi-C
 
 Installation
