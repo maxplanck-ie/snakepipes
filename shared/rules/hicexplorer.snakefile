@@ -28,8 +28,8 @@ rule map_fastq_single_end:
 if(RF_resolution is True):
     rule build_matrix:
         input:
-            R1 = "BWA/{sample}_R1.bam",
-            R2 = "BWA/{sample}_R2.bam",
+            R1 = "BWA/{sample}"+reads[0]+".bam",
+            R2 = "BWA/{sample}"+reads[1]+".bam",
             bed = enzyme + ".bed"
         output:
              matrix = "HiC_matrices/{sample}_"+matrixFile_suffix+".h5",
@@ -58,8 +58,8 @@ if(RF_resolution is True):
 else:
     rule build_matrix:
         input:
-            R1 = "BWA/{sample}_R1.bam",
-            R2 = "BWA/{sample}_R2.bam"
+            R1 = "BWA/{sample}"+reads[0]+".bam",
+            R2 = "BWA/{sample}"+reads[1]+".bam"
         output:
             matrix = "HiC_matrices/{sample}_"+matrixFile_suffix+".h5",
             bam = "BWA/{sample}_R12_"+matrixFile_suffix+".bam"

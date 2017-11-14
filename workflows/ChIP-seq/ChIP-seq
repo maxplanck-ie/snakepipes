@@ -72,7 +72,8 @@ def parse_args(defaults={"verbose":None,"configfile":None,"max_jobs":None,"snake
 
     general.add_argument("-c", "--configfile",
                         dest="configfile",
-                        help="configuration file: config.yaml (default: '%(default)s')",
+                        help="configuration file: config.yaml. In absence of a config file, the default options from the "
+                        "workflows would be selected from /workflows/<workflow_name>/defaults.yaml (default: '%(default)s')",
                         default=defaults["configfile"])
 
     general.add_argument("-j", "--jobs",

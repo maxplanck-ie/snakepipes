@@ -10,6 +10,10 @@ MPI-IE Snakemake workflows : snakePipes
     :target: https://travis-ci.org/maxplanck-ie/snakemake_workflows
     :alt: Build Status
 
+.. image:: https://zenodo.org/badge/54579435.svg
+    :target: https://zenodo.org/badge/latestdoi/54579435
+    :alt: Citation
+
 snakePipes are our in-house, flexible and powerful workflows built using `snakemake <snakemake.readthedocs.io>`__ that simplify the analysis of NGS data.
 
 Workflows available
@@ -19,7 +23,6 @@ Workflows available
 - ChIP-seq (normal and allele-specific)
 - RNA-seq (normal and allele-specific)
 - scRNA-seq
-- ATAC-seq
 - Hi-C
 
 Installation
