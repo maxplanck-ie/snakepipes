@@ -103,7 +103,7 @@ def get_sample_names(infiles, ext, reads):
         x = os.path.basename(x).replace(ext, "")
         try:
             x = x.replace(reads[0], "").replace(reads[1], "")
-        except:
+        except IndexError:
             pass
         s.append(x)
     return sorted(list(set(s)))
@@ -145,7 +145,7 @@ def get_fragment_length(infile):
                 try:
                     median = next(f).split()[0]
                     return int(median)
-                except:
+                except TypeError:
                     print("ERROR: File", infile, "is NOT a proper Picard CollectInsertSizeMetrics metrics file.\n")
                     exit(1)
     # no match in infile
