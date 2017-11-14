@@ -17,7 +17,7 @@ if paired:
         benchmark:
             "QC_report/.benchmark/qc_report.{sample}.benchmark"
         shell:
-            "python " + os.path.join(workflow_tools, "sample_qc_report_PE.py") + " "
+            os.path.join(workflow_tools, "sample_qc_report_PE.py") + " "
             "{input.alignment_summary_metrics} {input.mark_duplicates_metrics} {input.insert_size_metrics} {input.macs2_xls} {input.macs2_qc_txt} "
             ">{output} 2>{log} "
 else:
@@ -36,7 +36,7 @@ else:
         benchmark:
             "QC_report/.benchmark/qc_report.{sample}.benchmark"
         shell:
-            "python " + os.path.join(workflow_tools, "sample_qc_report_SE.py") + " "
+            os.path.join(workflow_tools, "sample_qc_report_SE.py") + " "
             "{input.alignment_summary_metrics} {input.mark_duplicates_metrics} {input.macs2_xls} {input.macs2_qc_txt} "
             ">{output} 2>{log} "
 
