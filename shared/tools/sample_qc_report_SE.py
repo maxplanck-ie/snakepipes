@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 
 # single-end ONLY!
@@ -24,7 +24,7 @@ except IndexError:
 try:
     with open(infile_AlignmentSummaryMetrics) as f:
         lines = f.readlines()
-    columns = filter(lambda x: x.startswith("UNPAIRED"), lines)[0].strip().split("\t")
+    columns = list(filter(lambda x: x.startswith("UNPAIRED"), lines))[0].strip().split("\t")
 
     # PF_READS: The number of PF reads where PF is defined as passing Illumina's filter.
     total_reads = int(columns[2])
@@ -45,7 +45,7 @@ except OSError:
 try:
     with open(infile_MarkDuplicates) as f:
         lines = f.readlines()
-    columns = filter(lambda x: x.startswith("Unknown Library"), lines)[0].strip().split("\t")
+    columns = list(filter(lambda x: x.startswith("Unknown Library"), lines))[0].strip().split("\t")
 
     # UNPAIRED_READ_DUPLICATES: The number of fragments that were marked as duplicates.
     dup_mapped_reads = int(columns[4])
@@ -66,7 +66,7 @@ except OSError:
 try:
     with open(infile_MACS2_xls) as f:
         lines = f.readlines()
-    columns = filter(lambda x: x.startswith("# d"), lines)[0].strip()
+    columns = list(filter(lambda x: x.startswith("# d"), lines))[0].strip()
     fragment_size = int(columns.split(" = ")[1])
 except OSError:
     fragment_size = "NA"
