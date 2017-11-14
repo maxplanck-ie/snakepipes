@@ -19,7 +19,7 @@ input_InsertSizeMetrics = sys.argv[3]
 try:
     infile_MACS2_xls = sys.argv[4]              # sample_name.filtered.BAM_peaks.xls (optional)
     infile_MACS2_qc_txt = sys.argv[5]           # ample_name.filtered.BAM_peaks.qc.txt (optional)
-except:
+except IndexError:
     pass
 
 
@@ -49,7 +49,7 @@ try:
     fmapped_pairs = 1.0 * mapped_pairs / read_pairs
     fmapped_singletons = 1.0 * (mapped_reads - mapped_reads_in_pairs) / total_reads
 
-except:
+except OSError:
     exit("ERROR! Unable to read: {}".format(infile_AlignmentSummaryMetrics))
 
 
@@ -63,7 +63,7 @@ try:
     fdup_mapped_pairs = 1.0 * dup_mapped_pairs / mapped_pairs
     dupfree_mapped_pairs = mapped_pairs - dup_mapped_pairs
     fdupfree_mapped_pairs = 1.0 * dupfree_mapped_pairs / read_pairs
-except:
+except OSError:
     exit("ERROR! Unable to read: {}".format(infile_MarkDuplicates))
 
 
@@ -83,7 +83,7 @@ try:
         fragment_size = int(columns.split(" = ")[1])
     else:
         fragment_size = "NA"
-except:
+except OSError:
     fragment_size = "NA"
 
 
@@ -94,7 +94,7 @@ try:
         peak_count = int(columns[0])
         frip = round(float(columns[1]), 3)
         peak_genome_coverage = round(columns[2], 3)
-except:
+except OSError:
     peak_count = "NA"
     frip = "NA"
     peak_genome_coverage = "NA"

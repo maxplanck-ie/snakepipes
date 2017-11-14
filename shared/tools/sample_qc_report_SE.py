@@ -16,7 +16,7 @@ infile_MarkDuplicates = sys.argv[2]             # sample_name.mark_duplicates_me
 try:
     infile_MACS2_xls = sys.argv[3]              # sample_name.filtered.BAM_peaks.xls (optional)
     infile_MACS2_qc_txt = sys.argv[4]           # ample_name.filtered.BAM_peaks.qc.txt (optional)
-except:
+except IndexError:
     pass
 
 
@@ -37,7 +37,7 @@ try:
 
     # fraction of high-quality mapped reads (MAPQ >=20)
     fhq_mapped_reads = 1.0 * int(columns[8]) / total_reads
-except:
+except OSError:
     exit("ERROR! Unable to read: {}\n".format(infile_AlignmentSummaryMetrics))
 
 
@@ -58,7 +58,7 @@ try:
 
     # fraction of duplication free mapped reads
     fdupfree_mapped_reads = 1.0 * dupfree_mapped_reads / total_reads
-except:
+except OSError:
     exit("ERROR! Unable to read: {}".format(infile_MarkDuplicates))
 
 
@@ -68,7 +68,7 @@ try:
         lines = f.readlines()
     columns = list(filter(lambda x: x.startswith("# d"), lines))[0].strip()
     fragment_size = int(columns.split(" = ")[1])
-except:
+except OSError:
     fragment_size = "NA"
 
 
@@ -79,7 +79,7 @@ try:
         peak_count = int(columns[0])
         frip = round(float(columns[1]), 3)
         peak_genome_coverage = round(columns[2], 3)
-except:
+except OSError:
     peak_count = "NA"
     frip = "NA"
     peak_genome_coverage = "NA"
