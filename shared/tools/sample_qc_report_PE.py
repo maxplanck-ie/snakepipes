@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 
 # paired-end ONLY!
@@ -28,7 +28,7 @@ try:
     with open(infile_AlignmentSummaryMetrics) as f:
         lines = f.readlines()
 
-    columns = filter(lambda x: x.startswith("PAIR"), lines)[0].strip().split("\t")
+    columns = list(filter(lambda x: x.startswith("PAIR"), lines))[0].strip().split("\t")
 
     # PF_READS: The number of PF reads where PF is defined as passing Illumina's filter.
     total_reads = int(columns[2])
@@ -57,7 +57,7 @@ except:
 try:
     with open(infile_MarkDuplicates) as f:
         lines = f.readlines()
-    columns = filter(lambda x: x.startswith("Unknown Library"), lines)[0].strip().split("\t")
+    columns = list(filter(lambda x: x.startswith("Unknown Library"), lines))[0].strip().split("\t")
 
     dup_mapped_pairs = int(columns[5])
     fdup_mapped_pairs = 1.0 * dup_mapped_pairs / mapped_pairs
@@ -79,7 +79,7 @@ try:
     elif os.path.isfile(infile_MACS2_xls):
         with open(infile_MACS2_xls) as f:
             lines = f.readlines()
-        columns = filter(lambda x: x.startswith("# d"), lines)[0].strip()
+        columns = list(filter(lambda x: x.startswith("# d"), lines))[0].strip()
         fragment_size = int(columns.split(" = ")[1])
     else:
         fragment_size = "NA"
