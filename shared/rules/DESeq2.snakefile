@@ -27,7 +27,7 @@ rule DESeq2:
     shell:
         "( cd {params.outdir} && export R_LIBS_USER="+R_libs_path+" && "
         "cat "+os.path.join(workflow_tools,"DESeq2.R")+" | "
-        ""+os.path.join(R_path,"R")+" --vanilla --args "
+        ""+os.path.join(R_path,"R")+" --vanilla --slave --args "
         "{input.sample_info} " # 1
         "../{input.counts_table} " # 2
         "{params.fdr} " # 3
@@ -35,7 +35,7 @@ rule DESeq2:
         "{params.importfunc} " # 5
         "{params.allele_info} " # 6
         "{params.tx2gene_file} " # 7
-        ") 2>&1 | tee {log}"
+        " ) 2>&1 | tee {log}"
 
 
 ## DESeq2 (on Salmon)
@@ -59,7 +59,7 @@ rule DESeq2_Salmon:
     shell:
         "( cd {params.outdir} && export R_LIBS_USER="+R_libs_path+" && "
         "cat "+os.path.join(workflow_tools,"DESeq2.R")+" | "
-        ""+os.path.join(R_path,"R")+" --vanilla --args "
+        ""+os.path.join(R_path,"R")+" --vanilla --slave --args "
         "{input.sample_info} " # 1
         "../{input.counts_table} " # 2
         "{params.fdr} " # 3

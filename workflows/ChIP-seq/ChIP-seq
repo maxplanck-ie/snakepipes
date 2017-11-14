@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 
-__version__ = "0.5"
+__version__ = "0.6"
 
 __description__ = """
 ChIP-seq workflow v{version} - MPI-IE workflow for ChIP-seq analysis
-Fabian Kilpert, Andreas Richter, Steffen Heyne, Vivek Bhardwaj
-June, 2017
 
 Usage example:
     ChIP-seq -d working-dir mm10 samples.yaml
@@ -26,12 +24,17 @@ import textwrap
 import time
 import shutil
 import yaml
+import inspect
 
+#sys.path.append(os.path.abspath(os.path.dirname(inspect.getfile(inspect.currentframe()))) + "/shared/")
+#sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(inspect.getfile(inspect.currentframe())))))+"/shared/")
+sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(inspect.getfile(inspect.currentframe()) )))))+"/shared/")
 
-sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))))+"/shared/")
 import common_functions as cf
 
-def parse_args(defaults):
+def parse_args(defaults={"verbose":None,"configfile":None,"max_jobs":None,"snakemake_options":None,"tempdir":None,
+                         "paired":None,"bw_binsize":None,"sample_info":"","window_size":None}):
+
     """
     Parse arguments from the command line.
     """
@@ -43,7 +46,7 @@ def parse_args(defaults):
         add_help=False
     )
 
-    optional = parser._action_groups.pop() # Edited this line
+    #optional = parser._action_groups.pop() # Edited this line
 
     ## positional/required
     parser.add_argument("genome", metavar="GENOME", help="genome acronym of target organism (supported: 'dm3', 'dm6', 'hs37d5', 'mm9', 'mm10', 'SchizoSPombe_ASM294v2')")
@@ -53,7 +56,8 @@ def parse_args(defaults):
     required.add_argument("-d", "--working-dir",
                         dest="workingdir",
                         help="working directory is output directory and must contain DNA-mapping pipeline output files",
-                        required=True)
+                        required=False,
+                        default=".")
 
     general = parser.add_argument_group('general arguments')
     general.add_argument("-h", "--help",
@@ -127,7 +131,26 @@ def parse_args(defaults):
                              "(default: '%(default)s')",
     					default=defaults["window_size"])
 
+    return parser
+
+
+def main():
+
+    ## basic paths only used in wrapper
+    #this_script_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+    this_script_dir = os.path.dirname(os.path.realpath(__file__))
+    main_dir_path = os.path.join(os.path.dirname(os.path.dirname(this_script_dir)))
+
+    ## defaults
+    defaults = cf.load_configfile(os.path.join(this_script_dir, "defaults.yaml"),False)
+
+    ## get command line arguments
+    parser = parse_args(defaults)
     args = parser.parse_args()
+
+    ## we also add these paths to config, although we dont use them in the Snakefile
+    args.this_script_dir = this_script_dir
+    args.main_dir_path = main_dir_path
 
     ## checks for parameters necessary in wrapper
 # 1. Dir path
@@ -156,24 +179,6 @@ def parse_args(defaults):
         else:
             print("\nSample info file not found! (--DB {})\n".format(args.sample_info))
             exit(1)
-    return args
-
-
-def main():
-
-    ## basic paths only used in wrapper
-    this_script_dir = os.path.dirname(os.path.realpath(__file__))
-    main_dir_path = os.path.join(os.path.dirname(os.path.dirname(this_script_dir)))
-
-    ## defaults
-    defaults = cf.load_configfile(os.path.join(this_script_dir, "defaults.yaml"),False)
-
-    ## get command line arguments
-    args = parse_args(defaults)
-
-    ## we also add these paths to config, although we dont use them in the Snakefile
-    args.this_script_dir = this_script_dir
-    args.main_dir_path = main_dir_path
 
     ## merge configuration dicts
     config = defaults   # 1) form defaults.yaml
@@ -188,7 +193,7 @@ def main():
     ## save to configs.yaml in outdir
     cf.write_configfile(os.path.join(args.outdir,'ChIP-seq.config.yaml'),config)
 
-    snakemake_module_load = "module load snakemake slurm &&".split()
+    snakemake_module_load = "module load snakemake/3.12.0 slurm &&".split()
     snakemake_cmd = """
                     snakemake {snakemake_options} --latency-wait 300 --snakefile {snakefile} --jobs {max_jobs} --directory {workingdir} --configfile {configfile}
                     """.format( snakefile = os.path.join(this_script_dir, "Snakefile"),

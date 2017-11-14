@@ -114,6 +114,7 @@ def parse_args(defaults):
                         type=int,
                         default=defaults['atac_fragment_cutoff'])
 
+
     args = parser.parse_args()
 
     ## checks for parameters necessary in wrapper

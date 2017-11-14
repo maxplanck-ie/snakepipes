@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 
-__version__ = "0.5"
+__version__ = "0.6"
 
 __description__ = """
 single cell RNA-seq mapping and counting workflow v{version} - MPI-IE workflow for scRNA-seq
-Steffen Heyne, Dominic Gruen
-June, 2017
 
 usage example:
     scRNAseq-mapcount -i input-dir -o output-dir mm10
@@ -20,32 +18,35 @@ import textwrap
 import time
 import shutil
 import yaml
+import inspect
 
-sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))))+"/shared/")
+sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(inspect.getfile(inspect.currentframe()) )))))+"/shared/")
+
 import common_functions as cf
 
-def parse_args(defaults):
+def parse_args(defaults={"verbose":None,"configfile":None,"max_jobs":None,"snakemake_options":None,"tempdir":None,
+                         "downsample":None, "trim":None, "trim_options":None, "cell_names":None,
+                         "filter_annotation":None, "barcode_file":None, "barcode_pattern":None, "split_lib": None,
+                         "bw_binsize":None, "mapq":None}):
     """
     Parse arguments from the command line.
     """
 
     parser = argparse.ArgumentParser(
         prog=sys.argv[0],
-        formatter_class=argparse.RawDescriptionHelpFormatter, 
+        formatter_class=argparse.RawDescriptionHelpFormatter,
         description=textwrap.dedent(__description__),
         add_help=False
     )
 
-    optional = parser._action_groups.pop() # Edited this line
-
     ## positional/required
     parser.add_argument("genome", metavar="GENOME", help="genome acronym of target organism (supported: 'dm3', 'dm6', 'hs37d5', 'mm9', 'mm10', 'SchizoSPombe_ASM294v2') or file path to your own genome config!")
-    
-        
+
+
     required = parser.add_argument_group('required arguments')
     required.add_argument("-i", "--input-dir", dest="indir", help="input directory containing the FASTQ files, either paired-end OR single-end data",required=True)
     required.add_argument("-o", "--output-dir", dest="outdir", help="output directory",required=True)
- 
+
     general = parser.add_argument_group('general arguments')
     general.add_argument("-h", "--help", action="help", help="show this help message and exit")
     general.add_argument("-v", "--verbose", dest="verbose", action="store_true", help="verbose output (default: '%(default)s')", default=defaults["verbose"])
@@ -54,9 +55,9 @@ def parse_args(defaults):
     general.add_argument("--local", dest="local", action="store_true", default=False, help="run workflow locally; default: jobs are submitted to Slurm queue (default: '%(default)s')")
     general.add_argument("--snakemake_options", dest="snakemake_options", metavar="STR", type=str, help="Snakemake options to be passed directly to snakemake, e.g. use --snakemake_options='--dryrun --rerun-incomplete --unlock --forceall'. (default: '%(default)s')", default=defaults["snakemake_options"])
     general.add_argument("--tempdir", dest="tempdir", type=str, help="used prefix path for temporary directory created via mktemp. Created temp dir gets exported as $TMPDIR and is removed at the end of this wrapper! (default: '%(default)s')", default=defaults["tempdir"])
- 
+
     ## optional
-    parser._action_groups.append(optional)       
+    optional = parser.add_argument_group('Optional arguments')
     parser.add_argument("--downsample", dest="downsample", metavar="INT", help="downsample the given number of reads randomly from of each FASTQ file", type=int, default=defaults["downsample"])
     parser.add_argument("--trim", dest="trim", action="store_true", default=defaults["trim"], help="Activate trimming with Cutadapt. Default: no Trimming!")
     parser.add_argument("--trim_options", dest="trim_options", metavar="STR", type=str, help="Options passed to the selected trimmer, e.g. use --trim_options='-a A{30}' for polyA trimming with cutadapt (default: '%(default)s')", default=defaults["trim_options"])
@@ -67,12 +68,28 @@ def parse_args(defaults):
     parser.add_argument("--cell_names",dest="cell_names", metavar="STR",help="either tab-sep. file with cell name ranges or directory with *.csv files that contain cell names and plate/library information for all fastq files! (default: '%(default)s')",default=defaults["cell_names"])
     parser.add_argument("--bw-binsize", dest="bw_binsize", metavar="INT", help="bin size of output files in bigWig format (default: '%(default)s')", type=int, default=defaults["bw_binsize"])
 
+    return parser
 
+
+def main():
+
+    ## basic paths only used in wrapper
+    this_script_dir = os.path.dirname(os.path.realpath(__file__))
+    main_dir_path = os.path.join(os.path.dirname(os.path.dirname(this_script_dir)))
+
+    ## defaults
+    defaults = cf.load_configfile(os.path.join(this_script_dir, "defaults.yaml"),False)
+    ## get command line arguments
+    parser = parse_args(defaults)
     args = parser.parse_args()
-    
-    args.outdir = os.path.abspath(args.outdir)      
+
+    ## we also add these paths to config, although we dont use them in the Snakefile
+    args.this_script_dir = this_script_dir
+    args.main_dir_path = main_dir_path
+
+    args.outdir = os.path.abspath(args.outdir)
     args.cluster_logs_dir = os.path.join(args.outdir, "cluster_logs")
-    
+
     ## checks for parameters necessary in wrapper
     if os.path.exists(args.indir):
         args.indir = os.path.abspath(args.indir)
@@ -88,7 +105,7 @@ def parse_args(defaults):
         args.barcode_file = os.path.join(os.path.dirname(os.path.realpath(__file__)),"celseq_barcodes.192.txt")
     elif args.barcode_file != None and os.path.exists(os.path.abspath(args.barcode_file)):
         args.barcode_file = os.path.abspath(args.barcode_file)
-    else: 
+    else:
         print("\nBarcode file (--cell_barcode_file) not found! {}\n".format(args.barcode_file))
         exit(1)
 
@@ -97,44 +114,26 @@ def parse_args(defaults):
             args.cell_names = os.path.abspath(args.cell_names)
         else:
             print("\nCell_names file not found! {}\n".format(args.cell_names))
-            exit(1)    
-        
-    return args
+            exit(1)
 
 
-def main():
-    
-    ## basic paths only used in wrapper
-    this_script_dir = os.path.dirname(os.path.realpath(__file__))
-    main_dir_path = os.path.join(os.path.dirname(os.path.dirname(this_script_dir)))
-
-    ## defaults
-    defaults = cf.load_configfile(os.path.join(this_script_dir, "defaults.yaml"),False)
-
-    ## get command line arguments
-    args = parse_args(defaults)
-
-    ## we also add these paths to config, although we dont use them in the Snakefile
-    args.this_script_dir = this_script_dir
-    args.main_dir_path = main_dir_path
-    
     ## merge configuration dicts
     config = defaults   # 1) form defaults.yaml
     if args.configfile:
         user_config = cf.load_configfile(args.configfile,False)
         config = cf.merge_dicts(config, user_config) # 2) form user_config.yaml
     config_wrap = cf.config_diff(vars(args),defaults) # 3) from wrapper parameters
-    config = cf.merge_dicts(config, config_wrap) 
-    
+    config = cf.merge_dicts(config, config_wrap)
+
     #'filter_annotation' : "'-v -P \\\"full|decay|miRNA|misc_RNA|snRNA|snoRNA|scaRNA|sRNA|scRNA|rRNA|pseudogene|3prime_overlapping_ncRNA|processed_transcript\\\"'",
-    
+
     ## Output directory + log directory
     subprocess.call("[ -d {cluster_logs_dir} ] || mkdir -p {cluster_logs_dir}".format(cluster_logs_dir=args.cluster_logs_dir), shell=True)
 
     ## save to configs.yaml in outdir
     cf.write_configfile(os.path.join(args.outdir,'config.yaml'),config)
 
-    snakemake_module_load = "module load snakemake slurm &&".split()
+    snakemake_module_load = "module load snakemake/3.12.0 slurm &&".split()
     snakemake_cmd = """
                     snakemake {snakemake_options} --latency-wait 300 --snakefile {snakefile} --jobs {max_jobs} --directory {outdir} --configfile {configfile}
                     """.format( snakefile = os.path.join(this_script_dir, "Snakefile"),
@@ -152,8 +151,8 @@ def main():
 
     snakemake_log = "2>&1 | tee -a {}/scRNAseq-mapcount.log".format(args.outdir).split()
 
-    ## create local temp dir and add this path to environment as $TMPDIR variable 
-    ## on SLURM: $TMPDIR is set, created and removed by SlurmEasy on cluster node 
+    ## create local temp dir and add this path to environment as $TMPDIR variable
+    ## on SLURM: $TMPDIR is set, created and removed by SlurmEasy on cluster node
     temp_path = cf.make_temp_dir(args.tempdir, args.outdir)
     snakemake_exports = ("export TMPDIR="+temp_path+" && ").split()
 
@@ -188,13 +187,13 @@ def main():
             # job_ids = subprocess.check_output("""ls {cluster_logs_dir} | awk -F "." '{{print $NF}}' | sed 's/e\|o//' | sort -u""".format(cluster_logs_dir=cluster_logs_dir), shell=True).split()
             # for job_id in job_ids:
             #     subprocess.call( "qdel {} 2>&1 >/dev/null".format(str(job_id)), shell="bash" )
-    
+
     ## remove temp dir
     if (temp_path != "" and os.path.exists(temp_path)):
         shutil.rmtree(temp_path, ignore_errors=True)
-        if args.verbose: 
+        if args.verbose:
             print("Temp directory removed ("+temp_path+")!\n")
 
-            
+
 if __name__ == "__main__":
     main()
