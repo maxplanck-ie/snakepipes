@@ -48,7 +48,7 @@ nbins_toMerge: 0
 # shall we merge the samples?
 merge_samples: false
 # parameters for hicFindTADs
-tadparams: --minDepth 10000 --maxDepth 100000 --step 20000 --thresholdComparisons 0.01
+tadparams: --thresholdComparisons 0.01
 
 ################################################################################
 # Call snakemake directly, i.e. without using the wrapper script:
