@@ -74,6 +74,13 @@ def parse_args(defaults={"verbose":None,"configfile":None,"max_jobs":None,"snake
                         help="configuration file: config.yaml. In absence of a config file, the default options from the "
                         "workflows would be selected from /workflows/<workflow_name>/defaults.yaml (default: '%(default)s')",
                         default=defaults["configfile"])
+    
+    general.add_argument("--cluster_configfile",
+                        dest="cluster_configfile",
+                        help="configuration file for cluster usage: cluster.yaml. In absence, the default options from the "
+                        "workflows would be selected from shared/cluster.yaml (default: '%(default)s')",
+                        default=defaults["configfile"])
+    
 
     general.add_argument("-j", "--jobs",
                          dest="max_jobs",
@@ -283,7 +290,22 @@ def main():
     ## save to configs.yaml in outdir
     cf.write_configfile(os.path.join(args.outdir,'config.yaml'),config)
 
-    snakemake_module_load = "module load snakemake/3.12.0 slurm &&".split()
+    ## cluster config
+    cluster_config = cf.load_configfile(os.path.join(this_script_dir,"../../shared/","cluster.yaml"),False)
+    cluster_config = cf.merge_dicts(cf.load_configfile(os.path.join(this_script_dir,"cluster.yaml"),False), cluster_config)
+    
+    if args.cluster_configfile:
+        user_cluster_config = cf.load_configfile(args.cluster_configfile,False)
+        cluster_config = cf.merge_dicts(cluster_config, user_cluster_config) # 2) form user_config.yaml
+    cf.write_configfile(os.path.join(args.outdir,'cluster_config.yaml'),cluster_config)
+    
+    snakemake_module_load = "module load snakemake/3.12.0 "
+    
+    if not args.local:
+        snakemake_module_load += cluster_config["cluster_module_load"]
+    
+    snakemake_module_load = (snakemake_module_load + " && ").split()
+    
     snakemake_cmd = """
                     snakemake {snakemake_options} --latency-wait 300 --snakefile {snakefile} --jobs {max_jobs} --directory {outdir} --configfile {configfile}
                     """.format( snakefile = os.path.join(args.this_script_dir, "Snakefile"),
@@ -298,9 +320,12 @@ def main():
 
     if not args.local:
         snakemake_cmd += ["--cluster-config ",
-                         os.path.join(this_script_dir, "cluster.yaml"),
-                         " --cluster 'SlurmEasy --mem-per-cpu {cluster.memory} --threads {threads} --log",
+                         os.path.join(args.outdir,'cluster_config.yaml'),
+                         " --cluster \'", cluster_config["snakemake_cluster_cmd"],
+#                         " --cluster 'SlurmEasy --mem-per-cpu {cluster.memory} --threads {threads} --log",
                          args.cluster_logs_dir, "--name {rule}.snakemake'"]
+
+    print(snakemake_cmd)
 
     snakemake_log = "2>&1 | tee -a {}/RNA-seq.log".format(args.outdir).split()
 
