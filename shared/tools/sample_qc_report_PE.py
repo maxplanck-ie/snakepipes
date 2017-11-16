@@ -89,11 +89,12 @@ except OSError:
 
 # get peak qc from MACS2_peak_qc output #######################################
 try:
-    with open(infile_MACS2_qc_txt) as f:
-        columns = list(map(lambda x: float(x), f.readlines()[1].split()))
-        peak_count = int(columns[0])
-        frip = round(float(columns[1]), 3)
-        peak_genome_coverage = round(columns[2], 3)
+    if 'infile_MACS2_qc_txt' in locals():
+        with open(infile_MACS2_qc_txt) as f:
+            columns = list(map(lambda x: float(x), f.readlines()[1].split()))
+            peak_count = int(columns[0])
+            frip = round(float(columns[1]), 3)
+            peak_genome_coverage = round(columns[2], 3)
 except OSError:
     peak_count = "NA"
     frip = "NA"
