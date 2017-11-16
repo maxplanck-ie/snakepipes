@@ -16,6 +16,9 @@ import sys
 infile_AlignmentSummaryMetrics = sys.argv[1]    # sample_name.alignment_summary_metrics.txt
 infile_MarkDuplicates = sys.argv[2]             # sample_name.mark_duplicates_metrics.txt
 input_InsertSizeMetrics = sys.argv[3]
+
+infile_MACS2_xls = ""
+infile_MACS2_qc_txt = ""
 try:
     infile_MACS2_xls = sys.argv[4]              # sample_name.filtered.BAM_peaks.xls (optional)
     infile_MACS2_qc_txt = sys.argv[5]           # ample_name.filtered.BAM_peaks.qc.txt (optional)
@@ -65,7 +68,7 @@ try:
     fdupfree_mapped_pairs = 1.0 * dupfree_mapped_pairs / read_pairs
 except OSError:
     exit("ERROR! Unable to read: {}".format(infile_MarkDuplicates))
-
+    
 
 try:
     # Picard InsertSizeMetrics
@@ -88,18 +91,19 @@ except OSError:
 
 
 # get peak qc from MACS2_peak_qc output #######################################
+peak_count = "NA"
+frip = "NA"
+peak_genome_coverage = "NA"
+
 try:
-    if 'infile_MACS2_qc_txt' in locals():
+    if os.path.isfile(infile_MACS2_qc_txt):
         with open(infile_MACS2_qc_txt) as f:
             columns = list(map(lambda x: float(x), f.readlines()[1].split()))
             peak_count = int(columns[0])
             frip = round(float(columns[1]), 3)
             peak_genome_coverage = round(columns[2], 3)
 except OSError:
-    peak_count = "NA"
-    frip = "NA"
-    peak_genome_coverage = "NA"
-
+    pass
 
 # Output to stdout ###########################################################
 print("{sample_name}\t{read_pairs}\t{mapped_pairs}\t{fmapped_pairs:.3f}\t{dup_mapped_pairs}\t{fdup_mapped_pairs:.3f}\t{dupfree_mapped_pairs}\t{fdupfree_mapped_pairs:.3f}\t{fhq_mapped_reads:.3f}\t{fmapped_singletons:.3f}\t{fragment_size}\t{peak_count}\t{frip}\t{peak_genome_coverage}".format(
