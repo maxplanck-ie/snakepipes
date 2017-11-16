@@ -68,7 +68,7 @@ try:
     fdupfree_mapped_pairs = 1.0 * dupfree_mapped_pairs / read_pairs
 except OSError:
     exit("ERROR! Unable to read: {}".format(infile_MarkDuplicates))
-    
+
 
 try:
     # Picard InsertSizeMetrics
