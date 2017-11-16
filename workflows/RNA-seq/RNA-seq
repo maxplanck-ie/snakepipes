@@ -77,9 +77,9 @@ def parse_args(defaults={"verbose":None,"configfile":None,"max_jobs":None,"snake
     
     general.add_argument("--cluster_configfile",
                         dest="cluster_configfile",
-                        help="configuration file for cluster usage: cluster.yaml. In absence, the default options from the "
-                        "workflows would be selected from shared/cluster.yaml (default: '%(default)s')",
-                        default=defaults["configfile"])
+                        help="configuration file for cluster usage. In absence, the default options "
+                        "from shared/cluster.yaml and [workflow]/cluster.yaml would be selected (default: '%(default)s')",
+                        default=defaults["cluster_configfile"])
     
 
     general.add_argument("-j", "--jobs",
@@ -322,7 +322,6 @@ def main():
         snakemake_cmd += ["--cluster-config ",
                          os.path.join(args.outdir,'cluster_config.yaml'),
                          " --cluster \'", cluster_config["snakemake_cluster_cmd"],
-#                         " --cluster 'SlurmEasy --mem-per-cpu {cluster.memory} --threads {threads} --log",
                          args.cluster_logs_dir, "--name {rule}.snakemake'"]
 
     print(snakemake_cmd)
