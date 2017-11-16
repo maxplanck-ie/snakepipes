@@ -79,7 +79,7 @@ def parse_args(defaults={"verbose":None,"configfile":None,"max_jobs":None,"snake
                         dest="cluster_configfile",
                         help="configuration file for cluster usage. In absence, the default options "
                         "from shared/cluster.yaml and [workflow]/cluster.yaml would be selected (default: '%(default)s')",
-                        default=defaults["cluster_configfile"])
+                        default=None)
     
 
     general.add_argument("-j", "--jobs",
