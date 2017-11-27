@@ -106,7 +106,7 @@ def parse_args(defaults={"verbose":None,"configfile":None,"max_jobs":None,"snake
                         dest="paired",
                         action="store_false",
                         help="input data is single-end, not paired-end (default: '%(default)s')",
-                        default=defaults["paired"])
+                        default=not(defaults["paired"]))
 
     optional.add_argument("--bw-binsize",
                         dest="bw_binsize",
