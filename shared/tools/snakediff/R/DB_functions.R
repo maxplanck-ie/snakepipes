@@ -225,7 +225,11 @@ getDBregions_chip <- function(chipCountObject, plotfile = NULL){
 	# Merge DB windows into regions: Using quick and dirty method
 	merged <- csaw::mergeWindows(SummarizedExperiment::rowRanges(chipCountObject$windowCounts), tol = 100L)
 	# get combined test p-value for merged windows
-	tabcom <- csaw::combineTests(merged$id, results$table)
+	tabcom <- csaw::combineTests(merged$id, results$table, pval.col = 4, fc.col = 1)
+    # get fold change of the best window within each combined cluster
+    tab.best <- csaw::getBestTest(merged$id, results$table)
+    tabcom$best.logFC <- tab.best$logFC
+    tabcom$best.start <- GenomicRanges::start(SummarizedExperiment::rowRanges(chipCountObject$windowCounts))[tab.best$best]
 
 	# Return all results
 	chipResultObject <- list(fit = fit, results = results, mergedRegions = merged, combinedPvalues = tabcom)
@@ -251,6 +255,7 @@ writeOutput_chip <- function(chipResultObject, outfile_prefix, fdrcutoff){
 	tabcom <- chipResultObject$combinedPvalues
 	merged$region$score <- -10*log10(tabcom$FDR)
 	names(merged$region) <- paste0("region", 1:length(merged$region))
+    tabcom$name <- names(merged$region)
 	## export merged data
 	rtracklayer::export.bed(merged$region, paste0(outfile_prefix, "_allregions.bed"))
 	write.table(tabcom, file = paste0(outfile_prefix,"_scores.txt"),

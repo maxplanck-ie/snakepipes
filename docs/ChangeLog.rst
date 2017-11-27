@@ -1,7 +1,14 @@
-version 0.0.1 - March 23, 2016 - Fabian Kilpert
+Change Log
+================
+
+The history of development of the workflows is listed below, along with github IDs of
+people with most (but not all) contribution to the changes.
+
+
+version 0.0.1 - March 23, 2016 - @kilpert
 - initial version
 
-version 0.1.0 - June 15, 2016 - Andreas Richter
+version 0.1.0 - June 15, 2016 - @asrichter
 - added --fastqc and --bw-binsize parameters to DNA-mapping wrapper script
 - additional organisms are now supported by adding new genome.py files
 - defined (effective) genome size as (genome length)-(number of 'N's) in genome.py files
@@ -17,17 +24,17 @@ version 0.1.0 - June 15, 2016 - Andreas Richter
 - removed --local-cores parameter from all wrapper scripts as there are no local snakemake rules defined
 - many small other changes
 
-version 0.1.1 - June 17, 2016 - Andreas Richter
+version 0.1.1 - June 17, 2016 -  @asrichter
 - added option to run workflow locally instead of cluster submission
 - FASTQ.snakefile replaces FASTQ_symlink.snakefile and FASTQ_downsample.snakefile
 - several small changes
 
-version 0.2.0 - June 22, 2016 - Andreas Richter
+version 0.2.0 - June 22, 2016 -  @asrichter
 - added filtering option to filter BAM files for duplication, proper pairs and MAPQ
 - added variable 'outdir' to configuration
 - many small changes
 
-version 0.3.0 - June 24, 2016 - Andreas Richter
+version 0.3.0 - June 24, 2016 -  @asrichter
 - rewrote ChIP-seq workflow completely including wrapper script ChIP-seq
 - added histoneHMM for calling broadly enriched regions
 - added MACS2 peak quality controls
@@ -36,7 +43,7 @@ version 0.3.0 - June 24, 2016 - Andreas Richter
 - positional instead of required optional command line arguments
 - many small changes
 
-version 0.3.1 - June 25, 2016 - Andreas Richter
+version 0.3.1 - June 25, 2016 -  @asrichter
 - run Picard quality control on unfiltered BAM files
 - added --gcbias parameter to DNA-mapping wrapper script to run computeGCBias optionally
 - replaced --input-dir and --output-dir by --working-dir parameter in ChIP-seq
@@ -44,7 +51,7 @@ version 0.3.1 - June 25, 2016 - Andreas Richter
   the pipeline and must also contain the DNA-mapping pipeline output files
 - bugfixes
 
-version 0.3.2 - June 27, 2016 - Andreas Richter
+version 0.3.2 - June 27, 2016 -  @asrichter
 - added generation of QC reports for all samples to ChIP-seq pipeline
 - added consistency check for ChIP-seq pipeline whether all required input files exist for all samples
 - added peak count to MACS2 peak quality controls
@@ -53,9 +60,9 @@ version 0.3.2.1 - June 27, 2016 - Andreas Richter
 - added documentation to README.md
 - moved R library
 
-version 0.4 - 2016 - Fabian Kilpert, Steffen Heyne
+version 0.4 - 2016 - @kilpert, @steffenheyne
 
-version 0.5 - 2017 - Steffen Heyne, Fabian Kilpert, Michael Rauer
+version 0.5 - 2017 - @steffenheyne, @kilpert, @mirax87
 - major cleanup and refactoring of wrappers and code structure (but not rules)
 - scRNAseq workflow added
 - using yaml config files all over, ie.
@@ -72,7 +79,7 @@ version 0.5 - 2017 - Steffen Heyne, Fabian Kilpert, Michael Rauer
   now there is true hierachy: defaults->configfile->wrapper !
 
 
-version 0.6 (a.k.a RattleSnake) - Sept 2017 - Vivek Bhardwaj
+version 0.6 (a.k.a Tiger RattleSnake) - Sept 2017 - @vivekbhr
 - MAJOR CHANGES:
   - Allele-Specific mapping : Allele-specific DNA and RNA-mapping is now possible and both ChIP-Seq and RNA-seq pipeline can handle "allele_mapping" mode.
   - Differential binding : Differential binding can be performed using CSAW, both normal and allele-specific.
@@ -90,4 +97,15 @@ version 0.6 (a.k.a RattleSnake) - Sept 2017 - Vivek Bhardwaj
 Version 0.6.1
 
 - MINOR CHANGES:
-  - The allele-specific option is no longer on by default (it was Vivek's fault)
+  - The allele-specific option is no longer on by default (it was @vivekbhr's fault)
+
+Version 0.6.2
+
+- MINOR CHANGES:
+  - Explicitly define which snakemake version to use
+
+Version 0.7 (a.k.a Green Mamba) - Nov 2017 - @vivekbhr
+
+- MAJOR CHANGES:
+  - Read the Docs integration
+  - New workflow Hi-C, from mapping to TAD calling, using BWA and HiCExplorer

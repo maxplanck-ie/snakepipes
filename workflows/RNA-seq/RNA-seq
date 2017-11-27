@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 
-__version__ = "0.5"
+__version__ = "0.6"
 
 __description__ = """
 RNA-seq workflow v{version} - MPI-IE workflow for RNA mapping and analysis
-Fabian Kilpert, Steffen Heyne, Vivek Bhardwaj
-March 13, 2017
 
 usage example:
     RNA-seq -i input-dir -o output-dir mm10
@@ -22,16 +20,21 @@ import time
 import shutil
 import yaml
 import re
+import inspect
 
-sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))))+"/shared/")
+sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(inspect.getfile(inspect.currentframe()) )))))+"/shared/")
 import common_functions as cf
 
-def parse_args(defaults):
+def parse_args(defaults={"verbose":None,"configfile":None,"max_jobs":None,"snakemake_options":None,"tempdir":None,
+                         "mode":None, "downsample":None, "trim":None,"trim_prg":None,"trim_options":None, "fastqc":None,
+                         "library_type":None, "mapping_prg":None, "star_options":None, "hisat_options":None, "salmon_index_options":None,
+                         "featurecounts_options":None, "filter_annotation":None, "sample_info":None,
+                         "bw_binsize":None, "mapq":None}):
     """
     Parse arguments from the command line.
     """
     parser = argparse.ArgumentParser(
-        prog=os.path.basename(sys.argv[0]),
+        prog=sys.argv[0],
         formatter_class=argparse.RawDescriptionHelpFormatter,
         description=textwrap.dedent(__description__),
         add_help=False
@@ -68,7 +71,8 @@ def parse_args(defaults):
 
     general.add_argument("-c", "--configfile",
                         dest="configfile",
-                        help="configuration file: config.yaml (default: '%(default)s')",
+                        help="configuration file: config.yaml. In absence of a config file, the default options from the "
+                        "workflows would be selected from /workflows/<workflow_name>/defaults.yaml (default: '%(default)s')",
                         default=defaults["configfile"])
 
     general.add_argument("-j", "--jobs",
@@ -121,7 +125,8 @@ def parse_args(defaults):
     optional.add_argument("--trim",
     					dest="trim",
     					action="store_true",
-    					help="activate trimming (default: '%(default)s')",
+    					help="Activate fastq read trimming. If activated, Illumina adaptors are trimmed by default. "
+                        "Additional parameters can be specified under --trim_options (default: '%(default)s')",
     					default=defaults["trim"])
     optional.add_argument("--trim_options",
     					dest="trim_options",
@@ -214,7 +219,25 @@ def parse_args(defaults):
                         help="N-masked index of the reference genome (default: 'None')",
                         default='',
                         type=str)
+    return parser
+
+
+def main():
+
+    ## basic paths only used in wrapper
+    this_script_dir = os.path.dirname(os.path.realpath(__file__))
+    main_dir_path = os.path.join(os.path.dirname(os.path.dirname(this_script_dir)))
+
+    ## defaults
+    defaults = cf.load_configfile(os.path.join(this_script_dir, "defaults.yaml"),False)
+    ## get command line arguments
+    parser = parse_args(defaults)
     args = parser.parse_args()
+
+    ## we also add these paths to config, although we dont use them in the Snakefile
+    args.this_script_dir = this_script_dir
+    args.main_dir_path = main_dir_path
+
     args.outdir = os.path.abspath(args.outdir)
     args.cluster_logs_dir = os.path.join(args.outdir, "cluster_logs")
     # check for Allele-specific mapping mode
@@ -245,24 +268,6 @@ def parse_args(defaults):
             print("\nSample info file not found! (--DE {})\n".format(args.sample_info))
             exit(1)
 
-    return args
-
-
-def main():
-
-    ## basic paths only used in wrapper
-    this_script_dir = os.path.dirname(os.path.realpath(__file__))
-    main_dir_path = os.path.join(os.path.dirname(os.path.dirname(this_script_dir)))
-
-    ## defaults
-    defaults = cf.load_configfile(os.path.join(this_script_dir, "defaults.yaml"),False)
-
-    ## get command line arguments
-    args = parse_args(defaults)
-
-    ## we also add these paths to config, although we dont use them in the Snakefile
-    args.this_script_dir = this_script_dir
-    args.main_dir_path = main_dir_path
 
     ## merge configuration dicts
     config = defaults   # 1) form defaults.yaml
