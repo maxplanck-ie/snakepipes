@@ -4,8 +4,6 @@ __version__ = "0.0.1"
 
 __description__ = """
 DNA-mapping workflow v{version} - MPI-IE workflow for ATAC-seq Analysis
-Michael Rauer, Fabian Kilpert, Andreas Richter, Steffen Heyne
-Jue 21, 2017
 
 usage example:
     ATAC-seq -d workdir mm10 samples.yaml
@@ -22,12 +20,14 @@ import textwrap
 import time
 import shutil
 import yaml
+import inspect
+sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(inspect.getfile(inspect.currentframe()) )))))+"/shared/")
 
-sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))))+"/shared/")
 import common_functions as cf
 
 
-def parse_args(defaults):
+def parse_args(defaults={"verbose":None,"configfile":None,"max_jobs":None,"snakemake_options":None,"tempdir":None,
+                         "paired":None,"bw_binsize":None,"atac_fragment_cutoff":None}):
     """
     Parse arguments from the command line.
     """
@@ -114,8 +114,24 @@ def parse_args(defaults):
                         type=int,
                         default=defaults['atac_fragment_cutoff'])
 
+    return parser
 
+
+def main():
+
+    ## basic paths
+    this_script_dir = os.path.dirname(os.path.realpath(__file__))
+    main_dir_path = os.path.join(os.path.dirname(os.path.dirname(this_script_dir)))
+
+    ## defaults
+    defaults = cf.load_configfile(os.path.join(this_script_dir, "defaults.yaml"),False)
+
+    ## get command line arguments
+    parser = parse_args(defaults)
     args = parser.parse_args()
+
+    args.this_script_dir = this_script_dir
+    args.main_dir_path = main_dir_path
 
     ## checks for parameters necessary in wrapper
     if os.path.exists(args.workingdir):
@@ -135,30 +151,6 @@ def parse_args(defaults):
     else:
         print("\nError! Sample config file not found! ({})\n".format(args.samples_config))
         exit(1)
-
-    return args
-
-
-def merge_dicts(x, y):
-    z = x.copy()
-    z.update(y)
-    return(z)
-
-
-def main():
-
-    ## basic paths
-    this_script_dir = os.path.dirname(os.path.realpath(__file__))
-    main_dir_path = os.path.join(os.path.dirname(os.path.dirname(this_script_dir)))
-
-    ## defaults
-    defaults = cf.load_configfile(os.path.join(this_script_dir, "defaults.yaml"),False)
-
-    ## get command line arguments
-    args = parse_args(defaults)
-
-    args.this_script_dir = this_script_dir
-    args.main_dir_path = main_dir_path
 
     ## merge configuration dicts
     config = defaults   # 1) form defaults.yaml
