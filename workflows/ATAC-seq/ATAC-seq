@@ -27,7 +27,7 @@ import common_functions as cf
 
 
 def parse_args(defaults={"verbose":None,"configfile":None,"max_jobs":None,"snakemake_options":None,"tempdir":None,
-                         "paired":None,"bw_binsize":None,"atac_fragment_cutoff":None}):
+                         "bw_binsize":None,"atac_fragment_cutoff":None}):
     """
     Parse arguments from the command line.
     """
@@ -94,12 +94,6 @@ def parse_args(defaults={"verbose":None,"configfile":None,"max_jobs":None,"snake
 
     ## optional
     parser._action_groups.append(optional)
-    parser.add_argument("--single-end",
-                        dest="paired",
-                        action="store_false",
-                        help="input data is single-end, not paired-end (default: '%(default)s')",
-                        default=defaults["paired"])
-
     parser.add_argument("--bw-binsize",
                         dest="bw_binsize",
                         metavar="INT",
