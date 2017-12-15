@@ -2,26 +2,33 @@ rule reads2Frags:
     input:
         "filtered_bam/{sample}.filtered.bam"
     output:
-        allFrags=os.path.join(outdir_MACS2, "{sample}.all.bedpe"),
-        shortFrags=os.path.join(outdir_MACS2, "{sample}.short.bedpe")
+        allFrags=os.path.join(outdir_MACS2, "{sample}.all.bedpe")
     params:
-        cutoff=atac_fragment_cutoff,
-        chromosomelength=genome_index
+        cutoff=atac_fragment_cutoff
     threads: 6
     shell:
         samtools_path + "samtools sort -l 0 -n -@ {threads} {input} | "         # sort by name
         + bedtools_path +"bedtools bamtobed -bedpe -i - |"                      # convert to bedpe
         "awk -v OFS='\\t' '{{ print($1, $2, $6) }}' | "                         # extract fragment to bed
-        # "awk -v OFS='\\t' -v pos_offset=\"4\" -v neg_offset=\"5\" "
-        # "'{{ print($1, $2 - pos_offset , $6 + neg_offset ) }}' | "
-        "tee \"{output.allFrags}\" |"                                           # redirect all fragments
-        "awk -v cutoff={params.cutoff} -v OFS='\\t' \"{{ if(\$3-\$2 < cutoff) {{ print (\$0) }} }}\""   # filter out nucleosomal fragments, i.e. length > cutoff
-        "  > {output.shortFrags}"
+        " > {output.allFrags} "
+        "|| echo \"bam2bed conversion failed. Please check if you filtered for proper pairs\""
 
+rule filterByFragmentlength:
+    input:
+        rules.reads2Frags.output.allFrags
+    output:
+        shortFrags=os.path.join(outdir_MACS2, "{sample}.short.bedpe")
+    params:
+        cutoff=atac_fragment_cutoff
+    threads: 1
+    shell:
+        "cat {input} |"
+        "awk -v cutoff={params.cutoff} -v OFS='\\t' \"{{ if(\$3-\$2 < cutoff) {{ print (\$0) }} }}\""   # filter out nucleosomal fragments, i.e. length > cutoff
+        " > {output.shortFrags}"
 
 rule filterShortContigs:
     input:
-        rules.reads2Frags.output.shortFrags
+        rules.filterByFragmentlength.output.shortFrags
     output:
         os.path.join(outdir_MACS2, "{sample}.short.filtered.bedpe")
     params:
