@@ -139,11 +139,7 @@ def main():
         print("\nError! Provided configfile (-c) not found! ({})\n".format(args.configfile))
         exit(1)
 
-    if os.path.exists(os.path.abspath(args.samples_config)):
-        args.samples_config = os.path.abspath(args.samples_config)
-    else:
-        print("\nError! Sample config file not found! ({})\n".format(args.samples_config))
-        exit(1)
+
 
     ## merge configuration dicts
     config = defaults   # 1) form defaults.yaml

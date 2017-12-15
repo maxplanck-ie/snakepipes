@@ -9,7 +9,7 @@ rule reads2Frags:
     shell:
         samtools_path + "samtools sort -l 0 -n -@ {threads} {input} | "         # sort by name
         + bedtools_path +"bedtools bamtobed -bedpe -i - |"                      # convert to bedpe
-        "awk -v OFS='\\t' '{{ print($1, $2, $6) }}' | "                         # extract fragment to bed
+        "awk -v OFS='\\t' '{{ print($1, $2, $6) }}' "                         # extract fragment to bed
         " > {output.allFrags} "
         "|| echo \"bam2bed conversion failed. Please check if you filtered for proper pairs\""
 

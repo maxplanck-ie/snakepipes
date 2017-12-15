@@ -15,12 +15,8 @@ import yaml
 ### Initialization #############################################################
 
 ## Require configuration file (samples.yaml)
-if not os.path.isfile(samples_config):
-    print("ERROR: Cannot find samples file ("+samples_config+")")
-    exit(1)
-
 samples = [ os.path.basename(f) for f in glob.glob('filtered_bam/*.filtered.bam') ]
-samples = [ os.path.basename(x).replace('.bam','') for x in samples ]
+samples = [ os.path.basename(x).replace('.filtered.bam','') for x in samples ]
 print(samples)
 
 # consistency check whether all required files exist for all samples
