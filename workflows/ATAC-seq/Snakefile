@@ -39,7 +39,6 @@ onstart:
     if "verbose" in config and config["verbose"]:
         print("--- Workflow parameters --------------------------------------------------------")
         print("samples:", samples)
-        print("paired:", paired)
         print("ATAC fragment cutoff: ", atac_fragment_cutoff)
         print("-" * 80, "\n")
 
