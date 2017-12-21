@@ -1,0 +1,39 @@
+################################################################################
+# This file is the default configuration of the ATAC-seq workflow!
+#
+# In order to adjust some parameters, please either use the wrapper script
+# (eg. /path/to/snakemake_workflows/workflows/ATAC-seq/ATAC-seq)
+# or save a copy of this file, modify necessary parameters and then provide
+# this file to the wrapper or snakmake via '--configfile' option
+# (see below how to call the snakefile directly)
+#
+# Own parameters will be loaded during snakefile execution as well and hence
+# can be used in new/extended snakemake rules!
+################################################################################
+## General/Snakemake parameters, only used/set by wrapper or in Snakemake cmdl, but not in Snakefile
+configfile:
+tempdir: /data/extended/
+local: false
+max_jobs: 5
+snakemake_options:
+## workingdir need to be required DNA-mapping output dir, 'outdir' is set to workingdir internally
+workingdir:
+## preconfigured target genomes (mm9,mm10,dm3,...) , see /path/to/snakemake_workflows/shared/organisms/
+## Value can be also path to your own genome config file!
+genome:
+## Bin size of output files in bigWig format
+bw_binsize: 25
+atac_fragment_cutoff: 150
+verbose: false
+################################################################################
+# Call snakemake directly, i.e. without using the wrapper script:
+#
+# Please save a copy of this config yaml file and provide an adjusted config
+# via '--configfile' parameter!
+# example call:
+#
+# snakemake --snakefile /path/to/snakemake_workflows/workflows/ATAC-seq/Snakefile
+#           --configfile /path/to/snakemake_workflows/workflows/ATAC-seq/defaults.yaml
+#           --directory /path/to/outputdir
+#           --cores 32
+################################################################################
