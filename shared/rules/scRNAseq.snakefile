@@ -93,7 +93,7 @@ rule combine_sample_counts:
         split = split_lib,
         sample_cell_names = str(cell_names or '')
     shell:
-        R_path+"""Rscript {params.merge_script} Counts/ {output.merged_matrix} {output.used_cell_names_file} {params.split} {params.sample_cell_names} """
+        "export R_LIBS_USER="+R_libs_path+" && "+R_path+"Rscript {params.merge_script} Counts/ {output.merged_matrix} {output.used_cell_names_file} {params.split} {params.sample_cell_names} """
 
 
 rule sc_QC_metrics:
@@ -112,7 +112,7 @@ rule sc_QC_metrics:
         split = split_lib
     shell:
         ""+workflow.basedir+"/scRNAseq_QC_metrics.sh {params.in_dir} {params.out_dir} >{output.summary};"
-        ""+R_path+"Rscript {params.plot_script} {params.cellsum_dir} {params.out_prefix} {params.split} {input.cell_names_merged};"
+        " export R_LIBS_USER="+R_libs_path+" && "+R_path+"Rscript {params.plot_script} {params.cellsum_dir} {params.out_prefix} {params.split} {input.cell_names_merged};"
 
 
 #cat {output.counts_summary} | sed -n -e '/sample.idx.READS/,/#LIB/{{/#LIB/d;p}}' > {output.cell_summary}
