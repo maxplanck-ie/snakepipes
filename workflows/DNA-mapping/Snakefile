@@ -62,6 +62,8 @@ include: os.path.join(maindir, "shared", "rules", "bam_filtering.snakefile")
 # Picard CollectAlignmentSummaryMetrics and CollectInsertSizeMetrics
 include: os.path.join(maindir, "shared", "rules", "Picard_qc.snakefile")
 
+#Sambamba Markdup
+include: os.path.join(maindir, "shared", "rules", "sambamba.snakefile")
 # deeptools cmds
 include: os.path.join(maindir, "shared", "deeptools_cmds.snakefile")
 
@@ -189,11 +191,13 @@ rule all:
         expand("FASTQ/{sample}{read}.fastq.gz", sample = samples, read = reads),
         run_FastQC(fastqc),
         run_Trimming(trim, fastqc),
-        expand(mapping_prg+"/{sample}.bam", sample = samples),
+#       expand(mapping_prg+"/{sample}.bam", sample = samples),
+        expand(mapping_prg+"/{sample}.bam", sample = samples),       
         expand(mapping_prg+"/{sample}.bam.bai", sample = samples),
         expand("filtered_bam/{sample}.filtered.bam", sample = samples),
         expand("Picard_qc/AlignmentSummaryMetrics/{sample}.alignment_summary_metrics.txt", sample = samples),
-        expand("Picard_qc/MarkDuplicates/{sample}.mark_duplicates_metrics.txt", sample = samples),
+#       expand("Picard_qc/MarkDuplicates/{sample}.mark_duplicates_metrics.txt", sample = samples),
+        expand("Sambamba/{sample}.dup.txt", sample = samples),
         run_CollectInsertSizeMetrics(paired),
         expand("bamCoverage/{sample}.seq_depth_norm.bw", sample = samples),
         expand("bamCoverage/{sample}.filtered.seq_depth_norm.bw", sample = samples),
