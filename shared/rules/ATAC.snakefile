@@ -34,12 +34,12 @@ rule filterFragments:
     params:
         cutoff=atac_fragment_cutoff,
         metrics=os.path.join(outdir_MACS2, "{sample}.short.metrics")
-    threas: 6
+    threads: 6
     shell:
-        "/package/deeptools-develop/bin/alignmentSieve --bam {input} -outFile {output} "
-        "--numberOfProcessors {threads}"
-        "--filterMetrics {params.metrics}"
-        "--maxFragmentLength {params.cutoff}"
+        "/package/deeptools-develop/bin/alignmentSieve --bam {input} --outFile {output} "
+        "--numberOfProcessors {threads} "
+        "--filterMetrics {params.metrics} "
+        "--maxFragmentLength {params.cutoff} "
 
 # rule filterShortContigs:
 #     input:
