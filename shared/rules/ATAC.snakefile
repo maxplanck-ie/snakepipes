@@ -1,31 +1,3 @@
-# rule reads2Frags:
-#     input:
-#         "filtered_bam/{sample}.filtered.bam"
-#     output:
-#         allFrags=os.path.join(outdir_MACS2, "{sample}.all.bedpe")
-#     params:
-#         cutoff=atac_fragment_cutoff
-#     threads: 6
-#     shell:
-#         samtools_path + "samtools sort -l 0 -n -@ {threads} {input} | "         # sort by name
-#         + bedtools_path +"bedtools bamtobed -bedpe -i - |"                      # convert to bedpe
-#         "awk -v OFS='\\t' '{{ print($1, $2, $6) }}' "                         # extract fragment to bed
-#         " > {output.allFrags} "
-#         "|| echo \"bam2bed conversion failed. Please check if you filtered for proper pairs\""
-#
-# rule filterByFragmentlength:
-#     input:
-#         rules.reads2Frags.output.allFrags
-#     output:
-#         shortFrags=os.path.join(outdir_MACS2, "{sample}.short.bedpe")
-#     params:
-#         cutoff=atac_fragment_cutoff
-#     threads: 1
-#     shell:
-#         "cat {input} |"
-#         "awk -v cutoff={params.cutoff} -v OFS='\\t' \"{{ if(\$3-\$2 < cutoff) {{ print (\$0) }} }}\""   # filter out nucleosomal fragments, i.e. length > cutoff
-#         " > {output.shortFrags}"
-
 rule filterFragments:
     input:
         "filtered_bam/{sample}.filtered.bam"
@@ -40,16 +12,6 @@ rule filterFragments:
         "--numberOfProcessors {threads} "
         "--filterMetrics {params.metrics} "
         "--maxFragmentLength {params.cutoff} "
-
-# rule filterShortContigs:
-#     input:
-#         rules.filterByFragmentlength.output.shortFrags
-#     output:
-#         os.path.join(outdir_MACS2, "{sample}.short.filtered.bedpe")
-#     params:
-#         ignoreListFile=ignoreForPeaksFile
-#     shell:
-#         "cat {input} | grep -v -f {params.ignoreListFile} > {output}"
 
 # MACS2 BAMPE filter: samtools view -b -f 2 -F 4 -F 8 -F 256 -F 512 -F 2048
 rule callOpenChromatin:
