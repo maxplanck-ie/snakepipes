@@ -26,7 +26,7 @@ include: os.path.join(maindir, "shared", "rules", "deepTools_ChIP.snakefile")
 include: os.path.join(maindir, "shared", "rules", "MACS2.snakefile")
 
 # QC report for all samples
-include: os.path.join(maindir, "shared", "rules", "ChIP_qc_report.snakefile")
+include: os.path.join(maindir, "shared", "rules", "ChiP-seq_qc_report.snakefile")
 
 # deeptools cmds
 include: os.path.join(maindir, "shared", "deeptools_cmds.snakefile")
@@ -136,9 +136,7 @@ rule all:
         run_deepTools_allelic(),
         ## run csaw if asked for
         run_CSAW(),
-        expand("QC_report/{sample}.qc_report.tsv", sample = all_samples),
-        "QC_report/qc_report.all_samples.tsv"
-
+        "QC_report/QC_report_all.tsv"
 
 ### execute after workflow finished ############################################
 ################################################################################
