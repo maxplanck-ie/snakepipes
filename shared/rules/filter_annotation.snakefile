@@ -57,7 +57,6 @@ rule filter_annotation_bed:
     shell:
         "cat {input.bed_annot} | grep {params.pattern} > {output.bed_filtered} "
 
-
 rule annotation_bed2t2g:
     input:
         bed_annot = 'Annotation/genes.filtered.bed' 

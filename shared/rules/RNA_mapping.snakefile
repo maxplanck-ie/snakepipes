@@ -9,7 +9,7 @@ if mapping_prg.upper().find("HISAT2") >=0:
                 r2 = fastq_dir+"/{sample}"+reads[1]+".fastq.gz"
             output:
                 align_summary = mapping_prg+"/{sample}.HISAT2_summary.txt",
-                bam = mapping_prg+"/{sample}.bam",
+                bam = temp(mapping_prg+"/{sample}.sorted.bam"),
                 splice = mapping_prg+"/{sample}/splice_sites.txt",
                 met = mapping_prg+"/{sample}/metrics.txt",
                 unconc = mapping_prg+"/{sample}/un-conc.fastq.gz",
@@ -43,7 +43,7 @@ if mapping_prg.upper().find("HISAT2") >=0:
                 fastq_dir+"/{sample}.fastq.gz"
             output:
                 align_summary = mapping_prg+"/{sample}.HISAT2_summary.txt",
-                bam = mapping_prg+"/{sample}.bam",
+                bam = mapping_prg+"/{sample}.sorted.bam",
                 splice = mapping_prg+"/{sample}/splice_sites.txt",
                 met = mapping_prg+"/{sample}/metrics.txt",
                 un = mapping_prg+"/{sample}/un.fastq.gz",
@@ -80,7 +80,7 @@ elif mapping_prg.upper().find("STAR") >=0:
                 r1 = fastq_dir+"/{sample}"+reads[0]+".fastq.gz",
                 r2 = fastq_dir+"/{sample}"+reads[1]+".fastq.gz"
             output:
-                bam = mapping_prg+"/{sample}.bam"
+                bam = temp(mapping_prg+"/{sample}.sorted.bam")
             params:
                 star_options = str(star_options or ''),
                 gtf = genes_gtf,
@@ -108,7 +108,7 @@ elif mapping_prg.upper().find("STAR") >=0:
             input:
                 fastq_dir+"/{sample}.fastq.gz"
             output:
-                bam = mapping_prg+"/{sample}.bam"
+                bam = temp(mapping_prg+"/{sample}.sorted.bam")
             params:
                 star_options = str(star_options or ''),
                 gtf = genes_gtf,
