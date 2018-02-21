@@ -84,7 +84,7 @@ if (is.null(cell_names_path)){
 } else if ( file.exists(cell_names_path) & file.info(cell_names_path)$isdir == TRUE ) {
 	## cell_names_path is given as directory, use all *.csv files for cell names
 	print(paste("Read in all csv files with cell_names from path",cell_names_path))
-	files <- list.files(cell_names_path, pattern=".csv", full.names = TRUE)
+	files <- list.files(cell_names_path, pattern=".csv$", full.names = TRUE)
 	
 	if (length(files) == 0){
 		print(paste("no csv files found under",cell_names_path))
@@ -98,8 +98,9 @@ if (is.null(cell_names_path)){
 			print("required columns not found!")
 			stop(1)
 		}
-		
+	#	str(dat_csv)
 		cell_names <- rbind(cell_names, dat_csv)
+		
 	}
 } else {
 	print(paste("Provided path with cell names does not exists! Exit! (",cell_names_path,")"))
@@ -116,6 +117,7 @@ if (all(c("cell_prefix","cell_idx_start") %in% names(cell_names))) {
 		arrange(plate,library,cell_idx_start) %>% 
 		as.data.frame()
 }
+
 str(dat)
 alldata=data.frame(GENEID=NA)
 ## defaults in case no cell names are provided, ie. all cell from each sample/library are used
@@ -135,7 +137,8 @@ for (i in 1:length(dat$file)) {
 		print(paste(dat[i,"name"]," ignored, nothing found in cell_names file for that sample!"))
 		next
 	}
-	
+	#str(cell_names)
+
   tmp <- read.csv(dat$file[i],sep="\t",header=T)
   
   ## rename all cells 
