@@ -58,6 +58,7 @@ def get_merged_bins():
 ## get MAD thresholds for the matrix correction
 def get_mad_score(madfile):
     with open(madfile) as md:
+        lower = 0.0
         for line in md:
             lower = float(line.split()[2])
     upper = -(3*lower)

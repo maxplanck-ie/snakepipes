@@ -123,7 +123,8 @@ def run_deepTools_qc():
         file_list.append( [
         "deepTools_qc/plotCorrelation/correlation.pearson.read_coverage.heatmap.png",
         "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage.heatmap.png",
-        "deepTools_qc/plotPCA/PCA.read_coverage.png" ] )
+        "deepTools_qc/plotPCA/PCA.read_coverage.png",
+        "deepTools_qc/estimateReadFiltering/EstimateReadFiltering.txt"] )
         if 'allelic-mapping' in mode:
             file_list.append( [
             "deepTools_qc/plotCorrelation/correlation.pearson.read_coverage_allelic.heatmap.png",

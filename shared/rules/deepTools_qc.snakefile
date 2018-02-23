@@ -167,3 +167,14 @@ rule plotPCA:
         "deepTools_qc/.benchmark/plotPCA.benchmark"
     run:
         shell(plotPCA_cmd('fragment'))
+
+########## deepTools estimateReadFiltering ###################################
+
+rule estimate_read_filtering:
+    input:
+        expand(mapping_prg+"/{sample}.bam",sample=samples)
+    output:
+        "deepTools_qc/estimateReadFiltering/EstimateReadFiltering.txt"
+    run:
+        shell("estimateReadFiltering -b {input} -o {output}")
+                           

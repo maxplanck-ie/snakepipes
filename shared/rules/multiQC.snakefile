@@ -18,12 +18,15 @@ def multiqc_input_check(return_value):
     if mapping_prg == "Bowtie2":
         # pipeline is DNA-mapping
         infiles.append( expand("Bowtie2/{sample}.Bowtie2_summary.txt", sample = samples) +
-                expand("Sambamba/{sample}.dup.txt", sample = samples) )
+                expand("Sambamba/{sample}.dup.txt", sample = samples) + 
+                ["deepTools_qc/estimateReadFiltering/EstimateReadFiltering.txt"]
+                )
         if paired:
             infiles.append( expand("Picard_qc/InsertSizeMetrics/{sample}.insert_size_metrics.txt", sample = samples) )
-        indir += " Picard_qc "
-	indir += " Sambamba "
-	indir += "Bowtie2"
+        indir += " Picard_qc"
+	indir += " Sambamba"
+	indir += " Bowtie2"
+        indir += " deepTools_ChIP/estimateReadFiltering"
         if qualimap:
             infiles.append( expand("Qualimap_qc/{sample}.filtered.bamqc_results.txt", sample = samples) )
             indir += " Qualimap_qc "

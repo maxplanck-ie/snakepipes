@@ -113,12 +113,12 @@ def plotFingerprint_cmd():
     return((deepTools_path+"plotFingerprint " +
             "-b {input.bams} " +
             "--labels {params.labels} " +
-            "--plotTitle 'Cumulative read counts per bin without duplicates' " +
+#            "--plotTitle 'Cumulative read counts per bin without duplicates' " +
             "--ignoreDuplicates " +
             "--outQualityMetrics {output.metrics} " +
             "-p {threads} " +
             "{params.blacklist} " +
-            "{params.png} " +
+#            "{params.png} " +
             "{params.read_extension} " +
             "{params.jsd} " +
             "&> {log}"))

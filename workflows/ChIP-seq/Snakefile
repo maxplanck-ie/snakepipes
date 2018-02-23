@@ -61,7 +61,8 @@ def run_deepTools():
         control_name = get_control_name(chip_sample)
         file_list.append([
         "deepTools_ChIP/bamCompare/"+chip_sample+".filtered.log2ratio.over_"+control_name+".bw",
-        "deepTools_ChIP/bamCompare/"+chip_sample+".filtered.subtract."+control_name+".bw"
+        "deepTools_ChIP/bamCompare/"+chip_sample+".filtered.subtract."+control_name+".bw",
+        "deepTools_ChIP/plotFingerprint/plotFingerprint.metrics.txt"
         ])
     return(file_list)
 
@@ -79,7 +80,8 @@ def run_deepTools_allelic():
         file_list.append( [
         "deepTools_ChIP/plotEnrichment/plotEnrichment.gene_features_allelic.png",
         "deepTools_ChIP/plotEnrichment/plotEnrichment.gene_features_allelic.tsv",
-        "deepTools_ChIP/plotFingerprint/plotFingerprint.metrics_allelic.txt" ] )
+        "deepTools_ChIP/plotFingerprint/plotFingerprint.metrics_allelic.txt" 
+         ] )
         return(file_list)
     else:
         return([])
@@ -124,7 +126,6 @@ onstart:
 ################################################################################
 rule all:
     input:
-        "deepTools_ChIP/plotFingerprint/plotFingerprint.metrics.txt",
         run_deepTools(),
         #expand("deepTools_ChIP/bamCompare/{chip_sample}.filtered.log2ratio.over_{control_name}.bw", chip_sample = chip_samples_w_ctrl, control_name = control_names),
         #expand("deepTools_ChIP/bamCompare/{chip_sample}.filtered.subtract.{control_name}.bw", chip_sample = chip_samples_w_ctrl, control_name = control_names),
