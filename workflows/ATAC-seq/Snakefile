@@ -1,0 +1,78 @@
+import os
+
+
+### snakemake_workflows initialization ########################################
+maindir = os.path.dirname(os.path.dirname(workflow.basedir))
+sys.path.append(os.path.join(maindir, "shared"))
+
+import common_functions as cf
+
+# load tool paths
+globals().update(cf.load_paths(os.path.join(maindir, "shared", "paths.yaml"),maindir,config["verbose"]))
+# load config file
+globals().update(cf.load_configfile(workflow.overwrite_configfile,config["verbose"]))
+# load organism-specific data, i.e. genome indices, annotation, etc.
+globals().update(cf.load_organism_data(genome,maindir,config["verbose"]))
+
+outdir_MACS2 = 'MACS2_openChromatin/'
+outdir_ATACqc = 'MACS2_qc/'
+
+# do workflow specific stuff now
+include: os.path.join(workflow.basedir, "internals.snakefile")
+
+
+### include modules of other snakefiles ########################################
+################################################################################
+# Import deeptools cmds
+include: os.path.join(maindir, "shared", "deeptools_cmds.snakefile")
+
+# ATAC QC open chromatin
+include: os.path.join(maindir, "shared", "rules", "ATAC_qc.snakefile")
+
+# ATAC-seq open chromatin
+include: os.path.join(maindir, "shared", "rules", "ATAC.snakefile")
+
+# ATAC-seq deeptools compounts
+include: os.path.join(maindir, "shared", "rules", "deepTools_ATAC.snakefile")
+
+### execute before workflow starts #############################################
+################################################################################
+onstart:
+    if "verbose" in config and config["verbose"]:
+        print("--- Workflow parameters --------------------------------------------------------")
+        print("samples:", samples)
+        print("ATAC fragment cutoff: ", atac_fragment_cutoff)
+        print("-" * 80, "\n")
+
+        print("--- Environment ----------------------------------------------------------------")
+        print("$TMPDIR: ",os.getenv('TMPDIR', ""))
+        print("$HOSTNAME: ",os.getenv('HOSTNAME', ""))
+        print("-" * 80, "\n")
+
+        print("--- Genome ---------------------------------------------------------------------")
+        print("Genome:", genome)
+        print("Effective genome size:", genome_size)
+        print("Genome FASTA:", genome_fasta)
+        print("Genome index:", genome_index)
+        print("Genome 2bit:", genome_2bit)
+        print("Bowtie2 index:", bowtie2_index)
+        print("Gene annotation BED:", genes_bed)
+        print("Gene annotation GTF:", genes_gtf)
+        print("Blacklist regions BED:", blacklist_bed)
+        print("Ignore for normalization (bigwigs):", ignore_forNorm)
+        print("-" * 80, "\n")
+
+### main rule ##################################################################
+################################################################################
+rule all:
+    input:
+        expand(os.path.join(outdir_MACS2, "{sample}.short.bedpe"), sample = samples),
+        expand(os.path.join(outdir_MACS2, '{sample}_peaks.narrowPeak'), sample = samples),
+        expand(os.path.join(outdir_ATACqc, "{sample}.filtered.BAM_peaks.qc.txt"), sample = samples),
+        "deepTools_ATAC/plotFingerprint/plotFingerprint.metrics.txt"
+
+### execute after workflow finished ############################################
+################################################################################
+onsuccess:
+    if "verbose" in config and config["verbose"]:
+        print("\n--- ATAC OpenChrom workflow finished successfully! --------------------------------\n")

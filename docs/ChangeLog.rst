@@ -109,3 +109,8 @@ Version 0.7 (a.k.a Green Mamba) - Nov 2017 - @vivekbhr
 - MAJOR CHANGES:
   - Read the Docs integration
   - New workflow Hi-C, from mapping to TAD calling, using BWA and HiCExplorer
+
+Version 0.7.1 - Jan. 12 2018
+
+- MINOR CHANGES:
+  - Fixed issue #57 again via pull request #79, which was related to single-end ChIPseq processing

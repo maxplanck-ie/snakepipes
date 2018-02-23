@@ -61,6 +61,7 @@ def parse_args(defaults={"verbose":None,"configfile":None,"max_jobs":None,"snake
                         required=True)
 
     general = parser.add_argument_group('general arguments')
+
     general.add_argument("-h", "--help",
                         action="help",
                         help="show this help message and exit")
