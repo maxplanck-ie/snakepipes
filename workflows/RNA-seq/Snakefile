@@ -70,7 +70,9 @@ if "mapping-free" in mode:
 ## Sleuth (on Salmon)
 if "mapping-free" in mode and sample_info:
     include: os.path.join(maindir, "shared", "rules", "sleuth.snakefile")
-
+## Sambamba
+if "mapping" in mode:
+    include:os.path.join(maindir, "shared", "rules", "sambamba.snakefile")
 # deeptools cmds
 include: os.path.join(maindir, "shared", "deeptools_cmds.snakefile")
 
@@ -84,9 +86,11 @@ if sample_info:
 ## MultiQC
 include: os.path.join(maindir, "shared", "rules", "multiQC.snakefile")
 
+##Genomic_contamination
+include: os.path.join(maindir, "shared", "rules", "GenomicContamination.snakefile")
+
 ### conditional/optional rules #################################################
 ################################################################################
-
 def run_FastQC(fastqc):
     if fastqc:
         return( expand("FastQC/{sample}{read}_fastqc.html", sample = samples, read = reads) )
@@ -130,6 +134,7 @@ def run_mapping_free():
 def run_mapping():
     if "mapping" in mode:
         file_list = [
+        expand("Sambamba/{sample}.dup.txt", sample = samples),
         expand(mapping_prg+"/{sample}.bam.bai", sample = samples),
         expand("featureCounts/{sample}.counts.txt", sample=samples),
         "featureCounts/counts.tsv",
@@ -195,7 +200,12 @@ def run_deeptools_qc():
     else:
         return([])
 
-
+def run_GenomicContamination():
+    if genomic_contamination:
+       file_list = [expand("GenomicContamination/{sample}.featurecounts.txt", sample = samples)]
+       return (file_list)
+    else:
+       return([])
 ### execute before  starts #####################################################
 ################################################################################
 onstart:
@@ -230,12 +240,14 @@ rule all:
         "Annotation/genes.annotated.bed",
         "Annotation/genes.filtered.bed",
         "Annotation/genes.filtered.saf",    # this file is used for featureCounts later on!
-
         run_mapping_free(),            # Salmon
         run_mapping(),                 # classical mapping + counting
-        run_allelesp_mapping(),        # allelic-mapping
+	run_allelesp_mapping(),        # allelic-mapping
         make_nmasked_genome(),
         run_deeptools_qc(),
+        "Sambamba/flagstat_report_all.tsv",
+        run_GenomicContamination(),
+        "GenomicContamination/genomic_contamination_featurecount_report.tsv",
         "multiQC/multiqc_report.html"
 
 

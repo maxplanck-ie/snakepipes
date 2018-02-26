@@ -9,5 +9,6 @@ known_splicesites: "/data/repository/organisms/GRCm38_ensembl/gencode/m9/HISAT2/
 star_index: "/data/repository/organisms/GRCm38_ensembl/STARIndex/"
 genes_bed: "/data/repository/organisms/GRCm38_ensembl/gencode/m9/genes.bed"
 genes_gtf: "/data/repository/organisms/GRCm38_ensembl/gencode/m9/genes.gtf"
+extended_coding_regions_gtf: "/data/repository/organisms/GRCm38_ensembl/gencode/m9/genes.slop.gtf"
 blacklist_bed: "/data/repository/organisms/GRCm38_ensembl/DKFZ/GRCm38_General_readAttractingRegions.bed"
 ignore_forNorm: "MT X Y JH584299.1 GL456233.1 JH584301.1 GL456211.1 GL456350.1 JH584293.1 GL456221.1 JH584297.1 JH584296.1 GL456354.1 JH584294.1 JH584298.1 JH584300.1 GL456219.1 GL456210.1 JH584303.1 JH584302.1 GL456212.1 JH584304.1 GL456379.1 GL456216.1 GL456393.1 GL456366.1 GL456367.1 GL456239.1 GL456213.1 GL456383.1 GL456385.1 GL456360.1 GL456378.1 GL456389.1 GL456372.1 GL456370.1 GL456381.1 GL456387.1 GL456390.1 GL456394.1 GL456392.1 GL456382.1 GL456359.1 GL456396.1 GL456368.1 JH584292.1 JH584295.1"
