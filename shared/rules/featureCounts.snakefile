@@ -4,7 +4,7 @@
 rule featureCounts:
     input:
         bam = mapping_prg+"/{sample}.bam",
-        saf = "Annotation/genes.filtered.saf",
+        anno = genes_gtf
     output:
         "featureCounts/{sample}.counts.txt"
     params:
@@ -19,7 +19,7 @@ rule featureCounts:
         "{params.paired_opt}{params.opts} "
         "-T {threads} "
         "-s {params.libtype} "
-        "-F SAF -a {input.saf} "
+        "-a {input.anno} "
         "-o {output} "
         "--tmpDir ${{TMPDIR}} "
         "{input.bam} &>> {log} "
