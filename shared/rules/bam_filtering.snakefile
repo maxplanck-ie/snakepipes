@@ -1,28 +1,3 @@
-### Picard MarkDuplicates ######################################################
-
-rule MarkDuplicates:
-    input:
-        mapping_prg+"/{sample}.sorted.bam"
-    output:
-        bam = mapping_prg+"/{sample}.bam",
-        txt = "Picard_qc/MarkDuplicates/{sample}.mark_duplicates_metrics.txt"
-    log:
-        "Picard_qc/logs/MarkDuplicates.{sample}.log"
-    benchmark:
-        "Picard_qc/.benchmark/MarkDuplicates.{sample}.benchmark"
-    threads: 4 # Java performs parallel garbage collection
-    shell:
-        "java -Xmx8g -jar "+picard_path+"picard.jar MarkDuplicates "
-            "MAX_FILE_HANDLES=1000 "
-            "INPUT={input} "
-            "OUTPUT={output.bam} "
-            "METRICS_FILE={output.txt} "
-            "ASSUME_SORTED=true "
-            "VERBOSITY=WARNING "
-            "VALIDATION_STRINGENCY=LENIENT "
-            "&> {log} "
-
-
 ### samtools_filter ############################################################
 # When modifying the rule samtools_filter, double-check wether the function
 # update_filter() has to be modified concordantly
