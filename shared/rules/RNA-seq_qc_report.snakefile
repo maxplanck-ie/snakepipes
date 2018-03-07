@@ -16,12 +16,22 @@ rule report_flagstat_all_data:
       shell:
          "cat {input} | sort -k1,1V | cat <( echo -e 'sample\ttotal\tdup\tmapped') - > {output}"
 ##########QC report for all the samples#########
-rule qc_report_all:
-      input:
-         flagstat = "Sambamba/flagstat_report_all.tsv",
-         IHECmetrics = "GenomicContamination/genomic_contamination_featurecount_report.tsv"
-      output:
-         "QC_report/QC_report_all.tsv"
-      run:
-         shell("cat {input.IHECmetrics} | cut -f2,3 | paste {input.flagstat} - > {output}")
+if genomic_contamination:
+  rule qc_report_all:
+        input:
+            flagstat = "Sambamba/flagstat_report_all.tsv",
+            IHECmetrics = "GenomicContamination/genomic_contamination_featurecount_report.tsv"
+        output:
+            "QC_report/QC_report_all.tsv"
+        run:
+            shell("cat {input.IHECmetrics} | cut -f2,3 | paste {input.flagstat} - > {output}")
+else:
+  rule qc_report_all:
+        input:
+            flagstat = "Sambamba/flagstat_report_all.tsv"
+        output:
+            "QC_report/QC_report_all.tsv"
+        run:
+            shell("cat {input.flagstat} > {output}")
+ 
 #
