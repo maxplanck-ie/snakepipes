@@ -196,7 +196,7 @@ def parse_args(defaults={"verbose":None,"configfile":None,"max_jobs":None,"snake
     					help="bin size of output files in bigWig format (default: '%(default)s')",
     					type=int,
     					default=defaults["bw_binsize"])
-    optional.add_argument("-GC",
+    optional.add_argument("--contamination",
                                         dest="genomic_contamination",
                                         action="store_true",
                                         help="Returns a plot which presents the proportion of the intergenic reads (default: '%(default)s')",

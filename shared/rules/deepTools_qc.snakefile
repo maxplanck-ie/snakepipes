@@ -43,7 +43,8 @@ rule bamCoverage_filtered:
         "bamCoverage/.benchmark/bamCoverage.{sample}.filtered.benchmark"
     threads: 16
     run:
-        cmd = (bamcov_cmd() + " {params.blacklist}")
+#        cmd = (bamcov_cmd() + " {params.blacklist}")
+        cmd = (bamcov_cmd())        
         shell(cmd)
 
 # TODO: include blacklist!? use deeptools bam filtering options?
@@ -172,9 +173,10 @@ rule plotPCA:
 
 rule estimate_read_filtering:
     input:
-        expand(mapping_prg+"/{sample}.bam",sample=samples)
+        bam = mapping_prg+"/{sample}.bam",
+        bai = mapping_prg+"/{sample}.bam.bai"
     output:
-        "deepTools_qc/estimateReadFiltering/EstimateReadFiltering.txt"
+        "deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt"
     run:
-        shell("estimateReadFiltering -b {input} -o {output}")
-                           
+        shell(estimateReadFiltering_cmd())
+

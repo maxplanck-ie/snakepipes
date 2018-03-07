@@ -31,6 +31,9 @@ include: os.path.join(maindir, "shared", "rules", "ChiP-seq_qc_report.snakefile"
 # deeptools cmds
 include: os.path.join(maindir, "shared", "deeptools_cmds.snakefile")
 
+# sambamba 
+#include: os.path.join(maindir, "shared", "rules", "sambamba.snakefile")
+
 # deeptools for allelic bams (if present)
 if os.path.isdir(os.path.join(workingdir,'allelic_bams') ) and os.listdir(os.path.join(workingdir,'allelic_bams') ) != []:
     #print('allele-specific files detected')
@@ -62,7 +65,8 @@ def run_deepTools():
         file_list.append([
         "deepTools_ChIP/bamCompare/"+chip_sample+".filtered.log2ratio.over_"+control_name+".bw",
         "deepTools_ChIP/bamCompare/"+chip_sample+".filtered.subtract."+control_name+".bw",
-        "deepTools_ChIP/plotFingerprint/plotFingerprint.metrics.txt"
+        "deepTools_ChIP/plotFingerprint/plotFingerprint.metrics.txt",
+        "deepTools_ChIP/bamPEFragmentSize/fragmentSize.metric.tsv"
         ])
     return(file_list)
 
@@ -131,6 +135,7 @@ rule all:
         #expand("deepTools_ChIP/bamCompare/{chip_sample}.filtered.subtract.{control_name}.bw", chip_sample = chip_samples_w_ctrl, control_name = control_names),
         expand("MACS2/{chip_sample}.filtered.BAM_peaks.xls", chip_sample = chip_samples),
         expand("MACS2/{chip_sample}.filtered.BAM_peaks.qc.txt", chip_sample = chip_samples),
+        
         # run histoneHMM if allelic_bams are absent (since it gives index error without allele_specific index)
         run_histoneHMM(allele_info),
         ## run deeptools-allelic only if dir "allelic_bams" present and non empty
