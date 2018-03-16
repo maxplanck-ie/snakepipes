@@ -66,7 +66,7 @@ onstart:
 ################################################################################
 rule all:
     input:
-        expand(os.path.join(outdir_MACS2, "{sample}.short.bedpe"), sample = samples),
+        expand(os.path.join(outdir_MACS2, "{sample}.short.bam"), sample = samples),
         expand(os.path.join(outdir_MACS2, '{sample}_peaks.narrowPeak'), sample = samples),
         expand(os.path.join(outdir_ATACqc, "{sample}.filtered.BAM_peaks.qc.txt"), sample = samples),
         "deepTools_ATAC/plotFingerprint/plotFingerprint.metrics.txt"
