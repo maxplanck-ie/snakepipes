@@ -17,7 +17,7 @@ rule map_fastq_single_end:
     input: fastq_dir+"/{sample}{read}.fastq.gz"
     output: "BWA/{sample}{read}.bam"
     log:    "BWA/{sample}{read}.log"
-    threads: 16
+    threads: 15
     shell:
         "echo 'mapping {input}' > {log} && "
         + bwa_path + "bwa mem -A1 -B4  -E50 -L0 "
