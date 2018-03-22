@@ -73,6 +73,7 @@ if "mapping-free" in mode and sample_info:
 ## Sambamba
 if "mapping" in mode:
     include:os.path.join(maindir, "shared", "rules", "sambamba.snakefile")
+    include:os.path.join(maindir, "shared", "rules", "RNA-seq_qc_report.snakefile")
 # deeptools cmds
 include: os.path.join(maindir, "shared", "deeptools_cmds.snakefile")
 
@@ -134,10 +135,11 @@ def run_mapping_free():
 def run_mapping():
     if "mapping" in mode:
         file_list = [
-        expand("Sambamba/{sample}.dup.txt", sample = samples),
+        "Sambamba/flagstat_report_all.tsv",
         expand(mapping_prg+"/{sample}.bam.bai", sample = samples),
         expand("featureCounts/{sample}.counts.txt", sample=samples),
         "featureCounts/counts.tsv",
+        "QC_report/QC_report_all.tsv"
         ]
         if sample_info:
             file_list.append( ["DESeq2/DESeq2.session_info.txt"] )
@@ -182,7 +184,9 @@ def run_deeptools_qc():
         expand("bamCoverage/{sample}.RPKM.bw", sample = samples),
         expand("bamCoverage/{sample}.coverage.bw", sample = samples),
         "deepTools_qc/plotEnrichment/plotEnrichment.png",
-        "deepTools_qc/plotEnrichment/plotEnrichment.tsv"]
+        "deepTools_qc/plotEnrichment/plotEnrichment.tsv",
+        "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv",
+        expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample = samples)]
         if len(samples)>1:
             file_list.append( ["deepTools_qc/multiBigwigSummary/coverage.bed.npz",
                               "deepTools_qc/plotCorrelation/correlation.pearson.bed_coverage.heatmap.png",
@@ -202,7 +206,8 @@ def run_deeptools_qc():
 
 def run_GenomicContamination():
     if genomic_contamination:
-       file_list = [expand("GenomicContamination/{sample}.featurecounts.txt", sample = samples)]
+#       file_list = [expand("GenomicContamination/{sample}.featurecounts.txt", sample = samples)]
+       file_list = ["GenomicContamination/genomic_contamination_featurecount_report.tsv"]
        return (file_list)
     else:
        return([])
@@ -245,9 +250,7 @@ rule all:
 	run_allelesp_mapping(),        # allelic-mapping
         make_nmasked_genome(),
         run_deeptools_qc(),
-        "Sambamba/flagstat_report_all.tsv",
         run_GenomicContamination(),
-        "GenomicContamination/genomic_contamination_featurecount_report.tsv",
         "multiQC/multiqc_report.html"
 
 

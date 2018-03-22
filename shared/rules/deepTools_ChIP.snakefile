@@ -100,3 +100,16 @@ rule plotFingerprint:
     threads: 24
     run:
         shell(plotFingerprint_cmd())
+
+#######InsertSizeMetrics###############
+rule bamPE_fragment_size:
+   input:
+       bams = expand("filtered_bam/{sample}.filtered.bam", sample=all_samples)
+   output:
+       "deepTools_ChIP/bamPEFragmentSize/fragmentSize.metric.tsv"
+   log:
+       "deepTools_ChIP/bamPEFragmentSize/log"
+   threads: 24
+   run:
+       shell(bamPEFragmentSize_cmd())
+

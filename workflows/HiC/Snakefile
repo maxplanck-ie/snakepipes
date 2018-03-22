@@ -57,6 +57,37 @@ def run_CollectInsertSizeMetrics(paired):
     else:
         return([])
 
+def run_build_matrices():
+    file_list = []
+    if merge_samples and nbins_toMerge !=0:
+       file_list.append(["HiC_matrices/mergedSamples_Mbins"+str(nbins_toMerge)+"_"+matrixFile_suffix+".h5",
+                        "HiC_matrices/QCplots/mergedSamples_Mbins"+str(nbins_toMerge)+"_"+matrixFile_suffix+"_diagnostic_plot.pdf",
+                        "HiC_matrices/QCplots/mergedSamples_Mbins"+str(nbins_toMerge)+"_"+matrixFile_suffix+"_mad_threshold.out", 
+                        "HiC_matrices_corrected/mergedSamples_Mbins"+str(nbins_toMerge)+"_"+matrixFile_suffix+".corrected.h5",
+                        "TADs/mergedSamples_"+matrixFile_suffix+"_boundaries.bed"])
+       return(file_list)
+    elif merge_samples:
+       file_list.append(["HiC_matrices/mergedSamples_"+matrixFile_suffix+".h5",
+              "HiC_matrices/QCplots/mergedSamples_"+matrixFile_suffix+"_diagnostic_plot.pdf",
+              "HiC_matrices/QCplots/mergedSamples_"+matrixFile_suffix+"_diagnostic_plot.pdf",
+              "HiC_matrices/QCplots/mergedSamples_"+matrixFile_suffix+"_mad_threshold.out",
+              "HiC_matrices_corrected/mergedSamples_"+matrixFile_suffix+".corrected.h5",
+              "TADs/mergedSamples_"+matrixFile_suffix+"_boundaries.bed"])
+       return(file_list)
+
+    elif nbins_toMerge != 0:
+       return(expand("HiC_matrices/{sample}_Mbins"+str(nbins_toMerge)+"_"+matrixFile_suffix+".h5",sample=samples)+
+              expand("HiC_matrices/QCplots/{sample}_Mbins"+str(nbins_toMerge)+"_"+matrixFile_suffix+"_diagnostic_plot.pdf", sample=samples)+
+              expand("HiC_matrices/QCplots/{sample}_Mbins"+str(nbins_toMerge)+"_"+matrixFile_suffix+"_mad_threshold.out", sample=samples)+
+              expand("HiC_matrices_corrected/{sample}_Mbins"+str(nbins_toMerge)+"_"+matrixFile_suffix+".corrected.h5", sample=samples)+
+              expand("TADs/{sample}_Mbins"+str(nbins_toMerge)+"_"+matrixFile_suffix+"_boundaries.bed", sample=samples))
+
+    else:
+       return(expand("HiC_matrices/{sample}_"+matrixFile_suffix+".h5", sample=samples)+
+              expand("HiC_matrices/QCplots/{sample}_"+matrixFile_suffix+"_diagnostic_plot.pdf", sample=samples)+
+              expand("HiC_matrices/QCplots/{sample}_"+matrixFile_suffix+"_mad_threshold.out", sample=samples)+
+              expand("HiC_matrices_corrected/{sample}_"+matrixFile_suffix+".corrected.h5", sample=samples)+
+              expand("TADs/{sample}_"+matrixFile_suffix+"_boundaries.bed", sample=samples))
 
 ### execute before workflow starts #############################################
 ################################################################################
@@ -81,13 +112,7 @@ rule all:
         run_FastQC(fastqc),
         run_Trimming(trim, fastqc),
         expand(mapping_prg+"/{sample}{read}.bam", sample = samples, read = reads),
-        expand("HiC_matrices/{sample}_"+matrixFile_suffix+".h5", sample=samples),
-        expand("HiC_matrices/QCplots/{sample}_"+matrixFile_suffix+"_diagnostic_plot.pdf", sample=samples),
-        expand("HiC_matrices/QCplots/{sample}_"+matrixFile_suffix+"_mad_threshold.out", sample=samples),
-        expand("HiC_matrices_corrected/{sample}_"+matrixFile_suffix+".corrected.h5", sample=samples),
-        expand("TADs/{sample}_"+matrixFile_suffix+"_boundaries.bed", sample=samples),
-        get_merged_bins(),
-        merge_inputs(),
+        run_build_matrices()
 
 ### execute after workflow finished ############################################
 ################################################################################

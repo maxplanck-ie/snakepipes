@@ -8,7 +8,7 @@ def bamcompare_log2_cmd():
         "-b1 {input.chip_bam} " +
         "-b2 {input.control_bam} " +
         "-o {output} " +
-        "--ratio log2 " +
+        "--operation log2 " +
         "--scaleFactorsMethod readCount " +
         "{params.ignoreForNorm} " +
         "--binSize {params.bw_binsize} " +
@@ -23,9 +23,9 @@ def bamcompare_subtract_cmd():
             "-b1 {input.chip_bam} " +
             "-b2 {input.control_bam} " +
             "-o {output} " +
-            "--ratio subtract " +
+            "--operation subtract " +
             "--scaleFactorsMethod readCount " +
-            "--normalizeTo1x {params.genome_size} " +
+            "--normalizeUsing RPGC --effectiveGenomeSize {params.genome_size} " +
             "{params.ignoreForNorm} " +
             "--binSize {params.bw_binsize} " +
             "-p {threads} " +
@@ -38,20 +38,20 @@ def bamcov_raw_cmd():
             "-b {input.bam} " +
             "-o {output} " +
             "--binSize {params.bw_binsize} " +
-            "-p {threads} " +
+            "-p {threads}" 
             "&> {log}"))
 
 # bamCoverage CHIP
 def bamcov_cmd():
-    return((deepTools_path+"bamCoverage " +
-                "-b {input.bam} " +
-                "-o {output} " +
-                "--binSize {params.bw_binsize} " +
-                "-p {threads} " +
-                "--normalizeTo1x {params.genome_size} " +
-                "{params.ignoreForNorm} " +
-                "{params.read_extension} " +
-                "&> {log}"))
+    return(( deepTools_path+"bamCoverage "+
+             "-b {input.bam} " +
+             "-o {output} " +
+             "--binSize {params.bw_binsize} " +
+             "-p {threads} " +
+             "--normalizeUsing RPGC --effectiveGenomeSize {params.genome_size} " +
+             "{params.ignoreForNorm} " +
+             "{params.read_extension} " +
+             "&> {log}"))
 
 ## bamCoverage RNAseq
 def bamcov_rpkm_cmd():
@@ -60,7 +60,7 @@ def bamcov_rpkm_cmd():
             "-o {output} "
             "--binSize {params.bw_binsize} "
             "-p {threads} "
-            " --normalizeUsingRPKM "
+            " --normalizeUsing RPKM "
             "&> {log}") )
 
 ## computeGC bias (DNA)
@@ -213,3 +213,17 @@ def plotCoverage_cmd():
                 "{params.read_extension} " +
                 "--ignoreDuplicates " +
                 "&> {log}") )
+
+#EstimateReadFiltering
+def estimateReadFiltering_cmd():
+   return( (deepTools_path+"estimateReadFiltering "+
+               "-b {input.bam} "+
+               "-o {output}") )
+
+#bamPEFragmentSize
+def bamPEFragmentSize_cmd():
+    return( (deepTools_path+"bamPEFragmentSize " +
+             "--bamfiles {input.bams} " +
+             "--table {output} " + 
+             "-p {threads} " +
+             "&> {log}") )
