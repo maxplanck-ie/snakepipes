@@ -1,0 +1,8 @@
+################################################################################
+# Please specify all ATAC samples
+#
+# IMPORTANT: Use only whitespace, but NO TAB indentation in this YAML file!
+################################################################################
+atac_dict:
+  ATAC_S12:
+    None

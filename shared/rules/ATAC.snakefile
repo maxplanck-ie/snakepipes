@@ -1,75 +1,38 @@
-# rule filterMitochondrion:
-#     input:
-#         bam = "filtered_bam/{sample}.filtered.bam"
-#     output:
-#         bam = "filtered_bam/{sample}.filtered.noMitochondrion.bam"
-#     shell:
-#         # step1 identify all chroms and produce bed, w/o mitochondrion
-#         samtools idxstats ATAC_S11.bam | cut -f 1 | grep 'mitochondrion'
-#         # step2 write reads according to bed file
-
-
-rule sortByName:
-    input:
-        bam = "filtered_bam/{sample}.filtered.bam"
-    output:
-        bam = "peaks_openChromatin/{sample}.filtered.sorted.bam"
-    params:
-        byQuery='-n'
-    threads: 6
-    log: "peaks_openChromatin/logs/sortByName/{sample}.log"
-    shell:
-        samtools_path+"samtools sort {params.byQuery} -@ {threads} {input} -o {output} &> {log}" ## TMPDIR (environment variable) for scratch usage
-
-rule reads2fragments:
-    input:
-        bam = "peaks_openChromatin/{sample}.filtered.sorted.bam"
-    output:
-        bedpe = "peaks_openChromatin/{sample}.all.bedpe"
-    shell:
-            "/package/bedtools2/bin/bedtools bamtobed -bedpe -i {input} | cut -f 1,2,6 | "
-            "awk -v OFS='\\t' -v pos_offset=\"4\" -v neg_offset=\"5\" "
-            "'{{ if( $9 == \"+\" ) {{ print($1, $2 + pos_offset , $3 - neg_offset ) }} "
-            "else {{print($1, $2 - neg_offset , $3 + pos_offset) }} }}' > {output}"
-
 rule filterFragments:
     input:
-        bedpe="peaks_openChromatin/{sample}.all.bedpe"
+        "filtered_bam/{sample}.filtered.bam"
     output:
-        bedpe="peaks_openChromatin/{sample}.openchrom.bedpe"
+         shortFrags=os.path.join(outdir_MACS2, "{sample}.short.bam")
     params:
-        cutoff = fragmentFilterThreshold
+        cutoff=atac_fragment_cutoff,
+        metrics=os.path.join(outdir_MACS2, "{sample}.short.metrics")
+    threads: 6
     shell:
-        "cat {input} | "
-        "awk -v cutoff={params.cutoff} -v OFS='\\t' \"{{ if(\$3-\$2 < cutoff) {{ print (\$0) }} }}\" > "
-        "{output}"
+        "/package/deeptools-develop/bin/alignmentSieve --bam {input} --outFile {output} "
+        "--numberOfProcessors {threads} "
+        "--filterMetrics {params.metrics} "
+        "--maxFragmentLength {params.cutoff} "
 
-rule fragmentSizeDistribution:
-    input:
-        "peaks_openChromatin/{sample}.all.bedpe"
-    output:
-        "peaks_openChromatin/{sample}.all.fragdistr"
-    shell:
-        "cat {input} | awk '{{ print($3 - $2) }}' | sort -h | uniq -c > {output}"
-
+# MACS2 BAMPE filter: samtools view -b -f 2 -F 4 -F 8 -F 256 -F 512 -F 2048
 rule callOpenChromatin:
     input:
-        bedpe= "peaks_openChromatin/{sample}.openchrom.bedpe"
+        rules.filterFragments.output
     output:
-        peaks='peaks_openChromatin/openchromatin_{sample}_peaks.narrowPeak',
-        pileup='peaks_openChromatin/openchromatin_{sample}_treat_pileup.bdg',
-        ctrl='peaks_openChromatin/openchromatin_{sample}_control_lambda.bdg'
+        peaks = os.path.join(outdir_MACS2, '{sample}_peaks.narrowPeak'),
+        pileup = os.path.join(outdir_MACS2, '{sample}_treat_pileup.bdg'),
+        ctrl = os.path.join(outdir_MACS2, '{sample}_control_lambda.bdg'),
+        xls = os.path.join(outdir_MACS2, '{sample}_peaks.xls')
     params:
-        directory = "peaks_openChromatin",
+        directory = outdir_MACS2,
         genome=genome[0:2],
-        name='openchromatin_{sample}',
+        name='{sample}',
         bandwidth='--bw 25', # + bw_binsize
         qval_cutoff='--qvalue 0.01',
         nomodel='--nomodel',
         write_bdg='--bdg',
-        fileformat='--format BEDPE'
+        fileformat='--format BAMPE'
     threads: 6
-    log: "peaks_openChromatin/logs/callOpenChromatin/{sample}_macs2.log"
+    log: os.path.join(outdir_MACS2, "logs", "callOpenChromatin","{sample}_macs2.log")
     shell: # or run:
         ## macs2
         macs2_path+"macs2 callpeak "
@@ -77,16 +40,7 @@ rule callOpenChromatin:
             "--gsize {params.genome} "
             "--name {params.name} "
             "--outdir {params.directory} "
+            "--slocal 10000 "
+            "--nolambda "
             "{params.fileformat} {params.bandwidth} {params.qval_cutoff} {params.nomodel} {params.write_bdg} "
             "&> {log}"
-
-rule bedGraphToBigWig:
-    input:
-        "peaks_openChromatin/openchromatin_{sample}_{condition}.bdg"
-    output:
-        "peaks_openChromatin/openchromatin_{sample}_{condition}.bw"
-    params:
-        chromsize=genome_index
-    log: "peaks_openChromatin/logs/bedGraphToBigWig/openChromatin_{sample}_{condition}.log"
-    shell:
-        "/package/UCSCtools/bedGraphToBigWig {input} {params.chromsize} {output} &> {log}"

@@ -1,19 +1,15 @@
 #!/usr/bin/env python3
 
-__version__ = "0.6"
+__version__ = "0.0.1"
 
 __description__ = """
-ChIP-seq workflow v{version} - MPI-IE workflow for ChIP-seq analysis
+DNA-mapping workflow v{version} - MPI-IE workflow for ATAC-seq Analysis
 
-Usage example:
-    ChIP-seq -d working-dir mm10 samples.yaml
+usage example:
+    ATAC-seq -d workdir mm10 samples.yaml
 """.format(version=__version__)
 
 ## Dependencies from DNA-mapping workflow
-## OUTDIR/filtered_bam
-##       /Picard_qc/AlignmentSummaryMetrics
-##                 /MarkDuplicates
-##                 /InsertSizeMetrics
 
 import argparse
 import os
@@ -25,16 +21,13 @@ import time
 import shutil
 import yaml
 import inspect
-
-#sys.path.append(os.path.abspath(os.path.dirname(inspect.getfile(inspect.currentframe()))) + "/shared/")
-#sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(inspect.getfile(inspect.currentframe())))))+"/shared/")
 sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(inspect.getfile(inspect.currentframe()) )))))+"/shared/")
 
 import common_functions as cf
 
-def parse_args(defaults={"verbose":None,"configfile":None,"max_jobs":None,"snakemake_options":None,"tempdir":None,
-                         "paired":None,"bw_binsize":None,"sample_info":"","window_size":None}):
 
+def parse_args(defaults={"verbose":None,"configfile":None,"max_jobs":None,"snakemake_options":None,"tempdir":None,
+                         "bw_binsize":None,"atac_fragment_cutoff":None}):
     """
     Parse arguments from the command line.
     """
@@ -46,18 +39,16 @@ def parse_args(defaults={"verbose":None,"configfile":None,"max_jobs":None,"snake
         add_help=False
     )
 
-    #optional = parser._action_groups.pop() # Edited this line
+    optional = parser._action_groups.pop() # Edited this line
 
     ## positional/required
     parser.add_argument("genome", metavar="GENOME", help="genome acronym of target organism (supported: 'dm3', 'dm6', 'hs37d5', 'mm9', 'mm10', 'SchizoSPombe_ASM294v2')")
-    parser.add_argument("samples_config", metavar="SAMPLESCONFIG", help="configuration file (eg. 'example.chip_samples.yaml') with sample annotation")
 
     required = parser.add_argument_group('required arguments')
     required.add_argument("-d", "--working-dir",
                         dest="workingdir",
                         help="working directory is output directory and must contain DNA-mapping pipeline output files",
-                        required=False,
-                        default=".")
+                        required=True)
 
     general = parser.add_argument_group('general arguments')
     general.add_argument("-h", "--help",
@@ -72,73 +63,56 @@ def parse_args(defaults={"verbose":None,"configfile":None,"max_jobs":None,"snake
 
     general.add_argument("-c", "--configfile",
                         dest="configfile",
-                        help="configuration file: config.yaml. In absence of a config file, the default options from the "
-                        "workflows would be selected from /workflows/<workflow_name>/defaults.yaml (default: '%(default)s')",
+                        help="configuration file: config.yaml (default: '%(default)s')",
                         default=defaults["configfile"])
 
     general.add_argument("-j", "--jobs",
-                        dest="max_jobs",
-                        metavar="INT",
-                        help="maximum number of concurrently submitted Slurm jobs / cores if workflow is run locally (default: '%(default)s')",
-                        type=int,
-                        default=defaults["max_jobs"])
+                         dest="max_jobs",
+                         metavar="INT",
+                         help="maximum number of concurrently submitted Slurm jobs / cores if workflow is run locally (default: '%(default)s')",
+                         type=int, default=defaults["max_jobs"])
 
     general.add_argument("--local",
-                        dest="local",
-                        action="store_true",
-                        default=False,
-                        help="run workflow locally; default: jobs are submitted to Slurm queue (default: '%(default)s')")
+                         dest="local",
+                         action="store_true",
+                         default=False,
+                         help="run workflow locally; default: jobs are submitted to Slurm queue (default: '%(default)s')")
 
     general.add_argument("--snakemake_options",
                         dest="snakemake_options",
                         metavar="STR",
                         type=str,
-                        help="Snakemake options to be passed directly to snakemake, e.g. use --snakemake_options='--dryrun --rerun-incomplete --unlock --forceall'. (default: '%(default)s')", default=defaults["snakemake_options"])
+                        help="Snakemake options to be passed directly to snakemake, e.g. use --snakemake_options='--dryrun --rerun-incomplete --unlock --forceall'. (default: '%(default)s')",
+                        default=defaults["snakemake_options"])
 
     general.add_argument("--tempdir",
                         dest="tempdir",
                         type=str,
-                        help="used prefix path for temporary directory created via mktemp. Created temp dir gets exported as $TMPDIR and is removed at the end of this wrapper! (default: '%(default)s')", default=defaults["tempdir"])
+                        help="used prefix path for temporary directory created via mktemp. Created temp dir gets exported as $TMPDIR and is removed at the end of this wrapper! (default: '%(default)s')",
+                        default=defaults["tempdir"])
 
     ## optional
-    optional = parser.add_argument_group('optional arguments')
-    optional.add_argument("--single-end",
-                        dest="paired",
-                        action="store_false",
-                        help="input data is single-end, not paired-end (default: '%(default)s')",
-                        default=defaults["paired"])
-
-    optional.add_argument("--bw-binsize",
+    parser._action_groups.append(optional)
+    parser.add_argument("--bw-binsize",
                         dest="bw_binsize",
                         metavar="INT",
                         help="bin size of output files in bigWig format (default: '%(default)s')",
                         type=int,
                         default=defaults["bw_binsize"])
 
-    optional.add_argument("--DB",
-    					dest="sample_info",
-    					help="Information on samples (If differential binding analysis required); see "
-    						 "'snakemake_workflows/shared/tools/sampleInfo_DB.example.tsv' for example."
-    						 " IMPORTANT: The first entry defines which group of samples are control. "
-    						 " By this, the order of comparison and likewise the sign of values can be changed! (default: '%(default)s')",
-    					default=defaults["sample_info"])
-
-    optional.add_argument("--DB_windowSize",
-    					dest="window_size",
-    					help="Window size to counts reads in (If differential binding analysis required); "
-    						 "Default size is suitable for most transcription factors and sharp histone marks. "
-                             "Small window sizes (~20bp) should be used for very narrow transcription factor peaks, "
-                             "while large window sizes (~500 bp) should be used for broad marks (eg. H3K27me3) "
-                             "(default: '%(default)s')",
-    					default=defaults["window_size"])
+    parser.add_argument("--atac-fragment-cutoff",
+                        dest="atac_fragment_cutoff",
+                        metavar="INT",
+                        help="Size threshold for filtering of nucleosomal fragments(default: '%(default)s')",
+                        type=int,
+                        default=defaults['atac_fragment_cutoff'])
 
     return parser
 
 
 def main():
 
-    ## basic paths only used in wrapper
-    #this_script_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+    ## basic paths
     this_script_dir = os.path.dirname(os.path.realpath(__file__))
     main_dir_path = os.path.join(os.path.dirname(os.path.dirname(this_script_dir)))
 
@@ -149,12 +123,10 @@ def main():
     parser = parse_args(defaults)
     args = parser.parse_args()
 
-    ## we also add these paths to config, although we dont use them in the Snakefile
     args.this_script_dir = this_script_dir
     args.main_dir_path = main_dir_path
 
     ## checks for parameters necessary in wrapper
-# 1. Dir path
     if os.path.exists(args.workingdir):
         args.workingdir = os.path.abspath(args.workingdir)
     else:
@@ -162,24 +134,12 @@ def main():
         exit(1)
     args.outdir = args.workingdir
     args.cluster_logs_dir = os.path.join(args.outdir, "cluster_logs")
-# 2. Config file
+
     if args.configfile and not os.path.exists(args.configfile):
         print("\nError! Provided configfile (-c) not found! ({})\n".format(args.configfile))
         exit(1)
 
-    if os.path.exists(os.path.abspath(args.samples_config)):
-        args.samples_config = os.path.abspath(args.samples_config)
-    else:
-        print("\nError! Sample config file not found! ({})\n".format(args.samples_config))
-        exit(1)
 
-# 3. Sample info file
-    if args.sample_info:
-        if os.path.exists(os.path.abspath(args.sample_info)):
-            args.sample_info = os.path.abspath(args.sample_info)
-        else:
-            print("\nSample info file not found! (--DB {})\n".format(args.sample_info))
-            exit(1)
 
     ## merge configuration dicts
     config = defaults   # 1) form defaults.yaml
@@ -188,29 +148,30 @@ def main():
         config = cf.merge_dicts(config, user_config) # 2) form user_config.yaml
     config_wrap = cf.config_diff(vars(args),defaults) # 3) from wrapper parameters
     config = cf.merge_dicts(config, config_wrap)
-    #### Output directory + log directory
+
+    ## Output directory + log directory
     subprocess.call("[ -d {cluster_logs_dir} ] || mkdir -p {cluster_logs_dir}".format(cluster_logs_dir=args.cluster_logs_dir), shell=True)
 
     ## save to configs.yaml in outdir
-    cf.write_configfile(os.path.join(args.outdir,'ChIP-seq.config.yaml'),config)
+    cf.write_configfile(os.path.join(args.outdir,'ATAC-seq.config.yaml'),config)
 
     snakemake_module_load = "module load snakemake/3.12.0 slurm &&".split()
     snakemake_cmd = """
                     snakemake {snakemake_options} --latency-wait 300 --snakefile {snakefile} --jobs {max_jobs} --directory {workingdir} --configfile {configfile}
-                    """.format( snakefile = os.path.join(this_script_dir, "Snakefile"),
+                    """.format( snakefile = os.path.join(args.this_script_dir, "Snakefile"),
                                 max_jobs = args.max_jobs,
                                 workingdir = args.workingdir,
-                                snakemake_options=str(args.snakemake_options or ''),
-                                configfile = os.path.join(args.outdir,'ChIP-seq.config.yaml'),
+                                snakemake_options = str(args.snakemake_options or ''),
+                                configfile = os.path.join(args.outdir,'ATAC-seq.config.yaml'),
                               ).split()
 
     if args.verbose:
         snakemake_cmd.append("--printshellcmds")
 
     if not args.local:
-        snakemake_cmd += ["--cluster 'SlurmEasy --threads {threads} --log", args.cluster_logs_dir, "--name {rule}.snakemake'"]
+        snakemake_cmd += ["--cluster 'SlurmEasy --threads {threads} --log", args.cluster_logs_dir , "--name {rule}.snakemake'"]
 
-    snakemake_log = "2>&1 | tee -a {}/ChIP-seq.log".format(args.workingdir).split()
+    snakemake_log = "2>&1 | tee -a {}/ATAC-seq.log".format(args.outdir).split()
 
     ## create local temp dir and add this path to environment as $TMPDIR variable
     ## on SLURM: $TMPDIR is set, created and removed by SlurmEasy on cluster node
@@ -223,7 +184,7 @@ def main():
         print("\n", cmd, "\n")
 
     ## Write snakemake_cmd to log file
-    with open(os.path.join(args.workingdir,"ChIP-seq.log"),"w") as f:
+    with open(os.path.join(args.outdir,"Snakemake_call.log"),"w") as f:
         f.write(" ".join(sys.argv)+"\n\n")
         f.write(cmd+"\n\n")
 
@@ -253,8 +214,9 @@ def main():
     if (temp_path != "" and os.path.exists(temp_path)):
         shutil.rmtree(temp_path, ignore_errors=True)
         if args.verbose:
-            print("Temp directory removed ("+temp_path+")!\n")
+            print("temp dir removed: "+temp_path+"\n")
 
 
 if __name__ == "__main__":
+    #print "Args:", sys.argv
     main()

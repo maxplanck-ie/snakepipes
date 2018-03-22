@@ -62,6 +62,8 @@ include: os.path.join(maindir, "shared", "rules", "bam_filtering.snakefile")
 # Picard CollectAlignmentSummaryMetrics and CollectInsertSizeMetrics
 include: os.path.join(maindir, "shared", "rules", "Picard_qc.snakefile")
 
+#Sambamba Markdup
+include: os.path.join(maindir, "shared", "rules", "sambamba.snakefile")
 # deeptools cmds
 include: os.path.join(maindir, "shared", "deeptools_cmds.snakefile")
 
@@ -121,7 +123,8 @@ def run_deepTools_qc():
         file_list.append( [
         "deepTools_qc/plotCorrelation/correlation.pearson.read_coverage.heatmap.png",
         "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage.heatmap.png",
-        "deepTools_qc/plotPCA/PCA.read_coverage.png" ] )
+        "deepTools_qc/plotPCA/PCA.read_coverage.png"])
+        file_list.append(expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample = samples))
         if 'allelic-mapping' in mode:
             file_list.append( [
             "deepTools_qc/plotCorrelation/correlation.pearson.read_coverage_allelic.heatmap.png",
@@ -189,12 +192,10 @@ rule all:
         expand("FASTQ/{sample}{read}.fastq.gz", sample = samples, read = reads),
         run_FastQC(fastqc),
         run_Trimming(trim, fastqc),
-        expand(mapping_prg+"/{sample}.bam", sample = samples),
-        expand(mapping_prg+"/{sample}.bam.bai", sample = samples),
+        expand("Sambamba/{sample}.markdup.txt", sample = samples),       
         expand("filtered_bam/{sample}.filtered.bam", sample = samples),
         expand("Picard_qc/AlignmentSummaryMetrics/{sample}.alignment_summary_metrics.txt", sample = samples),
-        expand("Picard_qc/MarkDuplicates/{sample}.mark_duplicates_metrics.txt", sample = samples),
-        run_CollectInsertSizeMetrics(paired),
+#       run_CollectInsertSizeMetrics(paired),
         expand("bamCoverage/{sample}.seq_depth_norm.bw", sample = samples),
         expand("bamCoverage/{sample}.filtered.seq_depth_norm.bw", sample = samples),
         #run_bamCoverage_filtered(dedup, properpairs, mapq),

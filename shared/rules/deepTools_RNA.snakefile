@@ -113,3 +113,26 @@ rule plotPCA:
         "deepTools_qc/.benchmark/plotPCA.benchmark"
     run:
         shell(plotPCA_cmd('gene'))
+
+########deepTools estimateReadFiltering#########################
+rule estimateReadFiltering:
+   input:
+       bam = mapping_prg+"/{sample}.bam",
+       bai = mapping_prg+"/{sample}.bam.bai",
+   output:
+       "deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt"
+   run:
+      shell(estimateReadFiltering_cmd())
+
+#######InsertSizeMetrics###############
+rule bamPE_fragment_size:
+   input:
+       bams = expand(mapping_prg+"/{sample}.bam", sample=samples)
+   output:
+       "deepTools_ChIP/bamPEFragmentSize/fragmentSize.metric.tsv"
+   log:
+       "deepTools_ChIP/bamPEFragmentSize/log"
+   threads: 24
+   run:
+       shell(bamPEFragmentSize_cmd())
+

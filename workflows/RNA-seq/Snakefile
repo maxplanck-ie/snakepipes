@@ -70,7 +70,10 @@ if "mapping-free" in mode:
 ## Sleuth (on Salmon)
 if "mapping-free" in mode and sample_info:
     include: os.path.join(maindir, "shared", "rules", "sleuth.snakefile")
-
+## Sambamba
+if "mapping" in mode:
+    include:os.path.join(maindir, "shared", "rules", "sambamba.snakefile")
+    include:os.path.join(maindir, "shared", "rules", "RNA-seq_qc_report.snakefile")
 # deeptools cmds
 include: os.path.join(maindir, "shared", "deeptools_cmds.snakefile")
 
@@ -84,9 +87,11 @@ if sample_info:
 ## MultiQC
 include: os.path.join(maindir, "shared", "rules", "multiQC.snakefile")
 
+##Genomic_contamination
+include: os.path.join(maindir, "shared", "rules", "GenomicContamination.snakefile")
+
 ### conditional/optional rules #################################################
 ################################################################################
-
 def run_FastQC(fastqc):
     if fastqc:
         return( expand("FastQC/{sample}{read}_fastqc.html", sample = samples, read = reads) )
@@ -130,9 +135,11 @@ def run_mapping_free():
 def run_mapping():
     if "mapping" in mode:
         file_list = [
+        "Sambamba/flagstat_report_all.tsv",
         expand(mapping_prg+"/{sample}.bam.bai", sample = samples),
         expand("featureCounts/{sample}.counts.txt", sample=samples),
         "featureCounts/counts.tsv",
+        "QC_report/QC_report_all.tsv"
         ]
         if sample_info:
             file_list.append( ["DESeq2/DESeq2.session_info.txt"] )
@@ -177,7 +184,9 @@ def run_deeptools_qc():
         expand("bamCoverage/{sample}.RPKM.bw", sample = samples),
         expand("bamCoverage/{sample}.coverage.bw", sample = samples),
         "deepTools_qc/plotEnrichment/plotEnrichment.png",
-        "deepTools_qc/plotEnrichment/plotEnrichment.tsv"]
+        "deepTools_qc/plotEnrichment/plotEnrichment.tsv",
+        "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv",
+        expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample = samples)]
         if len(samples)>1:
             file_list.append( ["deepTools_qc/multiBigwigSummary/coverage.bed.npz",
                               "deepTools_qc/plotCorrelation/correlation.pearson.bed_coverage.heatmap.png",
@@ -195,7 +204,13 @@ def run_deeptools_qc():
     else:
         return([])
 
-
+def run_GenomicContamination():
+    if genomic_contamination:
+#       file_list = [expand("GenomicContamination/{sample}.featurecounts.txt", sample = samples)]
+       file_list = ["GenomicContamination/genomic_contamination_featurecount_report.tsv"]
+       return (file_list)
+    else:
+       return([])
 ### execute before  starts #####################################################
 ################################################################################
 onstart:
@@ -230,12 +245,12 @@ rule all:
         "Annotation/genes.annotated.bed",
         "Annotation/genes.filtered.bed",
         "Annotation/genes.filtered.saf",    # this file is used for featureCounts later on!
-
         run_mapping_free(),            # Salmon
         run_mapping(),                 # classical mapping + counting
-        run_allelesp_mapping(),        # allelic-mapping
+	run_allelesp_mapping(),        # allelic-mapping
         make_nmasked_genome(),
         run_deeptools_qc(),
+        run_GenomicContamination(),
         "multiQC/multiqc_report.html"
 
 

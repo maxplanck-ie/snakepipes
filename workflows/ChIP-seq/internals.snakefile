@@ -109,8 +109,9 @@ for sample in all_samples:
     req_files = [
         os.path.join(workingdir, "filtered_bam/"+sample+".filtered.bam"),
         os.path.join(workingdir, "filtered_bam/"+sample+".filtered.bam.bai"),
-        os.path.join(workingdir, "Picard_qc/MarkDuplicates/"+sample+".mark_duplicates_metrics.txt"),
-        os.path.join(workingdir, "Picard_qc/AlignmentSummaryMetrics/"+sample+".alignment_summary_metrics.txt")
+#       os.path.join(workingdir, "Picard_qc/MarkDuplicates/"+sample+".mark_duplicates_metrics.txt"),
+        os.path.join(workingdir, "Picard_qc/AlignmentSummaryMetrics/"+sample+".alignment_summary_metrics.txt"),
+#       os.path.join(workingdir, "Sambamba/"+sample+".dup.txt")
     ]
     if paired:
         req_files.append(os.path.join(workingdir, "Picard_qc/InsertSizeMetrics/"+sample+".insert_size_metrics.txt"))

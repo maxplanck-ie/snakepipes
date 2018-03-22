@@ -5,6 +5,7 @@ if paired:
         input:
             alignment_summary_metrics = "Picard_qc/AlignmentSummaryMetrics/{sample}.alignment_summary_metrics.txt",
             mark_duplicates_metrics = "Picard_qc/MarkDuplicates/{sample}.mark_duplicates_metrics.txt",
+#            mark_duplicates_metrics = "Sambamba/{sample}.dup.txt",
             insert_size_metrics = "Picard_qc/InsertSizeMetrics/{sample}.insert_size_metrics.txt",
             macs2_qc_txt = lambda wildcards: "MACS2/"+wildcards.sample+".filtered.BAM_peaks.qc.txt" if is_chip(wildcards.sample)
                 else [],
@@ -24,7 +25,8 @@ else:
     rule qc_report_sample:
         input:
             alignment_summary_metrics = "Picard_qc/AlignmentSummaryMetrics/{sample}.alignment_summary_metrics.txt",
-            mark_duplicates_metrics = "Picard_qc/MarkDuplicates/{sample}.mark_duplicates_metrics.txt",
+#            mark_duplicates_metrics = "Picard_qc/MarkDuplicates/{sample}.mark_duplicates_metrics.txt",
+             mark_duplicates_metrics = "Sambamba/{sample}.dup.txt",
             macs2_qc_txt = lambda wildcards: "MACS2/"+wildcards.sample+".filtered.BAM_peaks.qc.txt" if is_chip(wildcards.sample)
                 else [],
             macs2_xls = lambda wildcards: "MACS2/"+wildcards.sample+".filtered.BAM_peaks.xls" if is_chip(wildcards.sample)
