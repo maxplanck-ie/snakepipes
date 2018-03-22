@@ -32,7 +32,7 @@ if(RF_resolution is True):
             R2 = "BWA/{sample}"+reads[1]+".bam",
             bed = enzyme + ".bed"
         output:
-             matrix = temp("HiC_matrices/{sample}_"+matrixFile_suffix+".h5"),
+             matrix ="HiC_matrices/{sample}_"+matrixFile_suffix+".h5",
 #            bam = "BWA/{sample}_R12_"+matrixFile_suffix+".bam"
         params:
              QCfolder="HiC_matrices/QCplots/{sample}_QC/",
@@ -62,7 +62,7 @@ else:
             R1 = "BWA/{sample}"+reads[0]+".bam",
             R2 = "BWA/{sample}"+reads[1]+".bam"
         output:
-            matrix = temp("HiC_matrices/{sample}_"+matrixFile_suffix+".h5"),
+            matrix = "HiC_matrices/{sample}_"+matrixFile_suffix+".h5",
 #           bam = "BWA/{sample}_R12_"+matrixFile_suffix+".bam"
         params:
             QCfolder="HiC_matrices/QCplots/{sample}_QC/",
