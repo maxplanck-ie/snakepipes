@@ -87,7 +87,8 @@ if sample_info:
 include: os.path.join(maindir, "shared", "rules", "multiQC.snakefile")
 
 ##Genomic_contamination
-include: os.path.join(maindir, "shared", "rules", "GenomicContamination.snakefile")
+if genomic_contamination:
+    include: os.path.join(maindir, "shared", "rules", "GenomicContamination.snakefile")
 
 ### conditional/optional rules #################################################
 ################################################################################
@@ -203,6 +204,7 @@ def run_deeptools_qc():
 def run_GenomicContamination():
     if genomic_contamination:
        file_list = [expand("GenomicContamination/{sample}.featurecounts.txt", sample = samples)]
+       file_list.append("GenomicContamination/genomic_contamination_featurecount_report.tsv")
        return (file_list)
     else:
        return([])
@@ -239,7 +241,6 @@ rule all:
 
         "Annotation/genes.annotated.bed",
         "Annotation/genes.filtered.bed",
-        "Annotation/genes.filtered.saf",    # this file is used for featureCounts later on!
         run_mapping_free(),            # Salmon
         run_mapping(),                 # classical mapping + counting
 	run_allelesp_mapping(),        # allelic-mapping
@@ -247,7 +248,6 @@ rule all:
         run_deeptools_qc(),
         "Sambamba/flagstat_report_all.tsv",
         run_GenomicContamination(),
-        "GenomicContamination/genomic_contamination_featurecount_report.tsv",
         "multiQC/multiqc_report.html"
 
 

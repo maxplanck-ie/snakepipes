@@ -29,7 +29,7 @@ def parse_args(defaults={"verbose":None,"configfile":None,"max_jobs":None,"snake
                          "mode":None, "downsample":None, "trim":None,"trim_prg":None,"trim_options":None, "fastqc":None,
                          "library_type":None, "mapping_prg":None, "star_options":None, "hisat_options":None, "salmon_index_options":None,
                          "featurecounts_options":None, "filter_annotation":None, "sample_info":None,
-                         "bw_binsize":None, "genomic_contamination":None, "mapq":None}):
+                         "bw_binsize":None, "genomic_contamination":False, "mapq":None}):
     """
     Parse arguments from the command line.
     """
