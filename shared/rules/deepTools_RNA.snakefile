@@ -129,10 +129,9 @@ rule bamPE_fragment_size:
    input:
        bams = expand(mapping_prg+"/{sample}.bam", sample=samples)
    output:
-       "deepTools_ChIP/bamPEFragmentSize/fragmentSize.metric.tsv"
+       "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv"
    log:
-       "deepTools_ChIP/bamPEFragmentSize/log"
+       "deepTools_qc/bamPEFragmentSize/log"
    threads: 24
    run:
        shell(bamPEFragmentSize_cmd())
-
