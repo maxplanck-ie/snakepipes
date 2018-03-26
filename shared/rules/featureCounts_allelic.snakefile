@@ -3,7 +3,7 @@
 
 rule featureCounts_allele:
     input:
-        saf = "Annotation/genes.filtered.saf",
+        gtf = "Annotation/genes.filtered.gtf",
         bam = "allelic_bams/{sample}.allele_flagged.sorted.bam",
         allele1 = "allelic_bams/{sample}.genome1.sorted.bam",
         allele2 = "allelic_bams/{sample}.genome2.sorted.bam"
@@ -21,7 +21,7 @@ rule featureCounts_allele:
         " {params.paired_opt}{params.opts}"
         " -T {threads}"
         " -s {params.libtype}"
-        " -F SAF -a {input.saf}"
+        " -a {input.gtf}"
         " -o {output}"
         " --tmpDir ${{TMPDIR}}"
         " {input.bam} {input.allele1} {input.allele2} &>> {log}"

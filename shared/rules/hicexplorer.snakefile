@@ -17,7 +17,7 @@ rule map_fastq_single_end:
     input: fastq_dir+"/{sample}{read}.fastq.gz"
     output: "BWA/{sample}{read}.bam"
     log:    "BWA/{sample}{read}.log"
-    threads: 16
+    threads: 15
     shell:
         "echo 'mapping {input}' > {log} && "
         + bwa_path + "bwa mem -A1 -B4  -E50 -L0 "
@@ -32,8 +32,8 @@ if(RF_resolution is True):
             R2 = "BWA/{sample}"+reads[1]+".bam",
             bed = enzyme + ".bed"
         output:
-             matrix = "HiC_matrices/{sample}_"+matrixFile_suffix+".h5",
-             bam = "BWA/{sample}_R12_"+matrixFile_suffix+".bam"
+             matrix ="HiC_matrices/{sample}_"+matrixFile_suffix+".h5",
+#            bam = "BWA/{sample}_R12_"+matrixFile_suffix+".bam"
         params:
              QCfolder="HiC_matrices/QCplots/{sample}_QC/",
              res_seq = get_restriction_seq(enzyme),
@@ -54,7 +54,8 @@ if(RF_resolution is True):
             "--QCfolder {params.QCfolder} "
             "--threads {threads} "
             "{params.region} "
-            "-b {output.bam} -o {output.matrix} &> {log}"
+#           "-b {output.bam} -o {output.matrix} &> {log}"
+            "-o {output.matrix} &> {log}"           
 else:
     rule build_matrix:
         input:
@@ -62,7 +63,7 @@ else:
             R2 = "BWA/{sample}"+reads[1]+".bam"
         output:
             matrix = "HiC_matrices/{sample}_"+matrixFile_suffix+".h5",
-            bam = "BWA/{sample}_R12_"+matrixFile_suffix+".bam"
+#           bam = "BWA/{sample}_R12_"+matrixFile_suffix+".bam"
         params:
             QCfolder="HiC_matrices/QCplots/{sample}_QC/",
             bin_size = bin_size,
@@ -80,29 +81,28 @@ else:
             "--QCfolder {params.QCfolder} "
             "--threads {threads} "
             "{params.region} "
-            "-b {output.bam} -o {output.matrix} &> {log}"
+#           "-b {output.bam} -o {output.matrix} &> {log}"
+            "-o {output.matrix} &> {log}"           
 
 ## Merge the samples if asked
-if(merge_samples is True):
-    rule merge_matrices:
-        input:
-            expand("HiC_matrices/{sample}_"+matrixFile_suffix+".h5", sample=samples)
-        output:
-            "HiC_matrices/all_matrices_merged.h5"
-        shell:
-            hicExplorer_path + "hicSumMatrices -m {input} -o {output}"
+rule merge_matrices:
+      input:
+          expand("HiC_matrices/{sample}_"+matrixFile_suffix+".h5", sample=samples)
+      output:
+          matrix = temp("HiC_matrices/mergedSamples_"+matrixFile_suffix+".h5"),
+      run:
+          shell(hicExplorer_path + "hicSumMatrices -m {input} -o {output.matrix}")
 
 ## Merge the bins if asked
-if(nbins_toMerge != 0):
-    rule merge_bins:
-        input:
-            "HiC_matrices/{sample}_"+matrixFile_suffix+".h5"
-        output:
-            "HiC_matrices/{sample}_"+matrixFile_suffix+"_m"+str(nbins_toMerge)+".h5"
-        params:
-            num_bins=nbins_toMerge
-        shell:
-            hicExplorer_path + "hicMergeMatrixBins -m {input} -nb {params.num_bins} -o {output}"
+rule merge_bins:
+     input:
+         "HiC_matrices/{sample}_"+matrixFile_suffix+".h5"
+     output:
+         matrix = "HiC_matrices/{sample}_Mbins"+str(nbins_toMerge)+"_"+matrixFile_suffix+".h5"
+     params:
+         num_bins=nbins_toMerge
+     run:
+         shell(hicExplorer_path + "hicMergeMatrixBins -m {input} -nb {params.num_bins} -o {output.matrix}")
 
 ## diagnostic plots
 rule diagnostic_plot:

@@ -12,6 +12,7 @@ Pipeline                            Description
 =============================== ===========================================================================================
 :ref:`DNA-mapping`              Basic DNA mapping using bowtie2, filter mapped files, QC and create coverage plots
 :ref:`ChIP-Seq`                 Use the DNA mapping output and run ChIP/Input normalization and peak calling
+:ref:`ATAC-seq`                 Use the DNA mapping output and detect open chromatin regions from ATAC-seq
 :ref:`RNA-Seq`                  RNA-Seq workflow : From mapping to differential expression using DEseq2
 :ref:`scRNA-Seq`                Single-cell RNA-Seq workflow : From mapping to differential expression
 :ref:`HiC`                      Hi-C analysis workflow, from mapping to TAD calling
