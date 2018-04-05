@@ -1,0 +1,9 @@
+import os
+
+
+### snakemake_workflows initialization ########################################
+maindir = os.path.dirname(os.path.dirname(workflow.basedir))
+sys.path.append(os.path.join(maindir, "shared"))
+
+import common_functions as cf
+
