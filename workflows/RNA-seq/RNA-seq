@@ -187,8 +187,11 @@ def parse_args(defaults={"verbose":None,"configfile":None,"max_jobs":None,"snake
     					dest="sample_info",
     					help="Information on samples (required for DE analysis); see "
     						 "'snakemake_workflows/shared/tools/sampleInfo.example.tsv' for example."
-    						 " IMPORTANT: The first entry defines which group of samples are control. "
-    						 " By this, the order of comparison and likewise the sign of values can be changed! (default: '%(default)s')",
+    						 " The column names in the tsv files are 'sample' and 'condition'.The first entry"
+                             " defines which group of samples are control. "
+    						 " With this, the order of comparison and likewise the sign of values can be changed."
+                             " The DE analysis might fail if your sample names begin with a number. So watch out"
+                             " for that! (default: '%(default)s')",
     					default=defaults["sample_info"])
     optional.add_argument("--bw-binsize",
     					dest="bw_binsize",
