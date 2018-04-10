@@ -5,19 +5,10 @@ import re
 import yaml
 
 
-## Main variables ##############################################################
-
-
-### Functions ##################################################################
-
-### Variable defaults ##########################################################
-
-### Initialization #############################################################
-
 ## Require configuration file (samples.yaml)
 samples = [ os.path.basename(f) for f in glob.glob('filtered_bam/*.filtered.bam') ]
 samples = [ os.path.basename(x).replace('.filtered.bam','') for x in samples ]
-print(samples)
+#print(samples)
 
 # consistency check whether all required files exist for all samples
 for sample in samples:
@@ -34,6 +25,7 @@ for sample in samples:
 if not os.path.exists(outdir_MACS2):
     os.makedirs(outdir_MACS2)
 
+## do not remove X from norm?
 ignoreForPeaks = ignore_forNorm.split(' ')
 if "X" in ignoreForPeaks:
     ignoreForPeaks.remove("X")
