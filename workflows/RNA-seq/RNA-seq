@@ -189,7 +189,7 @@ def parse_args(defaults={"verbose":None,"configfile":None,"max_jobs":None,"snake
     						 "'snakemake_workflows/shared/tools/sampleInfo.example.tsv' for example."
     						 " The column names in the tsv files are 'sample' and 'condition'.The first entry"
                              " defines which group of samples are control. "
-    						 " With this, the order of comparison and likewise the sign of values can be changed."
+    						 " This way, the order of comparison and likewise the sign of values can be changed."
                              " The DE analysis might fail if your sample names begin with a number. So watch out"
                              " for that! (default: '%(default)s')",
     					default=defaults["sample_info"])
@@ -200,9 +200,9 @@ def parse_args(defaults={"verbose":None,"configfile":None,"max_jobs":None,"snake
     					type=int,
     					default=defaults["bw_binsize"])
     optional.add_argument("--dnaContam",
-                                        action="store_true",
-                                        help="Returns a plot which presents the proportion of the intergenic reads (default: '%(default)s')",
-                                        default=defaults["genomic_contamination"])
+                        action="store_true",
+                        help="Returns a plot which presents the proportion of the intergenic reads (default: '%(default)s')",
+                        default=defaults["genomic_contamination"])
     ###
     snpargs = parser.add_argument_group('allele-specific mapping arguments')
     snpargs.add_argument("--VCFfile",
