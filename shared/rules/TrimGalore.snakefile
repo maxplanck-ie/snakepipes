@@ -15,9 +15,11 @@ if paired:
             "FASTQ_Cutadapt/logs/Cutadapt.{sample}.log"
         benchmark:
             "FASTQ_Cutadapt/.benchmark/Cutadapt.{sample}.benchmark"
+        threads: 8
         shell:
             cutadapt_path+"cutadapt "
                 "{params.opts} "
+                "-j {threads}"
                 "-f fastq -e 0.1 -q 16 -O 3 --trim-n --minimum-length 25 -a AGATCGGAAGAGC -A AGATCGGAAGAGC "
                 "-o ${{TMPDIR}}{params.tmp1} -p ${{TMPDIR}}{params.tmp2} "
                 "{input.r1} {input.r2} "
@@ -36,9 +38,11 @@ else:
             "FASTQ_Cutadapt/logs/Cutadapt.{sample}.log"
         benchmark:
             "FASTQ_Cutadapt/.benchmark/Cutadapt.{sample}.benchmark"
+        threads: 8
         shell:
             cutadapt_path+"cutadapt "
                 "{params.opts} "
+                "-j {threads}"
                 "-f fastq -e 0.1 -q 16 -O 3 --trim-n --minimum-length 25 -a AGATCGGAAGAGC "
                 "-o ${{TMPDIR}}{params.tmp} "
                 "{input.r1} "
