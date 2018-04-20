@@ -29,4 +29,3 @@ multiqc_path: "module load MultiQC/1.3; "
 bwa_path: "/package/bwa-0.7.12/bin/"
 # paths referring to a conda installation (Temporary : in the future, all paths would be loaded from conda via module load)
 hicExplorer_path: "/package/anaconda3/envs/HiCExplorer-1.8/bin/"
-#hicExplorer_path: "/home/rabbani/miniconda3/bin/hicexplorer/"

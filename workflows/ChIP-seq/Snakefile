@@ -31,7 +31,7 @@ include: os.path.join(maindir, "shared", "rules", "ChiP-seq_qc_report.snakefile"
 # deeptools cmds
 include: os.path.join(maindir, "shared", "deeptools_cmds.snakefile")
 
-# sambamba 
+# sambamba
 #include: os.path.join(maindir, "shared", "rules", "sambamba.snakefile")
 
 # deeptools for allelic bams (if present)
@@ -79,12 +79,10 @@ def run_deepTools_allelic():
             "deepTools_ChIP/bamCompare/allele_specific/"+chip_sample+".genome1.log2ratio.over_"+control_name+".bw",
             "deepTools_ChIP/bamCompare/allele_specific/"+chip_sample+".genome2.log2ratio.over_"+control_name+".bw",
             ])
-#        file_list = expand("deepTools_ChIP/bamCompare/allele_specific/{chip_sample}.{suffix}.log2ratio.over_input.bw",
-#                        chip_sample = chip_samples_w_ctrl, suffix = ['genome1', 'genome2'])
         file_list.append( [
         "deepTools_ChIP/plotEnrichment/plotEnrichment.gene_features_allelic.png",
         "deepTools_ChIP/plotEnrichment/plotEnrichment.gene_features_allelic.tsv",
-        "deepTools_ChIP/plotFingerprint/plotFingerprint.metrics_allelic.txt" 
+        "deepTools_ChIP/plotFingerprint/plotFingerprint.metrics_allelic.txt"
          ] )
         return(file_list)
     else:
@@ -131,11 +129,9 @@ onstart:
 rule all:
     input:
         run_deepTools(),
-        #expand("deepTools_ChIP/bamCompare/{chip_sample}.filtered.log2ratio.over_{control_name}.bw", chip_sample = chip_samples_w_ctrl, control_name = control_names),
-        #expand("deepTools_ChIP/bamCompare/{chip_sample}.filtered.subtract.{control_name}.bw", chip_sample = chip_samples_w_ctrl, control_name = control_names),
         expand("MACS2/{chip_sample}.filtered.BAM_peaks.xls", chip_sample = chip_samples),
         expand("MACS2/{chip_sample}.filtered.BAM_peaks.qc.txt", chip_sample = chip_samples),
-        
+
         # run histoneHMM if allelic_bams are absent (since it gives index error without allele_specific index)
         run_histoneHMM(allele_info),
         ## run deeptools-allelic only if dir "allelic_bams" present and non empty
