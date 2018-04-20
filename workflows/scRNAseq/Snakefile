@@ -92,7 +92,7 @@ onstart:
 
 ### main rule ##################################################################
 ################################################################################
-localrules: annot
+localrules: annot, FASTQ
 rule all:
     input:
         expand("FASTQ/{sample}{read}.fastq.gz", sample = samples, read = reads),
@@ -118,4 +118,4 @@ rule annot:
 ################################################################################
 onsuccess:
     if "verbose" in config and config["verbose"]:
-        print("\n--- scRNAseq-mapcount workflow finished successfully! --------------------------------\n")   
+        print("\n--- scRNAseq-mapcount workflow finished successfully! --------------------------------\n")
