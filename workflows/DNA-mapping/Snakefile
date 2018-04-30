@@ -187,6 +187,8 @@ onstart:
 
 ### main rule ##################################################################
 ################################################################################
+localrules: FASTQ
+
 rule all:
     input:
         expand("FASTQ/{sample}{read}.fastq.gz", sample = samples, read = reads),
