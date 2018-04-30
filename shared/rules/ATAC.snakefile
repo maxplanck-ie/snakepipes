@@ -8,7 +8,7 @@ rule filterFragments:
         metrics=os.path.join(outdir_MACS2, "{sample}.short.metrics")
     threads: 6
     shell:
-        "/package/deeptools-develop/bin/alignmentSieve --bam {input} --outFile {output} "
+        deepTools_path + "alignmentSieve --bam {input} --outFile {output} "
         "--numberOfProcessors {threads} "
         "--filterMetrics {params.metrics} "
         "--maxFragmentLength {params.cutoff} "
