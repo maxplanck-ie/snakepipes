@@ -1,0 +1,4 @@
+cluster_module_load: slurm
+snakemake_cluster_cmd: SlurmEasy --mem-per-cpu {cluster.memory} --threads {threads} --log
+__default__:
+  memory: 6G

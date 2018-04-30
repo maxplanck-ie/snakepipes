@@ -1,5 +1,3 @@
-__default__:
-  memory: 6G
 SalmonIndex:
   memory: 12G
 SalmonQuant:
