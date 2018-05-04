@@ -14,8 +14,9 @@ globals().update(cf.load_configfile(workflow.overwrite_configfile,config["verbos
 # load organism-specific data, i.e. genome indices, annotation, etc.
 globals().update(cf.load_organism_data(genome,maindir,config["verbose"]))
 
-outdir_MACS2 = 'MACS2_openChromatin/'
-outdir_ATACqc = 'MACS2_qc/'
+outdir_MACS2 = 'MACS2/'
+outdir_ATACqc = 'MACS2_QC/'
+deeptools_ATAC='deepTools_ATAC/'
 
 # do workflow specific stuff now
 include: os.path.join(workflow.basedir, "internals.snakefile")
@@ -26,14 +27,37 @@ include: os.path.join(workflow.basedir, "internals.snakefile")
 # Import deeptools cmds
 include: os.path.join(maindir, "shared", "deeptools_cmds.snakefile")
 
-# ATAC QC open chromatin
-include: os.path.join(maindir, "shared", "rules", "ATAC_qc.snakefile")
-
 # ATAC-seq open chromatin
 include: os.path.join(maindir, "shared", "rules", "ATAC.snakefile")
 
+# ATAC QC open chromatin
+include: os.path.join(maindir, "shared", "rules", "ATAC_qc.snakefile")
+
 # ATAC-seq deeptools compounts
-include: os.path.join(maindir, "shared", "rules", "deepTools_ATAC.snakefile")
+#include: os.path.join(maindir, "shared", "rules", "deepTools_ATAC.snakefile")
+
+# deeptools for allelic bams (if present)
+if os.path.isdir(os.path.join(workingdir,'allelic_bams') ) and os.listdir(os.path.join(workingdir,'allelic_bams') ) != []:
+    #print('allele-specific files detected')
+    allele_info = 'TRUE'
+    include: os.path.join(maindir, "shared", "rules", "deepTools_ChIP_allelic.snakefile")
+else:
+    allele_info = 'FALSE'
+
+def run_deepTools_allelic():
+    file_list = []
+    if os.path.isdir('allelic_bams') and os.listdir('allelic_bams') != []:
+        file_list.append( [
+        os.path.join(deeptools_ATAC, "plotFingerprint/plotFingerprint.metrics_allelic.txt")
+         ] )
+    return(file_list)
+
+def run_CSAW():
+    if sample_info:
+        return( ["CSAW/CSAW.session_info.txt"] )
+    else:
+        return([])
+
 
 ### execute before workflow starts #############################################
 ################################################################################
@@ -69,7 +93,11 @@ rule all:
         expand(os.path.join(outdir_MACS2, "{sample}.short.bam"), sample = samples),
         expand(os.path.join(outdir_MACS2, '{sample}_peaks.narrowPeak'), sample = samples),
         expand(os.path.join(outdir_ATACqc, "{sample}.filtered.BAM_peaks.qc.txt"), sample = samples),
-        "deepTools_ATAC/plotFingerprint/plotFingerprint.metrics.txt"
+        os.path.join(deeptools_ATAC, "plotFingerprint/plotFingerprint.metrics.txt"),
+        ## run deeptools-allelic only if dir "allelic_bams" present and non empty
+        run_deepTools_allelic(),
+        ## run csaw if asked for
+        run_CSAW()
 
 ### execute after workflow finished ############################################
 ################################################################################

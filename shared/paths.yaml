@@ -7,7 +7,7 @@ histoneHMM_path: "/data/manke/repository/scripts/snakemake_workflows/R/x86_64-re
 # paths referring to /package/
 bedtools_path: "/package/bedtools2-2.25.0/bin/"
 bowtie2_path: "/package/bowtie2-2.2.8/bin/"
-cutadapt_path: "/package/cutadapt-1.9.1/bin/"
+cutadapt_path: "/package/anaconda3/envs/cutadapt-1.16/bin/"
 #deepTools_path: "/package/deeptools-2.5.1/bin/"
 deepTools_path: "module load deeptools; "
 fastqc_path: "/package/FastQC-0.11.3/bin/"
@@ -20,7 +20,7 @@ picard_path: "/package/picard-tools-1.136/"
 R_path: "/package/R-3.3.1/bin/"
 salmon_path: "/package/salmon-0.8.2/bin/"
 samtools_path: "/package/samtools-1.5.0/bin/"
-sambamba_path: "/package/sambamba-0.6.6/bin/"
+sambamba_path: "/package/sambamba-0.6.6/bin/" # still need version name in the sambamba snakefile (fix it?)
 tabix_path: "/package/tabix-1.2.1/"
 trim_galore_path: "/package/trim_galore_v0.4.4/"
 UCSC_tools_path: "/package/UCSCtools/"

@@ -64,6 +64,7 @@ include: os.path.join(maindir, "shared", "rules", "Picard_qc.snakefile")
 
 #Sambamba Markdup
 include: os.path.join(maindir, "shared", "rules", "sambamba.snakefile")
+
 # deeptools cmds
 include: os.path.join(maindir, "shared", "deeptools_cmds.snakefile")
 
@@ -187,12 +188,15 @@ onstart:
 
 ### main rule ##################################################################
 ################################################################################
+localrules: FASTQ
+
 rule all:
     input:
         expand("FASTQ/{sample}{read}.fastq.gz", sample = samples, read = reads),
         run_FastQC(fastqc),
         run_Trimming(trim, fastqc),
-        expand("Sambamba/{sample}.markdup.txt", sample = samples),       
+        expand(mapping_prg+"/{sample}.bam", sample = samples),
+        expand("Sambamba/{sample}.markdup.txt", sample = samples),
         expand("filtered_bam/{sample}.filtered.bam", sample = samples),
         expand("Picard_qc/AlignmentSummaryMetrics/{sample}.alignment_summary_metrics.txt", sample = samples),
 #       run_CollectInsertSizeMetrics(paired),

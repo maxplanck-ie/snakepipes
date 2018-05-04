@@ -36,9 +36,9 @@ if allele_hybrid == 'dual':
         shell:
             " ( [ -d snp_genome ] || mkdir -p snp_genome ) && cd snp_genome &&"
             " " + SNPsplit_path +"SNPsplit_genome_preparation"
-            " --dual_hybrid --genome_build {BASENAME} "
+            " --dual_hybrid --genome_build {BASENAME}"
             " --reference_genome {input.genome} --vcf_file {params.SNPpath}"
-            " --strain {params.strain1} --strain2 {params.strain2}"
+            " --strain {params.strain1} --strain2 {params.strain2} 2> {log}"
             "&& cd ../"
 else:
     rule create_snpgenome:
@@ -49,14 +49,15 @@ else:
             snpgenome_dir = SNPdir,
             snpfile = snp_file
         params:
-            strain1 = strains[0]
+            strain1 = strains[0],
+            SNPpath = os.path.abspath(VCFfile)
         log: "snp_genome/SNPsplit_createSNPgenome.log"
         shell:
             " ( [ -d snp_genome ] || mkdir -p snp_genome ) && cd snp_genome &&"
             " " + SNPsplit_path +"SNPsplit_genome_preparation"
-            " --genome_build {BASENAME} "
-            " --reference_genome {input.genome} --vcf_file {input.snps}"
-            " --strain {params.strain1}"
+            " --genome_build {BASENAME}"
+            " --reference_genome {input.genome} --vcf_file {params.SNPpath}"
+            " --strain {params.strain1} 2> {log}"
             "&& cd ../"
 
 if mapping_prg == "STAR":
