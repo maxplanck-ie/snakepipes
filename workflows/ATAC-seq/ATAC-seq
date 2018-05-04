@@ -107,6 +107,14 @@ def parse_args(defaults={"verbose":None,"configfile":None,"max_jobs":None,"snake
                         type=int,
                         default=defaults['atac_fragment_cutoff'])
 
+    optional.add_argument("--DOC",
+                        dest="sample_info",
+                        help="Information on samples (If differential open chromatin analysis is required); see "
+                            "'snakemake_workflows/shared/tools/sampleInfo_DB.example.tsv' for example."
+                            " IMPORTANT: The first entry defines which group of samples are control. "
+                            " By this, the order of comparison and likewise the sign of values can be changed! (default: '%(default)s')",
+                        default=defaults["sample_info"])
+
     return parser
 
 
