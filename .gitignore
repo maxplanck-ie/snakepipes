@@ -11,5 +11,5 @@ __pychache__
 runRNAseq.sh
 *tmp*
 .Rproj.user
-~
-.pyc
+*~
+*.pyc
