@@ -30,12 +30,12 @@ bwa_path: "/package/bwa-0.7.12/bin/"
 # paths referring to a conda installation (Temporary : in the future, all paths would be loaded from conda via module load)
 hicExplorer_path: "/package/anaconda3/envs/HiCExplorer-1.8/bin/"
 #hicExplorer_path: "/home/rabbani/miniconda3/bin/hicexplorer/"
-cutadapt_module_path: "module load cutadapt/1.16 ;"
-mCT_path: "/data/manke/repository/scripts/DNA_methylation/methylCtools"
-bwameth_path: "module load bwameth; "
-sambamba_module_path: "module load sambamba/0.6.6;"
-GATK_path: "/package/GenomeAnalysisTK-3.5"
-POM_path: "/package/MethylDackel-0.3.0/bin"
-bedtools_module_path: "module load bedtools2/2.27.0;"
-metilene_path: "/data/manke/repository/scripts/DNA_methylation/metilene_v0.2-6"
+cutadapt_module_path:'module load cutadapt/1.16 ;'
+mCT_path:'/data/manke/repository/scripts/DNA_methylation/methylCtools'
+bwameth_path:'module load bwameth; '
+sambamba_module_path:'module load sambamba/0.6.6;'
+GATK_path:'/package/GenomeAnalysisTK-3.5'
+POM_path:'/package/MethylDackel-0.3.0/bin'
+bedtools_module_path:'module load bedtools2/2.27.0;'
+metilene_path:'/data/manke/repository/scripts/DNA_methylation/metilene_v0.2-6'
 

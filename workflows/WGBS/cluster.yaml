@@ -1,0 +1,8 @@
+depth_of_cov:
+    memory: 30G
+calc_Mbias:
+    memory: 3G
+map_reads:
+    memory: 10G
+rm_dupes:
+    memory: 3G  

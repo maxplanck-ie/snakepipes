@@ -90,7 +90,7 @@ def run_int_aggStats(intList,sampleInfo):
         return ([os.path.join("aux_files",re.sub('.fa',w,os.path.basename(refG))) for w in int_dest])
     if intList and sampleInfo:
             int_dest2=[re.sub('.bed','.aggCpG.RData',os.path.basename(x)) for x in intList]
-            return ([os.path.join("aggregate_stats_limma",w) for w in int_dest2])
+            return ([os.path.join("aggregate_stats_limma",re.sub('.RData',w,'limdat.LG.RData')) for w in int_dest2])
     else:
         return ([])
 
@@ -123,8 +123,6 @@ onstart:
 
 ### main rule ##################################################################
 ################################################################################
-localrules: produce_report
-
 rule all:
     input:
         expand("FASTQ/{sample}{read}.fastq.gz", sample = samples, read = reads),
@@ -134,9 +132,8 @@ rule all:
         expand("QC_metrics/{sample}.Mbias.txt",sample=samples),
         os.path.join("aux_files",re.sub('.fa','.poz.ran1M.sorted.bed',os.path.basename(refG))),
         calc_doc(intList,False),
-        'QC_metrics/QC_report.pdf',
-        expand("methXT/{sample}_CpG.bedGraph",sample=samples),
-        expand("methXT/{sample}.CpG.filt2.bed",sample=samples),
+        'QC_metrics/QCreport.pdf',
+        expand("methXT/logs/{sample}.CpG.filt2.bed",sample=samples),
         run_CpG_stats(sampleInfo),
         run_metilene_all(sampleInfo),
         run_int_aggStats(intList,False),
@@ -146,4 +143,4 @@ rule all:
 ################################################################################
 onsuccess:
     if "verbose" in config and config["verbose"]:
-        print("\n--- WGBS workflow finished successfully! --------------------------------\n")
+        print("\n--- Hi-C workflow finished successfully! --------------------------------\n")

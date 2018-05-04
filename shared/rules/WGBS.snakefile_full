@@ -19,7 +19,7 @@ if trimReads=='auto':
                         cutThdRes=calc_cutThd([f,g],fqcin,l,wdir)
                         oo.write('\n'.join('%s\t%s\n' % x for x in cutThdRes))
                 os.chdir(wdir)
-
+            shell: 'echo bla'
 
     rule trimReads:
         input:
@@ -77,7 +77,7 @@ if not trimReads is None:
             R2cut="FASTQ_Cutadapt/{sample}"+reads[1]+".fastq.gz",
             crefG=crefG
         output:
-            temp(sbam="bams/{sample}"+".sorted.bam")
+            sbam="bams/{sample}"+".sorted.bam"
         #log:"bams/logs/{sample}"+".mapping.log"
         run:
             shell(bMeth_map_reads(input.R1cut,input.R2cut,input.crefG,nthreads))
@@ -115,17 +115,6 @@ rule rm_dupes:
     run:
         shell(sambamba_module_path + 'sambamba_v0.6.6 markdup --remove-duplicates -t ' + str(nthreads) + ' --tmpdir ' + tempfile.mkdtemp(suffix='',prefix='',dir='/data/extended') +' ' + "{input.sbam}" + ' ' + "{output.rmDupbam}") 
 
-rule index_PCRrm_bam:
-    input:
-        sbam="bams/{sample}"+".PCRrm.bam"
-    output:
-        sbami="bams/{sample}"+".PCRrm.bam.bai"
-    params:
-    #log:"bams/logs/{sample}"+".indexing.log"
-    run:
-        shell(os.path.join(samtools_path,'samtools') + ' index ' + "{input.sbam}")
-
-
 rule get_ran_CG:
     input:
         refG=refG
@@ -140,13 +129,12 @@ rule get_ran_CG:
 rule calc_Mbias:
     input:
         refG=refG,
-        rmDupBam="bams/{sample}"+".PCRrm.bam",
-        sbami="bams/{sample}"+".PCRrm.bam.bai"
+        rmDupBam="bams/{sample}"+".PCRrm.bam"
     output:
         mbiasTXT="QC_metrics/{sample}"+".Mbias.txt"
     #log:"QC_metrics/logs/{sample}"+".mbias.log"
     run:
-        shell(os.path.join(POM_path,'MethylDackel') + ' mbias ' + "{input.refG}" + ' ' + "{input.rmDupBam}" +' ' + "{output.mbiasTXT}" +' -@ '+str(nthreads) +' 2>' + "{output.mbiasTXT}")
+        shell(os.path.join(POM_path,'MethylDackel') + ' mbias ' + "{input.refG}" + ' ' + "{input.rmDupBam}" +' ' + "{output.mbiasTXT}" +' -@ '+str(nthreads) +' 2>' + "{output.mbiasTXT};sleep 300")
 
 
 if intList:
@@ -154,7 +142,6 @@ if intList:
         input:
             refG=refG,
             rmDupBam="bams/{sample}"+".PCRrm.bam",
-            sbami="bams/{sample}"+".PCRrm.bam.bai"
         output:
             outFileList=calc_doc(intList,True)
         params:
@@ -167,8 +154,7 @@ else:
     rule depth_of_cov:
         input:
             refG=refG,
-            rmDupBam="bams/{sample}"+".PCRrm.bam",
-            sbami="bams/{sample}"+".PCRrm.bam.bai"
+            rmDupBam="bams/{sample}"+".PCRrm.bam"
         output:
             outFileList=calc_doc(intList,True)
         params:
@@ -215,7 +201,7 @@ rule produce_report:
         mbiasTXT=expand("QC_metrics/{sample}.Mbias.txt",sample=samples),
         fstat=expand("QC_metrics/{sample}.flagstat",sample=samples)
     output:
-        QCrep='QC_metrics/QC_report.pdf'
+        QCrep='QC_metrics/QCreport.pdf'
     params:
         auxdir=os.path.join(wdir,"aux_files")
     #log:"QC_metrics/logs/QCrep.log"
@@ -225,9 +211,7 @@ rule produce_report:
 rule methyl_extract:
     input:
         rmDupbam="bams/{sample}"+".PCRrm.bam",
-        sbami="bams/{sample}"+".PCRrm.bam.bai",
-        refG=refG,
-        mbiasTXT="QC_metrics/{sample}"+".Mbias.txt"
+        refG=refG
     output:
         methTab="methXT/{sample}_CpG.bedGraph"
     params:
@@ -264,7 +248,7 @@ if sampleInfo:
             Rlib=R_libs_path
         #log:"singleCpG_stats_limma/logs/singleCpGstats.log"
         run:
-            shell(os.path.join(R_path,'Rscript') +' --no-save --no-restore ' + os.path.join(workflow_tools,'WGBSpipe.singleCpGstats.limma.R ') + "{params.statdir}" + ' ' + "{params.sampleInfo}" + ' ' + os.path.join(wdir,"methXT") + ' ' + "{params.Rlib}" +' ;sleep 300')
+            shell(os.path.join(R_path,'Rscript') +' --no-save --no-restore ' + os.path.join(workflow_tools,'WGBSpipe.singleCpGstats.limma.R ') + "{params.statdir}" + ' ' + "{params.sampleInfo}" + ' ' + "{input}" + ' ' + "{params.Rlib}" +' ;sleep 300')
 
     rule run_metilene:
         input:
@@ -276,7 +260,7 @@ if sampleInfo:
             DMRout=os.path.join(wdir,'metilene_out')
         #log:"metilene_out/logs/metilene.log"
         run:
-            shell(DMR_metilene(nthreads,input.sampleInfo))
+            shell(DMR_metilene(nthreads))
 
     rule get_CG_metilene:
         input:
@@ -336,6 +320,6 @@ if intList:
                 Rlib=R_libs_path
             #log:'aggregate_stats_limma/logs/aggStats.limma.log'
             run:
-                shell(int_stats_limma([y for y in input.intList]))
+                shell(int_stats_limma())
 
  

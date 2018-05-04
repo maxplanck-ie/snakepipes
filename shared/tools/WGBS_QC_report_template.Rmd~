@@ -1,0 +1,156 @@
+---
+title: "WGBS_QC_report"
+author: "`r Sys.info()[length(Sys.info())-1]`"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: pdf_document
+params:
+    QCdir: "/data/processing3/sikora/A215.test2/QC_metrics"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Conversion rate
+
+Commercial bisulfite conversion kits claim an efficiency of >98%. In practice, the expected conversion rate can be taken as >95%.
+Incomplete bisulfite conversion will result in uninterpretable methylation values.
+Bisulfite conversion rate is calculated on non-CpG cytosines in the sequencing reads.
+
+```{r}
+knitr::opts_chunk$set(echo = FALSE)
+QCdir<-params$QCdir
+message(sprintf("Processing quality metrics stored in %s",QCdir))
+convRatedir=dir(QCdir,pattern=".conv.rate.txt$",full.names=TRUE)
+if(length(convRatedir>0)){
+    convRate.short<-gsub(".conv.rate.txt","",basename(convRatedir))
+
+    convRateL<-vector("list",length(convRatedir))
+    names(convRateL)<-convRate.short
+
+    for(i in seq_along(convRateL)){
+        tabi<-read.table(convRatedir[i],header=FALSE,sep="\t",quote="",as.is=TRUE)
+        colnames(tabi)<-c("Read",names(convRateL)[i])
+        convRateL[[i]]<-tabi
+    }
+    convRatedat<-Reduce(function(...) merge(..., all=T,by="Read"), convRateL)
+    plottab<-as.data.frame(t(convRatedat),stringsAsFactors=FALSE)[-1,]
+    colnames(plottab)<-c("READ1","READ2")
+    require(pander)
+    pander(plottab,style='grid',caption="Conversion rate in forward and reverse mates.")}
+```
+
+## Mapping rate
+
+A good mapping rate of 80-90% indicates successful library construction. Low mapping rates may reflect issues with sample contamination, or damaged starting material.
+
+```{r , echo=FALSE}
+QCdir<-params$QCdir
+Mapdir=dir(QCdir,pattern="*flagstat$",full.names=TRUE)
+Mapdir.short<-gsub(".flagstat","",basename(Mapdir))
+
+bamRepL<-vector("list",length(Mapdir))
+names(bamRepL)<-Mapdir.short
+
+for(i in seq_along(bamRepL)){
+
+tot<-system(paste0('grep \"in total\" ',Mapdir[i]),intern=TRUE)
+mapped<-system(paste0('grep \"mapped\" ',Mapdir[i]),intern=TRUE)[1]
+tabi<-as.data.frame(cbind(as.numeric(unlist(strsplit(tot,split=" "))[1]),as.numeric(unlist(strsplit(mapped,split=" "))[1])))
+colnames(tabi)<-c("total","mapped")
+tabi$pct<-with(tabi,mapped/total)
+
+bamRepL[[i]]<-tabi
+
+}
+
+bamReptab<-as.data.frame(do.call(rbind,bamRepL),stringsAsFactors=FALSE)
+
+require(pander)
+pander(bamReptab,style='simple',caption="Mapping rate.")
+```
+
+## Genome-wide coverage
+
+For the purpose of method comparison and publication, genome-wide coverage is calculated with GATK depth of coverage. Reads with MAPQ >= 10 are counted.
+
+```{r,echo=FALSE}
+QCdir<-params$QCdir
+mq10.intCovdir<-dir(QCdir,pattern="*.mean.genome.doc.sample_summary",full.names=TRUE)
+mq10.short<-gsub(".mean.genome.doc.sample_summary","",basename(mq10.intCovdir))
+
+mq10covL<-vector("list",length(mq10.intCovdir))
+names(mq10covL)<-mq10.short
+
+for(i in seq_along(mq10covL)){
+tabi<-read.table(mq10.intCovdir[i],header=TRUE,sep="\t",quote="",colClasses=c(rep("NULL",2),"numeric",rep("character",3),rep("NULL",4),"numeric",rep("NULL",4)),fill=TRUE)
+tabi$SampleID<-names(mq10covL)[i]
+mq10covL[[i]]<-tabi[1,,drop=FALSE]
+}
+
+mq10covdat<-do.call(rbind,mq10covL)
+mq10plottab<-as.data.frame(mq10covdat[,c("mean")],stringsAsFactors=FALSE)
+colnames(mq10plottab)<-"MeanCoverage"
+rownames(mq10plottab)<-mq10covdat$SampleID
+require(pander)
+pander(mq10plottab,style='simple',caption="Mean genome-wide coverage.")
+```
+
+## CpG dinucleotide coverage
+
+Fraction of CpG dinucleotides covered with at least 10 reads of MAPQ >=10 is calculated on a random sample of 1mln CpGs.
+
+```{r,echo=FALSE}
+QCdir<-params$QCdir
+mq10.intCovdir<-dir(QCdir,pattern="*.mean.CG.doc.sample_summary",full.names=TRUE)
+mq10.short<-gsub("mean.CG.doc.sample_summary","",basename(mq10.intCovdir))
+
+mq10covL<-vector("list",length(mq10.intCovdir))
+names(mq10covL)<-mq10.short
+
+for(i in seq_along(mq10covL)){
+
+tabi<-read.table(mq10.intCovdir[i],header=TRUE,sep="\t",quote="",colClasses=c(rep("NULL",2),"numeric",rep("character",3),rep("NULL",4),"numeric",rep("NULL",4)),fill=TRUE)
+tabi$SampleID<-names(mq10covL)[i]
+mq10covL[[i]]<-tabi[1,,drop=FALSE]
+
+}
+
+mq10covdat<-do.call(rbind,mq10covL)
+
+mq10plottab<-as.data.frame(mq10covdat[,c("X._bases_above_10")],stringsAsFactors=FALSE)
+colnames(mq10plottab)<-"FrxnBasesAbove10"
+rownames(mq10plottab)<-mq10covdat$SampleID
+require(pander)
+pander(mq10plottab,style='simple',caption="Fraction of CpG dinucleotides covered at least 10x at MAPQ >=10.")
+```
+
+#Methylation bias
+
+Library construction of standard directional BS-Seq samples often consist of several steps including sonication, end-repair, A-tailing and adapter ligation. Since the end-repair step typically uses unmethylated cytosines for the fill-in reaction the filled-in bases will generally appear unmethylated after bisulfite conversion irrespective of their true genomic methylation state. (from sequencing.qcfail.com)
+Mbias is obtained using MethylDackel.
+
+```{r , echo=FALSE}
+QCdir<-params$QCdir
+Mbiasdir<-dir(QCdir,pattern="*.Mbias.txt",full.names=TRUE)
+Mbias.short<-gsub(".Mbias.txt","",basename(Mbiasdir))
+message(sprintf("Processing mbias files:  %s",Mbiasdir))
+
+MbiasL<-vector("list",length(Mbiasdir))
+names(MbiasL)<-Mbias.short
+
+for(i in seq_along(MbiasL)){
+
+tabi<-read.table(Mbiasdir[i],header=FALSE,sep="-",quote="",colClasses=c("NULL","NULL","character","NULL","character"))
+colnames(tabi)<-c("OT","OB")
+MbiasL[[i]]<-tabi
+
+}
+
+Mbiasdat<-do.call(rbind,MbiasL)
+
+require(pander)
+pander(Mbiasdat,style='simple',caption="Inclusion bounds on top and bottom strand reads.")
+
+```
+

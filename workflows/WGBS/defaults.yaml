@@ -11,20 +11,20 @@
 # can be used in new/extended snakemake rules!
 ################################################################################
 ## General/Snakemake parameters, only used/set by wrapper or in Snakemake cmdl, but not in Snakefile
-outdir:
+wdir:
 configfile:
 local: False
-max_jobs: 8
+max_jobs: 12
+nthreads: 8
 snakemake_options:
 tempdir: /data/extended/
 ## directory with fastq files
-indir:
+readin:
 ## directory with fastqc files for auto quality trimming
 fqcin:
-## preconfigured target genomes (mm9,mm10,dm3,...) , see /path/to/snakemake_workflows/shared/organisms/
-## Value can be also path to your own genome config file!
+## Genome information
 genome:
-converted_genome:
+convrefpath:
 convRef: False
 ###list of bed files to process
 intList: []
@@ -43,13 +43,10 @@ downsample:
 ## Options for trimming
 trimReads: auto
 nextera: False
-trimThreshold:
+trimThreshold: 10
 trimOtherArgs:
-## Run FASTQC read quality control
-fastqc: True
-## Retain only reads with at least the given mapping quality
-mapq: 10
 verbose: False
+
 ################################################################################
 # Call snakemake directly, i.e. without using the wrapper script:
 #
