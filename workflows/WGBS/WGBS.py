@@ -22,6 +22,8 @@ import yaml
 import inspect
 import glob
 import pandas
+import logging
+#from snakemake.logging import setup_logger,logger
 
 sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(inspect.getfile(inspect.currentframe()) )))))+"/shared/")
 import common_functions as cf
@@ -232,16 +234,28 @@ def main():
     args.this_script_dir = this_script_dir
     args.main_dir_path = main_dir_path
 
+    #setup logging
+    logger = logging.getLogger(__name__)
+    if not os.path.exists(args.wdir):
+        os.makedirs(args.wdir)
+    fhandler = logging.FileHandler(filename=os.path.join(args.wdir,'pipeline.log'), mode='a')
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    fhandler.setFormatter(formatter)
+    logger.addHandler(fhandler)
+    logger.setLevel(logging.DEBUG)
+    #setup_logger()
+
+
 ## checks for parameters necessary in wrapper
 # 1. Dir path
     if os.path.exists(args.indir):
         args.indir = os.path.abspath(args.indir)
     else:
-        print("\nError! Input dir not found! ({})\n".format(args.indir))
+        logger.error("\nError! Input dir not found! ({})\n".format(args.indir))
         exit(1)
 # 2. config file
     if args.configfile and not os.path.exists(args.configfile):
-        print("\nError! Provided configfile (-c) not found! ({})\n".format(args.configfile))
+        logger.error("\nError! Provided configfile (-c) not found! ({})\n".format(args.configfile))
         exit(1)
 
     ## merge configuration dicts
@@ -266,6 +280,8 @@ def main():
         user_cluster_config = cf.load_configfile(args.cluster_configfile,False)
         cluster_config = cf.merge_dicts(cluster_config, user_cluster_config) # 2) form user_config.yaml
     cf.write_configfile(os.path.join(args.wdir,'cluster_config.yaml'),cluster_config)
+
+    #threads=args.nthreads
  
     if not args.local:
         snakemake_module_load = "module load snakemake/3.12.0 " #3.12 #4.2.0 #3.7.1
@@ -290,46 +306,47 @@ def main():
         " --cluster \'", cluster_config["snakemake_cluster_cmd"],
         args.cluster_logs_dir, "--name {rule}.snakemake'"]
 
-    print(snakemake_cmd)
+    logger.info(snakemake_cmd)
 
-    snakemake_log = "2>&1 | tee -a {}/WGBSpipeline.log".format(args.wdir).split()
+    #snakemake_log = "2>&1 | tee -a {}/WGBSpipeline.log".format(args.wdir).split()
 
     ## create local temp dir and add this path to environment as $TMPDIR variable
     ## on SLURM: $TMPDIR is set, created and removed by SlurmEasy on cluster node
     temp_path = cf.make_temp_dir(args.tempdir, args.wdir, args.verbose)
     snakemake_exports = ("export TMPDIR="+temp_path+" && ").split()
 
-    cmd = " ".join(snakemake_exports + snakemake_module_load + snakemake_cmd + snakemake_log)
+    cmd = " ".join(snakemake_exports + snakemake_module_load + snakemake_cmd ) #+ snakemake_log
 
     if args.verbose:
-        print("\n", cmd, "\n")
+        logger.info(cmd) #"\n", cmd, "\n"
 
     ## Write snakemake_cmd to log file
-    with open(os.path.join(args.wdir,"WGBSpipeline.log"),"w") as f:
-        f.write(" ".join(sys.argv)+"\n\n")
-        f.write(cmd+"\n\n")
+    #with open(os.path.join(args.wdir,"WGBSpipeline.log"),"w") as f:
+    #    f.write(" ".join(sys.argv)+"\n\n")
+    #    f.write(cmd+"\n\n")
+    #logger.info(snakemake_cmd)
 
     ## Run snakemake
     p = subprocess.Popen(cmd, shell=True)
     if args.verbose:
-        print("PID:", p.pid, "\n")
+        logger.debug("PID:" + str(p.pid))#, "\n"
     try:
         p.wait()
     except:
-        print("\nWARNING: Snakemake terminated!!!")
+        logger.warning("\nWARNING: Snakemake terminated!!!")
         if p.returncode != 0:
             if p.returncode:
-                print("Returncode:", p.returncode)
+                logger.debug("Returncode:" + str(p.returncode))
 
             # kill snakemake and child processes
             subprocess.call(["pkill", "-SIGTERM", "-P", str(p.pid)])
-            print("SIGTERM sent to PID:", p.pid)
+            logger.debug("SIGTERM sent to PID:"+ str(p.pid))
 
     ## remove temp dir
     if (temp_path != "" and os.path.exists(temp_path)):
         shutil.rmtree(temp_path, ignore_errors=True)
         if args.verbose:
-            print("temp dir removed: "+temp_path+"\n")
+            logger.debug("temp dir removed: "+temp_path)#+"\n"
 
 
 if __name__ == "__main__":

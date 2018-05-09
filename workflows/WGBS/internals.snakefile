@@ -57,25 +57,24 @@ def calc_cutThd (zipL,fqin,logobject,wdir):
     
 
 
-def cut_reads_auto(inFile,nthreads):
+def cut_reads_auto(inFile):
     #prepare threshold values
     with open(inFile,'r') as ctfile:
         for line in ctfile:
             fields = line.strip().split()
             ct1=fields[0]
             ct2=fields[1]
-    bshcmd=cutadapt_module_path +' cutadapt -a AGATCGGAAGAGC -A AGATCGGAAGAGC --minimum-length 30  -n 5 -j' + str(nthreads) +' -u ' + ct1 + ' -U ' + ct2 + ' -o ' + "{output.R1cut}" + ' -p ' + "{output.R2cut}" + ' ' + "{input.R1}" + ' ' + "{input.R2}" 
+    bshcmd=cutadapt_module_path +" cutadapt -a AGATCGGAAGAGC -A AGATCGGAAGAGC --minimum-length 30  -n 5 -j {threads}" + ' -u ' + ct1 + ' -U ' + ct2 + " -o {output.R1cut} -p {output.R2cut} {input.R1} {input.R2}" 
     return bshcmd
 
-def cut_reads_user(trimThreshold,nthreads,trimOtherArgs,nextera):
+def cut_reads_user(trimThreshold,trimOtherArgs,nextera):
     adapterSeq = "AGATCGGAAGAGC"
     if nextera:
         adapterSeq = "CTGTCTCTTATA"
-    bshcmd = "{} cutadapt -a {} -A {} -q {} -m 30 -j {} {} -o {} -p {} {} {} ".format(cutadapt_module_path,
+    bshcmd = "{} cutadapt -a {} -A {} -q {} -m 30 -j {threads} {} -o {} -p {} {} {} ".format(cutadapt_module_path,
                                                                             adapterSeq,
                                                                             adapterSeq,
                                                                             trimThreshold,
-                                                                            nthreads,
                                                                             trimOtherArgs,
                                                                             {output.R1cut},
                                                                             {output.R2cut},
@@ -85,7 +84,7 @@ def cut_reads_user(trimThreshold,nthreads,trimOtherArgs,nextera):
 
 
 
-def bMeth_map_reads(INfile1,INfile2,crefG,nthreads):
+def bMeth_map_reads(INfile1,INfile2,crefG):
     read_root=re.sub('_R1.fastq.gz','',os.path.basename(INfile1))
     with io.TextIOWrapper(gzip.open(INfile1, 'r')) as f:
         file_content = f.readline().strip()
@@ -96,7 +95,7 @@ def bMeth_map_reads(INfile1,INfile2,crefG,nthreads):
     sortThreads = nthreads
     if nthreads > 4:
         sortThreads = 4
-    mapcmd=bwameth_path + ' bwameth.py --threads ' + str(nthreads)  + ' --read-group '+ RG + ' --reference ' + crefG + ' ' + INfile1 + ' ' + INfile2 + ' | ' + os.path.join(samtools_path,'samtools') + ' sort -T ' + tempfile.mkdtemp(suffix='',prefix=read_root,dir='/data/extended') + ' -m 3G -@ ' + str(sortThreads)  + ' -o ' + "{output.sbam}"
+    mapcmd=bwameth_path + " bwameth.py --threads  {threads}  --read-group "+ RG + ' --reference ' + crefG + ' ' + INfile1 + ' ' + INfile2 + ' | ' + os.path.join(samtools_path,'samtools') + ' sort -T ' + tempfile.mkdtemp(suffix='',prefix=read_root,dir='/data/extended') + ' -m 3G -@ ' + str(sortThreads)  + " -o {output.sbam}"
     return mapcmd
 
 
@@ -117,9 +116,9 @@ def mCT_get_ranCG():
 def BS_doc_XT(outListAuto,intList,refG):
     OUTlist=[w.replace('.sample_summary', '') for w in outListAuto]
     OUTlist2=OUTlist[2:]
-    WG_mean_cmd='java -Xmx30g -Djava.io.tmpdir=/data/extended -jar '+ os.path.join(GATK_path,'GenomeAnalysisTK.jar')+' -R '+ "{input.refG}" + ' -T DepthOfCoverage -o ' + str(OUTlist[0]) + ' -I ' + "{input.rmDupBam}" + ' -ct 0 -ct 1 -ct 2 -ct 5 -ct 10 -ct 15 -ct 20 -ct 30 -ct 50  -omitBaseOutput -mmq 10 --partitionType sample '
-    CG_cmd='java -Xmx50g -Djava.io.tmpdir=/data/extended -jar '+ os.path.join(GATK_path,'GenomeAnalysisTK.jar')+' -R '+ "{input.refG}" + ' -T DepthOfCoverage -o ' + str(OUTlist[1]) + ' -I ' + "{input.rmDupBam}" + ' -ct 0 -ct 1 -ct 2 -ct 5 -ct 10 -ct 15 -ct 20 -ct 30 -ct 50  -omitBaseOutput -omitIntervals -mmq 10 --partitionType sample -L ' + os.path.join("{params.auxdir}",re.sub('.fa','.poz.ran1M.sorted.bed',os.path.basename(refG)))
-    cmd_Xi=['java -Xmx30g -Djava.io.tmpdir=/data/extended -jar '+ os.path.join(GATK_path,'GenomeAnalysisTK.jar')+' -R '+ "{input.refG}" + ' -T DepthOfCoverage -o ' + oi + ' -I ' + "{input.rmDupBam}" + ' -ct 0 -ct 1 -ct 2 -ct 5 -ct 10 -ct 15 -ct 20 -ct 30 -ct 50  -omitBaseOutput -omitIntervals -mmq 10 --partitionType sample -L ' + bi for oi,bi in zip(OUTlist2,intList)]
+    WG_mean_cmd='java -Xmx30g -Djava.io.tmpdir=/data/extended -jar '+ os.path.join(GATK_path,'GenomeAnalysisTK.jar')+" -R {input.refG} -T DepthOfCoverage -o " + str(OUTlist[0]) + " -I {input.rmDupBam} -ct 0 -ct 1 -ct 2 -ct 5 -ct 10 -ct 15 -ct 20 -ct 30 -ct 50  -omitBaseOutput -mmq 10 --partitionType sample "
+    CG_cmd='java -Xmx50g -Djava.io.tmpdir=/data/extended -jar '+ os.path.join(GATK_path,'GenomeAnalysisTK.jar')+" -R {input.refG} -T DepthOfCoverage -o " + str(OUTlist[1]) + " -I {input.rmDupBam} -ct 0 -ct 1 -ct 2 -ct 5 -ct 10 -ct 15 -ct 20 -ct 30 -ct 50  -omitBaseOutput -omitIntervals -mmq 10 --partitionType sample -L " + os.path.join("{params.auxdir}",re.sub('.fa','.poz.ran1M.sorted.bed',os.path.basename(refG)))
+    cmd_Xi=['java -Xmx30g -Djava.io.tmpdir=/data/extended -jar '+ os.path.join(GATK_path,'GenomeAnalysisTK.jar')+" -R {input.refG} -T DepthOfCoverage -o " + oi + " -I {input.rmDupBam} -ct 0 -ct 1 -ct 2 -ct 5 -ct 10 -ct 15 -ct 20 -ct 30 -ct 50  -omitBaseOutput -omitIntervals -mmq 10 --partitionType sample -L " + bi for oi,bi in zip(OUTlist2,intList)]
     cmd_all=cmd_Xi
     cmd_all[0:0]=[CG_cmd]
     cmd_all[0:0]=[WG_mean_cmd]
@@ -130,8 +129,8 @@ def BS_doc_XT(outListAuto,intList,refG):
 
 def BS_doc(outListAuto,refG):
     OUTlist=[w.replace('.sample_summary', '') for w in outListAuto]
-    WG_mean_cmd='java -Xmx30g -Djava.io.tmpdir=/data/extended -jar '+ os.path.join(GATK_path,'GenomeAnalysisTK.jar')+' -R '+ "{input.refG}" + ' -T DepthOfCoverage -o ' + str(OUTlist[0]) + ' -I ' + "{input.rmDupBam}" + ' -ct 0 -ct 1 -ct 2 -ct 5 -ct 10 -ct 15 -ct 20 -ct 30 -ct 50  -omitBaseOutput -mmq 10 --partitionType sample '
-    CG_cmd='java -Xmx30g -Djava.io.tmpdir=/data/extended -jar '+ os.path.join(GATK_path,'GenomeAnalysisTK.jar')+' -R '+ "{input.refG}" + ' -T DepthOfCoverage -o ' + str(OUTlist[1]) + ' -I ' + "{input.rmDupBam}" + ' -ct 0 -ct 1 -ct 2 -ct 5 -ct 10 -ct 15 -ct 20 -ct 30 -ct 50  -omitBaseOutput -omitIntervals -mmq 10 --partitionType sample -L ' + os.path.join("{params.auxdir}",re.sub('.fa','.poz.ran1M.sorted.bed',os.path.basename(refG)))
+    WG_mean_cmd='java -Xmx30g -Djava.io.tmpdir=/data/extended -jar '+ os.path.join(GATK_path,'GenomeAnalysisTK.jar')+" -R {input.refG} -T DepthOfCoverage -o " + str(OUTlist[0]) + " -I {input.rmDupBam} -ct 0 -ct 1 -ct 2 -ct 5 -ct 10 -ct 15 -ct 20 -ct 30 -ct 50  -omitBaseOutput -mmq 10 --partitionType sample "
+    CG_cmd='java -Xmx30g -Djava.io.tmpdir=/data/extended -jar '+ os.path.join(GATK_path,'GenomeAnalysisTK.jar')+" -R {input.refG} -T DepthOfCoverage -o " + str(OUTlist[1]) + " -I {input.rmDupBam} -ct 0 -ct 1 -ct 2 -ct 5 -ct 10 -ct 15 -ct 20 -ct 30 -ct 50  -omitBaseOutput -omitIntervals -mmq 10 --partitionType sample -L " + os.path.join("{params.auxdir}",re.sub('.fa','.poz.ran1M.sorted.bed',os.path.basename(refG)))
     cmd_all=[WG_mean_cmd,CG_cmd]
     cmd_all_str=';'.join(cmd_all)
     return cmd_all_str
@@ -143,28 +142,28 @@ def BS_QC_rep():
     return cmd
 
 
-def methXT_POM(inFile,mbias_action,nthreads,wdir,OutFile):
+def methXT_POM(inFile,mbias_action,wdir,OutFile):
     read_root=re.sub('.PCRrm.bam','',os.path.basename(inFile)) 
     OUTpfx=os.path.join(wdir,re.sub('_CpG.bedGraph','',OutFile))
     if len(mbias_action) < 3:
         m_ignore=','.join([mbias_ignore]*4)
-        POM_cmd=os.path.join(POM_path,'MethylDackel') + ' extract '   + ' -o ' + OUTpfx + ' -q 10 -p 20 --nOT ' + m_ignore + ' --nOB  ' + m_ignore + ' --minDepth 10 --mergeContext --maxVariantFrac 0.25 --minOppositeDepth 5 -@ '+str(nthreads) + " {input.refG}" + ' ' + os.path.join(wdir,"{input.rmDupbam}") + ';sleep 300 '
+        POM_cmd=os.path.join(POM_path,'MethylDackel') + ' extract  -o ' + OUTpfx + ' -q 10 -p 20 --nOT ' + m_ignore + ' --nOB  ' + m_ignore + " --minDepth 10 --mergeContext --maxVariantFrac 0.25 --minOppositeDepth 5 -@ {threads} {input.refG} " + os.path.join(wdir,"{input.rmDupbam}") 
     elif mbias_action=="auto":
         with open(os.path.join("QC_metrics",read_root)+'.Mbias.txt', 'r') as f:
             first_line = f.readline()
         m_ignore=re.sub('Suggested inclusion options: ','',first_line).strip('\n')
-        POM_cmd=os.path.join(POM_path,'MethylDackel') + ' extract '   + ' -o ' + OUTpfx + ' -q 10 -p 20 ' + m_ignore + ' --minDepth 10 --mergeContext --maxVariantFrac 0.25 --minOppositeDepth 5 -@ '+str(nthreads)  + " {input.refG}" + ' ' + os.path.join(wdir,inFile) + ';sleep 300 '
+        POM_cmd=os.path.join(POM_path,'MethylDackel') + ' extract  -o ' + OUTpfx + ' -q 10 -p 20 ' + m_ignore + " --minDepth 10 --mergeContext --maxVariantFrac 0.25 --minOppositeDepth 5 -@ {threads} {input.refG} " + os.path.join(wdir,inFile) 
     elif len(mbias_action) > 4:
-        POM_cmd=os.path.join(POM_path,'MethylDackel') + ' extract '   + ' -o ' + OUTpfx + ' -q 10 -p 20 ' + mbias_action + ' --minDepth 10 --mergeContext --maxVariantFrac 0.25 --minOppositeDepth 5 -@ '+str(nthreads)  + " {input.refG}" + ' ' + os.path.join(wdir,inFile) + ';sleep 300 '
+        POM_cmd=os.path.join(POM_path,'MethylDackel') + ' extract  -o ' + OUTpfx + ' -q 10 -p 20 ' + mbias_action + " --minDepth 10 --mergeContext --maxVariantFrac 0.25 --minOppositeDepth 5 -@ {threads} {input.refG} " + os.path.join(wdir,inFile) 
     return POM_cmd
 
 
 
 def filt_POM(inFile,blackList):
     read_root=re.sub('_CpG.bedGraph','',os.path.basename(inFile))
-    Rfilt_cmd=os.path.join(R_path,'Rscript') +' --no-save --no-restore ' + os.path.join(workflow_tools,'WGBSpipe.POM.filt.R ') + "{params.methDir}" + ' ' + "{input.methTab}" + ' ' + "{params.Rlib}" 
+    Rfilt_cmd=os.path.join(R_path,'Rscript') +' --no-save --no-restore ' + os.path.join(workflow_tools,'WGBSpipe.POM.filt.R ') + "{params.methDir} {input.methTab} {params.Rlib}" 
     if blackList is None:
-        mv_cmd='mv -v '+ re.sub('_CpG.bedGraph','.CpG.filt.bed',inFile) + ' ' + re.sub('_CpG.bedGraph','.CpG.filt2.bed',inFile) + ';sleep 300'
+        mv_cmd='mv -v '+ re.sub('_CpG.bedGraph','.CpG.filt.bed',inFile) + ' ' + re.sub('_CpG.bedGraph','.CpG.filt2.bed',inFile) 
         cmd_all=';'.join([Rfilt_cmd,mv_cmd])
     else:
         SNP_filt=bedtools_module_path +' bedtools' + ' intersect -v -a' + re.sub('_CpG.bedGraph','.CpG.filt.bed',inFile) + ' -b ' + blackList + ' > ' + re.sub('_CpG.bedGraph','.CpG.filt2.bed',inFile)
@@ -173,8 +172,8 @@ def filt_POM(inFile,blackList):
 
 
 
-def DMR_metilene(nthreads,sampleInfo):
-    met_cmd=os.path.join(metilene_path,'metilene')+ ' -a ' + list(set(pandas.read_table(sampleInfo)['Group']))[0] + ' -b ' + list(set(pandas.read_table(sampleInfo)['Group']))[1] + ' -t ' + str(nthreads) + ' ' + "{input.MetIN}" + ' | sort -k 1,1 -k2,2n > ' + "{output.MetBed}" + ';touch ' + "{output.MetBed}"
+def DMR_metilene(sampleInfo):
+    met_cmd=os.path.join(metilene_path,'metilene')+ ' -a ' + list(set(pandas.read_table(sampleInfo)['Group']))[0] + ' -b ' + list(set(pandas.read_table(sampleInfo)['Group']))[1] + " -t {threads} {input.MetIN} | sort -k 1,1 -k2,2n > {output.MetBed}" 
     return met_cmd
 
 
@@ -183,28 +182,28 @@ def mCT_get_CpGxInt(pozF,outList,bedList,wdir):
     #pozF=os.path.join(wdir,"aux_files",re.sub('.fa*','.poz',os.path.basename(refG)))
     imdF=os.path.join(wdir,"aux_files",re.sub('.poz','.CpG.bed',os.path.basename(pozF)))
     if not os.path.exists(imdF):
-        cmd0='grep "+" ' +"{input.pozF}" + ' | awk \'{{print $1, $5, $5+1, $6, $8}}\' - | tr " " "\\t" | sort -k 1,1 -k2,2n - > ' + imdF
-        cmd1=[bedtools_module_path +' bedtools' + ' intersect -wa -a ' + imdF + ' -b ' + bli + ' > ' + oli for bli,oli in zip(bedList,outList) ]
+        cmd0='grep "+"' + " {input.pozF} "+ ' | awk \'{{print $1, $5, $5+1, $6, $8}}\' - | tr " " "\\t" | sort -k 1,1 -k2,2n - > ' + imdF
+        cmd1=[bedtools_module_path +' bedtools intersect -wa -a ' + imdF + ' -b ' + bli + ' > ' + oli for bli,oli in zip(bedList,outList) ]
         cmd_all=cmd1
         cmd_all[0:0]=[cmd0]
-        cmd_all_str=';'.join(cmd_all)
+        cmd_all_str=';'.join(cmd_all)+';sleep 300'
     else:
-        cmd1=[bedtools_module_path +' bedtools' + ' intersect -wa -a ' + imdF + ' -b ' + bli + ' > ' + oli for bli,oli in zip(bedList,outList) ]
+        cmd1=[bedtools_module_path +' bedtools intersect -wa -a ' + imdF + ' -b ' + bli + ' > ' + oli for bli,oli in zip(bedList,outList) ]
         cmd_all=cmd1
-        cmd_all_str=';'.join(cmd_all)
+        cmd_all_str=';'.join(cmd_all)+';sleep 300'
     return cmd_all_str
 
 
 
 def clean_up_metilene():
-    cmd=os.path.join(R_path,'Rscript') +' --no-save --no-restore ' + os.path.join(workflow_tools,'WGBSpipe.metilene_stats.limma.R ') + "{params.DMRout}" + ' ' + os.path.join(wdir,"{input.MetBed}") +' ' + os.path.join(wdir,"{input.MetCG}") + ' ' + os.path.join(wdir,"{input.Limdat}") +' ' + "{input.sampleInfo}" + ' ' + "{input.refG}" + ' "' + bedtools_module_path+'" ' + "{params.Rlib}" + ';sleep 300'
+    cmd=os.path.join(R_path,'Rscript') +' --no-save --no-restore ' + os.path.join(workflow_tools,'WGBSpipe.metilene_stats.limma.R ') + "{params.DMRout} " + os.path.join(wdir,"{input.MetBed}") +' ' + os.path.join(wdir,"{input.MetCG}") + ' ' + os.path.join(wdir,"{input.Limdat}") + " {input.sampleInfo} {input.refG}" + ' "' + bedtools_module_path+'" ' + "{params.Rlib}" 
     return cmd
 
 
 
 def int_stats_limma(intList):
     auxList=[os.path.join("{params.auxdir}",re.sub('.fa',re.sub('.bed','.CpGlist.bed',os.path.basename(x)),os.path.basename(refG))) for x in intList]
-    cmd_all=[os.path.join(R_path,'Rscript') +' --no-save --no-restore ' + os.path.join(workflow_tools,'WGBSpipe.interval_stats.limma.R ') + "{params.aggStatdir}" + ' ' + li +' '+ aui +' ' + os.path.join(wdir,"{input.Limdat}") + ' ' + "{input.sampleInfo}" + ' ' + "{params.Rlib}" for li,aui in zip(intList,auxList)]
+    cmd_all=[os.path.join(R_path,'Rscript') +' --no-save --no-restore ' + os.path.join(workflow_tools,'WGBSpipe.interval_stats.limma.R ') + "{params.aggStatdir} " + li +' '+ aui +' ' + os.path.join(wdir,"{input.Limdat}") + " {input.sampleInfo} {params.Rlib}" for li,aui in zip(intList,auxList)]
     cmd_all_str=';'.join(cmd_all)
     return cmd_all_str
 

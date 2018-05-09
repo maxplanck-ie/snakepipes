@@ -50,6 +50,11 @@ auxmtch<-as.data.frame(findOverlaps(query=auxGR, subject=bedGR))
 
 limdat.LG.inCGI<-auxdat[auxmtch$queryHits,] #for compatibility with previous method; not really necessary as auxdat comes from a pre-intersected bed file
 limdat.LG.inCGI$IntID<-names(ranges(bedGR))[auxmtch$subjectHits] ##needed for grouping per interval
+##
+noNA2<-apply(limdat.LG.inCGI[,!colnames(limdat.LG.inCGI) %in% c("Name","NAf","IntID"),with=FALSE],1,function(X)sum(is.na(X)))
+NAf2<-ifelse(noNA2>1,1,0)
+limdat.LG.inCGI$NAf<-NAf2
+
 ########################### END UPDATED CODE
 
 NA.inCGI<-with(limdat.LG.inCGI,ave(NAf,factor(IntID),FUN=sum))

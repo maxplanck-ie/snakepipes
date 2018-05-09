@@ -3,6 +3,8 @@ depth_of_cov:
 calc_Mbias:
     memory: 3G
 map_reads:
-    memory: 10G
+    memory: 20G
 rm_dupes:
     memory: 3G  
+conv_rate:
+    memory: 6G

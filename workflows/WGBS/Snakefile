@@ -2,6 +2,7 @@ import os
 import re
 from operator import is_not
 import glob
+#import logging
 
 
 ### snakemake_workflows initialization ########################################
@@ -28,12 +29,12 @@ paired = cf.is_paired(infiles,ext,reads)
 del infiles
 
 if not samples:
-    print("\n  Error! NO samples found in dir "+str(indir or '')+"!!!\n\n")
+    logger.error("  Error! NO samples found in dir "+str(indir or '')+"!!!")#\n \n\n
     exit(1)
 
 if not paired:
-    print("\n  Error! Paired-end samples not detected. "
-          "WGBS workflow currently works only with paired-end samples "+str(indir or '')+"!!!\n\n")
+    logger.error(" Error! Paired-end samples not detected. "
+          "WGBS workflow currently works only with paired-end samples "+str(indir or '')+"!!!")#\n \n\n
     exit(1)
 
 
@@ -111,15 +112,15 @@ include: os.path.join(workflow.basedir, "internals.snakefile")
 ################################################################################
 onstart:
     if "verbose" in config and config["verbose"]:
-        print("--- Workflow parameters --------------------------------------------------------")
-        print("samples:", samples)
-        print("input dir:", indir)
-        print("-" * 80, "\n")
+        logger.info("--- Workflow parameters --------------------------------------------------------")
+        logger.info("samples:"+ str(samples))
+        logger.info("input dir:"+ indir)
+        logger.info("-" * 80)#, "\n"
 
-        print("--- Environment ----------------------------------------------------------------")
-        print("$TMPDIR: ",os.getenv('TMPDIR', ""))
-        print("$HOSTNAME: ",os.getenv('HOSTNAME', ""))
-        print("-" * 80, "\n")
+        logger.info("--- Environment ----------------------------------------------------------------")
+        logger.info("$TMPDIR: "+os.getenv('TMPDIR', ""))
+        logger.info("$HOSTNAME: "+os.getenv('HOSTNAME', ""))
+        logger.info("-" * 80)#, "\n"
 
 ### main rule ##################################################################
 ################################################################################
@@ -129,6 +130,7 @@ rule all:
     input:
         expand("FASTQ/{sample}{read}.fastq.gz", sample = samples, read = reads),
         run_cutadapt(trimReads),
+        expand("FASTQ_downsampled/{sample}{read}.fastq.gz", sample = samples, read = reads),
         convert_refG(convRef),
         expand("bams/{sample}.PCRrm.bam", sample = samples),
         expand("QC_metrics/{sample}.Mbias.txt",sample=samples),
@@ -146,4 +148,4 @@ rule all:
 ################################################################################
 onsuccess:
     if "verbose" in config and config["verbose"]:
-        print("\n--- WGBS workflow finished successfully! --------------------------------\n")
+        logger.info("--- WGBS workflow finished successfully! --------------------------------")#\n \n
