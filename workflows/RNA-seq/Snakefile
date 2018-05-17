@@ -123,7 +123,8 @@ def run_mapping_free():
         expand("Salmon/{sample}/abundance.h5", sample=samples) ]
 
         if sample_info:
-            file_list.append( ["DESeq2_Salmon/DESeq2.session_info.txt"])
+            sample_name = os.path.splitext(os.path.basename(sample_info))[0]
+            file_list.append( ["DESeq2_Salmon_{}/DESeq2.session_info.txt".format(sample_name)])
         if sample_info and check_replicates(sample_info):
             file_list.append( ["sleuth/so.rds"] )
 
@@ -142,7 +143,8 @@ def run_mapping():
         "QC_report/QC_report_all.tsv"
         ]
         if sample_info:
-            file_list.append( ["DESeq2/DESeq2.session_info.txt"] )
+            sample_name = os.path.splitext(os.path.basename(sample_info))[0]
+            file_list.append( ["DESeq2_{}/DESeq2.session_info.txt".format(sample_name)] )
         return(file_list)
     else:
         return([])
@@ -173,7 +175,8 @@ def run_allelesp_mapping():
         "featureCounts/counts_allelic.tsv"
         ]
         if sample_info:
-            file_list.append( ["DESeq2/DESeq2.session_info.txt"] )
+            sample_name = os.path.splitext(os.path.basename(sample_info))[0]
+            file_list.append( ["DESeq2_{}/DESeq2.session_info.txt".format(sample_name)] )
         return(file_list)
     else:
         return([])
