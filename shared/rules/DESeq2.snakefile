@@ -6,6 +6,10 @@
 #    else:
 #        return("")
 
+## function to get the name of the samplesheet and extend the name of the folder DESeq2 to DESeq2_[name]
+def get_outdir(folder_name):
+    sample_name = os.path.splitext(os.path.basename(str(sample_info)))[0]
+    return("{}_{}".format(folder_name, sample_name))
 
 ## DESeq2 (on featureCounts)
 rule DESeq2:
@@ -14,16 +18,16 @@ rule DESeq2:
         sample_info = sample_info,
         symbol_file = "Annotation/genes.filtered.symbol" #get_symbol_file
     output:
-        "DESeq2/DESeq2.session_info.txt"
+        "{}/DESeq2.session_info.txt".format(get_outdir("DESeq2"))
     benchmark:
-        "DESeq2/.benchmark/DESeq2.featureCounts.benchmark"
+        "{}/.benchmark/DESeq2.featureCounts.benchmark".format(get_outdir("DESeq2"))
     params:
-        outdir = "DESeq2",
+        outdir = get_outdir("DESeq2"),
         fdr = 0.05,
         importfunc = os.path.join(workflow_tools,"snakediff","R", "DE_functions.R"),
         allele_info = lambda wildcards : 'TRUE' if 'allelic-mapping' in mode else 'FALSE',
         tx2gene_file = 'NA'
-    log: "DESeq2/DESeq2.log"
+    log: "{}/DESeq2.log".format(get_outdir("DESeq2"))
     shell:
         "( cd {params.outdir} && export R_LIBS_USER="+R_libs_path+" && "
         "cat "+os.path.join(workflow_tools,"DESeq2.R")+" | "
@@ -46,16 +50,16 @@ rule DESeq2_Salmon:
         tx2gene_file = "Annotation/genes.filtered.t2g",
         symbol_file = "Annotation/genes.filtered.symbol" #get_symbol_file
     output:
-        "DESeq2_Salmon/DESeq2.session_info.txt"
+        "{}/DESeq2.session_info.txt".format(get_outdir("DESeq2_Salmon"))
     benchmark:
-        "DESeq2_Salmon/.benchmark/DESeq2.Salmon.benchmark"
+        "{}/.benchmark/DESeq2.Salmon.benchmark".format(get_outdir("DESeq2_Salmon"))
     params:
-        outdir = "DESeq2_Salmon",
+        outdir = get_outdir("DESeq2_Salmon"),
         fdr = 0.05,
         importfunc = os.path.join(workflow_tools,"snakediff", "R" ,"DE_functions.R"),
         allele_info = 'FALSE',
         tx2gene_file = "Annotation/genes.filtered.t2g"
-    log: "DESeq2_Salmon/DESeq2.log"
+    log: "{}/DESeq2.log".format(get_outdir("DESeq2_Salmon"))
     shell:
         "( cd {params.outdir} && export R_LIBS_USER="+R_libs_path+" && "
         "cat "+os.path.join(workflow_tools,"DESeq2.R")+" | "

@@ -299,8 +299,7 @@ def main():
 
     ## cluster config
     cluster_config = cf.load_configfile(os.path.join(this_script_dir,"../../shared/","cluster.yaml"),False)
-    #cluster_config = cf.merge_dicts(cf.load_configfile(os.path.join(this_script_dir,"cluster.yaml"),False), cluster_config)
-
+    
     if args.cluster_configfile:
         user_cluster_config = cf.load_configfile(args.cluster_configfile,False)
         cluster_config = cf.merge_dicts(cluster_config, user_cluster_config) # 2) merge/override variables from user_config.yaml
@@ -330,8 +329,6 @@ def main():
                          os.path.join(args.outdir,'cluster_config.yaml'),
                          " --cluster \'", cluster_config["snakemake_cluster_cmd"],
                          args.cluster_logs_dir, "--name {rule}.snakemake'"]
-
-    print(snakemake_cmd)
 
     snakemake_log = "2>&1 | tee -a {}/RNA-seq.log".format(args.outdir).split()
 
