@@ -42,15 +42,6 @@ rule samtools_filter:
 
 
 ### samtools_index #############################################################
-
-rule samtools_index:
-    input:
-        mapping_prg+"/{sample}.bam"
-    output:
-        mapping_prg+"/{sample}.bam.bai"
-    shell:
-        samtools_path+"samtools index {input}"
-
 rule samtools_index_filtered:
     input:
         "filtered_bam/{sample}.bam"
