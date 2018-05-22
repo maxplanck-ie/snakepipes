@@ -7,23 +7,26 @@ rule get_restrictionSite:
         genome_fasta
     output:
         enzyme + ".bed"
+    conda:
+       "envs/snakepipes_hic_conda_env.yaml"
     params:
         res_seq = get_restriction_seq(enzyme)
     shell:
-        hicExplorer_path + "findRestSite -f {input} --searchPattern {params.res_seq} -o {output}"
+        "findRestSite -f {input} --searchPattern {params.res_seq} -o {output}"
 
 # Map
 rule map_fastq_single_end:
     input: fastq_dir+"/{sample}{read}.fastq.gz"
     output: "BWA/{sample}{read}.bam"
-    log:    "BWA/{sample}{read}.log"
+    conda:
+       "envs/snakepipes_hic_conda_env.yaml"
+    log: "BWA/{sample}{read}.log"
     threads: 15
     shell:
         "echo 'mapping {input}' > {log} && "
-        + bwa_path + "bwa mem -A1 -B4  -E50 -L0 "
+        "bwa mem -A1 -B4  -E50 -L0 "
         "-t {threads} " + bwa_index + " {input} 2>> {log} | "
         + samtools_path + "samtools view -Shb - > {output}"
-
 ## Make HiC Matrix
 if(RF_resolution is True):
     rule build_matrix:
@@ -34,6 +37,8 @@ if(RF_resolution is True):
         output:
              matrix ="HiC_matrices/{sample}_"+matrixFile_suffix+".h5",
 #            bam = "BWA/{sample}_R12_"+matrixFile_suffix+".bam"
+        conda:
+             "envs/snakepipes_hic_conda_env.yaml"            
         params:
              QCfolder="HiC_matrices/QCplots/{sample}_QC/",
              res_seq = get_restriction_seq(enzyme),
@@ -45,7 +50,7 @@ if(RF_resolution is True):
            "HiC_matrices/logs/{sample}.log"
         threads: 15
         shell:
-            hicExplorer_path + "hicBuildMatrix -s {input.R1} {input.R2} "
+            "hicBuildMatrix -s {input.R1} {input.R2} "
             "-rs {input.bed} "
             "--restrictionSequence {params.res_seq} "
             "--danglingSequence {params.dang_seq} "
@@ -64,6 +69,8 @@ else:
         output:
             matrix = "HiC_matrices/{sample}_"+matrixFile_suffix+".h5",
 #           bam = "BWA/{sample}_R12_"+matrixFile_suffix+".bam"
+        conda:
+           "envs/snakepipes_hic_conda_env.yaml"
         params:
             QCfolder="HiC_matrices/QCplots/{sample}_QC/",
             bin_size = bin_size,
@@ -74,7 +81,7 @@ else:
            "HiC_matrices/logs/{sample}.log"
         threads: 15
         shell:
-            hicExplorer_path + "hicBuildMatrix -s {input.R1} {input.R2} "
+            "hicBuildMatrix -s {input.R1} {input.R2} "
             "-bs {params.bin_size} "
             "--minDistance {params.min_dist} "
             "--maxDistance {params.max_dist} "
@@ -90,8 +97,10 @@ rule merge_matrices:
           expand("HiC_matrices/{sample}_"+matrixFile_suffix+".h5", sample=samples)
       output:
           matrix = temp("HiC_matrices/mergedSamples_"+matrixFile_suffix+".h5"),
-      run:
-          shell(hicExplorer_path + "hicSumMatrices -m {input} -o {output.matrix}")
+      conda:
+          "envs/snakepipes_hic_conda_env.yaml"
+      shell:
+          "hicSumMatrices -m {input} -o {output.matrix}"
 
 ## Merge the bins if asked
 rule merge_bins:
@@ -99,10 +108,12 @@ rule merge_bins:
          "HiC_matrices/{sample}_"+matrixFile_suffix+".h5"
      output:
          matrix = "HiC_matrices/{sample}_Mbins"+str(nbins_toMerge)+"_"+matrixFile_suffix+".h5"
+     conda:
+         "envs/snakepipes_hic_conda_env.yaml"
      params:
          num_bins=nbins_toMerge
-     run:
-         shell(hicExplorer_path + "hicMergeMatrixBins -m {input} -nb {params.num_bins} -o {output.matrix}")
+     shell:
+         "hicMergeMatrixBins -m {input} -nb {params.num_bins} -o {output.matrix}"
 
 ## diagnostic plots
 rule diagnostic_plot:
@@ -111,8 +122,10 @@ rule diagnostic_plot:
     output:
         plot = "HiC_matrices/QCplots/{sample}_"+matrixFile_suffix+"_diagnostic_plot.pdf",
         mad = "HiC_matrices/QCplots/{sample}_"+matrixFile_suffix+"_mad_threshold.out"
+    conda:
+       "envs/snakepipes_hic_conda_env.yaml"
     shell:
-        hicExplorer_path + "hicCorrectMatrix diagnostic_plot -m {input} -o {output.plot} > {output.mad}"
+       "hicCorrectMatrix diagnostic_plot -m {input} -o {output.plot} > {output.mad}"
 
 ## Correct matrices
 rule correct_matrix:
@@ -121,6 +134,8 @@ rule correct_matrix:
         mad = "HiC_matrices/QCplots/{sample}_"+matrixFile_suffix+"_mad_threshold.out"
     output:
         "HiC_matrices_corrected/{sample}_"+matrixFile_suffix+".corrected.h5"
+#    conda:
+#        "envs/snakepipes_hic_conda_env.yaml"
     log:
         correct = "HiC_matrices_corrected/logs/{sample}_"+matrixFile_suffix+".log"
     run:

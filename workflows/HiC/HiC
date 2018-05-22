@@ -28,7 +28,7 @@ import common_functions as cf
 def parse_args(defaults={"verbose":None,"configfile":None,"max_jobs":None,"snakemake_options":None,"tempdir":None,
                          "mode":None, "downsample":None, "trim":None,"trim_prg":None,"trim_options":None, "fastqc":None,
                          "bin_size":None, "RF_resolution":None, "enzyme":None, "restrict_region":None,
-                         "merge_samples":None, "nbins_toMerge":None, "tadparams":None}):
+                         "merge_samples":None, "nbins_toMerge":None, "tadparams":None, "noTAD":None, "noCorrect":None}):
     """
     Parse arguments from the command line.
     """
@@ -185,6 +185,19 @@ def parse_args(defaults={"verbose":None,"configfile":None,"max_jobs":None,"snake
                         help="parameters for HiCFindTADs. (default: '%(default)s')",
                         default=defaults["tadparams"])
 
+    optional.add_argument("--noTAD",
+                        dest="noTAD",
+                        action="store_true",
+                        help="Stop the pipeline before TAD calling. (default: '%(default)s')",
+                        default=defaults["noTAD"])
+
+    optional.add_argument("--noCorrect",
+                        dest="noCorrect",
+                        action="store_true",
+                        help="Stop the pipeline before correcting the matrix. (default: '%(default)s')",
+                        default=defaults["noCorrect"])
+
+
     return parser
 
 
@@ -231,9 +244,9 @@ def main():
     ## save to configs.yaml in outdir
     cf.write_configfile(os.path.join(args.outdir,'config.yaml'),config)
 
-    snakemake_module_load = "module load snakemake/3.12.0 slurm &&".split()
+    snakemake_module_load = "module load slurm &&".split()
     snakemake_cmd = """
-                    snakemake {snakemake_options} --latency-wait 300 --snakefile {snakefile} --jobs {max_jobs} --directory {outdir} --configfile {configfile}
+                    /data/processing/conda/bin/snakemake {snakemake_options} --latency-wait 300 --snakefile {snakefile} --jobs {max_jobs} --directory {outdir} --configfile {configfile}
                     """.format( snakefile = os.path.join(args.this_script_dir, "Snakefile"),
                                 max_jobs = args.max_jobs,
                                 outdir = args.outdir,
@@ -242,10 +255,10 @@ def main():
                               ).split()
 
     if args.verbose:
-        snakemake_cmd.append("--printshellcmds")
+        snakemake_cmd.append("--printshellcmds --use-conda --conda-prefix  /data/processing/conda/envs --create-envs-only ")
 
     if not args.local:
-        snakemake_cmd += ["--cluster 'SlurmEasy --threads {threads} --mem-per-cpu 30G --log", args.cluster_logs_dir, "--name {rule}.snakemake'"]
+        snakemake_cmd += ["--cluster 'SlurmEasy --threads {threads} --mem-per-cpu 30G --log ", args.cluster_logs_dir, "--name {rule}.snakemake'"]
 
     snakemake_log = "2>&1 | tee -a {}/Hi-C.log".format(args.outdir).split()
 
