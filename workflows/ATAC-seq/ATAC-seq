@@ -175,20 +175,20 @@ def main():
     if args.cluster_configfile:
         user_cluster_config = cf.load_configfile(args.cluster_configfile,False)
         cluster_config = cf.merge_dicts(cluster_config, user_cluster_config) # 2) merge/override variables from user_config.yaml
-    cf.write_configfile(os.path.join(args.outdir,'cluster_config.yaml'),cluster_config)
+    cf.write_configfile(os.path.join(args.outdir,'ATAC-seq.cluster_config.yaml'),cluster_config)
 
     snakemake_module_load = "module load snakemake/5.1.2"
 
     snakemake_module_load = (snakemake_module_load + " && ").split()
 
     snakemake_cmd = """
-                    snakemake {snakemake_options} --latency-wait {latency_wait} --snakefile {snakefile} --jobs {max_jobs} --directory {outdir} --configfile {configfile}
+                    snakemake {snakemake_options} --latency-wait {latency_wait} --snakefile {snakefile} --jobs {max_jobs} --directory {workingdir} --configfile {configfile}
                     """.format( latency_wait = cluster_config["snakemake_latency_wait"],
                                 snakefile = os.path.join(args.this_script_dir, "Snakefile"),
                                 max_jobs = args.max_jobs,
-                                outdir = args.outdir,
+                                workingdir = args.workingdir,
                                 snakemake_options=str(args.snakemake_options or ''),
-                                configfile = os.path.join(args.outdir,'config.yaml'),
+                                configfile = os.path.join(args.outdir,'ATAC-seq.config.yaml'),
                               ).split()
 
     if args.verbose:
@@ -196,7 +196,7 @@ def main():
 
     if not args.local:
         snakemake_cmd += ["--cluster-config",
-                         os.path.join(args.outdir,'cluster_config.yaml'),
+                         os.path.join(args.outdir,'ATAC-seq.cluster_config.yaml'),
                          "--cluster", "'"+cluster_config["snakemake_cluster_cmd"],
                          args.cluster_logs_dir, "--name {rule}.snakemake'"]
 
