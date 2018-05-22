@@ -45,7 +45,7 @@ paired = True
 fragment_length = cf.get_fragment_length("Picard_qc/InsertSizeMetrics/"+chip_samples[0]+".insert_size_metrics.txt")
 if sample_info:
     include: os.path.join(maindir, "shared", "rules", "CSAW.snakefile")
-print(samples)
+
 ## add outputs as asked
 def run_deepTools_allelic():
     file_list = []
