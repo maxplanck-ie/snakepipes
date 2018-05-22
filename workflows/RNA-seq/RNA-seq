@@ -306,7 +306,7 @@ def main():
         cluster_config = cf.merge_dicts(cluster_config, user_cluster_config) # 2) form user_config.yaml
     cf.write_configfile(os.path.join(args.outdir,'cluster_config.yaml'),cluster_config)
 
-    snakemake_module_load = "module load snakemake/3.12.0 "
+    snakemake_module_load = "module load snakemake/5.1.2 "
 
     if not args.local:
         snakemake_module_load += cluster_config["cluster_module_load"]
