@@ -44,7 +44,7 @@ rule bamCoverage_filtered:
     threads: 16
     run:
 #        cmd = (bamcov_cmd() + " {params.blacklist}")
-        cmd = (bamcov_cmd())        
+        cmd = (bamcov_cmd())
         shell(cmd)
 
 # TODO: include blacklist!? use deeptools bam filtering options?
@@ -132,7 +132,6 @@ rule plotCorrelation_pearson:
         "deepTools_qc/multiBamSummary/read_coverage.bins.npz"
     output:
         heatpng = "deepTools_qc/plotCorrelation/correlation.pearson.read_coverage.heatmap.png",
-#        scatterpng = "deepTools_qc/plotCorrelation/correlation.pearson.read_coverage.scatterplot.png",
         tsv = "deepTools_qc/plotCorrelation/correlation.pearson.read_coverage.tsv"
     log:
         "deepTools_qc/logs/plotCorrelation_pearson.log"
@@ -147,7 +146,6 @@ rule plotCorrelation_spearman:
         "deepTools_qc/multiBamSummary/read_coverage.bins.npz"
     output:
         heatpng = "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage.heatmap.png",
-#        scatterpng = "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage.scatterplot.png",
         tsv = "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage.tsv"
     log:
         "deepTools_qc/logs/plotCorrelation_spearman.log"
@@ -179,4 +177,3 @@ rule estimate_read_filtering:
         "deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt"
     run:
         shell(estimateReadFiltering_cmd())
-
