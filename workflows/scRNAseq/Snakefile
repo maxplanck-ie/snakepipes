@@ -96,17 +96,17 @@ localrules: annot, FASTQ
 rule all:
     input:
         expand("FASTQ/{sample}{read}.fastq.gz", sample = samples, read = reads),
-#        expand("FASTQ_barcoded/{sample}.fastq.gz", sample = samples),
-#        run_Trimming(trim),
-#        expand("FastQC/{sample}{read}_fastqc.html", sample = samples, read=reads),
-#        expand(mapping_prg+"/{sample}.bam", sample = samples),
-#        expand(mapping_prg+"/{sample}.bam.bai", sample = samples),
-#        expand("Counts/{sample}.cout.csv",sample = samples),
-#        expand("Counts/{sample}.coutt.csv",sample = samples),
-#        expand("Counts/{sample}.featureCounts_summary.txt",sample = samples),
-#        "Results/all_samples.gencode_genomic.coutt_merged.csv",
-#        "QC_report/QC_report.all_samples.libstats_reads.tsv",
-#        run_deeptools_qc(),
+        expand("FASTQ_barcoded/{sample}.fastq.gz", sample = samples),
+        run_Trimming(trim),
+        expand("FastQC/{sample}{read}_fastqc.html", sample = samples, read=reads),
+        expand(mapping_prg+"/{sample}.bam", sample = samples),
+        expand(mapping_prg+"/{sample}.bam.bai", sample = samples),
+        expand("Counts/{sample}.cout.csv",sample = samples),
+        expand("Counts/{sample}.coutt.csv",sample = samples),
+        expand("Counts/{sample}.featureCounts_summary.txt",sample = samples),
+        "Results/all_samples.gencode_genomic.coutt_merged.csv",
+        "QC_report/QC_report.all_samples.libstats_reads.tsv",
+        run_deeptools_qc(),
 rule annot:
     input:
         "Annotation/genes.filtered.bed",
