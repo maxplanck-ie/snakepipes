@@ -1,5 +1,5 @@
 ##sambamba is used for marking up duplications
-
+## takes the input from RNA mapping or DNA mapping snakefile
 rule sambamba_markdup:
        input:
            mapping_prg+"/{sample}.sorted.bam"
@@ -21,3 +21,11 @@ rule sambamba_flagstat:
            sambamba_path+"sambamba_v0.6.6 flagstat -p"
            " {input}"
            " | tee {output}"
+
+rule samtools_index:
+    input:
+        mapping_prg+"/{sample}.bam"
+    output:
+        mapping_prg+"/{sample}.bam.bai"
+    shell:
+        samtools_path+"samtools index {input}"

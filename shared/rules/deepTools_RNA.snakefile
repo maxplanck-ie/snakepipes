@@ -127,7 +127,8 @@ rule estimateReadFiltering:
 #######InsertSizeMetrics###############
 rule bamPE_fragment_size:
    input:
-       bams = expand(mapping_prg+"/{sample}.bam", sample=samples)
+       bams = expand(mapping_prg+"/{sample}.bam", sample=samples),
+       bais = expand(mapping_prg+"/{sample}.bam.bai", sample=samples)
    output:
        "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv"
    log:

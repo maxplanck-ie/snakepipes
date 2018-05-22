@@ -18,6 +18,29 @@ globals().update(cf.load_organism_data(genome,maindir,config["verbose"]))
 include: os.path.join(workflow.basedir, "internals.snakefile")
 
 # do workflow specific stuff now
+
+### include modules of other snakefiles ########################################
+################################################################################
+## FASTQ: either downsample FASTQ files or create symlinks to input files
+include: os.path.join(maindir, "shared", "rules", "FASTQ.snakefile")
+
+## FastQC
+if fastqc:
+    include: os.path.join(maindir, "shared", "rules", "FastQC.snakefile")
+
+## Trim
+if trim:
+    include: os.path.join(maindir, "shared", "rules", "TrimGalore.snakefile")
+
+## filtered annotation (GTF)
+include: os.path.join(maindir, "shared", "rules", "filter_annotation.snakefile")
+
+# deeptools cmds
+include: os.path.join(maindir, "shared", "deeptools_cmds.snakefile")
+## bamCoverage_RPKM
+include: os.path.join(maindir, "shared", "rules", "deepTools_RNA.snakefile")
+
+## add mode-specific files
 if "allelic-mapping" in mode:
     # Updated global vars if mode = "allelic-mapping"
     if allele_mode == 'create_and_map':
@@ -47,38 +70,18 @@ else:
     ## featureCounts
     include: os.path.join(maindir, "shared", "rules", "featureCounts.snakefile")
 
-### include modules of other snakefiles ########################################
-################################################################################
-## FASTQ: either downsample FASTQ files or create symlinks to input files
-include: os.path.join(maindir, "shared", "rules", "FASTQ.snakefile")
-
-## FastQC
-if fastqc:
-    include: os.path.join(maindir, "shared", "rules", "FastQC.snakefile")
-
-## Trim
-if trim:
-    include: os.path.join(maindir, "shared", "rules", "TrimGalore.snakefile")
-
-## filtered annotation (GTF)
-include: os.path.join(maindir, "shared", "rules", "filter_annotation.snakefile")
 
 ## Salmon
 if "mapping-free" in mode:
     include: os.path.join(maindir, "shared", "rules", "Salmon.snakefile")
+    ## Sleuth (on Salmon)
+    if sample_info:
+        include: os.path.join(maindir, "shared", "rules", "sleuth.snakefile")
 
-## Sleuth (on Salmon)
-if "mapping-free" in mode and sample_info:
-    include: os.path.join(maindir, "shared", "rules", "sleuth.snakefile")
 ## Sambamba
 if "mapping" in mode or "allelic-mapping" in mode:
     include:os.path.join(maindir, "shared", "rules", "sambamba.snakefile")
     include:os.path.join(maindir, "shared", "rules", "RNA-seq_qc_report.snakefile")
-# deeptools cmds
-include: os.path.join(maindir, "shared", "deeptools_cmds.snakefile")
-
-## bamCoverage_RPKM
-include: os.path.join(maindir, "shared", "rules", "deepTools_RNA.snakefile")
 
 ## DESeq2
 if sample_info:
@@ -209,11 +212,11 @@ def run_deeptools_qc():
 
 def run_GenomicContamination():
     if genomic_contamination:
-#       file_list = [expand("GenomicContamination/{sample}.featurecounts.txt", sample = samples)]
        file_list = ["GenomicContamination/genomic_contamination_featurecount_report.tsv"]
        return (file_list)
     else:
        return([])
+
 ### execute before  starts #####################################################
 ################################################################################
 onstart:
@@ -246,7 +249,6 @@ rule all:
         expand("FASTQ/{sample}{read}.fastq.gz", sample = samples, read = reads),
         run_FastQC(fastqc),
         run_Trimming(trim, fastqc),
-
         "Annotation/genes.annotated.bed",
         "Annotation/genes.filtered.bed",
         "Annotation/genes.filtered.saf",    # this file is used for featureCounts later on!

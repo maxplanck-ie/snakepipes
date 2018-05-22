@@ -17,10 +17,13 @@ if mapping_prg.upper().find("HISAT2") >=0:
             params:
                 input_splice = known_splicesites,
                 hisat_options = str(hisat_options or ''),
-                rna_strandness = rna_strandness
+                rna_strandness = rna_strandness,
+                samsort_memory = '2G'
             benchmark:
                 mapping_prg+"/.benchmark/HISAT2.{sample}.benchmark"
             threads: 10
+            resources:
+                mem_mb=4000
             shell:
                 hisat2_path+"hisat2 "
                 "-p {threads} "
@@ -35,7 +38,8 @@ if mapping_prg.upper().find("HISAT2") >=0:
                 "--al-conc-gz {output.alconc} "
                 "2> {output.align_summary} | "
                 ""+samtools_path+"samtools view -Sb - | "
-                ""+samtools_path+"samtools sort -m 2G -T ${{TMPDIR}}{wildcards.sample} -@ 2 -O bam - > {output.bam} "
+                ""+samtools_path+"samtools sort -m {params.samsort_memory} "
+                "-T ${{TMPDIR}}{wildcards.sample} -@ {threads} -O bam - > {output.bam} "
                 "&& touch {output.unconc} {output.alconc} "
     else:
         rule HISAT2:
@@ -43,7 +47,7 @@ if mapping_prg.upper().find("HISAT2") >=0:
                 fastq_dir+"/{sample}.fastq.gz"
             output:
                 align_summary = mapping_prg+"/{sample}.HISAT2_summary.txt",
-                bam = mapping_prg+"/{sample}.sorted.bam",
+                bam = temp(mapping_prg+"/{sample}.sorted.bam"),
                 splice = mapping_prg+"/{sample}/splice_sites.txt",
                 met = mapping_prg+"/{sample}/metrics.txt",
                 un = mapping_prg+"/{sample}/un.fastq.gz",
@@ -51,7 +55,8 @@ if mapping_prg.upper().find("HISAT2") >=0:
             params:
                 input_splice = known_splicesites,
                 hisat_options = str(hisat_options or ''),
-                rna_strandness = rna_strandness
+                rna_strandness = rna_strandness,
+                samsort_memory = '2G'
             benchmark:
                 mapping_prg+"/.benchmark/HISAT2.{sample}.benchmark"
             threads: 10
@@ -69,7 +74,8 @@ if mapping_prg.upper().find("HISAT2") >=0:
                 "--al-gz {output.al} "
                 "2> {output.align_summary} | "
                 ""+samtools_path+"samtools view -Sb - | "
-                ""+samtools_path+"samtools sort -m 2G -T ${{TMPDIR}}{wildcards.sample} -@ 2 -O bam - > {output.bam} "
+                ""+samtools_path+"samtools sort -m {params.samsort_memory} "
+                "-T ${{TMPDIR}}{wildcards.sample} -@ {threads} -O bam - > {output.bam} "
                 "&& touch {output.un} {output.al} "
 
 
@@ -97,7 +103,9 @@ elif mapping_prg.upper().find("STAR") >=0:
                 "--runThreadN {threads} "
                 "{params.star_options} "
                 "--sjdbOverhang 100 "
-                "--readFilesCommand zcat --outSAMunmapped Within --outSAMtype BAM SortedByCoordinate "
+                "--readFilesCommand zcat "
+                "--outSAMunmapped Within "
+                "--outSAMtype BAM SortedByCoordinate "
                 "--sjdbGTFfile {params.gtf} "
                 "--genomeDir {params.index} "
                 "--readFilesIn {input.r1} {input.r2} "
@@ -125,20 +133,11 @@ elif mapping_prg.upper().find("STAR") >=0:
                 "--runThreadN {threads} "
                 "{params.star_options} "
                 "--sjdbOverhang 100 "
-                "--readFilesCommand zcat --outSAMunmapped Within --outSAMtype BAM SortedByCoordinate "
+                "--readFilesCommand zcat "
+                "--outSAMunmapped Within "
+                "--outSAMtype BAM SortedByCoordinate "
                 "--sjdbGTFfile {params.gtf} "
                 "--genomeDir {params.index} "
                 "--readFilesIn {input} "
                 "--outFileNamePrefix {params.prefix} "
                 "&& mv {params.prefix}Aligned.sortedByCoord.out.bam {output.bam} "
-
-
-### samtools_index #############################################################
-
-rule BAM_index:
-    input:
-        mapping_prg+"/{sample}.bam"
-    output:
-        mapping_prg+"/{sample}.bam.bai"
-    shell:
-        samtools_path+"samtools index {input}"

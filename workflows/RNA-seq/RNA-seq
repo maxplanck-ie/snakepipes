@@ -78,7 +78,7 @@ def parse_args(defaults={"verbose":None,"configfile":None,"max_jobs":None,"snake
     general.add_argument("--cluster_configfile",
                         dest="cluster_configfile",
                         help="configuration file for cluster usage. In absence, the default options "
-                        "from shared/cluster.yaml and [workflow]/cluster.yaml would be selected (default: '%(default)s')",
+                        "from shared/cluster.yaml would be selected (default: '%(default)s')",
                         default=None)
 
 
@@ -303,7 +303,7 @@ def main():
 
     if args.cluster_configfile:
         user_cluster_config = cf.load_configfile(args.cluster_configfile,False)
-        cluster_config = cf.merge_dicts(cluster_config, user_cluster_config) # 2) form user_config.yaml
+        cluster_config = cf.merge_dicts(cluster_config, user_cluster_config) # 2) merge/override variables from user_config.yaml
     cf.write_configfile(os.path.join(args.outdir,'cluster_config.yaml'),cluster_config)
 
     snakemake_module_load = "module load snakemake/3.12.0 "
