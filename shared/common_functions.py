@@ -8,7 +8,7 @@ import yaml
 
 
 def get_snakepipes_path():
-       
+
     return os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 
 
@@ -28,7 +28,8 @@ def convert_library_type(R_path, paired, from_library_type, from_prg, to_prg, rs
 def merge_dicts(x, y):
     z = {}
     z = x.copy()
-    if y: z.update(y)
+    if y: 
+        z.update(y)
     return z
 
 
