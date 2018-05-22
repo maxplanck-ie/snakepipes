@@ -12,10 +12,11 @@
 ################################################################################
 ## General/Snakemake parameters, only used/set by wrapper or in Snakemake cmdl, but not in Snakefile
 configfile:
-tempdir: /data/extended/
+cluster_configfile:
 local: false
 max_jobs: 5
 snakemake_options:
+tempdir: /data/extended/
 ## workingdir need to be required DNA-mapping output dir, 'outdir' is set to workingdir internally
 workingdir:
 ## preconfigured target genomes (mm9,mm10,dm3,...) , see /path/to/snakemake_workflows/shared/organisms/
