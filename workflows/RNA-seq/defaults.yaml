@@ -15,7 +15,7 @@ outdir:
 configfile:
 local: False
 max_jobs: 5
-snakemake_options:
+snakemake_options: '--use-conda --conda-prefix /data/processing/conda/env'
 tempdir: /data/extended/
 ## directory with fastq files
 indir:
