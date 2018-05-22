@@ -1,3 +1,4 @@
+CONDA_SHARED_ENV = "shared_environment.yaml"
 
 rule bamCoverage_RPKM:
     input:
@@ -5,6 +6,8 @@ rule bamCoverage_RPKM:
         bai = mapping_prg+"/{sample}.bam.bai"
     output:
         "bamCoverage/{sample}.RPKM.bw"
+    conda:
+        CONDA_SHARED_ENV
     params:
         bw_binsize = bw_binsize
     log:
@@ -21,6 +24,8 @@ rule bamCoverage_raw:
         bai = mapping_prg+"/{sample}.bam.bai"
     output:
         "bamCoverage/{sample}.coverage.bw"
+    conda:
+        CONDA_SHARED_ENV
     params:
         bw_binsize = bw_binsize
     log:
@@ -40,6 +45,8 @@ rule plotEnrichment:
     output:
         png = "deepTools_qc/plotEnrichment/plotEnrichment.png",
         tsv = "deepTools_qc/plotEnrichment/plotEnrichment.tsv",
+    conda:
+        CONDA_SHARED_ENV
     params:
         labels = " ".join(samples),
     log:
@@ -57,6 +64,8 @@ rule multiBigwigSummary_bed:
         bed = "Annotation/genes.filtered.bed",
     output:
         "deepTools_qc/multiBigwigSummary/coverage.bed.npz"
+    conda:
+        CONDA_SHARED_ENV
     params:
         labels = " ".join(samples)
     log:
@@ -76,6 +85,8 @@ rule plotCorr_bed_pearson:
         heatpng = "deepTools_qc/plotCorrelation/correlation.pearson.bed_coverage.heatmap.png",
         #scatterpng = "deepTools_qc/plotCorrelation/correlation.pearson.bed_coverage.scatterplot.png",
         tsv = "deepTools_qc/plotCorrelation/correlation.pearson.bed_coverage.tsv"
+    conda:
+        CONDA_SHARED_ENV
     log:
         "deepTools_qc/logs/plotCorrelation_pearson.log"
     benchmark:
@@ -92,6 +103,8 @@ rule plotCorr_bed_spearman:
         heatpng = "deepTools_qc/plotCorrelation/correlation.spearman.bed_coverage.heatmap.png",
         #scatterpng = "deepTools_qc/plotCorrelation/correlation.spearman.bed_coverage.scatterplot.png",
         tsv = "deepTools_qc/plotCorrelation/correlation.spearman.bed_coverage.tsv"
+    conda:
+        CONDA_SHARED_ENV
     log:
         "deepTools_qc/logs/plotCorrelation_spearman.log"
     benchmark:
@@ -107,6 +120,8 @@ rule plotPCA:
         "deepTools_qc/multiBigwigSummary/coverage.bed.npz"
     output:
         "deepTools_qc/plotPCA/PCA.bed_coverage.png"
+    conda:
+        CONDA_SHARED_ENV
     log:
         "deepTools_qc/logs/plotPCA.log"
     benchmark:
@@ -116,23 +131,27 @@ rule plotPCA:
 
 ########deepTools estimateReadFiltering#########################
 rule estimateReadFiltering:
-   input:
-       bam = mapping_prg+"/{sample}.bam",
-       bai = mapping_prg+"/{sample}.bam.bai",
-   output:
-       "deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt"
-   run:
-      shell(estimateReadFiltering_cmd())
+    input:
+        bam = mapping_prg+"/{sample}.bam",
+        bai = mapping_prg+"/{sample}.bam.bai",
+    output:
+        "deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt"
+    conda:
+        CONDA_SHARED_ENV
+    run:
+        shell(estimateReadFiltering_cmd())
 
 #######InsertSizeMetrics###############
 rule bamPE_fragment_size:
-   input:
-       bams = expand(mapping_prg+"/{sample}.bam", sample=samples),
-       bais = expand(mapping_prg+"/{sample}.bam.bai", sample=samples)
-   output:
-       "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv"
-   log:
-       "deepTools_qc/bamPEFragmentSize/log"
-   threads: 24
-   run:
-       shell(bamPEFragmentSize_cmd())
+    input:
+        bams = expand(mapping_prg+"/{sample}.bam", sample=samples),
+        bais = expand(mapping_prg+"/{sample}.bam.bai", sample=samples)
+    output:
+        "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv"
+    conda:
+        CONDA_SHARED_ENV
+    log:
+        "deepTools_qc/bamPEFragmentSize/log"
+    threads: 24
+    run:
+        shell(bamPEFragmentSize_cmd())

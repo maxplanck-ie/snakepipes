@@ -1,5 +1,5 @@
-
 ### deepTools bamCoverage on allelic BAM files ################################
+CONDA_SHARED_ENV = "shared_environment.yaml"
 
 rule bamCoverage_allelic:
     input:
@@ -7,6 +7,8 @@ rule bamCoverage_allelic:
         bai = "allelic_bams/{sample}.{suffix}.sorted.bam.bai"
     output:
         "bamCoverage/allele_specific/{sample}.{suffix}.seq_depth_norm.bw"
+    conda:
+        CONDA_SHARED_ENV
     params:
         bw_binsize = bw_binsize,
         genome_size = int(genome_size),
@@ -36,6 +38,8 @@ rule computeGCBias_allelic:
     output:
         png = "deepTools_qc/computeGCBias/{sample}.{suffix}.GCBias.png",
         tsv = "deepTools_qc/computeGCBias/{sample}.{suffix}.GCBias.freq.tsv"
+    conda:
+        CONDA_SHARED_ENV
     params:
         paired = paired,
         fragment_length = fragment_length,
@@ -64,6 +68,8 @@ rule plotCoverage_allelic:
         bais = expand("allelic_bams/{sample}.{suffix}.sorted.bam.bai", sample=samples, suffix = ['genome1', 'genome2'])
     output:
         "deepTools_qc/plotCoverage/read_coverage_allelic.png"
+    conda:
+        CONDA_SHARED_ENV
     params:
         labels = " ".join(samples),
         read_extension = "--extendReads" if paired
@@ -84,6 +90,8 @@ rule multiBamSummary_allelic:
         bais = expand("allelic_bams/{sample}.{suffix}.sorted.bam.bai", sample=samples, suffix = ['genome1', 'genome2'])
     output:
         "deepTools_qc/multiBamSummary/read_coverage_allelic.bins.npz"
+    conda:
+        CONDA_SHARED_ENV
     params:
         labels = " ".join(expand('{sample}.{suffix}', sample=samples, suffix = ['genome1', 'genome2']) ),
         blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed
@@ -107,6 +115,8 @@ rule plotCorrelation_pearson_allelic:
     output:
         heatpng = "deepTools_qc/plotCorrelation/correlation.pearson.read_coverage_allelic.heatmap.png",
         tsv = "deepTools_qc/plotCorrelation/correlation.pearson.read_coverage_allelic.tsv"
+    conda:
+        CONDA_SHARED_ENV
     log:
         "deepTools_qc/logs/plotCorrelation_pearson_allelic.log"
     benchmark:
@@ -121,6 +131,8 @@ rule plotCorrelation_spearman_allelic:
     output:
         heatpng = "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage_allelic.heatmap.png",
         tsv = "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage_allelic.tsv"
+    conda:
+        CONDA_SHARED_ENV
     log:
         "deepTools_qc/logs/plotCorrelation_spearman_allelic.log"
     benchmark:
@@ -134,6 +146,8 @@ rule plotPCA_allelic:
         "deepTools_qc/multiBamSummary/read_coverage_allelic.bins.npz"
     output:
         "deepTools_qc/plotPCA/PCA.read_coverage_allelic.png"
+    conda:
+        CONDA_SHARED_ENV
     log:
         "deepTools_qc/logs/plotPCA_allelic.log"
     benchmark:

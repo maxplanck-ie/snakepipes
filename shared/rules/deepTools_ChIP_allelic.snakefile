@@ -1,4 +1,5 @@
 ### deepTools bamCompare log2ratio #######################################################
+CONDA_SHARED_ENV = "shared_environment.yaml"
 
 rule bamCompare_log2_genome1:
     input:
@@ -8,6 +9,7 @@ rule bamCompare_log2_genome1:
         control_bai = lambda wildcards: "allelic_bams/"+get_control(wildcards.chip_sample)+".genome1.sorted.bam.bai"
     output:
         "deepTools_ChIP/bamCompare/allele_specific/{chip_sample}.genome1.log2ratio.over_{control_name}.bw"#, chip_sample = chip_samples, suffix = ['genome1', 'genome2'])
+    conda: CONDA_SHARED_ENV
     params:
         bw_binsize = bw_binsize,
         ignoreForNorm = "--ignoreForNormalization " + ignore_forNorm if ignore_forNorm else "",
@@ -31,6 +33,7 @@ rule bamCompare_log2_genome2:
         control_bai = lambda wildcards: "allelic_bams/"+get_control(wildcards.chip_sample)+".genome2.sorted.bam.bai"
     output:
         "deepTools_ChIP/bamCompare/allele_specific/{chip_sample}.genome2.log2ratio.over_{control_name}.bw"
+    conda: CONDA_SHARED_ENV
     params:
         bw_binsize = bw_binsize,
         ignoreForNorm = "--ignoreForNormalization " + ignore_forNorm if ignore_forNorm else "",
@@ -55,6 +58,7 @@ rule plotEnrichment_allelic:
     output:
         png = "deepTools_ChIP/plotEnrichment/plotEnrichment.gene_features_allelic.png",
         tsv = "deepTools_ChIP/plotEnrichment/plotEnrichment.gene_features_allelic.tsv",
+    conda: CONDA_SHARED_ENV
     params:
         genes_gtf = genes_gtf,
         labels = " ".join(expand("{sample}_{suffix}", sample = all_samples, suffix = ['genome1', 'genome2'])),
@@ -79,6 +83,7 @@ rule plotFingerprint_allelic:
         bais = expand("allelic_bams/{sample}.{suffix}.sorted.bam.bai", sample = all_samples, suffix = ['genome1', 'genome2'])
     output:
         metrics = "deepTools_ChIP/plotFingerprint/plotFingerprint.metrics_allelic.txt"
+    conda: CONDA_SHARED_ENV
     params:
         labels = " ".join(all_samples),
         blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed
