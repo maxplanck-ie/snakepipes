@@ -106,7 +106,6 @@ rule plotCorrelation_pearson_allelic:
         "deepTools_qc/multiBamSummary/read_coverage_allelic.bins.npz"
     output:
         heatpng = "deepTools_qc/plotCorrelation/correlation.pearson.read_coverage_allelic.heatmap.png",
-        scatterpng = "deepTools_qc/plotCorrelation/correlation.pearson.read_coverage_allelic.scatterplot.png",
         tsv = "deepTools_qc/plotCorrelation/correlation.pearson.read_coverage_allelic.tsv"
     log:
         "deepTools_qc/logs/plotCorrelation_pearson_allelic.log"
@@ -121,7 +120,6 @@ rule plotCorrelation_spearman_allelic:
         "deepTools_qc/multiBamSummary/read_coverage_allelic.bins.npz"
     output:
         heatpng = "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage_allelic.heatmap.png",
-        scatterpng = "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage_allelic.scatterplot.png",
         tsv = "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage_allelic.tsv"
     log:
         "deepTools_qc/logs/plotCorrelation_spearman_allelic.log"
