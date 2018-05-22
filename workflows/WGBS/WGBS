@@ -276,7 +276,7 @@ def main():
                                 snakefile = os.path.join(args.this_script_dir, "Snakefile"),
                                 max_jobs = args.max_jobs,
                                 wdir = args.wdir,
-                                snakemake_options=str(args.snakemake_options or ''),
+                                snakemake_options = str(args.snakemake_options or ''),
                                 configfile = os.path.join(args.outdir,'config.yaml'),
                               ).split()
 
