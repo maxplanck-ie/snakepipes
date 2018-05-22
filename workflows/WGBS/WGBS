@@ -266,7 +266,9 @@ def main():
     cf.write_configfile(os.path.join(args.wdir, 'cluster_config.yaml'), cluster_config)
 
     if not args.local:
-        snakemake_module_load = "module load snakemake/3.12.0 " 
+<<<<<<< HEAD
+        snakemake_module_load = "module load snakemake/5.1.2 "
+>>>>>>> 589b6f47b5d6077eb40968714c4ce718ebc3e168
         snakemake_module_load += cluster_config["cluster_module_load"]
         snakemake_module_load = (snakemake_module_load + " && ").split()
 
