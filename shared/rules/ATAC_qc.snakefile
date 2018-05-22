@@ -55,7 +55,7 @@ rule MACS2_peak_qc:
     input:
         bam = "filtered_bam/{sample}.filtered.bam",
         aln_metrics = "Picard_qc/AlignmentSummaryMetrics/{sample}.alignment_summary_metrics.txt",
-        xls = os.path.join(outdir_MACS2, '{sample}_peaks.xls')
+        xls = os.path.join(outdir_MACS2, '{sample}.filtered.BAM_peaks.xls')
     output:
         qc = os.path.join(outdir_ATACqc, "{sample}.filtered.BAM_peaks.qc.txt")
     params:
