@@ -46,18 +46,14 @@ rule computeGCBias_allelic:
         genome_2bit = genome_2bit,
         blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed
                     else ""
+        median_fragment_length = cf.get_fragment_length(input.insert_size_metrics) if paired else fragment_length
     log:
         "deepTools_qc/logs/computeGCBias.{sample}.{suffix}.log"
     benchmark:
         "deepTools_qc/.benchmark/computeGCBias.{sample}.{suffix}.benchmark"
     threads: 16
-    run:
-        if params.paired:
-            median_fragment_length = cf.get_fragment_length(input.insert_size_metrics)
-        else:
-            median_fragment_length = params.fragment_length
-
-        shell(gcbias_cmd(median_fragment_length))
+    params: median_fragment_length=cf.get_fragment_length(input.insert_size_metrics) if paired else params.fragment_length
+    shell: gcbias_cmd
 
 ### deepTools plotCoverage #####################################################
 
@@ -78,8 +74,7 @@ rule plotCoverage_allelic:
     benchmark:
         "deepTools_qc/.benchmark/plotCoverage_allelic.benchmark"
     threads: 24
-    run:
-         shell(plotCoverage_cmd())
+    shell: plotCoverage_cmd
 
 ### deepTools multiBamSummary ##################################################
 
@@ -102,8 +97,7 @@ rule multiBamSummary_allelic:
     benchmark:
         "deepTools_qc/.benchmark/multiBamSummary_allelic.benchmark"
     threads: 24
-    run:
-        shell(multiBamSummary_cmd())
+    shell: multiBamSummary_cmd
 
 ### deepTools plotCorrelation ##################################################
 
@@ -120,8 +114,8 @@ rule plotCorrelation_pearson_allelic:
         "deepTools_qc/logs/plotCorrelation_pearson_allelic.log"
     benchmark:
         "deepTools_qc/.benchmark/plotCorrelation_pearson_allelic.benchmark"
-    run:
-        shell(plotCorr_cmd('fragment'))
+    params: label='fragment'
+    shell: plotCorr_cmd
 
 # Spearman: heatmap, scatterplot and correlation matrix
 rule plotCorrelation_spearman_allelic:
@@ -136,8 +130,8 @@ rule plotCorrelation_spearman_allelic:
         "deepTools_qc/logs/plotCorrelation_spearman_allelic.log"
     benchmark:
         "deepTools_qc/.benchmark/plotCorrelation_spearman_allelic.benchmark"
-    run:
-        shell(plotCorrSP_cmd('fragment'))
+    params: label='fragment'
+    shell: plotCorrSP_cmd
 
 ### deepTools plotPCA ##########################################################
 rule plotPCA_allelic:
@@ -151,5 +145,5 @@ rule plotPCA_allelic:
         "deepTools_qc/logs/plotPCA_allelic.log"
     benchmark:
         "deepTools_qc/.benchmark/plotPCA_allelic.benchmark"
-    run:
-        shell(plotPCA_cmd('fragment'))
+    params: label='fragment'
+    shell: plotPCA_cmd

@@ -39,6 +39,11 @@ bamcov_raw_cmd = """
                 -p {{threads}} &> {{log}}"))
     """
 
+# bamCoverage RPKM
+bamcov_RPKM_cmd = """
+    bamCoverage -b {input.bam} -o {output} --binSize {params.bw_binsize} -p {threads} --normalizeUsing RPKM &> {log}
+    """
+
 # bamCoverage CHIP
 bamcov_cmd = """
     bamCoverage -b {{input.bam}} \
@@ -50,21 +55,18 @@ bamcov_cmd = """
                 {{params.read_extension}} &> {{log}}
     """
 
-## computeGC bias (DNA)
-def gcbias_cmd(fragment_length):
-            return(
-                (deepTools_path+"computeGCBias " +
-                "-b {{input.bam}} " +
-                "--biasPlot {{output.png}} " +
-                "--GCbiasFrequenciesFile {{output.tsv}} " +
-                "--effectiveGenomeSize {{params.genome_size}} " +
-                "--genome {{params.genome_2bit}} " +
-                "--fragmentLength "+str(fragment_length)+" " +
-                "--sampleSize 10000000 " + # very long runtime with default sample size
-                "{{params.blacklist}}" +
-                "-p {{threads}}" +
-                "&> {{log}}")
-                )
+## computeGC bias (DNA), requires params.median_fragment_length
+gcbias_cmd = """
+    computeGCBias -b {{input.bam}} \
+                --biasPlot {{output.png}} \
+                --GCbiasFrequenciesFile {{output.tsv}} \
+                --effectiveGenomeSize {{params.genome_size}} \
+                --genome {{params.genome_2bit}} \
+                --fragmentLength {{params.median_fragment_length}}  \
+                --sampleSize 10000000 \
+                {{params.blacklist}} \
+                -p {{threads}} &> {{log}}
+    """
 
 # plot Enrichment (RNAseq)
 plotEnrich_cmd = """

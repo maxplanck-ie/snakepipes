@@ -15,9 +15,8 @@ rule bamCoverage_RPKM_allelic:
     benchmark:
         "bamCoverage/allele_specific/.benchmark/bamCoverage_RPKM.{sample}.{suffix}.benchmark"
     threads: 8
-    shell: """
-        bamCoverage -b {input.bam} -o {output} --binSize {params.bw_binsize} -p {threads} --normalizeUsing RPKM &> {log}
-        """
+    shell: bamcov_RPKM_cmd
+
 
 rule bamCoverage_raw_allelic:
     input:
@@ -34,8 +33,8 @@ rule bamCoverage_raw_allelic:
     benchmark:
         "bamCoverage/allele_specific.benchmark/bamCoverage_coverage.{sample}.benchmark"
     threads: 8
-    run:
-        shell(bamcov_raw_cmd())
+    shell: bamcov_raw_cmd
+
 
 rule plotEnrichment_allelic:
     input:
@@ -55,8 +54,7 @@ rule plotEnrichment_allelic:
     benchmark:
         "deepTools_qc/.benchmark/plotEnrichment_allelic.benchmark"
     threads: 8
-    run:
-        shell(plotEnrich_cmd())
+    shell: plotEnrich_cmd
 
 
 rule multiBigwigSummary_bed_allelic:
@@ -74,8 +72,7 @@ rule multiBigwigSummary_bed_allelic:
     benchmark:
         "deepTools_qc/.benchmark/multiBigwigSummary.bed_allelic.benchmark"
     threads: 8
-    run:
-        shell(multiBWsum_bed_cmd())
+    shell: multiBWsum_bed_cmd
 
 
 # Pearson: heatmap, scatterplot and correlation matrix
@@ -92,8 +89,8 @@ rule plotCorr_bed_pearson_allelic:
         "deepTools_qc/logs/plotCorrelation_pearson_allelic.log"
     benchmark:
         "deepTools_qc/.benchmark/plotCorrelation_pearson_allelic.benchmark"
-    run:
-        shell(plotCorr_cmd('gene'))
+    params: label='gene'
+    shell: plotCorr_cmd
 
 
 # Spearman: heatmap, scatterplot and correlation matrix
@@ -110,9 +107,8 @@ rule plotCorr_bed_spearman_allelic:
         "deepTools_qc/logs/plotCorrelation_spearman_allelic.log"
     benchmark:
         "deepTools_qc/.benchmark/plotCorrelation_spearman_allelic.benchmark"
-    run:
-        shell(plotCorrSP_cmd('gene'))
-
+    params: label='gene'
+    shell: plotCorrSP_cmd
 
 
 ### deepTools plotPCA ##########################################################
@@ -127,5 +123,5 @@ rule plotPCA_allelic:
         "deepTools_qc/logs/plotPCA_allelic.log"
     benchmark:
         "deepTools_qc/.benchmark/plotPCA_allelic.benchmark"
-    run:
-        shell(plotPCA_cmd('gene'))
+    params: label='gene'
+    shell: plotPCA_cmd

@@ -15,9 +15,8 @@ rule bamCoverage_RPKM:
     benchmark:
         "bamCoverage/.benchmark/bamCoverage_RPKM.{sample}.benchmark"
     threads: 8
-    shell: """
-        bamCoverage -b {input.bam} -o {output} --binSize {params.bw_binsize} -p {threads} --normalizeUsing RPKM &> {log}
-        """
+    shell: bamcov_RPKM_cmd
+
 
 rule bamCoverage_raw:
     input:
@@ -35,6 +34,7 @@ rule bamCoverage_raw:
         "bamCoverage/.benchmark/bamCoverage_coverage.{sample}.benchmark"
     threads: 8
     shell: bamcov_raw_cmd
+
 
 rule plotEnrichment:
     input:
@@ -111,7 +111,6 @@ rule plotCorr_bed_spearman:
     shell: plotCorrSP_cmd
 
 
-
 ### deepTools plotPCA ##########################################################
 rule plotPCA:
     input:
@@ -126,6 +125,7 @@ rule plotPCA:
         "deepTools_qc/.benchmark/plotPCA.benchmark"
     shell: plotPCA_cmd
 
+
 ########deepTools estimateReadFiltering#########################
 rule estimateReadFiltering:
     input:
@@ -136,6 +136,7 @@ rule estimateReadFiltering:
     conda:
         CONDA_SHARED_ENV
     shell: estimateReadFiltering_cmd
+
 
 #######InsertSizeMetrics###############
 rule bamPE_fragment_size:
