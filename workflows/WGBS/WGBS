@@ -215,6 +215,12 @@ def main():
     args.wdir = os.path.abspath(args.wdir)
     args.cluster_logs_dir = os.path.join(args.wdir, "cluster_logs")
 
+
+    ###conda environments:
+    CondaEnvironment=os.path.join(this_script_dir,'conda.yml')
+    SharedCondaEnvironment=os.path.join(this_script_dir,'shared_environment.yaml')
+    mCtCondaEnvironment=os.path.join(this_script_dir,'methylCtools.yaml')
+
     # we also add these paths to config, although we dont use them in the Snakefile
     args.this_script_dir = this_script_dir
     args.main_dir_path = main_dir_path
@@ -273,7 +279,7 @@ def main():
         snakemake_module_load = (snakemake_module_load + " && ").split()
 
     snakemake_cmd = """
-                    snakemake {snakemake_options} --latency-wait 300 --snakefile {snakefile} --jobs {max_jobs} --directory {wdir} --configfile {configfile}
+                    snakemake {snakemake_options} --latency-wait 300 --snakefile {snakefile} --jobs {max_jobs} --directory {wdir} --configfile {configfile} --use-conda
                     """.format(snakefile=os.path.join(args.this_script_dir, "Snakefile"),
                                max_jobs=args.max_jobs,
                                wdir=args.wdir,

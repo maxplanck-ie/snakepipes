@@ -1,5 +1,4 @@
 #run in R-3.3.1
-Rlib<-commandArgs(trailingOnly=TRUE)[4]
 #set working directory
 wdir<-commandArgs(trailingOnly=TRUE)[1]
 #system(paste0('mkdir -p ',wdir)) #for debugging
@@ -8,9 +7,9 @@ message(sprintf("working directory is %s",getwd()))
 
 
 options(stringsAsFactors=FALSE,na.rm=TRUE)
-require("limma",lib.loc=Rlib)
-library("carData",lib.loc=Rlib)
-require("car",lib.loc=Rlib)
+require("limma")
+library("carData")
+require("car")
 
 ###read in sample sheet
 
@@ -28,7 +27,7 @@ mshort<-gsub(".CpG.filt2.bed","",basename(mdir))
 
 cC<-c(rep("NULL",3),"numeric",rep("NULL",3),"character")
 
-require(data.table,lib.loc=Rlib)
+require(data.table)
 
 mlist<-vector("list",length(mdir))
 for(i in seq_along(mdir)){
@@ -57,7 +56,7 @@ if(nrow(limdat.LG.CC)==0){ message("None of the single CpG sites passed the filt
     rownames(limdat.LG.CC.logit)<-limdat.LG.CC$ms
 
 
-    require("FactoMineR",lib.loc=Rlib)
+    require("FactoMineR")
     x1<-PCA(limdat.LG.CC[,-1,with=FALSE],graph=FALSE)
 
     pdf("limdat.LG.CC.PCA.pdf",paper="a4",bg="white")
@@ -66,9 +65,9 @@ if(nrow(limdat.LG.CC)==0){ message("None of the single CpG sites passed the filt
 
 ########################## prepare density plots per group ##################################################
 
-    require("ggplot2",lib.loc=Rlib)
-    require("reshape2",lib.loc=Rlib)
-    require(dplyr,lib.loc=Rlib)
+    require("ggplot2")
+    require("reshape2")
+    require(dplyr)
 
 #calculate and save row means
     limdat.LG.CC.L<-melt(limdat.LG.CC,id.vars="ms",value.name="Beta",variable.name="SampleID")
