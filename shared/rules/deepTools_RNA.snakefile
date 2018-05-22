@@ -1,4 +1,4 @@
-CONDA_SHARED_ENV = "shared_environment.yaml"
+CONDA_SHARED_ENV = "envs/shared_environment.yaml"
 
 rule bamCoverage_RPKM:
     input:
@@ -15,8 +15,9 @@ rule bamCoverage_RPKM:
     benchmark:
         "bamCoverage/.benchmark/bamCoverage_RPKM.{sample}.benchmark"
     threads: 8
-    run:
-        shell(bamcov_rpkm_cmd())
+    shell: """
+        bamCoverage -b {input.bam} -o {output} --binSize {params.bw_binsize} -p {threads} --normalizeUsing RPKM &> {log}
+        """
 
 rule bamCoverage_raw:
     input:
@@ -33,8 +34,7 @@ rule bamCoverage_raw:
     benchmark:
         "bamCoverage/.benchmark/bamCoverage_coverage.{sample}.benchmark"
     threads: 8
-    run:
-        shell(bamcov_raw_cmd())
+    shell: bamcov_raw_cmd
 
 rule plotEnrichment:
     input:
@@ -54,8 +54,7 @@ rule plotEnrichment:
     benchmark:
         "deepTools_qc/.benchmark/plotEnrichment.benchmark"
     threads: 8
-    run:
-        shell(plotEnrich_cmd())
+    shell: plotEnrich_cmd
 
 
 rule multiBigwigSummary_bed:
@@ -73,8 +72,7 @@ rule multiBigwigSummary_bed:
     benchmark:
         "deepTools_qc/.benchmark/multiBigwigSummary.bed.benchmark"
     threads: 8
-    run:
-        shell(multiBWsum_bed_cmd())
+    shell: multiBWsum_bed_cmd
 
 
 # Pearson: heatmap, scatterplot and correlation matrix
@@ -91,8 +89,8 @@ rule plotCorr_bed_pearson:
         "deepTools_qc/logs/plotCorrelation_pearson.log"
     benchmark:
         "deepTools_qc/.benchmark/plotCorrelation_pearson.benchmark"
-    run:
-        shell(plotCorr_cmd('gene'))
+    params: label='gene'
+    shell: plotCorr_cmd
 
 
 # Spearman: heatmap, scatterplot and correlation matrix
@@ -109,8 +107,8 @@ rule plotCorr_bed_spearman:
         "deepTools_qc/logs/plotCorrelation_spearman.log"
     benchmark:
         "deepTools_qc/.benchmark/plotCorrelation_spearman.benchmark"
-    run:
-        shell(plotCorrSP_cmd('gene'))
+    params: label='gene'
+    shell: plotCorrSP_cmd
 
 
 
@@ -126,8 +124,7 @@ rule plotPCA:
         "deepTools_qc/logs/plotPCA.log"
     benchmark:
         "deepTools_qc/.benchmark/plotPCA.benchmark"
-    run:
-        shell(plotPCA_cmd('gene'))
+    shell: plotPCA_cmd
 
 ########deepTools estimateReadFiltering#########################
 rule estimateReadFiltering:
@@ -138,8 +135,7 @@ rule estimateReadFiltering:
         "deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt"
     conda:
         CONDA_SHARED_ENV
-    run:
-        shell(estimateReadFiltering_cmd())
+    shell: estimateReadFiltering_cmd
 
 #######InsertSizeMetrics###############
 rule bamPE_fragment_size:
@@ -153,5 +149,4 @@ rule bamPE_fragment_size:
     log:
         "deepTools_qc/bamPEFragmentSize/log"
     threads: 24
-    run:
-        shell(bamPEFragmentSize_cmd())
+    shell: bamPEFragmentSize_cmd

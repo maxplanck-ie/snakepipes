@@ -1,4 +1,4 @@
-CONDA_SHARED_ENV = "shared_environment.yaml"
+CONDA_SHARED_ENV = "envs/shared_environment.yaml"
 
 rule bamCoverage_RPKM_allelic:
     input:
@@ -15,8 +15,9 @@ rule bamCoverage_RPKM_allelic:
     benchmark:
         "bamCoverage/allele_specific/.benchmark/bamCoverage_RPKM.{sample}.{suffix}.benchmark"
     threads: 8
-    run:
-        shell(bamcov_rpkm_cmd())
+    shell: """
+        bamCoverage -b {input.bam} -o {output} --binSize {params.bw_binsize} -p {threads} --normalizeUsing RPKM &> {log}
+        """
 
 rule bamCoverage_raw_allelic:
     input:

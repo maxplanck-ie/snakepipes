@@ -1,5 +1,5 @@
 ### deepTools bamCoverage ######################################################
-CONDA_SHARED_ENV = "shared_environment.yaml"
+CONDA_SHARED_ENV = "envs/shared_environment.yaml"
 
 rule bamCoverage:
     input:

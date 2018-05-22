@@ -1,5 +1,5 @@
 ### deepTools bamCompare subtract #######################################################
-CONDA_SHARED_ENV = "shared_environment.yaml"
+CONDA_SHARED_ENV = "envs/shared_environment.yaml"
 
 rule bamCompare_subtract:
     input:
@@ -24,8 +24,7 @@ rule bamCompare_subtract:
     benchmark:
         "deepTools_ChIP/.benchmark/bamCompare.subtract.{chip_sample}.filtered.benchmark"
     threads: 16
-    run:
-        shell(bamcompare_subtract_cmd())
+    shell: bamcompare_subtract_cmd
 
 ### deepTools bamCompare log2ratio #######################################################
 
@@ -51,8 +50,7 @@ rule bamCompare_log2:
     benchmark:
         "deepTools_ChIP/.benchmark/bamCompare.log2ratio.{chip_sample}.filtered.benchmark"
     threads: 16
-    run:
-        shell(bamcompare_log2_cmd())
+    shell: bamcompare_log2_cmd
 
 
 ### deepTools plotEnrichment ###################################################
@@ -78,8 +76,7 @@ rule plotEnrichment:
     benchmark:
         "deepTools_ChIP/.benchmark/plotEnrichment.benchmark"
     threads: 24
-    run:
-        shell(plotEnrich_chip_cmd())
+    shell: plotEnrich_chip_cmd
 
 
 ### deepTools plotFingerprint (all files) ######################################
@@ -107,8 +104,8 @@ rule plotFingerprint:
     benchmark:
         "deepTools_ChIP/.benchmark/plotFingerprint.benchmark"
     threads: 24
-    run:
-        shell(plotFingerprint_cmd())
+    shell: plotFingerprint_cmd
+
 
 #######InsertSizeMetrics###############
 rule bamPE_fragment_size:
@@ -121,6 +118,4 @@ rule bamPE_fragment_size:
     log:
         "deepTools_ChIP/bamPEFragmentSize/log"
     threads: 24
-    run:
-        shell(bamPEFragmentSize_cmd())
-
+    shell: bamPEFragmentSize_cmd

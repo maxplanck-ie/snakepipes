@@ -1,5 +1,5 @@
 ### deepTools bamCoverage on allelic BAM files ################################
-CONDA_SHARED_ENV = "shared_environment.yaml"
+CONDA_SHARED_ENV = "envs/shared_environment.yaml"
 
 rule bamCoverage_allelic:
     input:
@@ -22,9 +22,8 @@ rule bamCoverage_allelic:
     benchmark:
         "bamCoverage/allele_specific/.benchmark/bamCoverage.{sample}.{suffix}.benchmark"
     threads: 16
-    run:
-        cmd = (bamcov_cmd() + " {params.blacklist}")
-        shell(cmd)
+    shell: bamcov_cmd + " {params.blacklist}"
+
 
 ### deepTools computeGCBias ####################################################
 

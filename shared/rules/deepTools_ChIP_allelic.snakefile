@@ -1,5 +1,5 @@
 ### deepTools bamCompare log2ratio #######################################################
-CONDA_SHARED_ENV = "shared_environment.yaml"
+CONDA_SHARED_ENV = "envs/shared_environment.yaml"
 
 rule bamCompare_log2_genome1:
     input:
@@ -22,8 +22,7 @@ rule bamCompare_log2_genome1:
     benchmark:
         "deepTools_ChIP/.benchmark/bamCompare.log2ratio.{chip_sample}.genome1.benchmark"
     threads: 16
-    run:
-        shell(bamcompare_log2_cmd())
+    shell: bamcompare_log2_cmd
 
 rule bamCompare_log2_genome2:
     input:
@@ -46,8 +45,7 @@ rule bamCompare_log2_genome2:
     benchmark:
         "deepTools_ChIP/.benchmark/bamCompare.log2ratio.{chip_sample}.genome2.benchmark"
     threads: 16
-    run:
-        shell(bamcompare_log2_cmd())
+    shell: bamcompare_log2_cmd
 
 ### deepTools plotEnrichment ###################################################
 
@@ -71,8 +69,7 @@ rule plotEnrichment_allelic:
     benchmark:
         "deepTools_ChIP/.benchmark/plotEnrichment_allelic.benchmark"
     threads: 24
-    run:
-        shell(plotEnrich_chip_cmd())
+    shell: plotEnrich_chip_cmd
 
 
 ### deepTools plotFingerprint (all files) ######################################
@@ -98,5 +95,4 @@ rule plotFingerprint_allelic:
     benchmark:
         "deepTools_ChIP/.benchmark/plotFingerprint_allelic.benchmark"
     threads: 24
-    run:
-        shell(plotFingerprint_cmd())
+    shell: plotFingerprint_cmd
