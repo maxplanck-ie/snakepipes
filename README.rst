@@ -49,10 +49,12 @@ Citation
 If you adopt/run snakePipes for your analysis, cite it as follows :
 
 ```
-snakePipes flexible and scalable NGS analysis pipelines built using snakemake. The MPI-IE Bioinformatics Facility. http://doi.org/10.5281/zenodo.1146540
+
+snakePipes: flexible and scalable NGS analysis pipelines built using snakemake. The MPI-IE Bioinformatics Facility. http://doi.org/10.5281/zenodo.1146540
+
 ```
 
 Notice
 -------------
 
-SnakePipes are currently unstable and under active development. 
+SnakePipes are currently unstable and under active development.

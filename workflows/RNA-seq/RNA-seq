@@ -299,7 +299,8 @@ def main():
 
     ## cluster config
     cluster_config = cf.load_configfile(os.path.join(this_script_dir,"../../shared/","cluster.yaml"),False)
-    
+    cluster_config = cf.merge_dicts(cf.load_configfile(os.path.join(this_script_dir,"cluster.yaml"),False), cluster_config)
+
     if args.cluster_configfile:
         user_cluster_config = cf.load_configfile(args.cluster_configfile,False)
         cluster_config = cf.merge_dicts(cluster_config, user_cluster_config) # 2) merge/override variables from user_config.yaml
