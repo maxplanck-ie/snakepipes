@@ -26,7 +26,7 @@ sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.
 import common_functions as cf
 
 
-def parse_args(defaults={"verbose":None,"configfile":None,"max_jobs":None,"snakemake_options":None,"tempdir":None,
+def parse_args(defaults={"verbose":None,"configfile":None,"cluster_configfile":None,"max_jobs":None,"snakemake_options":None,"tempdir":None,
                          "bw_binsize":None,"atac_fragment_cutoff":None}):
     """
     Parse arguments from the command line.
@@ -65,6 +65,12 @@ def parse_args(defaults={"verbose":None,"configfile":None,"max_jobs":None,"snake
                         dest="configfile",
                         help="configuration file: config.yaml (default: '%(default)s')",
                         default=defaults["configfile"])
+
+    general.add_argument("--cluster_configfile",
+                        dest="cluster_configfile",
+                        help="configuration file for cluster usage. In absence, the default options "
+                        "from shared/cluster.yaml and workflows/[workflow]/cluster.yaml would be selected (default: '%(default)s')",
+                        default=defaults["cluster_configfile"])
 
     general.add_argument("-j", "--jobs",
                          dest="max_jobs",
@@ -120,9 +126,9 @@ def parse_args(defaults={"verbose":None,"configfile":None,"max_jobs":None,"snake
 
 def main():
 
-    ## basic paths
+    ## basic paths only used in wrapper
     this_script_dir = os.path.dirname(os.path.realpath(__file__))
-    main_dir_path = os.path.join(os.path.dirname(os.path.dirname(this_script_dir)))
+    main_dir_path = cf.get_snakepipes_path()
 
     ## defaults
     defaults = cf.load_configfile(os.path.join(this_script_dir, "defaults.yaml"),False)
@@ -130,7 +136,8 @@ def main():
     ## get command line arguments
     parser = parse_args(defaults)
     args = parser.parse_args()
-
+    
+    ## we also add these paths to config, although we don't use them in the Snakefile
     args.this_script_dir = this_script_dir
     args.main_dir_path = main_dir_path
 
@@ -147,8 +154,6 @@ def main():
         print("\nError! Provided configfile (-c) not found! ({})\n".format(args.configfile))
         exit(1)
 
-
-
     ## merge configuration dicts
     config = defaults   # 1) form defaults.yaml
     if args.configfile:
@@ -163,10 +168,23 @@ def main():
     ## save to configs.yaml in outdir
     cf.write_configfile(os.path.join(args.outdir,'ATAC-seq.config.yaml'),config)
 
-    snakemake_module_load = "module load snakemake/5.1.2 slurm &&".split()
+    ## merge cluster config files: 1) global one, 2) workflow specific one, 3) user provided one
+    cluster_config = cf.load_configfile(cf.get_snakepipes_path()+"/shared/cluster.yaml",False)
+    cluster_config = cf.merge_dicts(cluster_config, cf.load_configfile(os.path.join(this_script_dir,"cluster.yaml"),False), )
+
+    if args.cluster_configfile:
+        user_cluster_config = cf.load_configfile(args.cluster_configfile,False)
+        cluster_config = cf.merge_dicts(cluster_config, user_cluster_config) # 2) merge/override variables from user_config.yaml
+    cf.write_configfile(os.path.join(args.outdir,'ATAC-seq.cluster_config.yaml'),cluster_config)
+
+    snakemake_module_load = "module load snakemake/5.1.2"
+
+    snakemake_module_load = (snakemake_module_load + " && ").split()
+
     snakemake_cmd = """
-                    snakemake {snakemake_options} --latency-wait 300 --snakefile {snakefile} --jobs {max_jobs} --directory {workingdir} --configfile {configfile}
-                    """.format( snakefile = os.path.join(args.this_script_dir, "Snakefile"),
+                    snakemake {snakemake_options} --latency-wait {latency_wait} --snakefile {snakefile} --jobs {max_jobs} --directory {workingdir} --configfile {configfile}
+                    """.format( latency_wait = cluster_config["snakemake_latency_wait"],
+                                snakefile = os.path.join(args.this_script_dir, "Snakefile"),
                                 max_jobs = args.max_jobs,
                                 workingdir = args.workingdir,
                                 snakemake_options = str(args.snakemake_options or ''),
@@ -177,7 +195,10 @@ def main():
         snakemake_cmd.append("--printshellcmds")
 
     if not args.local:
-        snakemake_cmd += ["--cluster 'SlurmEasy --threads {threads} --log", args.cluster_logs_dir , "--name {rule}.snakemake'"]
+        snakemake_cmd += ["--cluster-config",
+                         os.path.join(args.outdir,'ATAC-seq.cluster_config.yaml'),
+                         "--cluster", "'"+cluster_config["snakemake_cluster_cmd"],
+                         args.cluster_logs_dir, "--name {rule}.snakemake'"]
 
     snakemake_log = "2>&1 | tee -a {}/ATAC-seq.log".format(args.outdir).split()
 
