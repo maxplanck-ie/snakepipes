@@ -77,7 +77,7 @@ def parse_args(defaults={"verbose":None,"configfile":None,"cluster_configfile":N
                         help="configuration file: config.yaml. In absence of a config file, the default options from the "
                         "workflows would be selected from /workflows/<workflow_name>/defaults.yaml (default: '%(default)s')",
                         default=defaults["configfile"])
-    
+
     general.add_argument("--cluster_configfile",
                         dest="cluster_configfile",
                         help="configuration file for cluster usage. In absence, the default options "
@@ -200,6 +200,14 @@ def parse_args(defaults={"verbose":None,"configfile":None,"cluster_configfile":N
                         help="run computeGCBias quality control (long runtime!) (default: '%(default)s')",
                         default=defaults["gcbias"])
 
+    parser.add_argument("--plotFormat",
+                        dest="plot_format",
+                        choices=['png', 'pdf', 'None'],
+                        metavar="STR",
+                        type=str,
+                        help="Format of the output plots from deeptools. Select 'none' for no plot (default: '%(default)s')",
+                        default=defaults["plot_type"])
+
     snpargs = parser.add_argument_group('allele-specific mapping arguments')
     snpargs.add_argument("--VCFfile",
                         metavar="STR",
@@ -238,7 +246,7 @@ def main():
     ## get command line arguments
     parser = parse_args(defaults)
     args = parser.parse_args()
-    
+
     ## we also add these paths to config, although we don't use them in the Snakefile
     args.this_script_dir = this_script_dir
     args.main_dir_path = main_dir_path

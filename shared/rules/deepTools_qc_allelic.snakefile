@@ -7,8 +7,6 @@ rule bamCoverage_allelic:
         bai = "allelic_bams/{sample}.{suffix}.sorted.bam.bai"
     output:
         "bamCoverage/allele_specific/{sample}.{suffix}.seq_depth_norm.bw"
-    conda:
-        CONDA_SHARED_ENV
     params:
         bw_binsize = bw_binsize,
         genome_size = int(genome_size),
@@ -22,6 +20,7 @@ rule bamCoverage_allelic:
     benchmark:
         "bamCoverage/allele_specific/.benchmark/bamCoverage.{sample}.{suffix}.benchmark"
     threads: 16
+    conda: CONDA_SHARED_ENV
     shell: bamcov_cmd + " {params.blacklist}"
 
 
@@ -37,8 +36,6 @@ rule computeGCBias_allelic:
     output:
         png = "deepTools_qc/computeGCBias/{sample}.{suffix}.GCBias.png",
         tsv = "deepTools_qc/computeGCBias/{sample}.{suffix}.GCBias.freq.tsv"
-    conda:
-        CONDA_SHARED_ENV
     params:
         paired = paired,
         fragment_length = fragment_length,
@@ -52,6 +49,7 @@ rule computeGCBias_allelic:
     benchmark:
         "deepTools_qc/.benchmark/computeGCBias.{sample}.{suffix}.benchmark"
     threads: 16
+    conda: CONDA_SHARED_ENV
     shell: gcbias_cmd
 
 ### deepTools plotCoverage #####################################################
@@ -62,8 +60,6 @@ rule plotCoverage_allelic:
         bais = expand("allelic_bams/{sample}.{suffix}.sorted.bam.bai", sample=samples, suffix = ['genome1', 'genome2'])
     output:
         "deepTools_qc/plotCoverage/read_coverage_allelic.png"
-    conda:
-        CONDA_SHARED_ENV
     params:
         labels = " ".join(samples),
         read_extension = "--extendReads" if paired
@@ -73,6 +69,7 @@ rule plotCoverage_allelic:
     benchmark:
         "deepTools_qc/.benchmark/plotCoverage_allelic.benchmark"
     threads: 24
+    conda: CONDA_SHARED_ENV
     shell: plotCoverage_cmd
 
 ### deepTools multiBamSummary ##################################################
@@ -83,8 +80,6 @@ rule multiBamSummary_allelic:
         bais = expand("allelic_bams/{sample}.{suffix}.sorted.bam.bai", sample=samples, suffix = ['genome1', 'genome2'])
     output:
         "deepTools_qc/multiBamSummary/read_coverage_allelic.bins.npz"
-    conda:
-        CONDA_SHARED_ENV
     params:
         labels = " ".join(expand('{sample}.{suffix}', sample=samples, suffix = ['genome1', 'genome2']) ),
         blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed
@@ -96,6 +91,7 @@ rule multiBamSummary_allelic:
     benchmark:
         "deepTools_qc/.benchmark/multiBamSummary_allelic.benchmark"
     threads: 24
+    conda: CONDA_SHARED_ENV
     shell: multiBamSummary_cmd
 
 ### deepTools plotCorrelation ##################################################
@@ -105,15 +101,16 @@ rule plotCorrelation_pearson_allelic:
     input:
         "deepTools_qc/multiBamSummary/read_coverage_allelic.bins.npz"
     output:
-        heatpng = "deepTools_qc/plotCorrelation/correlation.pearson.read_coverage_allelic.heatmap.png",
         tsv = "deepTools_qc/plotCorrelation/correlation.pearson.read_coverage_allelic.tsv"
-    conda:
-        CONDA_SHARED_ENV
+    params:
+        plotcmd = "" if plot_format == 'None' else
+            "--plotFile " + "deepTools_qc/plotCorrelation/correlation.pearson.read_coverage_allelic.heatmap." + plot_format
     log:
         "deepTools_qc/logs/plotCorrelation_pearson_allelic.log"
     benchmark:
         "deepTools_qc/.benchmark/plotCorrelation_pearson_allelic.benchmark"
     params: label='fragment'
+    conda: CONDA_SHARED_ENV
     shell: plotCorr_cmd
 
 # Spearman: heatmap, scatterplot and correlation matrix
@@ -121,15 +118,16 @@ rule plotCorrelation_spearman_allelic:
     input:
         "deepTools_qc/multiBamSummary/read_coverage_allelic.bins.npz"
     output:
-        heatpng = "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage_allelic.heatmap.png",
         tsv = "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage_allelic.tsv"
-    conda:
-        CONDA_SHARED_ENV
+    params:
+        plotcmd = "" if plot_format == 'None' else
+            "--plotFile " + "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage_allelic.heatmap." + plot_format
     log:
         "deepTools_qc/logs/plotCorrelation_spearman_allelic.log"
     benchmark:
         "deepTools_qc/.benchmark/plotCorrelation_spearman_allelic.benchmark"
     params: label='fragment'
+    conda: CONDA_SHARED_ENV
     shell: plotCorrSP_cmd
 
 ### deepTools plotPCA ##########################################################
@@ -137,12 +135,14 @@ rule plotPCA_allelic:
     input:
         "deepTools_qc/multiBamSummary/read_coverage_allelic.bins.npz"
     output:
-        "deepTools_qc/plotPCA/PCA.read_coverage_allelic.png"
-    conda:
-        CONDA_SHARED_ENV
+        "deepTools_qc/plotPCA/PCA.read_coverage_allelic.tsv"
+    params:
+        plotcmd = "" if plot_format == 'None' else
+                "--plotFile " + "deepTools_qc/plotPCA/PCA.read_coverage_allelic." + plot_format
     log:
         "deepTools_qc/logs/plotPCA_allelic.log"
     benchmark:
         "deepTools_qc/.benchmark/plotPCA_allelic.benchmark"
     params: label='fragment'
+    conda: CONDA_SHARED_ENV
     shell: plotPCA_cmd

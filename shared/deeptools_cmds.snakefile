@@ -139,7 +139,7 @@ multiBWsum_bed_cmd = """
 plotCorr_cmd = """
     plotCorrelation \
                 -in {input} \
-                -o {output.heatpng} \
+                {params.plotcmd} \
                 --corMethod pearson \
                 --whatToPlot heatmap \
                 --skipZeros \
@@ -153,7 +153,7 @@ plotCorr_cmd = """
 plotCorrSP_cmd = """
     plotCorrelation \
         -in {input} \
-        -o {output.heatpng} \
+        {params.plotcmd} \
         --corMethod spearman \
         --whatToPlot heatmap \
         --skipZeros \
@@ -166,7 +166,9 @@ plotCorrSP_cmd = """
 # plot PCA (both), requires params.label
 plotPCA_cmd = """
     plotPCA -in {input} \
-            -o {output} \
+            {params.plotcmd} \
+            --transpose \
+            --outFileNameData {output.tsv} \
             -T 'PCA of {params.label} coverage' &> {log}
     """
 

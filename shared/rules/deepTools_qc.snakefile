@@ -7,8 +7,6 @@ rule bamCoverage:
         bai = mapping_prg+"/{sample}.bam.bai"
     output:
         "bamCoverage/{sample}.seq_depth_norm.bw"
-    conda:
-        CONDA_SHARED_ENV
     params:
         bw_binsize = bw_binsize,
         genome_size = int(genome_size),
@@ -20,6 +18,7 @@ rule bamCoverage:
     benchmark:
         "bamCoverage/.benchmark/bamCoverage.{sample}.benchmark"
     threads: 16
+    conda: CONDA_SHARED_ENV
     shell: bamcov_cmd
 
 
@@ -31,8 +30,6 @@ rule bamCoverage_filtered:
         bai = "filtered_bam/{sample}.filtered.bam.bai"
     output:
         "bamCoverage/{sample}.filtered.seq_depth_norm.bw"
-    conda:
-        CONDA_SHARED_ENV
     params:
         bw_binsize = bw_binsize,
         genome_size = int(genome_size),
@@ -46,6 +43,7 @@ rule bamCoverage_filtered:
     benchmark:
         "bamCoverage/.benchmark/bamCoverage.{sample}.filtered.benchmark"
     threads: 16
+    conda: CONDA_SHARED_ENV
     shell: bamcov_cmd
 
 # TODO: include blacklist!? use deeptools bam filtering options?
@@ -62,8 +60,6 @@ rule computeGCBias:
     output:
         png = "deepTools_qc/computeGCBias/{sample}.filtered.GCBias.png",
         tsv = "deepTools_qc/computeGCBias/{sample}.filtered.GCBias.freq.tsv"
-    conda:
-        CONDA_SHARED_ENV
     params:
         paired = paired,
         fragment_length = fragment_length,
@@ -77,6 +73,7 @@ rule computeGCBias:
     benchmark:
         "deepTools_qc/.benchmark/computeGCBias.{sample}.filtered.benchmark"
     threads: 16
+    conda: CONDA_SHARED_ENV
     shell: gcbias_cmd
 
 
@@ -88,8 +85,6 @@ rule plotCoverage:
         bais = expand("filtered_bam/{sample}.filtered.bam.bai", sample=samples)
     output:
         "deepTools_qc/plotCoverage/read_coverage.png"
-    conda:
-        CONDA_SHARED_ENV
     params:
         labels = " ".join(samples),
         read_extension = "--extendReads" if paired
@@ -99,6 +94,7 @@ rule plotCoverage:
     benchmark:
         "deepTools_qc/.benchmark/plotCoverage.benchmark"
     threads: 24
+    conda: CONDA_SHARED_ENV
     shell: plotCoverage_cmd
 
 ### deepTools multiBamSummary ##################################################
@@ -109,8 +105,6 @@ rule multiBamSummary:
         bais = expand("filtered_bam/{sample}.filtered.bam.bai", sample=samples)
     output:
         "deepTools_qc/multiBamSummary/read_coverage.bins.npz"
-    conda:
-        CONDA_SHARED_ENV
     params:
         labels = " ".join(samples),
         blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed
@@ -122,6 +116,7 @@ rule multiBamSummary:
     benchmark:
         "deepTools_qc/.benchmark/multiBamSummary.benchmark"
     threads: 24
+    conda: CONDA_SHARED_ENV
     shell: multiBamSummary_cmd
 
 
@@ -132,15 +127,16 @@ rule plotCorrelation_pearson:
     input:
         "deepTools_qc/multiBamSummary/read_coverage.bins.npz"
     output:
-        heatpng = "deepTools_qc/plotCorrelation/correlation.pearson.read_coverage.heatmap.png",
         tsv = "deepTools_qc/plotCorrelation/correlation.pearson.read_coverage.tsv"
-    conda:
-        CONDA_SHARED_ENV
+    params:
+        plotcmd = "" if plot_format == 'None' else
+            "--plotFile " + "deepTools_qc/plotCorrelation/correlation.pearson.read_coverage.heatmap." + plot_format
     log:
         "deepTools_qc/logs/plotCorrelation_pearson.log"
     benchmark:
         "deepTools_qc/.benchmark/plotCorrelation_pearson.benchmark"
     params: label='fragment'
+    conda: CONDA_SHARED_ENV
     shell: plotCorr_cmd
 
 # Spearman: heatmap, scatterplot and correlation matrix
@@ -148,15 +144,16 @@ rule plotCorrelation_spearman:
     input:
         "deepTools_qc/multiBamSummary/read_coverage.bins.npz"
     output:
-        heatpng = "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage.heatmap.png",
         tsv = "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage.tsv"
-    conda:
-        CONDA_SHARED_ENV
+    params:
+        plotcmd = "" if plot_format == 'None' else
+            "--plotFile " + "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage.heatmap." + plot_format
     log:
         "deepTools_qc/logs/plotCorrelation_spearman.log"
     benchmark:
         "deepTools_qc/.benchmark/plotCorrelation_spearman.benchmark"
     params: label='fragment'
+    conda: CONDA_SHARED_ENV
     shell: plotCorrSP_cmd
 
 ### deepTools plotPCA ##########################################################
@@ -164,14 +161,16 @@ rule plotPCA:
     input:
         "deepTools_qc/multiBamSummary/read_coverage.bins.npz"
     output:
-        "deepTools_qc/plotPCA/PCA.read_coverage.png"
-    conda:
-        CONDA_SHARED_ENV
+        "deepTools_qc/plotPCA/PCA.read_coverage.tsv"
+    params:
+        plotcmd = "" if plot_format == 'None' else
+                "--plotFile " + "deepTools_qc/plotPCA/PCA.read_coverage." + plot_format
     log:
         "deepTools_qc/logs/plotPCA.log"
     benchmark:
         "deepTools_qc/.benchmark/plotPCA.benchmark"
     params: label='fragment'
+    conda: CONDA_SHARED_ENV
     shell: plotPCA_cmd
 
 ########## deepTools estimateReadFiltering ###################################
@@ -182,6 +181,5 @@ rule estimate_read_filtering:
         bai = mapping_prg+"/{sample}.bam.bai"
     output:
         "deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt"
-    conda:
-        CONDA_SHARED_ENV
+    conda: CONDA_SHARED_ENV
     shell: estimateReadFiltering_cmd
