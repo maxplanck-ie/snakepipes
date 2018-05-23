@@ -4,3 +4,7 @@ channels:
  - conda-forge
 dependencies:
  - deeptools=3.0.2
+ - fastqc=0.11.7
+ - samtools
+ - cutadapt
+ - trim-galore

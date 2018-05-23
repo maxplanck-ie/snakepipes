@@ -19,6 +19,9 @@ include: os.path.join(workflow.basedir, "internals.snakefile")
 
 # do workflow specific stuff now
 
+CONDA_ENV_SHARED = "envs/shared_environment.yaml"
+CONDA_ENV_RNASEQ = "envs/RNAseq_environment.yaml"
+
 ### include modules of other snakefiles ########################################
 ################################################################################
 ## FASTQ: either downsample FASTQ files or create symlinks to input files
@@ -252,13 +255,13 @@ rule all:
         "Annotation/genes.annotated.bed",
         "Annotation/genes.filtered.bed",
         "Annotation/genes.filtered.saf",    # this file is used for featureCounts later on!
-        run_mapping_free(),            # Salmon
-        run_mapping(),                 # classical mapping + counting
-        run_allelesp_mapping(),        # allelic-mapping
-        make_nmasked_genome(),
-        run_deeptools_qc(),
-        run_GenomicContamination(),
-        "multiQC/multiqc_report.html"
+#        run_mapping_free(),            # Salmon
+#        run_mapping(),                 # classical mapping + counting
+#        run_allelesp_mapping(),        # allelic-mapping
+#        make_nmasked_genome(),
+#        run_deeptools_qc(),
+#        run_GenomicContamination(),
+#        "multiQC/multiqc_report.html"
 
 
 ### execute after  finished ####################################################
