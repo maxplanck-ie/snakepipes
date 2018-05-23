@@ -8,7 +8,7 @@ sys.path.append(os.path.join(maindir, "shared"))
 import common_functions as cf
 
 # load tool paths
-globals().update(cf.load_paths(os.path.join(maindir, "shared", "paths.yaml"),maindir,config["verbose"]))
+#globals().update(cf.load_paths(os.path.join(maindir, "shared", "paths.yaml"),maindir,config["verbose"]))
 # load config file
 globals().update(cf.load_configfile(workflow.overwrite_configfile,config["verbose"]))
 # load organism-specific data, i.e. genome indices, annotation, etc.
@@ -34,7 +34,7 @@ if trim:
 # HiCExplorer
 include: os.path.join(maindir, "shared", "rules", "hicexplorer.snakefile")
 
-include: os.path.join(maindir, "shared", "rules", "multiQC.snakefile")
+#include: os.path.join(maindir, "shared", "rules", "multiQC.snakefile")
 
 ### conditional/optional rules #################################################
 ################################################################################
@@ -126,7 +126,7 @@ rule all:
         run_Trimming(trim, fastqc),
         expand(mapping_prg+"/{sample}{read}.bam", sample = samples, read = reads),
         run_build_matrices(),
-        "multiQC/multiqc_report.html"
+#       "multiQC/multiqc_report.html"
 
 ### execute after workflow finished ############################################
 ################################################################################

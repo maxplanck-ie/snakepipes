@@ -26,7 +26,7 @@ rule map_fastq_single_end:
         "echo 'mapping {input}' > {log} && "
         "bwa mem -A1 -B4  -E50 -L0 "
         "-t {threads} " + bwa_index + " {input} 2>> {log} | "
-        +samtools_path+"samtools view -Shb - > {output}"
+        "samtools view -Shb - > {output}"
 ## Make HiC Matrix
 if(RF_resolution is True):
     rule build_matrix:
@@ -82,6 +82,7 @@ else:
            "HiC_matrices/logs/{sample}.log"
         threads: 15
         shell:
+#            "hicBuildMatrix -h"
             "hicBuildMatrix -s {input.R1} {input.R2} "
             "-bs {params.bin_size} "
             "--minDistance {params.min_dist} "
@@ -89,7 +90,7 @@ else:
             "--QCfolder {params.QCfolder} "
             "--threads {threads} "
             "{params.region} "
-#           "-b {output.bam} -o {output.matrix} &> {log}"
+##           "-b {output.bam} -o {output.matrix} &> {log}"
             "-o {output.matrix} &> {log}"           
 
 ## Merge the samples if asked
