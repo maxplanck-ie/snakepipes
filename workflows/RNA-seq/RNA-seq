@@ -305,11 +305,7 @@ def main():
         cluster_config = cf.merge_dicts(cluster_config, user_cluster_config) # 2) merge/override variables from user_config.yaml
     cf.write_configfile(os.path.join(args.outdir,'cluster_config.yaml'),cluster_config)
 
-    if not args.local:
-        snakemake_module_load += cluster_config["cluster_module_load"]
-    snakemake_module_load = "module load slurm "
-
-    snakemake_module_load = (snakemake_module_load + " && ").split()
+    snakemake_exports = "export PATH=/data/processing/conda/bin:$PATH && ".split()
 
     snakemake_cmd = """
                     snakemake {snakemake_options} --latency-wait {latency_wait} --snakefile {snakefile} --jobs {max_jobs} --directory {outdir} --configfile {configfile}
@@ -335,9 +331,9 @@ def main():
     ## create local temp dir and add this path to environment as $TMPDIR variable
     ## on SLURM: $TMPDIR is set, created and removed by SlurmEasy on cluster node
     temp_path = cf.make_temp_dir(args.tempdir, args.outdir, args.verbose)
-    snakemake_exports = ("export TMPDIR="+temp_path+" && ").split()
+    snakemake_exports += ("export TMPDIR="+temp_path+" && ").split()
 
-    cmd = " ".join(snakemake_exports + snakemake_module_load + snakemake_cmd + snakemake_log)
+    cmd = " ".join(snakemake_exports + snakemake_cmd + snakemake_log)
 
     if args.verbose:
         print("\n", cmd, "\n")
