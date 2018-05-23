@@ -8,7 +8,7 @@ sys.path.append(os.path.join(maindir, "shared"))
 import common_functions as cf
 
 # load tool paths
-globals().update(cf.load_paths(os.path.join(maindir, "shared", "paths.yaml"),maindir,config["verbose"]))
+#globals().update(cf.load_paths(os.path.join(maindir, "shared", "paths.yaml"),maindir,config["verbose"]))
 
 # load conda ENV (path is relative to "shared/rules" directory)
 CONDA_DNA_MAPPING_ENV = "envs/dna_mapping.yaml"
@@ -98,11 +98,11 @@ def run_Trimming(trim, fastqc):
     else:
         return([])
 
-def run_CollectInsertSizeMetrics(paired):
-    if paired:
-        return( expand("Picard_qc/InsertSizeMetrics/{sample}.insert_size_metrics.txt", sample = samples) )
-    else:
-        return([])
+#def run_CollectInsertSizeMetrics(paired):
+#    if paired:
+#        return( expand("Picard_qc/InsertSizeMetrics/{sample}.insert_size_metrics.txt", sample = samples) )
+#    else:
+#        return([])
 
 def run_computeGCBias(gcbias):
     if gcbias:
@@ -117,11 +117,13 @@ def run_computeGCBias(gcbias):
 def run_deepTools_qc():
     file_list = []
     if len(samples) <= 20:
-        file_list.append( ["deepTools_qc/plotCoverage/read_coverage.png"] )
+        file_list.append( ["deepTools_qc/plotCoverage/read_coverage.tsv"] )
+
     file_list.append( [
         "deepTools_qc/plotCorrelation/correlation.pearson.read_coverage.tsv",
         "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage.tsv",
-        "deepTools_qc/plotPCA/PCA.read_coverage.tsv"])
+        "deepTools_qc/plotPCA/PCA.read_coverage.tsv",
+        "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv" ])
     file_list.append(expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample = samples))
     if 'allelic-mapping' in mode:
         file_list.append( [

@@ -30,12 +30,13 @@ rule CollectAlignmentSummaryMetrics:
     benchmark:
         "Picard_qc/.benchmark/CollectAlignmentSummaryMetrics.{sample}.benchmark"
     threads: 4 # Java performs parallel garbage collection
+    conda: CONDA_DNA_MAPPING_ENV
     shell:
-        "java -Xmx4g -jar "+picard_path+"picard.jar CollectAlignmentSummaryMetrics "
-            "REFERENCE_SEQUENCE={input.genome} "
-            "INPUT={input.bam} OUTPUT={output} "
-            "VALIDATION_STRINGENCY=LENIENT "
-            "&> {log}"
+        "picard CollectAlignmentSummaryMetrics "
+        "REFERENCE_SEQUENCE={input.genome} "
+        "INPUT={input.bam} OUTPUT={output} "
+        "VALIDATION_STRINGENCY=LENIENT "
+        "&> {log}"
 
 
 ### Picard CollectInsertSizeMetrics ############################################
@@ -53,12 +54,13 @@ if paired:
         threads: 4 # Java performs parallel garbage collection
         params:
             pdf = "Picard_qc/InsertSizeMetrics/{sample}.insert_size_histogram.pdf"
+        conda: CONDA_DNA_MAPPING_ENV
         shell:
-            "export PATH="+R_path+":$PATH && "
-            "java -Xmx4g -jar "+picard_path+"picard.jar CollectInsertSizeMetrics "
-                "HISTOGRAM_FILE={params.pdf} "
-                "INPUT={input} "
-                "OUTPUT={output.txt} "
-                "VALIDATION_STRINGENCY=LENIENT "
-                "&> {log} "
-                "&& ( [ -f {params.pdf} ] || "+os.path.join(R_path, "Rscript")+" "+os.path.join(maindir, "shared", "tools", "CollectInsertSizeMetrics_histogram.R")+" {output.txt} ) "
+            "picard CollectInsertSizeMetrics "
+            "HISTOGRAM_FILE={params.pdf} "
+            "INPUT={input} "
+            "OUTPUT={output.txt} "
+            "VALIDATION_STRINGENCY=LENIENT "
+            "&> {log} "
+            #"&& ( [ -f {params.pdf} ] || "+os.path.join(R_path, "Rscript")+
+            #" "+os.path.join(maindir, "shared", "tools", "CollectInsertSizeMetrics_histogram.R")+" {output.txt} ) "

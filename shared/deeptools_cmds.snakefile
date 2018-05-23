@@ -175,7 +175,8 @@ plotPCA_cmd = """
 # plot Coverage
 plotCoverage_cmd = """
     plotCoverage -b {input.bams} \
-                 -o {output} \
+                 {params.plotcmd} \
+                 --outRawCounts {output} \
                  --labels {params.labels} \
                  --plotTitle 'Genome fragment coverage without duplicates' \
                  -p {threads} \
@@ -190,5 +191,7 @@ estimateReadFiltering_cmd = """
 
 #bamPEFragmentSize
 bamPEFragmentSize_cmd = """
-    bamPEFragmentSize --bamfiles {input.bams} --table {output} -p {threads} &> {log}
+    bamPEFragmentSize --bamfiles {input.bams} \
+    {params.plotcmd} \
+    --table {output} -p {threads} &> {log}
     """
