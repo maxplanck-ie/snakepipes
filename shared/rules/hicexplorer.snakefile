@@ -24,9 +24,9 @@ rule map_fastq_single_end:
     threads: 15
     shell:
         "echo 'mapping {input}' > {log} && "
-        "bwa mem -A1 -B4  -E50 -L0 "
+        +bwa_path+"bwa mem -A1 -B4  -E50 -L0 "
         "-t {threads} " + bwa_index + " {input} 2>> {log} | "
-        "samtools view -Shb - > {output}"
+        +samtools_path+"samtools view -Shb - > {output}"
 ## Make HiC Matrix
 if(RF_resolution is True):
     rule build_matrix:
@@ -129,7 +129,7 @@ rule diagnostic_plot:
 
 
 ## Compute MAD score thresholds
-rule compute_thresholds
+rule compute_thresholds:
    input: 
       "HiC_matrices/QCplots/{sample}_"+matrixFile_suffix+"_mad_threshold.out"
    output:
@@ -166,15 +166,16 @@ rule compute_thresholds
 ## Correct matrices
 rule correct_matrix:
     input:
-        matrix= "HiC_matrices/{sample}_"+matrixFile_suffix+".h5"
+        matrix= "HiC_matrices/{sample}_"+matrixFile_suffix+".h5",
         correct = "HiC_matrices_corrected/logs/{sample}_"+matrixFile_suffix+".log"
     output:
         "HiC_matrices_corrected/{sample}_"+matrixFile_suffix+".corrected.h5"
     conda:
         "envs/snakepipes_hic_conda_env.yaml"
     shell:
-        "hicCorrectMatrix correct --filterThreshold " +
-        thresholds + " -m {input.matrix} -o {output} >> {input.correct} 2>&1"
+        "thresholds=$(cat '${input.correct}';"
+        "hicCorrectMatrix correct --filterThreshold $thresholds"
+        " -m {input.matrix} -o {output} >> {input.correct} 2>&1"
 
 
 ## Call TADs
