@@ -1,0 +1,8 @@
+name: snakepipes_shared_environment_1.0
+channels:
+ - bioconda
+ - conda-forge
+dependencies:
+ - deeptools=3.0.2
+ - seqtk=1.2
+ - pigz=2.3.4

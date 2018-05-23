@@ -1,0 +1,6 @@
+name: snakepipes_dna-mapping_1.0
+channels:
+ - bioconda
+ - conda-forge
+dependencies:
+ - bowtie2 = 2.3.4.1
