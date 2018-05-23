@@ -262,6 +262,17 @@ def main():
     # save to configs.yaml in wdir
     cf.write_configfile(os.path.join(args.wdir, 'config.yaml'), config)
 
+    ######################################### conditional parameters ##################################################
+    ###switch between TruSeq and Nextera adapter sequences
+    adapterSeq = "AGATCGGAAGAGC"
+    if nextera:
+        adapterSeq = "CTGTCTCTTATA"
+
+    sortThreads = nthreads
+    if nthreads > 4:
+        sortThreads = 4
+
+
     # cluster config
     cluster_config = cf.load_configfile(os.path.join(this_script_dir, "../../shared/", "cluster.yaml"), False)
     cluster_config = cf.merge_dicts(cf.load_configfile(os.path.join(this_script_dir, "cluster.yaml"), False), cluster_config)

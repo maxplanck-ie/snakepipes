@@ -12,7 +12,7 @@ dependencies:
   - methyldackel=0.3.0
   - metilene=0.2.6
   - bedtools=2.27.1
-  - gatk=3.8
+  - gatk4=4.0b6
   - bioconductor-limma=3.34.9
   - r-car=2.1_4
   - r-data.table=1.10.4
