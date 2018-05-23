@@ -20,8 +20,8 @@ if paired:
         shell:
             "cutadapt "
                 "{params.opts} "
-                "-j {threads}"
-                "-f fastq -e 0.1 -q 16 -O 3 --trim-n --minimum-length 25 -a AGATCGGAAGAGC -A AGATCGGAAGAGC "
+                "-j {threads} "
+                "-e 0.1 -q 16 -O 3 --trim-n --minimum-length 25 -a AGATCGGAAGAGC -A AGATCGGAAGAGC "
                 "-o ${{TMPDIR}}{params.tmp1} -p ${{TMPDIR}}{params.tmp2} "
                 "{input.r1} {input.r2} "
                 "&> {log} "
@@ -44,7 +44,7 @@ else:
         shell:
             "cutadapt "
                 "{params.opts} "
-                "-j {threads}"
+                "-j {threads} "
                 "-f fastq -e 0.1 -q 16 -O 3 --trim-n --minimum-length 25 -a AGATCGGAAGAGC "
                 "-o ${{TMPDIR}}{params.tmp} "
                 "{input.r1} "

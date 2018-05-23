@@ -42,47 +42,47 @@ sampleInfo <- read.table(sampleInfoFilePath, header = TRUE, colClasses = c("char
 
 ## is paired end? : define read params
 if(isTRUE(paired)) {
-	pe_param <- csaw::readParam(max.frag = 500, pe = "both")#, restrict = "X")
+    pe_param <- csaw::readParam(max.frag = 500, pe = "both")
 } else {
-	pe_param <- csaw::readParam(max.frag = 500, pe = "none")
+    pe_param <- csaw::readParam(max.frag = 500, pe = "none")
 }
 
 ## Read data
 chip_object <- readfiles_chip(sampleInfo = sampleInfo,
-					fragment_length = fraglength,
-					window_size = windowSize,
-					alleleSpecific = allelic_info,
-					pe.param = pe_param)
+                    fragment_length = fraglength,
+                    window_size = windowSize,
+                    alleleSpecific = allelic_info,
+                    pe.param = pe_param)
 
 ## make QC plot for one sample
 first_bam <- head(SummarizedExperiment::colData(chip_object$windowCounts)$bam.files, n = 1)
 last_bam <- tail(SummarizedExperiment::colData(chip_object$windowCounts)$bam.files, n = 1)
 
 print(paste0("Making QC plots for first sample : ", first_bam))
-makeQCplots_chip(bam.file = first_bam, outplot = "CSAW/QCplots_first_sample.pdf", pe.param = pe_param)
+#makeQCplots_chip(bam.file = first_bam, outplot = "CSAW/QCplots_first_sample.pdf", pe.param = pe_param)
 
 print(paste0("Making QC plots for last sample : ", last_bam))
-makeQCplots_chip(bam.file = last_bam, outplot = "CSAW/QCplots_last_sample.pdf", pe.param = pe_param)
+#makeQCplots_chip(bam.file = last_bam, outplot = "CSAW/QCplots_last_sample.pdf", pe.param = pe_param)
 
-## merge all peaks from the samples mentioned in sampleinfo to test
+## merge all peaks from the samples mentioned in sampleinfo to test (exclude "Input")
 # get files to read from MACS
 fnames <- sampleInfo[sampleInfo$condition != "control",]$name
 
 allpeaks <- lapply(fnames, function(x) {
-	narrow <- paste0("MACS2/",x,".filtered.BAM_peaks.narrowPeak")
-	broad <- paste0("MACS2/",x,".filtered.BAM_peaks.broadPeak")
-	# first look for narrowpeak then braod peak
-	if(file.exists(narrow)) {
-		bed <- read.delim(narrow, header = FALSE)
-	} else if (file.exists(broad)) {
-		bed <- read.delim(broad, header = FALSE)
-	} else {
-		stop("MACS2 output doesn't exist. Neither ", narrow, " , nor ", broad)
-	}
+    narrow <- paste0("MACS2/",x,".filtered.BAM_peaks.narrowPeak")
+    broad <- paste0("MACS2/",x,".filtered.BAM_peaks.broadPeak")
+    # first look for narrowpeak then braod peak
+    if(file.exists(narrow)) {
+        bed <- read.delim(narrow, header = FALSE)
+    } else if (file.exists(broad)) {
+        bed <- read.delim(broad, header = FALSE)
+    } else {
+        stop("MACS2 output doesn't exist. Neither ", narrow, " , nor ", broad)
+    }
 
-	bed.gr <- GRanges(seqnames = bed$V1, ranges = IRanges(start = bed$V2, end = bed$V3), name = bed$V4)
-	return(bed.gr)
-	})
+    bed.gr <- GRanges(seqnames = bed$V1, ranges = IRanges(start = bed$V2, end = bed$V3), name = bed$V4)
+    return(bed.gr)
+    })
 # merge
 allpeaks <- Reduce(function(x,y) GenomicRanges::union(x,y), allpeaks)
 

@@ -53,11 +53,11 @@ cat(paste("Salmon tx2gene file : ", tx2gene_file, "\n"))
 ## sampleInfo (setup of the experiment)
 sampleInfo <- read.table(sampleInfoFilePath, header = TRUE, stringsAsFactor = F)
 sampleInfo$condition <- as.factor(sampleInfo$condition)
-sampleInfo$condition <- relevel(sampleInfo$condition, ref = "control")
+sampleInfo$condition <- relevel(sampleInfo$condition, ref = as.character(sampleInfo$condition[1])) # first sample defines base
 
 ## add X at the beginning of rows beginning with a number (makes it consistent to column names of of the count matrix!)
 if ( any(grepl("^[0-9]", sampleInfo$name)) ) {
-	sampleInfo[grepl("^[0-9]", sampleInfo$name),]$name <- paste("X", sampleInfo[grepl("^[0-9]", sampleInfo$name),]$name, sep="")
+    sampleInfo[grepl("^[0-9]", sampleInfo$name),]$name <- paste0("X", sampleInfo[grepl("^[0-9]", sampleInfo$name),]$name)
 }
 
 ## ~~~~~~ 2. Check if data is in proper order  ~~~~~
@@ -80,17 +80,17 @@ if(isTRUE(tximport)) {
 seqout <- DESeq_basic(countdata, coldata = sampleInfo, fdr = fdr, alleleSpecific = allelic_info, from_salmon = tximport)
 
 DESeq_downstream(DEseqout = seqout, countdata, sampleInfo,
-		     fdr = fdr, outprefix = "DEseq_basic", heatmap_topN = topN,
-		     geneNamesFile = geneNamesFilePath)
+             fdr = fdr, outprefix = "DEseq_basic", heatmap_topN = topN,
+             geneNamesFile = geneNamesFilePath)
 
 ## Run allele-sepecific DESeq wrapper (if asked for)
 if (isTRUE(allelic_info)) {
-	seqout_allelic <- DESeq_allelic(countdata, coldata = sampleInfo, fdr = fdr)
+    seqout_allelic <- DESeq_allelic(countdata, coldata = sampleInfo, fdr = fdr)
 
-	DESeq_downstream(DEseqout = seqout_allelic, countdata, sampleInfo,
-			     fdr = fdr, outprefix = "DEseq_allelic", heatmap_topN = topN,
-			     geneNamesFile = geneNamesFilePath)
-	}
+    DESeq_downstream(DEseqout = seqout_allelic, countdata, sampleInfo,
+                 fdr = fdr, outprefix = "DEseq_allelic", heatmap_topN = topN,
+                 geneNamesFile = geneNamesFilePath)
+    }
 
 
 ## ~~~~~~ 4. report on versions used ~~~~~
