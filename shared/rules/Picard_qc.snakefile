@@ -1,3 +1,4 @@
+CONDA_SHARED_ENV = "envs/shared_environment.yaml"
 
 
 ### Filter the genome fasta for selected chromsomes for picard if the mode is allele-specific
@@ -7,10 +8,11 @@ rule filterFasta:
         fasta = genome_fasta
     output:
         temp(mapping_prg+"/genome_selectedChrs.fa")
-    run:
-        shell("samtools view -H {input.bam}"
-              " | awk '$1 == \"@SQ\" {{print $2}}' | sed 's/SN://g' | sort -n > chrnames.txt")
-        shell("samtools faidx {input.fasta} `cat chrnames.txt ` > {output} && rm chrnames.txt")
+    conda: CONDA_SHARED_ENV
+    shell: """
+        samtools view -H {input.bam} | awk '$1 == \"@SQ\" {{print $2}}' | sed 's/SN://g' | sort -n > chrnames.txt
+        samtools faidx {input.fasta} `cat chrnames.txt ` > {output} && rm chrnames.txt
+        """
 
 
 ### Picard CollectAlignmentSummaryMetrics ######################################

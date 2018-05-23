@@ -1,4 +1,6 @@
 ### HISAT2 #####################################################################
+CONDA_SHARED_ENV = "envs/shared_environment.yaml"
+
 
 if paired:
     rule HISAT2:
@@ -74,5 +76,5 @@ rule HISAT2_BAM_index:
         "HISAT2/{sample}.bam"
     output:
         "HISAT2/{sample}.bam.bai"
-    shell:
-        samtools_path+"samtools index {input}"
+    conda: CONDA_SHARED_ENV
+    shell: "samtools index {input}"
