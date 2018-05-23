@@ -62,7 +62,7 @@ gcbias_cmd = """
                 --GCbiasFrequenciesFile {output.tsv} \
                 --effectiveGenomeSize {params.genome_size} \
                 --genome {params.genome_2bit} \
-                --fragmentLength {params.median_fragment_length}  \
+                {params.median_fragment_length}  \
                 --sampleSize 10000000 \
                 {params.blacklist} \
                 -p {threads} &> {log}
