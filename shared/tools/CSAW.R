@@ -59,12 +59,12 @@ first_bam <- head(SummarizedExperiment::colData(chip_object$windowCounts)$bam.fi
 last_bam <- tail(SummarizedExperiment::colData(chip_object$windowCounts)$bam.files, n = 1)
 
 print(paste0("Making QC plots for first sample : ", first_bam))
-makeQCplots_chip(bam.file = first_bam, outplot = "CSAW/QCplots_first_sample.pdf", pe.param = pe_param)
+#makeQCplots_chip(bam.file = first_bam, outplot = "CSAW/QCplots_first_sample.pdf", pe.param = pe_param)
 
 print(paste0("Making QC plots for last sample : ", last_bam))
-makeQCplots_chip(bam.file = last_bam, outplot = "CSAW/QCplots_last_sample.pdf", pe.param = pe_param)
+#makeQCplots_chip(bam.file = last_bam, outplot = "CSAW/QCplots_last_sample.pdf", pe.param = pe_param)
 
-## merge all peaks from the samples mentioned in sampleinfo to test
+## merge all peaks from the samples mentioned in sampleinfo to test (exclude "Input")
 # get files to read from MACS
 fnames <- sampleInfo[sampleInfo$condition != "control",]$name
 

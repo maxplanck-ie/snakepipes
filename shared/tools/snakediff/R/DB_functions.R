@@ -20,7 +20,7 @@ readfiles_chip <- function(sampleInfo, fragment_length, window_size, alleleSpeci
         stop("only up to 2 conditions can be used for Differential binding analysis")
     }
     if( isTRUE(alleleSpecific) ) {
-        print("Mode : AlleleSpecific")
+        message("Mode : AlleleSpecific")
         # make allele-specific model matrix for edgeR
         design <- data.frame(name = rep(sampleInfo$name, each = 2),
                        condition = factor(rep(sampleInfo$condition, each = 2)),
@@ -31,12 +31,12 @@ readfiles_chip <- function(sampleInfo, fragment_length, window_size, alleleSpeci
 
         if(length(unique(sampleInfo$condition)) == 1 ) {
             # for 1 samples, use normal design
-            print("1 sample used : comparing genome2 to genome1")
+            message("1 sample used : comparing genome2 to genome1")
             designm <- model.matrix(~ allele, data = design)
             designType <- "allele"
         } else {
             # for 1 sample, use interaction design
-            print(">1 samples used : comparing genome2 to genome1 blocking for different conditions")
+            message(">1 samples used : comparing genome2 to genome1 blocking for different conditions")
             designm <- model.matrix(~ allele + condition,data = design)
             designType <- "blocking"
         }
@@ -46,11 +46,11 @@ readfiles_chip <- function(sampleInfo, fragment_length, window_size, alleleSpeci
                         pattern = paste0(sampleInfo$name,".genome[1-2].sorted.bam$", collapse = "|"),
                         full.names = TRUE )
     } else {
-        print("Mode : Differential Binding")
+        message("Mode : Differential Binding")
         # make model matrix for differential binding
         design <- data.frame(name = sampleInfo$name,
                        condition = factor(sampleInfo$condition ) )
-        design$condition <- relevel(design$condition, "control")
+        design$condition <- relevel(design$condition, ref = as.character(design$condition[1]))# make the first entry the base level
         designm <- model.matrix(~condition, data = design)
         designType <- "condition"
     }
@@ -59,7 +59,8 @@ readfiles_chip <- function(sampleInfo, fragment_length, window_size, alleleSpeci
       bam.files <- list.files("filtered_bam",
                         pattern = paste0(sampleInfo$name,".filtered.bam$", collapse = "|"),
                         full.names = TRUE )
-    print(paste("bam files used:", bam.files, sep = "\n"))
+    message("bam files used:")
+    print(bam.files)
     # readFiles using CSAW
     mincount <- 20
     message(paste0("Counting reads in windows.. windows with total counts < ", mincount, " are discarded"))
@@ -150,7 +151,7 @@ tmmNormalize_chip <- function(chipCountObject, binsize, plotfile){
     bam.files <- SummarizedExperiment::colData(chipCountObject$windowCounts)$bam.files
     # Get norm factors
     wider <- csaw::windowCounts(bam.files, bin = TRUE, width = binsize, param = chipCountObject$pe.param)
-    normfacs <- csaw::normOffsets(wider)
+    normfacs <- csaw::normOffsets(wider)$norm.factors
     chipCountObject$normFactors <- normfacs
 
     # get norm counts
