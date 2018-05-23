@@ -123,6 +123,7 @@ rule plotPCA:
         "deepTools_qc/logs/plotPCA.log"
     benchmark:
         "deepTools_qc/.benchmark/plotPCA.benchmark"
+    params: label='gene'
     shell: plotPCA_cmd
 
 
