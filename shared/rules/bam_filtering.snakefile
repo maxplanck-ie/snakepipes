@@ -9,8 +9,7 @@ rule samtools_filter:
         mapping_prg+"/{sample}.bam"
     output:
         bam = "filtered_bam/{sample}.filtered.bam",
-        filter_file = "filtered_bam/{sample}.filter" if (dedup or properpairs or mapq > 0)
-                      else []
+        filter_file = "filtered_bam/{sample}.filter"
     params:
         dedup = dedup,
         properpairs = properpairs,
@@ -30,8 +29,8 @@ rule samtools_filter:
             ln -s -r {input} {output.bam} ;
         else
             samtools view -@ {threads} -b $filter -o {output.bam} {input} 2> {log} ;
-            echo "samtools view arguments: $filter" > {output.filter_file}
         fi
+        echo "samtools view arguments: $filter" > {output.filter_file}
         """
 
 
