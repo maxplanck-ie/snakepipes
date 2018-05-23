@@ -8,3 +8,6 @@ dependencies:
  - samtools
  - cutadapt
  - trim-galore
+ - seqtk=1.2
+ - pigz=2.3.4
+

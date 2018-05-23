@@ -6,9 +6,10 @@ if genes_gtf.lower().find("gencode")>=0:
             gtf = genes_gtf
         output:
             bed_annot = "Annotation/genes.annotated.bed"
+        conda: CONDA_ENV_SHARED
         shell:
             "join -t $'\t' -o auto --check-order -1 4 -2 2 "
-            "<("+UCSC_tools_path+"gtfToGenePred -ignoreGroupsWithoutExons {input.gtf} /dev/stdout | "+UCSC_tools_path+"""genePredToBed /dev/stdin /dev/stdout | tr " " "\\t" | sort -k4) """
+            "<(gtfToGenePred -ignoreGroupsWithoutExons {input.gtf} /dev/stdout | genePredToBed /dev/stdin /dev/stdout | tr ' ' $'\t' | sort -k4) "
             """ <(cat {input.gtf} | awk '$3~"transcript|exon"{{print $0}}' | tr -d "\\";" | """
             """ awk '{{pos=match($0,"tag.basic"); if (pos==0) basic="full"; else basic="basic"; """
             """ pos=match($0,"gene_[bio]*type.[^[:space:]]+"); gt=substr($0,RSTART,RLENGTH); """
@@ -29,9 +30,10 @@ elif genes_gtf.lower().find("ensembl")>=0:
             gtf = genes_gtf
         output:
             bed_annot = "Annotation/genes.annotated.bed"
+        conda: CONDA_ENV_SHARED
         shell:
             "join -t $'\t' -o auto --check-order -1 4 -2 2 "
-            "<("+UCSC_tools_path+"gtfToGenePred {input.gtf} /dev/stdout | "+UCSC_tools_path+"""genePredToBed /dev/stdin /dev/stdout | tr " " "\\t" | sort -k4) """
+            "<(gtfToGenePred {input.gtf} /dev/stdout | genePredToBed /dev/stdin /dev/stdout | tr ' ' $'\t' | sort -k4) "
             """ <(cat {input.gtf} | awk '$3=="transcript"{{print $0}}' | tr -d "\\";" | """
             """ awk '{{"""
             """ pos=match($0,"gene_biotype.[^[:space:]]+"); if (pos!=0) gt=substr($0,RSTART,RLENGTH); else gt="gene_biotype unknown_gene_biotype"; """
@@ -84,8 +86,9 @@ rule annotation_bed2fasta:
     benchmark:
         "Annotation/.benchmark/annotation_bed2fasta.benchmark"
     threads: 1
+    conda: CONDA_ENV_SHARED
     shell:
-        bedtools_path+"bedtools getfasta -fi {input.genome_fasta} -bed {input.bed} -fo {output} -name "
+        "bedtools getfasta -fi {input.genome_fasta} -bed {input.bed} -fo {output} -name "
 
 
 rule annotation_bed2saf:
@@ -105,7 +108,6 @@ rule annotation_bed2gtf_transcripts:
     output:
         gtf = "Annotation/genes.filtered.transcripts.gtf"
     params:
-        ucsc = UCSC_tools_path,
         gtf_orig = genes_gtf
     shell:
         """
@@ -120,13 +122,12 @@ rule annotation_bed2gtf:
         bed = "Annotation/genes.filtered.bed"
     output:
         gtf = "Annotation/genes.filtered.gtf"
-    params:
-        ucsc = UCSC_tools_path
+    conda: CONDA_ENV_SHARED
     shell:
     	"""
-        {params.ucsc}bedToGenePred {input.bed} stdout | awk -v map_f={input.bed} '
+        bedToGenePred {input.bed} stdout | awk -v map_f={input.bed} '
         BEGIN{{while (getline < map_f) MAP[$13]=$16}} {{OFS="\\t";print $0,"0",MAP[$1]}}' |
-        {params.ucsc}genePredToGtf -utr file stdin stdout |
+        genePredToGtf -utr file stdin stdout |
         grep -v "CDS" |
         awk -v map_f={input.bed} '
         BEGIN{{while (getline < map_f) MAP[$16]=$17}}

@@ -16,8 +16,9 @@ if paired:
         benchmark:
             "FASTQ_Cutadapt/.benchmark/Cutadapt.{sample}.benchmark"
         threads: 8
+        conda: CONDA_ENV_SHARED
         shell:
-            cutadapt_path+"cutadapt "
+            "cutadapt "
                 "{params.opts} "
                 "-j {threads}"
                 "-f fastq -e 0.1 -q 16 -O 3 --trim-n --minimum-length 25 -a AGATCGGAAGAGC -A AGATCGGAAGAGC "
@@ -39,8 +40,9 @@ else:
         benchmark:
             "FASTQ_Cutadapt/.benchmark/Cutadapt.{sample}.benchmark"
         threads: 8
+        conda: CONDA_ENV_SHARED
         shell:
-            cutadapt_path+"cutadapt "
+            "cutadapt "
                 "{params.opts} "
                 "-j {threads}"
                 "-f fastq -e 0.1 -q 16 -O 3 --trim-n --minimum-length 25 -a AGATCGGAAGAGC "
@@ -68,9 +70,10 @@ if paired:
             "FASTQ_TrimGalore/logs/TrimGalore.{sample}.log"
         benchmark:
             "FASTQ_TrimGalore/.benchmark/TrimGalore.{sample}.benchmark"
+        conda: CONDA_ENV_SHARED
         shell:
-            trim_galore_path+"trim_galore "
-                "--path_to_cutadapt "+cutadapt_path+"cutadapt "
+                "trim_galore "
+                "--path_to_cutadapt cutadapt "
                 "--output_dir FASTQ_TrimGalore "
                 "--paired "
                 "--stringency 3 "
@@ -91,9 +94,10 @@ else:
             "FASTQ_TrimGalore/logs/TrimGalore.{sample}.log"
         benchmark:
             "FASTQ_TrimGalore/.benchmark/TrimGalore.{sample}.benchmark"
+        conda: CONDA_ENV_SHARED
         shell:
-            trim_galore_path+"trim_galore "
-                "--path_to_cutadapt "+cutadapt_path+"cutadapt "
+                "trim_galore "
+                "--path_to_cutadapt cutadapt "
                 "--output_dir FASTQ_TrimGalore "
                 "--stringency 3 "
                 "{params.opts} "
@@ -114,5 +118,6 @@ rule FastQC_on_trimmed:
     benchmark:
         "FastQC_trimmed/.benchmark/FastQC_trimmed.{sample}{read}.benchmark"
     threads: 2
+    conda: CONDA_ENV_SHARED
     shell:
-        fastqc_path+"fastqc -o FastQC_trimmed {input} &> {log}"
+        "fastqc -o FastQC_trimmed {input} &> {log}"
