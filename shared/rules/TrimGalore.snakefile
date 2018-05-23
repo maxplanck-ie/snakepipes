@@ -1,3 +1,5 @@
+CONDA_SHARED_ENV = "envs/shared_environment.yaml"
+
 ### cutadapt #################################################################
 if paired:
     rule cutadapt:
@@ -8,48 +10,35 @@ if paired:
             r1 = "FASTQ_Cutadapt/{sample}"+reads[0]+".fastq.gz",
             r2 = "FASTQ_Cutadapt/{sample}"+reads[1]+".fastq.gz"
         params:
-            tmp1 = "{sample}"+reads[0]+".fq.gz",
-            tmp2 = "{sample}"+reads[1]+".fq.gz",
             opts = str(trim_options or '')
         log:
             "FASTQ_Cutadapt/logs/Cutadapt.{sample}.log"
         benchmark:
             "FASTQ_Cutadapt/.benchmark/Cutadapt.{sample}.benchmark"
         threads: 8
-        conda: CONDA_ENV_SHARED
-        shell:
-            "cutadapt "
-                "{params.opts} "
-                "-j {threads} "
-                "-e 0.1 -q 16 -O 3 --trim-n --minimum-length 25 -a AGATCGGAAGAGC -A AGATCGGAAGAGC "
-                "-o ${{TMPDIR}}{params.tmp1} -p ${{TMPDIR}}{params.tmp2} "
-                "{input.r1} {input.r2} "
-                "&> {log} "
-                "&& (mv ${{TMPDIR}}{params.tmp1} {output.r1}; mv ${{TMPDIR}}{params.tmp2} {output.r2}; touch {output.r1} {output.r2})"
+        conda: CONDA_SHARED_ENV
+        shell: """
+            cutadapt {params.opts} -j {threads} -e 0.1 -q 16 -O 3 --trim-n --minimum-length 25 -a AGATCGGAAGAGC -A AGATCGGAAGAGC \
+                -o {output.r1} -p {output.r2} {input.r1} {input.r2} &> {log}
+            """
 else:
     rule cutadapt:
         input:
             r1 = fastq_indir_trim+"/{sample}.fastq.gz",
         output:
-            r1 = "FASTQ_Cutadapt/{sample}.fastq.gz",
+            "FASTQ_Cutadapt/{sample}.fastq.gz",
         params:
-            tmp = "{sample}.fq.gz",
             opts = str(trim_options or '')
         log:
             "FASTQ_Cutadapt/logs/Cutadapt.{sample}.log"
         benchmark:
             "FASTQ_Cutadapt/.benchmark/Cutadapt.{sample}.benchmark"
         threads: 8
-        conda: CONDA_ENV_SHARED
-        shell:
-            "cutadapt "
-                "{params.opts} "
-                "-j {threads} "
-                "-f fastq -e 0.1 -q 16 -O 3 --trim-n --minimum-length 25 -a AGATCGGAAGAGC "
-                "-o ${{TMPDIR}}{params.tmp} "
-                "{input.r1} "
-                "&> {log} "
-                "&& (mv ${{TMPDIR}}{params.tmp} {output.r1}; touch {output.r1})"
+        conda: CONDA_SHARED_ENV
+        shell: """
+            cutadapt {params.opts} -j {threads} -e 0.1 -q 16 -O 3 --trim-n --minimum-length 25 -a AGATCGGAAGAGC \
+                -o {output} {input.r1} &> {log}
+            """
 
 
 ### TrimGalore #################################################################
@@ -70,17 +59,11 @@ if paired:
             "FASTQ_TrimGalore/logs/TrimGalore.{sample}.log"
         benchmark:
             "FASTQ_TrimGalore/.benchmark/TrimGalore.{sample}.benchmark"
-        conda: CONDA_ENV_SHARED
-        shell:
-                "trim_galore "
-                "--path_to_cutadapt cutadapt "
-                "--output_dir FASTQ_TrimGalore "
-                "--paired "
-                "--stringency 3 "
-                "{params.opts} "
-                "{input.r1} {input.r2} "
-                "&> {log} "
-                "&& (mv {params.tmp1} {output.r1}; mv {params.tmp2} {output.r2})"
+        conda: CONDA_SHARED_ENV
+        shell: """
+            trim_galore --output_dir FASTQ_TrimGalore --paired --stringency 3 {params.opts} {input.r1} {input.r2} &> {log} && \
+            (mv {params.tmp1} {output.r1} ; mv {params.tmp2} {output.r2})
+            """
 else:
     rule TrimGalore:
         input:
@@ -94,16 +77,11 @@ else:
             "FASTQ_TrimGalore/logs/TrimGalore.{sample}.log"
         benchmark:
             "FASTQ_TrimGalore/.benchmark/TrimGalore.{sample}.benchmark"
-        conda: CONDA_ENV_SHARED
-        shell:
-                "trim_galore "
-                "--path_to_cutadapt cutadapt "
-                "--output_dir FASTQ_TrimGalore "
-                "--stringency 3 "
-                "{params.opts} "
-                "{input} "
-                "&> {log} "
-                "&& mv {params.tmp} {output}"
+        conda: CONDA_SHARED_ENV
+        shell: """
+            trim_galore --output_dir FASTQ_TrimGalore --stringency 3 {params.opts} {input} &> {log} && \
+            mv {params.tmp} {output}
+            """
 
 
 ### FastQC_on_trimmed #######################################################
@@ -118,6 +96,5 @@ rule FastQC_on_trimmed:
     benchmark:
         "FastQC_trimmed/.benchmark/FastQC_trimmed.{sample}{read}.benchmark"
     threads: 2
-    conda: CONDA_ENV_SHARED
-    shell:
-        "fastqc -o FastQC_trimmed {input} &> {log}"
+    conda: CONDA_SHARED_ENV
+    shell: "fastqc -o FastQC_trimmed {input} &> {log}"

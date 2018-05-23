@@ -2,6 +2,9 @@ import os
 import re
 from operator import is_not
 
+CONDA_SHARED_ENV = "envs/shared_environment.yaml"
+
+
 ###get automatic cut threshold for hard-trimming of 5' ends
 
 if trimReads=='auto':
@@ -62,8 +65,8 @@ if not trimReads is None:
         params:
             fqcout=os.path.join(wdir,'FastQC_Cutadapt')
         threads: nthreads
-        run:
-            shell(os.path.join(fastqc_path,'fastqc ')+" --outdir {params.fqcout} -t  {threads} {input.R1cut} {input.R2cut}")
+        conda: CONDA_SHARED_ENV
+        shell: "fastqc --outdir {params.fqcout} -t  {threads} {input.R1cut} {input.R2cut}"
 
 if convRef:
     rule conv_ref:
@@ -109,8 +112,8 @@ rule index_bam:
         sbami=temp("bams/{sample}.sorted.bam.bai")
     params:
     #log:"bams/logs/{sample}"+".indexing.log"
-    run:
-        shell(os.path.join(samtools_path,'samtools') + " index {input.sbam}")
+    conda: CONDA_SHARED_ENV
+    shell: "samtools index {input.sbam}"
 
 rule rm_dupes:
     input:
