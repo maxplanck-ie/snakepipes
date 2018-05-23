@@ -18,7 +18,6 @@ if mapping_prg == "Bowtie2":
             output:
                 align_summary = mapping_prg+"/{sample}.Bowtie2_summary.txt",
                 bam = temp(mapping_prg+"/{sample}.sorted.bam")
-            conda: CONDA_DNA_MAPPING_ENV
             params:
                 bowtie_opts = str(bowtie_opts or ''),
                 mate_orientation = mate_orientation,
@@ -27,6 +26,7 @@ if mapping_prg == "Bowtie2":
             benchmark:
                 mapping_prg+"/.benchmark/Bowtie2.{sample}.benchmark"
             threads: 24
+            conda: CONDA_DNA_MAPPING_ENV
             shell:
                 "bowtie2"
                 " -X {params.insert_size_max}"
@@ -46,13 +46,13 @@ if mapping_prg == "Bowtie2":
             output:
                 align_summary = mapping_prg+"/{sample}.Bowtie2_summary.txt",
                 bam = temp(mapping_prg+"/{sample}.sorted.bam")
-            conda: CONDA_DNA_MAPPING_ENV
             params:
                 bowtie_opts = str(bowtie_opts or ''),
                 idxbase = getbw_idxbase(bowtie2_index_allelic)
             benchmark:
                 mapping_prg+"/.benchmark/Bowtie2.{sample}.benchmark"
             threads: 24
+            conda: CONDA_DNA_MAPPING_ENV
             shell:
                 "bowtie2"
                 " -x {params.idxbase} -U {input.r1}"

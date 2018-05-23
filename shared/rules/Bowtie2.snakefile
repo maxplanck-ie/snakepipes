@@ -7,7 +7,6 @@ if paired:
         output:
             align_summary = "Bowtie2/{sample}.Bowtie2_summary.txt",
             bam = temp("Bowtie2/{sample}.sorted.bam")
-        conda: CONDA_DNA_MAPPING_ENV
         params:
             bowtie_opts = str(bowtie_opts or ''),
             mate_orientation = mate_orientation,
@@ -15,6 +14,7 @@ if paired:
         benchmark:
             "Bowtie2/.benchmark/Bowtie2.{sample}.benchmark"
         threads: 24
+        conda: CONDA_DNA_MAPPING_ENV
         shell:
             "bowtie2 "
             "-X {params.insert_size_max} "
@@ -33,12 +33,12 @@ else:
         output:
             align_summary = "Bowtie2/{sample}.Bowtie2_summary.txt",
             bam = temp("Bowtie2/{sample}.sorted.bam")
-        conda: CONDA_DNA_MAPPING_ENV
         params:
             bowtie_opts = str(bowtie_opts or '')
         benchmark:
             "Bowtie2/.benchmark/Bowtie2.{sample}.benchmark"
         threads: 24
+        conda: CONDA_DNA_MAPPING_ENV
         shell:
             "bowtie2 "
             "-x "+bowtie2_index+" -U {input} "

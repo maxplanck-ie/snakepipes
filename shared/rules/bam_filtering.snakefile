@@ -37,8 +37,8 @@ rule samtools_filter:
 ### samtools_index #############################################################
 rule samtools_index_filtered:
     input:
-        "filtered_bam/{sample}.bam"
+        "filtered_bam/{sample}.filtered.bam"
     output:
-        "filtered_bam/{sample}.bam.bai"
+        "filtered_bam/{sample}.filtered.bam.bai"
     conda: CONDA_SHARED_ENV
     shell: "samtools index {input}"

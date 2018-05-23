@@ -19,8 +19,8 @@ def multiqc_input_check(return_value):
         infiles.append( expand("Bowtie2/{sample}.Bowtie2_summary.txt", sample = samples) +
                 expand("Sambamba/{sample}.markdup.txt", sample = samples) +
                 expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample=samples))
-        if paired:
-            infiles.append( expand("Picard_qc/InsertSizeMetrics/{sample}.insert_size_metrics.txt", sample = samples) )
+        #if paired:
+        #    infiles.append( expand("Picard_qc/InsertSizeMetrics/{sample}.insert_size_metrics.txt", sample = samples) )
         indir += " Picard_qc"
         indir += " Sambamba"
         indir += " Bowtie2"
@@ -58,4 +58,4 @@ rule multiQC:
         indirs = multiqc_input_check(return_value = "indir")
     log: "multiQC/multiQC.log"
     shell:
-        multiqc_path+"multiqc -o multiQC -f {params.indirs} &> {log}"
+        "multiqc -o multiQC -f {params.indirs} &> {log}"

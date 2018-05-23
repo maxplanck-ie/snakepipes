@@ -14,11 +14,9 @@ rule Qualimap_bamqc:
     benchmark:
         "Qualimap_qc/.benchmark/Qualimap_bamqc.{sample}.filtered.benchmark"
     threads: 16
+    conda: CONDA_DNA_MAPPING_ENV
     shell:
-        "export PATH="+R_path+":$PATH && "
-        # unset DISPLAY environment variable as Java VM might fail otherwise
-        "unset DISPLAY && "
-        ""+qualimap_path+"qualimap bamqc "
+        "qualimap bamqc "
         "--java-mem-size=8G "
         "--bam {input} "
         "--paint-chromosome-limits "
@@ -33,6 +31,7 @@ rule Qualimap_bamqc_symlink_txt:
         "Qualimap_qc/{sample}.filtered/genome_results.txt"
     output:
         "Qualimap_qc/{sample}.filtered.bamqc_results.txt"
+    conda: CONDA_DNA_MAPPING_ENV
     shell:
         "( [ -f {output} ] || ln -s -r {input} {output} ) && touch -h {output}"
 
@@ -42,5 +41,6 @@ rule Qualimap_bamqc_symlink_html:
         "Qualimap_qc/{sample}.filtered/qualimapReport.html"
     output:
         "Qualimap_qc/{sample}.filtered.bamqc_report.html"
+    conda: CONDA_DNA_MAPPING_ENV
     shell:
         "( [ -f {output} ] || ln -s -r {input} {output} ) && touch -h {output}"
