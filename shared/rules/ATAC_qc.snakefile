@@ -1,3 +1,5 @@
+CONDA_SHARED_ENV = "envs/shared_environment.yaml"
+
 def isFloat(string):
     try:
         float(string)
@@ -26,8 +28,8 @@ rule plotFingerprint:
     benchmark:
         os.path.join(deeptools_ATAC, ".benchmark","plotFingerprint.benchmark")
     threads: 24
-    run:
-        shell(plotFingerprint_cmd())
+    conda: CONDA_SHARED_ENV
+    shell: plotFingerprint_cmd
 
 rule plotFingerprint_allelic:
     input:
@@ -48,8 +50,8 @@ rule plotFingerprint_allelic:
     benchmark:
         os.path.join(deeptools_ATAC, ".benchmark/plotFingerprint_allelic.benchmark")
     threads: 24
-    run:
-        shell(plotFingerprint_cmd())
+    conda: CONDA_SHARED_ENV
+    shell: plotFingerprint_cmd
 
 rule MACS2_peak_qc:
     input:
