@@ -101,15 +101,15 @@ rule plotCorrelation_pearson_allelic:
     input:
         "deepTools_qc/multiBamSummary/read_coverage_allelic.bins.npz"
     output:
-        tsv = "deepTools_qc/plotCorrelation/correlation.pearson.read_coverage_allelic.tsv"
+        "deepTools_qc/plotCorrelation/correlation.pearson.read_coverage_allelic.tsv"
     params:
         plotcmd = "" if plot_format == 'None' else
-            "--plotFile " + "deepTools_qc/plotCorrelation/correlation.pearson.read_coverage_allelic.heatmap." + plot_format
+            "--plotFile " + "deepTools_qc/plotCorrelation/correlation.pearson.read_coverage_allelic.heatmap." + plot_format,
+        title='fragment'
     log:
         "deepTools_qc/logs/plotCorrelation_pearson_allelic.log"
     benchmark:
         "deepTools_qc/.benchmark/plotCorrelation_pearson_allelic.benchmark"
-    params: label='fragment'
     conda: CONDA_SHARED_ENV
     shell: plotCorr_cmd
 
@@ -118,15 +118,15 @@ rule plotCorrelation_spearman_allelic:
     input:
         "deepTools_qc/multiBamSummary/read_coverage_allelic.bins.npz"
     output:
-        tsv = "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage_allelic.tsv"
+        "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage_allelic.tsv"
     params:
         plotcmd = "" if plot_format == 'None' else
-            "--plotFile " + "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage_allelic.heatmap." + plot_format
+            "--plotFile " + "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage_allelic.heatmap." + plot_format,
+        title = 'fragment'
     log:
         "deepTools_qc/logs/plotCorrelation_spearman_allelic.log"
     benchmark:
         "deepTools_qc/.benchmark/plotCorrelation_spearman_allelic.benchmark"
-    params: label='fragment'
     conda: CONDA_SHARED_ENV
     shell: plotCorrSP_cmd
 
@@ -138,11 +138,11 @@ rule plotPCA_allelic:
         "deepTools_qc/plotPCA/PCA.read_coverage_allelic.tsv"
     params:
         plotcmd = "" if plot_format == 'None' else
-                "--plotFile " + "deepTools_qc/plotPCA/PCA.read_coverage_allelic." + plot_format
+                "--plotFile " + "deepTools_qc/plotPCA/PCA.read_coverage_allelic." + plot_format,
+        title='fragment'
     log:
         "deepTools_qc/logs/plotPCA_allelic.log"
     benchmark:
         "deepTools_qc/.benchmark/plotPCA_allelic.benchmark"
-    params: label='fragment'
     conda: CONDA_SHARED_ENV
     shell: plotPCA_cmd

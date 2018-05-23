@@ -30,7 +30,7 @@ import common_functions as cf
 def parse_args(defaults={"verbose":None,"configfile":None,"cluster_configfile":None,"max_jobs":None,"snakemake_options":None,"tempdir":None,
                          "mode":None, "downsample":None, "trim":None,"trim_prg":None,"trim_options":None, "fastqc":None,
                          "qualimap":None, "dedup":None, "properpairs":None, "insert_size_max":None, "gcbias":None,
-                         "bw_binsize":None, "mapq":None}):
+                         "bw_binsize":None, "mapq":None, "plot_format":None}):
     """
     Parse arguments from the command line.
     """
@@ -206,7 +206,7 @@ def parse_args(defaults={"verbose":None,"configfile":None,"cluster_configfile":N
                         metavar="STR",
                         type=str,
                         help="Format of the output plots from deeptools. Select 'none' for no plot (default: '%(default)s')",
-                        default=defaults["plot_type"])
+                        default=defaults["plot_format"])
 
     snpargs = parser.add_argument_group('allele-specific mapping arguments')
     snpargs.add_argument("--VCFfile",

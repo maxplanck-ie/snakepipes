@@ -127,15 +127,15 @@ rule plotCorrelation_pearson:
     input:
         "deepTools_qc/multiBamSummary/read_coverage.bins.npz"
     output:
-        tsv = "deepTools_qc/plotCorrelation/correlation.pearson.read_coverage.tsv"
+        "deepTools_qc/plotCorrelation/correlation.pearson.read_coverage.tsv"
     params:
         plotcmd = "" if plot_format == 'None' else
-            "--plotFile " + "deepTools_qc/plotCorrelation/correlation.pearson.read_coverage.heatmap." + plot_format
+            "--plotFile " + "deepTools_qc/plotCorrelation/correlation.pearson.read_coverage.heatmap." + plot_format,
+        title='fragment'
     log:
         "deepTools_qc/logs/plotCorrelation_pearson.log"
     benchmark:
         "deepTools_qc/.benchmark/plotCorrelation_pearson.benchmark"
-    params: label='fragment'
     conda: CONDA_SHARED_ENV
     shell: plotCorr_cmd
 
@@ -144,15 +144,15 @@ rule plotCorrelation_spearman:
     input:
         "deepTools_qc/multiBamSummary/read_coverage.bins.npz"
     output:
-        tsv = "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage.tsv"
+        "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage.tsv"
     params:
         plotcmd = "" if plot_format == 'None' else
-            "--plotFile " + "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage.heatmap." + plot_format
+            "--plotFile " + "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage.heatmap." + plot_format,
+        title='fragment'
     log:
         "deepTools_qc/logs/plotCorrelation_spearman.log"
     benchmark:
         "deepTools_qc/.benchmark/plotCorrelation_spearman.benchmark"
-    params: label='fragment'
     conda: CONDA_SHARED_ENV
     shell: plotCorrSP_cmd
 
@@ -164,12 +164,12 @@ rule plotPCA:
         "deepTools_qc/plotPCA/PCA.read_coverage.tsv"
     params:
         plotcmd = "" if plot_format == 'None' else
-                "--plotFile " + "deepTools_qc/plotPCA/PCA.read_coverage." + plot_format
+                "--plotFile " + "deepTools_qc/plotPCA/PCA.read_coverage." + plot_format,
+        title='fragment'
     log:
         "deepTools_qc/logs/plotPCA.log"
     benchmark:
         "deepTools_qc/.benchmark/plotPCA.benchmark"
-    params: label='fragment'
     conda: CONDA_SHARED_ENV
     shell: plotPCA_cmd
 

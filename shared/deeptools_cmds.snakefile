@@ -143,8 +143,8 @@ plotCorr_cmd = """
                 --corMethod pearson \
                 --whatToPlot heatmap \
                 --skipZeros \
-                --plotTitle 'Pearson correlation of {params.label} coverage' \
-                --outFileCorMatrix {output.tsv} \
+                --plotTitle 'Pearson correlation of {params.title} coverage' \
+                --outFileCorMatrix {output} \
                 --colorMap viridis \
                 --plotNumbers &> {log}
     """
@@ -157,8 +157,8 @@ plotCorrSP_cmd = """
         --corMethod spearman \
         --whatToPlot heatmap \
         --skipZeros \
-        --plotTitle 'Spearman correlation of {params.label} coverage' \
-        --outFileCorMatrix {output.tsv} \
+        --plotTitle 'Spearman correlation of {params.title} coverage' \
+        --outFileCorMatrix {output} \
         --colorMap viridis \
         --plotNumbers &> {log}
     """
@@ -168,8 +168,8 @@ plotPCA_cmd = """
     plotPCA -in {input} \
             {params.plotcmd} \
             --transpose \
-            --outFileNameData {output.tsv} \
-            -T 'PCA of {params.label} coverage' &> {log}
+            --outFileNameData {output} \
+            -T 'PCA of {params.title} coverage' &> {log}
     """
 
 # plot Coverage
