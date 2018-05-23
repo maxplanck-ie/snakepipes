@@ -1,0 +1,7 @@
+name: snakepipes_hic_conda_env_1.0
+channels:
+ - bioconda 
+dependencies:
+ - hicexplorer
+ - bwa
+ - samtools 
