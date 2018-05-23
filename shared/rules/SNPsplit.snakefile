@@ -1,3 +1,5 @@
+CONDA_SHARED_ENV = "envs/shared_environment.yaml"
+
 
 # SNPsplit rule
 if paired:
@@ -60,8 +62,8 @@ rule BAMsort_allelic:
         "allelic_bams/{sample}.{suffix}.sorted.bam"
     threads:
         12
-    shell:
-        samtools_path+"samtools sort -@ {threads} -T ${{TMPDIR}} -O bam -o {output} {input}"
+    conda: CONDA_SHARED_ENV
+    shell: "samtools sort -@ {threads} -T ${{TMPDIR}} -O bam -o {output} {input}"
 
 # index the sorted files
 rule BAMindex_allelic:
@@ -69,5 +71,5 @@ rule BAMindex_allelic:
         "allelic_bams/{sample}.{suffix}.sorted.bam"
     output:
         "allelic_bams/{sample}.{suffix}.sorted.bam.bai"
-    shell:
-        samtools_path+"samtools index {input}"
+    conda: CONDA_SHARED_ENV
+    shell: "samtools index {input}"
