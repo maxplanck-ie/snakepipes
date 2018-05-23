@@ -115,10 +115,12 @@ def parse_args(defaults={"verbose":None,"configfile":None,"cluster_configfile":N
 
     optional.add_argument("--DOC",
                         dest="sample_info",
-                        help="Information on samples (If differential open chromatin analysis is required); see "
-                            "'snakemake_workflows/shared/tools/sampleInfo_DB.example.tsv' for example."
-                            " IMPORTANT: The first entry defines which group of samples are control. "
-                            " By this, the order of comparison and likewise the sign of values can be changed! (default: '%(default)s')",
+                        help="Information on samples (If differential binding analysis required); see "
+    						 "'snakepipes/shared/tools/sampleInfo.example.tsv' for example."
+    						 " IMPORTANT: The first entry defines which group of samples are control. "
+    						 " By this, the order of comparison and likewise the sign of values can be changed! "
+                             " Also, the condition `control` should not be used (reserved to mark input samples "
+                             " in the ChIP-Seq workflow (default: '%(default)s')",
                         default=defaults["sample_info"])
 
     return parser
