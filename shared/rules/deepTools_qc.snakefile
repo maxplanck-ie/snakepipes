@@ -69,9 +69,9 @@ rule computeGCBias:
         fragment_length = fragment_length,
         genome_size = int(genome_size),
         genome_2bit = genome_2bit,
-        blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed
-                    else ""
-        median_fragment_length = cf.get_fragment_length(input.insert_size_metrics) if paired else fragment_length
+        blacklist = "--blackListFileName "+ blacklist_bed if blacklist_bed
+                    else "",
+        median_fragment_length = "" if paired else "-fragmentLength " + fragment_length
     log:
         "deepTools_qc/logs/computeGCBias.{sample}.filtered.log"
     benchmark:
