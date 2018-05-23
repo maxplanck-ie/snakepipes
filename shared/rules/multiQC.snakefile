@@ -46,16 +46,8 @@ def multiqc_input_check(return_value):
             infiles.append( expand("Salmon/{sample}/quant.sf", sample = samples) )
             indir += " Salmon "
     elif pipeline == "hic":
-        if merge_samples and nbins_toMerge !=0:
-             infiles.append(["HiC_matrices/QCplots/mergedSamples_Mbins"+str(nbins_toMerge)+"_"+matrixFile_suffix+"_mad_threshold.out"])
-        elif merge_samples:
-             infiles.append(["HiC_matrices/QCplots/mergedSamples_"+matrixFile_suffix+"_mad_threshold.out"])
-        elif nbins_toMerge != 0:
-             infiles.append(expand("HiC_matrices/QCplots/{sample}_Mbins"+str(nbins_toMerge)+"_"+matrixFile_suffix+"_mad_threshold.out", sample=samples))
-        else:
-             infiles.append(expand("HiC_matrices/QCplots/{sample}_"+matrixFile_suffix+"_mad_threshold.out", sample=samples))
-
-        indir += "HiC_matrices"
+        infiles.append(expand("HiC_matrices/QCplots/{sample}_QC/QC_table.txt",sample = samples))
+        indir += "HiC_matrices/QCplots/"
 
 
     if return_value == "infiles":

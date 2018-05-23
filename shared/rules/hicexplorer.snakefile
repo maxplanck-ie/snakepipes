@@ -24,7 +24,7 @@ rule map_fastq_single_end:
     threads: 15
     shell:
         "echo 'mapping {input}' > {log} && "
-        +bwa_path+"bwa mem -A1 -B4  -E50 -L0 "
+        "bwa mem -A1 -B4  -E50 -L0 "
         "-t {threads} " + bwa_index + " {input} 2>> {log} | "
         +samtools_path+"samtools view -Shb - > {output}"
 ## Make HiC Matrix
@@ -69,6 +69,7 @@ else:
         output:
             matrix = "HiC_matrices/{sample}_"+matrixFile_suffix+".h5",
 #           bam = "BWA/{sample}_R12_"+matrixFile_suffix+".bam"
+            qc = "HiC_matrices/QCplots/{sample}_QC/QC_table.txt"
         conda:
            "envs/snakepipes_hic_conda_env.yaml"
         params:
