@@ -4,3 +4,5 @@ channels:
  - conda-forge
 dependencies:
  - deeptools=3.0.2
+ - seqtk=1.2
+ - pigz=2.3.4
