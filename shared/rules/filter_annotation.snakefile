@@ -6,7 +6,7 @@ if genes_gtf.lower().find("gencode")>=0:
             gtf = genes_gtf
         output:
             bed_annot = "Annotation/genes.annotated.bed"
-        conda: CONDA_ENV_SHARED
+        conda: CONDA_RNASEQ_ENV
         shell:
             "join -t $'\t' -o auto --check-order -1 4 -2 2 "
             "<(gtfToGenePred -ignoreGroupsWithoutExons {input.gtf} /dev/stdout | genePredToBed /dev/stdin /dev/stdout | tr ' ' $'\t' | sort -k4) "
@@ -30,7 +30,7 @@ elif genes_gtf.lower().find("ensembl")>=0:
             gtf = genes_gtf
         output:
             bed_annot = "Annotation/genes.annotated.bed"
-        conda: CONDA_ENV_SHARED
+        conda: CONDA_RNASEQ_ENV
         shell:
             "join -t $'\t' -o auto --check-order -1 4 -2 2 "
             "<(gtfToGenePred {input.gtf} /dev/stdout | genePredToBed /dev/stdin /dev/stdout | tr ' ' $'\t' | sort -k4) "
@@ -86,9 +86,9 @@ rule annotation_bed2fasta:
     benchmark:
         "Annotation/.benchmark/annotation_bed2fasta.benchmark"
     threads: 1
-    conda: CONDA_ENV_SHARED
+    conda: CONDA_RNASEQ_ENV
     shell:
-        "bedtools getfasta -fi {input.genome_fasta} -bed {input.bed} -fo {output} -name "
+        "bedtools getfasta -s -split -fi {input.genome_fasta} -bed {input.bed} -fo {output} -name "
 
 
 rule annotation_bed2saf:
@@ -122,7 +122,7 @@ rule annotation_bed2gtf:
         bed = "Annotation/genes.filtered.bed"
     output:
         gtf = "Annotation/genes.filtered.gtf"
-    conda: CONDA_ENV_SHARED
+    conda: CONDA_RNASEQ_ENV
     shell:
     	"""
         bedToGenePred {input.bed} stdout | awk -v map_f={input.bed} '

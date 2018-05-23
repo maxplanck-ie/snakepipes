@@ -1,0 +1,17 @@
+name: snakepipes_RNAseq_environment_0.1
+channels:
+ - bioconda
+ - conda-forge
+dependencies:
+ - deeptools=3.0.2
+ - bedtools=2.27.1
+ - ucsc-genepredtogtf=357
+ - ucsc-bedtogenepred=357
+ - ucsc-genepredtobed=357
+ - ucsc-gtftoGenepred=357
+ - subread=1.6.1
+ - hisat2=2.1.0
+ - star=2.6.0b
+ - r-base=3.4.1
+ - salmon=0.9.1
+ - r-wasabi=0.2

@@ -24,8 +24,9 @@ if mapping_prg.upper().find("HISAT2") >=0:
             threads: 10
             resources:
                 mem_mb=4000
+            conda: CONDA_RNASEQ_ENV
             shell:
-                hisat2_path+"hisat2 "
+                "hisat2 "
                 "-p {threads} "
                 "{params.hisat_options} "
                 "{params.rna_strandness} "
@@ -37,8 +38,8 @@ if mapping_prg.upper().find("HISAT2") >=0:
                 "--un-conc-gz {output.unconc} "
                 "--al-conc-gz {output.alconc} "
                 "2> {output.align_summary} | "
-                ""+samtools_path+"samtools view -Sb - | "
-                ""+samtools_path+"samtools sort -m {params.samsort_memory} "
+                "samtools view -Sb - | "
+                "samtools sort -m {params.samsort_memory} "
                 "-T ${{TMPDIR}}{wildcards.sample} -@ {threads} -O bam - > {output.bam} "
                 "&& touch {output.unconc} {output.alconc} "
     else:
@@ -60,8 +61,9 @@ if mapping_prg.upper().find("HISAT2") >=0:
             benchmark:
                 mapping_prg+"/.benchmark/HISAT2.{sample}.benchmark"
             threads: 10
+            conda: CONDA_RNASEQ_ENV
             shell:
-                hisat2_path+"hisat2 "
+                "hisat2 "
                 "-p {threads} "
                 "{params.hisat_options} "
                 "{params.rna_strandness} "
@@ -73,8 +75,8 @@ if mapping_prg.upper().find("HISAT2") >=0:
                 "--un-gz {output.un} "
                 "--al-gz {output.al} "
                 "2> {output.align_summary} | "
-                ""+samtools_path+"samtools view -Sb - | "
-                ""+samtools_path+"samtools sort -m {params.samsort_memory} "
+                "samtools view -Sb - | "
+                "samtools sort -m {params.samsort_memory} "
                 "-T ${{TMPDIR}}{wildcards.sample} -@ {threads} -O bam - > {output.bam} "
                 "&& touch {output.un} {output.al} "
 
@@ -96,10 +98,10 @@ elif mapping_prg.upper().find("STAR") >=0:
             benchmark:
                 mapping_prg+"/.benchmark/STAR.{sample}.benchmark"
             threads: 12
+            conda: CONDA_RNASEQ_ENV
             shell:
                 "( [ -d {params.sample_dir} ] || mkdir -p {params.sample_dir} ) && "
-                "module load STAR && "
-                ""+star_path+"STAR "
+                "STAR "
                 "--runThreadN {threads} "
                 "{params.star_options} "
                 "--sjdbOverhang 100 "
@@ -126,10 +128,10 @@ elif mapping_prg.upper().find("STAR") >=0:
             benchmark:
                 mapping_prg+"/.benchmark/STAR.{sample}.benchmark"
             threads: 12
+            conda: CONDA_RNASEQ_ENV
             shell:
                 "( [ -d {params.sample_dir} ] || mkdir -p {params.sample_dir} ) && "
-                "module load STAR && "
-                ""+star_path+"STAR "
+                "STAR "
                 "--runThreadN {threads} "
                 "{params.star_options} "
                 "--sjdbOverhang 100 "

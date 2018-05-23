@@ -9,7 +9,7 @@ if paired:
         benchmark:
             "FastQC/.benchmark/FastQC.{sample}{read}.benchmark"
         threads: 2
-        conda: CONDA_ENV_SHARED
+        conda: CONDA_SHARED_ENV
         shell:
             "fastqc -o FastQC {input} &> {log}"
 
@@ -24,6 +24,6 @@ else:
         benchmark:
             "FastQC/.benchmark/FastQC.{sample}.benchmark"
         threads: 2
-        conda: CONDA_ENV_SHARED
+        conda: CONDA_SHARED_ENV
         shell:
             "fastqc -o FastQC {input} &> {log}"
