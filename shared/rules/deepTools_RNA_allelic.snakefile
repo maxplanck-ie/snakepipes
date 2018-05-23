@@ -1,3 +1,4 @@
+CONDA_SHARED_ENV = "envs/shared_environment.yaml"
 
 rule bamCoverage_RPKM_allelic:
     input:
@@ -5,6 +6,8 @@ rule bamCoverage_RPKM_allelic:
         bai = "allelic_bams/{sample}.{suffix}.sorted.bam.bai"
     output:
         "bamCoverage/allele_specific/{sample}.{suffix}.RPKM.bw"
+    conda:
+        CONDA_SHARED_ENV
     params:
         bw_binsize = config["bw_binsize"]
     log:
@@ -12,8 +15,8 @@ rule bamCoverage_RPKM_allelic:
     benchmark:
         "bamCoverage/allele_specific/.benchmark/bamCoverage_RPKM.{sample}.{suffix}.benchmark"
     threads: 8
-    run:
-        shell(bamcov_rpkm_cmd())
+    shell: bamcov_RPKM_cmd
+
 
 rule bamCoverage_raw_allelic:
     input:
@@ -21,6 +24,8 @@ rule bamCoverage_raw_allelic:
         bai = "allelic_bams/{sample}.{suffix}.sorted.bam.bai"
     output:
         "bamCoverage/allele_specific/{sample}.{suffix}.coverage.bw"
+    conda:
+        CONDA_SHARED_ENV
     params:
         bw_binsize = bw_binsize
     log:
@@ -28,8 +33,8 @@ rule bamCoverage_raw_allelic:
     benchmark:
         "bamCoverage/allele_specific.benchmark/bamCoverage_coverage.{sample}.benchmark"
     threads: 8
-    run:
-        shell(bamcov_raw_cmd())
+    shell: bamcov_raw_cmd
+
 
 rule plotEnrichment_allelic:
     input:
@@ -40,6 +45,8 @@ rule plotEnrichment_allelic:
     output:
         png = "deepTools_qc/plotEnrichment/plotEnrichment_allelic.png",
         tsv = "deepTools_qc/plotEnrichment/plotEnrichment_allelic.tsv"
+    conda:
+        CONDA_SHARED_ENV
     params:
         labels = " ".join(expand('{sample}.{suffix}', sample=samples, suffix = ['genome1', 'genome2']))
     log:
@@ -47,8 +54,7 @@ rule plotEnrichment_allelic:
     benchmark:
         "deepTools_qc/.benchmark/plotEnrichment_allelic.benchmark"
     threads: 8
-    run:
-        shell(plotEnrich_cmd())
+    shell: plotEnrich_cmd
 
 
 rule multiBigwigSummary_bed_allelic:
@@ -57,6 +63,8 @@ rule multiBigwigSummary_bed_allelic:
         bed = "Annotation/genes.filtered.bed"
     output:
         "deepTools_qc/multiBigwigSummary/coverage_allelic.bed.npz"
+    conda:
+        CONDA_SHARED_ENV
     params:
         labels = " ".join(expand('{sample}.{suffix}', sample=samples, suffix = ['genome1', 'genome2']))
     log:
@@ -64,8 +72,7 @@ rule multiBigwigSummary_bed_allelic:
     benchmark:
         "deepTools_qc/.benchmark/multiBigwigSummary.bed_allelic.benchmark"
     threads: 8
-    run:
-        shell(multiBWsum_bed_cmd())
+    shell: multiBWsum_bed_cmd
 
 
 # Pearson: heatmap, scatterplot and correlation matrix
@@ -76,12 +83,14 @@ rule plotCorr_bed_pearson_allelic:
         heatpng = "deepTools_qc/plotCorrelation/correlation.pearson.bed_coverage_allelic.heatmap.png",
         scatterpng = "deepTools_qc/plotCorrelation/correlation.pearson.bed_coverage_allelic.scatterplot.png",
         tsv = "deepTools_qc/plotCorrelation/correlation.pearson.bed_coverage_allelic.tsv"
+    conda:
+        CONDA_SHARED_ENV
     log:
         "deepTools_qc/logs/plotCorrelation_pearson_allelic.log"
     benchmark:
         "deepTools_qc/.benchmark/plotCorrelation_pearson_allelic.benchmark"
-    run:
-        shell(plotCorr_cmd('gene'))
+    params: label='gene'
+    shell: plotCorr_cmd
 
 
 # Spearman: heatmap, scatterplot and correlation matrix
@@ -92,13 +101,14 @@ rule plotCorr_bed_spearman_allelic:
         heatpng = "deepTools_qc/plotCorrelation/correlation.spearman.bed_coverage_allelic.heatmap.png",
         scatterpng = "deepTools_qc/plotCorrelation/correlation.spearman.bed_coverage_allelic.scatterplot.png",
         tsv = "deepTools_qc/plotCorrelation/correlation.spearman.bed_coverage_allelic.tsv"
+    conda:
+        CONDA_SHARED_ENV
     log:
         "deepTools_qc/logs/plotCorrelation_spearman_allelic.log"
     benchmark:
         "deepTools_qc/.benchmark/plotCorrelation_spearman_allelic.benchmark"
-    run:
-        shell(plotCorrSP_cmd('gene'))
-
+    params: label='gene'
+    shell: plotCorrSP_cmd
 
 
 ### deepTools plotPCA ##########################################################
@@ -107,9 +117,11 @@ rule plotPCA_allelic:
         "deepTools_qc/multiBigwigSummary/coverage_allelic.bed.npz"
     output:
         "deepTools_qc/plotPCA/PCA.bed_coverage_allelic.png"
+    conda:
+        CONDA_SHARED_ENV
     log:
         "deepTools_qc/logs/plotPCA_allelic.log"
     benchmark:
         "deepTools_qc/.benchmark/plotPCA_allelic.benchmark"
-    run:
-        shell(plotPCA_cmd('gene'))
+    params: label='gene'
+    shell: plotPCA_cmd
