@@ -208,10 +208,6 @@ def main():
         cluster_config = cf.merge_dicts(cluster_config, user_cluster_config) # 2) merge/override variables from user_config.yaml
     cf.write_configfile(os.path.join(args.outdir,'ChIP-seq.cluster_config.yaml'),cluster_config)
 
-    snakemake_module_load = "module load snakemake/5.1.2"
-
-    snakemake_module_load = (snakemake_module_load + " && ").split()
-
     snakemake_cmd = """
                     snakemake {snakemake_options} --latency-wait {latency_wait} --snakefile {snakefile} --jobs {max_jobs} --directory {workingdir} --configfile {configfile}
                     """.format( latency_wait = cluster_config["snakemake_latency_wait"],
@@ -238,7 +234,7 @@ def main():
     temp_path = cf.make_temp_dir(args.tempdir, args.outdir)
     snakemake_exports = ("export TMPDIR="+temp_path+" && ").split()
 
-    cmd = " ".join(snakemake_exports + snakemake_module_load + snakemake_cmd + snakemake_log)
+    cmd = " ".join(snakemake_exports + snakemake_cmd + snakemake_log)
 
     if args.verbose:
         print("\n", cmd, "\n")
