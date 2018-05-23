@@ -45,14 +45,13 @@ rule computeGCBias_allelic:
         genome_size = int(genome_size),
         genome_2bit = genome_2bit,
         blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed
-                    else ""
-        median_fragment_length = cf.get_fragment_length(input.insert_size_metrics) if paired else fragment_length
+                    else "",
+        median_fragment_length = "" if paired else "-fragmentLength " + fragment_length
     log:
         "deepTools_qc/logs/computeGCBias.{sample}.{suffix}.log"
     benchmark:
         "deepTools_qc/.benchmark/computeGCBias.{sample}.{suffix}.benchmark"
     threads: 16
-    params: median_fragment_length=cf.get_fragment_length(input.insert_size_metrics) if paired else params.fragment_length
     shell: gcbias_cmd
 
 ### deepTools plotCoverage #####################################################

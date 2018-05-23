@@ -62,7 +62,7 @@ gcbias_cmd = """
                 --GCbiasFrequenciesFile {output.tsv} \
                 --effectiveGenomeSize {params.genome_size} \
                 --genome {params.genome_2bit} \
-                --fragmentLength {params.median_fragment_length}  \
+                {params.median_fragment_length}  \
                 --sampleSize 10000000 \
                 {params.blacklist} \
                 -p {threads} &> {log}
@@ -117,7 +117,7 @@ multiBamSummary_cmd = """
     multiBamSummary bins \
                     -b {input.bams} \
                     -o {output} \
-                    --labels {params.label} \
+                    --labels {params.labels} \
                     --binSize 1000 \
                     {params.blacklist} \
                     -p {threads} \
