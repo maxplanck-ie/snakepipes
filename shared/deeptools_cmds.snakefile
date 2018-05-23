@@ -117,7 +117,7 @@ multiBamSummary_cmd = """
     multiBamSummary bins \
                     -b {input.bams} \
                     -o {output} \
-                    --labels {params.label} \
+                    --labels {params.labels} \
                     --binSize 1000 \
                     {params.blacklist} \
                     -p {threads} \
