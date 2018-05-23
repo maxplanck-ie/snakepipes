@@ -54,9 +54,6 @@ rule computeGCBias:
     input:
         bam = "filtered_bam/{sample}.filtered.bam",
         bai = "filtered_bam/{sample}.filtered.bam.bai",
-        insert_size_metrics =
-            "Picard_qc/InsertSizeMetrics/{sample}.insert_size_metrics.txt" if paired
-            else []
     output:
         png = "deepTools_qc/computeGCBias/{sample}.filtered.GCBias.png",
         tsv = "deepTools_qc/computeGCBias/{sample}.filtered.GCBias.freq.tsv"
@@ -84,11 +81,13 @@ rule plotCoverage:
         bams = expand("filtered_bam/{sample}.filtered.bam", sample=samples),
         bais = expand("filtered_bam/{sample}.filtered.bam.bai", sample=samples)
     output:
-        "deepTools_qc/plotCoverage/read_coverage.png"
+        "deepTools_qc/plotCoverage/read_coverage.tsv"
     params:
         labels = " ".join(samples),
         read_extension = "--extendReads" if paired
-                         else "--extendReads "+str(fragment_length)
+                         else "--extendReads "+str(fragment_length),
+        plotcmd = "" if plot_format == 'None' else
+                    "--plotFile " + "deepTools_qc/plotCoverage/read_coverage." + plot_format
     log:
         "deepTools_qc/logs/plotCoverage.log"
     benchmark:
@@ -183,3 +182,18 @@ rule estimate_read_filtering:
         "deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt"
     conda: CONDA_SHARED_ENV
     shell: estimateReadFiltering_cmd
+
+#######InsertSizeMetrics###############
+rule bamPE_fragment_size:
+    input:
+        bams = expand("filtered_bam/{sample}.filtered.bam", sample=samples)
+    output:
+        "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv"
+    params:
+        plotcmd = "" if plot_format == 'None' else
+                "--plotFile " + "deepTools_qc/bamPEFragmentSize/fragmentSizes." + plot_format,
+    log:
+        "deepTools_qc/logs/bamPEFragmentSize.log"
+    threads: 24
+    conda: CONDA_SHARED_ENV
+    shell: bamPEFragmentSize_cmd

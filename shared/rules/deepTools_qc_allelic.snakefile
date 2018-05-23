@@ -30,9 +30,6 @@ rule computeGCBias_allelic:
     input:
         bam = "allelic_bams/{sample}.{suffix}.sorted.bam",
         bai = "allelic_bams/{sample}.{suffix}.sorted.bam.bai",
-        insert_size_metrics =
-            "Picard_qc/InsertSizeMetrics/{sample}.insert_size_metrics.txt" if paired
-            else []
     output:
         png = "deepTools_qc/computeGCBias/{sample}.{suffix}.GCBias.png",
         tsv = "deepTools_qc/computeGCBias/{sample}.{suffix}.GCBias.freq.tsv"
