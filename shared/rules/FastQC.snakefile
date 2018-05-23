@@ -1,3 +1,5 @@
+CONDA_SHARED_ENV = "envs/shared_environment.yaml"
+
 if paired:
     rule FastQC:
         input:
@@ -9,8 +11,8 @@ if paired:
         benchmark:
             "FastQC/.benchmark/FastQC.{sample}{read}.benchmark"
         threads: 2
-        shell:
-            fastqc_path+"fastqc -o FastQC {input} &> {log}"
+        conda: CONDA_SHARED_ENV
+        shell: "fastqc -o FastQC {input} &> {log}"
 
 else:
     rule FastQC_singleEnd:
@@ -23,5 +25,5 @@ else:
         benchmark:
             "FastQC/.benchmark/FastQC.{sample}.benchmark"
         threads: 2
-        shell:
-            fastqc_path+"fastqc -o FastQC {input} &> {log}"
+        conda: CONDA_SHARED_ENV
+        shell: "fastqc -o FastQC {input} &> {log}"
