@@ -242,23 +242,23 @@ onstart:
 
 ### main rule ##################################################################
 ################################################################################
-#localrules: FASTQ
+localrules: FASTQ
 
 rule all:
     input:
         expand("FASTQ/{sample}{read}.fastq.gz", sample = samples, read = reads),
         run_FastQC(fastqc),
-#        run_Trimming(trim, fastqc),
-#        "Annotation/genes.annotated.bed",
-#        "Annotation/genes.filtered.bed",
-#        "Annotation/genes.filtered.saf",    # this file is used for featureCounts later on!
-#        run_mapping_free(),            # Salmon
-#        run_mapping(),                 # classical mapping + counting
-#        run_allelesp_mapping(),        # allelic-mapping
-#        make_nmasked_genome(),
-#        run_deeptools_qc(),
-#        run_GenomicContamination(),
-#        "multiQC/multiqc_report.html"
+        run_Trimming(trim, fastqc),
+        "Annotation/genes.annotated.bed",
+        "Annotation/genes.filtered.bed",
+        "Annotation/genes.filtered.saf",    # this file is used for featureCounts later on!
+        run_mapping_free(),            # Salmon
+        run_mapping(),                 # classical mapping + counting
+        run_allelesp_mapping(),        # allelic-mapping
+        make_nmasked_genome(),
+        run_deeptools_qc(),
+        run_GenomicContamination(),
+        "multiQC/multiqc_report.html"
 
 
 ### execute after  finished ####################################################
