@@ -1,8 +1,8 @@
 ### samtools_filter ############################################################
 CONDA_SHARED_ENV = "envs/shared_environment.yaml"
 
-# When modifying the rule samtools_filter, double-check wether the function
-# update_filter() has to be modified concordantly
+# When modifying the rule samtools_filter, double-check whether the function
+# update_filter() has to be modified too
 
 rule samtools_filter:
     input:
@@ -25,13 +25,13 @@ rule samtools_filter:
         filter=""
         if [ "{params.dedup}" == "True" ] ; then filter="$filter -F 1024"; fi
         if [ "{params.properpairs}" == "True" ] ; then filter="$filter -f 2"; fi
-        if [ "{params.mapq}" != "0" ] ; then filter="$filter -q params.mapq"; fi
-        if [ "filter" == ""] ; then
+        if [ "{params.mapq}" != "0" ] ; then filter="$filter -q {params.mapq}"; fi
+        if [ $filter == ""] ; then
             ln -s -r {input} {output.bam} ;
         else
-            samtools view -@ {threads} -b $filter -q {{input} > {output.bam} 2> {log} ;
+            samtools view -@ {threads} -b $filter -o {output.bam} {input} 2> {log} ;
+            echo "samtools view arguments: $filter" > {output.filter_file}
         fi
-        echo 'samtools view arguments: $filter' > {output.filter_file}
         """
 
 
