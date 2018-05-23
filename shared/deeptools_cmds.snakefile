@@ -145,7 +145,7 @@ plotCorr_cmd = """
                 --skipZeros \
                 --plotTitle 'Pearson correlation of {params.title} coverage' \
                 --outFileCorMatrix {output} \
-                --colorMap coolwarm \
+                --colorMap magma \
                 --plotNumbers &> {log}
     """
 
@@ -159,7 +159,7 @@ plotCorrSP_cmd = """
         --skipZeros \
         --plotTitle 'Spearman correlation of {params.title} coverage' \
         --outFileCorMatrix {output} \
-        --colorMap coolwarm \
+        --colorMap magma \
         --plotNumbers &> {log}
     """
 
