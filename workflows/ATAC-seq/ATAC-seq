@@ -27,7 +27,7 @@ import common_functions as cf
 
 
 def parse_args(defaults={"verbose":None,"configfile":None,"cluster_configfile":None,"max_jobs":None,"snakemake_options":None,"tempdir":None,
-                         "bw_binsize":None,"atac_fragment_cutoff":None}):
+                         "bw_binsize":None,"atac_fragment_cutoff":None, "sample_info":None}):
     """
     Parse arguments from the command line.
     """
@@ -138,7 +138,7 @@ def main():
     ## get command line arguments
     parser = parse_args(defaults)
     args = parser.parse_args()
-    
+
     ## we also add these paths to config, although we don't use them in the Snakefile
     args.this_script_dir = this_script_dir
     args.main_dir_path = main_dir_path
