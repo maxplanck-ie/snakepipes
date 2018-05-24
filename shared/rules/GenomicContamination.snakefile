@@ -9,7 +9,7 @@ rule GContamination_featureCounts:
                 txt = temp("GenomicContamination/{sample}.featurecounts.txt"),
                 summary = "GenomicContamination/{sample}.featurecounts.txt.summary"
             log:
-                "GenomicContamination/featurecounts.log"
+                "GenomicContamination/{sample}.featurecounts.log"
             threads: 8
             shell:
                 feature_counts_path+"featureCounts -T {threads} -a {input.gtf} -t transcript -o {output.txt} {input.bams} &>> {log}"

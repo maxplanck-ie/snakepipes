@@ -89,7 +89,7 @@ The DNA mapping pipeline will generate output of the following structure:
 
     $ tree -d -L 2 output-dir/
 
-..parsed-literal::
+.. parsed-literal::
 
     output-dir/
     |-- Bowtie2
