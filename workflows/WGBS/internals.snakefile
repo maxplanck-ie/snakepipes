@@ -57,21 +57,7 @@ def calc_cutThd (zipL,fqin,logobject,wdir):
     
 
 
-def get_Read_Group(INfile1):
-    with io.TextIOWrapper(gzip.open(INfile1, 'r')) as f:
-        file_content = f.readline().strip()
-    PL=re.sub('@','',file_content).split(":")[0]
-    PU=re.sub('@','',file_content).split(":")[2]
-    RG='@RG"\t"ID:1"\t"SM:{sample}"\t"LB:{sample}"\t"PL:'+PL+'"\t"PU:'+PU
-    
-    return RG
 
-
-def get_mbias_auto():
-    with open(os.path.join("QC_metrics","{sample}.Mbias.txt", 'r') as f:
-            first_line = f.readline()
-        m_ignore=re.sub('Suggested inclusion options: ','',first_line).strip('\n')
-    return m_ignore
 
 
 

@@ -265,14 +265,10 @@ def main():
     ######################################### conditional parameters ##################################################
     ###switch between TruSeq and Nextera adapter sequences
     adapterSeq = "AGATCGGAAGAGC"
-    if nextera:
+    if args.nextera:
         adapterSeq = "CTGTCTCTTATA"
 
-    sortThreads = nthreads
-    if nthreads > 4:
-        sortThreads = 4
-
-
+      
     # cluster config
     cluster_config = cf.load_configfile(os.path.join(this_script_dir, "../../shared/", "cluster.yaml"), False)
     cluster_config = cf.merge_dicts(cf.load_configfile(os.path.join(this_script_dir, "cluster.yaml"), False), cluster_config)
@@ -282,15 +278,15 @@ def main():
         cluster_config = cf.merge_dicts(cluster_config, user_cluster_config)
     cf.write_configfile(os.path.join(args.wdir, 'cluster_config.yaml'), cluster_config)
 
-    if not args.local:
-<<<<<<< HEAD
-        snakemake_module_load = "module load snakemake/5.1.2 "
->>>>>>> 589b6f47b5d6077eb40968714c4ce718ebc3e168
-        snakemake_module_load += cluster_config["cluster_module_load"]
-        snakemake_module_load = (snakemake_module_load + " && ").split()
+    #if not args.local:
+#<<<<<<< HEAD
+        #snakemake_module_load = "module load snakemake/5.1.2 "
+#>>>>>>> 589b6f47b5d6077eb40968714c4ce718ebc3e168
+        #snakemake_module_load += cluster_config["cluster_module_load"]
+        #snakemake_module_load = (snakemake_module_load + " && ").split()
 
     snakemake_cmd = """
-                    snakemake {snakemake_options} --latency-wait 300 --snakefile {snakefile} --jobs {max_jobs} --directory {wdir} --configfile {configfile} --use-conda
+                    snakemake {snakemake_options} --latency-wait 300 --snakefile {snakefile} --jobs {max_jobs} --directory {wdir} --configfile {configfile} --use-conda --conda-prefix /data/processing/conda/env
                     """.format(snakefile=os.path.join(args.this_script_dir, "Snakefile"),
                                max_jobs=args.max_jobs,
                                wdir=args.wdir,
@@ -314,7 +310,7 @@ def main():
     temp_path = cf.make_temp_dir(args.tempdir, args.wdir, args.verbose)
     snakemake_exports = ("export TMPDIR=" + temp_path + " && ").split()
 
-    cmd = " ".join(snakemake_exports + snakemake_module_load + snakemake_cmd)
+    cmd = " ".join(snakemake_exports  + snakemake_cmd) #+ snakemake_module_load
 
     if args.verbose:
         logger.info(cmd)

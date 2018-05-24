@@ -2,6 +2,8 @@ import os
 import re
 from operator import is_not
 import glob
+import io
+import gzip
 #import logging
 
 
@@ -20,6 +22,12 @@ globals().update(cf.load_organism_data(genome,maindir,config["verbose"]))
 
 refG=genome_fasta
 crefG=bwameth_index
+
+############conda configs###################
+this_script_dir = os.path.dirname(os.path.realpath(__file__))
+CondaEnvironment=os.path.join(this_script_dir,'conda.yml')
+SharedCondaEnvironment=os.path.join(this_script_dir,'shared_environment.yaml')
+mCtCondaEnvironment=os.path.join(this_script_dir,'methylCtools.yaml')
 
 ### Sample init #############################################################
 
@@ -94,6 +102,22 @@ def run_int_aggStats(intList,sampleInfo):
             return ([os.path.join("aggregate_stats_limma",w) for w in int_dest2])
     else:
         return ([])
+
+############# parsing functions ##########################################
+def get_Read_Group(INfile1):
+    with io.TextIOWrapper(gzip.open(INfile1, 'r')) as f:
+        file_content = f.readline().strip()
+    PL=re.sub('@','',file_content).split(":")[0]
+    PU=re.sub('@','',file_content).split(":")[2]
+    RG='@RG"\t"ID:1"\t"SM:{sample}"\t"LB:{sample}"\t"PL:'+PL+'"\t"PU:'+PU
+    return RG
+
+
+#def get_mbias_auto(file):
+#    with open(file, 'r') as f:
+#        first_line = f.readline()
+#    m_ignore=re.sub('Suggested inclusion options: ','',first_line).strip('\n')
+#    return m_ignore
 
 
 ### include modules of other snakefiles ######################################## ##some rules depend on the definitions above
