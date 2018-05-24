@@ -193,5 +193,5 @@ estimateReadFiltering_cmd = """
 bamPEFragmentSize_cmd = """
     bamPEFragmentSize --bamfiles {input.bams} \
     {params.plotcmd} \
-    --table {output} -p {threads} &> {log}
+    --table {output} -p {threads} > {log.out} 2> {log.err}
     """
