@@ -206,7 +206,7 @@ rule bamPE_fragment_size:
                 "-o " + "deepTools_qc/bamPEFragmentSize/fragmentSizes." + plot_format,
     log:
         out = "deepTools_qc/logs/bamPEFragmentSize.out",
-        err = "deepTools_qc/logs/bamPEFragmentSize.err",
+        err = "deepTools_qc/logs/bamPEFragmentSize.err"
     threads: 24
     conda: CONDA_SHARED_ENV
     shell: bamPEFragmentSize_cmd
