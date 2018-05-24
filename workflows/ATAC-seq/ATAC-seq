@@ -27,7 +27,7 @@ import common_functions as cf
 
 
 def parse_args(defaults={"verbose":None,"configfile":None,"cluster_configfile":None,"max_jobs":None,"snakemake_options":None,"tempdir":None,
-                         "bw_binsize":None,"atac_fragment_cutoff":None}):
+                         "bw_binsize":None,"atac_fragment_cutoff":None,"sample_info":None}):
     """
     Parse arguments from the command line.
     """

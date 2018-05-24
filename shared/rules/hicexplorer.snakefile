@@ -98,7 +98,7 @@ rule merge_matrices:
       input:
           expand("HiC_matrices/{sample}_"+matrixFile_suffix+".h5", sample=samples)
       output:
-          matrix = temp("HiC_matrices/mergedSamples_"+matrixFile_suffix+".h5"),
+          matrix = "HiC_matrices/mergedSamples_"+matrixFile_suffix+".h5",
       conda:
           "envs/snakepipes_hic_conda_env.yaml"
       shell:
