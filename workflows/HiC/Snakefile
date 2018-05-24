@@ -98,7 +98,8 @@ def run_build_matrices():
               if not noTAD:
                  file_list.append(expand("TADs/{sample}_"+matrixFile_suffix+"_boundaries.bed", sample=samples))
 
-    
+    if distVsCount:
+       "dist_vs_counts.png"
     return(file_list)
 
 ### execute before workflow starts #############################################

@@ -28,7 +28,7 @@ import common_functions as cf
 def parse_args(defaults={"verbose":None,"configfile":None,"cluster_configfile":None,"max_jobs":None,"snakemake_options":None,"tempdir":None,
                          "mode":None, "downsample":None, "trim":None,"trim_prg":None,"trim_options":None, "fastqc":None,
                          "bin_size":None, "RF_resolution":None, "enzyme":None, "restrict_region":None,
-                         "merge_samples":None, "nbins_toMerge":None, "tadparams":None, "noTAD":None, "noCorrect":None}):
+                         "merge_samples":None, "nbins_toMerge":None, "tadparams":None, "noTAD":None, "noCorrect":None, "distVsCount":None, "distVsCountParams":None}):
     """
     Parse arguments from the command line.
     """
@@ -203,6 +203,18 @@ def parse_args(defaults={"verbose":None,"configfile":None,"cluster_configfile":N
                         help="Stop the pipeline before correcting the matrix. (default: '%(default)s')",
                         default=defaults["noCorrect"])
 
+    optional.add_argument("--distVsCount",
+                        dest="distVsCount",
+                        action="store_true",
+                        help="Run hicDistVsCount. (default: '%(default)s')",
+                        default=defaults["distVsCount"])
+
+    optional.add_argument("--distVsCount_params",
+                        dest="distVsCountParams",
+                        type=str,
+                        metavar="STR",
+                        help="parameters to run hicDistVsCount. (default: '%(default)s')",
+                        default=defaults["distVsCountParams"])
 
     return parser
 

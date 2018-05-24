@@ -142,29 +142,6 @@ rule compute_thresholds:
         f.write('Thresholds for matrix correction are : {} \n'. format(thresholds))
         f.close()
 
-
-## Correct matrices
-#rule correct_matrix:
-#    input:
-#            matrix = "HiC_matrices/{sample}_"+matrixFile_suffix+".h5",
-#                    mad = "HiC_matrices/QCplots/{sample}_"+matrixFile_suffix+"_mad_threshold.out"
-#                        output:
-#                                "HiC_matrices_corrected/{sample}_"+matrixFile_suffix+".corrected.h5"
-#                                    log:
-#                                            correct = "HiC_matrices_corrected/logs/{sample}_"+matrixFile_suffix+".log"
-#                                                run:
-#                                                        thresholds = get_mad_score(input.mad)
-#                                                                f = open(log.correct, 'w')
-#                                                                        f.write('Thresholds for matrix correction are : {} \n'. format(thresholds))
-#                                                                                f.close()
-#
-#                                                                                        shell(
-#                                                                                                    hicExplorer_path + "hicCorrectMatrix correct --filterThreshold " +
-#                                                                                                                thresholds + " -m {input.matrix} -o {output} >> {log.correct} 2>&1"
-#                                                                                                                            )
-#
-
-
 ## Correct matrices
 rule correct_matrix:
     input:
@@ -200,3 +177,20 @@ rule call_tads:
         "--correctForMultipleTesting bonferroni "
         "-p {threads} "
         "--outPrefix {params.prefix} > {log} 2>&1"
+
+##compare matrices using hicPlotDistVsCounts
+rule distvscounts:
+   input:
+       expand("HiC_matrices_corrected/{sample}_"+matrixFile_suffix+".corrected.h5",sample=samples)
+   output:
+        "dist_vs_counts.png"
+   params:
+       distVsCountParams
+   conda:
+       "envs/snakepipes_hic_conda_env.yaml"
+   shell:
+       "hicPlotDistVsCounts -m {input} -o {output} {params}"
+
+
+
+

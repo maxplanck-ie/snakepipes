@@ -51,6 +51,8 @@ nbins_toMerge: 0
 merge_samples: false
 # parameters for hicFindTADs
 tadparams: --thresholdComparisons 0.01
+distVsCount: false
+distVsCountParams: 
 noTAD: false
 noCorrect: false
 

@@ -5,8 +5,8 @@ HiC
 
 Input requirements and outputs:
 -------------------------------------------
-This pipeline requires paired-end reads fastq files as input to build a contact matrix and to call TADs.
-
+This pipeline requires paired-end reads fastq files as input in order to build a contact matrix and to call TADs. 
+Prior to building a matrix, the pipeline maps reads against a user provided reference genome. The output of mapping step is then used for building the contact matrix.
 
 .. argparse::
    :filename: ../workflows/HiC/HiC
