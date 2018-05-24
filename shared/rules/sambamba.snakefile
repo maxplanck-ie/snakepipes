@@ -1,4 +1,7 @@
 ##sambamba is used for marking up duplications
+CONDA_SHARED_ENV = "envs/shared_environment.yaml"
+
+
 ## takes the input from RNA mapping or DNA mapping snakefile
 rule sambamba_markdup:
        input:
@@ -6,26 +9,26 @@ rule sambamba_markdup:
        output:
            mapping_prg+"/{sample}.bam"
        threads: 10
-       shell:
-           sambamba_path+"sambamba_v0.6.6 "
-           "markdup -t {threads} --sort-buffer-size=6000 "
-           "{input} "
-           "{output}"
+       conda: CONDA_SHARED_ENV
+       shell: """
+           sambamba markdup -t {threads} --sort-buffer-size=6000 {input} {output}
+           """
 
 rule sambamba_flagstat:
        input:
            mapping_prg+"/{sample}.bam"
        output:
            "Sambamba/{sample}.markdup.txt"
-       shell:
-           sambamba_path+"sambamba_v0.6.6 flagstat -p"
-           " {input}"
-           " | tee {output}"
+       conda: CONDA_SHARED_ENV
+       shell: """
+           sambamba flagstat -p {input} > {output}
+           """
+
 
 rule samtools_index:
     input:
         mapping_prg+"/{sample}.bam"
     output:
         mapping_prg+"/{sample}.bam.bai"
-    shell:
-        samtools_path+"samtools index {input}"
+    conda: CONDA_SHARED_ENV
+    shell: "samtools index {input}"

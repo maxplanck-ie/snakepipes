@@ -1,3 +1,5 @@
+CONDA_SHARED_ENV = "envs/shared_environment.yaml"
+
 
 ## allelic mapping using STAR
 if mapping_prg == "STAR":
@@ -92,13 +94,11 @@ else:
     print("Only STAR is implemented for Allele-specific mapping")
 
 
-
-
 #### INDEX the mapped files
 rule BAM_index:
     input:
         mapping_prg+"/{sample}.bam"
     output:
         mapping_prg+"/{sample}.bam.bai"
-    shell:
-        samtools_path+"samtools index {input}"
+    conda: CONDA_SHARED_ENV
+    shell: "samtools index {input}"

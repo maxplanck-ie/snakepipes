@@ -7,8 +7,8 @@ if downsample:
                 r1 = indir+"/{sample}"+reads[0]+".fastq.gz",
                 r2 = indir+"/{sample}"+reads[1]+".fastq.gz"
             output:
-                r1 = temp("FASTQ/{sample}"+reads[0]+".fastq.gz"),
-                r2 = temp("FASTQ/{sample}"+reads[1]+".fastq.gz")
+                r1 = "FASTQ/{sample}"+reads[0]+".fastq.gz",
+                r2 = "FASTQ/{sample}"+reads[1]+".fastq.gz"
             params:
                 num_reads = downsample
             benchmark:
@@ -24,7 +24,7 @@ if downsample:
             input:
                 indir+"/{sample}.fastq.gz"
             output:
-                fq = temp("FASTQ/{sample}.fastq.gz"),
+                fq = "FASTQ/{sample}.fastq.gz",
             threads: 12
             params:
                 num_reads = downsample
@@ -37,6 +37,6 @@ else:
         input:
             indir+"/{sample}{read}.fastq.gz"
         output:
-            temp("FASTQ/{sample}{read}.fastq.gz")
+            "FASTQ/{sample}{read}.fastq.gz"
         shell:
             "( [ -f {output} ] || ln -s -r {input} {output} ) && touch -h {output}"
