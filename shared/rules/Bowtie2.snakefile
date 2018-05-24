@@ -6,7 +6,7 @@ if paired:
             r2 = fastq_dir+"/{sample}"+reads[1]+".fastq.gz"
         output:
             align_summary = "Bowtie2/{sample}.Bowtie2_summary.txt",
-            bam = temp("Bowtie2/{sample}.sorted.bam")
+            bam = temp("Bowtie2/{sample}.sorted.bam")# removing since we keep the sambamba output (dupmarked)
         params:
             bowtie_opts = str(bowtie_opts or ''),
             mate_orientation = mate_orientation,
@@ -20,7 +20,7 @@ if paired:
             "-X {params.insert_size_max} "
             "-x "+bowtie2_index+" -1 {input.r1} -2 {input.r2} "
             "{params.bowtie_opts} {params.mate_orientation} "
-            "--rg-id {wildcards.sample} --rg CN:mpi-ie_deep_sequencing_unit "
+            "--rg-id {wildcards.sample} --rg CN:mpi-ie_deep_sequencing_unit "## remove the --rg tag
             "--rg DS:{wildcards.sample} --rg PL:ILLUMINA --rg SM:{wildcards.sample} "
             "-p {threads} "
             "2> {output.align_summary} | "
