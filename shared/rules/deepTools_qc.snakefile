@@ -14,7 +14,8 @@ rule bamCoverage:
         read_extension = "--extendReads" if paired
                          else "--extendReads "+str(fragment_length)
     log:
-        "bamCoverage/logs/bamCoverage.{sample}.log"
+        out = "bamCoverage/logs/bamCoverage.{sample}.out",
+        err = "bamCoverage/logs/bamCoverage.{sample}.err"
     benchmark:
         "bamCoverage/.benchmark/bamCoverage.{sample}.benchmark"
     threads: 16
@@ -39,7 +40,8 @@ rule bamCoverage_filtered:
         blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed
                     else "",
     log:
-        "bamCoverage/logs/bamCoverage.{sample}.filtered.log"
+        out = "bamCoverage/logs/bamCoverage.{sample}.filtered.out",
+        err = "bamCoverage/logs/bamCoverage.{sample}.filtered.err"
     benchmark:
         "bamCoverage/.benchmark/bamCoverage.{sample}.filtered.benchmark"
     threads: 16
@@ -66,7 +68,8 @@ rule computeGCBias:
                     else "",
         median_fragment_length = "" if paired else "-fragmentLength " + fragment_length
     log:
-        "deepTools_qc/logs/computeGCBias.{sample}.filtered.log"
+        out = "deepTools_qc/logs/computeGCBias.{sample}.filtered.out",
+        err = "deepTools_qc/logs/computeGCBias.{sample}.filtered.err"
     benchmark:
         "deepTools_qc/.benchmark/computeGCBias.{sample}.filtered.benchmark"
     threads: 16
@@ -89,7 +92,8 @@ rule plotCoverage:
         plotcmd = "" if plot_format == 'None' else
                     "--plotFile " + "deepTools_qc/plotCoverage/read_coverage." + plot_format
     log:
-        "deepTools_qc/logs/plotCoverage.log"
+        out = "deepTools_qc/logs/plotCoverage.out",
+        err = "deepTools_qc/logs/plotCoverage.err"
     benchmark:
         "deepTools_qc/.benchmark/plotCoverage.benchmark"
     threads: 24
@@ -111,7 +115,8 @@ rule multiBamSummary:
         read_extension = "--extendReads" if paired
                          else "--extendReads "+str(fragment_length)
     log:
-        "deepTools_qc/logs/multiBamSummary.log"
+        out = "deepTools_qc/logs/multiBamSummary.out",
+        err = "deepTools_qc/logs/multiBamSummary.err"
     benchmark:
         "deepTools_qc/.benchmark/multiBamSummary.benchmark"
     threads: 24
@@ -132,7 +137,8 @@ rule plotCorrelation_pearson:
             "--plotFile " + "deepTools_qc/plotCorrelation/correlation.pearson.read_coverage.heatmap." + plot_format,
         title='fragment'
     log:
-        "deepTools_qc/logs/plotCorrelation_pearson.log"
+        out = "deepTools_qc/logs/plotCorrelation_pearson.out",
+        err = "deepTools_qc/logs/plotCorrelation_pearson.err"
     benchmark:
         "deepTools_qc/.benchmark/plotCorrelation_pearson.benchmark"
     conda: CONDA_SHARED_ENV
@@ -149,7 +155,8 @@ rule plotCorrelation_spearman:
             "--plotFile " + "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage.heatmap." + plot_format,
         title='fragment'
     log:
-        "deepTools_qc/logs/plotCorrelation_spearman.log"
+        out = "deepTools_qc/logs/plotCorrelation_spearman.out",
+        err = "deepTools_qc/logs/plotCorrelation_spearman.err"
     benchmark:
         "deepTools_qc/.benchmark/plotCorrelation_spearman.benchmark"
     conda: CONDA_SHARED_ENV
@@ -166,7 +173,8 @@ rule plotPCA:
                 "--plotFile " + "deepTools_qc/plotPCA/PCA.read_coverage." + plot_format,
         title='fragment'
     log:
-        "deepTools_qc/logs/plotPCA.log"
+        out = "deepTools_qc/logs/plotPCA.out",
+        err = "deepTools_qc/logs/plotPCA.err"
     benchmark:
         "deepTools_qc/.benchmark/plotPCA.benchmark"
     conda: CONDA_SHARED_ENV
@@ -180,6 +188,9 @@ rule estimate_read_filtering:
         bai = mapping_prg+"/{sample}.bam.bai"
     output:
         "deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt"
+    log:
+        out = "deepTools_qc/logs/{sample}.estimateReadFiltering.out",
+        err = "deepTools_qc/logs/{sample}.estimateReadFiltering.err"
     conda: CONDA_SHARED_ENV
     shell: estimateReadFiltering_cmd
 
@@ -192,7 +203,7 @@ rule bamPE_fragment_size:
         "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv"
     params:
         plotcmd = "" if plot_format == 'None' else
-                "--plotFile " + "deepTools_qc/bamPEFragmentSize/fragmentSizes." + plot_format,
+                "-o " + "deepTools_qc/bamPEFragmentSize/fragmentSizes." + plot_format,
     log:
         out = "deepTools_qc/logs/bamPEFragmentSize.out",
         err = "deepTools_qc/logs/bamPEFragmentSize.err",
