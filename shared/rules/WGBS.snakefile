@@ -4,6 +4,12 @@ from operator import is_not
 import tempfile
 import pandas
 
+###conda environments:
+CondaEnvironment='envs/WGBS.conda.yml'
+mCtCondaEnvironment='envs/methylCtools.yaml'
+CONDA_SHARED_ENV = "envs/shared_environment.yaml"
+
+
 ###get automatic cut threshold for hard-trimming of 5' ends
 
 rule get_RG:
@@ -82,7 +88,9 @@ if not trimReads is None:
         params:
             fqcout=os.path.join(wdir,'FastQC_Cutadapt')
         threads: nthreads
-        conda: CondaEnvironment
+<<<<<<< HEAD
+        conda: CONDA_SHARED_ENV
+>>>>>>> d7b0e6fdf7c4ee99ca4f672131a99e84bb5d9e19
         shell: "fastqc --outdir {params.fqcout} -t  {threads} {input.R1cut} {input.R2cut}"
 
 if convRef:
@@ -137,7 +145,9 @@ rule index_bam:
         sbami=temp("bams/{sample}.sorted.bam.bai")
     #params:
     #log:"bams/logs/{sample}"+".indexing.log"
-    conda: CondaEnvironment
+<<<<<<< HEAD
+    conda: CONDA_SHARED_ENV
+>>>>>>> d7b0e6fdf7c4ee99ca4f672131a99e84bb5d9e19
     shell: "samtools index {input.sbam}"
 
 rule rm_dupes:

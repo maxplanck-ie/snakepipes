@@ -1,14 +1,15 @@
 ### samtools_filter ############################################################
-# When modifying the rule samtools_filter, double-check wether the function
-# update_filter() has to be modified concordantly
+CONDA_SHARED_ENV = "envs/shared_environment.yaml"
+
+# When modifying the rule samtools_filter, double-check whether the function
+# update_filter() has to be modified too
 
 rule samtools_filter:
     input:
         mapping_prg+"/{sample}.bam"
     output:
         bam = "filtered_bam/{sample}.filtered.bam",
-        filter_file = "filtered_bam/{sample}.filter" if (dedup or properpairs or mapq > 0)
-                      else []
+        filter_file = "filtered_bam/{sample}.filter"
     params:
         dedup = dedup,
         properpairs = properpairs,
@@ -18,27 +19,19 @@ rule samtools_filter:
     benchmark:
         "filtered_bam/.benchmark/samtools_filter.{sample}.benchmark"
     threads: 8
-    run:
-        # string with samtools view parameters for filtering
-        filter = ""
-        if params.dedup:
-            filter += "-F 1024 "
-        if params.properpairs:
-            filter += "-f 2 "
-        if params.mapq > 0:
-            filter += "-q {params.mapq}"
-
-        if filter:
-            shell(
-                samtools_path+"samtools view -@ {threads} "
-                "-b "+filter+" {input} > {output.bam} "
-                "2> {log} "
-                "&& echo 'samtools view arguments: "+filter+"' > {output.filter_file}"
-            )
-        else:
-            shell(
-                "( [ -f {output.bam} ] || ln -s -r {input} {output.bam} ) && touch -h {output.bam}"
-            )
+    conda: CONDA_SHARED_ENV
+    shell: """
+        filter=""
+        if [ "{params.dedup}" == "True" ] ; then filter="$filter -F 1024"; fi
+        if [ "{params.properpairs}" == "True" ] ; then filter="$filter -f 2"; fi
+        if [ "{params.mapq}" != "0" ] ; then filter="$filter -q {params.mapq}"; fi
+        if [ $filter == ""] ; then
+            ln -s -r {input} {output.bam} ;
+        else
+            samtools view -@ {threads} -b $filter -o {output.bam} {input} 2> {log} ;
+        fi
+        echo "samtools view arguments: $filter" > {output.filter_file}
+        """
 
 
 ### samtools_index #############################################################
@@ -47,5 +40,5 @@ rule samtools_index_filtered:
         "filtered_bam/{sample}.bam"
     output:
         "filtered_bam/{sample}.bam.bai"
-    shell:
-        samtools_path+"samtools index {input}"
+    conda: CONDA_SHARED_ENV
+    shell: "samtools index {input}"

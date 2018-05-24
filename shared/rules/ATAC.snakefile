@@ -2,29 +2,27 @@ rule filterFragments:
     input:
         "filtered_bam/{sample}.filtered.bam"
     output:
-         shortFrags=os.path.join(outdir_MACS2, "{sample}.short.bam")
+        shortBAM = os.path.join(outdir_MACS2, "{sample}.short.bam"),
+        metrics = os.path.join(outdir_MACS2, "{sample}.short.metrics")
     params:
-        cutoff=atac_fragment_cutoff,
-        metrics=os.path.join(outdir_MACS2, "{sample}.short.metrics")
+        cutoff = atac_fragment_cutoff
     threads: 6
     shell:
-        deepTools_path+"alignmentSieve --bam {input} --outFile {output} "
+        deepTools_path+"alignmentSieve --bam {input} --outFile {output.shortBAM} "
         "--numberOfProcessors {threads} "
-        "--filterMetrics {params.metrics} "
+        "--filterMetrics {output.metrics} "
         "--maxFragmentLength {params.cutoff} "
 
 # MACS2 BAMPE filter: samtools view -b -f 2 -F 4 -F 8 -F 256 -F 512 -F 2048
 rule callOpenChromatin:
     input:
-        rules.filterFragments.output
+        os.path.join(outdir_MACS2, "{sample}.short.bam")
     output:
-        peaks = os.path.join(outdir_MACS2, '{sample}_peaks.narrowPeak'),
-        pileup = os.path.join(outdir_MACS2, '{sample}_treat_pileup.bdg'),
-        ctrl = os.path.join(outdir_MACS2, '{sample}_control_lambda.bdg'),
-        xls = os.path.join(outdir_MACS2, '{sample}_peaks.xls')
+        peaks = os.path.join(outdir_MACS2, '{sample}.filtered.BAM_peaks.narrowPeak'),
+        xls = os.path.join(outdir_MACS2, '{sample}.filtered.BAM_peaks.xls')
     params:
         directory = outdir_MACS2,
-        genome=genome[0:2],
+        genome_size = int(genome_size),
         name='{sample}',
         bandwidth='--bw 25', # + bw_binsize
         qval_cutoff='--qvalue 0.01',
@@ -37,8 +35,8 @@ rule callOpenChromatin:
         ## macs2
         macs2_path+"macs2 callpeak "
             "--treatment {input} "
-            "--gsize {params.genome} "
-            "--name {params.name} "
+            "-g {params.genome_size} "
+            "--name {params.name}.filtered.BAM "
             "--outdir {params.directory} "
             "--slocal 10000 "
             "--nolambda "
