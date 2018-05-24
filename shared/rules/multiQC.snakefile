@@ -14,7 +14,7 @@ def multiqc_input_check(return_value):
         infiles.append( expand("FastQC/{sample}{read}_fastqc.html", sample = samples, read = reads) )
         indir +=" FastQC "
 
-    if mapping_prg == "Bowtie2":
+    if pipeline=="dna-mapping":
         # pipeline is DNA-mapping
         infiles.append( expand("Bowtie2/{sample}.Bowtie2_summary.txt", sample = samples) +
                 expand("Sambamba/{sample}.markdup.txt", sample = samples) +
@@ -28,7 +28,7 @@ def multiqc_input_check(return_value):
         if qualimap:
             infiles.append( expand("Qualimap_qc/{sample}.filtered.bamqc_results.txt", sample = samples) )
             indir += " Qualimap_qc "
-    else:
+    elif pipeline=="rna-seq":
         # must be RNA-mapping, add files as per the mode
         if not "mapping-free" in mode:
             infiles.append( expand(mapping_prg+"/{sample}.bam", sample = samples) +
@@ -44,6 +44,10 @@ def multiqc_input_check(return_value):
         else:
             infiles.append( expand("Salmon/{sample}/quant.sf", sample = samples) )
             indir += " Salmon "
+    elif pipeline == "hic":
+        infiles.append(expand("HiC_matrices/QCplots/{sample}_QC/QC_table.txt",sample = samples))
+        indir += "HiC_matrices/QCplots/"
+
 
     if return_value == "infiles":
         return(infiles)

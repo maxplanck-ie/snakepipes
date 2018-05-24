@@ -28,7 +28,7 @@ import common_functions as cf
 def parse_args(defaults={"verbose":None,"configfile":None,"cluster_configfile":None,"max_jobs":None,"snakemake_options":None,"tempdir":None,
                          "mode":None, "downsample":None, "trim":None,"trim_prg":None,"trim_options":None, "fastqc":None,
                          "bin_size":None, "RF_resolution":None, "enzyme":None, "restrict_region":None,
-                         "merge_samples":None, "nbins_toMerge":None, "tadparams":None}):
+                         "merge_samples":None, "nbins_toMerge":None, "tadparams":None, "noTAD":None, "noCorrect":None, "distVsCount":None, "distVsCountParams":None}):
     """
     Parse arguments from the command line.
     """
@@ -73,7 +73,7 @@ def parse_args(defaults={"verbose":None,"configfile":None,"cluster_configfile":N
                         "workflows would be selected from /workflows/<workflow_name>/defaults.yaml (default: '%(default)s')",
                         default=defaults["configfile"])
 
-   general.add_argument("--cluster_configfile",
+    general.add_argument("--cluster_configfile",
                         dest="cluster_configfile",
                         help="configuration file for cluster usage. In absence, the default options "
                         "from shared/cluster.yaml and workflows/[workflow]/cluster.yaml would be selected (default: '%(default)s')",
@@ -191,6 +191,31 @@ def parse_args(defaults={"verbose":None,"configfile":None,"cluster_configfile":N
                         help="parameters for HiCFindTADs. (default: '%(default)s')",
                         default=defaults["tadparams"])
 
+    optional.add_argument("--noTAD",
+                        dest="noTAD",
+                        action="store_true",
+                        help="Stop the pipeline before TAD calling. (default: '%(default)s')",
+                        default=defaults["noTAD"])
+
+    optional.add_argument("--noCorrect",
+                        dest="noCorrect",
+                        action="store_true",
+                        help="Stop the pipeline before correcting the matrix. (default: '%(default)s')",
+                        default=defaults["noCorrect"])
+
+    optional.add_argument("--distVsCount",
+                        dest="distVsCount",
+                        action="store_true",
+                        help="Run hicDistVsCount. (default: '%(default)s')",
+                        default=defaults["distVsCount"])
+
+    optional.add_argument("--distVsCount_params",
+                        dest="distVsCountParams",
+                        type=str,
+                        metavar="STR",
+                        help="parameters to run hicDistVsCount. (default: '%(default)s')",
+                        default=defaults["distVsCountParams"])
+
     return parser
 
 
@@ -238,6 +263,7 @@ def main():
     ## save to configs.yaml in outdir
     cf.write_configfile(os.path.join(args.outdir,'config.yaml'),config)
 
+
     ## merge cluster config files: 1) global one, 2) workflow specific one, 3) user provided one
     cluster_config = cf.load_configfile(cf.get_snakepipes_path()+"/shared/cluster.yaml",False)
     cluster_config = cf.merge_dicts(cluster_config, cf.load_configfile(os.path.join(this_script_dir,"cluster.yaml"),False), )
@@ -258,10 +284,13 @@ def main():
                               ).split()
 
     if args.verbose:
-        snakemake_cmd.append("--printshellcmds")
+        snakemake_cmd.append("--printshellcmds ")
 
     if not args.local:
-        snakemake_cmd += ["--cluster 'SlurmEasy --threads {threads} --mem-per-cpu 30G --log", args.cluster_logs_dir, "--name {rule}.snakemake'"]
+        snakemake_cmd += ["--cluster-config",
+                        os.path.join(args.outdir,'cluster_config.yaml'),
+                        "--cluster", "'"+cluster_config["snakemake_cluster_cmd"],
+                        args.cluster_logs_dir, "--name {rule}.snakemake'"]
 
     snakemake_log = "2>&1 | tee -a {}/Hi-C.log".format(args.outdir).split()
 

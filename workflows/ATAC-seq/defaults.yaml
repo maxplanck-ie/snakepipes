@@ -11,6 +11,7 @@
 # can be used in new/extended snakemake rules!
 ################################################################################
 ## General/Snakemake parameters, only used/set by wrapper or in Snakemake cmdl, but not in Snakefile
+pipeline: ATAC-seq
 configfile:
 cluster_configfile:
 local: false
