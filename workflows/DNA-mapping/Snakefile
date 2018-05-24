@@ -21,31 +21,6 @@ globals().update(cf.load_organism_data(genome,maindir,config["verbose"]))
 # do workflow specific stuff now
 include: os.path.join(workflow.basedir, "internals.snakefile")
 
-if "allelic-mapping" in mode:
-    # Updated global vars if mode = "allelic-mapping"
-    if allele_mode == 'create_and_map':
-        bowtie2_index_allelic = 'snp_genome/bowtie2_Nmasked/Genome.1.bt2'
-        if len(strains) == 1:
-            allele_hybrid = 'single'
-            snp_file = "snp_genome/all_SNPs_" + strains[0] + "_" + genome + ".txt.gz "
-        elif len(strains) == 2:
-            allele_hybrid = 'dual'
-            snp_file = "snp_genome/all_" + strains[1] + "_SNPs_" + strains[0] + "_reference.based_on_" + genome + ".txt"
-
-        include: os.path.join(maindir, "shared", "rules", "masked_genomeIndex.snakefile")
-    elif allele_mode == 'map_only':
-        bowtie2_index_allelic = Nmasked_index
-        snp_file = SNPfile
-    ## mapping rules
-    include: os.path.join(maindir, "shared", "rules", "Bowtie2_allelic.snakefile")
-    ## SNPsplit
-    include: os.path.join(maindir, "shared", "rules", "SNPsplit.snakefile")
-    # deepTools QC
-    include: os.path.join(maindir, "shared", "rules", "deepTools_qc_allelic.snakefile")
-else:
-    # Bowtie2 mapping, duplicate marking, BAM filtering and indexing
-    include: os.path.join(maindir, "shared", "rules", "Bowtie2.snakefile")
-
 ### include modules of other snakefiles ########################################
 ################################################################################
 
@@ -80,6 +55,32 @@ include: os.path.join(maindir, "shared", "rules", "Qualimap_bamqc.snakefile")
 
 ## MultiQC
 include: os.path.join(maindir, "shared", "rules", "multiQC.snakefile")
+
+## Allele-specific JOBs
+if "allelic-mapping" in mode:
+    # Updated global vars if mode = "allelic-mapping"
+    if allele_mode == 'create_and_map':
+        bowtie2_index_allelic = 'snp_genome/bowtie2_Nmasked/Genome.1.bt2'
+        if len(strains) == 1:
+            allele_hybrid = 'single'
+            snp_file = "snp_genome/all_SNPs_" + strains[0] + "_" + genome + ".txt.gz "
+        elif len(strains) == 2:
+            allele_hybrid = 'dual'
+            snp_file = "snp_genome/all_" + strains[1] + "_SNPs_" + strains[0] + "_reference.based_on_" + genome + ".txt"
+
+        include: os.path.join(maindir, "shared", "rules", "masked_genomeIndex.snakefile")
+    elif allele_mode == 'map_only':
+        bowtie2_index_allelic = Nmasked_index
+        snp_file = SNPfile
+    ## mapping rules
+    include: os.path.join(maindir, "shared", "rules", "Bowtie2_allelic.snakefile")
+    ## SNPsplit
+    include: os.path.join(maindir, "shared", "rules", "SNPsplit.snakefile")
+    # deepTools QC
+    include: os.path.join(maindir, "shared", "rules", "deepTools_qc_allelic.snakefile")
+else:
+    # Bowtie2 mapping, duplicate marking, BAM filtering and indexing
+    include: os.path.join(maindir, "shared", "rules", "Bowtie2.snakefile")
 
 ### conditional/optional rules #################################################
 ################################################################################

@@ -40,7 +40,7 @@ include: os.path.join(maindir, "shared", "deeptools_cmds.snakefile")
 ## bamCoverage_RPKM
 include: os.path.join(maindir, "shared", "rules", "deepTools_RNA.snakefile")
 
-## add mode-specific files
+## Allele-specific JOBS
 if "allelic-mapping" in mode:
     # Updated global vars if mode = "allelic-mapping"
     if allele_mode == 'create_and_map':
