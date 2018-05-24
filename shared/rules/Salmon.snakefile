@@ -145,13 +145,13 @@ rule Salmon_genes_counts:
 ## Prepare Salmon output for Sleuth
 rule Salmon_wasabi:
     input:
-        "Salmon/{sample}/quant.sf"
+        "Salmon/{sample}.quant.sf"
     output:
         "Salmon/{sample}/abundance.h5"
     params:
-        "Salmon/{sample}"
-    benchmark:
-        "Salmon/.benchmark/Salmon_wasabi.benchmark"
+        "Salmon/{sample}/"
+#    benchmark:
+#        "Salmon/.benchmark/Salmon_wasabi.benchmark"
     conda: CONDA_RNASEQ_ENV
     shell:
         "Rscript "+os.path.join(workflow_tools,"wasabi.R")+" {params}"

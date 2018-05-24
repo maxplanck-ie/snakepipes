@@ -16,7 +16,7 @@ rule report_flagstat_all_data:
       shell:
          "cat {input} | sort -k1,1V | cat <( echo -e 'sample\ttotal\tdup\tmapped') - > {output}"
 ##########QC report for all the samples#########
-if genomic_contamination:
+if dnaContam:
   rule qc_report_all:
         input:
             flagstat = "Sambamba/flagstat_report_all.tsv",

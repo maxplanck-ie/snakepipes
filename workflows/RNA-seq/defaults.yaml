@@ -40,7 +40,7 @@ bw_binsize: 25
 fastqc: False
 featurecounts_options: -C -Q 10 --primary
 filter_annotation:
-genomic_contamination: False
+dnaContam: False
 fragment_length: 200
 library_type: 2
 salmon_index_options: --type quasi -k 31

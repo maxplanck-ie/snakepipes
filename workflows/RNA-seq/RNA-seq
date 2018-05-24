@@ -208,7 +208,7 @@ def parse_args(defaults={"verbose":None,"configfile":None,"cluster_configfile":N
     optional.add_argument("--dnaContam",
                         action="store_true",
                         help="Returns a plot which presents the proportion of the intergenic reads (default: '%(default)s')",
-                        default=defaults["genomic_contamination"])
+                        default=defaults["dnaContam"])
     ###
     snpargs = parser.add_argument_group('allele-specific mapping arguments')
     snpargs.add_argument("--VCFfile",
