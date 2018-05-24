@@ -8,14 +8,15 @@ rule samtools_filter:
     input:
         mapping_prg+"/{sample}.bam"
     output:
-        bam = "filtered_bam/{sample}.filtered.bam",
-        filter_file = "filtered_bam/{sample}.filter"
+        bam = "filtered_bam/{sample}.filtered.bam"#,
+        #filter_file = "filtered_bam/{sample}.filter"
     params:
         dedup = dedup,
         properpairs = properpairs,
         mapq = mapq
     log:
-        "filtered_bam/logs/samtools_filter.{sample}.log"
+        out = "filtered_bam/logs/samtools_filter.{sample}.out",
+        err = "filtered_bam/logs/samtools_filter.{sample}.err"
     benchmark:
         "filtered_bam/.benchmark/samtools_filter.{sample}.benchmark"
     threads: 8
@@ -25,12 +26,11 @@ rule samtools_filter:
         if [ "{params.dedup}" == "True" ] ; then filter="$filter -F 1024"; fi
         if [ "{params.properpairs}" == "True" ] ; then filter="$filter -f 2"; fi
         if [ "{params.mapq}" != "0" ] ; then filter="$filter -q {params.mapq}"; fi
-        if [ $filter == ""] ; then
-            ln -s -r {input} {output.bam} ;
+        if [[ -z $filter ]] ; then ln -s -r {input} {output.bam} ;
         else
-            samtools view -@ {threads} -b $filter -o {output.bam} {input} 2> {log} ;
+            samtools view -@ {threads} -b $filter -o {output.bam} {input} 2> {log.err} ;
         fi
-        echo "samtools view arguments: $filter" > {output.filter_file}
+        echo "samtools view arguments: $filter" > {log.out}
         """
 
 
