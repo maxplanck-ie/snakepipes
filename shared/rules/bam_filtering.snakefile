@@ -1,5 +1,5 @@
 ### samtools_filter ############################################################
-CONDA_SHARED_ENV = "envs/shared_environment.yaml"
+
 
 # When modifying the rule samtools_filter, double-check whether the function
 # update_filter() has to be modified too

@@ -7,10 +7,10 @@ sys.path.append(os.path.join(maindir, "shared"))
 
 import common_functions as cf
 
-# load tool paths
-#globals().update(cf.load_paths(os.path.join(maindir, "shared", "paths.yaml"),maindir,config["verbose"]))
+# load conda ENVs (path is relative to "shared/rules" directory)
+CONDA_SHARED_ENV = "envs/shared_environment.yaml"
 
-# load conda ENV (path is relative to "shared/rules" directory)
+# load conda ENV
 CONDA_DNA_MAPPING_ENV = "envs/dna_mapping.yaml"
 
 # load config file

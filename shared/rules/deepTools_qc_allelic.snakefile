@@ -1,5 +1,5 @@
 ### deepTools bamCoverage on allelic BAM files ################################
-CONDA_SHARED_ENV = "envs/shared_environment.yaml"
+
 
 rule bamCoverage_allelic:
     input:

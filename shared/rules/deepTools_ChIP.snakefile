@@ -1,5 +1,5 @@
 ### deepTools bamCompare subtract #######################################################
-CONDA_SHARED_ENV = "envs/shared_environment.yaml"
+
 
 rule bamCompare_subtract:
     input:

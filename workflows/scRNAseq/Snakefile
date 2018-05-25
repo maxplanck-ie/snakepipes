@@ -6,14 +6,15 @@ sys.path.append(os.path.join(maindir, "shared"))
 
 import common_functions as cf
 
-# load tool paths
-globals().update(cf.load_paths(os.path.join(maindir, "shared", "paths.yaml"),maindir,config["verbose"]))
+# load conda ENVs (path is relative to "shared/rules" directory)
+CONDA_SHARED_ENV = "envs/shared_environment.yaml"
+
 # load config file
 globals().update(cf.load_configfile(workflow.overwrite_configfile,config["verbose"]))
 # load organism-specific data, i.e. genome indices, annotation, etc.
 globals().update(cf.load_organism_data(genome,maindir,config["verbose"]))
 
-# do workflow specific stuff now 
+# do workflow specific stuff now
 include: os.path.join(workflow.basedir, "internals.snakefile")
 
 
@@ -46,7 +47,7 @@ def run_Trimming(trim):
 
 def run_bamCoverage():
     return( expand("bamCoverage/{sample}.coverage.bw", sample = samples) )
-    
+
 def run_deeptools_qc():
     file_list = [
     expand("bamCoverage/{sample}.RPKM.bw", sample = samples),
@@ -59,10 +60,10 @@ def run_deeptools_qc():
                           "deepTools_qc/plotCorrelation/correlation.spearman.bed_coverage.heatmap.png",
                           "deepTools_qc/plotPCA/PCA.bed_coverage.png"] )
     return(file_list)
- 
+
 ### execute before workflow starts #############################################
 ################################################################################
-onstart:    
+onstart:
     if "verbose" in config and config["verbose"]:
         print("--- Workflow parameter ---------------------------------------------------------")
         print("Input directory:", indir)
@@ -84,7 +85,7 @@ onstart:
         print("CELLI_offset:",CELLI_offset)
 
         print("-" * 80, "\n")
-        
+
         print("--- Environment ----------------------------------------------------------------")
         print("$TMPDIR: ",os.getenv('TMPDIR', ""))
         print("$HOSTNAME: ",os.getenv('HOSTNAME', ""))
@@ -112,7 +113,7 @@ rule annot:
         "Annotation/genes.filtered.bed",
         "Annotation/genes.filtered.gtf",
         "Annotation/genes.filtered.transcripts.gtf",
-        
+
 
 ### execute after workflow finished ############################################
 ################################################################################

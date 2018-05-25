@@ -1,4 +1,4 @@
-CONDA_SHARED_ENV = "envs/shared_environment.yaml"
+
 
 
 ### Filter the genome fasta for selected chromsomes for picard if the mode is allele-specific

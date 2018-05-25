@@ -1,5 +1,5 @@
 ##sambamba is used for marking up duplications
-CONDA_SHARED_ENV = "envs/shared_environment.yaml"
+
 
 ## see Bowtie2.snakefile or RNA_mapping.snakefile for input
 ## takes the input from RNA mapping or DNA mapping snakefile
