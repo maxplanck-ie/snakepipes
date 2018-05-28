@@ -9,6 +9,7 @@ import common_functions as cf
 
 # load conda ENVs (path is relative to "shared/rules" directory)
 CONDA_SHARED_ENV = "envs/shared_environment.yaml"
+CONDA_HIC_ENV = "envs/snakepipes_hic_conda_env.yaml"
 
 # load config file
 globals().update(cf.load_configfile(workflow.overwrite_configfile,config["verbose"]))
