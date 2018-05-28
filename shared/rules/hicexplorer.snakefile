@@ -1,7 +1,3 @@
-CONDA_HIC_ENV = "envs/snakepipes_hic_conda_env.yaml"
-
-import os
-
 ## get restriction site bed files
 rule get_restrictionSite:
     input:
@@ -57,7 +53,7 @@ if(RF_resolution is True):
             "--threads {threads} "
             "{params.region} "
 #           "-b {output.bam} -o {output.matrix} &> {log}"
-            "-o {output.matrix} &> {log}"           
+            "-o {output.matrix} &> {log}"
 else:
     rule build_matrix:
         input:
@@ -85,7 +81,7 @@ else:
             "--QCfolder {params.QCfolder} "
             "--threads {threads} "
             "{params.region} "
-            "-o {output.matrix} &> {log}"           
+            "-o {output.matrix} &> {log}"
 
 ## Merge the samples if asked
 rule merge_matrices:
@@ -123,7 +119,7 @@ rule diagnostic_plot:
 
 # Compute MAD score thresholds
 rule compute_thresholds:
-   input: 
+   input:
       "HiC_matrices/QCplots/{sample}_"+matrixFile_suffix+"_mad_threshold.out"
    output:
       "HiC_matrices_corrected/logs/thresholds_{sample}_"+matrixFile_suffix+".log"
@@ -180,7 +176,3 @@ rule distvscounts:
        CONDA_HIC_ENV
    shell:
        "hicPlotDistVsCounts -m {input} -o {output} {params}"
-
-
-
-
