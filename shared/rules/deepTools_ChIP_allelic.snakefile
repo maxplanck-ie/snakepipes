@@ -1,5 +1,5 @@
 ### deepTools bamCompare log2ratio #######################################################
-CONDA_SHARED_ENV = "envs/shared_environment.yaml"
+
 
 rule bamCompare_log2_genome1:
     input:

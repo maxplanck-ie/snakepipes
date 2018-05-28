@@ -1,6 +1,3 @@
-CONDA_SHARED_ENV = "envs/shared_environment.yaml"
-
-
 # SNPsplit rule
 if paired:
     SNPparam = '--paired'
@@ -18,8 +15,9 @@ if mapping_prg == "Bowtie2":
         params:
             paired = SNPparam,
             outdir = "allelic_bams"
+        conda: CONDA_SHARED_ENV
         shell:
-            SNPsplit_path + "SNPsplit"
+            "SNPsplit"
             " {params.paired} --samtools_path "+samtools_path+"samtools"
             " -o {params.outdir} --snp_file {input.snp} {input.bam}"
 elif mapping_prg == "STAR":
@@ -32,8 +30,9 @@ elif mapping_prg == "STAR":
         params:
             paired = SNPparam,
             outdir = "allelic_bams"
+        conda: CONDA_SHARED_ENV
         shell:
-            SNPsplit_path + "SNPsplit"
+            "SNPsplit"
             " {params.paired} --samtools_path "+samtools_path+"samtools"
             " -o {params.outdir} --snp_file {input.snp} {input.bam}"
 

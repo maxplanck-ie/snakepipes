@@ -1,0 +1,4 @@
+bamCoverage:
+    memory: 20G
+bamCoverage_filtered:
+    memory: 20G  
