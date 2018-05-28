@@ -20,6 +20,7 @@ import time
 import shutil
 import yaml
 import inspect
+from glob import glob
 
 sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(inspect.getfile(inspect.currentframe()) )))))+"/shared/")
 
@@ -30,7 +31,7 @@ import common_functions as cf
 def parse_args(defaults={"verbose":None,"configfile":None,"cluster_configfile":None,"max_jobs":None,"snakemake_options":None,"tempdir":None,
                          "mode":None, "downsample":None, "trim":None,"trim_prg":None,"trim_options":None, "fastqc":None,
                          "qualimap":None, "dedup":None, "properpairs":None, "insert_size_max":None, "gcbias":None,
-                         "bw_binsize":None, "mapq":None}):
+                         "bw_binsize":None, "mapq":None, "plot_format":None}):
     """
     Parse arguments from the command line.
     """
@@ -77,7 +78,7 @@ def parse_args(defaults={"verbose":None,"configfile":None,"cluster_configfile":N
                         help="configuration file: config.yaml. In absence of a config file, the default options from the "
                         "workflows would be selected from /workflows/<workflow_name>/defaults.yaml (default: '%(default)s')",
                         default=defaults["configfile"])
-    
+
     general.add_argument("--cluster_configfile",
                         dest="cluster_configfile",
                         help="configuration file for cluster usage. In absence, the default options "
@@ -200,6 +201,14 @@ def parse_args(defaults={"verbose":None,"configfile":None,"cluster_configfile":N
                         help="run computeGCBias quality control (long runtime!) (default: '%(default)s')",
                         default=defaults["gcbias"])
 
+    parser.add_argument("--plotFormat",
+                        dest="plot_format",
+                        choices=['png', 'pdf', 'None'],
+                        metavar="STR",
+                        type=str,
+                        help="Format of the output plots from deeptools. Select 'none' for no plot (default: '%(default)s')",
+                        default=defaults["plot_format"])
+
     snpargs = parser.add_argument_group('allele-specific mapping arguments')
     snpargs.add_argument("--VCFfile",
                         metavar="STR",
@@ -238,7 +247,7 @@ def main():
     ## get command line arguments
     parser = parse_args(defaults)
     args = parser.parse_args()
-    
+
     ## we also add these paths to config, although we don't use them in the Snakefile
     args.this_script_dir = this_script_dir
     args.main_dir_path = main_dir_path
@@ -308,7 +317,18 @@ def main():
                          "--cluster", "'"+cluster_config["snakemake_cluster_cmd"],
                          args.cluster_logs_dir, "--name {rule}.snakemake'"]
 
-    snakemake_log = "2>&1 | tee -a {}/DNA-mapping.log".format(args.outdir).split()
+    ## Write snakemake_cmd to log file
+    fnames = glob(os.path.join(args.outdir, 'DNA-mapping_run-[0-9*].log'))
+    if len(fnames) == 0:
+        n = 1 # no matching files, this is the first run
+    else:
+        fnames.sort()
+        f_prev = fnames.pop()
+        n = int(f_prev.split("-")[2].split(".")[0]) + 1 # get new run number
+    # append the new run number to the file name
+    logfile_name = "DNA-mapping_run-"+ str(n) +".log"
+
+    snakemake_log = "2>&1 | tee -a {}/{}".format(args.outdir, logfile_name).split()
 
     ## create local temp dir and add this path to environment as $TMPDIR variable
     ## on SLURM: $TMPDIR is set, created and removed by SlurmEasy on cluster node
@@ -320,8 +340,8 @@ def main():
     if args.verbose:
         print("\n", cmd, "\n")
 
-    ## Write snakemake_cmd to log file
-    with open(os.path.join(args.outdir,"DNA-mapping.log"),"w") as f:
+    # write log file
+    with open(os.path.join(args.outdir, logfile_name), "w") as f:
         f.write(" ".join(sys.argv)+"\n\n")
         f.write(cmd+"\n\n")
 
@@ -340,12 +360,6 @@ def main():
             # kill snakemake and child processes
             subprocess.call(["pkill", "-SIGTERM", "-P", str(p.pid)])
             print("SIGTERM sent to PID:", p.pid)
-
-            # # kill grid engine jobs
-            # time.sleep(10)
-            # job_ids = subprocess.check_output("""ls {cluster_logs_dir} | awk -F "." '{{print $NF}}' | sed 's/e\|o//' | sort -u""".format(cluster_logs_dir=cluster_logs_dir), shell=True).split()
-            # for job_id in job_ids:
-            #     subprocess.call( "qdel {} 2>&1 >/dev/null".format(str(job_id)), shell="bash" )
 
     ## remove temp dir
     if (temp_path != "" and os.path.exists(temp_path)):
