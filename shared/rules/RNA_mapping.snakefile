@@ -1,4 +1,20 @@
 
+rule convertLibraryTypeHisat2:
+    input: genes_gtf
+    output: mapping_prg+"/lib_type.txt"
+    params: 
+        lib_str = "PE" if paired else "SE",
+        from_library_type = library_type,
+        from_prg = "featureCounts",
+        to_prg="HISAT2",
+        tsv = os.path.join(maindir, "shared", "tools", "library_type.tsv"),
+        rscript = os.path.join(maindir, "shared", "tools", "library_type.R"),
+    threads: 1
+    conda: CONDA_RNASEQ_ENV
+    shell:
+        "Rscript {params.rscript} {params.tsv} {params.lib_str} {params.from_library_type} {params.from_prg} {params.to_prg} > {output}"
+        
+
 ### HISAT2 #####################################################################
 
 if mapping_prg.upper().find("HISAT2") >=0:
@@ -6,7 +22,8 @@ if mapping_prg.upper().find("HISAT2") >=0:
         rule HISAT2:
             input:
                 r1 = fastq_dir+"/{sample}"+reads[0]+".fastq.gz",
-                r2 = fastq_dir+"/{sample}"+reads[1]+".fastq.gz"
+                r2 = fastq_dir+"/{sample}"+reads[1]+".fastq.gz",
+                lib_type=mapping_prg+"/lib_type.txt"
             output:
                 align_summary = mapping_prg+"/{sample}.HISAT2_summary.txt",
                 bam = temp(mapping_prg+"/{sample}.sorted.bam"),
@@ -17,19 +34,17 @@ if mapping_prg.upper().find("HISAT2") >=0:
             params:
                 input_splice = known_splicesites,
                 hisat_options = str(hisat_options or ''),
-                rna_strandness = rna_strandness,
                 samsort_memory = '2G'
             benchmark:
                 mapping_prg+"/.benchmark/HISAT2.{sample}.benchmark"
             threads: 10
-            resources:
-                mem_mb=4000
             conda: CONDA_RNASEQ_ENV
             shell:
+                "lib_type=$(cat {input.lib_type} | awk '{{if ($1!=\"NA\") print \"--rna-strandness \"$1; else print \"\"}}'); echo \"lib_type=\"$lib_type 1>&2; "
                 "hisat2 "
                 "-p {threads} "
                 "{params.hisat_options} "
-                "{params.rna_strandness} "
+                "$lib_type "
                 "-x "+hisat2_index+" "
                 "--known-splicesite-infile {params.input_splice} "
                 "-1 {input.r1} -2 {input.r2} "
@@ -45,7 +60,8 @@ if mapping_prg.upper().find("HISAT2") >=0:
     else:
         rule HISAT2:
             input:
-                fastq_dir+"/{sample}.fastq.gz"
+                fastq_dir+"/{sample}.fastq.gz",
+                lib_type=mapping_prg+"/lib_type.txt"
             output:
                 align_summary = mapping_prg+"/{sample}.HISAT2_summary.txt",
                 bam = temp(mapping_prg+"/{sample}.sorted.bam"),
@@ -56,17 +72,17 @@ if mapping_prg.upper().find("HISAT2") >=0:
             params:
                 input_splice = known_splicesites,
                 hisat_options = str(hisat_options or ''),
-                rna_strandness = rna_strandness,
                 samsort_memory = '2G'
             benchmark:
                 mapping_prg+"/.benchmark/HISAT2.{sample}.benchmark"
             threads: 10
             conda: CONDA_RNASEQ_ENV
             shell:
+                "lib_type=$(cat {input.lib_type} | awk '{{if ($1!=\"NA\") print \"--rna-strandness \"$1; else print \"\"}}'); echo \"lib_type=\"$lib_type 1>&2; "
                 "hisat2 "
                 "-p {threads} "
                 "{params.hisat_options} "
-                "{params.rna_strandness} "
+                "$lib_type "
                 "-x "+hisat2_index+" "
                 "--known-splicesite-infile {params.input_splice} "
                 "-U {input} "

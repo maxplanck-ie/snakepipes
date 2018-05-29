@@ -234,8 +234,7 @@ onstart:
         print("read extension:", reads)
         print("fastq dir:", fastq_dir)
         print("filter annotation:", filter_annotation)
-        print("RNA strandness:", rna_strandness)
-        print("Salmon libtype:", salmon_libtype)
+        print("FeatureCounts library type:", library_type)
         print("Sample info:", sample_info)
         print("-" * 80, "\n")
 

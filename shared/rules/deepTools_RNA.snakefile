@@ -134,6 +134,9 @@ rule estimateReadFiltering:
         bai = mapping_prg+"/{sample}.bam.bai",
     output:
         "deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt"
+    log:
+        out = "deepTools_qc/logs/estimateReadFiltering.{sample}.out",
+        err = "bamCoverage/logs/estimateReadFiltering.{sample}.err"
     conda:
         CONDA_SHARED_ENV
     shell: estimateReadFiltering_cmd
