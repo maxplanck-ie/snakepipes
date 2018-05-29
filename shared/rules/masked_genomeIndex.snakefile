@@ -39,7 +39,7 @@ if allele_hybrid == 'dual':
             " SNPsplit_genome_preparation"
             " --dual_hybrid --genome_build {BASENAME}"
             " --reference_genome {input.genome} --vcf_file {params.SNPpath}"
-            " --strain {params.strain1} --strain2 {params.strain2} 2> {log}"
+            " --strain {params.strain1} --strain2 {params.strain2} 2>&1"
             "&& cd ../"
 else:
     rule create_snpgenome:
@@ -59,7 +59,7 @@ else:
             " SNPsplit_genome_preparation"
             " --genome_build {BASENAME}"
             " --reference_genome {input.genome} --vcf_file {params.SNPpath}"
-            " --strain {params.strain1} 2> {log}"
+            " --strain {params.strain1} 2>&1 "
             "&& cd ../"
 
 if mapping_prg == "STAR":
