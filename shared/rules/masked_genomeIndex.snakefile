@@ -10,7 +10,7 @@ if allele_hybrid == 'dual':
                     strains[1] + "_dual_hybrid.based_on_" + \
                     BASENAME + "_N-masked"
 else:
-    SNPdir = "snp_genome/" + strains[0] + "_" + "_N-masked"
+    SNPdir = "snp_genome/" + strains[0] + "_N-masked"
 
 def getref_fileList(dir):
     fl = glob.glob(dir + "/*.fa")
@@ -32,14 +32,14 @@ if allele_hybrid == 'dual':
             strain1 = strains[0],
             strain2 = strains[1],
             SNPpath = os.path.abspath(VCFfile)
- #       log: "snp_genome/SNPsplit_createSNPgenome.log"
+        log: "snp_genome/SNPsplit_createSNPgenome.log"
         conda: CONDA_SHARED_ENV
         shell:
             " ( [ -d snp_genome ] || mkdir -p snp_genome ) && cd snp_genome &&"
             " SNPsplit_genome_preparation"
             " --dual_hybrid --genome_build {BASENAME}"
             " --reference_genome {input.genome} --vcf_file {params.SNPpath}"
-            " --strain {params.strain1} --strain2 {params.strain2} 2>&1"
+            " --strain {params.strain1} --strain2 {params.strain2} 2> {log}"
             "&& cd ../"
 else:
     rule create_snpgenome:
@@ -52,14 +52,14 @@ else:
         params:
             strain1 = strains[0],
             SNPpath = os.path.abspath(VCFfile)
- #       log: "snp_genome/SNPsplit_createSNPgenome.log"
+        log: "snp_genome/SNPsplit_createSNPgenome.log"
         conda: CONDA_SHARED_ENV
         shell:
             " ( [ -d snp_genome ] || mkdir -p snp_genome ) && cd snp_genome &&"
             " SNPsplit_genome_preparation"
             " --genome_build {BASENAME}"
             " --reference_genome {input.genome} --vcf_file {params.SNPpath}"
-            " --strain {params.strain1} 2>&1 "
+            " --strain {params.strain1} 2> {log}"
             "&& cd ../"
 
 if mapping_prg == "STAR":
