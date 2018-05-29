@@ -16,7 +16,7 @@ configfile:
 local: False
 max_jobs: 12
 nthreads: 8
-snakemake_options:
+snakemake_options: '--use-conda --conda-prefix /data/processing/conda/env'
 tempdir: /data/extended/
 ## directory with fastq files
 readin:

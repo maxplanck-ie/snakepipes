@@ -57,5 +57,6 @@ rule multiQC:
     params:
         indirs = multiqc_input_check(return_value = "indir")
     log: "multiQC/multiQC.log"
+    conda: CONDA_SHARED_ENV
     shell:
-        multiqc_path+"multiqc -o multiQC -f {params.indirs} &> {log}"
+        "multiqc -o multiQC -f {params.indirs} &> {log}"

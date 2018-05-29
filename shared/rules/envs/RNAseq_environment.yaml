@@ -15,3 +15,5 @@ dependencies:
  - r-base=3.4.1
  - salmon=0.9.1
  - r-wasabi=0.2
+ - snpsplit=0.3.4
+ 

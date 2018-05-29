@@ -20,10 +20,10 @@ if mapping_prg == "STAR":
             benchmark:
                 mapping_prg+"/.benchmark/STAR.{sample}.benchmark"
             threads: 12
+            conda: CONDA_RNASEQ_ENV
             shell:
                 " ( [ -d {params.sample_dir} ] || mkdir -p {params.sample_dir} ) && "
-                " module load STAR &&"
-                " "+star_path+"STAR"
+                " STAR"
                 " {params.star_options}"
                 " --runThreadN {threads}"
                 " --genomeDir {params.idx}"
@@ -63,10 +63,10 @@ if mapping_prg == "STAR":
             benchmark:
                 mapping_prg+"/.benchmark/STAR.{sample}.benchmark"
             threads: 12
+            conda: CONDA_RNASEQ_ENV
             shell:
                 " ( [ -d {params.sample_dir} ] || mkdir -p {params.sample_dir} ) && "
-                " module load STAR &&"
-                " "+star_path+"STAR"
+                " STAR"
                 " {params.star_options}"
                 " --runThreadN {threads}"
                 " --genomeDir {params.idx}"
