@@ -8,7 +8,7 @@ message(sprintf("working directory is %s",getwd()))
 
 options(stringsAsFactors=FALSE,na.rm=TRUE)
 require("limma")
-library("carData")
+#library("carData")
 require("car")
 
 ###read in sample sheet

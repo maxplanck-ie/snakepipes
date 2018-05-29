@@ -216,9 +216,6 @@ def main():
     args.wdir = os.path.abspath(args.wdir)
     args.cluster_logs_dir = os.path.join(args.wdir, "cluster_logs")
 
-<<<<<<< HEAD
-
->>>>>>> d7b0e6fdf7c4ee99ca4f672131a99e84bb5d9e19
     args.this_script_dir = this_script_dir
     args.main_dir_path = main_dir_path
 
@@ -259,7 +256,7 @@ def main():
     # save to configs.yaml in wdir
     cf.write_configfile(os.path.join(args.wdir, 'config.yaml'), config)
 
-<<<<<<< HEAD
+
     ######################################### conditional parameters ##################################################
     ###switch between TruSeq and Nextera adapter sequences
     adapterSeq = "AGATCGGAAGAGC"
@@ -271,26 +268,24 @@ def main():
     cluster_config = cf.load_configfile(cf.get_snakepipes_path()+"/shared/cluster.yaml",False)
     cluster_config = cf.merge_dicts(cluster_config, cf.load_configfile(os.path.join(this_script_dir,"cluster.yaml"),False), )
 
->>>>>>> d7b0e6fdf7c4ee99ca4f672131a99e84bb5d9e19
 
     if args.cluster_configfile:
         user_cluster_config = cf.load_configfile(args.cluster_configfile,False)
         cluster_config = cf.merge_dicts(cluster_config, user_cluster_config) # 2) merge/override variables from user_config.yaml
-    cf.write_configfile(os.path.join(args.outdir,'cluster_config.yaml'),cluster_config)
+    cf.write_configfile(os.path.join(args.wdir,'cluster_config.yaml'),cluster_config)
 
-<<<<<<< HEAD
-    
+
+#--use-conda --conda-prefix /data/processing/conda/envs --create-envs-only    
     snakemake_cmd = """
-                    snakemake {snakemake_options} --latency-wait {latency_wait} --snakefile {snakefile} --jobs {max_jobs} --directory {wdir} --configfile {configfile}
+                    snakemake {snakemake_options} --latency-wait {latency_wait} --snakefile {snakefile} --jobs {max_jobs} --directory {wdir} --configfile {configfile} 
                     """.format( latency_wait = cluster_config["snakemake_latency_wait"],
                                 snakefile = os.path.join(args.this_script_dir, "Snakefile"),
                                 max_jobs = args.max_jobs,
                                 wdir = args.wdir,
                                 snakemake_options = str(args.snakemake_options or ''),
-                                configfile = os.path.join(args.outdir,'config.yaml'),
+                                configfile = os.path.join(args.wdir,'config.yaml'),
                               ).split()
 
->>>>>>> d7b0e6fdf7c4ee99ca4f672131a99e84bb5d9e19
     if args.verbose:
         snakemake_cmd.append("--printshellcmds")
 

@@ -1,0 +1,9 @@
+name: Rmd-env-0.1.0
+
+channels:
+  - bioconda
+  - conda-forge
+
+dependencies:
+  - r-rmarkdown=0.9.5
+  - r-pander

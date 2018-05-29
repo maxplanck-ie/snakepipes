@@ -87,7 +87,7 @@ if(nrow(bedtab.CC)==0) {message("None of the genomic intervals passed the filter
 ### limma + ebayes + BH p value adjustment
 
     require("limma")
-    library("carData")
+    #library("carData")
     require("car")
     require("FactoMineR")
     require("reshape2")

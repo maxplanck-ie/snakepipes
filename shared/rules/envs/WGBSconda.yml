@@ -2,23 +2,20 @@ name: WGBS-env-0.1.0
 
 channels:
   - bioconda
+  - conda-forge
 
 dependencies:
-  - cutadapt=1.9.1
-  - fastqc=0.11.7
   - bwameth=0.2.1
-  - samtools=1.8
-  - sambamba=0.6.6
   - methyldackel=0.3.0
   - metilene=0.2.6
   - bedtools=2.27.1
-  - gatk4=4.0b6
+  - gatk=3.5
   - bioconductor-limma=3.34.9
   - r-car=2.1_4
   - r-data.table=1.10.4
   - r-factominer=1.38
   - r-ggplot2=2.2.0
   - r-reshape2
-  - r-dplyr=0.5.0
-  - bioconductor-genomicranges=1.30.3
-  - bioconductor-biomart=2.34.2
+  - r-dplyr=0.7.4
+  - bioconductor-genomicranges=1.30.0
+  - bioconductor-biomart=2.32.1

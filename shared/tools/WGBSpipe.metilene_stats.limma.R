@@ -84,7 +84,7 @@ if(nrow(bedtab.CC)==0) {message("None of the metilene intervals passed the filte
 ### limma + ebayes + BH p value adjustment
 
     require("limma")
-    library("carData")
+    #library("carData")
     require("car")
     require("FactoMineR")
     require("reshape2")
