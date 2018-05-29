@@ -31,6 +31,7 @@ rule plotFingerprint:
     conda: CONDA_SHARED_ENV
     shell: plotFingerprint_cmd
 
+
 rule plotFingerprint_allelic:
     input:
         bams = expand("allelic_bams/{sample}.{suffix}.sorted.bam", sample = samples, suffix = ['genome1', 'genome2']),
@@ -54,6 +55,8 @@ rule plotFingerprint_allelic:
     conda: CONDA_SHARED_ENV
     shell: plotFingerprint_cmd
 
+
+# samtools, bedtools
 rule MACS2_peak_qc:
     input:
         bam = "filtered_bam/{sample}.filtered.bam",
@@ -68,35 +71,27 @@ rule MACS2_peak_qc:
         os.path.join(outdir_ATACqc, "logs/ATAC_qc.{sample}.filtered.log")
     benchmark:
         os.path.join(outdir_ATACqc, ".benchmark/ATAC_qc.{sample}.filtered.benchmark")
-    run:
+    conda: CONDA_ATAC_ENV
+    shell: """
         # get the number of peaks
-        cmd = "cat "+params.peaks+" | wc -l"
-        peak_count = int(subprocess.check_output( cmd, shell=True).decode())
+        peak_count=`cat {params.peaks} | wc -l`
 
         # get the number of mapped reads from Picard CollectAlignmentSummaryMetrics output
-        cmd = "egrep '^PAIR|UNPAIRED' "+input.aln_metrics+" | cut -f 6"
-        mapped_reads = int(subprocess.check_output( cmd, shell=True).decode())
+        mapped_reads=`egrep '^PAIR|UNPAIRED' {input.aln_metrics} | cut -f 6`
 
         # calculate the number of alignments overlapping the peaks
         # exclude reads flagged as unmapped (unmapped reads will be reported when using -L)
-        cmd = samtools_path+"samtools view -c -F 4 -L "+params.peaks+" "+input.bam
-        reads_in_peaks = int(subprocess.check_output( cmd, shell=True).decode())
+        reads_in_peaks=`samtools view -c -F 4 -L {params.peaks} {input.bam}`
 
         # calculate Fraction of Reads In Peaks
-        frip = reads_in_peaks / mapped_reads
+        frip=`bc -l <<< "$reads_in_peaks/$mapped_reds"`
 
         # compute peak genome coverage
-        cmd = ("sort -k 1,1 "+params.peaks+" | "+
-               bedtools_path+"genomeCoverageBed -i - -g "+params.genome_index+" | "+
-               "grep -P '^genome\t1' | cut -f 5"
-              )
-        res=subprocess.check_output( cmd, shell=True).decode()
-        genomecov=0
-        if isFloat(res):
-        	genomecov=float(res)
+        genomecov=`sort -k 1,1 {params.peaks} | genomeCoverageBed -i - -g {params.genome_index} | grep -P '^genome\t1' | cut -f 5`
+        #genomecov=0
+        #if isFloat(res):
+        #	genomecov=float(res)
 
         # write peak-based QC metrics to output file
-        with open(output.qc, "w") as f:
-            f.write("peak_count\tFRiP\tpeak_genome_coverage\n"
-                    "{:d}\t{:.3f}\t{:.4f}\n".format(
-                    peak_count, frip, genomecov))
+        printf "peak_count\tFRiP\tpeak_genome_coverage\n%d\t%5.3f\t%6.4f\n" ${peak_count} ${frip} ${genomecov} > {output.qc}
+        """

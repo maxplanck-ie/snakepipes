@@ -13,3 +13,4 @@ dependencies:
  - sambamba=0.6.6
  - multiqc=1.5
  - snpsplit=0.3.3
+ - macs2=2.1.1.10260309

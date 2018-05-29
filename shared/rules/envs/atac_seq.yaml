@@ -1,0 +1,10 @@
+name: snakepipes_atac-seq_1.0
+channels:
+ - bioconda
+ - conda-forge
+ - r
+dependencies:
+ - samtools = 1.7
+ - bedtools = 2.27.1
+ - bioconductor-csaw = 1.12.0
+ - bioconductor-genomicranges = 1.30.3

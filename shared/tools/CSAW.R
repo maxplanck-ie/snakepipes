@@ -1,28 +1,23 @@
+#!/usr/bin/env Rscript
 ## ChIPseq differential binding workflow
 
-## Usage: cat CSAW.R | /package/R-3.2.0/bin/R --vanilla --quiet --args samplesheet.tsv 0.05 TRUE FALSE
+sampleInfoFilePath <- snakemake@input[["sample_info"]]  #"samplesheet.tab"
+fdr <- as.numeric(snakemake@params[["fdr"]])
+paired <- as.logical(snakemake@params[["paired"]])
+fraglength <- as.numeric(snakemake@params[["fragment_length"]])  # This needs to be figured out somehow
+windowSize <- as.numeric(snakemake@params[["window_size"]])
+importfunc <- snakemake@params[["importfunc"]]  #"DB_functions.R"
+allelic_info <- as.logical(snakemake@params[["allele_info"]])
 
-# args 1 : sample information matrix (tsv)
-# args 2 : FDR cutoff
-# args 3 : paired-end info
-# args 4 : seq fragment length
-# args 5 : window size to count reads
-# args 6 : allele-specific info
-# args 7 : path to DB_functions
-
-## get Args
-args = commandArgs(TRUE)
-
-sampleInfoFilePath <- args[1] #"samplesheet.tab"
-fdr <- as.numeric(args[2])
-paired <- as.logical(args[3])
-fraglength <- as.numeric(args[4])
-windowSize <- as.numeric(args[5])
-importfunc <- args[6] #"~/programs/snakemake_workflows/shared/tools/DB_functions.R"
-allelic_info <- as.logical(args[7])
+# Handle PE reads
+if(paired) {
+    fraglength = NA
+    d = read.delim(snakemake@input[["insert_size_metrics"]])
+    ## GET fraglength
+}
 
 # include functions
-source(importfunc)
+source(snakemake@params[["importfunc"]])
 library(GenomicRanges)
 ## fix default FDR significance threshold
 if ( is.na(fdr) ) fdr <- 0.05
