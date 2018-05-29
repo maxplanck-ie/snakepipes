@@ -1,4 +1,4 @@
-CONDA_SHARED_ENV = "envs/shared_environment.yaml"
+
 
 if paired:
     rule FastQC:

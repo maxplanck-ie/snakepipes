@@ -26,8 +26,9 @@ if mapping_prg == "Bowtie2":
             benchmark:
                 mapping_prg+"/.benchmark/Bowtie2.{sample}.benchmark"
             threads: 24
+            conda: CONDA_DNA_MAPPING_ENV
             shell:
-                bowtie2_path+"bowtie2"
+                "bowtie2"
                 " -X {params.insert_size_max}"
                 " -x {params.idxbase} -1 {input.r1} -2 {input.r2}"
                 " {params.bowtie_opts} {params.mate_orientation}"
@@ -35,8 +36,8 @@ if mapping_prg == "Bowtie2":
                 " --rg DS:{wildcards.sample} --rg PL:ILLUMINA --rg SM:{wildcards.sample}"
                 " -p {threads}"
                 " 2> {output.align_summary} |"
-                " "+samtools_path+"samtools view -Sb - |"
-                " "+samtools_path+"samtools sort -m 2G -T ${{TMPDIR}}{wildcards.sample} -@ 2 -O bam - > {output.bam}"
+                "samtools view -Sb - |"
+                "samtools sort -m 2G -T ${{TMPDIR}}{wildcards.sample} -@ 2 -O bam - > {output.bam}"
     else:
         rule Bowtie2_allele:
             input:
@@ -51,16 +52,17 @@ if mapping_prg == "Bowtie2":
             benchmark:
                 mapping_prg+"/.benchmark/Bowtie2.{sample}.benchmark"
             threads: 24
+            conda: CONDA_DNA_MAPPING_ENV
             shell:
-                bowtie2_path+"bowtie2"
-                    " -x {params.idxbase} -U {input.r1}"
-                    " --reorder"
-                    " {params.bowtie_opts}"
-                    " --rg-id {wildcards.sample} --rg CN:mpi-ie_deep_sequencing_unit "
-                    " --rg DS:{wildcards.sample} --rg PL:ILLUMINA --rg SM:{wildcards.sample} "
-                    " -p {threads}"
-                    " 2> {output.align_summary} |"
-                    " "+samtools_path+"samtools view -Sbu - |"
-                    " "+samtools_path+"samtools sort -m 2G -T ${{TMPDIR}}{wildcards.sample} -@ 2 -O bam - > {output.bam}"
+                "bowtie2"
+                " -x {params.idxbase} -U {input.r1}"
+                " --reorder"
+                " {params.bowtie_opts}"
+                " --rg-id {wildcards.sample} --rg CN:mpi-ie_deep_sequencing_unit "
+                " --rg DS:{wildcards.sample} --rg PL:ILLUMINA --rg SM:{wildcards.sample} "
+                " -p {threads}"
+                " 2> {output.align_summary} |"
+                "samtools view -Sbu - |"
+                "samtools sort -m 2G -T ${{TMPDIR}}{wildcards.sample} -@ 2 -O bam - > {output.bam}"
 else:
     print("Only bowtie2 implemented")

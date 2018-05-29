@@ -7,8 +7,12 @@ sys.path.append(os.path.join(maindir, "shared"))
 
 import common_functions as cf
 
-# load tool paths
-globals().update(cf.load_paths(os.path.join(maindir, "shared", "paths.yaml"),maindir,config["verbose"]))
+# load conda ENVs (path is relative to "shared/rules" directory)
+CONDA_SHARED_ENV = "envs/shared_environment.yaml"
+
+# load conda ENV
+CONDA_DNA_MAPPING_ENV = "envs/dna_mapping.yaml"
+
 # load config file
 globals().update(cf.load_configfile(workflow.overwrite_configfile,config["verbose"]))
 # load organism-specific data, i.e. genome indices, annotation, etc.
@@ -16,31 +20,6 @@ globals().update(cf.load_organism_data(genome,maindir,config["verbose"]))
 
 # do workflow specific stuff now
 include: os.path.join(workflow.basedir, "internals.snakefile")
-
-if "allelic-mapping" in mode:
-    # Updated global vars if mode = "allelic-mapping"
-    if allele_mode == 'create_and_map':
-        bowtie2_index_allelic = 'snp_genome/bowtie2_Nmasked/Genome.1.bt2'
-        if len(strains) == 1:
-            allele_hybrid = 'single'
-            snp_file = "snp_genome/all_SNPs_" + strains[0] + "_" + genome + ".txt.gz "
-        elif len(strains) == 2:
-            allele_hybrid = 'dual'
-            snp_file = "snp_genome/all_" + strains[1] + "_SNPs_" + strains[0] + "_reference.based_on_" + genome + ".txt"
-
-        include: os.path.join(maindir, "shared", "rules", "masked_genomeIndex.snakefile")
-    elif allele_mode == 'map_only':
-        bowtie2_index_allelic = Nmasked_index
-        snp_file = SNPfile
-    ## mapping rules
-    include: os.path.join(maindir, "shared", "rules", "Bowtie2_allelic.snakefile")
-    ## SNPsplit
-    include: os.path.join(maindir, "shared", "rules", "SNPsplit.snakefile")
-    # deepTools QC
-    include: os.path.join(maindir, "shared", "rules", "deepTools_qc_allelic.snakefile")
-else:
-    # Bowtie2 mapping, duplicate marking, BAM filtering and indexing
-    include: os.path.join(maindir, "shared", "rules", "Bowtie2.snakefile")
 
 ### include modules of other snakefiles ########################################
 ################################################################################
@@ -77,6 +56,32 @@ include: os.path.join(maindir, "shared", "rules", "Qualimap_bamqc.snakefile")
 ## MultiQC
 include: os.path.join(maindir, "shared", "rules", "multiQC.snakefile")
 
+## Allele-specific JOBs
+if "allelic-mapping" in mode:
+    # Updated global vars if mode = "allelic-mapping"
+    if allele_mode == 'create_and_map':
+        bowtie2_index_allelic = 'snp_genome/bowtie2_Nmasked/Genome.1.bt2'
+        if len(strains) == 1:
+            allele_hybrid = 'single'
+            snp_file = "snp_genome/all_SNPs_" + strains[0] + "_" + genome + ".txt.gz "
+        elif len(strains) == 2:
+            allele_hybrid = 'dual'
+            snp_file = "snp_genome/all_" + strains[1] + "_SNPs_" + strains[0] + "_reference.based_on_" + genome + ".txt"
+
+        include: os.path.join(maindir, "shared", "rules", "masked_genomeIndex.snakefile")
+    elif allele_mode == 'map_only':
+        bowtie2_index_allelic = Nmasked_index
+        snp_file = SNPfile
+    ## mapping rules
+    include: os.path.join(maindir, "shared", "rules", "Bowtie2_allelic.snakefile")
+    ## SNPsplit
+    include: os.path.join(maindir, "shared", "rules", "SNPsplit.snakefile")
+    # deepTools QC
+    include: os.path.join(maindir, "shared", "rules", "deepTools_qc_allelic.snakefile")
+else:
+    # Bowtie2 mapping, duplicate marking, BAM filtering and indexing
+    include: os.path.join(maindir, "shared", "rules", "Bowtie2.snakefile")
+
 ### conditional/optional rules #################################################
 ################################################################################
 def run_FastQC(fastqc):
@@ -94,17 +99,11 @@ def run_Trimming(trim, fastqc):
     else:
         return([])
 
-def run_CollectInsertSizeMetrics(paired):
-    if paired:
-        return( expand("Picard_qc/InsertSizeMetrics/{sample}.insert_size_metrics.txt", sample = samples) )
-    else:
-        return([])
-
-# def run_bamCoverage_filtered(dedup, properpairs, mapq):
-#     if (dedup or properpairs or mapq > 0):
-#         return( expand("bamCoverage/{sample}.filtered.seq_depth_norm.bw", sample = samples) )
-#     else:
-#         return([])
+#def run_CollectInsertSizeMetrics(paired):
+#    if paired:
+#        return( expand("Picard_qc/InsertSizeMetrics/{sample}.insert_size_metrics.txt", sample = samples) )
+#    else:
+#        return([])
 
 def run_computeGCBias(gcbias):
     if gcbias:
@@ -119,18 +118,19 @@ def run_computeGCBias(gcbias):
 def run_deepTools_qc():
     file_list = []
     if len(samples) <= 20:
-        file_list.append( ["deepTools_qc/plotCoverage/read_coverage.png"] )
+        file_list.append( ["deepTools_qc/plotCoverage/read_coverage.tsv"] )
     if len(samples)>1 and len(samples)<=20:
         file_list.append( [
-        "deepTools_qc/plotCorrelation/correlation.pearson.read_coverage.heatmap.png",
-        "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage.heatmap.png",
-        "deepTools_qc/plotPCA/PCA.read_coverage.png"])
+            "deepTools_qc/plotCorrelation/correlation.pearson.read_coverage.tsv",
+            "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage.tsv",
+            "deepTools_qc/plotPCA/PCA.read_coverage.tsv",
+            "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv" ])
         file_list.append(expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample = samples))
         if 'allelic-mapping' in mode:
             file_list.append( [
-            "deepTools_qc/plotCorrelation/correlation.pearson.read_coverage_allelic.heatmap.png",
-            "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage_allelic.heatmap.png",
-            "deepTools_qc/plotPCA/PCA.read_coverage_allelic.png" ] )
+                "deepTools_qc/plotCorrelation/correlation.pearson.read_coverage_allelic.tsv",
+                "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage_allelic.tsv",
+                "deepTools_qc/plotPCA/PCA.read_coverage_allelic.tsv" ] )
 
     return (file_list)
 
@@ -199,10 +199,8 @@ rule all:
         expand("Sambamba/{sample}.markdup.txt", sample = samples),
         expand("filtered_bam/{sample}.filtered.bam", sample = samples),
         expand("Picard_qc/AlignmentSummaryMetrics/{sample}.alignment_summary_metrics.txt", sample = samples),
-#       run_CollectInsertSizeMetrics(paired),
         expand("bamCoverage/{sample}.seq_depth_norm.bw", sample = samples),
         expand("bamCoverage/{sample}.filtered.seq_depth_norm.bw", sample = samples),
-        #run_bamCoverage_filtered(dedup, properpairs, mapq),
         run_computeGCBias(gcbias),
         run_deepTools_qc(),
         run_Qualimap(),

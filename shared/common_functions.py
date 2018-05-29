@@ -138,24 +138,27 @@ def is_paired(infiles, ext, reads):
     return paired
 
 
-def get_fragment_length(infile):
+def get_fragment_length(infile, sampleName):
     """
     Return median insert size from a metrics file created by
-    Picard CollectInsertSizeMetrics
-    Read 2 column text file, grep line by 1st column, return 2nd
+    deeptools bamPEFragmentSize.
+    Read the 37 column text file, grep the row corresponding to the sample and
+    return the entry from 6th column (Frag. Len. Median)
     """
     with open(infile, "r") as f:
         for line in f:
             line = line.strip()
-            if line.startswith("MEDIAN_INSERT_SIZE"):
+            if line.startswith(sampleName):
                 try:
-                    median = next(f).split()[0]
-                    return int(median)
+                    median = line.split()[5]
+                    return float(median)
                 except TypeError:
-                    print("ERROR: File", infile, "is NOT a proper Picard CollectInsertSizeMetrics metrics file.\n")
+                    print("ERROR: File", infile, "is NOT an output from bamPEFragmentSize.\n")
                     exit(1)
+            else:
+                pass
     # no match in infile
-    print("ERROR: File", infile, "is NOT a proper Picard CollectInsertSizeMetrics metrics file.")
+    print("ERROR: File", infile, "is NOT an output from bamPEFragmentSize.\n")
     exit(1)
 
 

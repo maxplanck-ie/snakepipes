@@ -2,7 +2,7 @@ import os
 import re
 from operator import is_not
 
-CONDA_SHARED_ENV = "envs/shared_environment.yaml"
+
 
 
 ###get automatic cut threshold for hard-trimming of 5' ends

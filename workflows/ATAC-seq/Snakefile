@@ -7,8 +7,9 @@ sys.path.append(os.path.join(maindir, "shared"))
 
 import common_functions as cf
 
-# load tool paths
-globals().update(cf.load_paths(os.path.join(maindir, "shared", "paths.yaml"),maindir,config["verbose"]))
+# load conda ENVs (path is relative to "shared/rules" directory)
+CONDA_SHARED_ENV = "envs/shared_environment.yaml"
+
 # load config file
 globals().update(cf.load_configfile(workflow.overwrite_configfile,config["verbose"]))
 # load organism-specific data, i.e. genome indices, annotation, etc.
@@ -20,7 +21,6 @@ deeptools_ATAC='deepTools_ATAC/'
 
 # do workflow specific stuff now
 include: os.path.join(workflow.basedir, "internals.snakefile")
-
 
 ### include modules of other snakefiles ########################################
 ################################################################################

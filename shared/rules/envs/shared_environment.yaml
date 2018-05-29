@@ -11,4 +11,5 @@ dependencies:
  - cutadapt=1.16
  - trim-galore=0.4.5
  - sambamba=0.6.6
- - multiqc
+ - multiqc=1.5
+ - snpsplit=0.3.3
