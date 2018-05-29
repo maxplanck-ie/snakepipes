@@ -53,7 +53,7 @@ else:
             strain1 = strains[0],
             SNPpath = os.path.abspath(VCFfile)
  #       log: "snp_genome/SNPsplit_createSNPgenome.log"
-        conda: CONDA_RNASEQ_ENV
+        conda: CONDA_SHARED_ENV
         shell:
             " ( [ -d snp_genome ] || mkdir -p snp_genome ) && cd snp_genome &&"
             " SNPsplit_genome_preparation"
