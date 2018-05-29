@@ -1,4 +1,4 @@
-CONDA_SHARED_ENV = "envs/shared_environment.yaml"
+
 
 rule bamCoverage_RPKM_allelic:
     input:

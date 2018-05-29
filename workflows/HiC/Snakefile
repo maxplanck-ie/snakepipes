@@ -7,8 +7,10 @@ sys.path.append(os.path.join(maindir, "shared"))
 
 import common_functions as cf
 
-# load tool paths
-globals().update(cf.load_paths(os.path.join(maindir, "shared", "paths.yaml"),maindir,config["verbose"]))
+# load conda ENVs (path is relative to "shared/rules" directory)
+CONDA_SHARED_ENV = "envs/shared_environment.yaml"
+CONDA_HIC_ENV = "envs/snakepipes_hic_conda_env.yaml"
+
 # load config file
 globals().update(cf.load_configfile(workflow.overwrite_configfile,config["verbose"]))
 # load organism-specific data, i.e. genome indices, annotation, etc.
@@ -33,6 +35,8 @@ if trim:
 
 # HiCExplorer
 include: os.path.join(maindir, "shared", "rules", "hicexplorer.snakefile")
+
+#include: os.path.join(maindir, "shared", "rules", "multiQC.snakefile")
 
 ### conditional/optional rules #################################################
 ################################################################################
@@ -62,32 +66,43 @@ def run_build_matrices():
     if merge_samples and nbins_toMerge !=0:
        file_list.append(["HiC_matrices/mergedSamples_Mbins"+str(nbins_toMerge)+"_"+matrixFile_suffix+".h5",
                         "HiC_matrices/QCplots/mergedSamples_Mbins"+str(nbins_toMerge)+"_"+matrixFile_suffix+"_diagnostic_plot.pdf",
-                        "HiC_matrices/QCplots/mergedSamples_Mbins"+str(nbins_toMerge)+"_"+matrixFile_suffix+"_mad_threshold.out", 
-                        "HiC_matrices_corrected/mergedSamples_Mbins"+str(nbins_toMerge)+"_"+matrixFile_suffix+".corrected.h5",
-                        "TADs/mergedSamples_"+matrixFile_suffix+"_boundaries.bed"])
-       return(file_list)
+                        "HiC_matrices/QCplots/mergedSamples_Mbins"+str(nbins_toMerge)+"_"+matrixFile_suffix+"_mad_threshold.out"])
+       if not noCorrect:
+          file_list.append(["HiC_matrices_corrected/mergedSamples_Mbins"+str(nbins_toMerge)+"_"+matrixFile_suffix+".corrected.h5"])
+          if not noTAD:
+             file_list.append(["TADs/mergedSamples_"+matrixFile_suffix+"_boundaries.bed"])
+
     elif merge_samples:
        file_list.append(["HiC_matrices/mergedSamples_"+matrixFile_suffix+".h5",
               "HiC_matrices/QCplots/mergedSamples_"+matrixFile_suffix+"_diagnostic_plot.pdf",
               "HiC_matrices/QCplots/mergedSamples_"+matrixFile_suffix+"_diagnostic_plot.pdf",
-              "HiC_matrices/QCplots/mergedSamples_"+matrixFile_suffix+"_mad_threshold.out",
-              "HiC_matrices_corrected/mergedSamples_"+matrixFile_suffix+".corrected.h5",
-              "TADs/mergedSamples_"+matrixFile_suffix+"_boundaries.bed"])
-       return(file_list)
+              "HiC_matrices/QCplots/mergedSamples_"+matrixFile_suffix+"_mad_threshold.out"])
+       if not noCorrect:
+              file_list.append(["HiC_matrices_corrected/mergedSamples_"+matrixFile_suffix+".corrected.h5"])
+              if not noTAD:
+                 file_list.append(["TADs/mergedSamples_"+matrixFile_suffix+"_boundaries.bed"])
 
     elif nbins_toMerge != 0:
-       return(expand("HiC_matrices/{sample}_Mbins"+str(nbins_toMerge)+"_"+matrixFile_suffix+".h5",sample=samples)+
+        file_list.append(expand("HiC_matrices/{sample}_Mbins"+str(nbins_toMerge)+"_"+matrixFile_suffix+".h5",sample=samples)+
               expand("HiC_matrices/QCplots/{sample}_Mbins"+str(nbins_toMerge)+"_"+matrixFile_suffix+"_diagnostic_plot.pdf", sample=samples)+
-              expand("HiC_matrices/QCplots/{sample}_Mbins"+str(nbins_toMerge)+"_"+matrixFile_suffix+"_mad_threshold.out", sample=samples)+
-              expand("HiC_matrices_corrected/{sample}_Mbins"+str(nbins_toMerge)+"_"+matrixFile_suffix+".corrected.h5", sample=samples)+
-              expand("TADs/{sample}_Mbins"+str(nbins_toMerge)+"_"+matrixFile_suffix+"_boundaries.bed", sample=samples))
+              expand("HiC_matrices/QCplots/{sample}_Mbins"+str(nbins_toMerge)+"_"+matrixFile_suffix+"_mad_threshold.out", sample=samples))
+        if not noCorrect:
+              file_list.append(expand("HiC_matrices_corrected/{sample}_Mbins"+str(nbins_toMerge)+"_"+matrixFile_suffix+".corrected.h5", sample=samples))
+              if not noTAD:
+                 file_list.append(expand("TADs/{sample}_Mbins"+str(nbins_toMerge)+"_"+matrixFile_suffix+"_boundaries.bed", sample=samples))
 
     else:
-       return(expand("HiC_matrices/{sample}_"+matrixFile_suffix+".h5", sample=samples)+
+       file_list.append(expand("HiC_matrices/{sample}_"+matrixFile_suffix+".h5", sample=samples)+
               expand("HiC_matrices/QCplots/{sample}_"+matrixFile_suffix+"_diagnostic_plot.pdf", sample=samples)+
-              expand("HiC_matrices/QCplots/{sample}_"+matrixFile_suffix+"_mad_threshold.out", sample=samples)+
-              expand("HiC_matrices_corrected/{sample}_"+matrixFile_suffix+".corrected.h5", sample=samples)+
-              expand("TADs/{sample}_"+matrixFile_suffix+"_boundaries.bed", sample=samples))
+              expand("HiC_matrices/QCplots/{sample}_"+matrixFile_suffix+"_mad_threshold.out", sample=samples))
+       if not noCorrect:
+              file_list.append(expand("HiC_matrices_corrected/{sample}_"+matrixFile_suffix+".corrected.h5", sample=samples))
+              if not noTAD:
+                 file_list.append(expand("TADs/{sample}_"+matrixFile_suffix+"_boundaries.bed", sample=samples))
+
+    if distVsCount:
+       "dist_vs_counts.png"
+    return(file_list)
 
 ### execute before workflow starts #############################################
 ################################################################################
@@ -113,7 +128,8 @@ rule all:
         run_FastQC(fastqc),
         run_Trimming(trim, fastqc),
         expand(mapping_prg+"/{sample}{read}.bam", sample = samples, read = reads),
-        run_build_matrices()
+        run_build_matrices(),
+#       "multiQC/multiqc_report.html"
 
 ### execute after workflow finished ############################################
 ################################################################################

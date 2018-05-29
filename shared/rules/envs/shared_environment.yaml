@@ -6,8 +6,10 @@ dependencies:
  - deeptools=3.0.2
  - seqtk=1.2
  - pigz=2.3.4
+ - snpsplit=0.3.4
  - samtools=1.7
  - fastqc=0.11.7
  - cutadapt=1.15
  - trim-galore=0.4.5
  - sambamba=0.6.6
+ - multiqc=1.5

@@ -14,8 +14,13 @@ sys.path.append(os.path.join(maindir, "shared"))
 import common_functions as cf
 workflow_tools=os.path.join(maindir, "shared", "tools")
 
+<<<<<<< HEAD
 # load tool paths
 #globals().update(cf.load_paths(os.path.join(maindir, "shared", "paths.yaml"),maindir,config["verbose"]))
+=======
+# load conda ENVs (path is relative to "shared/rules" directory)
+CONDA_SHARED_ENV = "envs/shared_environment.yaml"
+>>>>>>> 2490d918428cfbb0829e963554432c92f23c935d
 # load config file
 globals().update(cf.load_configfile(workflow.overwrite_configfile,config["verbose"]))
 # load organism-specific data, i.e. genome indices, annotation, etc.
@@ -82,7 +87,7 @@ def calc_doc(intList,wcard):
     if intList:
         int_dest=[re.sub('.bed','.mean.doc.sample_summary',os.path.basename(x)) for x in intList]
         int_dest[:0]=['mean.CG.doc.sample_summary']
-        int_dest[:0]=['mean.genome.doc.sample_summary'] 
+        int_dest[:0]=['mean.genome.doc.sample_summary']
         if wcard:
             return ([os.path.join('QC_metrics',w) for w in expand('{{sample}}.{sfix}',sfix=int_dest)])
         else:
@@ -92,7 +97,7 @@ def calc_doc(intList,wcard):
         if wcard:
             return ([os.path.join('QC_metrics',w) for w in expand('{{sample}}.{sfix}',sfix=int_dest)])
         else:
-            return ([os.path.join('QC_metrics',w) for w in expand('{sample}.{sfix}',sample=samples,sfix=int_dest)])       
+            return ([os.path.join('QC_metrics',w) for w in expand('{sample}.{sfix}',sample=samples,sfix=int_dest)])
 
 
 def run_CpG_stats(sampleInfo):

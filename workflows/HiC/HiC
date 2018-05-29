@@ -20,6 +20,7 @@ import time
 import shutil
 import yaml
 import inspect
+from glob import glob
 
 sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(inspect.getfile(inspect.currentframe()) )))))+"/shared/")
 import common_functions as cf
@@ -28,7 +29,7 @@ import common_functions as cf
 def parse_args(defaults={"verbose":None,"configfile":None,"cluster_configfile":None,"max_jobs":None,"snakemake_options":None,"tempdir":None,
                          "mode":None, "downsample":None, "trim":None,"trim_prg":None,"trim_options":None, "fastqc":None,
                          "bin_size":None, "RF_resolution":None, "enzyme":None, "restrict_region":None,
-                         "merge_samples":None, "nbins_toMerge":None, "tadparams":None}):
+                         "merge_samples":None, "nbins_toMerge":None, "tadparams":None, "noTAD":None, "noCorrect":None, "distVsCount":None, "distVsCountParams":None}):
     """
     Parse arguments from the command line.
     """
@@ -73,7 +74,7 @@ def parse_args(defaults={"verbose":None,"configfile":None,"cluster_configfile":N
                         "workflows would be selected from /workflows/<workflow_name>/defaults.yaml (default: '%(default)s')",
                         default=defaults["configfile"])
 
-   general.add_argument("--cluster_configfile",
+    general.add_argument("--cluster_configfile",
                         dest="cluster_configfile",
                         help="configuration file for cluster usage. In absence, the default options "
                         "from shared/cluster.yaml and workflows/[workflow]/cluster.yaml would be selected (default: '%(default)s')",
@@ -191,11 +192,36 @@ def parse_args(defaults={"verbose":None,"configfile":None,"cluster_configfile":N
                         help="parameters for HiCFindTADs. (default: '%(default)s')",
                         default=defaults["tadparams"])
 
+    optional.add_argument("--noTAD",
+                        dest="noTAD",
+                        action="store_true",
+                        help="Stop the pipeline before TAD calling. (default: '%(default)s')",
+                        default=defaults["noTAD"])
+
+    optional.add_argument("--noCorrect",
+                        dest="noCorrect",
+                        action="store_true",
+                        help="Stop the pipeline before correcting the matrix. (default: '%(default)s')",
+                        default=defaults["noCorrect"])
+
+    optional.add_argument("--distVsCount",
+                        dest="distVsCount",
+                        action="store_true",
+                        help="Run hicDistVsCount. (default: '%(default)s')",
+                        default=defaults["distVsCount"])
+
+    optional.add_argument("--distVsCount_params",
+                        dest="distVsCountParams",
+                        type=str,
+                        metavar="STR",
+                        help="parameters to run hicDistVsCount. (default: '%(default)s')",
+                        default=defaults["distVsCountParams"])
+
     return parser
 
 
 def main():
-    
+
     ## basic paths only used in wrapper
     this_script_dir = os.path.dirname(os.path.realpath(__file__))
     main_dir_path = cf.get_snakepipes_path()
@@ -238,6 +264,7 @@ def main():
     ## save to configs.yaml in outdir
     cf.write_configfile(os.path.join(args.outdir,'config.yaml'),config)
 
+
     ## merge cluster config files: 1) global one, 2) workflow specific one, 3) user provided one
     cluster_config = cf.load_configfile(cf.get_snakepipes_path()+"/shared/cluster.yaml",False)
     cluster_config = cf.merge_dicts(cluster_config, cf.load_configfile(os.path.join(this_script_dir,"cluster.yaml"),False), )
@@ -258,12 +285,26 @@ def main():
                               ).split()
 
     if args.verbose:
-        snakemake_cmd.append("--printshellcmds")
+        snakemake_cmd.append("--printshellcmds ")
 
     if not args.local:
-        snakemake_cmd += ["--cluster 'SlurmEasy --threads {threads} --mem-per-cpu 30G --log", args.cluster_logs_dir, "--name {rule}.snakemake'"]
+        snakemake_cmd += ["--cluster-config",
+                        os.path.join(args.outdir,'cluster_config.yaml'),
+                        "--cluster", "'"+cluster_config["snakemake_cluster_cmd"],
+                        args.cluster_logs_dir, "--name {rule}.snakemake'"]
 
-    snakemake_log = "2>&1 | tee -a {}/Hi-C.log".format(args.outdir).split()
+    ## Write snakemake_cmd to log file
+    fnames = glob(os.path.join(args.outdir, 'Hi-C_run-[0-9*].log'))
+    if len(fnames) == 0:
+        n = 1 # no matching files, this is the first run
+    else:
+        fnames.sort()
+        f_prev = fnames.pop()
+        n = int(f_prev.split("-")[2].split(".")[0]) + 1 # get new run number
+    # append the new run number to the file name
+    logfile_name = "Hi-C_run-"+ str(n) +".log"
+
+    snakemake_log = "2>&1 | tee -a {}/{}".format(args.outdir, logfile_name).split()
 
     ## create local temp dir and add this path to environment as $TMPDIR variable
     ## on SLURM: $TMPDIR is set, created and removed by SlurmEasy on cluster node
@@ -275,8 +316,8 @@ def main():
     if args.verbose:
         print("\n", cmd, "\n")
 
-    ## Write snakemake_cmd to log file
-    with open(os.path.join(args.outdir,"Hi-C.log"),"w") as f:
+    # write log file
+    with open(os.path.join(args.outdir, logfile_name), "w") as f:
         f.write(" ".join(sys.argv)+"\n\n")
         f.write(cmd+"\n\n")
 

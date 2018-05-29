@@ -19,6 +19,7 @@ import time
 import shutil
 import yaml
 import inspect
+from glob import glob
 
 sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(inspect.getfile(inspect.currentframe()) )))))+"/shared/")
 
@@ -51,7 +52,7 @@ def parse_args(defaults={"verbose":None,"configfile":None,"cluster_configfile":N
     required.add_argument("-i", "--input-dir",
                          dest="indir",
                          help="input directory containing the FASTQ files, either paired-end OR single-end data",required=True)
-    
+
     required.add_argument("-o", "--output-dir",
                          dest="outdir",
                          help="output directory",required=True)
@@ -61,36 +62,36 @@ def parse_args(defaults={"verbose":None,"configfile":None,"cluster_configfile":N
     general.add_argument("-h", "--help",
                         action="help",
                         help="show this help message and exit")
-    
+
     general.add_argument("-v", "--verbose",
                         dest="verbose",
                         action="store_true",
                         help="verbose output (default: '%(default)s')",
                         default=defaults["verbose"])
-    
+
     general.add_argument("-c", "--configfile",
                         dest="configfile",
                         help="configuration file: config.yaml (default: '%(default)s')",
                         default=defaults["configfile"])
-     
+
     general.add_argument("--cluster_configfile",
                         dest="cluster_configfile",
                         help="configuration file for cluster usage. In absence, the default options "
                         "from shared/cluster.yaml and workflows/[workflow]/cluster.yaml would be selected (default: '%(default)s')",
                         default=defaults["cluster_configfile"])
-    
+
     general.add_argument("-j", "--jobs",
                         dest="max_jobs",
                         metavar="INT",
                         help="maximum number of concurrently submitted Slurm jobs / cores if workflow is run locally "
                         "(default: '%(default)s')", type=int, default=defaults["max_jobs"])
-    
+
     general.add_argument("--local",
                         dest="local",
                         action="store_true",
                         default=False,
                         help="run workflow locally; default: jobs are submitted to Slurm queue (default: '%(default)s')")
-    
+
     general.add_argument("--snakemake_options",
                         dest="snakemake_options",
                         metavar="STR",
@@ -98,7 +99,7 @@ def parse_args(defaults={"verbose":None,"configfile":None,"cluster_configfile":N
                         help="Snakemake options to be passed directly to snakemake, e.g. use "
                         "--snakemake_options='--dryrun --rerun-incomplete --unlock --forceall'. (default: '%(default)s')",
                         default=defaults["snakemake_options"])
-    
+
     general.add_argument("--tempdir",
                         dest="tempdir",
                         type=str,
@@ -108,7 +109,7 @@ def parse_args(defaults={"verbose":None,"configfile":None,"cluster_configfile":N
 
      ## optional
     optional = parser.add_argument_group('Optional arguments')
-    
+
     optional.add_argument("--downsample",
                        dest="downsample",
                        metavar="INT",
@@ -174,7 +175,7 @@ def main():
     ## basic paths only used in wrapper
     this_script_dir = os.path.dirname(os.path.realpath(__file__))
     main_dir_path = cf.get_snakepipes_path()
-    
+
     ## defaults
     defaults = cf.load_configfile(os.path.join(this_script_dir, "defaults.yaml"),False)
     ## get command line arguments
@@ -257,7 +258,18 @@ def main():
                          "--cluster", "'"+cluster_config["snakemake_cluster_cmd"],
                          args.cluster_logs_dir, "--name {rule}.snakemake'"]
 
-    snakemake_log = "2>&1 | tee -a {}/scRNAseq-mapcount.log".format(args.outdir).split()
+    ## Write snakemake_cmd to log file
+    fnames = glob(os.path.join(args.outdir, 'RNA-seq_run-[0-9*].log'))
+    if len(fnames) == 0:
+        n = 1 # no matching files, this is the first run
+    else:
+        fnames.sort()
+        f_prev = fnames.pop()
+        n = int(f_prev.split("-")[2].split(".")[0]) + 1 # get new run number
+    # append the new run number to the file name
+    logfile_name = "RNA-seq_run-"+ str(n) +".log"
+
+    snakemake_log = "2>&1 | tee -a {}/{}".format(args.outdir, logfile_name).split()
 
     ## create local temp dir and add this path to environment as $TMPDIR variable
     ## on SLURM: $TMPDIR is set, created and removed by SlurmEasy on cluster node
@@ -269,8 +281,8 @@ def main():
     if args.verbose:
         print("\n", cmd, "\n")
 
-    ## Write snakemake_cmd to log file
-    with open(os.path.join(args.outdir,"scRNAseq-mapcount.log"),"w") as f:
+    # write log file
+    with open(os.path.join(args.outdir, logfile_name), "w") as f:
         f.write(" ".join(sys.argv)+"\n\n")
         f.write(cmd+"\n\n")
 

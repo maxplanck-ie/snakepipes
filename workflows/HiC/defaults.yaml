@@ -11,12 +11,13 @@
 # can be used in new/extended snakemake rules!
 ################################################################################
 ## General/Snakemake parameters, only used/set by wrapper or in Snakemake cmdl, but not in Snakefile
+pipeline: hic
 outdir:
 configfile:
-cluster_configFile:
+cluster_configfile:
 local: False
 max_jobs: 5
-snakemake_options: '--use-conda --conda-prefix /data/processing/conda/env'
+snakemake_options: '--use-conda --conda-prefix /data/processing/conda/env '
 tempdir: /data/extended/
 ## directory with fastq files
 indir:
@@ -50,6 +51,10 @@ nbins_toMerge: 0
 merge_samples: false
 # parameters for hicFindTADs
 tadparams: --thresholdComparisons 0.01
+distVsCount: false
+distVsCountParams: 
+noTAD: false
+noCorrect: false
 
 ################################################################################
 # Call snakemake directly, i.e. without using the wrapper script:

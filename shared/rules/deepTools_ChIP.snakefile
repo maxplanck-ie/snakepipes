@@ -1,5 +1,5 @@
 ### deepTools bamCompare subtract #######################################################
-CONDA_SHARED_ENV = "envs/shared_environment.yaml"
+
 
 rule bamCompare_subtract:
     input:
@@ -9,8 +9,6 @@ rule bamCompare_subtract:
         control_bai = lambda wildcards: "filtered_bam/"+get_control(wildcards.chip_sample)+".filtered.bam.bai",
     output:
         "deepTools_ChIP/bamCompare/{chip_sample}.filtered.subtract.{control_name}.bw"
-    conda:
-        CONDA_SHARED_ENV
     params:
         bw_binsize = bw_binsize,
         genome_size = genome_size,
@@ -24,6 +22,7 @@ rule bamCompare_subtract:
     benchmark:
         "deepTools_ChIP/.benchmark/bamCompare.subtract.{chip_sample}.filtered.benchmark"
     threads: 16
+    conda: CONDA_SHARED_ENV
     shell: bamcompare_subtract_cmd
 
 ### deepTools bamCompare log2ratio #######################################################
@@ -36,8 +35,6 @@ rule bamCompare_log2:
         control_bai = lambda wildcards: "filtered_bam/"+get_control(wildcards.chip_sample)+".filtered.bam.bai",
     output:
         "deepTools_ChIP/bamCompare/{chip_sample}.filtered.log2ratio.over_{control_name}.bw"
-    conda:
-        CONDA_SHARED_ENV
     params:
         bw_binsize = bw_binsize,
         ignoreForNorm = "--ignoreForNormalization " + ignore_forNorm if ignore_forNorm else "",
@@ -50,6 +47,7 @@ rule bamCompare_log2:
     benchmark:
         "deepTools_ChIP/.benchmark/bamCompare.log2ratio.{chip_sample}.filtered.benchmark"
     threads: 16
+    conda: CONDA_SHARED_ENV
     shell: bamcompare_log2_cmd
 
 
@@ -62,8 +60,6 @@ rule plotEnrichment:
     output:
         png = "deepTools_ChIP/plotEnrichment/plotEnrichment.gene_features.png",
         tsv = "deepTools_ChIP/plotEnrichment/plotEnrichment.gene_features.tsv",
-    conda:
-        CONDA_SHARED_ENV
     params:
         genes_gtf = genes_gtf,
         labels = " ".join(all_samples),
@@ -76,6 +72,7 @@ rule plotEnrichment:
     benchmark:
         "deepTools_ChIP/.benchmark/plotEnrichment.benchmark"
     threads: 24
+    conda: CONDA_SHARED_ENV
     shell: plotEnrich_chip_cmd
 
 
@@ -87,8 +84,6 @@ rule plotFingerprint:
         bais = expand("filtered_bam/{sample}.filtered.bam.bai", sample = all_samples)
     output:
         metrics = "deepTools_ChIP/plotFingerprint/plotFingerprint.metrics.txt"
-    conda:
-        CONDA_SHARED_ENV
     params:
         labels = " ".join(all_samples),
         blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed
@@ -104,18 +99,5 @@ rule plotFingerprint:
     benchmark:
         "deepTools_ChIP/.benchmark/plotFingerprint.benchmark"
     threads: 24
+    conda: CONDA_SHARED_ENV
     shell: plotFingerprint_cmd
-
-
-#######InsertSizeMetrics###############
-rule bamPE_fragment_size:
-    input:
-        bams = expand("filtered_bam/{sample}.filtered.bam", sample=all_samples)
-    output:
-        "deepTools_ChIP/bamPEFragmentSize/fragmentSize.metric.tsv"
-    conda:
-        CONDA_SHARED_ENV
-    log:
-        "deepTools_ChIP/bamPEFragmentSize/log"
-    threads: 24
-    shell: bamPEFragmentSize_cmd
