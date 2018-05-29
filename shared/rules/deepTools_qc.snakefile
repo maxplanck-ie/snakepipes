@@ -50,33 +50,6 @@ rule bamCoverage_filtered:
 
 # TODO: include blacklist!? use deeptools bam filtering options?
 
-### deepTools computeGCBias ####################################################
-
-rule computeGCBias:
-    input:
-        bam = "filtered_bam/{sample}.filtered.bam",
-        bai = "filtered_bam/{sample}.filtered.bam.bai",
-    output:
-        png = "deepTools_qc/computeGCBias/{sample}.filtered.GCBias.png",
-        tsv = "deepTools_qc/computeGCBias/{sample}.filtered.GCBias.freq.tsv"
-    params:
-        paired = paired,
-        fragment_length = fragment_length,
-        genome_size = int(genome_size),
-        genome_2bit = genome_2bit,
-        blacklist = "--blackListFileName "+ blacklist_bed if blacklist_bed
-                    else "",
-        median_fragment_length = "" if paired else "-fragmentLength " + fragment_length
-    log:
-        out = "deepTools_qc/logs/computeGCBias.{sample}.filtered.out",
-        err = "deepTools_qc/logs/computeGCBias.{sample}.filtered.err"
-    benchmark:
-        "deepTools_qc/.benchmark/computeGCBias.{sample}.filtered.benchmark"
-    threads: 16
-    conda: CONDA_SHARED_ENV
-    shell: gcbias_cmd
-
-
 ### deepTools plotCoverage #####################################################
 
 rule plotCoverage:
@@ -193,6 +166,33 @@ rule estimate_read_filtering:
         err = "deepTools_qc/logs/{sample}.estimateReadFiltering.err"
     conda: CONDA_SHARED_ENV
     shell: estimateReadFiltering_cmd
+
+### deepTools computeGCBias ####################################################
+
+rule computeGCBias:
+    input:
+        bam = "filtered_bam/{sample}.filtered.bam",
+        bai = "filtered_bam/{sample}.filtered.bam.bai",
+    output:
+        png = "deepTools_qc/computeGCBias/{sample}.filtered.GCBias.png",
+        tsv = "deepTools_qc/computeGCBias/{sample}.filtered.GCBias.freq.tsv"
+    params:
+        paired = paired,
+        fragment_length = fragment_length,
+        genome_size = int(genome_size),
+        genome_2bit = genome_2bit,
+        blacklist = "--blackListFileName "+ blacklist_bed if blacklist_bed
+                    else "",
+        median_fragment_length = "" if paired else "-fragmentLength " + fragment_length,
+        sampleSize = downsample if downsample and downsample < 10000000 else 10000000
+    log:
+        out = "deepTools_qc/logs/computeGCBias.{sample}.filtered.out",
+        err = "deepTools_qc/logs/computeGCBias.{sample}.filtered.err"
+    benchmark:
+        "deepTools_qc/.benchmark/computeGCBias.{sample}.filtered.benchmark"
+    threads: 16
+    conda: CONDA_SHARED_ENV
+    shell: gcbias_cmd
 
 #######InsertSizeMetrics###############
 rule bamPE_fragment_size:

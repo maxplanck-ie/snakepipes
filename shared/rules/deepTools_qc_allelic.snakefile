@@ -24,33 +24,6 @@ rule bamCoverage_allelic:
     conda: CONDA_SHARED_ENV
     shell: bamcov_cmd
 
-
-### deepTools computeGCBias ####################################################
-
-rule computeGCBias_allelic:
-    input:
-        bam = "allelic_bams/{sample}.{suffix}.sorted.bam",
-        bai = "allelic_bams/{sample}.{suffix}.sorted.bam.bai",
-    output:
-        png = "deepTools_qc/computeGCBias/{sample}.{suffix}.GCBias.png",
-        tsv = "deepTools_qc/computeGCBias/{sample}.{suffix}.GCBias.freq.tsv"
-    params:
-        paired = paired,
-        fragment_length = fragment_length,
-        genome_size = int(genome_size),
-        genome_2bit = genome_2bit,
-        blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed
-                    else "",
-        median_fragment_length = "" if paired else "-fragmentLength " + fragment_length
-    log:
-        out = "deepTools_qc/logs/computeGCBias.{sample}.{suffix}.out",
-        err = "deepTools_qc/logs/computeGCBias.{sample}.{suffix}.err"
-    benchmark:
-        "deepTools_qc/.benchmark/computeGCBias.{sample}.{suffix}.benchmark"
-    threads: 16
-    conda: CONDA_SHARED_ENV
-    shell: gcbias_cmd
-
 ### deepTools plotCoverage #####################################################
 
 rule plotCoverage_allelic:

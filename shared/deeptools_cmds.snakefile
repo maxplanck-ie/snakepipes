@@ -42,7 +42,9 @@ bamcov_raw_cmd = """
 
 # bamCoverage RPKM
 bamcov_RPKM_cmd = """
-    bamCoverage -b {input.bam} -o {output} --binSize {params.bw_binsize} -p {threads} --normalizeUsing RPKM  > {log.out} 2> {log.err}
+    bamCoverage -b {input.bam} \
+    -o {output} --binSize {params.bw_binsize} \
+    -p {threads} --normalizeUsing RPKM  > {log.out} 2> {log.err}
     """
 
 # bamCoverage CHIP
@@ -66,7 +68,7 @@ gcbias_cmd = """
                 --effectiveGenomeSize {params.genome_size} \
                 --genome {params.genome_2bit} \
                 {params.median_fragment_length}  \
-                --sampleSize 10000000 \
+                --sampleSize {params.sampleSize} \
                 {params.blacklist} \
                 -p {threads}  > {log.out} 2> {log.err}
     """
@@ -189,12 +191,15 @@ plotCoverage_cmd = """
 
 #EstimateReadFiltering
 estimateReadFiltering_cmd = """
-    estimateReadFiltering -b {input.bam} -o {output}  > {log.out} 2> {log.err}
+    estimateReadFiltering -b {input.bam} \
+    -o {output}  > {log.out} 2> {log.err}
     """
 
 #bamPEFragmentSize
 bamPEFragmentSize_cmd = """
-    bamPEFragmentSize --bamfiles {input.bams} \
+    bamPEFragmentSize \
+    --bamfiles {input.bams} \
+    --binSize 1000000 \
     {params.plotcmd} \
     --table {output} -p {threads} > {log.out} 2> {log.err}
     """

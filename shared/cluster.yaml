@@ -1,6 +1,6 @@
 snakemake_latency_wait: 300
 snakemake_cluster_cmd: module load slurm; SlurmEasy --mem-per-cpu {cluster.memory} --threads {threads} --log
 __default__:
-    memory: 6G
+    memory: 20G
 snp_split:
     memory: 30G

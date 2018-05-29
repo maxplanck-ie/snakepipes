@@ -198,7 +198,8 @@ def parse_args(defaults={"verbose":None,"configfile":None,"cluster_configfile":N
     parser.add_argument("--gcbias",
                         dest="gcbias",
                         action="store_true",
-                        help="run computeGCBias quality control (long runtime!) (default: '%(default)s')",
+                        help="run computeGCBias quality control (long runtime!). Note that "
+                        "gcbias analysis is skipped if downsampling is specified (default: '%(default)s')",
                         default=defaults["gcbias"])
 
     parser.add_argument("--plotFormat",
