@@ -22,7 +22,7 @@ rule bamCoverage_allelic:
         "bamCoverage/allele_specific/.benchmark/bamCoverage.{sample}.{suffix}.benchmark"
     threads: 16
     conda: CONDA_SHARED_ENV
-    shell: bamcov_cmd + " {params.blacklist}"
+    shell: bamcov_cmd
 
 
 ### deepTools computeGCBias ####################################################

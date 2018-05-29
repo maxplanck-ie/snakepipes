@@ -1,8 +1,8 @@
-### functions shared across workflows ##########################################
-################################################################################
-import os
 
-## bamcompare
+####---- Common deeptools commands used for multiple workflows ------#####
+
+
+# bamcompare
 bamcompare_log2_cmd = """
     bamCompare -b1 {input.chip_bam} \
                -b2 {input.control_bam} \
@@ -23,7 +23,8 @@ bamcompare_subtract_cmd = """
                -o {output} \
                --operation subtract \
                --scaleFactorsMethod readCount \
-               --normalizeUsing RPGC --effectiveGenomeSize {params.genome_size} \
+               --normalizeUsing RPGC \
+               --effectiveGenomeSize {params.genome_size} \
                {params.ignoreForNorm} \
                --binSize {params.bw_binsize} \
                -p {threads} \
@@ -50,8 +51,10 @@ bamcov_cmd = """
                 -o {output} \
                 --binSize {params.bw_binsize} \
                 -p {threads} \
-                --normalizeUsing RPGC --effectiveGenomeSize {params.genome_size} \
+                --normalizeUsing RPGC \
+                --effectiveGenomeSize {params.genome_size} \
                 {params.ignoreForNorm} \
+                {params.blacklist} \
                 {params.read_extension}  > {log.out} 2> {log.err}
     """
 
