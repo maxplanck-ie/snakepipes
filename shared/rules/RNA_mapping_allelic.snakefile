@@ -95,10 +95,10 @@ else:
 
 
 #### INDEX the mapped files
-rule BAM_index:
-    input:
-        mapping_prg+"/{sample}.bam"
-    output:
-        mapping_prg+"/{sample}.bam.bai"
-    conda: CONDA_SHARED_ENV
-    shell: "samtools index {input}"
+#rule BAM_index:
+#    input:
+#        mapping_prg+"/{sample}.bam"
+#    output:
+#        mapping_prg+"/{sample}.bam.bai"
+#    conda: CONDA_SHARED_ENV
+#    shell: "samtools index {input}"

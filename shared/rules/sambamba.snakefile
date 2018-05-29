@@ -26,7 +26,7 @@ rule sambamba_flagstat:
            """
 
 ## index the duplicate marked folder
-rule samtools_index:
+rule samtools_index:BAM_index
     input:
         mapping_prg+"/{sample}.bam"
     output:
