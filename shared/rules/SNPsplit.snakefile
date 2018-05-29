@@ -1,8 +1,3 @@
-# SNPsplit rule
-if paired:
-    SNPparam = '--paired'
-else:
-    SNPparam = ''
 
 ## get input bam depending on the mapping prog (use filtered bam in case of chip-seq data)
 if mapping_prg == "Bowtie2":
@@ -13,12 +8,11 @@ if mapping_prg == "Bowtie2":
         output:
             expand("allelic_bams/{{sample}}.filtered.{suffix}.bam", suffix = ['allele_flagged', 'genome1', 'genome2', 'unassigned'])
         params:
-            paired = SNPparam,
+            paired = '--paired' if paired else '',
             outdir = "allelic_bams"
         conda: CONDA_SHARED_ENV
         shell:
-            "SNPsplit"
-            " {params.paired} --samtools_path "+samtools_path+"samtools"
+            "SNPsplit {params.paired}"
             " -o {params.outdir} --snp_file {input.snp} {input.bam}"
 elif mapping_prg == "STAR":
     rule snp_split:
@@ -28,12 +22,11 @@ elif mapping_prg == "STAR":
         output:
             expand("allelic_bams/{{sample}}.{suffix}.bam", suffix = ['allele_flagged', 'genome1', 'genome2', 'unassigned'])
         params:
-            paired = SNPparam,
+            paired = '--paired' if paired else '',
             outdir = "allelic_bams"
         conda: CONDA_SHARED_ENV
         shell:
-            "SNPsplit"
-            " {params.paired} --samtools_path "+samtools_path+"samtools"
+            "SNPsplit {params.paired}"
             " -o {params.outdir} --snp_file {input.snp} {input.bam}"
 
 # move the allele-specific bams to another folder
