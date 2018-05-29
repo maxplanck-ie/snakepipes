@@ -12,7 +12,7 @@ def get_snakepipes_path():
     return os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 
 
-#def convert_library_type(paired, from_library_type, from_prg, to_prg, rscript, tsv):
+# def convert_library_type(paired, from_library_type, from_prg, to_prg, rscript, tsv):
 #    """ Converts the library to e.g. from 2 (featureCounts) to RF (HISAT2) """
 #    if paired:
 #        lib_str = "PE"
