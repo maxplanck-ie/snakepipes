@@ -32,7 +32,7 @@ if allele_hybrid == 'dual':
             strain1 = strains[0],
             strain2 = strains[1],
             SNPpath = os.path.abspath(VCFfile)
-        log: "snp_genome/SNPsplit_createSNPgenome.log"
+ #       log: "snp_genome/SNPsplit_createSNPgenome.log"
         conda: CONDA_SHARED_ENV
         shell:
             " ( [ -d snp_genome ] || mkdir -p snp_genome ) && cd snp_genome &&"
@@ -52,7 +52,7 @@ else:
         params:
             strain1 = strains[0],
             SNPpath = os.path.abspath(VCFfile)
-        log: "snp_genome/SNPsplit_createSNPgenome.log"
+ #       log: "snp_genome/SNPsplit_createSNPgenome.log"
         conda: CONDA_RNASEQ_ENV
         shell:
             " ( [ -d snp_genome ] || mkdir -p snp_genome ) && cd snp_genome &&"
