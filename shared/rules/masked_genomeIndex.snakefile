@@ -55,12 +55,12 @@ else:
         log: "SNPsplit_createSNPgenome.log"
         conda: CONDA_SHARED_ENV
         shell:
-            " ( [ -d snp_genome ] || mkdir -p snp_genome ) && cd snp_genome &&"
+            #" ( [ -d snp_genome ] || mkdir -p snp_genome ) && 
+            " cd snp_genome;"
             " SNPsplit_genome_preparation"
             " --genome_build {BASENAME}"
             " --reference_genome {input.genome} --vcf_file {params.SNPpath}"
-            " --strain {params.strain1} 2> {log}"
-            "&& cd ../"
+            " --strain {params.strain1} 2>{log}"
 
 if mapping_prg == "STAR":
     rule star_index:
