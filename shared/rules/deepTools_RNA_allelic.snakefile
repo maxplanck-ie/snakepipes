@@ -96,7 +96,7 @@ rule plotCorr_bed_pearson_allelic:
     params: 
         plotcmd = "" if plot_format == 'None' else
             "--plotFile " + "deepTools_qc/plotCorrelation/correlation.pearson.bed_coverage_allelic.heatmap." + plot_format,
-        title='fragment'
+        title='genes'
     shell: plotCorr_cmd
 
 
@@ -116,7 +116,7 @@ rule plotCorr_bed_spearman_allelic:
     params: 
         plotcmd = "" if plot_format == 'None' else
             "--plotFile " + "deepTools_qc/plotCorrelation/correlation.spearman.bed_coverage_allelic.heatmap." + plot_format,
-        title='fragment'
+        title='genes'
     shell: plotCorrSP_cmd
 
 
@@ -136,5 +136,5 @@ rule plotPCA_allelic:
     params: 
         plotcmd = "" if plot_format == 'None' else
                 "--plotFile " + "deepTools_qc/plotPCA/PCA.bed_coverage_allelic." + plot_format,
-        title='fragment'
+        title='genes'
     shell: plotPCA_cmd
