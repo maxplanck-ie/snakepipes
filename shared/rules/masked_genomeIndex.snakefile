@@ -47,7 +47,7 @@ else:
             genome = GENOMEDIR
         output:
             genome1 = "snp_genome/" + strains[0] + '_SNP_filtering_report.txt',
-            snpgenome_dir = SNPdir+"/",
+            snpgenome_dir = SNPdir,
             snpfile = snp_file
         params:
             strain1 = strains[0],
@@ -55,12 +55,12 @@ else:
         log: "SNPsplit_createSNPgenome.log"
         conda: CONDA_SHARED_ENV
         shell:
-            #" ( [ -d snp_genome ] || mkdir -p snp_genome ) && 
-            " cd snp_genome;"
+            " ( [ -d snp_genome ] || mkdir -p snp_genome ) && cd snp_genome &&"
             " SNPsplit_genome_preparation"
             " --genome_build {BASENAME}"
             " --reference_genome {input.genome} --vcf_file {params.SNPpath}"
-            " --strain {params.strain1} 2>{log}"
+            " --strain {params.strain1} 2> {log}"
+            "&& cd ../"
 
 if mapping_prg == "STAR":
     rule star_index:
