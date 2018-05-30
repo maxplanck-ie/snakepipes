@@ -41,7 +41,7 @@ bw_binsize: 25
 fastqc: False
 featurecounts_options: -C -Q 10 --primary
 filter_annotation:
-genomic_contamination: False
+dnaContam: False
 fragment_length: 200
 library_type: 2
 salmon_index_options: --type quasi -k 31
@@ -50,6 +50,7 @@ mapping_prg: STAR
 star_options:
 hisat_options:
 verbose: False
+plot_format: png
 # for allele-spcific mapping
 snp_file:
 Nmasked_index: 

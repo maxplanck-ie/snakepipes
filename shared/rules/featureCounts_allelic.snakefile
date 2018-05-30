@@ -16,8 +16,9 @@ rule featureCounts_allele:
     log:
         "featureCounts/{sample}.log"
     threads: 8
+    conda: CONDA_RNASEQ_ENV
     shell:
-        feature_counts_path+"featureCounts"
+        " featureCounts"
         " {params.paired_opt}{params.opts}"
         " -T {threads}"
         " -s {params.libtype}"
@@ -31,5 +32,6 @@ rule merge_featureCounts:
         expand("featureCounts/{sample}.allelic_counts.txt", sample=samples)
     output:
         "featureCounts/counts_allelic.tsv"
+    conda: CONDA_RNASEQ_ENV
     shell:
-        R_path + "Rscript "+os.path.join(maindir, "shared", "tools", "merge_featureCounts.R")+" {output} {input}"
+        "Rscript "+os.path.join(maindir, "shared", "tools", "merge_featureCounts.R")+" {output} {input}"

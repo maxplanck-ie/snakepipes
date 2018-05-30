@@ -4,8 +4,8 @@ rule convert_flagstat_output:
          "Sambamba/{sample}.markdup.txt"
       output:
          temp("Sambamba/{sample}.dup.converted.tsv")
-      run:
-         shell("sed -n '1p;4p;5p' {input} | cut -d' ' -f1 | tr '\n' '\t' | sed 's/^/{wildcards.sample}\t/' | sed -e '$a\\' | tee {output}")
+      shell:
+         "sed -n '1p;4p;5p' {input} | cut -d' ' -f1 | tr '\n' '\t' | sed 's/^/{wildcards.sample}\t/' | sed -e '$a\\' | tee {output}"
 
 #######merge converted sambamba reports######
 rule report_flagstat_all_data:
@@ -16,22 +16,22 @@ rule report_flagstat_all_data:
       shell:
          "cat {input} | sort -k1,1V | cat <( echo -e 'sample\ttotal\tdup\tmapped') - > {output}"
 ##########QC report for all the samples#########
-if genomic_contamination:
+if dnaContam:
   rule qc_report_all:
         input:
             flagstat = "Sambamba/flagstat_report_all.tsv",
             IHECmetrics = "GenomicContamination/genomic_contamination_featurecount_report.tsv"
         output:
             "QC_report/QC_report_all.tsv"
-        run:
-            shell("cat {input.IHECmetrics} | cut -f2,3 | paste {input.flagstat} - > {output}")
+        shell:
+            "cat {input.IHECmetrics} | cut -f2,3 | paste {input.flagstat} - > {output}"
 else:
   rule qc_report_all:
         input:
             flagstat = "Sambamba/flagstat_report_all.tsv"
         output:
             "QC_report/QC_report_all.tsv"
-        run:
-            shell("cat {input.flagstat} > {output}")
+        shell:
+            "cat {input.flagstat} > {output}"
  
 #

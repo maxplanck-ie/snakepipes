@@ -1,5 +1,4 @@
 
-
 rule bamCoverage_RPKM:
     input:
         bam = mapping_prg+"/{sample}.bam",
@@ -11,7 +10,8 @@ rule bamCoverage_RPKM:
     params:
         bw_binsize = bw_binsize
     log:
-        "bamCoverage/logs/bamCoverage_RPKM.{sample}.log"
+        out="bamCoverage/logs/bamCoverage_RPKM.{sample}.out",
+        err="bamCoverage/logs/bamCoverage_RPKM.{sample}.err"
     benchmark:
         "bamCoverage/.benchmark/bamCoverage_RPKM.{sample}.benchmark"
     threads: 8
@@ -29,7 +29,8 @@ rule bamCoverage_raw:
     params:
         bw_binsize = bw_binsize
     log:
-        "bamCoverage/logs/bamCoverage_coverage.{sample}.log"
+        out="bamCoverage/logs/bamCoverage_coverage.{sample}.out",
+        err="bamCoverage/logs/bamCoverage_coverage.{sample}.err"
     benchmark:
         "bamCoverage/.benchmark/bamCoverage_coverage.{sample}.benchmark"
     threads: 8
@@ -43,14 +44,16 @@ rule plotEnrichment:
         gtf = "Annotation/genes.filtered.gtf",
         gtf2= "Annotation/genes.filtered.transcripts.gtf"
     output:
-        png = "deepTools_qc/plotEnrichment/plotEnrichment.png",
-        tsv = "deepTools_qc/plotEnrichment/plotEnrichment.tsv",
+        "deepTools_qc/plotEnrichment/plotEnrichment.tsv",
     conda:
         CONDA_SHARED_ENV
     params:
         labels = " ".join(samples),
+        plotcmd = "" if plot_format == 'None' else
+            "--plotFile " + "deepTools_qc/plotEnrichment/plotEnrichment." + plot_format
     log:
-        "deepTools_qc/logs/plotEnrichment.log"
+        out="deepTools_qc/logs/plotEnrichment.out",
+        err="deepTools_qc/logs/plotEnrichment.err"
     benchmark:
         "deepTools_qc/.benchmark/plotEnrichment.benchmark"
     threads: 8
@@ -68,7 +71,8 @@ rule multiBigwigSummary_bed:
     params:
         labels = " ".join(samples)
     log:
-        "deepTools_qc/logs/multiBigwigSummary.log"
+        out="deepTools_qc/logs/multiBigwigSummary.out",
+        err="deepTools_qc/logs/multiBigwigSummary.err"
     benchmark:
         "deepTools_qc/.benchmark/multiBigwigSummary.bed.benchmark"
     threads: 8
@@ -80,16 +84,18 @@ rule plotCorr_bed_pearson:
     input:
         "deepTools_qc/multiBigwigSummary/coverage.bed.npz"
     output:
-        heatpng = "deepTools_qc/plotCorrelation/correlation.pearson.bed_coverage.heatmap.png",
-        #scatterpng = "deepTools_qc/plotCorrelation/correlation.pearson.bed_coverage.scatterplot.png",
-        tsv = "deepTools_qc/plotCorrelation/correlation.pearson.bed_coverage.tsv"
+        "deepTools_qc/plotCorrelation/correlation.pearson.bed_coverage.tsv"
     conda:
         CONDA_SHARED_ENV
     log:
-        "deepTools_qc/logs/plotCorrelation_pearson.log"
+        out="deepTools_qc/logs/plotCorrelation_pearson.out",
+        err="deepTools_qc/logs/plotCorrelation_pearson.err"
     benchmark:
         "deepTools_qc/.benchmark/plotCorrelation_pearson.benchmark"
-    params: label='gene'
+    params: 
+        plotcmd = "" if plot_format == 'None' else
+            "--plotFile " + "deepTools_qc/plotCorrelation/correlation.pearson.bed_coverage.heatmap." + plot_format,
+        title='genes'
     shell: plotCorr_cmd
 
 
@@ -98,16 +104,18 @@ rule plotCorr_bed_spearman:
     input:
         "deepTools_qc/multiBigwigSummary/coverage.bed.npz"
     output:
-        heatpng = "deepTools_qc/plotCorrelation/correlation.spearman.bed_coverage.heatmap.png",
-        #scatterpng = "deepTools_qc/plotCorrelation/correlation.spearman.bed_coverage.scatterplot.png",
-        tsv = "deepTools_qc/plotCorrelation/correlation.spearman.bed_coverage.tsv"
+        "deepTools_qc/plotCorrelation/correlation.spearman.bed_coverage.tsv"
     conda:
         CONDA_SHARED_ENV
     log:
-        "deepTools_qc/logs/plotCorrelation_spearman.log"
+        out="deepTools_qc/logs/plotCorrelation_spearman.out",
+        err="deepTools_qc/logs/plotCorrelation_spearman.err"
     benchmark:
         "deepTools_qc/.benchmark/plotCorrelation_spearman.benchmark"
-    params: label='gene'
+    params:        
+        plotcmd = "" if plot_format == 'None' else
+            "--plotFile " + "deepTools_qc/plotCorrelation/correlation.spearman.bed_coverage.heatmap." + plot_format,
+        title='genes'
     shell: plotCorrSP_cmd
 
 
@@ -116,14 +124,18 @@ rule plotPCA:
     input:
         "deepTools_qc/multiBigwigSummary/coverage.bed.npz"
     output:
-        "deepTools_qc/plotPCA/PCA.bed_coverage.png"
+        "deepTools_qc/plotPCA/PCA.bed_coverage.tsv"
     conda:
         CONDA_SHARED_ENV
     log:
-        "deepTools_qc/logs/plotPCA.log"
+        out="deepTools_qc/logs/plotPCA.out",
+        err="deepTools_qc/logs/plotPCA.err",
     benchmark:
         "deepTools_qc/.benchmark/plotPCA.benchmark"
-    params: label='gene'
+    params: 
+        plotcmd = "" if plot_format == 'None' else
+                "--plotFile " + "deepTools_qc/plotPCA/PCA.bed_coverage." + plot_format,
+        title='genes'
     shell: plotPCA_cmd
 
 
@@ -134,6 +146,9 @@ rule estimateReadFiltering:
         bai = mapping_prg+"/{sample}.bam.bai",
     output:
         "deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt"
+    log:
+        out = "deepTools_qc/logs/estimateReadFiltering.{sample}.out",
+        err = "bamCoverage/logs/estimateReadFiltering.{sample}.err"
     conda:
         CONDA_SHARED_ENV
     shell: estimateReadFiltering_cmd
@@ -146,9 +161,13 @@ rule bamPE_fragment_size:
         bais = expand(mapping_prg+"/{sample}.bam.bai", sample=samples)
     output:
         "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv"
+    params:
+        plotcmd = "" if plot_format == 'None' else
+                "-o " + "deepTools_qc/bamPEFragmentSize/fragmentSizes." + plot_format,
     conda:
         CONDA_SHARED_ENV
     log:
-        "deepTools_qc/bamPEFragmentSize/log"
+        out="deepTools_qc/logs/bamPEFragmentSize..out",
+        err="deepTools_qc/logs/bamPEFragmentSize.err"
     threads: 24
     shell: bamPEFragmentSize_cmd
