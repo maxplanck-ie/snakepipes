@@ -77,11 +77,11 @@ gcbias_cmd = """
 plotEnrich_cmd = """
     plotEnrichment -p {threads} \
                    -b {input.bam} \
+                   {params.plotcmd} \
                    --BED {input.gtf} {input.gtf2} \
-                   --plotFile {output.png} \
                    --labels {params.labels} \
                    --plotTitle 'Fraction of reads in regions' \
-                   --outRawCounts {output.tsv} \
+                   --outRawCounts {output} \
                    --variableScales  > {log.out} 2> {log.err}
     """
 
@@ -92,7 +92,7 @@ plotEnrich_chip_cmd = """
         --BED {params.genes_gtf} \
         --plotFile {output.png} \
         --labels {params.labels} \
-        --plotTitle 'Sigal enrichment (fraction of reads) without duplicates' \
+        --plotTitle 'Signal enrichment (fraction of reads) without duplicates' \
         --outRawCounts {output.tsv} \
         --variableScales \
         {params.blacklist} \

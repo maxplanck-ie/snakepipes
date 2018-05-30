@@ -47,7 +47,6 @@ nextera: False
 trimThreshold: 10
 trimOtherArgs:
 verbose: False
-
 ################################################################################
 # Call snakemake directly, i.e. without using the wrapper script:
 #

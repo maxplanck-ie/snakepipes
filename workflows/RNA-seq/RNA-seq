@@ -30,7 +30,7 @@ def parse_args(defaults={"verbose":None,"configfile":None,"cluster_configfile":N
                          "mode":None, "downsample":None, "trim":None,"trim_prg":None,"trim_options":None, "fastqc":None,
                          "library_type":None, "mapping_prg":None, "star_options":None, "hisat_options":None, "salmon_index_options":None,
                          "featurecounts_options":None, "filter_annotation":None, "sample_info":None,
-                         "bw_binsize":None, "genomic_contamination":None, "mapq":None}):
+                         "bw_binsize":None, "genomic_contamination":None, "mapq":None, "plot_format":None}):
     """
     Parse arguments from the command line.
     """
@@ -209,7 +209,16 @@ def parse_args(defaults={"verbose":None,"configfile":None,"cluster_configfile":N
     optional.add_argument("--dnaContam",
                         action="store_true",
                         help="Returns a plot which presents the proportion of the intergenic reads (default: '%(default)s')",
-                        default=defaults["genomic_contamination"])
+                        default=defaults["dnaContam"])
+    
+    parser.add_argument("--plotFormat",
+                        dest="plot_format",
+                        choices=['png', 'pdf', 'None'],
+                        metavar="STR",
+                        type=str,
+                        help="Format of the output plots from deeptools. Select 'none' for no plot (default: '%(default)s')",
+                        default=defaults["plot_format"])
+    
     ###
     snpargs = parser.add_argument_group('allele-specific mapping arguments')
     snpargs.add_argument("--VCFfile",
