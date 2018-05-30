@@ -47,7 +47,7 @@ else:
             genome = GENOMEDIR
         output:
             genome1 = "snp_genome/" + strains[0] + '_SNP_filtering_report.txt',
-            snpgenome_dir = SNPdir,
+            snpgenome_dir = SNPdir+"/",
             snpfile = snp_file
         params:
             strain1 = strains[0],
