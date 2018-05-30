@@ -45,12 +45,12 @@ def mod_fapos(sysargv):
     args = parser.parse_args(sysargv)
     
     try:
-    	inFA = open(args.inREF, "r")
-    	if args.outPOS == "-": outPOS = sys.stdout
-    	else: outPOS = open(args.outPOS, "w")
-    	
+        inFA = open(args.inREF, "r")
+        if args.outPOS == "-": outPOS = sys.stdout
+        else: outPOS = open(args.outPOS, "w")
+        
     except IOError as strerror:
-    	sys.exit("methylCtools fapos: error: %s" % strerror)
+        sys.exit("methylCtools fapos: error: %s" % strerror)
 
     t = [args.c1, args.c2, args.c3, args.c4]
     if not sum(t): t[1] = True
@@ -63,40 +63,40 @@ def mod_fapos(sysargv):
 
     complement = {"A":"T", "C":"G", "G":"C", "T":"A", "a":"t", "c":"g", "g":"c", "t":"a"}
     def rcomp(st):
-    	return "".join([complement.get(nt, "N") for nt in st[::-1]])		# default: "N", converts all other characters to N
-    		
+        return "".join([complement.get(nt, "N") for nt in st[::-1]])        # default: "N", converts all other characters to N
+            
     def pp(i, l):
-    	if seq[i].upper() == "C":
-    		if i+2 < l:
-    			if t[0]:
-    				outPOS.write("%s\t%i\t%s\t%s\t%s\n" % (cname, i, "+", "C", seq[i:(i+3)]))
-    			elif seq[i+1].upper() == "G":
-    				outPOS.write("%s\t%i\t%s\t%s\t%s\n" % (cname, i, "+", "CG", seq[i:(i+3)]))
-    			elif t[2]:
-    				outPOS.write("%s\t%i\t%s\t%s\t%s\n" % (cname, i, "+", "CH", seq[i:(i+3)]))
-    			elif t[3]:
-    				if seq[i+2].upper() == "G":
-    					outPOS.write("%s\t%i\t%s\t%s\t%s\n" % (cname, i, "+", "CHG", seq[i:(i+3)]))
-    				else:
-    					outPOS.write("%s\t%i\t%s\t%s\t%s\n" % (cname, i, "+", "CHH", seq[i:(i+3)]))	
-    	else:
-    		if i-2 >= 0:
-    			if t[0]:
-    				outPOS.write("%s\t%i\t%s\t%s\t%s\n" % (cname, i, "-", "C", rcomp(seq[(i-2):(i+1)])))
-    			elif seq[i-1].upper() == "C":
-    				outPOS.write("%s\t%i\t%s\t%s\t%s\n" % (cname, i, "-", "CG", rcomp(seq[(i-2):(i+1)])))
-    			elif t[2]:
-    				outPOS.write("%s\t%i\t%s\t%s\t%s\n" % (cname, i, "-", "CH", rcomp(seq[(i-2):(i+1)])))
-    			elif t[3]:
-    				if seq[i-2].upper() == "C":
-    					outPOS.write("%s\t%i\t%s\t%s\t%s\n" % (cname, i, "-", "CHG", rcomp(seq[(i-2):(i+1)])))
-    				else:
-    					outPOS.write("%s\t%i\t%s\t%s\t%s\n" % (cname, i, "-", "CHH", rcomp(seq[(i-2):(i+1)])))		
+        if seq[i].upper() == "C":
+            if i+2 < l:
+                if t[0]:
+                    outPOS.write("%s\t%i\t%s\t%s\t%s\n" % (cname, i, "+", "C", seq[i:(i+3)]))
+                elif seq[i+1].upper() == "G":
+                    outPOS.write("%s\t%i\t%s\t%s\t%s\n" % (cname, i, "+", "CG", seq[i:(i+3)]))
+                elif t[2]:
+                    outPOS.write("%s\t%i\t%s\t%s\t%s\n" % (cname, i, "+", "CH", seq[i:(i+3)]))
+                elif t[3]:
+                    if seq[i+2].upper() == "G":
+                        outPOS.write("%s\t%i\t%s\t%s\t%s\n" % (cname, i, "+", "CHG", seq[i:(i+3)]))
+                    else:
+                        outPOS.write("%s\t%i\t%s\t%s\t%s\n" % (cname, i, "+", "CHH", seq[i:(i+3)]))    
+        else:
+            if i-2 >= 0:
+                if t[0]:
+                    outPOS.write("%s\t%i\t%s\t%s\t%s\n" % (cname, i, "-", "C", rcomp(seq[(i-2):(i+1)])))
+                elif seq[i-1].upper() == "C":
+                    outPOS.write("%s\t%i\t%s\t%s\t%s\n" % (cname, i, "-", "CG", rcomp(seq[(i-2):(i+1)])))
+                elif t[2]:
+                    outPOS.write("%s\t%i\t%s\t%s\t%s\n" % (cname, i, "-", "CH", rcomp(seq[(i-2):(i+1)])))
+                elif t[3]:
+                    if seq[i-2].upper() == "C":
+                        outPOS.write("%s\t%i\t%s\t%s\t%s\n" % (cname, i, "-", "CHG", rcomp(seq[(i-2):(i+1)])))
+                    else:
+                        outPOS.write("%s\t%i\t%s\t%s\t%s\n" % (cname, i, "-", "CHH", rcomp(seq[(i-2):(i+1)])))        
     
 
     #######################################
     # main
-    						
+                            
     if t[0]: tc = "C"
     elif t[1]: tc = "CG"
     elif t[2]: tc = "CG/CH"
@@ -106,20 +106,20 @@ def mod_fapos(sysargv):
     cname = False
     p = re.compile("[C,G]", re.IGNORECASE)
     for line in inFA:
-    	if line[0] == ">":
-    		if cname:
-    			seqlen = len(seq)
-    			for m in p.finditer(seq):
-    				pp(m.start(), seqlen)
-    		cname = line.rstrip()[1:]
-    		seq = ""
-    		if args.qf: sys.stderr.write("%s status: processing %s\n" % (nicetime(), cname))
-    	else:
-    		seq += line.rstrip()
+        if line[0] == ">":
+            if cname:
+                seqlen = len(seq)
+                for m in p.finditer(seq):
+                    pp(m.start(), seqlen)
+            cname = line.rstrip()[1:]
+            seq = ""
+            if args.qf: sys.stderr.write("%s status: processing %s\n" % (nicetime(), cname))
+        else:
+            seq += line.rstrip()
     
     seqlen = len(seq)
     for m in p.finditer(seq):
-    	pp(m.start(), seqlen)
+        pp(m.start(), seqlen)
 
 
     #######################################
