@@ -16,9 +16,6 @@ rule sleuth_Salmon:
     log: "sleuth.log"
     conda: CONDA_RNASEQ_ENV
     shell:
-#        "( cd {params.outdir} && export R_LIBS_USER="+R_libs_path+" && "
-#        "cat "+os.path.join(workflow_tools,"sleuth.R")+" | "
-#        ""+os.path.join(R_path,"R")+" --vanilla --args "
         "cd {params.outdir} && "
         "Rscript {params.script} "
         "{input.sample_info} "

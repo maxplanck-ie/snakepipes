@@ -64,9 +64,6 @@ rule DESeq2_Salmon:
     log: "DESeq2.log"
     conda: CONDA_RNASEQ_ENV
     shell:
-#        "( cd {params.outdir} && export R_LIBS_USER="+R_libs_path+" && "
-#        "cat "+os.path.join(workflow_tools,"DESeq2.R")+" | "
-#        ""+os.path.join(R_path,"R")+" --vanilla --slave --args "
         "cd {params.outdir} && "
         "Rscript {params.script} "
         "{input.sample_info} " # 1

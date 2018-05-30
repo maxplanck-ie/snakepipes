@@ -45,12 +45,13 @@ rule plotEnrichment_allelic:
         gtf = "Annotation/genes.filtered.gtf",
         gtf2= "Annotation/genes.filtered.transcripts.gtf"
     output:
-        png = "deepTools_qc/plotEnrichment/plotEnrichment_allelic.png",
-        tsv = "deepTools_qc/plotEnrichment/plotEnrichment_allelic.tsv"
+        "deepTools_qc/plotEnrichment/plotEnrichment_allelic.tsv"
     conda:
         CONDA_SHARED_ENV
     params:
-        labels = " ".join(expand('{sample}.{suffix}', sample=samples, suffix = ['genome1', 'genome2']))
+        labels = " ".join(expand('{sample}.{suffix}', sample=samples, suffix = ['genome1', 'genome2'])),
+        plotcmd = "" if plot_format == 'None' else
+            "--plotFile " + "deepTools_qc/plotEnrichment/plotEnrichment_allelic." + plot_format
     log:
         out="deepTools_qc/logs/plotEnrichment_allelic.out",
         err="deepTools_qc/logs/plotEnrichment_allelic.err"

@@ -44,12 +44,13 @@ rule plotEnrichment:
         gtf = "Annotation/genes.filtered.gtf",
         gtf2= "Annotation/genes.filtered.transcripts.gtf"
     output:
-        png = "deepTools_qc/plotEnrichment/plotEnrichment.png",
-        tsv = "deepTools_qc/plotEnrichment/plotEnrichment.tsv",
+        "deepTools_qc/plotEnrichment/plotEnrichment.tsv",
     conda:
         CONDA_SHARED_ENV
     params:
         labels = " ".join(samples),
+        plotcmd = "" if plot_format == 'None' else
+            "--plotFile " + "deepTools_qc/plotEnrichment/plotEnrichment." + plot_format
     log:
         out="deepTools_qc/logs/plotEnrichment.out",
         err="deepTools_qc/logs/plotEnrichment.err"
@@ -93,8 +94,8 @@ rule plotCorr_bed_pearson:
         "deepTools_qc/.benchmark/plotCorrelation_pearson.benchmark"
     params: 
         plotcmd = "" if plot_format == 'None' else
-            "--plotFile " + "deepTools_qc/plotCorrelation/correlation.pearson.read_coverage.heatmap." + plot_format,
-        title='fragment'
+            "--plotFile " + "deepTools_qc/plotCorrelation/correlation.pearson.bed_coverage.heatmap." + plot_format,
+        title='genes'
     shell: plotCorr_cmd
 
 
@@ -113,8 +114,8 @@ rule plotCorr_bed_spearman:
         "deepTools_qc/.benchmark/plotCorrelation_spearman.benchmark"
     params:        
         plotcmd = "" if plot_format == 'None' else
-            "--plotFile " + "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage.heatmap." + plot_format,
-        title='fragment'
+            "--plotFile " + "deepTools_qc/plotCorrelation/correlation.spearman.bed_coverage.heatmap." + plot_format,
+        title='genes'
     shell: plotCorrSP_cmd
 
 
@@ -133,8 +134,8 @@ rule plotPCA:
         "deepTools_qc/.benchmark/plotPCA.benchmark"
     params: 
         plotcmd = "" if plot_format == 'None' else
-                "--plotFile " + "deepTools_qc/plotPCA/PCA.read_coverage." + plot_format,
-        title='fragment'
+                "--plotFile " + "deepTools_qc/plotPCA/PCA.bed_coverage." + plot_format,
+        title='genes'
     shell: plotPCA_cmd
 
 

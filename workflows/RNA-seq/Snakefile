@@ -195,7 +195,6 @@ def run_deeptools_qc():
         file_list = [
         expand("bamCoverage/{sample}.RPKM.bw", sample = samples),
         expand("bamCoverage/{sample}.coverage.bw", sample = samples),
-        "deepTools_qc/plotEnrichment/plotEnrichment.png",
         "deepTools_qc/plotEnrichment/plotEnrichment.tsv",
         "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv",
         expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample = samples)]
@@ -205,8 +204,7 @@ def run_deeptools_qc():
                               "deepTools_qc/plotCorrelation/correlation.spearman.bed_coverage.tsv",
                               "deepTools_qc/plotPCA/PCA.bed_coverage.tsv"] )
         if 'allelic-mapping' in mode:
-            file_list.append(["deepTools_qc/plotEnrichment/plotEnrichment_allelic.png",
-                              "deepTools_qc/plotEnrichment/plotEnrichment_allelic.tsv"])
+            file_list.append(["deepTools_qc/plotEnrichment/plotEnrichment_allelic.tsv"])
             if len(samples)>1:
                 file_list.append( ["deepTools_qc/multiBigwigSummary/coverage_allelic.bed.npz",
                                    "deepTools_qc/plotCorrelation/correlation.pearson.bed_coverage_allelic.tsv",
