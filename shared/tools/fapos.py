@@ -22,12 +22,12 @@ def mod_fapos(sysargv):
     import re
     import datetime
 
-    def nicetime(): 
+    def nicetime():
         return datetime.datetime.now().strftime("[fapos %Y-%m-%d %H:%M:%S]")
 
     #######################################
     # arguments, filehandles
-	
+
     parser = argparse.ArgumentParser(prog="methylCtools fapos", version="0.9.4", description="creates cytosine position index for defined context")
     parser.add_argument("-s", "--silent", dest="qf", action="store_false", help="do not show status messages")
 
@@ -47,56 +47,56 @@ def mod_fapos(sysargv):
 
     try:
         inFA = open(args.inREF, "r")
-        if args.outPOS == "-": 
+        if args.outPOS == "-":
             outPOS = sys.stdout
-        else: 
+        else:
             outPOS = open(args.outPOS, "w")
 
     except IOError as strerror:
         sys.exit("methylCtools fapos: error: %s" % strerror)
 
     t = [args.c1, args.c2, args.c3, args.c4]
-    if not sum(t): 
+    if not sum(t):
         t[1] = True
 
-    if args.qf: 
+    if args.qf:
         sys.stderr.write("%s command: %s\n" % (nicetime(), " ".join(sys.argv)))
 
     #######################################
     # functions
 
-    complement = {"A":"T", "C":"G", "G":"C", "T":"A", "a":"t", "c":"g", "g":"c", "t":"a"}
+    complement = {"A": "T", "C": "G", "G": "C", "T": "A", "a": "t", "c": "g", "g": "c", "t": "a"}
+
     def rcomp(st):
-        return "".join([complement.get(nt, "N") for nt in st[::-1]])		# default: "N", converts all other characters to N
-			
+        return "".join([complement.get(nt, "N") for nt in st[::-1]])  # default: "N", converts all other characters to N
+
     def pp(i, l):
         if seq[i].upper() == "C":
-            if i+2 < l:
+            if i + 2 < l:
                 if t[0]:
-                    outPOS.write("%s\t%i\t%s\t%s\t%s\n" % (cname, i, "+", "C", seq[i:(i+3)]))
-                elif seq[i+1].upper() == "G":
-                    outPOS.write("%s\t%i\t%s\t%s\t%s\n" % (cname, i, "+", "CG", seq[i:(i+3)]))
+                    outPOS.write("%s\t%i\t+\tC\t%s\n" % (cname, i, seq[i:(i + 3)]))
+                elif seq[i + 1].upper() == "G":
+                    outPOS.write("%s\t%i\t+\tCG\t%s\n" % (cname, i, seq[i:(i + 3)]))
                 elif t[2]:
-                    outPOS.write("%s\t%i\t%s\t%s\t%s\n" % (cname, i, "+", "CH", seq[i:(i+3)]))
+                    outPOS.write("%s\t%i\t+\tCH\t%s\n" % (cname, i, seq[i:(i + 3)]))
                 elif t[3]:
-                    if seq[i+2].upper() == "G":
-                        outPOS.write("%s\t%i\t%s\t%s\t%s\n" % (cname, i, "+", "CHG", seq[i:(i+3)]))
+                    if seq[i + 2].upper() == "G":
+                        outPOS.write("%s\t%i\t+\tCHG\t%s\n" % (cname, i, seq[i:(i + 3)]))
                     else:
-                        outPOS.write("%s\t%i\t%s\t%s\t%s\n" % (cname, i, "+", "CHH", seq[i:(i+3)]))	
+                        outPOS.write("%s\t%i\t+\tCHH\t%s\n" % (cname, i, seq[i:(i + 3)]))
         else:
-            if i-2 >= 0:
+            if i - 2 >= 0:
                 if t[0]:
-                    outPOS.write("%s\t%i\t%s\t%s\t%s\n" % (cname, i, "-", "C", rcomp(seq[(i-2):(i+1)])))
-                elif seq[i-1].upper() == "C":
-                    outPOS.write("%s\t%i\t%s\t%s\t%s\n" % (cname, i, "-", "CG", rcomp(seq[(i-2):(i+1)])))
+                    outPOS.write("%s\t%i\t-\tC\t%s\n" % (cname, i, rcomp(seq[(i - 2):(i + 1)])))
+                elif seq[i - 1].upper() == "C":
+                    outPOS.write("%s\t%i\t-\tCG\t%s\n" % (cname, i, rcomp(seq[(i - 2):(i + 1)])))
                 elif t[2]:
-                    outPOS.write("%s\t%i\t%s\t%s\t%s\n" % (cname, i, "-", "CH", rcomp(seq[(i-2):(i+1)])))
+                    outPOS.write("%s\t%i\t-\tCH\t%s\n" % (cname, i, rcomp(seq[(i - 2):(i + 1)])))
                 elif t[3]:
-                    if seq[i-2].upper() == "C":
-                        outPOS.write("%s\t%i\t%s\t%s\t%s\n" % (cname, i, "-", "CHG", rcomp(seq[(i-2):(i+1)])))
+                    if seq[i - 2].upper() == "C":
+                        outPOS.write("%s\t%i\t-\tCHG\t%s\n" % (cname, i, rcomp(seq[(i - 2):(i + 1)])))
                     else:
-                        outPOS.write("%s\t%i\t%s\t%s\t%s\n" % (cname, i, "-", "CHH", rcomp(seq[(i-2):(i+1)])))		
-	
+                        outPOS.write("%s\t%i\t-\tCHH\t%s\n" % (cname, i, rcomp(seq[(i - 2):(i + 1)])))
 
     #######################################
     # main
@@ -113,6 +113,7 @@ def mod_fapos(sysargv):
 
     cname = False
     p = re.compile("[C,G]", re.IGNORECASE)
+    seq = ""
     for line in inFA:
         if line[0] == ">":
             if cname:
@@ -125,11 +126,11 @@ def mod_fapos(sysargv):
                 sys.stderr.write("%s status: processing %s\n" % (nicetime(), cname))
         else:
             seq += line.rstrip()
- 
+
     seqlen = len(seq)
     for m in p.finditer(seq):
         pp(m.start(), seqlen)
- 
+
     #######################################
     # end
     inFA.close()
@@ -138,7 +139,7 @@ def mod_fapos(sysargv):
     if args.qf:
         sys.stderr.write("%s end: position index generated\n" % nicetime())
 
+
 if __name__ == "__main__":
     import sys
     mod_fapos(sys.argv[1:])
-
