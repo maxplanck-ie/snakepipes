@@ -13,10 +13,11 @@
 ## General/Snakemake parameters, only used/set by wrapper or in Snakemake cmdl, but not in Snakefile
 wdir:
 configfile:
+cluster_configfile:
 local: False
 max_jobs: 12
 nthreads: 8
-snakemake_options: '--use-conda --conda-prefix /data/processing/conda/env'
+snakemake_options: '--use-conda --conda-prefix /data/processing/conda/envs'
 tempdir: /data/extended/
 ## directory with fastq files
 readin:
@@ -46,7 +47,6 @@ nextera: False
 trimThreshold: 10
 trimOtherArgs:
 verbose: False
-
 ################################################################################
 # Call snakemake directly, i.e. without using the wrapper script:
 #

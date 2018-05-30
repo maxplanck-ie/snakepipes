@@ -5,6 +5,8 @@ calc_Mbias:
 map_reads:
     memory: 20G
 rm_dupes:
-    memory: 3G  
+    memory: 3G 
+downsample_reads:
+    memory: 6G 
 conv_rate:
     memory: 6G

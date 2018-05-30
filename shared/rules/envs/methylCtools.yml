@@ -1,0 +1,12 @@
+name: mCtools-env-0.1.0
+
+channels:
+  - anaconda
+  - conda-forge
+
+dependencies:
+  - python=2.7
+#  - sys
+#  - argparse
+#  - datetime
+#  - re
