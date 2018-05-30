@@ -52,7 +52,7 @@ if "allelic-mapping" in mode:
         star_index_allelic = 'snp_genome/star_Nmasked/Genome'
         if len(strains) == 1:
             allele_hybrid = 'single'
-            snp_file = "snp_genome/all_SNPs_" + strains[0] + "_" + genome + ".txt.gz "
+            snp_file = "snp_genome/all_SNPs_" + strains[0] + "_" + genome + ".txt.gz"
         elif len(strains) == 2:
             allele_hybrid = 'dual'
             snp_file = "snp_genome/all_" + strains[1] + "_SNPs_" + strains[0] + "_reference.based_on_" + genome + ".txt"
