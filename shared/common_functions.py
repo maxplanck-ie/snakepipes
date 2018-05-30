@@ -20,7 +20,6 @@ def convert_library_type(R_path, paired, from_library_type, from_prg, to_prg, rs
         lib_str = "SE"
 
     cmd = ("{}Rscript {} {} {} {} {} {}".format(R_path, rscript, tsv, lib_str, from_library_type, from_prg, to_prg))
-    # print("\n"+cmd)
 
     return subprocess.check_output(cmd, shell=True).decode()
 

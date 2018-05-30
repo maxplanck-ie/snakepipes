@@ -12,7 +12,9 @@ rule bamCoverage:
         genome_size = int(genome_size),
         ignoreForNorm = "--ignoreForNormalization " + ignore_forNorm if ignore_forNorm else "",
         read_extension = "--extendReads" if paired
-                         else "--extendReads "+str(fragment_length)
+                         else "--extendReads "+str(fragment_length),
+        blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed
+                    else "",
     log:
         out = "bamCoverage/logs/bamCoverage.{sample}.out",
         err = "bamCoverage/logs/bamCoverage.{sample}.err"
