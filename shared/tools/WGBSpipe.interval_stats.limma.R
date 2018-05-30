@@ -1,5 +1,4 @@
 #run in R-3.3.1
-Rlib<-commandArgs(trailingOnly=TRUE)[6]
 #set working directory
 wdir<-commandArgs(trailingOnly=TRUE)[1]
 #system(paste0('mkdir -p ',wdir)) #for debugging
@@ -32,7 +31,7 @@ if(!unique(grepl("Name",colnames(auxbed)))){auxbed$Name<-paste(auxbed$CHROM,auxb
 sCpGF<-commandArgs(trailingOnly=TRUE)[4]
 message(sprintf("loading %s",sCpGF))
 
-require(data.table,lib.loc=Rlib)
+require(data.table)
 load(sCpGF)
 
 noNA<-apply(limdat.LG,1,function(X)sum(is.na(X)))
@@ -40,7 +39,7 @@ NAf<-ifelse(noNA>1,1,0)
 limdat.LG$NAf<-NAf
 colnames(limdat.LG)[colnames(limdat.LG) %in% "ms"]<-"Name"
 
-require(GenomicRanges,lib.loc=Rlib)
+require(GenomicRanges)
 
 bedGR<-GRanges(seqnames=bedtab$CHROM,ranges=IRanges(start=bedtab$START,end=bedtab$END,names=bedtab$Name),strand=bedtab$STRAND)
 auxdat<-as.data.table(merge(x=auxbed,y=limdat.LG,by="Name",all.x=TRUE,sort=FALSE))
@@ -87,13 +86,13 @@ if(nrow(bedtab.CC)==0) {message("None of the genomic intervals passed the filter
 ####for differential interval methylation
 ### limma + ebayes + BH p value adjustment
 
-    require("limma",lib.loc=Rlib)
-    library("carData",lib.loc=Rlib)
-    require("car",lib.loc=Rlib)
-    require("FactoMineR",lib.loc=Rlib)
-    require("reshape2",lib.loc=Rlib)
-    require("ggplot2",lib.loc=Rlib)
-    require("dplyr",lib.loc=Rlib)
+    require("limma")
+    #library("carData")
+    require("car")
+    require("FactoMineR")
+    require("reshape2")
+    require("ggplot2")
+    require("dplyr")
 
     CGI.limdat.CC.logit<-logit(CGI.limdat.CC,percents=FALSE,adjust=0.025)
     x1<-PCA(CGI.limdat.CC,graph=FALSE)

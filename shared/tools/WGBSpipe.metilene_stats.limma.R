@@ -1,5 +1,4 @@
 #run in R-3.3.1
-Rlib<-commandArgs(trailingOnly=TRUE)[8]
 #set working directory
 wdir<-commandArgs(trailingOnly=TRUE)[1]
 #system(paste0('mkdir -p ',wdir)) #for debugging
@@ -29,7 +28,7 @@ if(!unique(grepl("Name",colnames(auxbed)))){auxbed$Name<-paste(auxbed$CHROM,auxb
 #load single CpG data, count NAs per row/CpG
 sCpGF<-commandArgs(trailingOnly=TRUE)[4]
 message(sprintf("loading %s",sCpGF))
-require(data.table,lib.loc=Rlib)
+require(data.table)
 load(sCpGF)
 
 noNA<-apply(limdat.LG,1,function(X)sum(is.na(X)))
@@ -37,7 +36,7 @@ NAf<-ifelse(noNA>1,1,0)
 limdat.LG$NAf<-NAf
 colnames(limdat.LG)[colnames(limdat.LG) %in% "ms"]<-"Name"
 
-require(GenomicRanges,lib.loc=Rlib)
+require(GenomicRanges)
 
 bedGR<-GRanges(seqnames=bedtab$CHROM,ranges=IRanges(start=bedtab$START,end=bedtab$END,names=paste(bedtab$CHROM,bedtab$START,bedtab$END,sep="_")))
 auxdat<-as.data.table(merge(x=auxbed,y=limdat.LG,by="Name",all.x=TRUE,sort=FALSE))
@@ -84,13 +83,13 @@ if(nrow(bedtab.CC)==0) {message("None of the metilene intervals passed the filte
 ####for differential interval methylation
 ### limma + ebayes + BH p value adjustment
 
-    require("limma",lib.loc=Rlib)
-    library("carData",lib.loc=Rlib)
-    require("car",lib.loc=Rlib)
-    require("FactoMineR",lib.loc=Rlib)
-    require("reshape2",lib.loc=Rlib)
-    require("ggplot2",lib.loc=Rlib)
-    require("dplyr",lib.loc=Rlib)
+    require("limma")
+    #library("carData")
+    require("car")
+    require("FactoMineR")
+    require("reshape2")
+    require("ggplot2")
+    require("dplyr")
 
     CGI.limdat.CC.logit<-logit(CGI.limdat.CC,percents=FALSE,adjust=0.025) 
     x1<-PCA(CGI.limdat.CC,graph=FALSE)
@@ -152,19 +151,18 @@ if(nrow(bedtab.CC)==0) {message("None of the metilene intervals passed the filte
         genMod<-ensL[length(ensL)]
         message(sprintf("Processing genome %s and gene models in %s",refG,genMod))
 
-        bedpath<-commandArgs(trailingOnly=TRUE)[7]
 
         system(paste0('sed -e \'s/^/chr/\' ', genMod,' | sort -d  -k1,1 -k2,2n  | sed -e \'s/chr//\'  > ' ,wdir ,'/genes.sorted.bed'))
         system(paste0('sed -e \'s/^/chr/\' ',wdir,'/', bedshort,".limma.bed",' | sort  -k1,1 -k2,2n | sed -e \'s/chr//\' > ',wdir,'/',bedshort,".limma.sorted.bed"))
         system(paste0('sed -i \'/CHROM/d\' ',wdir,'/',bedshort,".limma.sorted.bed"))
 
-        system(paste0(bedpath,'bedtools closest -D b -a ',wdir,'/',bedshort,".limma.sorted.bed",' -b ', wdir ,'/genes.sorted.bed',' > ',wdir,'/',bedshort,'.limma.closest.bed'))
+        system(paste0('bedtools closest -D b -a ',wdir,'/',bedshort,".limma.sorted.bed",' -b ', wdir ,'/genes.sorted.bed',' > ',wdir,'/',bedshort,'.limma.closest.bed'))
 
         DMR.filt.an<-fread(paste0(wdir,'/',bedshort,'.limma.closest.bed'),header=FALSE,sep="\t")
         DMR.filt.an<-DMR.filt.an[,c(1:17,18:21,23,30),with=FALSE]
         colnames(DMR.filt.an)<-c(colnames(CGI.bed.intT),"ChrEns","StartEns","EndEns","ENST","StrandEns","Dist")
 
-        library(biomaRt,lib.loc=Rlib)
+        library(biomaRt)
         emv<-c("ENSDART"="drerio","ENSMUST"="mmusculus","ENSG"="hsapiens","FBtr"="dmelanogaster")
         ems<-emv[grep(gsub("[0-9].+","",DMR.filt.an$ENST[1]),names(emv))]
         ens.xx<-useMart(biomart="ensembl",dataset=paste0(ems,"_gene_ensembl"))

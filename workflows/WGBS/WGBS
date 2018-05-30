@@ -216,7 +216,6 @@ def main():
     args.wdir = os.path.abspath(args.wdir)
     args.cluster_logs_dir = os.path.join(args.wdir, "cluster_logs")
 
-    # we also add these paths to config, although we don't use them in the Snakefile
     args.this_script_dir = this_script_dir
     args.main_dir_path = main_dir_path
 
@@ -257,27 +256,34 @@ def main():
     # save to configs.yaml in wdir
     cf.write_configfile(os.path.join(args.wdir, 'config.yaml'), config)
 
+
+    ######################################### conditional parameters ##################################################
+    ###switch between TruSeq and Nextera adapter sequences
+    adapterSeq = "AGATCGGAAGAGC"
+    if args.nextera:
+        adapterSeq = "CTGTCTCTTATA"
+
+      
     ## merge cluster config files: 1) global one, 2) workflow specific one, 3) user provided one
     cluster_config = cf.load_configfile(cf.get_snakepipes_path()+"/shared/cluster.yaml",False)
     cluster_config = cf.merge_dicts(cluster_config, cf.load_configfile(os.path.join(this_script_dir,"cluster.yaml"),False), )
 
+
     if args.cluster_configfile:
         user_cluster_config = cf.load_configfile(args.cluster_configfile,False)
         cluster_config = cf.merge_dicts(cluster_config, user_cluster_config) # 2) merge/override variables from user_config.yaml
-    cf.write_configfile(os.path.join(args.outdir,'cluster_config.yaml'),cluster_config)
+    cf.write_configfile(os.path.join(args.wdir,'cluster_config.yaml'),cluster_config)
 
-    snakemake_module_load = "module load snakemake/5.1.2"
 
-    snakemake_module_load = (snakemake_module_load + " && ").split()
-
+#--use-conda --conda-prefix /data/processing/conda/envs --create-envs-only    
     snakemake_cmd = """
-                    snakemake {snakemake_options} --latency-wait {latency_wait} --snakefile {snakefile} --jobs {max_jobs} --directory {wdir} --configfile {configfile}
+                    snakemake {snakemake_options} --latency-wait {latency_wait} --snakefile {snakefile} --jobs {max_jobs} --directory {wdir} --configfile {configfile} 
                     """.format( latency_wait = cluster_config["snakemake_latency_wait"],
                                 snakefile = os.path.join(args.this_script_dir, "Snakefile"),
                                 max_jobs = args.max_jobs,
                                 wdir = args.wdir,
                                 snakemake_options = str(args.snakemake_options or ''),
-                                configfile = os.path.join(args.outdir,'config.yaml'),
+                                configfile = os.path.join(args.wdir,'config.yaml'),
                               ).split()
 
     if args.verbose:
@@ -298,7 +304,7 @@ def main():
     temp_path = cf.make_temp_dir(args.tempdir, args.wdir, args.verbose)
     snakemake_exports = ("export TMPDIR=" + temp_path + " && ").split()
 
-    cmd = " ".join(snakemake_exports + snakemake_module_load + snakemake_cmd)
+    cmd = " ".join(snakemake_exports  + snakemake_cmd) #+ snakemake_module_load
 
     if args.verbose:
         logger.info(cmd)
