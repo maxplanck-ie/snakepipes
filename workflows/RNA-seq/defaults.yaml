@@ -50,6 +50,7 @@ mapping_prg: STAR
 star_options:
 hisat_options:
 verbose: False
+plot_format: png
 # for allele-spcific mapping
 snp_file:
 Nmasked_index: 

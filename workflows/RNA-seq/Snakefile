@@ -201,17 +201,17 @@ def run_deeptools_qc():
         expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample = samples)]
         if len(samples)>1:
             file_list.append( ["deepTools_qc/multiBigwigSummary/coverage.bed.npz",
-                              "deepTools_qc/plotCorrelation/correlation.pearson.bed_coverage.heatmap.png",
-                              "deepTools_qc/plotCorrelation/correlation.spearman.bed_coverage.heatmap.png",
-                              "deepTools_qc/plotPCA/PCA.bed_coverage.png"] )
+                              "deepTools_qc/plotCorrelation/correlation.pearson.bed_coverage.tsv",
+                              "deepTools_qc/plotCorrelation/correlation.spearman.bed_coverage.tsv",
+                              "deepTools_qc/plotPCA/PCA.bed_coverage.tsv"] )
         if 'allelic-mapping' in mode:
             file_list.append(["deepTools_qc/plotEnrichment/plotEnrichment_allelic.png",
                               "deepTools_qc/plotEnrichment/plotEnrichment_allelic.tsv"])
             if len(samples)>1:
                 file_list.append( ["deepTools_qc/multiBigwigSummary/coverage_allelic.bed.npz",
-                                   "deepTools_qc/plotCorrelation/correlation.pearson.bed_coverage_allelic.heatmap.png",
-                                   "deepTools_qc/plotCorrelation/correlation.spearman.bed_coverage_allelic.heatmap.png",
-                                   "deepTools_qc/plotPCA/PCA.bed_coverage_allelic.png"] )
+                                   "deepTools_qc/plotCorrelation/correlation.pearson.bed_coverage_allelic.tsv",
+                                   "deepTools_qc/plotCorrelation/correlation.spearman.bed_coverage_allelic.tsv",
+                                   "deepTools_qc/plotPCA/PCA.bed_coverage_allelic.tsv"] )
         return(file_list)
     else:
         return([])

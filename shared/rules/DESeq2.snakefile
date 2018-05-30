@@ -22,19 +22,17 @@ rule DESeq2:
     benchmark:
         "{}/.benchmark/DESeq2.featureCounts.benchmark".format(get_outdir("DESeq2"))
     params:
+        script=os.path.join(maindir, "shared", "tools", "DESeq2.R"),
         outdir = get_outdir("DESeq2"),
         fdr = 0.05,
         importfunc = os.path.join(maindir, "shared", "tools","snakediff","R", "DE_functions.R"),
         allele_info = lambda wildcards : 'TRUE' if 'allelic-mapping' in mode else 'FALSE',
         tx2gene_file = 'NA'
-    log: "{}/DESeq2.log".format(get_outdir("DESeq2"))
+    log: "DESeq2.log"
     conda: CONDA_RNASEQ_ENV
-    shell:
-#        "( cd {params.outdir} && export R_LIBS_USER="+R_libs_path+" && "
-#        "cat "+os.path.join(workflow_tools,"DESeq2.R")+" | "
-#        ""+os.path.join(R_path,"R")+" --vanilla --slave --args "
-		"cd {param.outdir} &&
-        "Rscipt "+os.path.join(maindir, "shared", "tools", "DESeq2.R")
+    shell: 
+        "cd {params.outdir} && "
+        "Rscript {params.script} "
         "{input.sample_info} " # 1
         "../{input.counts_table} " # 2
         "{params.fdr} " # 3
@@ -57,17 +55,20 @@ rule DESeq2_Salmon:
     benchmark:
         "{}/.benchmark/DESeq2.Salmon.benchmark".format(get_outdir("DESeq2_Salmon"))
     params:
+        script=os.path.join(maindir, "shared", "tools", "DESeq2.R"),
         outdir = get_outdir("DESeq2_Salmon"),
         fdr = 0.05,
-        importfunc = os.path.join(workflow_tools,"snakediff", "R" ,"DE_functions.R"),
+        importfunc = os.path.join(maindir, "shared", "tools","snakediff", "R" ,"DE_functions.R"),
         allele_info = 'FALSE',
         tx2gene_file = "Annotation/genes.filtered.t2g"
-    log: "{}/DESeq2.log".format(get_outdir("DESeq2_Salmon"))
+    log: "DESeq2.log"
     conda: CONDA_RNASEQ_ENV
     shell:
-        "( cd {params.outdir} && export R_LIBS_USER="+R_libs_path+" && "
-        "cat "+os.path.join(workflow_tools,"DESeq2.R")+" | "
-        ""+os.path.join(R_path,"R")+" --vanilla --slave --args "
+#        "( cd {params.outdir} && export R_LIBS_USER="+R_libs_path+" && "
+#        "cat "+os.path.join(workflow_tools,"DESeq2.R")+" | "
+#        ""+os.path.join(R_path,"R")+" --vanilla --slave --args "
+        "cd {params.outdir} && "
+        "Rscript {params.script} "
         "{input.sample_info} " # 1
         "../{input.counts_table} " # 2
         "{params.fdr} " # 3
@@ -75,4 +76,4 @@ rule DESeq2_Salmon:
         "{params.importfunc} " # 5
         "{params.allele_info} " # 6
         "../{input.tx2gene_file} " # 7
-        ") 2>&1 | tee {log}"
+        " 2>&1 | tee {log}"

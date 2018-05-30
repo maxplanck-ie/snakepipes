@@ -88,7 +88,7 @@ rule annotation_bed2fasta:
     threads: 1
     conda: CONDA_RNASEQ_ENV
     shell:
-        "bedtools getfasta -s -split -fi {input.genome_fasta} -bed {input.bed} -fo {output} -name "
+        "bedtools getfasta -name -s -split -fi {input.genome_fasta} -bed {input.bed} | sed 's/(.*)//g' > {output}"
 
 
 rule annotation_bed2saf:
