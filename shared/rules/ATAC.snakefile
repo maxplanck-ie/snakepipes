@@ -31,8 +31,8 @@ rule callOpenChromatin:
         write_bdg='--bdg',
         fileformat='--format BAMPE'
     threads: 6
-    log: os.path.join(outdir_MACS2, "logs", "callOpenChromatin","{sample}_macs2.log")
-    conda: CONDA_SHARED_ENV
+    log: os.path.join(outdir_MACS2, "logs", "callOpenChromatin", "{sample}_macs2.log")
+    conda: CONDA_ATAC_ENV
     shell: """
         macs2 callpeak --treatment {input} \
             -g {params.genome_size} \

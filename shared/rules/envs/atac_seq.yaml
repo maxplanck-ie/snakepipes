@@ -5,6 +5,7 @@ channels:
  - r
 dependencies:
  - samtools = 1.7
- - bedtools = 2.27.1
  - bioconductor-csaw = 1.12.0
  - bioconductor-genomicranges = 1.30.3
+ - macs2 = 2.1.1.20160309  #python 2!?!
+ - gawk = 4.1.3
