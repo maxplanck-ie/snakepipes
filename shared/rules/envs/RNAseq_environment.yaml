@@ -3,7 +3,6 @@ channels:
  - bioconda
  - conda-forge
 dependencies:
- - deeptools=3.0.2
  - bedtools=2.27.1
  - ucsc-genepredtogtf=357
  - ucsc-bedtogenepred=357
@@ -15,3 +14,7 @@ dependencies:
  - r-base=3.4.1
  - salmon=0.9.1
  - r-wasabi=0.2
+ - r-sleuth=0.29.0
+ - r-dplyr=0.7.4
+ - bioconductor-biomart=2.34.2
+
