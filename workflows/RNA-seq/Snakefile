@@ -258,7 +258,7 @@ rule all:
         run_mapping_free(),            # Salmon
         run_mapping(),                 # classical mapping + counting
         run_allelesp_mapping(),        # allelic-mapping
-#        make_nmasked_genome(),
+        make_nmasked_genome(),
         run_deeptools_qc(),
         run_GenomicContamination(),
         "multiQC/multiqc_report.html"
