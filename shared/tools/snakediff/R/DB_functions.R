@@ -53,12 +53,12 @@ readfiles_chip <- function(sampleInfo, fragment_length, window_size, alleleSpeci
         design$condition <- relevel(design$condition, ref = as.character(design$condition[1]))# make the first entry the base level
         designm <- model.matrix(~condition, data = design)
         designType <- "condition"
+        # define bam files to read
+        bam.files <- list.files("filtered_bam",
+                                pattern = paste0(sampleInfo$name,".filtered.bam$", collapse = "|"),
+                                full.names = TRUE )
     }
 
-    # define bam files to read
-    bam.files <- list.files("filtered_bam",
-                            pattern = paste0(sampleInfo$name,".filtered.bam$", collapse = "|"),
-                            full.names = TRUE )
     message("bam files used:")
     print(bam.files)
 
@@ -161,18 +161,18 @@ tmmNormalize_chip <- function(chipCountObject, binsize, plotfile){
 
     # plot normalized counts
     pdf(plotfile)
-    par(mfrow = c(3, 3), mar = c(5, 4, 2, 1.5))
-    for (i in 1:(length(bam.files) - 1)) {
-        cur.x <- adj.counts[, 1]
-        cur.y <- adj.counts[, 1 + i]
-        smoothScatter(x = (cur.x + cur.y)/2 + 6*log2(10),
-                    y = cur.x-cur.y, xlab = "A",
-                    ylab = "M",
-                    main = paste("1 vs", i + 1))
+    #par(mfrow = c(3, 3), mar = c(5, 4, 2, 1.5))
+    #for (i in 1:(length(bam.files) - 1)) {
+    #    cur.x <- adj.counts[, 1]
+    #    cur.y <- adj.counts[, 1 + i]
+    #    smoothScatter(x = (cur.x + cur.y)/2 + 6*log2(10),
+    #                y = cur.x-cur.y, xlab = "A",
+    #                ylab = "M",
+    #                main = paste("1 vs", i + 1))
 
-        all.dist <- diff(log2(normfacs[c(i + 1, 1)]))
-        abline(h = all.dist, col = "red")
-    }
+    #    all.dist <- diff(log2(normfacs[c(i + 1, 1)]))
+    #    abline(h = all.dist, col = "red")
+    #}
     ## MDS plot to check for replicate variability
     for (top in c(100, 500, 1000, 5000)) {
         limma::plotMDS(adj.counts, main = top,
