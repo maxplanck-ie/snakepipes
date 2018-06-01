@@ -41,18 +41,19 @@ bw_binsize: 25
 fastqc: False
 featurecounts_options: -C -Q 10 --primary
 filter_annotation:
-genomic_contamination: False
 fragment_length: 200
 library_type: 2
 salmon_index_options: --type quasi -k 31
+dnaContam: False
 ## supported mappers: STAR HISAT2
 mapping_prg: STAR
 star_options:
 hisat_options:
 verbose: False
+plot_format: png
 # for allele-spcific mapping
 snp_file:
-Nmasked_index: 
+Nmasked_index:
 ################################################################################
 # Call snakemake directly, i.e. without using the wrapper script:
 #

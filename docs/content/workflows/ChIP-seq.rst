@@ -59,6 +59,7 @@ Input requirements
 ---------------------------
 
 The DNA mapping pipeline generates output that is fully compatible with the ChIP-seq pipeline input requirements!
+When running the ChIP-seq pipeline, please specify the output directory of DNA-mapping pipeline as the working directory (-w).
 
 The ChIP-seq pipeline requires at least the following input files for each sample that is specified in the configuration file:
 

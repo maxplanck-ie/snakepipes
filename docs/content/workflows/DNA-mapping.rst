@@ -66,18 +66,6 @@ Configuration file
 	bowtie_opts:
 	qualimap: false
 	verbose: False
-	################################################################################
-	# Call snakemake directly, i.e. without using the wrapper script:
-	#
-	# Please save a copy of this config yaml file and provide an adjusted config
-	# via '--configfile' parameter!
-	# example call:
-	#
-	# snakemake --snakefile /path/to/snakemake_workflows/workflows/DNA-mapping/Snakefile
-	#           --configfile /path/to/snakemake_workflows/workflows/DNA-mapping/defaults.yaml
-	#           --directory /path/to/outputdir
-	#           --cores 32
-	################################################################################
 
 
 Structure of output directory
@@ -89,7 +77,7 @@ The DNA mapping pipeline will generate output of the following structure:
 
     $ tree -d -L 2 output-dir/
 
-.. parsed-literal::
+..parsed-literal::
 
     output-dir/
     |-- Bowtie2
