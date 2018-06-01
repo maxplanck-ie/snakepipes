@@ -148,7 +148,7 @@ def get_fragment_length(infile, sampleName):
     with open(infile, "r") as f:
         for line in f:
             line = line.strip()
-            if line.startswith(sampleName):
+            if line.startswith("filtered_bam/{}".format(sampleName)):
                 try:
                     median = line.split()[5]
                     return float(median)

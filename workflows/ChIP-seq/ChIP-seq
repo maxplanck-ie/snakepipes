@@ -121,23 +121,23 @@ def parse_args(defaults={"verbose":None,"configfile":None,"cluster_configfile":N
                         default=defaults["bw_binsize"])
 
     optional.add_argument("--DB",
-    					dest="sample_info",
-    					help="Information on samples (If differential binding analysis required); see "
-    						 "'snakepipes/shared/tools/sampleInfo.example.tsv' for example."
-    						 " IMPORTANT: The first entry defines which group of samples are control. "
-    						 " By this, the order of comparison and likewise the sign of values can be changed! "
+                        dest="sample_info",
+                        help="Information on samples (If differential binding analysis required); see "
+                             "'snakepipes/shared/tools/sampleInfo.example.tsv' for example."
+                             " IMPORTANT: The first entry defines which group of samples are control. "
+                             " By this, the order of comparison and likewise the sign of values can be changed! "
                              " Also, the condition `control` should only be used for input samples (control peaks"
                              " are not evaluated for differential binding) (default: '%(default)s')",
-    					default=defaults["sample_info"])
+                        default=defaults["sample_info"])
 
     optional.add_argument("--DB_windowSize",
-    					dest="window_size",
-    					help="Window size to counts reads in (If differential binding analysis required); "
-    						 "Default size is suitable for most transcription factors and sharp histone marks. "
+                        dest="window_size",
+                        help="Window size to counts reads in (If differential binding analysis required); "
+                             "Default size is suitable for most transcription factors and sharp histone marks. "
                              "Small window sizes (~20bp) should be used for very narrow transcription factor peaks, "
                              "while large window sizes (~500 bp) should be used for broad marks (eg. H3K27me3) "
                              "(default: '%(default)s')",
-    					default=defaults["window_size"])
+                        default=defaults["window_size"])
 
     return parser
 
