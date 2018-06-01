@@ -33,7 +33,8 @@ sampleInfo <- read.table(sampleInfoFilePath, header = TRUE, colClasses = c("char
 pe = "none"
 if(isTRUE(paired)) {
     pe = "both"
-    fraglength = NA
+    d = read.delim("deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv")
+    fraglength = median(d[,6])
 }
 pe_param <- csaw::readParam(max.frag = 500, pe = pe)  # Some CSAW functions explode the processor count with >1 core
 
@@ -44,11 +45,7 @@ chip_object <- readfiles_chip(sampleInfo = sampleInfo,
                               alleleSpecific = allelic_info,
                               pe.param = pe_param)
 
-## make QC plot for one sample
-first_bam <- head(SummarizedExperiment::colData(chip_object$windowCounts)$bam.files, n = 1)
-last_bam <- tail(SummarizedExperiment::colData(chip_object$windowCounts)$bam.files, n = 1)
-
-## merge all peaks from the samples mentioned in sampleinfo to test (exclude "Input")
+## merge all peaks from the samples mentioned in sampleinfo to test (exclude "control")
 # get files to read from MACS
 fnames <- sampleInfo[sampleInfo$condition != "control",]$name
 
