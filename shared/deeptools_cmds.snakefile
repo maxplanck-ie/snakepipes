@@ -1,8 +1,8 @@
-### functions shared across workflows ##########################################
-################################################################################
-import os
 
-## bamcompare
+####---- Common deeptools commands used for multiple workflows ------#####
+
+
+# bamcompare
 bamcompare_log2_cmd = """
     bamCompare -b1 {input.chip_bam} \
                -b2 {input.control_bam} \
@@ -23,7 +23,8 @@ bamcompare_subtract_cmd = """
                -o {output} \
                --operation subtract \
                --scaleFactorsMethod readCount \
-               --normalizeUsing RPGC --effectiveGenomeSize {params.genome_size} \
+               --normalizeUsing RPGC \
+               --effectiveGenomeSize {params.genome_size} \
                {params.ignoreForNorm} \
                --binSize {params.bw_binsize} \
                -p {threads} \
@@ -41,7 +42,9 @@ bamcov_raw_cmd = """
 
 # bamCoverage RPKM
 bamcov_RPKM_cmd = """
-    bamCoverage -b {input.bam} -o {output} --binSize {params.bw_binsize} -p {threads} --normalizeUsing RPKM  > {log.out} 2> {log.err}
+    bamCoverage -b {input.bam} \
+    -o {output} --binSize {params.bw_binsize} \
+    -p {threads} --normalizeUsing RPKM  > {log.out} 2> {log.err}
     """
 
 # bamCoverage CHIP
@@ -50,8 +53,10 @@ bamcov_cmd = """
                 -o {output} \
                 --binSize {params.bw_binsize} \
                 -p {threads} \
-                --normalizeUsing RPGC --effectiveGenomeSize {params.genome_size} \
+                --normalizeUsing RPGC \
+                --effectiveGenomeSize {params.genome_size} \
                 {params.ignoreForNorm} \
+                {params.blacklist} \
                 {params.read_extension}  > {log.out} 2> {log.err}
     """
 
@@ -63,7 +68,7 @@ gcbias_cmd = """
                 --effectiveGenomeSize {params.genome_size} \
                 --genome {params.genome_2bit} \
                 {params.median_fragment_length}  \
-                --sampleSize 10000000 \
+                --sampleSize {params.sampleSize} \
                 {params.blacklist} \
                 -p {threads}  > {log.out} 2> {log.err}
     """
@@ -186,12 +191,15 @@ plotCoverage_cmd = """
 
 #EstimateReadFiltering
 estimateReadFiltering_cmd = """
-    estimateReadFiltering -b {input.bam} -o {output}  > {log.out} 2> {log.err}
+    estimateReadFiltering -b {input.bam} \
+    -o {output}  > {log.out} 2> {log.err}
     """
 
 #bamPEFragmentSize
 bamPEFragmentSize_cmd = """
-    bamPEFragmentSize --bamfiles {input.bams} \
+    bamPEFragmentSize \
+    --bamfiles {input.bams} \
+    --binSize 1000000 \
     {params.plotcmd} \
     --table {output} -p {threads} > {log.out} 2> {log.err}
     """
