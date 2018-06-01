@@ -163,10 +163,13 @@ tmmNormalize_chip <- function(chipCountObject, binsize, plotfile){
     pdf(plotfile)
     par(mfrow = c(3, 3), mar = c(5, 4, 2, 1.5))
     for (i in 1:(length(bam.files) - 1)) {
-        cur.x <- adj.counts[,1]
-        cur.y <- adj.counts[,1 + i]
-        smoothScatter(x = (cur.x + cur.y)/2 + 6*log2(10), y = cur.x-cur.y, xlab = "A",
-                  ylab = "M", main = paste("1 vs", i+1))
+        cur.x <- adj.counts[, 1]
+        cur.y <- adj.counts[, 1 + i]
+        smoothScatter(x = (cur.x + cur.y)/2 + 6*log2(10),
+                    y = cur.x-cur.y, xlab = "A",
+                    ylab = "M",
+                    main = paste("1 vs", i + 1))
+
         all.dist <- diff(log2(normfacs[c(i + 1, 1)]))
         abline(h = all.dist, col = "red")
     }
