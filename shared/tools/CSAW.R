@@ -2,6 +2,7 @@
 ## ChIPseq differential binding workflow
 
 sampleInfoFilePath <- snakemake@input[["sample_info"]]  #"samplesheet.tab"
+insert_size_metrics <- snakemake@input[["insert_size_metrics"]] # bamPEFragmentSize output
 fdr <- as.numeric(snakemake@params[["fdr"]])
 paired <- as.logical(snakemake@params[["paired"]])
 fraglength <- as.numeric(snakemake@params[["fragment_length"]])  # This needs to be figured out somehow
@@ -33,7 +34,8 @@ sampleInfo <- read.table(sampleInfoFilePath, header = TRUE, colClasses = c("char
 pe = "none"
 if(isTRUE(paired)) {
     pe = "both"
-    fraglength = NA
+    d = read.delim(insert_size_metrics)
+    fraglength = median(d[,6])
 }
 pe_param <- csaw::readParam(max.frag = 500, pe = pe)  # Some CSAW functions explode the processor count with >1 core
 
@@ -44,7 +46,7 @@ chip_object <- readfiles_chip(sampleInfo = sampleInfo,
                               alleleSpecific = allelic_info,
                               pe.param = pe_param)
 
-## make QC plot for one sample
+## make QC plot for first and last sample
 first_bam <- head(SummarizedExperiment::colData(chip_object$windowCounts)$bam.files, n = 1)
 last_bam <- tail(SummarizedExperiment::colData(chip_object$windowCounts)$bam.files, n = 1)
 
@@ -54,7 +56,7 @@ makeQCplots_chip(bam.file = first_bam, outplot = "CSAW/QCplots_first_sample.pdf"
 print(paste0("Making QC plots for last sample : ", last_bam))
 makeQCplots_chip(bam.file = last_bam, outplot = "CSAW/QCplots_last_sample.pdf", pe.param = pe_param)
 
-## merge all peaks from the samples mentioned in sampleinfo to test (exclude "Input")
+## merge all peaks from the samples mentioned in sampleinfo to test (exclude "Control")
 # get files to read from MACS
 fnames <- sampleInfo[sampleInfo$condition != "control",]$name
 
