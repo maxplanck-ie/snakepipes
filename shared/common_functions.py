@@ -183,7 +183,6 @@ def checkAlleleParams(args):
     # first some sanity checks
     mode = list(map(str.strip, re.split(',|;', args.mode)))
     mode = [element.lower() for element in mode]
-
     if "allelic-mapping" in mode and "mapping" in mode:
         print("\nError! Please specify either allelic-mapping or mapping for option --mode! \n")
         exit(1)
