@@ -17,7 +17,7 @@ configfile:
 cluster_configfile:
 local: False
 max_jobs: 5
-snakemake_options: '--use-conda --conda-prefix /data/processing/conda/env '
+snakemake_options: '--use-conda --conda-prefix /data/processing/conda/envs '
 tempdir: /data/extended/
 ## directory with fastq files
 indir:

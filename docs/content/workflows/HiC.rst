@@ -21,20 +21,18 @@ The HiC pipeline will generate output of the following structure:
 
 .. code:: bash
 
-    $ tree -d -L 2 output-dir/
+    $ tree -d -L 2 outputdir
+  
+output directory::
 
-
-.. parsed-literal::
-
- output-dir/
-    |-- BWA
-    |-- FASTQ
-    |-- HiC_matrices
-    |     |-- logs
-    |     |-- QCplots
-    |-- HiC_matrices_corrected
-    |     |-- logs
-    |-- TADs
-          |--logs
-
+    outputdir
+    |--BWA
+    |--FASTQ
+    |--HiC_matrices
+    |   |--logs
+    |   |--QCplots
+    |--HiC_matrices_corrected
+    |   |--logs
+    |--TADs
+        |--logs
 
