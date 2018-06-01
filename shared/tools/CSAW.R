@@ -5,7 +5,7 @@ sampleInfoFilePath <- snakemake@input[["sample_info"]]  #"samplesheet.tab"
 insert_size_metrics <- snakemake@input[["insert_size_metrics"]] # bamPEFragmentSize output
 fdr <- as.numeric(snakemake@params[["fdr"]])
 paired <- as.logical(snakemake@params[["paired"]])
-fraglength <- as.numeric(snakemake@params[["fragment_length"]])  # This needs to be figured out somehow
+fraglength <- as.numeric(snakemake@params[["fragment_length"]])  # used when the data is not paired end
 windowSize <- as.numeric(snakemake@params[["window_size"]])
 importfunc <- snakemake@params[["importfunc"]]  #"DB_functions.R"
 allelic_info <- as.logical(snakemake@params[["allele_info"]])
