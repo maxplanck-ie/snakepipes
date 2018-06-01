@@ -30,7 +30,7 @@ def parse_args(defaults={"verbose":None,"configfile":None,"cluster_configfile":N
                          "mode":None, "downsample":None, "trim":None,"trim_prg":None,"trim_options":None, "fastqc":None,
                          "library_type":None, "mapping_prg":None, "star_options":None, "hisat_options":None, "salmon_index_options":None,
                          "featurecounts_options":None, "filter_annotation":None, "sample_info":None,
-                         "bw_binsize":None, "genomic_contamination":None, "mapq":None, "plot_format":None}):
+                         "bw_binsize":None, "dnaContam":None, "mapq":None, "plot_format":None}):
     """
     Parse arguments from the command line.
     """
@@ -113,104 +113,104 @@ def parse_args(defaults={"verbose":None,"configfile":None,"cluster_configfile":N
     ## optional
     optional = parser.add_argument_group('Optional arguments')
     optional.add_argument("-m", "--mode",
-    					dest="mode",
-    					help="workflow running modes (available: 'mapping-free, mapping, allelic-mapping, deepTools_qc')"
-    					" (default: '%(default)s')",
-    					default=defaults["mode"])
+                        dest="mode",
+                        help="workflow running modes (available: 'mapping-free, mapping, allelic-mapping, deepTools_qc')"
+                        " (default: '%(default)s')",
+                        default=defaults["mode"])
 
     optional.add_argument("--downsample",
-    					dest="downsample",
-    					metavar="INT",
-    					help="downsample the given number of reads randomly from each FASTQ file (default: '%(default)s')",
-    					type=int,
-    					default=defaults["downsample"])
+                        dest="downsample",
+                        metavar="INT",
+                        help="downsample the given number of reads randomly from each FASTQ file (default: '%(default)s')",
+                        type=int,
+                        default=defaults["downsample"])
     optional.add_argument("--trim_prg",
-    					dest="trim_prg",
-    					choices=['cutadapt', 'trimgalore'],
-    					help="trimming program: cutadapt or trimgalore (default: '%(default)s')",
-    					default=defaults["trim_prg"])
+                        dest="trim_prg",
+                        choices=['cutadapt', 'trimgalore'],
+                        help="trimming program: cutadapt or trimgalore (default: '%(default)s')",
+                        default=defaults["trim_prg"])
     optional.add_argument("--trim",
-    					dest="trim",
-    					action="store_true",
-    					help="Activate fastq read trimming. If activated, Illumina adaptors are trimmed by default. "
+                        dest="trim",
+                        action="store_true",
+                        help="Activate fastq read trimming. If activated, Illumina adaptors are trimmed by default. "
                         "Additional parameters can be specified under --trim_options (default: '%(default)s')",
-    					default=defaults["trim"])
+                        default=defaults["trim"])
     optional.add_argument("--trim_options",
-    					dest="trim_options",
-    					metavar="STR",
-    					type=str,
-    					help="Additional option string for trimming program of choice. (default: '%(default)s')",
-    					default=defaults["trim_options"])
+                        dest="trim_options",
+                        metavar="STR",
+                        type=str,
+                        help="Additional option string for trimming program of choice. (default: '%(default)s')",
+                        default=defaults["trim_options"])
     optional.add_argument("--fastqc",
-    					dest="fastqc",
-    					action="store_true",
-    					help="run FastQC read quality control (default: '%(default)s')",
-    					default=defaults["fastqc"])
+                        dest="fastqc",
+                        action="store_true",
+                        help="run FastQC read quality control (default: '%(default)s')",
+                        default=defaults["fastqc"])
     optional.add_argument("--library_type",
-    					dest="library_type",
-    					metavar="",
-    					help="user provided library type strand specificity. featurCounts style: 0, 1, 2 (Illumina TruSeq); default: '%(default)s')",
-    					type=int,
-    					default=defaults["library_type"])
+                        dest="library_type",
+                        metavar="",
+                        help="user provided library type strand specificity. featurCounts style: 0, 1, 2 (Illumina TruSeq); default: '%(default)s')",
+                        type=int,
+                        default=defaults["library_type"])
     optional.add_argument("--mapping_prg",
-    					dest="mapping_prg",
-    					metavar="STR",
-    					help="Program used for mapping: STAR or HISAT2 (default: '%(default)s')",
-    					type=str,
-    					default=defaults["mapping_prg"])
+                        dest="mapping_prg",
+                        metavar="STR",
+                        help="Program used for mapping: STAR or HISAT2 (default: '%(default)s')",
+                        type=str,
+                        default=defaults["mapping_prg"])
     optional.add_argument("--star_options",
-    					dest="star_options",
-    					metavar="STR",
-    					help="STAR option string, e.g.: '--twopassMode Basic' (default: '%(default)s')",
-    					type=str,
-    					default=defaults["star_options"])
+                        dest="star_options",
+                        metavar="STR",
+                        help="STAR option string, e.g.: '--twopassMode Basic' (default: '%(default)s')",
+                        type=str,
+                        default=defaults["star_options"])
     optional.add_argument("--hisat_options",
-    					dest="hisat_options",
-    					metavar="STR",
-    					help="HISAT2 option string (default: '%(default)s')",
-    					type=str,
-    					default=defaults["hisat_options"])
+                        dest="hisat_options",
+                        metavar="STR",
+                        help="HISAT2 option string (default: '%(default)s')",
+                        type=str,
+                        default=defaults["hisat_options"])
     optional.add_argument("--salmon_index_options",
-    					dest="salmon_index_options",
-    					metavar="STR",
-    					type=str,
-    					help="Salmon index options, e.g. '--type fmd' (default: '%(default)s')",
-    					default=defaults["salmon_index_options"])
+                        dest="salmon_index_options",
+                        metavar="STR",
+                        type=str,
+                        help="Salmon index options, e.g. '--type fmd' (default: '%(default)s')",
+                        default=defaults["salmon_index_options"])
     optional.add_argument("--featurecounts_options",
-    					dest="featurecounts_options",
-    					metavar="STR",
-    					type=str,
-    					help="featureCounts option string. The options '-p -B'"
-    						 " are always used for paired-end data (default: '%(default)s')",
-    					default=defaults["featurecounts_options"])
+                        dest="featurecounts_options",
+                        metavar="STR",
+                        type=str,
+                        help="featureCounts option string. The options '-p -B'"
+                             " are always used for paired-end data (default: '%(default)s')",
+                        default=defaults["featurecounts_options"])
     optional.add_argument("--filter_annotation",
-    					dest="filter_annotation",
-    					metavar="STR",
-    					type=str,
-    					help="filter annotation GTF by grep for use with Salmon, e.g."
-    						 " use --filter_annotation='-v pseudogene'; default: '%(default)s')",
-    					default=defaults["filter_annotation"])
+                        dest="filter_annotation",
+                        metavar="STR",
+                        type=str,
+                        help="filter annotation GTF by grep for use with Salmon, e.g."
+                             " use --filter_annotation='-v pseudogene'; default: '%(default)s')",
+                        default=defaults["filter_annotation"])
     optional.add_argument("--DE",
-    					dest="sample_info",
-    					help="Information on samples (required for DE analysis); see "
-    						 "'snakemake_workflows/shared/tools/sampleInfo.example.tsv' for example."
-    						 " The column names in the tsv files are 'sample' and 'condition'.The first entry"
+                        dest="sample_info",
+                        help="Information on samples (required for DE analysis); see "
+                             "'snakemake_workflows/shared/tools/sampleInfo.example.tsv' for example."
+                             " The column names in the tsv files are 'sample' and 'condition'.The first entry"
                              " defines which group of samples are control. "
-    						 " This way, the order of comparison and likewise the sign of values can be changed."
+                             " This way, the order of comparison and likewise the sign of values can be changed."
                              " The DE analysis might fail if your sample names begin with a number. So watch out"
                              " for that! (default: '%(default)s')",
-    					default=defaults["sample_info"])
+                        default=defaults["sample_info"])
     optional.add_argument("--bw-binsize",
-    					dest="bw_binsize",
-    					metavar="INT",
-    					help="bin size of output files in bigWig format (default: '%(default)s')",
-    					type=int,
-    					default=defaults["bw_binsize"])
+                        dest="bw_binsize",
+                        metavar="INT",
+                        help="bin size of output files in bigWig format (default: '%(default)s')",
+                        type=int,
+                        default=defaults["bw_binsize"])
     optional.add_argument("--dnaContam",
                         action="store_true",
                         help="Returns a plot which presents the proportion of the intergenic reads (default: '%(default)s')",
                         default=defaults["dnaContam"])
-    
+
     parser.add_argument("--plotFormat",
                         dest="plot_format",
                         choices=['png', 'pdf', 'None'],
@@ -218,7 +218,7 @@ def parse_args(defaults={"verbose":None,"configfile":None,"cluster_configfile":N
                         type=str,
                         help="Format of the output plots from deeptools. Select 'none' for no plot (default: '%(default)s')",
                         default=defaults["plot_format"])
-    
+
     ###
     snpargs = parser.add_argument_group('allele-specific mapping arguments')
     snpargs.add_argument("--VCFfile",

@@ -21,6 +21,8 @@ Pipeline                            Description
 Quick start
 ----------------
 
+The desing of all workflows, as well as configuration is the same. Here's an example with ChIP-seq data.
+
 A **typical ChIP-seq analysis of human samples** starting from paired-end FASTQ files in the directory `input-dir`:
 
 .. code:: bash
@@ -29,12 +31,17 @@ A **typical ChIP-seq analysis of human samples** starting from paired-end FASTQ 
     my_H3K27ac_sample_R1.fastq.gz  my_H3K27me3_sample_R1.fastq.gz  my_Input_sample_R1.fastq.gz
     my_H3K27ac_sample_R2.fastq.gz  my_H3K27me3_sample_R2.fastq.gz  my_Input_sample_R2.fastq.gz
     $
-    $ snakemake_workflows/DNA-mapping hs37d5 \
-          -i /path/to/input-dir -o /path/to/output-dir --dedup && \
-      snakemake_workflows/ChIP-seq hs37d5 chip-seq.config.yaml \
-          -d /path/to/outputdir
+    $ snakemake_workflows/DNA-mapping \
+          -i /path/to/input-dir -o /path/to/output-dir --dedup hs37d5 && \
+      snakemake_workflows/ChIP-seq chip-seq.config.yaml \
+          -d /path/to/outputdir hs37d5
 
-All individual jobs of the workflow will be submitted to the Slurm queue. To run the workflow locally, use the parameter `--local` for local mode and the parameter `-j 48` to specify the maximal number of used CPU threads (here: 48) or concurrent running Slurm jobs (actual used threads are defined in each rule).
+Here, hs37d5 is the name of the genome. The yaml file corresponding to this genome should exist under `/shared/organisms/hs37d5.yaml`.
+This yaml file should have paths to the required genome fasta, index, GTF and other annotations (see **Genome configuration file** below).
+
+All individual jobs of the workflow will be submitted to the Grid engine using the command specified under /shared/cluster.yaml.
+To run the workflow locally, use the parameter `--local` for local mode and the parameter `-j 48` to specify the maximal
+number of used CPU threads (here: 48) or concurrent running Slurm jobs (actual used threads are defined in each rule).
 
 A **configuration file is required for the ChIP-seq workflow** and should adhere to the following style :
 **IMPORTANT: Use only whitespace, but NO TAB indentation in this file:**
@@ -67,7 +74,8 @@ A **configuration file is required for the ChIP-seq workflow** and should adhere
 Genome configuration file
 ----------------------------
 
-Further organisms can be supported by adding a genome configuration file `my_organism.yaml` in the following style to the `snakemake_workflows` directory:
+Any organism can be supported in the workflows by adding a genome configuration file `my_organism.yaml` in the
+following style to the `snakemake_workflows` directory:
 
 .. code:: bash
 
