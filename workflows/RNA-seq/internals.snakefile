@@ -47,15 +47,6 @@ paired = cf.is_paired(infiles,ext,reads)
 if not paired:
     reads = [""]
 
-## rna-strandness for HISAT2
-rna_strandness = cf.convert_library_type(R_path, paired, library_type, "featureCounts", "HISAT2", os.path.join(maindir, "shared", "tools", "library_type.R"), os.path.join(maindir, "shared", "tools", "library_type.tsv"))
-if rna_strandness == "NA":
-    rna_strandness = ""
-else:
-    rna_strandness = "--rna-strandness "+rna_strandness
-
-salmon_libtype = cf.convert_library_type(R_path, paired, library_type, "featureCounts", "Salmon", os.path.join(maindir, "shared", "tools", "library_type.R"), os.path.join(maindir, "shared", "tools", "library_type.tsv"))
-
 ## Require configuration file (samples.yaml)
 if sample_info and not os.path.isfile(sample_info):
     print("ERROR: Cannot find sample info file! ("+sample_info+")\n")

@@ -11,7 +11,8 @@ rule bamCoverage_RPKM_allelic:
     params:
         bw_binsize = config["bw_binsize"]
     log:
-        "bamCoverage/allele_specific/logs/bamCoverage_RPKM.{sample}.{suffix}.log"
+        out="bamCoverage/allele_specific/logs/bamCoverage_RPKM.{sample}.{suffix}.out",
+        err="bamCoverage/allele_specific/logs/bamCoverage_RPKM.{sample}.{suffix}.err",
     benchmark:
         "bamCoverage/allele_specific/.benchmark/bamCoverage_RPKM.{sample}.{suffix}.benchmark"
     threads: 8
@@ -29,7 +30,8 @@ rule bamCoverage_raw_allelic:
     params:
         bw_binsize = bw_binsize
     log:
-        "bamCoverage/allele_specificlogs/bamCoverage_coverage.{sample}.log"
+        out="bamCoverage/allele_specificlogs/bamCoverage_coverage.{sample}.out",
+        err="bamCoverage/allele_specificlogs/bamCoverage_coverage.{sample}.err"
     benchmark:
         "bamCoverage/allele_specific.benchmark/bamCoverage_coverage.{sample}.benchmark"
     threads: 8
@@ -43,14 +45,16 @@ rule plotEnrichment_allelic:
         gtf = "Annotation/genes.filtered.gtf",
         gtf2= "Annotation/genes.filtered.transcripts.gtf"
     output:
-        png = "deepTools_qc/plotEnrichment/plotEnrichment_allelic.png",
-        tsv = "deepTools_qc/plotEnrichment/plotEnrichment_allelic.tsv"
+        "deepTools_qc/plotEnrichment/plotEnrichment_allelic.tsv"
     conda:
         CONDA_SHARED_ENV
     params:
-        labels = " ".join(expand('{sample}.{suffix}', sample=samples, suffix = ['genome1', 'genome2']))
+        labels = " ".join(expand('{sample}.{suffix}', sample=samples, suffix = ['genome1', 'genome2'])),
+        plotcmd = "" if plot_format == 'None' else
+            "--plotFile " + "deepTools_qc/plotEnrichment/plotEnrichment_allelic." + plot_format
     log:
-        "deepTools_qc/logs/plotEnrichment_allelic.log"
+        out="deepTools_qc/logs/plotEnrichment_allelic.out",
+        err="deepTools_qc/logs/plotEnrichment_allelic.err"
     benchmark:
         "deepTools_qc/.benchmark/plotEnrichment_allelic.benchmark"
     threads: 8
@@ -68,7 +72,8 @@ rule multiBigwigSummary_bed_allelic:
     params:
         labels = " ".join(expand('{sample}.{suffix}', sample=samples, suffix = ['genome1', 'genome2']))
     log:
-        "deepTools_qc/logs/multiBigwigSummary_allelic.log"
+        out="deepTools_qc/logs/multiBigwigSummary_allelic.out",
+        err="deepTools_qc/logs/multiBigwigSummary_allelic.err"
     benchmark:
         "deepTools_qc/.benchmark/multiBigwigSummary.bed_allelic.benchmark"
     threads: 8
@@ -80,16 +85,18 @@ rule plotCorr_bed_pearson_allelic:
     input:
         "deepTools_qc/multiBigwigSummary/coverage_allelic.bed.npz"
     output:
-        heatpng = "deepTools_qc/plotCorrelation/correlation.pearson.bed_coverage_allelic.heatmap.png",
-        scatterpng = "deepTools_qc/plotCorrelation/correlation.pearson.bed_coverage_allelic.scatterplot.png",
-        tsv = "deepTools_qc/plotCorrelation/correlation.pearson.bed_coverage_allelic.tsv"
+        "deepTools_qc/plotCorrelation/correlation.pearson.bed_coverage_allelic.tsv"
     conda:
         CONDA_SHARED_ENV
     log:
-        "deepTools_qc/logs/plotCorrelation_pearson_allelic.log"
+        out="deepTools_qc/logs/plotCorrelation_pearson_allelic.out",
+        err="deepTools_qc/logs/plotCorrelation_pearson_allelic.err"
     benchmark:
         "deepTools_qc/.benchmark/plotCorrelation_pearson_allelic.benchmark"
-    params: label='gene'
+    params: 
+        plotcmd = "" if plot_format == 'None' else
+            "--plotFile " + "deepTools_qc/plotCorrelation/correlation.pearson.bed_coverage_allelic.heatmap." + plot_format,
+        title='genes'
     shell: plotCorr_cmd
 
 
@@ -98,16 +105,18 @@ rule plotCorr_bed_spearman_allelic:
     input:
         "deepTools_qc/multiBigwigSummary/coverage_allelic.bed.npz"
     output:
-        heatpng = "deepTools_qc/plotCorrelation/correlation.spearman.bed_coverage_allelic.heatmap.png",
-        scatterpng = "deepTools_qc/plotCorrelation/correlation.spearman.bed_coverage_allelic.scatterplot.png",
-        tsv = "deepTools_qc/plotCorrelation/correlation.spearman.bed_coverage_allelic.tsv"
+        "deepTools_qc/plotCorrelation/correlation.spearman.bed_coverage_allelic.tsv"
     conda:
         CONDA_SHARED_ENV
     log:
-        "deepTools_qc/logs/plotCorrelation_spearman_allelic.log"
+        out="deepTools_qc/logs/plotCorrelation_spearman_allelic.out",
+        err="deepTools_qc/logs/plotCorrelation_spearman_allelic.err"
     benchmark:
         "deepTools_qc/.benchmark/plotCorrelation_spearman_allelic.benchmark"
-    params: label='gene'
+    params: 
+        plotcmd = "" if plot_format == 'None' else
+            "--plotFile " + "deepTools_qc/plotCorrelation/correlation.spearman.bed_coverage_allelic.heatmap." + plot_format,
+        title='genes'
     shell: plotCorrSP_cmd
 
 
@@ -116,12 +125,16 @@ rule plotPCA_allelic:
     input:
         "deepTools_qc/multiBigwigSummary/coverage_allelic.bed.npz"
     output:
-        "deepTools_qc/plotPCA/PCA.bed_coverage_allelic.png"
+        "deepTools_qc/plotPCA/PCA.bed_coverage_allelic.tsv"
     conda:
         CONDA_SHARED_ENV
     log:
-        "deepTools_qc/logs/plotPCA_allelic.log"
+        out="deepTools_qc/logs/plotPCA_allelic.out",
+        err="deepTools_qc/logs/plotPCA_allelic.err"
     benchmark:
         "deepTools_qc/.benchmark/plotPCA_allelic.benchmark"
-    params: label='gene'
+    params: 
+        plotcmd = "" if plot_format == 'None' else
+                "--plotFile " + "deepTools_qc/plotPCA/PCA.bed_coverage_allelic." + plot_format,
+        title='genes'
     shell: plotPCA_cmd

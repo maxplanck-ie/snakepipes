@@ -1,3 +1,20 @@
+
+rule convertLibraryTypeSalmon:
+    input: "Annotation/genes.filtered.fa"
+    output: "Salmon/lib_type.txt"
+    params: 
+        lib_str = "PE" if paired else "SE",
+        from_library_type = library_type,
+        from_prg = "featureCounts",
+        to_prg="Salmon",
+        tsv = os.path.join(maindir, "shared", "tools", "library_type.tsv"),
+        rscript = os.path.join(maindir, "shared", "tools", "library_type.R"),
+    threads: 1
+    conda: CONDA_RNASEQ_ENV
+    shell:
+        "Rscript {params.rscript} {params.tsv} {params.lib_str} {params.from_library_type} {params.from_prg} {params.to_prg} > {output}"
+        
+
 ## Salmon Index
 rule SalmonIndex:
     input:
@@ -12,8 +29,9 @@ rule SalmonIndex:
 
     log: "Salmon/SalmonIndex/SalmonIndex.log"
     threads: 8
+    conda: CONDA_RNASEQ_ENV
     shell:
-        salmon_path+"salmon index --sasamp {params.sasamp} -p {threads} -t {input} -i Salmon/SalmonIndex {params.salmon_index_options} &> {log} && touch {output}"
+        "salmon index --sasamp {params.sasamp} -p {threads} -t {input} -i Salmon/SalmonIndex {params.salmon_index_options} &> {log} && touch {output}"
 
 
 ## Salmon quant
@@ -22,7 +40,8 @@ if paired:
         input:
             r1 = fastq_dir+"/{sample}"+reads[0]+".fastq.gz",
             r2 = fastq_dir+"/{sample}"+reads[1]+".fastq.gz",
-            bin = "Salmon/SalmonIndex/sa.bin"
+            bin = "Salmon/SalmonIndex/sa.bin",
+            lib_type = "Salmon/lib_type.txt"
         output:
             quant = "Salmon/{sample}/quant.sf",
             quant_genes = "Salmon/{sample}/quant.genes.sf"
@@ -30,23 +49,25 @@ if paired:
             "Salmon/.benchmark/SalmonQuant.{sample}.benchmark"
         params:
             outdir = "Salmon/{sample}",
-            libtype = salmon_libtype,
             gtf = genes_gtf,
         threads: 8
+        conda: CONDA_RNASEQ_ENV
         shell:
-            salmon_path+"salmon quant "
+            "lib_type=$(cat {input.lib_type} ); echo \"lib_type=\"$lib_type 1>&2; "
+            "salmon quant "
             "-p {threads} "
             "--numBootstraps 50 "
             "-g {params.gtf} "
             "-i Salmon/SalmonIndex "
-            "-l {params.libtype} "
+            "-l $lib_type "
             "-1 {input.r1} -2 {input.r2} "
             "-o {params.outdir} "
 else:
     rule SalmonQuant:
         input:
             fastq = fastq_dir+"/{sample}.fastq.gz",
-            bin = "Salmon/SalmonIndex/sa.bin"
+            bin = "Salmon/SalmonIndex/sa.bin",
+            lib_type = "Salmon/lib_type.txt"
         output:
             quant = "Salmon/{sample}/quant.sf",
             quant_genes = "Salmon/{sample}/quant.genes.sf"
@@ -54,16 +75,17 @@ else:
             "Salmon/.benchmark/SalmonQuant.{sample}.benchmark"
         params:
             outdir = "Salmon/{sample}",
-            libtype = salmon_libtype,
             gtf = genes_gtf,
         threads: 8
+        conda: CONDA_RNASEQ_ENV
         shell:
-            salmon_path+"salmon quant "
+            "lib_type=$(cat {input.lib_type} ); echo \"lib_type=\"$lib_type 1>&2; "
+            "salmon quant "
             "-p {threads} "
             "--numBootstraps 50 "
             "-g {params.gtf} "
             "-i Salmon/SalmonIndex "
-            "-l {params.libtype} "
+            "-l $lib_type "
             "-r {input.fastq} "
             "-o {params.outdir} "
 
@@ -92,8 +114,9 @@ rule Salmon_TPM:
         "Salmon/.benchmark/Salmon_TPM.benchmark"
     log:
         "Salmon/Salmon_TPM.log"
+    conda: CONDA_RNASEQ_ENV
     shell:
-        R_path+"Rscript "+os.path.join(maindir, "shared", "tools", "merge_count_tables.R")+" Name TPM {output} {input} "
+        "Rscript "+os.path.join(maindir, "shared", "tools", "merge_count_tables.R")+" Name TPM {output} {input} "
 
 
 rule Salmon_genes_TPM:
@@ -105,8 +128,9 @@ rule Salmon_genes_TPM:
         "Salmon/.benchmark/Salmon_genes_TPM.benchmark"
     log:
         "Salmon/Salmon_genes_TPM.log"
+    conda: CONDA_RNASEQ_ENV
     shell:
-        R_path+"Rscript "+os.path.join(maindir, "shared", "tools", "merge_count_tables.R")+" Name TPM {output} {input} "
+        "Rscript "+os.path.join(maindir, "shared", "tools", "merge_count_tables.R")+" Name TPM {output} {input} "
 
 
 rule Salmon_counts:
@@ -118,8 +142,9 @@ rule Salmon_counts:
         "Salmon/.benchmark/Salmon_counts.benchmark"
     log:
         "Salmon/Salmon_counts.log"
+    conda: CONDA_RNASEQ_ENV
     shell:
-        R_path+"Rscript "+os.path.join(maindir, "shared", "tools", "merge_count_tables.R")+" Name NumReads {output} {input} "
+        "Rscript "+os.path.join(maindir, "shared", "tools", "merge_count_tables.R")+" Name NumReads {output} {input} "
 
 
 rule Salmon_genes_counts:
@@ -131,22 +156,19 @@ rule Salmon_genes_counts:
         "Salmon/.benchmark/Salmon_genes_counts.benchmark"
     log:
         "Salmon/Salmon_genes_counts.log"
+    conda: CONDA_RNASEQ_ENV
     shell:
-        R_path+"Rscript "+os.path.join(maindir, "shared", "tools", "merge_count_tables.R")+" Name TPM {output} {input} "
+        "Rscript "+os.path.join(maindir, "shared", "tools", "merge_count_tables.R")+" Name TPM {output} {input} "
 
 
 ## Prepare Salmon output for Sleuth
 rule Salmon_wasabi:
     input:
-        "Salmon/{sample}/quant.sf"
+        "Salmon/{sample}.quant.sf"
     output:
         "Salmon/{sample}/abundance.h5"
     params:
-        "Salmon/{sample}"
-    benchmark:
-        "Salmon/.benchmark/Salmon_wasabi.benchmark"
+        "Salmon/{sample}/"
+    conda: CONDA_RNASEQ_ENV
     shell:
-        "export R_LIBS_USER="+R_libs_path+" && "
-        "cat "+os.path.join(workflow_tools,"wasabi.R")+" | "
-        ""+os.path.join(R_path,"R")+" --vanilla --args "
-        "{params}; "
+        "Rscript "+os.path.join(maindir, "shared", "tools", "wasabi.R")+" {params}"
