@@ -181,7 +181,10 @@ def make_temp_dir(tempdir, fallback_dir, verbose=False):
 
 def checkAlleleParams(args):
     # first some sanity checks
-    if "allelic-mapping" in args.mode and "mapping" in args.mode:
+    mode = list(map( str.strip, re.split(',|;', args.mode) ))
+    mode = [element.lower() for element in mode]
+
+    if "allelic-mapping" in mode and "mapping" in mode:
         print("\nError! Please specify either allelic-mapping or mapping for option --mode! \n")
         exit(1)
     if "allelic-mapping" in args.mode:
