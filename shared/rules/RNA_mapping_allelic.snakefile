@@ -10,7 +10,7 @@ if mapping_prg == "STAR":
                 r2 = fastq_dir+"/{sample}"+reads[1]+".fastq.gz",
                 index = star_index_allelic
             output:
-                mapping_prg+"/{sample}.bam"
+                temp(mapping_prg+"/{sample}.sorted.bam")
             params:
                 star_options = str(star_options or ''),
                 gtf = genes_gtf,
@@ -53,7 +53,7 @@ if mapping_prg == "STAR":
                 r1 = fastq_dir+"/{sample}.fastq.gz",
                 index = star_index_allelic
             output:
-                mapping_prg+"/{sample}.bam"
+                temp(mapping_prg+"/{sample}.sorted.bam")
             params:
                 star_options = str(star_options or ''),
                 gtf = genes_gtf,
