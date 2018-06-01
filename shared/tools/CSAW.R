@@ -9,18 +9,15 @@ windowSize <- as.numeric(snakemake@params[["window_size"]])
 importfunc <- snakemake@params[["importfunc"]]  #"DB_functions.R"
 allelic_info <- as.logical(snakemake@params[["allele_info"]])
 
-# Handle PE reads
-if(paired) {
-    fraglength = NA
-    d = read.delim(snakemake@input[["insert_size_metrics"]])
-    ## GET fraglength
-}
+## create output directory
 
 # include functions
-source(snakemake@params[["importfunc"]])
-library(GenomicRanges)
+sink("CSAW/CSAW.log", append=TRUE)
+source(paste(snakemake@config[["main_dir_path"]], snakemake@params[["importfunc"]], sep="/"))
+suppressPackageStartupMessages(library(GenomicRanges))
 ## fix default FDR significance threshold
 if ( is.na(fdr) ) fdr <- 0.05
+if (!dir.exists("CSAW")) dir.create("CSAW")
 
 ## print the info
 cat(paste("Working dir:", getwd(), "\n"))
@@ -29,35 +26,27 @@ cat(paste("FDR:", fdr, "\n"))
 cat(paste("paired-end? :", paired, "\n"))
 cat(paste("allele-specific? :", allelic_info, "\n"))
 
-## create output directory
-dir.create("CSAW")
-
 ## sampleInfo (setup of the experiment)
 sampleInfo <- read.table(sampleInfoFilePath, header = TRUE, colClasses = c("character", "factor"))
 
 ## is paired end? : define read params
+pe = "none"
 if(isTRUE(paired)) {
-    pe_param <- csaw::readParam(max.frag = 500, pe = "both")
-} else {
-    pe_param <- csaw::readParam(max.frag = 500, pe = "none")
+    pe = "both"
+    fraglength = NA
 }
+pe_param <- csaw::readParam(max.frag = 500, pe = pe)  # Some CSAW functions explode the processor count with >1 core
 
 ## Read data
 chip_object <- readfiles_chip(sampleInfo = sampleInfo,
-                    fragment_length = fraglength,
-                    window_size = windowSize,
-                    alleleSpecific = allelic_info,
-                    pe.param = pe_param)
+                              fragment_length = fraglength,
+                              window_size = windowSize,
+                              alleleSpecific = allelic_info,
+                              pe.param = pe_param)
 
 ## make QC plot for one sample
 first_bam <- head(SummarizedExperiment::colData(chip_object$windowCounts)$bam.files, n = 1)
 last_bam <- tail(SummarizedExperiment::colData(chip_object$windowCounts)$bam.files, n = 1)
-
-print(paste0("Making QC plots for first sample : ", first_bam))
-#makeQCplots_chip(bam.file = first_bam, outplot = "CSAW/QCplots_first_sample.pdf", pe.param = pe_param)
-
-print(paste0("Making QC plots for last sample : ", last_bam))
-#makeQCplots_chip(bam.file = last_bam, outplot = "CSAW/QCplots_last_sample.pdf", pe.param = pe_param)
 
 ## merge all peaks from the samples mentioned in sampleinfo to test (exclude "Input")
 # get files to read from MACS
@@ -78,6 +67,7 @@ allpeaks <- lapply(fnames, function(x) {
     bed.gr <- GRanges(seqnames = bed$V1, ranges = IRanges(start = bed$V2, end = bed$V3), name = bed$V4)
     return(bed.gr)
     })
+
 # merge
 allpeaks <- Reduce(function(x,y) GenomicRanges::union(x,y), allpeaks)
 
@@ -102,6 +92,7 @@ writeOutput_chip(chip_results, outfile_prefix = "CSAW/DiffBinding", fdrcutoff = 
 
 ## save data
 print("Saving data")
+sink()
 save(chip_object, chip_results, file = "CSAW/DiffBinding_analysis.Rdata")
 
 #### SESSION INFO

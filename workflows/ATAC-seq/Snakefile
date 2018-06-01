@@ -93,6 +93,7 @@ onstart:
 ### main rule ##################################################################
 ################################################################################
 #print(expand(os.path.join(outdir_MACS2, "{sample}"), sample = samples))
+localrules: CSAW
 rule all:
     input:
         expand(os.path.join(outdir_MACS2, "{sample}.short.bam"), sample = samples),
