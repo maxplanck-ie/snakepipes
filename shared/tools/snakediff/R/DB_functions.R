@@ -59,9 +59,8 @@ readfiles_chip <- function(sampleInfo, fragment_length, window_size, alleleSpeci
                                 full.names = TRUE )
     }
 
-    message("bam files used:")
-    print(bam.files)
-
+    message("bam files used: ")
+    message(bam.files)
     # readFiles using CSAW
     mincount <- 20
     message(paste0("Counting reads in windows.. windows with total counts < ", mincount, " are discarded"))
