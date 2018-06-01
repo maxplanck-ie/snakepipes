@@ -104,11 +104,10 @@ def run_Trimming(trim, fastqc):
 #        return([])
 
 def run_computeGCBias(gcbias):
+    file_list = []
     if gcbias:
         if not downsample:
             file_list = expand("deepTools_qc/computeGCBias/{sample}.filtered.GCBias.png", sample = samples)
-        else:
-            file_list = []
     return(file_list)
 
 def run_deepTools_qc():
