@@ -1,10 +1,8 @@
 import os
 
-
 ### snakemake_workflows initialization ########################################
 maindir = os.path.dirname(os.path.dirname(workflow.basedir))
 sys.path.append(os.path.join(maindir, "shared"))
-
 import common_functions as cf
 
 # load conda ENVs (path is relative to "shared/rules" directory)
@@ -107,13 +105,11 @@ def run_Trimming(trim, fastqc):
 
 def run_computeGCBias(gcbias):
     if gcbias:
-        file_list = expand("deepTools_qc/computeGCBias/{sample}.filtered.GCBias.png", sample = samples)
-        if 'allelic-mapping' in mode:
-            file_list.append(expand("deepTools_qc/computeGCBias/{sample}.{suffix}.GCBias.png",
-                                    sample = samples, suffix = ['genome1', 'genome2']))
-        return(file_list)
-    else:
-        return([])
+        if not downsample:
+            file_list = expand("deepTools_qc/computeGCBias/{sample}.filtered.GCBias.png", sample = samples)
+        else:
+            file_list = []
+    return(file_list)
 
 def run_deepTools_qc():
     file_list = []
@@ -184,7 +180,7 @@ onstart:
         print("$TMPDIR: ",os.getenv('TMPDIR', ""))
         print("$HOSTNAME: ",os.getenv('HOSTNAME', ""))
         print("-" * 80, "\n")
-#print(samples)
+
 
 ### main rule ##################################################################
 ################################################################################

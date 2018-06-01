@@ -16,38 +16,13 @@ rule bamCoverage_allelic:
         blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed
                     else "",
     log:
-        "bamCoverage/allele_specific/logs/bamCoverage.{sample}.{suffix}.log"
+        out = "bamCoverage/allele_specific/logs/bamCoverage.{sample}.{suffix}.out",
+        err = "bamCoverage/allele_specific/logs/bamCoverage.{sample}.{suffix}.err"
     benchmark:
         "bamCoverage/allele_specific/.benchmark/bamCoverage.{sample}.{suffix}.benchmark"
     threads: 16
     conda: CONDA_SHARED_ENV
-    shell: bamcov_cmd + " {params.blacklist}"
-
-
-### deepTools computeGCBias ####################################################
-
-rule computeGCBias_allelic:
-    input:
-        bam = "allelic_bams/{sample}.{suffix}.sorted.bam",
-        bai = "allelic_bams/{sample}.{suffix}.sorted.bam.bai",
-    output:
-        png = "deepTools_qc/computeGCBias/{sample}.{suffix}.GCBias.png",
-        tsv = "deepTools_qc/computeGCBias/{sample}.{suffix}.GCBias.freq.tsv"
-    params:
-        paired = paired,
-        fragment_length = fragment_length,
-        genome_size = int(genome_size),
-        genome_2bit = genome_2bit,
-        blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed
-                    else "",
-        median_fragment_length = "" if paired else "-fragmentLength " + fragment_length
-    log:
-        "deepTools_qc/logs/computeGCBias.{sample}.{suffix}.log"
-    benchmark:
-        "deepTools_qc/.benchmark/computeGCBias.{sample}.{suffix}.benchmark"
-    threads: 16
-    conda: CONDA_SHARED_ENV
-    shell: gcbias_cmd
+    shell: bamcov_cmd
 
 ### deepTools plotCoverage #####################################################
 
@@ -62,7 +37,8 @@ rule plotCoverage_allelic:
         read_extension = "--extendReads" if paired
                          else "--extendReads "+str(fragment_length)
     log:
-        "deepTools_qc/logs/plotCoverage_allelic.log"
+        out = "deepTools_qc/logs/plotCoverage_allelic.out",
+        err = "deepTools_qc/logs/plotCoverage_allelic.err"
     benchmark:
         "deepTools_qc/.benchmark/plotCoverage_allelic.benchmark"
     threads: 24
@@ -84,7 +60,8 @@ rule multiBamSummary_allelic:
         read_extension = "--extendReads" if paired
                          else "--extendReads "+str(fragment_length)
     log:
-        "deepTools_qc/logs/multiBamSummary_allelic.log"
+        out = "deepTools_qc/logs/multiBamSummary_allelic.out",
+        err = "deepTools_qc/logs/multiBamSummary_allelic.err"
     benchmark:
         "deepTools_qc/.benchmark/multiBamSummary_allelic.benchmark"
     threads: 24
@@ -104,7 +81,8 @@ rule plotCorrelation_pearson_allelic:
             "--plotFile " + "deepTools_qc/plotCorrelation/correlation.pearson.read_coverage_allelic.heatmap." + plot_format,
         title='fragment'
     log:
-        "deepTools_qc/logs/plotCorrelation_pearson_allelic.log"
+        out = "deepTools_qc/logs/plotCorrelation_pearson_allelic.out",
+        err = "deepTools_qc/logs/plotCorrelation_pearson_allelic.err"
     benchmark:
         "deepTools_qc/.benchmark/plotCorrelation_pearson_allelic.benchmark"
     conda: CONDA_SHARED_ENV
@@ -121,7 +99,8 @@ rule plotCorrelation_spearman_allelic:
             "--plotFile " + "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage_allelic.heatmap." + plot_format,
         title = 'fragment'
     log:
-        "deepTools_qc/logs/plotCorrelation_spearman_allelic.log"
+        out = "deepTools_qc/logs/plotCorrelation_spearman_allelic.out",
+        err = "deepTools_qc/logs/plotCorrelation_spearman_allelic.err"
     benchmark:
         "deepTools_qc/.benchmark/plotCorrelation_spearman_allelic.benchmark"
     conda: CONDA_SHARED_ENV
@@ -138,7 +117,8 @@ rule plotPCA_allelic:
                 "--plotFile " + "deepTools_qc/plotPCA/PCA.read_coverage_allelic." + plot_format,
         title='fragment'
     log:
-        "deepTools_qc/logs/plotPCA_allelic.log"
+        out = "deepTools_qc/logs/plotPCA_allelic.out",
+        err = "deepTools_qc/logs/plotPCA_allelic.err"
     benchmark:
         "deepTools_qc/.benchmark/plotPCA_allelic.benchmark"
     conda: CONDA_SHARED_ENV

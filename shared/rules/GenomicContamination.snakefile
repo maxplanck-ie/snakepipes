@@ -11,8 +11,9 @@ rule GContamination_featureCounts:
             log:
                 "GenomicContamination/{sample}.featurecounts.log"
             threads: 8
+            conda: CONDA_RNASEQ_ENV
             shell:
-                feature_counts_path+"featureCounts -T {threads} -a {input.gtf} -t transcript -o {output.txt} {input.bams} &>> {log}"
+                "featureCounts -T {threads} -a {input.gtf} -t transcript -o {output.txt} {input.bams} &>> {log}"
 
 rule GContamination_featurecount_report:
            input:

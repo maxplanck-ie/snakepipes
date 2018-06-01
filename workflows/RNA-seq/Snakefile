@@ -20,6 +20,10 @@ include: os.path.join(workflow.basedir, "internals.snakefile")
 
 # do workflow specific stuff now
 
+CONDA_SHARED_ENV = "envs/shared_environment.yaml"
+CONDA_RNASEQ_ENV = "envs/RNAseq_environment.yaml"
+CONDA_DNA_MAPPING_ENV = "envs/dna_mapping.yaml"
+
 ### include modules of other snakefiles ########################################
 ################################################################################
 ## FASTQ: either downsample FASTQ files or create symlinks to input files
@@ -48,7 +52,7 @@ if "allelic-mapping" in mode:
         star_index_allelic = 'snp_genome/star_Nmasked/Genome'
         if len(strains) == 1:
             allele_hybrid = 'single'
-            snp_file = "snp_genome/all_SNPs_" + strains[0] + "_" + genome + ".txt.gz "
+            snp_file = "snp_genome/all_SNPs_" + strains[0] + "_" + genome + ".txt.gz"
         elif len(strains) == 2:
             allele_hybrid = 'dual'
             snp_file = "snp_genome/all_" + strains[1] + "_SNPs_" + strains[0] + "_reference.based_on_" + genome + ".txt"
@@ -141,6 +145,7 @@ def run_mapping():
     if "mapping" in mode:
         file_list = [
         "Sambamba/flagstat_report_all.tsv",
+        expand(mapping_prg+"/{sample}.bam", sample = samples),
         expand(mapping_prg+"/{sample}.bam.bai", sample = samples),
         expand("featureCounts/{sample}.counts.txt", sample=samples),
         "featureCounts/counts.tsv",
@@ -190,29 +195,27 @@ def run_deeptools_qc():
         file_list = [
         expand("bamCoverage/{sample}.RPKM.bw", sample = samples),
         expand("bamCoverage/{sample}.coverage.bw", sample = samples),
-        "deepTools_qc/plotEnrichment/plotEnrichment.png",
         "deepTools_qc/plotEnrichment/plotEnrichment.tsv",
         "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv",
         expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample = samples)]
         if len(samples)>1:
             file_list.append( ["deepTools_qc/multiBigwigSummary/coverage.bed.npz",
-                              "deepTools_qc/plotCorrelation/correlation.pearson.bed_coverage.heatmap.png",
-                              "deepTools_qc/plotCorrelation/correlation.spearman.bed_coverage.heatmap.png",
-                              "deepTools_qc/plotPCA/PCA.bed_coverage.png"] )
+                              "deepTools_qc/plotCorrelation/correlation.pearson.bed_coverage.tsv",
+                              "deepTools_qc/plotCorrelation/correlation.spearman.bed_coverage.tsv",
+                              "deepTools_qc/plotPCA/PCA.bed_coverage.tsv"] )
         if 'allelic-mapping' in mode:
-            file_list.append(["deepTools_qc/plotEnrichment/plotEnrichment_allelic.png",
-                              "deepTools_qc/plotEnrichment/plotEnrichment_allelic.tsv"])
+            file_list.append(["deepTools_qc/plotEnrichment/plotEnrichment_allelic.tsv"])
             if len(samples)>1:
                 file_list.append( ["deepTools_qc/multiBigwigSummary/coverage_allelic.bed.npz",
-                                   "deepTools_qc/plotCorrelation/correlation.pearson.bed_coverage_allelic.heatmap.png",
-                                   "deepTools_qc/plotCorrelation/correlation.spearman.bed_coverage_allelic.heatmap.png",
-                                   "deepTools_qc/plotPCA/PCA.bed_coverage_allelic.png"] )
+                                   "deepTools_qc/plotCorrelation/correlation.pearson.bed_coverage_allelic.tsv",
+                                   "deepTools_qc/plotCorrelation/correlation.spearman.bed_coverage_allelic.tsv",
+                                   "deepTools_qc/plotPCA/PCA.bed_coverage_allelic.tsv"] )
         return(file_list)
     else:
         return([])
 
 def run_GenomicContamination():
-    if genomic_contamination:
+    if dnaContam:
        file_list = ["GenomicContamination/genomic_contamination_featurecount_report.tsv"]
        return (file_list)
     else:
@@ -230,8 +233,7 @@ onstart:
         print("read extension:", reads)
         print("fastq dir:", fastq_dir)
         print("filter annotation:", filter_annotation)
-        print("RNA strandness:", rna_strandness)
-        print("Salmon libtype:", salmon_libtype)
+        print("FeatureCounts library type:", library_type)
         print("Sample info:", sample_info)
         print("-" * 80, "\n")
 
@@ -247,7 +249,7 @@ localrules: FASTQ
 
 rule all:
     input:
-        expand("FASTQ/{sample}{read}.fastq.gz", sample = samples, read = reads),
+       # expand("FASTQ/{sample}{read}.fastq.gz", sample = samples, read = reads),
         run_FastQC(fastqc),
         run_Trimming(trim, fastqc),
         "Annotation/genes.annotated.bed",
@@ -256,7 +258,7 @@ rule all:
         run_mapping_free(),            # Salmon
         run_mapping(),                 # classical mapping + counting
         run_allelesp_mapping(),        # allelic-mapping
-        make_nmasked_genome(),
+#        make_nmasked_genome(),
         run_deeptools_qc(),
         run_GenomicContamination(),
         "multiQC/multiqc_report.html"
