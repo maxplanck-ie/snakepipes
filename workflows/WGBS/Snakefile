@@ -12,7 +12,7 @@ import common_functions as cf
 workflow_tools=os.path.join(maindir, "shared", "tools")
 
 # load conda ENVs (path is relative to "shared/rules" directory)
-#CONDA_SHARED_ENV = "envs/shared_environment.yaml"
+CONDA_SHARED_ENV = "envs/shared_environment.yaml"
 
 # load config file
 globals().update(cf.load_configfile(workflow.overwrite_configfile,config["verbose"]))
