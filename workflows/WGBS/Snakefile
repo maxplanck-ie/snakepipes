@@ -14,13 +14,8 @@ sys.path.append(os.path.join(maindir, "shared"))
 import common_functions as cf
 workflow_tools=os.path.join(maindir, "shared", "tools")
 
-<<<<<<< HEAD
-# load tool paths
-#globals().update(cf.load_paths(os.path.join(maindir, "shared", "paths.yaml"),maindir,config["verbose"]))
-=======
 # load conda ENVs (path is relative to "shared/rules" directory)
 CONDA_SHARED_ENV = "envs/shared_environment.yaml"
->>>>>>> 2490d918428cfbb0829e963554432c92f23c935d
 # load config file
 globals().update(cf.load_configfile(workflow.overwrite_configfile,config["verbose"]))
 # load organism-specific data, i.e. genome indices, annotation, etc.
