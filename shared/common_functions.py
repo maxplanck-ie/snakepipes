@@ -181,6 +181,11 @@ def make_temp_dir(tempdir, fallback_dir, verbose=False):
 
 def checkAlleleParams(args):
     # first some sanity checks
+    mode = list(map(str.strip, re.split(',|;', args.mode)))
+    mode = [element.lower() for element in mode]
+    if "allelic-mapping" in mode and "mapping" in mode:
+        print("\nError! Please specify either allelic-mapping or mapping for option --mode! \n")
+        exit(1)
     if "allelic-mapping" in args.mode:
         if not os.path.exists(args.SNPfile):
             # if no SNPfile, check for a VCF file

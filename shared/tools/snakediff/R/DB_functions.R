@@ -101,8 +101,7 @@ makeQCplots_chip <- function(bam.file, outplot, pe.param){
         windowed <- csaw::windowCounts(curbam, spacing = 50, param = pe.param, filter = 20)
         rwsms <- rowSums(SummarizedExperiment::assay(windowed))
         maxed <- csaw::findMaxima(SummarizedExperiment::rowRanges(windowed), range = 1000, metric = rwsms)
-        curbam.out <- csaw::profileSites(curbam, SummarizedExperiment::rowRanges(windowed)[maxed],
-                               param = pe.param, weight = 1/rwsms[maxed])
+        curbam.out <- csaw::profileSites(curbam, SummarizedExperiment::rowRanges(windowed)[maxed], param = pe.param)
         return(curbam.out)
     }
     collected <- plotwc(bam.file)
