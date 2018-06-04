@@ -8,7 +8,7 @@ MPI-IE Snakemake workflows : snakePipes
 
 .. image:: https://travis-ci.org/maxplanck-ie/snakepipes.svg?branch=develop
     :target: https://travis-ci.org/maxplanck-ie/snakepipes
-    :alt: Build Status
+    :alt: Build Staus
 
 .. image:: https://zenodo.org/badge/54579435.svg
     :target: https://zenodo.org/badge/latestdoi/54579435
