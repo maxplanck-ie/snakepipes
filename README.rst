@@ -6,9 +6,9 @@ MPI-IE Snakemake workflows : snakePipes
     :target: http://snakepipes.readthedocs.io/en/latest/?badge=latest
     :alt: Documentation Status
 
-.. image:: https://travis-ci.org/maxplanck-ie/snakemake_workflows.svg?branch=develop
-    :target: https://travis-ci.org/maxplanck-ie/snakemake_workflows
-    :alt: Build Status
+.. image:: https://travis-ci.org/maxplanck-ie/snakepipes.svg?branch=develop
+    :target: https://travis-ci.org/maxplanck-ie/snakepipes
+    :alt: Build Staus
 
 .. image:: https://zenodo.org/badge/54579435.svg
     :target: https://zenodo.org/badge/latestdoi/54579435

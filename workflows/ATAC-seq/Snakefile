@@ -95,7 +95,7 @@ onstart:
 #print(expand(os.path.join(outdir_MACS2, "{sample}"), sample = samples))
 rule all:
     input:
-        expand(os.path.join(outdir_MACS2, "{sample}.short.bam"), sample = samples),
+        #expand(os.path.join(outdir_MACS2, "{sample}.short.bam"), sample = samples),
         expand(os.path.join(outdir_MACS2, "{sample}.filtered.BAM_peaks.xls"), sample = samples),
         expand(os.path.join(outdir_ATACqc,"{sample}.filtered.BAM_peaks.qc.txt"), sample = samples),
         os.path.join(deeptools_ATAC, "plotFingerprint/plotFingerprint.metrics.txt"),
