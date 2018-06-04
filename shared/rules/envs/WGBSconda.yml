@@ -18,4 +18,4 @@ dependencies:
   - r-reshape2
   - r-dplyr=0.7.4
   - bioconductor-genomicranges=1.30.0
-  - bioconductor-biomart=2.32.1
+  - bioconductor-biomart=2.34.2
