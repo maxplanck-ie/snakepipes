@@ -46,6 +46,7 @@ if mapping_prg == "STAR":
                 " --alignIntronMin 1"
                 " --alignIntronMax 1000000"
                 " --alignMatesGapMax 1000000"
+                " --outBAMsortingBinsN 100"
                 " && mv {params.prefix}Aligned.sortedByCoord.out.bam {output} "
     else:
         rule STAR_allele:
@@ -89,6 +90,7 @@ if mapping_prg == "STAR":
                 " --alignIntronMin 1"
                 " --alignIntronMax 1000000"
                 " --alignMatesGapMax 1000000"
+                " --outBAMsortingBinsN 100"
                 " && mv {params.prefix}Aligned.sortedByCoord.out.bam {output}"
 else:
     print("Only STAR is implemented for Allele-specific mapping")
