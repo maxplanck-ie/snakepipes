@@ -319,11 +319,10 @@ rule get_flagstat:
     output:
         fstat="QC_metrics/{sample}.flagstat"
     log:
-        err="QC_metrics/logs/{sample}.get_flagstat.err",
-        out="QC_metrics/logs/{sample}.get_flagstat.out"
+        err="QC_metrics/logs/{sample}.get_flagstat.err"        
     threads: 1
     conda: CONDA_SHARED_ENV
-    shell: "samtools flagstat {input.rmDupbam} > {output.fstat} 1>{log.out} 2>{log.err}" 
+    shell: "samtools flagstat {input.rmDupbam} > {output.fstat} 2>{log.err}" 
 
 rule produce_report:
     input:
