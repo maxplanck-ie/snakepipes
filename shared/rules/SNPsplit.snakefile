@@ -6,6 +6,7 @@ if mapping_prg == "Bowtie2":
             snp = snp_file,
             bam = "filtered_bam/{sample}.filtered.bam"
         output:
+            temp("filtered_bam/{sample}.sortedByName.bam"),
             expand("allelic_bams/{{sample}}.filtered.{suffix}.bam", suffix = ['allele_flagged', 'genome1', 'genome2', 'unassigned'])
         params:
             paired = '--paired' if paired else '',
@@ -20,6 +21,7 @@ elif mapping_prg == "STAR":
             snp = snp_file,
             bam = mapping_prg+"/{sample}.bam"
         output:
+            temp(mapping_prg+"/{sample}.sortedByName.bam"),
             expand("allelic_bams/{{sample}}.{suffix}.bam", suffix = ['allele_flagged', 'genome1', 'genome2', 'unassigned'])
         params:
             paired = '--paired' if paired else '',
