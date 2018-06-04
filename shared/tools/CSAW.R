@@ -1,31 +1,24 @@
+#!/usr/bin/env Rscript
 ## ChIPseq differential binding workflow
 
-## Usage: cat CSAW.R | /package/R-3.2.0/bin/R --vanilla --quiet --args samplesheet.tsv 0.05 TRUE FALSE
+sampleInfoFilePath <- snakemake@input[["sample_info"]]  #"samplesheet.tab"
+insert_size_metrics <- snakemake@input[["insert_size_metrics"]] # bamPEFragmentSize output
+fdr <- as.numeric(snakemake@params[["fdr"]])
+paired <- as.logical(snakemake@params[["paired"]])
+fraglength <- as.numeric(snakemake@params[["fragment_length"]])  # used when the data is not paired end
+windowSize <- as.numeric(snakemake@params[["window_size"]])
+importfunc <- snakemake@params[["importfunc"]]  #"DB_functions.R"
+allelic_info <- as.logical(snakemake@params[["allele_info"]])
 
-# args 1 : sample information matrix (tsv)
-# args 2 : FDR cutoff
-# args 3 : paired-end info
-# args 4 : seq fragment length
-# args 5 : window size to count reads
-# args 6 : allele-specific info
-# args 7 : path to DB_functions
-
-## get Args
-args = commandArgs(TRUE)
-
-sampleInfoFilePath <- args[1] #"samplesheet.tab"
-fdr <- as.numeric(args[2])
-paired <- as.logical(args[3])
-fraglength <- as.numeric(args[4])
-windowSize <- as.numeric(args[5])
-importfunc <- args[6] #"~/programs/snakemake_workflows/shared/tools/DB_functions.R"
-allelic_info <- as.logical(args[7])
+## create output directory
 
 # include functions
-source(importfunc)
-library(GenomicRanges)
+sink("CSAW/CSAW.log", append=TRUE)
+source(paste(snakemake@config[["main_dir_path"]], snakemake@params[["importfunc"]], sep="/"))
+suppressPackageStartupMessages(library(GenomicRanges))
 ## fix default FDR significance threshold
 if ( is.na(fdr) ) fdr <- 0.05
+if (!dir.exists("CSAW")) dir.create("CSAW")
 
 ## print the info
 cat(paste("Working dir:", getwd(), "\n"))
@@ -34,37 +27,36 @@ cat(paste("FDR:", fdr, "\n"))
 cat(paste("paired-end? :", paired, "\n"))
 cat(paste("allele-specific? :", allelic_info, "\n"))
 
-## create output directory
-dir.create("CSAW")
-
 ## sampleInfo (setup of the experiment)
 sampleInfo <- read.table(sampleInfoFilePath, header = TRUE, colClasses = c("character", "factor"))
 
 ## is paired end? : define read params
+pe = "none"
 if(isTRUE(paired)) {
-    pe_param <- csaw::readParam(max.frag = 500, pe = "both")
-} else {
-    pe_param <- csaw::readParam(max.frag = 500, pe = "none")
+    pe = "both"
+    d = read.delim(insert_size_metrics)
+    fraglength = median(d[,6])
 }
+pe_param <- csaw::readParam(max.frag = 500, pe = pe)  # Some CSAW functions explode the processor count with >1 core
 
 ## Read data
 chip_object <- readfiles_chip(sampleInfo = sampleInfo,
-                    fragment_length = fraglength,
-                    window_size = windowSize,
-                    alleleSpecific = allelic_info,
-                    pe.param = pe_param)
+                              fragment_length = fraglength,
+                              window_size = windowSize,
+                              alleleSpecific = allelic_info,
+                              pe.param = pe_param)
 
-## make QC plot for one sample
+## make QC plot for first and last sample
 first_bam <- head(SummarizedExperiment::colData(chip_object$windowCounts)$bam.files, n = 1)
 last_bam <- tail(SummarizedExperiment::colData(chip_object$windowCounts)$bam.files, n = 1)
 
 print(paste0("Making QC plots for first sample : ", first_bam))
-#makeQCplots_chip(bam.file = first_bam, outplot = "CSAW/QCplots_first_sample.pdf", pe.param = pe_param)
+makeQCplots_chip(bam.file = first_bam, outplot = "CSAW/QCplots_first_sample.pdf", pe.param = pe_param)
 
 print(paste0("Making QC plots for last sample : ", last_bam))
-#makeQCplots_chip(bam.file = last_bam, outplot = "CSAW/QCplots_last_sample.pdf", pe.param = pe_param)
+makeQCplots_chip(bam.file = last_bam, outplot = "CSAW/QCplots_last_sample.pdf", pe.param = pe_param)
 
-## merge all peaks from the samples mentioned in sampleinfo to test (exclude "Input")
+## merge all peaks from the samples mentioned in sampleinfo to test (exclude "Control")
 # get files to read from MACS
 fnames <- sampleInfo[sampleInfo$condition != "control",]$name
 
@@ -83,6 +75,7 @@ allpeaks <- lapply(fnames, function(x) {
     bed.gr <- GRanges(seqnames = bed$V1, ranges = IRanges(start = bed$V2, end = bed$V3), name = bed$V4)
     return(bed.gr)
     })
+
 # merge
 allpeaks <- Reduce(function(x,y) GenomicRanges::union(x,y), allpeaks)
 
@@ -107,6 +100,7 @@ writeOutput_chip(chip_results, outfile_prefix = "CSAW/DiffBinding", fdrcutoff = 
 
 ## save data
 print("Saving data")
+sink()
 save(chip_object, chip_results, file = "CSAW/DiffBinding_analysis.Rdata")
 
 #### SESSION INFO

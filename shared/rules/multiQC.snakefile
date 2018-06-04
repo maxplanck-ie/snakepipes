@@ -54,6 +54,7 @@ def multiqc_input_check(return_value):
     else:
         return(indir)
 
+
 rule multiQC:
     input:
         multiqc_input_check(return_value = "infiles")

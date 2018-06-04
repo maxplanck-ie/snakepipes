@@ -113,7 +113,7 @@ plotFingerprint_cmd = """
             {params.blacklist} \
             {params.png} \
             {params.read_extension} \
-            {params.jsd}  > {log.out} 2> {log.err}
+            {params.jsd}  &> {log}
     """
 
 

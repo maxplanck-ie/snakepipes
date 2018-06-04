@@ -148,7 +148,7 @@ def get_fragment_length(infile, sampleName):
     with open(infile, "r") as f:
         for line in f:
             line = line.strip()
-            if line.startswith(sampleName):
+            if line.startswith("filtered_bam/{}".format(sampleName)):
                 try:
                     median = line.split()[5]
                     return float(median)
@@ -181,6 +181,11 @@ def make_temp_dir(tempdir, fallback_dir, verbose=False):
 
 def checkAlleleParams(args):
     # first some sanity checks
+    mode = list(map(str.strip, re.split(',|;', args.mode)))
+    mode = [element.lower() for element in mode]
+    if "allelic-mapping" in mode and "mapping" in mode:
+        print("\nError! Please specify either allelic-mapping or mapping for option --mode! \n")
+        exit(1)
     if "allelic-mapping" in args.mode:
         if not os.path.exists(args.SNPfile):
             # if no SNPfile, check for a VCF file
