@@ -332,7 +332,6 @@ def main():
 
     # Produce the DAG if desired
     if args.createDAG:
-        print(" ".join(snakemake_cmd + ['--rulegraph']))
         DAGproc = subprocess.Popen(snakemake_cmd + ['--rulegraph'], stdout=subprocess.PIPE)
         _ = open("{}/pipeline.pdf".format(args.outdir), "wb")
         subprocess.check_call(["dot", "-Tpdf"], stdin=DAGproc.stdout, stdout=_)
