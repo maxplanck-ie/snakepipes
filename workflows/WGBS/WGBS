@@ -280,7 +280,6 @@ def main():
     cf.write_configfile(os.path.join(args.wdir,'cluster_config.yaml'),cluster_config)
 
 
-#--use-conda --conda-prefix /data/processing/conda/envs --create-envs-only    
     snakemake_cmd = """
                     snakemake {snakemake_options} --latency-wait {latency_wait} --snakefile {snakefile} --jobs {max_jobs} --directory {wdir} --configfile {configfile} 
                     """.format( latency_wait = cluster_config["snakemake_latency_wait"],

@@ -1,7 +1,7 @@
 name: snakepipes_atac-seq_1.0
 channels:
- - bioconda
  - conda-forge
+ - bioconda
 dependencies:
  - samtools = 1.7
  - bioconductor-csaw = 1.12.0
