@@ -30,10 +30,10 @@ rule bamCoverage_raw_allelic:
     params:
         bw_binsize = bw_binsize
     log:
-        out="bamCoverage/allele_specificlogs/bamCoverage_coverage.{sample}.out",
-        err="bamCoverage/allele_specificlogs/bamCoverage_coverage.{sample}.err"
+        out="bamCoverage/allele_specificlogs/bamCoverage_coverage.{sample}.{suffix}.out",
+        err="bamCoverage/allele_specificlogs/bamCoverage_coverage.{sample}.{suffix}.err"
     benchmark:
-        "bamCoverage/allele_specific.benchmark/bamCoverage_coverage.{sample}.benchmark"
+        "bamCoverage/allele_specific.benchmark/bamCoverage_coverage.{sample}.{suffix}.benchmark"
     threads: 8
     shell: bamcov_raw_cmd
 
