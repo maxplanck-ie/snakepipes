@@ -45,6 +45,10 @@ include: os.path.join(maindir, "shared", "deeptools_cmds.snakefile")
 ## bamCoverage_RPKM
 include: os.path.join(maindir, "shared", "rules", "deepTools_RNA.snakefile")
 
+## sambamba
+include:os.path.join(maindir, "shared", "rules", "sambamba.snakefile")
+include:os.path.join(maindir, "shared", "rules", "RNA-seq_qc_report.snakefile")
+
 ## Allele-specific JOBS
 if "allelic-mapping" in mode:
     # Updated global vars if mode = "allelic-mapping"
@@ -82,11 +86,6 @@ if "mapping-free" in mode:
     ## Sleuth (on Salmon)
     if sample_info:
         include: os.path.join(maindir, "shared", "rules", "sleuth.snakefile")
-
-## Sambamba
-if "mapping" in mode or "allelic-mapping" in mode:
-    include:os.path.join(maindir, "shared", "rules", "sambamba.snakefile")
-    include:os.path.join(maindir, "shared", "rules", "RNA-seq_qc_report.snakefile")
 
 ## DESeq2
 if sample_info:
@@ -254,7 +253,7 @@ rule all:
         run_Trimming(trim, fastqc),
         "Annotation/genes.annotated.bed",
         "Annotation/genes.filtered.bed",
-        "Annotation/genes.filtered.saf",    # this file is used for featureCounts later on!
+#        "Annotation/genes.filtered.saf",    # this file is used for featureCounts later on!
         run_mapping_free(),            # Salmon
         run_mapping(),                 # classical mapping + counting
         run_allelesp_mapping(),        # allelic-mapping

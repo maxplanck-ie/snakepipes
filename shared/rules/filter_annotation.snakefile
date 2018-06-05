@@ -91,15 +91,15 @@ rule annotation_bed2fasta:
         "bedtools getfasta -name -s -split -fi {input.genome_fasta} -bed {input.bed} | sed 's/(.*)//g' > {output}"
 
 
-rule annotation_bed2saf:
-    input:
-        bed_annot = "Annotation/genes.annotated.bed"
-    output:
-        bed_filtered = "Annotation/genes.filtered.saf"
-    params:
-        pattern =  str(filter_annotation or '\'\'')
-    shell:
-        """echo -e 'GeneID\tChr\tStart\tEnd\tStrand' > {output} && grep {params.pattern} {input} | awk 'BEGIN{{OFS="\t"}}{{print $16, $1, $2, $3, $6}}' >> {output} """
+#rule annotation_bed2saf:
+#    input:
+#        bed_annot = "Annotation/genes.annotated.bed"
+#    output:
+#        bed_filtered = "Annotation/genes.filtered.saf"
+#    params:
+#        pattern =  str(filter_annotation or '\'\'')
+#    shell:
+#        """echo -e 'GeneID\tChr\tStart\tEnd\tStrand' > {output} && grep {params.pattern} {input} | awk 'BEGIN{{OFS="\t"}}{{print $16, $1, $2, $3, $6}}' >> {output} """
 
 
 rule annotation_bed2gtf_transcripts:
