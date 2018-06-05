@@ -113,6 +113,11 @@ def parse_args(defaults={"verbose":None,"configfile":None,"cluster_configfile":N
                         "$TMPDIR and is removed at the end of this wrapper! (default: '%(default)s')",
                         default=defaults["tempdir"])
 
+    general.add_argument("--DAG",
+                         dest="createDAG",
+                         action="store_true",
+                         help="If specified, a file called pipeline.pdf is produced in the output directory that shows the rules used and their relationship to each other.")
+
     ## optional
     optional = parser.add_argument_group('Optional arguments')
     optional.add_argument("-m", "--mode",
@@ -308,6 +313,13 @@ def main():
                                 snakemake_options = str(args.snakemake_options or ''),
                                 configfile = os.path.join(args.outdir,'config.yaml'),
                               ).split()
+
+    # Produce the DAG if desired
+    if args.createDAG:
+        DAGproc = subprocess.Popen(snakemake_cmd + ['--rulegraph'], stdout=subprocess.PIPE)
+        _ = open("{}/pipeline.pdf".format(args.workingdir), "wb")
+        subprocess.check_call(["dot", "-Tpdf"], stdin=DAGproc.stdout, stdout=_)
+        _.close()
 
     if args.verbose:
         snakemake_cmd.append("--printshellcmds")
