@@ -48,7 +48,7 @@ def parse_args(defaults={"verbose":None,"configfile":None,"cluster_configfile":N
     ## positional/required
     parser.add_argument("genome",
                         metavar="GENOME",
-                        help="Genome acronym of target organism (supported: 'dm3', 'dm6', 'hs37d5', 'mm9', 'mm10', 'SchizoSPombe_ASM294v2')")
+                        help="Genome acronym of target organism (supported: 'dm3', 'dm6', 'hs37d5', 'hg38', 'mm9', 'mm10', 'SchizoSPombe_ASM294v2')")
 
     required = parser.add_argument_group('required arguments')
     required.add_argument("-i", "--input-dir",

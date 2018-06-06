@@ -1,5 +1,6 @@
 ### histoneHMM broad enrichment calling ########################################
 
+# -b 750 -P 0.1
 rule histoneHMM:
     input:
         "filtered_bam/{sample}.filtered.bam"
@@ -14,15 +15,11 @@ rule histoneHMM:
         "histoneHMM/logs/histoneHMM.{sample}.filtered.log"
     benchmark:
         "histoneHMM/.benchmark/histoneHMM.{sample}.filtered.benchmark"
-    shell:
-      "export R_LIBS_USER="+R_libs_path+" && "+
-      R_path+"Rscript "+histoneHMM_path+"histoneHMM_call_regions.R "
-        "-b 750 "
-        "-c {params.genome_index} "
-        "-o {params.prefix} "
-        "-P 0.1 "
-        "{input} "
-        "&> {log}"
+    conda: CONDA_CHIPSEQ_ENV
+    shell: """
+        RHOME=`R RHOME`
+        $RHOME/library/histoneHMM/bin/histoneHMM_call_regions.R -b 750 -c {params.genome_index} -o {params.prefix} -P 0.1 {input} &> {log}
+        """
 
 
 ### compress and index GFF result file from histoneHMM for usage with IGV ######
@@ -43,11 +40,10 @@ rule histoneHMM_out_gz:
     benchmark:
         "histoneHMM/.benchmark/histoneHMM_out_gz.{sample}.filtered.benchmark"
     threads: 2
-    shell:
-        "grep -v ^\"#\" {input.gff} | "
-        "sort -k1,1 -k4,4n | "+
-        tabix_path+"bgzip > {output.gff} && "+
-        tabix_path+"tabix -p gff {output.gff} "
-        "&> {log} && "+
-        "gzip {input.post} && "+
-        "gzip {input.txt}"
+    conda: CONDA_CHIPSEQ_ENV
+    shell: """
+        grep -v ^\"#\" {input.gff} | sort -k1,1 -k4,4n | bgzip > {output.gff}
+        tabix -p gff {output.gff} &> {log}
+        gzip {input.post}
+        gzip {input.txt}
+        """

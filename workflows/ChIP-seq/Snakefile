@@ -9,6 +9,8 @@ import common_functions as cf
 
 # load conda ENVs (path is relative to "shared/rules" directory)
 CONDA_SHARED_ENV = "envs/shared_environment.yaml"
+CONDA_CHIPSEQ_ENV = "envs/chip_seq.yaml"
+
 # load config file
 globals().update(cf.load_configfile(workflow.overwrite_configfile,config["verbose"]))
 # load organism-specific data, i.e. genome indices, annotation, etc.
@@ -19,6 +21,9 @@ include: os.path.join(workflow.basedir, "internals.snakefile")
 
 ### include modules of other snakefiles ########################################
 ################################################################################
+# deeptools cmds
+include: os.path.join(maindir, "shared", "deeptools_cmds.snakefile")
+
 # deepTools ChIP
 include: os.path.join(maindir, "shared", "rules", "deepTools_ChIP.snakefile")
 
@@ -28,15 +33,11 @@ include: os.path.join(maindir, "shared", "rules", "MACS2.snakefile")
 # QC report for all samples
 include: os.path.join(maindir, "shared", "rules", "ChiP-seq_qc_report.snakefile")
 
-# deeptools cmds
-include: os.path.join(maindir, "shared", "deeptools_cmds.snakefile")
-
 # sambamba
 #include: os.path.join(maindir, "shared", "rules", "sambamba.snakefile")
 
 # deeptools for allelic bams (if present)
 if os.path.isdir(os.path.join(workingdir,'allelic_bams') ) and os.listdir(os.path.join(workingdir,'allelic_bams') ) != []:
-    #print('allele-specific files detected')
     allele_info = 'TRUE'
     include: os.path.join(maindir, "shared", "rules", "deepTools_ChIP_allelic.snakefile")
 else:
@@ -65,8 +66,7 @@ def run_deepTools():
         file_list.append([
         "deepTools_ChIP/bamCompare/"+chip_sample+".filtered.log2ratio.over_"+control_name+".bw",
         "deepTools_ChIP/bamCompare/"+chip_sample+".filtered.subtract."+control_name+".bw",
-        "deepTools_ChIP/plotFingerprint/plotFingerprint.metrics.txt",
-        "deepTools_ChIP/bamPEFragmentSize/fragmentSize.metric.tsv"
+        "deepTools_ChIP/plotFingerprint/plotFingerprint.metrics.txt"
         ])
     return(file_list)
 

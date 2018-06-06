@@ -151,7 +151,7 @@ def get_fragment_length(infile, sampleName):
             if line.startswith("filtered_bam/{}".format(sampleName)):
                 try:
                     median = line.split()[5]
-                    return float(median)
+                    return int(float(median))
                 except TypeError:
                     print("ERROR: File", infile, "is NOT an output from bamPEFragmentSize.\n")
                     exit(1)
