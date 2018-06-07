@@ -13,7 +13,7 @@ bamcompare_log2_cmd = """
                --binSize {params.bw_binsize} \
                -p {threads} \
                {params.read_extension} \
-               {params.blacklist} > {log.out} 2> {log.err}
+               {params.blacklist} &> {log}
     """
 
 # bamcompare subtract
@@ -29,7 +29,7 @@ bamcompare_subtract_cmd = """
                --binSize {params.bw_binsize} \
                -p {threads} \
                {params.read_extension} \
-               {params.blacklist}  > {log.out} 2> {log.err}
+               {params.blacklist}  &> {log}
     """
 
 # bamCoverage RAW
@@ -98,7 +98,7 @@ plotEnrich_chip_cmd = """
         {params.blacklist} \
         -p {threads} \
         {params.read_extension} \
-        --ignoreDuplicates  > {log.out} 2> {log.err}
+        --ignoreDuplicates  &> {log}
     """
 
 #plot fingerprint (ChIP-seq)

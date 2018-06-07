@@ -23,6 +23,6 @@ rule sleuth_Salmon:
         "../{params.outdir} "
         "{params.fdr} "
         "../{input.t2g} "
-        "2>&1 | tee {log}"
+        "2>&1 > {log}"
 
 ## sleuth (on Salmon)

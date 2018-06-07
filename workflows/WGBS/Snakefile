@@ -168,6 +168,7 @@ rule all:
 ### execute after workflow finished ############################################
 ################################################################################
 onsuccess:
+    cf.cleanLogs(wdir)
     if "verbose" in config and config["verbose"]:
         with open (os.path.join(wdir, 'pipeline.log'),"a") as lo:
             print("--- WGBS workflow finished successfully! --------------------------------",file=lo)#\n \n

@@ -13,8 +13,7 @@ rule bamCoverage:
         ignoreForNorm = "--ignoreForNormalization {}".format(ignore_forNorm) if ignore_forNorm else "",
         read_extension = "--extendReads" if paired
                          else "--extendReads {}".format(fragment_length),
-        blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed
-                    else "",
+        blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed else "",
     log:
         out = "bamCoverage/logs/bamCoverage.{sample}.out",
         err = "bamCoverage/logs/bamCoverage.{sample}.err"
@@ -86,8 +85,7 @@ rule multiBamSummary:
         "deepTools_qc/multiBamSummary/read_coverage.bins.npz"
     params:
         labels = " ".join(samples),
-        blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed
-                    else "",
+        blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed else "",
         read_extension = "--extendReads" if paired
                          else "--extendReads {}".format(fragment_length)
     log:
@@ -184,9 +182,8 @@ rule computeGCBias:
         fragment_length = fragment_length,
         genome_size = int(genome_size),
         genome_2bit = genome_2bit,
-        blacklist = "--blackListFileName "+ blacklist_bed if blacklist_bed
-                    else "",
-        median_fragment_length = "" if paired else "-fragmentLength " + fragment_length,
+        blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed else "",
+        median_fragment_length = "" if paired else "-fragmentLength {}".format(fragment_length),
         sampleSize = downsample if downsample and downsample < 10000000 else 10000000
     log:
         out = "deepTools_qc/logs/computeGCBias.{sample}.filtered.out",
@@ -206,7 +203,7 @@ rule bamPE_fragment_size:
         "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv"
     params:
         plotcmd = "" if plot_format == 'None' else
-                "-o deepTools_qc/bamPEFragmentSize/fragmentSizes.{}".format(plot_format),
+                "-o deepTools_qc/bamPEFragmentSize/fragmentSizes.{}".format(plot_format)
     log:
         out = "deepTools_qc/logs/bamPEFragmentSize.out",
         err = "deepTools_qc/logs/bamPEFragmentSize.err"
