@@ -266,5 +266,6 @@ rule all:
 ### execute after  finished ####################################################
 ################################################################################
 onsuccess:
+    cf.cleanLogs(outdir)
     if "verbose" in config and config["verbose"]:
         print("\n--- RNA-seq workflow finished successfully! ------------------------------------\n")

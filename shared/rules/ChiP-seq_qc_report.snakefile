@@ -14,8 +14,10 @@ rule report_flagstat_all_data:
         expand("Sambamba/{sample}.dup.converted.tsv",sample=all_samples)
     output:
         "Sambamba/flagstat_report_all.tsv"
-    shell:
-        "cat {input} | sort -k1,1V | cat <( echo -e 'sample\ttotal\tdup\tmapped') - > {output}"
+    shell: """
+        echo -e 'sample\ttotal\tdup\tmapped' > {output}
+        sort -k1,1V {input} >> {output}
+        """
 
 ##########QC report for all the samples#########
 rule qc_report_all:
@@ -25,5 +27,5 @@ rule qc_report_all:
     output:
         "QC_report/QC_report_all.tsv"
     shell: """
-        cat {input.metrics} | awk 'NR == 1; NR > 1 {{print $0 | \"sort -K1,1V\"}}' | cut -f4,8,10,12 | paste {input.flagstat} - > {output}
+        awk 'NR == 1; NR > 1 {{print $0 | \"sort -K1,1V\"}}' {input.metrics} | cut -f4,8,10,12 | paste {input.flagstat} - > {output}
         """
