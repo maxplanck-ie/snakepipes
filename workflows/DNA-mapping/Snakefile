@@ -207,5 +207,6 @@ rule all:
 ### execute after workflow finished ############################################
 ################################################################################
 onsuccess:
+    cf.cleanLogs(outdir)
     if "verbose" in config and config["verbose"]:
         print("\n--- DNA mapping workflow finished successfully! --------------------------------\n")

@@ -5,6 +5,7 @@ import subprocess
 import os
 import re
 import yaml
+import glob
 
 
 def get_snakepipes_path():
@@ -151,7 +152,7 @@ def get_fragment_length(infile, sampleName):
             if line.startswith("filtered_bam/{}".format(sampleName)):
                 try:
                     median = line.split()[5]
-                    return float(median)
+                    return int(float(median))
                 except TypeError:
                     print("ERROR: File", infile, "is NOT an output from bamPEFragmentSize.\n")
                     exit(1)
@@ -208,3 +209,17 @@ def checkAlleleParams(args):
     else:
         allele_mode = None
     return allele_mode
+
+
+def cleanLogs(d):
+    """
+    Remove all empty log files, both in cluster_logs/ and */logs/
+    """
+    for f in glob.glob(os.path.join(d, "cluster_logs", "*")):
+        s = os.stat(f)
+        if s.st_size == 0:
+            os.remove(f)
+    for f in glob.glob(os.path.join(d, "*", "logs", "*")):
+        s = os.stat(f)
+        if s.st_size == 0:
+            os.remove(f)

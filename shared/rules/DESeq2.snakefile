@@ -40,7 +40,7 @@ rule DESeq2:
         "{params.importfunc} " # 5
         "{params.allele_info} " # 6
         "{params.tx2gene_file} " # 7
-        " 2>&1 | tee {log}"
+        " 2>&1 > {log}"
 
 
 ## DESeq2 (on Salmon)
@@ -73,4 +73,4 @@ rule DESeq2_Salmon:
         "{params.importfunc} " # 5
         "{params.allele_info} " # 6
         "../{input.tx2gene_file} " # 7
-        " 2>&1 | tee {log}"
+        " 2>&1 > {log}"

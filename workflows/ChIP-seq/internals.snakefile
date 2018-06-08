@@ -26,10 +26,10 @@ def get_control_name(sample):
     Return False if given ChIP-seq sample has no control
     """
     if sample in chip_samples_w_ctrl:
-        if 'control_name' in chip_dict[sample] and chip_dict[sample]['control_name'] != None:
-            return(chip_dict[sample]['control_name'])
+        if 'control' in chip_dict[sample] and chip_dict[sample]['control'] != None:
+            return chip_dict[sample]['control']
         else:
-            return('Input')
+            return False
     else:
         return False
 
@@ -111,8 +111,6 @@ for sample in all_samples:
         os.path.join(workingdir, "filtered_bam/"+sample+".filtered.bam.bai"),
         os.path.join(workingdir, "Picard_qc/AlignmentSummaryMetrics/"+sample+".alignment_summary_metrics.txt"),
     ]
-    if paired:
-        req_files.append(os.path.join(workingdir, "Picard_qc/InsertSizeMetrics/"+sample+".insert_size_metrics.txt"))
 
     # check for all samples whether all required files exist
     for file in req_files:
@@ -120,3 +118,8 @@ for sample in all_samples:
             print('ERROR: Required file "{}" for sample "{}" specified in '
                   'configuration file is NOT available.'.format(file, sample))
             exit(1)
+
+if paired:
+    if not os.path.isfile(os.path.join(workingdir, "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv")):
+        sys.exit('ERROR: {} is required but not present\n'.format(os.path.join(workingdir, "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv")))
+        req_files.append(os.path.join(workingdir, "Picard_qc/InsertSizeMetrics/"+sample+".insert_size_metrics.txt"))
