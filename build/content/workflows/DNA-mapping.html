@@ -1,0 +1,523 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="python" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="python" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>DNA-mapping &mdash; snakePipes 0.6.2 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="ChIP-seq" href="ChIP-seq.html" />
+    <link rel="prev" title="Setting up the workflows" href="../setting_up.html" /> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> snakePipes
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.6
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../setting_up.html">Setting up the workflows</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">DNA-mapping</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#configuration-file">Configuration file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#structure-of-output-directory">Structure of output directory</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Positional Arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Named Arguments">Named Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#required arguments">required arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#general arguments">general arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Optional arguments">Optional arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#allele-specific mapping arguments">allele-specific mapping arguments</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ChIP-seq.html">ChIP-seq</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RNA-seq.html">RNA-seq</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scRNA-seq.html">scRNA-seq</a></li>
+<li class="toctree-l1"><a class="reference internal" href="HiC.html">HiC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ChangeLog.html">Change Log</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">snakePipes</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+      <li>DNA-mapping</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/content/workflows/DNA-mapping.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="dna-mapping">
+<span id="id1"></span><h1>DNA-mapping<a class="headerlink" href="#dna-mapping" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="configuration-file">
+<h2>Configuration file<a class="headerlink" href="#configuration-file" title="Permalink to this headline">¶</a></h2>
+<div class="code bash highlight-default notranslate"><div class="highlight"><pre><span></span>$ cat snakemake_workflows/workflows/DNA-mapping/defaults.yaml
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">################################################################################</span>
+<span class="c1"># This file is the default configuration of the DNA-mapping workflow!</span>
+<span class="c1">#</span>
+<span class="c1"># In order to adjust some parameters, please either use the wrapper script</span>
+<span class="c1"># (eg. /path/to/snakemake_workflows/workflows/DNA-mapping/DNA-mapping)</span>
+<span class="c1"># or save a copy of this file, modify necessary parameters and then provide</span>
+<span class="c1"># this file to the wrapper or snakmake via &#39;--configfile&#39; option</span>
+<span class="c1"># (see below how to call the snakefile directly)</span>
+<span class="c1">#</span>
+<span class="c1"># Own parameters will be loaded during snakefile executiuon as well and hence</span>
+<span class="c1"># can be used in new/extended snakemake rules!</span>
+<span class="c1">################################################################################</span>
+<span class="c1">## General/Snakemake parameters, only used/set by wrapper or in Snakemake cmdl, but not in Snakefile</span>
+<span class="n">outdir</span><span class="p">:</span>
+<span class="n">configfile</span><span class="p">:</span>
+<span class="n">local</span><span class="p">:</span> <span class="kc">False</span>
+<span class="n">max_jobs</span><span class="p">:</span> <span class="mi">5</span>
+<span class="n">snakemake_options</span><span class="p">:</span>
+<span class="n">tempdir</span><span class="p">:</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">extended</span><span class="o">/</span>
+<span class="c1">## directory with fastq files</span>
+<span class="n">indir</span><span class="p">:</span>
+<span class="c1">## preconfigured target genomes (mm9,mm10,dm3,...) , see /path/to/snakemake_workflows/shared/organisms/</span>
+<span class="c1">## Value can be also path to your own genome config file!</span>
+<span class="n">genome</span><span class="p">:</span>
+<span class="c1">## FASTQ file extension (default: &quot;.fastq.gz&quot;)</span>
+<span class="n">ext</span><span class="p">:</span> <span class="o">.</span><span class="n">fastq</span><span class="o">.</span><span class="n">gz</span>
+<span class="c1">## paired-end read name extension (default: [&#39;_R1&#39;, &quot;_R2&quot;])</span>
+<span class="n">reads</span><span class="p">:</span> <span class="p">[</span><span class="n">_R1</span><span class="p">,</span> <span class="n">_R2</span><span class="p">]</span>
+<span class="c1">## Number of reads to downsample from each FASTQ file</span>
+<span class="n">downsample</span><span class="p">:</span>
+<span class="c1">## Options for trimming</span>
+<span class="n">trim</span><span class="p">:</span> <span class="kc">False</span>
+<span class="n">trim_prg</span><span class="p">:</span> <span class="n">cutadapt</span>
+<span class="n">trim_options</span><span class="p">:</span>
+<span class="c1">## Bin size of output files in bigWig format</span>
+<span class="n">bw_binsize</span><span class="p">:</span> <span class="mi">25</span>
+<span class="c1">## Run FASTQC read quality control</span>
+<span class="n">fastqc</span><span class="p">:</span> <span class="n">false</span>
+<span class="c1">## Run computeGCBias quality control</span>
+<span class="n">gcbias</span><span class="p">:</span> <span class="n">false</span>
+<span class="c1">## Retain only de-duplicated reads/read pairs</span>
+<span class="n">dedup</span><span class="p">:</span> <span class="n">false</span>
+<span class="c1">## Retain only reads with at least the given mapping quality</span>
+<span class="n">mapq</span><span class="p">:</span> <span class="mi">0</span>
+<span class="c1">## Retain only reads mapping in proper pairs</span>
+<span class="n">properpairs</span><span class="p">:</span> <span class="n">false</span>
+<span class="c1">## Mate orientation in paired-end experiments for Bowtie2 mapping</span>
+<span class="c1">## (default &quot;--fr&quot; is appropriate for Illumina sequencing)</span>
+<span class="n">mate_orientation</span><span class="p">:</span> <span class="o">--</span><span class="n">fr</span>
+<span class="c1">## Median/mean fragment length, only relevant for single-end data (default: 200)</span>
+<span class="n">fragment_length</span><span class="p">:</span> <span class="mi">200</span>
+<span class="n">bowtie_opts</span><span class="p">:</span>
+<span class="n">qualimap</span><span class="p">:</span> <span class="n">false</span>
+<span class="n">verbose</span><span class="p">:</span> <span class="kc">False</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="structure-of-output-directory">
+<h2>Structure of output directory<a class="headerlink" href="#structure-of-output-directory" title="Permalink to this headline">¶</a></h2>
+<p>The DNA mapping pipeline will generate output of the following structure:</p>
+<div class="code bash highlight-default notranslate"><div class="highlight"><pre><span></span>$ tree -d -L 2 output-dir/
+</pre></div>
+</div>
+<p>..parsed-literal:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>output-dir/
+|-- Bowtie2
+|-- FASTQ
+|-- FastQC
+|-- Picard_qc
+|   |-- AlignmentSummaryMetrics
+|   |-- InsertSizeMetrics
+|   |-- MarkDuplicates
+|-- Qualimap_qc
+|-- bamCoverage
+|-- cluster_logs
+|-- deepTools_qc
+|   |-- multiBamSummary
+|   |-- plotCorrelation
+|   |-- plotCoverage
+|   `-- plotPCA
+`-- filtered_bam
+</pre></div>
+</div>
+<p>When enabling read trimming, additional directories will be generated containing the trimmed FASTQ files and, optionally, the FASTQC output on the trimmed FASTQ files.</p>
+<p><p>DNA-mapping workflow v0.6 - MPI-IE workflow for DNA mapping</p>
+<dl class="docutils">
+<dt>usage example:</dt>
+<dd>DNA-mapping -i input-dir -o output-dir mm10</dd>
+</dl>
+</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">DNA</span><span class="o">-</span><span class="n">mapping</span> <span class="o">-</span><span class="n">i</span> <span class="n">INDIR</span> <span class="o">-</span><span class="n">o</span> <span class="n">OUTDIR</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">v</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">c</span> <span class="n">CONFIGFILE</span><span class="p">]</span>
+                   <span class="p">[</span><span class="o">--</span><span class="n">cluster_configfile</span> <span class="n">CLUSTER_CONFIGFILE</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">j</span> <span class="n">INT</span><span class="p">]</span>
+                   <span class="p">[</span><span class="o">--</span><span class="n">local</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">snakemake_options</span> <span class="n">STR</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">tempdir</span> <span class="n">TEMPDIR</span><span class="p">]</span>
+                   <span class="p">[</span><span class="o">--</span><span class="n">DAG</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">m</span> <span class="n">MODE</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">downsample</span> <span class="n">INT</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">trim</span><span class="p">]</span>
+                   <span class="p">[</span><span class="o">--</span><span class="n">trim_prg</span> <span class="p">{</span><span class="n">cutadapt</span><span class="p">,</span><span class="n">trimgalore</span><span class="p">}]</span> <span class="p">[</span><span class="o">--</span><span class="n">trim_options</span> <span class="n">STR</span><span class="p">]</span>
+                   <span class="p">[</span><span class="o">--</span><span class="n">qualimap</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">fastqc</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">dedup</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">properpairs</span><span class="p">]</span>
+                   <span class="p">[</span><span class="o">--</span><span class="n">mapq</span> <span class="n">INT</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">bw</span><span class="o">-</span><span class="n">binsize</span> <span class="n">INT</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">insert</span><span class="o">-</span><span class="n">size</span> <span class="n">INT</span><span class="p">]</span>
+                   <span class="p">[</span><span class="o">--</span><span class="n">gcbias</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">plotFormat</span> <span class="n">STR</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">VCFfile</span> <span class="n">STR</span><span class="p">]</span>
+                   <span class="p">[</span><span class="o">--</span><span class="n">strains</span> <span class="n">STR</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">SNPfile</span> <span class="n">STR</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">Nmasked_index</span> <span class="n">STR</span><span class="p">]</span>
+                   <span class="n">GENOME</span>
+</pre></div>
+</div>
+<div class="section" id="Positional Arguments">
+<h3>Positional Arguments<a class="headerlink" href="#Positional Arguments" title="Permalink to this headline">¶</a></h3>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd>GENOME</kbd></td>
+<td>Genome acronym of target organism (supported: 'dm3', 'dm6', 'hs37d5', 'mm9', 'mm10', 'SchizoSPombe_ASM294v2')</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="Named Arguments">
+<h3>Named Arguments<a class="headerlink" href="#Named Arguments" title="Permalink to this headline">¶</a></h3>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd>--downsample</kbd></td>
+<td>downsample the given number of reads randomly from of each FASTQ file (default: 'None')</td></tr>
+<tr><td class="option-group">
+<kbd>--trim</kbd></td>
+<td>Activate fastq read trimming. If activated, Illumina adaptors are trimmed by default. Additional parameters can be specified under --trim_options (default: 'None')</td></tr>
+<tr><td class="option-group">
+<kbd>--trim_prg</kbd></td>
+<td><p class="first">Possible choices: cutadapt, trimgalore</p>
+<p class="last">trimming program: Cutadapt or TrimGalore (default: 'None')</p>
+</td></tr>
+<tr><td class="option-group">
+<kbd>--trim_options</kbd></td>
+<td>Additional option string for trimming program of choice. (default: 'None')</td></tr>
+<tr><td class="option-group">
+<kbd>--qualimap</kbd></td>
+<td>activate Qualimap (default: 'None')</td></tr>
+<tr><td class="option-group">
+<kbd>--fastqc</kbd></td>
+<td>run FastQC read quality control (default: 'None')</td></tr>
+<tr><td class="option-group">
+<kbd>--dedup</kbd></td>
+<td>retain only de-duplicated reads/read pairs (given single-/paired-end data), recommended for ChIP-seq data (default: 'None')</td></tr>
+<tr><td class="option-group">
+<kbd>--properpairs</kbd></td>
+<td>retain only reads mapping in proper pairs (default: 'None')</td></tr>
+<tr><td class="option-group">
+<kbd>--mapq</kbd></td>
+<td>retain only reads with at least the given mapping quality. We recommend usingmapq of 3 or more for ChIP-seq to remove all true multimapping reads. (default: 'None')</td></tr>
+<tr><td class="option-group">
+<kbd>--bw-binsize</kbd></td>
+<td>bin size of output files in bigWig format (default: 'None')</td></tr>
+<tr><td class="option-group">
+<kbd>--insert-size</kbd></td>
+<td>Maximum insert size allowed during mapping (default: 'None')</td></tr>
+<tr><td class="option-group">
+<kbd>--gcbias</kbd></td>
+<td>run computeGCBias quality control (long runtime!). Note that gcbias analysis is skipped if downsampling is specified (default: 'None')</td></tr>
+<tr><td class="option-group">
+<kbd>--plotFormat</kbd></td>
+<td><p class="first">Possible choices: png, pdf, None</p>
+<p class="last">Format of the output plots from deeptools. Select 'none' for no plot (default: 'None')</p>
+</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="required arguments">
+<h3>required arguments<a class="headerlink" href="#required arguments" title="Permalink to this headline">¶</a></h3>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group" colspan="2">
+<kbd>-i, --input-dir</kbd></td>
+</tr>
+<tr><td>&#160;</td><td>input directory containing the FASTQ files, either paired-end OR single-end data</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd>-o, --output-dir</kbd></td>
+</tr>
+<tr><td>&#160;</td><td>output directory</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="general arguments">
+<h3>general arguments<a class="headerlink" href="#general arguments" title="Permalink to this headline">¶</a></h3>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd>-v, --verbose</kbd></td>
+<td>verbose output (default: 'None')</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd>-c, --configfile</kbd></td>
+</tr>
+<tr><td>&#160;</td><td>configuration file: config.yaml. In absence of a config file, the default options from the workflows would be selected from /workflows/&lt;workflow_name&gt;/defaults.yaml (default: 'None')</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd>--cluster_configfile</kbd></td>
+</tr>
+<tr><td>&#160;</td><td>configuration file for cluster usage. In absence, the default options from shared/cluster.yaml and workflows/[workflow]/cluster.yaml would be selected (default: 'None')</td></tr>
+<tr><td class="option-group">
+<kbd>-j, --jobs</kbd></td>
+<td>maximum number of concurrently submitted Slurm jobs / cores if workflow is run locally (default: 'None')</td></tr>
+<tr><td class="option-group">
+<kbd>--local</kbd></td>
+<td><p class="first">run workflow locally; default: jobs are submitted to Slurm queue (default: 'False')</p>
+<p class="last">Default: False</p>
+</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd>--snakemake_options</kbd></td>
+</tr>
+<tr><td>&#160;</td><td>Snakemake options to be passed directly to snakemake, e.g. use --snakemake_options='--dryrun --rerun-incomplete --unlock --forceall'. (default: 'None')</td></tr>
+<tr><td class="option-group">
+<kbd>--tempdir</kbd></td>
+<td>used prefix path for temporary directory created via mktemp. Created temp dir gets exported as $TMPDIR and is removed at the end of this wrapper! (default: 'None')</td></tr>
+<tr><td class="option-group">
+<kbd>--DAG</kbd></td>
+<td><p class="first">If specified, a file called pipeline.pdf is produced in the output directory that shows the rules used and their relationship to each other.</p>
+<p class="last">Default: False</p>
+</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="Optional arguments">
+<h3>Optional arguments<a class="headerlink" href="#Optional arguments" title="Permalink to this headline">¶</a></h3>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd>-m, --mode</kbd></td>
+<td>workflow running modes (available: 'mapping, allelic-mapping') (default: 'None')</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="allele-specific mapping arguments">
+<h3>allele-specific mapping arguments<a class="headerlink" href="#allele-specific mapping arguments" title="Permalink to this headline">¶</a></h3>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd>--VCFfile</kbd></td>
+<td><p class="first">VCF file to create N-masked genomes (default: 'None')</p>
+<p class="last">Default: &quot;&quot;</p>
+</td></tr>
+<tr><td class="option-group">
+<kbd>--strains</kbd></td>
+<td><p class="first">Name or ID of SNP strains separated by comma (default: 'None')</p>
+<p class="last">Default: &quot;&quot;</p>
+</td></tr>
+<tr><td class="option-group">
+<kbd>--SNPfile</kbd></td>
+<td><p class="first">File containing SNP locations (default: 'None')</p>
+<p class="last">Default: &quot;&quot;</p>
+</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd>--Nmasked_index</kbd></td>
+</tr>
+<tr><td>&#160;</td><td><p class="first">N-masked index of the reference genome (default: 'None')</p>
+<p class="last">Default: &quot;&quot;</p>
+</td></tr>
+</tbody>
+</table>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="100%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference external" href="https://github.com/maxplanck-ie/snakemake_workflows">code &#64; github</a>.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="ChIP-seq.html" class="btn btn-neutral float-right" title="ChIP-seq" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../setting_up.html" class="btn btn-neutral" title="Setting up the workflows" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, MPI-IE.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'0.6.2',
+            LANGUAGE:'python',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

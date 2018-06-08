@@ -1,0 +1,465 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="python" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="python" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>ChIP-seq &mdash; snakePipes 0.6.2 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="RNA-seq" href="RNA-seq.html" />
+    <link rel="prev" title="DNA-mapping" href="DNA-mapping.html" /> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> snakePipes
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.6
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../setting_up.html">Setting up the workflows</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DNA-mapping.html">DNA-mapping</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">ChIP-seq</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#configuration-file">Configuration file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#input-requirements">Input requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#structure-of-output-directory">Structure of output directory</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Positional Arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#required arguments">required arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#general arguments">general arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="RNA-seq.html">RNA-seq</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scRNA-seq.html">scRNA-seq</a></li>
+<li class="toctree-l1"><a class="reference internal" href="HiC.html">HiC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ChangeLog.html">Change Log</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">snakePipes</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+      <li>ChIP-seq</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/content/workflows/ChIP-seq.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="chip-seq">
+<span id="id1"></span><h1>ChIP-seq<a class="headerlink" href="#chip-seq" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="configuration-file">
+<h2>Configuration file<a class="headerlink" href="#configuration-file" title="Permalink to this headline">¶</a></h2>
+<div class="code bash highlight-default notranslate"><div class="highlight"><pre><span></span>$ cat snakemake_workflows/workflows/ChIP-seq/defaults.yaml
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">################################################################################</span>
+<span class="c1"># This file is the default configuration of the ChIP-seq workflow!</span>
+<span class="c1">#</span>
+<span class="c1"># In order to adjust some parameters, please either use the wrapper script</span>
+<span class="c1"># (eg. /path/to/snakemake_workflows/workflows/ChIP-seq/ChIP-seq)</span>
+<span class="c1"># or save a copy of this file, modify necessary parameters and then provide</span>
+<span class="c1"># this file to the wrapper or snakmake via &#39;--configfile&#39; option</span>
+<span class="c1"># (see below how to call the snakefile directly)</span>
+<span class="c1">#</span>
+<span class="c1"># Own parameters will be loaded during snakefile executiuon as well and hence</span>
+<span class="c1"># can be used in new/extended snakemake rules!</span>
+<span class="c1">################################################################################</span>
+<span class="c1">## General/Snakemake parameters, only used/set by wrapper or in Snakemake cmdl, but not in Snakefile</span>
+<span class="n">configfile</span><span class="p">:</span>
+<span class="n">tempdir</span><span class="p">:</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">extended</span><span class="o">/</span>
+<span class="n">local</span><span class="p">:</span> <span class="n">false</span>
+<span class="n">max_jobs</span><span class="p">:</span> <span class="mi">5</span>
+<span class="n">snakemake_options</span><span class="p">:</span>
+<span class="c1">## workingdir need to be required DNA-mapping output dir, &#39;outdir&#39; is set to workingdir internally</span>
+<span class="n">workingdir</span><span class="p">:</span>
+<span class="c1">## preconfigured target genomes (mm9,mm10,dm3,...) , see /path/to/snakemake_workflows/shared/organisms/</span>
+<span class="c1">## Value can be also path to your own genome config file!</span>
+<span class="n">genome</span><span class="p">:</span>
+<span class="c1">## paired end data?</span>
+<span class="n">paired</span><span class="p">:</span> <span class="n">true</span>
+<span class="c1">## Bin size of output files in bigWig format</span>
+<span class="n">bw_binsize</span><span class="p">:</span> <span class="mi">25</span>
+<span class="c1">## Median/mean fragment length, only relevant for single-end data (default: 200)</span>
+<span class="n">fragment_length</span><span class="p">:</span> <span class="mi">200</span>
+<span class="n">verbose</span><span class="p">:</span> <span class="n">false</span>
+<span class="c1">################################################################################</span>
+<span class="c1"># Call snakemake directly, i.e. without using the wrapper script:</span>
+<span class="c1">#</span>
+<span class="c1"># Please save a copy of this config yaml file and provide an adjusted config</span>
+<span class="c1"># via &#39;--configfile&#39; parameter!</span>
+<span class="c1"># example call:</span>
+<span class="c1">#</span>
+<span class="c1"># snakemake --snakefile /path/to/snakemake_workflows/workflows/ChIP-seq/Snakefile</span>
+<span class="c1">#           --configfile /path/to/snakemake_workflows/workflows/ChIP-seq/defaults.yaml</span>
+<span class="c1">#           --directory /path/to/outputdir</span>
+<span class="c1">#           --cores 32</span>
+<span class="c1">################################################################################</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="input-requirements">
+<h2>Input requirements<a class="headerlink" href="#input-requirements" title="Permalink to this headline">¶</a></h2>
+<p>The DNA mapping pipeline generates output that is fully compatible with the ChIP-seq pipeline input requirements!
+When running the ChIP-seq pipeline, please specify the output directory of DNA-mapping pipeline as the working directory (-w).</p>
+<p>The ChIP-seq pipeline requires at least the following input files for each sample that is specified in the configuration file:</p>
+<div class="code bash highlight-default notranslate"><div class="highlight"><pre><span></span>$ tree -L 2 output-dir/filtered_bam/ output-dir/Picard_qc/
+</pre></div>
+</div>
+<p>..parsed-literal:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>output-dir/filtered_bam/
+|-- my_H3K27ac_sample.filtered.bam
+|-- my_H3K27ac_sample.filtered.bam.bai
+|-- my_H3K27me3_sample.filtered.bam
+|-- my_H3K27me3_sample.filtered.bam.bai
+|-- my_Input_sample.filtered.bam
+`-- my_Input_sample.filtered.bam.bai
+output-dir/Picard_qc/
+|-- AlignmentSummaryMetrics
+|   |-- my_H3K27ac_sample.alignment_summary_metrics.txt
+|   |-- my_H3K27me3_sample.alignment_summary_metrics.txt
+|   `-- my_Input_sample.alignment_summary_metrics.txt
+|-- InsertSizeMetrics
+|   |-- my_H3K27ac_sample.insert_size_metrics.txt
+|   |-- my_H3K27me3_sample.insert_size_metrics.txt
+|   `-- my_Input_sample.insert_size_metrics.txt
+`-- MarkDuplicates
+    |-- my_H3K27ac_sample.mark_duplicates_metrics.txt
+    |-- my_H3K27me3_sample.mark_duplicates_metrics.txt
+    `-- my_Input_sample.mark_duplicates_metrics.txt
+</pre></div>
+</div>
+</div>
+<div class="section" id="structure-of-output-directory">
+<h2>Structure of output directory<a class="headerlink" href="#structure-of-output-directory" title="Permalink to this headline">¶</a></h2>
+<p>The ChIP-seq pipeline will generate additional output as follows:</p>
+<div class="code bash highlight-default notranslate"><div class="highlight"><pre><span></span>$ tree -d -L 2 output-dir/
+</pre></div>
+</div>
+<p>..parsed-literal:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>output-dir/
+...
+|-- MACS2
+...
+|-- QC_report
+...
+|-- cluster_logs
+|-- deepTools_ChIP
+|   |-- bamCompare
+|   |-- plotEnrichment
+|   `-- plotFingerprint
+...
+`-- histoneHMM
+</pre></div>
+</div>
+<p>The tool <cite>histoneHMM</cite> will only be run if at least one sample is annotated as broad (IP enrichment).</p>
+<p><p>ChIP-seq workflow v0.6 - MPI-IE workflow for ChIP-seq analysis</p>
+<dl class="docutils">
+<dt>Usage example:</dt>
+<dd>ChIP-seq -d working-dir mm10 samples.yaml</dd>
+</dl>
+</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">ChIP</span><span class="o">-</span><span class="n">seq</span> <span class="p">[</span><span class="o">-</span><span class="n">d</span> <span class="n">WORKINGDIR</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">v</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">c</span> <span class="n">CONFIGFILE</span><span class="p">]</span>
+                <span class="p">[</span><span class="o">--</span><span class="n">cluster_configfile</span> <span class="n">CLUSTER_CONFIGFILE</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">j</span> <span class="n">INT</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">local</span><span class="p">]</span>
+                <span class="p">[</span><span class="o">--</span><span class="n">snakemake_options</span> <span class="n">STR</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">tempdir</span> <span class="n">TEMPDIR</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">DAG</span><span class="p">]</span>
+                <span class="p">[</span><span class="o">--</span><span class="n">single</span><span class="o">-</span><span class="n">end</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">bw</span><span class="o">-</span><span class="n">binsize</span> <span class="n">INT</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">DB</span> <span class="n">SAMPLE_INFO</span><span class="p">]</span>
+                <span class="p">[</span><span class="o">--</span><span class="n">DB_windowSize</span> <span class="n">WINDOW_SIZE</span><span class="p">]</span>
+                <span class="n">GENOME</span> <span class="n">SAMPLESCONFIG</span>
+</pre></div>
+</div>
+<div class="section" id="Positional Arguments">
+<h3>Positional Arguments<a class="headerlink" href="#Positional Arguments" title="Permalink to this headline">¶</a></h3>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd>GENOME</kbd></td>
+<td>genome acronym of target organism (supported: 'dm3', 'dm6', 'hs37d5', 'mm9', 'mm10', 'SchizoSPombe_ASM294v2')</td></tr>
+<tr><td class="option-group">
+<kbd>SAMPLESCONFIG</kbd></td>
+<td>configuration file (eg. 'example.chip_samples.yaml') with sample annotation</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="required arguments">
+<h3>required arguments<a class="headerlink" href="#required arguments" title="Permalink to this headline">¶</a></h3>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group" colspan="2">
+<kbd>-d, --working-dir</kbd></td>
+</tr>
+<tr><td>&#160;</td><td><p class="first">working directory is output directory and must contain DNA-mapping pipeline output files</p>
+<p class="last">Default: &quot;.&quot;</p>
+</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="general arguments">
+<h3>general arguments<a class="headerlink" href="#general arguments" title="Permalink to this headline">¶</a></h3>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd>-v, --verbose</kbd></td>
+<td>verbose output (default: 'None')</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd>-c, --configfile</kbd></td>
+</tr>
+<tr><td>&#160;</td><td>configuration file: config.yaml. In absence of a config file, the default options from the workflows would be selected from /workflows/&lt;workflow_name&gt;/defaults.yaml (default: 'None')</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd>--cluster_configfile</kbd></td>
+</tr>
+<tr><td>&#160;</td><td>configuration file for cluster usage. In absence, the default options from shared/cluster.yaml and workflows/[workflow]/cluster.yaml would be selected (default: 'None')</td></tr>
+<tr><td class="option-group">
+<kbd>-j, --jobs</kbd></td>
+<td>maximum number of concurrently submitted Slurm jobs / cores if workflow is run locally (default: 'None')</td></tr>
+<tr><td class="option-group">
+<kbd>--local</kbd></td>
+<td><p class="first">run workflow locally; default: jobs are submitted to Slurm queue (default: 'False')</p>
+<p class="last">Default: False</p>
+</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd>--snakemake_options</kbd></td>
+</tr>
+<tr><td>&#160;</td><td>Snakemake options to be passed directly to snakemake, e.g. use --snakemake_options='--dryrun --rerun-incomplete --unlock --forceall'. (default: 'None')</td></tr>
+<tr><td class="option-group">
+<kbd>--tempdir</kbd></td>
+<td>used prefix path for temporary directory created via mktemp. Created temp dir gets exported as $TMPDIR and is removed at the end of this wrapper! (default: 'None')</td></tr>
+<tr><td class="option-group">
+<kbd>--DAG</kbd></td>
+<td><p class="first">If specified, a file called pipeline.pdf is produced in the output directory that shows the rules used and their relationship to each other.</p>
+<p class="last">Default: False</p>
+</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="Named Arguments">
+<h3>Named Arguments<a class="headerlink" href="#Named Arguments" title="Permalink to this headline">¶</a></h3>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd>--single-end</kbd></td>
+<td>input data is single-end, not paired-end (default: 'None')</td></tr>
+<tr><td class="option-group">
+<kbd>--bw-binsize</kbd></td>
+<td>bin size of output files in bigWig format (default: 'None')</td></tr>
+<tr><td class="option-group">
+<kbd>--DB</kbd></td>
+<td><p class="first">Information on samples (If differential binding analysis required); see 'snakepipes/shared/tools/sampleInfo.example.tsv' for example. IMPORTANT: The first entry defines which group of samples are control.  By this, the order of comparison and likewise the sign of values can be changed!  Also, the condition <cite>control</cite> should only be used for input samples (control peaks are not evaluated for differential binding) (default: '')</p>
+<p class="last">Default: &quot;&quot;</p>
+</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd>--DB_windowSize</kbd></td>
+</tr>
+<tr><td>&#160;</td><td>Window size to counts reads in (If differential binding analysis required); Default size is suitable for most transcription factors and sharp histone marks. Small window sizes (~20bp) should be used for very narrow transcription factor peaks, while large window sizes (~500 bp) should be used for broad marks (eg. H3K27me3) (default: 'None')</td></tr>
+</tbody>
+</table>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="100%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference external" href="https://github.com/maxplanck-ie/snakemake_workflows">code &#64; github</a>.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="RNA-seq.html" class="btn btn-neutral float-right" title="RNA-seq" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="DNA-mapping.html" class="btn btn-neutral" title="DNA-mapping" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, MPI-IE.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'0.6.2',
+            LANGUAGE:'python',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
