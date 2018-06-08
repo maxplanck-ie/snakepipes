@@ -14,7 +14,7 @@
 pipeline: hic
 outdir:
 configfile:
-cluster_configfile:
+cluster_configfile: 
 local: False
 max_jobs: 5
 snakemake_options: '--use-conda --conda-prefix /data/processing/conda/envs '
@@ -27,7 +27,7 @@ genome:
 ## FASTQ file extension (default: ".fastq.gz")
 ext: .fastq.gz
 ## paired-end read name extension (default: ['_R1', "_R2"])
-reads: [_R1, _R2]
+reads: [_1, _2]
 mapping_prg: BWA
 ## Number of reads to downsample from each FASTQ file
 downsample:

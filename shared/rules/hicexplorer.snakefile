@@ -16,7 +16,8 @@ rule get_restrictionSite:
 # Map
 rule map_fastq_single_end:
     input: fastq_dir+"/{sample}{read}.fastq.gz"
-    output: "BWA/{sample}{read}.bam"
+    output:
+        out =  "BWA/{sample}{read}.bam"
     log: 
         out = "BWA/logs/{sample}{read}.out",
         err = "BWA/logs/{sample}{read}.err"
@@ -26,7 +27,8 @@ rule map_fastq_single_end:
         "echo 'mapping {input}' > {log.out} && "
         "bwa mem -A1 -B4  -E50 -L0 "
         "-t {threads} " + bwa_index + " {input}  2> {log.err} | "
-        "samtools view -Shb - > {output}  2>> {log.err}"
+        "samtools view -Shb - > {output.out}  2>> {log.err}"
+
 ## Make HiC Matrix
 if(RF_resolution is True):
     rule build_matrix:
@@ -76,7 +78,7 @@ else:
             max_dist = MAX_RS_DISTANCE
         log:
             out = "HiC_matrices/logs/{sample}"+matrixFile_suffix+".out",
-            err = "Hic_matrices/logs/{sample}"+matrixFile_suffix+".err"
+            err = "HiC_matrices/logs/{sample}"+matrixFile_suffix+".err"
         threads: 15
         conda: CONDA_HIC_ENV
         shell:
