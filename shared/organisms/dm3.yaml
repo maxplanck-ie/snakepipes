@@ -9,6 +9,6 @@ known_splicesites: "/data/repository/organisms/dm3_ensembl/ensembl/release-78/HI
 star_index: "/data/repository/organisms/dm3_ensembl/STARIndex/"
 genes_bed: "/data/repository/organisms/dm3_ensembl/Ensembl/release-78/genes.bed"
 genes_gtf: "/data/repository/organisms/dm3_ensembl/Ensembl/release-78/genes.gtf"
-extended_coding_regions_gtf: "dm3_ensembl/Ensembl/release-78/genes.slop.gtf"
+extended_coding_regions_gtf: "/data/repository/organisms/dm3_ensembl/Ensembl/release-78/genes.slop.gtf"
 blacklist_bed:
 ignore_forNorm: "U Uextra X XHet YHet dmel_mitochondrion_genome"
