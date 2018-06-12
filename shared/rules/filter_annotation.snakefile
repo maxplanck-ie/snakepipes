@@ -9,7 +9,7 @@ if genes_gtf.lower().find("gencode")>=0:
         conda: CONDA_RNASEQ_ENV
         shell:
             "join -t $'\t' -o auto --check-order -1 4 -2 2 "
-            "<(gtfToGenePred -ignoreGroupsWithoutExons {input.gtf} /dev/stdout | genePredToBed /dev/stdin /dev/stdout | tr ' ' $'\t' | sort -k4) "
+            "<(gtfToGenePred -ignoreGroupsWithoutExons {input.gtf} /dev/stdout | genePredToBed /dev/stdin /dev/stdout | tr ' ' $'\t' | sort -k4,4) "
             """ <(cat {input.gtf} | awk '$3~"transcript|exon"{{print $0}}' | tr -d "\\";" | """
             """ awk '{{pos=match($0,"tag.basic"); if (pos==0) basic="full"; else basic="basic"; """
             """ pos=match($0,"gene_[bio]*type.[^[:space:]]+"); gt=substr($0,RSTART,RLENGTH); """
@@ -21,7 +21,7 @@ if genes_gtf.lower().find("gencode")>=0:
             """ pos=match($0,"transcript_name.[^[:space:]]*"); tna=substr($0,RSTART,RLENGTH); """
             """ pos=match($0,"gene_name.[^[:space:]]*"); gna=substr($0,RSTART,RLENGTH); """
             """ OFS="\\t"; print tid,tna,tt,gid,gna,gt,"gencode",basic,tsl,lvl}}' | """
-            """ tr " " "\\t" | sort | uniq | sort -k2) | """
+            """ tr " " "\\t" | sort | uniq | sort -k2,2) | """
             """ awk '{{$13=$13"\\t"$1; $4=$4"\\t"$1; OFS="\\t";print $0}}' | """
             """ cut --complement -f 1,14,16,18,20,22,24 > {output.bed_annot} """
 elif genes_gtf.lower().find("ensembl")>=0:
@@ -33,7 +33,7 @@ elif genes_gtf.lower().find("ensembl")>=0:
         conda: CONDA_RNASEQ_ENV
         shell:
             "join -t $'\t' -o auto --check-order -1 4 -2 2 "
-            "<(gtfToGenePred {input.gtf} /dev/stdout | genePredToBed /dev/stdin /dev/stdout | tr ' ' $'\t' | sort -k4) "
+            "<(gtfToGenePred {input.gtf} /dev/stdout | genePredToBed /dev/stdin /dev/stdout | tr ' ' $'\t' | sort -k4,4) "
             """ <(cat {input.gtf} | awk '$3=="transcript"{{print $0}}' | tr -d "\\";" | """
             """ awk '{{"""
             """ pos=match($0,"gene_biotype.[^[:space:]]+"); if (pos!=0) gt=substr($0,RSTART,RLENGTH); else gt="gene_biotype unknown_gene_biotype"; """
@@ -43,7 +43,7 @@ elif genes_gtf.lower().find("ensembl")>=0:
             """ pos=match($0,"transcript_name.[^[:space:]]*"); if (pos!=0) tna=substr($0,RSTART,RLENGTH); else tna=tid; """
             """ pos=match($0,"gene_name.[^[:space:]]*"); if (pos!=0) gna=substr($0,RSTART,RLENGTH); else gna=gid; """
             """ OFS="\\t"; print tid,tna,tt,gid,gna,gt}}' | """
-            """ tr " " "\\t" | sort -k2) | """
+            """ tr " " "\\t" | sort -k2,2) | """
             """ awk '{{$13=$13"\\t"$1; $4=$4"\\t"$1; OFS="\\t";print $0}}' | """
             """ cut --complement -f 1,14,16,18,20,22,24 > {output.bed_annot} """
 ## else the gtf format is not supported!!!
