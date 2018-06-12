@@ -171,6 +171,14 @@ def parse_args(defaults={"verbose":None,"configfile":None,"cluster_configfile":N
                        help="bin size of output files in bigWig format (default: '%(default)s')",
                        type=int,
                        default=defaults["bw_binsize"])
+    parser.add_argument("--plotFormat",
+                        dest="plot_format",
+                        choices=['png', 'pdf', 'None'],
+                        metavar="STR",
+                        type=str,
+                        help="Format of the output plots from deeptools. Select 'none' for no plot (default: '%(default)s')",
+                        default=defaults["plot_format"])
+
 
     return parser
 

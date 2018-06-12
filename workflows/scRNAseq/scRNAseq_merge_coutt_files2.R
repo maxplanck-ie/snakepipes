@@ -62,11 +62,9 @@ if (!is.na(args[5])) {
 
 ######################################################
 
-#cell_names_path = "A732_cell_names.tsv"
 print(paste(coutt_path,"/*.coutt.csv",sep=""))
 
 dat=data.frame(file=mixedsort(Sys.glob(paste(coutt_path,"/*.coutt.csv",sep=""))),stringsAsFactors=F)
-#dat=data.frame(file=mixedsort(Sys.glob(paste("A732_mapping.gencode.genome/Counts/","/Sebastian1*.coutt.csv",sep=""))),stringsAsFactors=F)
 
 ## create sample names from file names
 dat$name=gsub(".*/(.*).coutt.csv","\\1",dat$file)
@@ -98,7 +96,7 @@ if (is.null(cell_names_path)){
 			print("required columns not found!")
 			stop(1)
 		}
-	#	str(dat_csv)
+		
 		cell_names <- rbind(cell_names, dat_csv)
 		
 	}

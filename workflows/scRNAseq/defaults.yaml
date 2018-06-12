@@ -43,6 +43,8 @@ cell_names:
 library_type: 2
 bw_binsize: 10
 verbose: False
+plot_format: png
+dnaContam: False
 ################################################################################
 # Call snakemake directly, i.e. without using the wrapper script:
 #

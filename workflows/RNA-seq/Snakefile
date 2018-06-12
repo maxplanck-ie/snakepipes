@@ -9,20 +9,16 @@ import common_functions as cf
 
 # load conda ENVs (path is relative to "shared/rules" directory)
 CONDA_SHARED_ENV = "envs/shared_environment.yaml"
+CONDA_RNASEQ_ENV = "envs/RNAseq_environment.yaml"
+CONDA_DNA_MAPPING_ENV = "envs/dna_mapping.yaml"
 
 # load config file
 globals().update(cf.load_configfile(workflow.overwrite_configfile,config["verbose"]))
 # load organism-specific data, i.e. genome indices, annotation, etc.
 globals().update(cf.load_organism_data(genome,maindir,config["verbose"]))
 
-# mapping defaults
-include: os.path.join(workflow.basedir, "internals.snakefile")
-
 # do workflow specific stuff now
-
-CONDA_SHARED_ENV = "envs/shared_environment.yaml"
-CONDA_RNASEQ_ENV = "envs/RNAseq_environment.yaml"
-CONDA_DNA_MAPPING_ENV = "envs/dna_mapping.yaml"
+include: os.path.join(workflow.basedir, "internals.snakefile")
 
 ### include modules of other snakefiles ########################################
 ################################################################################
