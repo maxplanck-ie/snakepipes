@@ -47,7 +47,12 @@ def multiqc_input_check(return_value):
     elif pipeline == "hic":
         infiles.append(expand("HiC_matrices/QCplots/{sample}_QC/QC_table.txt",sample = samples))
         indir += "HiC_matrices/QCplots/"
-
+    elif pipeline == "scrna-seq":
+    	infiles.append( expand(mapping_prg+"/{sample}.bam", sample = samples) +
+                        expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample=samples))
+        indir += mapping_prg + " featureCounts "
+        indir += " deepTools_qc/estimateReadFiltering"
+        infiles.append( expand("featureCounts/{sample}.counts.txt", sample = samples) )
 
     if return_value == "infiles":
         return(infiles)

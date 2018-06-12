@@ -7,9 +7,9 @@ bam=$1		## mapping for 96 cells
 gtf=$2		## gene annotation
 bc_file=$3	## celSeq cell barcode file
 sample_name=$4	## sample name, used for featureCounts as ouput name, NOT a directory or path
-fc_path=$5	## path to fc like "/package/subread-1.5.0-p1/bin/"
-tmp=$6		## will be created by this script, used as working dir for featureCounts due to -R issue
-threads=$7	## for featureCOunts only
+#fc_path=$5	## path to fc like "/package/subread-1.5.0-p1/bin/"
+tmp=$5		## will be created by this script, used as working dir for featureCounts due to -R issue
+threads=$6	## for featureCOunts only
 
 
 ## gtf is expected in this format, we use only gene_id and gene_name
@@ -26,7 +26,8 @@ mkdir -p $tmp_path 1>&2
 tmp_dir=$(mktemp -d --tmpdir=$tmp_path)
 
 ## call featureCounts
-${fc_path}featureCounts -a $gtf_path -T $threads -s 1 -R -F "GTF" --tmpDir ${tmp_dir} -o ${tmp_dir}/_tmp_$sample_name $bam_path 1>&2
+echo "featureCounts -a $gtf_path -T $threads -s 1 -R CORE -F "GTF" --tmpDir ${tmp_dir} -o ${tmp_dir}/_tmp_$sample_name $bam_path 1>&2"
+featureCounts -a $gtf_path -T $threads -s 1 -R CORE -F "GTF" --tmpDir ${tmp_dir} -o ${tmp_dir}/_tmp_$sample_name $bam_path 1>&2
 
 ## add gene_id (gtf col 10), gene_name (gtf col 18) to featureCounts output, last col is gene_name + chromosome
 ## <(cat $gtf_path | tr " " "\t" | tr -d "\";" | awk '{print $10,$18,$18"__chr"$1}') \

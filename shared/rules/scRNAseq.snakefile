@@ -12,6 +12,7 @@ rule fastq_barcode:
             CELLI_length = CELLI_length,
             CELLI_offset = CELLI_offset
         threads: 8
+        conda: CONDA_SCRNASEQ_ENV
         shell:"""
             paste <(paste - - - - < <(zcat {input.R1}))   <(paste - - - - < <(zcat {input.R2})) | \
             tr '\t' '\n' | \
@@ -57,12 +58,12 @@ rule sc_bam_featureCounts_genomic:
     params:
         count_script = workflow.basedir+"/scRNAseq_bam_featureCounts.sh",
         bc_file = barcode_file,
-        fc_path = feature_counts_path
     threads: 
         5
+    conda: CONDA_SCRNASEQ_ENV
     shell:
         """
-        {params.count_script} {input.bam} {input.gtf} {params.bc_file} {wildcards.sample} {params.fc_path} ${{TMPDIR}} {threads} 1>{output.counts} 2>{output.counts_summary};       
+        {params.count_script} {input.bam} {input.gtf} {params.bc_file} {wildcards.sample} ${{TMPDIR}} {threads} 1>{output.counts} 2>{output.counts_summary};       
         """
 
 
@@ -77,6 +78,7 @@ rule extract_scale_counts:
         count_script = workflow.basedir+"/extract_counts_rb.pl",
         UMI_length = UMI_length
     log: "Counts/logs/extract_counts.{sample}.log"
+    conda: CONDA_SCRNASEQ_ENV
     shell:
         """{params.count_script} -bl={params.UMI_length} -in={input.counts} """
         """ -outc={output.coutc} -outb={output.coutb} -outt={output.coutt} &>{log} """
@@ -92,8 +94,9 @@ rule combine_sample_counts:
         merge_script = workflow.basedir+"/scRNAseq_merge_coutt_files2.R",
         split = split_lib,
         sample_cell_names = str(cell_names or '')
+    conda: CONDA_SCRNASEQ_ENV
     shell:
-        "export R_LIBS_USER="+R_libs_path+" && "+R_path+"Rscript {params.merge_script} Counts/ {output.merged_matrix} {output.used_cell_names_file} {params.split} {params.sample_cell_names} """
+        "Rscript {params.merge_script} Counts/ {output.merged_matrix} {output.used_cell_names_file} {params.split} {params.sample_cell_names} """
 
 
 rule sc_QC_metrics:
@@ -110,9 +113,10 @@ rule sc_QC_metrics:
         plot_script = workflow.basedir+"/scRNAseq_QC_metrics2.R",
         out_prefix = "QC_report/QC_report.all_samples",
         split = split_lib
+    conda: CONDA_SCRNASEQ_ENV
     shell:
         ""+workflow.basedir+"/scRNAseq_QC_metrics.sh {params.in_dir} {params.out_dir} >{output.summary};"
-        " export R_LIBS_USER="+R_libs_path+" && "+R_path+"Rscript {params.plot_script} {params.cellsum_dir} {params.out_prefix} {params.split} {input.cell_names_merged};"
+        " Rscript {params.plot_script} {params.cellsum_dir} {params.out_prefix} {params.split} {input.cell_names_merged};"
 
 
 #cat {output.counts_summary} | sed -n -e '/sample.idx.READS/,/#LIB/{{/#LIB/d;p}}' > {output.cell_summary}
