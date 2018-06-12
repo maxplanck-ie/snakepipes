@@ -25,7 +25,7 @@ if trim:
 		fastq_dir = "FASTQ_Cutadapt"
 
 mapping_prg = "STAR_genomic"
-#mapping_prg = "HISAT2_genomic"
+
 star_options = "--twopassMode Basic"
 hisat_options = ""
 

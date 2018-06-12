@@ -26,7 +26,7 @@ mkdir -p $tmp_path 1>&2
 tmp_dir=$(mktemp -d --tmpdir=$tmp_path)
 
 ## call featureCounts
-echo "featureCounts -a $gtf_path -T $threads -s 1 -R CORE -F "GTF" --tmpDir ${tmp_dir} -o ${tmp_dir}/_tmp_$sample_name $bam_path 1>&2"
+(>&2 echo "featureCounts -a $gtf_path -T $threads -s 1 -R CORE -F "GTF" --tmpDir ${tmp_dir} -o ${tmp_dir}/_tmp_$sample_name $bam_path 1>&2")
 featureCounts -a $gtf_path -T $threads -s 1 -R CORE -F "GTF" --tmpDir ${tmp_dir} -o ${tmp_dir}/_tmp_$sample_name $bam_path 1>&2
 
 ## add gene_id (gtf col 10), gene_name (gtf col 18) to featureCounts output, last col is gene_name + chromosome
@@ -40,7 +40,7 @@ cat ${tmp_dir}/${sample_name}.bam.featureCounts | awk -v map_f=$gtf_path \
 	} 
 }
 {OFS="\t";
-if ($3 in MAP) print $0,MAP[$3]; else print $0,"NA","NA";
+if ($4 in MAP) print $0,MAP[$4]; else print $0,"NA","NA";
 }' |
 ## Output after pipe is like:
 ##

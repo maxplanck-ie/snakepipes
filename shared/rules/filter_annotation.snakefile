@@ -55,9 +55,13 @@ rule filter_annotation_bed:
     output:
         bed_filtered = "Annotation/genes.filtered.bed"
     params:
-        pattern = str(filter_annotation or '\'\'')
+        pattern = str(filter_annotation or '\'\''),
+        cmd = "Annotation/filter_command.txt"
     shell:
-        "cat {input.bed_annot} | grep {params.pattern} > {output.bed_filtered} "
+        """
+        cat {input.bed_annot} | grep {params.pattern} > {output.bed_filtered};
+        echo 'cat {input.bed_annot} | grep \'{params.pattern}\' > {output.bed_filtered}' > {params.cmd}
+        """
 
 rule annotation_bed2t2g:
     input:
