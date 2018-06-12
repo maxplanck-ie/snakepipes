@@ -43,14 +43,6 @@ if not cf.is_paired(infiles,ext,reads):
 ## but we need to keep "reads" for rule fastq_barcode
 paired = False
 
-## rna-strandness for HISAT2
-rna_strandness = cf.convert_library_type(R_path, paired, library_type, "featureCounts", "HISAT2", os.path.join(maindir, "shared", "tools", "library_type.R"), os.path.join(maindir, "shared", "tools", "library_type.tsv"))
-if rna_strandness == "NA":
-    rna_strandness = ""
-else:
-    rna_strandness = "--rna-strandness "+rna_strandness
-
-
 ### barcode pattern extraction #################################################
 pattern = re.compile("[N]+")
 
