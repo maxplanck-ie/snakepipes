@@ -335,11 +335,10 @@ def main():
     if len(fnames) == 0:
         n = 1 # no matching files, this is the first run
     else:
-        fnames.sort()
-        f_prev = fnames.pop()
-        n = int(f_prev.split("-")[2].split(".")[0]) + 1 # get new run number
+        fnames.sort(key=os.path.getctime)
+        n = int(fnames[-1].split("-")[-1].split(".")[0]) + 1 # get new run number
     # append the new run number to the file name
-    logfile_name = "DNA-mapping_run-"+ str(n) +".log"
+    logfile_name = "DNA-mapping_run-{}.log".format(n) 
 
     snakemake_log = "2>&1 | tee -a {}/{}".format(args.outdir, logfile_name).split()
 
