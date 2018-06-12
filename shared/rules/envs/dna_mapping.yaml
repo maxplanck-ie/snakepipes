@@ -7,3 +7,4 @@ dependencies:
  - bowtie2 = 2.3.4.1
  - picard = 2.9.2
  - qualimap = 2.2.2a
+ - samtools=1.7
