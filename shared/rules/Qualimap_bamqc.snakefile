@@ -10,7 +10,8 @@ rule Qualimap_bamqc:
         outdir = "Qualimap_qc/{sample}.filtered",
         collect_overlap_pairs = "--collect-overlap-pairs" if paired else ""
     log:
-        "Qualimap_qc/logs/Qualimap_bamqc.{sample}.filtered.log"
+        out = "Qualimap_qc/logs/Qualimap_bamqc.{sample}.filtered.out",
+        err = "Qualimap_qc/logs/Qualimap_bamqc.{sample}.filtered.err"
     benchmark:
         "Qualimap_qc/.benchmark/Qualimap_bamqc.{sample}.filtered.benchmark"
     threads: 16

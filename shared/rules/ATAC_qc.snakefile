@@ -1,12 +1,5 @@
 
 
-def isFloat(string):
-    try:
-        float(string)
-        return True
-    except ValueError:
-        return False
-
 rule plotFingerprint:
     input:
         bams = expand("filtered_bam/{sample}.filtered.bam", sample = samples),
@@ -23,7 +16,8 @@ rule plotFingerprint:
         jsd = "--JSDsample filtered_bam/{}.filtered.bam".format(samples[0]) if (len(samples)>0)
             else ""
     log:
-        os.path.join(deeptools_ATAC, "logs/plotFingerprint.log")
+        out = os.path.join(deeptools_ATAC, "logs/plotFingerprint.out"),
+        err = os.path.join(deeptools_ATAC, "logs/plotFingerprint.err")
     benchmark:
         os.path.join(deeptools_ATAC, ".benchmark/plotFingerprint.benchmark")
     threads: 24
@@ -46,7 +40,8 @@ rule plotFingerprint_allelic:
               else "",
         jsd = ""
     log:
-        os.path.join(deeptools_ATAC, "logs/plotFingerprint_allelic.log")
+        out = os.path.join(deeptools_ATAC, "logs/plotFingerprint_allelic.out"),
+        err = os.path.join(deeptools_ATAC, "logs/plotFingerprint_allelic.err")
     benchmark:
         os.path.join(deeptools_ATAC, ".benchmark/plotFingerprint_allelic.benchmark")
     threads: 24

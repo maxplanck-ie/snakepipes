@@ -77,7 +77,9 @@ rule multiQC:
     output: "multiQC/multiqc_report.html"
     params:
         indirs = multiqc_input_check(return_value = "indir")
-    log: "multiQC/multiQC.log"
+    log:
+        out = "multiQC/multiQC.out",
+        err = "multiQC/multiQC.err"
     conda: CONDA_SHARED_ENV
     shell:
-        "multiqc -o multiQC -f {params.indirs} &> {log}"
+        "multiqc -o multiQC -f {params.indirs} > {log.out} 2> {log.err}"

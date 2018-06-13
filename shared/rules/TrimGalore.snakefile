@@ -12,14 +12,15 @@ if paired:
         params:
             opts = str(trim_options or '')
         log:
-            "FASTQ_Cutadapt/logs/Cutadapt.{sample}.log"
+            out = "FASTQ_Cutadapt/logs/Cutadapt.{sample}.out",
+            err = "FASTQ_Cutadapt/logs/Cutadapt.{sample}.err"
         benchmark:
             "FASTQ_Cutadapt/.benchmark/Cutadapt.{sample}.benchmark"
         threads: 8
         conda: CONDA_SHARED_ENV
         shell: """
             cutadapt {params.opts} -j {threads} -e 0.1 -q 16 -O 3 --trim-n --minimum-length 25 -a AGATCGGAAGAGC -A AGATCGGAAGAGC \
-                -o {output.r1} -p {output.r2} {input.r1} {input.r2} &> {log}
+                -o {output.r1} -p {output.r2} {input.r1} {input.r2} > {log.out} 2> {log.err}
             """
 else:
     rule cutadapt:
@@ -30,14 +31,15 @@ else:
         params:
             opts = str(trim_options or '')
         log:
-            "FASTQ_Cutadapt/logs/Cutadapt.{sample}.log"
+            out = "FASTQ_Cutadapt/logs/Cutadapt.{sample}.out",
+            err = "FASTQ_Cutadapt/logs/Cutadapt.{sample}.err"
         benchmark:
             "FASTQ_Cutadapt/.benchmark/Cutadapt.{sample}.benchmark"
         threads: 8
         conda: CONDA_SHARED_ENV
         shell: """
             cutadapt {params.opts} -j {threads} -e 0.1 -q 16 -O 3 --trim-n --minimum-length 25 -a AGATCGGAAGAGC \
-                -o {output} {input.r1} &> {log}
+                -o {output} {input.r1} > {log.out} 2> {log.err}
             """
 
 
@@ -56,13 +58,15 @@ if paired:
             tmp2 = "FASTQ_TrimGalore/{sample}"+reads[1]+"_val_2.fq.gz",
             opts = str(trim_options or '')
         log:
-            "FASTQ_TrimGalore/logs/TrimGalore.{sample}.log"
+            out = "FASTQ_TrimGalore/logs/TrimGalore.{sample}.out",
+            err = "FASTQ_TrimGalore/logs/TrimGalore.{sample}.err"
         benchmark:
             "FASTQ_TrimGalore/.benchmark/TrimGalore.{sample}.benchmark"
         conda: CONDA_SHARED_ENV
         shell: """
-            trim_galore --output_dir FASTQ_TrimGalore --paired --stringency 3 {params.opts} {input.r1} {input.r2} &> {log} && \
-            (mv {params.tmp1} {output.r1} ; mv {params.tmp2} {output.r2})
+            trim_galore --output_dir FASTQ_TrimGalore --paired --stringency 3 {params.opts} {input.r1} {input.r2} > {log.out} 2> {log.err}
+            mv {params.tmp1} {output.r1}
+            mv {params.tmp2} {output.r2}
             """
 else:
     rule TrimGalore:
@@ -74,12 +78,13 @@ else:
             tmp = "FASTQ_TrimGalore/{sample}_trimmed.fq.gz",
             opts = str(trim_options or '')
         log:
-            "FASTQ_TrimGalore/logs/TrimGalore.{sample}.log"
+            out = "FASTQ_TrimGalore/logs/TrimGalore.{sample}.out",
+            err = "FASTQ_TrimGalore/logs/TrimGalore.{sample}.err"
         benchmark:
             "FASTQ_TrimGalore/.benchmark/TrimGalore.{sample}.benchmark"
         conda: CONDA_SHARED_ENV
         shell: """
-            trim_galore --output_dir FASTQ_TrimGalore --stringency 3 {params.opts} {input} &> {log} && \
+            trim_galore --output_dir FASTQ_TrimGalore --stringency 3 {params.opts} {input} > {log.out} 2> {log.err}
             mv {params.tmp} {output}
             """
 
