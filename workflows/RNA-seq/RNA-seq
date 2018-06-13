@@ -261,7 +261,7 @@ def main():
     ## get command line arguments
     parser = parse_args(defaults)
     args = parser.parse_args()
-    
+
     ## we also add these paths to config, although we don't use them in the Snakefile
     args.this_script_dir = this_script_dir
     args.main_dir_path = main_dir_path
@@ -295,6 +295,10 @@ def main():
         else:
             print("\nSample info file not found! (--DE {})\n".format(args.sample_info))
             exit(1)
+        if not cf.check_sample_info_header(args.sample_info):
+            print("ERROR: Please use 'name' and 'condition' as column headers in sample info file! ("+sample_info+")\n")
+            exit(1)
+
 # 4. get abspath from user provided genome/organism file
     if not os.path.isfile(os.path.join(main_dir_path, "shared", "organisms", args.genome + ".yaml")) and os.path.isfile(args.genome):
         args.genome = os.path.abspath(args.genome)

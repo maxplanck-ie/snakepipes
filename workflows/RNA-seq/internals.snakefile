@@ -3,13 +3,13 @@ import os
 import subprocess
 import re
 
-
-## Main variables ##############################################################
-
 ### Functions ##################################################################
 
-## returns true if there are at least 2 replicates per conditions
 def check_replicates(sample_info_file):
+    """
+    return True if each condition has at least 2 replicates
+    this check is eg. necessary for sleuth  
+    """
     ret = subprocess.check_output(
             "cat "+sample_info_file+"| awk '/^\S*$/{next;}{if (NR==1){ col=0; for (i=1;i<=NF;i++) if ($i~\"condition\") col=i}; if (NR>1) print $col}' | sort | uniq -c | awk '{if ($1>1) ok++}END{if (NR>1 && ok>=NR) print \"REPLICATES_OK\"}'",
             shell=True).decode()
@@ -19,7 +19,11 @@ def check_replicates(sample_info_file):
     else:
         return False
 
+
 def check_sample_info_header(sample_info_file):
+    """
+    return True in case sample info file contains column names 'name' and 'condition'
+    """
     ret = subprocess.check_output(
             "cat "+sample_info_file+" | head -n1",
             shell=True).decode()
@@ -56,7 +60,6 @@ paired = cf.is_paired(infiles,ext,reads)
 if not paired:
     reads = [""]
 
-## Require configuration file (samples.yaml)
 if sample_info and not os.path.isfile(sample_info):
     print("ERROR: Cannot find sample info file! ("+sample_info+")\n")
     exit(1)
