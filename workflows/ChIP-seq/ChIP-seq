@@ -177,13 +177,11 @@ def main():
     if args.configfile and not os.path.exists(args.configfile):
         print("\nError! Provided configfile (-c) not found! ({})\n".format(args.configfile))
         exit(1)
-
     if os.path.exists(os.path.abspath(args.samples_config)):
         args.samples_config = os.path.abspath(args.samples_config)
     else:
         print("\nError! Sample config file not found! ({})\n".format(args.samples_config))
         exit(1)
-
 # 3. Sample info file
     if args.sample_info:
         if os.path.exists(os.path.abspath(args.sample_info)):
@@ -191,6 +189,9 @@ def main():
         else:
             print("\nSample info file not found! (--DB {})\n".format(args.sample_info))
             exit(1)
+# 4. get abspath from user provided genome/organism file
+    if not os.path.isfile(os.path.join(main_dir_path, "shared", "organisms", args.genome + ".yaml")) and os.path.isfile(args.genome):
+        args.genome = os.path.abspath(args.genome)
 
     ## merge configuration dicts
     config = defaults   # 1) form defaults.yaml
