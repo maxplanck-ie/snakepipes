@@ -97,9 +97,10 @@ rule FastQC_on_trimmed:
     output:
         "FastQC_trimmed/{sample}{read}_fastqc.html"
     log:
-        "FastQC_trimmed/logs/FastQC_trimmed.{sample}{read}.log"
+        out = "FastQC_trimmed/logs/FastQC_trimmed.{sample}{read}.out",
+        err = "FastQC_trimmed/logs/FastQC_trimmed.{sample}{read}.err"
     benchmark:
         "FastQC_trimmed/.benchmark/FastQC_trimmed.{sample}{read}.benchmark"
     threads: 2
     conda: CONDA_SHARED_ENV
-    shell: "fastqc -o FastQC_trimmed {input} &> {log}"
+    shell: "fastqc -o FastQC_trimmed {input} > {log.out} 2> {log.err}"

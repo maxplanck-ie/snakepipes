@@ -12,7 +12,8 @@ rule featureCounts:
         paired_opt = lambda wildcards: "-p -B " if paired else "",
         opts = config["featurecounts_options"],
     log:
-        "featureCounts/{sample}.log"
+        out = "featureCounts/{sample}.out",
+        err = "featureCounts/{sample}.err"
     threads: 8
     conda: CONDA_RNASEQ_ENV
     shell:
@@ -23,7 +24,7 @@ rule featureCounts:
         "-a {input.gtf} "
         "-o {output} "
         "--tmpDir ${{TMPDIR}} "
-        "{input.bam} &>> {log} "
+        "{input.bam} > {log.out} 2> {log.err}"
 
 rule merge_featureCounts:
     input:

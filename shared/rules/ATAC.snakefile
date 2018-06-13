@@ -43,5 +43,5 @@ rule callOpenChromatin:
             {params.fileformat} \
             {params.qval_cutoff} \
             {params.nomodel} \
-            {params.write_bdg} &> {log}
+            {params.write_bdg} > {log.out} 2> {log.err}
         """
