@@ -11,7 +11,7 @@ import re
 ## returns true if there are at least 2 replicates per conditions
 def check_replicates(sample_info_file):
     ret = subprocess.check_output(
-            "cat "+sample_info_file+"| awk '{if (NR==1){ col=0; for (i=1;i<=NF;i++) if ($i~\"condition\") col=i} else print $col}' | sort | uniq -c | awk '{if ($1>1) ok++}END{if (NR>1 && ok>=NR) print \"REPLICATES_OK\"}'",
+            "cat "+sample_info_file+"| awk '/^\S*$/{next;}{if (NR==1){ col=0; for (i=1;i<=NF;i++) if ($i~\"condition\") col=i}; if (NR>1) print $col}' | sort | uniq -c | awk '{if ($1>1) ok++}END{if (NR>1 && ok>=NR) print \"REPLICATES_OK\"}'",
             shell=True).decode()
 
     if ret.find("REPLICATES_OK") >=0:
@@ -19,6 +19,15 @@ def check_replicates(sample_info_file):
     else:
         return False
 
+def check_sample_info_header(sample_info_file):
+    ret = subprocess.check_output(
+            "cat "+sample_info_file+" | head -n1",
+            shell=True).decode()
+    
+    if "name" in ret.split() and "condition" in ret.split():
+        return True
+    else:
+        return False
 
 ## Variable defaults ##########################################################
 
@@ -50,6 +59,10 @@ if not paired:
 ## Require configuration file (samples.yaml)
 if sample_info and not os.path.isfile(sample_info):
     print("ERROR: Cannot find sample info file! ("+sample_info+")\n")
+    exit(1)
+
+if sample_info and not check_sample_info_header(sample_info):
+    print("ERROR: Please use 'name' and 'condition' as column headers in sample info file! ("+sample_info+")\n")
     exit(1)
 
 if sample_info and not check_replicates(sample_info):
