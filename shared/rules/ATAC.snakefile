@@ -31,7 +31,9 @@ rule callOpenChromatin:
         write_bdg='--bdg',
         fileformat='--format BAMPE'
     threads: 6
-    log: os.path.join(outdir_MACS2, "logs", "callOpenChromatin", "{sample}_macs2.log")
+    log:
+        out = os.path.join(outdir_MACS2, "logs", "callOpenChromatin", "{sample}_macs2.out"),
+        err = os.path.join(outdir_MACS2, "logs", "callOpenChromatin", "{sample}_macs2.err")
     conda: CONDA_ATAC_ENV
     shell: """
         macs2 callpeak --treatment {input} \
@@ -41,5 +43,5 @@ rule callOpenChromatin:
             {params.fileformat} \
             {params.qval_cutoff} \
             {params.nomodel} \
-            {params.write_bdg} &> {log}
+            {params.write_bdg} > {log.out} 2> {log.err}
         """

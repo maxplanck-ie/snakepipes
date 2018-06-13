@@ -10,18 +10,24 @@ rule get_restrictionSite:
     shell:
         "findRestSite -f {input} --searchPattern {params.res_seq} -o {output}"
 
+
 # Map
 rule map_fastq_single_end:
     input: fastq_dir+"/{sample}{read}.fastq.gz"
     output: "BWA/{sample}{read}.bam"
-    log: "BWA/{sample}{read}.log"
+    params:
+        idx = bwa_index
+    log:
+        out = "BWA/{sample}{read}.out",
+        err = "BWA/{sample}{read}.err"
     threads: 15
     conda: CONDA_HIC_ENV
-    shell:
-        "echo 'mapping {input}' > {log} && "
-        "bwa mem -A1 -B4  -E50 -L0 "
-        "-t {threads} " + bwa_index + " {input} 2>> {log} | "
-        "samtools view -Shb - > {output}"
+    shell: """
+        echo "mapping {input}" > {log.out}
+        bwa mem -A1 -B4  -E50 -L0 -t {threads} {params.index} {input} 2>> {log.err} | samtools view -bo {output} -
+        """
+
+
 ## Make HiC Matrix
 if(RF_resolution is True):
     rule build_matrix:
@@ -39,7 +45,8 @@ if(RF_resolution is True):
              min_dist = MIN_RS_DISTANCE,
              max_dist = MAX_RS_DISTANCE
         log:
-            "HiC_matrices/logs/{sample}.log"
+            out = "HiC_matrices/logs/{sample}.out",
+            err = "HiC_matrices/logs/{sample}.err"
         threads: 15
         conda: CONDA_HIC_ENV
         shell:
@@ -52,8 +59,7 @@ if(RF_resolution is True):
             "--QCfolder {params.QCfolder} "
             "--threads {threads} "
             "{params.region} "
-#           "-b {output.bam} -o {output.matrix} &> {log}"
-            "-o {output.matrix} &> {log}"
+            "-o {output.matrix} > {log.out} 2> {log.err}"
 else:
     rule build_matrix:
         input:
@@ -70,7 +76,8 @@ else:
             min_dist = MIN_RS_DISTANCE,
             max_dist = MAX_RS_DISTANCE
         log:
-           "HiC_matrices/logs/{sample}.log"
+           out = "HiC_matrices/logs/{sample}.out",
+           err = "HiC_matrices/logs/{sample}.err"
         threads: 15
         conda: CONDA_HIC_ENV
         shell:
@@ -81,7 +88,7 @@ else:
             "--QCfolder {params.QCfolder} "
             "--threads {threads} "
             "{params.region} "
-            "-o {output.matrix} &> {log}"
+            "-o {output.matrix} > {log.out} 2> {log.err}"
 
 ## Merge the samples if asked
 rule merge_matrices:
@@ -156,13 +163,14 @@ rule call_tads:
         parameters=tadparams
     threads: 10
     log:
-       "TADs/logs/{sample}_findTADs.log"
+       out = "TADs/logs/{sample}_findTADs.out",
+       err = "TADs/logs/{sample}_findTADs.err"
     shell:
         "hicFindTADs -m {input} "
-        "{params.parameters} "# needs to be variable
+        "{params.parameters} "
         "--correctForMultipleTesting bonferroni "
         "-p {threads} "
-        "--outPrefix {params.prefix} > {log} 2>&1"
+        "--outPrefix {params.prefix} > {log.out} 2> {log.err}"
 
 ##compare matrices using hicPlotDistVsCounts
 rule distvscounts:

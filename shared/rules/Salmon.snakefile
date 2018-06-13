@@ -27,11 +27,15 @@ rule SalmonIndex:
         salmon_index_options = salmon_index_options,
         sasamp = 1
 
-    log: "Salmon/SalmonIndex/SalmonIndex.log"
+    log:
+        out = "Salmon/SalmonIndex/SalmonIndex.out",
+        err = "Salmon/SalmonIndex/SalmonIndex.err",
     threads: 8
     conda: CONDA_RNASEQ_ENV
-    shell:
-        "salmon index --sasamp {params.sasamp} -p {threads} -t {input} -i Salmon/SalmonIndex {params.salmon_index_options} &> {log} && touch {output}"
+    shell: """
+        salmon index --sasamp {params.sasamp} -p {threads} -t {input} -i Salmon/SalmonIndex {params.salmon_index_options} > {log.out} 2> {log.err}
+        touch {output}
+        """
 
 
 ## Salmon quant

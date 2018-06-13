@@ -7,12 +7,13 @@ if paired:
         output:
             "FastQC/{sample}{read}_fastqc.html"
         log:
-            "FastQC/logs/FastQC.{sample}{read}.log"
+            out = "FastQC/logs/FastQC.{sample}{read}.out",
+            err = "FastQC/logs/FastQC.{sample}{read}.err"
         benchmark:
             "FastQC/.benchmark/FastQC.{sample}{read}.benchmark"
         threads: 2
         conda: CONDA_SHARED_ENV
-        shell: "fastqc -o FastQC {input} &> {log}"
+        shell: "fastqc -o FastQC {input} > {log.out} 2> {log.err}"
 
 else:
     rule FastQC_singleEnd:
@@ -21,9 +22,10 @@ else:
         output:
             "FastQC/{sample}_fastqc.html"
         log:
-            "FastQC/logs/FastQC.{sample}.log"
+            out = "FastQC/logs/FastQC.{sample}.out",
+            err = "FastQC/logs/FastQC.{sample}.err"
         benchmark:
             "FastQC/.benchmark/FastQC.{sample}.benchmark"
         threads: 2
         conda: CONDA_SHARED_ENV
-        shell: "fastqc -o FastQC {input} &> {log}"
+        shell: "fastqc -o FastQC {input} > {log.out} 2> {log.err}"

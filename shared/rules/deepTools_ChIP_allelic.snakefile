@@ -18,7 +18,8 @@ rule bamCompare_log2_genome1:
         blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed
                     else "",
     log:
-        "deepTools_ChIP/logs/bamCompare.log2ratio.{chip_sample}.genome1.log"
+        out = "deepTools_ChIP/logs/bamCompare.log2ratio.{chip_sample}.genome1.out",
+        err = "deepTools_ChIP/logs/bamCompare.log2ratio.{chip_sample}.genome1.err"
     benchmark:
         "deepTools_ChIP/.benchmark/bamCompare.log2ratio.{chip_sample}.genome1.benchmark"
     threads: 16
@@ -41,7 +42,8 @@ rule bamCompare_log2_genome2:
         blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed
                     else "",
     log:
-        "deepTools_ChIP/logs/bamCompare.log2ratio.{chip_sample}.genome2.log"
+        out = "deepTools_ChIP/logs/bamCompare.log2ratio.{chip_sample}.genome2.out",
+        err = "deepTools_ChIP/logs/bamCompare.log2ratio.{chip_sample}.genome2.err"
     benchmark:
         "deepTools_ChIP/.benchmark/bamCompare.log2ratio.{chip_sample}.genome2.benchmark"
     threads: 16
@@ -65,7 +67,8 @@ rule plotEnrichment_allelic:
         read_extension = "--extendReads" if paired
                          else "--extendReads "+str(fragment_length)
     log:
-        "deepTools_ChIP/logs/plotEnrichment_allelic.log"
+        out = "deepTools_ChIP/logs/plotEnrichment_allelic.out",
+        err = "deepTools_ChIP/logs/plotEnrichment_allelic.err"
     benchmark:
         "deepTools_ChIP/.benchmark/plotEnrichment_allelic.benchmark"
     threads: 24
@@ -91,7 +94,8 @@ rule plotFingerprint_allelic:
               else "",
         jsd = ""
     log:
-        "deepTools_ChIP/logs/plotFingerprint_allelic.log"
+        out = "deepTools_ChIP/logs/plotFingerprint_allelic.out",
+        err = "deepTools_ChIP/logs/plotFingerprint_allelic.err"
     benchmark:
         "deepTools_ChIP/.benchmark/plotFingerprint_allelic.benchmark"
     threads: 24

@@ -16,7 +16,8 @@ rule bamCompare_subtract:
         read_extension = "--extendReads" if paired else "--extendReads {}".format(fragment_length),
         blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed else ""
     log:
-        "deepTools_ChIP/logs/bamCompare.subtract.{chip_sample}.filtered.subtract.{control_name}.log"
+        out = "deepTools_ChIP/logs/bamCompare.subtract.{chip_sample}.filtered.subtract.{control_name}.out",
+        err = "deepTools_ChIP/logs/bamCompare.subtract.{chip_sample}.filtered.subtract.{control_name}.err"
     benchmark:
         "deepTools_ChIP/.benchmark/bamCompare.subtract.{chip_sample}.filtered.subtract.{control_name}.benchmark"
     threads: 16
@@ -39,7 +40,8 @@ rule bamCompare_log2:
         read_extension = "--extendReads" if paired else "--extendReads {}".format(fragment_length),
         blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed else ""
     log:
-        "deepTools_ChIP/logs/bamCompare.log2ratio.{chip_sample}.{control_name}.filtered.log"
+        out = "deepTools_ChIP/logs/bamCompare.log2ratio.{chip_sample}.{control_name}.filtered.out",
+        err = "deepTools_ChIP/logs/bamCompare.log2ratio.{chip_sample}.{control_name}.filtered.err"
     benchmark:
         "deepTools_ChIP/.benchmark/bamCompare.log2ratio.{chip_sample}.{control_name}.filtered.benchmark"
     threads: 16
@@ -62,7 +64,8 @@ rule plotEnrichment:
         blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed else "",
         read_extension = "--extendReads" if paired else "--extendReads {}".format(fragment_length)
     log:
-        "deepTools_ChIP/logs/plotEnrichment.log"
+        out = "deepTools_ChIP/logs/plotEnrichment.out",
+        err = "deepTools_ChIP/logs/plotEnrichment.err"
     benchmark:
         "deepTools_ChIP/.benchmark/plotEnrichment.benchmark"
     threads: 24
@@ -87,7 +90,8 @@ rule plotFingerprint:
         jsd = "--JSDsample filtered_bam/{}.filtered.bam".format(control_samples[0]) if (len(control_samples)>0)
             else ""
     log:
-        "deepTools_ChIP/logs/plotFingerprint.log"
+        out = "deepTools_ChIP/logs/plotFingerprint.out",
+        err = "deepTools_ChIP/logs/plotFingerprint.err"
     benchmark:
         "deepTools_ChIP/.benchmark/plotFingerprint.benchmark"
     threads: 24
