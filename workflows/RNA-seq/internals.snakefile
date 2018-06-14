@@ -3,6 +3,10 @@ import os
 import subprocess
 import re
 
+
+## Main variables ##############################################################
+
+
 ### Functions ##################################################################
 
 def check_replicates(sample_info_file):
