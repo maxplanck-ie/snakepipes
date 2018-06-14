@@ -254,6 +254,9 @@ def main():
     if args.configfile and not os.path.exists(args.configfile):
         print("\nError! Provided configfile (-c) not found! ({})\n".format(args.configfile))
         exit(1)
+# 3. get abspath from user provided genome/organism file
+    if not os.path.isfile(os.path.join(main_dir_path, "shared", "organisms", args.genome + ".yaml")) and os.path.isfile(args.genome):
+        args.genome = os.path.abspath(args.genome)
 
     ## merge configuration dicts
     config = defaults   # 1) form defaults.yaml

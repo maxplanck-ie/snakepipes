@@ -295,7 +295,13 @@ def main():
         else:
             print("\nSample info file not found! (--DE {})\n".format(args.sample_info))
             exit(1)
+        if not cf.check_sample_info_header(args.sample_info):
+            print("ERROR: Please use 'name' and 'condition' as column headers in sample info file! ("+sample_info+")\n")
+            exit(1)
 
+# 4. get abspath from user provided genome/organism file
+    if not os.path.isfile(os.path.join(main_dir_path, "shared", "organisms", args.genome + ".yaml")) and os.path.isfile(args.genome):
+        args.genome = os.path.abspath(args.genome)
 
     ## merge configuration dicts
     config = defaults   # 1) form defaults.yaml

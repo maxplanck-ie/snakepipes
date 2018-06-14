@@ -167,7 +167,7 @@ rule bamPE_fragment_size:
     conda:
         CONDA_SHARED_ENV
     log:
-        out="deepTools_qc/logs/bamPEFragmentSize..out",
+        out="deepTools_qc/logs/bamPEFragmentSize.out",
         err="deepTools_qc/logs/bamPEFragmentSize.err"
     threads: 24
     shell: bamPEFragmentSize_cmd
