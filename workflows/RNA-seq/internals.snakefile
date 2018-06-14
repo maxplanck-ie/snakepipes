@@ -20,19 +20,6 @@ def check_replicates(sample_info_file):
         return False
 
 
-def check_sample_info_header(sample_info_file):
-    """
-    return True in case sample info file contains column names 'name' and 'condition'
-    """
-    ret = subprocess.check_output(
-            "cat "+sample_info_file+" | head -n1",
-            shell=True).decode()
-    
-    if "name" in ret.split() and "condition" in ret.split():
-        return True
-    else:
-        return False
-
 ## Variable defaults ##########################################################
 
 mode = list(map(str.strip, re.split(',|;', config["mode"])))
@@ -64,7 +51,7 @@ if sample_info and not os.path.isfile(sample_info):
     print("ERROR: Cannot find sample info file! ("+sample_info+")\n")
     exit(1)
 
-if sample_info and not check_sample_info_header(sample_info):
+if sample_info and not cf.check_sample_info_header(sample_info):
     print("ERROR: Please use 'name' and 'condition' as column headers in sample info file! ("+sample_info+")\n")
     exit(1)
 
