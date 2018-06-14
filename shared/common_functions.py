@@ -230,9 +230,8 @@ def check_sample_info_header(sample_info_file):
     """
     return True in case sample info file contains column names 'name' and 'condition'
     """
-    ret = subprocess.check_output(
-            "cat " + sample_info_file + " | head -n1",
-            shell=True).decode()
+    ret = subprocess.check_output("cat " + sample_info_file + " | head -n1",
+                                  shell=True).decode()
 
     if "name" in ret.split() and "condition" in ret.split():
         return True
