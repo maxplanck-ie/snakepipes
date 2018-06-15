@@ -18,7 +18,7 @@ rule map_fastq_single_end:
     input: fastq_dir+"/{sample}{read}.fastq.gz"
     output:
         out =  "BWA/{sample}{read}.bam"
-    log: 
+    log:
         out = "BWA/logs/{sample}{read}.out",
         err = "BWA/logs/{sample}{read}.err"
     threads: 15
@@ -110,7 +110,7 @@ rule merge_bins:
          "HiC_matrices/{sample}_"+matrixFile_suffix+".h5"
      output:
          matrix = "HiC_matrices/{sample}_Mbins"+str(nbins_toMerge)+"_"+matrixFile_suffix+".h5"
-     
+
      params:
          num_bins=nbins_toMerge
      log:
@@ -118,7 +118,7 @@ rule merge_bins:
          err = "HiC_matrices/logs/{sample}_Mbins"+str(nbins_toMerge)+"_"+matrixFile_suffix+".err"
      conda: CONDA_HIC_ENV
      shell:
-         "hicMergeMatrixBins -m {input} -nb {params.num_bins} -o {output.matrix} >{log.out} 2>{log.err} "  
+         "hicMergeMatrixBins -m {input} -nb {params.num_bins} -o {output.matrix} >{log.out} 2>{log.err} "
 
 ## diagnostic plots
 rule diagnostic_plot:
@@ -127,10 +127,11 @@ rule diagnostic_plot:
     output:
         plot = "HiC_matrices/QCplots/{sample}_"+matrixFile_suffix+"_diagnostic_plot.pdf",
         mad = "HiC_matrices/QCplots/{sample}_"+matrixFile_suffix+"_mad_threshold.out"
-
-    conda: CONDA_HIC_ENV       
+    params:
+        chr = chromosomes
+    conda: CONDA_HIC_ENV
     shell:
-       "hicCorrectMatrix diagnostic_plot -m {input} -o {output.plot} &> {output.mad} " 
+       "hicCorrectMatrix diagnostic_plot -m {input} -o {output.plot} {params.chr} &> {output.mad} "
 
 
 # Compute MAD score thresholds
@@ -152,11 +153,13 @@ rule correct_matrix:
         correct = "HiC_matrices_corrected/logs/thresholds_{sample}_"+matrixFile_suffix+".out"
     output:
         "HiC_matrices_corrected/{sample}_"+matrixFile_suffix+".corrected.h5"
+    params:
+        chr = chromosomes
     conda: CONDA_HIC_ENV
     shell:
         "thresholds=$(cat \"{input.correct}\");"
         "hicCorrectMatrix correct --filterThreshold $thresholds"
-        " -m {input.matrix} -o {output} >> {input.correct}"
+        " {params.chr} -m {input.matrix} -o {output} >> {input.correct}"
 
 
 ## Call TADs

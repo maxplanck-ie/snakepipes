@@ -27,7 +27,7 @@ genome:
 ## FASTQ file extension (default: ".fastq.gz")
 ext: .fastq.gz
 ## paired-end read name extension (default: ['_R1', "_R2"])
-reads: [_1, _2]
+reads: ['_R1', '_R2']
 mapping_prg: BWA
 ## Number of reads to downsample from each FASTQ file
 downsample:
@@ -44,7 +44,7 @@ enzyme: HindIII
 # bin size in base pairs, if RF resolution is not required
 bin_size: 10000
 # build matrix only for given region
-restrict_region:
+restrict_region: 
 # Create files with N merged bins (0 = No)
 nbins_toMerge: 0
 # shall we merge the samples?
@@ -55,7 +55,7 @@ distVsCount: false
 distVsCountParams: 
 noTAD: false
 noCorrect: false
-
+chromosomes: --chromosomes 17
 ################################################################################
 # Call snakemake directly, i.e. without using the wrapper script:
 #
