@@ -5,14 +5,24 @@ def multiqc_input_check(return_value):
     infiles = []
     indir = ""
 
-    if trim:
-        infiles.append( expand("FastQC_trimmed/{sample}{read}_fastqc.html", sample = samples, read = reads) )
-        indir += " FastQC_trimmed "
-        infiles.append( expand(fastq_dir+"/{sample}{read}.fastq.gz", sample = samples, read = reads) )
-        indir += fastq_dir + " "
-    elif fastqc:
-        infiles.append( expand("FastQC/{sample}{read}_fastqc.html", sample = samples, read = reads) )
-        indir +=" FastQC "
+    if paired:
+        if trim:
+            infiles.append( expand("FastQC_trimmed/{sample}{read}_fastqc.html", sample = samples, read = reads) )
+            indir += " FastQC_trimmed "
+            infiles.append( expand(fastq_dir+"/{sample}{read}.fastq.gz", sample = samples, read = reads) )
+            indir += fastq_dir + " "
+        elif fastqc:
+            infiles.append( expand("FastQC/{sample}{read}_fastqc.html", sample = samples, read = reads) )
+            indir +=" FastQC "
+    else:
+        if trim:
+            infiles.append( expand("FastQC_trimmed/{sample}_fastqc.html", sample = samples) )
+            indir += " FastQC_trimmed "
+            infiles.append( expand(fastq_dir+"/{sample}.fastq.gz", sample = samples) )
+            indir += fastq_dir + " "
+        elif fastqc:
+            infiles.append( expand("FastQC/{sample}_fastqc.html", sample = samples) )
+            indir +=" FastQC "
 
     if pipeline=="dna-mapping":
         # pipeline is DNA-mapping
@@ -47,12 +57,19 @@ def multiqc_input_check(return_value):
     elif pipeline == "hic":
         infiles.append(expand("HiC_matrices/QCplots/{sample}_QC/QC_table.txt",sample = samples))
         indir += "HiC_matrices/QCplots/"
-
+    elif pipeline == "scrna-seq":
+        infiles.append( expand(mapping_prg+"/{sample}.bam", sample = samples) +
+        expand("Sambamba/{sample}.markdup.txt", sample = samples) +
+        expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample=samples))
+        indir += mapping_prg
+        indir += " Sambamba "
+        indir += " deepTools_qc/estimateReadFiltering"
 
     if return_value == "infiles":
         return(infiles)
     else:
         return(indir)
+
 
 rule multiQC:
     input:
@@ -60,7 +77,9 @@ rule multiQC:
     output: "multiQC/multiqc_report.html"
     params:
         indirs = multiqc_input_check(return_value = "indir")
-    log: "multiQC/multiQC.log"
+    log:
+        out = "multiQC/multiQC.out",
+        err = "multiQC/multiQC.err"
     conda: CONDA_SHARED_ENV
     shell:
-        "multiqc -o multiQC -f {params.indirs} &> {log}"
+        "multiqc -o multiQC -f {params.indirs} > {log.out} 2> {log.err}"

@@ -5,22 +5,15 @@ import glob
 import io
 import gzip
 
-#import logging
-
-
 ### snakemake_workflows initialization ########################################
 maindir = os.path.dirname(os.path.dirname(workflow.basedir))
 sys.path.append(os.path.join(maindir, "shared"))
 import common_functions as cf
 workflow_tools=os.path.join(maindir, "shared", "tools")
 
-<<<<<<< HEAD
-# load tool paths
-#globals().update(cf.load_paths(os.path.join(maindir, "shared", "paths.yaml"),maindir,config["verbose"]))
-=======
 # load conda ENVs (path is relative to "shared/rules" directory)
 CONDA_SHARED_ENV = "envs/shared_environment.yaml"
->>>>>>> 2490d918428cfbb0829e963554432c92f23c935d
+
 # load config file
 globals().update(cf.load_configfile(workflow.overwrite_configfile,config["verbose"]))
 # load organism-specific data, i.e. genome indices, annotation, etc.
@@ -30,18 +23,13 @@ globals().update(cf.load_organism_data(genome,maindir,config["verbose"]))
 refG=genome_fasta
 crefG=bwameth_index
 
-############conda configs###################
-this_script_dir = os.path.dirname(os.path.realpath(__file__))
-CondaEnvironment=os.path.join(this_script_dir,'conda.yml')
-SharedCondaEnvironment=os.path.join(this_script_dir,'shared_environment.yaml')
-mCtCondaEnvironment=os.path.join(this_script_dir,'methylCtools.yaml')
+#this_script_dir = os.path.dirname(os.path.realpath(__file__))
 
 ### Sample init #############################################################
 
 infiles = sorted(glob.glob(os.path.join(str(indir or ''), '*'+ext)))
 samples = cf.get_sample_names(infiles,ext,reads)
 paired = cf.is_paired(infiles,ext,reads)
-#del infiles
 
 if not samples:
     logger.error("  Error! NO samples found in dir "+str(indir or '')+"!!!")#\n \n\n
@@ -66,7 +54,9 @@ def get_Read_Group(INfiles):
 
 RG_dict=get_Read_Group(infiles)
 del infiles
-### conditional/optional rules #################################################  #some of those definitions are used to generate output strings for some of the rules
+
+### conditional/optional rules #################################################  
+#some of those definitions are used to generate output strings for some of the rules
 ################################################################################
 
 def run_cutadapt(trimReads):
@@ -123,21 +113,10 @@ def run_int_aggStats(intList,sampleInfo):
     else:
         return ([])
 
-############# parsing functions ##########################################
-#def get_Read_Group(INfile1):
-#    with io.TextIOWrapper(gzip.open(INfile1, 'r')) as f:
-#        file_content = f.readline().strip()
-#    read_root=re.sub('_R1.fastq.gz','',os.path.basename(INfile1))
-#    PL=re.sub('@','',file_content).split(":")[0]
-#    PU=re.sub('@','',file_content).split(":")[2]
-#    RG='@RG"\\t"ID:1"\\t"SM:'+read_root+'"\\t"LB:'+read_root+'"\\t"PL:'+PL+'"\\t"PU:'+PU
-#    return RG
 
 
-
-
-
-### include modules of other snakefiles ######################################## ##some rules depend on the definitions above
+### include modules of other snakefiles ######################################## 
+##some rules depend on the definitions above
 ################################################################################
 # FASTQ: either downsample FASTQ files or create symlinks to input files
 include: os.path.join(maindir, "shared", "rules", "FASTQ.snakefile")
@@ -145,23 +124,24 @@ include: os.path.join(maindir, "shared", "rules", "FASTQ.snakefile")
 # WGBS
 include: os.path.join(maindir, "shared", "rules", "WGBS.snakefile")
 
-# do workflow specific stuff now
+# non-rule operations specific to the workflow
 include: os.path.join(workflow.basedir, "internals.snakefile")
 
 
 ### execute before workflow starts #############################################
 ################################################################################
 onstart:
-    if "verbose" in config and config["verbose"]:
-        logger.info("--- Workflow parameters --------------------------------------------------------")
-        logger.info("samples:"+ str(samples))
-        logger.info("input dir:"+ indir)
-        logger.info("-" * 80)#, "\n"
+    with open (os.path.join(wdir, 'pipeline.log'),"a") as lo:
+        if "verbose" in config and config["verbose"]:
+            print("--- Workflow parameters --------------------------------------------------------",file=lo)
+            print("samples:"+ str(samples),file=lo)
+            print("input dir:"+ indir,file=lo)
+            print("-" * 80,file=lo)#, "\n"
 
-        logger.info("--- Environment ----------------------------------------------------------------")
-        logger.info("$TMPDIR: "+os.getenv('TMPDIR', ""))
-        logger.info("$HOSTNAME: "+os.getenv('HOSTNAME', ""))
-        logger.info("-" * 80)#, "\n"
+            print("--- Environment ----------------------------------------------------------------",file=lo)
+            print("$TMPDIR: "+os.getenv('TMPDIR', ""),file=lo)
+            print("$HOSTNAME: "+os.getenv('HOSTNAME', ""),file=lo)
+            print("-" * 80,file=lo)#, "\n"
 
 ### main rule ##################################################################
 ################################################################################
@@ -188,5 +168,7 @@ rule all:
 ### execute after workflow finished ############################################
 ################################################################################
 onsuccess:
+    cf.cleanLogs(wdir)
     if "verbose" in config and config["verbose"]:
-        logger.info("--- WGBS workflow finished successfully! --------------------------------")#\n \n
+        with open (os.path.join(wdir, 'pipeline.log'),"a") as lo:
+            print("--- WGBS workflow finished successfully! --------------------------------",file=lo)#\n \n

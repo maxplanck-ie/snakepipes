@@ -13,7 +13,9 @@ rule sleuth_Salmon:
         indir = "Salmon",
         outdir = "sleuth",
         fdr = 0.05,
-    log: "sleuth.log"
+    log:
+        out = "sleuth/logs/sleuth.out",
+        err = "sleuth/logs/sleuth.err"
     conda: CONDA_RNASEQ_ENV
     shell:
         "cd {params.outdir} && "
@@ -23,6 +25,4 @@ rule sleuth_Salmon:
         "../{params.outdir} "
         "{params.fdr} "
         "../{input.t2g} "
-        "2>&1 | tee {log}"
-
-## sleuth (on Salmon)
+        "> {log.out} 2> {log.err}"

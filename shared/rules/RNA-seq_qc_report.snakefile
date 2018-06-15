@@ -5,7 +5,7 @@ rule convert_flagstat_output:
       output:
          temp("Sambamba/{sample}.dup.converted.tsv")
       shell:
-         "sed -n '1p;4p;5p' {input} | cut -d' ' -f1 | tr '\n' '\t' | sed 's/^/{wildcards.sample}\t/' | sed -e '$a\\' | tee {output}"
+         "sed -n '1p;4p;5p' {input} | cut -d' ' -f1 | tr '\n' '\t' | sed 's/^/{wildcards.sample}\t/' | sed -e '$a\\' > {output}"
 
 #######merge converted sambamba reports######
 rule report_flagstat_all_data:
@@ -14,7 +14,8 @@ rule report_flagstat_all_data:
       output:
          "Sambamba/flagstat_report_all.tsv"
       shell:
-         "cat {input} | sort -k1,1V | cat <( echo -e 'sample\ttotal\tdup\tmapped') - > {output}"
+         "sort -k1,1V {input} | cat <( echo -e 'sample\ttotal\tdup\tmapped') - > {output}"
+
 ##########QC report for all the samples#########
 if dnaContam:
   rule qc_report_all:
@@ -24,7 +25,7 @@ if dnaContam:
         output:
             "QC_report/QC_report_all.tsv"
         shell:
-            "cat {input.IHECmetrics} | cut -f2,3 | paste {input.flagstat} - > {output}"
+            "cut -f2,3 {input.IHECmetrics} | paste {input.flagstat} - > {output}"
 else:
   rule qc_report_all:
         input:
@@ -32,6 +33,4 @@ else:
         output:
             "QC_report/QC_report_all.tsv"
         shell:
-            "cat {input.flagstat} > {output}"
- 
-#
+            "cp {input.flagstat} {output}"

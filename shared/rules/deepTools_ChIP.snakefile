@@ -5,22 +5,21 @@ rule bamCompare_subtract:
     input:
         chip_bam = "filtered_bam/{chip_sample}.filtered.bam",
         chip_bai = "filtered_bam/{chip_sample}.filtered.bam.bai",
-        control_bam = lambda wildcards: "filtered_bam/"+get_control(wildcards.chip_sample)+".filtered.bam",
-        control_bai = lambda wildcards: "filtered_bam/"+get_control(wildcards.chip_sample)+".filtered.bam.bai",
+        control_bam = "filtered_bam/{control_name}.filtered.bam",
+        control_bai = "filtered_bam/{control_name}.filtered.bam.bai"
     output:
         "deepTools_ChIP/bamCompare/{chip_sample}.filtered.subtract.{control_name}.bw"
     params:
         bw_binsize = bw_binsize,
         genome_size = genome_size,
-        ignoreForNorm = "--ignoreForNormalization " + ignore_forNorm if ignore_forNorm else "",
-        read_extension = "--extendReads" if paired
-                         else "--extendReads "+str(fragment_length),
-        blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed
-                         else "",
+        ignoreForNorm = "--ignoreForNormalization {}".format(ignore_forNorm) if ignore_forNorm else "",
+        read_extension = "--extendReads" if paired else "--extendReads {}".format(fragment_length),
+        blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed else ""
     log:
-        "deepTools_ChIP/logs/bamCompare.subtract.{chip_sample}.filtered.log"
+        out = "deepTools_ChIP/logs/bamCompare.subtract.{chip_sample}.filtered.subtract.{control_name}.out",
+        err = "deepTools_ChIP/logs/bamCompare.subtract.{chip_sample}.filtered.subtract.{control_name}.err"
     benchmark:
-        "deepTools_ChIP/.benchmark/bamCompare.subtract.{chip_sample}.filtered.benchmark"
+        "deepTools_ChIP/.benchmark/bamCompare.subtract.{chip_sample}.filtered.subtract.{control_name}.benchmark"
     threads: 16
     conda: CONDA_SHARED_ENV
     shell: bamcompare_subtract_cmd
@@ -31,21 +30,20 @@ rule bamCompare_log2:
     input:
         chip_bam = "filtered_bam/{chip_sample}.filtered.bam",
         chip_bai = "filtered_bam/{chip_sample}.filtered.bam.bai",
-        control_bam = lambda wildcards: "filtered_bam/"+get_control(wildcards.chip_sample)+".filtered.bam",
-        control_bai = lambda wildcards: "filtered_bam/"+get_control(wildcards.chip_sample)+".filtered.bam.bai",
+        control_bam = "filtered_bam/{control_name}.filtered.bam",
+        control_bai = "filtered_bam/{control_name}.filtered.bam.bai",
     output:
         "deepTools_ChIP/bamCompare/{chip_sample}.filtered.log2ratio.over_{control_name}.bw"
     params:
         bw_binsize = bw_binsize,
-        ignoreForNorm = "--ignoreForNormalization " + ignore_forNorm if ignore_forNorm else "",
-        read_extension = "--extendReads" if paired
-                         else "--extendReads "+str(fragment_length),
-        blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed
-                    else "",
+        ignoreForNorm = "--ignoreForNormalization {}".format(ignore_forNorm) if ignore_forNorm else "",
+        read_extension = "--extendReads" if paired else "--extendReads {}".format(fragment_length),
+        blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed else ""
     log:
-        "deepTools_ChIP/logs/bamCompare.log2ratio.{chip_sample}.filtered.log"
+        out = "deepTools_ChIP/logs/bamCompare.log2ratio.{chip_sample}.{control_name}.filtered.out",
+        err = "deepTools_ChIP/logs/bamCompare.log2ratio.{chip_sample}.{control_name}.filtered.err"
     benchmark:
-        "deepTools_ChIP/.benchmark/bamCompare.log2ratio.{chip_sample}.filtered.benchmark"
+        "deepTools_ChIP/.benchmark/bamCompare.log2ratio.{chip_sample}.{control_name}.filtered.benchmark"
     threads: 16
     conda: CONDA_SHARED_ENV
     shell: bamcompare_log2_cmd
@@ -63,12 +61,11 @@ rule plotEnrichment:
     params:
         genes_gtf = genes_gtf,
         labels = " ".join(all_samples),
-        blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed
-                    else "",
-        read_extension = "--extendReads" if paired
-                         else "--extendReads "+str(fragment_length)
+        blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed else "",
+        read_extension = "--extendReads" if paired else "--extendReads {}".format(fragment_length)
     log:
-        "deepTools_ChIP/logs/plotEnrichment.log"
+        out = "deepTools_ChIP/logs/plotEnrichment.out",
+        err = "deepTools_ChIP/logs/plotEnrichment.err"
     benchmark:
         "deepTools_ChIP/.benchmark/plotEnrichment.benchmark"
     threads: 24
@@ -86,16 +83,15 @@ rule plotFingerprint:
         metrics = "deepTools_ChIP/plotFingerprint/plotFingerprint.metrics.txt"
     params:
         labels = " ".join(all_samples),
-        blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed
-                    else "",
-        read_extension = "--extendReads" if paired
-                         else "--extendReads "+str(fragment_length),
+        blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed else "",
+        read_extension = "--extendReads" if paired else "--extendReads {}".format(fragment_length),
         png = "--plotFile deepTools_ChIP/plotFingerprint/plotFingerprint.png" if (len(all_samples)<=20)
               else "",
-        jsd = "--JSDsample filtered_bam/"+control_samples[0]+".filtered.bam" if (len(control_samples)>0)
+        jsd = "--JSDsample filtered_bam/{}.filtered.bam".format(control_samples[0]) if (len(control_samples)>0)
             else ""
     log:
-        "deepTools_ChIP/logs/plotFingerprint.log"
+        out = "deepTools_ChIP/logs/plotFingerprint.out",
+        err = "deepTools_ChIP/logs/plotFingerprint.err"
     benchmark:
         "deepTools_ChIP/.benchmark/plotFingerprint.benchmark"
     threads: 24

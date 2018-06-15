@@ -30,13 +30,13 @@ convRef: False
 ###list of bed files to process
 intList: []
 ###SNP black list (bed file)
-blackList: 
+blackList:
 ###sample Info
 sampleInfo:
 ###inclusion bounds for methylation extraction
 mbias_ignore: auto
 ## FASTQ file extension (default: ".fastq.gz")
-ext: .fastq.gz
+ext: '.fastq.gz'
 ## paired-end read name extension (default: ['_R1', "_R2"])
 reads: [_R1, _R2]
 ## Number of reads to downsample from each FASTQ file

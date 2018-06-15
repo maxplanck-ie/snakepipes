@@ -1,5 +1,6 @@
 ### histoneHMM broad enrichment calling ########################################
 
+# -b 750 -P 0.1
 rule histoneHMM:
     input:
         "filtered_bam/{sample}.filtered.bam"
@@ -11,18 +12,15 @@ rule histoneHMM:
         prefix = "histoneHMM/{sample}.filtered.histoneHMM",
         genome_index = genome_index
     log:
-        "histoneHMM/logs/histoneHMM.{sample}.filtered.log"
+        out = "histoneHMM/logs/histoneHMM.{sample}.filtered.out",
+        err = "histoneHMM/logs/histoneHMM.{sample}.filtered.err"
     benchmark:
         "histoneHMM/.benchmark/histoneHMM.{sample}.filtered.benchmark"
-    shell:
-      "export R_LIBS_USER="+R_libs_path+" && "+
-      R_path+"Rscript "+histoneHMM_path+"histoneHMM_call_regions.R "
-        "-b 750 "
-        "-c {params.genome_index} "
-        "-o {params.prefix} "
-        "-P 0.1 "
-        "{input} "
-        "&> {log}"
+    conda: CONDA_CHIPSEQ_ENV
+    shell: """
+        RHOME=`R RHOME`
+        $RHOME/library/histoneHMM/bin/histoneHMM_call_regions.R -b 750 -c {params.genome_index} -o {params.prefix} -P 0.1 {input} > {log.out} 2> {log.err}
+        """
 
 
 ### compress and index GFF result file from histoneHMM for usage with IGV ######
@@ -39,15 +37,15 @@ rule histoneHMM_out_gz:
         post = touch("histoneHMM/{sample}.filtered.histoneHMM-em-posterior.txt.gz"),
         txt = touch("histoneHMM/{sample}.filtered.histoneHMM.txt.gz")
     log:
-        "histoneHMM/logs/histoneHMM_out_gz.{sample}.filtered.log"
+        out = "histoneHMM/logs/histoneHMM_out_gz.{sample}.filtered.out",
+        err = "histoneHMM/logs/histoneHMM_out_gz.{sample}.filtered.err"
     benchmark:
         "histoneHMM/.benchmark/histoneHMM_out_gz.{sample}.filtered.benchmark"
     threads: 2
-    shell:
-        "grep -v ^\"#\" {input.gff} | "
-        "sort -k1,1 -k4,4n | "+
-        tabix_path+"bgzip > {output.gff} && "+
-        tabix_path+"tabix -p gff {output.gff} "
-        "&> {log} && "+
-        "gzip {input.post} && "+
-        "gzip {input.txt}"
+    conda: CONDA_CHIPSEQ_ENV
+    shell: """
+        grep -v ^\"#\" {input.gff} | sort -k1,1 -k4,4n | bgzip > {output.gff}
+        tabix -p gff {output.gff} > {log.out} 2> {log.err}
+        gzip {input.post}
+        gzip {input.txt}
+        """

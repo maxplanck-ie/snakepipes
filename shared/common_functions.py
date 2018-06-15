@@ -1,10 +1,12 @@
 #!/usr/bin/env python
+
 # functions shared across workflows ##########################################
-################################################################################
+##############################################################################
 import subprocess
 import os
 import re
 import yaml
+import glob
 
 
 def get_snakepipes_path():
@@ -33,7 +35,7 @@ def merge_dicts(x, y):
     return z
 
 
-# this is a pure sanity fucntion to avoid obvious mailfunction during snakefile execution
+# this is a pure sanity function to avoid obvious mailfunction during snakefile execution
 # because we load yaml/path/genome configs directly into global namespace!
 def sanity_dict_clean(myDict):
     unwanted_keys = ['maindir', 'workflow']
@@ -148,10 +150,10 @@ def get_fragment_length(infile, sampleName):
     with open(infile, "r") as f:
         for line in f:
             line = line.strip()
-            if line.startswith(sampleName):
+            if line.startswith("filtered_bam/{}".format(sampleName)):
                 try:
                     median = line.split()[5]
-                    return float(median)
+                    return int(float(median))
                 except TypeError:
                     print("ERROR: File", infile, "is NOT an output from bamPEFragmentSize.\n")
                     exit(1)
@@ -181,6 +183,11 @@ def make_temp_dir(tempdir, fallback_dir, verbose=False):
 
 def checkAlleleParams(args):
     # first some sanity checks
+    mode = list(map(str.strip, re.split(',|;', args.mode)))
+    mode = [element.lower() for element in mode]
+    if "allelic-mapping" in mode and "mapping" in mode:
+        print("\nError! Please specify either allelic-mapping or mapping for option --mode! \n")
+        exit(1)
     if "allelic-mapping" in args.mode:
         if not os.path.exists(args.SNPfile):
             # if no SNPfile, check for a VCF file
@@ -203,3 +210,30 @@ def checkAlleleParams(args):
     else:
         allele_mode = None
     return allele_mode
+
+
+def cleanLogs(d):
+    """
+    Remove all empty log files, both in cluster_logs/ and */logs/
+    """
+    for f in glob.glob(os.path.join(d, "cluster_logs", "*")):
+        s = os.stat(f)
+        if s.st_size == 0:
+            os.remove(f)
+    for f in glob.glob(os.path.join(d, "*", "logs", "*")):
+        s = os.stat(f)
+        if s.st_size == 0:
+            os.remove(f)
+
+
+def check_sample_info_header(sample_info_file):
+    """
+    return True in case sample info file contains column names 'name' and 'condition'
+    """
+    ret = subprocess.check_output("cat " + sample_info_file + " | head -n1",
+                                  shell=True).decode()
+
+    if "name" in ret.split() and "condition" in ret.split():
+        return True
+    else:
+        return False

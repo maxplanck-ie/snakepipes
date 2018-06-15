@@ -25,7 +25,7 @@ indir:
 ## Value can be also path to your own genome config file!
 genome:
 ## FASTQ file extension (default: ".fastq.gz")
-ext: .fastq.gz
+ext: '.fastq.gz'
 ## paired-end read name extension (default: ['_R1', "_R2"])
 reads: [_R1, _R2]
 ## mapping mode
@@ -59,7 +59,7 @@ plot_format: png
 ## Median/mean fragment length, only relevant for single-end data (default: 200)
 fragment_length: 200
 qualimap: false
-verbose: False
+verbose: false
 ################################################################################
 # Call snakemake directly, i.e. without using the wrapper script:
 #

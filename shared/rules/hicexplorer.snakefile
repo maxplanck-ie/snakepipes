@@ -13,6 +13,7 @@ rule get_restrictionSite:
     shell:
         "findRestSite -f {input} --searchPattern {params.res_seq} -o {output} > {log.out} 2> {log.err}"
 
+
 # Map
 rule map_fastq_single_end:
     input: fastq_dir+"/{sample}{read}.fastq.gz"
@@ -77,6 +78,7 @@ else:
             min_dist = MIN_RS_DISTANCE,
             max_dist = MAX_RS_DISTANCE
         log:
+
             out = "HiC_matrices/logs/{sample}"+matrixFile_suffix+".out",
             err = "HiC_matrices/logs/{sample}"+matrixFile_suffix+".err"
         threads: 15
@@ -179,7 +181,7 @@ rule call_tads:
         CONDA_HIC_ENV
     shell:
         "hicFindTADs -m {input} "
-        "{params.parameters} "# needs to be variable
+        "{params.parameters} "
         "--correctForMultipleTesting bonferroni "
         "-p {threads} "
         "--outPrefix {params.prefix} > {log.out} 2> {log.err}"

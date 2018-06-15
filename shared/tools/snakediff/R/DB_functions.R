@@ -53,22 +53,22 @@ readfiles_chip <- function(sampleInfo, fragment_length, window_size, alleleSpeci
         design$condition <- relevel(design$condition, ref = as.character(design$condition[1]))# make the first entry the base level
         designm <- model.matrix(~condition, data = design)
         designType <- "condition"
+        # define bam files to read
+        bam.files <- list.files("filtered_bam",
+                                pattern = paste0(sampleInfo$name,".filtered.bam$", collapse = "|"),
+                                full.names = TRUE )
     }
 
-      # define bam files to read
-      bam.files <- list.files("filtered_bam",
-                        pattern = paste0(sampleInfo$name,".filtered.bam$", collapse = "|"),
-                        full.names = TRUE )
-    message("bam files used:")
-    print(bam.files)
+    message("bam files used: ")
+    message(bam.files)
     # readFiles using CSAW
     mincount <- 20
     message(paste0("Counting reads in windows.. windows with total counts < ", mincount, " are discarded"))
-    counts <- csaw::windowCounts(bam.files = bam.files, param = pe.param, ext = fragment_length, spacing = window_size,  filter = mincount)
+    counts <- csaw::windowCounts(bam.files = bam.files, param = pe.param, ext = fragment_length, spacing = window_size, filter = mincount)
 
     # output
     chipCountObject <- list(windowCounts = counts, sampleInfo = sampleInfo,
-                    design = designm, designType = designType, pe.param = pe.param)
+                            design = designm, designType = designType, pe.param = pe.param)
     return(chipCountObject)
 }
 
@@ -101,8 +101,7 @@ makeQCplots_chip <- function(bam.file, outplot, pe.param){
         windowed <- csaw::windowCounts(curbam, spacing = 50, param = pe.param, filter = 20)
         rwsms <- rowSums(SummarizedExperiment::assay(windowed))
         maxed <- csaw::findMaxima(SummarizedExperiment::rowRanges(windowed), range = 1000, metric = rwsms)
-        curbam.out <- csaw::profileSites(curbam, SummarizedExperiment::rowRanges(windowed)[maxed],
-                               param = pe.param, weight = 1/rwsms[maxed])
+        curbam.out <- csaw::profileSites(curbam, SummarizedExperiment::rowRanges(windowed)[maxed], param = pe.param)
         return(curbam.out)
     }
     collected <- plotwc(bam.file)
@@ -151,7 +150,7 @@ tmmNormalize_chip <- function(chipCountObject, binsize, plotfile){
     bam.files <- SummarizedExperiment::colData(chipCountObject$windowCounts)$bam.files
     # Get norm factors
     wider <- csaw::windowCounts(bam.files, bin = TRUE, width = binsize, param = chipCountObject$pe.param)
-    normfacs <- csaw::normOffsets(wider)$norm.factors
+    normfacs <- csaw::normOffsets(wider, se.out=FALSE)
     chipCountObject$normFactors <- normfacs
 
     # get norm counts
@@ -160,15 +159,18 @@ tmmNormalize_chip <- function(chipCountObject, binsize, plotfile){
 
     # plot normalized counts
     pdf(plotfile)
-    par(mfrow = c(3, 3), mar = c(5, 4, 2, 1.5))
-    for (i in 1:(length(bam.files) - 1)) {
-        cur.x <- adj.counts[,1]
-        cur.y <- adj.counts[,1 + i]
-        smoothScatter(x = (cur.x + cur.y)/2 + 6*log2(10), y = cur.x-cur.y, xlab = "A",
-                  ylab = "M", main = paste("1 vs", i+1))
-        all.dist <- diff(log2(normfacs[c(i + 1, 1)]))
-        abline(h = all.dist, col = "red")
-    }
+    #par(mfrow = c(3, 3), mar = c(5, 4, 2, 1.5))
+    #for (i in 1:(length(bam.files) - 1)) {
+    #    cur.x <- adj.counts[, 1]
+    #    cur.y <- adj.counts[, 1 + i]
+    #    smoothScatter(x = (cur.x + cur.y)/2 + 6*log2(10),
+    #                y = cur.x-cur.y, xlab = "A",
+    #                ylab = "M",
+    #                main = paste("1 vs", i + 1))
+
+    #    all.dist <- diff(log2(normfacs[c(i + 1, 1)]))
+    #    abline(h = all.dist, col = "red")
+    #}
     ## MDS plot to check for replicate variability
     for (top in c(100, 500, 1000, 5000)) {
         limma::plotMDS(adj.counts, main = top,

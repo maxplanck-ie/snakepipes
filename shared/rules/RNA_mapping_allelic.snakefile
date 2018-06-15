@@ -10,7 +10,7 @@ if mapping_prg == "STAR":
                 r2 = fastq_dir+"/{sample}"+reads[1]+".fastq.gz",
                 index = star_index_allelic
             output:
-                mapping_prg+"/{sample}.bam"
+                temp(mapping_prg+"/{sample}.sorted.bam")
             params:
                 star_options = str(star_options or ''),
                 gtf = genes_gtf,
@@ -46,6 +46,7 @@ if mapping_prg == "STAR":
                 " --alignIntronMin 1"
                 " --alignIntronMax 1000000"
                 " --alignMatesGapMax 1000000"
+                " --outBAMsortingBinsN 100"
                 " && mv {params.prefix}Aligned.sortedByCoord.out.bam {output} "
     else:
         rule STAR_allele:
@@ -53,7 +54,7 @@ if mapping_prg == "STAR":
                 r1 = fastq_dir+"/{sample}.fastq.gz",
                 index = star_index_allelic
             output:
-                mapping_prg+"/{sample}.bam"
+                temp(mapping_prg+"/{sample}.sorted.bam")
             params:
                 star_options = str(star_options or ''),
                 gtf = genes_gtf,
@@ -89,16 +90,7 @@ if mapping_prg == "STAR":
                 " --alignIntronMin 1"
                 " --alignIntronMax 1000000"
                 " --alignMatesGapMax 1000000"
+                " --outBAMsortingBinsN 100"
                 " && mv {params.prefix}Aligned.sortedByCoord.out.bam {output}"
 else:
     print("Only STAR is implemented for Allele-specific mapping")
-
-
-#### INDEX the mapped files
-#rule BAM_index:
-#    input:
-#        mapping_prg+"/{sample}.bam"
-#    output:
-#        mapping_prg+"/{sample}.bam.bai"
-#    conda: CONDA_SHARED_ENV
-#    shell: "samtools index {input}"

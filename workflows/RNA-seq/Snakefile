@@ -9,20 +9,16 @@ import common_functions as cf
 
 # load conda ENVs (path is relative to "shared/rules" directory)
 CONDA_SHARED_ENV = "envs/shared_environment.yaml"
+CONDA_RNASEQ_ENV = "envs/RNAseq_environment.yaml"
+CONDA_DNA_MAPPING_ENV = "envs/dna_mapping.yaml"
 
 # load config file
 globals().update(cf.load_configfile(workflow.overwrite_configfile,config["verbose"]))
 # load organism-specific data, i.e. genome indices, annotation, etc.
 globals().update(cf.load_organism_data(genome,maindir,config["verbose"]))
 
-# mapping defaults
-include: os.path.join(workflow.basedir, "internals.snakefile")
-
 # do workflow specific stuff now
-
-CONDA_SHARED_ENV = "envs/shared_environment.yaml"
-CONDA_RNASEQ_ENV = "envs/RNAseq_environment.yaml"
-CONDA_DNA_MAPPING_ENV = "envs/dna_mapping.yaml"
+include: os.path.join(workflow.basedir, "internals.snakefile")
 
 ### include modules of other snakefiles ########################################
 ################################################################################
@@ -44,6 +40,10 @@ include: os.path.join(maindir, "shared", "rules", "filter_annotation.snakefile")
 include: os.path.join(maindir, "shared", "deeptools_cmds.snakefile")
 ## bamCoverage_RPKM
 include: os.path.join(maindir, "shared", "rules", "deepTools_RNA.snakefile")
+
+## sambamba
+include:os.path.join(maindir, "shared", "rules", "sambamba.snakefile")
+include:os.path.join(maindir, "shared", "rules", "RNA-seq_qc_report.snakefile")
 
 ## Allele-specific JOBS
 if "allelic-mapping" in mode:
@@ -82,11 +82,6 @@ if "mapping-free" in mode:
     ## Sleuth (on Salmon)
     if sample_info:
         include: os.path.join(maindir, "shared", "rules", "sleuth.snakefile")
-
-## Sambamba
-if "mapping" in mode or "allelic-mapping" in mode:
-    include:os.path.join(maindir, "shared", "rules", "sambamba.snakefile")
-    include:os.path.join(maindir, "shared", "rules", "RNA-seq_qc_report.snakefile")
 
 ## DESeq2
 if sample_info:
@@ -133,7 +128,7 @@ def run_mapping_free():
         if sample_info:
             sample_name = os.path.splitext(os.path.basename(sample_info))[0]
             file_list.append( ["DESeq2_Salmon_{}/DESeq2.session_info.txt".format(sample_name)])
-        if sample_info and check_replicates(sample_info):
+        if sample_info and cf.check_replicates(sample_info):
             file_list.append( ["sleuth/so.rds"] )
 
         return(file_list)
@@ -254,11 +249,11 @@ rule all:
         run_Trimming(trim, fastqc),
         "Annotation/genes.annotated.bed",
         "Annotation/genes.filtered.bed",
-        "Annotation/genes.filtered.saf",    # this file is used for featureCounts later on!
+#        "Annotation/genes.filtered.saf",    # this file is used for featureCounts later on!
         run_mapping_free(),            # Salmon
         run_mapping(),                 # classical mapping + counting
         run_allelesp_mapping(),        # allelic-mapping
-#        make_nmasked_genome(),
+        make_nmasked_genome(),
         run_deeptools_qc(),
         run_GenomicContamination(),
         "multiQC/multiqc_report.html"
@@ -267,5 +262,6 @@ rule all:
 ### execute after  finished ####################################################
 ################################################################################
 onsuccess:
+    cf.cleanLogs(outdir)
     if "verbose" in config and config["verbose"]:
         print("\n--- RNA-seq workflow finished successfully! ------------------------------------\n")

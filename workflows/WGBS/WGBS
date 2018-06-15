@@ -39,7 +39,7 @@ def parse_args(defaults={"verbose": None, "configfile": None, "cluster_configfil
     # positional/required
     parser.add_argument("genome",
                         metavar="GENOME",
-                        help="Genome acronym of target organism (supported: 'dm3', 'dm6', 'hs37d5', 'mm9', 'mm10', 'SchizoSPombe_ASM294v2')")
+                        help="Genome acronym of target organism (supported: 'dm3', 'dm6', 'hs37d5', 'hg38', 'mm9', 'mm10', 'SchizoSPombe_ASM294v2')")
 
     required = parser.add_argument_group('required arguments')
     required.add_argument("-ri", "--indir",
@@ -109,6 +109,11 @@ def parse_args(defaults={"verbose": None, "configfile": None, "cluster_configfil
                          help="used prefix path for temporary directory created via mktemp. Created temp dir gets exported as "
                          "$TMPDIR and is removed at the end of this wrapper! (default: '%(default)s')",
                          default=defaults["tempdir"])
+
+    general.add_argument("--DAG",
+                         dest="createDAG",
+                         action="store_true",
+                         help="If specified, a file called pipeline.pdf is produced in the output directory that shows the rules used and their relationship to each other.")
 
     # optional
     optional = parser.add_argument_group('optional')
@@ -275,7 +280,6 @@ def main():
     cf.write_configfile(os.path.join(args.wdir,'cluster_config.yaml'),cluster_config)
 
 
-#--use-conda --conda-prefix /data/processing/conda/envs --create-envs-only    
     snakemake_cmd = """
                     snakemake {snakemake_options} --latency-wait {latency_wait} --snakefile {snakefile} --jobs {max_jobs} --directory {wdir} --configfile {configfile} 
                     """.format( latency_wait = cluster_config["snakemake_latency_wait"],
@@ -285,6 +289,18 @@ def main():
                                 snakemake_options = str(args.snakemake_options or ''),
                                 configfile = os.path.join(args.wdir,'config.yaml'),
                               ).split()
+
+    # Produce the DAG if desired
+    if args.createDAG:
+        oldVerbose = config['verbose']
+        config['verbose'] = False
+        cf.write_configfile(os.path.join(args.wdir,'config.yaml'),config)
+        DAGproc = subprocess.Popen(snakemake_cmd + ['--rulegraph'], stdout=subprocess.PIPE)
+        _ = open("{}/pipeline.pdf".format(args.wdir), "wb")
+        foo = subprocess.check_call(["dot", "-Tpdf"], stdin=DAGproc.stdout, stdout=_)
+        _.close()
+        config['verbose'] = oldVerbose
+        cf.write_configfile(os.path.join(args.wdir,'config.yaml'),config)
 
     if args.verbose:
         snakemake_cmd.append("--printshellcmds")
