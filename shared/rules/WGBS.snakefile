@@ -60,7 +60,7 @@ elif trimReads=='user':
         params:
             adapterSeq=adapterSeq,
             trimThreshold=trimThreshold,
-            trimOtherArgs=trimOtherArgs
+            trimOtherArgs=lambda wildcards: '' if trimOtherArgs is None else str(trimOtherArgs)
         threads: nthreads
         conda: CONDA_SHARED_ENV
         shell: "cutadapt -a {params.adapterSeq} -A {params.adapterSeq} -q {params.trimThreshold} -m 30 -j {threads} {params.trimOtherArgs} -o {output.R1cut} -p {output.R2cut} {input.R1} {input.R2} 1>{log.out} 2>{log.err}" 

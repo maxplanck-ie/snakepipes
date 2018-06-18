@@ -139,6 +139,14 @@ def parse_args(defaults={"verbose": None, "configfile": None, "cluster_configfil
                           help="Folder with fastqc.zip files to automatically detect hard trimming threshold. ",
                           default=defaults["fqcin"])
 
+
+    optional.add_argument("--adapterSeq",
+                          dest="adapterSeq",
+                          metavar="STR",
+                          type=str,
+                          help="Adapter sequence for cutadapt. (default: '%(default)s')",
+                          default=defaults["adapterSeq"])
+
     optional.add_argument("--nextera",
                           dest="nextera",
                           action="store",
