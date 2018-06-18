@@ -116,4 +116,9 @@ output directory::
 Rules dependencies:
 -------------------------
 
-:download:`Rules dependencies <../images/hic-dag.pdf>`
+.. image:: ../images/hic-dag.png
+   :width: 500px
+   :height: 800px
+   :scale: 75 %
+   :align: center
+
