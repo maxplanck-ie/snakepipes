@@ -13,11 +13,6 @@ Prior to building a matrix, the pipeline maps reads against a user provided refe
    :func: parse_args
    :prog: HiC
 
-Usage example
-------------------------------
-.. parsed-literal::
-
-   $ /path/to/snakemake/workflows/HiC/HiC [options] -i <input.dir> -o <output.dir>
 
 Workflow config file
 ----------------------------------
@@ -118,3 +113,7 @@ output directory::
     |--TADs
         |--logs
 
+Rules dependencies:
+-------------------------
+
+:download:`Rules dependencies <../images/hic-dag.pdf>`

@@ -78,7 +78,6 @@ else:
             min_dist = MIN_RS_DISTANCE,
             max_dist = MAX_RS_DISTANCE
         log:
-
             out = "HiC_matrices/logs/{sample}"+matrixFile_suffix+".out",
             err = "HiC_matrices/logs/{sample}"+matrixFile_suffix+".err"
         threads: 15

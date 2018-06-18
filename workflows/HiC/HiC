@@ -6,7 +6,7 @@ __description__ = """
 Hi-C workflow v{version} - MPI-IE workflow for Hi-C analysis
 
 usage example:
-    HiC -i input-dir -o output-dir mm10
+    HiC  [options] -i <input.dir> -o <output.dir>  genome
 """.format(version=__version__)
 
 
