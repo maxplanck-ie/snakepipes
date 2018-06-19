@@ -188,11 +188,11 @@ rule call_tads:
 ##compare matrices using hicPlotDistVsCounts
 rule distvscounts:
    input:
-       expand("HiC_matrices_corrected/{sample}_"+matrixFile_suffix+".corrected.h5",sample=samples)
+        matrices = lambda wildcards: os.path.join(' '.join(run_build_matrices()[1]))
    output:
         "HiC_matrices_corrected/dist_vs_counts.png"
    params:
-        function_params = lambda wildcards: distVsCountParams if distVsCountParams else " ",
+        function_params = lambda wildcards: distVsCountParams if distVsCountParams else " "
    log:
         out = "HiC_matrices_corrected/logs/dist_vs_counts.out",
         err = "HiC_matrices_corrected/logs/dist_vs_counts.err"
@@ -200,4 +200,4 @@ rule distvscounts:
    conda:
        CONDA_HIC_ENV
    shell:
-       "hicPlotDistVsCounts -m {input} -o {output} {params.function_params} > {log.out} 2> {log.err}"
+       "hicPlotDistVsCounts -m  {input.matrices} -o {output} {params.function_params} > {log.out} 2> {log.err}"

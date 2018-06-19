@@ -14,7 +14,7 @@
 pipeline: hic
 outdir:
 configfile:
-cluster_configfile: 
+cluster_configfile:
 local: False
 max_jobs: 5
 snakemake_options: '--use-conda --conda-prefix /data/processing/conda/envs '
@@ -44,7 +44,7 @@ enzyme: HindIII
 # bin size in base pairs, if RF resolution is not required
 bin_size: 10000
 # build matrix only for given region
-restrict_region: 
+restrict_region:
 # Create files with N merged bins (0 = No)
 nbins_toMerge: 0
 # shall we merge the samples?

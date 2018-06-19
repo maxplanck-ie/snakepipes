@@ -70,11 +70,10 @@ def run_build_matrices():
        if not noCorrect:
           file_list.append(["HiC_matrices_corrected/mergedSamples_Mbins"+str(nbins_toMerge)+"_"+matrixFile_suffix+".corrected.h5"])
           if not noTAD:
-             file_list.append(["TADs/mergedSamples_"+matrixFile_suffix+"_boundaries.bed"])
+             file_list.append(["TADs/mergedSamples_Mbins"+str(nbins_toMerge)+"_"+matrixFile_suffix+"_boundaries.bed"])
 
     elif merge_samples:
        file_list.append(["HiC_matrices/mergedSamples_"+matrixFile_suffix+".h5",
-              "HiC_matrices/QCplots/mergedSamples_"+matrixFile_suffix+"_diagnostic_plot.pdf",
               "HiC_matrices/QCplots/mergedSamples_"+matrixFile_suffix+"_diagnostic_plot.pdf",
               "HiC_matrices/QCplots/mergedSamples_"+matrixFile_suffix+"_mad_threshold.out"])
        if not noCorrect:
@@ -99,11 +98,10 @@ def run_build_matrices():
               file_list.append(expand("HiC_matrices_corrected/{sample}_"+matrixFile_suffix+".corrected.h5", sample=samples))
               if not noTAD:
                  file_list.append(expand("TADs/{sample}_"+matrixFile_suffix+"_boundaries.bed", sample=samples))
-
     return(file_list)
 
 
-def run_dist_vs_count(): ##it is always run on the original samples with the initial bin set bin size!
+def run_dist_vs_count():
     if distVsCount:
        return(["HiC_matrices_corrected/dist_vs_counts.png"])
     else:

@@ -60,7 +60,7 @@ def get_mad_score(madfile):
     with open(madfile) as md:
         lower = 0.0
         for line in md:
-            lower = float(line.split()[2])                 
+            lower = float(line.split()[2])
     upper = -(3*lower)
     cutoff = str(lower) + " " + str(upper)
     return(cutoff)
@@ -76,7 +76,6 @@ if trim:
 
 
 ### Initialization #############################################################
-
 infiles = sorted(glob.glob(os.path.join(str(indir or ''), '*'+ext)))
 samples = cf.get_sample_names(infiles,ext,reads)
 paired = cf.is_paired(infiles,ext,reads)
