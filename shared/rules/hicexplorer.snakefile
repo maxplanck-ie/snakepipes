@@ -190,9 +190,9 @@ rule distvscounts:
    input:
        expand("HiC_matrices_corrected/{sample}_"+matrixFile_suffix+".corrected.h5",sample=samples)
    output:
-        "dist_vs_counts.png"
+        "HiC_matrices_corrected/dist_vs_counts.png"
    params:
-       distVsCountParams
+        function_params = lambda wildcards: distVsCountParams if distVsCountParams else " ",
    log:
         out = "HiC_matrices_corrected/logs/dist_vs_counts.out",
         err = "HiC_matrices_corrected/logs/dist_vs_counts.err"
@@ -200,4 +200,4 @@ rule distvscounts:
    conda:
        CONDA_HIC_ENV
    shell:
-       "hicPlotDistVsCounts -m {input} -o {output} {params} > {log.out} 2> {log.err}"
+       "hicPlotDistVsCounts -m {input} -o {output} {params.function_params} > {log.out} 2> {log.err}"

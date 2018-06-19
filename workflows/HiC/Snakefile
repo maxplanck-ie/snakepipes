@@ -100,9 +100,15 @@ def run_build_matrices():
               if not noTAD:
                  file_list.append(expand("TADs/{sample}_"+matrixFile_suffix+"_boundaries.bed", sample=samples))
 
-    if distVsCount:
-       "dist_vs_counts.png"
     return(file_list)
+
+
+def run_dist_vs_count(): ##it is always run on the original samples with the initial bin set bin size!
+    if distVsCount:
+       return(["HiC_matrices_corrected/dist_vs_counts.png"])
+    else:
+       return([])
+
 
 ### execute before workflow starts #############################################
 ################################################################################
@@ -129,6 +135,7 @@ rule all:
         run_Trimming(trim, fastqc),
         expand(mapping_prg+"/{sample}{read}.bam", sample = samples, read = reads),
         run_build_matrices(),
+        run_dist_vs_count(),
 #       "multiQC/multiqc_report.html"
 
 ### execute after workflow finished ############################################
