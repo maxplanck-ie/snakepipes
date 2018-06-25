@@ -60,7 +60,7 @@ elif trimReads=='user':
         params:
             adapterSeq=adapterSeq,
             trimThreshold=trimThreshold,
-            trimOtherArgs=trimOtherArgs
+            trimOtherArgs=lambda wildcards: '' if trimOtherArgs is None else str(trimOtherArgs)
         threads: nthreads
         conda: CONDA_SHARED_ENV
         shell: "cutadapt -a {params.adapterSeq} -A {params.adapterSeq} -q {params.trimThreshold} -m 30 -j {threads} {params.trimOtherArgs} -o {output.R1cut} -p {output.R2cut} {input.R1} {input.R2} 1>{log.out} 2>{log.err}" 
@@ -241,7 +241,8 @@ else:
         params:
             tempdir=tempdir,
             auxdir=os.path.join(wdir,"aux_files"),
-            OUTlist=lambda wildcards,output: [w.replace('.sample_summary', '') for w in output.outFileList]
+            OUTlist0=lambda wildcards,output: output.outFileList[0].replace('.sample_summary', ''),
+            OUTlist1=lambda wildcards,output: output.outFileList[1].replace('.sample_summary','') 
         log:
             err="QC_metrics/logs/{sample}.depth_of_cov.err",
             out="QC_metrics/logs/{sample}.depth_of_cov.out"

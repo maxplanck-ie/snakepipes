@@ -1,0 +1,333 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="python" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="python" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>ATAC-seq &mdash; snakePipes 0.6.2 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> snakePipes
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.6
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../setting_up.html">Setting up the workflows</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DNA-mapping.html">DNA-mapping</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ChIP-seq.html">ChIP-seq</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RNA-seq.html">RNA-seq</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scRNA-seq.html">scRNA-seq</a></li>
+<li class="toctree-l1"><a class="reference internal" href="HiC.html">HiC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="WGBS.html">WGBS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ChangeLog.html">Change Log</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">snakePipes</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+      <li>ATAC-seq</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/content/workflows/ATAC-seq.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="atac-seq">
+<span id="id1"></span><h1>ATAC-seq<a class="headerlink" href="#atac-seq" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="input-requirements">
+<h2>Input requirements<a class="headerlink" href="#input-requirements" title="Permalink to this headline">¶</a></h2>
+<p>The DNA mapping pipeline generates output that is fully compatible with the ChIP-seq pipeline input requirements!
+When running the ChIP-seq pipeline, please specify the output directory of DNA-mapping pipeline as the working directory (-w).</p>
+<p><p>DNA-mapping workflow v0.0.1 - MPI-IE workflow for ATAC-seq Analysis</p>
+<dl class="docutils">
+<dt>usage example:</dt>
+<dd>ATAC-seq -d workdir mm10 samples.yaml</dd>
+</dl>
+</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">ATAC</span><span class="o">-</span><span class="n">seq</span> <span class="o">-</span><span class="n">d</span> <span class="n">WORKINGDIR</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">v</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">c</span> <span class="n">CONFIGFILE</span><span class="p">]</span>
+                <span class="p">[</span><span class="o">--</span><span class="n">cluster_configfile</span> <span class="n">CLUSTER_CONFIGFILE</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">j</span> <span class="n">INT</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">local</span><span class="p">]</span>
+                <span class="p">[</span><span class="o">--</span><span class="n">snakemake_options</span> <span class="n">STR</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">tempdir</span> <span class="n">TEMPDIR</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">DAG</span><span class="p">]</span>
+                <span class="p">[</span><span class="o">--</span><span class="n">bw</span><span class="o">-</span><span class="n">binsize</span> <span class="n">INT</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">atac</span><span class="o">-</span><span class="n">fragment</span><span class="o">-</span><span class="n">cutoff</span> <span class="n">INT</span><span class="p">]</span>
+                <span class="p">[</span><span class="o">--</span><span class="n">DOC</span> <span class="n">SAMPLE_INFO</span><span class="p">]</span>
+                <span class="n">GENOME</span>
+</pre></div>
+</div>
+<div class="section" id="Positional Arguments">
+<h3>Positional Arguments<a class="headerlink" href="#Positional Arguments" title="Permalink to this headline">¶</a></h3>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd>GENOME</kbd></td>
+<td>genome acronym of target organism (supported: 'dm3', 'dm6', 'hs37d5', 'hg38', 'mm9', 'mm10', 'SchizoSPombe_ASM294v2')</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="required arguments">
+<h3>required arguments<a class="headerlink" href="#required arguments" title="Permalink to this headline">¶</a></h3>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group" colspan="2">
+<kbd>-d, --working-dir</kbd></td>
+</tr>
+<tr><td>&#160;</td><td>working directory is output directory and must contain DNA-mapping pipeline output files</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="general arguments">
+<h3>general arguments<a class="headerlink" href="#general arguments" title="Permalink to this headline">¶</a></h3>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd>-v, --verbose</kbd></td>
+<td>verbose output (default: 'None')</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd>-c, --configfile</kbd></td>
+</tr>
+<tr><td>&#160;</td><td>configuration file: config.yaml (default: 'None')</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd>--cluster_configfile</kbd></td>
+</tr>
+<tr><td>&#160;</td><td>configuration file for cluster usage. In absence, the default options from shared/cluster.yaml and workflows/[workflow]/cluster.yaml would be selected (default: 'None')</td></tr>
+<tr><td class="option-group">
+<kbd>-j, --jobs</kbd></td>
+<td>maximum number of concurrently submitted Slurm jobs / cores if workflow is run locally (default: 'None')</td></tr>
+<tr><td class="option-group">
+<kbd>--local</kbd></td>
+<td><p class="first">run workflow locally; default: jobs are submitted to Slurm queue (default: 'False')</p>
+<p class="last">Default: False</p>
+</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd>--snakemake_options</kbd></td>
+</tr>
+<tr><td>&#160;</td><td>Snakemake options to be passed directly to snakemake, e.g. use --snakemake_options='--dryrun --rerun-incomplete --unlock --forceall'. (default: 'None')</td></tr>
+<tr><td class="option-group">
+<kbd>--tempdir</kbd></td>
+<td>used prefix path for temporary directory created via mktemp. Created temp dir gets exported as $TMPDIR and is removed at the end of this wrapper! (default: 'None')</td></tr>
+<tr><td class="option-group">
+<kbd>--DAG</kbd></td>
+<td><p class="first">If specified, a file called pipeline.pdf is produced in the output directory that shows the rules used and their relationship to each other.</p>
+<p class="last">Default: False</p>
+</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="Named Arguments">
+<h3>Named Arguments<a class="headerlink" href="#Named Arguments" title="Permalink to this headline">¶</a></h3>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd>--bw-binsize</kbd></td>
+<td>bin size of output files in bigWig format (default: 'None')</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd>--atac-fragment-cutoff</kbd></td>
+</tr>
+<tr><td>&#160;</td><td>Size threshold for filtering of nucleosomal fragments(default: 'None')</td></tr>
+<tr><td class="option-group">
+<kbd>--DOC</kbd></td>
+<td>Information on samples (If differential binding analysis required); see 'snakepipes/shared/tools/sampleInfo.example.tsv' for example. IMPORTANT: The first entry defines which group of samples are control.  By this, the order of comparison and likewise the sign of values can be changed!  Also, the condition <cite>control</cite> should not be used (reserved to mark input samples  in the ChIP-Seq workflow (default: 'None')</td></tr>
+</tbody>
+</table>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="100%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference external" href="https://github.com/maxplanck-ie/snakemake_workflows">code &#64; github</a>.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, MPI-IE.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'0.6.2',
+            LANGUAGE:'python',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
