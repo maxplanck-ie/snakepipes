@@ -56,9 +56,10 @@ sampleInfo$condition <- as.factor(sampleInfo$condition)
 sampleInfo$condition <- relevel(sampleInfo$condition, ref = as.character(sampleInfo$condition[1])) # first sample defines base
 
 ## add X at the beginning of rows beginning with a number (makes it consistent to column names of of the count matrix!)
-if ( any(grepl("^[0-9]", sampleInfo$name)) ) {
-    sampleInfo[grepl("^[0-9]", sampleInfo$name),]$name <- paste0("X", sampleInfo[grepl("^[0-9]", sampleInfo$name),]$name)
-}
+#if ( any(grepl("^[0-9]", sampleInfo$name)) ) {
+#    sampleInfo[grepl("^[0-9]", sampleInfo$name),]$name <- paste0("X", sampleInfo[grepl("^[0-9]", sampleInfo$name),]$name)
+#}
+sampleInfo$name <- make.names(sampleInfo$name)
 
 ## ~~~~~~ 2. Check if data is in proper order  ~~~~~
 if(isTRUE(tximport)) {
@@ -71,7 +72,7 @@ if(isTRUE(tximport)) {
 } else {
   ## Get data from featurecounts
   ## counts
-  countdata <- read.table(countFilePath, header=TRUE, check.names = FALSE)
+  countdata <- read.table(countFilePath, header=TRUE, check.names = TRUE)
   # check setup table and grep colnames
   countdata <- checktable(countdata, sample_info = sampleInfo, alleleSpecific = allelic_info)
 }
