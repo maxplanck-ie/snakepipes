@@ -4,7 +4,9 @@ import argparse
 import subprocess
 import snakePipes
 import os
+import yaml
 import glob
+import hashlib
 
 
 def parse_arguments():
@@ -21,6 +23,8 @@ def parse_arguments():
 
     createEnvsParser.add_argument('--keepCondaDir', action='store_true', help='If specified, the `snakemake_options:` setting in the workflow `defaults.yaml` files will NOT be overwritten. This is typically unwise and only expert users should specify this.')
 
+    createEnvsParser.add_argument('--force', action='store_true', help='Force creation of conda environments, even if they apparently exist.')
+
 
     return parser
 
@@ -33,28 +37,61 @@ def info():
 
     # Organism yaml files
     print("Organism YAML files:")
-    print(os.path.join(baseDir, "shared/organisms/*.yaml"))
     for f in glob.glob(os.path.join(baseDir, "shared/organisms/*.yaml")):
         print("    {}".format(f))
 
     # cluster.yaml under shared
-    print("\n{}\tThe default cluster.yaml file. Its defaults are overridden by the per-workflow cluster.yaml files.".format(os.path.join(baseDir, "shared/cluster.yaml")))
-    print("\nWorkflow-specific cluster.yaml files are in:\n")
+    print("\nThe default cluster.yaml file. Its defaults are overridden by the per-workflow cluster.yaml files:\n    {}".format(os.path.join(baseDir, "shared/cluster.yaml")))
+    print("\nWorkflow-specific cluster.yaml and defaults.yaml files are in:")
     for f in glob.glob(os.path.join(baseDir, "workflows/*/cluster.yaml")):
         print("    {}".format(os.path.dirname(f)))
 
 
-    # defaults.yaml
-    print("\nWorkflow-specific settings are in defaults.yaml in:\n")
-    for f in glob.glob(os.path.join(baseDir, "workflows/*/defaults.yaml")):
-        print("    {}".format(os.path.dirname(f)))
-
-
-def createCondaEnvs(keepCondaDir):
+def createCondaEnvs(keepCondaDir, force):
     """
-    Do something
+    Create all of the conda environments
     """
-    pass
+    baseDir = os.path.dirname(snakePipes.__file__)
+    created = set()
+
+    condaDir = subprocess.check_output("which conda", shell=True).decode('utf-8').strip()
+    condaDir = os.path.join(os.path.dirname(os.path.dirname(condaDir)), "envs")
+
+    for workflow in glob.glob(os.path.join(baseDir, "workflows/*/defaults.yaml")):
+        f = open(workflow)
+        cf = yaml.load(f)
+        f.close()
+        _ = cf['snakemake_options'].split(" ")
+        idx = _.index('--conda-prefix')
+        condaEnvDir = _[idx + 1]
+        if not keepCondaDir:
+            _[idx + 1] = condaDir
+            condaDirUse = condaDir
+        else:
+            condaDirUse = _[idx + 1]
+        cf['snakemake_options'] = ' '.join(_)
+
+        # rewrite defaults.yaml
+        f = open(workflow, "w")
+        f.write(yaml.dump(cf))
+        f.close()
+
+        for env in glob.glob(os.path.join(baseDir, "shared/rules/envs/*.yaml")):
+            # Hash the file ala snakemake
+            md5hash = hashlib.md5()
+            md5hash.update(condaDirUse.encode())
+            f = open(env, 'rb')
+            md5hash.update(f.read())
+            f.close()
+            h = md5hash.hexdigest()
+
+            if h not in created or force:
+                created.add(h)
+                sys.stderr.write("Creating environment from {} in {}\n".format(env, condaDirUse))
+                cmd = "conda env create --force --file {} --prefix {}".format(env, os.path.join(condaDirUse, h))
+                if os.path.exists(os.path.join(condaDirUse, h)) and not force:
+                    continue
+                subprocess.check_call(cmd)
 
 
 def main(args):
@@ -62,7 +99,7 @@ def main(args):
     if args.command == 'info':
         info()
     else:
-        createCondaEnvs(args.keepCondaDir)
+        createCondaEnvs(args.keepCondaDir, args.force)
 
 
 if __name__ == "__main__":
