@@ -60,9 +60,16 @@ def is_chip(sample):
 # { ChIP1: { control: Input1, broad: True }, ChIP2: { control: Input2, broad: false }
 #config["chip_dict"] = {}
 
-## Require configuration file (samples.yaml)
 if not os.path.isfile(samples_config):
     print("ERROR: Cannot find samples file ("+samples_config+")")
+    exit(1)
+
+if sample_info and not os.path.isfile(sample_info):
+    print("ERROR: Cannot find sample info file! ("+sample_info+")\n")
+    exit(1)
+
+if sample_info and not cf.check_sample_info_header(sample_info):
+    print("ERROR: Please use 'name' and 'condition' as column headers in sample info file! ("+sample_info+")\n")
     exit(1)
 
 chip_dict = {}

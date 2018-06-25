@@ -1,12 +1,5 @@
 import subprocess
 
-def isFloat(string):
-    try:
-        float(string)
-        return True
-    except ValueError:
-        return False
-
 # MACS2 should be called on already filtered, e.g. duplicate-free, BAM files
 # for paired-end BAM files, Picard MarkDuplicates is fragment-based and
 # therefore superior to MACS2 mate 1-based duplicate detection
@@ -29,7 +22,7 @@ if paired:
         params:
             fragment_length = lambda wildcards: cf.get_fragment_length("deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv", wildcards.chip_sample),
             genome_size = genome_size,
-            # TODO: test BAMPE mode and activate BAMPE for paired-end data and BAMPE for single-end data
+            # TODO: test BAMPE mode and activate BAMPE for paired-end data and BAM for single-end data
             # if results of BAMPE and BAM are in good agreement for paired-end data
             # does BAMPE mode really extends each read pair or does it only estimate a mean fragment size? the latter would be no advantage over BAM mode
             # format = "-f BAMPE" if paired else "-f BAM"
@@ -39,7 +32,8 @@ if paired:
                 lambda wildcards: "-c filtered_bam/"+get_control(wildcards.chip_sample)+".filtered.bam" if get_control(wildcards.chip_sample)
                 else "",
         log:
-            "MACS2/logs/MACS2.{chip_sample}.filtered.log"
+            out = "MACS2/logs/MACS2.{chip_sample}.filtered.out",
+            err = "MACS2/logs/MACS2.{chip_sample}.filtered.err"
         benchmark:
             "MACS2/.benchmark/MACS2.{chip_sample}.filtered.benchmark"
         conda: CONDA_CHIPSEQ_ENV
@@ -48,14 +42,14 @@ if paired:
                 {params.control_param} -f BAM \
                 -g {params.genome_size} --keep-dup all \
                 --outdir MACS2 --name {wildcards.chip_sample}.filtered.BAM \
-                --nomodel --extsize {params.fragment_length} {params.broad_calling} &> {log}
+                --nomodel --extsize {params.fragment_length} {params.broad_calling} > {log.out} 2> {log.err}
 
             # also run MACS2 in paired-end mode BAMPE for comparison with single-end mode
             macs2 callpeak -t {input.chip} \
                 {params.control_param} -f BAMPE \
                 -g {params.genome_size} --keep-dup all \
                 --outdir MACS2 --name {wildcards.chip_sample}.filtered.BAMPE \
-                {params.broad_calling} &> {log}.BAMPE
+                {params.broad_calling} > {log.out}.BAMPE 2> {log.err}.BAMPE
             """
 else:
     rule MACS2:
@@ -76,13 +70,14 @@ else:
                 lambda wildcards: "-c filtered_bam/"+get_control(wildcards.chip_sample)+".filtered.bam" if get_control(wildcards.chip_sample)
                 else "",
         log:
-            "MACS2/logs/MACS2.{chip_sample}.filtered.log"
+            out = "MACS2/logs/MACS2.{chip_sample}.filtered.out",
+            err = "MACS2/logs/MACS2.{chip_sample}.filtered.err"
         benchmark:
             "MACS2/.benchmark/MACS2.{chip_sample}.filtered.benchmark"
         conda: CONDA_CHIPSEQ_ENV
         shell: """
             macs2 callpeak -t {input.chip} {params.control_param} -f BAM -g {params.genome_size} --keep-dup all --outdir MACS2 \
-                --name {wildcards.chip_sample}.filtered.BAM --nomodel --extsize {params.fragment_length} {params.broad_calling} &> {log}
+                --name {wildcards.chip_sample}.filtered.BAM --nomodel --extsize {params.fragment_length} {params.broad_calling} > {log.out} 2> {log.err}
             """
 
 
@@ -101,8 +96,6 @@ rule MACS2_peak_qc:
             lambda wildcards: "MACS2/{sample}.filtered.BAM_peaks.broadPeak" if is_broad(wildcards.sample)
             else "MACS2/{sample}.filtered.BAM_peaks.narrowPeak",
         genome_index = genome_index
-    log:
-        "MACS2/logs/MACS2_peak_qc.{sample}.filtered.log"
     benchmark:
         "MACS2/.benchmark/MACS2_peak_qc.{sample}.filtered.benchmark"
     conda: CONDA_CHIPSEQ_ENV

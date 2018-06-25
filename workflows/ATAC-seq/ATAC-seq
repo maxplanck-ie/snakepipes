@@ -151,6 +151,7 @@ def main():
     args.main_dir_path = main_dir_path
 
     ## checks for parameters necessary in wrapper
+# 1. Dir path
     if os.path.exists(args.workingdir):
         args.workingdir = os.path.abspath(args.workingdir)
     else:
@@ -158,10 +159,23 @@ def main():
         exit(1)
     args.outdir = args.workingdir
     args.cluster_logs_dir = os.path.join(args.outdir, "cluster_logs")
-
+# 2. Config file
     if args.configfile and not os.path.exists(args.configfile):
         print("\nError! Provided configfile (-c) not found! ({})\n".format(args.configfile))
         exit(1)
+# 3. Sample info file
+    if args.sample_info:
+        if os.path.exists(os.path.abspath(args.sample_info)):
+            args.sample_info = os.path.abspath(args.sample_info)
+        else:
+            print("\nSample info file not found! (--DB {})\n".format(args.sample_info))
+            exit(1)
+        if not cf.check_sample_info_header(args.sample_info):
+            print("ERROR: Please use 'name' and 'condition' as column headers in sample info file! ("+sample_info+")\n")
+            exit(1)
+# 4. get abspath from user provided genome/organism file
+    if not os.path.isfile(os.path.join(main_dir_path, "shared", "organisms", args.genome + ".yaml")) and os.path.isfile(args.genome):
+        args.genome = os.path.abspath(args.genome)
 
     ## merge configuration dicts
     config = defaults   # 1) form defaults.yaml
@@ -198,10 +212,15 @@ def main():
 
     # Produce the DAG if desired
     if args.createDAG:
+        oldVerbose = config['verbose']
+        config['verbose'] = False
+        cf.write_configfile(os.path.join(args.outdir,'ATAC-seq.config.yaml'),config)
         DAGproc = subprocess.Popen(snakemake_cmd + ['--rulegraph'], stdout=subprocess.PIPE)
-        _ = open("{}/pipeline.pdf".format(args.workingdir), "wb")
-        subprocess.check_call(["dot", "-Tpdf"], stdin=DAGproc.stdout, stdout=_)
+        _ = open("{}/pipeline.pdf".format(args.outdir), "wb")
+        foo = subprocess.check_call(["dot", "-Tpdf"], stdin=DAGproc.stdout, stdout=_)
         _.close()
+        config['verbose'] = oldVerbose
+        cf.write_configfile(os.path.join(args.outdir,'ATAC-seq.config.yaml'),config)
 
     if args.verbose:
         snakemake_cmd.append("--printshellcmds")
@@ -217,11 +236,10 @@ def main():
     if len(fnames) == 0:
         n = 1 # no matching files, this is the first run
     else:
-        fnames.sort()
-        f_prev = fnames.pop()
-        n = int(f_prev.split("-")[2].split(".")[0]) + 1 # get new run number
+        fnames.sort(key=os.path.getctime)
+        n = int(fnames[-1].split("-")[-1].split(".")[0]) + 1 # get new run number
     # append the new run number to the file name
-    logfile_name = "ATAC-seq_run-"+ str(n) +".log"
+    logfile_name = "ATAC-seq_run-{}.log".format(n)
 
     snakemake_log = "2>&1 | tee -a {}/{}".format(args.outdir, logfile_name).split()
 

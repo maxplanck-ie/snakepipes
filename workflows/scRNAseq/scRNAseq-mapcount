@@ -171,6 +171,14 @@ def parse_args(defaults={"verbose":None,"configfile":None,"cluster_configfile":N
                        help="bin size of output files in bigWig format (default: '%(default)s')",
                        type=int,
                        default=defaults["bw_binsize"])
+    parser.add_argument("--plotFormat",
+                        dest="plot_format",
+                        choices=['png', 'pdf', 'None'],
+                        metavar="STR",
+                        type=str,
+                        help="Format of the output plots from deeptools. Select 'none' for no plot (default: '%(default)s')",
+                        default=defaults["plot_format"])
+
 
     return parser
 
@@ -195,16 +203,22 @@ def main():
     args.cluster_logs_dir = os.path.join(args.outdir, "cluster_logs")
 
     ## checks for parameters necessary in wrapper
+# 1. Dir path
     if os.path.exists(args.indir):
         args.indir = os.path.abspath(args.indir)
     else:
         print("\nError! Input dir (-i) not found! ({})\n".format(args.indir))
         exit(1)
-
+# 2. Config file
     if args.configfile and not os.path.exists(args.configfile):
         print("\nError! Provided configfile (-c) not found! ({})\n".format(args.configfile))
         exit(1)
 
+# 3. get abspath from user provided genome/organism file
+    if not os.path.isfile(os.path.join(main_dir_path, "shared", "organisms", args.genome + ".yaml")) and os.path.isfile(args.genome):
+        args.genome = os.path.abspath(args.genome)
+
+# 4. barcode file
     if args.barcode_file == None:
         args.barcode_file = os.path.join(os.path.dirname(os.path.realpath(__file__)),"celseq_barcodes.192.txt")
     elif args.barcode_file != None and os.path.exists(os.path.abspath(args.barcode_file)):
@@ -212,7 +226,7 @@ def main():
     else:
         print("\nBarcode file (--cell_barcode_file) not found! {}\n".format(args.barcode_file))
         exit(1)
-
+# 5. cell name tables
     if args.cell_names:
         if os.path.exists(os.path.abspath(args.cell_names)):
             args.cell_names = os.path.abspath(args.cell_names)
@@ -256,10 +270,15 @@ def main():
 
     # Produce the DAG if desired
     if args.createDAG:
+        oldVerbose = config['verbose']
+        config['verbose'] = False
+        cf.write_configfile(os.path.join(args.outdir,'config.yaml'),config)
         DAGproc = subprocess.Popen(snakemake_cmd + ['--rulegraph'], stdout=subprocess.PIPE)
         _ = open("{}/pipeline.pdf".format(args.outdir), "wb")
-        subprocess.check_call(["dot", "-Tpdf"], stdin=DAGproc.stdout, stdout=_)
+        foo = subprocess.check_call(["dot", "-Tpdf"], stdin=DAGproc.stdout, stdout=_)
         _.close()
+        config['verbose'] = oldVerbose
+        cf.write_configfile(os.path.join(args.outdir,'config.yaml'),config)
 
     if args.verbose:
         snakemake_cmd.append("--printshellcmds")
@@ -275,11 +294,10 @@ def main():
     if len(fnames) == 0:
         n = 1 # no matching files, this is the first run
     else:
-        fnames.sort()
-        f_prev = fnames.pop()
-        n = int(f_prev.split("-")[2].split(".")[0]) + 1 # get new run number
+        fnames.sort(key=os.path.getctime)
+        n = int(fnames[-1].split("-")[-1].split(".")[0]) + 1 # get new run number
     # append the new run number to the file name
-    logfile_name = "RNA-seq_run-"+ str(n) +".log"
+    logfile_name = "RNA-seq_run-{}.log".format(n) 
 
     snakemake_log = "2>&1 | tee -a {}/{}".format(args.outdir, logfile_name).split()
 

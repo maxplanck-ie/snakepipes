@@ -94,13 +94,3 @@ if mapping_prg == "STAR":
                 " && mv {params.prefix}Aligned.sortedByCoord.out.bam {output}"
 else:
     print("Only STAR is implemented for Allele-specific mapping")
-
-
-#### INDEX the mapped files
-#rule BAM_index:
-#    input:
-#        mapping_prg+"/{sample}.bam"
-#    output:
-#        mapping_prg+"/{sample}.bam.bai"
-#    conda: CONDA_SHARED_ENV
-#    shell: "samtools index {input}"

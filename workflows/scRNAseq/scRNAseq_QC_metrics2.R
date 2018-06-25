@@ -207,3 +207,15 @@ ggplot(sc_dat,aes(x=x,y=y,fill=UMI))+
 
 dev.off()
 
+
+#barcode2plate <- function(y) {
+#	y1 = y-1 %% 16
+#	print(y1)
+#	if (y %/% 8 == 0) {
+#		y2 = 2*y1-1 
+#	} else {
+#		y2 = ((y+1)-8) * 2
+#	}
+#	return(y2)
+#}
+

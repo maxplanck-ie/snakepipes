@@ -254,6 +254,9 @@ def main():
     if args.configfile and not os.path.exists(args.configfile):
         print("\nError! Provided configfile (-c) not found! ({})\n".format(args.configfile))
         exit(1)
+# 3. get abspath from user provided genome/organism file
+    if not os.path.isfile(os.path.join(main_dir_path, "shared", "organisms", args.genome + ".yaml")) and os.path.isfile(args.genome):
+        args.genome = os.path.abspath(args.genome)
 
     ## merge configuration dicts
     config = defaults   # 1) form defaults.yaml
@@ -291,10 +294,15 @@ def main():
 
     # Produce the DAG if desired
     if args.createDAG:
+        oldVerbose = config['verbose']
+        config['verbose'] = False
+        cf.write_configfile(os.path.join(args.outdir,'config.yaml'),config)
         DAGproc = subprocess.Popen(snakemake_cmd + ['--rulegraph'], stdout=subprocess.PIPE)
         _ = open("{}/pipeline.pdf".format(args.outdir), "wb")
-        subprocess.check_call(["dot", "-Tpdf"], stdin=DAGproc.stdout, stdout=_)
+        foo = subprocess.check_call(["dot", "-Tpdf"], stdin=DAGproc.stdout, stdout=_)
         _.close()
+        config['verbose'] = oldVerbose
+        cf.write_configfile(os.path.join(args.outdir,'config.yaml'),config)
 
     if args.verbose:
         snakemake_cmd.append("--printshellcmds ")
@@ -310,11 +318,10 @@ def main():
     if len(fnames) == 0:
         n = 1 # no matching files, this is the first run
     else:
-        fnames.sort()
-        f_prev = fnames.pop()
-        n = int(f_prev.split("-")[2].split(".")[0]) + 1 # get new run number
+        fnames.sort(key=os.path.getctime)
+        n = int(fnames[-1].split("-")[-1].split(".")[0]) + 1 # get new run number
     # append the new run number to the file name
-    logfile_name = "Hi-C_run-"+ str(n) +".log"
+    logfile_name = "Hi-C_run-{}.log".format(n) 
 
     snakemake_log = "2>&1 | tee -a {}/{}".format(args.outdir, logfile_name).split()
 
