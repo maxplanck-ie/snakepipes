@@ -1,0 +1,71 @@
+#!/usr/bin/env python
+import sys
+import argparse
+import subprocess
+import snakePipes
+import os
+import glob
+
+
+def parse_arguments():
+    parser = argparse.ArgumentParser(description='Setup and information script for snakePipes',
+                                     usage='$ snakePipes info')
+
+    subparsers = parser.add_subparsers(title='Commands',
+                                       dest='command')
+
+    infoParser = subparsers.add_parser('info', help='Print the location of the various yaml files')
+
+    createEnvsParser = subparsers.add_parser('createEnvs',
+                                             help='Create or update conda enviroments according to the workflow-specific yaml files. Note that changing the snakemake_options: option will result in ALL conda environments being recreated.')
+
+    createEnvsParser.add_argument('--keepCondaDir', action='store_true', help='If specified, the `snakemake_options:` setting in the workflow `defaults.yaml` files will NOT be overwritten. This is typically unwise and only expert users should specify this.')
+
+
+    return parser
+
+
+def info():
+    """
+    Print the locations of EVERY yaml file. Break these up a bit so it's clear what they actually belong to.
+    """
+    baseDir = os.path.dirname(snakePipes.__file__)
+
+    # Organism yaml files
+    print("Organism YAML files:")
+    print(os.path.join(baseDir, "shared/organisms/*.yaml"))
+    for f in glob.glob(os.path.join(baseDir, "shared/organisms/*.yaml")):
+        print("    {}".format(f))
+
+    # cluster.yaml under shared
+    print("\n{}\tThe default cluster.yaml file. Its defaults are overridden by the per-workflow cluster.yaml files.".format(os.path.join(baseDir, "shared/cluster.yaml")))
+    print("\nWorkflow-specific cluster.yaml files are in:\n")
+    for f in glob.glob(os.path.join(baseDir, "workflows/*/cluster.yaml")):
+        print("    {}".format(os.path.dirname(f)))
+
+
+    # defaults.yaml
+    print("\nWorkflow-specific settings are in defaults.yaml in:\n")
+    for f in glob.glob(os.path.join(baseDir, "workflows/*/defaults.yaml")):
+        print("    {}".format(os.path.dirname(f)))
+
+
+def createCondaEnvs(keepCondaDir):
+    """
+    Do something
+    """
+    pass
+
+
+def main(args):
+    args = parse_arguments().parse_args(args)
+    if args.command == 'info':
+        info()
+    else:
+        createCondaEnvs(args.keepCondaDir)
+
+
+if __name__ == "__main__":
+    if len(sys.argv) == 1:
+        sys.argv.append("--help")
+    main(sys.argv[1:])
