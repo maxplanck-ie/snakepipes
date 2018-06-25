@@ -13,3 +13,10 @@ runRNAseq.sh
 .Rproj.user
 *~
 *.pyc
+dist
+build
+
+# sphinx build folder
+_build
+_modules
+_sources

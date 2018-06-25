@@ -24,7 +24,7 @@ rule map_fastq_single_end:
     conda: CONDA_HIC_ENV
     shell: """
         echo "mapping {input}" > {log.out}
-        bwa mem -A1 -B4  -E50 -L0 -t {threads} {params.index} {input} 2>> {log.err} | samtools view -bo {output} -
+        bwa mem -A1 -B4  -E50 -L0 -t {threads} {params.idx} {input} 2>> {log.err} | samtools view -bo {output} -
         """
 
 
