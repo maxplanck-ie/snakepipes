@@ -1,0 +1,25 @@
+package:
+  name: snakepipes
+  version: 1.0.0-alpha1
+
+source:
+  url: https://github.com/maxplanck-ie/snakepipes/archive/7bf82df45c0b3b8ad6b09da5f634e64403b6c8fa.zip
+  sha256: 06fc1ffe2ab4535b33d791b30aa061e1555eb3f57e076c65038f1dc94a2269a1
+
+build:
+  number: 0
+  skip: True  # [not py3k]
+
+requirements:
+  run:
+    - snakemake
+    - graphviz
+
+test:
+  commands:
+    - DNA --help
+
+about:
+  home: 'https://snakepipes.readthedocs.org'
+  license: GPLv3
+  summary: NGS processing pipelines from the MPI-IE

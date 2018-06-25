@@ -3,7 +3,7 @@ channels:
  - bioconda
  - conda-forge
 dependencies:
- - deeptools=3.0.2
+ - deeptools=3.1.0
  - seqtk=1.2
  - pigz=2.3.4
  - snpsplit=0.3.4

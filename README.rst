@@ -29,14 +29,21 @@ Workflows available
 Installation
 -------------
 
-Currently the workflows don't require installation of the scripts (install.sh simply creates the link to available workflows).
-Simply clone this github repository and modify the configuration files under `shared/organisms` and `shared/paths.yaml` with your own paths.
+Snakepipes uses conda for installation and dependency resolution, so you will need to `install conda <https://conda.io/docs/user-guide/install/index.html>`__ first. Then create an environment for snakepipes:
 
-### Points to consider while adopting snakePipes for your institution :
- - While some paths under `shared/paths.yaml` are loaded directly using abspath, other are loaded via `module load`. This is how we have
-   implemented this so far for our case. Replace these paths with your own method of loading programs (eg. via source activate).
- - Python 3 and Snakemake are the absolute dependencies. Snakemake itself is loaded via module load in our case. Replace and install as per your
-   configuration.
+    conda create -n snakepipes-1.0.0 -c mpi-ie -c bioconda -c conda-forge snakepipes==1.0.0
+
+This snakepipes is then installed, however you will need to perform a few steps to actually configure snakepipes and finish the setup:
+
+  1. Modify/remove/add the organism yaml files appropriately
+  2. Modify the cluster.yaml file appropriately
+  3. Create the per-workflow conda environments
+
+To facilitate this, you can use the `snakePipes info` command to list the locations of the various yaml files. Edit or remove these to suite your needs and then run `snakePipes createEnvs` to create the per-workflow conda environments. Note that this will also set the `snakemake_options:` line in the various workflow `default.yaml` files, by default. If you have already modified this then use the `--keepCondaDir` option.
+
+.. note:: Whenever you change the `snakemake_options:` line in a workflow `default.yaml`, you should run `snakePipes createEnvs` to ensure that the conda environments are then created.
+
+.. note:: Running `snakePipes createEnvs` is not strictly required, but facilitates multiple users using the same snakePipes installation.
 
 Documentation
 --------------
