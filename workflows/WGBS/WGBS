@@ -23,7 +23,7 @@ import common_functions as cf
 
 
 def parse_args(defaults={"verbose": None, "configfile": None, "cluster_configfile":None, "max_jobs": None, "nthreads": None, "snakemake_options": None, "tempdir": None,
-                         "downsample": None, "trimReads": None, "fqcin": None, "nextera": None, "trimThreshold": None, "trimOtherArgs": None, "convrefpath": None,
+                         "downsample": None, "trimReads": None, "fqcin": None, "adapterSeq":None,"nextera": None, "trimThreshold": None, "trimOtherArgs": None, "convrefpath": None,
                          "convRef": None, "intList": None, "blackList": None, "sampleInfo": None, "mbias_ignore": None}):
     """
     Parse arguments from the command line.

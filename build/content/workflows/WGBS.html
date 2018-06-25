@@ -91,10 +91,11 @@
 <li class="toctree-l1"><a class="reference internal" href="scRNA-seq.html">scRNA-seq</a></li>
 <li class="toctree-l1"><a class="reference internal" href="HiC.html">HiC</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">WGBS</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#input-requirements-and-outputs">Input requirements and outputs:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#input-requirements">Input requirements :</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#what-it-does">What it does:</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#configuration-file">Configuration file</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#structure-of-output-directory">Structure of output directory</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#usage-example">Usage example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#example-output-plots">Example output plots</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#argparse">Argparse</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#Positional Arguments">Positional Arguments</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#required arguments">required arguments</a></li>
@@ -171,10 +172,20 @@
             
   <div class="section" id="wgbs">
 <span id="id1"></span><h1>WGBS<a class="headerlink" href="#wgbs" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="input-requirements-and-outputs">
-<h2>Input requirements and outputs:<a class="headerlink" href="#input-requirements-and-outputs" title="Permalink to this headline">¶</a></h2>
-<p>This pipeline requires paired-end reads fastq files and a bisulfite converted genome as inputs. Methylation values per CpG dinucleotide are extracted after read mapping.
-Statistical analysis of differential methylation is performed if user provides a bed file with genomic intervals to aggregate methylation values over. De novo DMR calling, statistical evaluation and annotation with nearest gene are performed automatically. Various quality metrics are collected and a QC report is output.</p>
+<div class="section" id="input-requirements">
+<h2>Input requirements :<a class="headerlink" href="#input-requirements" title="Permalink to this headline">¶</a></h2>
+<p>This pipeline requires paired-end reads fastq files and a bisulfite converted genome as inputs.
+Optional inputs include bed files with genomic intervals of interest, used to aggregate single CpG values over; a sample sheet with grouping information to use in differential methylation analysis; a blacklist bed file with genomic positions corresponding to known snps to mask single CpG methylation values.</p>
+</div>
+<div class="section" id="what-it-does">
+<h2>What it does:<a class="headerlink" href="#what-it-does" title="Permalink to this headline">¶</a></h2>
+<p>Optionally trimmed reads are mapped to reference genome using a bisulfite-specific aligner (bwa-meth).
+Quality metrics are collected and synthesized in a QC report, including bisulfite conversion rate, mapping rate, percentage CpGs covered a least 10x, methylation bias.
+Methylation ratios are extracted (MethylDackel) for CpG positions in the reference genome and filtered for minimum coverage (10x), snp allelic frequency (&lt;0.25 illegitimate bases).
+If sample sheet is provided, logit-transformed beta values for CpG positions are tested for differential methylation using limma.
+Metilene is called to detect de novo DMRs. In addition to the nonparametric statistics output by metilene, limma-derived statistics are recalculated for DMRs, which are further annotated with nearest gene information.
+If bed file(s) with genomic intervals of interest are provided, methylation ratios are aggregated over those and limma is used on logit-transformed methylation ratios to test for differential methylation.</p>
+<img alt="../../_images/WGBS_pipeline.png" src="../../_images/WGBS_pipeline.png" />
 </div>
 <div class="section" id="configuration-file">
 <h2>Configuration file<a class="headerlink" href="#configuration-file" title="Permalink to this headline">¶</a></h2>
@@ -247,8 +258,8 @@ Statistical analysis of differential methylation is performed if user provides a
 </div>
 <div class="section" id="structure-of-output-directory">
 <h2>Structure of output directory<a class="headerlink" href="#structure-of-output-directory" title="Permalink to this headline">¶</a></h2>
-<p>The WGBS pipeline will generate additional output as follows:</p>
-<div class="code bash highlight-default notranslate"><div class="highlight"><pre><span></span>$ tree -d -L 2 output-dir/
+<p>The WGBS pipeline will generate output as follows:</p>
+<div class="code bash highlight-default notranslate"><div class="highlight"><pre><span></span>$ tree -d -L 2 output_dir/
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>output_dir
@@ -281,9 +292,11 @@ Statistical analysis of differential methylation is performed if user provides a
 </div>
 <p>Aggregate stats will be calculated if user provides at least one bed file with genomic intervals of interest. Differential methylation analysis or DMR detection will only be run if user provides a sample sheet.</p>
 </div>
-<div class="section" id="usage-example">
-<h2>Usage example<a class="headerlink" href="#usage-example" title="Permalink to this headline">¶</a></h2>
-<p>python3 snakemake_workflows/workflows/WGBS/WGBS --indir /data/manke/group/snakepipes_test_files/WGBS/reads --wdir /data/processing3/WGBS_snakepipe_example_OUT_logging_auto --intList /data/manke/group/snakepipes_test_files/WGBS/danRer10.cpgIsland.ext.sorted.chr25.noCHR.bed --sampleInfo /data/manke/group/snakepipes_test_files/WGBS/example_sampleSheet.csv GRCz10</p>
+<div class="section" id="example-output-plots">
+<h2>Example output plots<a class="headerlink" href="#example-output-plots" title="Permalink to this headline">¶</a></h2>
+<p>Using data from Habibi et al., Cell Stem Cell 2013 corresponding to mouse chr6:4000000-6000000, following plots could be obtained:</p>
+<img alt="../../_images/limdat.LG.CC.PCA.png" src="../../_images/limdat.LG.CC.PCA.png" />
+<img alt="../../_images/Beta.MeanXgroup.all.violin.png" src="../../_images/Beta.MeanXgroup.all.violin.png" />
 </div>
 <div class="section" id="argparse">
 <h2>Argparse<a class="headerlink" href="#argparse" title="Permalink to this headline">¶</a></h2>
@@ -297,9 +310,9 @@ Statistical analysis of differential methylation is performed if user provides a
             <span class="p">[</span><span class="o">--</span><span class="n">cluster_configfile</span> <span class="n">CLUSTER_CONFIGFILE</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">j</span> <span class="n">INT</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">nt</span> <span class="n">INT</span><span class="p">]</span>
             <span class="p">[</span><span class="o">--</span><span class="n">local</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">snakemake_options</span> <span class="n">STR</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">tempdir</span> <span class="n">TEMPDIR</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">DAG</span><span class="p">]</span>
             <span class="p">[</span><span class="o">--</span><span class="n">downsample</span> <span class="n">INT</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">trimReads</span> <span class="p">{</span><span class="n">auto</span><span class="p">,</span><span class="n">user</span><span class="p">,</span><span class="kc">None</span><span class="p">}]</span> <span class="p">[</span><span class="o">--</span><span class="n">fqcin</span> <span class="n">FQCIN</span><span class="p">]</span>
-            <span class="p">[</span><span class="o">--</span><span class="n">nextera</span> <span class="n">NEXTERA</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">trimThreshold</span> <span class="n">STR</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">trimOtherArgs</span> <span class="n">STR</span><span class="p">]</span>
-            <span class="p">[</span><span class="o">--</span><span class="n">cref</span> <span class="n">STR</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">convRef</span> <span class="n">STR</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">intList</span> <span class="n">STR</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">blackList</span> <span class="n">STR</span><span class="p">]</span>
-            <span class="p">[</span><span class="o">--</span><span class="n">sampleInfo</span> <span class="n">STR</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">mbias</span> <span class="n">STR</span><span class="p">]</span>
+            <span class="p">[</span><span class="o">--</span><span class="n">adapterSeq</span> <span class="n">STR</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">nextera</span> <span class="n">NEXTERA</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">trimThreshold</span> <span class="n">STR</span><span class="p">]</span>
+            <span class="p">[</span><span class="o">--</span><span class="n">trimOtherArgs</span> <span class="n">STR</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">cref</span> <span class="n">STR</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">convRef</span> <span class="n">STR</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">intList</span> <span class="n">STR</span><span class="p">]</span>
+            <span class="p">[</span><span class="o">--</span><span class="n">blackList</span> <span class="n">STR</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">sampleInfo</span> <span class="n">STR</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">mbias</span> <span class="n">STR</span><span class="p">]</span>
             <span class="n">GENOME</span>
 </pre></div>
 </div>
@@ -311,7 +324,7 @@ Statistical analysis of differential methylation is performed if user provides a
 <tbody valign="top">
 <tr><td class="option-group">
 <kbd>GENOME</kbd></td>
-<td>Genome acronym of target organism (supported: 'dm3', 'dm6', 'hs37d5', 'mm9', 'mm10', 'SchizoSPombe_ASM294v2')</td></tr>
+<td>Genome acronym of target organism (supported: 'dm3', 'dm6', 'hs37d5', 'hg38', 'mm9', 'mm10', 'SchizoSPombe_ASM294v2')</td></tr>
 </tbody>
 </table>
 </div>
@@ -391,6 +404,9 @@ Statistical analysis of differential methylation is performed if user provides a
 <tr><td class="option-group">
 <kbd>--fqcin</kbd></td>
 <td>Folder with fastqc.zip files to automatically detect hard trimming threshold.</td></tr>
+<tr><td class="option-group">
+<kbd>--adapterSeq</kbd></td>
+<td>Adapter sequence for cutadapt. (default: 'None')</td></tr>
 <tr><td class="option-group">
 <kbd>--nextera</kbd></td>
 <td>Trim nextera adapters rather than TruSeq adapters (default: 'None')</td></tr>

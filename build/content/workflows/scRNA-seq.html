@@ -90,12 +90,14 @@
 <li class="toctree-l1"><a class="reference internal" href="RNA-seq.html">RNA-seq</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">scRNA-seq</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#Positional Arguments">Positional Arguments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Named Arguments">Named Arguments</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#required arguments">required arguments</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#general arguments">general arguments</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#Optional arguments">Optional arguments</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="HiC.html">HiC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="WGBS.html">WGBS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ChangeLog.html">Change Log</a></li>
 </ul>
 
@@ -177,6 +179,7 @@
                          <span class="p">[</span><span class="o">--</span><span class="n">cell_barcode_file</span> <span class="n">STR</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">barcode_pattern</span> <span class="n">STR</span><span class="p">]</span>
                          <span class="p">[</span><span class="o">--</span><span class="n">split_lib</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">filter_annotation</span> <span class="n">STR</span><span class="p">]</span>
                          <span class="p">[</span><span class="o">--</span><span class="n">cell_names</span> <span class="n">STR</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">bw</span><span class="o">-</span><span class="n">binsize</span> <span class="n">INT</span><span class="p">]</span>
+                         <span class="p">[</span><span class="o">--</span><span class="n">plotFormat</span> <span class="n">STR</span><span class="p">]</span>
                          <span class="n">GENOME</span>
 </pre></div>
 </div>
@@ -188,7 +191,21 @@
 <tbody valign="top">
 <tr><td class="option-group">
 <kbd>GENOME</kbd></td>
-<td>genome acronym of target organism (supported: 'dm3', 'dm6', 'hs37d5', 'mm9', 'mm10', 'SchizoSPombe_ASM294v2') or file path to your own genome config!</td></tr>
+<td>genome acronym of target organism (supported: 'dm3', 'dm6', 'hs37d5', 'hg38', 'mm9', 'mm10', 'SchizoSPombe_ASM294v2') or file path to your own genome config!</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="Named Arguments">
+<h2>Named Arguments<a class="headerlink" href="#Named Arguments" title="Permalink to this headline">¶</a></h2>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd>--plotFormat</kbd></td>
+<td><p class="first">Possible choices: png, pdf, None</p>
+<p class="last">Format of the output plots from deeptools. Select 'none' for no plot (default: 'None')</p>
+</td></tr>
 </tbody>
 </table>
 </div>

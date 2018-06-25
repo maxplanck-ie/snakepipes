@@ -19,6 +19,7 @@ Metilene is called to detect de novo DMRs. In addition to the nonparametric stat
 If bed file(s) with genomic intervals of interest are provided, methylation ratios are aggregated over those and limma is used on logit-transformed methylation ratios to test for differential methylation.
 
 
+.. image:: ../images/WGBS_pipeline.png
 
 Configuration file
 ---------------------
@@ -131,6 +132,15 @@ The WGBS pipeline will generate output as follows:
         `-- logs
 
 Aggregate stats will be calculated if user provides at least one bed file with genomic intervals of interest. Differential methylation analysis or DMR detection will only be run if user provides a sample sheet.
+
+Example output plots 
+--------------------------------
+
+Using data from Habibi et al., Cell Stem Cell 2013 corresponding to mouse chr6:4000000-6000000, following plots could be obtained:
+
+.. image:: ../images/limdat.LG.CC.PCA.png
+
+.. image:: ../images/Beta.MeanXgroup.all.violin.png
 
 
 Argparse

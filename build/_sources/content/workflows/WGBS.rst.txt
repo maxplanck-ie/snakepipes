@@ -3,10 +3,23 @@
 WGBS
 ============
 
-Input requirements and outputs:
+Input requirements :
 -------------------------------------------
-This pipeline requires paired-end reads fastq files and a bisulfite converted genome as inputs. Methylation values per CpG dinucleotide are extracted after read mapping. 
-Statistical analysis of differential methylation is performed if user provides a bed file with genomic intervals to aggregate methylation values over. De novo DMR calling, statistical evaluation and annotation with nearest gene are performed automatically. Various quality metrics are collected and a QC report is output.
+This pipeline requires paired-end reads fastq files and a bisulfite converted genome as inputs. 
+Optional inputs include bed files with genomic intervals of interest, used to aggregate single CpG values over; a sample sheet with grouping information to use in differential methylation analysis; a blacklist bed file with genomic positions corresponding to known snps to mask single CpG methylation values.
+
+
+What it does:
+-------------------------------------------
+Optionally trimmed reads are mapped to reference genome using a bisulfite-specific aligner (bwa-meth).
+Quality metrics are collected and synthesized in a QC report, including bisulfite conversion rate, mapping rate, percentage CpGs covered a least 10x, methylation bias.
+Methylation ratios are extracted (MethylDackel) for CpG positions in the reference genome and filtered for minimum coverage (10x), snp allelic frequency (<0.25 illegitimate bases).
+If sample sheet is provided, logit-transformed beta values for CpG positions are tested for differential methylation using limma.
+Metilene is called to detect de novo DMRs. In addition to the nonparametric statistics output by metilene, limma-derived statistics are recalculated for DMRs, which are further annotated with nearest gene information.
+If bed file(s) with genomic intervals of interest are provided, methylation ratios are aggregated over those and limma is used on logit-transformed methylation ratios to test for differential methylation.
+
+
+.. image:: ../images/WGBS_pipeline.png
 
 Configuration file
 ---------------------
@@ -83,11 +96,11 @@ Configuration file
 Structure of output directory
 --------------------------------
 
-The WGBS pipeline will generate additional output as follows:
+The WGBS pipeline will generate output as follows:
 
 .. code:: bash
 
-    $ tree -d -L 2 output-dir/
+    $ tree -d -L 2 output_dir/
 
 .. parsed-literal::
 
@@ -120,13 +133,14 @@ The WGBS pipeline will generate additional output as follows:
 
 Aggregate stats will be calculated if user provides at least one bed file with genomic intervals of interest. Differential methylation analysis or DMR detection will only be run if user provides a sample sheet.
 
-
-Usage example
+Example output plots 
 --------------------------------
 
-.. parsed-literal::
+Using data from Habibi et al., Cell Stem Cell 2013 corresponding to mouse chr6:4000000-6000000, following plots could be obtained:
 
-python3 snakemake_workflows/workflows/WGBS/WGBS --indir /data/manke/group/snakepipes_test_files/WGBS/reads --wdir /data/processing3/WGBS_snakepipe_example_OUT_logging_auto --intList /data/manke/group/snakepipes_test_files/WGBS/danRer10.cpgIsland.ext.sorted.chr25.noCHR.bed --sampleInfo /data/manke/group/snakepipes_test_files/WGBS/example_sampleSheet.csv GRCz10
+.. image:: ../images/limdat.LG.CC.PCA.png
+
+.. image:: ../images/Beta.MeanXgroup.all.violin.png
 
 
 Argparse
