@@ -95,12 +95,12 @@ else:
 ## Merge the samples if asked
 rule merge_matrices:
       input:
-          expand("HiC_matrices/{sample}_"+matrixFile_suffix+".h5", sample=samples)
+          lambda wildcards: expand("HiC_matrices/{sample}_"+matrixFile_suffix+".h5", sample = sample_dict[wildcards.group])
       output:
-          matrix = "HiC_matrices/mergedSamples_"+matrixFile_suffix+".h5",
+          matrix = "HiC_matrices/mergedSamples_{group}_"+matrixFile_suffix+".h5"
       log:
-         out = "HiC_matrices/logs/mergedSamples_"+matrixFile_suffix+".out",
-         err = "HiC_matrices/logs/mergedSamples_"+matrixFile_suffix+".err"
+         out = "HiC_matrices/logs/mergedSamples_{group}_"+matrixFile_suffix+".out",
+         err = "HiC_matrices/logs/mergedSamples_{group}_"+matrixFile_suffix+".err"
       conda: CONDA_HIC_ENV
       shell:
           "hicSumMatrices -m {input} -o {output.matrix} > {log.out} &> {log.err}"
@@ -129,7 +129,7 @@ rule diagnostic_plot:
         plot = "HiC_matrices/QCplots/{sample}_"+matrixFile_suffix+"_diagnostic_plot.pdf",
         mad = "HiC_matrices/QCplots/{sample}_"+matrixFile_suffix+"_mad_threshold.out"
     params:
-        chr = chromosomes
+        chr = lambda wildcards: " --chromosomes " + chromosomes if chromosomes else ""
     conda: CONDA_HIC_ENV
     shell:
        "hicCorrectMatrix diagnostic_plot -m {input} -o {output.plot} {params.chr} &> {output.mad} "
@@ -155,7 +155,7 @@ rule correct_matrix:
     output:
         "HiC_matrices_corrected/{sample}_"+matrixFile_suffix+".corrected.h5"
     params:
-        chr = chromosomes
+        chr = lambda wildcards: " --chromosomes " + chromosomes if chromosomes else ""
     conda: CONDA_HIC_ENV
     shell:
         "thresholds=$(cat \"{input.correct}\");"

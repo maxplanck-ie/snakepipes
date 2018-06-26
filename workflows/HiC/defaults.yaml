@@ -55,7 +55,9 @@ distVsCount: false
 distVsCountParams:
 noTAD: false
 noCorrect: false
-chromosomes: --chromosomes 17
+chromosomes:
+# a .tsv file contains names and replicates of samples.
+sample_info:
 ################################################################################
 # Call snakemake directly, i.e. without using the wrapper script:
 #

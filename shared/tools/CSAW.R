@@ -75,7 +75,7 @@ allpeaks <- lapply(fnames, function(x) {
     bed.gr <- GRanges(seqnames = bed$V1, ranges = IRanges(start = bed$V2, end = bed$V3), name = bed$V4)
     return(bed.gr)
     })
-
+print(length(allpeaks))
 # merge
 allpeaks <- Reduce(function(x,y) GenomicRanges::union(x,y), allpeaks)
 
