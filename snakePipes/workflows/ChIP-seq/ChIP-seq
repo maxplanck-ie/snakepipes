@@ -9,12 +9,6 @@ Usage example:
     ChIP-seq -d working-dir mm10 samples.yaml
 """.format(version=__version__)
 
-## Dependencies from DNA-mapping workflow
-## OUTDIR/filtered_bam
-##       /Picard_qc/AlignmentSummaryMetrics
-##                 /MarkDuplicates
-##                 /InsertSizeMetrics
-
 import argparse
 import os
 import signal
@@ -26,10 +20,9 @@ import shutil
 import yaml
 import inspect
 from glob import glob
+import snakePipes.common_functions as cf
+import snakePipes.parserCommon as parserCommon
 
-sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(inspect.getfile(inspect.currentframe()) )))))+"/shared/")
-
-import common_functions as cf
 
 def parse_args(defaults={"verbose":None,"configfile":None,"cluster_configfile":None,"max_jobs":None,"snakemake_options":None,"tempdir":None,
                          "paired":None,"bw_binsize":None,"sample_info":"","window_size":None}):
@@ -37,215 +30,149 @@ def parse_args(defaults={"verbose":None,"configfile":None,"cluster_configfile":N
     """
     Parse arguments from the command line.
     """
+    mainArgs = parserCommon.mainArguments(defaults, workingDir=True)
 
     parser = argparse.ArgumentParser(
         prog=sys.argv[0],
         formatter_class=argparse.RawDescriptionHelpFormatter,
         description=textwrap.dedent(__description__),
+        parents=[mainArgs],
         add_help=False
     )
 
-    #optional = parser._action_groups.pop() # Edited this line
-
-    ## positional/required
-    parser.add_argument("genome", metavar="GENOME", help="genome acronym of target organism (supported: 'dm3', 'dm6', 'hs37d5', 'hg38', 'mm9', 'mm10', 'SchizoSPombe_ASM294v2')")
     parser.add_argument("samples_config", metavar="SAMPLESCONFIG", help="configuration file (eg. 'example.chip_samples.yaml') with sample annotation")
 
-    required = parser.add_argument_group('required arguments')
-    required.add_argument("-d", "--working-dir",
-                        dest="workingdir",
-                        help="working directory is output directory and must contain DNA-mapping pipeline output files",
-                        required=False,
-                        default=".")
 
-    general = parser.add_argument_group('general arguments')
-    general.add_argument("-h", "--help",
-                        action="help",
-                        help="show this help message and exit")
+    # Workflow options
+    options = parser.add_argument_group('Options')
+    options.add_argument("--single-end",
+                         dest="paired",
+                         action="store_false",
+                         help="input data is single-end, not paired-end (default: '%(default)s')",
+                         default=defaults["paired"])
 
-    general.add_argument("-v", "--verbose",
-                        dest="verbose",
-                        action="store_true",
-                        help="verbose output (default: '%(default)s')",
-                        default=defaults["verbose"])
+    options.add_argument("--bw-binsize",
+                         dest="bw_binsize",
+                         metavar="INT",
+                         help="bin size of output files in bigWig format (default: '%(default)s')",
+                         type=int,
+                         default=defaults["bw_binsize"])
 
-    general.add_argument("-c", "--configfile",
-                        dest="configfile",
-                        help="configuration file: config.yaml. In absence of a config file, the default options from the "
-                        "workflows would be selected from /workflows/<workflow_name>/defaults.yaml (default: '%(default)s')",
-                        default=defaults["configfile"])
+    options.add_argument("--DB",
+                         dest="sample_info",
+                         help="Information on samples (If differential binding analysis required); see "
+                              "'snakepipes/shared/tools/sampleInfo.example.tsv' for example."
+                              " IMPORTANT: The first entry defines which group of samples are control. "
+                              " By this, the order of comparison and likewise the sign of values can be changed! "
+                              " Also, the condition `control` should only be used for input samples (control peaks"
+                              " are not evaluated for differential binding) (default: '%(default)s')",
+                         default=defaults["sample_info"])
 
-    general.add_argument("--cluster_configfile",
-                        dest="cluster_configfile",
-                        help="configuration file for cluster usage. In absence, the default options "
-                        "from shared/cluster.yaml and workflows/[workflow]/cluster.yaml would be selected (default: '%(default)s')",
-                        default=defaults["cluster_configfile"])
-
-    general.add_argument("-j", "--jobs",
-                        dest="max_jobs",
-                        metavar="INT",
-                        help="maximum number of concurrently submitted Slurm jobs / cores if workflow is run locally (default: '%(default)s')",
-                        type=int,
-                        default=defaults["max_jobs"])
-
-    general.add_argument("--local",
-                        dest="local",
-                        action="store_true",
-                        default=False,
-                        help="run workflow locally; default: jobs are submitted to Slurm queue (default: '%(default)s')")
-
-    general.add_argument("--snakemake_options",
-                        dest="snakemake_options",
-                        metavar="STR",
-                        type=str,
-                        help="Snakemake options to be passed directly to snakemake, e.g. use --snakemake_options='--dryrun --rerun-incomplete --unlock --forceall'. (default: '%(default)s')", default=defaults["snakemake_options"])
-
-    general.add_argument("--tempdir",
-                        dest="tempdir",
-                        type=str,
-                        help="used prefix path for temporary directory created via mktemp. Created temp dir gets exported as $TMPDIR and is removed at the end of this wrapper! (default: '%(default)s')", default=defaults["tempdir"])
-
-    general.add_argument("--DAG",
-                         dest="createDAG",
-                         action="store_true",
-                         help="If specified, a file called pipeline.pdf is produced in the output directory that shows the rules used and their relationship to each other.")
-
-    ## optional
-    optional = parser.add_argument_group('optional arguments')
-    optional.add_argument("--single-end",
-                        dest="paired",
-                        action="store_false",
-                        help="input data is single-end, not paired-end (default: '%(default)s')",
-                        default=defaults["paired"])
-
-    optional.add_argument("--bw-binsize",
-                        dest="bw_binsize",
-                        metavar="INT",
-                        help="bin size of output files in bigWig format (default: '%(default)s')",
-                        type=int,
-                        default=defaults["bw_binsize"])
-
-    optional.add_argument("--DB",
-                        dest="sample_info",
-                        help="Information on samples (If differential binding analysis required); see "
-                             "'snakepipes/shared/tools/sampleInfo.example.tsv' for example."
-                             " IMPORTANT: The first entry defines which group of samples are control. "
-                             " By this, the order of comparison and likewise the sign of values can be changed! "
-                             " Also, the condition `control` should only be used for input samples (control peaks"
-                             " are not evaluated for differential binding) (default: '%(default)s')",
-                        default=defaults["sample_info"])
-
-    optional.add_argument("--DB_windowSize",
-                        dest="window_size",
-                        help="Window size to counts reads in (If differential binding analysis required); "
-                             "Default size is suitable for most transcription factors and sharp histone marks. "
-                             "Small window sizes (~20bp) should be used for very narrow transcription factor peaks, "
-                             "while large window sizes (~500 bp) should be used for broad marks (eg. H3K27me3) "
-                             "(default: '%(default)s')",
-                        default=defaults["window_size"])
+    options.add_argument("--DB_windowSize",
+                         dest="window_size",
+                         help="Window size to counts reads in (If differential binding analysis required); "
+                              "Default size is suitable for most transcription factors and sharp histone marks. "
+                              "Small window sizes (~20bp) should be used for very narrow transcription factor peaks, "
+                              "while large window sizes (~500 bp) should be used for broad marks (eg. H3K27me3) "
+                              "(default: '%(default)s')",
+                         default=defaults["window_size"])
 
     return parser
 
 
 def main():
-
-    ## basic paths only used in wrapper
-    this_script_dir = os.path.dirname(os.path.realpath(__file__))
-    main_dir_path = cf.get_snakepipes_path()
+    # Script-neutral paths
+    baseDir = os.path.dirname(cf.__file__)
+    workflowDir = os.path.join(baseDir, "workflows", os.path.basename(__file__))
 
     ## defaults
-    defaults = cf.load_configfile(os.path.join(this_script_dir, "defaults.yaml"),False)
+    defaults = cf.load_configfile(os.path.join(workflowDir, "defaults.yaml"),False)
 
     ## get command line arguments
     parser = parse_args(defaults)
     args = parser.parse_args()
 
     ## we also add these paths to config, although we don't use them in the Snakefile
-    args.this_script_dir = this_script_dir
-    args.main_dir_path = main_dir_path
+    args.baseDir = baseDir
 
     ## checks for parameters necessary in wrapper
     # 1. Dir path
     if os.path.exists(args.workingdir):
         args.workingdir = os.path.abspath(args.workingdir)
     else:
-        print("\nError! Working-dir (-d) dir not found! ({})\n".format(args.workingdir))
-        exit(1)
+        sys.exit("\nError! Working-dir (-d) dir not found! ({})\n".format(args.workingdir))
     args.outdir = args.workingdir
     args.cluster_logs_dir = os.path.join(args.outdir, "cluster_logs")
     # 2. Config file
     if args.configfile and not os.path.exists(args.configfile):
-        print("\nError! Provided configfile (-c) not found! ({})\n".format(args.configfile))
-        exit(1)
+        sys.exit("\nError! Provided configfile (-c) not found! ({})\n".format(args.configfile))
     if os.path.exists(os.path.abspath(args.samples_config)):
         args.samples_config = os.path.abspath(args.samples_config)
     else:
-        print("\nError! Sample config file not found! ({})\n".format(args.samples_config))
-        exit(1)
+        sys.exit("\nError! Sample config file not found! ({})\n".format(args.samples_config))
     # 3. Sample info file
     if args.sample_info:
         if os.path.exists(os.path.abspath(args.sample_info)):
             args.sample_info = os.path.abspath(args.sample_info)
         else:
-            print("\nSample info file not found! (--DB {})\n".format(args.sample_info))
-            exit(1)
+            sys.exit("\nSample info file not found! (--DB {})\n".format(args.sample_info))
         if not cf.check_sample_info_header(args.sample_info):
-            print("ERROR: Please use 'name' and 'condition' as column headers in sample info file! ("+sample_info+")\n")
-            exit(1)
-# 4. get abspath from user provided genome/organism file
-    if not os.path.isfile(os.path.join(main_dir_path, "shared", "organisms", args.genome + ".yaml")) and os.path.isfile(args.genome):
+            sys.exit("ERROR: Please use 'name' and 'condition' as column headers in sample info file! ("+sample_info+")\n")
+    # 4. get abspath from user provided genome/organism file
+    if not os.path.isfile(os.path.join(baseDir, "shared/organisms/{}.yaml".format(args.genome))) and os.path.isfile(args.genome):
         args.genome = os.path.abspath(args.genome)
 
     ## merge configuration dicts
     config = defaults   # 1) form defaults.yaml
     if args.configfile:
-        user_config = cf.load_configfile(args.configfile,False)
+        user_config = cf.load_configfile(args.configfile, False)
         config = cf.merge_dicts(config, user_config) # 2) form user_config.yaml
-    config_wrap = cf.config_diff(vars(args),defaults) # 3) from wrapper parameters
+    config_wrap = cf.config_diff(vars(args), defaults) # 3) from wrapper parameters
     config = cf.merge_dicts(config, config_wrap)
-    #### Output directory + log directory
+
+    ## Output directory + log directory
     subprocess.call("[ -d {cluster_logs_dir} ] || mkdir -p {cluster_logs_dir}".format(cluster_logs_dir=args.cluster_logs_dir), shell=True)
 
     ## save to configs.yaml in outdir
-    cf.write_configfile(os.path.join(args.outdir,'ChIP-seq.config.yaml'),config)
+    cf.write_configfile(os.path.join(args.outdir, 'ChIP-seq.config.yaml'), config)
 
     ## merge cluster config files: 1) global one, 2) workflow specific one, 3) user provided one
-    cluster_config = cf.load_configfile(cf.get_snakepipes_path()+"/shared/cluster.yaml",False)
-    cluster_config = cf.merge_dicts(cluster_config, cf.load_configfile(os.path.join(this_script_dir,"cluster.yaml"),False), )
+    cluster_config = cf.load_configfile(os.path.join(baseDir, "shared/cluster.yaml"), False)
+    cluster_config = cf.merge_dicts(cluster_config, cf.load_configfile(os.path.join(workflowDir, "cluster.yaml"), False), )
 
     if args.cluster_configfile:
-        user_cluster_config = cf.load_configfile(args.cluster_configfile,False)
+        user_cluster_config = cf.load_configfile(args.cluster_configfile, False)
         cluster_config = cf.merge_dicts(cluster_config, user_cluster_config) # 2) merge/override variables from user_config.yaml
-    cf.write_configfile(os.path.join(args.outdir,'ChIP-seq.cluster_config.yaml'),cluster_config)
+    cf.write_configfile(os.path.join(args.outdir, 'ChIP-seq.cluster_config.yaml'), cluster_config)
 
     snakemake_cmd = """
                     snakemake {snakemake_options} --latency-wait {latency_wait} --snakefile {snakefile} --jobs {max_jobs} --directory {workingdir} --configfile {configfile}
                     """.format( latency_wait = cluster_config["snakemake_latency_wait"],
-                                snakefile = os.path.join(args.this_script_dir, "Snakefile"),
+                                snakefile = os.path.join(workflowDir, "Snakefile"),
                                 max_jobs = args.max_jobs,
                                 workingdir = args.workingdir,
                                 snakemake_options = str(args.snakemake_options or ''),
-                                configfile = os.path.join(args.outdir,'ChIP-seq.config.yaml'),
+                                configfile = os.path.join(args.outdir, 'ChIP-seq.config.yaml'),
                               ).split()
 
     # Produce the DAG if desired
     if args.createDAG:
         oldVerbose = config['verbose']
         config['verbose'] = False
-        cf.write_configfile(os.path.join(args.outdir,'ChIP-seq.config.yaml'),config)
+        cf.write_configfile(os.path.join(args.outdir, 'ChIP-seq.config.yaml'), config)
         DAGproc = subprocess.Popen(snakemake_cmd + ['--rulegraph'], stdout=subprocess.PIPE)
         _ = open("{}/pipeline.pdf".format(args.outdir), "wb")
         foo = subprocess.check_call(["dot", "-Tpdf"], stdin=DAGproc.stdout, stdout=_)
         _.close()
         config['verbose'] = oldVerbose
-        cf.write_configfile(os.path.join(args.outdir,'ChIP-seq.config.yaml'),config)
+        cf.write_configfile(os.path.join(args.outdir, 'ChIP-seq.config.yaml'), config)
 
     if args.verbose:
         snakemake_cmd.append("--printshellcmds")
 
     if not args.local:
         snakemake_cmd += ["--cluster-config",
-                         os.path.join(args.outdir,'ChIP-seq.cluster_config.yaml'),
+                         os.path.join(args.outdir, 'ChIP-seq.cluster_config.yaml'),
                          "--cluster", "'"+cluster_config["snakemake_cluster_cmd"],
                          args.cluster_logs_dir, "--name {rule}.snakemake'"]
 
@@ -296,7 +223,7 @@ def main():
     if (temp_path != "" and os.path.exists(temp_path)):
         shutil.rmtree(temp_path, ignore_errors=True)
         if args.verbose:
-            print("Temp directory removed ("+temp_path+")!\n")
+            print("Temp directory removed ({})!\n".format(temp_path))
 
 
 if __name__ == "__main__":

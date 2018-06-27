@@ -21,9 +21,13 @@ def parse_arguments():
     createEnvsParser = subparsers.add_parser('createEnvs',
                                              help='Create or update conda enviroments according to the workflow-specific yaml files. Note that changing the snakemake_options: option will result in ALL conda environments being recreated.')
 
-    createEnvsParser.add_argument('--keepCondaDir', action='store_true', help='If specified, the `snakemake_options:` setting in the workflow `defaults.yaml` files will NOT be overwritten. This is typically unwise and only expert users should specify this.')
+    mex = createEnvsParser.add_mutually_exclusive_group()
+    mex.add_argument('--keepCondaDir', action='store_true', help='If specified, the `snakemake_options:` setting in the workflow `defaults.yaml` files will NOT be overwritten. This is typically unwise and only expert users should specify this.')
+    mex.add_argument('--condaDir', help='If specified, use this as the base directory for the created conda environments. This will ignore what is already in the workflow-specific yaml files and where conda is installed.')
 
     createEnvsParser.add_argument('--force', action='store_true', help='Force creation of conda environments, even if they apparently exist.')
+
+    createEnvsParser.add_argument('--info', '-i', action='store_true', help='Only print the environments that would be created, don\'t actually create them.')
 
 
     return parser
@@ -47,7 +51,7 @@ def info():
         print("    {}".format(os.path.dirname(f)))
 
 
-def createCondaEnvs(keepCondaDir, force):
+def createCondaEnvs(args):
     """
     Create all of the conda environments
     """
@@ -62,13 +66,22 @@ def createCondaEnvs(keepCondaDir, force):
         cf = yaml.load(f)
         f.close()
         _ = cf['snakemake_options'].split(" ")
-        idx = _.index('--conda-prefix')
+        try:
+            idx = _.index('--conda-prefix')
+        except:
+            sys.exit("The snakemake_options directive in {} lacks --conda-prefix!\n".format(workflow))
+
         condaEnvDir = _[idx + 1]
-        if not keepCondaDir:
-            _[idx + 1] = condaDir
-            condaDirUse = condaDir
-        else:
+        if args.condaDir:
+            condaDirUse = args.condaDir
+            _[idx + 1] = condaDirUse
+        elif args.keepCondaDir:
             condaDirUse = _[idx + 1]
+        else:
+            condaDirUse = condaDir
+            # Remove --conda-prefix entirely
+            del _[idx + 1]
+            del _[idx]
         cf['snakemake_options'] = ' '.join(_)
 
         # rewrite defaults.yaml
@@ -85,13 +98,18 @@ def createCondaEnvs(keepCondaDir, force):
             f.close()
             h = md5hash.hexdigest()
 
-            if h not in created or force:
+            if h not in created or args.force:
                 created.add(h)
                 sys.stderr.write("Creating environment from {} in {}\n".format(env, condaDirUse))
-                cmd = "conda env create --force --file {} --prefix {}".format(env, os.path.join(condaDirUse, h))
-                if os.path.exists(os.path.join(condaDirUse, h)) and not force:
+                if '--conda-prefix' in cf['snakemake_options']:
+                    cmd = "conda env create --force --file {} --prefix {}".format(env, os.path.join(condaDirUse, h))
+                else:
+                    cmd = "conda env create --force --file {} --name {}".format(env, h)
+                if os.path.exists(os.path.join(condaDirUse, h)) and not args.force:
                     continue
-                subprocess.check_call(cmd)
+                if not args.info:
+                    os.makedirs(os.path.join(condaDirUse, h), exist_ok=True)
+                    subprocess.check_call(cmd, shell=True)
 
 
 def main(args):
@@ -99,7 +117,7 @@ def main(args):
     if args.command == 'info':
         info()
     else:
-        createCondaEnvs(args.keepCondaDir, args.force)
+        createCondaEnvs(args)
 
 
 if __name__ == "__main__":

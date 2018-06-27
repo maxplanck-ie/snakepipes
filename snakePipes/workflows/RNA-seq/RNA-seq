@@ -22,9 +22,9 @@ import yaml
 import re
 import inspect
 from glob import glob
+import snakePipes.common_functions as cf
+import snakePipes.parserCommon as parserCommon
 
-sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(inspect.getfile(inspect.currentframe()) )))))+"/shared/")
-import common_functions as cf
 
 def parse_args(defaults={"verbose":None,"configfile":None,"cluster_configfile":None,"max_jobs":None,"snakemake_options":None,"tempdir":None,
                          "mode":None, "downsample":None, "trim":None,"trim_prg":None,"trim_options":None, "fastqc":None,
@@ -34,219 +34,126 @@ def parse_args(defaults={"verbose":None,"configfile":None,"cluster_configfile":N
     """
     Parse arguments from the command line.
     """
+    mainArgs = parserCommon.mainArguments(defaults, workingDir=False)
+    snpArgs = parserCommon.snpArguments(defaults)
+
     parser = argparse.ArgumentParser(
         prog=sys.argv[0],
         formatter_class=argparse.RawDescriptionHelpFormatter,
         description=textwrap.dedent(__description__),
+        parents=[mainArgs, snpArgs],
         add_help=False
     )
 
-    #optional = parser._action_groups.pop() # Edited this line
-
-    ## positional/required
-    parser.add_argument("genome",
-                        metavar="GENOME",
-                        help="genome acronym of target organism (supported: 'dm3', 'dm6', 'hs37d5', 'hg38', 'mm9', 'mm10', 'SchizoSPombe_ASM294v2')")
-
-    required = parser.add_argument_group('required arguments')
-
-    required.add_argument("-i", "--input-dir",
-                         dest="indir",
-                         required=True,
-                         help="input directory containing the FASTQ files, either paired-end OR single-end data")
-    required.add_argument("-o", "--output-dir",
-                         dest="outdir",
-                         required=True,
-                         help="output directory")
-    ## general args
-    general = parser.add_argument_group('general arguments')
-    general.add_argument("-h", "--help",
-                         action="help",
-                         help="show this help message and exit")
-
-    general.add_argument("-v", "--verbose",
-                         dest="verbose",
-                         action="store_true",
-                         help="verbose output (default: '%(default)s')",
-                         default=defaults["verbose"])
-
-    general.add_argument("-c", "--configfile",
-                        dest="configfile",
-                        help="configuration file: config.yaml. In absence of a config file, the default options from the "
-                        "workflows would be selected from /workflows/<workflow_name>/defaults.yaml (default: '%(default)s')",
-                        default=defaults["configfile"])
-
-    general.add_argument("--cluster_configfile",
-                        dest="cluster_configfile",
-                        help="configuration file for cluster usage. In absence, the default options "
-                        "from shared/cluster.yaml and workflows/[workflow]/cluster.yaml would be selected (default: '%(default)s')",
-                        default=defaults["cluster_configfile"])
-
-    general.add_argument("-j", "--jobs",
-                         dest="max_jobs",
-                         metavar="INT",
-                         help="maximum number of concurrently submitted Slurm jobs / cores if workflow is run locally (default: '%(default)s')",
-                         type=int,
-                         default=defaults["max_jobs"])
-
-    general.add_argument("--local",
-                        dest="local",
-                        action="store_true",
-                        help="run workflow locally; default: jobs are submitted to Slurm queue (default: '%(default)s')",
-                        default=False)
-
-    general.add_argument("--snakemake_options",
-                         dest="snakemake_options",
-                         metavar="STR", type=str,
-                         help="Snakemake options to be passed directly to snakemake,"
-                              " e.g. use --snakemake_options='--dryrun --rerun-incomplete --unlock --forceall'."
-                              " (default: '%(default)s')",
-                        default=defaults["snakemake_options"])
-
-    general.add_argument("--tempdir",
-                         dest="tempdir",
-                         type=str,
-                         help="used prefix path for temporary directory created via mktemp."
-                              " Created temp dir gets exported as $TMPDIR and is removed at the end of this wrapper! (default: '%(default)s')",
-                         default=defaults["tempdir"])
-
-    general.add_argument("--DAG",
-                         dest="createDAG",
-                         action="store_true",
-                         help="If specified, a file called pipeline.pdf is produced in the output directory that shows the rules used and their relationship to each other.")
-
-    ## optional
-    optional = parser.add_argument_group('Optional arguments')
+    # Workflow options
+    optional = parser.add_argument_group('Options')
     optional.add_argument("-m", "--mode",
-                        dest="mode",
-                        help="workflow running modes (available: 'mapping-free, mapping, allelic-mapping, deepTools_qc')"
-                        " (default: '%(default)s')",
-                        default=defaults["mode"])
+                          dest="mode",
+                          help="workflow running modes (available: 'mapping-free, mapping, allelic-mapping, deepTools_qc')"
+                          " (default: '%(default)s')",
+                          default=defaults["mode"])
 
     optional.add_argument("--downsample",
-                        dest="downsample",
-                        metavar="INT",
-                        help="downsample the given number of reads randomly from each FASTQ file (default: '%(default)s')",
-                        type=int,
-                        default=defaults["downsample"])
+                          dest="downsample",
+                          metavar="INT",
+                          help="downsample the given number of reads randomly from each FASTQ file (default: '%(default)s')",
+                          type=int,
+                          default=defaults["downsample"])
     optional.add_argument("--trim_prg",
-                        dest="trim_prg",
-                        choices=['cutadapt', 'trimgalore'],
-                        help="trimming program: cutadapt or trimgalore (default: '%(default)s')",
-                        default=defaults["trim_prg"])
+                          dest="trim_prg",
+                          choices=['cutadapt', 'trimgalore'],
+                          help="trimming program: cutadapt or trimgalore (default: '%(default)s')",
+                          default=defaults["trim_prg"])
     optional.add_argument("--trim",
-                        dest="trim",
-                        action="store_true",
-                        help="Activate fastq read trimming. If activated, Illumina adaptors are trimmed by default. "
-                        "Additional parameters can be specified under --trim_options (default: '%(default)s')",
-                        default=defaults["trim"])
+                          dest="trim",
+                          action="store_true",
+                          help="Activate fastq read trimming. If activated, Illumina adaptors are trimmed by default. "
+                          "Additional parameters can be specified under --trim_options (default: '%(default)s')",
+                          default=defaults["trim"])
     optional.add_argument("--trim_options",
-                        dest="trim_options",
-                        metavar="STR",
-                        type=str,
-                        help="Additional option string for trimming program of choice. (default: '%(default)s')",
-                        default=defaults["trim_options"])
+                          dest="trim_options",
+                          metavar="STR",
+                          type=str,
+                          help="Additional option string for trimming program of choice. (default: '%(default)s')",
+                          default=defaults["trim_options"])
     optional.add_argument("--fastqc",
-                        dest="fastqc",
-                        action="store_true",
-                        help="run FastQC read quality control (default: '%(default)s')",
-                        default=defaults["fastqc"])
+                          dest="fastqc",
+                          action="store_true",
+                          help="run FastQC read quality control (default: '%(default)s')",
+                          default=defaults["fastqc"])
     optional.add_argument("--library_type",
-                        dest="library_type",
-                        metavar="",
-                        help="user provided library type strand specificity. featurCounts style: 0, 1, 2 (Illumina TruSeq); default: '%(default)s')",
-                        type=int,
-                        default=defaults["library_type"])
+                          dest="library_type",
+                          metavar="",
+                          help="user provided library type strand specificity. featurCounts style: 0, 1, 2 (Illumina TruSeq); default: '%(default)s')",
+                          type=int,
+                          default=defaults["library_type"])
     optional.add_argument("--mapping_prg",
-                        dest="mapping_prg",
-                        metavar="STR",
-                        help="Program used for mapping: STAR or HISAT2 (default: '%(default)s')",
-                        type=str,
-                        default=defaults["mapping_prg"])
+                          dest="mapping_prg",
+                          metavar="STR",
+                          help="Program used for mapping: STAR or HISAT2 (default: '%(default)s')",
+                          type=str,
+                          default=defaults["mapping_prg"])
     optional.add_argument("--star_options",
-                        dest="star_options",
-                        metavar="STR",
-                        help="STAR option string, e.g.: '--twopassMode Basic' (default: '%(default)s')",
-                        type=str,
-                        default=defaults["star_options"])
+                          dest="star_options",
+                          metavar="STR",
+                          help="STAR option string, e.g.: '--twopassMode Basic' (default: '%(default)s')",
+                          type=str,
+                          default=defaults["star_options"])
     optional.add_argument("--hisat_options",
-                        dest="hisat_options",
-                        metavar="STR",
-                        help="HISAT2 option string (default: '%(default)s')",
-                        type=str,
-                        default=defaults["hisat_options"])
+                          dest="hisat_options",
+                          metavar="STR",
+                          help="HISAT2 option string (default: '%(default)s')",
+                          type=str,
+                          default=defaults["hisat_options"])
     optional.add_argument("--salmon_index_options",
-                        dest="salmon_index_options",
-                        metavar="STR",
-                        type=str,
-                        help="Salmon index options, e.g. '--type fmd' (default: '%(default)s')",
-                        default=defaults["salmon_index_options"])
+                          dest="salmon_index_options",
+                          metavar="STR",
+                          type=str,
+                          help="Salmon index options, e.g. '--type fmd' (default: '%(default)s')",
+                          default=defaults["salmon_index_options"])
     optional.add_argument("--featurecounts_options",
-                        dest="featurecounts_options",
-                        metavar="STR",
-                        type=str,
-                        help="featureCounts option string. The options '-p -B'"
-                             " are always used for paired-end data (default: '%(default)s')",
-                        default=defaults["featurecounts_options"])
+                          dest="featurecounts_options",
+                          metavar="STR",
+                          type=str,
+                          help="featureCounts option string. The options '-p -B'"
+                               " are always used for paired-end data (default: '%(default)s')",
+                          default=defaults["featurecounts_options"])
     optional.add_argument("--filter_annotation",
-                        dest="filter_annotation",
-                        metavar="STR",
-                        type=str,
-                        help="filter annotation GTF by grep for use with Salmon, e.g."
-                             " use --filter_annotation='-v pseudogene'; default: '%(default)s')",
-                        default=defaults["filter_annotation"])
+                          dest="filter_annotation",
+                          metavar="STR",
+                          type=str,
+                          help="filter annotation GTF by grep for use with Salmon, e.g."
+                               " use --filter_annotation='-v pseudogene'; default: '%(default)s')",
+                          default=defaults["filter_annotation"])
     optional.add_argument("--DE",
-                        dest="sample_info",
-                        help="Information on samples (required for DE analysis); see "
-                             "'snakemake_workflows/shared/tools/sampleInfo.example.tsv' for example."
-                             " The column names in the tsv files are 'sample' and 'condition'.The first entry"
-                             " defines which group of samples are control. "
-                             " This way, the order of comparison and likewise the sign of values can be changed."
-                             " The DE analysis might fail if your sample names begin with a number. So watch out"
-                             " for that! (default: '%(default)s')",
-                        default=defaults["sample_info"])
+                          dest="sample_info",
+                          help="Information on samples (required for DE analysis); see "
+                               "'snakemake_workflows/shared/tools/sampleInfo.example.tsv' for example."
+                               " The column names in the tsv files are 'sample' and 'condition'.The first entry"
+                               " defines which group of samples are control. "
+                               " This way, the order of comparison and likewise the sign of values can be changed."
+                               " The DE analysis might fail if your sample names begin with a number. So watch out"
+                               " for that! (default: '%(default)s')",
+                          default=defaults["sample_info"])
     optional.add_argument("--bw-binsize",
-                        dest="bw_binsize",
-                        metavar="INT",
-                        help="bin size of output files in bigWig format (default: '%(default)s')",
-                        type=int,
-                        default=defaults["bw_binsize"])
+                          dest="bw_binsize",
+                          metavar="INT",
+                          help="bin size of output files in bigWig format (default: '%(default)s')",
+                          type=int,
+                          default=defaults["bw_binsize"])
     optional.add_argument("--dnaContam",
-                        action="store_true",
-                        help="Returns a plot which presents the proportion of the intergenic reads (default: '%(default)s')",
-                        default=defaults["dnaContam"])
+                          action="store_true",
+                          help="Returns a plot which presents the proportion of the intergenic reads (default: '%(default)s')",
+                          default=defaults["dnaContam"])
 
-    parser.add_argument("--plotFormat",
-                        dest="plot_format",
-                        choices=['png', 'pdf', 'None'],
-                        metavar="STR",
-                        type=str,
-                        help="Format of the output plots from deeptools. Select 'none' for no plot (default: '%(default)s')",
-                        default=defaults["plot_format"])
+    optional.add_argument("--plotFormat",
+                          dest="plot_format",
+                          choices=['png', 'pdf', 'None'],
+                          metavar="STR",
+                          type=str,
+                          help="Format of the output plots from deeptools. Select 'none' for no plot (default: '%(default)s')",
+                          default=defaults["plot_format"])
 
-    ###
-    snpargs = parser.add_argument_group('allele-specific mapping arguments')
-    snpargs.add_argument("--VCFfile",
-                        metavar="STR",
-                        help="VCF file to create N-masked genomes (default: 'None')",
-                        default='',
-                        type=str)
-    snpargs.add_argument("--strains",
-                        dest="strains",
-                        metavar="STR",
-                        help="Name or ID of SNP strains separated by comma (default: 'None')",
-                        default='',
-                        type=str)
-    snpargs.add_argument("--SNPfile",
-                        metavar="STR",
-                        help="File containing SNP locations (default: 'None')",
-                        default='',
-                        type=str)
-    snpargs.add_argument("--Nmasked_index",
-                        metavar="STR",
-                        help="N-masked index of the reference genome (default: 'None')",
-                        default='',
-                        type=str)
     return parser
 
 

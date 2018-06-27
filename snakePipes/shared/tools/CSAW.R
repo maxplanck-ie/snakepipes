@@ -14,7 +14,7 @@ allelic_info <- as.logical(snakemake@params[["allele_info"]])
 
 # include functions
 sink("CSAW/CSAW.log", append=TRUE)
-source(paste(snakemake@config[["main_dir_path"]], snakemake@params[["importfunc"]], sep="/"))
+source(paste(snakemake@config[["baseDir"]], snakemake@params[["importfunc"]], sep="/"))
 suppressPackageStartupMessages(library(GenomicRanges))
 ## fix default FDR significance threshold
 if ( is.na(fdr) ) fdr <- 0.05

@@ -3,9 +3,7 @@ import os
 
 ### snakemake_workflows initialization ########################################
 maindir = os.path.dirname(os.path.dirname(workflow.basedir))
-sys.path.append(os.path.join(maindir, "shared"))
-
-import common_functions as cf
+import snakePipes.common_functions as cf
 
 # load conda ENVs (path is relative to "shared/rules" directory)
 CONDA_SHARED_ENV = "envs/shared_environment.yaml"
@@ -14,7 +12,7 @@ CONDA_ATAC_ENV = "envs/atac_seq.yaml"
 # load config file
 globals().update(cf.load_configfile(workflow.overwrite_configfile,config["verbose"]))
 # load organism-specific data, i.e. genome indices, annotation, etc.
-globals().update(cf.load_organism_data(genome,maindir,config["verbose"]))
+globals().update(cf.load_organism_data(genome, maindir, config["verbose"]))
 
 outdir_MACS2 = 'MACS2/'
 outdir_ATACqc = 'MACS2_QC/'

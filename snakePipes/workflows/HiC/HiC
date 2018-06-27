@@ -21,9 +21,7 @@ import shutil
 import yaml
 import inspect
 from glob import glob
-
-sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(inspect.getfile(inspect.currentframe()) )))))+"/shared/")
-import common_functions as cf
+import snakePipes.common_functions as cf
 
 
 def parse_args(defaults={"verbose":None,"configfile":None,"cluster_configfile":None,"max_jobs":None,"snakemake_options":None,"tempdir":None,

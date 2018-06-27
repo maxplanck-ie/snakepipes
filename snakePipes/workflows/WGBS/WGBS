@@ -17,9 +17,7 @@ import textwrap
 import shutil
 import inspect
 import logging
-
-sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(inspect.getfile(inspect.currentframe())))))) + "/shared/")
-import common_functions as cf
+import snakePipes.common_functions as cf
 
 
 def parse_args(defaults={"verbose": None, "configfile": None, "cluster_configfile":None, "max_jobs": None, "nthreads": None, "snakemake_options": None, "tempdir": None,

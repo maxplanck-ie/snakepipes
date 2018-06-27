@@ -23,8 +23,6 @@ bamcompare_subtract_cmd = """
                -o {output} \
                --operation subtract \
                --scaleFactorsMethod readCount \
-               --normalizeUsing RPGC \
-               --effectiveGenomeSize {params.genome_size} \
                {params.ignoreForNorm} \
                --binSize {params.bw_binsize} \
                -p {threads} \
