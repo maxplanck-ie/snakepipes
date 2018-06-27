@@ -10,8 +10,8 @@ def ListGenomes():
     dName = os.path.dirname(__file__)
     genomes = [os.path.basename(f)[:-5] for f in glob.glob(os.path.join(dName, "shared/organisms/*.yaml"))]
     return genomes
-    
-    
+
+
 def mainArguments(defaults, workingDir=False):
     """
     Return a parser with the general and required args. This will include EITHER
@@ -40,7 +40,6 @@ def mainArguments(defaults, workingDir=False):
                               dest="outdir",
                               required=True,
                               help="output directory")
-    
 
     general = parser.add_argument_group('general arguments')
     general.add_argument("-h", "--help",
