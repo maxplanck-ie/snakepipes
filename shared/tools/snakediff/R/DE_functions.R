@@ -260,7 +260,8 @@ DESeq_downstream <- function(DEseqout,
 			# replace rownames of heatmap data with these gene names
 			rownames(heatmap_data) <- htdat$external_gene_name
 		}
-		heatmap_data <- scale(heatmap_data, center = TRUE, scale = TRUE)
+		## scaling is not so useful for already normalized data, or?
+		#heatmap_data <- scale(heatmap_data, center = TRUE, scale = TRUE)
 	} else {
 		print("No DE genes detected!")
 	}
@@ -304,15 +305,27 @@ DESeq_downstream <- function(DEseqout,
 	     ylim = c(0,5), cex = .4, col = rgb(0,0,0,.3))
 	abline(h = qf(.99, p, m - p))
 
-	# 7. Heatmap topN genes
+	# 7. Heatmap topN genes rld 
 	pheatmap::pheatmap(heatmap_data,
 				 cluster_rows = TRUE,
 				 clustering_method = "average",
 				 show_rownames = TRUE,
 				 cluster_cols = FALSE,
 				 color = colorRampPalette(rev(RColorBrewer::brewer.pal(9,"RdBu")))(255),
-				 main = sprintf("Heatmap : Top %d DE genes (by p-value)", heatmap_topN)
+				 main = sprintf("Heatmap : Top %d DE genes (by p-value) color: norm. expression (rld) ", heatmap_topN)
 	)
+	
+	# 7.1 Heatmap topN genes z-score
+	pheatmap::pheatmap(heatmap_data,
+			cluster_rows = TRUE,
+			clustering_method = "average",
+			show_rownames = TRUE,
+			cluster_cols = FALSE,
+			scale = "row",
+			color = colorRampPalette(rev(RColorBrewer::brewer.pal(9,"RdBu")))(255),
+			main = sprintf("Heatmap : Top %d DE genes (by p-value) color: z-score  ", heatmap_topN)
+	)
+	
 	# 8. MAplot
 	DESeq2::plotMA(ddr)
 
