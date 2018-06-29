@@ -5,10 +5,7 @@ import snakePipes.common_functions as cf
 maindir = os.path.dirname(os.path.dirname(workflow.basedir))
 
 # load conda ENVs (path is relative to "shared/rules" directory)
-CONDA_SHARED_ENV = "envs/shared_environment.yaml"
-
-# load conda ENV
-CONDA_DNA_MAPPING_ENV = "envs/dna_mapping.yaml"
+globals().update(cf.set_env_yamls())
 
 # load config file
 globals().update(cf.load_configfile(workflow.overwrite_configfile,config["verbose"]))

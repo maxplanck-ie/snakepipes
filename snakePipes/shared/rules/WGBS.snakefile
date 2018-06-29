@@ -4,13 +4,7 @@ from operator import is_not
 import tempfile
 import pandas
 
-###conda environments:
-CondaEnvironment='envs/WGBSconda.yml'
-mCtCondaEnvironment='envs/methylCtools.yml'
-RmdCondaEnvironment='envs/Rmdconda.yml'
-CONDA_SHARED_ENV = "envs/shared_environment.yaml"
-
-  
+ 
 ###get automatic cut threshold for hard-trimming of 5' ends
 if trimReads=='auto':
     if fqcin:

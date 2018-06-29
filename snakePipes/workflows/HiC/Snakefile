@@ -6,8 +6,7 @@ import snakePipes.common_functions as cf
 maindir = os.path.dirname(os.path.dirname(workflow.basedir))
 
 # load conda ENVs (path is relative to "shared/rules" directory)
-CONDA_SHARED_ENV = "envs/shared_environment.yaml"
-CONDA_HIC_ENV = "envs/snakepipes_hic_conda_env.yaml"
+globals().update(cf.set_env_yamls())
 
 # load config file
 globals().update(cf.load_configfile(workflow.overwrite_configfile,config["verbose"]))

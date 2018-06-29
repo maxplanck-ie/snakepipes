@@ -1,11 +1,3 @@
-## If a symbol file is available
-#def get_symbol_file(wildcards):
-#    symbol_file = os.path.join(maindir, "shared", "organisms", genome+".symbol")
-#    if os.path.isfile(symbol_file):
-#        return(symbol_file)
-#    else:
-#        return("")
-
 ## function to get the name of the samplesheet and extend the name of the folder DESeq2 to DESeq2_[name]
 def get_outdir(folder_name):
     sample_name = os.path.splitext(os.path.basename(str(sample_info)))[0]
@@ -28,9 +20,6 @@ rule DESeq2:
         importfunc = os.path.join(maindir, "shared", "tools","snakediff","R", "DE_functions.R"),
         allele_info = lambda wildcards : 'TRUE' if 'allelic-mapping' in mode else 'FALSE',
         tx2gene_file = 'NA'
-    log:
-        out = "DESeq2.out",
-        err = "DESeq2.err"
     conda: CONDA_RNASEQ_ENV
     shell: 
         "cd {params.outdir} && "

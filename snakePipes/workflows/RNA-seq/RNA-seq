@@ -158,20 +158,19 @@ def parse_args(defaults={"verbose":None,"configfile":None,"cluster_configfile":N
 
 
 def main():
-
-    ## basic paths only used in wrapper
-    this_script_dir = os.path.dirname(os.path.realpath(__file__))
-    main_dir_path = cf.get_snakepipes_path()
+    # Script-neutral paths
+    baseDir = os.path.dirname(cf.__file__)
+    workflowDir = os.path.join(baseDir, "workflows", os.path.basename(__file__))
 
     ## defaults
-    defaults = cf.load_configfile(os.path.join(this_script_dir, "defaults.yaml"),False)
+    defaults = cf.load_configfile(os.path.join(workflowDir, "defaults.yaml"),False)
+
     ## get command line arguments
     parser = parse_args(defaults)
     args = parser.parse_args()
 
     ## we also add these paths to config, although we don't use them in the Snakefile
-    args.this_script_dir = this_script_dir
-    args.main_dir_path = main_dir_path
+    args.baseDir = baseDir
 
     args.outdir = os.path.abspath(args.outdir)
     args.cluster_logs_dir = os.path.join(args.outdir, "cluster_logs")
@@ -184,18 +183,18 @@ def main():
         args.SNPfile = os.path.abspath(args.SNPfile)
         args.Nmasked_index = os.path.abspath(args.Nmasked_index)
 
-## checks for parameters necessary in wrapper
-# 1. Dir path
+    ## checks for parameters necessary in wrapper
+    # 1. Dir path
     if os.path.exists(args.indir):
         args.indir = os.path.abspath(args.indir)
     else:
         print("\nError! Input dir (-i) not found! ({})\n".format(args.indir))
         exit(1)
-# 2. config file
+    # 2. config file
     if args.configfile and not os.path.exists(args.configfile):
         print("\nError! Provided configfile (-c) not found! ({})\n".format(args.configfile))
         exit(1)
-# 3. Sample info file
+    # 3. Sample info file
     if args.sample_info:
         if os.path.exists(os.path.abspath(args.sample_info)):
             args.sample_info = os.path.abspath(args.sample_info)
@@ -206,37 +205,37 @@ def main():
             print("ERROR: Please use 'name' and 'condition' as column headers in sample info file! ("+sample_info+")\n")
             exit(1)
 
-# 4. get abspath from user provided genome/organism file
-    if not os.path.isfile(os.path.join(main_dir_path, "shared", "organisms", args.genome + ".yaml")) and os.path.isfile(args.genome):
+    # 4. get abspath from user provided genome/organism file
+    if not os.path.isfile(os.path.join(baseDir, "shared/organisms/{}.yaml".format(args.genome))) and os.path.isfile(args.genome):
         args.genome = os.path.abspath(args.genome)
 
     ## merge configuration dicts
     config = defaults   # 1) form defaults.yaml
     if args.configfile:
-        user_config = cf.load_configfile(args.configfile,False)
+        user_config = cf.load_configfile(args.configfile, False)
         config = cf.merge_dicts(config, user_config) # 2) form user_config.yaml
-    config_wrap = cf.config_diff(vars(args),defaults) # 3) from wrapper parameters (only those that differ)
+    config_wrap = cf.config_diff(vars(args), defaults) # 3) from wrapper parameters (only those that differ)
     config = cf.merge_dicts(config, config_wrap)
 
     ## Output directory + log directory
     subprocess.call("[ -d {cluster_logs_dir} ] || mkdir -p {cluster_logs_dir}".format(cluster_logs_dir=args.cluster_logs_dir), shell=True)
 
     ## save to configs.yaml in outdir
-    cf.write_configfile(os.path.join(args.outdir,'config.yaml'),config)
+    cf.write_configfile(os.path.join(args.outdir, 'config.yaml'), config)
 
     ## merge cluster config files: 1) global one, 2) workflow specific one, 3) user provided one
-    cluster_config = cf.load_configfile(cf.get_snakepipes_path()+"/shared/cluster.yaml",False)
-    cluster_config = cf.merge_dicts(cluster_config, cf.load_configfile(os.path.join(this_script_dir,"cluster.yaml"),False), )
+    cluster_config = cf.load_configfile(os.path.join(baseDir, "shared/cluster.yaml"), False)
+    cluster_config = cf.merge_dicts(cluster_config, cf.load_configfile(os.path.join(workflowDir, "cluster.yaml"), False), )
 
     if args.cluster_configfile:
-        user_cluster_config = cf.load_configfile(args.cluster_configfile,False)
+        user_cluster_config = cf.load_configfile(args.cluster_configfile, False)
         cluster_config = cf.merge_dicts(cluster_config, user_cluster_config) # 2) merge/override variables from user_config.yaml
-    cf.write_configfile(os.path.join(args.outdir,'cluster_config.yaml'),cluster_config)
+    cf.write_configfile(os.path.join(args.outdir, 'cluster_config.yaml'), cluster_config)
 
     snakemake_cmd = """
                     snakemake {snakemake_options} --latency-wait {latency_wait} --snakefile {snakefile} --jobs {max_jobs} --directory {outdir} --configfile {configfile}
                     """.format( latency_wait = cluster_config["snakemake_latency_wait"],
-                                snakefile = os.path.join(args.this_script_dir, "Snakefile"),
+                                snakefile = os.path.join(workflowDir, "Snakefile"),
                                 max_jobs = args.max_jobs,
                                 outdir = args.outdir,
                                 snakemake_options = str(args.snakemake_options or ''),
@@ -247,13 +246,13 @@ def main():
     if args.createDAG:
         oldVerbose = config['verbose']
         config['verbose'] = False
-        cf.write_configfile(os.path.join(args.outdir,'config.yaml'),config)
+        cf.write_configfile(os.path.join(args.outdir,'config.yaml'), config)
         DAGproc = subprocess.Popen(snakemake_cmd + ['--rulegraph'], stdout=subprocess.PIPE)
         _ = open("{}/pipeline.pdf".format(args.outdir), "wb")
         foo = subprocess.check_call(["dot", "-Tpdf"], stdin=DAGproc.stdout, stdout=_)
         _.close()
         config['verbose'] = oldVerbose
-        cf.write_configfile(os.path.join(args.outdir,'config.yaml'),config)
+        cf.write_configfile(os.path.join(args.outdir,'config.yaml'), config)
 
     if args.verbose:
         snakemake_cmd.append("--printshellcmds")
@@ -307,12 +306,6 @@ def main():
             # kill snakemake and child processes
             subprocess.call(["pkill", "-SIGTERM", "-P", str(p.pid)])
             print("SIGTERM sent to PID:", p.pid)
-
-            # # kill grid engine jobs
-            # time.sleep(10)
-            # job_ids = subprocess.check_output("""ls {cluster_logs_dir} | awk -F "." '{{print $NF}}' | sed 's/e\|o//' | sort -u""".format(cluster_logs_dir=cluster_logs_dir), shell=True).split()
-            # for job_id in job_ids:
-            #     subprocess.call( "qdel {} 2>&1 >/dev/null".format(str(job_id)), shell="bash" )
 
     ## remove temp dir
     if (temp_path != "" and os.path.exists(temp_path)):
