@@ -6,7 +6,7 @@ __description__ = """
 Hi-C workflow v{version} - MPI-IE workflow for Hi-C analysis
 
 usage example:
-    HiC -i input-dir -o output-dir mm10
+    HiC  [options] -i <input.dir> -o <output.dir>  genome
 """.format(version=__version__)
 
 
@@ -222,6 +222,13 @@ def parse_args(defaults={"verbose":None,"configfile":None,"cluster_configfile":N
                         help="parameters to run hicDistVsCount. (default: '%(default)s')",
                         default=defaults["distVsCountParams"])
 
+    optional.add_argument("--sampleInfo",
+                        dest="sample_info",
+                        type=str,
+                        metavar="STR",
+                        help="A .tsv file contains samples' names and replicates. (default: '%(default)s')",
+                        default=defaults["sample_info"])                    
+
     return parser
 
 
@@ -321,7 +328,7 @@ def main():
         fnames.sort(key=os.path.getctime)
         n = int(fnames[-1].split("-")[-1].split(".")[0]) + 1 # get new run number
     # append the new run number to the file name
-    logfile_name = "Hi-C_run-{}.log".format(n) 
+    logfile_name = "Hi-C_run-{}.log".format(n)
 
     snakemake_log = "2>&1 | tee -a {}/{}".format(args.outdir, logfile_name).split()
 

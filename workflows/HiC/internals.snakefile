@@ -1,7 +1,7 @@
 import glob
 import os
 import subprocess
-
+import pandas as pd
 ## Main variables ##############################################################
 
 
@@ -60,7 +60,7 @@ def get_mad_score(madfile):
     with open(madfile) as md:
         lower = 0.0
         for line in md:
-            lower = float(line.split()[2])                 
+            lower = float(line.split()[2])
     upper = -(3*lower)
     cutoff = str(lower) + " " + str(upper)
     return(cutoff)
@@ -76,7 +76,6 @@ if trim:
 
 
 ### Initialization #############################################################
-
 infiles = sorted(glob.glob(os.path.join(str(indir or ''), '*'+ext)))
 samples = cf.get_sample_names(infiles,ext,reads)
 paired = cf.is_paired(infiles,ext,reads)
@@ -90,3 +89,18 @@ if not paired:
     print("\n  Error! Paired-end samples not detected. "
           "Hi-C workflow requires paired-end samples "+str(indir or '')+"!!!\n\n")
     exit(1)
+
+sample_dict = {}
+if sample_info:     #Read the sample info and make a dictionary
+    sample_conditions =  pd.read_csv(os.path.join(os.path.abspath(sample_info)),sep = '\t')
+    for id, row in sample_conditions.iterrows():
+        v, k = row
+        if k in sample_dict:
+            sample_dict[k] = [sample_dict[k], v]
+        else:
+            sample_dict[k]=v
+        print(sample_dict)
+
+else:
+    for sample in samples:
+        sample_dict['cond1'] = sample
