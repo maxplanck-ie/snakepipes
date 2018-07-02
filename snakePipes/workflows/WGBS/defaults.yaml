@@ -43,6 +43,7 @@ reads: [_R1, _R2]
 downsample:
 ## Options for trimming
 trimReads: auto
+adapterSeq: AGATCGGAAGAGC
 nextera: False
 trimThreshold: 10
 trimOtherArgs: ""

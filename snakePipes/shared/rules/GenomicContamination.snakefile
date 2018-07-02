@@ -4,7 +4,7 @@
 rule GContamination_featureCounts:
     input:
         bams = mapping_prg+"/{sample}.bam",
-        gtf = extended_coding_regions_gtf
+        gtf = str(extended_coding_regions_gtf or '')
     output:
         txt = temp("GenomicContamination/{sample}.featurecounts.txt"),
         summary = "GenomicContamination/{sample}.featurecounts.txt.summary"

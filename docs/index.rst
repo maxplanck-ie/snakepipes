@@ -16,6 +16,7 @@ Pipeline                            Description
 :ref:`RNA-Seq`                  RNA-Seq workflow : From mapping to differential expression using DEseq2
 :ref:`scRNA-Seq`                Single-cell RNA-Seq workflow : From mapping to differential expression
 :ref:`HiC`                      Hi-C analysis workflow, from mapping to TAD calling
+:ref:`WGBS`                     WGBS analysis workflow, from mapping to DMR calling and differential methylation analysis
 =============================== ===========================================================================================
 
 Quick start
@@ -111,6 +112,7 @@ Contents:
    content/workflows/RNA-seq.rst
    content/workflows/scRNA-seq.rst
    content/workflows/HiC.rst
+   content/workflows/WGBS.rst
    ChangeLog.rst
 
 Citation

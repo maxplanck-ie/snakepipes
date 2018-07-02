@@ -26,7 +26,7 @@ import snakePipes.common_functions as cf
 def parse_args(defaults={"verbose":None,"configfile":None,"cluster_configfile":None,"max_jobs":None,"snakemake_options":None,"tempdir":None,
                          "downsample":None, "trim":None, "trim_options":None, "cell_names":None,
                          "filter_annotation":None, "barcode_file":None, "barcode_pattern":None, "split_lib": None,
-                         "bw_binsize":None, "mapq":None}):
+                         "bw_binsize":None, "mapq":None, "plot_format":None}):
     """
     Parse arguments from the command line.
     """
