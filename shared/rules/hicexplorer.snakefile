@@ -171,7 +171,7 @@ rule call_tads:
         "TADs/{sample}_"+matrixFile_suffix+"_boundaries.bed"
     params:
         prefix="TADs/{sample}_"+matrixFile_suffix,
-        parameters=tadparams
+        parameters=lambda wildcards: tadparams if tadparams else ""
     threads: 10
     log:
         out = "TADs/logs/{sample}_findTADs.out",
@@ -186,7 +186,7 @@ rule call_tads:
         "--outPrefix {params.prefix} > {log.out} 2> {log.err}"
 
 ##compare matrices using hicPlotDistVsCounts
-rule distvscounts:
+rule distvscounts: #TODO
    input:
         matrices = lambda wildcards: os.path.join(' '.join(run_build_matrices()[1]))
    output:
