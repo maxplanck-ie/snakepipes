@@ -7,6 +7,7 @@ import os
 import yaml
 import glob
 import hashlib
+import snakePipes.common_functions as cof
 
 
 def parse_arguments():
@@ -51,6 +52,16 @@ def info():
         print("    {}".format(os.path.dirname(f)))
 
 
+def registerGATK(gatkEnv):
+    URL="https://software.broadinstitute.org/gatk/download/auth?package=GATK-archive&version=3.5-0-g36282e4"
+    cmd = "wget -O GATK-archive-3.5.tar.bz2 '{}'".format(URL)
+    subprocess.check_call(cmd, shell=True)
+
+    cmd = "{}/bin/gatk-register GATK-archive-3.5.tar.bz2".format(gatkEnv)
+    subprocess.check_call(cmd, shell=True)
+    os.remove("GATK-archive-3.5.tar.bz2") 
+
+
 def createCondaEnvs(args):
     """
     Create all of the conda environments
@@ -60,6 +71,7 @@ def createCondaEnvs(args):
 
     condaDir = subprocess.check_output("which conda", shell=True).decode('utf-8').strip()
     condaDir = os.path.join(os.path.dirname(os.path.dirname(condaDir)), "envs")
+    gatkEnv = None
 
     for workflow in glob.glob(os.path.join(baseDir, "workflows/*/defaults.yaml")):
         f = open(workflow)
@@ -89,27 +101,33 @@ def createCondaEnvs(args):
         f.write(yaml.dump(cf))
         f.close()
 
-        for env in glob.glob(os.path.join(baseDir, "shared/rules/envs/*.yaml")):
+        for env in cof.set_env_yamls().values():
             # Hash the file ala snakemake
             md5hash = hashlib.md5()
             md5hash.update(condaDirUse.encode())
-            f = open(env, 'rb')
+            f = open(os.path.join(baseDir, "shared/rules", env), 'rb')
             md5hash.update(f.read())
             f.close()
             h = md5hash.hexdigest()
 
+            if 'WGBS' in env:
+                gatkEnv = os.path.join(condaDirUse, h)
+
             if h not in created or args.force:
                 created.add(h)
-                sys.stderr.write("Creating environment from {} in {}\n".format(env, condaDirUse))
+                sys.stderr.write("Creating environment from {} in {}\n".format(os.path.join(baseDir, "shared/rules", env), condaDirUse))
                 if '--conda-prefix' in cf['snakemake_options']:
-                    cmd = "conda env create --force --file {} --prefix {}".format(env, os.path.join(condaDirUse, h))
+                    cmd = "conda env create --force --file {} --prefix {}".format(os.path.join(baseDir, "shared/rules", env), os.path.join(condaDirUse, h))
                 else:
-                    cmd = "conda env create --force --file {} --name {}".format(env, h)
+                    cmd = "conda env create --force --file {} --name {}".format(os.path.join(baseDir, "shared/rules", env), h)
                 if os.path.exists(os.path.join(condaDirUse, h)) and not args.force:
                     continue
                 if not args.info:
                     os.makedirs(os.path.join(condaDirUse, h), exist_ok=True)
                     subprocess.check_call(cmd, shell=True)
+    # We can't actually install GATK with conda, which is annoying
+    if gatkEnv:
+        registerGATK(gatkEnv)
 
 
 def main(args):

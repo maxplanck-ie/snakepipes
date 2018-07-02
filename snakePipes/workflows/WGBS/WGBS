@@ -206,21 +206,25 @@ def parse_args(defaults={"verbose": None, "configfile": None, "cluster_configfil
 
 
 def main():
-    
-    ## basic paths only used in wrapper
-    this_script_dir = os.path.dirname(os.path.realpath(__file__))
-    main_dir_path = cf.get_snakepipes_path()
+    # Script-neutral paths
+    baseDir = os.path.dirname(cf.__file__)
+    workflowDir = os.path.join(baseDir, "workflows", os.path.basename(__file__))
 
-    # defaults
-    defaults = cf.load_configfile(os.path.join(this_script_dir, "defaults.yaml"), False)
+    ## defaults
+    defaults = cf.load_configfile(os.path.join(workflowDir, "defaults.yaml"),False)
+
     # get command line arguments
     parser = parse_args(defaults)
     args = parser.parse_args()
     args.wdir = os.path.abspath(args.wdir)
     args.cluster_logs_dir = os.path.join(args.wdir, "cluster_logs")
 
-    args.this_script_dir = this_script_dir
-    args.main_dir_path = main_dir_path
+    args.baseDir = baseDir
+
+    ###switch between TruSeq and Nextera adapter sequences
+    args.adapterSeq = "AGATCGGAAGAGC"
+    if args.nextera:
+        args.adapterSeq = "CTGTCTCTTATA"
 
     # setup logging
     logger = logging.getLogger(__name__)
@@ -259,18 +263,9 @@ def main():
     # save to configs.yaml in wdir
     cf.write_configfile(os.path.join(args.wdir, 'config.yaml'), config)
 
-
-    ######################################### conditional parameters ##################################################
-    ###switch between TruSeq and Nextera adapter sequences
-    adapterSeq = "AGATCGGAAGAGC"
-    if args.nextera:
-        adapterSeq = "CTGTCTCTTATA"
-
-      
     ## merge cluster config files: 1) global one, 2) workflow specific one, 3) user provided one
-    cluster_config = cf.load_configfile(cf.get_snakepipes_path()+"/shared/cluster.yaml",False)
-    cluster_config = cf.merge_dicts(cluster_config, cf.load_configfile(os.path.join(this_script_dir,"cluster.yaml"),False), )
-
+    cluster_config = cf.load_configfile(os.path.join(baseDir, "shared/cluster.yaml"), False)
+    cluster_config = cf.merge_dicts(cluster_config, cf.load_configfile(os.path.join(workflowDir, "cluster.yaml"), False), )
 
     if args.cluster_configfile:
         user_cluster_config = cf.load_configfile(args.cluster_configfile,False)
@@ -281,7 +276,7 @@ def main():
     snakemake_cmd = """
                     snakemake {snakemake_options} --latency-wait {latency_wait} --snakefile {snakefile} --jobs {max_jobs} --directory {wdir} --configfile {configfile} 
                     """.format( latency_wait = cluster_config["snakemake_latency_wait"],
-                                snakefile = os.path.join(args.this_script_dir, "Snakefile"),
+                                snakefile = os.path.join(workflowDir, "Snakefile"),
                                 max_jobs = args.max_jobs,
                                 wdir = args.wdir,
                                 snakemake_options = str(args.snakemake_options or ''),

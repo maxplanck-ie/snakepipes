@@ -19,9 +19,9 @@ def set_env_yamls():
             'CONDA_CHIPSEQ_ENV': 'envs/chip_seq.yaml',
             'CONDA_ATAC_ENV': 'envs/atac_seq.yaml',
             'CONDA_HIC_ENV': 'envs/snakepipes_hic_conda_env.yaml',
-            'CondaEnvironment': 'envs/WGBSconda.yml',
-            'mCtCondaEnvironment': 'envs/methylCtools.yml',
-            'RmdCondaEnvironment': 'envs/Rmdconda.yml'}
+            'CondaEnvironment': 'envs/WGBSconda.yaml',
+            'mCtCondaEnvironment': 'envs/methylCtools.yaml',
+            'RmdCondaEnvironment': 'envs/Rmdconda.yaml'}
 
 
 def merge_dicts(x, y):

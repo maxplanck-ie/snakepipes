@@ -235,7 +235,9 @@ else:
         params:
             tempdir=tempdir,
             auxdir=os.path.join(wdir,"aux_files"),
-            OUTlist=lambda wildcards,output: [w.replace('.sample_summary', '') for w in output.outFileList]
+            OUTlist=lambda wildcards,output: [w.replace('.sample_summary', '') for w in output.outFileList],
+            OUTlist0=lambda wildcards,output: [w.replace('.sample_summary', '') for w in output.outFileList][0],
+            OUTlist1=lambda wildcards,output: [w.replace('.sample_summary', '') for w in output.outFileList][1]
         log:
             err="QC_metrics/logs/{sample}.depth_of_cov.err",
             out="QC_metrics/logs/{sample}.depth_of_cov.out"

@@ -45,7 +45,7 @@ downsample:
 trimReads: auto
 nextera: False
 trimThreshold: 10
-trimOtherArgs:
+trimOtherArgs: ""
 verbose: False
 ################################################################################
 # Call snakemake directly, i.e. without using the wrapper script:

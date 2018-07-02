@@ -182,20 +182,19 @@ def parse_args(defaults={"verbose":None,"configfile":None,"cluster_configfile":N
 
 
 def main():
-
-    ## basic paths only used in wrapper
-    this_script_dir = os.path.dirname(os.path.realpath(__file__))
-    main_dir_path = cf.get_snakepipes_path()
+    # Script-neutral paths
+    baseDir = os.path.dirname(cf.__file__)
+    workflowDir = os.path.join(baseDir, "workflows", os.path.basename(__file__))
 
     ## defaults
-    defaults = cf.load_configfile(os.path.join(this_script_dir, "defaults.yaml"),False)
+    defaults = cf.load_configfile(os.path.join(workflowDir, "defaults.yaml"),False)
+
     ## get command line arguments
     parser = parse_args(defaults)
     args = parser.parse_args()
 
     ## we also add these paths to config, although we dont use them in the Snakefile
-    args.this_script_dir = this_script_dir
-    args.main_dir_path = main_dir_path
+    args.baseDir = baseDir
 
     args.outdir = os.path.abspath(args.outdir)
     args.cluster_logs_dir = os.path.join(args.outdir, "cluster_logs")
@@ -213,7 +212,7 @@ def main():
         exit(1)
 
 # 3. get abspath from user provided genome/organism file
-    if not os.path.isfile(os.path.join(main_dir_path, "shared", "organisms", args.genome + ".yaml")) and os.path.isfile(args.genome):
+    if not os.path.isfile(os.path.join(baseDir, "shared/organisms/{}.yaml".format(args.genome))) and os.path.isfile(args.genome):
         args.genome = os.path.abspath(args.genome)
 
 # 4. barcode file
@@ -248,8 +247,8 @@ def main():
     cf.write_configfile(os.path.join(args.outdir,'config.yaml'),config)
 
     ## merge cluster config files: 1) global one, 2) workflow specific one, 3) user provided one
-    cluster_config = cf.load_configfile(cf.get_snakepipes_path()+"/shared/cluster.yaml",False)
-    cluster_config = cf.merge_dicts(cluster_config, cf.load_configfile(os.path.join(this_script_dir,"cluster.yaml"),False), )
+    cluster_config = cf.load_configfile(os.path.join(baseDir, "shared/cluster.yaml"), False)
+    cluster_config = cf.merge_dicts(cluster_config, cf.load_configfile(os.path.join(workflowDir, "cluster.yaml"), False), )
 
     if args.cluster_configfile:
         user_cluster_config = cf.load_configfile(args.cluster_configfile,False)
@@ -259,7 +258,7 @@ def main():
     snakemake_cmd = """
                     snakemake {snakemake_options} --latency-wait {latency_wait} --snakefile {snakefile} --jobs {max_jobs} --directory {outdir} --configfile {configfile}
                     """.format( latency_wait = cluster_config["snakemake_latency_wait"],
-                                snakefile = os.path.join(this_script_dir, "Snakefile"),
+                                snakefile = os.path.join(workflowDir, "Snakefile"),
                                 max_jobs = args.max_jobs,
                                 outdir = args.outdir,
                                 snakemake_options = str(args.snakemake_options or ''),
