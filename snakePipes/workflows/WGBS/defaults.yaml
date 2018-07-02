@@ -42,7 +42,7 @@ reads: [_R1, _R2]
 ## Number of reads to downsample from each FASTQ file
 downsample:
 ## Options for trimming
-trimReads: auto
+trimReads: 'user'
 adapterSeq: AGATCGGAAGAGC
 nextera: False
 trimThreshold: 10
