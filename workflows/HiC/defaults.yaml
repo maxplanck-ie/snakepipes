@@ -50,7 +50,7 @@ nbins_toMerge: 0
 # shall we merge the samples?
 merge_samples: false
 # parameters for hicFindTADs
-tadparams: '--thresholdComparisons 0.01 --minDepth 20000 --maxDepth 100000 --delta 0.1 --correctForMultipleTesting fdr'
+tadparams: '--thresholdComparisons 0.01'
 distVsCount: false
 distVsCountParams:
 noTAD: false

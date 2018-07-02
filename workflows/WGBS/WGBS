@@ -23,7 +23,7 @@ import common_functions as cf
 
 
 def parse_args(defaults={"verbose": None, "configfile": None, "cluster_configfile":None, "max_jobs": None, "nthreads": None, "snakemake_options": None, "tempdir": None,
-                         "downsample": None, "trimReads": None, "fqcin": None, "nextera": None, "trimThreshold": None, "trimOtherArgs": None, "convrefpath": None,
+                         "downsample": None, "trimReads": None, "fqcin": None, "adapterSeq":None,"nextera": None, "trimThreshold": None, "trimOtherArgs": None, "convrefpath": None,
                          "convRef": None, "intList": None, "blackList": None, "sampleInfo": None, "mbias_ignore": None}):
     """
     Parse arguments from the command line.
@@ -138,6 +138,14 @@ def parse_args(defaults={"verbose": None, "configfile": None, "cluster_configfil
                           action="store",
                           help="Folder with fastqc.zip files to automatically detect hard trimming threshold. ",
                           default=defaults["fqcin"])
+
+
+    optional.add_argument("--adapterSeq",
+                          dest="adapterSeq",
+                          metavar="STR",
+                          type=str,
+                          help="Adapter sequence for cutadapt. (default: '%(default)s')",
+                          default=defaults["adapterSeq"])
 
     optional.add_argument("--nextera",
                           dest="nextera",

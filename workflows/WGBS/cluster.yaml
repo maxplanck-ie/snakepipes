@@ -10,3 +10,5 @@ downsample_reads:
     memory: 6G 
 conv_rate:
     memory: 6G
+CpG_stats:
+    memory: 30G

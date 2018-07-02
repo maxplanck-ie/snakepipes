@@ -317,6 +317,28 @@ def main():
                                 configfile = os.path.join(args.outdir,'config.yaml'),
                               ).split()
 
+    # clean up filtered_bam if needed appropriate
+    filt = ""
+    if args.dedup:
+        filt += "-F 1024 "
+    if args.properpairs:
+        filt += "-f 2 "
+    if args.mapq is not None and args.mapq > 0:
+        filt += "-q {} ".format(args.mapq)
+    filter_rules = os.path.join(args.outdir, "filter_rules")
+    if os.path.exists(filter_rules):
+        f = open(filter_rules)
+        cont = f.read()
+        f.close()
+        if cont != filt:
+            f = open(filter_rules, "w")
+            f.write(filt)
+            f.close()
+    else:
+        f = open(filter_rules, "w")
+        f.write(filt)
+        f.close()
+
     # Produce the DAG if desired
     if args.createDAG:
         oldVerbose = config['verbose']
@@ -364,28 +386,6 @@ def main():
     with open(os.path.join(args.outdir, logfile_name), "w") as f:
         f.write(" ".join(sys.argv)+"\n\n")
         f.write(cmd+"\n\n")
-
-    # clean up filtered_bam if needed appropriate
-    filt = ""
-    if args.dedup:
-        filt += "-F 1024 "
-    if args.properpairs:
-        filt += "-f 2 "
-    if args.mapq is not None and args.mapq > 0:
-        filt += "-q {} ".format(args.mapq)
-    filter_rules = os.path.join(args.outdir, "filter_rules")
-    if os.path.exists(filter_rules):
-        f = open(filter_rules)
-        cont = f.read()
-        f.close()
-        if cont != filt:
-            f = open(filter_rules, "w")
-            f.write(filt)
-            f.close()
-    else:
-        f = open(filter_rules, "w")
-        f.write(filt)
-        f.close()
 
     ## Run snakemake
     p = subprocess.Popen(cmd, shell=True)
