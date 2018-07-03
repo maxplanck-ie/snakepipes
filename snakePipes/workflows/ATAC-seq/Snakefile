@@ -1,0 +1,109 @@
+import os
+import snakePipes.common_functions as cf
+
+
+### snakemake_workflows initialization ########################################
+maindir = os.path.dirname(os.path.dirname(workflow.basedir))
+
+# load conda ENVs (path is relative to "shared/rules" directory)
+globals().update(cf.set_env_yamls())
+
+# load config file
+globals().update(cf.load_configfile(workflow.overwrite_configfile,config["verbose"]))
+# load organism-specific data, i.e. genome indices, annotation, etc.
+globals().update(cf.load_organism_data(genome, maindir, config["verbose"]))
+
+outdir_MACS2 = 'MACS2/'
+outdir_ATACqc = 'MACS2_QC/'
+deeptools_ATAC='deepTools_ATAC/'
+
+# do workflow specific stuff now
+include: os.path.join(workflow.basedir, "internals.snakefile")
+
+### include modules of other snakefiles ########################################
+################################################################################
+# Import deeptools cmds
+include: os.path.join(maindir, "shared", "deeptools_cmds.snakefile")
+
+# ATAC-seq open chromatin
+include: os.path.join(maindir, "shared", "rules", "ATAC.snakefile")
+
+# ATAC QC open chromatin
+include: os.path.join(maindir, "shared", "rules", "ATAC_qc.snakefile")
+
+# flags for allelic mode
+if os.path.isdir(os.path.join(workingdir,'allelic_bams') ) and os.listdir(os.path.join(workingdir,'allelic_bams') ) != []:
+    allele_info = 'TRUE'
+else:
+    allele_info = 'FALSE'
+# CSAW for differential binding (if sampleinfo specified)
+# needs a "ChIP-sample" variable, here all samples are ChIP-Samples
+chip_samples = samples
+paired = True
+fragment_length = cf.get_fragment_length("deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv", chip_samples[0])
+if sample_info:
+    include: os.path.join(maindir, "shared", "rules", "CSAW.snakefile")
+
+## add outputs as asked
+def run_deepTools_allelic():
+    file_list = []
+    if os.path.isdir('allelic_bams') and os.listdir('allelic_bams') != []:
+        file_list.append( [
+        os.path.join(deeptools_ATAC, "plotFingerprint/plotFingerprint.metrics_allelic.txt")
+         ] )
+    return(file_list)
+
+def run_CSAW():
+    if sample_info:
+        return( ["CSAW/CSAW.session_info.txt"] )
+    else:
+        return([])
+
+
+### execute before workflow starts #############################################
+################################################################################
+onstart:
+    if "verbose" in config and config["verbose"]:
+        print("--- Workflow parameters --------------------------------------------------------")
+        print("samples:", samples)
+        print("ATAC fragment cutoff: ", atac_fragment_cutoff)
+        print("-" * 80, "\n")
+
+        print("--- Environment ----------------------------------------------------------------")
+        print("$TMPDIR: ",os.getenv('TMPDIR', ""))
+        print("$HOSTNAME: ",os.getenv('HOSTNAME', ""))
+        print("-" * 80, "\n")
+
+        print("--- Genome ---------------------------------------------------------------------")
+        print("Genome:", genome)
+        print("Effective genome size:", genome_size)
+        print("Genome FASTA:", genome_fasta)
+        print("Genome index:", genome_index)
+        print("Genome 2bit:", genome_2bit)
+        print("Bowtie2 index:", bowtie2_index)
+        print("Gene annotation BED:", genes_bed)
+        print("Gene annotation GTF:", genes_gtf)
+        print("Blacklist regions BED:", blacklist_bed)
+        print("Ignore for normalization (bigwigs):", ignore_forNorm)
+        print("-" * 80, "\n")
+
+### main rule ##################################################################
+################################################################################
+#print(expand(os.path.join(outdir_MACS2, "{sample}"), sample = samples))
+rule all:
+    input:
+        #expand(os.path.join(outdir_MACS2, "{sample}.short.bam"), sample = samples),
+        expand(os.path.join(outdir_MACS2, "{sample}.filtered.BAM_peaks.xls"), sample = samples),
+        expand(os.path.join(outdir_ATACqc,"{sample}.filtered.BAM_peaks.qc.txt"), sample = samples),
+        os.path.join(deeptools_ATAC, "plotFingerprint/plotFingerprint.metrics.txt"),
+        ## run deeptools-allelic only if dir "allelic_bams" present and non empty
+        run_deepTools_allelic(),
+        ## run csaw if asked for
+        run_CSAW()
+
+### execute after workflow finished ############################################
+################################################################################
+onsuccess:
+    cf.cleanLogs(outdir)
+    if "verbose" in config and config["verbose"]:
+        print("\n--- ATAC OpenChrom workflow finished successfully! --------------------------------\n")

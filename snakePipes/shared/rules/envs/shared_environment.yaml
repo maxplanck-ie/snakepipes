@@ -1,0 +1,15 @@
+name: snakepipes_shared_environment_1.0
+channels:
+ - bioconda
+ - conda-forge
+dependencies:
+ - deeptools=3.1.0
+ - seqtk=1.2
+ - pigz=2.3.4
+ - snpsplit=0.3.4
+ - samtools=1.7
+ - fastqc=0.11.7
+ - cutadapt=1.16
+ - trim-galore=0.4.5
+ - sambamba=0.6.6
+ - multiqc=1.5

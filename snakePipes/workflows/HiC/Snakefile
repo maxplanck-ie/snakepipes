@@ -1,0 +1,141 @@
+import os
+import snakePipes.common_functions as cf
+
+
+### snakemake_workflows initialization ########################################
+maindir = os.path.dirname(os.path.dirname(workflow.basedir))
+
+# load conda ENVs (path is relative to "shared/rules" directory)
+globals().update(cf.set_env_yamls())
+
+# load config file
+globals().update(cf.load_configfile(workflow.overwrite_configfile,config["verbose"]))
+# load organism-specific data, i.e. genome indices, annotation, etc.
+globals().update(cf.load_organism_data(genome,maindir,config["verbose"]))
+
+# do workflow specific stuff now
+include: os.path.join(workflow.basedir, "internals.snakefile")
+
+### include modules of other snakefiles ########################################
+################################################################################
+
+# FASTQ: either downsample FASTQ files or create symlinks to input files
+include: os.path.join(maindir, "shared", "rules", "FASTQ.snakefile")
+
+# FastQC
+if fastqc:
+    include: os.path.join(maindir, "shared", "rules", "FastQC.snakefile")
+
+# trimming
+if trim:
+    include: os.path.join(maindir, "shared", "rules", "TrimGalore.snakefile")
+
+# HiCExplorer
+include: os.path.join(maindir, "shared", "rules", "hicexplorer.snakefile")
+
+#include: os.path.join(maindir, "shared", "rules", "multiQC.snakefile")
+
+### conditional/optional rules #################################################
+################################################################################
+def run_FastQC(fastqc):
+    if fastqc:
+        return( expand("FastQC/{sample}{read}_fastqc.html", sample = samples, read = reads) )
+    else:
+        return([])
+
+def run_Trimming(trim, fastqc):
+    if trim and fastqc:
+        return( expand(fastq_dir+"/{sample}{read}.fastq.gz", sample = samples, read = reads) +
+                expand("FastQC_trimmed/{sample}{read}_fastqc.html", sample = samples, read = reads) )
+    elif trim:
+        return( expand(fastq_dir+"/{sample}{read}.fastq.gz", sample = samples, read = reads) )
+    else:
+        return([])
+
+def run_CollectInsertSizeMetrics(paired):
+    if paired:
+        return( expand("Picard_qc/InsertSizeMetrics/{sample}.insert_size_metrics.txt", sample = samples) )
+    else:
+        return([])
+
+def run_build_matrices():
+    file_list = []
+    if merge_samples and nbins_toMerge !=0:
+       file_list.append(expand("HiC_matrices/mergedSamples_{group}_Mbins"+str(nbins_toMerge)+"_"+matrixFile_suffix+".h5", group = sample_dict.keys())+
+                        expand("HiC_matrices/QCplots/mergedSamples_{group}_Mbins"+str(nbins_toMerge)+"_"+matrixFile_suffix+"_diagnostic_plot.pdf", group = sample_dict.keys())+
+                        expand("HiC_matrices/QCplots/mergedSamples_{group}_Mbins"+str(nbins_toMerge)+"_"+matrixFile_suffix+"_mad_threshold.out", group = sample_dict.keys()))
+       if not noCorrect:
+          file_list.append(expand("HiC_matrices_corrected/mergedSamples_{group}_Mbins"+str(nbins_toMerge)+"_"+matrixFile_suffix+".corrected.h5", group = sample_dict.keys()))
+          if not noTAD:
+             file_list.append(expand("TADs/mergedSamples_{group}_Mbins"+str(nbins_toMerge)+"_"+matrixFile_suffix+"_boundaries.bed",group = sample_dict.keys()))
+
+    elif merge_samples:
+       file_list.append(expand("HiC_matrices/mergedSamples_{group}_"+matrixFile_suffix+".h5", group = sample_dict.keys())+
+                        expand("HiC_matrices/QCplots/mergedSamples_{group}_"+matrixFile_suffix+"_diagnostic_plot.pdf", group = sample_dict.keys())+
+                        expand("HiC_matrices/QCplots/mergedSamples_{group}_"+matrixFile_suffix+"_mad_threshold.out", group = sample_dict.keys()))
+       if not noCorrect:
+              file_list.append(expand("HiC_matrices_corrected/mergedSamples_{group}_"+matrixFile_suffix+".corrected.h5", group = sample_dict.keys()))
+              if not noTAD:
+                 file_list.append(expand("TADs/mergedSamples_{group}_"+matrixFile_suffix+"_boundaries.bed", group = sample_dict.keys()))
+
+    elif nbins_toMerge != 0:
+        file_list.append(expand("HiC_matrices/{sample}_Mbins"+str(nbins_toMerge)+"_"+matrixFile_suffix+".h5",sample=samples)+
+              expand("HiC_matrices/QCplots/{sample}_Mbins"+str(nbins_toMerge)+"_"+matrixFile_suffix+"_diagnostic_plot.pdf", sample=samples)+
+              expand("HiC_matrices/QCplots/{sample}_Mbins"+str(nbins_toMerge)+"_"+matrixFile_suffix+"_mad_threshold.out", sample=samples))
+        if not noCorrect:
+              file_list.append(expand("HiC_matrices_corrected/{sample}_Mbins"+str(nbins_toMerge)+"_"+matrixFile_suffix+".corrected.h5", sample=samples))
+              if not noTAD:
+                 file_list.append(expand("TADs/{sample}_Mbins"+str(nbins_toMerge)+"_"+matrixFile_suffix+"_boundaries.bed", sample=samples))
+
+    else:
+       file_list.append(expand("HiC_matrices/{sample}_"+matrixFile_suffix+".h5", sample=samples)+
+              expand("HiC_matrices/QCplots/{sample}_"+matrixFile_suffix+"_diagnostic_plot.pdf", sample=samples)+
+              expand("HiC_matrices/QCplots/{sample}_"+matrixFile_suffix+"_mad_threshold.out", sample=samples))
+       if not noCorrect:
+              file_list.append(expand("HiC_matrices_corrected/{sample}_"+matrixFile_suffix+".corrected.h5", sample=samples))
+              if not noTAD:
+                 file_list.append(expand("TADs/{sample}_"+matrixFile_suffix+"_boundaries.bed", sample=samples))
+    return(file_list)
+
+
+def run_dist_vs_count():
+    if distVsCount:
+       return(["dist_vs_counts.png"])
+    else:
+       return([])
+
+
+### execute before workflow starts #############################################
+################################################################################
+onstart:
+    if "verbose" in config and config["verbose"]:
+        print("--- Workflow parameters --------------------------------------------------------")
+        print("samples:", samples)
+        print("fastq dir:", fastq_dir)
+        print("-" * 80, "\n")
+
+        print("--- Environment ----------------------------------------------------------------")
+        print("$TMPDIR: ",os.getenv('TMPDIR', ""))
+        print("$HOSTNAME: ",os.getenv('HOSTNAME', ""))
+        print("-" * 80, "\n")
+
+### main rule ##################################################################
+################################################################################
+localrules: FASTQ
+
+rule all:
+    input:
+        expand("FASTQ/{sample}{read}.fastq.gz", sample = samples, read = reads),
+        run_FastQC(fastqc),
+        run_Trimming(trim, fastqc),
+        expand(mapping_prg+"/{sample}{read}.bam", sample = samples, read = reads),
+        run_build_matrices(),
+        run_dist_vs_count(),
+#       "multiQC/multiqc_report.html"
+
+### execute after workflow finished ############################################
+################################################################################
+onsuccess:
+    cf.cleanLogs(outdir)
+    if "verbose" in config and config["verbose"]:
+        print("\n--- Hi-C workflow finished successfully! --------------------------------\n")

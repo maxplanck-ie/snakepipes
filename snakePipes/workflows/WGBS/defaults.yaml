@@ -1,0 +1,60 @@
+################################################################################
+# This file is the default configuration of the WGBS workflow!
+#
+# In order to adjust some parameters, please either use the wrapper script
+# (eg. /path/to/snakemake_workflows/workflows/WGBS/WGBS)
+# or save a copy of this file, modify necessary parameters and then provide
+# this file to the wrapper or snakemake via '--configfile' option
+# (see below how to call the snakefile directly)
+#
+# Own parameters will be loaded during snakefile executiuon as well and hence
+# can be used in new/extended snakemake rules!
+################################################################################
+## General/Snakemake parameters, only used/set by wrapper or in Snakemake cmdl, but not in Snakefile
+wdir:
+configfile:
+cluster_configfile:
+local: False
+max_jobs: 12
+nthreads: 8
+## directory with fastq files
+readin:
+## directory with fastqc files for auto quality trimming
+fqcin:
+## Genome information
+genome:
+convrefpath:
+convRef: False
+###list of bed files to process
+intList: []
+###SNP black list (bed file)
+blackList:
+###sample Info
+sampleInfo:
+###inclusion bounds for methylation extraction
+mbias_ignore: auto
+## FASTQ file extension (default: ".fastq.gz")
+ext: '.fastq.gz'
+## paired-end read name extension (default: ['_R1', "_R2"])
+reads: [_R1, _R2]
+## Number of reads to downsample from each FASTQ file
+downsample:
+## Options for trimming
+trimReads: 'user'
+adapterSeq: AGATCGGAAGAGC
+nextera: False
+trimThreshold: 10
+trimOtherArgs: ""
+verbose: False
+################################################################################
+# Call snakemake directly, i.e. without using the wrapper script:
+#
+# Please save a copy of this config yaml file and provide an adjusted config
+# via '--configfile' parameter!
+# example call:
+#
+# snakemake --snakefile /path/to/snakemake_workflows/workflows/WGBS/Snakefile
+#           --configfile /path/to/snakemake_workflows/workflows/WGBS/defaults.yaml
+#           --directory /path/to/outputdir
+#           --cores 32
+################################################################################
