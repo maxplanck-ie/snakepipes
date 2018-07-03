@@ -186,11 +186,11 @@ rule call_tads:
         "--outPrefix {params.prefix} > {log.out} 2> {log.err}"
 
 ##compare matrices using hicPlotDistVsCounts
-rule distvscounts: #TODO
+rule distvscounts:
    input:
-        matrices = lambda wildcards: os.path.join(' '.join(run_build_matrices()[1]))
+        matrices = expand("HiC_matrices_corrected/{sample}_"+matrixFile_suffix+".corrected.h5", sample = samples)
    output:
-        "HiC_matrices_corrected/dist_vs_counts.png"
+        "dist_vs_counts.png"
    params:
         function_params = lambda wildcards: distVsCountParams if distVsCountParams else " "
    log:
