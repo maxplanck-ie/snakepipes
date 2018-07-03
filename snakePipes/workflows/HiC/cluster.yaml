@@ -1,0 +1,3 @@
+map_fastq_single_end:
+          memory: 3G
+

@@ -17,7 +17,7 @@ configfile:
 cluster_configfile:
 local: False
 max_jobs: 5
-snakemake_options: '--use-conda --conda-prefix /data/processing/conda/env '
+snakemake_options: '--use-conda --conda-prefix /data/processing/conda/envs '
 tempdir: /data/extended/
 ## directory with fastq files
 indir:
@@ -27,7 +27,7 @@ genome:
 ## FASTQ file extension (default: ".fastq.gz")
 ext: '.fastq.gz'
 ## paired-end read name extension (default: ['_R1', "_R2"])
-reads: [_R1, _R2]
+reads: ['_R1', '_R2']
 mapping_prg: BWA
 ## Number of reads to downsample from each FASTQ file
 downsample:
@@ -50,12 +50,14 @@ nbins_toMerge: 0
 # shall we merge the samples?
 merge_samples: false
 # parameters for hicFindTADs
-tadparams: --thresholdComparisons 0.01
+tadparams: '--thresholdComparisons 0.01'
 distVsCount: false
 distVsCountParams:
 noTAD: false
 noCorrect: false
-
+chromosomes:
+# a .tsv file contains names and replicates of samples.
+sample_info:
 ################################################################################
 # Call snakemake directly, i.e. without using the wrapper script:
 #
