@@ -29,6 +29,7 @@ def parse_arguments():
     createEnvsParser.add_argument('--force', action='store_true', help='Force creation of conda environments, even if they apparently exist.')
 
     createEnvsParser.add_argument('--info', '-i', action='store_true', help='Only print the environments that would be created, don\'t actually create them.')
+    createEnvsParser.add_argument('--skipGATK', action='store_true', help='Skip registering GATK')
 
 
     return parser
@@ -126,7 +127,7 @@ def createCondaEnvs(args):
                     os.makedirs(os.path.join(condaDirUse, h), exist_ok=True)
                     subprocess.check_call(cmd, shell=True)
     # We can't actually install GATK with conda, which is annoying
-    if gatkEnv:
+    if gatkEnv and not args.skipGATK:
         registerGATK(gatkEnv)
 
 

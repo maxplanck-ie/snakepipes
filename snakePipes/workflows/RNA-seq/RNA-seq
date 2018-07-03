@@ -188,22 +188,18 @@ def main():
     if os.path.exists(args.indir):
         args.indir = os.path.abspath(args.indir)
     else:
-        print("\nError! Input dir (-i) not found! ({})\n".format(args.indir))
-        exit(1)
+        sys.exit("\nError! Input dir (-i) not found! ({})\n".format(args.indir))
     # 2. config file
     if args.configfile and not os.path.exists(args.configfile):
-        print("\nError! Provided configfile (-c) not found! ({})\n".format(args.configfile))
-        exit(1)
+        sys.exit("\nError! Provided configfile (-c) not found! ({})\n".format(args.configfile))
     # 3. Sample info file
     if args.sample_info:
         if os.path.exists(os.path.abspath(args.sample_info)):
             args.sample_info = os.path.abspath(args.sample_info)
         else:
-            print("\nSample info file not found! (--DE {})\n".format(args.sample_info))
-            exit(1)
+            sys.exit("\nSample info file not found! (--DE {})\n".format(args.sample_info))
         if not cf.check_sample_info_header(args.sample_info):
-            print("ERROR: Please use 'name' and 'condition' as column headers in sample info file! ("+sample_info+")\n")
-            exit(1)
+            sys.exit("ERROR: Please use 'name' and 'condition' as column headers in sample info file! ("+sample_info+")\n")
 
     # 4. get abspath from user provided genome/organism file
     if not os.path.isfile(os.path.join(baseDir, "shared/organisms/{}.yaml".format(args.genome))) and os.path.isfile(args.genome):
@@ -246,7 +242,7 @@ def main():
     if args.createDAG:
         oldVerbose = config['verbose']
         config['verbose'] = False
-        cf.write_configfile(os.path.join(args.outdir,'config.yaml'), config)
+        cf.write_configfile(os.path.join(args.outdir, 'config.yaml'), config)
         DAGproc = subprocess.Popen(snakemake_cmd + ['--rulegraph'], stdout=subprocess.PIPE)
         _ = open("{}/pipeline.pdf".format(args.outdir), "wb")
         foo = subprocess.check_call(["dot", "-Tpdf"], stdin=DAGproc.stdout, stdout=_)
@@ -259,7 +255,7 @@ def main():
 
     if not args.local:
         snakemake_cmd += ["--cluster-config",
-                         os.path.join(args.outdir,'cluster_config.yaml'),
+                         os.path.join(args.outdir, 'cluster_config.yaml'),
                          "--cluster", "'"+cluster_config["snakemake_cluster_cmd"],
                          args.cluster_logs_dir, "--name {rule}.snakemake'"]
 
