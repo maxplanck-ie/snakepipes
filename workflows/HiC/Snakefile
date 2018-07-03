@@ -103,7 +103,7 @@ def run_build_matrices():
 
 def run_dist_vs_count():
     if distVsCount:
-       return(["HiC_matrices_corrected/dist_vs_counts.png"])
+       return(["dist_vs_counts.png"])
     else:
        return([])
 
