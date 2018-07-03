@@ -37,11 +37,11 @@ This snakepipes is then installed, however you will need to perform a few steps 
 
   1. Modify/remove/add the organism yaml files appropriately
   2. Modify the cluster.yaml file appropriately
-  3. Create the per-workflow conda environments
+  3. Create the conda environments
 
-To facilitate this, you can use the `snakePipes info` command to list the locations of the various yaml files. Edit or remove these to suite your needs and then run `snakePipes createEnvs` to create the per-workflow conda environments. Note that this will also set the `snakemake_options:` line in the various workflow `default.yaml` files, by default. If you have already modified this then use the `--keepCondaDir` option.
+To facilitate this, you can use the `snakePipes info` command to list the locations of the various yaml files. Edit or remove these to suite your needs and then run `snakePipes createEnvs` to create the requisite conda environments. Note that this will also set the `snakemake_options:` line in the global snakePipes `defaults.yaml` files. If you have already modified this then use the `--keepCondaDir` option.
 
-.. note:: Whenever you change the `snakemake_options:` line in a workflow `default.yaml`, you should run `snakePipes createEnvs` to ensure that the conda environments are then created.
+.. note:: Whenever you change the `snakemake_options:` line in `defaults.yaml`, you should run `snakePipes createEnvs` to ensure that the conda environments are then created.
 
 .. note:: Running `snakePipes createEnvs` is not strictly required, but facilitates multiple users using the same snakePipes installation.
 
