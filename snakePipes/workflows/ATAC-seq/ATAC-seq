@@ -76,7 +76,9 @@ def main():
     workflowDir = os.path.join(baseDir, "workflows", os.path.basename(__file__))
 
     ## defaults
-    defaults = cf.load_configfile(os.path.join(workflowDir, "defaults.yaml"),False)
+    defaults = cf.load_configfile(os.path.join(workflowDir, "defaults.yaml"), False)
+    globalDefaults = cf.load_configfile(os.path.join(baseDir, "shared/defaults.yaml"), False)
+    defaults = cf.merge_dicts(defaults, globalDefaults)
 
     ## get command line arguments
     parser = parse_args(defaults)

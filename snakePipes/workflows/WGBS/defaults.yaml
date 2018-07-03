@@ -17,8 +17,6 @@ cluster_configfile:
 local: False
 max_jobs: 12
 nthreads: 8
-snakemake_options: '--use-conda --conda-prefix /data/processing/conda/envs'
-tempdir: /data/extended/
 ## directory with fastq files
 readin:
 ## directory with fastqc files for auto quality trimming

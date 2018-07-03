@@ -46,6 +46,9 @@ def info():
     for f in glob.glob(os.path.join(baseDir, "shared/organisms/*.yaml")):
         print("    {}".format(f))
 
+    # defaults.yaml under shared
+    print("\nThe workflow-generic defaults.yaml file is:\n    {}".format(os.path.join(baseDir, "shared/defaults.yaml")))
+
     # cluster.yaml under shared
     print("\nThe default cluster.yaml file. Its defaults are overridden by the per-workflow cluster.yaml files:\n    {}".format(os.path.join(baseDir, "shared/cluster.yaml")))
     print("\nWorkflow-specific cluster.yaml and defaults.yaml files are in:")
@@ -74,58 +77,55 @@ def createCondaEnvs(args):
     condaDir = os.path.join(os.path.dirname(os.path.dirname(condaDir)), "envs")
     gatkEnv = None
 
-    for workflow in glob.glob(os.path.join(baseDir, "workflows/*/defaults.yaml")):
-        f = open(workflow)
-        cf = yaml.load(f)
+    f = open(os.path.join(baseDir, "shared/defaults.yaml"))
+    cf = yaml.load(f)
+    f.close()
+    _ = cf['snakemake_options'].split(" ")
+    try:
+        idx = _.index('--conda-prefix')
+    except:
+        sys.exit("The snakemake_options directive in {} lacks --conda-prefix!\n".format(os.path.join(baseDir, "shared/defaults.yaml")))
+
+    condaEnvDir = _[idx + 1]
+    if args.condaDir:
+        condaDirUse = args.condaDir
+        _[idx + 1] = condaDirUse
+    elif args.keepCondaDir:
+        condaDirUse = _[idx + 1]
+    else:
+        condaDirUse = condaDir
+        # Remove --conda-prefix entirely
+        del _[idx + 1]
+        del _[idx]
+    cf['snakemake_options'] = ' '.join(_)
+
+    # rewrite defaults.yaml
+    cof.write_configfile(os.path.join(baseDir, "shared/defaults.yaml"), cf)
+
+    for env in cof.set_env_yamls().values():
+        # Hash the file ala snakemake
+        md5hash = hashlib.md5()
+        md5hash.update(condaDirUse.encode())
+        f = open(os.path.join(baseDir, "shared/rules", env), 'rb')
+        md5hash.update(f.read())
         f.close()
-        _ = cf['snakemake_options'].split(" ")
-        try:
-            idx = _.index('--conda-prefix')
-        except:
-            sys.exit("The snakemake_options directive in {} lacks --conda-prefix!\n".format(workflow))
+        h = md5hash.hexdigest()
 
-        condaEnvDir = _[idx + 1]
-        if args.condaDir:
-            condaDirUse = args.condaDir
-            _[idx + 1] = condaDirUse
-        elif args.keepCondaDir:
-            condaDirUse = _[idx + 1]
-        else:
-            condaDirUse = condaDir
-            # Remove --conda-prefix entirely
-            del _[idx + 1]
-            del _[idx]
-        cf['snakemake_options'] = ' '.join(_)
+        if 'WGBS' in env:
+            gatkEnv = os.path.join(condaDirUse, h)
 
-        # rewrite defaults.yaml
-        f = open(workflow, "w")
-        f.write(yaml.dump(cf))
-        f.close()
-
-        for env in cof.set_env_yamls().values():
-            # Hash the file ala snakemake
-            md5hash = hashlib.md5()
-            md5hash.update(condaDirUse.encode())
-            f = open(os.path.join(baseDir, "shared/rules", env), 'rb')
-            md5hash.update(f.read())
-            f.close()
-            h = md5hash.hexdigest()
-
-            if 'WGBS' in env:
-                gatkEnv = os.path.join(condaDirUse, h)
-
-            if h not in created or args.force:
-                created.add(h)
-                sys.stderr.write("Creating environment from {} in {}\n".format(os.path.join(baseDir, "shared/rules", env), condaDirUse))
-                if '--conda-prefix' in cf['snakemake_options']:
-                    cmd = "conda env create --force --file {} --prefix {}".format(os.path.join(baseDir, "shared/rules", env), os.path.join(condaDirUse, h))
-                else:
-                    cmd = "conda env create --force --file {} --name {}".format(os.path.join(baseDir, "shared/rules", env), h)
-                if os.path.exists(os.path.join(condaDirUse, h)) and not args.force:
-                    continue
-                if not args.info:
-                    os.makedirs(os.path.join(condaDirUse, h), exist_ok=True)
-                    subprocess.check_call(cmd, shell=True)
+        if h not in created or args.force:
+            created.add(h)
+            sys.stderr.write("Creating environment from {} in {}\n".format(os.path.join(baseDir, "shared/rules", env), condaDirUse))
+            if '--conda-prefix' in cf['snakemake_options']:
+                cmd = "conda env create --force --file {} --prefix {}".format(os.path.join(baseDir, "shared/rules", env), os.path.join(condaDirUse, h))
+            else:
+                cmd = "conda env create --force --file {} --name {}".format(os.path.join(baseDir, "shared/rules", env), h)
+            if os.path.exists(os.path.join(condaDirUse, h)) and not args.force:
+                continue
+            if not args.info:
+                os.makedirs(os.path.join(condaDirUse, h), exist_ok=True)
+                subprocess.check_call(cmd, shell=True)
     # We can't actually install GATK with conda, which is annoying
     if gatkEnv and not args.skipGATK:
         registerGATK(gatkEnv)

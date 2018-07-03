@@ -17,8 +17,6 @@ configfile:
 cluster_configfile:
 local: False
 max_jobs: 5
-snakemake_options: '--use-conda --conda-prefix /data/processing/conda/envs '
-tempdir: /data/extended/
 ## directory with fastq files
 indir:
 ## preconfigured target genomes (mm9,mm10,dm3,...) , see /path/to/snakemake_workflows/shared/organisms/
