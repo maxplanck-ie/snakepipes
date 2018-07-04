@@ -1,6 +1,7 @@
 import argparse
 import os.path
 import glob
+from snakePipes import __version__
 
 
 def ListGenomes():
@@ -93,6 +94,10 @@ def mainArguments(defaults, workingDir=False):
                          action="store_true",
                          help="If specified, a file called pipeline.pdf is produced in the output directory that shows the rules used and their relationship to each other.")
 
+    general.add_argument("--version",
+                         action="version",
+                         version="%(prog)s {}".format(__version__))
+
     return parser
 
 
@@ -128,3 +133,60 @@ def snpArguments(defaults):
                          type=str)
 
     return parser
+
+
+# DNA-mapping options added
+def commonOptions(grp, defaults, bw=True, plots=True):
+    """
+    Common options found in many workflows
+    grp is an argument group that's simply appended to
+    """
+    grp.add_argument("--downsample",
+                     dest="downsample",
+                     metavar="INT",
+                     help="Downsample the given number of reads randomly from of each FASTQ file (default: '%(default)s')",
+                     type=int,
+                     default=defaults["downsample"])
+
+    grp.add_argument("--trim",
+                     dest="trim",
+                     action="store_true",
+                     help="Activate fastq read trimming. If activated, Illumina adaptors are trimmed by default. "
+                     "Additional parameters can be specified under --trim_options (default: '%(default)s')",
+                     default=defaults["trim"])
+
+    grp.add_argument("--trim_prg",
+                     dest="trim_prg",
+                     choices=['cutadapt', 'trimgalore'],
+                     help="Trimming program to use: Cutadapt or TrimGalore (default: '%(default)s')",
+                     default=defaults["trim_prg"])
+
+    grp.add_argument("--trim_options",
+                     dest="trim_options",
+                     metavar="STR",
+                     type=str,
+                     help="Additional option string for trimming program of choice. (default: '%(default)s')",
+                     default=defaults["trim_options"])
+
+    grp.add_argument("--fastqc",
+                     dest="fastqc",
+                     action="store_true",
+                     help="Run FastQC read quality control (default: '%(default)s')",
+                     default=defaults["fastqc"])
+
+    if bw:
+        grp.add_argument("--bw-binsize",
+                         dest="bw_binsize",
+                         metavar="INT",
+                         help="Bin size of output files in bigWig format (default: '%(default)s')",
+                         type=int,
+                         default=defaults["bw_binsize"])
+
+    if plots:
+        grp.add_argument("--plotFormat",
+                         dest="plot_format",
+                         choices=['png', 'pdf', 'None'],
+                         metavar="STR",
+                         type=str,
+                         help="Format of the output plots from deepTools. Select 'none' for no plots (default: '%(default)s')",
+                         default=defaults["plot_format"])

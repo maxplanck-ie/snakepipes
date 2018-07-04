@@ -1,27 +1,17 @@
 #!/usr/bin/env python3
 
-__version__ = "0.6"
-
 __description__ = """
-RNA-seq workflow v{version} - MPI-IE workflow for RNA mapping and analysis
+MPI-IE workflow for RNA mapping and analysis
 
 usage example:
     RNA-seq -i input-dir -o output-dir mm10
-""".format(version=__version__)
+"""
 
 
 import argparse
 import os
-import signal
-import subprocess
 import sys
 import textwrap
-import time
-import shutil
-import yaml
-import re
-import inspect
-from glob import glob
 import snakePipes.common_functions as cf
 import snakePipes.parserCommon as parserCommon
 
@@ -53,64 +43,43 @@ def parse_args(defaults={"verbose":None,"configfile":None,"cluster_configfile":N
                           " (default: '%(default)s')",
                           default=defaults["mode"])
 
-    optional.add_argument("--downsample",
-                          dest="downsample",
-                          metavar="INT",
-                          help="downsample the given number of reads randomly from each FASTQ file (default: '%(default)s')",
-                          type=int,
-                          default=defaults["downsample"])
-    optional.add_argument("--trim_prg",
-                          dest="trim_prg",
-                          choices=['cutadapt', 'trimgalore'],
-                          help="trimming program: cutadapt or trimgalore (default: '%(default)s')",
-                          default=defaults["trim_prg"])
-    optional.add_argument("--trim",
-                          dest="trim",
-                          action="store_true",
-                          help="Activate fastq read trimming. If activated, Illumina adaptors are trimmed by default. "
-                          "Additional parameters can be specified under --trim_options (default: '%(default)s')",
-                          default=defaults["trim"])
-    optional.add_argument("--trim_options",
-                          dest="trim_options",
-                          metavar="STR",
-                          type=str,
-                          help="Additional option string for trimming program of choice. (default: '%(default)s')",
-                          default=defaults["trim_options"])
-    optional.add_argument("--fastqc",
-                          dest="fastqc",
-                          action="store_true",
-                          help="run FastQC read quality control (default: '%(default)s')",
-                          default=defaults["fastqc"])
+    parserCommon.commonOptions(optional, defaults, bw=False)
+
     optional.add_argument("--library_type",
                           dest="library_type",
                           metavar="",
                           help="user provided library type strand specificity. featurCounts style: 0, 1, 2 (Illumina TruSeq); default: '%(default)s')",
                           type=int,
                           default=defaults["library_type"])
+
     optional.add_argument("--mapping_prg",
                           dest="mapping_prg",
                           metavar="STR",
                           help="Program used for mapping: STAR or HISAT2 (default: '%(default)s')",
                           type=str,
                           default=defaults["mapping_prg"])
+
     optional.add_argument("--star_options",
                           dest="star_options",
                           metavar="STR",
                           help="STAR option string, e.g.: '--twopassMode Basic' (default: '%(default)s')",
                           type=str,
                           default=defaults["star_options"])
+
     optional.add_argument("--hisat_options",
                           dest="hisat_options",
                           metavar="STR",
                           help="HISAT2 option string (default: '%(default)s')",
                           type=str,
                           default=defaults["hisat_options"])
+
     optional.add_argument("--salmon_index_options",
                           dest="salmon_index_options",
                           metavar="STR",
                           type=str,
                           help="Salmon index options, e.g. '--type fmd' (default: '%(default)s')",
                           default=defaults["salmon_index_options"])
+
     optional.add_argument("--featurecounts_options",
                           dest="featurecounts_options",
                           metavar="STR",
@@ -118,6 +87,7 @@ def parse_args(defaults={"verbose":None,"configfile":None,"cluster_configfile":N
                           help="featureCounts option string. The options '-p -B'"
                                " are always used for paired-end data (default: '%(default)s')",
                           default=defaults["featurecounts_options"])
+
     optional.add_argument("--filter_annotation",
                           dest="filter_annotation",
                           metavar="STR",
@@ -125,6 +95,7 @@ def parse_args(defaults={"verbose":None,"configfile":None,"cluster_configfile":N
                           help="filter annotation GTF by grep for use with Salmon, e.g."
                                " use --filter_annotation='-v pseudogene'; default: '%(default)s')",
                           default=defaults["filter_annotation"])
+
     optional.add_argument("--DE",
                           dest="sample_info",
                           help="Information on samples (required for DE analysis); see "
@@ -135,47 +106,29 @@ def parse_args(defaults={"verbose":None,"configfile":None,"cluster_configfile":N
                                " The DE analysis might fail if your sample names begin with a number. So watch out"
                                " for that! (default: '%(default)s')",
                           default=defaults["sample_info"])
-    optional.add_argument("--bw-binsize",
-                          dest="bw_binsize",
-                          metavar="INT",
-                          help="bin size of output files in bigWig format (default: '%(default)s')",
-                          type=int,
-                          default=defaults["bw_binsize"])
+
     optional.add_argument("--dnaContam",
                           action="store_true",
                           help="Returns a plot which presents the proportion of the intergenic reads (default: '%(default)s')",
                           default=defaults["dnaContam"])
 
-    optional.add_argument("--plotFormat",
-                          dest="plot_format",
-                          choices=['png', 'pdf', 'None'],
-                          metavar="STR",
-                          type=str,
-                          help="Format of the output plots from deeptools. Select 'none' for no plot (default: '%(default)s')",
-                          default=defaults["plot_format"])
-
     return parser
 
 
 def main():
-    # Script-neutral paths
-    baseDir = os.path.dirname(cf.__file__)
-    workflowDir = os.path.join(baseDir, "workflows", os.path.basename(__file__))
+    baseDir, workflowDir, defaults = cf.setDefaults(os.path.basename(__file__))
 
-    ## defaults
-    defaults = cf.load_configfile(os.path.join(workflowDir, "defaults.yaml"),False)
-    globalDefaults = cf.load_configfile(os.path.join(baseDir, "shared/defaults.yaml"), False)
-    defaults = cf.merge_dicts(defaults, globalDefaults)
-
-    ## get command line arguments
+    # get command line arguments
     parser = parse_args(defaults)
     args = parser.parse_args()
 
-    ## we also add these paths to config, although we don't use them in the Snakefile
+    # we also add these paths to config, although we don't use them in the Snakefile
     args.baseDir = baseDir
 
-    args.outdir = os.path.abspath(args.outdir)
-    args.cluster_logs_dir = os.path.join(args.outdir, "cluster_logs")
+    # Common arguments
+    cf.checkCommonArguments(args, baseDir, outDir=True)
+
+    ## Begin workflow-specific checks
     # check for Allele-specific mapping mode
     args.allele_mode = cf.checkAlleleParams(args)
     # convert file path to abspath
@@ -184,132 +137,16 @@ def main():
     elif args.allele_mode == "map_only":
         args.SNPfile = os.path.abspath(args.SNPfile)
         args.Nmasked_index = os.path.abspath(args.Nmasked_index)
+    ## End workflow-specific checks
 
-    ## checks for parameters necessary in wrapper
-    # 1. Dir path
-    if os.path.exists(args.indir):
-        args.indir = os.path.abspath(args.indir)
-    else:
-        sys.exit("\nError! Input dir (-i) not found! ({})\n".format(args.indir))
-    # 2. config file
-    if args.configfile and not os.path.exists(args.configfile):
-        sys.exit("\nError! Provided configfile (-c) not found! ({})\n".format(args.configfile))
-    # 3. Sample info file
-    if args.sample_info:
-        if os.path.exists(os.path.abspath(args.sample_info)):
-            args.sample_info = os.path.abspath(args.sample_info)
-        else:
-            sys.exit("\nSample info file not found! (--DE {})\n".format(args.sample_info))
-        if not cf.check_sample_info_header(args.sample_info):
-            sys.exit("ERROR: Please use 'name' and 'condition' as column headers in sample info file! ("+sample_info+")\n")
-
-    # 4. get abspath from user provided genome/organism file
-    if not os.path.isfile(os.path.join(baseDir, "shared/organisms/{}.yaml".format(args.genome))) and os.path.isfile(args.genome):
-        args.genome = os.path.abspath(args.genome)
-
-    ## merge configuration dicts
-    config = defaults   # 1) form defaults.yaml
-    if args.configfile:
-        user_config = cf.load_configfile(args.configfile, False)
-        config = cf.merge_dicts(config, user_config) # 2) form user_config.yaml
-    config_wrap = cf.config_diff(vars(args), defaults) # 3) from wrapper parameters (only those that differ)
-    config = cf.merge_dicts(config, config_wrap)
-
-    ## Output directory + log directory
-    subprocess.call("[ -d {cluster_logs_dir} ] || mkdir -p {cluster_logs_dir}".format(cluster_logs_dir=args.cluster_logs_dir), shell=True)
-
-    ## save to configs.yaml in outdir
-    cf.write_configfile(os.path.join(args.outdir, 'config.yaml'), config)
-
-    ## merge cluster config files: 1) global one, 2) workflow specific one, 3) user provided one
-    cluster_config = cf.load_configfile(os.path.join(baseDir, "shared/cluster.yaml"), False)
-    cluster_config = cf.merge_dicts(cluster_config, cf.load_configfile(os.path.join(workflowDir, "cluster.yaml"), False), )
-
-    if args.cluster_configfile:
-        user_cluster_config = cf.load_configfile(args.cluster_configfile, False)
-        cluster_config = cf.merge_dicts(cluster_config, user_cluster_config) # 2) merge/override variables from user_config.yaml
-    cf.write_configfile(os.path.join(args.outdir, 'cluster_config.yaml'), cluster_config)
-
-    snakemake_cmd = """
-                    snakemake {snakemake_options} --latency-wait {latency_wait} --snakefile {snakefile} --jobs {max_jobs} --directory {outdir} --configfile {configfile}
-                    """.format( latency_wait = cluster_config["snakemake_latency_wait"],
-                                snakefile = os.path.join(workflowDir, "Snakefile"),
-                                max_jobs = args.max_jobs,
-                                outdir = args.outdir,
-                                snakemake_options = str(args.snakemake_options or ''),
-                                configfile = os.path.join(args.outdir,'config.yaml'),
-                              ).split()
-
-    # Produce the DAG if desired
-    if args.createDAG:
-        oldVerbose = config['verbose']
-        config['verbose'] = False
-        cf.write_configfile(os.path.join(args.outdir, 'config.yaml'), config)
-        DAGproc = subprocess.Popen(snakemake_cmd + ['--rulegraph'], stdout=subprocess.PIPE)
-        _ = open("{}/pipeline.pdf".format(args.outdir), "wb")
-        foo = subprocess.check_call(["dot", "-Tpdf"], stdin=DAGproc.stdout, stdout=_)
-        _.close()
-        config['verbose'] = oldVerbose
-        cf.write_configfile(os.path.join(args.outdir,'config.yaml'), config)
-
-    if args.verbose:
-        snakemake_cmd.append("--printshellcmds")
-
-    if not args.local:
-        snakemake_cmd += ["--cluster-config",
-                         os.path.join(args.outdir, 'cluster_config.yaml'),
-                         "--cluster", "'"+cluster_config["snakemake_cluster_cmd"],
-                         args.cluster_logs_dir, "--name {rule}.snakemake'"]
-
-    ## Write snakemake_cmd to log file
-    fnames = glob(os.path.join(args.outdir, 'RNA-seq_run-[0-9*].log'))
-    if len(fnames) == 0:
-        n = 1 # no matching files, this is the first run
-    else:
-        fnames.sort(key=os.path.getctime)
-        n = int(fnames[-1].split("-")[-1].split(".")[0]) + 1 # get new run number
-    # append the new run number to the file name
-    logfile_name = "RNA-seq_run-{}.log".format(n) 
-
-    snakemake_log = "2>&1 | tee -a {}/{}".format(args.outdir, logfile_name).split()
-
-    ## create local temp dir and add this path to environment as $TMPDIR variable
-    ## on SLURM: $TMPDIR is set, created and removed by SlurmEasy on cluster node
-    temp_path = cf.make_temp_dir(args.tempdir, args.outdir, args.verbose)
-    snakemake_exports = ("export TMPDIR="+temp_path+" && ").split()
+    # Handle YAML and log files
+    snakemake_cmd = cf.commonYAMLandLogs(baseDir, workflowDir, defaults, args, os.path.basename(__file__))
+    snakemake_log, snakemake_exports, logfile_name, temp_path = cf.logAndExport(args, os.path.basename(__file__))
 
     cmd = " ".join(snakemake_exports + snakemake_cmd + snakemake_log)
 
-    if args.verbose:
-        print("\n", cmd, "\n")
-
-    # write log file
-    with open(os.path.join(args.outdir, logfile_name), "w") as f:
-        f.write(" ".join(sys.argv)+"\n\n")
-        f.write(cmd+"\n\n")
-
-
-    ## Run snakemake
-    p = subprocess.Popen(cmd, shell=True)
-    if args.verbose:
-        print("PID:", p.pid, "\n")
-    try:
-        p.wait()
-    except:
-        print("\nWARNING: Snakemake terminated!!!")
-        if p.returncode != 0:
-            if p.returncode:
-                print("Returncode:", p.returncode)
-
-            # kill snakemake and child processes
-            subprocess.call(["pkill", "-SIGTERM", "-P", str(p.pid)])
-            print("SIGTERM sent to PID:", p.pid)
-
-    ## remove temp dir
-    if (temp_path != "" and os.path.exists(temp_path)):
-        shutil.rmtree(temp_path, ignore_errors=True)
-        if args.verbose:
-            print("temp dir removed: "+temp_path+"\n")
+    # Run everything
+    cf.runAndCleanup(args, cmd, logfile_name, temp_path)
 
 
 if __name__ == "__main__":
