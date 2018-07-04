@@ -83,22 +83,6 @@ def load_organism_data(genome, maindir, verbose):
         exit("ERROR: Genome configuration file NOT found for: {}\n".format(genome))
     return organism
 
-
-def load_paths(pathfile, maindir, verbose):
-    paths = load_configfile(pathfile, False)
-
-    # add path to tools dir
-    paths["workflow_tools"] = os.path.join(maindir, "shared", "tools")
-
-    if verbose:
-        print("\n--- paths ---------------------------------------------------------------------")
-        for k, v in sorted(paths.items()):
-            print("{}: {}".format(k, v))
-        print("-" * 80, "\n")
-
-    return paths
-
-
 def get_sample_names(infiles, ext, reads):
     """
     Get sample names without file extensions
