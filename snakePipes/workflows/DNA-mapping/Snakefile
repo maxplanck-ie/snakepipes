@@ -39,7 +39,7 @@ include: os.path.join(maindir, "shared", "rules", "Picard_qc.snakefile")
 include: os.path.join(maindir, "shared", "rules", "sambamba.snakefile")
 
 # deeptools cmds
-include: os.path.join(maindir, "shared", "deeptools_cmds.snakefile")
+include: os.path.join(maindir, "shared", "tools" , "deeptools_cmds.snakefile")
 
 # deepTools QC
 include: os.path.join(maindir, "shared", "rules", "deepTools_qc.snakefile")

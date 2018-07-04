@@ -83,6 +83,7 @@ def load_organism_data(genome, maindir, verbose):
         exit("ERROR: Genome configuration file NOT found for: {}\n".format(genome))
     return organism
 
+
 def get_sample_names(infiles, ext, reads):
     """
     Get sample names without file extensions

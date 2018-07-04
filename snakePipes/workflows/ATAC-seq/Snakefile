@@ -23,7 +23,7 @@ include: os.path.join(workflow.basedir, "internals.snakefile")
 ### include modules of other snakefiles ########################################
 ################################################################################
 # Import deeptools cmds
-include: os.path.join(maindir, "shared", "deeptools_cmds.snakefile")
+include: os.path.join(maindir, "shared", "tools" , "deeptools_cmds.snakefile")
 
 # ATAC-seq open chromatin
 include: os.path.join(maindir, "shared", "rules", "ATAC.snakefile")
