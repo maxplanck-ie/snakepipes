@@ -8,7 +8,7 @@ import snakePipes.common_functions as cf
 
 ### snakemake_workflows initialization ########################################
 maindir = os.path.dirname(os.path.dirname(workflow.basedir))
-workflow_tools=os.path.join(maindir, "shared", "tools")
+workflow_tools=os.path.join(maindir, "shared", "rscripts")
 
 # load conda ENVs (path is relative to "shared/rules" directory)
 globals().update(cf.set_env_yamls())
@@ -49,12 +49,12 @@ def get_Read_Group(INfiles):
         PU=re.sub('@','',file_content).split(":")[2]
         RG='@RG"\\t"ID:1"\\t"SM:'+read_root+'"\\t"LB:'+read_root+'"\\t"PL:'+PL+'"\\t"PU:'+PU
         RG_dict[read_root]=RG
-    return RG_dict    
+    return RG_dict
 
 RG_dict=get_Read_Group(infiles)
 del infiles
 
-### conditional/optional rules #################################################  
+### conditional/optional rules #################################################
 #some of those definitions are used to generate output strings for some of the rules
 ################################################################################
 
@@ -114,7 +114,7 @@ def run_int_aggStats(intList,sampleInfo):
 
 
 
-### include modules of other snakefiles ######################################## 
+### include modules of other snakefiles ########################################
 ##some rules depend on the definitions above
 ################################################################################
 # FASTQ: either downsample FASTQ files or create symlinks to input files
