@@ -311,7 +311,7 @@ DESeq_downstream <- function(DEseqout,
 				 clustering_method = "average",
 				 show_rownames = TRUE,
 				 cluster_cols = FALSE,
-				 color = colorRampPalette(rev(RColorBrewer::brewer.pal(9,"RdBu")))(255),
+				 color = colorRampPalette(RColorBrewer::brewer.pal(9,"YlGnBu"))(255),
 				 main = sprintf("Heatmap : Top %d DE genes (by p-value) color: norm. expression (rld) ", heatmap_topN)
 	)
 	
