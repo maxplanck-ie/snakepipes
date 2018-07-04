@@ -17,19 +17,36 @@ def parse_arguments():
     subparsers = parser.add_subparsers(title='Commands',
                                        dest='command')
 
-    infoParser = subparsers.add_parser('info', help='Print the location of the various yaml files')
+    infoParser = subparsers.add_parser('info',
+                                      help='Print the location of the various yaml files')
 
     createEnvsParser = subparsers.add_parser('createEnvs',
-                                             help='Create or update conda enviroments according to the workflow-specific yaml files. Note that changing the snakemake_options: option will result in ALL conda environments being recreated.')
+                                            help='Create or update conda enviroments according to the '
+                                            'workflow-specific yaml files. Note that changing the snakemake_options: '
+                                            'option will result in ALL conda environments being recreated.')
 
     mex = createEnvsParser.add_mutually_exclusive_group()
-    mex.add_argument('--keepCondaDir', action='store_true', help='If specified, the `snakemake_options:` setting in the workflow `defaults.yaml` files will NOT be overwritten. This is typically unwise and only expert users should specify this.')
-    mex.add_argument('--condaDir', help='If specified, use this as the base directory for the created conda environments. This will ignore what is already in the workflow-specific yaml files and where conda is installed.')
+    mex.add_argument('--keepCondaDir',
+                     action='store_true',
+                     help='If specified, the `snakemake_options:` setting in '
+                         'the workflow `defaults.yaml` files will NOT be overwritten. '
+                         'This is typically unwise and only expert users should specify this.')
+    mex.add_argument('--condaDir',
+                     help='If specified, use this as the base directory for the '
+                        'created conda environments. This will ignore what is already '
+                        'in the workflow-specific yaml files and where conda is installed.')
 
-    createEnvsParser.add_argument('--force', action='store_true', help='Force creation of conda environments, even if they apparently exist.')
+    createEnvsParser.add_argument('--force',
+                                 action='store_true',
+                                 help='Force creation of conda environments, even if they apparently exist.')
 
-    createEnvsParser.add_argument('--info', '-i', action='store_true', help='Only print the environments that would be created, don\'t actually create them.')
-    createEnvsParser.add_argument('--skipGATK', action='store_true', help='Skip registering GATK')
+    createEnvsParser.add_argument('--info', '-i',
+                                 action='store_true',
+                                 help='Only print the environments that would be created, don\'t actually create them.')
+
+    createEnvsParser.add_argument('--skipGATK',
+                                 action='store_true',
+                                 help='Skip registering GATK')
 
 
     return parser
@@ -63,7 +80,7 @@ def registerGATK(gatkEnv):
 
     cmd = "{}/bin/gatk-register GATK-archive-3.5.tar.bz2".format(gatkEnv)
     subprocess.check_call(cmd, shell=True)
-    os.remove("GATK-archive-3.5.tar.bz2") 
+    os.remove("GATK-archive-3.5.tar.bz2")
 
 
 def createCondaEnvs(args):

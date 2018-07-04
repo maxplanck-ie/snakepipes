@@ -13,15 +13,15 @@ def set_env_yamls():
     """
     This defines the global variables describing where the conda env yaml files are
     """
-    return {'CONDA_SHARED_ENV': 'envs/shared_environment.yaml',
-            'CONDA_RNASEQ_ENV': 'envs/RNAseq_environment.yaml',
+    return {'CONDA_SHARED_ENV': 'envs/shared.yaml',
+            'CONDA_RNASEQ_ENV': 'envs/rna_seq.yaml',
             'CONDA_DNA_MAPPING_ENV': 'envs/dna_mapping.yaml',
             'CONDA_CHIPSEQ_ENV': 'envs/chip_seq.yaml',
             'CONDA_ATAC_ENV': 'envs/atac_seq.yaml',
-            'CONDA_HIC_ENV': 'envs/hic_conda_env.yaml',
-            'CondaEnvironment': 'envs/WGBSconda.yaml',
+            'CONDA_HIC_ENV': 'envs/hic.yaml',
+            'CondaEnvironment': 'envs/wgbs.yaml',
             'mCtCondaEnvironment': 'envs/methylCtools.yaml',
-            'RmdCondaEnvironment': 'envs/Rmdconda.yaml'}
+            'RmdCondaEnvironment': 'envs/rmarkdown.yaml'}
 
 
 def merge_dicts(x, y):
