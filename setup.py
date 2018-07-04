@@ -12,7 +12,7 @@ for d in glob('snakePipes/workflows/*'):
 
 setup(
     name='snakePipes',
-    version=__version__,
+    version=__version__,  # noqa: F821
     scripts=scripts,
     packages=find_packages(),
     include_package_data=True,

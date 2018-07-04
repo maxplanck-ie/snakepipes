@@ -287,7 +287,7 @@ def checkCommonArguments(args, baseDir, outDir=False):
         else:
             sys.exit("\nSample info file not found! (--DB {})\n".format(args.sample_info))
         if not check_sample_info_header(args.sample_info):
-            sys.exit("ERROR: Please use 'name' and 'condition' as column headers in sample info file! ({})\n".format(sample_info))
+            sys.exit("ERROR: Please use 'name' and 'condition' as column headers in sample info file! ({})\n".format(args.sample_info))
     # 4. get abspath from user provided genome/organism file
     if not os.path.isfile(os.path.join(baseDir, "shared/organisms/{}.yaml".format(args.genome))) and os.path.isfile(args.genome):
         args.genome = os.path.abspath(args.genome)
@@ -302,8 +302,8 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, workflowName):
     config = defaults   # 1) form defaults.yaml
     if args.configfile:
         user_config = load_configfile(args.configfile, False)
-        config = merge_dicts(config, user_config) # 2) form user_config.yaml
-    config_wrap = config_diff(vars(args), defaults) # 3) from wrapper parameters
+        config = merge_dicts(config, user_config)  # 2) from user_config.yaml
+    config_wrap = config_diff(vars(args), defaults)  # 3) from wrapper parameters
     config = merge_dicts(config, config_wrap)
 
     # Ensure the log directory exists
@@ -318,17 +318,17 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, workflowName):
 
     if args.cluster_configfile:
         user_cluster_config = load_configfile(args.cluster_configfile, False)
-        cluster_config = merge_dicts(cluster_config, user_cluster_config) # 2) merge/override variables from user_config.yaml
+        cluster_config = merge_dicts(cluster_config, user_cluster_config)  # merge/override variables from user_config.yaml
     write_configfile(os.path.join(args.outdir, '{}.cluster_config.yaml'.format(workflowName)), cluster_config)
 
     snakemake_cmd = """
                     snakemake {snakemake_options} --latency-wait {latency_wait} --snakefile {snakefile} --jobs {max_jobs} --directory {workingdir} --configfile {configfile}
-                    """.format(latency_wait = cluster_config["snakemake_latency_wait"],
-                               snakefile = os.path.join(workflowDir, "Snakefile"),
-                               max_jobs = args.max_jobs,
-                               workingdir = args.workingdir,
-                               snakemake_options = str(args.snakemake_options or ''),
-                               configfile = os.path.join(args.outdir, '{}.config.yaml'.format(workflowName))).split()
+                    """.format(latency_wait=cluster_config["snakemake_latency_wait"],
+                               snakefile=os.path.join(workflowDir, "Snakefile"),
+                               max_jobs=args.max_jobs,
+                               workingdir=args.workingdir,
+                               snakemake_options=str(args.snakemake_options or ''),
+                               configfile=os.path.join(args.outdir, '{}.config.yaml'.format(workflowName))).split()
 
     # Produce the DAG if desired
     if args.createDAG:
@@ -337,7 +337,7 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, workflowName):
         write_configfile(os.path.join(args.outdir, '{}.config.yaml'.format(workflowName)), config)
         DAGproc = subprocess.Popen(snakemake_cmd + ['--rulegraph'], stdout=subprocess.PIPE)
         _ = open("{}/pipeline.pdf".format(args.outdir), "wb")
-        foo = subprocess.check_call(["dot", "-Tpdf"], stdin=DAGproc.stdout, stdout=_)
+        subprocess.check_call(["dot", "-Tpdf"], stdin=DAGproc.stdout, stdout=_)
         _.close()
         config['verbose'] = oldVerbose
         write_configfile(os.path.join(args.outdir, '{}.config.yaml'.format(workflowName)), config)
@@ -361,10 +361,10 @@ def logAndExport(args, workflowName):
     # Write snakemake_cmd to log file
     fnames = glob.glob(os.path.join(args.outdir, '{}_run-[0-9*].log'.format(workflowName)))
     if len(fnames) == 0:
-        n = 1 # no matching files, this is the first run
+        n = 1  # no matching files, this is the first run
     else:
         fnames.sort(key=os.path.getctime)
-        n = int(fnames[-1].split("-")[-1].split(".")[0]) + 1 # get new run number
+        n = int(fnames[-1].split("-")[-1].split(".")[0]) + 1  # get new run number
     # append the new run number to the file name
     logfile_name = "{}_run-{}.log".format(workflowName, n)
 
@@ -391,7 +391,7 @@ def runAndCleanup(args, cmd, logfile_name, temp_path):
         f.write(" ".join(sys.argv) + "\n\n")
         f.write(cmd + "\n\n")
 
-    ## Run snakemake
+    # Run snakemake
     p = subprocess.Popen(cmd, shell=True)
     if args.verbose:
         print("PID:", p.pid, "\n")
@@ -407,7 +407,7 @@ def runAndCleanup(args, cmd, logfile_name, temp_path):
             subprocess.call(["pkill", "-SIGTERM", "-P", str(p.pid)])
             print("SIGTERM sent to PID:", p.pid)
 
-    ## remove temp dir
+    # remove temp dir
     if (temp_path != "" and os.path.exists(temp_path)):
         shutil.rmtree(temp_path, ignore_errors=True)
         if args.verbose:
