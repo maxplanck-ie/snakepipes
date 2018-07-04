@@ -4,5 +4,5 @@
 # Note that due to limitations in yaml.dump, only very basic structures are
 # permitted here.
 ################################################################################
-snakemake_options: '--use-conda --conda-prefix /data/processing/conda/env'
+snakemake_options: '--use-conda --conda-prefix /data/general/scratch/conda_envs'
 tempdir: /data/extended/

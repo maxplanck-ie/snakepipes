@@ -20,6 +20,9 @@ rule DESeq2:
         importfunc = os.path.join(maindir, "shared", "tools","snakediff","R", "DE_functions.R"),
         allele_info = lambda wildcards : 'TRUE' if 'allelic-mapping' in mode else 'FALSE',
         tx2gene_file = 'NA'
+    log:
+        out = "DESeq2.out",
+        err = "DESeq2.err"
     conda: CONDA_RNASEQ_ENV
     shell: 
         "cd {params.outdir} && "
@@ -53,8 +56,8 @@ rule DESeq2_Salmon:
         allele_info = 'FALSE',
         tx2gene_file = "Annotation/genes.filtered.t2g"
     log:
-        out = "DESeq2.out",
-        err = "DESeq2.err"
+        out = "DESeq2_Salmon.out",
+        err = "DESeq2_Salmon.err"
     conda: CONDA_RNASEQ_ENV
     shell:
         "cd {params.outdir} && "
