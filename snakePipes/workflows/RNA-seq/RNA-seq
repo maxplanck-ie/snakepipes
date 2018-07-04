@@ -140,7 +140,7 @@ def main():
     ## End workflow-specific checks
 
     # Handle YAML and log files
-    snakemake_cmd = cf.commonYAMLandLogs(baseDir, workflowDir, defaults, args, os.path.basename(__file__))
+    snakemake_cmd = cf.commonYAMLandLogs(baseDir, workflowDir, defaults, args, __file__)
     snakemake_log, snakemake_exports, logfile_name, temp_path = cf.logAndExport(args, os.path.basename(__file__))
 
     cmd = " ".join(snakemake_exports + snakemake_cmd + snakemake_log)

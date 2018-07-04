@@ -293,11 +293,15 @@ def checkCommonArguments(args, baseDir, outDir=False):
         args.genome = os.path.abspath(args.genome)
 
 
-def commonYAMLandLogs(baseDir, workflowDir, defaults, args, workflowName):
+def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
     """
     Merge dictionaries, write YAML files, construct the snakemake command
     and create the DAG
     """
+    print(callingScript)
+    workflowName = os.path.basename(callingScript)
+    snakemake_path = os.path.dirname(os.path.abspath(callingScript))
+
     # merge configuration dicts
     config = defaults   # 1) form defaults.yaml
     if args.configfile:
@@ -322,8 +326,9 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, workflowName):
     write_configfile(os.path.join(args.outdir, '{}.cluster_config.yaml'.format(workflowName)), cluster_config)
 
     snakemake_cmd = """
-                    snakemake {snakemake_options} --latency-wait {latency_wait} --snakefile {snakefile} --jobs {max_jobs} --directory {workingdir} --configfile {configfile}
-                    """.format(latency_wait=cluster_config["snakemake_latency_wait"],
+                    {snakemake} {snakemake_options} --latency-wait {latency_wait} --snakefile {snakefile} --jobs {max_jobs} --directory {workingdir} --configfile {configfile}
+                    """.format(snakemake=os.path.join(snakemake_path, "snakemake"),
+                               latency_wait=cluster_config["snakemake_latency_wait"],
                                snakefile=os.path.join(workflowDir, "Snakefile"),
                                max_jobs=args.max_jobs,
                                workingdir=args.workingdir,
