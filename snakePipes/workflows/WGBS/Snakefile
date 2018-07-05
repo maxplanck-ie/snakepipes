@@ -130,7 +130,7 @@ include: os.path.join(workflow.basedir, "internals.snakefile")
 ### execute before workflow starts #############################################
 ################################################################################
 onstart:
-    with open (os.path.join(wdir, 'pipeline.log'),"a") as lo:
+    with open (os.path.join(outdir, 'pipeline.log'),"a") as lo:
         if "verbose" in config and config["verbose"]:
             print("--- Workflow parameters --------------------------------------------------------",file=lo)
             print("samples:"+ str(samples),file=lo)
@@ -167,7 +167,7 @@ rule all:
 ### execute after workflow finished ############################################
 ################################################################################
 onsuccess:
-    cf.cleanLogs(wdir)
+    cf.cleanLogs(outdir)
     if "verbose" in config and config["verbose"]:
-        with open (os.path.join(wdir, 'pipeline.log'),"a") as lo:
+        with open (os.path.join(outdir, 'pipeline.log'),"a") as lo:
             print("--- WGBS workflow finished successfully! --------------------------------",file=lo)#\n \n

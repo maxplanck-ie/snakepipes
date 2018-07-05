@@ -1,120 +1,39 @@
 #!/usr/bin/env python3
 
-__version__ = "0.7.1"
-
 __description__ = """
-WGBS workflow v{version} - MPI-IE workflow for WGBS analysis
+MPI-IE workflow for WGBS analysis
 
 usage example:
-    WGBS -ri read_input_dir -w output-dir mm10
-""".format(version=__version__)
+    WGBS -i read_input_dir -o output-dir mm10
+"""
 
 import argparse
 import os
-import subprocess
 import sys
 import textwrap
-import shutil
-import inspect
-import logging
 import snakePipes.common_functions as cf
+import snakePipes.parserCommon as parserCommon
 
 
+# -nt?
 def parse_args(defaults={"verbose": None, "configfile": None, "cluster_configfile":None, "max_jobs": None, "nthreads": None, "snakemake_options": None, "tempdir": None,
                          "downsample": None, "trimReads": None, "fqcin": None, "adapterSeq":None,"nextera": None, "trimThreshold": None, "trimOtherArgs": None, "convrefpath": None,
                          "convRef": None, "intList": None, "blackList": None, "sampleInfo": None, "mbias_ignore": None}):
     """
     Parse arguments from the command line.
     """
+    mainArgs = parserCommon.mainArguments(defaults)
 
     parser = argparse.ArgumentParser(
         prog=sys.argv[0],
         formatter_class=argparse.RawDescriptionHelpFormatter,
         description=textwrap.dedent(__description__),
+        parents=[mainArgs],
         add_help=False
     )
 
-    # positional/required
-    parser.add_argument("genome",
-                        metavar="GENOME",
-                        help="Genome acronym of target organism (supported: 'dm3', 'dm6', 'hs37d5', 'hg38', 'mm9', 'mm10', 'SchizoSPombe_ASM294v2')")
-
-    required = parser.add_argument_group('required arguments')
-    required.add_argument("-ri", "--indir",
-                          dest="indir",
-                          help="input directory containing the paired-end FASTQ files",
-                          required=True)
-
-    required.add_argument("-w", "--wdir",
-                          dest="wdir",
-                          help="working directory",
-                          required=True)
-
-    general = parser.add_argument_group('general arguments')
-    general.add_argument("-h", "--help",
-                         action="help",
-                         help="show this help message and exit")
-
-    general.add_argument("-v", "--verbose",
-                         dest="verbose",
-                         action="store_true",
-                         help="verbose output (default: '%(default)s')",
-                         default=defaults["verbose"])
-
-    general.add_argument("-c", "--configfile",
-                         dest="configfile",
-                         help="configuration file: config.yaml. In absence of a config file, the default options from the "
-                         "workflows would be selected from /workflows/<workflow_name>/defaults.yaml (default: '%(default)s')",
-                         default=defaults["configfile"])
-
-    general.add_argument("--cluster_configfile",
-                        dest="cluster_configfile",
-                        help="configuration file for cluster usage. In absence, the default options "
-                        "from shared/cluster.yaml and workflows/[workflow]/cluster.yaml would be selected (default: '%(default)s')",
-                        default=defaults["cluster_configfile"])
-
-    general.add_argument("-j", "--jobs",
-                         dest="max_jobs",
-                         metavar="INT",
-                         help="maximum number of concurrently submitted Slurm jobs / cores if workflow is run locally (default: '%(default)s')",
-                         type=int,
-                         default=defaults["max_jobs"])
-
-    general.add_argument("-nt", "--nthreads",
-                         dest="nthreads",
-                         metavar="INT",
-                         help="number of threads to use for multi-threaded tasks",
-                         type=int,
-                         default=defaults["nthreads"])
-
-    general.add_argument("--local",
-                         dest="local",
-                         action="store_true",
-                         default=False,
-                         help="run workflow locally; default: jobs are submitted to Slurm queue (default: '%(default)s')")
-
-    general.add_argument("--snakemake_options",
-                         dest="snakemake_options",
-                         metavar="STR",
-                         type=str,
-                         help="Snakemake options to be passed directly to snakemake, e.g. use "
-                         "--snakemake_options='--dryrun --rerun-incomplete --unlock --forceall'. (default: '%(default)s')",
-                         default=defaults["snakemake_options"])
-
-    general.add_argument("--tempdir",
-                         dest="tempdir",
-                         type=str,
-                         help="used prefix path for temporary directory created via mktemp. Created temp dir gets exported as "
-                         "$TMPDIR and is removed at the end of this wrapper! (default: '%(default)s')",
-                         default=defaults["tempdir"])
-
-    general.add_argument("--DAG",
-                         dest="createDAG",
-                         action="store_true",
-                         help="If specified, a file called pipeline.pdf is produced in the output directory that shows the rules used and their relationship to each other.")
-
-    # optional
-    optional = parser.add_argument_group('optional')
+    # Workflow options
+    optional = parser.add_argument_group('Options')
 
     optional.add_argument("--downsample",
                           dest="downsample",
@@ -137,6 +56,12 @@ def parse_args(defaults={"verbose": None, "configfile": None, "cluster_configfil
                           help="Folder with fastqc.zip files to automatically detect hard trimming threshold. ",
                           default=defaults["fqcin"])
 
+    optional.add_argument("-nt", "--nthreads",
+                          dest="nthreads",
+                          metavar="INT",
+                          help="number of threads to use for multi-threaded tasks",
+                          type=int,
+                          default=defaults["nthreads"])
 
     optional.add_argument("--adapterSeq",
                           dest="adapterSeq",
@@ -183,7 +108,7 @@ def parse_args(defaults={"verbose": None, "configfile": None, "cluster_configfil
                           dest="intList",
                           metavar="STR",
                           action='append',
-                          help="Bed file(s) with target intervals to run analysis on. Use multiple times to pass multiple bed files. (default: '%(default)s')",
+                          help="BED file(s) with target intervals to run analysis on. Use multiple times to pass multiple bed files. (default: '%(default)s')",
                           default=defaults["intList"])
 
     optional.add_argument("--blackList",
@@ -214,141 +139,31 @@ def parse_args(defaults={"verbose": None, "configfile": None, "cluster_configfil
 
 
 def main():
-    # Script-neutral paths
-    baseDir = os.path.dirname(cf.__file__)
-    workflowDir = os.path.join(baseDir, "workflows", os.path.basename(__file__))
-
-    ## defaults
-    defaults = cf.load_configfile(os.path.join(workflowDir, "defaults.yaml"),False)
-    globalDefaults = cf.load_configfile(os.path.join(baseDir, "shared/defaults.yaml"), False)
-    defaults = cf.merge_dicts(defaults, globalDefaults)
+    baseDir, workflowDir, defaults = cf.setDefaults(os.path.basename(__file__))
 
     # get command line arguments
     parser = parse_args(defaults)
     args = parser.parse_args()
-    args.wdir = os.path.abspath(args.wdir)
-    args.cluster_logs_dir = os.path.join(args.wdir, "cluster_logs")
 
+    # we also add these paths to config, although we don't use them in the Snakefile
     args.baseDir = baseDir
 
-    ###switch between TruSeq and Nextera adapter sequences
+    # Common arguments
+    cf.checkCommonArguments(args, baseDir, outDir=True)
+
+    ## Begin workflow-specific code
     args.adapterSeq = "AGATCGGAAGAGC"
     if args.nextera:
         args.adapterSeq = "CTGTCTCTTATA"
 
-    # setup logging
-    logger = logging.getLogger(__name__)
-    if not os.path.exists(args.wdir):
-        os.makedirs(args.wdir)
-    fhandler = logging.FileHandler(filename=os.path.join(args.wdir, 'pipeline.log'), mode='a')
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    fhandler.setFormatter(formatter)
-    logger.addHandler(fhandler)
-    logger.setLevel(logging.DEBUG)
+    # Handle YAML and log files
+    snakemake_cmd = cf.commonYAMLandLogs(baseDir, workflowDir, defaults, args, __file__)
+    snakemake_log, snakemake_exports, logfile_name, temp_path = cf.logAndExport(args, os.path.basename(__file__))
 
+    cmd = " ".join(snakemake_exports + snakemake_cmd + snakemake_log)
 
-# checks for parameters necessary in wrapper
-# 1. Dir path
-    if os.path.exists(args.indir):
-        args.indir = os.path.abspath(args.indir)
-    else:
-        logger.error("\nError! Input dir not found! ({})\n".format(args.indir))
-        exit(1)
-# 2. config file
-    if args.configfile and not os.path.exists(args.configfile):
-        logger.error("\nError! Provided configfile (-c) not found! ({})\n".format(args.configfile))
-        exit(1)
-
-    # merge configuration dicts
-    config = defaults   # 1) form defaults.yaml
-    if args.configfile:
-        user_config = cf.load_configfile(args.configfile, False)
-        config = cf.merge_dicts(config, user_config)  # 2) form user_config.yaml
-    config_wrap = cf.config_diff(vars(args), defaults)  # 3) from wrapper parameters
-    config = cf.merge_dicts(config, config_wrap)
-
-    # Output directory + log directory
-    subprocess.call("[ -d {cluster_logs_dir} ] || mkdir -p {cluster_logs_dir}".format(cluster_logs_dir=args.cluster_logs_dir), shell=True)
-
-    # save to configs.yaml in wdir
-    cf.write_configfile(os.path.join(args.wdir, 'config.yaml'), config)
-
-    ## merge cluster config files: 1) global one, 2) workflow specific one, 3) user provided one
-    cluster_config = cf.load_configfile(os.path.join(baseDir, "shared/cluster.yaml"), False)
-    cluster_config = cf.merge_dicts(cluster_config, cf.load_configfile(os.path.join(workflowDir, "cluster.yaml"), False), )
-
-    if args.cluster_configfile:
-        user_cluster_config = cf.load_configfile(args.cluster_configfile,False)
-        cluster_config = cf.merge_dicts(cluster_config, user_cluster_config) # 2) merge/override variables from user_config.yaml
-    cf.write_configfile(os.path.join(args.wdir,'cluster_config.yaml'),cluster_config)
-
-
-    snakemake_cmd = """
-                    snakemake {snakemake_options} --latency-wait {latency_wait} --snakefile {snakefile} --jobs {max_jobs} --directory {wdir} --configfile {configfile} 
-                    """.format( latency_wait = cluster_config["snakemake_latency_wait"],
-                                snakefile = os.path.join(workflowDir, "Snakefile"),
-                                max_jobs = args.max_jobs,
-                                wdir = args.wdir,
-                                snakemake_options = str(args.snakemake_options or ''),
-                                configfile = os.path.join(args.wdir,'config.yaml'),
-                              ).split()
-
-    # Produce the DAG if desired
-    if args.createDAG:
-        oldVerbose = config['verbose']
-        config['verbose'] = False
-        cf.write_configfile(os.path.join(args.wdir,'config.yaml'),config)
-        DAGproc = subprocess.Popen(snakemake_cmd + ['--rulegraph'], stdout=subprocess.PIPE)
-        _ = open("{}/pipeline.pdf".format(args.wdir), "wb")
-        foo = subprocess.check_call(["dot", "-Tpdf"], stdin=DAGproc.stdout, stdout=_)
-        _.close()
-        config['verbose'] = oldVerbose
-        cf.write_configfile(os.path.join(args.wdir,'config.yaml'),config)
-
-    if args.verbose:
-        snakemake_cmd.append("--printshellcmds")
-
-    if not args.local:
-        snakemake_cmd += ["--cluster-config ",
-                          os.path.join(args.wdir, 'cluster_config.yaml'),
-                          " --cluster \'",
-                          cluster_config["snakemake_cluster_cmd"],
-                          args.cluster_logs_dir,
-                          "--name {rule}.snakemake'"]
-
-    logger.info(snakemake_cmd)
-
-    # create local temp dir and add this path to environment as $TMPDIR variable
-    # on SLURM: $TMPDIR is set, created and removed by SlurmEasy on cluster node
-    temp_path = cf.make_temp_dir(args.tempdir, args.wdir, args.verbose)
-    snakemake_exports = ("export TMPDIR=" + temp_path + " && ").split()
-
-    cmd = " ".join(snakemake_exports  + snakemake_cmd) #+ snakemake_module_load
-
-    if args.verbose:
-        logger.info(cmd)
-
-    # Run snakemake
-    p = subprocess.Popen(cmd, shell=True)
-    if args.verbose:
-        logger.debug("PID:" + str(p.pid))
-    try:
-        p.wait()
-    except:
-        logger.warning("\nWARNING: Snakemake terminated!!!")
-        if p.returncode != 0:
-            if p.returncode:
-                logger.debug("Returncode:" + str(p.returncode))
-
-            # kill snakemake and child processes
-            subprocess.call(["pkill", "-SIGTERM", "-P", str(p.pid)])
-            logger.debug("SIGTERM sent to PID:" + str(p.pid))
-
-    # remove temp dir
-    if (temp_path != "" and os.path.exists(temp_path)):
-        shutil.rmtree(temp_path, ignore_errors=True)
-        if args.verbose:
-            logger.debug("temp dir removed: " + temp_path)
+    # Run everything
+    cf.runAndCleanup(args, cmd, logfile_name, temp_path)
 
 
 if __name__ == "__main__":
