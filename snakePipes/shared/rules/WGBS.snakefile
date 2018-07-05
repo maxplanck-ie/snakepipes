@@ -19,9 +19,9 @@ if trimReads=='auto':
             run:
                 for f,g,z,l in zip ({input.R1zip},{input.R2zip},output,log):
                     with open(z, "w") as oo:
-                        cutThdRes=calc_cutThd([f,g],fqcin,l,wdir)
+                        cutThdRes=calc_cutThd([f,g],fqcin,l,outdir)
                         oo.write('\n'.join('%s\t%s\n' % x for x in cutThdRes))
-                os.chdir(wdir)
+                os.chdir(outdir)
 
 
     rule trimReads:
@@ -73,7 +73,7 @@ if not trimReads is None:
             err="FastQC_Cutadapt/logs/{sample}.postTrimFastQC.err",
             out="FastQC_Cutadapt/logs/{sample}.postTrimFastQC.out"
         params:
-            fqcout=os.path.join(wdir,'FastQC_Cutadapt')
+            fqcout=os.path.join(outdir,'FastQC_Cutadapt')
         threads: nthreads
         conda: CONDA_SHARED_ENV
         shell: "fastqc --outdir {params.fqcout} -t  {threads} {input.R1cut} {input.R2cut} 1>{log.out} 2>{log.err}"
@@ -210,7 +210,7 @@ if intList:
             outFileList=calc_doc(intList,True)
         params:
             tempdir=tempdir,
-            auxdir=os.path.join(wdir,"aux_files"),
+            auxdir=os.path.join(outdir,"aux_files"),
             OUTlist=lambda wildcards,output: [w.replace('.sample_summary', '') for w in output.outFileList],
             OUTlist0=lambda wildcards,output: [w.replace('.sample_summary', '') for w in output.outFileList][0],
             OUTlist1=lambda wildcards,output: [w.replace('.sample_summary', '') for w in output.outFileList][1],
@@ -234,7 +234,7 @@ else:
             outFileList=calc_doc(intList,True)
         params:
             tempdir=tempdir,
-            auxdir=os.path.join(wdir,"aux_files"),
+            auxdir=os.path.join(outdir,"aux_files"),
             OUTlist0=lambda wildcards,output: output.outFileList[0].replace('.sample_summary', ''),
             OUTlist1=lambda wildcards,output: output.outFileList[1].replace('.sample_summary','') 
         log:
@@ -328,13 +328,13 @@ rule produce_report:
     output:
         QCrep='QC_metrics/QC_report.pdf'
     params:
-        auxdir=os.path.join(wdir,"aux_files")
+        auxdir=os.path.join(outdir,"aux_files")
     log:
         err="QC_metrics/logs/produce_report.err",
         out="QC_metrics/logs/produce_report.out"
     conda: RmdCondaEnvironment 
     threads: 1
-    shell: "cp -v " + os.path.join(workflow_tools,"WGBS_QC_report_template.Rmd")+ " " + os.path.join("aux_files", "WGBS_QC_report_template.Rmd") + ';Rscript -e "rmarkdown::render(\''+os.path.join(wdir,"aux_files", "WGBS_QC_report_template.Rmd")+'\', params=list(QCdir=\'"' + os.path.join(wdir,"QC_metrics") +'"\' ), output_file =\'"'+ os.path.join(wdir,"QC_metrics",'QC_report.pdf"\'')+')"' + " 1>{log.out} 2>{log.err}"
+    shell: "cp -v " + os.path.join(workflow_tools,"WGBS_QC_report_template.Rmd")+ " " + os.path.join("aux_files", "WGBS_QC_report_template.Rmd") + ';Rscript -e "rmarkdown::render(\''+os.path.join(outdir,"aux_files", "WGBS_QC_report_template.Rmd")+'\', params=list(QCdir=\'"' + os.path.join(outdir,"QC_metrics") +'"\' ), output_file =\'"'+ os.path.join(outdir,"QC_metrics",'QC_report.pdf"\'')+')"' + " 1>{log.out} 2>{log.err}"
 
 
 if mbias_ignore=="auto":
@@ -347,13 +347,13 @@ if mbias_ignore=="auto":
         output:
             methTab="methXT/{sample}_CpG.bedGraph"
         params:
-            OUTpfx=lambda wildcards,output: os.path.join(wdir,re.sub('_CpG.bedGraph','',output.methTab))
+            OUTpfx=lambda wildcards,output: os.path.join(outdir,re.sub('_CpG.bedGraph','',output.methTab))
         log:
             err="methXT/logs/{sample}.methyl_extract.err",
             out="methXT/logs/{sample}.methyl_extract.out"
         threads: nthreads
         conda: CondaEnvironment
-        shell: "mi=$(cat {input.mbiasTXT} | sed 's/Suggested inclusion options: //' );MethylDackel extract  -o {params.OUTpfx} -q 10 -p 20 $mi --minDepth 10 --mergeContext --maxVariantFrac 0.25 --minOppositeDepth 5 -@ {threads} {input.refG} " + os.path.join(wdir,"{input.rmDupbam}") + " 1>{log.out} 2>{log.err}"
+        shell: "mi=$(cat {input.mbiasTXT} | sed 's/Suggested inclusion options: //' );MethylDackel extract  -o {params.OUTpfx} -q 10 -p 20 $mi --minDepth 10 --mergeContext --maxVariantFrac 0.25 --minOppositeDepth 5 -@ {threads} {input.refG} " + os.path.join(outdir,"{input.rmDupbam}") + " 1>{log.out} 2>{log.err}"
             
 
 else:
@@ -366,13 +366,13 @@ else:
             methTab="methXT/{sample}_CpG.bedGraph"
         params:
             mbias_ignore=mbias_ignore,
-            OUTpfx=lambda wildcards,output: os.path.join(wdir,re.sub('_CpG.bedGraph','',output.methTab))
+            OUTpfx=lambda wildcards,output: os.path.join(outdir,re.sub('_CpG.bedGraph','',output.methTab))
         log:
             err="methXT/logs/{sample}.methyl_extract.err",
             out="methXT/logs/{sample}.methyl_extract.out"
         threads: nthreads
         conda: CondaEnvironment
-        shell: "MethylDackel extract  -o {params.OUTpfx} -q 10 -p 20 {params.mbias_ignore} --minDepth 10 --mergeContext --maxVariantFrac 0.25 --minOppositeDepth 5 -@ {threads} {input.refG} " + os.path.join(wdir,"{input.rmDupbam}") + " 1>{log.out} 2>{log.err}"
+        shell: "MethylDackel extract  -o {params.OUTpfx} -q 10 -p 20 {params.mbias_ignore} --minDepth 10 --mergeContext --maxVariantFrac 0.25 --minOppositeDepth 5 -@ {threads} {input.refG} " + os.path.join(outdir,"{input.rmDupbam}") + " 1>{log.out} 2>{log.err}"
 
 if blackList is None:
     rule CpG_filt:
@@ -381,8 +381,8 @@ if blackList is None:
         output:
             tabFilt="methXT/{sample}.CpG.filt2.bed"
         params:
-            methDir=os.path.join(wdir,"methXT"),
-            OUTtemp=lambda wildcards,input: os.path.join(wdir,re.sub('_CpG.bedGraph','.CpG.filt.bed',input.methTab))
+            methDir=os.path.join(outdir,"methXT"),
+            OUTtemp=lambda wildcards,input: os.path.join(outdir,re.sub('_CpG.bedGraph','.CpG.filt.bed',input.methTab))
         log:
             err="methXT/logs/{sample}.CpG_filt.err",
             out="methXT/logs/{sample}.CpG_filt.out"
@@ -398,8 +398,8 @@ else:
         output:
             tabFilt="methXT/{sample}.CpG.filt2.bed"
         params:
-            methDir=os.path.join(wdir,"methXT"),
-            OUTtemp=lambda wildcards,input: os.path.join(wdir,re.sub('_CpG.bedGraph','.CpG.filt.bed',input.methTab))
+            methDir=os.path.join(outdir,"methXT"),
+            OUTtemp=lambda wildcards,input: os.path.join(outdir,re.sub('_CpG.bedGraph','.CpG.filt.bed',input.methTab))
         log:
             err="methXT/logs/{sample}.CpG_filt.err",
             out="methXT/logs/{sample}.CpG_filt.out"
@@ -416,14 +416,14 @@ if sampleInfo:
             Limdat='singleCpG_stats_limma/limdat.LG.RData',
             MetIN='singleCpG_stats_limma/metilene.IN.txt'
         params:
-            statdir=os.path.join(wdir,'singleCpG_stats_limma'),
+            statdir=os.path.join(outdir,'singleCpG_stats_limma'),
             sampleInfo=sampleInfo
         log:
             err="singleCpG_stats_limma/logs/CpG_stats.err",
             out="singleCpG_stats_limma/logs/CpG_stats.out"
         threads: 1
         conda: CondaEnvironment
-        shell: "Rscript --no-save --no-restore " + os.path.join(workflow_tools,'WGBSpipe.singleCpGstats.limma.R ') + "{params.statdir} {params.sampleInfo} "  + os.path.join(wdir,"methXT") + " 1>{log.out} 2>{log.err}"
+        shell: "Rscript --no-save --no-restore " + os.path.join(workflow_tools,'WGBSpipe.singleCpGstats.limma.R ') + "{params.statdir} {params.sampleInfo} "  + os.path.join(outdir,"methXT") + " 1>{log.out} 2>{log.err}"
 
     rule run_metilene:
         input:
@@ -432,7 +432,7 @@ if sampleInfo:
         output:
             MetBed='metilene_out/singleCpG.metilene.bed'
         params:
-            DMRout=os.path.join(wdir,'metilene_out')
+            DMRout=os.path.join(outdir,'metilene_out')
         log:
             err="metilene_out/logs/run_metilene.err"
         threads: nthreads
@@ -449,7 +449,7 @@ if sampleInfo:
             imdF=temp("aux_files/"+re.sub('.fa*','.CpG.bed',os.path.basename(refG))),
             MetCG=os.path.join("aux_files",re.sub('.fa','.metilene.CpGlist.bed',os.path.basename(refG)))
         params:
-            auxdir=os.path.join(wdir,"aux_files")            
+            auxdir=os.path.join(outdir,"aux_files")            
         log:
             err="aux_files/logs/get_CG_metilene.err"
         threads: 1
@@ -468,13 +468,13 @@ if sampleInfo:
             LimBed='metilene_out/singleCpG.metilene.limma.bed',
             LimAnnot='metilene_out/metilene.limma.annotated.txt'
         params:
-            DMRout=os.path.join(wdir,'metilene_out')
+            DMRout=os.path.join(outdir,'metilene_out')
         log:
             err="metilene_out/logs/cleanup_metilene.err",
             out="metilene_out/logs/cleanup_metilene.out"
         threads: 1
         conda: CondaEnvironment
-        shell: 'Rscript --no-save --no-restore ' + os.path.join(workflow_tools,'WGBSpipe.metilene_stats.limma.R ') + "{params.DMRout} " + os.path.join(wdir,"{input.MetBed}") +' ' + os.path.join(wdir,"{input.MetCG}") + ' ' + os.path.join(wdir,"{input.Limdat}") + " {input.sampleInfo} {input.refG} 1>{log.out} 2>{log.err}" 
+        shell: 'Rscript --no-save --no-restore ' + os.path.join(workflow_tools,'WGBSpipe.metilene_stats.limma.R ') + "{params.DMRout} " + os.path.join(outdir,"{input.MetBed}") +' ' + os.path.join(outdir,"{input.MetCG}") + ' ' + os.path.join(outdir,"{input.Limdat}") + " {input.sampleInfo} {input.refG} 1>{log.out} 2>{log.err}" 
 
 
 if intList:
@@ -505,7 +505,7 @@ if intList:
             output:
                 outFiles=run_int_aggStats(intList,sampleInfo)
             params:
-                auxshell=lambda wildcards,input:';'.join(['Rscript --no-save --no-restore ' + os.path.join(workflow_tools,'WGBSpipe.interval_stats.limma.R ') + os.path.join(wdir,'aggregate_stats_limma ') + li +' '+ aui +' ' + os.path.join(wdir,input.Limdat) + ' '  + input.sampleInfo  for li,aui in zip(intList,[os.path.join(wdir,"aux_files",re.sub('.fa',re.sub('.bed','.CpGlist.bed',os.path.basename(x)),os.path.basename(refG))) for x in intList])])
+                auxshell=lambda wildcards,input:';'.join(['Rscript --no-save --no-restore ' + os.path.join(workflow_tools,'WGBSpipe.interval_stats.limma.R ') + os.path.join(outdir,'aggregate_stats_limma ') + li +' '+ aui +' ' + os.path.join(outdir,input.Limdat) + ' '  + input.sampleInfo  for li,aui in zip(intList,[os.path.join(outdir,"aux_files",re.sub('.fa',re.sub('.bed','.CpGlist.bed',os.path.basename(x)),os.path.basename(refG))) for x in intList])])
             log:
                 err="aggregate_stats_limma/logs/intAgg_stats.err",
                 out="aggregate_stats_limma/logs/intAgg_stats.out"
