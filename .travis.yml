@@ -6,4 +6,4 @@ install:
   - pip install flake8
 
 script:
-  - flake8 --ignore=E501 .
+  - flake8 --ignore=E501,E722 .

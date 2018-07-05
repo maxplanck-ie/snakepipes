@@ -9,18 +9,18 @@ import io
 import tempfile
 import shutil
 
-def calc_cutThd (zipL,fqin,logobject,wdir):
+def calc_cutThd (zipL,fqin,logobject,outdir):
     rNcutL=[]
     with open(logobject,"w") as lo:
         for zipi in zipL: 
             zf=os.path.basename(zipi)
             print("Processing zipped fastqc file:" + zf,file=lo)
-            if not os.path.exists(os.path.join(wdir,"FastQC_In",re.sub('\.zip','',zf))):
+            if not os.path.exists(os.path.join(outdir,"FastQC_In",re.sub('\.zip','',zf))):
                 with zipfile.ZipFile(zipi, "r") as z:
-                        z.extractall(path=os.path.join(wdir,"FastQC_In"))
-            fqtxt=os.path.join(wdir,"FastQC_In",re.sub('\.zip','',zf),'fastqc_data.txt')
+                        z.extractall(path=os.path.join(outdir,"FastQC_In"))
+            fqtxt=os.path.join(outdir,"FastQC_In",re.sub('\.zip','',zf),'fastqc_data.txt')
             print('Currently processing :'+ fqtxt,file=lo)
-            os.chdir(os.path.join(wdir,"FastQC_In",re.sub('\.zip','',zf)))
+            os.chdir(os.path.join(outdir,"FastQC_In",re.sub('\.zip','',zf)))
             subprocess.check_output(['csplit', '-z' , fqtxt , '/>>/','{*}'])
             with open(fqtxt,'r') as file:
                 line=file.readline().strip()

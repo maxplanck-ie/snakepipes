@@ -7,6 +7,8 @@ import os
 import re
 import yaml
 import glob
+import sys
+import shutil
 
 
 def set_env_yamls():
@@ -219,3 +221,184 @@ def check_sample_info_header(sample_info_file):
         return True
     else:
         return False
+
+
+def setDefaults(fileName):
+    """
+    Set a number of variables used in the wrappers and the defaults
+    """
+    # Script-neutral paths
+    baseDir = os.path.dirname(__file__)
+    workflowDir = os.path.join(baseDir, "workflows", fileName)
+
+    # defaults
+    defaults = load_configfile(os.path.join(workflowDir, "defaults.yaml"), False)
+    globalDefaults = load_configfile(os.path.join(baseDir, "shared/defaults.yaml"), False)
+    defaults = merge_dicts(defaults, globalDefaults)
+    return baseDir, workflowDir, defaults
+
+
+def checkCommonArguments(args, baseDir, outDir=False):
+    """
+    Check the wrapper arguments
+    """
+    # Some workflows use a working dir, others and outdir
+    if outDir:
+        args.outdir = os.path.abspath(args.outdir)
+        args.workingdir = args.outdir
+    else:
+        args.workingdir = os.path.abspath(args.workingdir)
+
+    # 1. Dir path
+    if outDir:
+        if os.path.exists(args.indir):
+            args.indir = os.path.abspath(args.indir)
+        else:
+            sys.exit("\nError! Input dir not found! ({})\n".format(args.indir))
+    else:
+        if os.path.exists(args.workingdir):
+            args.workingdir = os.path.abspath(args.workingdir)
+        else:
+            sys.exit("\nError! Working-dir (-d) dir not found! ({})\n".format(args.workingdir))
+        args.outdir = args.workingdir
+    args.cluster_logs_dir = os.path.join(args.outdir, "cluster_logs")
+    # 2. Config file
+    if args.configfile and not os.path.exists(args.configfile):
+        sys.exit("\nError! Provided configfile (-c) not found! ({})\n".format(args.configfile))
+    # 3. Sample info file
+    if 'sample_info' in args and args.sample_info:
+        if os.path.exists(os.path.abspath(args.sample_info)):
+            args.sample_info = os.path.abspath(args.sample_info)
+        else:
+            sys.exit("\nSample info file not found! (--DB {})\n".format(args.sample_info))
+        if not check_sample_info_header(args.sample_info):
+            sys.exit("ERROR: Please use 'name' and 'condition' as column headers in sample info file! ({})\n".format(args.sample_info))
+    # 4. get abspath from user provided genome/organism file
+    if not os.path.isfile(os.path.join(baseDir, "shared/organisms/{}.yaml".format(args.genome))) and os.path.isfile(args.genome):
+        args.genome = os.path.abspath(args.genome)
+
+
+def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
+    """
+    Merge dictionaries, write YAML files, construct the snakemake command
+    and create the DAG
+    """
+    print(callingScript)
+    workflowName = os.path.basename(callingScript)
+    snakemake_path = os.path.dirname(os.path.abspath(callingScript))
+
+    # merge configuration dicts
+    config = defaults   # 1) form defaults.yaml
+    if args.configfile:
+        user_config = load_configfile(args.configfile, False)
+        config = merge_dicts(config, user_config)  # 2) from user_config.yaml
+    config_wrap = config_diff(vars(args), defaults)  # 3) from wrapper parameters
+    config = merge_dicts(config, config_wrap)
+
+    # Ensure the log directory exists
+    os.makedirs(args.cluster_logs_dir, exist_ok=True)
+
+    # save to configs.yaml in outdir
+    write_configfile(os.path.join(args.outdir, '{}.config.yaml'.format(workflowName)), config)
+
+    # merge cluster config files: 1) global one, 2) workflow specific one, 3) user provided one
+    cluster_config = load_configfile(os.path.join(baseDir, "shared/cluster.yaml"), False)
+    cluster_config = merge_dicts(cluster_config, load_configfile(os.path.join(workflowDir, "cluster.yaml"), False), )
+
+    if args.cluster_configfile:
+        user_cluster_config = load_configfile(args.cluster_configfile, False)
+        cluster_config = merge_dicts(cluster_config, user_cluster_config)  # merge/override variables from user_config.yaml
+    write_configfile(os.path.join(args.outdir, '{}.cluster_config.yaml'.format(workflowName)), cluster_config)
+
+    snakemake_cmd = """
+                    {snakemake} {snakemake_options} --latency-wait {latency_wait} --snakefile {snakefile} --jobs {max_jobs} --directory {workingdir} --configfile {configfile}
+                    """.format(snakemake=os.path.join(snakemake_path, "snakemake"),
+                               latency_wait=cluster_config["snakemake_latency_wait"],
+                               snakefile=os.path.join(workflowDir, "Snakefile"),
+                               max_jobs=args.max_jobs,
+                               workingdir=args.workingdir,
+                               snakemake_options=str(args.snakemake_options or ''),
+                               configfile=os.path.join(args.outdir, '{}.config.yaml'.format(workflowName))).split()
+
+    # Produce the DAG if desired
+    if args.createDAG:
+        oldVerbose = config['verbose']
+        config['verbose'] = False
+        write_configfile(os.path.join(args.outdir, '{}.config.yaml'.format(workflowName)), config)
+        DAGproc = subprocess.Popen(snakemake_cmd + ['--rulegraph'], stdout=subprocess.PIPE)
+        _ = open("{}/pipeline.pdf".format(args.outdir), "wb")
+        subprocess.check_call(["dot", "-Tpdf"], stdin=DAGproc.stdout, stdout=_)
+        _.close()
+        config['verbose'] = oldVerbose
+        write_configfile(os.path.join(args.outdir, '{}.config.yaml'.format(workflowName)), config)
+
+    if args.verbose:
+        snakemake_cmd.append("--printshellcmds")
+
+    if not args.local:
+        snakemake_cmd += ["--cluster-config",
+                          os.path.join(args.outdir, '{}.cluster_config.yaml'.format(workflowName)),
+                          "--cluster", "'" + cluster_config["snakemake_cluster_cmd"],
+                          args.cluster_logs_dir, "--name {rule}.snakemake'"]
+
+    return snakemake_cmd
+
+
+def logAndExport(args, workflowName):
+    """
+    Set up logging and exports (TMPDIR)
+    """
+    # Write snakemake_cmd to log file
+    fnames = glob.glob(os.path.join(args.outdir, '{}_run-[0-9*].log'.format(workflowName)))
+    if len(fnames) == 0:
+        n = 1  # no matching files, this is the first run
+    else:
+        fnames.sort(key=os.path.getctime)
+        n = int(fnames[-1].split("-")[-1].split(".")[0]) + 1  # get new run number
+    # append the new run number to the file name
+    logfile_name = "{}_run-{}.log".format(workflowName, n)
+
+    snakemake_log = "2>&1 | tee -a {}/{}".format(args.outdir, logfile_name).split()
+
+    # create local temp dir and add this path to environment as $TMPDIR variable
+    # on SLURM: $TMPDIR is set, created and removed by SlurmEasy on cluster node
+    temp_path = make_temp_dir(args.tempdir, args.outdir)
+    snakemake_exports = ["export", "TMPDIR='{}'".format(temp_path), "&&"]
+
+    return snakemake_log, snakemake_exports, logfile_name, temp_path
+
+
+def runAndCleanup(args, cmd, logfile_name, temp_path):
+    """
+    Actually run snakemake. Kill its child processes on error.
+    Also clean up when finished.
+    """
+    if args.verbose:
+        print("\n{}\n".format(cmd))
+
+    # write log file
+    with open(os.path.join(args.outdir, logfile_name), "w") as f:
+        f.write(" ".join(sys.argv) + "\n\n")
+        f.write(cmd + "\n\n")
+
+    # Run snakemake
+    p = subprocess.Popen(cmd, shell=True)
+    if args.verbose:
+        print("PID:", p.pid, "\n")
+    try:
+        p.wait()
+    except:
+        print("\nWARNING: Snakemake terminated!!!")
+        if p.returncode != 0:
+            if p.returncode:
+                print("Returncode:", p.returncode)
+
+            # kill snakemake and child processes
+            subprocess.call(["pkill", "-SIGTERM", "-P", str(p.pid)])
+            print("SIGTERM sent to PID:", p.pid)
+
+    # remove temp dir
+    if (temp_path != "" and os.path.exists(temp_path)):
+        shutil.rmtree(temp_path, ignore_errors=True)
+        if args.verbose:
+            print("Temp directory removed ({})!\n".format(temp_path))
