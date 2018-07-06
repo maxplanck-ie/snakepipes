@@ -32,6 +32,7 @@ if trim:
 
 # HiCExplorer
 include: os.path.join(maindir, "shared", "rules", "hicexplorer.snakefile")
+
 # multiQC
 include: os.path.join(maindir, "shared", "rules", "multiQC.snakefile")
 
@@ -60,41 +61,58 @@ def run_CollectInsertSizeMetrics(paired):
 
 def run_build_matrices():
     file_list = []
-    if merge_samples and nbins_toMerge !=0:
-       file_list.append(expand("HiC_matrices/mergedSamples_{group}_Mbins"+str(nbins_toMerge)+"_"+matrixFile_suffix+".h5", group = sample_dict.keys())+
-                        expand("HiC_matrices/QCplots/mergedSamples_{group}_Mbins"+str(nbins_toMerge)+"_"+matrixFile_suffix+"_diagnostic_plot.pdf", group = sample_dict.keys())+
-                        expand("HiC_matrices/QCplots/mergedSamples_{group}_Mbins"+str(nbins_toMerge)+"_"+matrixFile_suffix+"_mad_threshold.out", group = sample_dict.keys()))
-       if not noCorrect:
-          file_list.append(expand("HiC_matrices_corrected/mergedSamples_{group}_Mbins"+str(nbins_toMerge)+"_"+matrixFile_suffix+".corrected.h5", group = sample_dict.keys()))
-          if not noTAD:
-             file_list.append(expand("TADs/mergedSamples_{group}_Mbins"+str(nbins_toMerge)+"_"+matrixFile_suffix+"_boundaries.bed",group = sample_dict.keys()))
-
-    elif merge_samples:
-       file_list.append(expand("HiC_matrices/mergedSamples_{group}_"+matrixFile_suffix+".h5", group = sample_dict.keys())+
-                        expand("HiC_matrices/QCplots/mergedSamples_{group}_"+matrixFile_suffix+"_diagnostic_plot.pdf", group = sample_dict.keys())+
-                        expand("HiC_matrices/QCplots/mergedSamples_{group}_"+matrixFile_suffix+"_mad_threshold.out", group = sample_dict.keys()))
-       if not noCorrect:
-              file_list.append(expand("HiC_matrices_corrected/mergedSamples_{group}_"+matrixFile_suffix+".corrected.h5", group = sample_dict.keys()))
-              if not noTAD:
-                 file_list.append(expand("TADs/mergedSamples_{group}_"+matrixFile_suffix+"_boundaries.bed", group = sample_dict.keys()))
-
-    elif nbins_toMerge != 0:
-        file_list.append(expand("HiC_matrices/{sample}_Mbins"+str(nbins_toMerge)+"_"+matrixFile_suffix+".h5",sample=samples)+
-              expand("HiC_matrices/QCplots/{sample}_Mbins"+str(nbins_toMerge)+"_"+matrixFile_suffix+"_diagnostic_plot.pdf", sample=samples)+
-              expand("HiC_matrices/QCplots/{sample}_Mbins"+str(nbins_toMerge)+"_"+matrixFile_suffix+"_mad_threshold.out", sample=samples))
+    ## SAMPLES TO MERGE??
+    if merge_samples:
+        # get samples to merge
+        sample_dict = get_sampleInfo(sample_info)
+        GROUPS = sample_dict.keys()
+        if nbins_toMerge > 0:
+            suffix = "_Mbins" + str(nbins_toMerge) + "_" + matrixFile_suffix
+            file_list.append([
+                expand("HiC_matrices/{group}"+suffix+".h5", group=GROUPS),
+                expand("HiC_matrices/QCplots/{group}"+suffix+"_diagnostic_plot.pdf", group=GROUPS),
+                expand("HiC_matrices/QCplots/{group}"+suffix+"_mad_threshold.out", group=GROUPS)
+                ])
+            if not noCorrect:
+                file_list.append(expand("HiC_matrices_corrected/{group}"+suffix+".corrected.h5", group=GROUPS))
+                if not noTAD:
+                    file_list.append(expand("TADs/{group}"+suffix+"_boundaries.bed", group=GROUPS))
+        else:
+            suffix = "_" + matrixFile_suffix
+            file_list.append([
+                expand("HiC_matrices/{group}"+suffix+".h5", group=GROUPS),
+                expand("HiC_matrices/QCplots/{group}"+suffix+"_diagnostic_plot.pdf", group=GROUPS),
+                expand("HiC_matrices/QCplots/{group}"+suffix+"_mad_threshold.out", group=GROUPS)
+                ])
+            if not noCorrect:
+                   file_list.append(expand("HiC_matrices_corrected/{group}"+matrixFile_suffix+".corrected.h5", group = group=GROUPS))
+                   if not noTAD:
+                      file_list.append(expand("TADs/{group}"+suffix+"_boundaries.bed", group=GROUPS))
+    ## BINS TO MERGE??
+    elif nbins_toMerge > 0:
+        suffix = "_Mbins" + str(nbins_toMerge) + "_" + matrixFile_suffix
+        file_list.append([
+            expand("HiC_matrices/{sample}"+suffix+".h5", sample=samples),
+            expand("HiC_matrices/QCplots/{sample}"+suffix+"_diagnostic_plot.pdf", sample=samples),
+            expand("HiC_matrices/QCplots/{sample}"+suffix+"_mad_threshold.out", sample=samples)
+            ])
         if not noCorrect:
-              file_list.append(expand("HiC_matrices_corrected/{sample}_Mbins"+str(nbins_toMerge)+"_"+matrixFile_suffix+".corrected.h5", sample=samples))
+              file_list.append(expand("HiC_matrices_corrected/{sample}"+suffix+".corrected.h5", sample=samples))
               if not noTAD:
-                 file_list.append(expand("TADs/{sample}_Mbins"+str(nbins_toMerge)+"_"+matrixFile_suffix+"_boundaries.bed", sample=samples))
+                 file_list.append(expand("TADs/{sample}"+suffix+"_boundaries.bed", sample=samples))
 
+    ## NOTHING TO MERGE??
     else:
-       file_list.append(expand("HiC_matrices/{sample}_"+matrixFile_suffix+".h5", sample=samples)+
-              expand("HiC_matrices/QCplots/{sample}_"+matrixFile_suffix+"_diagnostic_plot.pdf", sample=samples)+
-              expand("HiC_matrices/QCplots/{sample}_"+matrixFile_suffix+"_mad_threshold.out", sample=samples))
+        suffix = "_"+matrixFile_suffix
+       file_list.append([
+       expand("HiC_matrices/{sample}"+suffix+".h5", sample=samples),
+              expand("HiC_matrices/QCplots/{sample}"+suffix+"_diagnostic_plot.pdf", sample=samples)+
+              expand("HiC_matrices/QCplots/{sample}"+suffix+"_mad_threshold.out", sample=samples))
        if not noCorrect:
-              file_list.append(expand("HiC_matrices_corrected/{sample}_"+matrixFile_suffix+".corrected.h5", sample=samples))
+              file_list.append(expand("HiC_matrices_corrected/{sample}"+suffix+".corrected.h5", sample=samples))
               if not noTAD:
-                 file_list.append(expand("TADs/{sample}_"+matrixFile_suffix+"_boundaries.bed", sample=samples))
+                 file_list.append(expand("TADs/{sample}"+suffix+"_boundaries.bed", sample=samples))
+
     return(file_list)
 
 
