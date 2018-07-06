@@ -4,6 +4,6 @@ RNA-seq
 ================
 
 .. argparse::
-   :filename: ../workflows/RNA-seq/RNA-seq
+   :filename: ../snakePipes/workflows/RNA-seq/RNA-seq
    :func: parse_args
    :prog: RNA-seq

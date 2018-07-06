@@ -5,18 +5,12 @@ HiC
 
 Input requirements and outputs:
 -------------------------------------------
-This pipeline requires paired-end reads fastq files as input in order to build a contact matrix and to call TADs. 
+This pipeline requires paired-end reads fastq files as input in order to build a contact matrix and to call TADs.
 Prior to building a matrix, the pipeline maps reads against a user provided reference genome. The output of mapping step is then used for building the contact matrix.
-
-.. argparse::
-   :filename: ../workflows/HiC/HiC
-   :func: parse_args
-   :prog: HiC
-
 
 Workflow config file
 ----------------------------------
-Default parameters from the provided config file can be altered by user. Note that proper reads name extension from the fastq files should be entered as values of the 'reads' key of the config file. 
+Default parameters from the provided config file can be altered by user. Note that proper reads name extension from the fastq files should be entered as values of the 'reads' key of the config file.
 
 .. parsed-literal::
 
@@ -36,7 +30,7 @@ Default parameters from the provided config file can be altered by user. Note th
  pipeline: hic
  outdir:
  onfigfile:
- luster_configfile: 
+ luster_configfile:
  local: False
  max_jobs: 5
  snakemake_options: '--use-conda --conda-prefix /path/to/conda/envs '
@@ -48,7 +42,7 @@ Default parameters from the provided config file can be altered by user. Note th
  genome:
  ## FASTQ file extension (default: ".fastq.gz")
  ext: .fastq.gz
- ## paired-end read name extension (default: ['_R1', "_R2"]) 
+ ## paired-end read name extension (default: ['_R1', "_R2"])
  reads: [_R1, _R2]
  mapping_prg: BWA
  ## Number of reads to downsample from each FASTQ file
@@ -74,7 +68,7 @@ Default parameters from the provided config file can be altered by user. Note th
  # parameters for hicFindTADs
  tadparams: --thresholdComparisons 0.01
  distVsCount: false
- distVsCountParams: 
+ distVsCountParams:
  noTAD: false
  noCorrect: false
 
@@ -99,7 +93,7 @@ The HiC pipeline will generate output of the following structure:
 .. code:: bash
 
     $ tree -d -L 2 outputdir
-  
+
 output directory::
 
     outputdir
@@ -122,3 +116,8 @@ Rules dependencies:
    :scale: 75 %
    :align: center
 
+
+.. argparse::
+    :filename: ../snakePipes/workflows/HiC/HiC
+    :func: parse_args
+    :prog: HiC
