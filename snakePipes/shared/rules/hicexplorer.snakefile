@@ -112,7 +112,6 @@ rule merge_bins:
          "HiC_matrices/{sample}_"+matrixFile_suffix+".h5"
      output:
          matrix = "HiC_matrices/{sample}_Mbins"+str(nbins_toMerge)+"_"+matrixFile_suffix+".h5"
-
      params:
          num_bins=nbins_toMerge
      log:
