@@ -85,9 +85,9 @@ def run_build_matrices():
                 expand("HiC_matrices/QCplots/{group}"+suffix+"_mad_threshold.out", group=GROUPS)
                 ])
             if not noCorrect:
-                   file_list.append(expand("HiC_matrices_corrected/{group}"+matrixFile_suffix+".corrected.h5", group = group=GROUPS))
-                   if not noTAD:
-                      file_list.append(expand("TADs/{group}"+suffix+"_boundaries.bed", group=GROUPS))
+                file_list.append(expand("HiC_matrices_corrected/{group}"+suffix+".corrected.h5", group=GROUPS))
+                if not noTAD:
+                    file_list.append(expand("TADs/{group}"+suffix+"_boundaries.bed", group=GROUPS))
     # BINS TO MERGE??
     elif nbins_toMerge > 0:
         suffix = "_Mbins" + str(nbins_toMerge) + "_" + matrixFile_suffix
