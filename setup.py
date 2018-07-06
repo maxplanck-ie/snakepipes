@@ -20,7 +20,8 @@ setup(
     license='GPL v3',
     description='Snakemake workflows and wrappers for NGS data processing from the MPI-IE',
     install_requires=[
-        "snakemake"
+        "snakemake",
+        "pandas"
     ],
     zip_safe=False,
 )
