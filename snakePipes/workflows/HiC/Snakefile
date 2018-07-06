@@ -109,7 +109,7 @@ def run_build_matrices():
             expand("HiC_matrices/QCplots/{sample}"+suffix+"_diagnostic_plot.pdf", sample=samples),
             expand("HiC_matrices/QCplots/{sample}"+suffix+"_mad_threshold.out", sample=samples)
             ])
-       if not noCorrect:
+        if not noCorrect:
             file_list.append(expand("HiC_matrices_corrected/{sample}"+suffix+".corrected.h5", sample=samples))
             if not noTAD:
                 file_list.append(expand("TADs/{sample}"+suffix+"_boundaries.bed", sample=samples))
