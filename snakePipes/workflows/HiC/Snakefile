@@ -32,8 +32,8 @@ if trim:
 
 # HiCExplorer
 include: os.path.join(maindir, "shared", "rules", "hicexplorer.snakefile")
-
-#include: os.path.join(maindir, "shared", "rules", "multiQC.snakefile")
+# multiQC
+include: os.path.join(maindir, "shared", "rules", "multiQC.snakefile")
 
 ### conditional/optional rules #################################################
 ################################################################################
@@ -131,7 +131,7 @@ rule all:
         expand(mapping_prg+"/{sample}{read}.bam", sample = samples, read = reads),
         run_build_matrices(),
         run_dist_vs_count(),
-#       "multiQC/multiqc_report.html"
+       "multiQC/multiqc_report.html"
 
 ### execute after workflow finished ############################################
 ################################################################################

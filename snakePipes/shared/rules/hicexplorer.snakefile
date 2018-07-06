@@ -69,7 +69,7 @@ else:
             R2 = "BWA/{sample}"+reads[1]+".bam"
         output:
             matrix = "HiC_matrices/{sample}_"+matrixFile_suffix+".h5",
-            qc = "HiC_matrices/QCplots/{sample}_QC/QC_table.txt"
+            qc = "HiC_matrices/QCplots/{sample}_QC/QC.log"
 
         params:
             QCfolder="HiC_matrices/QCplots/{sample}_QC/",
@@ -90,7 +90,8 @@ else:
             "--QCfolder {params.QCfolder} "
             "--threads {threads} "
             "{params.region} "
-            "-o {output.matrix} > {log.out} 2> {log.err}"
+            "-o {output.matrix} > {log.out} 2> {log.err} &&"
+            " rm {params.QCfolder}"+"QC_table.txt"
 
 ## Merge the samples if asked
 rule merge_matrices:
