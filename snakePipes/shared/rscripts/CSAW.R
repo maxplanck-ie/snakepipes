@@ -29,7 +29,7 @@ cat(paste("allele-specific? :", allelic_info, "\n"))
 
 ## sampleInfo (setup of the experiment)
 sampleInfo <- read.table(sampleInfoFilePath, header = TRUE, colClasses = c("character", "factor"))
-
+colnames(sampleInfo) <- c("name", "condition")
 ## is paired end? : define read params
 pe = "none"
 if(isTRUE(paired)) {
