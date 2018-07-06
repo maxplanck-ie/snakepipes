@@ -147,6 +147,5 @@ Argparse
 --------------------------------
 
 .. argparse::
-   :filename: ../snakePipes/workflows/WGBS/WGBS
-   :func: parse_args
+   :ref: snakePipes.WGBS.parse_args
    :prog: WGBS

@@ -118,6 +118,5 @@ Rules dependencies:
 
 
 .. argparse::
-    :filename: ../snakePipes/workflows/HiC/HiC
-    :func: parse_args
+    :ref: snakePipes.HiC.parse_args
     :prog: HiC

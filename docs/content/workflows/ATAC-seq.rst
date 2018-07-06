@@ -11,6 +11,5 @@ When running the ChIP-seq pipeline, please specify the output directory of DNA-m
 
 
 .. argparse::
-    :filename: ../snakePipes/workflows/ATAC-seq/ATAC-seq
-    :func: parse_args
+    :ref: snakePipes.ATAC-seq.parse_args
     :prog: ATAC-seq
