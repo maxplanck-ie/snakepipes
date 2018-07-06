@@ -1,0 +1,141 @@
+#!/usr/bin/env python3
+
+__description__ = """
+MPI-IE workflow for Hi-C analysis
+
+usage example:
+    HiC -i input-dir -o output-dir mm10
+"""
+
+
+import argparse
+import os
+import sys
+import textwrap
+import snakePipes.common_functions as cf
+import snakePipes.parserCommon as parserCommon
+
+
+def parse_args(defaults={"verbose":None,"configfile":None,"cluster_configfile":None,"max_jobs":None,"snakemake_options":None,"tempdir":None,
+                         "mode":None, "downsample":None, "trim":None,"trim_prg":None,"trim_options":None, "fastqc":None,
+                         "bin_size":None, "RF_resolution":None, "enzyme":None, "restrict_region":None,
+                         "merge_samples":None, "nbins_toMerge":None, "tadparams":None, "noTAD":None, "noCorrect":None, "distVsCount":None, "distVsCountParams":None}):
+    """
+    Parse arguments from the command line.
+    """
+    mainArgs = parserCommon.mainArguments(defaults)
+
+    parser = argparse.ArgumentParser(
+        prog=sys.argv[0],
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        description=textwrap.dedent(__description__),
+        parents=[mainArgs],
+        add_help=False
+    )
+
+    # Workflow options
+    optional = parser.add_argument_group('Options')
+
+    parserCommon.commonOptions(optional, defaults, bw=False, plots=False)
+
+    optional.add_argument("--RF_resolution",
+                          dest="RF_resolution",
+                          action="store_true",
+                          help="Create Hi-C matrices at restriction fragment resolution. Using RF "
+                          "resolution would override the --bin_size argument. (default: '%(default)s')",
+                          default=defaults["RF_resolution"])
+
+    optional.add_argument("--enzyme",
+                          dest="enzyme",
+                          choices=['DpnII', 'HindIII'],
+                          help="Which enzyme was used to create Hi-C library (default: '%(default)s')",
+                          default=defaults["enzyme"])
+
+    optional.add_argument("--bin_size",
+                          dest="bin_size",
+                          type=int,
+                          metavar="INT",
+                          help="Create Hi-C matrices at a given bin_size (default: '%(default)s')",
+                          default=defaults["bin_size"])
+
+    optional.add_argument("--restrict_region",
+                          dest="restrict_region",
+                          type=str,
+                          metavar="STR",
+                          help="Restrict building of HiC Matrix to given region [Chr:Start-End]. "
+                          "Only one chromosome can also be specified (default: '%(default)s')",
+                          default=defaults["restrict_region"])
+
+    optional.add_argument("--merge_samples",
+                          dest="merge_samples",
+                          action="store_true",
+                          help="Merge all HiC matrices and create a new matrix. (default: '%(default)s')",
+                          default=defaults["merge_samples"])
+
+    optional.add_argument("--merge_bins",
+                          dest="nbins_toMerge",
+                          type=int,
+                          help="If > 0 , create a lower resolution HiC matrix for each sample "
+                          "by merging the given number of bins. (default: '%(default)s')",
+                          default=defaults["nbins_toMerge"])
+
+    optional.add_argument("--findTADs_params",
+                          dest="tadparams",
+                          type=str,
+                          metavar="STR",
+                          help="parameters for HiCFindTADs. (default: '%(default)s')",
+                          default=defaults["tadparams"])
+
+    optional.add_argument("--noTAD",
+                          dest="noTAD",
+                          action="store_true",
+                          help="Stop the pipeline before TAD calling. (default: '%(default)s')",
+                          default=defaults["noTAD"])
+
+    optional.add_argument("--noCorrect",
+                          dest="noCorrect",
+                          action="store_true",
+                          help="Stop the pipeline before correcting the matrix. (default: '%(default)s')",
+                          default=defaults["noCorrect"])
+
+    optional.add_argument("--distVsCount",
+                          dest="distVsCount",
+                          action="store_true",
+                          help="Run hicDistVsCount. (default: '%(default)s')",
+                          default=defaults["distVsCount"])
+
+    optional.add_argument("--distVsCount_params",
+                          dest="distVsCountParams",
+                          type=str,
+                          metavar="STR",
+                          help="parameters to run hicDistVsCount. (default: '%(default)s')",
+                          default=defaults["distVsCountParams"])
+
+    return parser
+
+
+def main():
+    baseDir, workflowDir, defaults = cf.setDefaults(os.path.basename(__file__))
+
+    # get command line arguments
+    parser = parse_args(defaults)
+    args = parser.parse_args()
+
+    # we also add these paths to config, although we don't use them in the Snakefile
+    args.baseDir = baseDir
+
+    # Common arguments
+    cf.checkCommonArguments(args, baseDir, outDir=True)
+
+    # Handle YAML and log files
+    snakemake_cmd = cf.commonYAMLandLogs(baseDir, workflowDir, defaults, args, __file__)
+    snakemake_log, snakemake_exports, logfile_name, temp_path = cf.logAndExport(args, os.path.basename(__file__))
+
+    cmd = " ".join(snakemake_exports + snakemake_cmd + snakemake_log)
+
+    # Run everything
+    cf.runAndCleanup(args, cmd, logfile_name, temp_path)
+
+
+if __name__ == "__main__":
+    main()

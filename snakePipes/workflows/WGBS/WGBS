@@ -1,0 +1,170 @@
+#!/usr/bin/env python3
+
+__description__ = """
+MPI-IE workflow for WGBS analysis
+
+usage example:
+    WGBS -i read_input_dir -o output-dir mm10
+"""
+
+import argparse
+import os
+import sys
+import textwrap
+import snakePipes.common_functions as cf
+import snakePipes.parserCommon as parserCommon
+
+
+# -nt?
+def parse_args(defaults={"verbose": None, "configfile": None, "cluster_configfile":None, "max_jobs": None, "nthreads": None, "snakemake_options": None, "tempdir": None,
+                         "downsample": None, "trimReads": None, "fqcin": None, "adapterSeq":None,"nextera": None, "trimThreshold": None, "trimOtherArgs": None, "convrefpath": None,
+                         "convRef": None, "intList": None, "blackList": None, "sampleInfo": None, "mbias_ignore": None}):
+    """
+    Parse arguments from the command line.
+    """
+    mainArgs = parserCommon.mainArguments(defaults)
+
+    parser = argparse.ArgumentParser(
+        prog=sys.argv[0],
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        description=textwrap.dedent(__description__),
+        parents=[mainArgs],
+        add_help=False
+    )
+
+    # Workflow options
+    optional = parser.add_argument_group('Options')
+
+    optional.add_argument("--downsample",
+                          dest="downsample",
+                          metavar="INT",
+                          help="downsample the given number of reads randomly from of each FASTQ file (default: '%(default)s')",
+                          type=int,
+                          default=defaults["downsample"])
+
+    optional.add_argument("--trimReads",
+                          dest="trimReads",
+                          action="store",
+                          choices=['auto', 'user', None],
+                          help="Activate fastq read trimming. If activated, Illumina adaptors are trimmed by default. "
+                          "Additional parameters can be specified under --trimOtherArgs (default: '%(default)s')",
+                          default=defaults["trimReads"])
+
+    optional.add_argument("--fqcin",
+                          dest="fqcin",
+                          action="store",
+                          help="Folder with fastqc.zip files to automatically detect hard trimming threshold. ",
+                          default=defaults["fqcin"])
+
+    optional.add_argument("-nt", "--nthreads",
+                          dest="nthreads",
+                          metavar="INT",
+                          help="number of threads to use for multi-threaded tasks",
+                          type=int,
+                          default=defaults["nthreads"])
+
+    optional.add_argument("--adapterSeq",
+                          dest="adapterSeq",
+                          metavar="STR",
+                          type=str,
+                          help="Adapter sequence for cutadapt. (default: '%(default)s')",
+                          default=defaults["adapterSeq"])
+
+    optional.add_argument("--nextera",
+                          dest="nextera",
+                          action="store",
+                          help="Trim nextera adapters rather than TruSeq adapters (default: '%(default)s')",
+                          default=defaults["nextera"])
+
+    optional.add_argument("--trimThreshold",
+                          dest="trimThreshold",
+                          metavar="STR",
+                          type=str,
+                          help="Trimming threshold for cutadapt. (default: '%(default)s')",
+                          default=defaults["trimThreshold"])
+
+    optional.add_argument("--trimOtherArgs",
+                          dest="trimOtherArgs",
+                          metavar="STR",
+                          type=str,
+                          help="Additional arguments passed to cutadapt. (default: '%(default)s')",
+                          default=defaults["trimOtherArgs"])
+
+    optional.add_argument("--cref",
+                          dest="convrefpath",
+                          metavar="STR",
+                          type=str,
+                          help="Path to converted reference genome. (default: '%(default)s')",
+                          default=defaults["convrefpath"])
+
+    optional.add_argument("--convRef",
+                          dest="convRef",
+                          metavar="STR",
+                          type=str,
+                          help="Convert reference genome. (default: '%(default)s')",
+                          default=defaults["convRef"])
+
+    optional.add_argument("--intList",
+                          dest="intList",
+                          metavar="STR",
+                          action='append',
+                          help="BED file(s) with target intervals to run analysis on. Use multiple times to pass multiple bed files. (default: '%(default)s')",
+                          default=defaults["intList"])
+
+    optional.add_argument("--blackList",
+                          dest="blackList",
+                          metavar="STR",
+                          action='store',
+                          type=str,
+                          help="Bed file(s) with SNP positions to mask for methylation calling. (default: '%(default)s')",
+                          default=defaults["blackList"])
+
+    optional.add_argument("--sampleInfo",
+                          dest="sampleInfo",
+                          metavar="STR",
+                          action='store',
+                          type=str,
+                          help="Text file with sample information to use for statistical analysis. (default: '%(default)s')",
+                          default=defaults["sampleInfo"])
+
+    optional.add_argument("--mbias",
+                          dest="mbias_ignore",
+                          metavar="STR",
+                          action='store',
+                          type=str,
+                          help="Number of nucleotides with mbias to ignore during methylation extraction. (default: '%(default)s')",
+                          default=defaults["mbias_ignore"])
+
+    return parser
+
+
+def main():
+    baseDir, workflowDir, defaults = cf.setDefaults(os.path.basename(__file__))
+
+    # get command line arguments
+    parser = parse_args(defaults)
+    args = parser.parse_args()
+
+    # we also add these paths to config, although we don't use them in the Snakefile
+    args.baseDir = baseDir
+
+    # Common arguments
+    cf.checkCommonArguments(args, baseDir, outDir=True)
+
+    ## Begin workflow-specific code
+    args.adapterSeq = "AGATCGGAAGAGC"
+    if args.nextera:
+        args.adapterSeq = "CTGTCTCTTATA"
+
+    # Handle YAML and log files
+    snakemake_cmd = cf.commonYAMLandLogs(baseDir, workflowDir, defaults, args, __file__)
+    snakemake_log, snakemake_exports, logfile_name, temp_path = cf.logAndExport(args, os.path.basename(__file__))
+
+    cmd = " ".join(snakemake_exports + snakemake_cmd + snakemake_log)
+
+    # Run everything
+    cf.runAndCleanup(args, cmd, logfile_name, temp_path)
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,152 @@
+#!/usr/bin/env python3
+
+__description__ = """
+MPI-IE workflow for scRNA-seq (CEL-Seq2 and related protocols)
+
+usage example:
+    scRNAseq-mapcount -i input-dir -o output-dir mm10
+"""
+
+
+import argparse
+import os
+import sys
+import textwrap
+import snakePipes.common_functions as cf
+import snakePipes.parserCommon as parserCommon
+
+
+def parse_args(defaults={"verbose":None,"configfile":None,"cluster_configfile":None,"max_jobs":None,"snakemake_options":None,"tempdir":None,
+                         "downsample":None, "trim":None, "trim_options":None, "cell_names":None,
+                         "filter_annotation":None, "barcode_file":None, "barcode_pattern":None, "split_lib": None,
+                         "bw_binsize":None, "mapq":None, "plot_format":None}):
+    """
+    Parse arguments from the command line.
+    """
+    mainArgs = parserCommon.mainArguments(defaults, workingDir=False)
+
+    parser = argparse.ArgumentParser(
+        prog=sys.argv[0],
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        description=textwrap.dedent(__description__),
+        parents=[mainArgs],
+        add_help=False
+    )
+
+    # Workflow options
+    optional = parser.add_argument_group('Options')
+
+    optional.add_argument("--downsample",
+                          dest="downsample",
+                          metavar="INT",
+                          help="Downsample the given number of reads randomly from of each FASTQ file",
+                          type=int,
+                          default=defaults["downsample"])
+
+    optional.add_argument("--trim",
+                          dest="trim",
+                          action="store_true",
+                          default=defaults["trim"],
+                          help="Activate trimming with Cutadapt. Default: no Trimming!")
+
+    optional.add_argument("--trim_options",
+                          dest="trim_options",
+                          metavar="STR",
+                          type=str,
+                          help="Options passed to the selected trimmer, e.g. use --trim_options='-a A{30}' "
+                          "for polyA trimming with cutadapt (default: '%(default)s')",
+                          default=defaults["trim_options"])
+
+    optional.add_argument("--cell_barcode_file",
+                          dest="barcode_file",
+                          metavar="STR",
+                          help="2-column file with cell-index (1st col) and barcode (2nd col). Default/None will use "
+                          "internal CelSeq2@MPI-IE file with 192 barcodes. (default: '%(default)s')",
+                          type=str,
+                          default= defaults["barcode_file"])
+
+    optional.add_argument("--barcode_pattern",
+                          dest="barcode_pattern",
+                          metavar="STR",
+                          help="Defines the cell barcode and UMI order and length at the 5' end of R1 (Cel-seq protocol). "
+                          "'N' defines UMI/random positions, X defines fixed positions; (default '%(default)s')",
+                          type=str,
+                          default=defaults["barcode_pattern"])
+
+    optional.add_argument("--split_lib",
+                          dest="split_lib",
+                          action="store_true",
+                          help="Set this option if only 96 out of 192 barcodes were used per sample.",
+                          default=defaults["split_lib"])
+
+    optional.add_argument("--filter_annotation",
+                          dest="filter_annotation",
+                          metavar="STR",
+                          type=str,
+                          help="filter annotation GTF by grep for feature counting, e.g. use --filter_annotation='-v pseudogene'; "
+                          "(default: '%(default)s')",
+                          default=defaults["filter_annotation"])
+
+    optional.add_argument("--cell_names",
+                          dest="cell_names",
+                          metavar="STR",
+                          help="either tab-sep. file with cell name ranges or directory with *.csv files that contain "
+                          "cell names and plate/library information for all fastq files! (default: '%(default)s')",
+                          default=defaults["cell_names"])
+
+    optional.add_argument("--bw-binsize",
+                          dest="bw_binsize",
+                          metavar="INT",
+                          help="Bin size of output files in bigWig format (default: '%(default)s')",
+                          type=int,
+                          default=defaults["bw_binsize"])
+
+    optional.add_argument("--plotFormat",
+                          dest="plot_format",
+                          choices=['png', 'pdf', 'None'],
+                          metavar="STR",
+                          type=str,
+                          help="Format of the output plots from deeptools. Select 'none' for no plot (default: '%(default)s')",
+                          default=defaults["plot_format"])
+
+    return parser
+
+
+def main():
+    baseDir, workflowDir, defaults = cf.setDefaults(os.path.basename(__file__))
+
+    # get command line arguments
+    parser = parse_args(defaults)
+    args = parser.parse_args()
+
+    # we also add these paths to config, although we don't use them in the Snakefile
+    args.baseDir = baseDir
+
+    # Common arguments
+    cf.checkCommonArguments(args, baseDir, outDir=True)
+    # 4. barcode file
+    if args.barcode_file == None:
+        args.barcode_file = os.path.join(workflowDir, "celseq_barcodes.192.txt")
+    elif args.barcode_file != None and os.path.exists(os.path.abspath(args.barcode_file)):
+        args.barcode_file = os.path.abspath(args.barcode_file)
+    else:
+        sys.exit("\nBarcode file (--cell_barcode_file) not found! {}\n".format(args.barcode_file))
+    # 5. cell name tables
+    if args.cell_names:
+        if os.path.exists(os.path.abspath(args.cell_names)):
+            args.cell_names = os.path.abspath(args.cell_names)
+        else:
+            sys.exit("\nCell_names file not found! {}\n".format(args.cell_names))
+
+    # Handle YAML and log files
+    snakemake_cmd = cf.commonYAMLandLogs(baseDir, workflowDir, defaults, args, __file__)
+    snakemake_log, snakemake_exports, logfile_name, temp_path = cf.logAndExport(args, os.path.basename(__file__))
+
+    cmd = " ".join(snakemake_exports + snakemake_cmd + snakemake_log)
+
+    # Run everything
+    cf.runAndCleanup(args, cmd, logfile_name, temp_path)
+
+
+if __name__ == "__main__":
+    main()
