@@ -104,7 +104,7 @@ write(c("library(sleuth)",
         "sleuth_live(so)"),
       file="sleuth_live.R")
 
-png("MA-plot.png")
+pdf("MA-plot.pdf")
 plot_ma(so, wald_beta_name, sig_level = fdr)
 dev.off()
 
