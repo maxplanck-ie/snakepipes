@@ -38,14 +38,16 @@ Install snakePipes from our GitHub repo as follows:
 
 snakePipes is now installed, however you will need to perform a few steps to configure snakePipes and finish the setup:
 
-  1. *Modify/remove/add the organism yaml files appropriately* : these yaml files would contain location of appropriate
-    GTF files and genome indexes corresponding to different organisms. The location of these files after installation can be
-    found using `snakePipes --info` command.
-  2. *Modify the cluster.yaml file appropriately* : This yaml file contains information about your cluster scheduler (SGE/slurm). Location
-    revealed using `snakePipes --info` command.
-  3. *Create the conda environments* : conda environments for workflows could be created using `snakePipes --createEnvs` command.
-    This takes a while, but only need to be done once. Optionally, workflow-specific env could also be created automatically when you
-    run any specific workflow for the first time.
+1. *Modify/remove/add the organism yaml files appropriately* : these yaml files would contain location of appropriate
+GTF files and genome indexes corresponding to different organisms. The location of these files after installation can be
+found using `snakePipes --info` command.
+
+2. *Modify the cluster.yaml file appropriately* : This yaml file contains information about your cluster scheduler (SGE/slurm).
+Location revealed using `snakePipes --info` command.
+
+3. *Create the conda environments* : conda environments for workflows could be created using `snakePipes --createEnvs` command.
+This takes a while, but only need to be done once. Optionally, workflow-specific env could also be created automatically when you 
+run any specific workflow for the first time.
 
 
 .. note:: `snakePipes createEnvs` will also set the `snakemake_options:` line in the global snakePipes `defaults.yaml` files. If you have already modified this then use the `--keepCondaDir` option.
