@@ -8,7 +8,7 @@ import snakePipes.common_functions as cf
 
 ### snakemake_workflows initialization ########################################
 maindir = os.path.dirname(os.path.dirname(workflow.basedir))
-workflow_tools=os.path.join(maindir, "shared", "rscripts")
+workflow_tools=os.path.join(maindir, "shared", "tools")
 
 # load conda ENVs (path is relative to "shared/rules" directory)
 globals().update(cf.set_env_yamls())
