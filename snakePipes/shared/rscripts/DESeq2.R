@@ -52,7 +52,6 @@ cat(paste("Salmon tx2gene file : ", tx2gene_file, "\n"))
 ## ~~~~~ 1. SETUP ~~~~~
 ## sampleInfo (setup of the experiment)
 sampleInfo <- read.table(sampleInfoFilePath, header = TRUE, stringsAsFactor = F)
-colnames(sampleInfo) <- c("name", "condition")
 sampleInfo$condition <- as.factor(sampleInfo$condition)
 sampleInfo$condition <- relevel(sampleInfo$condition, ref = as.character(sampleInfo$condition[1])) # first sample defines base
 

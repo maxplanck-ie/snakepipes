@@ -212,12 +212,12 @@ def cleanLogs(d):
 
 def check_sample_info_header(sample_info_file):
     """
-    return True in case sample info file contains column names 'sample' and 'group'
+    return True in case sample info file contains column names 'name' and 'condition'
     """
     ret = subprocess.check_output("cat " + sample_info_file + " | head -n1",
                                   shell=True).decode()
 
-    if "sample" in ret.split() and "group" in ret.split():
+    if "name" in ret.split() and "condition" in ret.split():
         return True
     else:
         return False
@@ -272,7 +272,7 @@ def checkCommonArguments(args, baseDir, outDir=False):
         else:
             sys.exit("\nSample info file not found! (--DB {})\n".format(args.sample_info))
         if not check_sample_info_header(args.sample_info):
-            sys.exit("ERROR: Please use 'sample' and 'group' as column headers in sample info file! ({})\n".format(args.sample_info))
+            sys.exit("ERROR: Please use 'name' and 'condition' as column headers in sample info file! ({})\n".format(args.sample_info))
     # 4. get abspath from user provided genome/organism file
     if not os.path.isfile(os.path.join(baseDir, "shared/organisms/{}.yaml".format(args.genome))) and os.path.isfile(args.genome):
         args.genome = os.path.abspath(args.genome)
