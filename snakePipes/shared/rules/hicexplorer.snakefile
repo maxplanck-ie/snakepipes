@@ -43,7 +43,7 @@ if(RF_resolution is True):
              QCfolder="HiC_matrices/QCplots/{sample}_QC/",
              res_seq = get_restriction_seq(enzyme),
              dang_seq = get_dangling_seq(enzyme),
-             region = lambda wildcards: "--region " + restrict_region if restrict_region else "",
+             region = lambda wildcards: "--region " + str(restrict_region) if restrict_region else "",
              min_dist = MIN_RS_DISTANCE,
              max_dist = MAX_RS_DISTANCE
         log:
@@ -74,7 +74,7 @@ else:
         params:
             QCfolder="HiC_matrices/QCplots/{sample}_QC/",
             bin_size = bin_size,
-            region = lambda wildcards: "--region " + restrict_region if restrict_region else "",
+            region = lambda wildcards: "--region " + str(restrict_region) if restrict_region else "",
             min_dist = MIN_RS_DISTANCE,
             max_dist = MAX_RS_DISTANCE
         log:
