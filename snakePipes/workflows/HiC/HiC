@@ -111,6 +111,13 @@ def parse_args(defaults={"verbose":None,"configfile":None,"cluster_configfile":N
                           help="parameters to run hicDistVsCount. (default: '%(default)s')",
                           default=defaults["distVsCountParams"])
 
+    optional.add_argument("--sampleInfo",
+                          dest="sample_info",
+                          type=str,
+                          metavar="STR",
+                          help="A .tsv file contains samples' names and replicates. (default: '%(default)s')",
+                          default=defaults["sample_info"])            
+
     return parser
 
 
