@@ -102,7 +102,8 @@ def createCondaEnvs(args):
     try:
         idx = _.index('--conda-prefix')
     except:
-        sys.exit("The snakemake_options directive in {} lacks --conda-prefix!\n".format(os.path.join(baseDir, "shared/defaults.yaml")))
+        idx = len(_)
+        _.extend(['--conda-prefix', condaDir])
 
     condaEnvDir = _[idx + 1]
     if args.condaDir:
