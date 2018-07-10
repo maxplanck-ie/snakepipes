@@ -4,7 +4,7 @@ channels:
  - anaconda
  - bioconda
 dependencies:
- - hicexplorer = 2.1.3
+ - hicexplorer = 2.1.4
  - bwa = 0.7.17
  - samtools = 1.8
  - python-dateutil = 2.7.3
