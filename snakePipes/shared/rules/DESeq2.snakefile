@@ -14,17 +14,17 @@ rule DESeq2:
     benchmark:
         "{}/.benchmark/DESeq2.featureCounts.benchmark".format(get_outdir("DESeq2"))
     params:
-        script=os.path.join(maindir, "shared", "tools", "DESeq2.R"),
+        script=os.path.join(maindir, "shared", "rscripts", "DESeq2.R"),
         outdir = get_outdir("DESeq2"),
         fdr = 0.05,
-        importfunc = os.path.join(maindir, "shared", "tools","snakediff","R", "DE_functions.R"),
+        importfunc = os.path.join(maindir, "shared", "rscripts", "DE_functions.R"),
         allele_info = lambda wildcards : 'TRUE' if 'allelic-mapping' in mode else 'FALSE',
         tx2gene_file = 'NA'
     log:
         out = "DESeq2.out",
         err = "DESeq2.err"
     conda: CONDA_RNASEQ_ENV
-    shell: 
+    shell:
         "cd {params.outdir} && "
         "Rscript {params.script} "
         "{input.sample_info} " # 1
@@ -49,10 +49,10 @@ rule DESeq2_Salmon:
     benchmark:
         "{}/.benchmark/DESeq2.Salmon.benchmark".format(get_outdir("DESeq2_Salmon"))
     params:
-        script=os.path.join(maindir, "shared", "tools", "DESeq2.R"),
+        script=os.path.join(maindir, "shared", "rscripts", "DESeq2.R"),
         outdir = get_outdir("DESeq2_Salmon"),
         fdr = 0.05,
-        importfunc = os.path.join(maindir, "shared", "tools","snakediff", "R" ,"DE_functions.R"),
+        importfunc = os.path.join(maindir, "shared", "rscripts", "DE_functions.R"),
         allele_info = 'FALSE',
         tx2gene_file = "Annotation/genes.filtered.t2g"
     log:

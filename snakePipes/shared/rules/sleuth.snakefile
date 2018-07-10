@@ -9,7 +9,7 @@ rule sleuth_Salmon:
     benchmark:
         "sleuth/.benchmark/sleuth.Salmon.benchmark"
     params:
-        script=os.path.join(maindir, "shared", "tools", "sleuth.R"),
+        script=os.path.join(maindir, "shared", "rscripts", "sleuth.R"),
         indir = "Salmon",
         outdir = "sleuth",
         fdr = 0.05,

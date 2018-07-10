@@ -110,13 +110,14 @@ def parse_args(defaults={"verbose":None,"configfile":None,"cluster_configfile":N
                           metavar="STR",
                           help="parameters to run hicDistVsCount. (default: '%(default)s')",
                           default=defaults["distVsCountParams"])
-
     optional.add_argument("--sampleInfo",
                           dest="sample_info",
                           type=str,
                           metavar="STR",
-                          help="A .tsv file contains samples' names and replicates. (default: '%(default)s')",
-                          default=defaults["sample_info"])            
+                          help="A .tsv file containing sample names and associated groups. "
+                          "If provided, the file would be used to identify groups to merge the samples "
+                          "(default: '%(default)s')",
+                          default=defaults["sample_info"])
 
     return parser
 

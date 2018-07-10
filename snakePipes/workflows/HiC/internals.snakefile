@@ -65,6 +65,23 @@ def get_mad_score(madfile):
     cutoff = str(lower) + " " + str(upper)
     return(cutoff)
 
+## get sample grouping information
+def get_sampleInfo(sample_info):
+    sample_dict = {}
+    if sample_info:     #Read the sample info and make a dictionary
+        sample_conditions =  pd.read_csv(os.path.join(os.path.abspath(sample_info)), sep = '\t', header = 0)
+        for id, row in sample_conditions.iterrows():
+            v, k = row
+            if k in sample_dict:
+                sample_dict[k] = [sample_dict[k], v]
+            else:
+                sample_dict[k]=v
+    else:
+        for sample in samples:
+            sample_dict['cond1'] = sample
+
+    return sample_dict
+
 ## trim
 fastq_dir = "FASTQ"
 if trim:
@@ -89,18 +106,3 @@ if not paired:
     print("\n  Error! Paired-end samples not detected. "
           "Hi-C workflow requires paired-end samples "+str(indir or '')+"!!!\n\n")
     exit(1)
-
-sample_dict = {}
-if sample_info:     #Read the sample info and make a dictionary
-    sample_conditions =  pd.read_csv(os.path.join(os.path.abspath(sample_info)),sep = '\t')
-    for id, row in sample_conditions.iterrows():
-        v, k = row
-        if k in sample_dict:
-            sample_dict[k] = [sample_dict[k], v]
-        else:
-            sample_dict[k]=v
-        print(sample_dict)
-
-else:
-    for sample in samples:
-        sample_dict['cond1'] = sample
