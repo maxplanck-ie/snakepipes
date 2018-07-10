@@ -334,7 +334,7 @@ rule produce_report:
         out="QC_metrics/logs/produce_report.out"
     conda: RmdCondaEnvironment 
     threads: 1
-    shell: "cp -v " + os.path.join(workflow_tools,"WGBS_QC_report_template.Rmd")+ " " + os.path.join("aux_files", "WGBS_QC_report_template.Rmd") + ';Rscript -e "rmarkdown::render(\''+os.path.join(outdir,"aux_files", "WGBS_QC_report_template.Rmd")+'\', params=list(QCdir=\'"' + os.path.join(outdir,"QC_metrics") +'"\' ), output_file =\'"'+ os.path.join(outdir,"QC_metrics",'QC_report.pdf"\'')+')"' + " 1>{log.out} 2>{log.err}"
+    shell: "cp -v " + os.path.join(workflow_rscripts,"WGBS_QC_report_template.Rmd")+ " " + os.path.join("aux_files", "WGBS_QC_report_template.Rmd") + ';Rscript -e "rmarkdown::render(\''+os.path.join(outdir,"aux_files", "WGBS_QC_report_template.Rmd")+'\', params=list(QCdir=\'"' + os.path.join(outdir,"QC_metrics") +'"\' ), output_file =\'"'+ os.path.join(outdir,"QC_metrics",'QC_report.pdf"\'')+')"' + " 1>{log.out} 2>{log.err}"
 
 
 if mbias_ignore=="auto":
@@ -388,7 +388,7 @@ if blackList is None:
             out="methXT/logs/{sample}.CpG_filt.out"
         threads: 1
         conda: CondaEnvironment
-        shell: "Rscript --no-save --no-restore " + os.path.join(workflow_tools,'WGBSpipe.POM.filt.R ') + "{params.methDir} {input.methTab};mv -v {params.OUTtemp} {output.tabFilt} 1>{log.out} 2>{log.err}"
+        shell: "Rscript --no-save --no-restore " + os.path.join(workflow_rscripts,'WGBSpipe.POM.filt.R ') + "{params.methDir} {input.methTab};mv -v {params.OUTtemp} {output.tabFilt} 1>{log.out} 2>{log.err}"
 
 else:
     rule CpG_filt:
@@ -405,7 +405,7 @@ else:
             out="methXT/logs/{sample}.CpG_filt.out"
         threads: 1
         conda: CondaEnvironment
-        shell: "Rscript --no-save --no-restore " + os.path.join(workflow_tools,'WGBSpipe.POM.filt.R ') + "{params.methDir} {input.methTab};bedtools intersect -v -a {params.OUTtemp} -b {input.blackListF} > {output.tabFilt} 1>{log.out} 2>{log.err}"
+        shell: "Rscript --no-save --no-restore " + os.path.join(workflow_rscripts,'WGBSpipe.POM.filt.R ') + "{params.methDir} {input.methTab};bedtools intersect -v -a {params.OUTtemp} -b {input.blackListF} > {output.tabFilt} 1>{log.out} 2>{log.err}"
 
 
 if sampleInfo:
@@ -423,7 +423,7 @@ if sampleInfo:
             out="singleCpG_stats_limma/logs/CpG_stats.out"
         threads: 1
         conda: CondaEnvironment
-        shell: "Rscript --no-save --no-restore " + os.path.join(workflow_tools,'WGBSpipe.singleCpGstats.limma.R ') + "{params.statdir} {params.sampleInfo} "  + os.path.join(outdir,"methXT") + " 1>{log.out} 2>{log.err}"
+        shell: "Rscript --no-save --no-restore " + os.path.join(workflow_rscripts,'WGBSpipe.singleCpGstats.limma.R ') + "{params.statdir} {params.sampleInfo} "  + os.path.join(outdir,"methXT") + " 1>{log.out} 2>{log.err}"
 
     rule run_metilene:
         input:
@@ -474,7 +474,7 @@ if sampleInfo:
             out="metilene_out/logs/cleanup_metilene.out"
         threads: 1
         conda: CondaEnvironment
-        shell: 'Rscript --no-save --no-restore ' + os.path.join(workflow_tools,'WGBSpipe.metilene_stats.limma.R ') + "{params.DMRout} " + os.path.join(outdir,"{input.MetBed}") +' ' + os.path.join(outdir,"{input.MetCG}") + ' ' + os.path.join(outdir,"{input.Limdat}") + " {input.sampleInfo} {input.refG} 1>{log.out} 2>{log.err}" 
+        shell: 'Rscript --no-save --no-restore ' + os.path.join(workflow_rscripts,'WGBSpipe.metilene_stats.limma.R ') + "{params.DMRout} " + os.path.join(outdir,"{input.MetBed}") +' ' + os.path.join(outdir,"{input.MetCG}") + ' ' + os.path.join(outdir,"{input.Limdat}") + " {input.sampleInfo} {input.refG} 1>{log.out} 2>{log.err}" 
 
 
 if intList:
@@ -505,7 +505,7 @@ if intList:
             output:
                 outFiles=run_int_aggStats(intList,sampleInfo)
             params:
-                auxshell=lambda wildcards,input:';'.join(['Rscript --no-save --no-restore ' + os.path.join(workflow_tools,'WGBSpipe.interval_stats.limma.R ') + os.path.join(outdir,'aggregate_stats_limma ') + li +' '+ aui +' ' + os.path.join(outdir,input.Limdat) + ' '  + input.sampleInfo  for li,aui in zip(intList,[os.path.join(outdir,"aux_files",re.sub('.fa',re.sub('.bed','.CpGlist.bed',os.path.basename(x)),os.path.basename(refG))) for x in intList])])
+                auxshell=lambda wildcards,input:';'.join(['Rscript --no-save --no-restore ' + os.path.join(workflow_rscripts,'WGBSpipe.interval_stats.limma.R ') + os.path.join(outdir,'aggregate_stats_limma ') + li +' '+ aui +' ' + os.path.join(outdir,input.Limdat) + ' '  + input.sampleInfo  for li,aui in zip(intList,[os.path.join(outdir,"aux_files",re.sub('.fa',re.sub('.bed','.CpGlist.bed',os.path.basename(x)),os.path.basename(refG))) for x in intList])])
             log:
                 err="aggregate_stats_limma/logs/intAgg_stats.err",
                 out="aggregate_stats_limma/logs/intAgg_stats.out"

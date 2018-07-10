@@ -17,5 +17,6 @@ dependencies:
  - r-sleuth=0.29.0
  - r-dplyr=0.7.4
  - r-ggplot2=2.2.1
+ - r-pheatmap
  - bioconductor-deseq2=1.18.1 
  - bioconductor-biomart=2.34.2
