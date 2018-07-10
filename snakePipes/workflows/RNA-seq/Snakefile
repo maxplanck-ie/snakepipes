@@ -33,7 +33,7 @@ if trim:
 include: os.path.join(maindir, "shared", "rules", "filter_annotation.snakefile")
 
 # deeptools cmds
-include: os.path.join(maindir, "shared", "deeptools_cmds.snakefile")
+include: os.path.join(maindir, "shared", "tools" , "deeptools_cmds.snakefile")
 ## bamCoverage_RPKM
 include: os.path.join(maindir, "shared", "rules", "deepTools_RNA.snakefile")
 

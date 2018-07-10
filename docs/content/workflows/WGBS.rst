@@ -5,7 +5,7 @@ WGBS
 
 Input requirements :
 -------------------------------------------
-This pipeline requires paired-end reads fastq files and a bisulfite converted genome as inputs. 
+This pipeline requires paired-end reads fastq files and a bisulfite converted genome as inputs.
 Optional inputs include bed files with genomic intervals of interest, used to aggregate single CpG values over; a sample sheet with grouping information to use in differential methylation analysis; a blacklist bed file with genomic positions corresponding to known snps to mask single CpG methylation values.
 
 
@@ -62,7 +62,7 @@ Configuration file
 	###list of bed files to process
 	intList: []
 	###SNP black list (bed file)
-	blackList: 
+	blackList:
 	###sample Info
 	sampleInfo:
 	###inclusion bounds for methylation extraction
@@ -133,7 +133,7 @@ The WGBS pipeline will generate output as follows:
 
 Aggregate stats will be calculated if user provides at least one bed file with genomic intervals of interest. Differential methylation analysis or DMR detection will only be run if user provides a sample sheet.
 
-Example output plots 
+Example output plots
 --------------------------------
 
 Using data from Habibi et al., Cell Stem Cell 2013 corresponding to mouse chr6:4000000-6000000, following plots could be obtained:
@@ -147,6 +147,5 @@ Argparse
 --------------------------------
 
 .. argparse::
-   :filename: ../workflows/WGBS/WGBS
-   :func: parse_args
+   :ref: snakePipes.WGBS.parse_args
    :prog: WGBS

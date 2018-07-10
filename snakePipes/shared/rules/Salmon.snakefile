@@ -2,18 +2,18 @@
 rule convertLibraryTypeSalmon:
     input: "Annotation/genes.filtered.fa"
     output: "Salmon/lib_type.txt"
-    params: 
+    params:
         lib_str = "PE" if paired else "SE",
         from_library_type = library_type,
         from_prg = "featureCounts",
         to_prg="Salmon",
         tsv = os.path.join(maindir, "shared", "tools", "library_type.tsv"),
-        rscript = os.path.join(maindir, "shared", "tools", "library_type.R"),
+        rscript = os.path.join(maindir, "shared", "rscripts", "library_type.R"),
     threads: 1
     conda: CONDA_RNASEQ_ENV
     shell:
         "Rscript {params.rscript} {params.tsv} {params.lib_str} {params.from_library_type} {params.from_prg} {params.to_prg} > {output}"
-        
+
 
 ## Salmon Index
 rule SalmonIndex:
@@ -120,7 +120,7 @@ rule Salmon_TPM:
         "Salmon/Salmon_TPM.log"
     conda: CONDA_RNASEQ_ENV
     shell:
-        "Rscript "+os.path.join(maindir, "shared", "tools", "merge_count_tables.R")+" Name TPM {output} {input} "
+        "Rscript "+os.path.join(maindir, "shared", "rscripts", "merge_count_tables.R")+" Name TPM {output} {input} "
 
 
 rule Salmon_genes_TPM:
@@ -134,7 +134,7 @@ rule Salmon_genes_TPM:
         "Salmon/Salmon_genes_TPM.log"
     conda: CONDA_RNASEQ_ENV
     shell:
-        "Rscript "+os.path.join(maindir, "shared", "tools", "merge_count_tables.R")+" Name TPM {output} {input} "
+        "Rscript "+os.path.join(maindir, "shared", "rscripts", "merge_count_tables.R")+" Name TPM {output} {input} "
 
 
 rule Salmon_counts:
@@ -148,7 +148,7 @@ rule Salmon_counts:
         "Salmon/Salmon_counts.log"
     conda: CONDA_RNASEQ_ENV
     shell:
-        "Rscript "+os.path.join(maindir, "shared", "tools", "merge_count_tables.R")+" Name NumReads {output} {input} "
+        "Rscript "+os.path.join(maindir, "shared", "rscripts", "merge_count_tables.R")+" Name NumReads {output} {input} "
 
 
 rule Salmon_genes_counts:
@@ -162,7 +162,7 @@ rule Salmon_genes_counts:
         "Salmon/Salmon_genes_counts.log"
     conda: CONDA_RNASEQ_ENV
     shell:
-        "Rscript "+os.path.join(maindir, "shared", "tools", "merge_count_tables.R")+" Name TPM {output} {input} "
+        "Rscript "+os.path.join(maindir, "shared", "rscripts", "merge_count_tables.R")+" Name TPM {output} {input} "
 
 
 ## Prepare Salmon output for Sleuth
@@ -175,4 +175,4 @@ rule Salmon_wasabi:
         "Salmon/{sample}/"
     conda: CONDA_RNASEQ_ENV
     shell:
-        "Rscript "+os.path.join(maindir, "shared", "tools", "wasabi.R")+" {params}"
+        "Rscript "+os.path.join(maindir, "shared", "rscripts", "wasabi.R")+" {params}"

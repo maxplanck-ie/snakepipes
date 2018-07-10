@@ -15,15 +15,15 @@ def set_env_yamls():
     """
     This defines the global variables describing where the conda env yaml files are
     """
-    return {'CONDA_SHARED_ENV': 'envs/shared_environment.yaml',
-            'CONDA_RNASEQ_ENV': 'envs/RNAseq_environment.yaml',
+    return {'CONDA_SHARED_ENV': 'envs/shared.yaml',
+            'CONDA_RNASEQ_ENV': 'envs/rna_seq.yaml',
             'CONDA_DNA_MAPPING_ENV': 'envs/dna_mapping.yaml',
             'CONDA_CHIPSEQ_ENV': 'envs/chip_seq.yaml',
             'CONDA_ATAC_ENV': 'envs/atac_seq.yaml',
-            'CONDA_HIC_ENV': 'envs/hic_conda_env.yaml',
-            'CondaEnvironment': 'envs/WGBSconda.yaml',
+            'CONDA_HIC_ENV': 'envs/hic.yaml',
+            'CondaEnvironment': 'envs/wgbs.yaml',
             'mCtCondaEnvironment': 'envs/methylCtools.yaml',
-            'RmdCondaEnvironment': 'envs/Rmdconda.yaml'}
+            'RmdCondaEnvironment': 'envs/rmarkdown.yaml'}
 
 
 def merge_dicts(x, y):
@@ -84,21 +84,6 @@ def load_organism_data(genome, maindir, verbose):
     else:
         exit("ERROR: Genome configuration file NOT found for: {}\n".format(genome))
     return organism
-
-
-def load_paths(pathfile, maindir, verbose):
-    paths = load_configfile(pathfile, False)
-
-    # add path to tools dir
-    paths["workflow_tools"] = os.path.join(maindir, "shared", "tools")
-
-    if verbose:
-        print("\n--- paths ---------------------------------------------------------------------")
-        for k, v in sorted(paths.items()):
-            print("{}: {}".format(k, v))
-        print("-" * 80, "\n")
-
-    return paths
 
 
 def get_sample_names(infiles, ext, reads):

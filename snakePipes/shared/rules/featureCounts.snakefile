@@ -33,4 +33,4 @@ rule merge_featureCounts:
         "featureCounts/counts.tsv"
     conda: CONDA_RNASEQ_ENV
     shell:
-        "Rscript "+os.path.join(maindir, "shared", "tools", "merge_featureCounts.R")+" {output} {input}"
+        "Rscript "+os.path.join(maindir, "shared", "rscripts", "merge_featureCounts.R")+" {output} {input}"

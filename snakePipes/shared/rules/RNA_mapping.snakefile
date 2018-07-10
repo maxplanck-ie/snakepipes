@@ -2,18 +2,18 @@
 rule convertLibraryTypeHisat2:
     input: genes_gtf
     output: mapping_prg+"/lib_type.txt"
-    params: 
+    params:
         lib_str = "PE" if paired else "SE",
         from_library_type = library_type,
         from_prg = "featureCounts",
         to_prg="HISAT2",
         tsv = os.path.join(maindir, "shared", "tools", "library_type.tsv"),
-        rscript = os.path.join(maindir, "shared", "tools", "library_type.R"),
+        rscript = os.path.join(maindir, "shared", "rscripts", "library_type.R"),
     threads: 1
     conda: CONDA_RNASEQ_ENV
     shell:
         "Rscript {params.rscript} {params.tsv} {params.lib_str} {params.from_library_type} {params.from_prg} {params.to_prg} > {output}"
-        
+
 
 ### HISAT2 #####################################################################
 

@@ -43,7 +43,7 @@ if(RF_resolution is True):
              QCfolder="HiC_matrices/QCplots/{sample}_QC/",
              res_seq = get_restriction_seq(enzyme),
              dang_seq = get_dangling_seq(enzyme),
-             region = lambda wildcards: "--region " + restrict_region if restrict_region else "",
+             region = lambda wildcards: "--region " + str(restrict_region) if restrict_region else "",
              min_dist = MIN_RS_DISTANCE,
              max_dist = MAX_RS_DISTANCE
         log:
@@ -69,12 +69,12 @@ else:
             R2 = "BWA/{sample}"+reads[1]+".bam"
         output:
             matrix = "HiC_matrices/{sample}_"+matrixFile_suffix+".h5",
-            qc = "HiC_matrices/QCplots/{sample}_QC/QC_table.txt"
+            qc = "HiC_matrices/QCplots/{sample}_QC/QC.log"
 
         params:
             QCfolder="HiC_matrices/QCplots/{sample}_QC/",
             bin_size = bin_size,
-            region = lambda wildcards: "--region " + restrict_region if restrict_region else "",
+            region = lambda wildcards: "--region " + str(restrict_region) if restrict_region else "",
             min_dist = MIN_RS_DISTANCE,
             max_dist = MAX_RS_DISTANCE
         log:
@@ -90,7 +90,8 @@ else:
             "--QCfolder {params.QCfolder} "
             "--threads {threads} "
             "{params.region} "
-            "-o {output.matrix} > {log.out} 2> {log.err}"
+            "-o {output.matrix} > {log.out} 2> {log.err} &&"
+            " rm {params.QCfolder}"+"QC_table.txt"
 
 ## Merge the samples if asked
 rule merge_matrices:
@@ -111,7 +112,6 @@ rule merge_bins:
          "HiC_matrices/{sample}_"+matrixFile_suffix+".h5"
      output:
          matrix = "HiC_matrices/{sample}_Mbins"+str(nbins_toMerge)+"_"+matrixFile_suffix+".h5"
-
      params:
          num_bins=nbins_toMerge
      log:
