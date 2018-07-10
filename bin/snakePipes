@@ -7,6 +7,7 @@ import os
 import yaml
 import glob
 import hashlib
+import shutil
 import snakePipes.common_functions as cof
 
 
@@ -48,7 +49,6 @@ def parse_arguments():
                                   action='store_true',
                                   help='Skip registering GATK')
 
-
     return parser
 
 
@@ -81,6 +81,7 @@ def registerGATK(gatkEnv):
     cmd = "{}/bin/gatk-register GATK-archive-3.5.tar.bz2".format(gatkEnv)
     subprocess.check_call(cmd, shell=True)
     os.remove("GATK-archive-3.5.tar.bz2")
+    shutil.rmtree("/tmp/gatk")
 
 
 def createCondaEnvs(args):
@@ -101,7 +102,8 @@ def createCondaEnvs(args):
     try:
         idx = _.index('--conda-prefix')
     except:
-        sys.exit("The snakemake_options directive in {} lacks --conda-prefix!\n".format(os.path.join(baseDir, "shared/defaults.yaml")))
+        idx = len(_)
+        _.extend(['--conda-prefix', condaDir])
 
     condaEnvDir = _[idx + 1]
     if args.condaDir:
@@ -111,9 +113,7 @@ def createCondaEnvs(args):
         condaDirUse = _[idx + 1]
     else:
         condaDirUse = condaDir
-        # Remove --conda-prefix entirely
-        del _[idx + 1]
-        del _[idx]
+        _[idx + 1] = condaDirUse
     cf['snakemake_options'] = ' '.join(_)
 
     # rewrite defaults.yaml
@@ -128,7 +128,7 @@ def createCondaEnvs(args):
         f.close()
         h = md5hash.hexdigest()
 
-        if 'WGBS' in env:
+        if 'wgbs' in env:
             gatkEnv = os.path.join(condaDirUse, h)
 
         if h not in created or args.force:
