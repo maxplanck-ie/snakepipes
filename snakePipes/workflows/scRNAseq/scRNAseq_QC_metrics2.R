@@ -119,7 +119,7 @@ libs_per_plate = 2
 if (is_split_library) libs_per_plate = 4
 
 
-png(file=paste(out_prefix,".reads_UMI_plot.png",sep=""),width=1500,height=1500)
+pdf(file=paste(out_prefix,".reads_UMI_plot.pdf",sep=""))
 ggplot(dat=sc_dat,aes(x=(READS_UNIQFEAT),y=(UMI),color=sample))+geom_point(size=3,alpha=0.8) + 
 	facet_wrap(~sample,ncol=libs_per_plate)+
 	xlab("reads on feature per cell")+
@@ -148,7 +148,7 @@ if (num_samples>4){
 
 print(height)
 
-png(file=paste(out_prefix,".plate_cUPM.png",sep=""),width=1000,height=height)
+pdf(file=paste(out_prefix,".plate_cUPM.pdf",sep=""))
 
 ggplot(sc_dat,aes(x=x,y=y,fill=cUPM_zscore))+ 
 		geom_tile() + 
@@ -165,7 +165,7 @@ ggplot(sc_dat,aes(x=x,y=y,fill=cUPM_zscore))+
 
 dev.off()
 
-png(file=paste(out_prefix,".plate_cRPM.png",sep=""),width=1000,height=height)
+pdf(file=paste(out_prefix,".plate_cRPM.png",sep="")) #,width=1000,height=height)
 
 ggplot(sc_dat,aes(x=x,y=y,fill=cRPM_zscore))+ 
 		geom_tile() + 
@@ -182,7 +182,7 @@ ggplot(sc_dat,aes(x=x,y=y,fill=cRPM_zscore))+
 dev.off()
 
 
-png(file=paste(out_prefix,".plate_abs_transcripts.png",sep=""),width=1000,height=height)
+pdf(file=paste(out_prefix,".plate_abs_transcripts.png",sep="")) #,width=1000,height=height)
 
 ggplot(sc_dat,aes(x=x,y=y,fill=UMI))+ 
 		geom_tile() + 
