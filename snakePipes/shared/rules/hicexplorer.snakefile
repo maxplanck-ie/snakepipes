@@ -61,7 +61,8 @@ if(RF_resolution is True):
             "--QCfolder {params.QCfolder} "
             "--threads {threads} "
             "{params.region} "
-            "-o {output.matrix} > {log.out} 2> {log.err}"
+            "-o {output.matrix} > {log.out} 2> {log.err} &&"
+            " rm {params.QCfolder}"+"QC_table.txt"
 else:
     rule build_matrix:
         input:
