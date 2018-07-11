@@ -92,7 +92,11 @@ def createCondaEnvs(args):
     created = set()
 
     condaDir = subprocess.check_output("which conda", shell=True).decode('utf-8').strip()
-    condaDir = os.path.join(os.path.dirname(os.path.dirname(condaDir)), "envs")
+    condaDir = os.path.dirname(os.path.dirname(condaDir))
+    if "envs" in condaDir:
+        condaDir = os.path.dirname(condaDir)
+    else:
+        condaDir = os.path.join(condaDir, "envs")
     gatkEnv = None
 
     f = open(os.path.join(baseDir, "shared/defaults.yaml"))
@@ -134,7 +138,7 @@ def createCondaEnvs(args):
         if h not in created or args.force:
             created.add(h)
             sys.stderr.write("Creating environment from {} in {}\n".format(os.path.join(baseDir, "shared/rules", env), condaDirUse))
-            if '--conda-prefix' in cf['snakemake_options']:
+            if '--conda-prefix' in cf['snakemake_options'] and (args.condaDir or args.keepCondaDir):
                 cmd = "conda env create --force --file {} --prefix {}".format(os.path.join(baseDir, "shared/rules", env), os.path.join(condaDirUse, h))
             else:
                 cmd = "conda env create --force --file {} --name {}".format(os.path.join(baseDir, "shared/rules", env), h)
