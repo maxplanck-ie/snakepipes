@@ -26,6 +26,9 @@ def parse_arguments():
                                                   'workflow-specific yaml files. Note that changing the snakemake_options: '
                                                   'option will result in ALL conda environments being recreated.')
 
+    envInfoParser = subparsers.add_parser('envInfo',
+                                          help='Prints the location in which each conda environment is actually stored.')
+
     mex = createEnvsParser.add_mutually_exclusive_group()
     mex.add_argument('--keepCondaDir',
                      action='store_true',
@@ -71,6 +74,38 @@ def info():
     print("\nWorkflow-specific cluster.yaml and defaults.yaml files are in:")
     for f in glob.glob(os.path.join(baseDir, "workflows/*/cluster.yaml")):
         print("    {}".format(os.path.dirname(f)))
+
+
+def envInfo():
+    """
+    For each environment yaml file print where its conda env is actually located
+    """
+    baseDir = os.path.dirname(snakePipes.__file__)
+    condaDir = subprocess.check_output("which conda", shell=True).decode('utf-8').strip()
+    condaDir = os.path.dirname(os.path.dirname(condaDir))
+    if "envs" in condaDir:
+        condaDir = os.path.dirname(condaDir)
+    else:
+        condaDir = os.path.join(condaDir, "envs")
+
+    f = open(os.path.join(baseDir, "shared/defaults.yaml"))
+    cf = yaml.load(f)
+    f.close()
+
+    _ = cf['snakemake_options'].split(" ")
+    idx = _.index('--conda-prefix')
+    condaEnvDir = _[idx + 1]
+
+    for env in cof.set_env_yamls().values():
+        # Hash the file ala snakemake
+        md5hash = hashlib.md5()
+        md5hash.update(condaEnvDir.encode())
+        f = open(os.path.join(baseDir, "shared/rules", env), 'rb')
+        md5hash.update(f.read())
+        f.close()
+        h = md5hash.hexdigest()
+
+        print("{} is in:\n    {}\n".format(env, os.path.join(condaEnvDir, h)))
 
 
 def registerGATK(gatkEnv):
@@ -156,6 +191,8 @@ def main(args):
     args = parse_arguments().parse_args(args)
     if args.command == 'info':
         info()
+    elif args.command == 'envInfo':
+        envInfo()
     else:
         createCondaEnvs(args)
 
