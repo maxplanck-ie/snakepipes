@@ -4,6 +4,11 @@ from operator import is_not
 import tempfile
 import pandas
 
+## function to get the name of the samplesheet and extend the name of the folder for all analyses relying on sample_info
+def get_outdir(folder_name):
+    sample_name = re.sub('_sampleSheet.tsv','',os.path.basename(sampleInfo))
+    return("{}_{}".format(folder_name, sample_name))
+
  
 ###get automatic cut threshold for hard-trimming of 5' ends
 if trimReads=='auto':
@@ -429,29 +434,29 @@ if sampleInfo:
     rule CpG_stats:
         input: expand("methXT/{sample}.CpG.filt2.bed",sample=samples)
         output:
-            RDatAll='singleCpG_stats_limma/singleCpG.RData',
-            Limdat='singleCpG_stats_limma/limdat.LG.RData',
-            MetIN='singleCpG_stats_limma/metilene.IN.txt'
+            RDatAll='{}/singleCpG.RData'.format(get_outdir("singleCpG_stats_limma")),
+            Limdat='{}/limdat.LG.RData'.format(get_outdir("singleCpG_stats_limma")),
+            MetIN='{}/metilene.IN.txt'.format(get_outdir("singleCpG_stats_limma"))
         params:
             statdir=os.path.join(outdir,'singleCpG_stats_limma'),
             sampleInfo=sampleInfo
         log:
-            err="singleCpG_stats_limma/logs/CpG_stats.err",
-            out="singleCpG_stats_limma/logs/CpG_stats.out"
+            err='{}/logs/CpG_stats.err'.format(get_outdir("singleCpG_stats_limma")),
+            out='{}/logs/CpG_stats.out'.format(get_outdir("singleCpG_stats_limma"))
         threads: 1
         conda: CondaEnvironment
         shell: "Rscript --no-save --no-restore " + os.path.join(workflow_rscripts,'WGBSpipe.singleCpGstats.limma.R ') + "{params.statdir} {params.sampleInfo} "  + os.path.join(outdir,"methXT") + " 1>{log.out} 2>{log.err}"
 
     rule run_metilene:
         input:
-            MetIN='singleCpG_stats_limma/metilene.IN.txt',
+            MetIN='{}/metilene.IN.txt'.format(get_outdir("singleCpG_stats_limma")),
             sampleInfo=sampleInfo
         output:
-            MetBed='metilene_out/singleCpG.metilene.bed'
+            MetBed='{}/singleCpG.metilene.bed'.format(get_outdir("metilene_out"))
         params:
-            DMRout=os.path.join(outdir,'metilene_out')
+            DMRout=os.path.join(outdir,'{}'.format(get_outdir("metilene_out")))
         log:
-            err="metilene_out/logs/run_metilene.err"
+            err="{}/logs/run_metilene.err".format(get_outdir("metilene_out"))
         threads: nthreads
         conda: CondaEnvironment
         shell: 'metilene -a ' + list(set(pandas.read_table(sampleInfo)['Group']))[0] + ' -b ' + list(set(pandas.read_table(sampleInfo)['Group']))[1] + " -t {threads} {input.MetIN} | sort -k 1,1 -k2,2n > {output.MetBed}" + " 2>{log.err}"
@@ -460,35 +465,34 @@ if sampleInfo:
     rule get_CG_metilene:
         input:
             refG=refG,
-            MetBed='metilene_out/singleCpG.metilene.bed',
-            pozF="aux_files/"+re.sub('.fa*','.poz.gz',os.path.basename(refG))
+            MetBed='{}/singleCpG.metilene.bed'.format(get_outdir("metilene_out")),
+            imdF="aux_files/"+re.sub('.fa*','.CpG.bed',os.path.basename(refG))
         output:
-            imdF=temp("aux_files/"+re.sub('.fa*','.CpG.bed',os.path.basename(refG))),
-            MetCG=os.path.join("aux_files",re.sub('.fa','.metilene.CpGlist.bed',os.path.basename(refG)))
+            MetCG=os.path.join("aux_files",re.sub('_sampleSheet.tsv','.metilene.CpGlist.bed',os.path.basename(sampleInfo)))
         params:
             auxdir=os.path.join(outdir,"aux_files")            
         log:
             err="aux_files/logs/get_CG_metilene.err"
         threads: 1
         conda: CondaEnvironment
-        shell: 'grep "+"' + " {input.pozF} "+ ' | awk \'{{print $1, $5, $5+1, $6, $8}}\' - | tr " " "\\t" | sort -k 1,1 -k2,2n - > ' + "{output.imdF};"+ "bedtools intersect -wa -a {output.imdF} -b {input.MetBed} > {output.MetCG}  2>{log.err};sleep 300"
+        shell: "bedtools intersect -wa -a {input.imdF} -b {input.MetBed} > {output.MetCG}  2>{log.err};sleep 300"
             
 
     rule cleanup_metilene:
         input:
-            Limdat='singleCpG_stats_limma/limdat.LG.RData',
-            MetBed='metilene_out/singleCpG.metilene.bed',
-            MetCG=os.path.join("aux_files",re.sub('.fa','.metilene.CpGlist.bed',os.path.basename(refG))),
+            Limdat='{}/limdat.LG.RData'.format(get_outdir("singleCpG_stats_limma")),
+            MetBed='{}/singleCpG.metilene.bed'.format(get_outdir("metilene_out")),
+            MetCG=os.path.join("aux_files",re.sub('_sampleSheet.tsv','.metilene.CpGlist.bed',os.path.basename(sampleInfo))),
             sampleInfo=sampleInfo,
             refG=refG
         output:
-            LimBed='metilene_out/singleCpG.metilene.limma.bed',
-            LimAnnot='metilene_out/metilene.limma.annotated.txt'
+            LimBed='{}/singleCpG.metilene.limma.bed'.format(get_outdir("metilene_out")),
+            LimAnnot='{}/metilene.limma.annotated.txt'.format(get_outdir("metilene_out"))
         params:
-            DMRout=os.path.join(outdir,'metilene_out')
+            DMRout=os.path.join(outdir,'{}'.format(get_outdir("metilene_out")))
         log:
-            err="metilene_out/logs/cleanup_metilene.err",
-            out="metilene_out/logs/cleanup_metilene.out"
+            err="{}/logs/cleanup_metilene.err".format(get_outdir("metilene_out")),
+            out="{}/logs/cleanup_metilene.out".format(get_outdir("metilene_out"))
         threads: 1
         conda: CondaEnvironment
         shell: 'Rscript --no-save --no-restore ' + os.path.join(workflow_rscripts,'WGBSpipe.metilene_stats.limma.R ') + "{params.DMRout} " + os.path.join(outdir,"{input.MetBed}") +' ' + os.path.join(outdir,"{input.MetCG}") + ' ' + os.path.join(outdir,"{input.Limdat}") + " {input.sampleInfo} {input.refG} 1>{log.out} 2>{log.err}" 
@@ -499,22 +503,23 @@ if intList:
         input:
             intList=intList,
             refG=refG,
-            imdF="aux_files/"+re.sub('.fa*','.CpG.bed',os.path.basename(refG))
+            pozF="aux_files/"+re.sub('.fa*','.poz.gz',os.path.basename(refG))
         output:
+            imdF=temp("aux_files/"+re.sub('.fa*','.CpG.bed',os.path.basename(refG))),
             outList=run_int_aggStats(intList,False) 
         log:
             err="aux_files/logs/get_CG_per_int.err"
         params:
-            auxshell=lambda wildcards,input,output: ';'.join(["bedtools intersect -wa -a "+ input.imdF + " -b " + bli + ' > ' + oli  for bli,oli in zip(input.intList,output.outList) ])+';sleep 300'
+            auxshell=lambda wildcards,input,output: ';'.join(["bedtools intersect -wa -a "+ output.imdF + " -b " + bli + ' > ' + oli  for bli,oli in zip(input.intList,output.outList) ])+';sleep 300'
         threads: 1
         conda: CondaEnvironment
-        shell:"{params.auxshell} 2>{log.err}"
+        shell:'grep "+"' + " {input.pozF} "+ ' | awk \'{{print $1, $5, $5+1, $6, $8}}\' - | tr " " "\\t" | sort -k 1,1 -k2,2n - > ' + "{output.imdF}; {params.auxshell} 2>{log.err}"
 
 
     if sampleInfo:
         rule intAgg_stats:
             input:
-                Limdat='singleCpG_stats_limma/limdat.LG.RData',
+                Limdat='{}/limdat.LG.RData'.format(get_outdir("singleCpG_stats_limma")),
                 intList=intList,
                 refG=refG,
                 sampleInfo=sampleInfo,
@@ -524,8 +529,8 @@ if intList:
             params:
                 auxshell=lambda wildcards,input:';'.join(['Rscript --no-save --no-restore ' + os.path.join(workflow_rscripts,'WGBSpipe.interval_stats.limma.R ') + os.path.join(outdir,'aggregate_stats_limma ') + li +' '+ aui +' ' + os.path.join(outdir,input.Limdat) + ' '  + input.sampleInfo  for li,aui in zip(intList,[os.path.join(outdir,"aux_files",re.sub('.fa',re.sub('.bed','.CpGlist.bed',os.path.basename(x)),os.path.basename(refG))) for x in intList])])
             log:
-                err="aggregate_stats_limma/logs/intAgg_stats.err",
-                out="aggregate_stats_limma/logs/intAgg_stats.out"
+                err="{}/logs/intAgg_stats.err".format(get_outdir("aggregate_stats_limma")),
+                out="{}/logs/intAgg_stats.out".format(get_outdir("aggregate_stats_limma"))
             threads: 1
             conda: CondaEnvironment
             shell: "{params.auxshell} 1>{log.out} 2>{log.err}"

@@ -15,6 +15,7 @@ require("car")
 
 spath<-commandArgs(trailingOnly=TRUE)[2]
 sampleInfo<-read.table(spath,header=TRUE,sep="\t",as.is=TRUE)
+if(!"PlottingID" %in% colnames(sampleInfo)){sampleInfo$PlottingID<-sampleInfo$SampleID}
 
 
 ############read in methylation tracks; use (reference)-sorted bed files #############################################
@@ -77,28 +78,48 @@ if(nrow(limdat.LG.CC)==0){ message("None of the single CpG sites passed the filt
 
     head(limdat.LG.CC.Means)
 
-##density plots
-    ggplot(data=limdat.LG.CC.Means,aes(x=Beta.Mean))+geom_density(aes(group=Group,colour=Group,fill=Group),alpha=0.3)+ggtitle("Single CpG sites")+
-    theme(text = element_text(size=16),axis.text = element_text(size=12),axis.title = element_text(size=14))+xlab("Mean methylation ratio")
-    ggsave(filename="Beta.MeanXgroup.all.dens.png")
+    if ("Control" %in% limdat.LG.CC.Means$Group){
+        limdat.LG.CC.Means$Group<-factor(limdat.LG.CC.Means$Group)
+        limdat.LG.CC.Means$Group<-relevel(limdat.LG.CC.Means$Group,ref="Control")}
+    else if ("WT" %in% limdat.LG.CC.Means$Group){
+        limdat.LG.CC.Means$Group<-factor(limdat.LG.CC.Means$Group)
+        limdat.LG.CC.Means$Group<-relevel(limdat.LG.CC.Means$Group,ref="WT")}
 
-##violin plots
+    sink("GroupMean.ttest.txt")
+    limdat.LG.CC.MeansXSample<-data.table(summarize(group_by(limdat.LG.CC.L,SampleID),Beta.Mean=mean(Beta)))
+    limdat.LG.CC.MeansXSample$Beta.Mean.logit<-logit(limdat.LG.CC.MeansXSample$Beta.Mean,percents=FALSE,adjust=0.025)
+    limdat.LG.CC.MeansXSample$Group<-sampleInfo$Group[match(limdat.LG.CC.MeansXSample$SampleID,sampleInfo$PlottingID)]
+    print(limdat.LG.CC.MeansXSample)
+    print(t.test(Beta.Mean.logit~Group,data=limdat.LG.CC.MeansXSample,var.equal=TRUE))
+    sink()
+
+    ##density plots
+    ggplot(data=limdat.LG.CC.Means,aes(x=Beta.Mean))+geom_density(aes(group=Group,colour=Group,fill=Group),alpha=0.3)+ggtitle("Single CpG sites")+
+    theme(text = element_text(size=16),axis.text = element_text(size=12),axis.title = element_text(size=14))+xlab("Mean methylation ratio")+scale_fill_manual(values=c("grey28","red"))+scale_colour_manual(values=c("grey28","red"))
+    ggsave("Beta.MeanXgroup.all.dens.png")
+
+    ##violin plots
     ggplot(data=limdat.LG.CC.Means)+geom_violin(aes(x=Group,y=Beta.Mean,fill=Group))+geom_boxplot(aes(x=Group,y=Beta.Mean),width=0.1)+ggtitle("Single CpG sites")+
-    theme(text = element_text(size=16),axis.text = element_text(size=12),axis.title = element_text(size=14))+xlab("Mean methylation ratio")
+    theme(text = element_text(size=16),axis.text = element_text(size=12),axis.title = element_text(size=14))+xlab("Mean methylation ratio")+scale_fill_manual(values=c("grey28","red"))
     ggsave("Beta.MeanXgroup.all.violin.png")
 
-#limma
+    #limma
     design<-as.data.frame(matrix(ncol=2,nrow=(ncol(limdat.LG.CC.logit))),stringsAsFactors=FALSE)
     colnames(design)<-c("Intercept","Group")
     rownames(design)<-colnames(limdat.LG.CC.logit)
-    design$Group<-as.numeric(factor(sampleInfo$Group[match(colnames(limdat.LG.CC.logit),sampleInfo$PlottingID)]))
+    if("Control" %in% sampleInfo$Group){
+        gp<-factor(sampleInfo$Group[match(colnames(limdat.LG.CC.logit),sampleInfo$PlottingID)])
+        gp<-relevel(gp,ref="Control")}
+    else if("WT" %in% sampleInfo$Group){
+        gp<-factor(sampleInfo$Group[match(colnames(limdat.LG.CC.logit),sampleInfo$PlottingID)])
+        gp<-relevel(gp,ref="WT")}
+    design$Group<-as.numeric(gp)
     design$Intercept<-1
     design<-as.matrix(design)
 
     fit<-lmFit(limdat.LG.CC.logit,design)
     fit.eB<-eBayes(fit)
-    #head(fit.eB$s2.prior)
-    #head(fit.eB$s2.post)
+    
 
     tT.FDR5<-topTable(fit.eB,2,p.value=0.05,number=Inf)
     if(nrow(tT.FDR5)==0){ message("No CpG sites were significantly differentially methylated.")}else{
@@ -112,7 +133,7 @@ if(nrow(limdat.LG.CC)==0){ message("None of the single CpG sites passed the filt
         nrow(tT.FDR5)/nrow(limdat.LG.CC.logit)
 
 ###
-        limdat.LG.CC.Diff<-summarize(group_by(limdat.LG.CC.Means,ms),Diff=(Beta.Mean[1]-Beta.Mean[2]))
+        limdat.LG.CC.Diff<-summarize(group_by(limdat.LG.CC.Means,ms),Diff=(Beta.Mean[1]-Beta.Mean[2]))#this is just used for filtering, direction not important
         tT.FDR5.Diff0.2<-tT.FDR5[rownames(tT.FDR5) %in% limdat.LG.CC.Diff$ms[abs(limdat.LG.CC.Diff$Diff)>=0.2],]
 
         nrow(tT.FDR5.Diff0.2)
@@ -127,7 +148,7 @@ if(nrow(limdat.LG.CC)==0){ message("None of the single CpG sites passed the filt
         limdat.LG.CC.tw$chr<-gsub("_.+","",limdat.LG.CC.tw$ms)
         limdat.LG.CC.tw$pos<-gsub(".+_","",limdat.LG.CC.tw$ms)
         limdat.LG.CC.tw2<-limdat.LG.CC.tw[,c("chr","pos",colnames(limdat.LG.CC)[2:ncol(limdat.LG.CC)]),with=FALSE]
-        gv<-sampleInfo$Group[match(colnames(limdat.LG.CC)[2:ncol(limdat.LG.CC)],sampleInfo$PlottingID)]
+        gv<-sampleInfo$Group[match(colnames(limdat.LG.CC)[2:ncol(limdat.LG.CC)],sampleInfo$PlottingID)]###check this and modify if necessary
         gtab<-table(sampleInfo$Group[match(colnames(limdat.LG.CC)[2:ncol(limdat.LG.CC)],sampleInfo$PlottingID)])
         cnn<-vector("numeric",length(gv))
         for(i in seq_along(gtab)){

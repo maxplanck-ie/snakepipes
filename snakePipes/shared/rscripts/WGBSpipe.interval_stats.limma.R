@@ -97,9 +97,10 @@ if(nrow(bedtab.CC)==0) {message("None of the genomic intervals passed the filter
     CGI.limdat.CC.logit<-logit(CGI.limdat.CC,percents=FALSE,adjust=0.025)
     x1<-PCA(CGI.limdat.CC,graph=FALSE)
 
+    if(nrow(x1$eig)>=2){
     pdf(paste0(bedshort,".CGI.limdat.CC.PCA.pdf"),paper="a4",bg="white") 
     plot.PCA(x1,choix="var")
-    dev.off()
+    dev.off()}else{message("There are not enough PC dimentions for a 2D plot.")}
 
 #calculate row means
     spath<-commandArgs(trailingOnly=TRUE)[5]
@@ -111,14 +112,22 @@ if(nrow(bedtab.CC)==0) {message("None of the genomic intervals passed the filter
     CGI.limdat.CC.Means<-data.table(summarize(group_by(CGI.limdat.CC.L,IntID,Group),Beta.Mean=mean(Beta)))
 
 
+   if ("Control" %in% CGI.limdat.CC.Means$Group){
+        CGI.limdat.CC.Means$Group<-factor(CGI.limdat.CC.Means$Group)
+        CGI.limdat.CC.Means$Group<-relevel(CGI.limdat.CC.Means$Group,ref="Control")}
+   if ("WT" %in% CGI.limdat.CC.Means$Group){
+        CGI.limdat.CC.Means$Group<-factor(CGI.limdat.CC.Means$Group)
+        CGI.limdat.CC.Means$Group<-relevel(CGI.limdat.CC.Means$Group,ref="WT")}
+
+
 ##density plots
     ggplot(data=CGI.limdat.CC.Means,aes(x=Beta.Mean))+geom_density(aes(group=Group,colour=Group,fill=Group),alpha=0.3)+ggtitle("Genomic intervals")+
-    theme(text = element_text(size=16),axis.text = element_text(size=12),axis.title = element_text(size=14))+xlab("Mean methylation ratio")
+    theme(text = element_text(size=16),axis.text = element_text(size=12),axis.title = element_text(size=14))+xlab("Mean methylation ratio")+scale_fill_manual(values=c("grey28","red"))+scale_colour_manual(values=c("grey28","red"))
     ggsave(paste0(bedshort,".Beta.MeanXgroup.int.dens.png"))
 
 ##violin plots
     ggplot(data=CGI.limdat.CC.Means)+geom_violin(aes(x=Group,y=Beta.Mean,fill=Group))+geom_boxplot(aes(x=Group,y=Beta.Mean),width=0.1)+ggtitle("Genomic intervals")+
-    theme(text = element_text(size=16),axis.text = element_text(size=12),axis.title = element_text(size=14))+xlab("Mean methylation ratio")
+    theme(text = element_text(size=16),axis.text = element_text(size=12),axis.title = element_text(size=14))+xlab("Mean methylation ratio")+scale_fill_manual(values=c("grey28","red"))
     ggsave(paste0(bedshort,".Beta.MeanXgroup.int.violin.png"))
 
 
@@ -126,7 +135,13 @@ if(nrow(bedtab.CC)==0) {message("None of the genomic intervals passed the filter
     design<-as.data.frame(matrix(ncol=2,nrow=(ncol(CGI.limdat.CC.logit))),stringsAsFactors=FALSE)
     colnames(design)<-c("Intercept","Group")
     rownames(design)<-colnames(CGI.limdat.CC.logit)
-    design$Group<-as.numeric(factor(sampleInfo$Group[match(colnames(CGI.limdat.CC.logit),sampleInfo$PlottingID)]))
+    if("Control" %in% sampleInfo$Group){
+        gp<-factor(sampleInfo$Group[match(colnames(CGI.limdat.CC.logit),sampleInfo$PlottingID)])
+        gp<-relevel(gp,ref="Control")}
+    if("WT" %in% sampleInfo$Group){
+        gp<-factor(sampleInfo$Group[match(colnames(CGI.limdat.CC.logit),sampleInfo$PlottingID)])
+        gp<-relevel(gp,ref="WT")}
+    design$Group<-as.numeric(gp)
     design$Intercept<-1
     design<-as.matrix(design)
 
