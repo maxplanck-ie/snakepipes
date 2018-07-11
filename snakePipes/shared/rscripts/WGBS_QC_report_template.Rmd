@@ -76,8 +76,8 @@ Observed PCR duplication rate on a PCR-free protocol should be low, not exceedin
 
 ```{r , echo=FALSE}
 QCdir<-params$QCdir
-Mapdir=dir(gsub("QC_metrics","bams",QCdir),pattern="*.sorted.rmDupes.err.log$",full.names=TRUE,recursive=TRUE)
-Mapdir.short<-gsub(".sorted.rmDupes.err.log","",basename(Mapdir))
+Mapdir=dir(gsub("QC_metrics","bams",QCdir),pattern="*.rm_dupes.err$",full.names=TRUE,recursive=TRUE)
+Mapdir.short<-gsub(".rm_dupes.err","",basename(Mapdir))
 
 bamRepL<-vector("list",length(Mapdir))
 names(bamRepL)<-Mapdir.short
