@@ -14,7 +14,7 @@ requirements:
     - python
   run:
     - python
-    - snakemake
+    - snakemake >= 5.2.0
     - pandas
     - graphviz
 
