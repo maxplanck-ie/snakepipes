@@ -197,6 +197,23 @@ rule calc_Mbias:
     conda: CondaEnvironment
     shell: "MethylDackel mbias {input.refG} {input.rmDupBam} {output.mbiasTXT} -@ {threads} 1>{log.out} 2>{output.mbiasTXT}"
 
+rule calc_GCbias:
+    input:
+        refG=refG,
+        rmDupBam="bams/{sample}.PCRrm.bam",
+        sbami="bams/{sample}.PCRrm.bam.bai"
+    output:
+        GCbiasTXT="QC_metrics/{sample}.freq.txt",
+        GCbiasPNG="QC_metrics/{sample}.GCbias.png"
+    params:
+        genomeSize=genome_size,
+        twobitpath=genome_2bit
+    log:
+        out="QC_metrics/logs/{sample}.calc_GCbias.out"
+    threads: nthreads
+    conda: CONDA_SHARED_ENV
+    shell: "computeGCBias -b {input.rmDupBam} --effectiveGenomeSize {params.genomeSize} -g {params.twobitpath} -l 300 --GCbiasFrequenciesFile {output.GCbiasTXT} -p {threads} --biasPlot {output.GCbiasPNG} --plotFileFormat png "
+
 
 if intList:
     rule depth_of_cov:
