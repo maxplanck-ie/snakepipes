@@ -158,6 +158,8 @@ rule all:
         os.path.join("aux_files",re.sub('.fa','.poz.ran1M.sorted.bed',os.path.basename(refG))),
         calc_doc(intList,False),
         'QC_metrics/QC_report.pdf',
+        expand("QC_metrics/{sample}.freq.txt",sample=samples),
+        expand("QC_metrics/{sample}.GCbias.png",sample=samples),
         expand("methXT/{sample}_CpG.bedGraph",sample=samples),
         expand("methXT/{sample}.CpG.filt2.bed",sample=samples),
         run_CpG_stats(sampleInfo),
