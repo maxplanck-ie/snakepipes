@@ -67,7 +67,6 @@ def run_build_matrices():
     file_list = []
     # SAMPLES TO MERGE??
     if merge_samples:
-        print(GROUPS)
         if nbins_toMerge > 0:
             suffix = "_Mbins" + str(nbins_toMerge) + "_" + matrixFile_suffix
         else:
