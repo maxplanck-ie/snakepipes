@@ -99,10 +99,10 @@ rule merge_matrices:
       input:
           lambda wildcards: expand("HiC_matrices/{sample}_"+matrixFile_suffix+matrix_format, sample = sample_dict[wildcards.group])
       output:
-          matrix = "HiC_matrices/{group}_"+matrixFile_suffix+matrix_format
+          matrix = "HiC_matrices/mergedSamples_{group}_"+matrixFile_suffix+matrix_format
       log:
-         out = "HiC_matrices/logs/{group}_"+matrixFile_suffix+".out",
-         err = "HiC_matrices/logs/{group}_"+matrixFile_suffix+".err"
+         out = "HiC_matrices/logs/hicSumMatrices_{group}_"+matrixFile_suffix+".out",
+         err = "HiC_matrices/logs/hicSumMatrices_{group}_"+matrixFile_suffix+".err"
       conda: CONDA_HIC_ENV
       shell:
           "hicSumMatrices -m {input} -o {output.matrix} > {log.out} &> {log.err}"
