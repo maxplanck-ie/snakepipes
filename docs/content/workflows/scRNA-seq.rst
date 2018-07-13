@@ -4,5 +4,6 @@ scRNA-seq
 ==========
 
 .. argparse::
-   :ref: snakePipes.scRNA-seq.parse_args
-   :prog: scRNAseq-mapcount
+   :func: parse_args
+   :filename: ../snakePipes/workflows/scRNAseq/scRNAseq
+   :prog: scRNAseq

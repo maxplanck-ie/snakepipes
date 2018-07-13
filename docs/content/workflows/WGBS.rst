@@ -102,7 +102,7 @@ The WGBS pipeline will generate output as follows:
 
     $ tree -d -L 2 output_dir/
 
-.. parsed-literal::
+::
 
     output_dir
     |-- FASTQ
@@ -147,5 +147,6 @@ Argparse
 --------------------------------
 
 .. argparse::
-   :ref: snakePipes.WGBS.parse_args
+   :func: parse_args
+   :filename: ../snakePipes/workflows/WGBS/WGBS
    :prog: WGBS

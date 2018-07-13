@@ -116,8 +116,7 @@ def parse_args(defaults={"verbose":None,"configfile":None,"cluster_configfile":N
                           metavar="STR",
                           help="A .tsv file containing sample names and associated groups. "
                           "If provided, the file would be used to identify groups to merge the samples "
-                          "(default: '%(default)s')",
-                          default=defaults["sample_info"])
+                          "(default: None)")
 
     return parser
 

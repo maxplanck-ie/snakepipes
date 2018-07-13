@@ -119,5 +119,6 @@ The ChIP-seq pipeline will generate additional output as follows:
 The tool `histoneHMM` will only be run if at least one sample is annotated as broad (IP enrichment).
 
 .. argparse::
-   :ref: snakePipes.ChIP-seq.parse_args
+   :func: parse_args
+   :filename: ../snakePipes/workflows/ChIP-seq/ChIP-seq
    :prog: ChIP-seq

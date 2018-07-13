@@ -1,1 +1,3 @@
 sphinx-argparse
+mock
+sphinx-rtd-theme
