@@ -21,8 +21,8 @@ If bed file(s) with genomic intervals of interest are provided, methylation rati
 
 .. image:: ../images/WGBS_pipeline.png
 
-Configuration file
----------------------
+Workflow configuration file
+----------------------------------
 
 .. code:: bash
 
