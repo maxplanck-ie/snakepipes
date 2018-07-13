@@ -10,12 +10,12 @@ Below is the list of pipelines available in snakePipes
 =============================== ===========================================================================================
 Pipeline                            Description
 =============================== ===========================================================================================
-:ref:`DNA-mapping`              Basic DNA mapping using bowtie2, filter mapped files, QC and create coverage plots
-:ref:`ChIP-Seq`                 Use the DNA mapping output and run ChIP/Input normalization and peak calling
 :ref:`ATAC-seq`                 Use the DNA mapping output and detect open chromatin regions from ATAC-seq
+:ref:`ChIP-Seq`                 Use the DNA mapping output and run ChIP/Input normalization and peak calling
+:ref:`DNA-mapping`              Basic DNA mapping using bowtie2, filter mapped files, QC and create coverage plots
+:ref:`HiC`                      Hi-C analysis workflow, from mapping to TAD calling
 :ref:`RNA-Seq`                  RNA-Seq workflow : From mapping to differential expression using DEseq2
 :ref:`scRNA-Seq`                Single-cell RNA-Seq workflow : From mapping to differential expression
-:ref:`HiC`                      Hi-C analysis workflow, from mapping to TAD calling
 :ref:`WGBS`                     WGBS analysis workflow, from mapping to DMR calling and differential methylation analysis
 =============================== ===========================================================================================
 
@@ -107,11 +107,12 @@ Contents:
    :maxdepth: 2
 
    content/setting_up.rst
-   content/workflows/DNA-mapping.rst
+   content/workflows/ATAC-seq.rst
    content/workflows/ChIP-seq.rst
+   content/workflows/DNA-mapping.rst
+   content/workflows/HiC.rst
    content/workflows/RNA-seq.rst
    content/workflows/scRNA-seq.rst
-   content/workflows/HiC.rst
    content/workflows/WGBS.rst
    ChangeLog.rst
 

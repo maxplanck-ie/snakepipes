@@ -52,6 +52,10 @@ def parse_arguments():
                                   action='store_true',
                                   help='Skip registering GATK')
 
+    createEnvsParser.add_argument('--develop',
+                                  action='store_true',
+                                  help='Developer mode, this prevents disabling site-packages in the root conda environment')
+
     return parser
 
 
@@ -207,7 +211,8 @@ def createCondaEnvs(args):
         registerGATK(gatkEnv)
 
     # Ignore site-packages in this env
-    fixSitePy(rootDir)
+    if not args.develop:
+        fixSitePy(rootDir)
 
 
 def main(args):
