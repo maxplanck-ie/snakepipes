@@ -3,14 +3,21 @@
 RNA-seq
 ================
 
+What it does
+----------------
+
 The snakePipes RNA-seq workflow allows users to process their single or paired-end
 RNA-Seq fastq files upto the point of gene/transcript-counts and differential expression.
 It also allows full allele-specific RNA-Seq analysis (up to allele-specific
 differential expression) using the *allelic-mapping* mode.
 
+.. image:: ../images/RNAseq_pipeline.png
+
 Input requirements and output
 -----------------------------
 
+The only requirement is a directory of gzipped fastq files. Additionally for
+differential expression analysis, a tab-separated sample information file could be provided.
 
 
 Analysis modes

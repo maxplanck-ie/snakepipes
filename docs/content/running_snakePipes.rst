@@ -51,3 +51,24 @@ Below is an explanation of each key mentioned in the organism yaml file.
           Files for either STAR or HISAT2 could be skipped for RNA-seq if the respective
           aligner is not used. We nevertheless recommended providing all the files, to allow
           more flexible analysis.
+
+The sample_info tsv file
+-------------------------
+
+Most of the workflows allow users to perform grouped operations as an option, for example
+differential expression analysis in RNA-seq workflow, differential binding analysis in
+ChIP-Seq workflow, differential open-chromatin analysis in ATAC-seq workflow or merging of
+groups in Hi-C workflow. For all this analysis, snakePipes needs a sample_info.tsv file that
+contains sample grouping information. In most cases users would want to groups samples by
+replicates. The format of the file is as follows:
+
+    name   condition
+    sample1    control
+    sample1    control
+    sample2    test
+    sample2    test
+
+An example of such tsv file is .. _link: sampleInfo.example.tsv\_
+
+The name section referes to sample names (without the read suffix), while the condition
+section refers to sample group (control/test, male/female, normal/diseased etc..)
