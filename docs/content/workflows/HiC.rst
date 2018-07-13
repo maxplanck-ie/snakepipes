@@ -3,24 +3,32 @@
 HiC
 ============
 
+The snakePipes HiC workflow allows users to process their HiC data from raw fastq files to
+corrected HiC matrices and TADs. The workflow utilized mapping by BWA, followed by analysis
+using [HiCExplorer](https://www.nature.com/articles/s41467-017-02525-w). The output matrices
+are currently in HiCExplorer .hdf5 format but would later be moved to the `.cool` format used
+by the 4D nucleome consortium.
+
+
 Input requirements and outputs:
 -------------------------------------------
 This pipeline requires paired-end reads fastq files as input in order to build a contact matrix and to call TADs.
-Prior to building a matrix, the pipeline maps reads against a user provided reference genome. The output of mapping step is then used for building the contact matrix.
+Prior to building the matrix, the pipeline maps reads against a user-specified reference genome.
+The output of mapping step is then used for building the contact matrix.
 
-Workflow config file
+Workflow configuration file
 ----------------------------------
-Default parameters from the provided config file can be altered by user. Note that proper reads name extension from the fastq files should be entered as values of the 'reads' key of the config file.
+Default parameters from the provided config file can be altered by user. Below is
+the config file description for the HiC workflow :
 
 .. parsed-literal::
 
  ################################################################################
  # This file is the default configuration of the HiC workflow!
  #
- # In order to adjust some parameters, please either use the wrapper script
- # (eg. /path/to/snakemake_workflows/workflows/HiC/HiC)
- # or save a copy of this file, modify necessary parameters and then provide
- # this file to the wrapper or snakmake via '--configfile' option
+ # In order to adjust some parameters,
+ # save a copy of this file, modify necessary parameters and then provide
+ # this file to the HiC wrapper or snakemake via '--configfile' option
  # (see below how to call the snakefile directly)
  #
  # Own parameters will be loaded during snakefile executiuon as well and hence

@@ -56,7 +56,8 @@ def multiqc_input_check(return_value):
             indir += " Salmon "
     elif pipeline == "hic":
         infiles.append(expand("HiC_matrices/QCplots/{sample}_QC/QC.log", sample = samples))
-        indir += "HiC_matrices/QCplots/"
+        indir += " BWA "
+        indir += " ".join(expand("HiC_matrices/QCplots/{sample}_QC ", sample = samples))
     elif pipeline == "scrna-seq":
         infiles.append( expand(mapping_prg+"/{sample}.bam", sample = samples) +
         expand("Sambamba/{sample}.markdup.txt", sample = samples) +
