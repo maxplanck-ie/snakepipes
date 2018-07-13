@@ -84,7 +84,7 @@ The only parameters that are useful to change are `bw_binsize`, `atac_fragment_c
 Output structure:
 -----------------
 
-Assuming a sample sheet is used, the following will be **added** to the working directory:
+Assuming a sample sheet is used, the following will be **added** to the working directory::
 
     .
     ├── CSAW
