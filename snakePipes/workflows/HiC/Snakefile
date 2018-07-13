@@ -68,26 +68,20 @@ def run_build_matrices():
         GROUPS = sample_dict.keys()
         if nbins_toMerge > 0:
             suffix = "_Mbins" + str(nbins_toMerge) + "_" + matrixFile_suffix
-            file_list.append([
-                expand("HiC_matrices/{group}"+suffix+matrix_format, group=GROUPS),
-                expand("HiC_matrices/QCplots/{group}"+suffix+"_diagnostic_plot.pdf", group=GROUPS),
-                expand("HiC_matrices/QCplots/{group}"+suffix+"_mad_threshold.out", group=GROUPS)
-                ])
-            if not noCorrect:
-                file_list.append(expand("HiC_matrices_corrected/{group}"+suffix+".corrected"+matrix_format, group=GROUPS))
-                if not noTAD:
-                    file_list.append(expand("TADs/{group}"+suffix+"_boundaries.bed", group=GROUPS))
         else:
             suffix = "_" + matrixFile_suffix
-            file_list.append([
-                expand("HiC_matrices/{group}"+suffix+matrix_format, group=GROUPS),
-                expand("HiC_matrices/QCplots/{group}"+suffix+"_diagnostic_plot.pdf", group=GROUPS),
-                expand("HiC_matrices/QCplots/{group}"+suffix+"_mad_threshold.out", group=GROUPS)
-                ])
-            if not noCorrect:
-                file_list.append(expand("HiC_matrices_corrected/{group}"+suffix+".corrected"+matrix_format, group=GROUPS))
-                if not noTAD:
-                    file_list.append(expand("TADs/{group}"+suffix+"_boundaries.bed", group=GROUPS))
+
+        file_list.append([
+            expand("HiC_matrices/{group}"+suffix+matrix_format, group=GROUPS),
+            expand("HiC_matrices/QCplots/{group}"+suffix+"_diagnostic_plot.pdf", group=GROUPS),
+            expand("HiC_matrices/QCplots/{group}"+suffix+"_mad_threshold.out", group=GROUPS)
+            ])
+        if not noCorrect:
+            file_list.append(expand("HiC_matrices_corrected/{group}"+suffix+".corrected"+matrix_format, group=GROUPS))
+            if not noTAD:
+                file_list.append(expand("TADs/{group}"+suffix+"_boundaries.bed", group=GROUPS))
+        pass
+
     # BINS TO MERGE??
     elif nbins_toMerge > 0:
         suffix = "_Mbins" + str(nbins_toMerge) + "_" + matrixFile_suffix
@@ -100,7 +94,6 @@ def run_build_matrices():
             file_list.append(expand("HiC_matrices_corrected/{sample}"+suffix+".corrected"+matrix_format, sample=samples))
             if not noTAD:
                 file_list.append(expand("TADs/{sample}"+suffix+"_boundaries.bed", sample=samples))
-
     # NOTHING TO MERGE??
     else:
         suffix = "_"+matrixFile_suffix
