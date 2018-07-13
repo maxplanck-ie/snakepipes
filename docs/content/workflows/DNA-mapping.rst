@@ -102,5 +102,6 @@ When enabling read trimming, additional directories will be generated containing
 
 
 .. argparse::
-   :ref: snakePipes.DNA-mapping.parse_args
+   :func: parse_args
+   :filename: ../snakePipes/workflows/DNA-mapping/DNA-mapping
    :prog: DNA-mapping
