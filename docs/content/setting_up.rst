@@ -14,7 +14,7 @@ miniconda or anaconda. A minimal version (miniconda) is enough for snakePipes. G
 
 After installation, check your python path and version :
 
-.. code:: bash
+.. code-block:: bash
 
     $ which python
     $ /your_path/miniconda3/bin/python
@@ -35,33 +35,38 @@ The easiest way to install snakePipes is via our conda channel. The following co
 conda virtual environment named `snakePipes`, which you can then activate via `source activate snakePipes`.
 
 .. code:: bash
+
     conda create -n snakePipes -c mpi-ie -c bioconda -c conda-forge snakePipes
 
 Another way is via pip, using our [GitHub repository](https://github.com/maxplanck-ie/snakepipes).
 
 .. code:: bash
+
     pip install --user --upgrade git+https://github.com/maxplanck-ie/snakepipes@develop
 
 Finally, for advanced users who want to modify the source code, you can install via pip,
 after cloning the source code from our [GitHub repository](https://github.com/maxplanck-ie/snakepipes).
 
-.. code:: bash
+.. code-block:: bash
+
     git clone https://github.com/maxplanck-ie/snakepipes.git && cd snakePipes
     # then configure as per your wish
     # now install
     pip install --user --upgrade /path/to/local/snakepipes/
 
 .. note:: There is a difference between installing via conda or installing via pip. The python installation from user's
-$PATH is ignored when installing via conda (first method) while is considered when installing via pip.
+          $PATH is ignored when installing via conda (first method) while is considered when installing via pip.
 
 .. note:: Using the --user argument would install the program into `~/.local/bin/`. So make sure to have it in your $PATH
 
 .. code:: bash
+
     export PATH=~/.local/bin:$PATH
 
 Snakemake and pandas are installed as requirements to snakePipes. Ensure you have everything working by testing these commands:
 
-.. code:: bash
+.. code-block:: bash
+
     snakemake --help
     snakePipes --help
 
@@ -73,6 +78,7 @@ All the tools required for running various pipelines are installed via various c
 (mainly bioconda). The following commands installs the tools and creates the respective conda environments.
 
 .. code:: bash
+
     snakePipes createEnvs
 
 .. note:: Creating the environments might take 1-2 hours. But it only has to be done once.
@@ -83,6 +89,7 @@ file on our GitHub repository. You can modify it to suite your needs.
 Here's the content of *defaults.yaml*:
 
 .. parsed-literal::
+
     snakemake_options: '--use-conda --conda-prefix /data/general/scratch/conda_envs'
     tempdir: /data/extended/
 
@@ -117,16 +124,17 @@ An example from drosophila genome dm3 is below.
 
 Not all files are required for all pipelines, but we recommend to keep all required files ready nevertheless.
 
+.. parsed-literal::
 
-################################################################################
-# Call snakemake directly, i.e. without using the wrapper script:
-#
-# Please save a copy of this config yaml file and provide an adjusted config
-# via '--configfile' parameter!
-# example call:
-#
-# snakemake --snakefile /path/to/snakemake_workflows/workflows/ATAC-seq/Snakefile
-#           --configfile /path/to/snakemake_workflows/workflows/ATAC-seq/defaults.yaml
-#           --directory /path/to/outputdir
-#           --cores 32
-################################################################################
+    ################################################################################
+    # Call snakemake directly, i.e. without using the wrapper script:
+    #
+    # Please save a copy of this config yaml file and provide an adjusted config
+    # via '--configfile' parameter!
+    # example call:
+    #
+    # snakemake --snakefile /path/to/snakemake_workflows/workflows/ATAC-seq/Snakefile
+    #           --configfile /path/to/snakemake_workflows/workflows/ATAC-seq/defaults.yaml
+    #           --directory /path/to/outputdir
+    #           --cores 32
+    ################################################################################
