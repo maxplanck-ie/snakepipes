@@ -71,6 +71,26 @@ Snakemake and pandas are installed as requirements to snakePipes. Ensure you hav
     snakePipes --help
 
 
+Inspect and modify the setup files
+------------------------------------
+
+After installation of snakePipes, all files required to configure it would be installed in a default path.
+The path to these files could be revealed by running the following command:
+
+.. code:: bash
+
+    snakePipes info
+
+This would reveal the location of :
+* **defaults.yaml** See :ref:`conda`
+* **cluster.yaml** See :ref:`cluster`
+* **organisms/<organism>.yaml** : See :ref:`organisms`
+
+You could modify these files to suite your needs before setting up the conda environments (see below).
+
+
+.. _conda:
+
 Install the conda environments
 --------------------------------
 
@@ -82,6 +102,11 @@ All the tools required for running various pipelines are installed via various c
     snakePipes createEnvs
 
 .. note:: Creating the environments might take 1-2 hours. But it only has to be done once.
+
+.. note::
+
+    `snakePipes createEnvs` will also set the `snakemake_options:` line in the global snakePipes
+    `defaults.yaml` files. If you have already modified this then use the `--keepCondaDir` option.
 
 The place where the conda envs are created (and therefore the tools are installed) is defined in `snakePipes/defaults.yaml`
 file on our GitHub repository. You can modify it to suite your needs.
@@ -95,6 +120,15 @@ Here's the content of *defaults.yaml*:
 
 The `tempdir` path could be changed to any suitable directory that can hold the temporary files during pipeline execution.
 
+.. note::
+
+    Whenever you change the `snakemake_options:` line in `defaults.yaml`, you should run
+    `snakePipes createEnvs` to ensure that the conda environments are then created.
+
+Running `snakePipes createEnvs` is not strictly required, but facilitates multiple users using the same snakePipes installation.
+
+
+.. _organism:
 
 Configure the organisms
 ----------------------------
@@ -123,18 +157,3 @@ An example from drosophila genome dm3 is below.
     ignore_forNorm: "U Uextra X XHet YHet dmel_mitochondrion_genome"
 
 Not all files are required for all pipelines, but we recommend to keep all required files ready nevertheless.
-
-.. parsed-literal::
-
-    ################################################################################
-    # Call snakemake directly, i.e. without using the wrapper script:
-    #
-    # Please save a copy of this config yaml file and provide an adjusted config
-    # via '--configfile' parameter!
-    # example call:
-    #
-    # snakemake --snakefile /path/to/snakemake_workflows/workflows/ATAC-seq/Snakefile
-    #           --configfile /path/to/snakemake_workflows/workflows/ATAC-seq/defaults.yaml
-    #           --directory /path/to/outputdir
-    #           --cores 32
-    ################################################################################
