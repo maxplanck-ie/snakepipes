@@ -6,7 +6,7 @@ import pandas
 
 ## function to get the name of the samplesheet and extend the name of the folder for all analyses relying on sample_info
 def get_outdir(folder_name):
-    sample_name = re.sub('_sampleSheet.tsv','',os.path.basename(sampleInfo))
+    sample_name = re.sub('_sampleSheet.csv','',os.path.basename(sampleInfo))
     return("{}_{}".format(folder_name, sample_name))
 
  
@@ -179,7 +179,7 @@ rule get_ran_CG:
     input:
         refG=refG
     output:
-        pozF=temp("aux_files/"+re.sub('.fa*','.poz.gz',os.path.basename(refG))),
+        pozF="aux_files/"+re.sub('.fa*','.poz.gz',os.path.basename(refG)),
         ranCG=os.path.join("aux_files",re.sub('.fa','.poz.ran1M.sorted.bed',os.path.basename(refG)))
     log:
         err="aux_files/logs/get_ran_CG.err"
@@ -430,6 +430,19 @@ else:
         shell: "Rscript --no-save --no-restore " + os.path.join(workflow_rscripts,'WGBSpipe.POM.filt.R ') + "{params.methDir} {input.methTab};bedtools intersect -v -a {params.OUTtemp} -b {input.blackListF} > {output.tabFilt} 1>{log.out} 2>{log.err}"
 
 
+if sampleInfo or intList:
+    rule make_CG_bed:
+        input:
+            pozF="aux_files/"+re.sub('.fa*','.poz.gz',os.path.basename(refG))
+        output:
+            imdF="aux_files/"+re.sub('.fa*','.CpG.bed',os.path.basename(refG))
+        log:
+            err="aux_files/logs/make_CG_bed.err"
+        threads: 1
+        conda: CondaEnvironment
+        shell: 'grep "+"' + " {input.pozF} "+ ' | awk \'{{print $1, $5, $5+1, $6, $8}}\' - | tr " " "\\t" | sort -k 1,1 -k2,2n - > ' + "{output.imdF}"
+
+
 if sampleInfo:
     rule CpG_stats:
         input: expand("methXT/{sample}.CpG.filt2.bed",sample=samples)
@@ -438,7 +451,7 @@ if sampleInfo:
             Limdat='{}/limdat.LG.RData'.format(get_outdir("singleCpG_stats_limma")),
             MetIN='{}/metilene.IN.txt'.format(get_outdir("singleCpG_stats_limma"))
         params:
-            statdir=os.path.join(outdir,'singleCpG_stats_limma'),
+            statdir=os.path.join(outdir,'{}'.format(get_outdir("singleCpG_stats_limma"))),
             sampleInfo=sampleInfo
         log:
             err='{}/logs/CpG_stats.err'.format(get_outdir("singleCpG_stats_limma")),
@@ -503,17 +516,16 @@ if intList:
         input:
             intList=intList,
             refG=refG,
-            pozF="aux_files/"+re.sub('.fa*','.poz.gz',os.path.basename(refG))
+            imdF="aux_files/"+re.sub('.fa*','.CpG.bed',os.path.basename(refG))
         output:
-            imdF=temp("aux_files/"+re.sub('.fa*','.CpG.bed',os.path.basename(refG))),
             outList=run_int_aggStats(intList,False) 
         log:
             err="aux_files/logs/get_CG_per_int.err"
         params:
-            auxshell=lambda wildcards,input,output: ';'.join(["bedtools intersect -wa -a "+ output.imdF + " -b " + bli + ' > ' + oli  for bli,oli in zip(input.intList,output.outList) ])+';sleep 300'
+            auxshell=lambda wildcards,input,output: ';'.join(["bedtools intersect -wa -a "+ input.imdF + " -b " + bli + ' > ' + oli  for bli,oli in zip(input.intList,output.outList) ])+';sleep 300'
         threads: 1
         conda: CondaEnvironment
-        shell:'grep "+"' + " {input.pozF} "+ ' | awk \'{{print $1, $5, $5+1, $6, $8}}\' - | tr " " "\\t" | sort -k 1,1 -k2,2n - > ' + "{output.imdF}; {params.auxshell} 2>{log.err}"
+        shell: "{params.auxshell} 2>{log.err}"
 
 
     if sampleInfo:

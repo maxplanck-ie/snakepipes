@@ -90,7 +90,7 @@ def calc_doc(intList,wcard):
             return ([os.path.join('QC_metrics',w) for w in expand('{sample}.{sfix}',sample=samples,sfix=int_dest)])
 
 def get_outdir(folder_name):
-    sample_name = re.sub('_sampleSheet.tsv','',os.path.basename(sampleInfo))
+    sample_name = re.sub('_sampleSheet.csv','',os.path.basename(sampleInfo))
     return("{}_{}".format(folder_name, sample_name))
 
 
@@ -150,12 +150,13 @@ onstart:
 
 ### main rule ##################################################################
 ################################################################################
-localrules: produce_report
+localrules: 
+    FASTQ,
+    produce_report
 
 rule all:
     input:
         expand("FASTQ/{sample}{read}.fastq.gz", sample = samples, read = reads),
-        run_cutadapt(trimReads),
         expand("FASTQ_downsampled/{sample}{read}.fastq.gz", sample = samples, read = reads),
         convert_refG(convRef),
         expand("bams/{sample}.PCRrm.bam", sample = samples),
