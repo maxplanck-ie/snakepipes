@@ -74,7 +74,7 @@ at the `Max Planck Institute for Immunobiology and Epigenetics <http://www.ie-fr
 Help and Support
 -----------------
 
-For query/questions regarding snakePipes, please write to the deepTools user group : `deeptools@googlegroups.com`
+For query/questions regarding snakePipes, please write on biostars with the tag **#snakePipes**
 
 For feature requests or bug reports, please open an issue on [our GitHub Repository](https://github.com/maxplanck-ie/snakepipes)
 
