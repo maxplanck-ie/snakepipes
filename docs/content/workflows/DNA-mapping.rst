@@ -3,104 +3,106 @@
 DNA-mapping
 ============
 
-Configuration file
-------------------------
+What it does:
+-------------
 
-.. code:: bash
+This is the primary DNA-mapping pipeline. It can be used both alone or upstream of the ATAC-seq and ChIP-seq pipelines. This has a wide array of options, including trimming and various QC steps (e.g., marking duplicates and plotting coverage and PCAs). In addition, basic coverage tracks are created to facilitate viewing the data in IGV.
 
-    $ cat snakemake_workflows/workflows/DNA-mapping/defaults.yaml
+.. image:: ../images/DNAmapping_pipeline.png
 
-.. parsed-literal::
+Input requirements:
+-------------------
 
-	################################################################################
-	# This file is the default configuration of the DNA-mapping workflow!
-	#
-	# In order to adjust some parameters, please either use the wrapper script
-	# (eg. /path/to/snakemake_workflows/workflows/DNA-mapping/DNA-mapping)
-	# or save a copy of this file, modify necessary parameters and then provide
-	# this file to the wrapper or snakmake via '--configfile' option
-	# (see below how to call the snakefile directly)
-	#
-	# Own parameters will be loaded during snakefile executiuon as well and hence
-	# can be used in new/extended snakemake rules!
-	################################################################################
-	## General/Snakemake parameters, only used/set by wrapper or in Snakemake cmdl, but not in Snakefile
-	outdir:
-	configfile:
-	local: False
-	max_jobs: 5
-	snakemake_options:
-	tempdir: /data/extended/
-	## directory with fastq files
-	indir:
-	## preconfigured target genomes (mm9,mm10,dm3,...) , see /path/to/snakemake_workflows/shared/organisms/
-	## Value can be also path to your own genome config file!
-	genome:
-	## FASTQ file extension (default: ".fastq.gz")
-	ext: .fastq.gz
-	## paired-end read name extension (default: ['_R1', "_R2"])
-	reads: [_R1, _R2]
-	## Number of reads to downsample from each FASTQ file
-	downsample:
-	## Options for trimming
-	trim: False
-	trim_prg: cutadapt
-	trim_options:
-	## Bin size of output files in bigWig format
-	bw_binsize: 25
-	## Run FASTQC read quality control
-	fastqc: false
-	## Run computeGCBias quality control
-	gcbias: false
-	## Retain only de-duplicated reads/read pairs
-	dedup: false
-	## Retain only reads with at least the given mapping quality
-	mapq: 0
-	## Retain only reads mapping in proper pairs
-	properpairs: false
-	## Mate orientation in paired-end experiments for Bowtie2 mapping
-	## (default "--fr" is appropriate for Illumina sequencing)
-	mate_orientation: --fr
-	## Median/mean fragment length, only relevant for single-end data (default: 200)
-	fragment_length: 200
-	bowtie_opts:
-	qualimap: false
-	verbose: False
+The only requirements are a directory of gzipped fastq files.
 
+Configuration file:
+~~~~~~~~~~~~~~~~~~~
 
-Structure of output directory
--------------------------------
+There is a configuration file in `snakePipes/workflows/DNA-mapping/defaults.yaml`::
 
-The DNA mapping pipeline will generate output of the following structure:
+    ## General/Snakemake parameters, only used/set by wrapper or in Snakemake cmdl, but not in Snakefile
+    pipeline: dna-mapping
+    outdir:
+    configfile:
+    cluster_configfile:
+    local: False
+    max_jobs: 5
+    ## directory with fastq files
+    indir:
+    ## preconfigured target genomes (mm9,mm10,dm3,...) , see /path/to/snakemake_workflows/shared/organisms/
+    ## Value can be also path to your own genome config file!
+    genome:
+    ## FASTQ file extension (default: ".fastq.gz")
+    ext: '.fastq.gz'
+    ## paired-end read name extension (default: ['_R1', "_R2"])
+    reads: [_R1, _R2]
+    ## mapping mode
+    mode: mapping
+    mapping_prg: Bowtie2
+    ## Number of reads to downsample from each FASTQ file
+    downsample:
+    ## Options for trimming
+    trim: False
+    trim_prg: cutadapt
+    trim_options:
+    ## Bin size of output files in bigWig format
+    bw_binsize: 25
+    ## Run FASTQC read quality control
+    fastqc: false
+    ## Run computeGCBias quality control
+    gcbias: false
+    ## Retain only de-duplicated reads/read pairs
+    dedup: false
+    ## Retain only reads with at least the given mapping quality
+    mapq: 0
+    ## Retain only reads mapping in proper pairs
+    properpairs: false
+    ## Mate orientation in paired-end experiments for Bowtie2 mapping
+    ## (default "--fr" is appropriate for Illumina sequencing)
+    mate_orientation: --fr
+    ## other Bowtie2 stuff
+    insert_size_max: 1000
+    bowtie_opts:
+    plot_format: png
+    ## Median/mean fragment length, only relevant for single-end data (default: 200)
+    fragment_length: 200
+    qualimap: false
+    verbose: false
 
-.. code:: bash
+Many of these options can be more conveniently set on the command-line (e.g., `--qualimap` sets `qualimap: true`). However, you may need to change the `reads:` setting if your paired-end files are not denoted by `sample_R1.fastq.gz` and `sample_R2.fastq.gz`, but rather `sample_1.fastq.gz` and `sample_2.fastq.gz`.
 
-    $ tree -d -L 2 output-dir/
+Structure of output directory:
+------------------------------
 
-..parsed-literal::
+The DNA mapping pipeline will generate output of the following structure::
 
-    output-dir/
-    |-- Bowtie2
-    |-- FASTQ
-    |-- FastQC
-    |-- Picard_qc
-    |   |-- AlignmentSummaryMetrics
-    |   |-- InsertSizeMetrics
-    |   |-- MarkDuplicates
-    |-- Qualimap_qc
-    |-- bamCoverage
-    |-- cluster_logs
-    |-- deepTools_qc
-    |   |-- multiBamSummary
-    |   |-- plotCorrelation
-    |   |-- plotCoverage
-    |   `-- plotPCA
-    `-- filtered_bam
+    .
+    ├── bamCoverage
+    ├── Bowtie2
+    ├── deepTools_qc
+    │   ├── bamPEFragmentSize
+    │   ├── estimateReadFiltering
+    │   ├── multiBamSummary
+    │   ├── plotCorrelation
+    │   ├── plotCoverage
+    │   └── plotPCA
+    ├── FASTQ
+    ├── FastQC
+    ├── filtered_bam
+    ├── multiQC
+    │   └── multiqc_data
+    ├── Picard_qc
+    │   └── AlignmentSummaryMetrics
+    └── Sambamba
 
+A number of other directories may optionally be present if you specified read trimming, using Qualimap, or a variety of other options. These are typically self-explanatory.
 
-When enabling read trimming, additional directories will be generated containing the trimmed FASTQ files and, optionally, the FASTQC output on the trimmed FASTQ files.
+A fair number of useful QC plots are or can be generated by the pipeline. These include correlation and PCA plots as well as the output from MultiQC.
 
+.. image:: ../images/DNAmapping_correlation.png
 
 .. argparse::
-   :ref: snakePipes.DNA-mapping.parse_args
+   :func: parse_args
+   :filename: ../snakePipes/workflows/DNA-mapping/DNA-mapping
    :prog: DNA-mapping
+   :nodefault:

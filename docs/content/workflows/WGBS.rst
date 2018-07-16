@@ -21,8 +21,8 @@ If bed file(s) with genomic intervals of interest are provided, methylation rati
 
 .. image:: ../images/WGBS_pipeline.png
 
-Configuration file
----------------------
+Workflow configuration file
+----------------------------------
 
 .. code:: bash
 
@@ -102,7 +102,7 @@ The WGBS pipeline will generate output as follows:
 
     $ tree -d -L 2 output_dir/
 
-.. parsed-literal::
+::
 
     output_dir
     |-- FASTQ
@@ -147,5 +147,7 @@ Argparse
 --------------------------------
 
 .. argparse::
-   :ref: snakePipes.WGBS.parse_args
-   :prog: WGBS
+    :func: parse_args
+    :filename: ../snakePipes/workflows/WGBS/WGBS
+    :prog: WGBS
+    :nodefault:

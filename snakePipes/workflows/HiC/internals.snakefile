@@ -16,6 +16,8 @@ MAX_RS_DISTANCE = 1000
 #samples = ['SRR2240738', 'SRR2240739', 'SRR2240740']
 
 ### Functions ##################################################################
+# define matrix format (filename suffix)
+matrix_format = ".h5"
 
 ## find out which resolution is it (RF or binsize)
 def get_matrixFile_suffix():
@@ -43,7 +45,7 @@ def get_dangling_seq(name):
 ## merge all the HiC matrices and create new file if asked
 def merge_inputs():
     if(merge_samples is True):
-        return(["HiC_matrices/all_matrices_merged.h5"#,"HiC_matrices/QCplots/all_matrices_merged_diagnostic_plot.pdf"
+        return(["HiC_matrices/all_matrices_merged"+matrix_format #,"HiC_matrices/QCplots/all_matrices_merged_diagnostic_plot.pdf"
                ])
     else:
         return([])
@@ -51,7 +53,7 @@ def merge_inputs():
 ## merge hic Bins if asked and create new files
 def get_merged_bins():
     if(nbins_toMerge != 0):
-        return(expand("HiC_matrices/{sample}_"+matrixFile_suffix+"_m"+str(nbins_toMerge)+".h5", sample=samples))
+        return(expand("HiC_matrices/{sample}_"+matrixFile_suffix+"_m"+str(nbins_toMerge)+matrix_format, sample=samples))
     else:
         return([])
 
@@ -78,7 +80,7 @@ def get_sampleInfo(sample_info):
                 sample_dict[k]=v
     else:
         for sample in samples:
-            sample_dict['cond1'] = sample
+            sample_dict['merged'] = sample
 
     return sample_dict
 

@@ -59,58 +59,51 @@ def run_CollectInsertSizeMetrics(paired):
     else:
         return([])
 
+# get samples to merge
+sample_dict = get_sampleInfo(sample_info)
+GROUPS = sample_dict.keys()
+
 def run_build_matrices():
     file_list = []
     # SAMPLES TO MERGE??
     if merge_samples:
-        # get samples to merge
-        sample_dict = get_sampleInfo(sample_info)
-        GROUPS = sample_dict.keys()
         if nbins_toMerge > 0:
             suffix = "_Mbins" + str(nbins_toMerge) + "_" + matrixFile_suffix
-            file_list.append([
-                expand("HiC_matrices/{group}"+suffix+".h5", group=GROUPS),
-                expand("HiC_matrices/QCplots/{group}"+suffix+"_diagnostic_plot.pdf", group=GROUPS),
-                expand("HiC_matrices/QCplots/{group}"+suffix+"_mad_threshold.out", group=GROUPS)
-                ])
-            if not noCorrect:
-                file_list.append(expand("HiC_matrices_corrected/{group}"+suffix+".corrected.h5", group=GROUPS))
-                if not noTAD:
-                    file_list.append(expand("TADs/{group}"+suffix+"_boundaries.bed", group=GROUPS))
         else:
             suffix = "_" + matrixFile_suffix
-            file_list.append([
-                expand("HiC_matrices/{group}"+suffix+".h5", group=GROUPS),
-                expand("HiC_matrices/QCplots/{group}"+suffix+"_diagnostic_plot.pdf", group=GROUPS),
-                expand("HiC_matrices/QCplots/{group}"+suffix+"_mad_threshold.out", group=GROUPS)
-                ])
-            if not noCorrect:
-                file_list.append(expand("HiC_matrices_corrected/{group}"+suffix+".corrected.h5", group=GROUPS))
-                if not noTAD:
-                    file_list.append(expand("TADs/{group}"+suffix+"_boundaries.bed", group=GROUPS))
+
+        file_list.append([
+            expand("HiC_matrices/mergedSamples_{group}"+suffix+matrix_format, group=GROUPS),
+            expand("HiC_matrices/QCplots/mergedSamples_{group}"+suffix+"_diagnostic_plot.pdf", group=GROUPS),
+            expand("HiC_matrices/QCplots/mergedSamples_{group}"+suffix+"_mad_threshold.out", group=GROUPS)
+            ])
+        if not noCorrect:
+            file_list.append(expand("HiC_matrices_corrected/mergedSamples_{group}"+suffix+".corrected"+matrix_format, group=GROUPS))
+            if not noTAD:
+                file_list.append(expand("TADs/mergedSamples_{group}"+suffix+"_boundaries.bed", group=GROUPS))
+
     # BINS TO MERGE??
     elif nbins_toMerge > 0:
         suffix = "_Mbins" + str(nbins_toMerge) + "_" + matrixFile_suffix
         file_list.append([
-            expand("HiC_matrices/{sample}"+suffix+".h5", sample=samples),
+            expand("HiC_matrices/{sample}"+suffix+matrix_format, sample=samples),
             expand("HiC_matrices/QCplots/{sample}"+suffix+"_diagnostic_plot.pdf", sample=samples),
             expand("HiC_matrices/QCplots/{sample}"+suffix+"_mad_threshold.out", sample=samples)
             ])
         if not noCorrect:
-            file_list.append(expand("HiC_matrices_corrected/{sample}"+suffix+".corrected.h5", sample=samples))
+            file_list.append(expand("HiC_matrices_corrected/{sample}"+suffix+".corrected"+matrix_format, sample=samples))
             if not noTAD:
                 file_list.append(expand("TADs/{sample}"+suffix+"_boundaries.bed", sample=samples))
-
     # NOTHING TO MERGE??
     else:
         suffix = "_"+matrixFile_suffix
         file_list.append([
-            expand("HiC_matrices/{sample}"+suffix+".h5", sample=samples),
+            expand("HiC_matrices/{sample}"+suffix+matrix_format, sample=samples),
             expand("HiC_matrices/QCplots/{sample}"+suffix+"_diagnostic_plot.pdf", sample=samples),
             expand("HiC_matrices/QCplots/{sample}"+suffix+"_mad_threshold.out", sample=samples)
             ])
         if not noCorrect:
-            file_list.append(expand("HiC_matrices_corrected/{sample}"+suffix+".corrected.h5", sample=samples))
+            file_list.append(expand("HiC_matrices_corrected/{sample}"+suffix+".corrected"+matrix_format, sample=samples))
             if not noTAD:
                 file_list.append(expand("TADs/{sample}"+suffix+"_boundaries.bed", sample=samples))
 

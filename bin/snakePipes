@@ -26,6 +26,9 @@ def parse_arguments():
                                                   'workflow-specific yaml files. Note that changing the snakemake_options: '
                                                   'option will result in ALL conda environments being recreated.')
 
+    envInfoParser = subparsers.add_parser('envInfo',
+                                          help='Prints the location in which each conda environment is actually stored.')
+
     mex = createEnvsParser.add_mutually_exclusive_group()
     mex.add_argument('--keepCondaDir',
                      action='store_true',
@@ -48,6 +51,10 @@ def parse_arguments():
     createEnvsParser.add_argument('--skipGATK',
                                   action='store_true',
                                   help='Skip registering GATK')
+
+    createEnvsParser.add_argument('--develop',
+                                  action='store_true',
+                                  help='Developer mode, this prevents disabling site-packages in the root conda environment')
 
     return parser
 
@@ -73,15 +80,63 @@ def info():
         print("    {}".format(os.path.dirname(f)))
 
 
+def envInfo():
+    """
+    For each environment yaml file print where its conda env is actually located
+    """
+    baseDir = os.path.dirname(snakePipes.__file__)
+    condaDir = subprocess.check_output("which conda", shell=True).decode('utf-8').strip()
+    condaDir = os.path.dirname(os.path.dirname(condaDir))
+    if "envs" in condaDir:
+        condaDir = os.path.dirname(condaDir)
+    else:
+        condaDir = os.path.join(condaDir, "envs")
+
+    f = open(os.path.join(baseDir, "shared/defaults.yaml"))
+    cf = yaml.load(f)
+    f.close()
+
+    _ = cf['snakemake_options'].split(" ")
+    idx = _.index('--conda-prefix')
+    condaEnvDir = _[idx + 1]
+
+    for env in cof.set_env_yamls().values():
+        # Hash the file ala snakemake
+        md5hash = hashlib.md5()
+        md5hash.update(condaEnvDir.encode())
+        f = open(os.path.join(baseDir, "shared/rules", env), 'rb')
+        md5hash.update(f.read())
+        f.close()
+        h = md5hash.hexdigest()
+
+        print("{} is in:\n    {}\n".format(env, os.path.join(condaEnvDir, h)))
+
+
 def registerGATK(gatkEnv):
     URL="https://software.broadinstitute.org/gatk/download/auth?package=GATK-archive&version=3.5-0-g36282e4"
-    cmd = "wget -O GATK-archive-3.5.tar.bz2 '{}'".format(URL)
-    subprocess.check_call(cmd, shell=True)
+    cmd = ["wget", "-O", "GATK-archive-3.5.tar.bz2", "{}".format(URL)]
+    subprocess.check_call(cmd)
 
-    cmd = "{}/bin/gatk-register GATK-archive-3.5.tar.bz2".format(gatkEnv)
-    subprocess.check_call(cmd, shell=True)
+    cmd = ["{}/bin/gatk-register".format(gatkEnv), "GATK-archive-3.5.tar.bz2"]
+    subprocess.check_call(cmd)
     os.remove("GATK-archive-3.5.tar.bz2")
     shutil.rmtree("/tmp/gatk")
+
+
+def fixSitePy(envPath):
+    """
+    We would really like to prevent any snakePipes environment from using the user site packages.
+    """
+    for fname in glob.glob('{}/lib/python*/site.py'.format(envPath)):
+        f = open(fname).read()
+        lines = f.split('\n')
+        lines = [line if not line.startswith('ENABLE_USER_SITE') else 'ENABLE_USER_SITE = False' for line in lines]
+        f = open(fname, "w")
+        f.write("\n".join(lines))
+        f.close()
+
+        cmd = [os.path.join(envPath, "bin", "python"), '-m', 'compileall', fname]
+        subprocess.check_call(cmd)
 
 
 def createCondaEnvs(args):
@@ -89,10 +144,14 @@ def createCondaEnvs(args):
     Create all of the conda environments
     """
     baseDir = os.path.dirname(snakePipes.__file__)
-    created = set()
 
     condaDir = subprocess.check_output("which conda", shell=True).decode('utf-8').strip()
-    condaDir = os.path.join(os.path.dirname(os.path.dirname(condaDir)), "envs")
+    condaDir = os.path.dirname(os.path.dirname(condaDir))
+    rootDir = condaDir
+    if "envs" in condaDir:
+        condaDir = os.path.dirname(condaDir)
+    else:
+        condaDir = os.path.join(condaDir, "envs")
     gatkEnv = None
 
     f = open(os.path.join(baseDir, "shared/defaults.yaml"))
@@ -131,27 +190,37 @@ def createCondaEnvs(args):
         if 'wgbs' in env:
             gatkEnv = os.path.join(condaDirUse, h)
 
-        if h not in created or args.force:
-            created.add(h)
-            sys.stderr.write("Creating environment from {} in {}\n".format(os.path.join(baseDir, "shared/rules", env), condaDirUse))
-            if '--conda-prefix' in cf['snakemake_options']:
-                cmd = "conda env create --force --file {} --prefix {}".format(os.path.join(baseDir, "shared/rules", env), os.path.join(condaDirUse, h))
-            else:
-                cmd = "conda env create --force --file {} --name {}".format(os.path.join(baseDir, "shared/rules", env), h)
-            if os.path.exists(os.path.join(condaDirUse, h)) and not args.force:
-                continue
-            if not args.info:
+        sys.stderr.write("Creating environment from {} in {}\n".format(os.path.join(baseDir, "shared/rules", env), condaDirUse))
+        cmd = ["conda", "env", "create", "--force", "--file", os.path.join(baseDir, "shared/rules", env)]
+        if '--conda-prefix' in cf['snakemake_options'] and (args.condaDir or args.keepCondaDir):
+            cmd += ["--prefix", os.path.join(condaDirUse, h)]
+        else:
+            cmd += ["--name", h]
+
+        # Don't actually create the env if either --info is set or it already exists and --force is NOT set
+        if not args.info:
+            if not os.path.exists(os.path.join(condaDirUse, h)) or args.force:
                 os.makedirs(os.path.join(condaDirUse, h), exist_ok=True)
-                subprocess.check_call(cmd, shell=True)
+                subprocess.check_call(cmd)
+
+        # Ignore site-packages
+        fixSitePy(os.path.join(condaDirUse, h))
+
     # We can't actually install GATK with conda, which is annoying
     if gatkEnv and not args.skipGATK:
         registerGATK(gatkEnv)
+
+    # Ignore site-packages in this env
+    if not args.develop:
+        fixSitePy(rootDir)
 
 
 def main(args):
     args = parse_arguments().parse_args(args)
     if args.command == 'info':
         info()
+    elif args.command == 'envInfo':
+        envInfo()
     else:
         createCondaEnvs(args)
 

@@ -38,7 +38,7 @@ if(RF_resolution is True):
             R2 = "BWA/{sample}"+reads[1]+".bam",
             bed = enzyme + ".bed"
         output:
-             matrix ="HiC_matrices/{sample}_"+matrixFile_suffix+".h5",
+             matrix ="HiC_matrices/{sample}_"+matrixFile_suffix+matrix_format
         params:
              QCfolder="HiC_matrices/QCplots/{sample}_QC/",
              res_seq = get_restriction_seq(enzyme),
@@ -47,8 +47,8 @@ if(RF_resolution is True):
              min_dist = MIN_RS_DISTANCE,
              max_dist = MAX_RS_DISTANCE
         log:
-            out = "HiC_matrices/logs/{sample}"+matrixFile_suffix+".out",
-            err = "HiC_matrices/logs/{sample}"+matrixFile_suffix+".err"
+            out = "HiC_matrices/logs/{sample}_"+matrixFile_suffix+".out",
+            err = "HiC_matrices/logs/{sample}_"+matrixFile_suffix+".err"
         threads: 15
         conda: CONDA_HIC_ENV
         shell:
@@ -61,14 +61,15 @@ if(RF_resolution is True):
             "--QCfolder {params.QCfolder} "
             "--threads {threads} "
             "{params.region} "
-            "-o {output.matrix} > {log.out} 2> {log.err}"
+            "-o {output.matrix} > {log.out} 2> {log.err} &&"
+            " rm {params.QCfolder}"+"QC_table.txt"
 else:
     rule build_matrix:
         input:
             R1 = "BWA/{sample}"+reads[0]+".bam",
             R2 = "BWA/{sample}"+reads[1]+".bam"
         output:
-            matrix = "HiC_matrices/{sample}_"+matrixFile_suffix+".h5",
+            matrix = "HiC_matrices/{sample}_"+matrixFile_suffix+matrix_format,
             qc = "HiC_matrices/QCplots/{sample}_QC/QC.log"
 
         params:
@@ -78,8 +79,8 @@ else:
             min_dist = MIN_RS_DISTANCE,
             max_dist = MAX_RS_DISTANCE
         log:
-            out = "HiC_matrices/logs/{sample}"+matrixFile_suffix+".out",
-            err = "HiC_matrices/logs/{sample}"+matrixFile_suffix+".err"
+            out = "HiC_matrices/logs/{sample}_"+matrixFile_suffix+".out",
+            err = "HiC_matrices/logs/{sample}_"+matrixFile_suffix+".err"
         threads: 15
         conda: CONDA_HIC_ENV
         shell:
@@ -96,12 +97,12 @@ else:
 ## Merge the samples if asked
 rule merge_matrices:
       input:
-          lambda wildcards: expand("HiC_matrices/{sample}_"+matrixFile_suffix+".h5", sample = sample_dict[wildcards.group])
+          lambda wildcards: expand("HiC_matrices/{sample}_"+matrixFile_suffix+matrix_format, sample = sample_dict[wildcards.group])
       output:
-          matrix = "HiC_matrices/mergedSamples_{group}_"+matrixFile_suffix+".h5"
+          matrix = "HiC_matrices/mergedSamples_{group}_"+matrixFile_suffix+matrix_format
       log:
-         out = "HiC_matrices/logs/mergedSamples_{group}_"+matrixFile_suffix+".out",
-         err = "HiC_matrices/logs/mergedSamples_{group}_"+matrixFile_suffix+".err"
+         out = "HiC_matrices/logs/hicSumMatrices_{group}_"+matrixFile_suffix+".out",
+         err = "HiC_matrices/logs/hicSumMatrices_{group}_"+matrixFile_suffix+".err"
       conda: CONDA_HIC_ENV
       shell:
           "hicSumMatrices -m {input} -o {output.matrix} > {log.out} &> {log.err}"
@@ -109,9 +110,9 @@ rule merge_matrices:
 ## Merge the bins if asked
 rule merge_bins:
      input:
-         "HiC_matrices/{sample}_"+matrixFile_suffix+".h5"
+         "HiC_matrices/{sample}_"+matrixFile_suffix+matrix_format
      output:
-         matrix = "HiC_matrices/{sample}_Mbins"+str(nbins_toMerge)+"_"+matrixFile_suffix+".h5"
+         matrix = "HiC_matrices/{sample}_Mbins"+str(nbins_toMerge)+"_"+matrixFile_suffix+matrix_format
      params:
          num_bins=nbins_toMerge
      log:
@@ -124,7 +125,7 @@ rule merge_bins:
 ## diagnostic plots
 rule diagnostic_plot:
     input:
-        "HiC_matrices/{sample}_"+matrixFile_suffix+".h5"
+        "HiC_matrices/{sample}_"+matrixFile_suffix+matrix_format
     output:
         plot = "HiC_matrices/QCplots/{sample}_"+matrixFile_suffix+"_diagnostic_plot.pdf",
         mad = "HiC_matrices/QCplots/{sample}_"+matrixFile_suffix+"_mad_threshold.out"
@@ -150,10 +151,10 @@ rule compute_thresholds:
 ## Correct matrices
 rule correct_matrix:
     input:
-        matrix= "HiC_matrices/{sample}_"+matrixFile_suffix+".h5",
+        matrix= "HiC_matrices/{sample}_"+matrixFile_suffix+matrix_format,
         correct = "HiC_matrices_corrected/logs/thresholds_{sample}_"+matrixFile_suffix+".out"
     output:
-        "HiC_matrices_corrected/{sample}_"+matrixFile_suffix+".corrected.h5"
+        "HiC_matrices_corrected/{sample}_"+matrixFile_suffix+".corrected"+matrix_format
     params:
         chr = lambda wildcards: " --chromosomes " + chromosomes if chromosomes else ""
     conda: CONDA_HIC_ENV
@@ -166,7 +167,7 @@ rule correct_matrix:
 ## Call TADs
 rule call_tads:
     input:
-        "HiC_matrices_corrected/{sample}_"+matrixFile_suffix+".corrected.h5"
+        "HiC_matrices_corrected/{sample}_"+matrixFile_suffix+".corrected"+matrix_format
     output:
         "TADs/{sample}_"+matrixFile_suffix+"_boundaries.bed"
     params:
@@ -188,7 +189,7 @@ rule call_tads:
 ##compare matrices using hicPlotDistVsCounts
 rule distvscounts:
    input:
-        matrices = expand("HiC_matrices_corrected/{sample}_"+matrixFile_suffix+".corrected.h5", sample = samples)
+        matrices = expand("HiC_matrices_corrected/{sample}_"+matrixFile_suffix+".corrected"+matrix_format, sample = samples)
    output:
         "dist_vs_counts.png"
    params:
