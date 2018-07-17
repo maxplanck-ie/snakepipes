@@ -1,103 +1,82 @@
 snakePipes
 =============
 
-snakePipes are pipelines built using snakemake for the analysis of various sequencing datasets.
+snakePipes are pipelines built using [snakemake](snakemake.readthedocs.io) and *python* for the analysis of epigenomic datasets.
 
 Below is the list of pipelines available in snakePipes
 -------------------------------------------------------
 
-
-=============================== ===========================================================================================
+=============================== ========================================================================================================
 Pipeline                            Description
-=============================== ===========================================================================================
-:ref:`ATAC-seq`                 Use the DNA mapping output and detect open chromatin regions from ATAC-seq
-:ref:`ChIP-Seq`                 Use the DNA mapping output and run ChIP/Input normalization and peak calling
+=============================== ========================================================================================================
 :ref:`DNA-mapping`              Basic DNA mapping using bowtie2, filter mapped files, QC and create coverage plots
+:ref:`ChIP-Seq`                 Use the DNA mapping output and run ChIP/Input normalization and peak calling
+:ref:`ATAC-seq`                 Use the DNA mapping output and detect open chromatin regions for ATAC-seq data
 :ref:`HiC`                      Hi-C analysis workflow, from mapping to TAD calling
 :ref:`RNA-Seq`                  RNA-Seq workflow : From mapping to differential expression using DEseq2
-:ref:`scRNA-Seq`                Single-cell RNA-Seq workflow : From mapping to differential expression
-:ref:`WGBS`                     WGBS analysis workflow, from mapping to DMR calling and differential methylation analysis
-=============================== ===========================================================================================
+:ref:`scRNA-Seq`                Single-cell RNA-Seq (CEL-Seq2) workflow : From mapping to differential expression
+:ref:`WGBS`                     Whole-genome Bisulfite-Seq analysis workflow, from mapping to DMR calling and differential methylation analysis
+=============================== ========================================================================================================
 
 Quick start
 ----------------
 
-The desing of all workflows, as well as configuration is the same. Here's an example with ChIP-seq data.
-
-A **typical ChIP-seq analysis of human samples** starting from paired-end FASTQ files in the directory `input-dir`:
+Assuming you have *python3* with *conda*, install snakePipes with:
 
 .. code:: bash
 
-    $ ls /path/to/input-dir/
-    my_H3K27ac_sample_R1.fastq.gz  my_H3K27me3_sample_R1.fastq.gz  my_Input_sample_R1.fastq.gz
-    my_H3K27ac_sample_R2.fastq.gz  my_H3K27me3_sample_R2.fastq.gz  my_Input_sample_R2.fastq.gz
-    $
-    $ snakemake_workflows/DNA-mapping \
-          -i /path/to/input-dir -o /path/to/output-dir --dedup hs37d5 && \
-      snakemake_workflows/ChIP-seq chip-seq.config.yaml \
-          -d /path/to/outputdir hs37d5
+    conda create -n snakePipes -c mpi-ie -c bioconda -c conda-forge snakePipes
 
-Here, hs37d5 is the name of the genome. The yaml file corresponding to this genome should exist under `/shared/organisms/hs37d5.yaml`.
-This yaml file should have paths to the required genome fasta, index, GTF and other annotations (see **Genome configuration file** below).
-
-All individual jobs of the workflow will be submitted to the Grid engine using the command specified under /shared/cluster.yaml.
-To run the workflow locally, use the parameter `--local` for local mode and the parameter `-j 48` to specify the maximal
-number of used CPU threads (here: 48) or concurrent running Slurm jobs (actual used threads are defined in each rule).
-
-A **configuration file is required for the ChIP-seq workflow** and should adhere to the following style :
-**IMPORTANT: Use only whitespace, but NO TAB indentation in this file:**
-
-.. code:: bash
-
-    $ cat chip-seq.config.yaml
-
-.. parsed-literal::
-
-    ################################################################################
-    # Please specify all ChIP samples plus their matching control/chromatin input
-    # sample.
-    # Specify for each ChIP sample whether the IP target results in broad/mixed-type
-    # enrichment (most histone marks, e.g. H3K4me1, H3K36me3, H3K9me3, H3K27me3)
-    # or not. In the latter case, the enrichment is instead punctuate/narrow
-    # (e.g. TFs, active histone marks as H3K27ac or H3K4me3).
-    #
-    # IMPORTANT: Use only whitespace, but NO TAB indentation in this YAML file!
-    ################################################################################
-    chip_dict:
-      my_H3K27ac_sample:
-        control: my_Input_sample
-        broad: False
-      my_H3K27me3_sample:
-        control: my_Input_sample
-        broad: True
+Download genome fasta, indexes and annotations for an example organism (mouse - mm10):
 
 
-Genome configuration file
-----------------------------
+Download example fastq files for the mouse genome:
 
-Any organism can be supported in the workflows by adding a genome configuration file `my_organism.yaml` in the
-following style to the `snakemake_workflows` directory:
+
+Execute the example RNA-Seq mapping and differential expression analysis pipeline:
+
+
+
+Running your own analysis
+-----------------------------
+
+For a detail introduction to setting up snakePipes from scratch, please visit :doc:`/content/setting_up.rst`
+
+For each organism of interest, snakePipes requires fasta files, genome indexes and annotation files.
+Paths to these files are specified in the organism/<name>.yaml files. After installation, the location
+of these files could be revealed by the following command:
 
 .. code:: bash
 
-    $ cat snakemake_workflows/shared/organisms/hs37d5.yaml
+    snakePipes info
 
-.. parsed-literal::
+You could either modify the existing files (add your own paths), or add a new file there. See more detail in
+:doc:`/content/running_snakePipes.rst`
 
-	genome_size: 2900338458
-	genome_fasta: "/SOMEPATH/hs37d5_ensembl/genome_fasta/genome.fa"
-	genome_index: "/SOMEPATH/hs37d5_ensembl/genome_fasta/genome.fa.fai"
-	genome_2bit: "/SOMEPATH/hs37d5_ensembl/genome_fasta/genome.2bit"
-	bowtie2_index: "/SOMEPATH/hs37d5_ensembl/BowtieIndex/genome"
-	hisat2_index: "/SOMEPATH/hs37d5_ensembl/HISAT2Index/genome"
-	known_splicesites: "/SOMEPATH/hs37d5_ensembl/gencode/release_19/HISAT2/splice_sites.txt"
-	star_index: "/SOMEPATH/hs37d5_ensembl/STARIndex/"
-	genes_bed: "/SOMEPATH/hs37d5_ensembl/gencode/release_19/genes.bed"
-	genes_gtf: "/SOMEPATH/hs37d5_ensembl/gencode/release_19/genes.gtf"
-	blacklist_bed: "/SOMEPATH/hs37d5_ensembl/ENCODE/hs37d5_extended_Encode-blacklist.bed"
+snakePipes could either be executed locally, or on any snakemake-supported cluster infrastructure. See details
+for setting up the cluster command in :doc:`/content/running_snakePipes.rst`
+
+Citation
+---------
+
+If you adopt/run snakePipes for your analysis, cite it as follows :
+
+    snakePipes: flexible and scalable NGS analysis pipelines built using snakemake.
+    The MPI-IE Bioinformatics Facility. http://doi.org/10.5281/zenodo.1146540
 
 
-.. note:: If no blacklist regions are available for your organism of interest, leave `blacklist_bed:` empty
+.. image:: content/images/logo_mpi-ie.jpg
+
+This tool suite is developed by the `Bioinformatics Unit <http://www.ie-freiburg.mpg.de/bioinformaticsfac>`_
+at the `Max Planck Institute for Immunobiology and Epigenetics <http://www.ie-freiburg.mpg.de/>`_, Freiburg.
+
+
+Help and Support
+-----------------
+
+For query/questions regarding snakePipes, please write on biostars with the tag **#snakePipes**
+
+For feature requests or bug reports, please open an issue on [our GitHub Repository](https://github.com/maxplanck-ie/snakepipes)
 
 
 Contents:
@@ -107,22 +86,16 @@ Contents:
    :maxdepth: 2
 
    content/setting_up.rst
-   content/workflows/ATAC-seq.rst
-   content/workflows/ChIP-seq.rst
+   content/running_snakePipes.rst
    content/workflows/DNA-mapping.rst
+   content/workflows/ChIP-seq.rst
+   content/workflows/ATAC-seq.rst
    content/workflows/HiC.rst
    content/workflows/RNA-seq.rst
    content/workflows/scRNA-seq.rst
    content/workflows/WGBS.rst
    ChangeLog.rst
 
-Citation
----------
-
-.. image:: content/images/logo_mpi-ie.jpg
-
-This tool suite is developed by the `Bioinformatics Unit <http://www.ie-freiburg.mpg.de/bioinformaticsfac>`_
-at the `Max Planck Institute for Immunobiology and Epigenetics <http://www.ie-freiburg.mpg.de/>`_, Freiburg.
 
 Indices and tables
 ==================

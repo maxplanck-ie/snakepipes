@@ -43,34 +43,27 @@ This will create a new conda environment called "snakePipes" into which snakePip
 
 A few additional steps you can then take:
 
-1. *Modify/remove/add the organism yaml files appropriately* : these yaml files would contain location of appropriate
+1. **Modify/remove/add the organism yaml files appropriately** : these yaml files would contain location of appropriate
 GTF files and genome indexes corresponding to different organisms. The location of these files after installation can be
 found using `snakePipes --info` command.
 
-2. *Modify the cluster.yaml file appropriately* : This yaml file contains information about your cluster scheduler (SGE/slurm).
+2. **Modify the cluster.yaml file appropriately** : This yaml file contains information about your cluster scheduler (SGE/slurm).
 Location revealed using `snakePipes --info` command.
 
-.. note:: `snakePipes createEnvs` will also set the `snakemake_options:` line in the global snakePipes `defaults.yaml` files. If you have already modified this then use the `--keepCondaDir` option.
-
-.. note:: Whenever you change the `snakemake_options:` line in `defaults.yaml`, you should run `snakePipes createEnvs` to ensure that the conda environments are then created.
-
-.. note:: Running `snakePipes createEnvs` is not strictly required, but facilitates multiple users using the same snakePipes installation.
 
 Documentation
 --------------
 
-For documentation on setup and usage, please visit our `read the docs page <https://snakepipes.readthedocs.io/en/latest/>`__.
+For detailed documentation on setup and usage, please visit our `read the docs page <https://snakepipes.readthedocs.io/en/latest/>`__.
+
 
 Citation
 -------------
 
 If you adopt/run snakePipes for your analysis, cite it as follows :
 
-```
+    snakePipes: flexible and scalable NGS analysis pipelines built using snakemake. The MPI-IE Bioinformatics Facility. http://doi.org/10.5281/zenodo.1146540
 
-snakePipes: flexible and scalable NGS analysis pipelines built using snakemake. The MPI-IE Bioinformatics Facility. http://doi.org/10.5281/zenodo.1146540
-
-```
 
 Notice
 -------------

@@ -26,7 +26,7 @@ def mainArguments(defaults, workingDir=False):
     genomes = ListGenomes()
     parser.add_argument("genome", metavar="GENOME", help="Genome acronym of the target organism. Either a yaml file or one of: {}".format(", ".join(genomes)))
 
-    required = parser.add_argument_group('required arguments')
+    required = parser.add_argument_group('Required Arguments')
     if workingDir:
         required.add_argument("-d", "--working-dir",
                               dest="workingdir",
@@ -42,7 +42,7 @@ def mainArguments(defaults, workingDir=False):
                               required=True,
                               help="output directory")
 
-    general = parser.add_argument_group('general arguments')
+    general = parser.add_argument_group('General Arguments')
     general.add_argument("-h", "--help",
                          action="help",
                          help="show this help message and exit")
