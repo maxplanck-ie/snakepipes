@@ -1,10 +1,10 @@
 .. _HiC:
 
 HiC
-============
+===
 
 What it does
-----------------
+------------
 
 The snakePipes HiC workflow allows users to process their HiC data from raw fastq files to
 corrected HiC matrices and TADs. The workflow utilized mapping by BWA, followed by analysis
@@ -14,14 +14,14 @@ are currently in HiCExplorer .hdf5 format.
 .. image:: ../images/HiC_pipeline.png
 
 Input requirements and outputs
----------------------------------
+------------------------------
 
 This pipeline requires paired-end reads fastq files as input in order to build a contact matrix and to call TADs.
 Prior to building the matrix, the pipeline maps reads against a user-specified reference genome.
 The output of mapping step is then used for building the contact matrix.
 
 Workflow configuration file
-------------------------------
+---------------------------
 
 Default parameters from the provided config file can be altered by user. Below is
 the config file description for the HiC workflow :
@@ -87,7 +87,7 @@ the config file description for the HiC workflow :
 
 
 Structure of output directory
--------------------------------
+-----------------------------
 
 The HiC pipeline will generate output of the following structure:
 
@@ -108,8 +108,8 @@ output directory::
     |--TADs
         |--logs
 
-Rules dependencies:
--------------------------
+Rules dependencies
+------------------
 
 .. image:: ../images/hic-dag.png
    :width: 500px
@@ -117,6 +117,9 @@ Rules dependencies:
    :scale: 75 %
    :align: center
 
+
+Command line options
+--------------------
 
 .. argparse::
     :func: parse_args

@@ -3,8 +3,8 @@
 ChIP-seq
 ========
 
-What it does:
--------------
+What it does
+------------
 
 The ChIP-seq pipeline takes one or more BAM files and attempts to find peaks. If multiple samples and a sample sheet are provided, then CSAW is additionally used to call differential peaks. Both sharp and broad peak calling are supported.
 
@@ -12,8 +12,8 @@ The ChIP-seq pipeline takes one or more BAM files and attempts to find peaks. If
 
 In addition to peaks, bigWig tracks are also generated.
 
-Input requirements:
--------------------
+Input requirements
+------------------
 
 The DNA mapping pipeline generates output that is fully compatible with the ChIP-seq pipeline input requirements!
 When running the ChIP-seq pipeline, please specify the output directory of DNA-mapping pipeline as the working directory (-w).
@@ -44,8 +44,8 @@ The `filtered_bam` directory contains either filtered or unfiltered BAM files, h
 
 `sampleSheet.tsv` is only needed for differential accessibility.
 
-Sample configuration:
-~~~~~~~~~~~~~~~~~~~~~
+Sample configuration
+~~~~~~~~~~~~~~~~~~~~
 
 The ChIP-seq sample configuration yaml file describes what type of peak calling to perform on each sample and what sample to use as input::
 
@@ -65,8 +65,8 @@ The ChIP-seq sample configuration yaml file describes what type of peak calling 
 
 As you can see, the same control can be used for all samples.
 
-Sample sheet:
-~~~~~~~~~~~~~
+Sample sheet
+~~~~~~~~~~~~
 
 The (optional) sample sheet is a tab-separated file with two columns, named name and condition. An example is below::
 
@@ -79,8 +79,8 @@ The (optional) sample sheet is a tab-separated file with two columns, named name
     SRR7013050      OreR
 
 
-Configuration file:
-~~~~~~~~~~~~~~~~~~~
+Configuration file
+~~~~~~~~~~~~~~~~~~
 
 There is a configuration file in `snakePipes/workflows/ChIP-seq/defaults.yaml`::
 
@@ -148,6 +148,9 @@ The ChIP-seq pipeline will generate additional output as follows::
         └── sample2.filtered.BAMPE_peaks.xls
 
 The `histoneHMM` directory will only exist if you have broad marks. There may be an additional `CSAW` folder if you provide a sample sheet.
+
+Command line options
+--------------------
 
 .. argparse::
     :func: parse_args
