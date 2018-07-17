@@ -89,16 +89,21 @@ def calc_doc(intList,wcard):
         else:
             return ([os.path.join('QC_metrics',w) for w in expand('{sample}.{sfix}',sample=samples,sfix=int_dest)])
 
+def get_outdir(folder_name):
+    sample_name = re.sub('_sampleSheet.[a-z]{3}$','',os.path.basename(sampleInfo))
+    return("{}_{}".format(folder_name, sample_name))
+
 
 def run_CpG_stats(sampleInfo):
     if sampleInfo:
-        return (['singleCpG_stats_limma/singleCpG.RData', 'singleCpG_stats_limma/limdat.LG.RData','singleCpG_stats_limma/metilene.IN.txt'])
+        
+        return (['{}/singleCpG.RData'.format(get_outdir("singleCpG_stats_limma")), '{}/limdat.LG.RData'.format(get_outdir("singleCpG_stats_limma")),'{}/metilene.IN.txt'.format(get_outdir("singleCpG_stats_limma"))])
     else:
         return ([])
 
 def run_metilene_all(sampleInfo):
     if sampleInfo:
-        return (['metilene_out/singleCpG.metilene.limma.bed','metilene_out/metilene.limma.annotated.txt'])
+        return (['{}/singleCpG.metilene.limma.bed'.format(get_outdir("metilene_out")),'{}/metilene.limma.annotated.txt'.format(get_outdir("metilene_out"))])
     else:
         return ([])
 
@@ -109,7 +114,7 @@ def run_int_aggStats(intList,sampleInfo):
         return ([os.path.join("aux_files",re.sub('.fa',w,os.path.basename(refG))) for w in int_dest])
     if intList and sampleInfo:
             int_dest2=[re.sub('.bed','.aggCpG.RData',os.path.basename(x)) for x in intList]
-            return ([os.path.join("aggregate_stats_limma",w) for w in int_dest2])
+            return ([os.path.join("{}".format(get_outdir("aggregate_stats_limma")),w) for w in int_dest2])
     else:
         return ([])
 
@@ -145,12 +150,13 @@ onstart:
 
 ### main rule ##################################################################
 ################################################################################
-localrules: produce_report
+localrules: 
+    FASTQ,
+    produce_report
 
 rule all:
     input:
         expand("FASTQ/{sample}{read}.fastq.gz", sample = samples, read = reads),
-        run_cutadapt(trimReads),
         expand("FASTQ_downsampled/{sample}{read}.fastq.gz", sample = samples, read = reads),
         convert_refG(convRef),
         expand("bams/{sample}.PCRrm.bam", sample = samples),

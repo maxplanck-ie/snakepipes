@@ -58,7 +58,7 @@ tot<-system(paste0('grep \"in total\" ',Mapdir[i]),intern=TRUE)
 mapped<-system(paste0('grep \"mapped\" ',Mapdir[i]),intern=TRUE)[1]
 tabi<-as.data.frame(cbind(as.numeric(unlist(strsplit(tot,split=" "))[1]),as.numeric(unlist(strsplit(mapped,split=" "))[1])))
 colnames(tabi)<-c("total","mapped")
-tabi$pct<-with(tabi,mapped/total)
+tabi$pct<-with(tabi,mapped/total*100)
 
 bamRepL[[i]]<-tabi
 
