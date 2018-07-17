@@ -90,7 +90,7 @@ def calc_doc(intList,wcard):
             return ([os.path.join('QC_metrics',w) for w in expand('{sample}.{sfix}',sample=samples,sfix=int_dest)])
 
 def get_outdir(folder_name):
-    sample_name = re.sub('_sampleSheet.csv','',os.path.basename(sampleInfo))
+    sample_name = re.sub('_sampleSheet.[a-z]{3}$','',os.path.basename(sampleInfo))
     return("{}_{}".format(folder_name, sample_name))
 
 
