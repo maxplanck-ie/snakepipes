@@ -1,10 +1,10 @@
 .. _RNA-seq:
 
 RNA-seq
-================
+=======
 
 What it does
-----------------
+------------
 
 The snakePipes RNA-seq workflow allows users to process their single or paired-end
 RNA-Seq fastq files upto the point of gene/transcript-counts and differential expression.
@@ -21,12 +21,12 @@ differential expression analysis, a tab-separated sample information file could 
 
 
 Analysis modes
--------------------------
+--------------
 
 Following analysis (*modes*) are possible using the RNA-seq workflow:
 
 "mapping"
-~~~~~~~~~~
+~~~~~~~~~
 
 **mapping** mode could be more accurately referred to "alignment" mode. In this mode,
 the pipeline uses one of the selected aligners to create BAM files, followed by
@@ -44,7 +44,7 @@ Allele-specific, gene-level differential expression analysis is then performed u
 .. note:: **allelic-mapping** mode is mutually exclusive with **mapping** mode
 
 "mapping-free"
-~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~
 
 **mapping-free** mode could be more accurately referred to "alignment-free" mode. In this mode,
 the pipeline uses **salmon** to perform transcript-level expression quantification. This mode
@@ -52,11 +52,14 @@ performs both transcript-level differential expression (using **Sleuth**), and g
 differential expression (using **wasabi**, followed by **DESeq2**).
 
 "deepTools_qc"
-~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~
 
 The pipeline provides multiple quality controls through deepTools, which can be triggered
 using the *deepTools_qc* mode. It's a very useful add-on with any of the other modes.
 
+
+Command line options
+--------------------
 
 .. argparse::
     :func: parse_args

@@ -1,7 +1,10 @@
 .. _scRNA-seq:
 
 scRNA-seq
-==========
+=========
+
+Command line options
+--------------------
 
 .. argparse::
     :func: parse_args

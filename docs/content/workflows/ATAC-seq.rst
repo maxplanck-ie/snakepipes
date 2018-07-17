@@ -1,10 +1,10 @@
 .. _ATAC-seq:
 
 ATAC-seq
-============
+========
 
-What it does:
--------------
+What it does
+------------
 
 The ATAC-seq pipeline takes one or more BAM files and attempts to find accessible regions. If multiple samples and a sample sheet are provided, then CSAW is additionally used to find differentially accessible regions. Prior to finding open/accessible regions, the BAM files are filtered to include only properly paired reads with appropriate fragment sizes (<150 bases by default). These filtered fragments are then used for the remainder of the pipeline.
 
@@ -12,8 +12,8 @@ The ATAC-seq pipeline takes one or more BAM files and attempts to find accessibl
 
 Note that the `CSAW` step will be skipped if there is no sample sheet.
 
-Input requirements:
--------------------
+Input requirements
+------------------
 
 The DNA mapping pipeline generates output that is fully compatible with the ATAC-seq pipeline input requirements!
 When running the ATAC-seq pipeline, please specify the output directory of DNA-mapping pipeline as the working directory (-w).
@@ -40,8 +40,8 @@ The `filtered_bam` directory contains either filtered or unfiltered BAM file, ho
 
 `sampleSheet.tsv` is only needed for differential accessibility.
 
-Sample sheet:
-~~~~~~~~~~~~~
+Sample sheet
+~~~~~~~~~~~~
 
 The (optional) sample sheet is a tab-separated file with two columns, named `name` and `condition`. An example is below::
 
@@ -55,8 +55,8 @@ The (optional) sample sheet is a tab-separated file with two columns, named `nam
 
 The condition associated with the first line is used as the base level for comparisons.
 
-Configuration file:
-~~~~~~~~~~~~~~~~~~~
+Configuration file
+~~~~~~~~~~~~~~~~~~
 
 There is a configuration file in `snakePipes/workflows/ATACseq/defaults.yaml`::
 
@@ -81,8 +81,8 @@ There is a configuration file in `snakePipes/workflows/ATACseq/defaults.yaml`::
 
 The only parameters that are useful to change are `bw_binsize`, `atac_fragment_cutoff`, and `window_size`. Note however that those can be more conveniently changed on the command line.
 
-Output structure:
------------------
+Output structure
+----------------
 
 Assuming a sample sheet is used, the following will be **added** to the working directory::
 
@@ -120,6 +120,9 @@ Assuming a sample sheet is used, the following will be **added** to the working 
         └── sample2.filtered.BAM_peaks.qc.txt
 
 There are additionally log files in most of the directories. The various outputs are documented in the CSAW and MACS2 documentation. The `MACS2_QC` folder contains a number of QC metrics that we find useful, namely the number of peaks, fraction of reads in peaks (FRiP) and percentage of the genome covered by peaks.
+
+Command line options
+--------------------
 
 .. argparse::
     :func: parse_args

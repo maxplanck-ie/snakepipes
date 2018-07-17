@@ -1,16 +1,18 @@
 .. _WGBS:
 
 WGBS
-============
+====
 
-Input requirements :
--------------------------------------------
+Input requirements
+------------------
+
 This pipeline requires paired-end reads fastq files and a bisulfite converted genome as inputs.
 Optional inputs include bed files with genomic intervals of interest, used to aggregate single CpG values over; a sample sheet with grouping information to use in differential methylation analysis; a blacklist bed file with genomic positions corresponding to known snps to mask single CpG methylation values.
 
 
-What it does:
--------------------------------------------
+What it does
+------------
+
 Optionally trimmed reads are mapped to reference genome using a bisulfite-specific aligner (bwa-meth).
 Quality metrics are collected and synthesized in a QC report, including bisulfite conversion rate, mapping rate, percentage CpGs covered a least 10x, methylation bias.
 Methylation ratios are extracted (MethylDackel) for CpG positions in the reference genome and filtered for minimum coverage (10x), snp allelic frequency (<0.25 illegitimate bases).
@@ -22,7 +24,7 @@ If bed file(s) with genomic intervals of interest are provided, methylation rati
 .. image:: ../images/WGBS_pipeline.png
 
 Workflow configuration file
-----------------------------------
+---------------------------
 
 .. code:: bash
 
@@ -94,7 +96,7 @@ Workflow configuration file
 
 
 Structure of output directory
---------------------------------
+-----------------------------
 
 The WGBS pipeline will generate output as follows:
 
@@ -134,7 +136,7 @@ The WGBS pipeline will generate output as follows:
 Aggregate stats will be calculated if user provides at least one bed file with genomic intervals of interest. Differential methylation analysis or DMR detection will only be run if user provides a sample sheet.
 
 Example output plots
---------------------------------
+--------------------
 
 Using data from Habibi et al., Cell Stem Cell 2013 corresponding to mouse chr6:4000000-6000000, following plots could be obtained:
 
@@ -143,8 +145,8 @@ Using data from Habibi et al., Cell Stem Cell 2013 corresponding to mouse chr6:4
 .. image:: ../images/Beta.MeanXgroup.all.violin.png
 
 
-Argparse
---------------------------------
+Command line options
+--------------------
 
 .. argparse::
     :func: parse_args
