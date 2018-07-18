@@ -108,16 +108,6 @@ output directory::
     |--TADs
         |--logs
 
-Rules dependencies
-------------------
-
-.. image:: ../images/hic-dag.png
-   :width: 500px
-   :height: 800px
-   :scale: 75 %
-   :align: center
-
-
 Command line options
 --------------------
 
