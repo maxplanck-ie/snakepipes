@@ -17,8 +17,6 @@ import os
 
 # to allow readthedocs to compile without installing some dependencies
 import mock
-
-# MOCK_MODULES = ['numpy', 'numpy.ma', 'scipy', 'pyBigWig']
 MOCK_MODULES = ['yaml']
 
 for mod_name in MOCK_MODULES:
@@ -74,7 +72,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'snakePipes'
-copyright = u'2017, MPI-IE'
+copyright = u'2018, MPI-IE'
 author = u'MPI-IE'
 
 # The version info for the project you're documenting, acts as replacement for

@@ -139,6 +139,31 @@ def fixSitePy(envPath):
         subprocess.check_call(cmd)
 
 
+def fixSnakemake(envPath):
+    """
+    Fix issue #916 in snakemake. This should eventually be removed before a real release.
+    """
+    for fname in glob.glob('{}/lib/python*/site-packages/snakemake/script.py'.format(envPath))
+        f = open(fname).read()
+        lines = f.split('\n')
+        idx = None
+        for lineNum, line in enumerate(lines):
+            if not idx and 'if path.startswith("file://"):' in line:
+                idx = lineNum
+                break
+        if idx:
+            del lines[idx:idx + 8]
+            lines.insert(idx, ['            dir = ".snakemake/scripts"',
+                               '            prefix = ""',
+                               '            os.makedirs(dir, exist_ok=True)'])
+            f = open(fname, "w")
+            f.write("\n".join(lines))
+            f.close()
+
+            cmd = [os.path.join(envPath, "bin", "python"), '-m', 'compileall', fname]
+            subprocess.check_call(cmd)
+
+
 def createCondaEnvs(args):
     """
     Create all of the conda environments
@@ -213,6 +238,7 @@ def createCondaEnvs(args):
     # Ignore site-packages in this env
     if not args.develop:
         fixSitePy(rootDir)
+        fixSnakemake(rootDir)
 
 
 def main(args):

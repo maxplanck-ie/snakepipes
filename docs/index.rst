@@ -1,14 +1,14 @@
 snakePipes
-=============
+==========
 
-snakePipes are pipelines built using [snakemake](snakemake.readthedocs.io) and *python* for the analysis of epigenomic datasets.
+snakePipes are pipelines built using `snakemake <snakemake.readthedocs.io>`__ and *python* for the analysis of epigenomic datasets.
 
 Below is the list of pipelines available in snakePipes
--------------------------------------------------------
+------------------------------------------------------
 
-=============================== ========================================================================================================
+=============================== ===============================================================================================================
 Pipeline                            Description
-=============================== ========================================================================================================
+=============================== ===============================================================================================================
 :ref:`DNA-mapping`              Basic DNA mapping using bowtie2, filter mapped files, QC and create coverage plots
 :ref:`ChIP-Seq`                 Use the DNA mapping output and run ChIP/Input normalization and peak calling
 :ref:`ATAC-seq`                 Use the DNA mapping output and detect open chromatin regions for ATAC-seq data
@@ -16,10 +16,10 @@ Pipeline                            Description
 :ref:`RNA-Seq`                  RNA-Seq workflow : From mapping to differential expression using DEseq2
 :ref:`scRNA-Seq`                Single-cell RNA-Seq (CEL-Seq2) workflow : From mapping to differential expression
 :ref:`WGBS`                     Whole-genome Bisulfite-Seq analysis workflow, from mapping to DMR calling and differential methylation analysis
-=============================== ========================================================================================================
+=============================== ===============================================================================================================
 
 Quick start
-----------------
+-----------
 
 Assuming you have *python3* with *conda*, install snakePipes with:
 
@@ -38,9 +38,9 @@ Execute the example RNA-Seq mapping and differential expression analysis pipelin
 
 
 Running your own analysis
------------------------------
+-------------------------
 
-For a detail introduction to setting up snakePipes from scratch, please visit :doc:`/content/setting_up.rst`
+For a detail introduction to setting up snakePipes from scratch, please visit :doc:`content/setting_up`
 
 For each organism of interest, snakePipes requires fasta files, genome indexes and annotation files.
 Paths to these files are specified in the organism/<name>.yaml files. After installation, the location
@@ -51,13 +51,13 @@ of these files could be revealed by the following command:
     snakePipes info
 
 You could either modify the existing files (add your own paths), or add a new file there. See more detail in
-:doc:`/content/running_snakePipes.rst`
+:doc:`content/running_snakePipes`
 
 snakePipes could either be executed locally, or on any snakemake-supported cluster infrastructure. See details
-for setting up the cluster command in :doc:`/content/running_snakePipes.rst`
+for setting up the cluster command in :doc:`content/running_snakePipes`
 
 Citation
----------
+--------
 
 If you adopt/run snakePipes for your analysis, cite it as follows :
 
@@ -72,15 +72,15 @@ at the `Max Planck Institute for Immunobiology and Epigenetics <http://www.ie-fr
 
 
 Help and Support
------------------
+----------------
 
 For query/questions regarding snakePipes, please write on biostars with the tag **#snakePipes**
 
-For feature requests or bug reports, please open an issue on [our GitHub Repository](https://github.com/maxplanck-ie/snakepipes)
+For feature requests or bug reports, please open an issue on `our GitHub Repository <https://github.com/maxplanck-ie/snakepipes>`__.
 
 
 Contents:
-------------
+---------
 
 .. toctree::
    :maxdepth: 2
