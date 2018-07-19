@@ -15,8 +15,8 @@ import snakePipes.common_functions as cf
 import snakePipes.parserCommon as parserCommon
 
 
-def parse_args({"verbose": False, "configfile": None, "cluster_configfile": None, "max_jobs": 5, "snakemake_options": "--use-conda", "tempdir": None,
-                "bw_binsize": 25, "atac_fragment_cutoff": 150, "sample_info": None}):
+def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfile": None, "max_jobs": 5, "snakemake_options": "--use-conda", "tempdir": None,
+                         "bw_binsize": 25, "atac_fragment_cutoff": 150, "sample_info": None}):
     """
     Parse arguments from the command line.
     """
