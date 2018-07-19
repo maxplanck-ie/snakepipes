@@ -15,13 +15,14 @@ import snakePipes.common_functions as cf
 import snakePipes.parserCommon as parserCommon
 
 
-# -nt?
-def parse_args(defaults={"verbose": None, "configfile": None, "cluster_configfile":None, "max_jobs": None, "nthreads": None, "snakemake_options": None, "tempdir": None,
-                         "downsample": None, "trimReads": None, "fqcin": None, "adapterSeq":None,"nextera": None, "trimThreshold": None, "trimOtherArgs": None, "convrefpath": None,
-                         "convRef": None, "intList": None, "blackList": None, "sampleInfo": None, "mbias_ignore": None}):
+def parse_args(defaults=None):
     """
     Parse arguments from the command line.
     """
+    # This only happens on RTD
+    if not defaults:
+        baseDir, workflowDir, defaults = cf.setDefaults(os.path.basename(__file__))
+
     mainArgs = parserCommon.mainArguments(defaults)
 
     parser = argparse.ArgumentParser(
