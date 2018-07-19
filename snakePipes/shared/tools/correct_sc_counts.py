@@ -61,7 +61,7 @@ for feature in sortedFeatures:
     for cnt in UMICounts[feature]:
         if(cnt >= maxUMIs):
             maxUMIs -= 0.5
-        CorrectedCountsFile.write("\t{}".format(abs(-math.log(1.0 - float(cnt)/float(maxUMIs)) * maxUMIs)))  # The abs() prevents -0.0
+        CorrectedCountsFile.write("\t{}".format(abs(-math.log(1.0 - float(cnt) / float(maxUMIs)) * maxUMIs)))  # The abs() prevents -0.0
     CorrectedCountsFile.write("\n")
 for f in [ReadCountsFile, UMICountsFile, CorrectedCountsFile]:
     f.close()
