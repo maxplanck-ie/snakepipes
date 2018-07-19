@@ -62,19 +62,19 @@ if (!is.na(args[5])) {
 
 ######################################################
 
-print(paste(coutt_path,"/*.coutt.csv",sep=""))
+print(paste(coutt_path,"/*.corrected.txt",sep=""))
 
-dat=data.frame(file=mixedsort(Sys.glob(paste(coutt_path,"/*.coutt.csv",sep=""))),stringsAsFactors=F)
+dat=data.frame(file=mixedsort(Sys.glob(paste(coutt_path,"/*.corrected.txt",sep=""))),stringsAsFactors=F)
 
 ## create sample names from file names
-dat$name=gsub(".*/(.*).coutt.csv","\\1",dat$file)
+dat$name=gsub(".*/(.*).corrected.txt","\\1",dat$file)
 
 print(dat$file)
 print(dat$name)
 
 cell_names <- NULL
 if (is.null(cell_names_path)){
-	print("use all cells in found coutt files!")
+	print("use all cells in found corrected files!")
 } else if (file.exists(cell_names_path) & file.info(cell_names_path)$isdir == FALSE) {
 	## cell_names_path is file with ranges of cell names (column names: cell_idx_start,cell_idx_end,cell_prefix)
 	print(paste("Read in csv file with cell_names as ranges (",cell_names_path,")"))

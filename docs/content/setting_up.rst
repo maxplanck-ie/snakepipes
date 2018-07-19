@@ -6,11 +6,8 @@ Unlike many other pipelines, setting up snakePipes is easy! All you need is a *c
 Install conda with python3
 --------------------------
 
-.. note:: If you have any other, non-conda version/installation of python configured in your $PATH,
-        ~/.bashrc or ~/.bash_profile, please remove them first in order to avoid conflicts.
-
-Then follow the instructions `here <https://conda.io/docs/user-guide/install/index.html>`__ to install either
-miniconda or anaconda. A minimal version (miniconda) is enough for snakePipes. Get miniconda installer `here <https://conda.io/miniconda.html>`__.
+Follow the instructions `here <https://conda.io/docs/user-guide/install/index.html>`__ to install either
+miniconda or anaconda. A minimal version (miniconda) is enough for snakePipes. Get the miniconda installer `here <https://conda.io/miniconda.html>`__.
 
 After installation, check your python path and version :
 
@@ -38,20 +35,14 @@ conda virtual environment named `snakePipes`, which you can then activate via `s
 
     conda create -n snakePipes -c mpi-ie -c bioconda -c conda-forge snakePipes
 
-Another way is via pip, using our `GitHub repository <https://github.com/maxplanck-ie/snakepipes>`__.
+Development installation
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you wish to modify snakePipes you can install it via pip, using our `GitHub repository <https://github.com/maxplanck-ie/snakepipes>`__ or your own local modified clone.
 
 .. code:: bash
 
     pip install --user --upgrade git+https://github.com/maxplanck-ie/snakepipes@develop
-
-Finally, for advanced users who want to modify the source code, you can install via pip,
-after cloning the source code from our `GitHub repository <https://github.com/maxplanck-ie/snakepipes>`__.
-
-.. code-block:: bash
-
-    git clone https://github.com/maxplanck-ie/snakepipes.git && cd snakePipes
-    # modify as desired
-    pip install --user --upgrade .
 
 .. note:: There is a difference between installing via conda or installing via pip. The python installation from user's
           $PATH is ignored when installing via conda (first method) while is considered when installing via pip. You must use the `--develop` option later when you run `snakePipes createEnvs`.

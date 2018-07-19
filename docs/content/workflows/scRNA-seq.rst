@@ -81,10 +81,10 @@ The following will be produced in the output directory::
     ├── Annotation
     ├── bamCoverage
     ├── Counts
-    │   ├── GSM2668205.coutb.csv
-    │   ├── GSM2668205.coutc.csv
-    │   ├── GSM2668205.cout.csv
-    │   ├── GSM2668205.coutt.csv
+    │   ├── GSM2668205.umis.txt
+    │   ├── GSM2668205.reads.txt
+    │   ├── GSM2668205.raw_counts.txt
+    │   ├── GSM2668205.corrected.txt
     │   ├── GSM2668205.featureCounts_summary.txt
     ├── deepTools_qc
     │   ├── bamPEFragmentSize
@@ -105,7 +105,7 @@ The following will be produced in the output directory::
     │   ├── QC_report.all_samples.plate_cUPM.pdf
     │   └── QC_report.all_samples.reads_UMI_plot.pdf
     ├── Results
-    │   ├── all_samples.gencode_genomic.coutt_merged.csv
+    │   ├── all_samples.gencode_genomic.coutt_merged.txt
     │   └── all_samples.used_cells.tsv
     ├── Sambamba
     │   ├── flagstat_report_all.tsv
@@ -114,7 +114,7 @@ The following will be produced in the output directory::
         ├── GSM2668205.bam
         └── GSM2668205.bam.bai
 
-The `Annotation` directory contains a filtered version of your original GTF file, with pseudogenes removed by default. The `Counts` director contains 4 sets of counts: ???. 
+The `Annotation` directory contains a filtered version of your original GTF file, with pseudogenes removed by default. The `Counts` directory contains 4 sets of counts: UMIs/feature/cell (.umis.txt), reads/feature/cell (.reads.txt), corrected number of UMIs/feature/cell (corrected.txt) and raw counts per cell per UMI per feature (raw_counts.txt). Of these, the values in corrected.txt should be used for further analysis and the others for quality control. The `QC_report` and `Results` ... ???. The `Sambamba` and `STAR_genomic` directories contain the output file from duplicate marking and genomic alignments, respectively.
 
 Example images
 --------------
