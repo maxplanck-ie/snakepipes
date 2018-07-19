@@ -53,7 +53,7 @@ rule sc_bam_featureCounts_genomic:
         bam = mapping_prg+"/{sample}.bam",
         gtf = "Annotation/genes.filtered.gtf"
     output:
-        counts = "Counts/{sample}.cout.csv",
+        counts = "Counts/{sample}.raw_counts.txt",
         counts_summary = "Counts/{sample}.featureCounts_summary.txt"
     params:
         count_script = workflow.basedir+"/scRNAseq_bam_featureCounts.sh",
@@ -69,28 +69,29 @@ rule sc_bam_featureCounts_genomic:
 
 rule extract_scale_counts:
     input:
-        counts = "Counts/{sample}.cout.csv"
+        counts = "Counts/{sample}.raw_counts.txt"
     output:
-        coutt = "Counts/{sample}.coutt.csv",
-        coutb = "Counts/{sample}.coutb.csv",
-        coutc = "Counts/{sample}.coutc.csv"
+        corrected = "Counts/{sample}.corrected.txt",
+        umis = "Counts/{sample}.umis.txt",
+        reads = "Counts/{sample}.reads.txt"
     params:
-        count_script = workflow.basedir+"/extract_counts_rb.pl",
+        count_script = os.path.join(maindir, "shared", "tools", "correct_sc_counts.py"),
         UMI_length = UMI_length
     log:
         out = "Counts/logs/extract_counts.{sample}.out",
         err = "Counts/logs/extract_counts.{sample}.err"
     conda: CONDA_RNASEQ_ENV
-    shell:
-        """{params.count_script} -bl={params.UMI_length} -in={input.counts} """
-        """ -outc={output.coutc} -outb={output.coutb} -outt={output.coutt} > {log.out} 2> {log.err}"""
+    shell: """
+        {params.count_script} --umiLength {params.UMI_length} \
+            {input.counts} {output.reads} {output.umis} {output.corrected} > {log.out} 2> {log.err}
+        """
 
 
 rule combine_sample_counts:
     input:
-        expand("Counts/{sample}.coutt.csv",sample = samples),
+        expand("Counts/{sample}.corrected.txt",sample = samples),
     output:
-        merged_matrix = "Results/all_samples.gencode_genomic.coutt_merged.csv",
+        merged_matrix = "Results/all_samples.gencode_genomic.corrected_merged.csv",
         used_cell_names_file = "Results/all_samples.used_cells.tsv"
     params:
         merge_script = workflow.basedir+"/scRNAseq_merge_coutt_files2.R",

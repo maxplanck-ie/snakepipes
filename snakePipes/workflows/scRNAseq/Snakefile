@@ -56,9 +56,9 @@ def run_deeptools_qc():
     "deepTools_qc/plotEnrichment/plotEnrichment.tsv"]
     if len(samples)>1:
         file_list.append( ["deepTools_qc/multiBigwigSummary/coverage.bed.npz",
-                              "deepTools_qc/plotCorrelation/correlation.pearson.bed_coverage.tsv",
-                              "deepTools_qc/plotCorrelation/correlation.spearman.bed_coverage.tsv",
-                              "deepTools_qc/plotPCA/PCA.bed_coverage.tsv"] )
+                           "deepTools_qc/plotCorrelation/correlation.pearson.bed_coverage.tsv",
+                           "deepTools_qc/plotCorrelation/correlation.spearman.bed_coverage.tsv",
+                           "deepTools_qc/plotPCA/PCA.bed_coverage.tsv"] )
     return(file_list)
 
 ### execute before workflow starts #############################################
@@ -106,10 +106,10 @@ rule all:
         "Annotation/genes.filtered.bed",
         "Annotation/genes.filtered.gtf",
         "Annotation/genes.filtered.transcripts.gtf",      
-        expand("Counts/{sample}.cout.csv",sample = samples),
+        expand("Counts/{sample}.raw_counts.txt",sample = samples),
         expand("Counts/{sample}.featureCounts_summary.txt",sample = samples),
-        expand("Counts/{sample}.coutt.csv",sample = samples),
-        "Results/all_samples.gencode_genomic.coutt_merged.csv",
+        expand("Counts/{sample}.corrected.txt",sample = samples),
+        "Results/all_samples.gencode_genomic.corrected_merged.csv",
         "QC_report/QC_report.all_samples.libstats_reads.tsv",
         run_deeptools_qc(),
         "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv",
