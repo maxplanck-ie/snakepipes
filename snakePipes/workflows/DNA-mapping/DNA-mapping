@@ -113,6 +113,7 @@ def main():
         args.Nmasked_index = os.path.abspath(args.Nmasked_index)
 
     # clean up filtered_bam if needed appropriate
+    os.makedirs(args.outdir, exist_ok=True)
     filt = ""
     if args.dedup:
         filt += "-F 1024 "

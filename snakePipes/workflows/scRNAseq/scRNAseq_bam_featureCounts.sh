@@ -40,10 +40,16 @@ cat ${tmp_dir}/${sample_name}.bam.featureCounts | awk -v map_f=$gtf_path \
 	} 
 }
 {OFS="\t";
-if ($4 in MAP) print $0,MAP[$4]; else print $0,"NA","NA";
+if ($4 in MAP) print $0,MAP[$4]; else print $0,"NA","NA"; # MAP[$4] contains tab!
 }' |
 ## Output after pipe is like:
+## new featureCounts from 1.6
+## J00182:58:HN77HBBXX:5:1115:11992:23681:SC:CGTTAC:41:UMI:TGGGGT:36:40:63 Unassigned_MultiMapping -1      NA	NA	NA
+## J00182:58:HN77HBBXX:5:1213:15280:14150:SC:CGTTAC:41:UMI:TGGGGT:36:36:63 Unassigned_MultiMapping -1      NA	NA 	NA
+## J00182:58:HN77HBBXX:5:2110:31507:27883:SC:AGTACC:41:UMI:ATCGGA:34:60:63 Assigned        1       ENSMUSG00000103201.1	Gm37180	Gm37180__chr1
+## J00182:58:HN77HBBXX:6:2107:21724:18247:SC:AGTACC:41:UMI:ATCGGA:36:47:63 Assigned        1       ENSMUSG00000103201.1	Gm37180	Gm37180__chr1
 ##
+## old featurecounts <=1.5.2
 ## SN7001180:281:C99CMACXX:2:1203:1365:44875:SC:ACTCGA:37:UMI:ATTCCT:35:36:38	Unassigned_NoFeatures   *       *	NA	NA
 ## SN7001180:281:C99CMACXX:2:2212:8564:84823:SC:ACGTGA:37:UMI:CGCCAG:35:35:38	Assigned	ENSMUSG00000103377.1	*	Gm37180	Gm37180__chr1
 ## SN7001180:281:C99CMACXX:2:1211:18877:23349:SC:GACAAC:37:UMI:TGTCCG:35:27:38	Unassigned_Ambiguity	*	Number_Of_Overlapped_Genes=2	NA	NA
@@ -68,9 +74,9 @@ BEGIN{
 
 	if (BC[2] in CELL) {					## valid cell barcode
 		if (BC[5]~"N") cell_noumi[CELL[BC[2]]] += 1;    ## UMIs with N are also not considered later on
-		else if ($2~"Assigned" && $3 != "*") {          ## if unique feature then count it
-			ALL[$6][BC[5]][CELL[BC[2]]] += 1;       ## $3 is single GENEID if num==1
-			cell_uniqfeat[CELL[BC[2]]] += 1; }      ## only stats
+		else if ($2~"Assigned" && $3 != "-1") {         ## if unique feature then count it
+			ALL[$6][BC[5]][CELL[BC[2]]] += 1;         ##
+			cell_uniqfeat[CELL[BC[2]]] += 1; }        ## only stats
 		else if ($2~"NoFeatures") cell_nofeat[CELL[BC[2]]] += 1;
 		else if ($2~"MultiMapping") cell_multimap[CELL[BC[2]]] += 1;			
 		else if ($2~"Unassigned_Ambiguity") cell_multifeat[CELL[BC[2]]] +=1;
@@ -113,7 +119,7 @@ END{
 
 		ALLcell_unmap += cell_unmap[j];
 		ALLcell_nofeat += cell_nofeat[j];
-            	ALLcell_noumi += cell_noumi[j];
+        ALLcell_noumi += cell_noumi[j];
 		ALLcell_multimap += cell_multimap[j];
 		ALLcell_multifeat += cell_multifeat[j];
 		ALLcell_uniqfeat += cell_uniqfeat[j];
