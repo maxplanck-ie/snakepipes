@@ -133,7 +133,7 @@ def run_alignment_free():
 
 
 def run_alignment():
-    if "alignment" in mode:
+    if "alignment" in mode.split(","):
         file_list = [
         "Sambamba/flagstat_report_all.tsv",
         expand(mapping_prg+"/{sample}.bam", sample = samples),

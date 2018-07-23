@@ -137,6 +137,10 @@ def main():
     elif args.allele_mode == "map_only":
         args.SNPfile = os.path.abspath(args.SNPfile)
         args.Nmasked_index = os.path.abspath(args.Nmasked_index)
+    modeTemp = args.mode.split(",")
+    # deeptools_qc requires alignment as input
+    if "deeptools_qc" in modeTemp and "alignment" not in modeTemp:
+        args.mode = "{},alignment".format(args.mode)
     ## End workflow-specific checks
 
     # Handle YAML and log files

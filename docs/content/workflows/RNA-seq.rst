@@ -55,7 +55,7 @@ differential expression (using **wasabi**, followed by **DESeq2**).
 ~~~~~~~~~~~~~~
 
 The pipeline provides multiple quality controls through deepTools, which can be triggered
-using the *deepTools_qc* mode. It's a very useful add-on with any of the other modes.
+using the *deepTools_qc* mode. It's a very useful add-on with any of the other modes. Note that this mode will additionally cause the *alignment* mode to be used!
 
 
 Command line options
