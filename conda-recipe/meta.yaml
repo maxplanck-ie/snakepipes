@@ -1,12 +1,13 @@
 package:
   name: snakepipes
-  version: 1.0.0_alpha2
+  version: 1.0.0_alpha3
 
 source:
   path: ../
 
 build:
   number: 0
+  noarch: python
   skip: True  # [not py3k]
 
 requirements:
