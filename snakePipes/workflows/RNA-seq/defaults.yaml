@@ -45,7 +45,7 @@ salmon_index_options: --type quasi -k 31
 dnaContam: False
 ## supported mappers: STAR HISAT2
 mapping_prg: STAR
-star_options:
+star_options: --outBAMsortingBinsN 100
 hisat_options:
 verbose: False
 plot_format: png
