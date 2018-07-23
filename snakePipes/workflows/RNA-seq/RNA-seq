@@ -17,7 +17,7 @@ import snakePipes.parserCommon as parserCommon
 
 
 def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfile": None, "max_jobs": 5, "snakemake_options": "--use-conda", "tempdir": None,
-                         "mode": "mapping-free,deepTools_qc", "downsample": False, "trim": False, "trim_prg": "cutadapt", "trim_options": None, "fastqc": False,
+                         "mode": "alignment-free,deepTools_qc", "downsample": False, "trim": False, "trim_prg": "cutadapt", "trim_options": None, "fastqc": False,
                          "library_type": 2, "mapping_prg": "STAR", "star_options": "--outBAMsortingBinsN 100", "hisat_options": None, "salmon_index_options": "--type quasi -k 31",
                          "featurecounts_options": "-C -Q 10 --primary", "filter_annotation": None, "sample_info": None,
                          "bw_binsize": 25, "dnaContam": False, "plot_format": "png"}):
@@ -39,7 +39,7 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
     optional = parser.add_argument_group('Options')
     optional.add_argument("-m", "--mode",
                           dest="mode",
-                          help="workflow running modes (available: 'mapping-free, mapping, allelic-mapping, deepTools_qc')"
+                          help="workflow running modes (available: 'alignment-free, alignment, allelic-mapping, deepTools_qc')"
                           " (default: '%(default)s')",
                           default=defaults["mode"])
 
@@ -137,6 +137,10 @@ def main():
     elif args.allele_mode == "map_only":
         args.SNPfile = os.path.abspath(args.SNPfile)
         args.Nmasked_index = os.path.abspath(args.Nmasked_index)
+    modeTemp = args.mode.split(",")
+    # deeptools_qc requires alignment as input
+    if "deeptools_qc" in modeTemp and "alignment" not in modeTemp:
+        args.mode = "{},alignment".format(args.mode)
     ## End workflow-specific checks
 
     # Handle YAML and log files

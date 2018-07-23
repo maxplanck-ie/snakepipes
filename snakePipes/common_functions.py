@@ -393,9 +393,9 @@ def runAndCleanup(args, cmd, logfile_name, temp_path):
             if p.returncode:
                 print("Returncode:", p.returncode)
 
-            # kill snakemake and child processes
-            subprocess.call(["pkill", "-SIGTERM", "-P", str(p.pid)])
-            print("SIGTERM sent to PID:", p.pid)
+    # Exit with an error if snakemake encountered an error
+    if p.returncode != 0:
+        sys.exit(p.returncode)
 
     # remove temp dir
     if (temp_path != "" and os.path.exists(temp_path)):

@@ -73,7 +73,7 @@ else:
 
 
 ## Salmon
-if "mapping-free" in mode:
+if "alignment-free" in mode:
     include: os.path.join(maindir, "shared", "rules", "Salmon.snakefile")
     ## Sleuth (on Salmon)
     if sample_info:
@@ -108,8 +108,8 @@ def run_Trimming(trim, fastqc):
         return([])
 
 
-def run_mapping_free():
-    if "mapping-free" in mode:
+def run_alignment_free():
+    if "alignment-free" in mode:
         file_list = [
         "Annotation/genes.filtered.fa",
         "Salmon/SalmonIndex/sa.bin",
@@ -132,8 +132,8 @@ def run_mapping_free():
         return([])
 
 
-def run_mapping():
-    if "mapping" in mode:
+def run_alignment():
+    if "alignment" in mode.split(","):
         file_list = [
         "Sambamba/flagstat_report_all.tsv",
         expand(mapping_prg+"/{sample}.bam", sample = samples),
@@ -246,8 +246,8 @@ rule all:
         "Annotation/genes.annotated.bed",
         "Annotation/genes.filtered.bed",
 #        "Annotation/genes.filtered.saf",    # this file is used for featureCounts later on!
-        run_mapping_free(),            # Salmon
-        run_mapping(),                 # classical mapping + counting
+        run_alignment_free(),            # Salmon
+        run_alignment(),                 # classical mapping + counting
         run_allelesp_mapping(),        # allelic-mapping
         make_nmasked_genome(),
         run_deeptools_qc(),

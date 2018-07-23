@@ -40,7 +40,7 @@ def multiqc_input_check(return_value):
             indir += " Qualimap_qc "
     elif pipeline=="rna-seq":
         # must be RNA-mapping, add files as per the mode
-        if not "mapping-free" in mode:
+        if not "alignment-free" in mode:
             infiles.append( expand(mapping_prg+"/{sample}.bam", sample = samples) +
                     expand("Sambamba/{sample}.markdup.txt", sample = samples) +
                     expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample=samples))
