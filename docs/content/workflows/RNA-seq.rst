@@ -25,10 +25,10 @@ Analysis modes
 
 Following analysis (*modes*) are possible using the RNA-seq workflow:
 
-"mapping"
-~~~~~~~~~
+"alignment"
+~~~~~~~~~~~
 
-**mapping** mode could be more accurately referred to "alignment" mode. In this mode,
+In this mode,
 the pipeline uses one of the selected aligners to create BAM files, followed by
 gene-level quantification using **featurecounts**. Gene-level differential expression
 analysis is then performed using **DESeq2**.
@@ -43,10 +43,10 @@ Allele-specific, gene-level differential expression analysis is then performed u
 
 .. note:: **allelic-mapping** mode is mutually exclusive with **mapping** mode
 
-"mapping-free"
-~~~~~~~~~~~~~~
+"alignment-free"
+~~~~~~~~~~~~~~~~
 
-**mapping-free** mode could be more accurately referred to "alignment-free" mode. In this mode,
+In this mode,
 the pipeline uses **salmon** to perform transcript-level expression quantification. This mode
 performs both transcript-level differential expression (using **Sleuth**), and gene-level
 differential expression (using **wasabi**, followed by **DESeq2**).

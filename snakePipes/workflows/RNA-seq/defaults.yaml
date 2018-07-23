@@ -33,7 +33,7 @@ trim: False
 trim_prg: cutadapt
 trim_options:
 ## further options
-mode: mapping-free,deepTools_qc
+mode: alignment-free,deepTools_qc
 sample_info:
 bw_binsize: 25
 fastqc: False
