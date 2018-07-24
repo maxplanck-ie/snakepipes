@@ -1,6 +1,6 @@
 package:
   name: snakepipes
-  version: 1.0.0_alpha3
+  version: 1.0.0_alpha4
 
 source:
   path: ../
