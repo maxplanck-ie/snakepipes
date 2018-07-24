@@ -6,7 +6,7 @@ if mapping_prg == "Bowtie2":
             snp = snp_file,
             bam = "filtered_bam/{sample}.filtered.bam"
         output:
-            temp("filtered_bam/{sample}.sortedByName.bam"),
+            temp("filtered_bam/{sample}.filtered.sortedByName.bam"),
             expand("allelic_bams/{{sample}}.filtered.{suffix}.bam", suffix = ['allele_flagged', 'genome1', 'genome2', 'unassigned'])
         params:
             paired = '--paired' if paired else '',
