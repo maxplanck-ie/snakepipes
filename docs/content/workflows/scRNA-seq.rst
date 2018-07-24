@@ -30,7 +30,9 @@ The format of the cell barcodes file is shown below. Note that the default file 
     8       ACAGAC
     9       ACGTTG
 
-The default cell barcodes are 192 hexamers listed in a file with the first column a cell number and the second the barcode sequence.
+The default cell barcodes are 192 hexamers listed in a file with the first column a cell number and the second the barcode sequence. 
+
+Predefined cell barcodes are required right now. However it is planned to make this more generic in future workflow versions.
 
 Configuration file
 ~~~~~~~~~~~~~~~~~~
@@ -71,6 +73,22 @@ The default configuration file is listed below and can be found in `snakePipes/w
     dnaContam: False
 
 While all of these can be changed on the command line, you may find it useful to change `barcode_pattern` and `barcode_file` if you find that you need to change them frequently.
+
+Barcode pattern
+~~~~~~~~~~~~~~~
+
+The scRNA-seq pipeline requires barcodes at 5' end of read 1. The default barcode_pattern takes the first 6 bases as UMI (NNNNNN) and the following 6 bases as cell barcode (XXXXXX).
+'Don't care' positions eg. before stretches of 'N' can be indicated with '.'
+
+Trimming
+~~~~~~~~
+
+It is recommended to use the `--trim` option as this uses cutadapt to trim remaining adapters *and* poly-A tails from read 2 (see defaults for `--trim_options`).       
+
+Pseudogene filter
+~~~~~~~~~~~~~~~~~
+
+As defualt
 
 Output structure
 ----------------
