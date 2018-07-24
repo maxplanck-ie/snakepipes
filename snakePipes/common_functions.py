@@ -283,7 +283,6 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
     Merge dictionaries, write YAML files, construct the snakemake command
     and create the DAG
     """
-    print(callingScript)
     workflowName = os.path.basename(callingScript)
     snakemake_path = os.path.dirname(os.path.abspath(callingScript))
 
@@ -326,7 +325,7 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
         config['verbose'] = False
         write_configfile(os.path.join(args.outdir, '{}.config.yaml'.format(workflowName)), config)
         DAGproc = subprocess.Popen(snakemake_cmd + ['--rulegraph'], stdout=subprocess.PIPE)
-        _ = open("{}/pipeline.pdf".format(args.outdir), "wb")
+        _ = open("{}/{}_pipeline.pdf".format(args.outdir, workflowName), "wb")
         subprocess.check_call(["dot", "-Tpdf"], stdin=DAGproc.stdout, stdout=_)
         _.close()
         config['verbose'] = oldVerbose
@@ -358,14 +357,12 @@ def logAndExport(args, workflowName):
     # append the new run number to the file name
     logfile_name = "{}_run-{}.log".format(workflowName, n)
 
-    snakemake_log = "2>&1 | tee -a {}/{}".format(args.outdir, logfile_name).split()
-
     # create local temp dir and add this path to environment as $TMPDIR variable
     # on SLURM: $TMPDIR is set, created and removed by SlurmEasy on cluster node
     temp_path = make_temp_dir(args.tempdir, args.outdir)
     snakemake_exports = ["export", "TMPDIR='{}'".format(temp_path), "&&"]
 
-    return snakemake_log, snakemake_exports, logfile_name, temp_path
+    return snakemake_exports, logfile_name, temp_path
 
 
 def runAndCleanup(args, cmd, logfile_name, temp_path):
@@ -377,24 +374,32 @@ def runAndCleanup(args, cmd, logfile_name, temp_path):
         print("\n{}\n".format(cmd))
 
     # write log file
-    with open(os.path.join(args.outdir, logfile_name), "w") as f:
-        f.write(" ".join(sys.argv) + "\n\n")
-        f.write(cmd + "\n\n")
+    f = open(os.path.join(args.outdir, logfile_name), "w")
+    f.write(" ".join(sys.argv) + "\n\n")
+    f.write(cmd + "\n\n")
 
-    # Run snakemake
-    p = subprocess.Popen(cmd, shell=True)
+    # Run snakemake, stderr -> stdout is needed so readline() doesn't block
+    p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     if args.verbose:
         print("PID:", p.pid, "\n")
-    try:
-        p.wait()
-    except:
-        print("\nWARNING: Snakemake terminated!!!")
-        if p.returncode != 0:
-            if p.returncode:
-                print("Returncode:", p.returncode)
+
+    while p.poll() is None:
+        stdout = p.stdout.readline(1024)
+        if stdout:
+            sys.stdout.write(stdout.decode('utf-8'))
+            f.write(stdout.decode('utf-8'))
+            sys.stdout.flush()
+            f.flush()
+    # This avoids the race condition of p.poll() exiting before we get all the output
+    stdout = p.stdout.read()
+    if stdout:
+        sys.stdout.write(stdout.decode('utf-8'))
+        f.write(stdout.decode('utf-8'))
+    f.close()
 
     # Exit with an error if snakemake encountered an error
     if p.returncode != 0:
+        sys.stderr.write("Error: snakemake returned an error code of {}, so processing is incomplete!\n".format(p.returncode))
         sys.exit(p.returncode)
 
     # remove temp dir

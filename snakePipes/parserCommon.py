@@ -92,7 +92,7 @@ def mainArguments(defaults, workingDir=False):
     general.add_argument("--DAG",
                          dest="createDAG",
                          action="store_true",
-                         help="If specified, a file called pipeline.pdf is produced in the output directory that shows the rules used and their relationship to each other.")
+                         help="If specified, a file ending in _pipeline.pdf is produced in the output directory that shows the rules used and their relationship to each other.")
 
     general.add_argument("--version",
                          action="version",
