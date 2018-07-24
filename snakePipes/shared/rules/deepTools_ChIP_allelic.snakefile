@@ -18,10 +18,10 @@ rule bamCompare_log2_genome1:
         blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed
                     else "",
     log:
-        out = "deepTools_ChIP/logs/bamCompare.log2ratio.{chip_sample}.genome1.out",
-        err = "deepTools_ChIP/logs/bamCompare.log2ratio.{chip_sample}.genome1.err"
+        out = "deepTools_ChIP/logs/bamCompare.log2ratio.{chip_sample}.{control_name}.genome1.out",
+        err = "deepTools_ChIP/logs/bamCompare.log2ratio.{chip_sample}.{control_name}.genome1.err"
     benchmark:
-        "deepTools_ChIP/.benchmark/bamCompare.log2ratio.{chip_sample}.genome1.benchmark"
+        "deepTools_ChIP/.benchmark/bamCompare.log2ratio.{chip_sample}.{control_name}.genome1.benchmark"
     threads: 16
     shell: bamcompare_log2_cmd
 
@@ -42,10 +42,10 @@ rule bamCompare_log2_genome2:
         blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed
                     else "",
     log:
-        out = "deepTools_ChIP/logs/bamCompare.log2ratio.{chip_sample}.genome2.out",
-        err = "deepTools_ChIP/logs/bamCompare.log2ratio.{chip_sample}.genome2.err"
+        out = "deepTools_ChIP/logs/bamCompare.log2ratio.{chip_sample}.{control_name}.genome2.out",
+        err = "deepTools_ChIP/logs/bamCompare.log2ratio.{chip_sample}.{control_name}.genome2.err"
     benchmark:
-        "deepTools_ChIP/.benchmark/bamCompare.log2ratio.{chip_sample}.genome2.benchmark"
+        "deepTools_ChIP/.benchmark/bamCompare.log2ratio.{chip_sample}.{control_name}.genome2.benchmark"
     threads: 16
     shell: bamcompare_log2_cmd
 
