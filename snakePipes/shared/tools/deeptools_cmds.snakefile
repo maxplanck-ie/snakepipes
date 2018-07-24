@@ -172,6 +172,7 @@ plotPCA_cmd = """
             {params.plotcmd} \
             --transpose \
             --outFileNameData {output} \
+            --plotWidth 10 \
             -T 'PCA of {params.title} coverage' > {log.out} 2> {log.err}
     """
 
