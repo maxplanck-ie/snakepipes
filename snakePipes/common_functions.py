@@ -418,34 +418,34 @@ def predict_chip_dict(wdir):
     """
     pat = re.compile(r"input.*$", re.IGNORECASE)
 
-    infiles = sorted(glob.glob(os.path.join(wdir,'filtered_bam/', '*.bam')))
-    samples = get_sample_names(infiles,".filtered.bam",['', ''])
-    
+    infiles = sorted(glob.glob(os.path.join(wdir, 'filtered_bam/', '*.bam')))
+    samples = get_sample_names(infiles, ".filtered.bam", ['', ''])
+
     chip_dict_pred = {}
-    chip_dict_pred["chip_dict"] ={}
+    chip_dict_pred["chip_dict"] = {}
     print("---------------------------------------------------------------------------------------")
     print("Predict Chip-seq sample configuration")
     print("---------------------------------------------------------------------------------------")
     print("\nCheck identified samples...")
     for i in samples:
-        print(" "+i+"... ")
-        if re.match(r".*input.*",i,re.IGNORECASE):
-            print("\n","control/input sample found! Try to find corresponding ChIP samples...")
-            c_prefix = pat.sub("",i)
+        print(" " + i + "... ")
+        if re.match(r".*input.*", i, re.IGNORECASE):
+            print("\n", "control/input sample found! Try to find corresponding ChIP samples...")
+            c_prefix = pat.sub("", i)
             for j in samples:
-                if j!=i and re.match(r".*"+c_prefix+".*",j,re.IGNORECASE):
-                    print("  ",i," --> ",j)
-                    chip_dict_pred["chip_dict"][j]={}
+                if j != i and re.match(r".*" + c_prefix + ".*", j, re.IGNORECASE):
+                    print("  ", i, " --> ", j)
+                    chip_dict_pred["chip_dict"][j] = {}
                     chip_dict_pred["chip_dict"][j]['control'] = i
-                    if re.match(".*(H3K4me1|H3K36me3|H3K9me3|H3K27me3).*",j,re.IGNORECASE):
+                    if re.match(".*(H3K4me1|H3K36me3|H3K9me3|H3K27me3).*", j, re.IGNORECASE):
                         chip_dict_pred["chip_dict"][j]['broad'] = True
                     else:
                         chip_dict_pred["chip_dict"][j]['broad'] = False
             print("")
-            
-    write_configfile(os.path.join(wdir,"chip_seq_sample_config.yaml"),chip_dict_pred)
+
+    write_configfile(os.path.join(wdir, "chip_seq_sample_config.yaml"), chip_dict_pred)
     print("---------------------------------------------------------------------------------------")
-    print("Chip-seq sample configuration is written to file ",os.path.join(wdir,"chip_seq_sample_config.yaml"))
+    print("Chip-seq sample configuration is written to file ", os.path.join(wdir, "chip_seq_sample_config.yaml"))
     print("Please check and modify this file - this is just a guess! Then run the workflow with it.")
     print("---------------------------------------------------------------------------------------")
     sys.exit(0)
