@@ -14,6 +14,8 @@ The scRNA-seq pipeline is intended to process CEL-Seq2 data, though it may be ab
 
 UMIs in the read headers are used to avoid counting PCR duplicates. A number of bigWig and QC plots (e.g., from `plotEnrichment`) are generated as well.
 
+.. image:: ../images/scRNAseq_pipeline.png
+
 Input requirements
 ------------------
 
