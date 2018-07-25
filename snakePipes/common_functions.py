@@ -412,9 +412,9 @@ def runAndCleanup(args, cmd, logfile_name, temp_path):
 def predict_chip_dict(wdir):
     """
     Predict a chip_dict from bam files under filtered_bam/ from DNA-mapping workflow
-    input/controls samples are identified from pattern 'input' (case ignored)
-    write out chip_dict as yaml in workflow workingdir
-    predicts wether a sample is broad or narrow
+    ChIP input/control samples are identified from pattern 'input' (case ignored)
+    chip_dict is written as yaml to current workflow workingdir
+    predicts whether a sample is broad or narrow based on histone mark pattern
     """
     pat = re.compile(r"input.*$", re.IGNORECASE)
 
