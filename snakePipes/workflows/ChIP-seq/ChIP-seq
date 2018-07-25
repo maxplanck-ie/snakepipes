@@ -16,7 +16,7 @@ import snakePipes.parserCommon as parserCommon
 
 
 def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfile": None, "max_jobs": 5, "snakemake_options": "--use-conda", "tempdir": None,
-                         "paired": True, "bw_binsize": 25, "sample_info": "", "window_size": 150}):
+                         "paired": True, "bw_binsize": 25, "sample_info": "", "window_size": 150, "predict_chip_dict": False}):
     """
     Parse arguments from the command line.
     """
@@ -30,7 +30,7 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
         add_help=False
     )
 
-    parser.add_argument("samples_config", metavar="SAMPLESCONFIG", help="configuration file (eg. 'example.chip_samples.yaml') with sample annotation")
+    parser.add_argument("samples_config", nargs='?', metavar="SAMPLESCONFIG", help="configuration file (eg. 'example.chip_samples.yaml') with sample annotation")
 
 
     # Workflow options
@@ -66,6 +66,11 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
                                "while large window sizes (~500 bp) should be used for broad marks (eg. H3K27me3) "
                                "(default: '%(default)s')",
                           default=defaults["window_size"])
+    
+    optional.add_argument("--predict_chip_dict",
+                          dest="predict_chip_dict",
+                          action="store_true",
+                          help="Use existing bam files to predict a chip-seq sample configuration file. Write it to the workingdir")
 
     return parser
 
@@ -84,10 +89,13 @@ def main():
     cf.checkCommonArguments(args, baseDir)
 
     # Local argument checks
-    if os.path.exists(os.path.abspath(args.samples_config)):
+    if args.predict_chip_dict:
+        cf.predict_chip_dict(args.workingdir)
+
+    if args.samples_config is not None and os.path.exists(os.path.abspath(args.samples_config)):
         args.samples_config = os.path.abspath(args.samples_config)
     else:
-        sys.exit("\nError! Sample config file not found! ({})\n".format(args.samples_config))
+        sys.exit("\nError! Sample config file not found! ({})\n Either create one or call the workflow with --predict_chip_dict!\n".format(args.samples_config))
 
     # Handle YAML and log files
     snakemake_cmd = cf.commonYAMLandLogs(baseDir, workflowDir, defaults, args, __file__)
