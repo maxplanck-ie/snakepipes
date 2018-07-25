@@ -23,7 +23,9 @@ if trim:
 		fastq_dir = "FASTQ_TrimGalore"
 	elif trim_prg == "cutadapt":
 		fastq_dir = "FASTQ_Cutadapt"
-
+else:
+	fastq_indir_trim = None
+	
 mapping_prg = "STAR_genomic"
 
 star_options = "--twopassMode Basic"

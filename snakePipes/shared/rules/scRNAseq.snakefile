@@ -58,12 +58,13 @@ rule sc_bam_featureCounts_genomic:
     params:
         count_script = workflow.basedir+"/scRNAseq_bam_featureCounts.sh",
         bc_file = barcode_file,
+        lib_type = library_type
     threads: 
         5
     conda: CONDA_RNASEQ_ENV
     shell:
         """
-        {params.count_script} {input.bam} {input.gtf} {params.bc_file} {wildcards.sample} ${{TMPDIR}} {threads} 1>{output.counts} 2>{output.counts_summary};       
+        {params.count_script} {input.bam} {input.gtf} {params.bc_file} {wildcards.sample} {params.lib_type} ${{TMPDIR}} {threads} 1>{output.counts} 2>{output.counts_summary};       
         """
 
 
@@ -114,8 +115,9 @@ rule sc_QC_metrics:
         out_dir = outdir+"/QC_report/",
         plot_script = workflow.basedir+"/scRNAseq_QC_metrics2.R",
         out_prefix = "QC_report/QC_report.all_samples",
+        plot_format = plot_format,
         split = split_lib
     conda: CONDA_RNASEQ_ENV
     shell:
         ""+workflow.basedir+"/scRNAseq_QC_metrics.sh {params.in_dir} {params.out_dir} >{output.summary};"
-        " Rscript {params.plot_script} {params.cellsum_dir} {params.out_prefix} {params.split} {input.cell_names_merged};"
+        " Rscript {params.plot_script} {params.cellsum_dir} {params.out_prefix} {params.split} {input.cell_names_merged} {params.plot_format}"
