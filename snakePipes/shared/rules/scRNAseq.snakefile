@@ -58,12 +58,13 @@ rule sc_bam_featureCounts_genomic:
     params:
         count_script = workflow.basedir+"/scRNAseq_bam_featureCounts.sh",
         bc_file = barcode_file,
+        lib_type = library_type
     threads: 
         5
     conda: CONDA_RNASEQ_ENV
     shell:
         """
-        {params.count_script} {input.bam} {input.gtf} {params.bc_file} {wildcards.sample} ${{TMPDIR}} {threads} 1>{output.counts} 2>{output.counts_summary};       
+        {params.count_script} {input.bam} {input.gtf} {params.bc_file} {wildcards.sample} {params.lib_type} ${{TMPDIR}} {threads} 1>{output.counts} 2>{output.counts_summary};       
         """
 
 
