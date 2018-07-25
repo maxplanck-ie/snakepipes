@@ -128,13 +128,11 @@ libs_per_plate = 2
 if (is_split_library) libs_per_plate = 4
 
 
-#pdf(file=paste(out_prefix,".reads_UMI_plot.pdf",sep=""))
 p<-ggplot(dat=sc_dat,aes(x=(READS_UNIQFEAT),y=(UMI),color=sample))+geom_point(size=3,alpha=0.8) + 
 	facet_wrap(~sample,ncol=libs_per_plate)+
 	xlab("reads on feature per cell")+
 	ylab("unique UMIs per cell (trancripts)")+
 	theme(strip.text.x = element_text(size = 12, colour = "black",face="bold"))
-#dev.off()
 
 if (!is.null(plot_format)){
 	ggsave(plot=p,filename=paste(out_prefix,".reads_UMI_plot.",plot_format,sep=""),device=plot_format,dpi=200)
@@ -162,8 +160,6 @@ if (num_samples>4){
 
 print(height)
 
-#pdf(file=paste(out_prefix,".plate_cUPM.pdf",sep=""))
-
 p <- ggplot(sc_dat,aes(x=x,y=y,fill=cUPM_zscore))+ 
 		geom_tile() + 
 		facet_wrap(~sample,ncol = libs_per_plate, scales = "free") + 
@@ -180,9 +176,7 @@ p <- ggplot(sc_dat,aes(x=x,y=y,fill=cUPM_zscore))+
 if (!is.null(plot_format)){
 	ggsave(plot=p,filename=paste(out_prefix,".plate_cUPM.",plot_format,sep=""),device=plot_format,dpi=200)
 }
-#dev.off()
 
-#pdf(file=paste(out_prefix,".plate_cRPM.png",sep="")) #,width=1000,height=height)
 
 p<-ggplot(sc_dat,aes(x=x,y=y,fill=cRPM_zscore))+ 
 		geom_tile() + 
@@ -200,10 +194,6 @@ if (!is.null(plot_format)){
 	ggsave(plot=p,filename=paste(out_prefix,".plate_cRPM.",plot_format,sep=""),device=plot_format,dpi=200)
 }
 
-#dev.off()
-
-
-#pdf(file=paste(out_prefix,".plate_abs_transcripts.png",sep="")) #,width=1000,height=height)
 
 p<-ggplot(sc_dat,aes(x=x,y=y,fill=UMI))+ 
 		geom_tile() + 
@@ -225,7 +215,7 @@ p<-ggplot(sc_dat,aes(x=x,y=y,fill=UMI))+
 		theme(plot.title = element_text(color="white", size=22, face="bold",hjust = 0.5)) + 
 		theme(legend.title = element_text(colour="grey90", size=16, face="bold")) + 
 		theme(legend.text = element_text(colour="grey90", size = 16, face = "bold"))
-#dev.off()
+
 if (!is.null(plot_format)){
 	ggsave(plot=p,filename=paste(out_prefix,".plate_abs_transcripts.",plot_format,sep=""),device=plot_format,dpi=200)
 }
@@ -241,4 +231,3 @@ if (!is.null(plot_format)){
 #	}
 #	return(y2)
 #}
-
