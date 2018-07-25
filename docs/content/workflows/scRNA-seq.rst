@@ -72,7 +72,7 @@ The default configuration file is listed below and can be found in `snakePipes/w
     barcode_pattern: "NNNNNNXXXXXX"
     split_lib: False
     cell_names:
-    library_type: 2
+    library_type: 1
     bw_binsize: 10
     verbose: False
     plot_format: png
@@ -107,7 +107,7 @@ Here we assume you provide eg. a gencode or ensemble annotation file (via genes_
 Library Type
 ~~~~~~~~~~~~~~~
 
-The CEL-seq2 protocol produces reads where read 2 maps in sense direction.
+The CEL-seq2 protocol produces reads where read 2 maps in sense direction (:code:`library_type: 1`). After barcodes are transferred to read 2, the workflow continues in single-end mode.
 
 Split lib
 ~~~~~~~~~
@@ -158,14 +158,25 @@ The following will be produced in the output directory::
         ├── GSM2668205.bam
         └── GSM2668205.bam.bai
 
-The `Annotation` directory contains a filtered version of your original GTF file, with pseudogenes removed by default. The `Counts` directory contains 4 sets of counts: UMIs/feature/cell (.umis.txt), reads/feature/cell (.reads.txt), corrected number of UMIs/feature/cell (corrected.txt) and raw counts per cell per UMI per feature (raw_counts.txt). Of these, the values in corrected.txt should be used for further analysis and the others for quality control. 
+The `Annotation` directory contains a filtered version of your original GTF file, with pseudogenes removed by default. 
+The `bamCoverage` directory contains a bigwig track for each sample (not per cell!). This can be used eg. in IGV to check where your reads map in general.
+The `Counts` directory contains 4 sets of counts: UMIs/feature/cell (.umis.txt), reads/feature/cell (.reads.txt), corrected number of UMIs/feature/cell (corrected.txt) and raw counts per cell per UMI per feature (raw_counts.txt). Of these, the values in corrected.txt should be used for further analysis and the others for quality control.
+The `deeptools_qc` directory contains additional QC reports and plots. The `FASTQC` directory can be used to verify eg. the barcode layout of read 1.
+The `QC_report` directory contains additional QC stats as tables and plots.    
 
-The `QC_report` and `Results` ... ???. The `Sambamba` and `STAR_genomic` directories contain the output file from duplicate marking and genomic alignments, respectively.
+Results
+--------------
+
+- Main result: the genes per cell count table with poisson-corrected counts can be found under :code:`Results/all_samples.gencode_genomic.corrected_merged.csv`
+- corresponding annotation files are: `Annotation/genes.filtered.bed` and `Annotation/genes.filtered.gtf`, respectively
+- the folders `QC_report`, `FASTQC`, `deeptools_qc` and `multiQC` contain various QC tables and plots.  
+- `Sambamba` and `STAR_genomic` directories contain the output file from duplicate marking and genomic alignments, respectively
+
 
 Example images
 --------------
 
-There are a number of QC images produced by the pipeline, a few examples follow: ???
+There are a number of QC images produced by the pipeline:
 
 .. image:: ../images/scRNAseq_UMI_plot.png
 
@@ -174,6 +185,7 @@ This figure plots the number of UMIs on transcripts per cell vs the number of re
 .. image:: ../images/scRNAseq_plate_abs_transcript.png
 
 This figure shows the distribution of the number of UMIs across the single cells. Each block is a single cell and the color indicates the number of UMIs assigned to it. This is useful for flagging outlier cells.
+Note: the layout corresponds to half of a 384-well plate as this is used usually for CEL-seq2. The plot can also help to see biases corresponding to the well-plate.
 
 Command line options
 --------------------
