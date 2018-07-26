@@ -43,7 +43,7 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
                           " (default: '%(default)s')",
                           default=defaults["mode"])
 
-    parserCommon.commonOptions(optional, defaults, bw=False)
+    parserCommon.commonOptions(optional, defaults, bw=True)
 
     optional.add_argument("--library_type",
                           dest="library_type",
