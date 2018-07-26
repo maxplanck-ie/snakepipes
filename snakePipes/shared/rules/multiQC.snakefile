@@ -5,24 +5,25 @@ def multiqc_input_check(return_value):
     infiles = []
     indir = ""
 
-    if paired:
-        if trim:
-            infiles.append( expand("FastQC_trimmed/{sample}{read}_fastqc.html", sample = samples, read = reads) )
-            indir += " FastQC_trimmed "
-            infiles.append( expand(fastq_dir+"/{sample}{read}.fastq.gz", sample = samples, read = reads) )
-            indir += fastq_dir + " "
-        elif fastqc:
-            infiles.append( expand("FastQC/{sample}{read}_fastqc.html", sample = samples, read = reads) )
-            indir +=" FastQC "
-    else:
-        if trim:
-            infiles.append( expand("FastQC_trimmed/{sample}_fastqc.html", sample = samples) )
-            indir += " FastQC_trimmed "
-            infiles.append( expand(fastq_dir+"/{sample}.fastq.gz", sample = samples) )
-            indir += fastq_dir + " "
-        elif fastqc:
-            infiles.append( expand("FastQC/{sample}_fastqc.html", sample = samples) )
-            indir +=" FastQC "
+    if not pipeline=="scrna-seq":
+        if paired:
+            if trim:
+                infiles.append( expand("FastQC_trimmed/{sample}{read}_fastqc.html", sample = samples, read = reads) )
+                indir += " FastQC_trimmed "
+                infiles.append( expand(fastq_dir+"/{sample}{read}.fastq.gz", sample = samples, read = reads) )
+                indir += fastq_dir + " "
+            elif fastqc:
+                infiles.append( expand("FastQC/{sample}{read}_fastqc.html", sample = samples, read = reads) )
+                indir +=" FastQC "
+        else:
+            if trim:
+                infiles.append( expand("FastQC_trimmed/{sample}_fastqc.html", sample = samples) )
+                indir += " FastQC_trimmed "
+                infiles.append( expand(fastq_dir+"/{sample}.fastq.gz", sample = samples) )
+                indir += fastq_dir + " "
+            elif fastqc:
+                infiles.append( expand("FastQC/{sample}_fastqc.html", sample = samples) )
+                indir +=" FastQC "
 
     if pipeline=="dna-mapping":
         # pipeline is DNA-mapping
@@ -59,6 +60,16 @@ def multiqc_input_check(return_value):
         indir += " BWA "
         indir += " ".join(expand("HiC_matrices/QCplots/{sample}_QC ", sample = samples))
     elif pipeline == "scrna-seq":
+        if trim:
+            infiles.append( expand("FastQC_trimmed/{sample}_fastqc.html", sample = samples) )
+            indir += " FastQC_trimmed "
+            infiles.append( expand("FastQC/{sample}{read}_fastqc.html", sample = samples, read = reads) )
+            indir +=" FastQC "
+            infiles.append( expand(fastq_dir+"/{sample}.fastq.gz", sample = samples, read = reads) )
+            indir += fastq_dir + " "
+        elif fastqc:
+             infiles.append( expand("FastQC/{sample}{read}_fastqc.html", sample = samples, read = reads) )
+             indir +=" FastQC "
         infiles.append( expand(mapping_prg+"/{sample}.bam", sample = samples) +
         expand("Sambamba/{sample}.markdup.txt", sample = samples) +
         expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt", sample=samples))

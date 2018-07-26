@@ -38,10 +38,10 @@ barcode_file:
 barcode_pattern: "NNNNNNXXXXXX"
 split_lib: False
 cell_names:
-library_type: 2
+library_type: 1
 bw_binsize: 10
 verbose: False
-plot_format: png
+plot_format: pdf
 dnaContam: False
 ################################################################################
 # Call snakemake directly, i.e. without using the wrapper script:
