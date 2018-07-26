@@ -115,7 +115,7 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
                           metavar="STR",
                           action='store',
                           type=str,
-                          help="Bed file(s) with SNP positions to mask for methylation calling. Use this in case your strain of interest contains SNPs that are not in the reference genome. (default: '%(default)s')",
+                          help="Bed file(s) with positions to mask for methylation calling. Useful for masking SNPs in your strain of interest. (default: '%(default)s')",
                           default=defaults["blackList"])
 
     optional.add_argument("--sampleInfo",
