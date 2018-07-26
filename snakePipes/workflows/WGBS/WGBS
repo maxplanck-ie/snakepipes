@@ -52,13 +52,13 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
     optional.add_argument("--fqcin",
                           dest="fqcin",
                           action="store",
-                          help="Folder with fastqc.zip files to automatically detect hard trimming threshold. ",
+                          help="Folder with fastqc.zip files to automatically detect hard trimming threshold. (default: '%(default)s')",
                           default=defaults["fqcin"])
 
     optional.add_argument("-nt", "--nthreads",
                           dest="nthreads",
                           metavar="INT",
-                          help="number of threads to use for multi-threaded tasks",
+                          help="number of threads to use for multi-threaded tasks. (default: '%(default)s')",
                           type=int,
                           default=defaults["nthreads"])
 
