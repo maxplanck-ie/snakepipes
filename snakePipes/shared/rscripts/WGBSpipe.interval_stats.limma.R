@@ -108,7 +108,7 @@ if(nrow(bedtab.CC)==0) {message("None of the genomic intervals passed the filter
 #calculate and save row means
     CGI.limdat.CC$IntID<-rownames(CGI.limdat.CC)
     CGI.limdat.CC.L<-melt(CGI.limdat.CC,id.vars="IntID",value.name="Beta",variable.name="SampleID")
-    CGI.limdat.CC.L$Group<-sampleInfo$Group[match(CGI.limdat.CC.L$SampleID,sampleInfo$PlottingID)]
+    CGI.limdat.CC.L$Group<-sampleInfo$Group[match(CGI.limdat.CC.L$SampleID,sampleInfo$SampleID)]
     CGI.limdat.CC.Means<-data.table(summarize(group_by(CGI.limdat.CC.L,IntID,Group),Beta.Mean=mean(Beta)))
 
 
@@ -136,10 +136,10 @@ if(nrow(bedtab.CC)==0) {message("None of the genomic intervals passed the filter
     colnames(design)<-c("Intercept","Group")
     rownames(design)<-colnames(CGI.limdat.CC.logit)
     if("Control" %in% sampleInfo$Group){
-        gp<-factor(sampleInfo$Group[match(colnames(CGI.limdat.CC.logit),sampleInfo$PlottingID)])
+        gp<-factor(sampleInfo$Group[match(colnames(CGI.limdat.CC.logit),sampleInfo$SampleID)])
         gp<-relevel(gp,ref="Control")}
     if("WT" %in% sampleInfo$Group){
-        gp<-factor(sampleInfo$Group[match(colnames(CGI.limdat.CC.logit),sampleInfo$PlottingID)])
+        gp<-factor(sampleInfo$Group[match(colnames(CGI.limdat.CC.logit),sampleInfo$SampleID)])
         gp<-relevel(gp,ref="WT")}
     design$Group<-as.numeric(gp)
     design$Intercept<-1

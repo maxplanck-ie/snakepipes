@@ -12,3 +12,7 @@ conv_rate:
     memory: 6G
 CpG_stats:
     memory: 30G
+cleanup_metilene:
+    memory: 20G
+intAgg_stats:
+    memory: 30G
