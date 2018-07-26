@@ -25,14 +25,16 @@ if(!"PlottingID" %in% colnames(sampleInfo)){sampleInfo$PlottingID<-sampleInfo$Sa
 mpath<-commandArgs(trailingOnly=TRUE)[3]
 mdir<-dir(mpath,pattern="*CpG.filt2.bed",full.names=TRUE)
 mshort<-gsub(".CpG.filt2.bed","",basename(mdir))
+mdir<-mdir[match(sampleInfo$SampleID,mshort)]
+mshort<-gsub(".CpG.filt2.bed","",basename(mdir))
 
-cC<-c(rep("NULL",3),"numeric",rep("NULL",3),"character")
+#cC<-c(rep("NULL",3),"numeric",rep("NULL",3),"character")
 
 require(data.table)
 
 mlist<-vector("list",length(mdir))
 for(i in seq_along(mdir)){
-    tabi<-fread(mdir[i],colClasses=cC,sep="\t",header=TRUE)
+    tabi<-fread(mdir[i],select=c("Beta","ms"),sep="\t",header=TRUE)
     colnames(tabi)[colnames(tabi) %in% "Beta"]<-mshort[i]
     mlist[[i]]<-tabi
 }
@@ -42,11 +44,6 @@ limdat<-limdat[,c(1,match(sampleInfo$SampleID,colnames(limdat))),with=FALSE]
 
 
 limdat.LG<-limdat 
-#if(unique(grepl("MethylDackel",mdir))){
-#    limdat.LG[,2:ncol(limdat.LG)]<-limdat[,2:ncol(limdat),with=FALSE]/100
-#}
-if("Merge" %in% colnames(sampleInfo)){
-    colnames(limdat.LG)[2:ncol(limdat.LG)]<-sampleInfo$PlottingID[match(colnames(limdat.LG[,2:ncol(limdat.LG)]),sampleInfo$Merge)]}else{colnames(limdat.LG)[2:ncol(limdat.LG)]<-sampleInfo$PlottingID[match(colnames(limdat.LG[,2:ncol(limdat.LG)]),sampleInfo$SampleID)]}
 limdat.LG[,2:ncol(limdat.LG)]<-limdat.LG[,2:ncol(limdat.LG)]/100
 limdat.LG.CC<-limdat.LG[complete.cases(limdat.LG),] 
 if(nrow(limdat.LG.CC)==0){ message("None of the single CpG sites passed the filtering.")}else{
@@ -73,7 +70,7 @@ if(nrow(limdat.LG.CC)==0){ message("None of the single CpG sites passed the filt
 #calculate and save row means
     limdat.LG.CC.L<-melt(limdat.LG.CC,id.vars="ms",value.name="Beta",variable.name="SampleID")
     limdat.LG.CC.L$SampleID<-as.character(limdat.LG.CC.L$SampleID)
-    limdat.LG.CC.L$Group<-sampleInfo$Group[match(limdat.LG.CC.L$SampleID,sampleInfo$PlottingID)]
+    limdat.LG.CC.L$Group<-sampleInfo$Group[match(limdat.LG.CC.L$SampleID,sampleInfo$SampleID)]
     limdat.LG.CC.Means<-data.table(summarize(group_by(limdat.LG.CC.L,ms,Group),Beta.Mean=mean(Beta)))
 
     head(limdat.LG.CC.Means)
@@ -81,14 +78,14 @@ if(nrow(limdat.LG.CC)==0){ message("None of the single CpG sites passed the filt
     if ("Control" %in% limdat.LG.CC.Means$Group){
         limdat.LG.CC.Means$Group<-factor(limdat.LG.CC.Means$Group)
         limdat.LG.CC.Means$Group<-relevel(limdat.LG.CC.Means$Group,ref="Control")}
-    else if ("WT" %in% limdat.LG.CC.Means$Group){
+    if ("WT" %in% limdat.LG.CC.Means$Group){
         limdat.LG.CC.Means$Group<-factor(limdat.LG.CC.Means$Group)
         limdat.LG.CC.Means$Group<-relevel(limdat.LG.CC.Means$Group,ref="WT")}
 
     sink("GroupMean.ttest.txt")
     limdat.LG.CC.MeansXSample<-data.table(summarize(group_by(limdat.LG.CC.L,SampleID),Beta.Mean=mean(Beta)))
     limdat.LG.CC.MeansXSample$Beta.Mean.logit<-logit(limdat.LG.CC.MeansXSample$Beta.Mean,percents=FALSE,adjust=0.025)
-    limdat.LG.CC.MeansXSample$Group<-sampleInfo$Group[match(limdat.LG.CC.MeansXSample$SampleID,sampleInfo$PlottingID)]
+    limdat.LG.CC.MeansXSample$Group<-sampleInfo$Group[match(limdat.LG.CC.MeansXSample$SampleID,sampleInfo$SampleID)]
     print(limdat.LG.CC.MeansXSample)
     print(t.test(Beta.Mean.logit~Group,data=limdat.LG.CC.MeansXSample,var.equal=TRUE))
     sink()
@@ -108,10 +105,10 @@ if(nrow(limdat.LG.CC)==0){ message("None of the single CpG sites passed the filt
     colnames(design)<-c("Intercept","Group")
     rownames(design)<-colnames(limdat.LG.CC.logit)
     if("Control" %in% sampleInfo$Group){
-        gp<-factor(sampleInfo$Group[match(colnames(limdat.LG.CC.logit),sampleInfo$PlottingID)])
+        gp<-factor(sampleInfo$Group[match(colnames(limdat.LG.CC.logit),sampleInfo$SampleID)])
         gp<-relevel(gp,ref="Control")}
     else if("WT" %in% sampleInfo$Group){
-        gp<-factor(sampleInfo$Group[match(colnames(limdat.LG.CC.logit),sampleInfo$PlottingID)])
+        gp<-factor(sampleInfo$Group[match(colnames(limdat.LG.CC.logit),sampleInfo$SampleID)])
         gp<-relevel(gp,ref="WT")}
     design$Group<-as.numeric(gp)
     design$Intercept<-1
@@ -148,8 +145,8 @@ if(nrow(limdat.LG.CC)==0){ message("None of the single CpG sites passed the filt
         limdat.LG.CC.tw$chr<-gsub("_.+","",limdat.LG.CC.tw$ms)
         limdat.LG.CC.tw$pos<-gsub(".+_","",limdat.LG.CC.tw$ms)
         limdat.LG.CC.tw2<-limdat.LG.CC.tw[,c("chr","pos",colnames(limdat.LG.CC)[2:ncol(limdat.LG.CC)]),with=FALSE]
-        gv<-sampleInfo$Group[match(colnames(limdat.LG.CC)[2:ncol(limdat.LG.CC)],sampleInfo$PlottingID)]###check this and modify if necessary
-        gtab<-table(sampleInfo$Group[match(colnames(limdat.LG.CC)[2:ncol(limdat.LG.CC)],sampleInfo$PlottingID)])
+        gv<-sampleInfo$Group[match(colnames(limdat.LG.CC)[2:ncol(limdat.LG.CC)],sampleInfo$SampleID)]###check this and modify if necessary
+        gtab<-table(sampleInfo$Group[match(colnames(limdat.LG.CC)[2:ncol(limdat.LG.CC)],sampleInfo$SampleID)])
         cnn<-vector("numeric",length(gv))
         for(i in seq_along(gtab)){
             cnn[which(gv %in% names(gtab)[i])]<-seq_along(which(gv %in% names(gtab)[i]))
