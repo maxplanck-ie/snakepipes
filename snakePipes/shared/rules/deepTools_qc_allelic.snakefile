@@ -33,7 +33,7 @@ rule plotCoverage_allelic:
     output:
         "deepTools_qc/plotCoverage/read_coverage_allelic.png"
     params:
-        labels = " ".join(samples),
+        labels = " ".join(expand('{sample}.{suffix}', sample=samples, suffix = ['genome1', 'genome2'])),
         read_extension = "--extendReads" if paired
                          else "--extendReads "+str(fragment_length)
     log:
@@ -54,7 +54,7 @@ rule multiBamSummary_allelic:
     output:
         "deepTools_qc/multiBamSummary/read_coverage_allelic.bins.npz"
     params:
-        labels = " ".join(expand('{sample}.{suffix}', sample=samples, suffix = ['genome1', 'genome2']) ),
+        labels = " ".join(expand('{sample}.{suffix}', sample=samples, suffix = ['genome1', 'genome2'])),
         blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed
                     else "",
         read_extension = "--extendReads" if paired

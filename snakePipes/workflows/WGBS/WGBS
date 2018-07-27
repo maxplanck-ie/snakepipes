@@ -52,13 +52,13 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
     optional.add_argument("--fqcin",
                           dest="fqcin",
                           action="store",
-                          help="Folder with fastqc.zip files to automatically detect hard trimming threshold. ",
+                          help="Folder with fastqc.zip files to automatically detect hard trimming threshold. (default: '%(default)s')",
                           default=defaults["fqcin"])
 
     optional.add_argument("-nt", "--nthreads",
                           dest="nthreads",
                           metavar="INT",
-                          help="number of threads to use for multi-threaded tasks",
+                          help="number of threads to use for multi-threaded tasks. Please also check cluster-config for default per-job memory allocation. (default: '%(default)s')",
                           type=int,
                           default=defaults["nthreads"])
 
@@ -93,21 +93,21 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
                           dest="convrefpath",
                           metavar="STR",
                           type=str,
-                          help="Path to converted reference genome. (default: '%(default)s')",
+                          help="Path to Bisulfite-converted reference genome. (default: '%(default)s')",
                           default=defaults["convrefpath"])
 
     optional.add_argument("--convRef",
                           dest="convRef",
                           metavar="STR",
                           type=str,
-                          help="Convert reference genome. (default: '%(default)s')",
+                          help="In case a pre-converted reference-genome is not available. Convert the input reference genome. (default: '%(default)s')",
                           default=defaults["convRef"])
 
     optional.add_argument("--intList",
                           dest="intList",
                           metavar="STR",
                           action='append',
-                          help="BED file(s) with target intervals to run analysis on. Use multiple times to pass multiple bed files. (default: '%(default)s')",
+                          help="BED file(s) with target intervals to confine the analysis on. Use multiple times to pass multiple bed files. (default: '%(default)s')",
                           default=defaults["intList"])
 
     optional.add_argument("--blackList",
@@ -115,7 +115,7 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
                           metavar="STR",
                           action='store',
                           type=str,
-                          help="Bed file(s) with SNP positions to mask for methylation calling. (default: '%(default)s')",
+                          help="Bed file(s) with positions to mask for methylation calling. Useful for masking SNPs in your strain of interest. (default: '%(default)s')",
                           default=defaults["blackList"])
 
     optional.add_argument("--sampleInfo",
@@ -131,7 +131,7 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
                           metavar="STR",
                           action='store',
                           type=str,
-                          help="Number of nucleotides with mbias to ignore during methylation extraction. (default: '%(default)s')",
+                          help="Number of nucleotides with methylation bias to ignore during methylation extraction. In the *auto* mode this number is automaticaly calculated by MethylDackel (default: '%(default)s')",
                           default=defaults["mbias_ignore"])
 
     return parser
@@ -151,7 +151,6 @@ def main():
     cf.checkCommonArguments(args, baseDir, outDir=True)
 
     ## Begin workflow-specific code
-    args.adapterSeq = "AGATCGGAAGAGC"
     if args.nextera:
         args.adapterSeq = "CTGTCTCTTATA"
 
