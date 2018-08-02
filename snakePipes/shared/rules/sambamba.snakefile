@@ -12,7 +12,7 @@ rule sambamba_markdup:
        threads: 10
        conda: CONDA_SHARED_ENV
        shell: """
-           sambamba markdup -t {threads} --sort-buffer-size=6000 {input} {output}
+           sambamba markdup --overflow-list-size 600000 -t {threads} --sort-buffer-size=6000 {input} {output}
            """
 ## get statistics
 rule sambamba_flagstat:
