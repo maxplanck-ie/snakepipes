@@ -1,0 +1,14 @@
+genome_size: 1230258557
+genome_fasta: "/data/manke/group/rabbani/Dekker18/refgalgal5.fasta/Gallus_gallus.Gallus_gallus-5.0.dna_sm.toplevel.fa"
+genome_index: 
+genome_2bit: 
+bowtie2_index: "/data/manke/group/rabbani/Dekker18/Gallus_gallus.Gallus_gallus-5.0.dna_sm.toplevel.fa.gz" 
+hisat2_index: 
+bwa_index: 
+known_splicesites: 
+star_index: 
+genes_bed: 
+genes_gtf: 
+extended_coding_regions_gtf: 
+blacklist_bed: 
+ignore_forNorm:
