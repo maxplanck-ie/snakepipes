@@ -481,7 +481,7 @@ def predict_chip_dict(wdir):
         
         chip_dict_pred["chip_dict"][i] = {}
         chip_dict_pred["chip_dict"][i]['control'] = tmp
-        if re.match(".*(H3K4me1|H3K36me3|H3K9me3|H3K27me3).*", j, re.IGNORECASE):
+        if re.match(".*(H3K4me1|H3K36me3|H3K9me3|H3K27me3).*", i, re.IGNORECASE):
             chip_dict_pred["chip_dict"][i]['broad'] = True
         else:
             chip_dict_pred["chip_dict"][i]['broad'] = False
