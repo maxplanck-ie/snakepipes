@@ -460,34 +460,18 @@ def predict_chip_dict(wdir):
             if re.match(r".*"+c_suffix+"$",i,re.IGNORECASE):
                 suffix_matches.add(j)
                 print("suffix match!")
-                
-        print(len(prefix_matches))
-        print(len(suffix_matches))
-        
+
         final_matches = set(["NO_INPUT_FOUND"])
         
         if len(prefix_matches) > 0:
             final_matches = prefix_matches
         
-        if len(suffix_matches)>0 or (len(prefix_matches>0) and len(suffix_matches)<len(prefix_matches)):
+        if len(suffix_matches)>0 and (len(prefix_matches==0) or 
+                                       len(suffix_matches)<len(prefix_matches)):
             final_matches = suffix_matches
             
         if len(prefix_matches) == len(suffix_matches) and len(prefix_matches)>0:
             final_matches = set(prefix_matches).update(suffix_matches)
-        
-        
-#        if len(prefix_matches)==0 and len(suffix_matches)==0:
-#           final_matches = set(["NO_INPUT_FOUND"])
-#            print("here1")
-#        elif len(suffix_matches) == 0 or len(prefix_matches) >= len(suffix_matches)+1:
-#            final_matches = prefix_matches
-#            print("here2")
-#        elif len(prefix_matches) == 0 or len(prefix_matches)+1 <= len(suffix_matches):
-#            final_matches = suffix_matches
-#            print("here3")
-#        else:
-#            final_matches = set(suffix_matches).update(prefix_matches)
-#            print("here4")
 
         tmp=':'.join(list(final_matches))
         print(j, " pref:",prefix_matches," suf:",suffix_matches," ->",tmp)
