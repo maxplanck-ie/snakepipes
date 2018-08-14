@@ -416,8 +416,8 @@ def predict_chip_dict(wdir):
     chip_dict is written as yaml to current workflow workingdir
     predicts whether a sample is broad or narrow based on histone mark pattern
     """
-    pat = re.compile(r"input.*$", re.IGNORECASE)
-
+    pat1 = re.compile(r"input.*$", re.IGNORECASE)
+    pat2 = re.compile(r"^.*input", re.IGNORECASE)
     infiles = sorted(glob.glob(os.path.join(wdir, 'filtered_bam/', '*.bam')))
     samples = get_sample_names(infiles, ".filtered.bam", ['', ''])
 
@@ -426,14 +426,77 @@ def predict_chip_dict(wdir):
     print("---------------------------------------------------------------------------------------")
     print("Predict Chip-seq sample configuration")
     print("---------------------------------------------------------------------------------------")
-    print("\nCheck identified samples...")
+    print("\nSearch for Input/control samples...")
+    
+    input_samples = set([])
+    for i in samples:
+        #print(" " + i + "... ")
+        if re.match(r".*input.*", i, re.IGNORECASE):
+            print("...found: ",i)
+            input_samples.add(i)
+    
+    print(input_samples)
+    
+    print("\nTry to find corresponding ChIP samples...")
+    final_matches = set()
+    for i in samples:
+        
+        if i in input_samples:
+            continue
+        
+        print(" sample ",i)
+        
+        prefix_matches = set([])
+        suffix_matches = set([])
+        
+        for j in input_samples:
+            c_prefix = pat1.sub("", j)
+            c_suffix = pat2.sub("", j)
+            print(c_prefix," ",c_suffix)
+            
+            if re.match(r"^"+c_prefix+".*",i,re.IGNORECASE):
+                prefix_matches.add(j)
+                print("prefix match!")
+            if re.match(r".*"+c_suffix+"$",i,re.IGNORECASE):
+                suffix_matches.add(j)
+                print("suffix match!")
+                
+        print(len(prefix_matches))
+        print(len(suffix_matches))
+        if len(prefix_matches)==0 and len(suffix_matches)==0:
+            final_matches = set(["NO_INPUT_FOUND"])
+            print("here1")
+        elif len(suffix_matches) == 0 or len(prefix_matches) >= len(suffix_matches)+1:
+            final_matches = prefix_matches
+            print("here2")
+        elif len(prefix_matches) == 0 or len(prefix_matches)+1 <= len(suffix_matches):
+            final_matches = suffix_matches
+            print("here3")
+        else:
+            final_matches = set(suffix_matches).update(prefix_matches)
+            print("here4")
+
+        tmp=':'.join(list(final_matches))
+        print(j, " pref:",prefix_matches," suf:",suffix_matches," ->",tmp)
+        
+        
+    write_configfile(os.path.join(wdir, "chip_seq_sample_config.yaml"), chip_dict_pred)
+    print("---------------------------------------------------------------------------------------")
+    print("Chip-seq sample configuration is written to file ", os.path.join(wdir, "chip_seq_sample_config.yaml"))
+    print("Please check and modify this file - this is just a guess! Then run the workflow with it.")
+    print("---------------------------------------------------------------------------------------")
+    sys.exit(0)    
+    
+    
     for i in samples:
         print(" " + i + "... ")
         if re.match(r".*input.*", i, re.IGNORECASE):
-            print("\n", "control/input sample found! Try to find corresponding ChIP samples...")
-            c_prefix = pat.sub("", i)
+            print("\n"+"control/input sample found! Try to find corresponding ChIP samples...")
+            c_prefix = pat1.sub("", i)
+            c_suffix = pat2.sub("", i)
+            print(c_prefix," ",c_suffix)
             for j in samples:
-                if j != i and re.match(r".*" + c_prefix + ".*", j, re.IGNORECASE):
+                if j != i and not pat2.match(j) and re.match(r".*" + c_prefix + ".*", j, re.IGNORECASE):
                     print("  ", i, " --> ", j)
                     chip_dict_pred["chip_dict"][j] = {}
                     chip_dict_pred["chip_dict"][j]['control'] = i
@@ -441,6 +504,16 @@ def predict_chip_dict(wdir):
                         chip_dict_pred["chip_dict"][j]['broad'] = True
                     else:
                         chip_dict_pred["chip_dict"][j]['broad'] = False
+                elif j != i and not pat1.match(j) and re.match(r".*" + c_suffix + ".*", j, re.IGNORECASE):
+                    print("  ", i, " --> ", j)
+                    chip_dict_pred["chip_dict"][j] = {}
+                    chip_dict_pred["chip_dict"][j]['control'] = i
+                    if re.match(".*(H3K4me1|H3K36me3|H3K9me3|H3K27me3).*", j, re.IGNORECASE):
+                        chip_dict_pred["chip_dict"][j]['broad'] = True
+                    else:
+                        chip_dict_pred["chip_dict"][j]['broad'] = False
+                #else:
+                #    print(i," ",j," ",c_prefix," not match")
             print("")
 
     write_configfile(os.path.join(wdir, "chip_seq_sample_config.yaml"), chip_dict_pred)
