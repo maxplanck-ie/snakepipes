@@ -444,7 +444,7 @@ def predict_chip_dict(wdir):
         if i in input_samples:
             continue
         
-        print(" sample ", i)
+        print("\n sample: ", i)
         
         prefix_matches = set([])
         suffix_matches = set([])
@@ -472,7 +472,7 @@ def predict_chip_dict(wdir):
             final_matches = set(prefix_matches).update(suffix_matches)
 
         tmp=':'.join(list(final_matches))
-        print(" pref:",prefix_matches," suf:",suffix_matches," final:",tmp)
+        print("   pref:",prefix_matches," suf:",suffix_matches," final:",tmp)
         
         chip_dict_pred["chip_dict"][i] = {}
         chip_dict_pred["chip_dict"][i]['control'] = tmp
