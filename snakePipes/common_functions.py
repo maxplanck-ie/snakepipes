@@ -452,7 +452,7 @@ def predict_chip_dict(wdir):
         for j in input_samples:
             c_prefix = pat1.sub("", j)
             c_suffix = pat2.sub("", j)
-            print(c_prefix," ",c_suffix)
+            #print(c_prefix," ",c_suffix)
             
             if re.match(r"^"+c_prefix+".*",i,re.IGNORECASE):
                 prefix_matches.add(j)
@@ -472,7 +472,7 @@ def predict_chip_dict(wdir):
             final_matches = set(prefix_matches).update(suffix_matches)
 
         tmp=':'.join(list(final_matches))
-        print(j, " pref:",prefix_matches," suf:",suffix_matches," final:",tmp)
+        print(" pref:",prefix_matches," suf:",suffix_matches," final:",tmp)
         
         chip_dict_pred["chip_dict"][i] = {}
         chip_dict_pred["chip_dict"][i]['control'] = tmp
