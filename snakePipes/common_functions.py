@@ -479,6 +479,13 @@ def predict_chip_dict(wdir):
         tmp=':'.join(list(final_matches))
         print(j, " pref:",prefix_matches," suf:",suffix_matches," ->",tmp)
         
+        chip_dict_pred["chip_dict"][i] = {}
+        chip_dict_pred["chip_dict"][i]['control'] = tmp
+        if re.match(".*(H3K4me1|H3K36me3|H3K9me3|H3K27me3).*", j, re.IGNORECASE):
+            chip_dict_pred["chip_dict"][i]['broad'] = True
+        else:
+            chip_dict_pred["chip_dict"][i]['broad'] = False
+        
         
     write_configfile(os.path.join(wdir, "chip_seq_sample_config.yaml"), chip_dict_pred)
     print("---------------------------------------------------------------------------------------")
