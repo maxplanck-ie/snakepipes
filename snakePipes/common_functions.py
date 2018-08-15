@@ -454,7 +454,7 @@ def predict_chip_dict(wdir):
             if re.match(r".*" + c_suffix + "$", i, re.IGNORECASE):
                 suffix_matches.add(j)
 
-        final_matches = set(["None"])
+        final_matches = set([])
 
         if len(prefix_matches) > 0:
             final_matches = prefix_matches
@@ -467,9 +467,12 @@ def predict_chip_dict(wdir):
             final_matches = set(prefix_matches).update(suffix_matches)
 
         tmp = ':'.join(list(final_matches))
+        print("   pref:", prefix_matches, " suf:", suffix_matches, " final:", tmp)
+
         if len(final_matches) > 1:
             tmp = "__PLEASE_SELECT_ONLY_ONE_CONTROL__:" + tmp
-        print("   pref:", prefix_matches, " suf:", suffix_matches, " final:", tmp)
+        elif len(final_matches) == 0:
+            print("No control sample found!")
 
         chip_dict_pred["chip_dict"][i] = {}
         chip_dict_pred["chip_dict"][i]['control'] = tmp
