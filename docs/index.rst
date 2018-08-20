@@ -86,6 +86,7 @@ Contents:
    :maxdepth: 2
 
    content/setting_up.rst
+   content/create_index.rst
    content/running_snakePipes.rst
    content/workflows/DNA-mapping.rst
    content/workflows/ChIP-seq.rst
