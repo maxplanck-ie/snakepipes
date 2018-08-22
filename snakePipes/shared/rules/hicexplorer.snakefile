@@ -38,7 +38,8 @@ if(RF_resolution is True):
             R2 = "BWA/{sample}"+reads[1]+".bam",
             bed = enzyme + ".bed"
         output:
-             matrix ="HiC_matrices/{sample}_"+matrixFile_suffix+matrix_format
+             matrix ="HiC_matrices/{sample}_"+matrixFile_suffix+matrix_format,
+             qc = "HiC_matrices/QCplots/{sample}_QC/QC.log"
         params:
              QCfolder="HiC_matrices/QCplots/{sample}_QC/",
              res_seq = get_restriction_seq(enzyme),

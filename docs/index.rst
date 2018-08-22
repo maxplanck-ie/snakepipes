@@ -21,20 +21,17 @@ Pipeline                            Description
 Quick start
 -----------
 
-Assuming you have *python3* with *conda*, install snakePipes with:
+* Assuming you have *python3* with *conda*, install snakePipes with:
 
 .. code:: bash
 
     conda create -n snakePipes -c mpi-ie -c bioconda -c conda-forge snakePipes
 
-Download genome fasta, indexes and annotations for an example organism (mouse - mm10):
+* Download genome fasta and annotations for an your organism, and build indexes, Check in :doc:`content/create_index`
 
+* Download example fastq files for the human genome `here <https://zenodo.org/record/1346303>`_
 
-Download example fastq files for the mouse genome:
-
-
-Execute the example RNA-Seq mapping and differential expression analysis pipeline:
-
+* Execute the DNA-mapping pipeline using the example **command.sh** in the test data directory.
 
 
 Running your own analysis
@@ -88,6 +85,7 @@ Contents:
    content/setting_up.rst
    content/create_index.rst
    content/running_snakePipes.rst
+   content/advanced_usage.rst
    content/workflows/DNA-mapping.rst
    content/workflows/ChIP-seq.rst
    content/workflows/ATAC-seq.rst
