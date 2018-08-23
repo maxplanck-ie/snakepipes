@@ -26,10 +26,11 @@ rule filterCoveragePerScaffolds:
         count_cutoff = 2 # must contain more than 2 reads, i.e. 1 fragment
     threads: 6
     conda: CONDA_SHARED_ENV
-    shell:
-        "sambamba index -t {threads} {input.bam}"
-        "samtools idxstats {input.bam} | awk \"$3 > {params.cutoff_count}\" | cut -f 1 > {output.whitelist}"
-        "sambamba view -t {threads} -f bam -o {output.bam} {input.bam} $(cat {whitelist})"
+    shell: """
+        sambamba index -t {threads} {input.bam}
+        samtools idxstats {input.bam} | awk \"$3 > {params.cutoff_count}\" | cut -f 1 > {output.whitelist}
+        sambamba view -t {threads} -f bam -o {output.bam} {input.bam} $(cat {whitelist} | paste -sd\' \')
+        """
 
 # MACS2 BAMPE filter: samtools view -b -f 2 -F 4 -F 8 -F 256 -F 512 -F 2048
 rule callOpenChromatin:
