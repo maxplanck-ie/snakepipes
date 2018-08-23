@@ -16,7 +16,7 @@ rule filterFragments:
         """
 
 # necessary for that MACS2 BAMPE fails, if there is just one fragment mapped
-rule filterCoverageByScaffolds:
+rule filterCoveragePerScaffolds:
     input:
         BAM = os.path.join(outdir_MACS2, "{sample}.short.bam")
     output:
