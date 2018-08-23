@@ -25,7 +25,7 @@ rule filterCoveragePerScaffolds:
     params:
         count_cutoff = 2 # must contain more than 2 reads, i.e. 1 fragment
     threads: 6
-    conda:
+    conda: CONDA_SHARED_ENV
     shell:
         "sambamba index -t {threads} {input.bam}"
         "samtools idxstats {input.bam} | awk \"$3 > {params.cutoff_count}\" | cut -f 1 > {output.whitelist}"
