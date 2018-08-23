@@ -15,10 +15,26 @@ rule filterFragments:
         --maxFragmentLength {params.cutoff}
         """
 
+# necessary for that MACS2 BAMPE fails, if there is just one fragment mapped
+rule filterCoverageByScaffolds:
+    input:
+        BAM = os.path.join(outdir_MACS2, "{sample}.short.bam")
+    output:
+        whitelist = os.path.join(outdir_MACS2, "{sample}.chrom.selected"),
+        filteredBam = temp(os.path.join(outdir_MACS2, "{sample}.short.cleaned.bam"))
+    params:
+        count_cutoff = 2 # must contain more than 2 reads, i.e. 1 fragment
+    threads: 6
+    conda:
+    shell:
+        "sambamba index -t {threads} {input.bam}"
+        "samtools idxstats {input.bam} | awk \"$3 > {params.cutoff_count}\" | cut -f 1 > {output.whitelist}"
+        "sambamba view -t {threads} -f bam -o {output.bam} {input.bam} $(cat {whitelist})"
+
 # MACS2 BAMPE filter: samtools view -b -f 2 -F 4 -F 8 -F 256 -F 512 -F 2048
 rule callOpenChromatin:
     input:
-        os.path.join(outdir_MACS2, "{sample}.short.bam")
+        os.path.join(outdir_MACS2, "{sample}.short.cleaned.bam")
     output:
         peaks = os.path.join(outdir_MACS2, '{sample}.filtered.BAM_peaks.narrowPeak'),
         xls = os.path.join(outdir_MACS2, '{sample}.filtered.BAM_peaks.xls')
