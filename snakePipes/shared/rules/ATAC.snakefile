@@ -18,18 +18,20 @@ rule filterFragments:
 # necessary for that MACS2 BAMPE fails, if there is just one fragment mapped
 rule filterCoveragePerScaffolds:
     input:
-        BAM = os.path.join(outdir_MACS2, "{sample}.short.bam")
+        bam = os.path.join(outdir_MACS2, "{sample}.short.bam")
     output:
-        whitelist = os.path.join(outdir_MACS2, "{sample}.chrom.selected"),
-        filteredBam = temp(os.path.join(outdir_MACS2, "{sample}.short.cleaned.bam"))
+        whitelist = os.path.join(outdir_MACS2, "{sample}.chrom.whitelist"),
+        shortbai = temp(os.path.join(outdir_MACS2, "{sample}.short.bam.bai")),
+        bam = os.path.join(outdir_MACS2, "{sample}.short.cleaned.bam"),
+        bai = os.path.join(outdir_MACS2, "{sample}.short.cleaned.bam.bai")
     params:
-        count_cutoff = 2 # must contain more than 2 reads, i.e. 1 fragment
+        count_cutoff = int(fragmentCount_cutoff) * 2 # must contain more than 2 reads, i.e. 1 fragment
     threads: 6
     conda: CONDA_SHARED_ENV
     shell: """
-        sambamba index -t {threads} {input.bam}
-        samtools idxstats {input.bam} | awk \"$3 > {params.cutoff_count}\" | cut -f 1 > {output.whitelist}
-        sambamba view -t {threads} -f bam -o {output.bam} {input.bam} $(cat {whitelist} | paste -sd\' \')
+        sambamba index -t {threads} {input.bam} &&
+        samtools idxstats {input.bam} | awk -v cutoff={params.count_cutoff} \'$3 > cutoff\' | cut -f 1 > {output.whitelist} &&
+        sambamba view -t {threads} -f bam -o {output.bam} {input.bam} $(cat {output.whitelist} | paste -sd\' \')
         """
 
 # MACS2 BAMPE filter: samtools view -b -f 2 -F 4 -F 8 -F 256 -F 512 -F 2048
