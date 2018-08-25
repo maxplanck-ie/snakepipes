@@ -80,8 +80,9 @@ There is a configuration file in `snakePipes/workflows/ATACseq/defaults.yaml`::
     window_size: 20
     fragmentCount_cutoff: 1
 
-The only parameters that are useful to change are `bw_binsize`, `atac_fragment_size_cutoff`, and `window_size`. Note, however that those can be more conveniently changed on the command line. `fragmentCount_cutoff` is
-introduced to avoid errors in the peak calling step (default: 1 fragment) and only be increased, if MACS2 fails.
+The only parameters that are useful to change are `bw_binsize`, `atac_fragment_size_cutoff`, and `window_size`.
+Note, however that those can be more conveniently changed on the command line. `fragmentCount_cutoff` is
+introduced to avoid errors in the peak calling step and should only be changed if MACS2 fails.
 
 Output structure
 ----------------
