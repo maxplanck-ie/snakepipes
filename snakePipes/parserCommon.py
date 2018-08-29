@@ -13,18 +13,21 @@ def ListGenomes():
     return genomes
 
 
-def mainArguments(defaults, workingDir=False):
+def mainArguments(defaults, workingDir=False, createIndices=False):
     """
     Return a parser with the general and required args. This will include EITHER
     a -d option OR -i and -o, depending on the workingDir setting
 
     defaults is a dictionary of default values
+
+    A number of standard arguments are eliminated in the createIndices workflow.
     """
 
     parser = argparse.ArgumentParser(add_help=False)
 
-    genomes = ListGenomes()
-    parser.add_argument("genome", metavar="GENOME", help="Genome acronym of the target organism. Either a yaml file or one of: {}".format(", ".join(genomes)))
+    if not createIndices:
+        genomes = ListGenomes()
+        parser.add_argument("genome", metavar="GENOME", help="Genome acronym of the target organism. Either a yaml file or one of: {}".format(", ".join(genomes)))
 
     required = parser.add_argument_group('Required Arguments')
     if workingDir:
@@ -33,10 +36,11 @@ def mainArguments(defaults, workingDir=False):
                               help="working directory is output directory and must contain DNA-mapping pipeline output files",
                               required=True)
     else:
-        required.add_argument("-i", "--input-dir",
-                              dest="indir",
-                              required=True,
-                              help="input directory containing the FASTQ files, either paired-end OR single-end data")
+        if not createIndices:
+            required.add_argument("-i", "--input-dir",
+                                  dest="indir",
+                                  required=True,
+                                  help="input directory containing the FASTQ files, either paired-end OR single-end data")
         required.add_argument("-o", "--output-dir",
                               dest="outdir",
                               required=True,

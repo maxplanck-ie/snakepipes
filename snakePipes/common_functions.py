@@ -16,6 +16,7 @@ def set_env_yamls():
     This defines the global variables describing where the conda env yaml files are
     """
     return {'CONDA_SHARED_ENV': 'envs/shared.yaml',
+            'CONDA_CREATE_INDEX_ENV': 'envs/createIndices.yaml',
             'CONDA_RNASEQ_ENV': 'envs/rna_seq.yaml',
             'CONDA_DNA_MAPPING_ENV': 'envs/dna_mapping.yaml',
             'CONDA_CHIPSEQ_ENV': 'envs/chip_seq.yaml',
@@ -238,9 +239,11 @@ def setDefaults(fileName):
     return baseDir, workflowDir, defaults
 
 
-def checkCommonArguments(args, baseDir, outDir=False):
+def checkCommonArguments(args, baseDir, outDir=False, createIndices=False):
     """
     Check the wrapper arguments
+
+    The createIndices workflow disables some of this
     """
     # Some workflows use a working dir, others and outdir
     if outDir:
@@ -250,17 +253,18 @@ def checkCommonArguments(args, baseDir, outDir=False):
         args.workingdir = os.path.abspath(args.workingdir)
 
     # 1. Dir path
-    if outDir:
-        if os.path.exists(args.indir):
-            args.indir = os.path.abspath(args.indir)
+    if not createIndices:
+        if outDir:
+            if os.path.exists(args.indir):
+                args.indir = os.path.abspath(args.indir)
+            else:
+                sys.exit("\nError! Input dir not found! ({})\n".format(args.indir))
         else:
-            sys.exit("\nError! Input dir not found! ({})\n".format(args.indir))
-    else:
-        if os.path.exists(args.workingdir):
-            args.workingdir = os.path.abspath(args.workingdir)
-        else:
-            sys.exit("\nError! Working-dir (-d) dir not found! ({})\n".format(args.workingdir))
-        args.outdir = args.workingdir
+            if os.path.exists(args.workingdir):
+                args.workingdir = os.path.abspath(args.workingdir)
+            else:
+                sys.exit("\nError! Working-dir (-d) dir not found! ({})\n".format(args.workingdir))
+            args.outdir = args.workingdir
     args.cluster_logs_dir = os.path.join(args.outdir, "cluster_logs")
     # 2. Config file
     if args.configfile and not os.path.exists(args.configfile):
@@ -274,8 +278,9 @@ def checkCommonArguments(args, baseDir, outDir=False):
         if not check_sample_info_header(args.sample_info):
             sys.exit("ERROR: Please use 'name' and 'condition' as column headers in sample info file! ({})\n".format(args.sample_info))
     # 4. get abspath from user provided genome/organism file
-    if not os.path.isfile(os.path.join(baseDir, "shared/organisms/{}.yaml".format(args.genome))) and os.path.isfile(args.genome):
-        args.genome = os.path.abspath(args.genome)
+    if not createIndices:
+        if not os.path.isfile(os.path.join(baseDir, "shared/organisms/{}.yaml".format(args.genome))) and os.path.isfile(args.genome):
+            args.genome = os.path.abspath(args.genome)
 
 
 def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
