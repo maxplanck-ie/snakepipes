@@ -37,7 +37,7 @@ if(length(convRatedir>0)){
     plottab<-as.data.frame(t(convRatedat),stringsAsFactors=FALSE)[-1,]
     colnames(plottab)<-c("READ1","READ2")
     require(pander)
-    pander(plottab,style='grid',caption="Conversion rate in forward and reverse mates.")}
+    pander(plottab,style='grid',caption="Conversion rate in forward and reverse mates.")} else {message('No conversion rate output files found. If you started the pipeline from bam files, this is expected outcome. Otherwise, an error might have occured.')}
 ```
 
 ## Mapping rate
@@ -77,29 +77,31 @@ Observed PCR duplication rate on a PCR-free protocol should be low, not exceedin
 ```{r , echo=FALSE}
 QCdir<-params$QCdir
 Mapdir=dir(gsub("QC_metrics","bams",QCdir),pattern="*.rm_dupes.err$",full.names=TRUE,recursive=TRUE)
-Mapdir.short<-gsub(".rm_dupes.err","",basename(Mapdir))
+if(length(Mapdir>0)){
 
-bamRepL<-vector("list",length(Mapdir))
-names(bamRepL)<-Mapdir.short
+    Mapdir.short<-gsub(".rm_dupes.err","",basename(Mapdir))
 
-for(i in seq_along(bamRepL)){
+    bamRepL<-vector("list",length(Mapdir))
+    names(bamRepL)<-Mapdir.short
 
-PE<-system(paste0('grep \"end pairs\" ',Mapdir[i]),intern=TRUE)
-SE<-system(paste0('grep \"single ends\" ',Mapdir[i]),intern=TRUE)
-dup<-system(paste0('grep \"found\" ',Mapdir[i]),intern=TRUE)
-tabi<-as.data.frame(cbind(as.numeric(unlist(strsplit(PE,split=" "))[4]),as.numeric(unlist(strsplit(SE,split=" "))[7]),as.numeric(unlist(strsplit(dup,split=" "))[4])))
-colnames(tabi)<-c("PE","SE","Dupes")
-tabi$IN_dupes<-with(tabi,2*PE+SE)
-tabi$Pct_dupes<-with(tabi,Dupes/IN_dupes*100)
+    for(i in seq_along(bamRepL)){
 
-bamRepL[[i]]<-tabi
+    PE<-system(paste0('grep \"end pairs\" ',Mapdir[i]),intern=TRUE)
+    SE<-system(paste0('grep \"single ends\" ',Mapdir[i]),intern=TRUE)
+    dup<-system(paste0('grep \"found\" ',Mapdir[i]),intern=TRUE)
+    tabi<-as.data.frame(cbind(as.numeric(unlist(strsplit(PE,split=" "))[4]),as.numeric(unlist(strsplit(SE,split=" "))[7]),as.numeric(unlist(strsplit(dup,split=" "))[4])))
+    colnames(tabi)<-c("PE","SE","Dupes")
+    tabi$IN_dupes<-with(tabi,2*PE+SE)
+    tabi$Pct_dupes<-with(tabi,Dupes/IN_dupes*100)
 
-}
+    bamRepL[[i]]<-tabi
 
-bamReptab<-as.data.frame(do.call(rbind,bamRepL),stringsAsFactors=FALSE)
+    }
 
-require(pander)
-pander(bamReptab,style='simple',caption="PCR duplication rate.")
+    bamReptab<-as.data.frame(do.call(rbind,bamRepL),stringsAsFactors=FALSE)
+
+    require(pander)
+    pander(bamReptab,style='simple',caption="PCR duplication rate.")} else {message('No information on PCR duplicate removal found. If you started the pipeline from bam files, this is expected outcome. Otherwise, an error might have occured.')}
 ```
 
 ## Genome-wide coverage
