@@ -100,6 +100,16 @@ def get_sample_names(infiles, ext, reads):
         s.append(x)
     return sorted(list(set(s)))
 
+def get_sample_names_bam(infiles, bam_ext):
+    """
+    Get sample names without file extensions
+    """
+    s = []
+    for x in infiles:
+        x = os.path.basename(x).replace(bam_ext, "")
+        s.append(x)
+    return sorted(list(set(s)))
+
 
 def is_paired(infiles, ext, reads):
     """

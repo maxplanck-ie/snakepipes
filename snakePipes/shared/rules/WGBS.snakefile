@@ -9,6 +9,16 @@ def get_outdir(folder_name):
     sample_name = re.sub('_sampleSheet.[a-z]{3}$','',os.path.basename(sampleInfo))
     return("{}_{}".format(folder_name, sample_name))
 
+###symlink bams if this is the starting point
+if fromBam:
+    rule link_bam:
+        input:
+            indir+"/{sample}"+bam_ext
+        output:
+            "bams/{sample}"+bam_ext
+        shell:
+            "( [ -f {output} ] || ln -s -r {input} {output} ) && touch -h {output}"
+
  
 ###get automatic cut threshold for hard-trimming of 5' ends
 if trimReads=='auto':
@@ -115,7 +125,7 @@ if not trimReads is None:
         conda: CondaEnvironment
         shell: "bwameth.py --threads  {threads}  --read-group {params.RG} --reference {input.crefG} {input.R1cut} {input.R2cut} | samtools sort -T {params.tempdir} -m 3G -@ {params.sortThreads} -o {output.sbam} 1>{log.out} 2>{log.err}"
 
-if trimReads is None:
+if trimReads is None and not fromBam:
     rule map_reads:
         input:
             R1="FASTQ/{sample}"+reads[0]+".fastq.gz",
@@ -134,38 +144,38 @@ if trimReads is None:
         conda: CondaEnvironment
         shell: "bwameth.py --threads  {threads}  --read-group {params.RG} --reference {input.crefG} {input.R1} {input.R2} | samtools sort -T {params.tempdir} -m 3G -@ {params.sortThreads} -o {output.sbam} 1>{log.out} 2>{log.err}"
 
+if not fromBam:
+    rule index_bam:
+        input:
+            sbam="bams/{sample}.sorted.bam"
+        output:
+            sbami=temp("bams/{sample}.sorted.bam.bai")
+        log:
+            err="bams/logs/{sample}.index_bam.err",
+            out="bams/logs/{sample}.index_bam.out"
+        conda: CONDA_SHARED_ENV
+        shell: "samtools index {input.sbam} 1>{log.out} 2>{log.err}"
 
-rule index_bam:
-    input:
-        sbam="bams/{sample}.sorted.bam"
-    output:
-        sbami=temp("bams/{sample}.sorted.bam.bai")
-    log:
-        err="bams/logs/{sample}.index_bam.err",
-        out="bams/logs/{sample}.index_bam.out"
-    conda: CONDA_SHARED_ENV
-    shell: "samtools index {input.sbam} 1>{log.out} 2>{log.err}"
-
-rule rm_dupes:
-    input:
-        sbami="bams/{sample}.sorted.bam.bai",
-        sbam="bams/{sample}.sorted.bam"
-    output:
-        rmDupbam="bams/{sample}.PCRrm.bam"
-    log:
-        err="bams/logs/{sample}.rm_dupes.err",
-        out="bams/logs/{sample}.rm_dupes.out"
-    params:
-        tempdir=tempfile.mkdtemp(suffix='',prefix='',dir=tempdir)
-    threads: nthreads
-    conda: CONDA_SHARED_ENV
-    shell: "sambamba markdup --remove-duplicates -t {threads} --tmpdir {params.tempdir} {input.sbam} {output.rmDupbam} 1>{log.out} 2>{log.err}" 
+    rule rm_dupes:
+        input:
+            sbami="bams/{sample}.sorted.bam.bai",
+            sbam="bams/{sample}.sorted.bam"
+        output:
+            rmDupbam="bams/{sample}.PCRrm.bam"
+        log:
+            err="bams/logs/{sample}.rm_dupes.err",
+            out="bams/logs/{sample}.rm_dupes.out"
+        params:
+            tempdir=tempfile.mkdtemp(suffix='',prefix='',dir=tempdir)
+        threads: nthreads
+        conda: CONDA_SHARED_ENV
+        shell: "sambamba markdup --remove-duplicates -t {threads} --tmpdir {params.tempdir} {input.sbam} {output.rmDupbam} 1>{log.out} 2>{log.err}" 
 
 rule index_PCRrm_bam:
     input:
-        sbam="bams/{sample}.PCRrm.bam"
+        sbam="bams/{sample}"+bam_ext
     output:
-        sbami="bams/{sample}.PCRrm.bam.bai"
+        sbami="bams/{sample}"+bam_ext+".bai"
     params:
     log:
         err="bams/logs/{sample}.index_PCRrm_bam.err",
@@ -188,12 +198,11 @@ rule get_ran_CG:
     shell: 'set +o pipefail; ' + os.path.join(workflow_tools,'methylCtools') + " fapos {input.refG}  " + re.sub('.gz','',"{output.pozF}") + ';cat '+ re.sub('.gz','',"{output.pozF}") +' | grep "+" - | shuf | head -n 1000000 | awk \'{{print $1, $5, $5+1, $6, $8}}\' - | tr " " "\\t" | sort -k 1,1 -k2,2n - > ' + "{output.ranCG} 2>{log.err}"
         
 
-
 rule calc_Mbias:
     input:
         refG=refG,
-        rmDupBam="bams/{sample}.PCRrm.bam",
-        sbami="bams/{sample}.PCRrm.bam.bai"
+        rmDupBam="bams/{sample}"+bam_ext,
+        sbami="bams/{sample}"+bam_ext+".bai"
     output:
         mbiasTXT="QC_metrics/{sample}.Mbias.txt"
     log:
@@ -205,8 +214,8 @@ rule calc_Mbias:
 rule calc_GCbias:
     input:
         refG=refG,
-        rmDupBam="bams/{sample}.PCRrm.bam",
-        sbami="bams/{sample}.PCRrm.bam.bai"
+        rmDupBam="bams/{sample}"+bam_ext,
+        sbami="bams/{sample}"+bam_ext+".bai"
     output:
         GCbiasTXT="QC_metrics/{sample}.freq.txt",
         GCbiasPNG="QC_metrics/{sample}.GCbias.png"
@@ -224,8 +233,8 @@ if intList:
     rule depth_of_cov:
         input:
             refG=refG,
-            rmDupBam="bams/{sample}.PCRrm.bam",
-            sbami="bams/{sample}.PCRrm.bam.bai",
+            rmDupBam="bams/{sample}"+bam_ext,
+            sbami="bams/{sample}"+bam_ext+".bai",
             ranCG=os.path.join("aux_files",re.sub('.fa','.poz.ran1M.sorted.bed',os.path.basename(refG))),
             intList=intList
         output:
@@ -249,8 +258,8 @@ else:
     rule depth_of_cov:
         input:
             refG=refG,
-            rmDupBam="bams/{sample}.PCRrm.bam",
-            sbami="bams/{sample}.PCRrm.bam.bai",
+            rmDupBam="bams/{sample}"+bam_ext,
+            sbami="bams/{sample}"+bam_ext+".bai",
             ranCG=os.path.join("aux_files",re.sub('.fa','.poz.ran1M.sorted.bed',os.path.basename(refG)))
         output:
             outFileList=calc_doc(intList,True)
@@ -266,7 +275,7 @@ else:
         conda: CondaEnvironment
         shell: "gatk -Xmx30g -Djava.io.tmpdir={params.tempdir} -T DepthOfCoverage -R {input.refG} -o {params.OUTlist0} -I {input.rmDupBam} -ct 0 -ct 1 -ct 2 -ct 5 -ct 10 -ct 15 -ct 20 -ct 30 -ct 50  -omitBaseOutput -mmq 10 --partitionType sample ; gatk -Xmx30g -Djava.io.tmpdir={params.tempdir}  -T DepthOfCoverage -R {input.refG} -o {params.OUTlist1} -I {input.rmDupBam} -ct 0 -ct 1 -ct 2 -ct 5 -ct 10 -ct 15 -ct 20 -ct 30 -ct 50  -omitBaseOutput -mmq 10 --partitionType sample -L {input.ranCG} 1>{log.out} 2>{log.err}"
 
-if not trimReads is None:
+if not trimReads is None and not fromBam:
     rule downsample_reads:
         input:
             R1cut="FASTQ_Cutadapt/{sample}"+reads[0]+".fastq.gz",
@@ -300,39 +309,40 @@ if not trimReads is None:
         shell: os.path.join(workflow_tools,'conversionRate_KS.sh ')+ "{params.read_root} {output.R12cr} 1>{log.out} 2>{log.err}"
 
 else:
-    rule downsample_reads:
-        input:
-            R1="FASTQ/{sample}"+reads[0]+".fastq.gz",
-            R2="FASTQ/{sample}"+reads[1]+".fastq.gz"
-        output:
-            R1downsampled="FASTQ_downsampled/{sample}"+reads[0]+".fastq.gz",
-            R2downsampled="FASTQ_downsampled/{sample}"+reads[1]+".fastq.gz"
-        log:
-            err="FASTQ_downsampled/logs/{sample}.downsample_reads.err",
-            out="FASTQ_downsampled/logs/{sample}.downsample_reads.out"
-        threads: nthreads
-        conda: CONDA_SHARED_ENV
-        shell: """
-                seqtk sample -s 100 {input.R1} 5000000 | pigz -p {threads} -9 > {output.R1downsampled}  
-                seqtk sample -s 100 {input.R2} 5000000 | pigz -p {threads} -9 > {output.R2downsampled}
-                1>{log.out} 2>{log.err} 
-               """
+    if not fromBam:
+        rule downsample_reads:
+            input:
+                R1="FASTQ/{sample}"+reads[0]+".fastq.gz",
+                R2="FASTQ/{sample}"+reads[1]+".fastq.gz"
+            output:
+                R1downsampled="FASTQ_downsampled/{sample}"+reads[0]+".fastq.gz",
+                R2downsampled="FASTQ_downsampled/{sample}"+reads[1]+".fastq.gz"
+            log:
+                err="FASTQ_downsampled/logs/{sample}.downsample_reads.err",
+                out="FASTQ_downsampled/logs/{sample}.downsample_reads.out"
+            threads: nthreads
+            conda: CONDA_SHARED_ENV
+            shell: """
+                    seqtk sample -s 100 {input.R1} 5000000 | pigz -p {threads} -9 > {output.R1downsampled}  
+                    seqtk sample -s 100 {input.R2} 5000000 | pigz -p {threads} -9 > {output.R2downsampled}
+                    1>{log.out} 2>{log.err} 
+                   """
     
-    rule conv_rate:
-        input:
-            R1="FASTQ_downsampled/{sample}"+reads[0]+".fastq.gz",
-            R2="FASTQ_downsampled/{sample}"+reads[1]+".fastq.gz"
-        output:
-            R12cr="QC_metrics/{sample}.conv.rate.txt"
-        log:
-            err="QC_metrics/logs/{sample}.conv_rate.err",
-            out="QC_metrics/logs/{sample}.conv_rate.out"
-        threads: 1
-        shell: os.path.join(workflow_tools,'conversionRate_KS.sh ')+ "FASTQ_downsampled/{sample} {output.R12cr} 1>{log.out} 2>{log.err}"
+        rule conv_rate:
+            input:
+                R1="FASTQ_downsampled/{sample}"+reads[0]+".fastq.gz",
+                R2="FASTQ_downsampled/{sample}"+reads[1]+".fastq.gz"
+            output:
+                R12cr="QC_metrics/{sample}.conv.rate.txt"
+            log:
+                err="QC_metrics/logs/{sample}.conv_rate.err",
+                out="QC_metrics/logs/{sample}.conv_rate.out"
+            threads: 1
+            shell: os.path.join(workflow_tools,'conversionRate_KS.sh ')+ "FASTQ_downsampled/{sample} {output.R12cr} 1>{log.out} 2>{log.err}"
 
 rule get_flagstat:
     input:
-        rmDupbam="bams/{sample}.PCRrm.bam"
+        rmDupbam="bams/{sample}"+bam_ext
     output:
         fstat="QC_metrics/{sample}.flagstat"
     log:
@@ -341,29 +351,47 @@ rule get_flagstat:
     conda: CONDA_SHARED_ENV
     shell: "samtools flagstat {input.rmDupbam} > {output.fstat} 2>{log.err}" 
 
-rule produce_report:
-    input:
-        doc_res=calc_doc(intList,False),
-        R12cr=expand("QC_metrics/{sample}.conv.rate.txt",sample=samples),
-        mbiasTXT=expand("QC_metrics/{sample}.Mbias.txt",sample=samples),
-        fstat=expand("QC_metrics/{sample}.flagstat",sample=samples)
-    output:
-        QCrep='QC_metrics/QC_report.pdf'
-    params:
-        auxdir=os.path.join(outdir,"aux_files")
-    log:
-        err="QC_metrics/logs/produce_report.err",
-        out="QC_metrics/logs/produce_report.out"
-    conda: RmdCondaEnvironment 
-    threads: 1
-    shell: "cp -v " + os.path.join(workflow_rscripts,"WGBS_QC_report_template.Rmd")+ " " + os.path.join("aux_files", "WGBS_QC_report_template.Rmd") + ';Rscript -e "rmarkdown::render(\''+os.path.join(outdir,"aux_files", "WGBS_QC_report_template.Rmd")+'\', params=list(QCdir=\'"' + os.path.join(outdir,"QC_metrics") +'"\' ), output_file =\'"'+ os.path.join(outdir,"QC_metrics",'QC_report.pdf"\'')+')"' + " 1>{log.out} 2>{log.err}"
+if not fromBam:
+    rule produce_report:
+        input:
+            doc_res=calc_doc(intList,False),
+            R12cr=expand("QC_metrics/{sample}.conv.rate.txt",sample=samples),
+            mbiasTXT=expand("QC_metrics/{sample}.Mbias.txt",sample=samples),
+            fstat=expand("QC_metrics/{sample}.flagstat",sample=samples)
+        output:
+            QCrep='QC_metrics/QC_report.pdf'
+        params:
+            auxdir=os.path.join(outdir,"aux_files")
+        log:
+            err="QC_metrics/logs/produce_report.err",
+            out="QC_metrics/logs/produce_report.out"
+        conda: RmdCondaEnvironment 
+        threads: 1
+        shell: "cp -v " + os.path.join(workflow_rscripts,"WGBS_QC_report_template.Rmd")+ " " + os.path.join("aux_files", "WGBS_QC_report_template.Rmd") + ';Rscript -e "rmarkdown::render(\''+os.path.join(outdir,"aux_files", "WGBS_QC_report_template.Rmd")+'\', params=list(QCdir=\'"' + os.path.join(outdir,"QC_metrics") +'"\' ), output_file =\'"'+ os.path.join(outdir,"QC_metrics",'QC_report.pdf"\'')+')"' + " 1>{log.out} 2>{log.err}"
+
+else:
+    rule produce_report:
+        input:
+            doc_res=calc_doc(intList,False),
+            mbiasTXT=expand("QC_metrics/{sample}.Mbias.txt",sample=samples),
+            fstat=expand("QC_metrics/{sample}.flagstat",sample=samples)
+        output:
+            QCrep='QC_metrics/QC_report.pdf'
+        params:
+            auxdir=os.path.join(outdir,"aux_files")
+        log:
+            err="QC_metrics/logs/produce_report.err",
+            out="QC_metrics/logs/produce_report.out"
+        conda: RmdCondaEnvironment 
+        threads: 1
+        shell: "cp -v " + os.path.join(workflow_rscripts,"WGBS_QC_report_template.Rmd")+ " " + os.path.join("aux_files", "WGBS_QC_report_template.Rmd") + ';Rscript -e "rmarkdown::render(\''+os.path.join(outdir,"aux_files", "WGBS_QC_report_template.Rmd")+'\', params=list(QCdir=\'"' + os.path.join(outdir,"QC_metrics") +'"\' ), output_file =\'"'+ os.path.join(outdir,"QC_metrics",'QC_report.pdf"\'')+')"' + " 1>{log.out} 2>{log.err}"
 
 
 if mbias_ignore=="auto":
     rule methyl_extract:
         input:
-            rmDupbam="bams/{sample}.PCRrm.bam",
-            sbami="bams/{sample}.PCRrm.bam.bai",
+            rmDupbam="bams/{sample}"+bam_ext,
+            sbami="bams/{sample}"+bam_ext+".bai",
             refG=refG,
             mbiasTXT="QC_metrics/{sample}.Mbias.txt"     
         output:
@@ -381,8 +409,8 @@ if mbias_ignore=="auto":
 else:
     rule methyl_extract:
         input:
-            rmDupbam="bams/{sample}.PCRrm.bam",
-            sbami="bams/{sample}.PCRrm.bam.bai",
+            rmDupbam="bams/{sample}"+bam_ext,
+            sbami="bams/{sample}"+bam_ext+".bai",
             refG=refG
         output:
             methTab="methXT/{sample}_CpG.bedGraph"
