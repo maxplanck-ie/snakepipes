@@ -17,7 +17,7 @@ import snakePipes.parserCommon as parserCommon
 
 def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfile":None, "max_jobs": 12, "nthreads": 8, "snakemake_options": "--use-conda", "tempdir": None,
                          "downsample": None, "trimReads": "user", "fqcin": None, "adapterSeq": "AGATCGGAAGAGC", "nextera": False, "trimThreshold": 10, "trimOtherArgs": None, "convrefpath": None,
-                         "convRef": None, "intList": [], "blackList": None, "sampleInfo": None, "mbias_ignore": "auto"}):
+                         "convRef": None, "intList": [], "blackList": None, "sampleInfo": None, "mbias_ignore": "auto", "fromBam": False}):
     """
     Parse arguments from the command line.
     """
@@ -133,6 +133,11 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
                           type=str,
                           help="Number of nucleotides with methylation bias to ignore during methylation extraction. In the *auto* mode this number is automaticaly calculated by MethylDackel (default: '%(default)s')",
                           default=defaults["mbias_ignore"])
+
+    optional.add_argument("--fromBam",
+                         dest="fromBam",
+                         action="store_true",
+                         help="Start pipeline from processed bam files after PCR duplicate removal.",default=defaults["fromBam"])
 
     return parser
 
