@@ -72,7 +72,7 @@ There is a configuration file in `snakePipes/workflows/ATACseq/defaults.yaml`::
     genome:
     ## Bin size of output files in bigWig format
     bw_binsize: 25
-    atac_fragment_size_cutoff: 150
+    fragmentSize_cutoff: 150
     verbose: false
     # sampleInfo_DB
     sample_info:
