@@ -52,7 +52,6 @@ def parse_args(defaults={"configfile": None, "cluster_configfile": None, "max_jo
     optional.add_argument("--effectiveGenomeSize",
                           help="The effective genome size. If you don't specify a value then the number of non-N bases will be used.")
 
-    # TODO this doesn't work with URLs
     optional.add_argument("--blacklist",
                           help="An optional URL or local path to a file to use to blacklist regions (such as that provided by the ENCODE consortium).")
 

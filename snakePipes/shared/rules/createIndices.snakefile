@@ -91,9 +91,10 @@ rule bowtie2Index:
     params:
       basedir = os.path.join(outdir, "BowtieIndex")
     conda: CONDA_DNA_MAPPING_ENV
+    threads: 10
     shell: """
         ln -s {input} {params.basedir}/genome.fa
-        bowtie2-build {params.basedir}/genome.fa {params.basedir}/genome
+        bowtie2-build -t {threads} {params.basedir}/genome.fa {params.basedir}/genome
         """
 
 # Default memory allocation: 20G
@@ -168,3 +169,13 @@ rule copyBlacklist:
         url = blacklist
     run:
         downloadFile(params.url, output)
+
+
+# Default memory allocation: 1G
+rule computeEffectiveGenomeSize:
+    input: genome_fasta
+    output: os.path.join(outdir, "genome_fasta", "effectiveSize")
+    conda: CONDA_SHARED_ENV
+    shell: """
+        seqtk comp {input} | awk '{{tot += $3 + $4 + $5 + $6}}END{{print tot}}' > {output}
+        """

@@ -80,6 +80,14 @@ if ignore_forNorm:
     f.close()
     organismDictionary['blacklist_bed'] = " ".join(ignore)
 
+if effectiveGenomeSize and effectiveGenomeSize > 0:
+    os.makedirs(os.path.join(outdir, "genome_fasta"), exist_ok=True)
+    f = open(os.path.join(outdir, "genome_fasta", "effectiveSize"), "w")
+    f.write("{}\n".format(effectiveGenomeSize))
+    f.close()
+else:
+    targets.append(os.path.join(outdir, "genome_fasta", "effectiveSize"))
+
 globals().update(organismDictionary)
 include: os.path.join(maindir, "shared", "rules", "createIndices.snakefile")
 
@@ -112,7 +120,9 @@ rule all:
 ################################################################################
 onsuccess:
     cf.cleanLogs(outdir)
-    organismDictionary['genome_size'] = getGenomeSize(outdir, effectiveGenomeSize)
+    f = open(os.path.join(outdir, "genome_fasta", "effectiveSize"))
+    organismDictionary['genome_size'] = f.read().strip()
+    f.close()
     cf.write_configfile(os.path.join(maindir, "shared", "organisms", "{}.yaml".format(genome)), organismDictionary)
     if "verbose" in config and config["verbose"]:
         print("\n--- index creation workflow finished successfully! --------------------------------\n")
