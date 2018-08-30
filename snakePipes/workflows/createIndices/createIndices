@@ -44,12 +44,13 @@ def parse_args(defaults={"configfile": None, "cluster_configfile": None, "max_jo
     # Workflow options
     optional = parser.add_argument_group('Options')
     optional.add_argument("--tools",
-                          help="Only produce indices for the following tools (by default, all indices will be created). The default is 'all'.",
+                          help="Only produce indices for the following tools (by default, all indices will be created). The default is 'all'. 'none' will create everything except aligner indices.",
                           default="all",
                           nargs="+",
-                          choices=['all', 'bowtie2', 'hisat2', 'bwa', 'bwameth', 'star'])
+                          choices=['all', 'bowtie2', 'hisat2', 'bwa', 'bwameth', 'star', 'none'])
 
     optional.add_argument("--effectiveGenomeSize",
+                          type=int,
                           help="The effective genome size. If you don't specify a value then the number of non-N bases will be used.")
 
     optional.add_argument("--blacklist",

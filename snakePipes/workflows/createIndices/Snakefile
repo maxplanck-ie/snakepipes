@@ -78,7 +78,7 @@ if ignore_forNorm:
     f = open(ignore_forNorm)
     ignore = [line.strip() for line in f]
     f.close()
-    organismDictionary['blacklist_bed'] = " ".join(ignore)
+    organismDictionary['ignore_forNorm'] = " ".join(ignore)
 
 if effectiveGenomeSize and effectiveGenomeSize > 0:
     os.makedirs(os.path.join(outdir, "genome_fasta"), exist_ok=True)
@@ -121,7 +121,7 @@ rule all:
 onsuccess:
     cf.cleanLogs(outdir)
     f = open(os.path.join(outdir, "genome_fasta", "effectiveSize"))
-    organismDictionary['genome_size'] = f.read().strip()
+    organismDictionary['genome_size'] = int(f.read().strip())
     f.close()
     cf.write_configfile(os.path.join(maindir, "shared", "organisms", "{}.yaml".format(genome)), organismDictionary)
     if "verbose" in config and config["verbose"]:
