@@ -5,7 +5,7 @@ rule filterFragments:
         shortBAM = temp(os.path.join(outdir_MACS2, "{sample}.short.bam")),
         metrics = os.path.join(outdir_MACS2, "{sample}.short.metrics")
     params:
-        cutoff = atac_fragment_size_cutoff
+        cutoff = fragmentSize_cutoff
     threads: 6
     conda: CONDA_SHARED_ENV
     shell: """
