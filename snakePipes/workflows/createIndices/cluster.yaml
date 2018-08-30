@@ -7,7 +7,7 @@ make2bit:
 downloadGTF:
     memory: 20G
 bowtie2Index:
-    memory: 8G
+    memory: 20G
 hisat2Index:
     memory: 2G
 starIndex:

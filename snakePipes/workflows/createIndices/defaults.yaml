@@ -16,6 +16,7 @@ configfile:
 cluster_configfile:
 local: False
 max_jobs: 5
+verbose: False
 ## Genome name used in snakePipes (no spaces!)
 genome:
 ## Tools to create indices for. "all" for all of them

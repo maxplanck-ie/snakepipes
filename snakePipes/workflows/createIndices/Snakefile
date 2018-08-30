@@ -9,11 +9,6 @@ globals().update(cf.set_env_yamls())
 
 # load config file
 globals().update(cf.load_configfile(workflow.overwrite_configfile, config["verbose"]))
-# load organism-specific data, i.e. genome indices, annotation, etc.
-globals().update(cf.load_organism_data(genome, maindir, config["verbose"]))
-
-# do workflow specific stuff now
-include: os.path.join(workflow.basedir, "internals.snakefile")
 
 ### include modules of other snakefiles ########################################
 ################################################################################
@@ -37,19 +32,16 @@ organismDictionary = {'genome_size': 0,
 
 targets = [os.path.join(outdir, x) for x in ["genome_fasta/genome.fa",
                                              "genome_fasta/genome.fa.fai",
-                                             "genome_fasta/genome.2bit",
-                                             "genome_fasta/effectiveSize"]]
+                                             "genome_fasta/genome.2bit"]]
 
 organismDictionary['genome_fasta'] = os.path.join(outdir, "genome_fasta/genome.fa")
 organismDictionary['genome_index'] = os.path.join(outdir, "genome_fasta/genome.fa.fai")
 organismDictionary['genome_2bit'] = os.path.join(outdir, "genome_fasta/genome.2bit")
 
-include os.path.join(maindir, "shared", "rules", "createIndices")
-
 if gtfURL:
     targets.extend([os.path.join(outdir, x) for x in ["annotation/genes.gtf",
                                                       "annotation/genes.bed",
-                                                      "annotation/genes.slop.gtf"]
+                                                      "annotation/genes.slop.gtf"]])
     organismDictionary['genes_gtf'] = os.path.join(outdir, "annotation/genes.gtf")
     organismDictionary['genes_bed'] = os.path.join(outdir, "annotation/genes.bed")
     organismDictionary['extended_coding_regions_gtf'] = os.path.join(outdir, "annotation/genes.slop.gtf")
@@ -78,7 +70,7 @@ if 'all' in tools or 'bwameth' in tools:
     organismDictionary['bwameth_index'] = os.path.join(outdir, "BWAmethIndex/genome.fa")
 
 if blacklist:
-    targets.append(outdir, "annotation/blacklist.bed")
+    targets.append(os.path.join(outdir, "annotation/blacklist.bed"))
     organismDictionary['blacklist_bed'] = os.path.join(outdir, "annotation/blacklist.bed")
 
 ignore = []
@@ -87,6 +79,9 @@ if ignore_forNorm:
     ignore = [line.strip() for line in f]
     f.close()
     organismDictionary['blacklist_bed'] = " ".join(ignore)
+
+globals().update(organismDictionary)
+include: os.path.join(maindir, "shared", "rules", "createIndices.snakefile")
 
 ### execute before workflow starts #############################################
 ################################################################################

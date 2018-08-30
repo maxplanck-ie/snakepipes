@@ -1,32 +1,36 @@
+def downloadFile(url, output):
+    import urllib.request
+    import gzip
+    import bz2
+    import os.path
+
+    if os.path.exists(url):
+        url = "file://{}".format(urllib.request.pathname2url(url))
+
+    f = urllib.request.urlopen(url)
+    content = f.read()
+    f.close()
+
+    of = open(output[0], "wb")
+
+    # Sniff the file format and decompress as needed
+    first3 = bytes(content[:3])
+    if first3 == b"\x1f\x8b\x08":
+        of.write(gzip.decompress(content))
+    elif first3 == b"\x42\x5a\x68":
+        of.write(bz2.decompress(content))
+    else:
+        of.write(content)
+    of.close()
+
+
 # Default memory allocation: 20G
 rule createGenomeFasta:
-    input: genomeURL
     output: genome_fasta
-    script:
-        import urllib.request
-        import gzip
-        import bz2
-        import os.path
-
-        url = input[0]
-        if os.path.exists(url):
-            url = urllib.request.pathname2url(url)
-
-        f = urllib.request.urlopen(url)
-        content = f.read()
-        f.close()
-
-        of = open(output[0], "wb")
-
-        # Sniff the file format and decompress as needed
-        first3 = bytes(content[:3])
-        if first3 == b"\x1f\x8b\x08":
-            of.write(gzip.decompress(content))
-        elif first3 == b"\x42\x5a\x68":
-            of.write(bz2.decompress(content))
-        else:
-            of.write(content)
-        of.close()
+    params:
+        url = genomeURL
+    run:
+        downloadFile(params.url, output)
 
 
 # Default memory allocation: 1G
@@ -52,33 +56,11 @@ rule make2bit:
 # This is the same as createGenomeFasta, we could decrease this to an external script
 # Default memory allocation: 20G
 rule downloadGTF:
-    input: gtfURL
     output: genes_gtf
-    script:
-        import urllib.request
-        import gzip
-        import bz2
-        import os.path
-
-        url = input[0]
-        if os.path.exists(url):
-            url = urllib.request.pathname2url(url)
-
-        f = urllib.request.urlopen(url)
-        content = f.read()
-        f.close()
-
-        of = open(output[0], "wb")
-
-        # Sniff the file format and decompress as needed
-        first3 = bytes(content[:3])
-        if first3 == b"\x1f\x8b\x08":
-            of.write(gzip.decompress(content))
-        elif first3 == b"\x42\x5a\x68":
-            of.write(bz2.decompress(content))
-        else:
-            of.write(content)
-        of.close()
+    params: 
+        url = gtfURL
+    run:
+        downloadFile(params.url, output)
 
 
 # Default memory allocation: 1G
@@ -102,7 +84,7 @@ rule extendCodingRegions:
         """
 
 
-# Default memory allocation: 8G
+# Default memory allocation: 20G
 rule bowtie2Index:
     input: genome_fasta
     output: os.path.join(outdir, "BowtieIndex/genome.rev.2.bt2")
@@ -115,7 +97,7 @@ rule bowtie2Index:
         """
 
 # Default memory allocation: 20G
-rule hiast2Index:
+rule hisat2Index:
     input: genome_fasta
     output: os.path.join(outdir, "HISAT2Index/genome.6.ht2")
     params:
@@ -181,8 +163,8 @@ rule bwamethIndex:
 
 # Default memory allocation: 1G
 rule copyBlacklist:
-    input: blacklist
     output: os.path.join(outdir, "annotation/blacklist.bed")
-    shell: """
-        cp {input} {output}
-        """
+    params: 
+        url = blacklist
+    run:
+        downloadFile(params.url, output)

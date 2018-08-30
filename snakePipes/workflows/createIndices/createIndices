@@ -34,7 +34,7 @@ def parse_args(defaults={"configfile": None, "cluster_configfile": None, "max_jo
 
     # Required arguments, which already exists as an argument group
     required = [grp for grp in parser._action_groups if grp.title == 'Required Arguments'][0]
-    required.add_argument("--genomeURL"
+    required.add_argument("--genomeURL",
                           required=True,
                           help="URL or local path to where the genome fasta file is located. The file may optionally be gzipped.")
 
@@ -52,6 +52,7 @@ def parse_args(defaults={"configfile": None, "cluster_configfile": None, "max_jo
     optional.add_argument("--effectiveGenomeSize",
                           help="The effective genome size. If you don't specify a value then the number of non-N bases will be used.")
 
+    # TODO this doesn't work with URLs
     optional.add_argument("--blacklist",
                           help="An optional URL or local path to a file to use to blacklist regions (such as that provided by the ENCODE consortium).")
 
@@ -72,7 +73,7 @@ def main():
     args.baseDir = baseDir
 
     # Common arguments
-    cf.checkCommonArguments(args, baseDir, outDir=True)
+    cf.checkCommonArguments(args, baseDir, outDir=True, createIndices=True)
 
 
     ### Workflow-specific arguments
@@ -80,6 +81,9 @@ def main():
         args.ignore_forNorm = os.path.abspath(args.ignore_forNorm)
         if not os.path.exists(args.ignore_forNorm):
             sys.exit("The file specified by `--ignore_forNorm` does not exist!\n")
+    if args.blacklist:
+        if os.path.exists(args.blacklist):
+            args.blacklist = os.path.abspath(args.blacklist)
     ###
 
     # Handle YAML and log files
