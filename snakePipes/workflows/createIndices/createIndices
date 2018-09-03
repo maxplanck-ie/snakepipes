@@ -4,7 +4,7 @@ __description__ = """
 Create indices for use by snakePipes
 
 usage example:
-    createIndices -o output-dir --genome genome_url.fa --gtf annotation_url.gtf genome_name
+    createIndices -o output-dir --genome ftp://ftp.ensembl.org/pub/release-93/fasta/mus_musculus/dna/Mus_musculus.GRCm38.dna_sm.primary_assembly.fa.gz --gtf ftp://ftp.ensembl.org/pub/release-93/fasta/mus_musculus/dna/Mus_musculus.GRCm38.dna_sm.primary_assembly.fa.gz --blacklist blacklist.bed --ignore_forNorm ignore.txt GRCm38_release93
 """
 
 
