@@ -1,0 +1,18 @@
+__default__:
+    memory: 1G
+createGenomeFasta:
+    memory: 20G
+make2bit:
+    memory: 8G
+downloadGTF:
+    memory: 20G
+bowtie2Index:
+    memory: 2G
+hisat2Index:
+    memory: 2G
+starIndex:
+    memory: 8G
+bwaIndex:
+    memory: 8G
+bwamethIndex:
+    memory: 8G
