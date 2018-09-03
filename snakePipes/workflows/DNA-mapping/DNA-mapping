@@ -19,7 +19,7 @@ import snakePipes.parserCommon as parserCommon
 def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfile": None, "max_jobs": 5, "snakemake_options": "--use-conda", "tempdir": None,
                          "mode": "mapping", "downsample": False, "trim": False, "trim_prg": "cutadapt", "trim_options": "", "fastqc": False,
                          "qualimap": False, "dedup": False, "properpairs": False, "insert_size_max": 1000, "gcbias": False,
-                         "bw_binsize": 25, "mapq": 0, "plot_format": "png"}):
+                         "bw_binsize": 25, "mapq": 0, "plot_format": "png", "bowtie_opts": "", "mate_orientation": "--fr"}):
     """
     Parse arguments from the command line.
     """
@@ -44,6 +44,17 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
                           default=defaults["mode"])
 
     parserCommon.commonOptions(optional, defaults)
+
+    optional.add_argument("--bowtie_opts",
+                          help="Options that will be passed to bowtie2. You can specify things such as `--local` or "
+                          "`--very-sensitive` here. The mate orientation and maximum insert size are specified "
+                          "elsewhere. Read group information is set automatically. Note that you may need to escape "
+                          "the first - (e.g., '\--very-fast'). Default: '%(default)s'.",
+                          default=defaults["bowtie_opts"])
+
+    optional.add_argument("--mate_orientation",
+                          help="The --fr, --ff, or --rf option for bowtie2 (default: '%(default)s')",
+                          default=defaults["mate_orientation"])
 
     optional.add_argument("--qualimap",
                           dest="qualimap",
