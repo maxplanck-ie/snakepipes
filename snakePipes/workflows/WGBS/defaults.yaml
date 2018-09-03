@@ -17,8 +17,8 @@ cluster_configfile:
 local: False
 max_jobs: 12
 nthreads: 8
-## directory with fastq files
-readin:
+## directory with fastq or bam files
+indir:
 ## directory with fastqc files for auto quality trimming
 fqcin:
 ## Genome information
@@ -46,6 +46,9 @@ nextera: False
 trimThreshold: 10
 trimOtherArgs: ""
 verbose: False
+#### Flag to control the pipeline entry point
+fromBam: False
+bam_ext: '.PCRrm.bam'
 ################################################################################
 # Call snakemake directly, i.e. without using the wrapper script:
 #
