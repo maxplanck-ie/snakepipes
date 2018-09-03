@@ -1,7 +1,7 @@
 .. _createIndices:
 
-Create Indices
-==============
+createIndices
+=============
 
 What it does
 ------------
@@ -48,7 +48,7 @@ These values are most conveniently set on the command line.
 Output structure
 ----------------
 
-The following structure will be created in the designated `outdir`:
+The following structure will be created in the designated `outdir`::
 
     .
     ├── annotation
