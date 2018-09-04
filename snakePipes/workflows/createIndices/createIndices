@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 
 __description__ = """
-Create indices for use by snakePipes
+Create indices for use by snakePipes. A YAML file will be created by default in the default location where snakePipes looks for organism YAML files.
 
 usage example:
-    createIndices -o output-dir --genome ftp://ftp.ensembl.org/pub/release-93/fasta/mus_musculus/dna/Mus_musculus.GRCm38.dna_sm.primary_assembly.fa.gz --gtf ftp://ftp.ensembl.org/pub/release-93/fasta/mus_musculus/dna/Mus_musculus.GRCm38.dna_sm.primary_assembly.fa.gz --blacklist blacklist.bed --ignore_forNorm ignore.txt GRCm38_release93
+    createIndices -o output-dir --genome ftp://ftp.ensembl.org/pub/release-93/fasta/mus_musculus/dna/Mus_musculus.GRCm38.dna_sm.primary_assembly.fa.gz --gtf ftp://ftp.ensembl.org/pub/release-93/gtf/mus_musculus/Mus_musculus.GRCm38.93.gtf.gz --blacklist blacklist.bed --ignore_forNorm ignore.txt GRCm38_release93
 """
 
 
@@ -30,7 +30,7 @@ def parse_args(defaults={"configfile": None, "cluster_configfile": None, "max_jo
         add_help=False
     )
 
-    parser.add_argument("genome", metavar="GENOME", help="The name to save this genome as. No spaces or special characters! Specifying an organism that already exists will cause the old information to be overwritten.")
+    parser.add_argument("genome", metavar="GENOME", help="The name to save this genome as. No spaces or special characters! Specifying an organism that already exists will cause the old information to be overwritten. See also the --userYAML option.")
 
     # Required arguments, which already exists as an argument group
     required = [grp for grp in parser._action_groups if grp.title == 'Required Arguments'][0]
@@ -58,6 +58,10 @@ def parse_args(defaults={"configfile": None, "cluster_configfile": None, "max_jo
 
     optional.add_argument("--ignore_forNorm",
                           help="An optional file list, with one entry per line, the chromosomes to ignore during normalization. These are typically sex chromosomes, mitochondrial DNA, and unplaced contigs.")
+
+    optional.add_argument("--userYAML",
+                          action="store_true",
+                          help="By default, this workflow creates an organism YAML file where snakePipes will look for it by default. If this isn't desired (e.g., you don't want the organism to be selectable by default or you don't have write permissions to the snakePipes installation) you can specify this option and the YAML file will instead be created in the location specified by the `-o` option.")
 
     return parser
 
