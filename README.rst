@@ -54,10 +54,10 @@ A few additional steps you can then take:
 
 1. **Modify/remove/add the organism yaml files appropriately** : these yaml files would contain location of appropriate
 GTF files and genome indexes corresponding to different organisms. The location of these files after installation can be
-found using `snakePipes --info` command.
+found using ``snakePipes --info`` command.
 
 2. **Modify the cluster.yaml file appropriately** : This yaml file contains settings for your cluster scheduler (SGE/slurm).
-Location revealed using `snakePipes --info` command.
+Location revealed using ``snakePipes --info`` command.
 
 
 Documentation
