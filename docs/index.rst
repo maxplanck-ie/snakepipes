@@ -55,12 +55,11 @@ snakePipes could either be executed locally, or on any snakemake-supported clust
 for setting up the cluster command in :doc:`content/running_snakePipes`
 
 Citation
---------
+-------------
 
 If you adopt/run snakePipes for your analysis, cite it as follows :
 
-    snakePipes: flexible and scalable NGS analysis pipelines built using snakemake.
-    The MPI-IE Bioinformatics Facility. http://doi.org/10.5281/zenodo.1146540
+Bhardwaj V, Heyne S, Sikora K, Rabbani L, Rauer M, Kilpert F, et al. **snakePipes enable flexible, scalable and integrative epigenomic analysis.** bioRxiv. 2018. p. 407312. `doi:10.1101/407312 <https://www.biorxiv.org/content/early/2018/09/04/407312>`__
 
 
 .. image:: content/images/logo_mpi-ie.jpg
