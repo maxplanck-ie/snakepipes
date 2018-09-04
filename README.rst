@@ -74,7 +74,7 @@ If you adopt/run snakePipes for your analysis, cite it as follows :
 Bhardwaj V, Heyne S, Sikora K, Rabbani L, Rauer M, Kilpert F, et al. **snakePipes enable flexible, scalable and integrative epigenomic analysis.** bioRxiv. 2018. p. 407312. `doi:10.1101/407312 <https://www.biorxiv.org/content/early/2018/09/04/407312>`__
 
 
-Notice
--------------
+Note
+------------- 
 
-SnakePipes are under active development. Please use issues to the GitHub repository for feature requests or bug reports.
+SnakePipes are under active development. We appreciate your help in improving it further. Please use issues to the GitHub repository for feature requests or bug reports.
