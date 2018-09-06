@@ -1,0 +1,18 @@
+depth_of_cov:
+    memory: 30G
+calc_Mbias:
+    memory: 3G
+map_reads:
+    memory: 20G
+rm_dupes:
+    memory: 3G 
+downsample_reads:
+    memory: 6G 
+conv_rate:
+    memory: 6G
+CpG_stats:
+    memory: 30G
+cleanup_metilene:
+    memory: 20G
+intAgg_stats:
+    memory: 30G

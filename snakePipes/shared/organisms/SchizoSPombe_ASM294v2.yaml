@@ -1,0 +1,14 @@
+genome_size: 12631379
+genome_fasta: "/data/repository/organisms/SchizoSPombe_ASM294v2_ensembl/genome_fasta/genome.fa"
+genome_index: "/data/repository/organisms/SchizoSPombe_ASM294v2_ensembl/genome_fasta/genome.fa.fai"
+genome_2bit: "/data/repository/organisms/SchizoSPombe_ASM294v2_ensembl/genome_fasta/genome.2bit"
+bowtie2_index: "/data/repository/organisms/SchizoSPombe_ASM294v2_ensembl/BowtieIndex/genome"
+hisat2_index: "/data/repository/organisms/SchizoSPombe_ASM294v2_ensembl/HISAT2Index/genome"
+bwa_index: "/data/repository/organisms/SchizoSPombe_ASM294v2_ensembl/BWAindex/genome.fa"
+known_splicesites: "/data/repository/organisms/SchizoSPombe_ASM294v2_ensembl/ensembl/release-35/HISAT2/splice_sites.txt"
+star_index: "/data/repository/organisms/SchizoSPombe_ASM294v2_ensembl/STARIndex/"
+genes_bed: "/data/repository/organisms/SchizoSPombe_ASM294v2_ensembl/Ensembl/release-35/genes.bed"
+genes_gtf: "/data/repository/organisms/SchizoSPombe_ASM294v2_ensembl/Ensembl/release-35/genes.gtf"
+extended_coding_regions_gtf: "/data/repository/organisms/SchizoSPombe_ASM294v2_ensembl/Ensembl/release-35/genes.slop.gtf"
+blacklist_bed:
+ignore_forNorm:

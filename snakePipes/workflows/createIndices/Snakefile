@@ -1,0 +1,133 @@
+import os
+import snakePipes.common_functions as cf
+
+### snakemake_workflows initialization ########################################
+maindir = os.path.dirname(os.path.dirname(workflow.basedir))
+
+# load conda ENVs (path is relative to "shared/rules" directory)
+globals().update(cf.set_env_yamls())
+
+# load config file
+globals().update(cf.load_configfile(workflow.overwrite_configfile, config["verbose"]))
+
+### include modules of other snakefiles ########################################
+################################################################################
+
+# This will eventually be written as a yaml file
+organismDictionary = {'genome_size': 0,
+                      'genome_fasta': '',
+                      'genome_index': '',
+                      'genome_2bit': '',
+                      'bowtie2_index': '',
+                      'hisat2_index': '',
+                      'bwa_index': '',
+                      'bwameth_index': '',
+                      'known_splicesites': '',
+                      'star_index': '',
+                      'genes_bed': '',
+                      'genes_gtf': '',
+                      'extended_coding_regions_gtf': '',
+                      'blacklist_bed': '',
+                      'ignore_forNorm': ''}
+
+targets = [os.path.join(outdir, x) for x in ["genome_fasta/genome.fa",
+                                             "genome_fasta/genome.fa.fai",
+                                             "genome_fasta/genome.2bit"]]
+
+organismDictionary['genome_fasta'] = os.path.join(outdir, "genome_fasta/genome.fa")
+organismDictionary['genome_index'] = os.path.join(outdir, "genome_fasta/genome.fa.fai")
+organismDictionary['genome_2bit'] = os.path.join(outdir, "genome_fasta/genome.2bit")
+
+if gtfURL:
+    targets.extend([os.path.join(outdir, x) for x in ["annotation/genes.gtf",
+                                                      "annotation/genes.bed",
+                                                      "annotation/genes.slop.gtf"]])
+    organismDictionary['genes_gtf'] = os.path.join(outdir, "annotation/genes.gtf")
+    organismDictionary['genes_bed'] = os.path.join(outdir, "annotation/genes.bed")
+    organismDictionary['extended_coding_regions_gtf'] = os.path.join(outdir, "annotation/genes.slop.gtf")
+
+if 'all' in tools or 'bowtie2' in tools:
+    targets.append(os.path.join(outdir, "BowtieIndex/genome.rev.2.bt2"))
+    organismDictionary['bowtie2_index'] = os.path.join(outdir, "BowtieIndex/genome")
+
+if 'all' in tools or 'hisat2' in tools:
+    targets.append(os.path.join(outdir, "HISAT2Index/genome.6.ht2"))
+    organismDictionary['hisat2_index'] = os.path.join(outdir, "HISAT2Index/genome")
+    if gtfURL:
+        targets.append(os.path.join(outdir, "HISAT2Index/splice_sites.txt"))
+        organismDictionary['known_splicesites'] = os.path.join(outdir, "HISAT2Index/splice_sites.txt")
+
+if 'all' in tools or 'star' in tools:
+    targets.append(os.path.join(outdir, "STARIndex/SAindex"))
+    organismDictionary['star_index'] = os.path.join(outdir, "STARIndex/")
+
+if 'all' in tools or 'bwa' in tools:
+    targets.append(os.path.join(outdir, "BWAIndex/genome.fa.sa"))
+    organismDictionary['bwa_index'] = os.path.join(outdir, "BWAIndex/genome.fa")
+
+if 'all' in tools or 'bwameth' in tools:
+    targets.append(os.path.join(outdir, "BWAmethIndex/genome.fa.bwameth.c2t.sa"))
+    organismDictionary['bwameth_index'] = os.path.join(outdir, "BWAmethIndex/genome.fa")
+
+if blacklist:
+    targets.append(os.path.join(outdir, "annotation/blacklist.bed"))
+    organismDictionary['blacklist_bed'] = os.path.join(outdir, "annotation/blacklist.bed")
+
+ignore = []
+if ignore_forNorm:
+    f = open(ignore_forNorm)
+    ignore = [line.strip() for line in f]
+    f.close()
+    organismDictionary['ignore_forNorm'] = " ".join(ignore)
+
+if effectiveGenomeSize and effectiveGenomeSize > 0:
+    os.makedirs(os.path.join(outdir, "genome_fasta"), exist_ok=True)
+    f = open(os.path.join(outdir, "genome_fasta", "effectiveSize"), "w")
+    f.write("{}\n".format(effectiveGenomeSize))
+    f.close()
+else:
+    targets.append(os.path.join(outdir, "genome_fasta", "effectiveSize"))
+
+globals().update(organismDictionary)
+include: os.path.join(maindir, "shared", "rules", "createIndices.snakefile")
+
+### execute before workflow starts #############################################
+################################################################################
+onstart:
+    if "verbose" in config and config["verbose"]:
+        print("--- Workflow parameters --------------------------------------------------------")
+        print("output directory: ", outdir)
+        print("genome name: ", genome)
+        print("genome URL/path: ", genomeURL)
+        print("GTF URL/path: ", gtfURL)
+        print("tools: ", " ".join(tools))
+        print("effectiveGenomeSize: ", effectiveGenomeSize)
+        print("blacklist file: ", blacklist)
+        print("ignore for normalization: ", " ".join(ignore))
+        print("-" * 80, "\n")
+
+        print("--- Environment ----------------------------------------------------------------")
+        print("$TMPDIR: ",os.getenv('TMPDIR', ""))
+        print("$HOSTNAME: ",os.getenv('HOSTNAME', ""))
+        print("-" * 80, "\n")
+
+### main rule ##################################################################
+################################################################################
+rule all:
+    input: targets
+
+### execute after workflow finished ############################################
+################################################################################
+onsuccess:
+    cf.cleanLogs(outdir)
+    f = open(os.path.join(outdir, "genome_fasta", "effectiveSize"))
+    organismDictionary['genome_size'] = int(f.read().strip())
+    f.close()
+    if not userYAML:
+        yamlPath = os.path.join(maindir, "shared", "organisms", "{}.yaml".format(genome))
+        cf.write_configfile(os.path.join(maindir, "shared", "organisms", "{}.yaml".format(genome)), organismDictionary)
+    else:
+        yamlPath = os.path.join(outdir, "{}.yaml".format(genome))
+    cf.write_configfile(yamlPath, organismDictionary)
+    if "verbose" in config and config["verbose"]:
+        print("\n--- index creation workflow finished successfully! --------------------------------\n")

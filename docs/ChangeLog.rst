@@ -15,8 +15,7 @@ version 0.1.0 - June 15, 2016 - @asrichter
 - simplified cluster submission by taking 'threads' parameter from rule definition, removed cluster.yaml
 - added DNA-mapping example configuration yaml file
 - added function get_fragment_length() to DNA-mapping internals.snakefile to parse median insert size from Picard output
-- added deepTools_qc.snakefile as one common snakefile for all deepTools rules,
-    moved all deepTools rules from ChIP-seq Snakefile and computeGCBias.snakefile
+- added deepTools_qc.snakefile as one common snakefile for all deepTools rules, moved all deepTools rules from ChIP-seq Snakefile and computeGCBias.snakefile
 - moved include statements of module snakefiles from rules.snakefile to DNA-mapping Snakefile to simplify structure, removed rules.snakefile
 - renamed functions do_TrimGalore(trim) and do_InsertSizeMetrics(paired) in DNA-mapping Snakefile
 - renamed load_organisms.snakefile to load_organism_data.py
@@ -46,9 +45,7 @@ version 0.3.0 - June 24, 2016 -  @asrichter
 version 0.3.1 - June 25, 2016 -  @asrichter
 - run Picard quality control on unfiltered BAM files
 - added --gcbias parameter to DNA-mapping wrapper script to run computeGCBias optionally
-- replaced --input-dir and --output-dir by --working-dir parameter in ChIP-seq
-  wrapper script to specify the working directory, which is output directory of
-  the pipeline and must also contain the DNA-mapping pipeline output files
+- replaced --input-dir and --output-dir by --working-dir parameter in ChIP-seq wrapper script to specify the working directory, which is output directory of the pipeline and must also contain the DNA-mapping pipeline output files
 - bugfixes
 
 version 0.3.2 - June 27, 2016 -  @asrichter
@@ -66,8 +63,10 @@ version 0.5 - 2017 - @steffenheyne, @kilpert, @mirax87
 - major cleanup and refactoring of wrappers and code structure (but not rules)
 - scRNAseq workflow added
 - using yaml config files all over, ie.
-	1) all wrappers write out a config yaml
-	2) Snakefile configuration only depends on provided '--configfile'
+
+  1) all wrappers write out a config yaml
+  2) Snakefile configuration only depends on provided '--configfile'
+
 - better handling and and more usage of common_functions
 - all genome config files converted to yaml, function to load genome information
 - own genome file can be provided instead of only pre-configured ones
@@ -81,14 +80,15 @@ version 0.5 - 2017 - @steffenheyne, @kilpert, @mirax87
 
 version 0.6 (a.k.a Tiger RattleSnake) - Sept 2017 - @vivekbhr
 - MAJOR CHANGES:
+
   - Allele-Specific mapping : Allele-specific DNA and RNA-mapping is now possible and both ChIP-Seq and RNA-seq pipeline can handle "allele_mapping" mode.
   - Differential binding : Differential binding can be performed using CSAW, both normal and allele-specific.
   - MultiQC : MultiQC summarizes QC results for DNA-mapping and RNA-mapping workflows.
-  - R package : New R package called snakediff contains all functions for differential binding and expression. The DE functions have been
-    transformed into clean and consistent layout, with docs.
+  - R package : New R package called snakediff contains all functions for differential binding and expression. The DE functions have been transformed into clean and consistent layout, with docs.
   - Deeptools commands : All deeptools commands now moved into common deeptools_cmds module, and are shared between functions.
 
 - MINOR CHANGES:
+
   - Wrappers have been formatted for easier readability.
   - chr X, Y, M and unmapped scaffolds are now ignored for normalization in bamCoverage (DNA-mapping) and bamCompare (Chip-Seq).
   - bamCompare outputs are named with suffix <control>, instead of a static suffix "Input", this allows the workflow to run with different controls
@@ -109,3 +109,8 @@ Version 0.7 (a.k.a Green Mamba) - Nov 2017 - @vivekbhr
 - MAJOR CHANGES:
   - Read the Docs integration
   - New workflow Hi-C, from mapping to TAD calling, using BWA and HiCExplorer
+
+Version 0.7.1 - Jan. 12 2018
+
+- MINOR CHANGES:
+  - Fixed issue #57 again via pull request #79, which was related to single-end ChIPseq processing

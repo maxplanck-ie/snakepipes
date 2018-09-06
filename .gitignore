@@ -11,3 +11,12 @@ __pychache__
 runRNAseq.sh
 *tmp*
 .Rproj.user
+*~
+*.pyc
+dist
+build
+
+# sphinx build folder
+_build
+_modules
+_sources

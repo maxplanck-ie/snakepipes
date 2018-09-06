@@ -1,0 +1,173 @@
+#!/usr/bin/env python3
+
+__description__ = """
+MPI-IE workflow for WGBS analysis
+
+usage example:
+    WGBS -i read_input_dir -o output-dir mm10
+"""
+
+import argparse
+import os
+import sys
+import textwrap
+import snakePipes.common_functions as cf
+import snakePipes.parserCommon as parserCommon
+
+
+def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfile":None, "max_jobs": 12, "nthreads": 8, "snakemake_options": "--use-conda", "tempdir": None,
+                         "downsample": None, "trimReads": "user", "fqcin": None, "adapterSeq": "AGATCGGAAGAGC", "nextera": False, "trimThreshold": 10, "trimOtherArgs": None, "convrefpath": None,
+                         "convRef": None, "intList": [], "blackList": None, "sampleInfo": None, "mbias_ignore": "auto", "fromBam": False}):
+    """
+    Parse arguments from the command line.
+    """
+    mainArgs = parserCommon.mainArguments(defaults)
+
+    parser = argparse.ArgumentParser(
+        prog=sys.argv[0],
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        description=textwrap.dedent(__description__),
+        parents=[mainArgs],
+        add_help=False
+    )
+
+    # Workflow options
+    optional = parser.add_argument_group('Options')
+
+    optional.add_argument("--downsample",
+                          dest="downsample",
+                          metavar="INT",
+                          help="downsample the given number of reads randomly from of each FASTQ file (default: '%(default)s')",
+                          type=int,
+                          default=defaults["downsample"])
+
+    optional.add_argument("--trimReads",
+                          dest="trimReads",
+                          action="store",
+                          choices=['auto', 'user', None],
+                          help="Activate fastq read trimming. If activated, Illumina adaptors are trimmed by default. "
+                          "Additional parameters can be specified under --trimOtherArgs (default: '%(default)s')",
+                          default=defaults["trimReads"])
+
+    optional.add_argument("--fqcin",
+                          dest="fqcin",
+                          action="store",
+                          help="Folder with fastqc.zip files to automatically detect hard trimming threshold. (default: '%(default)s')",
+                          default=defaults["fqcin"])
+
+    optional.add_argument("-nt", "--nthreads",
+                          dest="nthreads",
+                          metavar="INT",
+                          help="number of threads to use for multi-threaded tasks. Please also check cluster-config for default per-job memory allocation. (default: '%(default)s')",
+                          type=int,
+                          default=defaults["nthreads"])
+
+    optional.add_argument("--adapterSeq",
+                          dest="adapterSeq",
+                          metavar="STR",
+                          type=str,
+                          help="Adapter sequence for cutadapt. (default: '%(default)s')",
+                          default=defaults["adapterSeq"])
+
+    optional.add_argument("--nextera",
+                          dest="nextera",
+                          action="store",
+                          help="Trim nextera adapters rather than TruSeq adapters (default: '%(default)s')",
+                          default=defaults["nextera"])
+
+    optional.add_argument("--trimThreshold",
+                          dest="trimThreshold",
+                          metavar="STR",
+                          type=str,
+                          help="Trimming threshold for cutadapt. (default: '%(default)s')",
+                          default=defaults["trimThreshold"])
+
+    optional.add_argument("--trimOtherArgs",
+                          dest="trimOtherArgs",
+                          metavar="STR",
+                          type=str,
+                          help="Additional arguments passed to cutadapt. (default: '%(default)s')",
+                          default=defaults["trimOtherArgs"])
+
+    optional.add_argument("--cref",
+                          dest="convrefpath",
+                          metavar="STR",
+                          type=str,
+                          help="Path to Bisulfite-converted reference genome. (default: '%(default)s')",
+                          default=defaults["convrefpath"])
+
+    optional.add_argument("--convRef",
+                          dest="convRef",
+                          metavar="STR",
+                          type=str,
+                          help="In case a pre-converted reference-genome is not available. Convert the input reference genome. (default: '%(default)s')",
+                          default=defaults["convRef"])
+
+    optional.add_argument("--intList",
+                          dest="intList",
+                          metavar="STR",
+                          action='append',
+                          help="BED file(s) with target intervals to confine the analysis on. Use multiple times to pass multiple bed files. (default: '%(default)s')",
+                          default=defaults["intList"])
+
+    optional.add_argument("--blackList",
+                          dest="blackList",
+                          metavar="STR",
+                          action='store',
+                          type=str,
+                          help="Bed file(s) with positions to mask for methylation calling. Useful for masking SNPs in your strain of interest. (default: '%(default)s')",
+                          default=defaults["blackList"])
+
+    optional.add_argument("--sampleInfo",
+                          dest="sampleInfo",
+                          metavar="STR",
+                          action='store',
+                          type=str,
+                          help="Text file with sample information to use for statistical analysis. (default: '%(default)s')",
+                          default=defaults["sampleInfo"])
+
+    optional.add_argument("--mbias",
+                          dest="mbias_ignore",
+                          metavar="STR",
+                          action='store',
+                          type=str,
+                          help="Number of nucleotides with methylation bias to ignore during methylation extraction. In the *auto* mode this number is automaticaly calculated by MethylDackel (default: '%(default)s')",
+                          default=defaults["mbias_ignore"])
+
+    optional.add_argument("--fromBam",
+                         dest="fromBam",
+                         action="store_true",
+                         help="Start pipeline from processed bam files after PCR duplicate removal.",default=defaults["fromBam"])
+
+    return parser
+
+
+def main():
+    baseDir, workflowDir, defaults = cf.setDefaults(os.path.basename(__file__))
+
+    # get command line arguments
+    parser = parse_args(defaults)
+    args = parser.parse_args()
+
+    # we also add these paths to config, although we don't use them in the Snakefile
+    args.baseDir = baseDir
+
+    # Common arguments
+    cf.checkCommonArguments(args, baseDir, outDir=True)
+
+    ## Begin workflow-specific code
+    if args.nextera:
+        args.adapterSeq = "CTGTCTCTTATA"
+
+    # Handle YAML and log files
+    snakemake_cmd = cf.commonYAMLandLogs(baseDir, workflowDir, defaults, args, __file__)
+    snakemake_exports, logfile_name, temp_path = cf.logAndExport(args, os.path.basename(__file__))
+
+    cmd = " ".join(snakemake_exports + snakemake_cmd)
+
+    # Run everything
+    cf.runAndCleanup(args, cmd, logfile_name, temp_path)
+
+
+if __name__ == "__main__":
+    main()

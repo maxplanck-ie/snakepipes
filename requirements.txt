@@ -1,0 +1,2 @@
+snakemake >= 5.2.0
+pandas

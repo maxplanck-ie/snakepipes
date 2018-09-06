@@ -1,0 +1,66 @@
+################################################################################
+# This file is the default configuration of the RNA-seq workflow!
+#
+# In order to adjust some parameters, please either use the wrapper script
+# (eg. /path/to/snakemake_workflows/workflows/RNA-seq/RNA-seq)
+# or save a copy of this file, modify necessary parameters and then provide
+# this file to the wrapper or snakmake via '--configfile' option
+# (see below how to call the snakefile directly)
+#
+# Own parameters will be loaded during snakefile executiuon as well and hence
+# can be used in new/extended snakemake rules!
+################################################################################
+## General/Snakemake parameters, only used/set by wrapper or in Snakemake cmdl, but not in Snakefile
+pipeline: rna-seq
+outdir:
+configfile:
+cluster_configfile:
+local: False
+max_jobs: 5
+## directory with fastq files
+indir:
+## preconfigured target genomes (mm9,mm10,dm3,...) , see /path/to/snakemake_workflows/shared/organisms/
+## Value can be also path to your own genome config file!
+genome:
+## FASTQ file extension (default: ".fastq.gz")
+ext: '.fastq.gz'
+## paired-end read name extension (default: ["_R1", "_R2"])
+reads: ["_R1","_R2"]
+## Number of reads to downsample from each FASTQ file
+downsample:
+## Options for trimming
+trim: False
+trim_prg: cutadapt
+trim_options:
+## further options
+mode: alignment-free,deepTools_qc
+sample_info:
+bw_binsize: 25
+fastqc: False
+featurecounts_options: -C -Q 10 --primary
+filter_annotation:
+fragment_length: 200
+library_type: 2
+salmon_index_options: --type quasi -k 31
+dnaContam: False
+## supported mappers: STAR HISAT2
+mapping_prg: STAR
+star_options: --outBAMsortingBinsN 70
+hisat_options:
+verbose: False
+plot_format: png
+# for allele-spcific mapping
+snp_file:
+Nmasked_index:
+################################################################################
+# Call snakemake directly, i.e. without using the wrapper script:
+#
+# Please save a copy of this config yaml file and provide an adjusted config
+# via '--configfile' parameter!
+# example call:
+#
+# snakemake --snakefile /path/to/snakemake_workflows/workflows/RNA-seq/Snakefile
+#           --configfile /path/to/snakemake_workflows/workflows/RNA-seq/defaults.yaml
+#           --directory /path/to/outputdir
+#           --cores 32
+################################################################################

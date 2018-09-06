@@ -1,0 +1,6 @@
+bamCoverage:
+    memory: 20G
+bamCoverage_filtered:
+    memory: 20G  
+bamPE_fragment_size:
+    memory: 10G
