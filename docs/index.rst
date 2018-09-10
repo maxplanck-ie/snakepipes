@@ -9,6 +9,7 @@ Below is the list of pipelines available in snakePipes
 =============================== ===============================================================================================================
 Pipeline                            Description
 =============================== ===============================================================================================================
+:ref:`createIndices`            Create indices for an organism for further use within snakePipes
 :ref:`DNA-mapping`              Basic DNA mapping using bowtie2, filter mapped files, QC and create coverage plots
 :ref:`ChIP-Seq`                 Use the DNA mapping output and run ChIP/Input normalization and peak calling
 :ref:`ATAC-seq`                 Use the DNA mapping output and detect open chromatin regions for ATAC-seq data
@@ -27,7 +28,7 @@ Quick start
 
     conda create -n snakePipes -c mpi-ie -c bioconda -c conda-forge snakePipes
 
-* Download genome fasta and annotations for an your organism, and build indexes, Check in :doc:`content/create_index`
+* Download genome fasta and annotations for an your organism, and build indexes, Check in :ref:`createIndices`
 
 * Download example fastq files for the human genome `here <https://zenodo.org/record/1346303>`_
 
@@ -54,12 +55,11 @@ snakePipes could either be executed locally, or on any snakemake-supported clust
 for setting up the cluster command in :doc:`content/running_snakePipes`
 
 Citation
---------
+-------------
 
 If you adopt/run snakePipes for your analysis, cite it as follows :
 
-    snakePipes: flexible and scalable NGS analysis pipelines built using snakemake.
-    The MPI-IE Bioinformatics Facility. http://doi.org/10.5281/zenodo.1146540
+Bhardwaj V, Heyne S, Sikora K, Rabbani L, Rauer M, Kilpert F, et al. **snakePipes enable flexible, scalable and integrative epigenomic analysis.** bioRxiv. 2018. p. 407312. `doi:10.1101/407312 <https://www.biorxiv.org/content/early/2018/09/04/407312>`__
 
 
 .. image:: content/images/logo_mpi-ie.jpg
@@ -83,9 +83,9 @@ Contents:
    :maxdepth: 2
 
    content/setting_up.rst
-   content/create_index.rst
    content/running_snakePipes.rst
    content/advanced_usage.rst
+   content/workflows/createIndices.rst
    content/workflows/DNA-mapping.rst
    content/workflows/ChIP-seq.rst
    content/workflows/ATAC-seq.rst
