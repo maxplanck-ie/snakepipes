@@ -72,14 +72,17 @@ There is a configuration file in `snakePipes/workflows/ATACseq/defaults.yaml`::
     genome:
     ## Bin size of output files in bigWig format
     bw_binsize: 25
-    atac_fragment_cutoff: 150
+    fragmentSize_cutoff: 150
     verbose: false
     # sampleInfo_DB
     sample_info:
     # window_size
     window_size: 20
+    fragmentCount_cutoff: 1
 
-The only parameters that are useful to change are `bw_binsize`, `atac_fragment_cutoff`, and `window_size`. Note however that those can be more conveniently changed on the command line.
+The only parameters that are useful to change are `bw_binsize`, `fragmentSize_cutoff`, and `window_size`.
+Note, however that those can be more conveniently changed on the command line. `fragmentCount_cutoff` is
+introduced to avoid errors in the peak calling step and should only be changed if MACS2 fails.
 
 Output structure
 ----------------
