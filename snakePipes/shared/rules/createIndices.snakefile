@@ -151,16 +151,13 @@ rule bwaIndex:
 
 # Default memory allocation: 8G
 rule bwamethIndex:
-    input:
-        genome_fasta,
-        genome_index
+    input: genome_fasta
     output: os.path.join(outdir, "BWAmethIndex/genome.fa.bwameth.c2t.sa")
     params:
       genome = os.path.join(outdir, "BWAmethIndex", "genome.fa")
     conda: CondaEnvironment
     shell: """
         ln -s {input[0]} {params.genome}
-        ln -s {input[1]} {params.genome}.fai
         bwameth.py index {params.genome}
         """
 
