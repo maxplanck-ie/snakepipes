@@ -98,20 +98,29 @@ if convRef:
         input:
             refG=refG
         output:
-            crefG=temp(os.path.join('conv_ref',re.sub('.fa','.fa.bwameth.c2t',os.path.basename(refG))))
+            #crefG=os.path.join('aux_files',re.sub('.fa','.fa.bwameth.c2t',os.path.basename(refG))), ##temp?
+            cref_sa=os.path.join("aux_files",re.sub('.fa','.fa.bwameth.c2t.sa',os.path.basename(refG))),
+            cref_amb=os.path.join("aux_files",re.sub('.fa','.fa.bwameth.c2t.amb',os.path.basename(refG))),
+            locrefG=os.path.join("aux_files",os.path.basename(refG))
+        #params:
+            #cref_sa=os.path.join("aux_files",re.sub('.fa','.fa.bwameth.c2t.sa',os.path.basename(refG))),
+            #cref_amb=os.path.join("aux_files",re.sub('.fa','.fa.bwameth.c2t.amb',os.path.basename(refG)))
         log:
-            err="conv_ref/logs/{sample}.conv_ref.err",
-            out="conv_ref/logs/{sample}.conv_ref.out"
+            err="aux_files/logs/conv_ref.err",
+            out="aux_files/logs/conv_ref.out"
         threads: 1
         conda: CondaEnvironment
-        shell:"ln -s {input.refG} " + os.path.join("aux_files",os.path.basename("{input.refG}"))+';bwameth index ' + os.path.join("aux_files",os.path.basename("{input.refG}")) + " 1>{log.out} 2>{log.err}"
+        shell:"ln -s {input.refG} {output.locrefG}; bwameth.py index {output.locrefG}  1>{log.out} 2>{log.err}"
 
 if not trimReads is None:
     rule map_reads:
         input:
             R1cut="FASTQ_Cutadapt/{sample}"+reads[0]+".fastq.gz",
             R2cut="FASTQ_Cutadapt/{sample}"+reads[1]+".fastq.gz",
-            crefG=crefG
+            crefG=crefG,
+            #locrefG=os.path.join(os.path.dirname(crefG),re.sub('.fa','.fa.bwameth.c2t',os.path.basename(crefG)))
+            cref_sa=os.path.join("aux_files",re.sub('.fa','.fa.bwameth.c2t.sa',os.path.basename(refG))),
+            cref_amb=os.path.join("aux_files",re.sub('.fa','.fa.bwameth.c2t.amb',os.path.basename(refG)))
         output:
             sbam=temp("bams/{sample}.sorted.bam")
         log:
@@ -130,7 +139,10 @@ if trimReads is None and not fromBam:
         input:
             R1="FASTQ/{sample}"+reads[0]+".fastq.gz",
             R2="FASTQ/{sample}"+reads[1]+".fastq.gz",
-            crefG=crefG
+            crefG=crefG,
+            #locrefG=os.path.join(os.path.dirname(crefG),re.sub('.fa','.fa.bwameth.c2t',os.path.basename(crefG)))
+            cref_sa=os.path.join("aux_files",re.sub('.fa','.fa.bwameth.c2t.sa',os.path.basename(refG))),
+            cref_amb=os.path.join("aux_files",re.sub('.fa','.fa.bwameth.c2t.amb',os.path.basename(refG)))
         output:
             sbam=temp("bams/{sample}.sorted.bam")
         log:
@@ -211,22 +223,60 @@ rule calc_Mbias:
     conda: CondaEnvironment
     shell: "MethylDackel mbias {input.refG} {input.rmDupBam} {output.mbiasTXT} -@ {threads} 1>{log.out} 2>{output.mbiasTXT}"
 
-rule calc_GCbias:
-    input:
-        refG=refG,
-        rmDupBam="bams/{sample}"+bam_ext,
-        sbami="bams/{sample}"+bam_ext+".bai"
-    output:
-        GCbiasTXT="QC_metrics/{sample}.freq.txt",
-        GCbiasPNG="QC_metrics/{sample}.GCbias.png"
-    params:
-        genomeSize=genome_size,
-        twobitpath=genome_2bit
-    log:
-        out="QC_metrics/logs/{sample}.calc_GCbias.out"
-    threads: nthreads
-    conda: CONDA_SHARED_ENV
-    shell: "computeGCBias -b {input.rmDupBam} --effectiveGenomeSize {params.genomeSize} -g {params.twobitpath} -l 300 --GCbiasFrequenciesFile {output.GCbiasTXT} -p {threads} --biasPlot {output.GCbiasPNG} --plotFileFormat png "
+if convRef:
+    rule calc_genome_size:
+        input:
+            refG=refG
+        output:
+            gsize="aux_files/gsize.txt"
+        log:
+            err="aux_files/logs/gsize.err"
+        threads: 1
+        shell: os.path.join(workflow_tools,"faCount ") + "{input.refG} | awk \'END{{print $2-$7}}\'  > {output.gsize} 2>{log.err}"
+
+    rule get_twobit_genome:
+        input:
+            refG=refG
+        output:
+            twobit="aux_files/"+ re.sub(".fa",".2bit",os.path.basename(refG))
+        log:
+            err="aux_files/logs/fatotwobit.err"
+        threads: 1
+        shell: os.path.join(workflow_tools,"faToTwoBit ") + "{input.refG} {output.twobit} 2>{log.err}"
+
+    rule calc_GCbias:
+        input:
+            refG=refG,
+            rmDupBam="bams/{sample}"+bam_ext,
+            sbami="bams/{sample}"+bam_ext+".bai",
+            gsize="aux_files/gsize.txt",
+            twobit="aux_files/"+ re.sub(".fa",".2bit",os.path.basename(refG))
+        output:
+            GCbiasTXT="QC_metrics/{sample}.freq.txt",
+            GCbiasPNG="QC_metrics/{sample}.GCbias.png"
+        log:
+            out="QC_metrics/logs/{sample}.calc_GCbias.out"
+        threads: nthreads
+        conda: CONDA_SHARED_ENV
+        shell: "genomeSize=($(cat {input.gsize}));computeGCBias -b {input.rmDupBam} --effectiveGenomeSize $genomeSize -g {input.twobit} -l 300 --GCbiasFrequenciesFile {output.GCbiasTXT} -p {threads} --biasPlot {output.GCbiasPNG} --plotFileFormat png "
+
+else:
+    rule calc_GCbias:
+        input:
+            refG=refG,
+            rmDupBam="bams/{sample}"+bam_ext,
+            sbami="bams/{sample}"+bam_ext+".bai"
+        output:
+            GCbiasTXT="QC_metrics/{sample}.freq.txt",
+            GCbiasPNG="QC_metrics/{sample}.GCbias.png"
+        params:
+            genomeSize=genome_size,
+            twobitpath=genome_2bit
+        log:
+            out="QC_metrics/logs/{sample}.calc_GCbias.out"
+        threads: nthreads
+        conda: CONDA_SHARED_ENV
+        shell: "computeGCBias -b {input.rmDupBam} --effectiveGenomeSize {params.genomeSize} -g {params.twobitpath} -l 300 --GCbiasFrequenciesFile {output.GCbiasTXT} -p {threads} --biasPlot {output.GCbiasPNG} --plotFileFormat png "
 
 
 if intList:
@@ -334,11 +384,13 @@ else:
                 R2="FASTQ_downsampled/{sample}"+reads[1]+".fastq.gz"
             output:
                 R12cr="QC_metrics/{sample}.conv.rate.txt"
+            params:
+                pfx="FASTQ_downsampled/{sample}"
             log:
                 err="QC_metrics/logs/{sample}.conv_rate.err",
                 out="QC_metrics/logs/{sample}.conv_rate.out"
             threads: 1
-            shell: os.path.join(workflow_tools,'conversionRate_KS.sh ')+ "FASTQ_downsampled/{sample} {output.R12cr} 1>{log.out} 2>{log.err}"
+            shell: os.path.join(workflow_tools,'conversionRate_KS.sh ')+ "{params.pfx} {output.R12cr} 1>{log.out} 2>{log.err}"
 
 rule get_flagstat:
     input:
