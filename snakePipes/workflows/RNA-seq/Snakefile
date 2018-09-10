@@ -181,8 +181,8 @@ def run_allelesp_mapping():
     else:
         return([])
 
-def run_deeptools_qc():
-    if "deeptools_qc" in mode:
+def run_deepTools_qc():
+    if "deepTools_qc" in mode:
         file_list = [
         expand("bamCoverage/{sample}.RPKM.bw", sample = samples),
         expand("bamCoverage/{sample}.coverage.bw", sample = samples),
@@ -250,7 +250,7 @@ rule all:
         run_alignment(),                 # classical mapping + counting
         run_allelesp_mapping(),        # allelic-mapping
         make_nmasked_genome(),
-        run_deeptools_qc(),
+        run_deepTools_qc(),
         run_GenomicContamination(),
         "multiQC/multiqc_report.html"
 
