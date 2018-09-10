@@ -1,2 +1,2 @@
-snakemake >= 5.2.0
+snakemake >= 5.2.3
 pandas

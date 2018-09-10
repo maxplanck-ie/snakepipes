@@ -3,7 +3,7 @@ channels:
  - bioconda
  - conda-forge
 dependencies:
- - deeptools=3.1.0
+ - deeptools=3.1.2
  - seqtk=1.2
  - pigz=2.3.4
  - snpsplit=0.3.4
@@ -11,5 +11,5 @@ dependencies:
  - fastqc=0.11.7
  - cutadapt=1.16
  - trim-galore=0.4.5
- - sambamba=0.6.6
- - multiqc=1.5
+ - sambamba=0.6.8
+ - multiqc=1.6
