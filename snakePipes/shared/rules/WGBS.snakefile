@@ -98,13 +98,9 @@ if convRef:
         input:
             refG=refG
         output:
-            #crefG=os.path.join('aux_files',re.sub('.fa','.fa.bwameth.c2t',os.path.basename(refG))), ##temp?
             cref_sa=os.path.join("aux_files",re.sub('.fa','.fa.bwameth.c2t.sa',os.path.basename(refG))),
             cref_amb=os.path.join("aux_files",re.sub('.fa','.fa.bwameth.c2t.amb',os.path.basename(refG))),
             locrefG=os.path.join("aux_files",os.path.basename(refG))
-        #params:
-            #cref_sa=os.path.join("aux_files",re.sub('.fa','.fa.bwameth.c2t.sa',os.path.basename(refG))),
-            #cref_amb=os.path.join("aux_files",re.sub('.fa','.fa.bwameth.c2t.amb',os.path.basename(refG)))
         log:
             err="aux_files/logs/conv_ref.err",
             out="aux_files/logs/conv_ref.out"
@@ -118,7 +114,6 @@ if not trimReads is None:
             R1cut="FASTQ_Cutadapt/{sample}"+reads[0]+".fastq.gz",
             R2cut="FASTQ_Cutadapt/{sample}"+reads[1]+".fastq.gz",
             crefG=crefG,
-            #locrefG=os.path.join(os.path.dirname(crefG),re.sub('.fa','.fa.bwameth.c2t',os.path.basename(crefG)))
             cref_sa=os.path.join("aux_files",re.sub('.fa','.fa.bwameth.c2t.sa',os.path.basename(refG))),
             cref_amb=os.path.join("aux_files",re.sub('.fa','.fa.bwameth.c2t.amb',os.path.basename(refG)))
         output:
