@@ -16,16 +16,21 @@ globals().update(cf.set_env_yamls())
 
 # load config file
 globals().update(cf.load_configfile(workflow.overwrite_configfile,config["verbose"]))
-# load organism-specific data, i.e. genome indices, annotation, etc.
-globals().update(cf.load_organism_data(genome,maindir,config["verbose"]))
+if not convRef:
+    # load organism-specific data, i.e. genome indices, annotation, etc.
+    globals().update(cf.load_organism_data(genome,maindir,config["verbose"]))
+    refG=genome_fasta
+    crefG=bwameth_index
+else:
+    refG=genome
+    crefG=os.path.join('aux_files',os.path.basename(refG))
 
 ###switch off read trimming rules if bam input provided ## this might be moved to a more useful location in the future
-if fromBam:
+if trimReads=='None':
     trimReads=None
 
-
-refG=genome_fasta
-crefG=bwameth_index
+if fromBam:
+    trimReads=None
 
 #this_script_dir = os.path.dirname(os.path.realpath(__file__))
 
@@ -83,7 +88,7 @@ if not fromBam:
 
 def convert_refG(convRef):
     if convRef:
-        return (os.path.join('conv_ref',re.sub('.fa','.fa.bwameth.c2t',os.path.basename(refG))))
+        return ([os.path.join('aux_files',re.sub('.fa','.fa.bwameth.c2t.sa',os.path.basename(refG))),os.path.join('aux_files',re.sub('.fa','.fa.bwameth.c2t.amb',os.path.basename(refG)))])
     else:
         return([])
 
