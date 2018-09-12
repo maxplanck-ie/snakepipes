@@ -4,10 +4,18 @@ from operator import is_not
 import tempfile
 import pandas
 
+
 ## function to get the name of the samplesheet and extend the name of the folder for all analyses relying on sample_info
 def get_outdir(folder_name):
     sample_name = re.sub('_sampleSheet.[a-z]{3}$','',os.path.basename(sampleInfo))
     return("{}_{}".format(folder_name, sample_name))
+
+## count the number of fields in the chromosome name and generate awk string
+def get_awk_cmd(fasta):
+    with open(fasta) as f:
+        line = f.readline()
+    nF=len(line.split(' '))
+    return ('\'{{print $1, ${}, ${}+1, ${}, ${}}}\''.format(nF+1,nF+1,nF+2,nF+4))
 
 ###symlink bams if this is the starting point
 if fromBam:
@@ -101,12 +109,14 @@ if convRef:
             cref_sa=os.path.join("aux_files",re.sub('.fa','.fa.bwameth.c2t.sa',os.path.basename(refG))),
             cref_amb=os.path.join("aux_files",re.sub('.fa','.fa.bwameth.c2t.amb',os.path.basename(refG))),
             locrefG=os.path.join("aux_files",os.path.basename(refG))
+        params:
+            locdict=os.path.join("aux_files",re.sub('.fa','.dict',os.path.basename(refG)))
         log:
             err="aux_files/logs/conv_ref.err",
             out="aux_files/logs/conv_ref.out"
         threads: 1
         conda: CondaEnvironment
-        shell:"ln -s {input.refG} {output.locrefG}; bwameth.py index {output.locrefG}  1>{log.out} 2>{log.err}"
+        shell:"ln -s {input.refG} {output.locrefG}; bwameth.py index {output.locrefG}; samtools faidx {output.locrefG}; picard CreateSequenceDictionary R={output.locrefG} O={params.locdict}  1>{log.out} 2>{log.err}"
 
 if not trimReads is None:
     rule map_reads:
@@ -198,11 +208,13 @@ rule get_ran_CG:
     output:
         pozF="aux_files/"+re.sub('.fa*','.poz.gz',os.path.basename(refG)),
         ranCG=os.path.join("aux_files",re.sub('.fa','.poz.ran1M.sorted.bed',os.path.basename(refG)))
+    params:
+        awkCmd=get_awk_cmd(refG)
     log:
         err="aux_files/logs/get_ran_CG.err"
     threads: 1
     conda: mCtCondaEnvironment
-    shell: 'set +o pipefail; ' + os.path.join(workflow_tools,'methylCtools') + " fapos {input.refG}  " + re.sub('.gz','',"{output.pozF}") + ';cat '+ re.sub('.gz','',"{output.pozF}") +' | grep "+" - | shuf | head -n 1000000 | awk \'{{print $1, $5, $5+1, $6, $8}}\' - | tr " " "\\t" | sort -k 1,1 -k2,2n - > ' + "{output.ranCG} 2>{log.err}"
+    shell: 'set +o pipefail; ' + os.path.join(workflow_tools,'methylCtools') + " fapos {input.refG}  " + re.sub('.gz','',"{output.pozF}") + ';cat '+ re.sub('.gz','',"{output.pozF}") +' | grep "+" -' + " | shuf | head -n 1000000 | awk {params.awkCmd}" + ' - | tr " " "\\t" | sort -k 1,1 -k2,2n - > ' + "{output.ranCG} 2>{log.err}"
         
 
 rule calc_Mbias:
@@ -227,7 +239,8 @@ if convRef:
         log:
             err="aux_files/logs/gsize.err"
         threads: 1
-        shell: os.path.join(workflow_tools,"faCount ") + "{input.refG} | awk \'END{{print $2-$7}}\'  > {output.gsize} 2>{log.err}"
+        conda: CondaEnvironment
+        shell: "faCount {input.refG} | awk \'END{{print $2-$7}}\'  > {output.gsize} 2>{log.err}"
 
     rule get_twobit_genome:
         input:
@@ -237,7 +250,8 @@ if convRef:
         log:
             err="aux_files/logs/fatotwobit.err"
         threads: 1
-        shell: os.path.join(workflow_tools,"faToTwoBit ") + "{input.refG} {output.twobit} 2>{log.err}"
+        conda: CondaEnvironment
+        shell: "faToTwoBit {input.refG} {output.twobit} 2>{log.err}"
 
     rule calc_GCbias:
         input:
@@ -277,7 +291,7 @@ else:
 if intList:
     rule depth_of_cov:
         input:
-            refG=refG,
+            refG=lambda convRef: refG if False else crefG,
             rmDupBam="bams/{sample}"+bam_ext,
             sbami="bams/{sample}"+bam_ext+".bai",
             ranCG=os.path.join("aux_files",re.sub('.fa','.poz.ran1M.sorted.bed',os.path.basename(refG))),
@@ -302,7 +316,7 @@ if intList:
 else:
     rule depth_of_cov:
         input:
-            refG=refG,
+            refG=lambda convRef: refG if False else crefG,
             rmDupBam="bams/{sample}"+bam_ext,
             sbami="bams/{sample}"+bam_ext+".bai",
             ranCG=os.path.join("aux_files",re.sub('.fa','.poz.ran1M.sorted.bed',os.path.basename(refG)))
@@ -508,14 +522,16 @@ else:
 if sampleInfo or intList:
     rule make_CG_bed:
         input:
-            pozF="aux_files/"+re.sub('.fa*','.poz.gz',os.path.basename(refG))
+            pozF="aux_files/"+re.sub('.fa*','.poz.gz',os.path.basename(refG))            
         output:
             imdF="aux_files/"+re.sub('.fa*','.CpG.bed',os.path.basename(refG))
+        params:
+            awkCmd=get_awk_cmd(refG)
         log:
             err="aux_files/logs/make_CG_bed.err"
         threads: 1
         conda: CondaEnvironment
-        shell: 'grep "+"' + " {input.pozF} "+ ' | awk \'{{print $1, $5, $5+1, $6, $8}}\' - | tr " " "\\t" | sort -k 1,1 -k2,2n - > ' + "{output.imdF}"
+        shell: 'grep "+"' + " {input.pozF}  | awk {params.awkCmd}" + ' - | tr " " "\\t" | sort -k 1,1 -k2,2n - > ' + "{output.imdF}"
 
 
 if sampleInfo:
@@ -556,7 +572,7 @@ if sampleInfo:
             MetBed='{}/singleCpG.metilene.bed'.format(get_outdir("metilene_out")),
             imdF="aux_files/"+re.sub('.fa*','.CpG.bed',os.path.basename(refG))
         output:
-            MetCG=os.path.join("aux_files",re.sub('_sampleSheet.tsv','.metilene.CpGlist.bed',os.path.basename(sampleInfo)))
+            MetCG=os.path.join("aux_files",re.sub('_sampleSheet.[a-z]{3}$','.metilene.CpGlist.bed',os.path.basename(sampleInfo)))
         params:
             auxdir=os.path.join(outdir,"aux_files")            
         log:
@@ -570,20 +586,20 @@ if sampleInfo:
         input:
             Limdat='{}/limdat.LG.RData'.format(get_outdir("singleCpG_stats_limma")),
             MetBed='{}/singleCpG.metilene.bed'.format(get_outdir("metilene_out")),
-            MetCG=os.path.join("aux_files",re.sub('_sampleSheet.tsv','.metilene.CpGlist.bed',os.path.basename(sampleInfo))),
-            sampleInfo=sampleInfo,
-            refG=refG
+            MetCG=os.path.join("aux_files",re.sub('_sampleSheet.[a-z]{3}$','.metilene.CpGlist.bed',os.path.basename(sampleInfo))),
+            sampleInfo=sampleInfo
         output:
             LimBed='{}/singleCpG.metilene.limma.bed'.format(get_outdir("metilene_out")),
             LimAnnot='{}/metilene.limma.annotated.txt'.format(get_outdir("metilene_out"))
         params:
-            DMRout=os.path.join(outdir,'{}'.format(get_outdir("metilene_out")))
+            DMRout=os.path.join(outdir,'{}'.format(get_outdir("metilene_out"))),
+            gene_mod=lambda genes_bed: 'NA' if genes_bed=='' else genes_bed
         log:
             err="{}/logs/cleanup_metilene.err".format(get_outdir("metilene_out")),
             out="{}/logs/cleanup_metilene.out".format(get_outdir("metilene_out"))
         threads: 1
         conda: CondaEnvironment
-        shell: 'Rscript --no-save --no-restore ' + os.path.join(workflow_rscripts,'WGBSpipe.metilene_stats.limma.R ') + "{params.DMRout} " + os.path.join(outdir,"{input.MetBed}") +' ' + os.path.join(outdir,"{input.MetCG}") + ' ' + os.path.join(outdir,"{input.Limdat}") + " {input.sampleInfo} {input.refG} 1>{log.out} 2>{log.err}" 
+        shell: 'Rscript --no-save --no-restore ' + os.path.join(workflow_rscripts,'WGBSpipe.metilene_stats.limma.R ') + "{params.DMRout} " + os.path.join(outdir,"{input.MetBed}") +' ' + os.path.join(outdir,"{input.MetCG}") + ' ' + os.path.join(outdir,"{input.Limdat}") + " {input.sampleInfo} {params.gene_mod} 1>{log.out} 2>{log.err}" 
 
 
 if intList:

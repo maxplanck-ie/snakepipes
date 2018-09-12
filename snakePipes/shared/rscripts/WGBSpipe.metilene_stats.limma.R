@@ -160,34 +160,35 @@ if (length(readLines(bedF))==0) {message("No DMRs found.")}else{
             save(CGI.bed.intT,file=paste0(bedshort,".limma.RData"))
 
     ####### add nearest gene information
-            refG<-commandArgs(trailingOnly=TRUE)[6]
-            ensL<-sort(dir(gsub("/genome_fasta/genome.fa","/ensembl",refG),pattern="genes.bed",recursive=TRUE,full.names=TRUE))
-            genMod<-ensL[length(ensL)]
-            message(sprintf("Processing genome %s and gene models in %s",refG,genMod))
+            genMod<-commandArgs(trailingOnly=TRUE)[6]
+            if (genMod!='NA' & file.exists(genMod)){
+                message(sprintf("Processing gene models in %s",genMod))
 
 
-            system(paste0('sed -e \'s/^/chr/\' ', genMod,' | sort -d  -k1,1 -k2,2n  | sed -e \'s/chr//\'  > ' ,wdir ,'/genes.sorted.bed'))
-            system(paste0('sed -e \'s/^/chr/\' ',wdir,'/', bedshort,".limma.bed",' | sort  -k1,1 -k2,2n | sed -e \'s/chr//\' > ',wdir,'/',bedshort,".limma.sorted.bed"))
-            system(paste0('sed -i \'/CHROM/d\' ',wdir,'/',bedshort,".limma.sorted.bed"))
+                system(paste0('sed -e \'s/^/chr/\' ', genMod,' | sort -d  -k1,1 -k2,2n  | sed -e \'s/chr//\'  > ' ,wdir ,'/genes.sorted.bed'))
+                system(paste0('sed -e \'s/^/chr/\' ',wdir,'/', bedshort,".limma.bed",' | sort  -k1,1 -k2,2n | sed -e \'s/chr//\' > ',wdir,'/',bedshort,".limma.sorted.bed"))
+                system(paste0('sed -i \'/CHROM/d\' ',wdir,'/',bedshort,".limma.sorted.bed"))
 
-            system(paste0('bedtools closest -D b -a ',wdir,'/',bedshort,".limma.sorted.bed",' -b ', wdir ,'/genes.sorted.bed',' > ',wdir,'/',bedshort,'.limma.closest.bed'))
+                system(paste0('bedtools closest -D b -a ',wdir,'/',bedshort,".limma.sorted.bed",' -b ', wdir ,'/genes.sorted.bed',' > ',wdir,'/',bedshort,'.limma.closest.bed'))
 
-            DMR.filt.an<-fread(paste0(wdir,'/',bedshort,'.limma.closest.bed'),header=FALSE,sep="\t")
-            DMR.filt.an<-DMR.filt.an[,c(1:17,18:21,23,30),with=FALSE]
-            colnames(DMR.filt.an)<-c(colnames(CGI.bed.intT),"ChrEns","StartEns","EndEns","ENST","StrandEns","Dist")
+                DMR.filt.an<-fread(paste0(wdir,'/',bedshort,'.limma.closest.bed'),header=FALSE,sep="\t")
+                DMR.filt.an<-DMR.filt.an[,c(1:17,18:21,23,30),with=FALSE]
+                colnames(DMR.filt.an)<-c(colnames(CGI.bed.intT),"ChrEns","StartEns","EndEns","ENST","StrandEns","Dist")
 
-            library(biomaRt)
-            emv<-c("ENSDART"="drerio","ENSMUST"="mmusculus","ENSG"="hsapiens","FBtr"="dmelanogaster")
-            ems<-emv[grep(gsub("[0-9].+","",DMR.filt.an$ENST[1]),names(emv))]
-            ens.xx<-useMart(biomart="ensembl",dataset=paste0(ems,"_gene_ensembl"))
-            bm<-getBM(attributes=c("ensembl_gene_id","ensembl_transcript_id","external_gene_name","description"),filters="ensembl_transcript_id",values=DMR.filt.an$ENST,mart=ens.xx)
+                library(biomaRt)
+                emv<-c("ENSDART"="drerio","ENSMUST"="mmusculus","ENSG"="hsapiens","FBtr"="dmelanogaster")
+                ems<-emv[grep(gsub("[0-9].+","",DMR.filt.an$ENST[1]),names(emv))]
+                ens.xx<-useMart(biomart="ensembl",dataset=paste0(ems,"_gene_ensembl"))
+                bm<-getBM(attributes=c("ensembl_gene_id","ensembl_transcript_id","external_gene_name","description"),filters="ensembl_transcript_id",values=DMR.filt.an$ENST,mart=ens.xx)
 
-            DMR.filt.an2<-merge(x=DMR.filt.an,y=bm,by.x="ENST",by.y="ensembl_transcript_id",all.x=TRUE,allow.cartesian=TRUE)
-            write.table(DMR.filt.an2,file="metilene.limma.annotated.txt",row.names=FALSE,quote=FALSE,sep="\t")
-            DMR.filt.an2.pos<-DMR.filt.an2[DMR.filt.an2$MeanDiff>0,]
-            if(nrow(DMR.filt.an2.pos)>0){write.table(DMR.filt.an2.pos,file="metilene.limma.annotated.UP.txt",row.names=FALSE,quote=FALSE,sep="\t")}
-            DMR.filt.an2.neg<-DMR.filt.an2[DMR.filt.an2$MeanDiff<0,] 
-            if(nrow(DMR.filt.an2.neg)<0){write.table(DMR.filt.an2.neg,file="metilene.limma.annotated.DOWN.txt",row.names=FALSE,quote=FALSE,sep="\t")}
+                DMR.filt.an2<-merge(x=DMR.filt.an,y=bm,by.x="ENST",by.y="ensembl_transcript_id",all.x=TRUE,allow.cartesian=TRUE)
+                write.table(DMR.filt.an2,file="metilene.limma.annotated.txt",row.names=FALSE,quote=FALSE,sep="\t")
+                DMR.filt.an2.pos<-DMR.filt.an2[DMR.filt.an2$MeanDiff>0,]
+                if(nrow(DMR.filt.an2.pos)>0){write.table(DMR.filt.an2.pos,file="metilene.limma.annotated.UP.txt",row.names=FALSE,quote=FALSE,sep="\t")}
+                DMR.filt.an2.neg<-DMR.filt.an2[DMR.filt.an2$MeanDiff<0,] 
+                if(nrow(DMR.filt.an2.neg)<0){write.table(DMR.filt.an2.neg,file="metilene.limma.annotated.DOWN.txt",row.names=FALSE,quote=FALSE,sep="\t")}
+
+            } else {message("No gene models file was provided.")}
 
         }
     }
