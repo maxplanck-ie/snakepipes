@@ -165,8 +165,12 @@ if (length(readLines(bedF))==0) {message("No DMRs found.")}else{
                 message(sprintf("Processing gene models in %s",genMod))
 
 
-                system(paste0('sed -e \'s/^/chr/\' ', genMod,' | sort -d  -k1,1 -k2,2n  | sed -e \'s/chr//\'  > ' ,wdir ,'/genes.sorted.bed'))
-                system(paste0('sed -e \'s/^/chr/\' ',wdir,'/', bedshort,".limma.bed",' | sort  -k1,1 -k2,2n | sed -e \'s/chr//\' > ',wdir,'/',bedshort,".limma.sorted.bed"))
+                #system(paste0('sed -e \'s/^/chr/\' ', genMod,' | sort -d  -k1,1 -k2,2n  | sed -e \'s/chr//\'  > ' ,wdir ,'/genes.sorted.bed'))
+                #system(paste0('sed -e \'s/^/chr/\' ',wdir,'/', bedshort,".limma.bed",' | sort  -k1,1 -k2,2n | sed -e \'s/chr//\' > ',wdir,'/',bedshort,".limma.sorted.bed"))
+                #system(paste0('sed -i \'/CHROM/d\' ',wdir,'/',bedshort,".limma.sorted.bed"))
+
+                system(paste0('bedtools sort ', genMod,'  > ' ,wdir ,'/genes.sorted.bed'))
+                system(paste0('bedtools sort ',wdir,'/', bedshort,".limma.bed",' > ',wdir,'/',bedshort,".limma.sorted.bed"))
                 system(paste0('sed -i \'/CHROM/d\' ',wdir,'/',bedshort,".limma.sorted.bed"))
 
                 system(paste0('bedtools closest -D b -a ',wdir,'/',bedshort,".limma.sorted.bed",' -b ', wdir ,'/genes.sorted.bed',' > ',wdir,'/',bedshort,'.limma.closest.bed'))
@@ -186,7 +190,7 @@ if (length(readLines(bedF))==0) {message("No DMRs found.")}else{
                 DMR.filt.an2.pos<-DMR.filt.an2[DMR.filt.an2$MeanDiff>0,]
                 if(nrow(DMR.filt.an2.pos)>0){write.table(DMR.filt.an2.pos,file="metilene.limma.annotated.UP.txt",row.names=FALSE,quote=FALSE,sep="\t")}
                 DMR.filt.an2.neg<-DMR.filt.an2[DMR.filt.an2$MeanDiff<0,] 
-                if(nrow(DMR.filt.an2.neg)<0){write.table(DMR.filt.an2.neg,file="metilene.limma.annotated.DOWN.txt",row.names=FALSE,quote=FALSE,sep="\t")}
+                if(nrow(DMR.filt.an2.neg)>0){write.table(DMR.filt.an2.neg,file="metilene.limma.annotated.DOWN.txt",row.names=FALSE,quote=FALSE,sep="\t")}
 
             } else {message("No gene models file was provided.")}
 
