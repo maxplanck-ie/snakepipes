@@ -16,60 +16,79 @@ globals().update(cf.set_env_yamls())
 
 # load config file
 globals().update(cf.load_configfile(workflow.overwrite_configfile,config["verbose"]))
-# load organism-specific data, i.e. genome indices, annotation, etc.
-globals().update(cf.load_organism_data(genome,maindir,config["verbose"]))
+if not convRef:
+    # load organism-specific data, i.e. genome indices, annotation, etc.
+    globals().update(cf.load_organism_data(genome,maindir,config["verbose"]))
+    refG=genome_fasta
+    crefG=bwameth_index
+else:
+    refG=genome
+    crefG=os.path.join('aux_files',os.path.basename(refG))
 
+###switch off read trimming rules if bam input provided ## this might be moved to a more useful location in the future
+if trimReads=='None':
+    trimReads=None
 
-refG=genome_fasta
-crefG=bwameth_index
+if fromBam:
+    trimReads=None
 
 #this_script_dir = os.path.dirname(os.path.realpath(__file__))
 
 ### Sample init #############################################################
+if not fromBam:
+    infiles = sorted(glob.glob(os.path.join(str(indir or ''), '*'+ext)))
+    samples = cf.get_sample_names(infiles,ext,reads)
+    paired = cf.is_paired(infiles,ext,reads)
 
-infiles = sorted(glob.glob(os.path.join(str(indir or ''), '*'+ext)))
-samples = cf.get_sample_names(infiles,ext,reads)
-paired = cf.is_paired(infiles,ext,reads)
+    if not samples:
+        logger.error("  Error! NO samples found in dir "+str(indir or '')+"!!!")#\n \n\n
+        exit(1)
 
-if not samples:
-    logger.error("  Error! NO samples found in dir "+str(indir or '')+"!!!")#\n \n\n
-    exit(1)
+    if not paired:
+        logger.error(" Error! Paired-end samples not detected. "
+              "WGBS workflow currently works only with paired-end samples "+str(indir or '')+"!!!")#\n \n\n
+        exit(1)
 
-if not paired:
-    logger.error(" Error! Paired-end samples not detected. "
-          "WGBS workflow currently works only with paired-end samples "+str(indir or '')+"!!!")#\n \n\n
-    exit(1)
+    def get_Read_Group(INfiles):
+        RG_dict={}
+        for INfile in INfiles:
+            with io.TextIOWrapper(gzip.open(INfile, 'r')) as f:
+                file_content = f.readline().strip()
+            read_root=re.sub('_R1.fastq.gz','',os.path.basename(INfile))
+            PL=re.sub('@','',file_content).split(":")[0]
+            PU=re.sub('@','',file_content).split(":")[2]
+            RG='@RG"\\t"ID:1"\\t"SM:'+read_root+'"\\t"LB:'+read_root+'"\\t"PL:'+PL+'"\\t"PU:'+PU
+            RG_dict[read_root]=RG
+        return RG_dict
 
-def get_Read_Group(INfiles):
-    RG_dict={}
-    for INfile in INfiles:
-        with io.TextIOWrapper(gzip.open(INfile, 'r')) as f:
-            file_content = f.readline().strip()
-        read_root=re.sub('_R1.fastq.gz','',os.path.basename(INfile))
-        PL=re.sub('@','',file_content).split(":")[0]
-        PU=re.sub('@','',file_content).split(":")[2]
-        RG='@RG"\\t"ID:1"\\t"SM:'+read_root+'"\\t"LB:'+read_root+'"\\t"PL:'+PL+'"\\t"PU:'+PU
-        RG_dict[read_root]=RG
-    return RG_dict
+    RG_dict=get_Read_Group(infiles)
+    del infiles
 
-RG_dict=get_Read_Group(infiles)
-del infiles
+else:
+    infiles = sorted(glob.glob(os.path.join(str(indir or ''), '*'+bam_ext)))
+    samples = cf.get_sample_names_bam(infiles,bam_ext)
+    ###add checks for existing read group
+    del infiles
+
+
 
 ### conditional/optional rules #################################################
 #some of those definitions are used to generate output strings for some of the rules
 ################################################################################
 
-def run_cutadapt(trimReads):
-    if trimReads=='user':
-        return (expand("FASTQ_Cutadapt/{sample}{read}.fastq.gz", sample = samples, read = reads) + expand("FastQC_Cutadapt/{sample}{read}_fastqc.html", sample = samples, read = reads) )
-    elif trimReads=='auto':
-        return( expand("FastQC_In/{sample}.R12.ct.txt" ,sample = samples) + expand("FASTQ_Cutadapt/{sample}{read}.fastq.gz", sample = samples, read = reads) + expand("FastQC_Cutadapt/{sample}{read}_fastqc.html", sample = samples, read = reads) )
-    elif trimReads is None:
-        return([])
+if not fromBam:
+
+    def run_cutadapt(trimReads):
+        if trimReads=='user':
+            return (expand("FASTQ_Cutadapt/{sample}{read}.fastq.gz", sample = samples, read = reads) + expand("FastQC_Cutadapt/{sample}{read}_fastqc.html", sample = samples, read = reads) )
+        elif trimReads=='auto':
+            return( expand("FastQC_In/{sample}.R12.ct.txt" ,sample = samples) + expand("FASTQ_Cutadapt/{sample}{read}.fastq.gz", sample = samples, read = reads) + expand("FastQC_Cutadapt/{sample}{read}_fastqc.html", sample = samples, read = reads) )
+        elif trimReads is None:
+            return([])
 
 def convert_refG(convRef):
     if convRef:
-        return (os.path.join('conv_ref',re.sub('.fa','.fa.bwameth.c2t',os.path.basename(refG))))
+        return ([os.path.join('aux_files',re.sub('.fa','.fa.bwameth.c2t.sa',os.path.basename(refG))),os.path.join('aux_files',re.sub('.fa','.fa.bwameth.c2t.amb',os.path.basename(refG)))])
     else:
         return([])
 
@@ -123,8 +142,9 @@ def run_int_aggStats(intList,sampleInfo):
 ### include modules of other snakefiles ########################################
 ##some rules depend on the definitions above
 ################################################################################
-# FASTQ: either downsample FASTQ files or create symlinks to input files
-include: os.path.join(maindir, "shared", "rules", "FASTQ.snakefile")
+if not fromBam:
+    # FASTQ: either downsample FASTQ files or create symlinks to input files
+    include: os.path.join(maindir, "shared", "rules", "FASTQ.snakefile")
 
 # WGBS
 include: os.path.join(maindir, "shared", "rules", "WGBS.snakefile")
@@ -150,28 +170,51 @@ onstart:
 
 ### main rule ##################################################################
 ################################################################################
-localrules: 
-    FASTQ,
-    produce_report
+if not fromBam:
+    localrules: 
+        FASTQ,
+        produce_report
 
-rule all:
-    input:
-        expand("FASTQ/{sample}{read}.fastq.gz", sample = samples, read = reads),
-        expand("FASTQ_downsampled/{sample}{read}.fastq.gz", sample = samples, read = reads),
-        convert_refG(convRef),
-        expand("bams/{sample}.PCRrm.bam", sample = samples),
-        expand("QC_metrics/{sample}.Mbias.txt",sample=samples),
-        os.path.join("aux_files",re.sub('.fa','.poz.ran1M.sorted.bed',os.path.basename(refG))),
-        calc_doc(intList,False),
-        'QC_metrics/QC_report.pdf',
-        expand("QC_metrics/{sample}.freq.txt",sample=samples),
-        expand("QC_metrics/{sample}.GCbias.png",sample=samples),
-        expand("methXT/{sample}_CpG.bedGraph",sample=samples),
-        expand("methXT/{sample}.CpG.filt2.bed",sample=samples),
-        run_CpG_stats(sampleInfo),
-        run_metilene_all(sampleInfo),
-        run_int_aggStats(intList,False),
-        run_int_aggStats(intList,sampleInfo)
+    rule all:
+        input:
+            expand("FASTQ/{sample}{read}.fastq.gz", sample = samples, read = reads),
+            expand("FASTQ_downsampled/{sample}{read}.fastq.gz", sample = samples, read = reads),
+            convert_refG(convRef),
+            expand("bams/{sample}.PCRrm.bam", sample = samples),
+            expand("QC_metrics/{sample}.Mbias.txt",sample=samples),
+            os.path.join("aux_files",re.sub('.fa','.poz.ran1M.sorted.bed',os.path.basename(refG))),
+            calc_doc(intList,False),
+            'QC_metrics/QC_report.pdf',
+            expand("QC_metrics/{sample}.freq.txt",sample=samples),
+            expand("QC_metrics/{sample}.GCbias.png",sample=samples),
+            expand("methXT/{sample}_CpG.bedGraph",sample=samples),
+            expand("methXT/{sample}.CpG.filt2.bed",sample=samples),
+            run_CpG_stats(sampleInfo),
+            run_metilene_all(sampleInfo),
+            run_int_aggStats(intList,False),
+            run_int_aggStats(intList,sampleInfo)
+
+else:
+    localrules:
+        link_bam,
+        produce_report
+
+    rule all:
+        input:
+            convert_refG(convRef),
+            expand("bams/{sample}"+bam_ext, sample = samples),
+            expand("QC_metrics/{sample}.Mbias.txt",sample=samples),
+            os.path.join("aux_files",re.sub('.fa','.poz.ran1M.sorted.bed',os.path.basename(refG))),
+            calc_doc(intList,False),
+            'QC_metrics/QC_report.pdf',
+            expand("QC_metrics/{sample}.freq.txt",sample=samples),
+            expand("QC_metrics/{sample}.GCbias.png",sample=samples),
+            expand("methXT/{sample}_CpG.bedGraph",sample=samples),
+            expand("methXT/{sample}.CpG.filt2.bed",sample=samples),
+            run_CpG_stats(sampleInfo),
+            run_metilene_all(sampleInfo),
+            run_int_aggStats(intList,False),
+            run_int_aggStats(intList,sampleInfo)
 
 ### execute after workflow finished ############################################
 ################################################################################

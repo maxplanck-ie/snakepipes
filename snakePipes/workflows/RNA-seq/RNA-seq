@@ -138,8 +138,12 @@ def main():
         args.SNPfile = os.path.abspath(args.SNPfile)
         args.Nmasked_index = os.path.abspath(args.Nmasked_index)
     modeTemp = args.mode.split(",")
-    # deeptools_qc requires alignment as input
-    if "deeptools_qc" in modeTemp and "alignment" not in modeTemp:
+    validModes = set(["alignment", "alignment-free", "deepTools_qc"])
+    for mode in modeTemp:
+        if mode not in validModes:
+            sys.exit("{} is not a valid mode!\n".format(mode))
+    # deepTools_qc requires alignment as input
+    if "deepTools_qc" in modeTemp and "alignment" not in modeTemp:
         args.mode = "{},alignment".format(args.mode)
     ## End workflow-specific checks
 
