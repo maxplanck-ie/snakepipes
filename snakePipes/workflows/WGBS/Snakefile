@@ -32,6 +32,10 @@ if trimReads=='None':
 if fromBam:
     trimReads=None
 
+##check if genes_bed is available
+if not 'genes_bed' in globals():
+    genes_bed='NA'
+
 #this_script_dir = os.path.dirname(os.path.realpath(__file__))
 
 ### Sample init #############################################################
