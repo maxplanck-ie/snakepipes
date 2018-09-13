@@ -119,12 +119,12 @@ if (length(readLines(bedF))==0) {message("No DMRs found.")}else{
 
     ##density plots
         ggplot(data=CGI.limdat.CC.Means,aes(x=Beta.Mean))+geom_density(aes(group=Group,colour=Group,fill=Group),alpha=0.3)+ggtitle("Differentially methylated regions")+
-    theme(text = element_text(size=16),axis.text = element_text(size=12),axis.title = element_text(size=14))+xlab("Mean methylation ratio")+scale_fill_manual(values=c("grey28","red"))+scale_colour_manual(values=c("grey28","red"))+xlim(0,1)
+    theme(text = element_text(size=16),axis.text = element_text(size=12),axis.title = element_text(size=14))+xlab("Mean methylation ratio")+scale_fill_manual(values=c("grey28","red","darkblue","darkgreen"))+scale_colour_manual(values=c("grey28","red","darkblue","darkgreen"))+xlim(0,1)
         ggsave(paste0(bedshort,".Beta.MeanXgroup.metilene.dens.png"))
 
     ##violin plots
         ggplot(data=CGI.limdat.CC.Means)+geom_violin(aes(x=Group,y=Beta.Mean,fill=Group))+geom_boxplot(aes(x=Group,y=Beta.Mean),width=0.1)+ggtitle("Differentially methylated regions")+
-    theme(text = element_text(size=16),axis.text = element_text(size=12),axis.title = element_text(size=14))+xlab("Mean methylation ratio")+scale_fill_manual(values=c("grey28","red"))+ylim(0,1)
+    theme(text = element_text(size=16),axis.text = element_text(size=12),axis.title = element_text(size=14))+xlab("Mean methylation ratio")+scale_fill_manual(values=c("grey28","red","darkblue","darkgreen"))+ylim(0,1)
         ggsave(paste0(bedshort,".Beta.MeanXgroup.metilene.violin.png"))
 
     #differential methylation
@@ -167,13 +167,9 @@ if (length(readLines(bedF))==0) {message("No DMRs found.")}else{
                 message(sprintf("Processing gene models in %s",genMod))
 
 
-                #system(paste0('sed -e \'s/^/chr/\' ', genMod,' | sort -d  -k1,1 -k2,2n  | sed -e \'s/chr//\'  > ' ,wdir ,'/genes.sorted.bed'))
-                #system(paste0('sed -e \'s/^/chr/\' ',wdir,'/', bedshort,".limma.bed",' | sort  -k1,1 -k2,2n | sed -e \'s/chr//\' > ',wdir,'/',bedshort,".limma.sorted.bed"))
-                #system(paste0('sed -i \'/CHROM/d\' ',wdir,'/',bedshort,".limma.sorted.bed"))
-
-                system(paste0('bedtools sort ', genMod,'  > ' ,wdir ,'/genes.sorted.bed'))
-                system(paste0('bedtools sort ',wdir,'/', bedshort,".limma.bed",' > ',wdir,'/',bedshort,".limma.sorted.bed"))
-                system(paste0('sed -i \'/CHROM/d\' ',wdir,'/',bedshort,".limma.sorted.bed"))
+                system(paste0('bedtools sort -i ', genMod,'  > ' ,wdir ,'/genes.sorted.bed'))
+                system(paste0('sed -i \'/CHROM/d\' ',wdir,'/',bedshort,".limma.bed"))
+                system(paste0('bedtools sort -i ',wdir,'/', bedshort,".limma.bed",' > ',wdir,'/',bedshort,".limma.sorted.bed"))
 
                 system(paste0('bedtools closest -D b -a ',wdir,'/',bedshort,".limma.sorted.bed",' -b ', wdir ,'/genes.sorted.bed',' > ',wdir,'/',bedshort,'.limma.closest.bed'))
 
@@ -185,6 +181,7 @@ if (length(readLines(bedF))==0) {message("No DMRs found.")}else{
                 emv<-c("ENSDART"="drerio","ENSMUST"="mmusculus","ENSG"="hsapiens","FBtr"="dmelanogaster")
                 ems<-emv[grep(gsub("[0-9].+","",DMR.filt.an$ENST[1]),names(emv))]
                 ens.xx<-useMart(biomart="ensembl",dataset=paste0(ems,"_gene_ensembl"))
+                DMR.filt.an$ENST<-gsub("\\.[0-9].$","",DMR.filt.an$ENST)
                 bm<-getBM(attributes=c("ensembl_gene_id","ensembl_transcript_id","external_gene_name","description"),filters="ensembl_transcript_id",values=DMR.filt.an$ENST,mart=ens.xx)
 
                 DMR.filt.an2<-merge(x=DMR.filt.an,y=bm,by.x="ENST",by.y="ensembl_transcript_id",all.x=TRUE,allow.cartesian=TRUE)

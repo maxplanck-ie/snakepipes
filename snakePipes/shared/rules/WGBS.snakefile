@@ -592,7 +592,8 @@ if sampleInfo:
             LimAnnot='{}/metilene.limma.annotated.txt'.format(get_outdir("metilene_out"))
         params:
             DMRout=os.path.join(outdir,'{}'.format(get_outdir("metilene_out"))),
-            gene_mod=lambda genes_bed: 'NA' if genes_bed=='' else genes_bed
+            #gene_mod=lambda genes_bed: genes_bed if os.path.isfile(genes_bed) else 'NA'
+            gene_mod=genes_bed  
         log:
             err="{}/logs/cleanup_metilene.err".format(get_outdir("metilene_out")),
             out="{}/logs/cleanup_metilene.out".format(get_outdir("metilene_out"))
