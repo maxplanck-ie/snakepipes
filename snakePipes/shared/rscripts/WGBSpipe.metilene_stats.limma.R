@@ -133,11 +133,13 @@ if (length(readLines(bedF))==0) {message("No DMRs found.")}else{
         rownames(design)<-colnames(CGI.limdat.CC.logit)
         if("Control" %in% sampleInfo$Group){
             gp<-factor(sampleInfo$Group[match(colnames(CGI.limdat.CC.logit),sampleInfo$SampleID)])
-            gp<-relevel(gp,ref="Control")}
+            gp<-relevel(gp,ref="Control")
+            design$Group<-as.numeric(gp)}
         if("WT" %in% sampleInfo$Group){
             gp<-factor(sampleInfo$Group[match(colnames(CGI.limdat.CC.logit),sampleInfo$SampleID)])
-            gp<-relevel(gp,ref="WT")}
-        design$Group<-as.numeric(gp)
+            gp<-relevel(gp,ref="WT")
+            design$Group<-as.numeric(gp)}
+        else{design$Group<-as.numeric(factor(sampleInfo$Group))}
         design$Intercept<-1
         design<-as.matrix(design)
 

@@ -106,11 +106,13 @@ if(nrow(limdat.LG.CC)==0){ message("None of the single CpG sites passed the filt
     rownames(design)<-colnames(limdat.LG.CC.logit)
     if("Control" %in% sampleInfo$Group){
         gp<-factor(sampleInfo$Group[match(colnames(limdat.LG.CC.logit),sampleInfo$SampleID)])
-        gp<-relevel(gp,ref="Control")}
+        gp<-relevel(gp,ref="Control")
+        design$Group<-as.numeric(gp)}
     else if("WT" %in% sampleInfo$Group){
         gp<-factor(sampleInfo$Group[match(colnames(limdat.LG.CC.logit),sampleInfo$SampleID)])
-        gp<-relevel(gp,ref="WT")}
-    design$Group<-as.numeric(gp)
+        gp<-relevel(gp,ref="WT")
+        design$Group<-as.numeric(gp)}
+    else{design$Group<-as.numeric(factor(sampleInfo$Group))}
     design$Intercept<-1
     design<-as.matrix(design)
 

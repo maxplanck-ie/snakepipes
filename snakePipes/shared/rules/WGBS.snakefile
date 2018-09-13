@@ -121,11 +121,11 @@ if convRef:
 if not trimReads is None:
     rule map_reads:
         input:
+            lambda convRef: os.path.join("aux_files",re.sub('.fa','.fa.bwameth.c2t.sa',os.path.basename(refG))) if convRef is True else [],
+            lambda convRef: os.path.join("aux_files",re.sub('.fa','.fa.bwameth.c2t.amb',os.path.basename(refG))) if convRef is True  else [],
             R1cut="FASTQ_Cutadapt/{sample}"+reads[0]+".fastq.gz",
             R2cut="FASTQ_Cutadapt/{sample}"+reads[1]+".fastq.gz",
-            crefG=crefG,
-            cref_sa=os.path.join("aux_files",re.sub('.fa','.fa.bwameth.c2t.sa',os.path.basename(refG))),
-            cref_amb=os.path.join("aux_files",re.sub('.fa','.fa.bwameth.c2t.amb',os.path.basename(refG)))
+            crefG=crefG            
         output:
             sbam=temp("bams/{sample}.sorted.bam")
         log:
@@ -142,12 +142,11 @@ if not trimReads is None:
 if trimReads is None and not fromBam:
     rule map_reads:
         input:
+            lambda convRef: os.path.join("aux_files",re.sub('.fa','.fa.bwameth.c2t.sa',os.path.basename(refG))) if convRef is True else [],
+            lambda convRef: os.path.join("aux_files",re.sub('.fa','.fa.bwameth.c2t.amb',os.path.basename(refG))) if convRef is True  else [],
             R1="FASTQ/{sample}"+reads[0]+".fastq.gz",
             R2="FASTQ/{sample}"+reads[1]+".fastq.gz",
-            crefG=crefG,
-            #locrefG=os.path.join(os.path.dirname(crefG),re.sub('.fa','.fa.bwameth.c2t',os.path.basename(crefG)))
-            cref_sa=os.path.join("aux_files",re.sub('.fa','.fa.bwameth.c2t.sa',os.path.basename(refG))),
-            cref_amb=os.path.join("aux_files",re.sub('.fa','.fa.bwameth.c2t.amb',os.path.basename(refG)))
+            crefG=crefG
         output:
             sbam=temp("bams/{sample}.sorted.bam")
         log:
@@ -291,7 +290,7 @@ else:
 if intList:
     rule depth_of_cov:
         input:
-            refG=lambda convRef: refG if False else crefG,
+            refG=lambda convRef: crefG if convRef is True else refG,
             rmDupBam="bams/{sample}"+bam_ext,
             sbami="bams/{sample}"+bam_ext+".bai",
             ranCG=os.path.join("aux_files",re.sub('.fa','.poz.ran1M.sorted.bed',os.path.basename(refG))),
@@ -316,7 +315,7 @@ if intList:
 else:
     rule depth_of_cov:
         input:
-            refG=lambda convRef: refG if False else crefG,
+            refG=lambda convRef: crefG if convRef is True else refG,
             rmDupBam="bams/{sample}"+bam_ext,
             sbami="bams/{sample}"+bam_ext+".bai",
             ranCG=os.path.join("aux_files",re.sub('.fa','.poz.ran1M.sorted.bed',os.path.basename(refG)))
