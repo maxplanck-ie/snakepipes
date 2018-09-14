@@ -148,11 +148,19 @@ if(nrow(limdat.LG.CC)==0){ message("None of the single CpG sites passed the filt
         }###end if topTable has at least 1 entry
 
             limdat.LG.CC.tw<-limdat.LG.CC
+
+            ##reorder input data so that Treatment or WT go first
+            if ("Mut" %in% sampleInfo$Group){
+                limdat.LG.CC.tw<-limdat.LG.CC[,c("ms",colnames(limdat.LG.CC)[match(sampleInfo$SampleID[sampleInfo$Group %in% "Mut"],colnames(limdat.LG.CC))],colnames(limdat.LG.CC)[match(sampleInfo$SampleID[!sampleInfo$Group %in% "Mut"],colnames(limdat.LG.CC))])]
+            }
+            else if ("Treatment" %in% sampleInfo$Group){
+                limdat.LG.CC.tw<-limdat.LG.CC[,c("ms",colnames(limdat.LG.CC)[match(sampleInfo$SampleID[sampleInfo$Group %in% "Treatment"],colnames(limdat.LG.CC))],colnames(limdat.LG.CC)[match(sampleInfo$SampleID[!sampleInfo$Group %in% "Treatment"],colnames(limdat.LG.CC))])]
+
             limdat.LG.CC.tw$chr<-gsub("_.+","",limdat.LG.CC.tw$ms)
             limdat.LG.CC.tw$pos<-gsub(".+_","",limdat.LG.CC.tw$ms)
-            limdat.LG.CC.tw2<-limdat.LG.CC.tw[,c("chr","pos",colnames(limdat.LG.CC)[2:ncol(limdat.LG.CC)]),with=FALSE]
-            gv<-sampleInfo$Group[match(colnames(limdat.LG.CC)[2:ncol(limdat.LG.CC)],sampleInfo$SampleID)]###check this and modify if necessary
-            gtab<-table(sampleInfo$Group[match(colnames(limdat.LG.CC)[2:ncol(limdat.LG.CC)],sampleInfo$SampleID)])
+            limdat.LG.CC.tw2<-limdat.LG.CC.tw[,c("chr","pos",colnames(limdat.LG.CC.tw)[2:ncol(limdat.LG.CC.tw)]),with=FALSE]
+            gv<-sampleInfo$Group[match(colnames(limdat.LG.CC.tw)[2:ncol(limdat.LG.CC.tw)],sampleInfo$SampleID)]###check this and modify if necessary
+            gtab<-table(sampleInfo$Group[match(colnames(limdat.LG.CC.tw)[2:ncol(limdat.LG.CC.tw)],sampleInfo$SampleID)])
             cnn<-vector("numeric",length(gv))
             for(i in seq_along(gtab)){
                 cnn[which(gv %in% names(gtab)[i])]<-seq_along(which(gv %in% names(gtab)[i]))
