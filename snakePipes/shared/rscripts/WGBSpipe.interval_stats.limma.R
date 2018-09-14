@@ -115,9 +115,10 @@ if(nrow(bedtab.CC)==0) {message("None of the genomic intervals passed the filter
    if ("Control" %in% CGI.limdat.CC.Means$Group){
         CGI.limdat.CC.Means$Group<-factor(CGI.limdat.CC.Means$Group)
         CGI.limdat.CC.Means$Group<-relevel(CGI.limdat.CC.Means$Group,ref="Control")}
-   if ("WT" %in% CGI.limdat.CC.Means$Group){
+   else if ("WT" %in% CGI.limdat.CC.Means$Group){
         CGI.limdat.CC.Means$Group<-factor(CGI.limdat.CC.Means$Group)
         CGI.limdat.CC.Means$Group<-relevel(CGI.limdat.CC.Means$Group,ref="WT")}
+   else {CGI.limdat.CC.Means$Group<-factor(CGI.limdat.CC.Means$Group)}
 
 
 ##density plots
@@ -130,7 +131,7 @@ if(nrow(bedtab.CC)==0) {message("None of the genomic intervals passed the filter
     theme(text = element_text(size=16),axis.text = element_text(size=12),axis.title = element_text(size=14),axis.text.x = element_text(angle = 90, hjust = 1))+xlab("Mean methylation ratio")+scale_fill_manual(values=c("grey28","red","darkblue","darkgreen"))
     ggsave(paste0(bedshort,".Beta.MeanXgroup.int.violin.png"))
 
-    if(length(levels(limdat.LG.CC.Means$Group))==2){
+    if(length(levels(CGI.limdat.CC.Means$Group))==2){
 #differential methylation
         design<-as.data.frame(matrix(ncol=2,nrow=(ncol(CGI.limdat.CC.logit))),stringsAsFactors=FALSE)
         colnames(design)<-c("Intercept","Group")

@@ -290,7 +290,7 @@ else:
 if intList:
     rule depth_of_cov:
         input:
-            irefG=lambda convRef: crefG if True else refG,
+            irefG=crefG if convRef is True else refG,
             rmDupBam="bams/{sample}"+bam_ext,
             sbami="bams/{sample}"+bam_ext+".bai",
             ranCG=os.path.join("aux_files",re.sub('.fa','.poz.ran1M.sorted.bed',os.path.basename(refG))),
@@ -315,7 +315,7 @@ if intList:
 else:
     rule depth_of_cov:
         input:
-            irefG=lambda convRef: crefG if True else refG,
+            irefG=crefG if convRef is True else refG,
             rmDupBam="bams/{sample}"+bam_ext,
             sbami="bams/{sample}"+bam_ext+".bai",
             ranCG=os.path.join("aux_files",re.sub('.fa','.poz.ran1M.sorted.bed',os.path.basename(refG)))
