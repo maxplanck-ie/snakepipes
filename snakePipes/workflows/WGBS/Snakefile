@@ -146,7 +146,7 @@ def run_int_aggStats(intList,sampleInfo):
 
 def run_deeptools(skipGCbias):
     if not skipGCbias:
-        return (expand("QC_metrics/QC_metrics/{sample}.freq.txt", sample = samples, read = reads) + expand("QC_metrics/{sample}.GCbias.png", sample = samples, read = reads))
+        return (expand("QC_metrics/{sample}.freq.txt", sample = samples, read = reads) + expand("QC_metrics/{sample}.GCbias.png", sample = samples, read = reads))
     else:
         return ([])
 
