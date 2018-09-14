@@ -49,6 +49,9 @@ verbose: False
 #### Flag to control the pipeline entry point
 fromBam: False
 bam_ext: '.PCRrm.bam'
+###Flags to control skipping of certain QC calculations
+skipDOC: False
+skipGCbias: False
 ################################################################################
 # Call snakemake directly, i.e. without using the wrapper script:
 #

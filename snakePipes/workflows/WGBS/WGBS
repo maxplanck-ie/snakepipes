@@ -17,7 +17,7 @@ import snakePipes.parserCommon as parserCommon
 
 def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfile":None, "max_jobs": 12, "nthreads": 8, "snakemake_options": "--use-conda", "tempdir": None,
                          "downsample": None, "trimReads": "user", "fqcin": None, "adapterSeq": "AGATCGGAAGAGC", "nextera": False, "trimThreshold": 10, "trimOtherArgs": None, "convrefpath": None,
-                         "convRef": False, "intList": [], "blackList": None, "sampleInfo": None, "mbias_ignore": "auto", "fromBam": False}):
+                         "convRef": False, "intList": [], "blackList": None, "sampleInfo": None, "mbias_ignore": "auto", "fromBam": False, "skipDOC": False, "skipGCbias": False}):
     """
     Parse arguments from the command line.
     """
@@ -137,6 +137,16 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
                          dest="fromBam",
                          action="store_true",
                          help="Start pipeline from processed bam files after PCR duplicate removal.",default=defaults["fromBam"])
+
+    optional.add_argument("--skipDOC",
+                         dest="skipDOC",
+                         action="store_true",
+                         help="Skip depth of coverage calculation with GATK.",default=defaults["skipDOC"])
+
+    optional.add_argument("--skipGCbias",
+                         dest="skipGCbias",
+                         action="store_true",
+                         help="Skip GC bias calculation with deepTools.",default=defaults["skipGCbias"])
 
     return parser
 
