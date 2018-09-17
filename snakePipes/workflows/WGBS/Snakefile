@@ -32,6 +32,10 @@ if trimReads=='None':
 if fromBam:
     trimReads=None
 
+##check if genes_bed is available
+if not 'genes_bed' in globals():
+    genes_bed='NA'
+
 #this_script_dir = os.path.dirname(os.path.realpath(__file__))
 
 ### Sample init #############################################################
@@ -92,21 +96,24 @@ def convert_refG(convRef):
     else:
         return([])
 
-def calc_doc(intList,wcard):
-    if intList:
-        int_dest=[re.sub('.bed','.mean.doc.sample_summary',os.path.basename(x)) for x in intList]
-        int_dest[:0]=['mean.CG.doc.sample_summary']
-        int_dest[:0]=['mean.genome.doc.sample_summary']
-        if wcard:
-            return ([os.path.join('QC_metrics',w) for w in expand('{{sample}}.{sfix}',sfix=int_dest)])
+def calc_doc(intList,wcard,skipDOC):
+    if not skipDOC:
+        if intList:
+            int_dest=[re.sub('.bed','.mean.doc.sample_summary',os.path.basename(x)) for x in intList]
+            int_dest[:0]=['mean.CG.doc.sample_summary']
+            int_dest[:0]=['mean.genome.doc.sample_summary']
+            if wcard:
+                return ([os.path.join('QC_metrics',w) for w in expand('{{sample}}.{sfix}',sfix=int_dest)])
+            else:
+                return ([os.path.join('QC_metrics',w) for w in expand('{sample}.{sfix}',sample=samples,sfix=int_dest)])
         else:
-            return ([os.path.join('QC_metrics',w) for w in expand('{sample}.{sfix}',sample=samples,sfix=int_dest)])
+            int_dest=['.mean.genome.doc.sample_summary','.mean.CG.doc.sample_summary']
+            if wcard:
+                return ([os.path.join('QC_metrics',w) for w in expand('{{sample}}.{sfix}',sfix=int_dest)])
+            else:
+                return ([os.path.join('QC_metrics',w) for w in expand('{sample}.{sfix}',sample=samples,sfix=int_dest)])
     else:
-        int_dest=['.mean.genome.doc.sample_summary','.mean.CG.doc.sample_summary']
-        if wcard:
-            return ([os.path.join('QC_metrics',w) for w in expand('{{sample}}.{sfix}',sfix=int_dest)])
-        else:
-            return ([os.path.join('QC_metrics',w) for w in expand('{sample}.{sfix}',sample=samples,sfix=int_dest)])
+        return ([])
 
 def get_outdir(folder_name):
     sample_name = re.sub('_sampleSheet.[a-z]{3}$','',os.path.basename(sampleInfo))
@@ -134,6 +141,12 @@ def run_int_aggStats(intList,sampleInfo):
     if intList and sampleInfo:
             int_dest2=[re.sub('.bed','.aggCpG.RData',os.path.basename(x)) for x in intList]
             return ([os.path.join("{}".format(get_outdir("aggregate_stats_limma")),w) for w in int_dest2])
+    else:
+        return ([])
+
+def run_deeptools(skipGCbias):
+    if not skipGCbias:
+        return (expand("QC_metrics/{sample}.freq.txt", sample = samples, read = reads) + expand("QC_metrics/{sample}.GCbias.png", sample = samples, read = reads))
     else:
         return ([])
 
@@ -183,10 +196,9 @@ if not fromBam:
             expand("bams/{sample}.PCRrm.bam", sample = samples),
             expand("QC_metrics/{sample}.Mbias.txt",sample=samples),
             os.path.join("aux_files",re.sub('.fa','.poz.ran1M.sorted.bed',os.path.basename(refG))),
-            calc_doc(intList,False),
+            calc_doc(intList,False,skipDOC),
             'QC_metrics/QC_report.pdf',
-            expand("QC_metrics/{sample}.freq.txt",sample=samples),
-            expand("QC_metrics/{sample}.GCbias.png",sample=samples),
+            run_deeptools(skipGCbias),
             expand("methXT/{sample}_CpG.bedGraph",sample=samples),
             expand("methXT/{sample}.CpG.filt2.bed",sample=samples),
             run_CpG_stats(sampleInfo),
@@ -205,10 +217,9 @@ else:
             expand("bams/{sample}"+bam_ext, sample = samples),
             expand("QC_metrics/{sample}.Mbias.txt",sample=samples),
             os.path.join("aux_files",re.sub('.fa','.poz.ran1M.sorted.bed',os.path.basename(refG))),
-            calc_doc(intList,False),
+            calc_doc(intList,False,skipDOC),
             'QC_metrics/QC_report.pdf',
-            expand("QC_metrics/{sample}.freq.txt",sample=samples),
-            expand("QC_metrics/{sample}.GCbias.png",sample=samples),
+            run_deeptools(skipGCbias),
             expand("methXT/{sample}_CpG.bedGraph",sample=samples),
             expand("methXT/{sample}.CpG.filt2.bed",sample=samples),
             run_CpG_stats(sampleInfo),

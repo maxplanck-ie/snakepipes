@@ -4,10 +4,18 @@ from operator import is_not
 import tempfile
 import pandas
 
+
 ## function to get the name of the samplesheet and extend the name of the folder for all analyses relying on sample_info
 def get_outdir(folder_name):
     sample_name = re.sub('_sampleSheet.[a-z]{3}$','',os.path.basename(sampleInfo))
     return("{}_{}".format(folder_name, sample_name))
+
+## count the number of fields in the chromosome name and generate awk string
+def get_awk_cmd(fasta):
+    with open(fasta) as f:
+        line = f.readline()
+    nF=len(line.split(' '))
+    return ('\'{{print $1, ${}, ${}+1, ${}, ${}}}\''.format(nF+1,nF+1,nF+2,nF+4))
 
 ###symlink bams if this is the starting point
 if fromBam:
@@ -101,21 +109,23 @@ if convRef:
             cref_sa=os.path.join("aux_files",re.sub('.fa','.fa.bwameth.c2t.sa',os.path.basename(refG))),
             cref_amb=os.path.join("aux_files",re.sub('.fa','.fa.bwameth.c2t.amb',os.path.basename(refG))),
             locrefG=os.path.join("aux_files",os.path.basename(refG))
+        params:
+            locdict=os.path.join("aux_files",re.sub('.fa','.dict',os.path.basename(refG)))
         log:
             err="aux_files/logs/conv_ref.err",
             out="aux_files/logs/conv_ref.out"
         threads: 1
         conda: CondaEnvironment
-        shell:"ln -s {input.refG} {output.locrefG}; bwameth.py index {output.locrefG}  1>{log.out} 2>{log.err}"
+        shell:"ln -s {input.refG} {output.locrefG}; bwameth.py index {output.locrefG}; samtools faidx {output.locrefG}; picard CreateSequenceDictionary R={output.locrefG} O={params.locdict}  1>{log.out} 2>{log.err}"
 
 if not trimReads is None:
     rule map_reads:
         input:
+            lambda convRef: os.path.join("aux_files",re.sub('.fa','.fa.bwameth.c2t.sa',os.path.basename(refG))) if convRef is True else [],
+            lambda convRef: os.path.join("aux_files",re.sub('.fa','.fa.bwameth.c2t.amb',os.path.basename(refG))) if convRef is True  else [],
             R1cut="FASTQ_Cutadapt/{sample}"+reads[0]+".fastq.gz",
             R2cut="FASTQ_Cutadapt/{sample}"+reads[1]+".fastq.gz",
-            crefG=crefG,
-            cref_sa=os.path.join("aux_files",re.sub('.fa','.fa.bwameth.c2t.sa',os.path.basename(refG))),
-            cref_amb=os.path.join("aux_files",re.sub('.fa','.fa.bwameth.c2t.amb',os.path.basename(refG)))
+            crefG=crefG            
         output:
             sbam=temp("bams/{sample}.sorted.bam")
         log:
@@ -132,12 +142,11 @@ if not trimReads is None:
 if trimReads is None and not fromBam:
     rule map_reads:
         input:
+            lambda convRef: os.path.join("aux_files",re.sub('.fa','.fa.bwameth.c2t.sa',os.path.basename(refG))) if convRef is True else [],
+            lambda convRef: os.path.join("aux_files",re.sub('.fa','.fa.bwameth.c2t.amb',os.path.basename(refG))) if convRef is True  else [],
             R1="FASTQ/{sample}"+reads[0]+".fastq.gz",
             R2="FASTQ/{sample}"+reads[1]+".fastq.gz",
-            crefG=crefG,
-            #locrefG=os.path.join(os.path.dirname(crefG),re.sub('.fa','.fa.bwameth.c2t',os.path.basename(crefG)))
-            cref_sa=os.path.join("aux_files",re.sub('.fa','.fa.bwameth.c2t.sa',os.path.basename(refG))),
-            cref_amb=os.path.join("aux_files",re.sub('.fa','.fa.bwameth.c2t.amb',os.path.basename(refG)))
+            crefG=crefG
         output:
             sbam=temp("bams/{sample}.sorted.bam")
         log:
@@ -198,11 +207,13 @@ rule get_ran_CG:
     output:
         pozF="aux_files/"+re.sub('.fa*','.poz.gz',os.path.basename(refG)),
         ranCG=os.path.join("aux_files",re.sub('.fa','.poz.ran1M.sorted.bed',os.path.basename(refG)))
+    params:
+        awkCmd=get_awk_cmd(refG)
     log:
         err="aux_files/logs/get_ran_CG.err"
     threads: 1
     conda: mCtCondaEnvironment
-    shell: 'set +o pipefail; ' + os.path.join(workflow_tools,'methylCtools') + " fapos {input.refG}  " + re.sub('.gz','',"{output.pozF}") + ';cat '+ re.sub('.gz','',"{output.pozF}") +' | grep "+" - | shuf | head -n 1000000 | awk \'{{print $1, $5, $5+1, $6, $8}}\' - | tr " " "\\t" | sort -k 1,1 -k2,2n - > ' + "{output.ranCG} 2>{log.err}"
+    shell: 'set +o pipefail; ' + os.path.join(workflow_tools,'methylCtools') + " fapos {input.refG}  " + re.sub('.gz','',"{output.pozF}") + ';cat '+ re.sub('.gz','',"{output.pozF}") +' | grep "+" -' + " | shuf | head -n 1000000 | awk {params.awkCmd}" + ' - | tr " " "\\t" | sort -k 1,1 -k2,2n - > ' + "{output.ranCG} 2>{log.err}"
         
 
 rule calc_Mbias:
@@ -227,98 +238,102 @@ if convRef:
         log:
             err="aux_files/logs/gsize.err"
         threads: 1
-        shell: os.path.join(workflow_tools,"faCount ") + "{input.refG} | awk \'END{{print $2-$7}}\'  > {output.gsize} 2>{log.err}"
+        conda: CondaEnvironment
+        shell: "faCount {input.refG} | awk \'END{{print $2-$7}}\'  > {output.gsize} 2>{log.err}"
 
-    rule get_twobit_genome:
-        input:
-            refG=refG
-        output:
-            twobit="aux_files/"+ re.sub(".fa",".2bit",os.path.basename(refG))
-        log:
-            err="aux_files/logs/fatotwobit.err"
-        threads: 1
-        shell: os.path.join(workflow_tools,"faToTwoBit ") + "{input.refG} {output.twobit} 2>{log.err}"
+    if not skipGCbias:
+        rule get_twobit_genome:
+            input:
+                refG=refG
+            output:
+                twobit="aux_files/"+ re.sub(".fa",".2bit",os.path.basename(refG))
+            log:
+                err="aux_files/logs/fatotwobit.err"
+            threads: 1
+            conda: CondaEnvironment
+            shell: "faToTwoBit {input.refG} {output.twobit} 2>{log.err}"
 
-    rule calc_GCbias:
-        input:
-            refG=refG,
-            rmDupBam="bams/{sample}"+bam_ext,
-            sbami="bams/{sample}"+bam_ext+".bai",
-            gsize="aux_files/gsize.txt",
-            twobit="aux_files/"+ re.sub(".fa",".2bit",os.path.basename(refG))
-        output:
-            GCbiasTXT="QC_metrics/{sample}.freq.txt",
-            GCbiasPNG="QC_metrics/{sample}.GCbias.png"
-        log:
-            out="QC_metrics/logs/{sample}.calc_GCbias.out"
-        threads: nthreads
-        conda: CONDA_SHARED_ENV
-        shell: "genomeSize=($(cat {input.gsize}));computeGCBias -b {input.rmDupBam} --effectiveGenomeSize $genomeSize -g {input.twobit} -l 300 --GCbiasFrequenciesFile {output.GCbiasTXT} -p {threads} --biasPlot {output.GCbiasPNG} --plotFileFormat png "
+        rule calc_GCbias:
+            input:
+                refG=refG,
+                rmDupBam="bams/{sample}"+bam_ext,
+                sbami="bams/{sample}"+bam_ext+".bai",
+                gsize="aux_files/gsize.txt",
+                twobit="aux_files/"+ re.sub(".fa",".2bit",os.path.basename(refG))
+            output:
+                GCbiasTXT="QC_metrics/{sample}.freq.txt",
+                GCbiasPNG="QC_metrics/{sample}.GCbias.png"
+            log:
+                out="QC_metrics/logs/{sample}.calc_GCbias.out"
+            threads: nthreads
+            conda: CONDA_SHARED_ENV
+            shell: "genomeSize=($(cat {input.gsize}));computeGCBias -b {input.rmDupBam} --effectiveGenomeSize $genomeSize -g {input.twobit} -l 300 --GCbiasFrequenciesFile {output.GCbiasTXT} -p {threads} --biasPlot {output.GCbiasPNG} --plotFileFormat png "
 
 else:
-    rule calc_GCbias:
-        input:
-            refG=refG,
-            rmDupBam="bams/{sample}"+bam_ext,
-            sbami="bams/{sample}"+bam_ext+".bai"
-        output:
-            GCbiasTXT="QC_metrics/{sample}.freq.txt",
-            GCbiasPNG="QC_metrics/{sample}.GCbias.png"
-        params:
-            genomeSize=genome_size,
-            twobitpath=genome_2bit
-        log:
-            out="QC_metrics/logs/{sample}.calc_GCbias.out"
-        threads: nthreads
-        conda: CONDA_SHARED_ENV
-        shell: "computeGCBias -b {input.rmDupBam} --effectiveGenomeSize {params.genomeSize} -g {params.twobitpath} -l 300 --GCbiasFrequenciesFile {output.GCbiasTXT} -p {threads} --biasPlot {output.GCbiasPNG} --plotFileFormat png "
+    if not skipGCbias:
+        rule calc_GCbias:
+            input:
+                refG=refG,
+                rmDupBam="bams/{sample}"+bam_ext,
+                sbami="bams/{sample}"+bam_ext+".bai"
+            output:
+                GCbiasTXT="QC_metrics/{sample}.freq.txt",
+                GCbiasPNG="QC_metrics/{sample}.GCbias.png"
+            params:
+                genomeSize=genome_size,
+                twobitpath=genome_2bit
+            log:
+                out="QC_metrics/logs/{sample}.calc_GCbias.out"
+            threads: nthreads
+            conda: CONDA_SHARED_ENV
+            shell: "computeGCBias -b {input.rmDupBam} --effectiveGenomeSize {params.genomeSize} -g {params.twobitpath} -l 300 --GCbiasFrequenciesFile {output.GCbiasTXT} -p {threads} --biasPlot {output.GCbiasPNG} --plotFileFormat png "
+
+if not skipDOC:
+    if intList:
+        rule depth_of_cov:
+            input:
+                irefG=crefG if convRef is True else refG,
+                rmDupBam="bams/{sample}"+bam_ext,
+                sbami="bams/{sample}"+bam_ext+".bai",
+                ranCG=os.path.join("aux_files",re.sub('.fa','.poz.ran1M.sorted.bed',os.path.basename(refG))),
+                intList=intList
+            output:
+                outFileList=calc_doc(intList,True,skipDOC)
+            params:
+                tempdir=tempdir,
+                auxdir=os.path.join(outdir,"aux_files"),
+                OUTlist=lambda wildcards,output: [w.replace('.sample_summary', '') for w in output.outFileList],
+                OUTlist0=lambda wildcards,output: [w.replace('.sample_summary', '') for w in output.outFileList][0],
+                OUTlist1=lambda wildcards,output: [w.replace('.sample_summary', '') for w in output.outFileList][1],
+                auxshell=lambda wildcards,input,output: ';'.join("gatk -Xmx30g -Djava.io.tmpdir="+ tempdir +" -T DepthOfCoverage -R "+ input.irefG +" -o "+ oi +" -I " + input.rmDupBam + " -ct 0 -ct 1 -ct 2 -ct 5 -ct 10 -ct 15 -ct 20 -ct 30 -ct 50  -omitBaseOutput -mmq 10 --partitionType sample -L " + bi for oi,bi in zip([w.replace('.sample_summary', '') for w in output.outFileList][2:],input.intList))
+            log:
+                err="QC_metrics/logs/{sample}.depth_of_cov.err",
+                out="QC_metrics/logs/{sample}.depth_of_cov.out"
+            threads: 1
+            conda: CondaEnvironment
+            shell: "gatk -Xmx30g -Djava.io.tmpdir={params.tempdir} -T DepthOfCoverage -R {input.irefG} -o {params.OUTlist0} -I {input.rmDupBam} -ct 0 -ct 1 -ct 2 -ct 5 -ct 10 -ct 15 -ct 20 -ct 30 -ct 50  -omitBaseOutput -mmq 10 --partitionType sample ; gatk -Xmx30g -Djava.io.tmpdir={params.tempdir}  -T DepthOfCoverage -R {input.irefG} -o {params.OUTlist1} -I {input.rmDupBam} -ct 0 -ct 1 -ct 2 -ct 5 -ct 10 -ct 15 -ct 20 -ct 30 -ct 50  -omitBaseOutput -mmq 10 --partitionType sample -L {input.ranCG}; {params.auxshell} 1>{log.out} 2>{log.err}" 
 
 
-if intList:
-    rule depth_of_cov:
-        input:
-            refG=refG,
-            rmDupBam="bams/{sample}"+bam_ext,
-            sbami="bams/{sample}"+bam_ext+".bai",
-            ranCG=os.path.join("aux_files",re.sub('.fa','.poz.ran1M.sorted.bed',os.path.basename(refG))),
-            intList=intList
-        output:
-            outFileList=calc_doc(intList,True)
-        params:
-            tempdir=tempdir,
-            auxdir=os.path.join(outdir,"aux_files"),
-            OUTlist=lambda wildcards,output: [w.replace('.sample_summary', '') for w in output.outFileList],
-            OUTlist0=lambda wildcards,output: [w.replace('.sample_summary', '') for w in output.outFileList][0],
-            OUTlist1=lambda wildcards,output: [w.replace('.sample_summary', '') for w in output.outFileList][1],
-            auxshell=lambda wildcards,input,output: ';'.join("gatk -Xmx30g -Djava.io.tmpdir="+ tempdir +" -T DepthOfCoverage -R "+ input.refG +" -o "+ oi +" -I " + input.rmDupBam + " -ct 0 -ct 1 -ct 2 -ct 5 -ct 10 -ct 15 -ct 20 -ct 30 -ct 50  -omitBaseOutput -mmq 10 --partitionType sample -L " + bi for oi,bi in zip([w.replace('.sample_summary', '') for w in output.outFileList][2:],input.intList))
-        log:
-            err="QC_metrics/logs/{sample}.depth_of_cov.err",
-            out="QC_metrics/logs/{sample}.depth_of_cov.out"
-        threads: 1
-        conda: CondaEnvironment
-        shell: "gatk -Xmx30g -Djava.io.tmpdir={params.tempdir} -T DepthOfCoverage -R {input.refG} -o {params.OUTlist0} -I {input.rmDupBam} -ct 0 -ct 1 -ct 2 -ct 5 -ct 10 -ct 15 -ct 20 -ct 30 -ct 50  -omitBaseOutput -mmq 10 --partitionType sample ; gatk -Xmx30g -Djava.io.tmpdir={params.tempdir}  -T DepthOfCoverage -R {input.refG} -o {params.OUTlist1} -I {input.rmDupBam} -ct 0 -ct 1 -ct 2 -ct 5 -ct 10 -ct 15 -ct 20 -ct 30 -ct 50  -omitBaseOutput -mmq 10 --partitionType sample -L {input.ranCG}; {params.auxshell} 1>{log.out} 2>{log.err}" 
-
-
-else:
-    rule depth_of_cov:
-        input:
-            refG=refG,
-            rmDupBam="bams/{sample}"+bam_ext,
-            sbami="bams/{sample}"+bam_ext+".bai",
-            ranCG=os.path.join("aux_files",re.sub('.fa','.poz.ran1M.sorted.bed',os.path.basename(refG)))
-        output:
-            outFileList=calc_doc(intList,True)
-        params:
-            tempdir=tempdir,
-            auxdir=os.path.join(outdir,"aux_files"),
-            OUTlist0=lambda wildcards,output: output.outFileList[0].replace('.sample_summary', ''),
-            OUTlist1=lambda wildcards,output: output.outFileList[1].replace('.sample_summary','') 
-        log:
-            err="QC_metrics/logs/{sample}.depth_of_cov.err",
-            out="QC_metrics/logs/{sample}.depth_of_cov.out"
-        threads: 1
-        conda: CondaEnvironment
-        shell: "gatk -Xmx30g -Djava.io.tmpdir={params.tempdir} -T DepthOfCoverage -R {input.refG} -o {params.OUTlist0} -I {input.rmDupBam} -ct 0 -ct 1 -ct 2 -ct 5 -ct 10 -ct 15 -ct 20 -ct 30 -ct 50  -omitBaseOutput -mmq 10 --partitionType sample ; gatk -Xmx30g -Djava.io.tmpdir={params.tempdir}  -T DepthOfCoverage -R {input.refG} -o {params.OUTlist1} -I {input.rmDupBam} -ct 0 -ct 1 -ct 2 -ct 5 -ct 10 -ct 15 -ct 20 -ct 30 -ct 50  -omitBaseOutput -mmq 10 --partitionType sample -L {input.ranCG} 1>{log.out} 2>{log.err}"
+    else:
+        rule depth_of_cov:
+            input:
+                irefG=crefG if convRef is True else refG,
+                rmDupBam="bams/{sample}"+bam_ext,
+                sbami="bams/{sample}"+bam_ext+".bai",
+                ranCG=os.path.join("aux_files",re.sub('.fa','.poz.ran1M.sorted.bed',os.path.basename(refG)))
+            output:
+                outFileList=calc_doc(intList,True,skipDOC)
+            params:
+                tempdir=tempdir,
+                auxdir=os.path.join(outdir,"aux_files"),
+                OUTlist0=lambda wildcards,output: output.outFileList[0].replace('.sample_summary', ''),
+                OUTlist1=lambda wildcards,output: output.outFileList[1].replace('.sample_summary','') 
+            log:
+                err="QC_metrics/logs/{sample}.depth_of_cov.err",
+                out="QC_metrics/logs/{sample}.depth_of_cov.out"
+            threads: 1
+            conda: CondaEnvironment
+            shell: "gatk -Xmx30g -Djava.io.tmpdir={params.tempdir} -T DepthOfCoverage -R {input.irefG} -o {params.OUTlist0} -I {input.rmDupBam} -ct 0 -ct 1 -ct 2 -ct 5 -ct 10 -ct 15 -ct 20 -ct 30 -ct 50  -omitBaseOutput -mmq 10 --partitionType sample ; gatk -Xmx30g -Djava.io.tmpdir={params.tempdir}  -T DepthOfCoverage -R {input.irefG} -o {params.OUTlist1} -I {input.rmDupBam} -ct 0 -ct 1 -ct 2 -ct 5 -ct 10 -ct 15 -ct 20 -ct 30 -ct 50  -omitBaseOutput -mmq 10 --partitionType sample -L {input.ranCG} 1>{log.out} 2>{log.err}"
 
 if not trimReads is None and not fromBam:
     rule downsample_reads:
@@ -398,40 +413,22 @@ rule get_flagstat:
     conda: CONDA_SHARED_ENV
     shell: "samtools flagstat {input.rmDupbam} > {output.fstat} 2>{log.err}" 
 
-if not fromBam:
-    rule produce_report:
-        input:
-            doc_res=calc_doc(intList,False),
-            R12cr=expand("QC_metrics/{sample}.conv.rate.txt",sample=samples),
-            mbiasTXT=expand("QC_metrics/{sample}.Mbias.txt",sample=samples),
-            fstat=expand("QC_metrics/{sample}.flagstat",sample=samples)
-        output:
-            QCrep='QC_metrics/QC_report.pdf'
-        params:
-            auxdir=os.path.join(outdir,"aux_files")
-        log:
-            err="QC_metrics/logs/produce_report.err",
-            out="QC_metrics/logs/produce_report.out"
-        conda: RmdCondaEnvironment 
-        threads: 1
-        shell: "cp -v " + os.path.join(workflow_rscripts,"WGBS_QC_report_template.Rmd")+ " " + os.path.join("aux_files", "WGBS_QC_report_template.Rmd") + ';Rscript -e "rmarkdown::render(\''+os.path.join(outdir,"aux_files", "WGBS_QC_report_template.Rmd")+'\', params=list(QCdir=\'"' + os.path.join(outdir,"QC_metrics") +'"\' ), output_file =\'"'+ os.path.join(outdir,"QC_metrics",'QC_report.pdf"\'')+')"' + " 1>{log.out} 2>{log.err}"
-
-else:
-    rule produce_report:
-        input:
-            doc_res=calc_doc(intList,False),
-            mbiasTXT=expand("QC_metrics/{sample}.Mbias.txt",sample=samples),
-            fstat=expand("QC_metrics/{sample}.flagstat",sample=samples)
-        output:
-            QCrep='QC_metrics/QC_report.pdf'
-        params:
-            auxdir=os.path.join(outdir,"aux_files")
-        log:
-            err="QC_metrics/logs/produce_report.err",
-            out="QC_metrics/logs/produce_report.out"
-        conda: RmdCondaEnvironment 
-        threads: 1
-        shell: "cp -v " + os.path.join(workflow_rscripts,"WGBS_QC_report_template.Rmd")+ " " + os.path.join("aux_files", "WGBS_QC_report_template.Rmd") + ';Rscript -e "rmarkdown::render(\''+os.path.join(outdir,"aux_files", "WGBS_QC_report_template.Rmd")+'\', params=list(QCdir=\'"' + os.path.join(outdir,"QC_metrics") +'"\' ), output_file =\'"'+ os.path.join(outdir,"QC_metrics",'QC_report.pdf"\'')+')"' + " 1>{log.out} 2>{log.err}"
+rule produce_report:
+    input:
+        calc_doc(intList,False,skipDOC),
+        expand("QC_metrics/{sample}.conv.rate.txt",sample=samples) if not fromBam else [],
+        mbiasTXT=expand("QC_metrics/{sample}.Mbias.txt",sample=samples),
+        fstat=expand("QC_metrics/{sample}.flagstat",sample=samples)
+    output:
+        QCrep='QC_metrics/QC_report.pdf'
+    params:
+        auxdir=os.path.join(outdir,"aux_files")
+    log:
+        err="QC_metrics/logs/produce_report.err",
+        out="QC_metrics/logs/produce_report.out"
+    conda: RmdCondaEnvironment 
+    threads: 1
+    shell: "cp -v " + os.path.join(workflow_rscripts,"WGBS_QC_report_template.Rmd")+ " " + os.path.join("aux_files", "WGBS_QC_report_template.Rmd") + ';Rscript -e "rmarkdown::render(\''+os.path.join(outdir,"aux_files", "WGBS_QC_report_template.Rmd")+'\', params=list(QCdir=\'"' + os.path.join(outdir,"QC_metrics") +'"\' ), output_file =\'"'+ os.path.join(outdir,"QC_metrics",'QC_report.pdf"\'')+')"' + " 1>{log.out} 2>{log.err}"
 
 
 if mbias_ignore=="auto":
@@ -508,14 +505,16 @@ else:
 if sampleInfo or intList:
     rule make_CG_bed:
         input:
-            pozF="aux_files/"+re.sub('.fa*','.poz.gz',os.path.basename(refG))
+            pozF="aux_files/"+re.sub('.fa*','.poz.gz',os.path.basename(refG))            
         output:
             imdF="aux_files/"+re.sub('.fa*','.CpG.bed',os.path.basename(refG))
+        params:
+            awkCmd=get_awk_cmd(refG)
         log:
             err="aux_files/logs/make_CG_bed.err"
         threads: 1
         conda: CondaEnvironment
-        shell: 'grep "+"' + " {input.pozF} "+ ' | awk \'{{print $1, $5, $5+1, $6, $8}}\' - | tr " " "\\t" | sort -k 1,1 -k2,2n - > ' + "{output.imdF}"
+        shell: 'grep "+"' + " {input.pozF}  | awk {params.awkCmd}" + ' - | tr " " "\\t" | sort -k 1,1 -k2,2n - > ' + "{output.imdF}"
 
 
 if sampleInfo:
@@ -556,7 +555,7 @@ if sampleInfo:
             MetBed='{}/singleCpG.metilene.bed'.format(get_outdir("metilene_out")),
             imdF="aux_files/"+re.sub('.fa*','.CpG.bed',os.path.basename(refG))
         output:
-            MetCG=os.path.join("aux_files",re.sub('_sampleSheet.tsv','.metilene.CpGlist.bed',os.path.basename(sampleInfo)))
+            MetCG=os.path.join("aux_files",re.sub('_sampleSheet.[a-z]{3}$','.metilene.CpGlist.bed',os.path.basename(sampleInfo)))
         params:
             auxdir=os.path.join(outdir,"aux_files")            
         log:
@@ -570,20 +569,20 @@ if sampleInfo:
         input:
             Limdat='{}/limdat.LG.RData'.format(get_outdir("singleCpG_stats_limma")),
             MetBed='{}/singleCpG.metilene.bed'.format(get_outdir("metilene_out")),
-            MetCG=os.path.join("aux_files",re.sub('_sampleSheet.tsv','.metilene.CpGlist.bed',os.path.basename(sampleInfo))),
-            sampleInfo=sampleInfo,
-            refG=refG
+            MetCG=os.path.join("aux_files",re.sub('_sampleSheet.[a-z]{3}$','.metilene.CpGlist.bed',os.path.basename(sampleInfo))),
+            sampleInfo=sampleInfo
         output:
             LimBed='{}/singleCpG.metilene.limma.bed'.format(get_outdir("metilene_out")),
             LimAnnot='{}/metilene.limma.annotated.txt'.format(get_outdir("metilene_out"))
         params:
-            DMRout=os.path.join(outdir,'{}'.format(get_outdir("metilene_out")))
+            DMRout=os.path.join(outdir,'{}'.format(get_outdir("metilene_out"))),
+            gene_mod=genes_bed  
         log:
             err="{}/logs/cleanup_metilene.err".format(get_outdir("metilene_out")),
             out="{}/logs/cleanup_metilene.out".format(get_outdir("metilene_out"))
         threads: 1
         conda: CondaEnvironment
-        shell: 'Rscript --no-save --no-restore ' + os.path.join(workflow_rscripts,'WGBSpipe.metilene_stats.limma.R ') + "{params.DMRout} " + os.path.join(outdir,"{input.MetBed}") +' ' + os.path.join(outdir,"{input.MetCG}") + ' ' + os.path.join(outdir,"{input.Limdat}") + " {input.sampleInfo} {input.refG} 1>{log.out} 2>{log.err}" 
+        shell: 'Rscript --no-save --no-restore ' + os.path.join(workflow_rscripts,'WGBSpipe.metilene_stats.limma.R ') + "{params.DMRout} " + os.path.join(outdir,"{input.MetBed}") +' ' + os.path.join(outdir,"{input.MetCG}") + ' ' + os.path.join(outdir,"{input.Limdat}") + " {input.sampleInfo} {params.gene_mod} 1>{log.out} 2>{log.err}" 
 
 
 if intList:

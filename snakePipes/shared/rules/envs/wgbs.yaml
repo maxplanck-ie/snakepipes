@@ -11,6 +11,7 @@ dependencies:
   - bedtools=2.27.1
   - gatk=3.5
   - bioconductor-limma=3.34.9
+  - picard = 2.18.7
   - r-car=2.1_4
   - r-data.table=1.10.4
   - r-factominer=1.38
@@ -19,3 +20,5 @@ dependencies:
   - r-dplyr=0.7.4
   - bioconductor-genomicranges=1.30.0
   - bioconductor-biomart=2.34.2
+  - ucsc-fatotwobit
+  - ucsc-facount
