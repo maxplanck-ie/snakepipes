@@ -523,7 +523,8 @@ if sampleInfo:
         output:
             RDatAll='{}/singleCpG.RData'.format(get_outdir("singleCpG_stats_limma")),
             Limdat='{}/limdat.LG.RData'.format(get_outdir("singleCpG_stats_limma")),
-            MetIN='{}/metilene.IN.txt'.format(get_outdir("singleCpG_stats_limma"))
+            MetIN='{}/metilene.IN.txt'.format(get_outdir("singleCpG_stats_limma")),
+            Gifnfo='{}/groupInfo.txt'.format(get_outdir("singleCpG_stats_limma"))
         params:
             statdir=os.path.join(outdir,'{}'.format(get_outdir("singleCpG_stats_limma"))),
             sampleInfo=sampleInfo
@@ -537,7 +538,7 @@ if sampleInfo:
     rule run_metilene:
         input:
             MetIN='{}/metilene.IN.txt'.format(get_outdir("singleCpG_stats_limma")),
-            sampleInfo=sampleInfo
+            Ginfo='{}/groupInfo.txt'.format(get_outdir("singleCpG_stats_limma"))
         output:
             MetBed='{}/singleCpG.metilene.bed'.format(get_outdir("metilene_out"))
         params:
@@ -546,7 +547,7 @@ if sampleInfo:
             err="{}/logs/run_metilene.err".format(get_outdir("metilene_out"))
         threads: nthreads
         conda: CondaEnvironment
-        shell: 'metilene -a ' + list(set(pandas.read_table(sampleInfo)['Group']))[0] + ' -b ' + list(set(pandas.read_table(sampleInfo)['Group']))[1] + " -t {threads} {input.MetIN} | sort -k 1,1 -k2,2n > {output.MetBed}" + " 2>{log.err}"
+        shell: 'Gi=($(cat {input.Ginfo}));metilene -a ' + " ${{Gi[0]}} " + " -b  ${{Gi[1]}} -t {threads} {input.MetIN} | sort -k 1,1 -k2,2n > {output.MetBed} 2>{log.err}"
 
 
     rule get_CG_metilene:
