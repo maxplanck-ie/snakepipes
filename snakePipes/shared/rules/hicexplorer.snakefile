@@ -183,7 +183,7 @@ rule call_tads:
     shell:
         "hicFindTADs -m {input} "
         "{params.parameters} "
-        "--correctForMultipleTesting fdr "
+        "--correctForMultipleTesting bonferroni "
         "-p {threads} "
         "--outPrefix {params.prefix} > {log.out} 2> {log.err}"
 
