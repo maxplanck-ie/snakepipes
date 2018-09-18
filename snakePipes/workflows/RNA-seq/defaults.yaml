@@ -52,6 +52,9 @@ plot_format: png
 # for allele-spcific mapping
 snp_file:
 Nmasked_index:
+#### Flag to control the pipeline entry point
+fromBam: False
+bam_ext: '.bam'
 ################################################################################
 # Call snakemake directly, i.e. without using the wrapper script:
 #

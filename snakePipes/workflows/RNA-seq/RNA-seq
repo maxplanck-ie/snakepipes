@@ -20,7 +20,7 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
                          "mode": "alignment-free,deepTools_qc", "downsample": False, "trim": False, "trim_prg": "cutadapt", "trim_options": None, "fastqc": False,
                          "library_type": 2, "mapping_prg": "STAR", "star_options": "--outBAMsortingBinsN 100", "hisat_options": None, "salmon_index_options": "--type quasi -k 31",
                          "featurecounts_options": "-C -Q 10 --primary", "filter_annotation": None, "sample_info": None,
-                         "bw_binsize": 25, "dnaContam": False, "plot_format": "png"}):
+                         "bw_binsize": 25, "dnaContam": False, "plot_format": "png","fromBam": False}):
     """
     Parse arguments from the command line.
     """
@@ -111,6 +111,11 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
                           action="store_true",
                           help="Returns a plot which presents the proportion of the intergenic reads (default: '%(default)s')",
                           default=defaults["dnaContam"])
+
+    optional.add_argument("--fromBam",
+                         dest="fromBam",
+                         action="store_true",
+                         help="Start pipeline from processed bam files after PCR duplicate removal.",default=defaults["fromBam"])
 
     return parser
 
