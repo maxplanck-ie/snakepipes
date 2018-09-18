@@ -20,7 +20,7 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
                          "mode": "alignment-free,deepTools_qc", "downsample": False, "trim": False, "trim_prg": "cutadapt", "trim_options": None, "fastqc": False,
                          "library_type": 2, "mapping_prg": "STAR", "star_options": "--outBAMsortingBinsN 100", "hisat_options": None, "salmon_index_options": "--type quasi -k 31",
                          "featurecounts_options": "-C -Q 10 --primary", "filter_annotation": None, "sample_info": None,
-                         "bw_binsize": 25, "dnaContam": False, "plot_format": "png","fromBam": False}):
+                         "bw_binsize": 25, "dnaContam": False, "plot_format": "png","fromBam": False, "paired": True}):
     """
     Parse arguments from the command line.
     """
@@ -116,6 +116,12 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
                          dest="fromBam",
                          action="store_true",
                          help="Start pipeline from processed bam files after PCR duplicate removal.",default=defaults["fromBam"])
+
+    optional.add_argument("--single-end",
+                          dest="paired",
+                          action="store_false",
+                          help="input data is single-end, not paired-end",
+                          default=defaults["paired"])
 
     return parser
 

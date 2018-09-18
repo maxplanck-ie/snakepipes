@@ -84,7 +84,6 @@ else:
     fastqc=False
     trim=False
     dnaContam=False
-    paired=False
     include: os.path.join(maindir, "shared", "rules", "LinkBam.snakefile")
     include: os.path.join(maindir, "shared", "rules", "sambamba.snakefile")
     sample_name = os.path.splitext(os.path.basename(sample_info))[0]
@@ -249,6 +248,7 @@ onstart:
         print("--- Workflow parameters --------------------------------------------------------",file=lo)
         print("samples:"+ str(samples),file=lo)
         print("input dir:"+ indir,file=lo)
+        print("paired:", paired)
         print("-" * 80,file=lo)#, "\n"
 
         print("--- Environment ----------------------------------------------------------------",file=lo)
