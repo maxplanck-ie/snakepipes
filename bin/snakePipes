@@ -40,6 +40,9 @@ def parse_arguments():
                           'created conda environments. This will ignore what is already '
                           'in the workflow-specific yaml files and where conda is installed.')
 
+    createEnvsParser.add_argument('--only',
+                                  nargs='+',
+                                  help="If specified, a space-separated list of environments to create. This should typically only be done for testing purposes. The possible environments are: {}".format(cof.set_env_yamls().keys()))
     createEnvsParser.add_argument('--force',
                                   action='store_true',
                                   help='Force creation of conda environments, even if they apparently exist.')
@@ -179,6 +182,8 @@ def createCondaEnvs(args):
     cof.write_configfile(os.path.join(baseDir, "shared/defaults.yaml"), cf)
 
     for env in cof.set_env_yamls().values():
+        if args.only is not None and env not in args.only:
+            continue
         # Hash the file ala snakemake
         md5hash = hashlib.md5()
         md5hash.update(condaDirUse.encode())
