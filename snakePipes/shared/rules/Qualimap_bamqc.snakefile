@@ -17,6 +17,7 @@ rule Qualimap_bamqc:
     threads: 16
     conda: CONDA_DNA_MAPPING_ENV
     shell:
+        "unset DISPLAY && "
         "qualimap bamqc "
         "--java-mem-size=8G "
         "--bam {input} "

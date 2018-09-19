@@ -115,59 +115,64 @@ if(nrow(bedtab.CC)==0) {message("None of the genomic intervals passed the filter
    if ("Control" %in% CGI.limdat.CC.Means$Group){
         CGI.limdat.CC.Means$Group<-factor(CGI.limdat.CC.Means$Group)
         CGI.limdat.CC.Means$Group<-relevel(CGI.limdat.CC.Means$Group,ref="Control")}
-   if ("WT" %in% CGI.limdat.CC.Means$Group){
+   else if ("WT" %in% CGI.limdat.CC.Means$Group){
         CGI.limdat.CC.Means$Group<-factor(CGI.limdat.CC.Means$Group)
         CGI.limdat.CC.Means$Group<-relevel(CGI.limdat.CC.Means$Group,ref="WT")}
+   else {CGI.limdat.CC.Means$Group<-factor(CGI.limdat.CC.Means$Group)}
 
 
 ##density plots
     ggplot(data=CGI.limdat.CC.Means,aes(x=Beta.Mean))+geom_density(aes(group=Group,colour=Group,fill=Group),alpha=0.3)+ggtitle("Genomic intervals")+
-    theme(text = element_text(size=16),axis.text = element_text(size=12),axis.title = element_text(size=14))+xlab("Mean methylation ratio")+scale_fill_manual(values=c("grey28","red"))+scale_colour_manual(values=c("grey28","red"))
+    theme(text = element_text(size=16),axis.text = element_text(size=12),axis.title = element_text(size=14))+xlab("Mean methylation ratio")+scale_fill_manual(values=c("grey28","red","darkblue","darkgreen"))+scale_colour_manual(values=c("grey28","red","darkblue","darkgreen"))
     ggsave(paste0(bedshort,".Beta.MeanXgroup.int.dens.png"))
 
 ##violin plots
     ggplot(data=CGI.limdat.CC.Means)+geom_violin(aes(x=Group,y=Beta.Mean,fill=Group))+geom_boxplot(aes(x=Group,y=Beta.Mean),width=0.1)+ggtitle("Genomic intervals")+
-    theme(text = element_text(size=16),axis.text = element_text(size=12),axis.title = element_text(size=14))+xlab("Mean methylation ratio")+scale_fill_manual(values=c("grey28","red"))
+    theme(text = element_text(size=16),axis.text = element_text(size=12),axis.title = element_text(size=14),axis.text.x = element_text(angle = 90, hjust = 1))+xlab("Mean methylation ratio")+scale_fill_manual(values=c("grey28","red","darkblue","darkgreen"))
     ggsave(paste0(bedshort,".Beta.MeanXgroup.int.violin.png"))
 
-
+    if(length(levels(CGI.limdat.CC.Means$Group))==2){
 #differential methylation
-    design<-as.data.frame(matrix(ncol=2,nrow=(ncol(CGI.limdat.CC.logit))),stringsAsFactors=FALSE)
-    colnames(design)<-c("Intercept","Group")
-    rownames(design)<-colnames(CGI.limdat.CC.logit)
-    if("Control" %in% sampleInfo$Group){
-        gp<-factor(sampleInfo$Group[match(colnames(CGI.limdat.CC.logit),sampleInfo$SampleID)])
-        gp<-relevel(gp,ref="Control")}
-    if("WT" %in% sampleInfo$Group){
-        gp<-factor(sampleInfo$Group[match(colnames(CGI.limdat.CC.logit),sampleInfo$SampleID)])
-        gp<-relevel(gp,ref="WT")}
-    design$Group<-as.numeric(gp)
-    design$Intercept<-1
-    design<-as.matrix(design)
+        design<-as.data.frame(matrix(ncol=2,nrow=(ncol(CGI.limdat.CC.logit))),stringsAsFactors=FALSE)
+        colnames(design)<-c("Intercept","Group")
+        rownames(design)<-colnames(CGI.limdat.CC.logit)
+        if("Control" %in% sampleInfo$Group){
+            gp<-factor(sampleInfo$Group[match(colnames(CGI.limdat.CC.logit),sampleInfo$SampleID)])
+            gp<-relevel(gp,ref="Control")
+            design$Group<-as.numeric(gp)}
+        if("WT" %in% sampleInfo$Group){
+            gp<-factor(sampleInfo$Group[match(colnames(CGI.limdat.CC.logit),sampleInfo$SampleID)])
+            gp<-relevel(gp,ref="WT")
+            design$Group<-as.numeric(gp)}
+        else{design$Group<-as.numeric(factor(sampleInfo$Group))}
+        design$Intercept<-1
+        design<-as.matrix(design)
 
-    fit<-lmFit(CGI.limdat.CC.logit,design)
-    fit.eB<-eBayes(fit)
+        fit<-lmFit(CGI.limdat.CC.logit,design)
+        fit.eB<-eBayes(fit)
 
-    tT.FDR5<-topTable(fit.eB,2,p.value=0.05,number=Inf)
-    if(nrow(tT.FDR5)==0) {message("No genomic intervals were significantly differentially methylated.")
-        save(bedtab,limdat.LG.inCGI,CGI.limdat.CC,CGI.limdat.CC.Means,file=paste0(bedshort,".aggCpG.RData"))
+        tT.FDR5<-topTable(fit.eB,2,p.value=0.05,number=Inf)
+        if(nrow(tT.FDR5)==0) {message("No genomic intervals were significantly differentially methylated.")
+            save(bedtab,limdat.LG.inCGI,CGI.limdat.CC,CGI.limdat.CC.Means,file=paste0(bedshort,".aggCpG.RData"))
 
-    }else{
-        tT.FDR5<-tT.FDR5[,c("logFC","t","adj.P.Val","B")]
-        write.table(tT.FDR5,file=paste0(bedshort,".CGI.limdat.CC.tT.FDR5.txt"),sep="\t",quote=FALSE)
+        }else{
+            tT.FDR5<-tT.FDR5[,c("logFC","t","adj.P.Val","B")]
+            write.table(tT.FDR5,file=paste0(bedshort,".CGI.limdat.CC.tT.FDR5.txt"),sep="\t",quote=FALSE)
 
-        nrow(tT.FDR5)
-        nrow(CGI.limdat.CC.logit)
-        nrow(tT.FDR5)/nrow(CGI.limdat.CC.logit)
+            nrow(tT.FDR5)
+            nrow(CGI.limdat.CC.logit)
+            nrow(tT.FDR5)/nrow(CGI.limdat.CC.logit)
 
-        CGI.limdat.CC.Diff<-summarize(group_by(CGI.limdat.CC.Means,IntID),Diff=(Beta.Mean[1]-Beta.Mean[2]))
-        tT.FDR5.Diff0.2<-tT.FDR5[rownames(tT.FDR5) %in% CGI.limdat.CC.Diff$IntID[abs(CGI.limdat.CC.Diff$Diff)>=0.2],]
+            CGI.limdat.CC.Diff<-summarize(group_by(CGI.limdat.CC.Means,IntID),Diff=(Beta.Mean[1]-Beta.Mean[2]))
+            tT.FDR5.Diff0.2<-tT.FDR5[rownames(tT.FDR5) %in% CGI.limdat.CC.Diff$IntID[abs(CGI.limdat.CC.Diff$Diff)>=0.2],]
 
-        nrow(tT.FDR5.Diff0.2)
-        nrow(tT.FDR5.Diff0.2)/nrow(CGI.limdat.CC.logit)
+            nrow(tT.FDR5.Diff0.2)
+            nrow(tT.FDR5.Diff0.2)/nrow(CGI.limdat.CC.logit)
 
-        save(bedtab,limdat.LG.inCGI,CGI.limdat.CC,CGI.limdat.CC.Means,tT.FDR5,file=paste0(bedshort,".aggCpG.RData"))
+            save(bedtab,limdat.LG.inCGI,CGI.limdat.CC,CGI.limdat.CC.Means,tT.FDR5,file=paste0(bedshort,".aggCpG.RData"))
 
-    }
+        }###end if topTable has at least 1 entry
+    } else {message('More than 2 sample groups were provided. No statistical inference will be computed.')}### end if exactly two sample groups were specified
+
 }
 

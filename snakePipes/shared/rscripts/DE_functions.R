@@ -258,7 +258,7 @@ DESeq_downstream <- function(DEseqout,
 			htdat[napos, "external_gene_name"] <- as.character(htdat[napos, "Row.names"])
 
 			# replace rownames of heatmap data with these gene names
-			rownames(heatmap_data) <- htdat$external_gene_name
+			rownames(heatmap_data) <- htdat$external_gene_name[match(rownames(heatmap_data),htdat$Row.names)]
 		}
 		## scaling is not so useful for already normalized data, or?
 		#heatmap_data <- scale(heatmap_data, center = TRUE, scale = TRUE)
