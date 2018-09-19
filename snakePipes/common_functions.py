@@ -325,6 +325,9 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
         cluster_config = merge_dicts(cluster_config, user_cluster_config)  # merge/override variables from user_config.yaml
     write_configfile(os.path.join(args.outdir, '{}.cluster_config.yaml'.format(workflowName)), cluster_config)
 
+    if args.notemp:
+        args.snakemake_options += " --notemp"
+
     snakemake_cmd = """
                     {snakemake} {snakemake_options} --latency-wait {latency_wait} --snakefile {snakefile} --jobs {max_jobs} --directory {workingdir} --configfile {configfile} --keep-going
                     """.format(snakemake=os.path.join(snakemake_path, "snakemake"),

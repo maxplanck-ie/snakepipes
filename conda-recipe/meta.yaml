@@ -1,6 +1,6 @@
 package:
   name: snakepipes
-  version: 1.0.0_beta1
+  version: 1.0.0_beta2
 
 source:
   path: ../
@@ -15,7 +15,7 @@ requirements:
     - python
   run:
     - python
-    - snakemake 5.2.0
+    - snakemake >=5.2.3
     - pandas
     - graphviz
 
