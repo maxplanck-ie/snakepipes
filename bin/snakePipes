@@ -181,8 +181,8 @@ def createCondaEnvs(args):
     # rewrite defaults.yaml
     cof.write_configfile(os.path.join(baseDir, "shared/defaults.yaml"), cf)
 
-    for env in cof.set_env_yamls().values():
-        if args.only is not None and env not in args.only:
+    for envName, env in cof.set_env_yamls().items():
+        if args.only is not None and envName not in args.only:
             continue
         # Hash the file ala snakemake
         md5hash = hashlib.md5()

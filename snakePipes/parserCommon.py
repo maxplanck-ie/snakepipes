@@ -80,11 +80,15 @@ def mainArguments(defaults, workingDir=False, createIndices=False):
                          default=False,
                          help="run workflow locally; default: jobs are submitted to Slurm queue (default: '%(default)s')")
 
+    general.add_argument("--notemp",
+                         action="store_true",
+                         help="Prevent snakemake from removing files marked as being temporary (typically intermediate files that are rarely needed by end users). This is mostly useful for debugging problems.")
+
     general.add_argument("--snakemake_options",
                          dest="snakemake_options",
                          metavar="STR",
                          type=str,
-                         help="Snakemake options to be passed directly to snakemake, e.g. use --snakemake_options='--dryrun --rerun-incomplete --unlock --forceall'. (default: '%(default)s')",
+                         help="Snakemake options to be passed directly to snakemake, e.g. use --snakemake_options='--dryrun --rerun-incomplete --unlock --forceall'. WARNING! ONLY EXPERT USERS SHOULD CHANGE THIS! YOU MUST INCLUDE --conda --conda-prefix ... TO AVOID HEADACHES! (default: '%(default)s')",
                          default=defaults["snakemake_options"])
 
     general.add_argument("--tempdir",
