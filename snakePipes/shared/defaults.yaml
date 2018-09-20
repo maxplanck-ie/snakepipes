@@ -1,9 +1,10 @@
 ################################################################################
 # This file should hold values that should be present in ALL workflows
 #
+# Note that tempdir MUST end with a "/"!
+#
 # Note that due to limitations in yaml.dump, only very basic structures are
 # permitted here.
 ################################################################################
-#snakemake_options: '--use-conda --conda-prefix /package/anaconda3/envs'
-snakemake_options: '--use-conda --conda-prefix /data/processing/sikora/snakePipes_envs'
+snakemake_options: '--use-conda --conda-prefix /package/anaconda3/envs'
 tempdir: /data/extended/
