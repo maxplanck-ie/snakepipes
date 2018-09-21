@@ -13,7 +13,7 @@ if paired:
             insert_size_max = insert_size_max
         benchmark:
             "Bowtie2/.benchmark/Bowtie2.{sample}.benchmark"
-        threads: 24
+        threads: 24  # 1G per core
         conda: CONDA_DNA_MAPPING_ENV
         shell:
             "bowtie2 "
@@ -37,7 +37,7 @@ else:
             bowtie_opts = str(bowtie_opts or '')
         benchmark:
             "Bowtie2/.benchmark/Bowtie2.{sample}.benchmark"
-        threads: 24
+        threads: 24  # 1G per core
         conda: CONDA_DNA_MAPPING_ENV
         shell:
             "bowtie2 "
