@@ -21,6 +21,7 @@ setup(
     description='Snakemake workflows and wrappers for NGS data processing from the MPI-IE',
     install_requires=[
         "snakemake >= 5.2.0",
+        "psutil",
         "pandas"
     ],
     zip_safe=False,
