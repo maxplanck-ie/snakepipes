@@ -1,7 +1,7 @@
 SalmonIndex:
-  memory: 12G
+  memory: 18G
 SalmonQuant:
-  memory: 12G
+  memory: 14G
 STAR:
   memory: 3.2G
 bamPE_fragment_size:
