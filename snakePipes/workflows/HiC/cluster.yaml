@@ -1,3 +1,4 @@
 map_fastq_single_end:
-          memory: 3G
-
+    memory: 3G
+CollectInsertSizeMetrics:
+    memory: 1G

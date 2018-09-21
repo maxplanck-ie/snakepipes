@@ -25,7 +25,7 @@ if mapping_prg == "Bowtie2":
                 idxbase = getbw_idxbase(bowtie2_index_allelic)
             benchmark:
                 mapping_prg+"/.benchmark/Bowtie2.{sample}.benchmark"
-            threads: 24
+            threads: 24  # 1G per core
             conda: CONDA_DNA_MAPPING_ENV
             shell:
                 "bowtie2"
@@ -51,7 +51,7 @@ if mapping_prg == "Bowtie2":
                 idxbase = getbw_idxbase(bowtie2_index_allelic)
             benchmark:
                 mapping_prg+"/.benchmark/Bowtie2.{sample}.benchmark"
-            threads: 24
+            threads: 24  # 1G per core
             conda: CONDA_DNA_MAPPING_ENV
             shell:
                 "bowtie2"

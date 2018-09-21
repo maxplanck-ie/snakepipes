@@ -19,6 +19,7 @@ rule filterFasta:
 
 # use filtered genome fasta if the mode is allele-specific
 
+
 rule CollectAlignmentSummaryMetrics:
     input:
         bam = mapping_prg+"/{sample}.bam",
@@ -30,7 +31,7 @@ rule CollectAlignmentSummaryMetrics:
         err = "Picard_qc/logs/CollectAlignmentSummaryMetrics.{sample}.err"
     benchmark:
         "Picard_qc/.benchmark/CollectAlignmentSummaryMetrics.{sample}.benchmark"
-    threads: 4 # Java performs parallel garbage collection
+    threads: 4 # Java performs parallel garbage collection, 2GB per core
     conda: CONDA_DNA_MAPPING_ENV
     shell:
         "picard CollectAlignmentSummaryMetrics "
@@ -53,7 +54,7 @@ if paired:
             err = "Picard_qc/logs/CollectInsertSizeMetrics.{sample}.err"
         benchmark:
             "Picard_qc/.benchmark/CollectInsertSizeMetrics.{sample}.benchmark"
-        threads: 4 # Java performs parallel garbage collection
+        threads: 4 # Java performs parallel garbage collection, 1GB per core
         params:
             pdf = "Picard_qc/InsertSizeMetrics/{sample}.insert_size_histogram.pdf"
         conda: CONDA_DNA_MAPPING_ENV
