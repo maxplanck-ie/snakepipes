@@ -103,6 +103,22 @@ rule combine_sample_counts:
         "Rscript {params.merge_script} Counts/ {output.merged_matrix} {output.used_cell_names_file} {params.split} {params.sample_cell_names} """
 
 
+rule filter_cells:
+        input: 
+            merged_matrix = "Results/all_samples.gencode_genomic.corrected_merged.csv"
+        output:
+            metrics_tab = "Filtered_cells/metrics.tab.txt"
+        params:
+            wdir=os.path.join(outdir,"Filtered_cells"),
+            fINpath=lambda wildcards,input: os.path.join(outdir,input.merged_matrix)
+        log:
+            err='Filtered_cells/logs/filt_cells.err',
+            out='Filtered_cells/logs/filt_cells.out'
+        threads: 1
+        conda: CONDA_scRNASEQ_ENV
+        shell: "Rscript --no-save --no-restore " + os.path.join(workflow_rscripts,'scRNAseq_cell_filter_benchmark.R ') + "{params.wdir} {params.fINpath} 1>{log.out} 2>{log.err}"
+
+
 rule sc_QC_metrics:
     input:
         expand("Counts/{sample}.featureCounts_summary.txt",sample=samples),

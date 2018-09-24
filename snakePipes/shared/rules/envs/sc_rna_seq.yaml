@@ -1,6 +1,10 @@
-name: snakepipes_scRNAseq_environment
+name: snakepipes_scRNAseq_environment_v1.0
 channels:
  - bioconda
  - conda-forge
 dependencies:
  - umi_tools=0.5.3
+ - r-stringr=1.2.0
+ - bioconductor-monocle=2.6.0
+ - r-data.table=1.11.4
+ 
