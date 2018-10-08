@@ -1,6 +1,26 @@
 snakemake_latency_wait: 300
 snakemake_cluster_cmd: module load slurm; SlurmEasy --mem-per-cpu {cluster.memory} --threads {threads} --log
 __default__:
-    memory: 8G
+    memory: 1G
 snp_split:
     memory: 10G
+bamCoverage:
+    memory: 4G
+bamCoverage_RPKM:
+    memory: 2G
+bamCoverage_coverage:
+    memory: 2G
+plotCorrelation_pearson:
+    memory: 3G
+plotCorrelation_spearman:
+    memory: 3G
+plotCoverage:
+    memory: 1G
+plotEnrichment:
+    memory: 1G
+plotFingerprint:
+    memory: 1G
+plotPCA:
+    memory: 4G
+plotPCA_allelic:
+    memory: 4G

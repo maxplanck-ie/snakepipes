@@ -10,7 +10,7 @@ dependencies:
  - ucsc-gtftoGenepred=357
  - subread=1.6.1
  - hisat2=2.1.0
- - star=2.6.0c
+ - star=2.6.1b
  - salmon=0.9.1
  - r-base=3.4.1
  - r-wasabi=0.2
