@@ -7,4 +7,5 @@ dependencies:
  - r-stringr=1.2.0
  - bioconductor-monocle=2.6.0
  - r-data.table=1.11.4
- 
+ - r-seurat=2.3.4
+ - r-dplyr=0.7.6

@@ -107,7 +107,7 @@ rule filter_cells:
         input: 
             merged_matrix = "Results/all_samples.gencode_genomic.corrected_merged.csv"
         output:
-            metrics_tab = "Filtered_cells/metrics.tab.txt"
+            metrics_tab = "Filtered_cells/metrics.tab.RData"
         params:
             wdir=os.path.join(outdir,"Filtered_cells"),
             fINpath=lambda wildcards,input: os.path.join(outdir,input.merged_matrix)
@@ -117,6 +117,21 @@ rule filter_cells:
         threads: 1
         conda: CONDA_scRNASEQ_ENV
         shell: "Rscript --no-save --no-restore " + os.path.join(workflow_rscripts,'scRNAseq_cell_filter_benchmark.R ') + "{params.wdir} {params.fINpath} 1>{log.out} 2>{log.err}"
+
+
+rule cluster_cells:
+        input: 
+            metrics_tab = "Filtered_cells/metrics.tab.RData"
+        output:
+            plots=dynamic("Filtered_cells/Top2.clu{clu}.featurePlot.png")
+        params:
+            wdir=os.path.join(outdir,"Filtered_cells"),
+            fINpath=lambda wildcards,input: os.path.join(outdir,input.metrics_tab),
+            err='Filtered_cells/logs/cluster_cells.err',
+            out='Filtered_cells/logs/cluster_cells.out'
+        threads: 1
+        conda: CONDA_scRNASEQ_ENV
+        shell: "Rscript --no-save --no-restore " + os.path.join(workflow_rscripts,'scRNAseq_select_threshold_cluster.R ') + "{params.wdir} {params.fINpath} 1>{params.out} 2>{params.err}"
 
 
 rule sc_QC_metrics:

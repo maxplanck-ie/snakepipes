@@ -4,7 +4,7 @@ wdir<-commandArgs(trailingOnly=TRUE)[1]
 #system(paste0('mkdir -p ',wdir)) #for debugging
 setwd(wdir)
 message(sprintf("working directory is %s",getwd()))
-readRenviron("/home/sikora/.Renviron")
+#readRenviron("/home/sikora/.Renviron")
 options(stringsAsFactors=FALSE,na.rm=TRUE)
 
 require(monocle)
@@ -32,9 +32,11 @@ mono.set <- reduceDimension(mono.set, max_components = 2,reduction_method = 'tSN
 mono.set <- clusterCells(mono.set, num_clusters = NULL)
 plot_cell_clusters(mono.set,  1, 2, color="Cluster")
 ggsave(paste0("mono.set.",minTi,".tsne.auto.Cluster.png"))
-plot_rho_delta(mono.set,rho_threshold = 10, delta_threshold = 3)
+rho.sel<-quantile(pData(mono.set)$rho,0.8)
+delta.sel<-quantile(pData(mono.set)$delta,0.95)
+plot_rho_delta(mono.set,rho_threshold = rho.sel, delta_threshold = delta.sel)
 ggsave(paste0("mono.set.",minTi,".rho_delta.png"))
-mono.set <- clusterCells(mono.set, num_clusters = NULL,rho_threshold = 10, delta_threshold = 3,skip_rho_sigma=TRUE)
+mono.set <- clusterCells(mono.set, num_clusters = NULL,rho_threshold = rho.sel, delta_threshold = delta.sel,skip_rho_sigma=TRUE)
 plot_cell_clusters(mono.set,  1, 2, color="Cluster")
 ggsave(paste0("mono.set.",minTi,".tsne.thd.Cluster.png"))
 
