@@ -1,7 +1,7 @@
 #run in R3.4.0
 #set working directory
 wdir<-commandArgs(trailingOnly=TRUE)[1]
-#system(paste0('mkdir -p ',wdir)) #for debugging
+system(paste0('mkdir -p ',wdir)) #for debugging
 setwd(wdir)
 message(sprintf("working directory is %s",getwd()))
 
@@ -21,6 +21,7 @@ csv.dat<-fread(csvpath,header=TRUE,sep="\t")
 csv.dat[is.na(csv.dat)]<-0
 
 x<-csv.dat
+if(!"GENEID" %in% colnames(csv.dat)) { colnames(x)[1]<-"GENEID"} ##for debugging
 rownames(x) <- x$GENEID
 setkey(x,GENEID)
 expdat <- as.data.frame(x[grep("ERCC",rownames(x),invert=TRUE),-1,with=FALSE])
