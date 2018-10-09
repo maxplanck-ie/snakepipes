@@ -42,14 +42,17 @@ if trim:
 
 
 ### Initialization #############################################################
+if not fromBam:
+    infiles = sorted(glob.glob(os.path.join(indir, '*'+ext)))
+    samples = cf.get_sample_names(infiles,ext,reads)
 
-infiles = sorted(glob.glob(os.path.join(indir, '*'+ext)))
-samples = cf.get_sample_names(infiles,ext,reads)
+    paired = cf.is_paired(infiles,ext,reads)
 
-paired = cf.is_paired(infiles,ext,reads)
-
-if not paired:
-    reads = [""]
+    if not paired:
+        reads = [""]
+else:
+    infiles = sorted(glob.glob(os.path.join(str(indir or ''), '*'+bam_ext)))
+    samples = cf.get_sample_names_bam(infiles,bam_ext)
 
 if sample_info and not os.path.isfile(sample_info):
     print("ERROR: Cannot find sample info file! ("+sample_info+")\n")
