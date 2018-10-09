@@ -113,7 +113,7 @@ elif mapping_prg.upper().find("STAR") >=0:
                 sample_dir = mapping_prg+"/{sample}"
             benchmark:
                 mapping_prg+"/.benchmark/STAR.{sample}.benchmark"
-            threads: 12
+            threads: 20  # 3.2G per core
             conda: CONDA_RNASEQ_ENV
             shell:
                 "( [ -d {params.sample_dir} ] || mkdir -p {params.sample_dir} ) && "
@@ -143,7 +143,7 @@ elif mapping_prg.upper().find("STAR") >=0:
                 sample_dir = mapping_prg+"/{sample}"
             benchmark:
                 mapping_prg+"/.benchmark/STAR.{sample}.benchmark"
-            threads: 12
+            threads: 20  # 3.2G per core
             conda: CONDA_RNASEQ_ENV
             shell:
                 "( [ -d {params.sample_dir} ] || mkdir -p {params.sample_dir} ) && "

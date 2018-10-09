@@ -19,7 +19,7 @@ rule bamCoverage:
         err = "bamCoverage/logs/bamCoverage.{sample}.err"
     benchmark:
         "bamCoverage/.benchmark/bamCoverage.{sample}.benchmark"
-    threads: 16
+    threads: 16  # 4GB per core
     conda: CONDA_SHARED_ENV
     shell: bamcov_cmd
 
@@ -45,7 +45,7 @@ rule bamCoverage_filtered:
         err = "bamCoverage/logs/bamCoverage.{sample}.filtered.err"
     benchmark:
         "bamCoverage/.benchmark/bamCoverage.{sample}.filtered.benchmark"
-    threads: 16
+    threads: 16  # 4GB per core
     conda: CONDA_SHARED_ENV
     shell: bamcov_cmd
 

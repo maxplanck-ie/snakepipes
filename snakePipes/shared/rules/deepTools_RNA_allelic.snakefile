@@ -57,7 +57,7 @@ rule plotEnrichment_allelic:
         err="deepTools_qc/logs/plotEnrichment_allelic.err"
     benchmark:
         "deepTools_qc/.benchmark/plotEnrichment_allelic.benchmark"
-    threads: 8
+    threads: 24
     shell: plotEnrich_cmd
 
 

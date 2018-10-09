@@ -1,6 +1,6 @@
 package:
   name: snakepipes
-  version: 1.0.0_beta2
+  version: 1.0.0
 
 source:
   path: ../
@@ -25,5 +25,5 @@ test:
 
 about:
   home: 'https://snakepipes.readthedocs.org'
-  license: GPLv3
+  license: GPL3
   summary: NGS processing pipelines from the MPI-IE

@@ -56,7 +56,7 @@ rule plotEnrichment:
         err="deepTools_qc/logs/plotEnrichment.err"
     benchmark:
         "deepTools_qc/.benchmark/plotEnrichment.benchmark"
-    threads: 8
+    threads: 24
     shell: plotEnrich_cmd
 
 
