@@ -1,2 +1,4 @@
 STAR:
     memory: 3200M
+cluster_cells_raceid:
+    memory: 6G

@@ -79,4 +79,6 @@ for(i in seq_along(unique(top2$cluster))){
 
 }
 
-
+sink("sessionInfo.txt")
+print(sessionInfo())
+sink()

@@ -103,35 +103,66 @@ rule combine_sample_counts:
         "Rscript {params.merge_script} Counts/ {output.merged_matrix} {output.used_cell_names_file} {params.split} {params.sample_cell_names} """
 
 
-rule filter_cells:
+rule filter_cells_monocle:
         input: 
             merged_matrix = "Results/all_samples.gencode_genomic.corrected_merged.csv"
         output:
-            metrics_tab = "Filtered_cells/metrics.tab.RData"
+            metrics_tab = "Filtered_cells_monocle/metrics.tab.RData"
         params:
-            wdir=os.path.join(outdir,"Filtered_cells"),
+            wdir=os.path.join(outdir,"Filtered_cells_monocle"),
             fINpath=lambda wildcards,input: os.path.join(outdir,input.merged_matrix)
         log:
-            err='Filtered_cells/logs/filt_cells.err',
-            out='Filtered_cells/logs/filt_cells.out'
+            err='Filtered_cells_monocle/logs/filt_cells.err',
+            out='Filtered_cells_monocle/logs/filt_cells.out'
         threads: 1
         conda: CONDA_scRNASEQ_ENV
-        shell: "Rscript --no-save --no-restore " + os.path.join(workflow_rscripts,'scRNAseq_cell_filter_benchmark.R ') + "{params.wdir} {params.fINpath} 1>{log.out} 2>{log.err}"
+        shell: "Rscript --no-save --no-restore " + os.path.join(workflow_rscripts,'scRNAseq_cell_filter_monocle.R ') + "{params.wdir} {params.fINpath} 1>{log.out} 2>{log.err}"
 
 
-rule cluster_cells:
+rule cluster_cells_monocle:
         input: 
-            metrics_tab = "Filtered_cells/metrics.tab.RData"
+            metrics_tab = "Filtered_cells_monocle/metrics.tab.RData"
         output:
-            plots=dynamic("Filtered_cells/Top2.clu{clu}.featurePlot.png")
+            dummy="Filtered_cells_monocle/sessionInfo.txt"
         params:
-            wdir=os.path.join(outdir,"Filtered_cells"),
+            wdir=os.path.join(outdir,"Filtered_cells_monocle"),
             fINpath=lambda wildcards,input: os.path.join(outdir,input.metrics_tab),
-            err='Filtered_cells/logs/cluster_cells.err',
-            out='Filtered_cells/logs/cluster_cells.out'
+            err='Filtered_cells_monocle/logs/cluster_cells.err',
+            out='Filtered_cells_monocle/logs/cluster_cells.out'
         threads: 1
         conda: CONDA_scRNASEQ_ENV
-        shell: "Rscript --no-save --no-restore " + os.path.join(workflow_rscripts,'scRNAseq_select_threshold_cluster.R ') + "{params.wdir} {params.fINpath} 1>{params.out} 2>{params.err}"
+        shell: "Rscript --no-save --no-restore " + os.path.join(workflow_rscripts,'scRNAseq_select_threshold_cluster_monocle.R ') + "{params.wdir} {params.fINpath} 1>{params.out} 2>{params.err}"
+
+
+rule filter_cells_raceid:
+        input: 
+            merged_matrix = "Results/all_samples.gencode_genomic.corrected_merged.csv"
+        output:
+            metrics_tab = "Filtered_cells_RaceID/metrics.tab.RData"
+        params:
+            wdir=os.path.join(outdir,"Filtered_cells_RaceID"),
+            fINpath=lambda wildcards,input: os.path.join(outdir,input.merged_matrix)
+        log:
+            err='Filtered_cells_RaceID/logs/filt_cells.err',
+            out='Filtered_cells_RaceID/logs/filt_cells.out'
+        threads: 1
+        conda: CONDA_scRNASEQ_ENV
+        shell: "Rscript --no-save --no-restore " + os.path.join(workflow_rscripts,'scRNAseq_cell_filter_raceid.R ') + "{params.wdir} {params.fINpath} 1>{log.out} 2>{log.err}"
+
+
+rule cluster_cells_raceid:
+        input: 
+            metrics_tab = "Filtered_cells_RaceID/metrics.tab.RData"
+        output:
+            dummy="Filtered_cells_RaceID/sessionInfo.txt"
+        params:
+            wdir=os.path.join(outdir,"Filtered_cells_RaceID"),
+            fINpath=lambda wildcards,input: os.path.join(outdir,input.metrics_tab),
+            err='Filtered_cells_RaceID/logs/cluster_cells.err',
+            out='Filtered_cells_RaceID/logs/cluster_cells.out'
+        threads: 1
+        conda: CONDA_scRNASEQ_ENV
+        shell: "Rscript --no-save --no-restore " + os.path.join(workflow_rscripts,'scRNAseq_select_threshold_cluster_raceid.R ') + "{params.wdir} {params.fINpath} 1>{params.out} 2>{params.err}"
 
 
 rule sc_QC_metrics:
