@@ -51,6 +51,7 @@ res2L<-lapply(unique(sc@cpart),function(X){
         dg$Gene<-rownames(dg)
         return(dg)})
 top2<-as.data.frame(do.call(rbind,res2L))
+top2<-top2[with(top2, order(Cluster, padj)),]
 
 write.table(top2,paste0("minT",minTi,".Top2markers.txt"),sep="\t",row.names=TRUE,quote=FALSE)
 
@@ -67,6 +68,7 @@ res10L<-lapply(unique(sc@cpart),function(X){
         dg$Gene<-rownames(dg)
         return(dg)})
 top10<-as.data.frame(do.call(rbind,res10L))
+top10<-top10[with(top10, order(Cluster, padj)),]
 
 write.table(top10,paste0("minT",minTi,".Top10markers.txt"),sep="\t",row.names=TRUE,quote=FALSE)
 
@@ -77,12 +79,12 @@ dev.off()
 
 for(i in seq_along(unique(top2$Cluster))){
     clu<-unique(top2$Cluster)[i]
-    subdat<-as.data.frame(as.matrix(sc@ndata[top2$Gene[top2$Cluster %in% clu],])*min(sc@counts)+.1)
+    subdat<-as.data.frame(as.matrix(sc@ndata[top2$Gene[top2$Cluster %in% clu],,drop=FALSE])*min(sc@counts)+.1)
     subdat$GeneID<-rownames(subdat)
     plotdat<-melt(subdat,id.vars="GeneID",value.name="NormExpr",variable.name="CellID")
     plotdat$Cluster<-sc@cpart[match(plotdat$CellID,names(sc@cpart))]
-    plotdat$Cluster<-factor(plotdat$Cluster,levels=as.character(unique(plotdat$Cluster))[sort(unique(plotdat$Cluster))])
-    ggplot(data=plotdat)+geom_violin(aes(x=Cluster,y=NormExpr,fill=Cluster))+geom_boxplot(aes(x=Cluster,y=NormExpr),width=0.1)+ggtitle(paste0("Cluster ",clu))
+    plotdat$Cluster<-factor(plotdat$Cluster,levels=as.character(unique(plotdat$Cluster))[order(as.numeric(unique(plotdat$Cluster)))])
+    ggplot(data=plotdat)+geom_violin(aes(x=Cluster,y=NormExpr,fill=Cluster))+geom_boxplot(aes(x=Cluster,y=NormExpr),width=0.1)+ggtitle(paste0("Cluster ",clu))+facet_wrap(~GeneID)
     ggsave(paste0("Top2.clu",clu,".violin.png"),width=12,height=6)
     pdf(paste0("Top2.clu",clu,".featurePlot.pdf"),bg="white",onefile=TRUE)
     plotexpmap(sc,g=rownames(subdat)[1],n=rownames(subdat)[1],logsc=TRUE,fr=FALSE)
