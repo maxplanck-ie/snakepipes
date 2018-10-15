@@ -15,7 +15,7 @@ rule filterFragments:
         --maxFragmentLength {params.cutoff}
         """
 
-# necessary for that MACS2 BAMPE fails, if there is just one fragment mapped
+# MACS2 BAMPE fails if there is just one fragment mapped
 rule filterCoveragePerScaffolds:
     input:
         bam = os.path.join(outdir_MACS2, "{sample}.short.bam")
@@ -29,9 +29,10 @@ rule filterCoveragePerScaffolds:
     threads: 6
     conda: CONDA_SHARED_ENV
     shell: """
-        sambamba index -t {threads} {input.bam} &&
-        samtools idxstats {input.bam} | awk -v cutoff={params.count_cutoff} \'$3 > cutoff\' | cut -f 1 > {output.whitelist} &&
-        sambamba view -t {threads} -f bam -o {output.bam} {input.bam} $(cat {output.whitelist} | paste -sd\' \')
+        samtools index -@ {threads} {input.bam}
+        samtools idxstats {input.bam} | awk -v cutoff={params.count_cutoff} \'$3 > cutoff\' | cut -f 1 > {output.whitelist}
+        samtools view -@ {threads} -bo {output.bam} {input.bam} $(cat {output.whitelist} | paste -sd\' \')
+        samtools index -@ {threads} {output.bam}
         """
 
 # MACS2 BAMPE filter: samtools view -b -f 2 -F 4 -F 8 -F 256 -F 512 -F 2048
