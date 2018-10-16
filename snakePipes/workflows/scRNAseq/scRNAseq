@@ -19,7 +19,7 @@ import snakePipes.parserCommon as parserCommon
 def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfile": None, "max_jobs": 5, "snakemake_options": "--use-conda", "tempdir": None,
                          "downsample": False, "trim": False, "trim_options": "-a A{'30'}", "cell_names": None,
                          "filter_annotation": "-v -P 'decay|pseudogene' ", "barcode_file": None, "barcode_pattern": "NNNNNNXXXXXX", "split_lib": False,
-                         "bw_binsize": 10, "plot_format": "png"}):
+                         "bw_binsize": 10, "plot_format": "png", "skipRaceID": False}):
     """
     Parse arguments from the command line.
     """
@@ -108,6 +108,12 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
                           type=str,
                           help="Format of the output plots from deeptools. Select 'none' for no plot (default: '%(default)s')",
                           default=defaults["plot_format"])
+
+    optional.add_argument("--skipRaceID",
+                          dest="skipRaceID",
+                          action="store_true",
+                          default=defaults["skipRaceID"],
+                          help="Skip RaceID analysis.")
 
     return parser
 

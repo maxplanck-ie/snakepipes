@@ -43,6 +43,8 @@ bw_binsize: 10
 verbose: False
 plot_format: pdf
 dnaContam: False
+#Option to skip RaceID to save time
+skipRaceID: False
 ################################################################################
 # Call snakemake directly, i.e. without using the wrapper script:
 #
