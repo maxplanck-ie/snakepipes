@@ -138,7 +138,7 @@ def main():
         args.SNPfile = os.path.abspath(args.SNPfile)
         args.Nmasked_index = os.path.abspath(args.Nmasked_index)
     modeTemp = args.mode.split(",")
-    validModes = set(["alignment", "alignment-free", "deepTools_qc"])
+    validModes = set(["alignment", "alignment-free", "deepTools_qc", "allelic-mapping"])
     for mode in modeTemp:
         if mode not in validModes:
             sys.exit("{} is not a valid mode!\n".format(mode))
