@@ -1,7 +1,7 @@
 #run in R3.4.0
 #set working directory
 wdir<-commandArgs(trailingOnly=TRUE)[1]
-system(paste0('mkdir -p ',wdir)) #for debugging
+#system(paste0('mkdir -p ',wdir)) #for debugging
 setwd(wdir)
 message(sprintf("working directory is %s",getwd()))
 

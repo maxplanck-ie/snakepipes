@@ -62,6 +62,16 @@ def run_deeptools_qc():
                            "deepTools_qc/plotPCA/PCA.bed_coverage.tsv"] )
     return(file_list)
 
+def run_RaceID(skipRaceID):
+    if not skipRaceID:
+        file_list = [
+        "Filtered_cells_RaceID/metrics.tab.RData",
+        "Filtered_cells_RaceID/sessionInfo.txt"
+        ]
+        return(file_list)
+    else:
+        return([])
+
 ### execute before workflow starts #############################################
 ################################################################################
 onstart:
@@ -114,8 +124,7 @@ rule all:
         "QC_report/QC_report.all_samples.libstats_reads.tsv",
         "Filtered_cells_monocle/metrics.tab.RData",
         "Filtered_cells_monocle/sessionInfo.txt",
-        "Filtered_cells_RaceID/metrics.tab.RData",
-        "Filtered_cells_RaceID/sessionInfo.txt",
+        run_RaceID(skipRaceID),
         run_deeptools_qc(),
         "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv",
         expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample = samples),

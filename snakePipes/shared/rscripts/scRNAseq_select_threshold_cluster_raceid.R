@@ -43,23 +43,6 @@ png(paste0("sc.minT",minTi,".tsne.clu.png"))
 plotmap(sc,final=FALSE)
 dev.off()
 
-res2L<-lapply(unique(sc@cpart),function(X){
-        dg<-clustdiffgenes(sc,X,pvalue=.01)
-        dg<-dg[dg$fc>=2,]
-        dg<-head(dg,n=2)
-        dg$Cluster<-X
-        dg$Gene<-rownames(dg)
-        return(dg)})
-top2<-as.data.frame(do.call(rbind,res2L))
-top2<-top2[with(top2, order(Cluster, padj)),]
-
-write.table(top2,paste0("minT",minTi,".Top2markers.txt"),sep="\t",row.names=TRUE,quote=FALSE)
-
-genes <- unique(top2$Gene)
-png(paste0("sc.minT",minTi,".Top2markers.heatmap.png"))
-plotmarkergenes(sc,genes)
-dev.off()
-
 res10L<-lapply(unique(sc@cpart),function(X){
         dg<-clustdiffgenes(sc,X,pvalue=.01)
         dg<-dg[dg$fc>=2,]
@@ -77,6 +60,17 @@ png(paste0("sc.minT",minTi,".Top10markers.heatmap.png"))
 plotmarkergenes(sc,genes)
 dev.off()
 
+res2L<-lapply(unique(sc@cpart),function(X){
+        head(top10[top10$Cluster %in% X,],n=2)})
+top2<-as.data.frame(do.call(rbind,res2L))
+top2<-top2[with(top2, order(Cluster, padj)),]
+write.table(top2,paste0("minT",minTi,".Top2markers.txt"),sep="\t",row.names=TRUE,quote=FALSE)
+
+genes <- unique(top2$Gene)
+png(paste0("sc.minT",minTi,".Top2markers.heatmap.png"))
+plotmarkergenes(sc,genes)
+dev.off()
+
 for(i in seq_along(unique(top2$Cluster))){
     clu<-unique(top2$Cluster)[i]
     subdat<-as.data.frame(as.matrix(sc@ndata[top2$Gene[top2$Cluster %in% clu],,drop=FALSE])*min(sc@counts)+.1)
@@ -88,7 +82,8 @@ for(i in seq_along(unique(top2$Cluster))){
     ggsave(paste0("Top2.clu",clu,".violin.png"),width=12,height=6)
     pdf(paste0("Top2.clu",clu,".featurePlot.pdf"),bg="white",onefile=TRUE)
     plotexpmap(sc,g=rownames(subdat)[1],n=rownames(subdat)[1],logsc=TRUE,fr=FALSE)
-    plotexpmap(sc,g=rownames(subdat)[2],n=rownames(subdat)[2],logsc=TRUE,fr=FALSE)
+    if(nrow(subdat)>1){
+    plotexpmap(sc,g=rownames(subdat)[2],n=rownames(subdat)[2],logsc=TRUE,fr=FALSE)}
     dev.off()
     
 }
