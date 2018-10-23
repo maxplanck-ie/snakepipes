@@ -5,5 +5,7 @@ channels:
   - conda-forge
 
 dependencies:
-  - r-rmarkdown=0.9.5
+  - r-rmarkdown
   - r-pander
+  - r-stringi
+  - pandoc=1.19.2
