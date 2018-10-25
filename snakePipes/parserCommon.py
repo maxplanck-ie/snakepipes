@@ -106,6 +106,34 @@ def mainArguments(defaults, workingDir=False, createIndices=False):
                          action="version",
                          version="%(prog)s {}".format(__version__))
 
+    emailArgs = parser.add_argument_group('Email Arguments')
+    emailArgs.add_argument("--emailAddress",
+                           help="If specified, send an email upon completion to the given email address")
+
+    emailArgs.add_argument("--smtpServer",
+                           defaults=defaults["smtpServer"],
+                           help="If specified, the email server to use.")
+
+    emailArgs.add_argument("--smtpPort",
+                           type=int,
+                           defaults=defaults["smtpPort"],
+                           help="The port on the SMTP server to connect to. A value of 0 specifies the default port.")
+
+    emailArgs.add_argument("--onlySSL",
+                           action="store_true",
+                           defaults=defaults["onlySSL"],
+                           help="The SMTP server requires an SSL connection from the beginning.")
+
+    emailArgs.add_argument("--emailSender",
+                           defaults=defaults["emailSender"],
+                           help="The address of the email sender. If not specified, it will be the address indicated by `--emailAddress`")
+
+    emailArgs.add_argument("--smtpUsername"
+                           help="If your SMTP server requires authentication, this is the username to use.")
+
+    emailArgs.add_argument("--smtpPassword"
+                           help="If your SMTP server requires authentication, this is the username to use.")
+
     return parser
 
 
