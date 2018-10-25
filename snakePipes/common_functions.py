@@ -479,8 +479,7 @@ def predict_chip_dict(wdir):
         if len(prefix_matches) > 0:
             final_matches = prefix_matches
 
-        if len(suffix_matches) > 0 and (len(prefix_matches) == 0
-                                   or len(suffix_matches) < len(prefix_matches)):
+        if len(suffix_matches) > 0 and (len(prefix_matches) == 0 or len(suffix_matches) < len(prefix_matches)):
             final_matches = suffix_matches
 
         if len(prefix_matches) == len(suffix_matches) and len(prefix_matches) > 0:
