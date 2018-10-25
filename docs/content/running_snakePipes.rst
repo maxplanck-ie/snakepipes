@@ -1,58 +1,47 @@
 Running snakePipes
 ==================
 
-Pipelines under snakePipes are designed in a modular way such that all are configured and ran in a similar way.
+Pipelines under snakePipes are designed in a way such that all workflows are configured and ran in a similar way.
 
 
 Here's an example with ChIP-seq data.
 
-A **typical ChIP-seq analysis of human samples** starting from paired-end FASTQ files in the directory `input-dir`:
+A **typical ChIP-seq analysis** of human samples starts from paired-end FASTQ files in the directory `input-dir`:
 
 .. code:: bash
 
     $ ls /path/to/input-dir/
     my_H3K27ac_sample_R1.fastq.gz  my_H3K27me3_sample_R1.fastq.gz  my_Input_sample_R1.fastq.gz
     my_H3K27ac_sample_R2.fastq.gz  my_H3K27me3_sample_R2.fastq.gz  my_Input_sample_R2.fastq.gz
-    $
-    $ DNA-mapping \
-          -i /path/to/input-dir -o /path/to/output-dir --dedup hs37d5 && \
-      ChIP-seq chip-seq.config.yaml \
-          -d /path/to/outputdir hs37d5
 
-Here, hs37d5 is the name of the genome. The yaml file corresponding to this genome should exist under `snakePipes/shared/organisms/hs37d5.yaml`.
-This yaml file should have paths to the required genome fasta, index, GTF and other annotations (see **Genome configuration file** below).
+The :doc:`ChIP-seq` workflow requires the files to be processed via the :doc:`DNA-mapping` workflow first. We therefore run the DNA-mapping workflow :
 
-All individual jobs of the workflow will be submitted to the Grid engine using the command specified under /shared/cluster.yaml.
-To run the workflow locally, use the parameter `--local` for local mode and the parameter `-j 48` to specify the maximal
-number of used CPU threads (here: 48) or concurrent running Slurm jobs (actual used threads are defined in each rule).
+.. code:: bash
 
+    $ DNA-mapping -i /path/to/input-dir -o /path/to/output-dir --mapq 5 -j 10 --dedup hs37d5
 
-Genome configuration file
--------------------------
+* *--mapq 5* would filter mapped reads for a minimum mapping quality of 5. This would keep only primary alignments from bowtie2, sufficient for downstream analysis.
 
-Setting up of **organism yaml** files has been described in :doc:`setting_up`.
-Below is an explanation of each key mentioned in the organism yaml file.
+* *--dedup* would remove PCR duplicates (reads with matching 5' position in the genome), a typical step in ChIP-Seq analysis.
 
-::
+* *-j 10* defines 10 jobs to be run in parallel on the cluster (see below).
 
-    genome_size: # Integer, size of genome in base-pairs
-    genome_fasta: # path to genome.fasta for mapping
-    genome_index: # path to genome.fasta.fai (fasta index) for mapping
-    genome_2bit: # OPTIONAL. Needed for GC bias estimation by deepTools
-    bowtie2_index: # Needed for DNA-mapping workflow
-    hisat2_index: # index of the genome.fasta using HISAT2, needed for RNA-seq workflow
-    known_splicesites: # needed by HISAT2 for RNA-seq workflow
-    star_index: # index of the genome.fasta using STAR, needed for RNA-seq workflow
-    genes_bed: # Needed for QC and annotation in DNA-mapping/RNA-Seq workflows
-    genes_gtf: # Needed for QC and annotation in DNA-mapping/RNA-Seq workflows
-    blacklist_bed: # OPTIONAL. For QC and filtering of regions in multiple workflows.
+* *hs37d5* is the name of the genome (keyword for the yaml). The yaml file corresponding to this genome should exist as `snakePipes/shared/organisms/hs37d5.yaml`. (see :doc:`content/setting_up` for details).
+
+All individual jobs of the workflow will be submitted to the Grid engine using the command specified under /shared/cluster.yaml. The parameter `-j` defines the number of jobs to be run in parallel, while the number of threads per job is hard-coded in the workflows.
+
+**To run the workflow locally**, use the parameter `--local` for local mode and the parameter `-j 10` to specify the maximal number of used CPU threads (here: 10).
 
 
-.. note:: Some fields are optional and can be left empty. For example, if a blacklist file
-          is not available for your organism of interest, leave `blacklist_bed:` empty.
-          Files for either STAR or HISAT2 could be skipped for RNA-seq if the respective
-          aligner is not used. We nevertheless recommended providing all the files, to allow
-          more flexible analysis.
+Once the DNA-mapping run is finished sucessfully. We can run the ChIP-seq analysis in the same directory. The ChIP-seq workflow would follow up from the DNA-mapping outputs and perform peak calling, create ChIP-input normalized coverage files and also do differential (control-test) analysis if a sample information file is provided (see :ref:`sampleinfo`).
+
+.. code:: bash
+
+    $  ChIP-seq -d /path/to/dna-mapping-output/ hs37d5 chip-samples.yaml
+
+
+
+.. _sampleinfo:
 
 The sample_info tsv file
 ------------------------
