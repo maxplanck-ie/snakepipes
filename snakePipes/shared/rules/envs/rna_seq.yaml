@@ -18,5 +18,11 @@ dependencies:
  - r-dplyr=0.7.4
  - r-ggplot2=2.2.1
  - r-pheatmap
- - bioconductor-deseq2=1.18.1 
+ - r-rmarkdown
+ - r-knitr >=1.6
+ - pandoc=1.19.2
+ - r-dt
+ - r-rcolorbrewer
+ - bioconductor-deseq2=1.18.1
  - bioconductor-biomart=2.34.2
+# knitcitations missing from bioconda
