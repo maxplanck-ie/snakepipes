@@ -116,7 +116,8 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
                           type=str,
                           metavar="STR",
                           help="A .tsv file containing sample names and associated groups. "
-                          "If provided, the file would be used to identify groups to merge the samples "
+                          "If provided, the file would be used to identify groups to merge the samples. "
+                          "An example can be found at snakePipes/shared/sampleInfo.example.tsv"
                           "(default: None)")
 
     return parser
