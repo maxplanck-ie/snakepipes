@@ -3,22 +3,27 @@
 WGBS
 ====
 
-Input requirements
-------------------
-
-This pipeline requires paired-end reads fastq files and a bisulfite converted genome as inputs.
-Optional inputs include bed files with genomic intervals of interest, used to aggregate single CpG values over; a sample sheet with grouping information to use in differential methylation analysis; a blacklist bed file with genomic positions corresponding to known snps to mask single CpG methylation values.
-
-
 What it does
 ------------
 
-Optionally trimmed reads are mapped to reference genome using a bisulfite-specific aligner (bwa-meth).
-Quality metrics are collected and synthesized in a QC report, including bisulfite conversion rate, mapping rate, percentage CpGs covered a least 10x, methylation bias.
-Methylation ratios are extracted (MethylDackel) for CpG positions in the reference genome and filtered for minimum coverage (10x), snp allelic frequency (<0.25 illegitimate bases).
-If sample sheet is provided, logit-transformed beta values for CpG positions are tested for differential methylation using limma.
-Metilene is called to detect de novo DMRs. In addition to the nonparametric statistics output by metilene, limma-derived statistics are recalculated for DMRs, which are further annotated with nearest gene information.
-If bed file(s) with genomic intervals of interest are provided, methylation ratios are aggregated over those and limma is used on logit-transformed methylation ratios to test for differential methylation.
+The WGBS pipeline performs mapping, extraction of methylation signal, and (optionally) differential methylation analysis from FASTQ files.
+
+ * Reads are trimmed (optional) and mapped to reference genome using a bisulfite-specific aligner (`bwa-meth <https://arxiv.org/abs/1401.1129>`__). Quality metrics are collected and synthesized in a QC report, including bisulfite conversion rate, mapping rate, percentage CpGs covered a least 10x, methylation bias.
+
+ * Methylation ratios are extracted (`MethylDackel <https://github.com/dpryan79/MethylDackel>`__) for CpG positions in the reference genome and filtered for minimum coverage (10x), snp allelic frequency (<0.25 illegitimate bases).
+
+ * If a **sample sheet** is provided, logit-transformed beta values for CpG positions are tested for differential methylation using `limma <https://academic.oup.com/nar/article/43/7/e47/2414268>`__. `Metilene <https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4728377/>`__ is used to detect de novo DMRs. In addition to the nonparametric statistics output by metilene, limma-derived statistics are recalculated for DMRs, which are further annotated with nearest gene information.
+
+ * If bed file(s) with genomic intervals of interest are provided, methylation ratios are aggregated over those and limma is used on logit-transformed methylation ratios to test for differential methylation.
+
+
+Input requirements
+------------------
+
+This pipeline requires paired-end fastq files and a bisulfite converted genome as inputs.
+Optional inputs include bed files with genomic intervals of interest, used to aggregate single CpG values over; a sample sheet with grouping information to use in differential methylation analysis; a blacklist bed file with genomic positions corresponding to known snps to mask single CpG methylation values.
+
+
 
 
 .. image:: ../images/WGBS_pipeline.png
@@ -81,19 +86,6 @@ Workflow configuration file
 	trimThreshold: 10
 	trimOtherArgs:
 	verbose: False
-	################################################################################
-	# Call snakemake directly, i.e. without using the wrapper script:
-	#
-	# Please save a copy of this config yaml file and provide an adjusted config
-	# via '--configfile' parameter!
-	# example call:
-	#
-	# snakemake --snakefile /path/to/snakemake_workflows/workflows/WGBS/Snakefile
-	#           --configfile /path/to/snakemake_workflows/workflows/WGBS/defaults.yaml
-	#           --directory /path/to/outputdir
-	#           --cores 32
-	################################################################################
-
 
 Structure of output directory
 -----------------------------

@@ -123,10 +123,10 @@ Running `snakePipes createEnvs` is not strictly required, but facilitates multip
 Configure the organisms
 -----------------------
 
-For each organism of your choice, create a file called `shared/organisms/<organism>.yaml` and
-fill the paths to the required files next to the corresponding yaml entry. For common organisms, the required files are downloaded and the yaml entries can be created automatically via the workflow `createIndicies`.
+For each organism of your choice, create a file called ``shared/organisms/<organism>.yaml`` and
+fill the paths to the required files next to the corresponding yaml entry. For common organisms, the required files are downloaded and the yaml entries can be created automatically via the workflow ``createIndicies``.
 
-The yaml files look like this after the setup (an example from drosophila genome `dm3`) :
+The yaml files look like this after the setup (an example from drosophila genome ``dm3``) :
 
 .. parsed-literal::
 
@@ -173,7 +173,7 @@ After setting up the yamls, we can execute a snakePipes workflow on the organism
 Configure your cluster
 ----------------------
 
-The `cluster.yaml` file contains both the default memory requirements as well as two options passed to snakemake that control how jobs are submitted to the cluster and files are retrieved::
+The ``cluster.yaml`` file contains both the default memory requirements as well as two options passed to snakemake that control how jobs are submitted to the cluster and files are retrieved::
 
     snakemake_latency_wait: 300
     snakemake_cluster_cmd: module load slurm; SlurmEasy --mem-per-cpu {cluster.memory} --threads {threads} --log
@@ -182,16 +182,16 @@ The `cluster.yaml` file contains both the default memory requirements as well as
     snp_split:
         memory: 10G
 
-If you have cloned the repository locally, the file is located under `snakePipes/shared/`.
+If you have cloned the repository locally, the file is located under ``snakePipes/shared/``.
 
-You can change the default per-core memory allocation if needed here. Importantly, the `snakemake_cluster_cmd` option must be changed to match your needs. Whatever command you specify must include a `{cluster.memory}` option and a `{threads}` option. You can specify other required options here as well. The `snakemake_latency_wait` value defines how long snakemake should wait for files to appear before throwing an error. The default of 300 seconds is typically reasonable when a file system such as `NFS <https://en.wikipedia.org/wiki/Network_File_System>`__ is in use.
+You can change the default per-core memory allocation if needed here. Importantly, the ``snakemake_cluster_cmd`` option must be changed to match your needs. Whatever command you specify must include a `{cluster.memory}` option and a ``{threads}`` option. You can specify other required options here as well. The ``snakemake_latency_wait`` value defines how long snakemake should wait for files to appear before throwing an error. The default of 300 seconds is typically reasonable when a file system such as `NFS <https://en.wikipedia.org/wiki/Network_File_System>`__ is in use.
 
 .. _workflowOpts:
 
 Configure default options for workflows
 ---------------------------------------
 
-The default options for all command-line arguments as well as for the cluster (memory) are stored in the workflow-specific folders. If you have cloned the repository locally, these files are located under `snakePipes/workflows/<workflow_name>` folder. You can modify the values in these yamls to suite your needs. Most of the default values could also be replaced from the command line wrappers while executing a workflow.
+The default options for all command-line arguments as well as for the cluster (memory) are stored in the workflow-specific folders. If you have cloned the repository locally, these files are located under ``snakePipes/workflows/<workflow_name>`` folder. You can modify the values in these yamls to suite your needs. Most of the default values could also be replaced from the command line wrappers while executing a workflow.
 
 Below are some of the workflow defaults from the DNA-mapping pipeline. Empty sections means no default is set:
 

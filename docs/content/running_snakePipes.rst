@@ -28,30 +28,35 @@ The :doc:`ChIP-seq` workflow requires the files to be processed via the :doc:`DN
 
 * *hs37d5* is the name of the genome (keyword for the yaml). The yaml file corresponding to this genome should exist as `snakePipes/shared/organisms/hs37d5.yaml`. (see :doc:`content/setting_up` for details).
 
-All individual jobs of the workflow will be submitted to the Grid engine using the command specified under /shared/cluster.yaml. The parameter `-j` defines the number of jobs to be run in parallel, while the number of threads per job is hard-coded in the workflows.
+All individual jobs of the workflow will be submitted to the Grid engine using the command specified under /shared/cluster.yaml. The parameter ``-j`` defines the number of jobs to be run in parallel, while the number of threads per job is hard-coded in the workflows.
 
-**To run the workflow locally**, use the parameter `--local` for local mode and the parameter `-j 10` to specify the maximal number of used CPU threads (here: 10).
+**To run the workflow locally**, use the parameter ``--local`` for local mode and the parameter ``-j 10`` to specify the maximal number of used CPU threads (here: 10).
 
+**For single-end FASTQ files**, the workflow would automatically recognize them if the file name has no suffix (eg. "sample1.fastq" instead of "sample1_R1.fastq"). However, mixing of single and paired-end files in the same folder is not supported currently.
 
-Once the DNA-mapping run is finished sucessfully. We can run the ChIP-seq analysis in the same directory. The ChIP-seq workflow would follow up from the DNA-mapping outputs and perform peak calling, create ChIP-input normalized coverage files and also do differential (control-test) analysis if a sample information file is provided (see :ref:`sampleinfo`).
+Once the DNA-mapping run is finished sucessfully. We can run the ChIP-seq analysis in the same directory.
 
 .. code:: bash
 
     $  ChIP-seq -d /path/to/dna-mapping-output/ hs37d5 chip-samples.yaml
 
+* *-d * specifies the directory where the output of DNA-mapping workflow lies. The ChIP-seq workflow would also write it's output there.
 
+* *hs37d5* is the name of the genome (keyword for the yaml).
+
+* *chip-samples.yaml* is a yaml file that defines for each ChIP sample, the corresponding control (input) sample and the type of mark (broad/sharp). See :doc:`ChIP-seq` for more details on how to setup this yaml file.
+
+The ChIP-seq workflow would follow up from the DNA-mapping outputs and perform peak calling, create ChIP-input normalized coverage files and also perform differential (control-test) analysis if a sample information file is provided (see below).
 
 .. _sampleinfo:
 
-The sample_info tsv file
-------------------------
+The sample sheet
+-----------------
 
 Most of the workflows allow users to perform grouped operations as an option, for example
 differential expression analysis in RNA-seq workflow, differential binding analysis in
 ChIP-Seq workflow, differential open-chromatin analysis in ATAC-seq workflow or merging of
-groups in Hi-C workflow. For all this analysis, snakePipes needs a sample_info.tsv file that
-contains sample grouping information. In most cases users would want to groups samples by
-replicates. The format of the file is as follows:
+groups in Hi-C workflow. For all this analysis, snakePipes needs a ``sampleSheet.tsv`` file (file name is not important, but it has to be tab-separated) that contains sample grouping information. In most cases users would want to groups samples by replicates. The format of the file is as follows:
 
 ::
 
@@ -64,7 +69,27 @@ replicates. The format of the file is as follows:
 The name section referes to sample names (without the read suffix), while the condition
 section refers to sample group (control/test, male/female, normal/diseased etc..)
 
-Advanced usage
---------------
 
-It's also possible to directly run `snakemake`, please see :doc:`advanced_usage` for more information.
+Common considerations for all workflows
+----------------------------------------
+
+All of the snakePipes workflows that begin with a FASTQ file, perform the same pre-processing steps.
+
+ * **Linking/downsampling the FASTQ file** : The FASTQ rule in the workflows links the input FASTQ file into the FASTQ folder in the output directory. If ``downsampling`` is specified, the FASTQ folder would contain the downsampled FASTQ file.
+
+.. note:: The DNA-mapping and RNA-mapping pipelines can take either single, or paired-end FASTQ files. For paired-end data, the reads ``R1`` and ``R2`` are expected to have the suffix ``_R1`` and ``_R2`` respectively, which can be modified in the ``defaults.yaml`` file using the ``reads`` key, to your needs. For example, files downloaded from NCBI would normally have the extention ``.1.fastq.gz`` and ``.2.fastq.gz``. Also, please check the ``ext`` key in the configuration file if you wish to modify the read extension (default is ``.fastq.gz``).
+
+
+ * **Quality/adapter trimming** (optional): If ``--trim`` is selected, the `trimming` rule would run the selected program (either `Trimgalore <https://www.bioinformatics.babraham.ac.uk/projects/trim_galore/>`__, or `Cutadapt <https://journal.embnet.org/index.php/embnetjournal/article/view/200/479>`__) on the files in the FASTQ folder, and would produce another folder with name `FASTQ_<program>`, where <program> is either `Cutadapt` or `Trimgalore`.
+
+ * **FastQC** (optional): If ``--fastqc`` is specified, the `FASTQC` rule would run `FastQC <https://www.bioinformatics.babraham.ac.uk/projects/fastqc/>`__ on the input files and store the output under `FastQC` folder. If trimming is specified, FastQC is always produced on trimmed files, and stored under `FastQC_trimmed` folder.
+
+ * **MultiQC** : All workflows in snakePipes output a `MultiQC` folder, which summerizes the QC metrics obtained from various tools in the workflow via `MultiQC <https://multiqc.info/>`__, in an interactive HTML report. This output is quite useful to compare samples and get an overview of the data quality from all samples.
+
+ * **--snakemake_options**: All wrappers contain a ``--snakemake_options`` parameter, which is quite useful as it can be used to pass on any arguments directly to snakemake. One use case is to perform a *dry run*, i.e. to check which programs would be executed and which outputs would be created by the workflow, without actually running it. This can be executed via ``--snakemake_options -np ``. This would also print the commands to be used during the run.
+
+ * **--DAG**: All workflows can produce a `directed acyclic graph <https://en.wikipedia.org/wiki/Directed_acyclic_graph>`__ of themselves, using the `--DAG` option in the wrappers. This could be useful in reporting/presenting the results.
+
+ * **--tempdir and --notemp**: These options control where the temporary/intermediate processing files are written during the workflow (option: ``--tempdir``) and whether they are to be kept after the workflow is finished (option: `--notemp`). Normally the temporary files are removed after analysis.
+
+.. note:: It's useful to configure the ``--tempdir`` during setup of snakePipes, such that it points to an appropriate temporary folder on your machine/cluster.

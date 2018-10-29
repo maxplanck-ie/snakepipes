@@ -4,7 +4,7 @@ Advanced usage of snakePipes
 Calling snakemake without using the wrapper script:
 ---------------------------------------------------
 
-Please save a copy of this config yaml file and provide an adjusted config via '--configfile' parameter!
+It's also possible to directly run ``snakemake``. Please save a copy of this config yaml file and provide an adjusted config via ``--configfile`` parameter!
 
 example call::
 
