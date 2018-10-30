@@ -74,6 +74,7 @@ As you can see above, the same control can be used for multiple samples.
 
 .. note:: Set the flag broad to `True` for broad marks, such as H3K27me and H3K9me3
 
+.. _diffBinding:
 
 Differential Binding analysis
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -97,6 +98,7 @@ The differential binding module utilizes the R package `CSAW <https://bioconduct
 
 .. note:: If you name a group of samples as "control" in the sample sheet, the peaks present in these samples would not be used to create the union of peaks for testing. This is useful for conditions where you want to test between two groups, but only on the peaks from one group.
 
+.. _config:
 
 Configuration file
 ~~~~~~~~~~~~~~~~~~
@@ -127,8 +129,8 @@ There is a configuration file in `snakePipes/workflows/ChIP-seq/defaults.yaml`::
 
 The only parameters that are useful to change are `bw_binsize`, `fragment_length`, and `window_size`. Note however that those can be more conveniently changed on the command line.
 
-Structure of output directory
------------------------------
+Understanding the outputs
+---------------------------
 
 The ChIP-seq pipeline will generate additional output as follows::
 
@@ -166,18 +168,16 @@ The ChIP-seq pipeline will generate additional output as follows::
         ├── sample2.filtered.BAMPE_peaks.gappedPeak
         └── sample2.filtered.BAMPE_peaks.xls
 
-Understanding the outputs
----------------------------
 
 Following up on the DNA-mapping module results (see :doc:`DNA-mapping`), the workflow produces the following output directories :
 
-* **deepTools_ChIP**:
+* **deepTools_ChIP**: Contains output from two of the deepTools modules. The `bamCompare <https://deeptools.readthedocs.io/en/develop/content/tools/bamCompare.html>`__ output contains the input-normalized coverage files for the samples, which is very useful for downstream analysis, such as visualization in IGV and plotting the heatmaps. The `plotFingerPrint <https://deeptools.readthedocs.io/en/develop/content/tools/plotFingerprint.html>`__ output is a useful QC plot to assess signal enrichment in the ChIP samples.
 
-* **MACS2**:
+* **MACS2**: This folder contains the output of `MACS2 <https://github.com/taoliu/MACS>`__ on the ChIP samples, MACS2 would perform either a **narrow** or **broad** peak calling on the samples, as indicated by the ChIP sample configuration file (see :ref:`config`). The outputs files would contain the respective tags (**narrowPeak** or **broadPeak**).
 
-* **histoneHMM**: will only exist if you have broad marks.
+* **histoneHMM**: This folder contains the output of `histoneHMM<https://github.com/matthiasheinig/histoneHMM>`__. This folder will only exist if you have broad marks.
 
-* **CSAW**: This folder is created optionally, if you provide a sample sheet for differential binding analysis.
+* **CSAW**: This folder is created optionally, if you provide a sample sheet for differential binding analysis. (see :ref:`diffBinding`)
 
 .. note:: Although in case of broad marks, we also perform the MACS2 `broadpeak` analysis (output available as ``MACS2/<sample>.filtered.BAM_peaks.broadPeak``), we would recommend using the histoneHMM outputs in these cases, since histoneHMM produces better results than MACS2 for broad peaks.
 

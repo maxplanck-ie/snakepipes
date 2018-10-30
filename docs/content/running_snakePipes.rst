@@ -93,3 +93,5 @@ All of the snakePipes workflows that begin with a FASTQ file, perform the same p
  * **--tempdir and --notemp**: These options control where the temporary/intermediate processing files are written during the workflow (option: ``--tempdir``) and whether they are to be kept after the workflow is finished (option: `--notemp`). Normally the temporary files are removed after analysis.
 
 .. note:: It's useful to configure the ``--tempdir`` during setup of snakePipes, such that it points to an appropriate temporary folder on your machine/cluster.
+
+* **--bw_binsize**: This option is available for most workflows, and refers to the bin size used to create the coverage files. `BigWig files <https://genome.ucsc.edu/goldenpath/help/bigWig.html>`__ are created by most workflows in order to allow downstream analysis and visualization of outputs. This argument controls the size of the bins in which the genome is divided for creating this file. The default is sufficient for most analysis.
