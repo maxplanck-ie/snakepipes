@@ -168,12 +168,11 @@ Understanding the outputs
 
 - **Main result:** the genes per cell count table with poisson-corrected counts can be found under ``Results/all_samples.gencode_genomic.corrected_merged.csv``
 
-- corresponding annotation files are: ``Annotation/genes.filtered.bed`` and ``Annotation/genes.filtered.gtf``, respectively
+- corresponding annotation files are: ``Annotation/genes.filtered.bed`` and ``Annotation/genes.filtered.gtf``, respectively.
 
-- the folders `QC_report`, `FASTQC`, `deeptools_qc` and `multiQC` contain various QC tables and 
-plots.
+- the folders ``QC_report``, ``FASTQC``, ``deeptools_qc`` and ``multiQC`` contain various QC tables and plots.
 
-- **Sambamba** and **STAR_genomic** directories contain the output file from duplicate marking and genomic alignments, respectively
+- **Sambamba** and **STAR_genomic** directories contain the output file from duplicate marking and genomic alignments, respectively.
 
 Filtered_cells_monocle
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
