@@ -7,7 +7,6 @@ import subprocess
 
 ### MACS2 peak calling #########################################################
 
-
 if paired:
     rule MACS2:
         input:
@@ -22,15 +21,12 @@ if paired:
         params:
             fragment_length = lambda wildcards: cf.get_fragment_length("deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv", wildcards.chip_sample),
             genome_size = genome_size,
-            # TODO: test BAMPE mode and activate BAMPE for paired-end data and BAM for single-end data
-            # if results of BAMPE and BAM are in good agreement for paired-end data
-            # does BAMPE mode really extends each read pair or does it only estimate a mean fragment size? the latter would be no advantage over BAM mode
-            # format = "-f BAMPE" if paired else "-f BAM"
             broad_calling =
                 lambda wildcards: "--broad" if is_broad(wildcards.chip_sample) else "",
             control_param =
                 lambda wildcards: "-c filtered_bam/"+get_control(wildcards.chip_sample)+".filtered.bam" if get_control(wildcards.chip_sample)
                 else "",
+            bampe = lambda wildcards: TRUE if bamPE is True else []
         log:
             out = "MACS2/logs/MACS2.{chip_sample}.filtered.out",
             err = "MACS2/logs/MACS2.{chip_sample}.filtered.err"
@@ -44,12 +40,15 @@ if paired:
                 --outdir MACS2 --name {wildcards.chip_sample}.filtered.BAM \
                 --nomodel --extsize {params.fragment_length} {params.broad_calling} > {log.out} 2> {log.err}
 
-            # also run MACS2 in paired-end mode BAMPE for comparison with single-end mode
-            macs2 callpeak -t {input.chip} \
-                {params.control_param} -f BAMPE \
-                -g {params.genome_size} --keep-dup all \
-                --outdir MACS2 --name {wildcards.chip_sample}.filtered.BAMPE \
-                {params.broad_calling} > {log.out}.BAMPE 2> {log.err}.BAMPE
+            if [{params.bampe} == "TRUE"]
+            then
+                # also run MACS2 in paired-end mode BAMPE for comparison with single-end mode
+                macs2 callpeak -t {input.chip} \
+                    {params.control_param} -f BAMPE \
+                    -g {params.genome_size} --keep-dup all \
+                    --outdir MACS2 --name {wildcards.chip_sample}.filtered.BAMPE \
+                    {params.broad_calling} > {log.out}.BAMPE 2> {log.err}.BAMPE
+            fi
             """
 else:
     rule MACS2:
