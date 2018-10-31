@@ -4,8 +4,8 @@ if downsample:
     if paired:
         rule FASTQdownsample:
             input:
-                r1 = indir+"/{sample}"+reads[0]+".fastq.gz",
-                r2 = indir+"/{sample}"+reads[1]+".fastq.gz"
+                r1 = indir+"/{sample}"+reads[0]+ext,
+                r2 = indir+"/{sample}"+reads[1]+ext
             output:
                 r1 = "FASTQ/{sample}"+reads[0]+".fastq.gz",
                 r2 = "FASTQ/{sample}"+reads[1]+".fastq.gz"
