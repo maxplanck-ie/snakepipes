@@ -18,8 +18,10 @@ rule DESeq2:
         outdir = get_outdir("DESeq2"),
         fdr = 0.05,
         importfunc = os.path.join(maindir, "shared", "rscripts", "DE_functions.R"),
+        report_template = os.path.join(maindir, "shared", "rscripts", "DESeq2Report.Rmd"),
         allele_info = lambda wildcards : 'TRUE' if 'allelic-mapping' in mode else 'FALSE',
-        tx2gene_file = 'NA'
+        tx2gene_file = 'NA',
+        rmdTemplate = os.path.join(maindir, "shared", "rscripts", "DESeq2Report.Rmd")
     log:
         out = "DESeq2.out",
         err = "DESeq2.err"
@@ -34,6 +36,7 @@ rule DESeq2:
         "{params.importfunc} " # 5
         "{params.allele_info} " # 6
         "{params.tx2gene_file} " # 7
+        "{params.rmdTemplate} " # 8
         " > {log.out} 2> {log.err}"
 
 
