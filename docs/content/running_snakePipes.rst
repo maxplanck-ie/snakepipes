@@ -103,3 +103,16 @@ All of the snakePipes workflows that begin with a FASTQ file, perform the same p
 
 
 * **--bw_binsize**: This option is available for most workflows, and refers to the bin size used to create the coverage files. `BigWig files <https://genome.ucsc.edu/goldenpath/help/bigWig.html>`__ are created by most workflows in order to allow downstream analysis and visualization of outputs. This argument controls the size of the bins in which the genome is divided for creating this file. The default is sufficient for most analysis.
+
+Logging of outputs
+~~~~~~~~~~~~~~~~~~~
+
+snakePipes produces logs at three diferrent levels.
+
+* **<workflow>.log**: This file would be generated on the working directory, and contains everything printed on the screen via snakemake and python wrappers.
+
+* **cluster_logs**: In case snakePipes is setup with a cluster, the folder ``cluster_logs`` would contain the output and error messages from the cluster scheduler.
+
+* **<output>/logs**: Each output folder from snakePipes workflows contain their own log (``.err`` and ``.out``) file under ``/logs/`` folder. This contains the messages directly from the executed tools.
+
+.. note:: For most cases where a tool fails, these files contain useful debuggin information. However sometimes, the error can't be captured in these files and therefore ends up in the ``cluster_logs`` folder.
