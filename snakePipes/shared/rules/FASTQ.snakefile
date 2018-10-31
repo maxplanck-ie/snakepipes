@@ -39,4 +39,4 @@ else:
         output:
             "FASTQ/{sample}{read}.fastq.gz"
         shell:
-            "( [ -f {output} ] || ln -s -r {input} {output} ) && touch -h {output}"
+            "( [ -f {output} ] || ln -s -r {input} {output} )"
