@@ -28,7 +28,6 @@ else:
 	
 mapping_prg = "STAR_genomic"
 
-star_options = "--twopassMode Basic"
 hisat_options = ""
 
 ### Initialization #############################################################

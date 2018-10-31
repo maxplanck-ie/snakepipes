@@ -1,2 +1,4 @@
 ATAC_qc:
-    memory: 1G
+    memory: 2G
+MACS2:
+    memory: 2G

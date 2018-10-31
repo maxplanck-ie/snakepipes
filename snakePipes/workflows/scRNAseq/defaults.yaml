@@ -32,6 +32,8 @@ downsample:
 trim: False
 trim_prg: cutadapt
 trim_options: -a A{'30'}
+## N.B., setting --outBAMsortingBinsN too high can result in cryptic errors
+star_options: "--outBAMsortingBinsN 30 --twopassMode Basic"
 ## further options
 filter_annotation: "-v -P 'decay|pseudogene' "
 barcode_file:
