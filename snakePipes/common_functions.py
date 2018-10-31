@@ -123,9 +123,7 @@ def is_paired(infiles, ext, reads):
         fname = os.path.basename(infile).replace(ext, "")
         m = re.match("^(.+)(" + reads[0] + "|" + reads[1] + ")$", fname)
         if m:
-            # print(m.group())
             bname = m.group(1)
-            # print(bname)
             if bname not in infiles_dic:
                 infiles_dic[bname] = [infile]
             else:
@@ -275,9 +273,8 @@ def sendEmail(args, returnCode):
         s.send_message(msg)
         s.quit()
     except:
-        sys.write("An error occured while sending the email.\n")
+        sys.stderr.write("An error occured while sending the email.\n")
         pass
-
 
 
 def checkCommonArguments(args, baseDir, outDir=False, createIndices=False):
@@ -325,8 +322,10 @@ def checkCommonArguments(args, baseDir, outDir=False, createIndices=False):
 
     if args.emailAddress:
         # Must have at least an email server specified
-        if args.smtpServer == "":
+        if args.smtpServer == "" or not args.smtpServer:
             sys.exit("Sorry, there is no SMTP server specified in defaults.yaml. Please specify one with --smtpServer")
+        if args.emailSender == "" or not args.emailSender:
+            sys.exit("Sorry, there is no email sender specified in defaults.yaml. Please specify one with --emailSender")
 
 
 def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
@@ -519,8 +518,7 @@ def predict_chip_dict(wdir):
         if len(prefix_matches) > 0:
             final_matches = prefix_matches
 
-        if len(suffix_matches) > 0 and (len(prefix_matches) == 0 or
-                                        len(suffix_matches) < len(prefix_matches)):
+        if len(suffix_matches) > 0 and (len(prefix_matches) == 0 or len(suffix_matches) < len(prefix_matches)):
             final_matches = suffix_matches
 
         if len(prefix_matches) == len(suffix_matches) and len(prefix_matches) > 0:
