@@ -57,7 +57,7 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
     optional.add_argument("--DB",
                           dest="sample_info",
                           help="Information on samples (If differential binding analysis required); see "
-                               "'snakepipes/shared/sampleInfo.example.tsv' for example. "
+                               "'docs/content/sampleInfo.example.tsv' for example. "
                                "IMPORTANT: The first entry defines which group of samples are control. "
                                "By this, the order of comparison and likewise the sign of values can be changed! "
                                "Also, the condition `control` should only be used for input samples (control peaks "

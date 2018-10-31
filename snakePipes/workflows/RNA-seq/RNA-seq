@@ -99,7 +99,7 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
     optional.add_argument("--DE",
                           dest="sample_info",
                           help="Information on samples (required for DE analysis); see "
-                               "'snakePipes/shared/sampleInfo.example.tsv' for example."
+                               "'docs/content/sampleInfo.example.tsv' for example."
                                " The column names in the tsv files are 'sample' and 'condition'.The first entry"
                                " defines which group of samples are control. "
                                " This way, the order of comparison and likewise the sign of values can be changed."
