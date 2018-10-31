@@ -99,15 +99,21 @@ In addition to the FASTQ module results (see :doc:`running_snakePipes`), the wor
 
  * **Bowtie2** : Contains the BAM files after mapping with `Bowtie2 <http://bowtie-bio.sourceforge.net/bowtie2/index.shtml>`__ and indexed by `Samtools <http://www.htslib.org/>`__.
 
+
  * **filtered_bam** : Contains the BAM files filtered by the provided criteria, such as mapping quality (`--mapq`) or PCR duplicates (`--dedup`). This file is used for most downstream analysis in the DNA-mapping and ChIP-seq/ATAC-seq pipeline.
+
 
  * **bamCoverage** : Contains the coverage files (`bigWig format <https://genome.ucsc.edu/goldenpath/help/bigWig.html>`__) produced from the BAM files by `deepTools bamCoverage <https://deeptools.readthedocs.io/en/develop/content/tools/bamCoverage.html>`__ . The files are either raw, or 1x normalized (by sequencing depth). They are useful for plotting and inspecting the data in IGV.
 
+
  * **deepTools_qc** : Contains various QC files and plots produced by deepTools on the filtered BAM files. These are very useful for evaluation of data quality. The folders are named after the tools. Please look at the `deepTools documentation <https://deeptools.readthedocs.io/en/develop/content/list_of_tools.html>`__ on how to interpret the outputs from each tool.
 
-* **Picard_qc** : Contains the output by `picard CollectAlignmentSummaryMetrics <https://broadinstitute.github.io/picard/command-line-overview.html>`__ tool. This output is used for the evaluation of reads within peaks by the ChIp-Seq and ATAC-seq workflows.
 
-* **Sambamba** : Contains the alignment metrices evaluated on the BAM files by `Sambamba <http://lomereiter.github.io/sambamba/>`__.
+ * **Picard_qc** : Contains the output by `picard CollectAlignmentSummaryMetrics <https://broadinstitute.github.io/picard/command-line-overview.html>`__ tool. This output is used for the evaluation of reads within peaks by the ChIp-Seq and ATAC-seq workflows.
+
+
+ * **Sambamba** : Contains the alignment metrices evaluated on the BAM files by `Sambamba <http://lomereiter.github.io/sambamba/>`__.
+
 
 A number of other directories may optionally be present if you specified read trimming, using Qualimap, or a variety of other options. These are typically self-explanatory.
 
