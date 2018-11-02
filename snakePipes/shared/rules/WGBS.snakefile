@@ -25,7 +25,7 @@ if fromBam:
         output:
             "bams/{sample}"+bam_ext
         shell:
-            "( [ -f {output} ] || ln -s -r {input} {output} ) && touch -h {output}"
+            "( [ -f {output} ] || ln -s -r {input} {output} ) " #&& touch -h {output}"
 
 
 ###get automatic cut threshold for hard-trimming of 5' ends
@@ -115,7 +115,7 @@ if convRef:
             err="aux_files/logs/conv_ref.err",
             out="aux_files/logs/conv_ref.out"
         threads: 1
-        conda: CondaEnvironment
+        conda: CONDA_WGBS_ENV
         shell:"ln -s {input.refG} {output.locrefG}; bwameth.py index {output.locrefG}; samtools faidx {output.locrefG}; picard CreateSequenceDictionary R={output.locrefG} O={params.locdict}  1>{log.out} 2>{log.err}"
 
 if not trimReads is None:
@@ -136,7 +136,7 @@ if not trimReads is None:
             sortThreads=min(nthreads,4),
             RG=lambda wildcards: RG_dict[wildcards.sample]
         threads: nthreads
-        conda: CondaEnvironment
+        conda: CONDA_WGBS_ENV
         shell: "bwameth.py --threads  {threads}  --read-group {params.RG} --reference {input.crefG} {input.R1cut} {input.R2cut} | samtools sort -T {params.tempdir} -m 3G -@ {params.sortThreads} -o {output.sbam} 1>{log.out} 2>{log.err}"
 
 if trimReads is None and not fromBam:
@@ -157,7 +157,7 @@ if trimReads is None and not fromBam:
             sortThreads=min(nthreads,4),
             RG=lambda wildcards: RG_dict[wildcards.sample]
         threads: nthreads
-        conda: CondaEnvironment
+        conda: CONDA_WGBS_ENV
         shell: "bwameth.py --threads  {threads}  --read-group {params.RG} --reference {input.crefG} {input.R1} {input.R2} | samtools sort -T {params.tempdir} -m 3G -@ {params.sortThreads} -o {output.sbam} 1>{log.out} 2>{log.err}"
 
 if not fromBam:
@@ -212,7 +212,7 @@ rule get_ran_CG:
     log:
         err="aux_files/logs/get_ran_CG.err"
     threads: 1
-    conda: mCtCondaEnvironment
+    conda: CONDA_PY27_ENV
     shell: 'set +o pipefail; ' + os.path.join(workflow_tools,'methylCtools') + " fapos {input.refG}  " + re.sub('.gz','',"{output.pozF}") + ';cat '+ re.sub('.gz','',"{output.pozF}") +' | grep "+" -' + " | shuf | head -n 1000000 | awk {params.awkCmd}" + ' - | tr " " "\\t" | sort -k 1,1 -k2,2n - > ' + "{output.ranCG} 2>{log.err}"
 
 
@@ -226,7 +226,7 @@ rule calc_Mbias:
     log:
         out="QC_metrics/logs/{sample}.calc_Mbias.out"
     threads: nthreads
-    conda: CondaEnvironment
+    conda: CONDA_WGBS_ENV
     shell: "MethylDackel mbias {input.refG} {input.rmDupBam} {output.mbiasTXT} -@ {threads} 1>{log.out} 2>{output.mbiasTXT}"
 
 if convRef:
@@ -238,7 +238,7 @@ if convRef:
         log:
             err="aux_files/logs/gsize.err"
         threads: 1
-        conda: CondaEnvironment
+        conda: CONDA_WGBS_ENV
         shell: "faCount {input.refG} | awk \'END{{print $2-$7}}\'  > {output.gsize} 2>{log.err}"
 
     if not skipGCbias:
@@ -250,7 +250,7 @@ if convRef:
             log:
                 err="aux_files/logs/fatotwobit.err"
             threads: 1
-            conda: CondaEnvironment
+            conda: CONDA_WGBS_ENV
             shell: "faToTwoBit {input.refG} {output.twobit} 2>{log.err}"
 
         rule calc_GCbias:
@@ -310,7 +310,7 @@ if not skipDOC:
                 err="QC_metrics/logs/{sample}.depth_of_cov.err",
                 out="QC_metrics/logs/{sample}.depth_of_cov.out"
             threads: 1
-            conda: CondaEnvironment
+            conda: CONDA_WGBS_ENV
             shell: "gatk -Xmx30g -Djava.io.tmpdir={params.tempdir} -T DepthOfCoverage -R {input.irefG} -o {params.OUTlist0} -I {input.rmDupBam} -ct 0 -ct 1 -ct 2 -ct 5 -ct 10 -ct 15 -ct 20 -ct 30 -ct 50  -omitBaseOutput -mmq 10 --partitionType sample ; gatk -Xmx30g -Djava.io.tmpdir={params.tempdir}  -T DepthOfCoverage -R {input.irefG} -o {params.OUTlist1} -I {input.rmDupBam} -ct 0 -ct 1 -ct 2 -ct 5 -ct 10 -ct 15 -ct 20 -ct 30 -ct 50  -omitBaseOutput -mmq 10 --partitionType sample -L {input.ranCG}; {params.auxshell} 1>{log.out} 2>{log.err}"
 
 
@@ -332,7 +332,7 @@ if not skipDOC:
                 err="QC_metrics/logs/{sample}.depth_of_cov.err",
                 out="QC_metrics/logs/{sample}.depth_of_cov.out"
             threads: 1
-            conda: CondaEnvironment
+            conda: CONDA_WGBS_ENV
             shell: "gatk -Xmx30g -Djava.io.tmpdir={params.tempdir} -T DepthOfCoverage -R {input.irefG} -o {params.OUTlist0} -I {input.rmDupBam} -ct 0 -ct 1 -ct 2 -ct 5 -ct 10 -ct 15 -ct 20 -ct 30 -ct 50  -omitBaseOutput -mmq 10 --partitionType sample ; gatk -Xmx30g -Djava.io.tmpdir={params.tempdir}  -T DepthOfCoverage -R {input.irefG} -o {params.OUTlist1} -I {input.rmDupBam} -ct 0 -ct 1 -ct 2 -ct 5 -ct 10 -ct 15 -ct 20 -ct 30 -ct 50  -omitBaseOutput -mmq 10 --partitionType sample -L {input.ranCG} 1>{log.out} 2>{log.err}"
 
 if not trimReads is None and not fromBam:
@@ -426,7 +426,7 @@ rule produce_report:
     log:
         err="QC_metrics/logs/produce_report.err",
         out="QC_metrics/logs/produce_report.out"
-    conda: RmdCondaEnvironment
+    conda: CONDA_RMD_ENV
     threads: 1
     shell: "cp -v " + os.path.join(workflow_rscripts,"WGBS_QC_report_template.Rmd")+ " " + os.path.join("aux_files", "WGBS_QC_report_template.Rmd") + ';Rscript -e "rmarkdown::render(\''+os.path.join(outdir,"aux_files", "WGBS_QC_report_template.Rmd")+'\', params=list(QCdir=\'"' + os.path.join(outdir,"QC_metrics") +'"\' ), output_file =\'"'+ os.path.join(outdir,"QC_metrics",'QC_report.html"\'')+')"' + " 1>{log.out} 2>{log.err}"
 
@@ -446,7 +446,7 @@ if mbias_ignore=="auto":
             err="methXT/logs/{sample}.methyl_extract.err",
             out="methXT/logs/{sample}.methyl_extract.out"
         threads: nthreads
-        conda: CondaEnvironment
+        conda: CONDA_WGBS_ENV
         shell: "mi=$(cat {input.mbiasTXT} | sed 's/Suggested inclusion options: //' );MethylDackel extract  -o {params.OUTpfx} -q 10 -p 20 $mi --minDepth 10 --mergeContext --maxVariantFrac 0.25 --minOppositeDepth 5 -@ {threads} {input.refG} " + os.path.join(outdir,"{input.rmDupbam}") + " 1>{log.out} 2>{log.err}"
 
 
@@ -465,7 +465,7 @@ else:
             err="methXT/logs/{sample}.methyl_extract.err",
             out="methXT/logs/{sample}.methyl_extract.out"
         threads: nthreads
-        conda: CondaEnvironment
+        conda: CONDA_WGBS_ENV
         shell: "MethylDackel extract  -o {params.OUTpfx} -q 10 -p 20 {params.mbias_ignore} --minDepth 10 --mergeContext --maxVariantFrac 0.25 --minOppositeDepth 5 -@ {threads} {input.refG} " + os.path.join(outdir,"{input.rmDupbam}") + " 1>{log.out} 2>{log.err}"
 
 if blackList is None:
@@ -481,7 +481,7 @@ if blackList is None:
             err="methXT/logs/{sample}.CpG_filt.err",
             out="methXT/logs/{sample}.CpG_filt.out"
         threads: 1
-        conda: CondaEnvironment
+        conda: CONDA_WGBS_ENV
         shell: "Rscript --no-save --no-restore " + os.path.join(workflow_rscripts,'WGBSpipe.POM.filt.R ') + "{params.methDir} {input.methTab};mv -v {params.OUTtemp} {output.tabFilt} 1>{log.out} 2>{log.err}"
 
 else:
@@ -498,7 +498,7 @@ else:
             err="methXT/logs/{sample}.CpG_filt.err",
             out="methXT/logs/{sample}.CpG_filt.out"
         threads: 1
-        conda: CondaEnvironment
+        conda: CONDA_WGBS_ENV
         shell: "Rscript --no-save --no-restore " + os.path.join(workflow_rscripts,'WGBSpipe.POM.filt.R ') + "{params.methDir} {input.methTab};bedtools intersect -v -a {params.OUTtemp} -b {input.blackListF} > {output.tabFilt} 1>{log.out} 2>{log.err}"
 
 
@@ -513,7 +513,7 @@ if sampleInfo or intList:
         log:
             err="aux_files/logs/make_CG_bed.err"
         threads: 1
-        conda: CondaEnvironment
+        conda: CONDA_WGBS_ENV
         shell: 'grep "+"' + " {input.pozF}  | awk {params.awkCmd}" + ' - | tr " " "\\t" | sort -k 1,1 -k2,2n - > ' + "{output.imdF}"
 
 
@@ -532,7 +532,7 @@ if sampleInfo:
             err='{}/logs/CpG_stats.err'.format(get_outdir("singleCpG_stats_limma")),
             out='{}/logs/CpG_stats.out'.format(get_outdir("singleCpG_stats_limma"))
         threads: 1
-        conda: CondaEnvironment
+        conda: CONDA_WGBS_ENV
         shell: "Rscript --no-save --no-restore " + os.path.join(workflow_rscripts,'WGBSpipe.singleCpGstats.limma.R ') + "{params.statdir} {params.sampleInfo} "  + os.path.join(outdir,"methXT") + " 1>{log.out} 2>{log.err}"
 
     rule run_metilene:
@@ -546,7 +546,7 @@ if sampleInfo:
         log:
             err="{}/logs/run_metilene.err".format(get_outdir("metilene_out"))
         threads: nthreads
-        conda: CondaEnvironment
+        conda: CONDA_WGBS_ENV
         shell: 'Gi=($(cat {input.Ginfo}));metilene -a ' + " ${{Gi[0]}} " + " -b  ${{Gi[1]}} -t {threads} {input.MetIN} | sort -k 1,1 -k2,2n > {output.MetBed} 2>{log.err}"
 
 
@@ -562,7 +562,7 @@ if sampleInfo:
         log:
             err="aux_files/logs/get_CG_metilene.err"
         threads: 1
-        conda: CondaEnvironment
+        conda: CONDA_WGBS_ENV
         shell: "bedtools intersect -wa -a {input.imdF} -b {input.MetBed} > {output.MetCG}  2>{log.err};sleep 300"
 
 
@@ -582,7 +582,7 @@ if sampleInfo:
             err="{}/logs/cleanup_metilene.err".format(get_outdir("metilene_out")),
             out="{}/logs/cleanup_metilene.out".format(get_outdir("metilene_out"))
         threads: 1
-        conda: CondaEnvironment
+        conda: CONDA_WGBS_ENV
         shell: 'Rscript --no-save --no-restore ' + os.path.join(workflow_rscripts,'WGBSpipe.metilene_stats.limma.R ') + "{params.DMRout} " + os.path.join(outdir,"{input.MetBed}") +' ' + os.path.join(outdir,"{input.MetCG}") + ' ' + os.path.join(outdir,"{input.Limdat}") + " {input.sampleInfo} {params.gene_mod} 1>{log.out} 2>{log.err}"
 
 
@@ -599,7 +599,7 @@ if intList:
         params:
             auxshell=lambda wildcards,input,output: ';'.join(["bedtools intersect -wa -a "+ input.imdF + " -b " + bli + ' > ' + oli  for bli,oli in zip(input.intList,output.outList) ])+';sleep 300'
         threads: 1
-        conda: CondaEnvironment
+        conda: CONDA_WGBS_ENV
         shell: "{params.auxshell} 2>{log.err}"
 
 
@@ -619,5 +619,5 @@ if intList:
                 err="{}/logs/intAgg_stats.err".format(get_outdir("aggregate_stats_limma")),
                 out="{}/logs/intAgg_stats.out".format(get_outdir("aggregate_stats_limma"))
             threads: 1
-            conda: CondaEnvironment
+            conda: CONDA_WGBS_ENV
             shell: "{params.auxshell} 1>{log.out} 2>{log.err}"
