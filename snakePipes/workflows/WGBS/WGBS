@@ -41,7 +41,7 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
                           type=int,
                           default=defaults["downsample"])
 
-    optional.add_argument("--trimReads",
+    optional.add_argument("--trim",
                           dest="trimReads",
                           action="store",
                           choices=['auto', 'user', 'None'],
@@ -117,12 +117,12 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
                           help="Bed file(s) with positions to mask for methylation calling. Useful for masking SNPs in your strain of interest. (default: '%(default)s')",
                           default=defaults["blackList"])
 
-    optional.add_argument("--sampleInfo",
+    optional.add_argument("--DM",
                           dest="sampleInfo",
                           metavar="STR",
                           action='store',
                           type=str,
-                          help="Text file with sample information to use for statistical analysis. (default: '%(default)s')",
+                          help="Invoke Differential Methylation module between groups of samples by providing a text file with sample information to use for statistical analysis. (default: '%(default)s')",
                           default=defaults["sampleInfo"])
 
     optional.add_argument("--mbias",
