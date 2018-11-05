@@ -160,7 +160,6 @@ if(nrow(limdat.LG.CC)==0){ message("None of the single CpG sites passed the filt
             limdat.LG.CC.tw$pos<-gsub(".+_","",limdat.LG.CC.tw$ms)
             limdat.LG.CC.tw2<-limdat.LG.CC.tw[,c("chr","pos",colnames(limdat.LG.CC.tw)[2:(ncol(limdat.LG.CC.tw)-2)]),with=FALSE]
             gv<-sampleInfo$Group[match(colnames(limdat.LG.CC.tw2)[3:ncol(limdat.LG.CC.tw2)],sampleInfo$SampleID)]###check this and modify if necessary
-            gtab<-table(sampleInfo$Group[match(colnames(limdat.LG.CC.tw2)[3:ncol(limdat.LG.CC.tw2)],sampleInfo$SampleID)])
             ginfo<-unique(sampleInfo$Group[match(colnames(limdat.LG.CC.tw2)[3:ncol(limdat.LG.CC.tw2)],sampleInfo$SampleID)])
             write.table(ginfo,file="groupInfo.txt",sep="\t",row.names=FALSE,col.names=FALSE,quote=FALSE)
             cnn<-vector("numeric",length(gv))
