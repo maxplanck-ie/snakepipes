@@ -48,7 +48,7 @@ limdat.LG[,2:ncol(limdat.LG)]<-limdat.LG[,2:ncol(limdat.LG)]/100
 limdat.LG.CC<-limdat.LG[complete.cases(limdat.LG),] 
 if(nrow(limdat.LG.CC)==0){ message("None of the single CpG sites passed the filtering.")}else{
 
-    limdat.LG.CC.logit<-logit(limdat.LG.CC[,2:ncol(limdat.LG.CC),with=FALSE],percents=FALSE,adjust=0.025)
+    limdat.LG.CC.logit<-logit(limdat.LG.CC[,2:ncol(limdat.LG.CC),with=FALSE],percents=FALSE,adjust=0.025) ##result is a data.frame
     rownames(limdat.LG.CC.logit)<-limdat.LG.CC$ms
 
 
@@ -160,11 +160,11 @@ if(nrow(limdat.LG.CC)==0){ message("None of the single CpG sites passed the filt
             limdat.LG.CC.tw$pos<-gsub(".+_","",limdat.LG.CC.tw$ms)
             limdat.LG.CC.tw2<-limdat.LG.CC.tw[,c("chr","pos",colnames(limdat.LG.CC.tw)[2:(ncol(limdat.LG.CC.tw)-2)]),with=FALSE]
             gv<-sampleInfo$Group[match(colnames(limdat.LG.CC.tw2)[3:ncol(limdat.LG.CC.tw2)],sampleInfo$SampleID)]###check this and modify if necessary
-            gtab<-table(sampleInfo$Group[match(colnames(limdat.LG.CC.tw2)[3:ncol(limdat.LG.CC.tw2)],sampleInfo$SampleID)])
-            write.table(names(gtab),file="groupInfo.txt",sep="\t",row.names=FALSE,col.names=FALSE,quote=FALSE)
+            ginfo<-unique(sampleInfo$Group[match(colnames(limdat.LG.CC.tw2)[3:ncol(limdat.LG.CC.tw2)],sampleInfo$SampleID)])
+            write.table(ginfo,file="groupInfo.txt",sep="\t",row.names=FALSE,col.names=FALSE,quote=FALSE)
             cnn<-vector("numeric",length(gv))
-            for(i in seq_along(gtab)){
-                cnn[which(gv %in% names(gtab)[i])]<-seq_along(which(gv %in% names(gtab)[i]))
+            for(i in seq_along(ginfo)){
+                cnn[which(gv %in% ginfo[i])]<-seq_along(which(gv %in% ginfo[i]))
             }
 
             cnv<-paste(gv,cnn,sep="_")
