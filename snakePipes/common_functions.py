@@ -92,15 +92,20 @@ def get_sample_names(infiles, ext, reads):
     """
     Get sample names without file extensions
     """
-    s = []
+    s = set()
+    l = len(ext)
+    l0 = len(reads[0])
+    l1 = len(reads[1])
     for x in infiles:
-        x = os.path.basename(x).replace(ext, "")
-        try:
-            x = x.replace(reads[0], "").replace(reads[1], "")
-        except IndexError:
-            pass
-        s.append(x)
-    return sorted(list(set(s)))
+        x = os.path.basename(x)[:-l]
+        if x.endswith(reads[0]):
+            x = x[:-l0]
+        elif x.endswith(reads[1]):
+            x = x[:-l1]
+        else:
+            continue
+        s.add(x)
+    return sorted(list(s))
 
 
 def get_sample_names_bam(infiles, bam_ext):
