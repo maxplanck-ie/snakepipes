@@ -45,12 +45,15 @@ dev.off()
 
 res10L<-lapply(unique(sc@cpart),function(X){
         dg<-clustdiffgenes(sc,X,pvalue=.01)
-        dg<-dg[dg$fc>=2,]
+        dgsub<-dg[dg$fc>=2,]
+        if(nrow(dgsub)>0){
+        dg<-dgsub
         dg<-head(dg,n=10)
         dg$Cluster<-X
-        dg$Gene<-rownames(dg)
+        dg$Gene<-rownames(dg)}else{dg<-NULL}
         return(dg)})
 top10<-as.data.frame(do.call(rbind,res10L))
+top10<-top10[top10$padj<0.05,]
 top10<-top10[with(top10, order(Cluster, padj)),]
 
 write.table(top10,paste0("minT",minTi,".Top10markers.txt"),sep="\t",row.names=TRUE,quote=FALSE)
@@ -60,7 +63,7 @@ png(paste0("sc.minT",minTi,".Top10markers.heatmap.png"))
 plotmarkergenes(sc,genes)
 dev.off()
 
-res2L<-lapply(unique(sc@cpart),function(X){
+res2L<-lapply(unique(top10$Cluster),function(X){
         head(top10[top10$Cluster %in% X,],n=2)})
 top2<-as.data.frame(do.call(rbind,res2L))
 top2<-top2[with(top2, order(Cluster, padj)),]
