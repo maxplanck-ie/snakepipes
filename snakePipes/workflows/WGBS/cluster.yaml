@@ -17,6 +17,6 @@ cleanup_metilene:
 intAgg_stats:
     memory: 30G
 CpG_filt:
-    memory: 3G
+    memory: 6G
 get_ran_CG:
-    memory: 2G
+    memory: 3G
