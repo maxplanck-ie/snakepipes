@@ -1,7 +1,7 @@
 name: snakepipes_RNAseq_environment_0.1
 channels:
- - bioconda
  - conda-forge
+ - bioconda
 dependencies:
  - bedtools=2.27.1
  - ucsc-genepredtogtf=357
