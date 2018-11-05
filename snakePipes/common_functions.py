@@ -93,11 +93,11 @@ def get_sample_names(infiles, ext, reads):
     Get sample names without file extensions
     """
     s = set()
-    l = len(ext)
+    lext = len(ext)
     l0 = len(reads[0])
     l1 = len(reads[1])
     for x in infiles:
-        x = os.path.basename(x)[:-l]
+        x = os.path.basename(x)[:-lext]
         if x.endswith(reads[0]):
             x = x[:-l0]
         elif x.endswith(reads[1]):
