@@ -25,4 +25,4 @@ dependencies:
  - r-rcolorbrewer
  - bioconductor-deseq2=1.18.1
  - bioconductor-biomart=2.34.2
-# knitcitations missing from bioconda
+ - r-knitcitations
