@@ -80,7 +80,7 @@ Then a larger instance can be spun up and the `RNA-seq` pipeline run as normal.
 Receiving emails upon pipeline completion
 -----------------------------------------
 
-SnakePipes can send an email to the user once a pipeline is complete. In order for this to work, the following values need to be set in `defaults.yaml`:
+SnakePipes can send an email to the user once a pipeline is complete if users specify `--emailAddress`. In order for this to work, the following values need to be set in `defaults.yaml`:
 
 :smtpServer: The address of the outgoing SMTP server
 :smtpPort: The port on the SMTP server to use (0 means to use the standard port)
