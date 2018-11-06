@@ -168,6 +168,17 @@ After setting up the yamls, we can execute a snakePipes workflow on the organism
 
 .. note:: The name of the yaml file (except the .yaml suffix) is used as keyword to refer to the organism while running the workflows.
 
+Download premade indices
+------------------------
+
+For the sake of convenience, we provide premade indices for the following organisms:
+
+ - `Human <https://zenodo.org/record/1477929#.W-BexRwh3mE>`_
+ - `Mouse <https://zenodo.org/record/1475957#.W-BexBwh3mE>`_
+ - `Fruit fly <https://zenodo.org/record/1478017#.W-Bexhwh3mE>`_
+
+To use these, simply download and extract them. You will then need to modify the provided YAML file to indicate exactly where the indices are located (i.e., replace `/data/processing/ryan` with whatever is appropriate).
+
 .. _cluster:
 
 Configure your cluster
