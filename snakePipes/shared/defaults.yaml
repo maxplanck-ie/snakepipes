@@ -6,5 +6,5 @@
 # Note that due to limitations in yaml.dump, only very basic structures are
 # permitted here.
 ################################################################################
-snakemake_options: '--use-conda --conda-prefix /home/bhardwaj/programs/miniconda3/envs/'
+snakemake_options: '--use-conda --conda-prefix /package/anaconda3/envs'
 tempdir: /data/extended/
