@@ -24,7 +24,7 @@ params:
     geneNamesFile: 'test'
 ---
 
-```{r setup} 
+```{r setup}
 #### Libraries needed
 
 ## Bioconductor
@@ -74,7 +74,7 @@ if(!outputIsHTML) opts_chunk$set(bootstrap.show.code = FALSE, dev = device, echo
 ```{r setup2, bootstrap.show.message=FALSE}
 #### Code setup
 ## res (ddr) and dds are transferred to the template via DESeq2report function
-## I also need to transfer countdata, coldata and 
+## I also need to transfer countdata, coldata and
 load(params$DEseqoutRdata) ## dds and ddr
 
 ddr.df <- params$ddr.df  #_DEresults.tsv file
@@ -109,7 +109,7 @@ Most of the exploration below is based on the annotated DESeq2 output file gener
     )
     message("Filtered data set")
     print(head(df.filt))
-    
+
     ## Rlog transform
     rld <- DESeq2::rlog(dds)
 
@@ -334,11 +334,11 @@ The good old bar plot of UP and DOWN regulated genes.
     )
 ```
 
-This plot shows a histogram of the unadjusted and adjusted p-values. 
+This plot shows a histogram of the unadjusted and adjusted p-values.
 
 **Unadjusted P-values (grey)** might be skewed right or left, or flat as shown in the [Wikipedia examples](https://en.wikipedia.org/wiki/Histogram#Examples). The shape depends on the percent of features that are differentially expressed. For further information on how to interpret a histogram of p-values check [David Robinson's post on this topic](http://varianceexplained.org/statistics/interpreting-pvalue-histogram/).
 
-**Blue bars** show the distribution of the `r elementMetadata(res)$description[grep('adjusted', elementMetadata(res)$description)]`. It might be skewed right or left, or flat as shown in the [Wikipedia examples](https://en.wikipedia.org/wiki/Histogram#Examples). 
+**Blue bars** show the distribution of the `r elementMetadata(res)$description[grep('adjusted', elementMetadata(res)$description)]`. It might be skewed right or left, or flat as shown in the [Wikipedia examples](https://en.wikipedia.org/wiki/Histogram#Examples).
 
 Below is the numerical summary of the distribution of the p-values.
 
@@ -354,7 +354,7 @@ This is the numerical summary of the distribution of the `r elementMetadata(res)
 summary(res.df$padj)
 ```
 
-The table below shows the number of features with `r elementMetadata(res)$description[grep('adjusted', elementMetadata(res)$description)]` less or equal than some commonly used cutoff values. 
+The table below shows the number of features with `r elementMetadata(res)$description[grep('adjusted', elementMetadata(res)$description)]` less or equal than some commonly used cutoff values.
 
 ```{r padjTable, results = 'asis'}
 ## Split features by different adjusted p-value cutoffs
@@ -444,14 +444,14 @@ plotCounts_gg <- function(i, dds, intgroup) {
     group <- if (length(intgroup) == 1) {
         colData(dds)[[intgroup]]
     } else if (length(intgroup) == 2) {
-        lvls <- as.vector(t(outer(levels(colData(dds)[[intgroup[1]]]), 
-            levels(colData(dds)[[intgroup[2]]]), function(x, 
+        lvls <- as.vector(t(outer(levels(colData(dds)[[intgroup[1]]]),
+            levels(colData(dds)[[intgroup[2]]]), function(x,
                 y) paste(x, y, sep = " : "))))
-        droplevels(factor(apply(as.data.frame(colData(dds)[, 
-            intgroup, drop = FALSE]), 1, paste, collapse = " : "), 
+        droplevels(factor(apply(as.data.frame(colData(dds)[,
+            intgroup, drop = FALSE]), 1, paste, collapse = " : "),
             levels = lvls))
     } else {
-        factor(apply(as.data.frame(colData(dds)[, intgroup, drop = FALSE]), 
+        factor(apply(as.data.frame(colData(dds)[, intgroup, drop = FALSE]),
             1, paste, collapse = " : "))
     }
     data <- plotCounts(dds, gene=i, intgroup=intgroup, returnData = TRUE)
@@ -496,7 +496,7 @@ round(totalTime, digits=3)
 ```{r reproducibility3, echo=FALSE}
 ## Session info
 options(width = 120)
-session_info()
+sessionInfo()
 ```
 
 Pandoc version used: `r rmarkdown::pandoc_version()`.
@@ -511,4 +511,3 @@ Citations made with `knitcitations` `r citep(bib[['knitcitations']])`. The [BibT
 ## Print bibliography
 bibliography()
 ```
-
