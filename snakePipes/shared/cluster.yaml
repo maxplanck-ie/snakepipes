@@ -7,9 +7,11 @@ snp_split:
 bamCoverage:
     memory: 4G
 bamCoverage_RPKM:
-    memory: 2G
+    memory: 4G
 bamCoverage_coverage:
-    memory: 2G
+    memory: 4G
+bamCoverage_raw:
+    memory: 4G
 plotCorrelation_pearson:
     memory: 3G
 plotCorrelation_spearman:

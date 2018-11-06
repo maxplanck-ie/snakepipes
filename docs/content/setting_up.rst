@@ -146,6 +146,17 @@ An example from drosophila genome dm3 is below.
 
 Not all files are required for all pipelines, but we recommend to keep all required files ready nevertheless.
 
+Download premade indices
+------------------------
+
+For the sake of convenience, we provide premade indices for the following organisms:
+
+ - `Human <https://zenodo.org/record/1477929#.W-BexRwh3mE>`_
+ - `Mouse <https://zenodo.org/record/1475957#.W-BexBwh3mE>`_
+ - `Fruit fly <https://zenodo.org/record/1478017#.W-Bexhwh3mE>`_
+
+To use these, simply download and extract them. You will then need to modify the provided YAML file to indicate exactly where the indices are located (i.e., replace `/data/processing/ryan` with whatever is appropriate).
+
 .. _cluster:
 
 Configure your cluster

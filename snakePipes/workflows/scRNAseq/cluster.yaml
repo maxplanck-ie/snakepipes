@@ -1,2 +1,6 @@
 STAR:
     memory: 3200M
+sc_bam_featureCounts_genomic:
+    memory: 2G
+cluster_cells_raceid:
+    memory: 6G
