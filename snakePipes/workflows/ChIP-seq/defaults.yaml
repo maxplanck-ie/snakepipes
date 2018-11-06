@@ -27,6 +27,8 @@ paired: true
 bamPE: false
 ## Bin size of output files in bigWig format
 bw_binsize: 25
+## type of bigwig file to create
+bigWigType: both
 ## Median/mean fragment length, only relevant for single-end data (default: 200)
 fragment_length: 200
 verbose: false

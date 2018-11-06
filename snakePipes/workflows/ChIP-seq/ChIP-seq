@@ -47,6 +47,12 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
                           help="Use the BAMPE mode of macs2, on top of the BAM mode. The BAMPE mode would use the fragment sizes present in BAM file, and output the files under 'macs2' folder with an extention 'BAMPE_peaks.xls'. The default macs2 rule under snakePipes uses the fragment sizes estimated from deepTools, and produces files with an extention 'BAM_peaks.xls'. (default: '%(default)s')",
                           default=defaults["bamPE"])
 
+    optional.add_argument("--bigWigType",
+                          dest="bigWigType",
+                          help="Type of bigWig file to create. Options are: 'subtract' (control-subtracted ChIP coverage), 'log2ratio' (for log2 ratio of ChIP over control) or 'both' (create both set of bed files). Note that the allele-specific mode currently only produces 'log2ratio' bigwigs. (default: '%(default)s')",
+                          type=int,
+                          default=defaults["bigWigType"])
+
     optional.add_argument("--bw-binsize",
                           dest="bw_binsize",
                           metavar="INT",

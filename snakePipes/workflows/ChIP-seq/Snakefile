@@ -69,10 +69,13 @@ def run_deepTools():
     for chip_sample in chip_samples_w_ctrl:
         control_name = get_control_name(chip_sample)
         file_list.append([
-        "deepTools_ChIP/bamCompare/"+chip_sample+".filtered.log2ratio.over_"+control_name+".bw",
-        "deepTools_ChIP/bamCompare/"+chip_sample+".filtered.subtract."+control_name+".bw",
         "deepTools_ChIP/plotFingerprint/plotFingerprint.metrics.txt"
         ])
+        # get bigwigtype
+        if bigWigType == "subtract" or bigWigType == "both":
+            file_list.append(["deepTools_ChIP/bamCompare/"+chip_sample+".filtered.subtract."+control_name+".bw"])
+        if bigWigType == "log2ratio" or bigWigType == "both":
+            file_list.append(["deepTools_ChIP/bamCompare/"+chip_sample+".filtered.log2ratio.over_"+control_name+".bw"])
     return(file_list)
 
 def run_deepTools_allelic():
