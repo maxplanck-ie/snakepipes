@@ -129,9 +129,7 @@ def is_paired(infiles, ext, reads):
         fname = os.path.basename(infile).replace(ext, "")
         m = re.match("^(.+)(" + reads[0] + "|" + reads[1] + ")$", fname)
         if m:
-            # print(m.group())
             bname = m.group(1)
-            # print(bname)
             if bname not in infiles_dic:
                 infiles_dic[bname] = [infile]
             else:
@@ -256,6 +254,35 @@ def setDefaults(fileName):
     return baseDir, workflowDir, defaults
 
 
+def sendEmail(args, returnCode):
+    """
+    Try to send an email to the user. Errors must be non-fatal.
+    """
+    try:
+        import smtplib
+        from email.message import EmailMessage
+        msg = EmailMessage()
+        msg['Subject'] = "Snakepipes completed"
+        msg['From'] = args.emailSender
+        msg['To'] = args.emailAddress
+        if returnCode == 0:
+            msg.set_content("The pipeline finished successfully\n")
+        else:
+            msg.set_content("The pipeline failed with exit code {}\n".format(returnCode))
+
+        if args.onlySSL:
+            s = smtplib.SMTP_SSL(args.smtpServer, port=args.smtpPort)
+        else:
+            s = smtplib.SMTP(args.smtpServer, port=args.smtpPort)
+        if args.smtpUsername:
+            s.login(args.smtpUsername, args.smtpPassword)
+        s.send_message(msg)
+        s.quit()
+    except:
+        sys.stderr.write("An error occured while sending the email.\n")
+        pass
+
+
 def checkCommonArguments(args, baseDir, outDir=False, createIndices=False):
     """
     Check the wrapper arguments
@@ -298,6 +325,13 @@ def checkCommonArguments(args, baseDir, outDir=False, createIndices=False):
     if not createIndices:
         if not os.path.isfile(os.path.join(baseDir, "shared/organisms/{}.yaml".format(args.genome))) and os.path.isfile(args.genome):
             args.genome = os.path.abspath(args.genome)
+
+    if args.emailAddress:
+        # Must have at least an email server specified
+        if args.smtpServer == "" or not args.smtpServer:
+            sys.exit("Sorry, there is no SMTP server specified in defaults.yaml. Please specify one with --smtpServer")
+        if args.emailSender == "" or not args.emailSender:
+            sys.exit("Sorry, there is no email sender specified in defaults.yaml. Please specify one with --emailSender")
 
 
 def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
@@ -425,6 +459,8 @@ def runAndCleanup(args, cmd, logfile_name, temp_path):
     # Exit with an error if snakemake encountered an error
     if p.returncode != 0:
         sys.stderr.write("Error: snakemake returned an error code of {}, so processing is incomplete!\n".format(p.returncode))
+        if args.emailAddress:
+            sendEmail(args, p.returncode)
         sys.exit(p.returncode)
 
     # remove temp dir
@@ -432,6 +468,10 @@ def runAndCleanup(args, cmd, logfile_name, temp_path):
         shutil.rmtree(temp_path, ignore_errors=True)
         if args.verbose:
             print("Temp directory removed ({})!\n".format(temp_path))
+
+    # Send email if desired
+    if args.emailAddress:
+        sendEmail(args, 0)
 
 
 def predict_chip_dict(wdir):
