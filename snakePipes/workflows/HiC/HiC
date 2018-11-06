@@ -42,8 +42,7 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
     optional.add_argument("--RF_resolution",
                           dest="RF_resolution",
                           action="store_true",
-                          help="Create Hi-C matrices at restriction fragment resolution. Using RF "
-                          "resolution would override the --bin_size argument. (default: '%(default)s')",
+                          help="Create Hi-C matrices at the restriction fragment resolution. Using `RF_resolution` would override the --bin_size argument. (default: '%(default)s')",
                           default=defaults["RF_resolution"])
 
     optional.add_argument("--enzyme",
@@ -56,7 +55,7 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
                           dest="bin_size",
                           type=int,
                           metavar="INT",
-                          help="Create Hi-C matrices at a given bin_size (default: '%(default)s')",
+                          help="Create Hi-C matrices at the given bin_size. This option is mutally exclusive with the `--RF_resolution` option (default: '%(default)s')",
                           default=defaults["bin_size"])
 
     optional.add_argument("--restrict_region",
@@ -70,7 +69,7 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
     optional.add_argument("--merge_samples",
                           dest="merge_samples",
                           action="store_true",
-                          help="Merge all HiC matrices and create a new matrix. (default: '%(default)s')",
+                          help="Merge the HiC matrices and create a new matrix. If this option is specified togather with `--sampleInfo` (see below), the samples would be merged based on the defined groups. (default: '%(default)s')",
                           default=defaults["merge_samples"])
 
     optional.add_argument("--merge_bins",
@@ -96,13 +95,13 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
     optional.add_argument("--noCorrect",
                           dest="noCorrect",
                           action="store_true",
-                          help="Stop the pipeline before correcting the matrix. (default: '%(default)s')",
+                          help="Stop the pipeline before ICE-correction (i.e. run only upto building the matrix). (default: '%(default)s')",
                           default=defaults["noCorrect"])
 
     optional.add_argument("--distVsCount",
                           dest="distVsCount",
                           action="store_true",
-                          help="Run hicDistVsCount. (default: '%(default)s')",
+                          help="Produce a plot of the ICE-corrected HiC counts as a function of distance. This plot could be used for QC as well as comparison between samples for biological effects. The plot is create using the tool 'hicDistVsCount'. (default: '%(default)s')",
                           default=defaults["distVsCount"])
 
     optional.add_argument("--distVsCount_params",
@@ -116,8 +115,7 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
                           type=str,
                           metavar="STR",
                           help="A .tsv file containing sample names and associated groups. "
-                          "If provided, the file would be used to identify groups to merge the samples. "
-                          "An example can be found at snakePipes/shared/sampleInfo.example.tsv"
+                          "If provided, the file would be used to identify groups to merge the samples. An example can be found at 'docs/content/sampleInfo.example.tsv'"
                           "(default: None)")
 
     return parser

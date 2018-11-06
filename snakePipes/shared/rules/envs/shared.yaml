@@ -1,7 +1,7 @@
 name: snakepipes_shared_environment_1.0
 channels:
- - bioconda
  - conda-forge
+ - bioconda
 dependencies:
  - deeptools=3.1.2
  - seqtk=1.2

@@ -2,9 +2,10 @@
 title: "WGBS_QC_report"
 author: "`r Sys.info()[length(Sys.info())-1]`"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
-output: pdf_document
+output: html_document
 params:
-    QCdir: "/data/processing3/sikora/A215.test2/QC_metrics"
+    QCdir: "QC_metrics"
+    output_file: "QC_metrics/QC_report.html"
 ---
 
 ```{r setup, include=FALSE}
@@ -189,4 +190,3 @@ require(pander)
 pander(Mbiasdat,style='simple',caption="Inclusion bounds on top and bottom strand reads.")
 
 ```
-

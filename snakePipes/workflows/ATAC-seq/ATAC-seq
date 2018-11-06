@@ -46,14 +46,9 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
                           type=int,
                           default=defaults['fragmentSize_cutoff'])
 
-    optional.add_argument("--DOC",
+    optional.add_argument("--DA",
                           dest="sample_info",
-                          help="Information on samples (If differential binding analysis required); see "
-                               "'snakepipes/shared/sampleInfo.example.tsv' for example. "
-                               "IMPORTANT: The first entry defines which group of samples are control. "
-                               "By this, the order of comparison and likewise the sign of values can be changed! "
-                               "Also, the condition `control` should not be used (reserved to mark input samples "
-                               "in the ChIP-Seq workflow (default: '%(default)s')",
+                          help="Invoke differential Accessibility analysis by providing Information on samples (If differential binding analysis required); see 'docs/content/sampleInfo.example.tsv' for example. IMPORTANT: The first entry defines which group of samples are control. With this, the order of comparison and likewise the sign of values can be changed! Also, the condition `control` should not be used (reserved to mark input samples in the ChIP-Seq workflow (default: '%(default)s')",
                           default=defaults["sample_info"])
 
     return parser

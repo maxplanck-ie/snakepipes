@@ -122,7 +122,7 @@ def get_outdir(folder_name):
 
 def run_CpG_stats(sampleInfo):
     if sampleInfo:
-        
+
         return (['{}/singleCpG.RData'.format(get_outdir("singleCpG_stats_limma")), '{}/limdat.LG.RData'.format(get_outdir("singleCpG_stats_limma")),'{}/metilene.IN.txt'.format(get_outdir("singleCpG_stats_limma"))])
     else:
         return ([])
@@ -184,7 +184,7 @@ onstart:
 ### main rule ##################################################################
 ################################################################################
 if not fromBam:
-    localrules: 
+    localrules:
         FASTQ,
         produce_report
 
@@ -197,7 +197,7 @@ if not fromBam:
             expand("QC_metrics/{sample}.Mbias.txt",sample=samples),
             os.path.join("aux_files",re.sub('.fa','.poz.ran1M.sorted.bed',os.path.basename(refG))),
             calc_doc(intList,False,skipDOC),
-            'QC_metrics/QC_report.pdf',
+            'QC_metrics/QC_report.html',
             run_deeptools(skipGCbias),
             expand("methXT/{sample}_CpG.bedGraph",sample=samples),
             expand("methXT/{sample}.CpG.filt2.bed",sample=samples),
@@ -218,7 +218,7 @@ else:
             expand("QC_metrics/{sample}.Mbias.txt",sample=samples),
             os.path.join("aux_files",re.sub('.fa','.poz.ran1M.sorted.bed',os.path.basename(refG))),
             calc_doc(intList,False,skipDOC),
-            'QC_metrics/QC_report.pdf',
+            'QC_metrics/QC_report.html',
             run_deeptools(skipGCbias),
             expand("methXT/{sample}_CpG.bedGraph",sample=samples),
             expand("methXT/{sample}.CpG.filt2.bed",sample=samples),

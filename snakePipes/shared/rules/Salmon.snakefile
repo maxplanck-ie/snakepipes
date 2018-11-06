@@ -8,7 +8,7 @@ rule convertLibraryTypeSalmon:
         from_prg = "featureCounts",
         to_prg="Salmon",
         tsv = os.path.join(maindir, "shared", "tools", "library_type.tsv"),
-        rscript = os.path.join(maindir, "shared", "rscripts", "library_type.R"),
+        rscript = os.path.join(maindir, "shared", "rscripts", "library_type.R")
     threads: 1
     conda: CONDA_RNASEQ_ENV
     shell:
@@ -34,9 +34,8 @@ rule SalmonIndex:
     conda: CONDA_RNASEQ_ENV
     shell: """
         salmon index --sasamp {params.sasamp} -p {threads} -t {input} -i Salmon/SalmonIndex {params.salmon_index_options} > {log.out} 2> {log.err}
-        touch {output}
         """
-
+#        touch {output}
 
 ## Salmon quant
 if paired:
@@ -105,8 +104,8 @@ rule Salmon_symlinks:
         quant = "{sample}/quant.sf",
         quant_genes = "{sample}/quant.genes.sf"
     shell:
-        "ln -s -f {params.quant} {output.quant} && touch -h {output.quant}; "
-        "ln -s -f {params.quant_genes} {output.quant_genes} && touch -h {output.quant_genes} "
+        "ln -s -f {params.quant} {output.quant}" #&& touch -h {output.quant};
+        "ln -s -f {params.quant_genes} {output.quant_genes}" # && touch -h {output.quant_genes}
 
 
 rule Salmon_TPM:

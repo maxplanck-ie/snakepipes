@@ -4,8 +4,8 @@ if downsample:
     if paired:
         rule FASTQdownsample:
             input:
-                r1 = indir+"/{sample}"+reads[0]+".fastq.gz",
-                r2 = indir+"/{sample}"+reads[1]+".fastq.gz"
+                r1 = indir+"/{sample}"+reads[0]+ext,
+                r2 = indir+"/{sample}"+reads[1]+ext
             output:
                 r1 = "FASTQ/{sample}"+reads[0]+".fastq.gz",
                 r2 = "FASTQ/{sample}"+reads[1]+".fastq.gz"
@@ -39,4 +39,4 @@ else:
         output:
             "FASTQ/{sample}{read}.fastq.gz"
         shell:
-            "( [ -f {output} ] || ln -s -r {input} {output} ) && touch -h {output}"
+            "( [ -f {output} ] || ln -s -r {input} {output} )"

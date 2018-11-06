@@ -155,7 +155,7 @@ rule bwamethIndex:
     output: os.path.join(outdir, "BWAmethIndex/genome.fa.bwameth.c2t.sa")
     params:
       genome = os.path.join(outdir, "BWAmethIndex", "genome.fa")
-    conda: CondaEnvironment
+    conda: CONDA_WGBS_ENV
     shell: """
         ln -s {input[0]} {params.genome}
         bwameth.py index {params.genome}

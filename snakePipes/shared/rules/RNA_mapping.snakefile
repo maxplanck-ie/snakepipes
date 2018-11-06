@@ -56,7 +56,7 @@ if mapping_prg.upper().find("HISAT2") >=0:
                 "samtools view -Sb - | "
                 "samtools sort -m {params.samsort_memory} "
                 "-T ${{TMPDIR}}{wildcards.sample} -@ {threads} -O bam - > {output.bam} "
-                "&& touch {output.unconc} {output.alconc} "
+                #"&& touch {output.unconc} {output.alconc} "
     else:
         rule HISAT2:
             input:
@@ -94,7 +94,7 @@ if mapping_prg.upper().find("HISAT2") >=0:
                 "samtools view -Sb - | "
                 "samtools sort -m {params.samsort_memory} "
                 "-T ${{TMPDIR}}{wildcards.sample} -@ {threads} -O bam - > {output.bam} "
-                "&& touch {output.un} {output.al} "
+                #"&& touch {output.un} {output.al} "
 
 
 elif mapping_prg.upper().find("STAR") >=0:

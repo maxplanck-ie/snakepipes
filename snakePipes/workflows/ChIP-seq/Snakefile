@@ -44,6 +44,14 @@ else:
 if allele_info == 'FALSE':
     include: os.path.join(maindir, "shared", "rules", "histoneHMM.snakefile")
 
+def run_bamPE(bamPE):
+    if bamPE:
+        file_list = expand("MACS2/{chip_sample}.filtered.BAMPE_peaks.xls",
+                            chip_sample = chip_samples)
+    else:
+        file_list = []
+    return(file_list)
+
 def run_histoneHMM(allele_info):
     if allele_info == 'FALSE':
         ## run histoneHMM broad enrichment calling only for samples annotated as *broad*
@@ -61,10 +69,13 @@ def run_deepTools():
     for chip_sample in chip_samples_w_ctrl:
         control_name = get_control_name(chip_sample)
         file_list.append([
-        "deepTools_ChIP/bamCompare/"+chip_sample+".filtered.log2ratio.over_"+control_name+".bw",
-        "deepTools_ChIP/bamCompare/"+chip_sample+".filtered.subtract."+control_name+".bw",
         "deepTools_ChIP/plotFingerprint/plotFingerprint.metrics.txt"
         ])
+        # get bigwigtype
+        if bigWigType == "subtract" or bigWigType == "both":
+            file_list.append(["deepTools_ChIP/bamCompare/"+chip_sample+".filtered.subtract."+control_name+".bw"])
+        if bigWigType == "log2ratio" or bigWigType == "both":
+            file_list.append(["deepTools_ChIP/bamCompare/"+chip_sample+".filtered.log2ratio.over_"+control_name+".bw"])
     return(file_list)
 
 def run_deepTools_allelic():
@@ -126,7 +137,8 @@ rule all:
         run_deepTools(),
         expand("MACS2/{chip_sample}.filtered.BAM_peaks.xls", chip_sample = chip_samples),
         expand("MACS2/{chip_sample}.filtered.BAM_peaks.qc.txt", chip_sample = chip_samples),
-
+        ## run bamPE if asked
+        run_bamPE(bamPE),
         # run histoneHMM if allelic_bams are absent (since it gives index error without allele_specific index)
         run_histoneHMM(allele_info),
         ## run deeptools-allelic only if dir "allelic_bams" present and non empty

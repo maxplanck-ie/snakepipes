@@ -1,52 +1,52 @@
 ### deepTools bamCompare subtract #######################################################
 
-
-rule bamCompare_subtract:
-    input:
-        chip_bam = "filtered_bam/{chip_sample}.filtered.bam",
-        chip_bai = "filtered_bam/{chip_sample}.filtered.bam.bai",
-        control_bam = "filtered_bam/{control_name}.filtered.bam",
-        control_bai = "filtered_bam/{control_name}.filtered.bam.bai"
-    output:
-        "deepTools_ChIP/bamCompare/{chip_sample}.filtered.subtract.{control_name}.bw"
-    params:
-        bw_binsize = bw_binsize,
-        genome_size = genome_size,
-        ignoreForNorm = "--ignoreForNormalization {}".format(ignore_forNorm) if ignore_forNorm else "",
-        read_extension = "--extendReads" if paired else "--extendReads {}".format(fragment_length),
-        blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed else ""
-    log:
-        out = "deepTools_ChIP/logs/bamCompare.subtract.{chip_sample}.filtered.subtract.{control_name}.out",
-        err = "deepTools_ChIP/logs/bamCompare.subtract.{chip_sample}.filtered.subtract.{control_name}.err"
-    benchmark:
-        "deepTools_ChIP/.benchmark/bamCompare.subtract.{chip_sample}.filtered.subtract.{control_name}.benchmark"
-    threads: 16
-    conda: CONDA_SHARED_ENV
-    shell: bamcompare_subtract_cmd
+if bigWigType == "subtract" or bigWigType == "both":
+    rule bamCompare_subtract:
+        input:
+            chip_bam = "filtered_bam/{chip_sample}.filtered.bam",
+            chip_bai = "filtered_bam/{chip_sample}.filtered.bam.bai",
+            control_bam = "filtered_bam/{control_name}.filtered.bam",
+            control_bai = "filtered_bam/{control_name}.filtered.bam.bai"
+        output:
+            "deepTools_ChIP/bamCompare/{chip_sample}.filtered.subtract.{control_name}.bw"
+        params:
+            bw_binsize = bw_binsize,
+            genome_size = genome_size,
+            ignoreForNorm = "--ignoreForNormalization {}".format(ignore_forNorm) if ignore_forNorm else "",
+            read_extension = "--extendReads" if paired else "--extendReads {}".format(fragment_length),
+            blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed else ""
+        log:
+            out = "deepTools_ChIP/logs/bamCompare.subtract.{chip_sample}.filtered.subtract.{control_name}.out",
+            err = "deepTools_ChIP/logs/bamCompare.subtract.{chip_sample}.filtered.subtract.{control_name}.err"
+        benchmark:
+            "deepTools_ChIP/.benchmark/bamCompare.subtract.{chip_sample}.filtered.subtract.{control_name}.benchmark"
+        threads: 16
+        conda: CONDA_SHARED_ENV
+        shell: bamcompare_subtract_cmd
 
 ### deepTools bamCompare log2ratio #######################################################
-
-rule bamCompare_log2:
-    input:
-        chip_bam = "filtered_bam/{chip_sample}.filtered.bam",
-        chip_bai = "filtered_bam/{chip_sample}.filtered.bam.bai",
-        control_bam = "filtered_bam/{control_name}.filtered.bam",
-        control_bai = "filtered_bam/{control_name}.filtered.bam.bai",
-    output:
-        "deepTools_ChIP/bamCompare/{chip_sample}.filtered.log2ratio.over_{control_name}.bw"
-    params:
-        bw_binsize = bw_binsize,
-        ignoreForNorm = "--ignoreForNormalization {}".format(ignore_forNorm) if ignore_forNorm else "",
-        read_extension = "--extendReads" if paired else "--extendReads {}".format(fragment_length),
-        blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed else ""
-    log:
-        out = "deepTools_ChIP/logs/bamCompare.log2ratio.{chip_sample}.{control_name}.filtered.out",
-        err = "deepTools_ChIP/logs/bamCompare.log2ratio.{chip_sample}.{control_name}.filtered.err"
-    benchmark:
-        "deepTools_ChIP/.benchmark/bamCompare.log2ratio.{chip_sample}.{control_name}.filtered.benchmark"
-    threads: 16
-    conda: CONDA_SHARED_ENV
-    shell: bamcompare_log2_cmd
+if bigWigType == "log2ratio" or bigWigType == "both":
+    rule bamCompare_log2:
+        input:
+            chip_bam = "filtered_bam/{chip_sample}.filtered.bam",
+            chip_bai = "filtered_bam/{chip_sample}.filtered.bam.bai",
+            control_bam = "filtered_bam/{control_name}.filtered.bam",
+            control_bai = "filtered_bam/{control_name}.filtered.bam.bai",
+        output:
+            "deepTools_ChIP/bamCompare/{chip_sample}.filtered.log2ratio.over_{control_name}.bw"
+        params:
+            bw_binsize = bw_binsize,
+            ignoreForNorm = "--ignoreForNormalization {}".format(ignore_forNorm) if ignore_forNorm else "",
+            read_extension = "--extendReads" if paired else "--extendReads {}".format(fragment_length),
+            blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed else ""
+        log:
+            out = "deepTools_ChIP/logs/bamCompare.log2ratio.{chip_sample}.{control_name}.filtered.out",
+            err = "deepTools_ChIP/logs/bamCompare.log2ratio.{chip_sample}.{control_name}.filtered.err"
+        benchmark:
+            "deepTools_ChIP/.benchmark/bamCompare.log2ratio.{chip_sample}.{control_name}.filtered.benchmark"
+        threads: 16
+        conda: CONDA_SHARED_ENV
+        shell: bamcompare_log2_cmd
 
 
 ### deepTools plotEnrichment ###################################################
