@@ -76,3 +76,15 @@ Then a larger instance can be spun up and the `RNA-seq` pipeline run as normal.
     export PATH=/data/snakePipes/bin:$PATH
     source activate snakePipes
     RNA-seq -m alignment -i /data/data -o /data/output --local -j 192 /data/indices/GRCm28.yaml
+
+Receiving emails upon pipeline completion
+-----------------------------------------
+
+SnakePipes can send an email to the user once a pipeline is complete. In order for this to work, the following values need to be set in `defaults.yaml`:
+
+:smtpServer: The address of the outgoing SMTP server
+:smtpPort: The port on the SMTP server to use (0 means to use the standard port)
+:onlySSL: Set this to "True" if your SMTP server requires a full SSL connection from the beginning.
+:emailSender: The name of the "user" that sends emails (e.g., snakepipes@your-domain.com)
+
+There are two additional parameters that can be set: `smtpUsername` and `smtpPassword`. These are relevant to SMTP servers that require authentication to send emails. On shared systems, it's important to ensure that other users cannot read your defaults.yaml file if it includes your password!
