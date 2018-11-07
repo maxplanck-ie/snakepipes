@@ -107,11 +107,13 @@ snakePipes produces logs at three diferrent levels.
 
 * **<workflow>.log**: This file would be generated on the working directory, and contains everything printed on the screen via snakemake and python wrappers.
 
+* **<workflow>_organism.yaml**: This file is a copy of the YAML file specifying where all of the genomic indices, annotations, and other files are located.
+
 * **cluster_logs**: In case snakePipes is setup with a cluster, the folder ``cluster_logs`` would contain the output and error messages from the cluster scheduler.
 
 * **<output>/logs**: Each output folder from snakePipes workflows contain their own log (``.err`` and ``.out``) file under ``/logs/`` folder. This contains the messages directly from the executed tools.
 
-.. note:: For most cases where a tool fails, these files contain useful debuggin information. However sometimes, the error can't be captured in these files and therefore ends up in the ``cluster_logs`` folder.
+.. note:: For most cases where a tool fails, these files contain useful debugging information. However sometimes, the error can't be captured in these files and therefore ends up in the ``cluster_logs`` folder.
 
 Quality-Checks
 ~~~~~~~~~~~~~~~~~~~~~
