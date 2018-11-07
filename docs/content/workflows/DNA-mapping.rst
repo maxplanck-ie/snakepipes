@@ -91,8 +91,6 @@ The DNA mapping pipeline will generate output of the following structure::
     ├── filtered_bam
     ├── multiQC
     │   └── multiqc_data
-    ├── Picard_qc
-    │   └── AlignmentSummaryMetrics
     └── Sambamba
 
 In addition to the FASTQ module results (see :doc:`running_snakePipes`), the workflow produces the following outputs:
@@ -107,9 +105,6 @@ In addition to the FASTQ module results (see :doc:`running_snakePipes`), the wor
 
 
  * **deepTools_qc** : Contains various QC files and plots produced by deepTools on the filtered BAM files. These are very useful for evaluation of data quality. The folders are named after the tools. Please look at the `deepTools documentation <https://deeptools.readthedocs.io/en/develop/content/list_of_tools.html>`__ on how to interpret the outputs from each tool.
-
-
- * **Picard_qc** : Contains the output by `picard CollectAlignmentSummaryMetrics <https://broadinstitute.github.io/picard/command-line-overview.html>`__ tool. This output is used for the evaluation of reads within peaks by the ChIp-Seq and ATAC-seq workflows.
 
 
  * **Sambamba** : Contains the alignment metrices evaluated on the BAM files by `Sambamba <http://lomereiter.github.io/sambamba/>`__.

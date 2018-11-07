@@ -1,7 +1,7 @@
 import subprocess
 
 # MACS2 should be called on already filtered, e.g. duplicate-free, BAM files
-# for paired-end BAM files, Picard MarkDuplicates is fragment-based and
+# for paired-end BAM files, sambamba markdupes is fragment-based and
 # therefore superior to MACS2 mate 1-based duplicate detection
 
 
@@ -86,7 +86,6 @@ else:
 rule MACS2_peak_qc:
     input:
         bam = "filtered_bam/{sample}.filtered.bam",
-        aln_metrics = "Picard_qc/AlignmentSummaryMetrics/{sample}.alignment_summary_metrics.txt",
         xls = "MACS2/{sample}.filtered.BAM_peaks.xls"
     output:
         qc = "MACS2/{sample}.filtered.BAM_peaks.qc.txt"
@@ -102,8 +101,8 @@ rule MACS2_peak_qc:
         # get the number of peaks
         peak_count=`wc -l < {params.peaks}`
 
-        # get the number of mapped reads from Picard CollectAlignmentSummaryMetrics output
-        mapped_reads=`egrep '^PAIR|UNPAIRED' {input.aln_metrics} | cut -f 6`
+        # get the number of mapped reads
+        mapped_reads=`samtools view -c -F 4 {input.bam}`
 
         # calculate the number of alignments overlapping the peaks
         # exclude reads flagged as unmapped (unmapped reads will be reported when using -L)

@@ -54,7 +54,6 @@ rule plotFingerprint_allelic:
 rule MACS2_peak_qc:
     input:
         bam = "filtered_bam/{sample}.filtered.bam",
-        aln_metrics = "Picard_qc/AlignmentSummaryMetrics/{sample}.alignment_summary_metrics.txt",
         xls = os.path.join(outdir_MACS2, '{sample}.filtered.BAM_peaks.xls')
     output:
         qc = os.path.join(outdir_ATACqc, "{sample}.filtered.BAM_peaks.qc.txt")
@@ -68,8 +67,8 @@ rule MACS2_peak_qc:
         # get the number of peaks
         peak_count=`cat {params.peaks} | wc -l`
 
-        # get the number of mapped reads from Picard CollectAlignmentSummaryMetrics output
-        mapped_reads=`egrep '^PAIR|UNPAIRED' {input.aln_metrics} | cut -f 6`
+        # get the number of mapped reads
+        mapped_reads=`samtools view -c -F 4 {input.bam}`
 
         # calculate the number of alignments overlapping the peaks
         # exclude reads flagged as unmapped (unmapped reads will be reported when using -L)

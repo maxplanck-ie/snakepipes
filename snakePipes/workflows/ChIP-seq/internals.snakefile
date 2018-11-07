@@ -115,8 +115,7 @@ all_samples = sorted(control_samples + chip_samples)
 for sample in all_samples:
     req_files = [
         os.path.join(workingdir, "filtered_bam/"+sample+".filtered.bam"),
-        os.path.join(workingdir, "filtered_bam/"+sample+".filtered.bam.bai"),
-        os.path.join(workingdir, "Picard_qc/AlignmentSummaryMetrics/"+sample+".alignment_summary_metrics.txt"),
+        os.path.join(workingdir, "filtered_bam/"+sample+".filtered.bam.bai")
     ]
 
     # check for all samples whether all required files exist
@@ -129,4 +128,3 @@ for sample in all_samples:
 if paired:
     if not os.path.isfile(os.path.join(workingdir, "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv")):
         sys.exit('ERROR: {} is required but not present\n'.format(os.path.join(workingdir, "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv")))
-        req_files.append(os.path.join(workingdir, "Picard_qc/InsertSizeMetrics/"+sample+".insert_size_metrics.txt"))
