@@ -4,3 +4,5 @@ sc_bam_featureCounts_genomic:
     memory: 2G
 cluster_cells_raceid:
     memory: 6G
+annotation_bed2fasta:
+    memory: 4G
