@@ -40,14 +40,12 @@ if paired:
                 --outdir MACS2 --name {wildcards.chip_sample}.filtered.BAM \
                 --nomodel --extsize {params.fragment_length} {params.broad_calling} > {log.out} 2> {log.err}
 
-            if [ {params.bampe} == "TRUE" ]; then
-                # also run MACS2 in paired-end mode BAMPE for comparison with single-end mode
-                macs2 callpeak -t {input.chip} \
-                    {params.control_param} -f BAMPE \
-                    -g {params.genome_size} --keep-dup all \
-                    --outdir MACS2 --name {wildcards.chip_sample}.filtered.BAMPE \
-                    {params.broad_calling} > {log.out}.BAMPE 2> {log.err}.BAMPE
-            fi
+            # also run MACS2 in paired-end mode BAMPE for comparison with single-end mode
+            macs2 callpeak -t {input.chip} \
+                {params.control_param} -f BAMPE \
+                -g {params.genome_size} --keep-dup all \
+                --outdir MACS2 --name {wildcards.chip_sample}.filtered.BAMPE \
+                {params.broad_calling} > {log.out}.BAMPE 2> {log.err}.BAMPE
             """
 else:
     rule MACS2:
