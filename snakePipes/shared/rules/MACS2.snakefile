@@ -40,8 +40,7 @@ if paired:
                 --outdir MACS2 --name {wildcards.chip_sample}.filtered.BAM \
                 --nomodel --extsize {params.fragment_length} {params.broad_calling} > {log.out} 2> {log.err}
 
-            if [{params.bampe} == "TRUE"]
-            then
+            if [ {params.bampe} == "TRUE" ]; then
                 # also run MACS2 in paired-end mode BAMPE for comparison with single-end mode
                 macs2 callpeak -t {input.chip} \
                     {params.control_param} -f BAMPE \
