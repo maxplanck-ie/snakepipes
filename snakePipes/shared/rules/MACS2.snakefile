@@ -112,7 +112,7 @@ rule MACS2_peak_qc:
 
         # compute peak genome coverage
         peak_len=`awk '{{total+=$3-$2}}END{{print total}}' {params.peaks}`
-        genome_size=`awk '{{total+=$3-$2}}END{{print total}}' {params.peaks}`
+        genome_size=`awk '{{total+=$3-$2}}END{{print total}}' {params.genome_index}`
         genomecov=`bc -l <<< "$peak_len/$genome_size"`
 
         # write peak-based QC metrics to output file
