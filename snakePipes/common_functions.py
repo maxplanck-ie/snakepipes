@@ -365,6 +365,14 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
         cluster_config = merge_dicts(cluster_config, user_cluster_config)  # merge/override variables from user_config.yaml
     write_configfile(os.path.join(args.outdir, '{}.cluster_config.yaml'.format(workflowName)), cluster_config)
 
+    # Save the organism YAML file as {PIPELINE}_organism.yaml
+    orgyaml = os.path.join(baseDir, "shared/organisms/{}.yaml".format(args.genome))
+    if not os.path.isfile(orgyaml):
+        orgyaml = args.genome
+    organismYAMLname = os.path.join(args.outdir, "{}_organism.yaml".format(workflowName))
+    if os.path.abspath(organismYAMLname) != os.path.abspath(orgyaml):
+        shutil.copyfile(orgyaml, organismYAMLname)
+
     if args.notemp:
         args.snakemake_options += " --notemp"
 
