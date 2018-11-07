@@ -1,7 +1,7 @@
 import subprocess
 
 # MACS2 should be called on already filtered, e.g. duplicate-free, BAM files
-# for paired-end BAM files, Picard MarkDuplicates is fragment-based and
+# for paired-end BAM files, sambamba markdupes is fragment-based and
 # therefore superior to MACS2 mate 1-based duplicate detection
 
 
@@ -40,15 +40,12 @@ if paired:
                 --outdir MACS2 --name {wildcards.chip_sample}.filtered.BAM \
                 --nomodel --extsize {params.fragment_length} {params.broad_calling} > {log.out} 2> {log.err}
 
-            if [{params.bampe} == "TRUE"]
-            then
-                # also run MACS2 in paired-end mode BAMPE for comparison with single-end mode
-                macs2 callpeak -t {input.chip} \
-                    {params.control_param} -f BAMPE \
-                    -g {params.genome_size} --keep-dup all \
-                    --outdir MACS2 --name {wildcards.chip_sample}.filtered.BAMPE \
-                    {params.broad_calling} > {log.out}.BAMPE 2> {log.err}.BAMPE
-            fi
+            # also run MACS2 in paired-end mode BAMPE for comparison with single-end mode
+            macs2 callpeak -t {input.chip} \
+                {params.control_param} -f BAMPE \
+                -g {params.genome_size} --keep-dup all \
+                --outdir MACS2 --name {wildcards.chip_sample}.filtered.BAMPE \
+                {params.broad_calling} > {log.out}.BAMPE 2> {log.err}.BAMPE
             """
 else:
     rule MACS2:
@@ -86,7 +83,6 @@ else:
 rule MACS2_peak_qc:
     input:
         bam = "filtered_bam/{sample}.filtered.bam",
-        aln_metrics = "Picard_qc/AlignmentSummaryMetrics/{sample}.alignment_summary_metrics.txt",
         xls = "MACS2/{sample}.filtered.BAM_peaks.xls"
     output:
         qc = "MACS2/{sample}.filtered.BAM_peaks.qc.txt"
@@ -102,8 +98,8 @@ rule MACS2_peak_qc:
         # get the number of peaks
         peak_count=`wc -l < {params.peaks}`
 
-        # get the number of mapped reads from Picard CollectAlignmentSummaryMetrics output
-        mapped_reads=`egrep '^PAIR|UNPAIRED' {input.aln_metrics} | cut -f 6`
+        # get the number of mapped reads
+        mapped_reads=`samtools view -c -F 4 {input.bam}`
 
         # calculate the number of alignments overlapping the peaks
         # exclude reads flagged as unmapped (unmapped reads will be reported when using -L)
@@ -114,7 +110,7 @@ rule MACS2_peak_qc:
 
         # compute peak genome coverage
         peak_len=`awk '{{total+=$3-$2}}END{{print total}}' {params.peaks}`
-        genome_size=`awk '{{total+=$3-$2}}END{{print total}}' {params.peaks}`
+        genome_size=`awk '{{total+=$3-$2}}END{{print total}}' {params.genome_index}`
         genomecov=`bc -l <<< "$peak_len/$genome_size"`
 
         # write peak-based QC metrics to output file

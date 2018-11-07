@@ -53,12 +53,6 @@ def run_Trimming(trim, fastqc):
     else:
         return([])
 
-def run_CollectInsertSizeMetrics(paired):
-    if paired:
-        return( expand("Picard_qc/InsertSizeMetrics/{sample}.insert_size_metrics.txt", sample = samples) )
-    else:
-        return([])
-
 # get samples to merge
 sample_dict = get_sampleInfo(sample_info)
 GROUPS = sample_dict.keys()

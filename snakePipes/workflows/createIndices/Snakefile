@@ -32,6 +32,7 @@ organismDictionary = {'genome_size': 0,
 
 targets = [os.path.join(outdir, x) for x in ["genome_fasta/genome.fa",
                                              "genome_fasta/genome.fa.fai",
+                                             "genome_fasta/genome.dict",
                                              "genome_fasta/genome.2bit"]]
 
 organismDictionary['genome_fasta'] = os.path.join(outdir, "genome_fasta/genome.fa")

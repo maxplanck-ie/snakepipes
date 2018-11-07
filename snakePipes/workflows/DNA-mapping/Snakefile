@@ -32,9 +32,6 @@ if trim:
 # BAM filtering
 include: os.path.join(maindir, "shared", "rules", "bam_filtering.snakefile")
 
-# Picard CollectAlignmentSummaryMetrics and CollectInsertSizeMetrics
-include: os.path.join(maindir, "shared", "rules", "Picard_qc.snakefile")
-
 #Sambamba Markdup
 include: os.path.join(maindir, "shared", "rules", "sambamba.snakefile")
 
@@ -92,12 +89,6 @@ def run_Trimming(trim, fastqc):
         return( expand(fastq_dir+"/{sample}{read}.fastq.gz", sample = samples, read = reads) )
     else:
         return([])
-
-#def run_CollectInsertSizeMetrics(paired):
-#    if paired:
-#        return( expand("Picard_qc/InsertSizeMetrics/{sample}.insert_size_metrics.txt", sample = samples) )
-#    else:
-#        return([])
 
 def run_computeGCBias(gcbias):
     file_list = []
@@ -188,7 +179,6 @@ rule all:
         expand(mapping_prg+"/{sample}.bam", sample = samples),
         expand("Sambamba/{sample}.markdup.txt", sample = samples),
         expand("filtered_bam/{sample}.filtered.bam", sample = samples),
-        expand("Picard_qc/AlignmentSummaryMetrics/{sample}.alignment_summary_metrics.txt", sample = samples),
         expand("bamCoverage/{sample}.seq_depth_norm.bw", sample = samples),
         expand("bamCoverage/{sample}.filtered.seq_depth_norm.bw", sample = samples),
         run_computeGCBias(gcbias),
