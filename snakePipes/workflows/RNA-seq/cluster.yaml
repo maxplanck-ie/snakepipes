@@ -8,3 +8,7 @@ HISAT2:
     memory: 6G
 STAR:
     memory: 6G
+create_annotation_bed:
+    memory: 4G
+annotation_bed2fasta:
+    memory: 4G

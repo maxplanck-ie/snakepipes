@@ -103,9 +103,10 @@ rule Salmon_symlinks:
     params:
         quant = "{sample}/quant.sf",
         quant_genes = "{sample}/quant.genes.sf"
-    shell:
-        "ln -s -f {params.quant} {output.quant}" #&& touch -h {output.quant};
-        "ln -s -f {params.quant_genes} {output.quant_genes}" # && touch -h {output.quant_genes}
+    shell: """
+        ln -s -f {params.quant} {output.quant}
+        ln -s -f {params.quant_genes} {output.quant_genes}
+        """
 
 
 rule Salmon_TPM:
