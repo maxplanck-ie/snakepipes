@@ -27,5 +27,5 @@ rule qc_report_all:
     output:
         "QC_report/QC_report_all.tsv"
     shell: """
-        awk 'NR == 1; NR > 1 {{print $0 | \"sort -K1,1V\"}}' {input.metrics} | cut -f4,8,10,12 | paste {input.flagstat} - > {output}
+        awk 'NR == 1; NR > 1 {{print $0 | \"sort -k1,1V\"}}' {input.metrics} | cut -f4,8,10,12 | paste {input.flagstat} - > {output}
         """
