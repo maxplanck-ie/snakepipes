@@ -22,7 +22,7 @@ if downsample:
     else:
         rule FASTQdownsample:
             input:
-                indir+"/{sample}.fastq.gz"
+                indir+"/{sample}"+ext
             output:
                 fq = "FASTQ/{sample}.fastq.gz",
             threads: 12
@@ -35,7 +35,7 @@ if downsample:
 else:
     rule FASTQ:
         input:
-            indir+"/{sample}{read}.fastq.gz"
+            indir+"/{sample}{read}"+ext
         output:
             "FASTQ/{sample}{read}.fastq.gz"
         shell:
