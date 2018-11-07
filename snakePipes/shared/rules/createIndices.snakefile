@@ -42,6 +42,14 @@ rule fastaIndex:
         samtools faidx {input}
         """
 
+# Default memory allocation: 4G
+rule fastaDict:
+    input: genome_fasta
+    output: genome_dict
+    conda: CONDA_SHARED_ENV
+    shell: """
+        samtools dict -o {output} {input}
+        """
 
 # Default memory allocation: 8G
 rule make2bit:

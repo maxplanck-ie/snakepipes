@@ -16,3 +16,5 @@ bwaIndex:
     memory: 8G
 bwamethIndex:
     memory: 20G
+fastaDict:
+    memory: 4G
