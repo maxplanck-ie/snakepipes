@@ -377,7 +377,7 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
     if not os.path.isfile(orgyaml):
         orgyaml = args.genome
     organismYAMLname = os.path.join(args.outdir, "{}_organism.yaml".format(workflowName))
-    if os.path.abspath(organismYAMLname) != os.path.abspath(orgyaml):
+    if workflowName != "createIndices" and os.path.abspath(organismYAMLname) != os.path.abspath(orgyaml):
         shutil.copyfile(orgyaml, organismYAMLname)
 
     if args.notemp:
