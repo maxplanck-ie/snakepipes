@@ -69,8 +69,7 @@ There is a configuration file in ``snakePipes/workflows/ATACseq/defaults.yaml``:
     ## preconfigured target genomes (mm9,mm10,dm3,...) , see /path/to/snakemake_workflows/shared/organisms/
     ## Value can be also path to your own genome config file!
     genome:
-    ## Bin size of output files in bigWig format
-    bw_binsize: 25
+    ## The maximum fragment size to retain. This should typically be the size of a nucleosome
     fragmentSize_cutoff: 150
     verbose: false
     # sampleInfo_DB
@@ -79,7 +78,7 @@ There is a configuration file in ``snakePipes/workflows/ATACseq/defaults.yaml``:
     window_size: 20
     fragmentCount_cutoff: 1
 
-The only parameters that are useful to change are ``bw_binsize``, ``fragmentSize_cutoff``, and ``window_size``. Note, however that those can be more conveniently changed on the command line.
+The only parameters that are useful to change are ``fragmentSize_cutoff``, and ``window_size``. Note, however that those can be more conveniently changed on the command line.
 
 * **window_size**: is the size of windows to test differential binding using CSAW. The default small window size is sufficient for most analysis, since an ATAC-seq peak is sharp.
 
@@ -123,7 +122,7 @@ Assuming a sample sheet is used, the following will be **added** to the working 
         ├── sample1.filtered.BAM_peaks.qc.txt
         └── sample2.filtered.BAM_peaks.qc.txt
 
-Currently the ATAC-seq workflow performs detection of open chromatin regions via `MACS2<https://github.com/taoliu/MACS>`__, and if a sample sheet is provided, the detection of differential open chromatin sites via `CSAW<https://bioconductor.org/packages/release/bioc/html/csaw.html>`__. There are additionally log files in most of the directories. The various outputs are documented in the CSAW and MACS2 documentation.
+Currently the ATAC-seq workflow performs detection of open chromatin regions via `MACS2 <https://github.com/taoliu/MACS>`__, and if a sample sheet is provided, the detection of differential open chromatin sites via `CSAW <https://bioconductor.org/packages/release/bioc/html/csaw.html>`__. There are additionally log files in most of the directories. The various outputs are documented in the CSAW and MACS2 documentation.
 
 * **MACS2_QC**: contains a number of QC metrics that we find useful, namely :
     * the number of peaks

@@ -254,6 +254,23 @@ def setDefaults(fileName):
     return baseDir, workflowDir, defaults
 
 
+def handleUserArgs(args, defaults, args_func):
+    """
+    If a user supplies a custom YAML file then that must then replace the defaults.
+    However command line options need to take precedence, so update defaults and
+    simply reparse the command line options (with args_func().parse_args())
+    """
+    if args.configfile:
+        if not os.path.exists(args.configfile):
+            sys.exit("\nError! Provided configfile (-c) not found! ({})\n".format(args.configfile))
+        user_config = load_configfile(args.configfile, False)
+        defaults = merge_dicts(defaults, user_config)
+        parser = args_func(defaults)
+        args = parser.parse_args()
+    defaults.update(vars(args))
+    return args, defaults
+
+
 def sendEmail(args, returnCode):
     """
     Try to send an email to the user. Errors must be non-fatal.
@@ -310,10 +327,7 @@ def checkCommonArguments(args, baseDir, outDir=False, createIndices=False):
                 sys.exit("\nError! Working-dir (-d) dir not found! ({})\n".format(args.workingdir))
             args.outdir = args.workingdir
     args.cluster_logs_dir = os.path.join(args.outdir, "cluster_logs")
-    # 2. Config file
-    if args.configfile and not os.path.exists(args.configfile):
-        sys.exit("\nError! Provided configfile (-c) not found! ({})\n".format(args.configfile))
-    # 3. Sample info file
+    # 2. Sample info file
     if 'sample_info' in args and args.sample_info:
         if os.path.exists(os.path.abspath(args.sample_info)):
             args.sample_info = os.path.abspath(args.sample_info)
@@ -321,7 +335,7 @@ def checkCommonArguments(args, baseDir, outDir=False, createIndices=False):
             sys.exit("\nSample info file not found! (--DB {})\n".format(args.sample_info))
         if not check_sample_info_header(args.sample_info):
             sys.exit("ERROR: Please use 'name' and 'condition' as column headers in sample info file! ({})\n".format(args.sample_info))
-    # 4. get abspath from user provided genome/organism file
+    # 3. get abspath from user provided genome/organism file
     if not createIndices:
         if not os.path.isfile(os.path.join(baseDir, "shared/organisms/{}.yaml".format(args.genome))) and os.path.isfile(args.genome):
             args.genome = os.path.abspath(args.genome)
@@ -342,18 +356,11 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
     workflowName = os.path.basename(callingScript)
     snakemake_path = os.path.dirname(os.path.abspath(callingScript))
 
-    # merge configuration dicts
-    config = defaults   # 1) form defaults.yaml
-    if args.configfile:
-        user_config = load_configfile(args.configfile, False)
-        config = merge_dicts(config, user_config)  # 2) from user_config.yaml
-    config_wrap = config_diff(vars(args), defaults)  # 3) from wrapper parameters
-    config = merge_dicts(config, config_wrap)
-
     # Ensure the log directory exists
     os.makedirs(args.cluster_logs_dir, exist_ok=True)
 
     # save to configs.yaml in outdir
+    config = defaults
     write_configfile(os.path.join(args.outdir, '{}.config.yaml'.format(workflowName)), config)
 
     # merge cluster config files: 1) global one, 2) workflow specific one, 3) user provided one
