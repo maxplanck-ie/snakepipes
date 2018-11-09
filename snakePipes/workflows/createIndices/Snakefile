@@ -18,6 +18,7 @@ organismDictionary = {'genome_size': 0,
                       'genome_fasta': '',
                       'genome_index': '',
                       'genome_2bit': '',
+                      'genome_dict': '',
                       'bowtie2_index': '',
                       'hisat2_index': '',
                       'bwa_index': '',
@@ -38,6 +39,7 @@ targets = [os.path.join(outdir, x) for x in ["genome_fasta/genome.fa",
 organismDictionary['genome_fasta'] = os.path.join(outdir, "genome_fasta/genome.fa")
 organismDictionary['genome_index'] = os.path.join(outdir, "genome_fasta/genome.fa.fai")
 organismDictionary['genome_2bit'] = os.path.join(outdir, "genome_fasta/genome.2bit")
+organismDictionary['genome_dict'] = os.path.join(outdir, "genome_fasta/genome.dict")
 
 if gtfURL:
     targets.extend([os.path.join(outdir, x) for x in ["annotation/genes.gtf",
