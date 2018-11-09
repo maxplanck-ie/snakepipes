@@ -1,5 +1,31 @@
 ## make standard annotation
 
+# #!/bin/bash
+# 
+# gtf=$1
+# 
+# cat $gtf | head -n 10000 > tmp.gtf
+# 
+# gtf="tmp.gtf"
+# 
+# join -t $'\t' -o auto --check-order -1 4 -2 2 \
+#     <(gtfToGenePred -ignoreGroupsWithoutExons $gtf /dev/stdout | genePredToBed /dev/stdin /dev/stdout | tr ' ' $'\t' | sort -k4,4) \
+#     <(cat $gtf | \
+#     awk '$3~"transcript|exon"{print $0}' | tr -d "\";" | \
+#     awk '{pos=match($0,"gene_id.[^[:space:]]*"); gid=substr($0,RSTART,RLENGTH); \
+#         pos=match($0,"transcript_id.[^[:space:]]*"); if (pos!=0) tid=substr($0,RSTART,RLENGTH); else tid=gid; \
+#         pos=match($0,"transcript_name.[^[:space:]]*"); if (pos!=0) tna=substr($0,RSTART,RLENGTH); else tna=tid; \
+#         pos=match($0,"transcript_[bio]*type.[^[:space:]]+"); if (pos!=0) tt=substr($0,RSTART,RLENGTH); else tt="transcript_biotype NA";
+#         pos=match($0,"gene_name.[^[:space:]]*");  if (pos!=0) gna=substr($0,RSTART,RLENGTH); else gna=gid;\
+#         pos=match($0,"gene_[bio]*type.[^[:space:]]+"); if (pos!=0) gt=substr($0,RSTART,RLENGTH); else gt="gene_biotype NA"; \
+#         pos=match($0,"transcript_support_level.[^[:space:]]+"); if (pos!=0) tsl=substr($0,RSTART,RLENGTH);else tsl="transcript_support_level NA"; \
+#         pos=match($0,"[[:space:]]level.[^[:space:]]*"); if (pos!=0) lvl=substr($0,RSTART,RLENGTH);else lvl="level NA"; \
+#         pos=match($0,"tag.basic"); if (lvl~!"NA"){if (pos==0) basic="full"; else basic="basic"} else basic="NA";  \
+#         OFS="\t"; print tid,tna,tt,gid,gna,gt,"gencode",basic,tsl,lvl}' | \
+#      tr " " "\t" | sort | uniq | sort -k2,2) | \
+# awk '{$13=$13"\t"$1; $4=$4"\t"$1; OFS="\t";print $0}' | \
+# cut --complement -f 1,14,16,18,20,22,24
+
 if genes_gtf.lower().find("gencode")>=0:
     rule create_annotation_bed:
         input:
