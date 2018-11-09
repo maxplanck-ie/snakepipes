@@ -5,13 +5,13 @@ __default__:
 snp_split:
     memory: 10G
 bamCoverage:
-    memory: 4G
+    memory: 5G
 bamCoverage_RPKM:
-    memory: 4G
+    memory: 5G
 bamCoverage_coverage:
-    memory: 4G
+    memory: 5G
 bamCoverage_raw:
-    memory: 4G
+    memory: 5G
 plotCorrelation_pearson:
     memory: 3G
 plotCorrelation_spearman:
