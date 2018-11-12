@@ -1,78 +1,68 @@
 ## make standard annotation
 
-# #!/bin/bash
-# 
-# gtf=$1
-# 
-# cat $gtf | head -n 10000 > tmp.gtf
-# 
-# gtf="tmp.gtf"
-# 
-# join -t $'\t' -o auto --check-order -1 4 -2 2 \
-#     <(gtfToGenePred -ignoreGroupsWithoutExons $gtf /dev/stdout | genePredToBed /dev/stdin /dev/stdout | tr ' ' $'\t' | sort -k4,4) \
-#     <(cat $gtf | \
-#     awk '$3~"transcript|exon"{print $0}' | tr -d "\";" | \
-#     awk '{pos=match($0,"gene_id.[^[:space:]]*"); gid=substr($0,RSTART,RLENGTH); \
-#         pos=match($0,"transcript_id.[^[:space:]]*"); if (pos!=0) tid=substr($0,RSTART,RLENGTH); else tid=gid; \
-#         pos=match($0,"transcript_name.[^[:space:]]*"); if (pos!=0) tna=substr($0,RSTART,RLENGTH); else tna=tid; \
-#         pos=match($0,"transcript_[bio]*type.[^[:space:]]+"); if (pos!=0) tt=substr($0,RSTART,RLENGTH); else tt="transcript_biotype NA";
-#         pos=match($0,"gene_name.[^[:space:]]*");  if (pos!=0) gna=substr($0,RSTART,RLENGTH); else gna=gid;\
-#         pos=match($0,"gene_[bio]*type.[^[:space:]]+"); if (pos!=0) gt=substr($0,RSTART,RLENGTH); else gt="gene_biotype NA"; \
-#         pos=match($0,"transcript_support_level.[^[:space:]]+"); if (pos!=0) tsl=substr($0,RSTART,RLENGTH);else tsl="transcript_support_level NA"; \
-#         pos=match($0,"[[:space:]]level.[^[:space:]]*"); if (pos!=0) lvl=substr($0,RSTART,RLENGTH);else lvl="level NA"; \
-#         pos=match($0,"tag.basic"); if (lvl~!"NA"){if (pos==0) basic="full"; else basic="basic"} else basic="NA";  \
-#         OFS="\t"; print tid,tna,tt,gid,gna,gt,"gencode",basic,tsl,lvl}' | \
-#      tr " " "\t" | sort | uniq | sort -k2,2) | \
-# awk '{$13=$13"\t"$1; $4=$4"\t"$1; OFS="\t";print $0}' | \
-# cut --complement -f 1,14,16,18,20,22,24
+#             "join -t $'\t' -o auto --check-order -1 4 -2 2 "
+#             "<(gtfToGenePred -ignoreGroupsWithoutExons {input.gtf} /dev/stdout | genePredToBed /dev/stdin /dev/stdout | tr ' ' $'\t' | sort -k4,4) "
+#             """ <(cat {input.gtf} | awk '$3~"transcript|exon"{{print $0}}' | tr -d "\\";" | """
+#             """ awk '{{pos=match($0,"tag.basic"); if (pos==0) basic="full"; else basic="basic"; """
+#             """ pos=match($0,"gene_[bio]*type.[^[:space:]]+"); gt=substr($0,RSTART,RLENGTH); """
+#             """ pos=match($0,"transcript_[bio]*type.[^[:space:]]+"); if (pos!=0) tt=substr($0,RSTART,RLENGTH); else tt="transcript_type NA"; """
+#             """ pos=match($0,"transcript_support_level.[^[:space:]]+"); if (pos!=0) tsl=substr($0,RSTART,RLENGTH);else tsl="transcript_support_level NA"; """
+#             """ pos=match($0,"[[:space:]]level.[^[:space:]]*"); if (pos!=0) lvl=substr($0,RSTART,RLENGTH);else lvl="level NA"; """
+#             """ pos=match($0,"gene_id.[^[:space:]]*"); gid=substr($0,RSTART,RLENGTH); """
+#             """ pos=match($0,"transcript_id.[^[:space:]]*"); tid=substr($0,RSTART,RLENGTH); """
+#             """ pos=match($0,"transcript_name.[^[:space:]]*"); tna=substr($0,RSTART,RLENGTH); """
+#             """ pos=match($0,"gene_name.[^[:space:]]*"); gna=substr($0,RSTART,RLENGTH); """
+#             """ OFS="\\t"; print tid,tna,tt,gid,gna,gt,"gencode",basic,tsl,lvl}}' | """
+#             """ tr " " "\\t" | sort | uniq | sort -k2,2) | """
+#             """ awk '{{$13=$13"\\t"$1; $4=$4"\\t"$1; OFS="\\t";print $0}}' | """
+#             """ cut --complement -f 1,14,16,18,20,22,24 > {output.bed_annot} """
 
-if genes_gtf.lower().find("gencode")>=0:
-    rule create_annotation_bed:
-        input:
-            gtf = genes_gtf
-        output:
-            bed_annot = "Annotation/genes.annotated.bed"
-        conda: CONDA_RNASEQ_ENV
-        shell:
-            "join -t $'\t' -o auto --check-order -1 4 -2 2 "
-            "<(gtfToGenePred -ignoreGroupsWithoutExons {input.gtf} /dev/stdout | genePredToBed /dev/stdin /dev/stdout | tr ' ' $'\t' | sort -k4,4) "
-            """ <(cat {input.gtf} | awk '$3~"transcript|exon"{{print $0}}' | tr -d "\\";" | """
-            """ awk '{{pos=match($0,"tag.basic"); if (pos==0) basic="full"; else basic="basic"; """
-            """ pos=match($0,"gene_[bio]*type.[^[:space:]]+"); gt=substr($0,RSTART,RLENGTH); """
-            """ pos=match($0,"transcript_[bio]*type.[^[:space:]]+"); if (pos!=0) tt=substr($0,RSTART,RLENGTH); else tt="transcript_type NA"; """
-            """ pos=match($0,"transcript_support_level.[^[:space:]]+"); if (pos!=0) tsl=substr($0,RSTART,RLENGTH);else tsl="transcript_support_level NA"; """
-            """ pos=match($0,"[[:space:]]level.[^[:space:]]*"); if (pos!=0) lvl=substr($0,RSTART,RLENGTH);else lvl="level NA"; """
-            """ pos=match($0,"gene_id.[^[:space:]]*"); gid=substr($0,RSTART,RLENGTH); """
-            """ pos=match($0,"transcript_id.[^[:space:]]*"); tid=substr($0,RSTART,RLENGTH); """
-            """ pos=match($0,"transcript_name.[^[:space:]]*"); tna=substr($0,RSTART,RLENGTH); """
-            """ pos=match($0,"gene_name.[^[:space:]]*"); gna=substr($0,RSTART,RLENGTH); """
-            """ OFS="\\t"; print tid,tna,tt,gid,gna,gt,"gencode",basic,tsl,lvl}}' | """
-            """ tr " " "\\t" | sort | uniq | sort -k2,2) | """
-            """ awk '{{$13=$13"\\t"$1; $4=$4"\\t"$1; OFS="\\t";print $0}}' | """
-            """ cut --complement -f 1,14,16,18,20,22,24 > {output.bed_annot} """
-elif genes_gtf.lower().find("ensembl")>=0:
-    rule create_annotation_bed:
-        input:
-            gtf = genes_gtf
-        output:
-            bed_annot = "Annotation/genes.annotated.bed"
-        conda: CONDA_RNASEQ_ENV
-        shell:
-            "join -t $'\t' -o auto --check-order -1 4 -2 2 "
-            "<(gtfToGenePred {input.gtf} /dev/stdout | genePredToBed /dev/stdin /dev/stdout | tr ' ' $'\t' | sort -k4,4) "
-            """ <(cat {input.gtf} | awk '$3=="transcript"{{print $0}}' | tr -d "\\";" | """
-            """ awk '{{"""
-            """ pos=match($0,"gene_biotype.[^[:space:]]+"); if (pos!=0) gt=substr($0,RSTART,RLENGTH); else gt="gene_biotype unknown_gene_biotype"; """
-            """ pos=match($0,"transcript_biotype.[^[:space:]]+"); if (pos!=0) tt=substr($0,RSTART,RLENGTH); else tt="transcript_biotype unknown_tx_biotype"; """
-            """ pos=match($0,"gene_id.[^[:space:]]*"); gid=substr($0,RSTART,RLENGTH); """
-            """ pos=match($0,"transcript_id.[^[:space:]]*"); tid=substr($0,RSTART,RLENGTH); """
-            """ pos=match($0,"transcript_name.[^[:space:]]*"); if (pos!=0) tna=substr($0,RSTART,RLENGTH); else tna=tid; """
-            """ pos=match($0,"gene_name.[^[:space:]]*"); if (pos!=0) gna=substr($0,RSTART,RLENGTH); else gna=gid; """
-            """ OFS="\\t"; print tid,tna,tt,gid,gna,gt}}' | """
-            """ tr " " "\\t" | sort -k2,2) | """
-            """ awk '{{$13=$13"\\t"$1; $4=$4"\\t"$1; OFS="\\t";print $0}}' | """
-            """ cut --complement -f 1,14,16,18,20,22,24 > {output.bed_annot} """
+#     rule create_annotation_bed:
+#         input:
+#             gtf = genes_gtf
+#         output:
+#             bed_annot = "Annotation/genes.annotated.bed"
+#         conda: CONDA_RNASEQ_ENV
+#         shell:
+#             "join -t $'\t' -o auto --check-order -1 4 -2 2 "
+#             "<(gtfToGenePred {input.gtf} /dev/stdout | genePredToBed /dev/stdin /dev/stdout | tr ' ' $'\t' | sort -k4,4) "
+#             """ <(cat {input.gtf} | awk '$3=="transcript"{{print $0}}' | tr -d "\\";" | """
+#             """ awk '{{"""
+#             """ pos=match($0,"gene_biotype.[^[:space:]]+"); if (pos!=0) gt=substr($0,RSTART,RLENGTH); else gt="gene_biotype unknown_gene_biotype"; """
+#             """ pos=match($0,"transcript_biotype.[^[:space:]]+"); if (pos!=0) tt=substr($0,RSTART,RLENGTH); else tt="transcript_biotype unknown_tx_biotype"; """
+#             """ pos=match($0,"gene_id.[^[:space:]]*"); gid=substr($0,RSTART,RLENGTH); """
+#             """ pos=match($0,"transcript_id.[^[:space:]]*"); tid=substr($0,RSTART,RLENGTH); """
+#             """ pos=match($0,"transcript_name.[^[:space:]]*"); if (pos!=0) tna=substr($0,RSTART,RLENGTH); else tna=tid; """
+#             """ pos=match($0,"gene_name.[^[:space:]]*"); if (pos!=0) gna=substr($0,RSTART,RLENGTH); else gna=gid; """
+#             """ OFS="\\t"; print tid,tna,tt,gid,gna,gt}}' | """
+#             """ tr " " "\\t" | sort -k2,2) | """
+#             """ awk '{{$13=$13"\\t"$1; $4=$4"\\t"$1; OFS="\\t";print $0}}' | """
+#             """ cut --complement -f 1,14,16,18,20,22,24 > {output.bed_annot} """
 ## else the gtf format is not supported!!!
+
+rule create_annotation_bed:
+    input:
+        gtf = genes_gtf
+    output:
+        bed_annot = "Annotation/genes.annotated.bed"
+    conda: CONDA_RNASEQ_ENV
+    shell:
+        "join -t $'\t' -o auto --check-order -1 4 -2 1 "
+        "<(gtfToGenePred -ignoreGroupsWithoutExons {input.gtf} /dev/stdout | genePredToBed /dev/stdin /dev/stdout | tr ' ' $'\t' | sort -k4,4) "
+        "<(cat {input.gtf} | "
+        """ awk '$1!~"^#" && $3~"transcript|exon|start_codon|stop_codon|CDS"{{print $0}}' | tr -d "\\";" | """
+        """ awk '{{pos=match($0,"gene_id.([^[:space:]]+)",a); if (pos!=0) gid=a[1];else exit 1; """
+        """ pos=match($0,"transcript_id.([^[:space:]]+)",a); if (pos!=0) tid=a[1]; else tid=gid; """
+        """ pos=match($0,"transcript_name.([^[:space:]]+)",a); if (pos!=0) tna=a[1]; else tna=tid; """
+        """ pos=match($0,"transcript_[bio]*type.([^[:space:]]+)",a); if (pos!=0) tt=a[1]; else tt="NA"; """
+        """ pos=match($0,"gene_name.([^[:space:]]+)",a);  if (pos!=0) gna=a[1]; else gna=gid; """
+        """ pos=match($0,"gene_[bio]*type.([^[:space:]]+)",a); if (pos!=0) gt=a[1]; else gt="NA"; """
+        """ pos=match($0,"(transcript_support_level.[^[:space:]]+)",a); if (pos!=0) tsl=a[1]; else tsl="transcript_support_level NA"; """
+        """ pos=match($0,"[[:space:]](level.[^[:space:]]+)",a); if (pos!=0) lvl=a[1] ; else lvl="level NA"; """
+        """ pos=match($0,"tag.basic"); if (lvl!~"NA"){{if (pos==0) basic="full"; else basic="basic"}} else basic="NA"; """
+        """ OFS="\\t"; print tid,tna,tt,gid,gna,gt,"gencode",basic,"transcript_support_level",tsl,"level",lvl}}' | """
+        """ sort | uniq | sort -k1,1) | """
+        """ awk '{{OFS="\\t";print $2,$3,$4,$1,$5,$6,$7,$8,$9,$10,$11,$12,$1,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23}}' > {output.bed_annot} """ 
 
 
 rule filter_annotation_bed:
