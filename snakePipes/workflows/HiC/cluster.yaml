@@ -2,3 +2,5 @@ map_fastq_single_end:
     memory: 3G
 CollectInsertSizeMetrics:
     memory: 1G
+build_matrix:
+    memory: 9G

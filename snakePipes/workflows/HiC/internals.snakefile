@@ -69,18 +69,20 @@ def get_mad_score(madfile):
 
 ## get sample grouping information
 def get_sampleInfo(sample_info):
-    sample_dict = {}
+    sample_dict = dict()
     if sample_info:     #Read the sample info and make a dictionary
-        sample_conditions =  pd.read_csv(os.path.join(os.path.abspath(sample_info)), sep = '\t', header = 0)
+        sample_conditions =  pd.read_csv(os.path.join(os.path.abspath(sample_info)), sep = '\t')
         for id, row in sample_conditions.iterrows():
             v, k = row
             if k in sample_dict:
-                sample_dict[k] = [sample_dict[k], v]
+                sample_dict[k].append(v)
             else:
-                sample_dict[k]=v
+                sample_dict[k]=[v]
     else:
+        print ('no sample_info has been proveded')
+        sample_dict['merged'] = []
         for sample in samples:
-            sample_dict['merged'] = sample
+            sample_dict['merged'].append(sample)
 
     return sample_dict
 
