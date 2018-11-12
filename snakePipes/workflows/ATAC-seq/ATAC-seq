@@ -16,7 +16,7 @@ import snakePipes.parserCommon as parserCommon
 
 
 def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfile": None, "max_jobs": 5, "snakemake_options": "--use-conda", "tempdir": None,
-                         "bw_binsize": 25, "fragmentSize_cutoff": 150, "sample_info": None}):
+                         "fragmentSize_cutoff": 150, "sample_info": None}):
     """
     Parse arguments from the command line.
     """
@@ -32,13 +32,6 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
 
     # Workflow options
     optional = parser.add_argument_group('Options')
-    optional.add_argument("--bw-binsize",
-                          dest="bw_binsize",
-                          metavar="INT",
-                          help="bin size of output files in bigWig format (default: '%(default)s')",
-                          type=int,
-                          default=defaults["bw_binsize"])
-
     optional.add_argument("--fragmentSize-cutoff",
                           dest="fragmentSize_cutoff",
                           metavar="INT",
@@ -60,6 +53,7 @@ def main():
     # get command line arguments
     parser = parse_args(defaults)
     args = parser.parse_args()
+    args, defaults = cf.handleUserArgs(args, defaults, parse_args)
 
     # we also add these paths to config, although we don't use them in the Snakefile
     args.baseDir = baseDir
