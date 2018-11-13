@@ -26,7 +26,6 @@ rule SalmonIndex:
     params:
         salmon_index_options = salmon_index_options,
         sasamp = 1
-
     log:
         out = "Salmon/SalmonIndex/SalmonIndex.out",
         err = "Salmon/SalmonIndex/SalmonIndex.err",
@@ -35,7 +34,7 @@ rule SalmonIndex:
     shell: """
         salmon index --sasamp {params.sasamp} -p {threads} -t {input} -i Salmon/SalmonIndex {params.salmon_index_options} > {log.out} 2> {log.err}
         """
-#        touch {output}
+
 
 ## Salmon quant
 if paired:

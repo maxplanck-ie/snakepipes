@@ -92,7 +92,7 @@ rule annotation_bed2fasta:
     threads: 1
     conda: CONDA_RNASEQ_ENV
     shell:
-        "bedtools getfasta -name -s -split -fi {input.genome_fasta} -bed {input.bed} | sed 's/(.*)//g' > {output}"
+        "bedtools getfasta -name -s -split -fi {input.genome_fasta} -bed <(cat {input.bed} | cut -f1-12) | sed 's/(.*)//g' > {output}"
 
 
 ## the gtf created here is used for featureCounts, contains only the filtered entries from original gtf  

@@ -26,3 +26,4 @@ dependencies:
  - bioconductor-deseq2=1.18.1
  - bioconductor-biomart=2.34.2
  - r-knitcitations
+ - bioconductor-rhdf5=2.22.0
