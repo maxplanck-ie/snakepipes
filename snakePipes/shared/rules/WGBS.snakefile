@@ -563,7 +563,7 @@ if sampleInfo:
             err="aux_files/logs/get_CG_metilene.err"
         threads: 1
         conda: CondaEnvironment
-        shell: "bedtools intersect -wa -a {input.imdF} -b {input.MetBed} > {output.MetCG}  2>{log.err};sleep 300"
+        shell: "bedtools intersect -wa -a {input.imdF} -b {input.MetBed} > {output.MetCG}  2>{log.err}"
             
 
     rule cleanup_metilene:
@@ -597,7 +597,7 @@ if intList:
         log:
             err="aux_files/logs/get_CG_per_int.err"
         params:
-            auxshell=lambda wildcards,input,output: ';'.join(["bedtools intersect -wa -a "+ input.imdF + " -b " + bli + ' > ' + oli  for bli,oli in zip(input.intList,output.outList) ])+';sleep 300'
+            auxshell=lambda wildcards,input,output: ';'.join(["bedtools intersect -wa -a "+ input.imdF + " -b " + bli + ' > ' + oli  for bli,oli in zip(input.intList,output.outList) ])
         threads: 1
         conda: CondaEnvironment
         shell: "{params.auxshell} 2>{log.err}"
