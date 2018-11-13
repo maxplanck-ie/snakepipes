@@ -76,7 +76,7 @@ plotEnrich_cmd = """
     plotEnrichment -p {threads} \
                    -b {input.bam} \
                    {params.plotcmd} \
-                   --BED {input.gtf} {input.gtf2} \
+                   --BED {input.gtf} \
                    --labels {params.labels} \
                    --plotTitle 'Fraction of reads in regions' \
                    --outRawCounts {output} \

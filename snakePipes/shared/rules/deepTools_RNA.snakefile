@@ -41,8 +41,7 @@ rule plotEnrichment:
     input:
         bam = expand(mapping_prg+"/{sample}.bam", sample=samples),
         bai = expand(mapping_prg+"/{sample}.bam.bai", sample=samples),
-        gtf = "Annotation/genes.filtered.gtf",
-        gtf2= "Annotation/genes.filtered.transcripts.gtf"
+        gtf = "Annotation/genes.filtered.gtf"
     output:
         "deepTools_qc/plotEnrichment/plotEnrichment.tsv",
     conda:
