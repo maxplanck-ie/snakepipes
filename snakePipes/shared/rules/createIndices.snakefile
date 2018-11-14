@@ -42,6 +42,14 @@ rule fastaIndex:
         samtools faidx {input}
         """
 
+# Default memory allocation: 4G
+rule fastaDict:
+    input: genome_fasta
+    output: genome_dict
+    conda: CONDA_SHARED_ENV
+    shell: """
+        samtools dict -o {output} {input}
+        """
 
 # Default memory allocation: 8G
 rule make2bit:
@@ -155,7 +163,7 @@ rule bwamethIndex:
     output: os.path.join(outdir, "BWAmethIndex/genome.fa.bwameth.c2t.sa")
     params:
       genome = os.path.join(outdir, "BWAmethIndex", "genome.fa")
-    conda: CondaEnvironment
+    conda: CONDA_WGBS_ENV
     shell: """
         ln -s {input[0]} {params.genome}
         bwameth.py index {params.genome}

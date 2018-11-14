@@ -44,7 +44,7 @@ This will create a new conda environment called "snakePipes" into which snakePip
 * ``source activate snakePipes`` to activate the appropriate conda environment.
 * ``snakePipes createEnvs`` to create the various environments and register GATK.
 
-Indicies and annotations needed to run the workflows could be created by a simple command : 
+Indicies and annotations needed to run the workflows could be created by a simple command :
 
 ``createIndicies --genomeURL <path/url to your genome fasta> --gtfURL <path/url to genes.gtf> -o <output_dir> <name>``
 
@@ -54,10 +54,10 @@ A few additional steps you can then take:
 
 1. **Modify/remove/add the organism yaml files appropriately** : these yaml files would contain location of appropriate
 GTF files and genome indexes corresponding to different organisms. The location of these files after installation can be
-found using ``snakePipes --info`` command.
+found using ``snakePipes info`` command.
 
 2. **Modify the cluster.yaml file appropriately** : This yaml file contains settings for your cluster scheduler (SGE/slurm).
-Location revealed using ``snakePipes --info`` command.
+Location revealed using ``snakePipes info`` command.
 
 
 Documentation
@@ -75,6 +75,6 @@ Bhardwaj V, Heyne S, Sikora K, Rabbani L, Rauer M, Kilpert F, et al. **snakePipe
 
 
 Note
-------------- 
+-------------
 
 SnakePipes are under active development. We appreciate your help in improving it further. Please use issues to the GitHub repository for feature requests or bug reports.

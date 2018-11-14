@@ -1,7 +1,6 @@
 name: hic_conda_env_1.0
 channels:
  - conda-forge
- - anaconda
  - bioconda
 dependencies:
  - hicexplorer = 2.1.4

@@ -2,9 +2,7 @@ name: snakepipes_dna-mapping_1.0
 channels:
  - conda-forge
  - bioconda
- - r
 dependencies:
  - bowtie2 = 2.3.4.1
- - picard = 2.18.7
  - qualimap = 2.2.2a
  - samtools=1.7

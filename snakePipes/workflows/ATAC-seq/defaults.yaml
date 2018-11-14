@@ -21,8 +21,7 @@ workingdir:
 ## preconfigured target genomes (mm9,mm10,dm3,...) , see /path/to/snakemake_workflows/shared/organisms/
 ## Value can be also path to your own genome config file!
 genome:
-## Bin size of output files in bigWig format
-bw_binsize: 25
+## The maximum fragment size to retain. This should typically be the size of a nucleosome
 fragmentSize_cutoff: 150
 verbose: false
 # sampleInfo_DB

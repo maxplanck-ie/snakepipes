@@ -99,7 +99,7 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
     optional.add_argument("--DE",
                           dest="sample_info",
                           help="Information on samples (required for DE analysis); see "
-                               "'snakePipes/shared/sampleInfo.example.tsv' for example."
+                               "'docs/content/sampleInfo.example.tsv' for example."
                                " The column names in the tsv files are 'sample' and 'condition'.The first entry"
                                " defines which group of samples are control. "
                                " This way, the order of comparison and likewise the sign of values can be changed."
@@ -121,6 +121,7 @@ def main():
     # get command line arguments
     parser = parse_args(defaults)
     args = parser.parse_args()
+    args, defaults = cf.handleUserArgs(args, defaults, parse_args)
 
     # we also add these paths to config, although we don't use them in the Snakefile
     args.baseDir = baseDir
@@ -138,13 +139,10 @@ def main():
         args.SNPfile = os.path.abspath(args.SNPfile)
         args.Nmasked_index = os.path.abspath(args.Nmasked_index)
     modeTemp = args.mode.split(",")
-    validModes = set(["alignment", "alignment-free", "deepTools_qc"])
+    validModes = set(["alignment", "alignment-free", "deepTools_qc", "allelic-mapping"])
     for mode in modeTemp:
         if mode not in validModes:
             sys.exit("{} is not a valid mode!\n".format(mode))
-    # deepTools_qc requires alignment as input
-    if "deepTools_qc" in modeTemp and "alignment" not in modeTemp:
-        args.mode = "{},alignment".format(args.mode)
     ## End workflow-specific checks
 
     # Handle YAML and log files
