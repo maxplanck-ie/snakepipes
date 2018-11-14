@@ -148,8 +148,8 @@ if (length(readLines(bedF))==0) {message("No DMRs found.")}else{
         fit.eB<-eBayes(fit)
 
         ##read filters from commandline args
-        minAbsDiff<-as.numeric(commandArgs(trailingOnly=TRUE)[4])
-        fdr<-as.numeric(commandArgs(trailingOnly=TRUE)[5])
+        minAbsDiff<-as.numeric(commandArgs(trailingOnly=TRUE)[7])
+        fdr<-as.numeric(commandArgs(trailingOnly=TRUE)[8])
     
         tT<-topTable(fit.eB,2,p.value=1,number=Inf)
         tT$IntID<-rownames(tT)

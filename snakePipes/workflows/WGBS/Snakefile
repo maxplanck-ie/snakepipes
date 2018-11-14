@@ -129,7 +129,7 @@ def run_CpG_stats(sampleInfo):
 
 def run_metilene_all(sampleInfo):
     if sampleInfo:
-        return (['{}/singleCpG.metilene.limma.bed'.format(get_outdir("metilene_out")),'{}/metilene.limma.annotated.txt'.format(get_outdir("metilene_out"))])
+        return (['{}/singleCpG.metilene.limma_unfiltered.bed'.format(get_outdir("metilene_out")),'{}/metilene.limma.annotated_unfiltered.txt'.format(get_outdir("metilene_out"))])
     else:
         return ([])
 
