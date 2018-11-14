@@ -121,30 +121,36 @@ if(nrow(limdat.LG.CC)==0){ message("None of the single CpG sites passed the filt
 
         fit<-lmFit(limdat.LG.CC.logit,design)
         fit.eB<-eBayes(fit)
+
+##read filters from commandline args
+        minAbsDiff<-commandArgs(trailingOnly=TRUE)[4]
+        fdr<-commandArgs(trailingOnly=TRUE)[5]
     
+        tT<-topTable(fit.eB,2,p.value=1,number=Inf)
 
-        tT.FDR5<-topTable(fit.eB,2,p.value=0.05,number=Inf)
-        if(nrow(tT.FDR5)==0){ message("No CpG sites were significantly differentially methylated.")}else{
-            tT.FDR5<-tT.FDR5[,c("logFC","t","adj.P.Val","B")]
-            write.table(tT.FDR5,file="limdat.LG.CC.tT.FDR5.txt",sep="\t",quote=FALSE)
+        tT$IntID<-rownames(tT)
+        plotdat<-melt(tT,measure.vars=c("P.Value","adj.P.Val"),value.name="pval",variable.name="Category",id.vars="IntID")
 
+        ggplot(data=plotdat)+geom_histogram(aes(x=pval,group=Category,fill=Category),binwidth=0.005)+theme(text = element_text(size=16),axis.text = element_text(size=12),axis.title = element_text(size=14))+scale_fill_manual(values=c("grey28","red","darkblue","darkgreen"))+geom_vline(aes(xintercept=0.02))
+        ggsave("Pvalue.distribution.png")
 
+### filter top table for thresholds
+        limdat.LG.CC.Diff<-summarize(group_by(limdat.LG.CC.Means,ms),Diff=(Beta.Mean[1]-Beta.Mean[2]))#this is just used for filtering on absolute value, direction not important
+        tT_filt<-tT[tT$adj.P.Val<fdr & rownames(tT) %in% limdat.LG.CC.Diff$ms[abs(limdat.LG.CC.Diff$Diff)>=minAbsDiff],]
 
-            nrow(tT.FDR5)
+        if(nrow(tT_filt)==0){ message("No CpG sites were significantly differentially methylated according to the thresholds.")}else{
+            
+            nrow(tT_filt)
             nrow(limdat.LG.CC.logit)
-            nrow(tT.FDR5)/nrow(limdat.LG.CC.logit)
+            nrow(tT_filt)/nrow(limdat.LG.CC.logit)
 
 ###
-            limdat.LG.CC.Diff<-summarize(group_by(limdat.LG.CC.Means,ms),Diff=(Beta.Mean[1]-Beta.Mean[2]))#this is just used for filtering, direction not important
-            tT.FDR5.Diff0.2<-tT.FDR5[rownames(tT.FDR5) %in% limdat.LG.CC.Diff$ms[abs(limdat.LG.CC.Diff$Diff)>=0.2],]
-
-            nrow(tT.FDR5.Diff0.2)
-            nrow(tT.FDR5.Diff0.2)/nrow(limdat.LG.CC.logit)
-
             save(limdat.LG,file="limdat.LG.RData")
-            save(limdat.LG.CC.Means,limdat.LG.CC.Diff,tT.FDR5,file="singleCpG.RData")
+            save(limdat.LG.CC.Means,limdat.LG.CC.Diff,tT_filt,file="singleCpG.RData")
 
         }###end if topTable has at least 1 entry
+
+#### prepare metilene input
 
             limdat.LG.CC.tw<-limdat.LG.CC
 
