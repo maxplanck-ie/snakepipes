@@ -1,6 +1,6 @@
 library("sleuth")
 library("dplyr")
-library("biomaRt")
+#library("biomaRt")
 
 args = commandArgs(trailingOnly=TRUE)
 
