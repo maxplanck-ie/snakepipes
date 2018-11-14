@@ -562,15 +562,9 @@ if sampleInfo:
         log:
             err="aux_files/logs/get_CG_metilene.err"
         threads: 1
-<<<<<<< HEAD
-        conda: CondaEnvironment
+        conda: CONDA_WGBS_ENV
         shell: "bedtools intersect -wa -a {input.imdF} -b {input.MetBed} > {output.MetCG}  2>{log.err}"
             
-=======
-        conda: CONDA_WGBS_ENV
-        shell: "bedtools intersect -wa -a {input.imdF} -b {input.MetBed} > {output.MetCG}  2>{log.err};sleep 300"
-
->>>>>>> 257258482a6cf5ab20719ea247fbf1e4e487f548
 
     rule cleanup_metilene:
         input:
