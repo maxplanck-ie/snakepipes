@@ -109,6 +109,7 @@ if (length(readLines(bedF))==0) {message("No DMRs found.")}else{
         CGI.limdat.CC.L<-melt(CGI.limdat.CC,id.vars="IntID",value.name="Beta",variable.name="SampleID")
         CGI.limdat.CC.L$Group<-sampleInfo$Group[match(CGI.limdat.CC.L$SampleID,sampleInfo$SampleID)]
         CGI.limdat.CC.Means<-data.table(summarize(group_by(CGI.limdat.CC.L,IntID,Group),Beta.Mean=mean(Beta)))
+        save(CGI.limdat.CC,file="CGI.limdat.CC.RData")
 
     if ("Control" %in% CGI.limdat.CC.Means$Group){
             CGI.limdat.CC.Means$Group<-factor(CGI.limdat.CC.Means$Group)
