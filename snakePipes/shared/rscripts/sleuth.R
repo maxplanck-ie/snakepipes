@@ -1,6 +1,6 @@
 library("sleuth")
 library("dplyr")
-library("biomaRt")
+#library("biomaRt")
 
 args = commandArgs(trailingOnly=TRUE)
 
@@ -66,7 +66,7 @@ if (exists("t2g")) {
 	str(t2g)
 
   ## add gene names
-  so <- sleuth_prep(s2c, ~ condition, target_mapping = t2g)
+  so <- sleuth_prep(s2c, ~condition, target_mapping = t2g)
 } else {
   ## construct sleuth object
   so = sleuth_prep(s2c, ~ condition)

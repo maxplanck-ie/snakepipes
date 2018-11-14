@@ -165,13 +165,13 @@ p <- ggplot(sc_dat,aes(x=x,y=y,fill=cUPM_zscore))+
 		facet_wrap(~sample,ncol = libs_per_plate, scales = "free") + 
     	#facet_grid(plate~library,scales = "free") + 
 		scale_fill_gradient2(low="red",mid="blue",limits=c(-3,3),high="cyan" ) + 
-		coord_fixed() + 
+		#coord_fixed() + 
     	scale_y_continuous(breaks=-seq(1,15,2),labels = as.character(seq(2,16,2))) +
     	scale_x_continuous(breaks=seq(2,(max(sc_dat$cell_idx-1)%/%16)+1,2),labels = as.character(seq(2,(max(sc_dat$cell_idx-1)%/%16)+1,2))) +
 		theme_minimal() +
-		theme(strip.text.x = element_text(size = 18, colour = "black",face="bold")) +
+		theme(strip.text.x = element_text(size = 16, colour = "black",face="bold")) +
 		ggtitle(paste("cell z-score of norm. transcripts per cell (cUPM)")) + 
-		theme(plot.title = element_text(color="black", size=22, face="bold",hjust = 0.5))
+		theme(plot.title = element_text(color="black", size=18, face="bold",hjust = 0.5))
 
 if (!is.null(plot_format)){
 	ggsave(plot=p,filename=paste(out_prefix,".plate_cUPM.",plot_format,sep=""),device=plot_format,dpi=200)
@@ -182,13 +182,12 @@ p<-ggplot(sc_dat,aes(x=x,y=y,fill=cRPM_zscore))+
 		geom_tile() + 
 		facet_wrap(~sample,ncol = libs_per_plate,scales = "free") + 
 		scale_fill_gradient2(low="red",mid="blue",limits=c(-3,3),high="cyan" ) + 
-		coord_fixed() + 
-    scale_y_continuous(breaks=-seq(1,15,2),labels = as.character(seq(2,16,2))) +
-    scale_x_continuous(breaks=seq(2,(max(sc_dat$cell_idx-1)%/%16)+1,2),labels = as.character(seq(2,(max(sc_dat$cell_idx-1)%/%16)+1,2))) +
+    	scale_y_continuous(breaks=-seq(1,15,2),labels = as.character(seq(2,16,2))) +
+    	scale_x_continuous(breaks=seq(2,(max(sc_dat$cell_idx-1)%/%16)+1,2),labels = as.character(seq(2,(max(sc_dat$cell_idx-1)%/%16)+1,2))) +
 		theme_minimal() +
-		theme(strip.text.x = element_text(size = 18, colour = "black",face="bold")) +
+		theme(strip.text.x = element_text(size = 16, colour = "black",face="bold")) +
 		ggtitle(paste("cell z-score of norm. reads per cell (cRPM)")) + 
-		theme(plot.title = element_text(color="black", size=22, face="bold",hjust = 0.5))
+		theme(plot.title = element_text(color="black", size=18, face="bold",hjust = 0.5))
 
 if (!is.null(plot_format)){
 	ggsave(plot=p,filename=paste(out_prefix,".plate_cRPM.",plot_format,sep=""),device=plot_format,dpi=200)
@@ -202,17 +201,16 @@ p<-ggplot(sc_dat,aes(x=x,y=y,fill=UMI))+
 		scale_fill_gradientn(colors=c("red","blue","cyan"),
 				values=rescale(c(0,median(sc_dat$UMI)*0.75,max(sc_dat$UMI))),
 				limits=c(0,max(sc_dat$UMI)),space = "Lab") +
-		coord_fixed() +
-    scale_y_continuous(breaks=-seq(1,15,2),labels = as.character(seq(2,16,2))) +
-    scale_x_continuous(breaks=seq(2,(max(sc_dat$cell_idx-1)%/%16)+1,2),labels = as.character(seq(2,(max(sc_dat$cell_idx-1)%/%16)+1,2))) +
+    	scale_y_continuous(breaks=-seq(1,15,2),labels = as.character(seq(2,16,2))) +
+    	scale_x_continuous(breaks=seq(2,(max(sc_dat$cell_idx-1)%/%16)+1,2),labels = as.character(seq(2,(max(sc_dat$cell_idx-1)%/%16)+1,2))) +
 		theme_minimal() + 
-		theme(	strip.text.x = element_text(size = 17, colour = "white",face="bold"),
+		theme(	strip.text.x = element_text(size = 16, colour = "white",face="bold"),
 				axis.text = element_text(size = 10, colour = "grey"),
 				axis.ticks.y = element_blank(),
 				plot.background = element_rect(fill = "black"),
 				panel.grid = element_blank() ) +
         ggtitle(paste("Total number of transcripts per cell \n","red color < median (n=",median(sc_dat$UMI),") > blue clolor",sep = "")) + 
-		theme(plot.title = element_text(color="white", size=22, face="bold",hjust = 0.5)) + 
+		theme(plot.title = element_text(color="white", size=18, face="bold",hjust = 0.5)) + 
 		theme(legend.title = element_text(colour="grey90", size=16, face="bold")) + 
 		theme(legend.text = element_text(colour="grey90", size = 16, face = "bold"))
 
