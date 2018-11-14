@@ -1,7 +1,7 @@
 SalmonIndex:
-  memory: 1G
+  memory: 2G
 SalmonQuant:
-  memory: 1G
+  memory: 2G
 bamPE_fragment_size:
   memory: 10G
 HISAT2:
