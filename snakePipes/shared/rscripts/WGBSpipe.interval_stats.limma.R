@@ -151,25 +151,40 @@ if(nrow(bedtab.CC)==0) {message("None of the genomic intervals passed the filter
         fit<-lmFit(CGI.limdat.CC.logit,design)
         fit.eB<-eBayes(fit)
 
-        tT.FDR5<-topTable(fit.eB,2,p.value=0.05,number=Inf)
-        if(nrow(tT.FDR5)==0) {message("No genomic intervals were significantly differentially methylated.")
+
+        ##read filters from commandline args
+        minAbsDiff<-commandArgs(trailingOnly=TRUE)[4]
+        fdr<-commandArgs(trailingOnly=TRUE)[5]
+    
+        tT<-topTable(fit.eB,2,p.value=1,number=Inf)
+        tT$IntID<-rownames(tT)
+        plotdat<-melt(tT,measure.vars=c("P.Value","adj.P.Val"),value.name="pval",variable.name="Category",id.vars="IntID")
+
+        ggplot(data=plotdat)+geom_histogram(aes(x=pval,group=Category,fill=Category),binwidth=0.005)+theme(text = element_text(size=16),axis.text = element_text(size=12),axis.title = element_text(size=14))+scale_fill_manual(values=c("grey28","red","darkblue","darkgreen"))+geom_vline(aes(xintercept=0.02))
+        ggsave(paste0(bedshort,"_pvalue.distribution.png"))
+
+### filter top table for thresholds
+        limdat.LG.CC.Diff<-summarize(group_by(CGI.limdat.CC.Means,ms),Diff=(Beta.Mean[1]-Beta.Mean[2]))#this is just used for filtering on absolute value, direction not important
+        tT_filt<-tT[tT$adj.P.Val<fdr & rownames(tT) %in% limdat.LG.CC.Diff$ms[abs(limdat.LG.CC.Diff$Diff)>=minAbsDiff],]
+
+        if(nrow(tT_filt)==0) {message("No genomic intervals were significantly differentially methylated.")
             save(bedtab,limdat.LG.inCGI,CGI.limdat.CC,CGI.limdat.CC.Means,file=paste0(bedshort,".aggCpG.RData"))
 
         }else{
-            tT.FDR5<-tT.FDR5[,c("logFC","t","adj.P.Val","B")]
-            write.table(tT.FDR5,file=paste0(bedshort,".CGI.limdat.CC.tT.FDR5.txt"),sep="\t",quote=FALSE)
+            tT_filt<-tT_filt[,c("logFC","t","adj.P.Val","B")]
+            write.table(tT_filt,file=paste0(bedshort,".CGI.limdat.CC.tT_filt.txt"),sep="\t",quote=FALSE)
 
-            nrow(tT.FDR5)
+            nrow(tT_filt)
             nrow(CGI.limdat.CC.logit)
-            nrow(tT.FDR5)/nrow(CGI.limdat.CC.logit)
+            nrow(tT_filt)/nrow(CGI.limdat.CC.logit)
 
             CGI.limdat.CC.Diff<-summarize(group_by(CGI.limdat.CC.Means,IntID),Diff=(Beta.Mean[1]-Beta.Mean[2]))
-            tT.FDR5.Diff0.2<-tT.FDR5[rownames(tT.FDR5) %in% CGI.limdat.CC.Diff$IntID[abs(CGI.limdat.CC.Diff$Diff)>=0.2],]
+            tT_filt.Diff0.2<-tT_filt[rownames(tT_filt) %in% CGI.limdat.CC.Diff$IntID[abs(CGI.limdat.CC.Diff$Diff)>=0.2],]
 
-            nrow(tT.FDR5.Diff0.2)
-            nrow(tT.FDR5.Diff0.2)/nrow(CGI.limdat.CC.logit)
+            nrow(tT_filt.Diff0.2)
+            nrow(tT_filt.Diff0.2)/nrow(CGI.limdat.CC.logit)
 
-            save(bedtab,limdat.LG.inCGI,CGI.limdat.CC,CGI.limdat.CC.Means,tT.FDR5,file=paste0(bedshort,".aggCpG.RData"))
+            save(bedtab,limdat.LG.inCGI,CGI.limdat.CC,CGI.limdat.CC.Means,tT_filt,file=paste0(bedshort,".aggCpG.RData"))
 
         }###end if topTable has at least 1 entry
     } else {message('More than 2 sample groups were provided. No statistical inference will be computed.')}### end if exactly two sample groups were specified

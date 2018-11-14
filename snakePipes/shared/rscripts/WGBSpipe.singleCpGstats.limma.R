@@ -132,7 +132,7 @@ if(nrow(limdat.LG.CC)==0){ message("None of the single CpG sites passed the filt
         plotdat<-melt(tT,measure.vars=c("P.Value","adj.P.Val"),value.name="pval",variable.name="Category",id.vars="IntID")
 
         ggplot(data=plotdat)+geom_histogram(aes(x=pval,group=Category,fill=Category),binwidth=0.005)+theme(text = element_text(size=16),axis.text = element_text(size=12),axis.title = element_text(size=14))+scale_fill_manual(values=c("grey28","red","darkblue","darkgreen"))+geom_vline(aes(xintercept=0.02))
-        ggsave("Pvalue.distribution.png")
+        ggsave("SingleCpG_pvalue.distribution.png")
 
 ### filter top table for thresholds
         limdat.LG.CC.Diff<-summarize(group_by(limdat.LG.CC.Means,ms),Diff=(Beta.Mean[1]-Beta.Mean[2]))#this is just used for filtering on absolute value, direction not important
