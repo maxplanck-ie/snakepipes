@@ -163,9 +163,24 @@ if(nrow(bedtab.CC)==0) {message("None of the genomic intervals passed the filter
         ggplot(data=plotdat)+geom_histogram(aes(x=pval,group=Category,fill=Category),binwidth=0.005)+theme(text = element_text(size=16),axis.text = element_text(size=12),axis.title = element_text(size=14))+scale_fill_manual(values=c("grey28","red","darkblue","darkgreen"))+geom_vline(aes(xintercept=0.02))
         ggsave(paste0(bedshort,"_pvalue.distribution.png"))
 
-### filter top table for thresholds
-        limdat.LG.CC.Diff<-summarize(group_by(CGI.limdat.CC.Means,ms),Diff=(Beta.Mean[1]-Beta.Mean[2]))#this is just used for filtering on absolute value, direction not important
-        tT_filt<-tT[tT$adj.P.Val<fdr & rownames(tT) %in% limdat.LG.CC.Diff$ms[abs(limdat.LG.CC.Diff$Diff)>=minAbsDiff],]
+### annotate top table with mean difference
+        meandatW<-dcast(data=CGI.limdat.CC.Means,ms~Group,value.var="Beta.Mean")
+        if(sum(c("Control","Treatment") %in% colnames(meandatW))==2){meandatW$Diff<-with(meandatW,Treatment-Control)}
+        if(sum(c("WT","Mut") %in% colnames(meandatW))==2){meandatW$Diff<-with(meandatW,Mut-WT)}
+        else{meandatW$Diff<-meandatW[2]-meandatW[3]}
+
+        tT$Diff<-meandatW$Diff[match(rownames(tT),meandatW$ms)]
+
+        tT$Filter<-"Fail"
+        tT$Filter[tT$adj.P.Val<fdr&abs(tT$Diff)>=minAbsDiff]<-"Pass"
+
+        ggplot(data=tT)+geom_point(aes(x=Diff,y=-log10(adj.P.Val),color=Filter))+theme(text = element_text(size=16),axis.text = element_text(size=12),axis.title = element_text(size=14))+xlab("Mean difference")+scale_color_manual(values=c("grey28","red","darkblue","darkgreen"))
+        ggsave(paste0(bedshort,"_volcano.plot.png"))
+
+
+#### filter top table according to thresholds
+
+        tT_filt<-tT[tT$adj.P.Val<fdr & abs(tT$Diff)>=minAbsDiff,]  
 
         if(nrow(tT_filt)==0) {message("No genomic intervals were significantly differentially methylated.")
             save(bedtab,limdat.LG.inCGI,CGI.limdat.CC,CGI.limdat.CC.Means,file=paste0(bedshort,".aggCpG.RData"))

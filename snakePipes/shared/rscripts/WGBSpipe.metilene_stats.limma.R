@@ -148,8 +148,8 @@ if (length(readLines(bedF))==0) {message("No DMRs found.")}else{
         fit.eB<-eBayes(fit)
 
         ##read filters from commandline args
-        minAbsDiff<-commandArgs(trailingOnly=TRUE)[4]
-        fdr<-commandArgs(trailingOnly=TRUE)[5]
+        minAbsDiff<-as.numeric(commandArgs(trailingOnly=TRUE)[4])
+        fdr<-as.numeric(commandArgs(trailingOnly=TRUE)[5])
     
         tT<-topTable(fit.eB,2,p.value=1,number=Inf)
         tT$IntID<-rownames(tT)
@@ -158,9 +158,24 @@ if (length(readLines(bedF))==0) {message("No DMRs found.")}else{
         ggplot(data=plotdat)+geom_histogram(aes(x=pval,group=Category,fill=Category),binwidth=0.005)+theme(text = element_text(size=16),axis.text = element_text(size=12),axis.title = element_text(size=14))+scale_fill_manual(values=c("grey28","red","darkblue","darkgreen"))+geom_vline(aes(xintercept=0.02))
         ggsave(paste0(bedshort,"_pvalue.distribution.png"))
 
-### filter top table for thresholds
-        limdat.LG.CC.Diff<-summarize(group_by(CGI.limdat.CC.Means,ms),Diff=(Beta.Mean[1]-Beta.Mean[2]))#this is just used for filtering on absolute value, direction not important
-        tT_filt<-tT[tT$adj.P.Val<fdr & rownames(tT) %in% limdat.LG.CC.Diff$ms[abs(limdat.LG.CC.Diff$Diff)>=minAbsDiff],]        
+### annotate top table with mean difference
+        meandatW<-dcast(data=CGI.limdat.CC.Means,ms~Group,value.var="Beta.Mean")
+        if(sum(c("Control","Treatment") %in% colnames(meandatW))==2){meandatW$Diff<-with(meandatW,Treatment-Control)}
+        if(sum(c("WT","Mut") %in% colnames(meandatW))==2){meandatW$Diff<-with(meandatW,Mut-WT)}
+        else{meandatW$Diff<-meandatW[2]-meandatW[3]}
+
+        tT$Diff<-meandatW$Diff[match(rownames(tT),meandatW$ms)]
+
+        tT$Filter<-"Fail"
+        tT$Filter[tT$adj.P.Val<fdr&abs(tT$Diff)>=minAbsDiff]<-"Pass"
+
+        ggplot(data=tT)+geom_point(aes(x=Diff,y=-log10(adj.P.Val),color=Filter))+theme(text = element_text(size=16),axis.text = element_text(size=12),axis.title = element_text(size=14))+xlab("Mean difference")+scale_color_manual(values=c("grey28","red","darkblue","darkgreen"))
+        ggsave(paste0(bedshort,"_volcano.plot.png"))
+
+
+#### filter top table according to thresholds
+
+        tT_filt<-tT[tT$adj.P.Val<fdr & abs(tT$Diff)>=minAbsDiff,!colnames(tT) %in% "Diff"]        
 
         if(nrow(tT_filt)==0) {message("No metilene intervals were significantly differentially methylated.")}else{
             tT_filt<-tT_filt[,c("logFC","t","","adj.P.Val","B")]
