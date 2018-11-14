@@ -544,12 +544,15 @@ if sampleInfo:
         output:
             MetBed='{}/singleCpG.metilene.bed'.format(get_outdir("metilene_out"))
         params:
-            DMRout=os.path.join(outdir,'{}'.format(get_outdir("metilene_out")))
+            DMRout=os.path.join(outdir,'{}'.format(get_outdir("metilene_out"))),
+            maxD=maxDist,
+            minCG=minCpGs,
+            minMD=minMethDiff
         log:
             err="{}/logs/run_metilene.err".format(get_outdir("metilene_out"))
         threads: nthreads
         conda: CONDA_WGBS_ENV
-        shell: 'Gi=($(cat {input.Ginfo}));metilene -a ' + " ${{Gi[0]}} " + " -b  ${{Gi[1]}} -t {threads} {input.MetIN} | sort -k 1,1 -k2,2n > {output.MetBed} 2>{log.err}"
+        shell: 'Gi=($(cat {input.Ginfo}));metilene -a ' + " ${{Gi[0]}} " + " -b  ${{Gi[1]}} -M {params.maxD} -m {params.minCG} -d {params.minMD} -t {threads} {input.MetIN} | sort -k 1,1 -k2,2n > {output.MetBed} 2>{log.err}"
 
 
     rule get_CG_metilene:
