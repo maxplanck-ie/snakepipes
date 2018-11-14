@@ -146,35 +146,53 @@ if (length(readLines(bedF))==0) {message("No DMRs found.")}else{
 
         fit<-lmFit(CGI.limdat.CC.logit,design)
         fit.eB<-eBayes(fit)
-        tT.FDR5<-topTable(fit.eB,2,p.value=0.05,number=Inf)
-        if(nrow(tT.FDR5)==0) {message("No metilene intervals were significantly differentially methylated.")}else{
-            tT.FDR5<-tT.FDR5[,c("logFC","t","adj.P.Val","B")]
-            write.table(tT.FDR5,file=paste0(bedshort,".CGI.limdat.CC.tT.FDR5.txt"),sep="\t",quote=FALSE)
 
-            nrow(tT.FDR5)
+        ##read filters from commandline args
+        minAbsDiff<-commandArgs(trailingOnly=TRUE)[4]
+        fdr<-commandArgs(trailingOnly=TRUE)[5]
+    
+        tT<-topTable(fit.eB,2,p.value=1,number=Inf)
+        tT$IntID<-rownames(tT)
+        plotdat<-melt(tT,measure.vars=c("P.Value","adj.P.Val"),value.name="pval",variable.name="Category",id.vars="IntID")
+
+        ggplot(data=plotdat)+geom_histogram(aes(x=pval,group=Category,fill=Category),binwidth=0.005)+theme(text = element_text(size=16),axis.text = element_text(size=12),axis.title = element_text(size=14))+scale_fill_manual(values=c("grey28","red","darkblue","darkgreen"))+geom_vline(aes(xintercept=0.02))
+        ggsave(paste0(bedshort,"_pvalue.distribution.png"))
+
+### filter top table for thresholds
+        limdat.LG.CC.Diff<-summarize(group_by(CGI.limdat.CC.Means,ms),Diff=(Beta.Mean[1]-Beta.Mean[2]))#this is just used for filtering on absolute value, direction not important
+        tT_filt<-tT[tT$adj.P.Val<fdr & rownames(tT) %in% limdat.LG.CC.Diff$ms[abs(limdat.LG.CC.Diff$Diff)>=minAbsDiff],]        
+
+        if(nrow(tT_filt)==0) {message("No metilene intervals were significantly differentially methylated.")}else{
+            tT_filt<-tT_filt[,c("logFC","t","","adj.P.Val","B")]
+            
+            nrow(tT_filt)
             nrow(CGI.limdat.CC.logit)
-            nrow(tT.FDR5)/nrow(CGI.limdat.CC.logit)
+            nrow(tT_filt)/nrow(CGI.limdat.CC.logit)
 
 
     #annotate metilene output with this information
-            CGI.bed.intT<-as.data.frame(merge(x=bedtab,y=tT.FDR5,by.x="Name",by.y="row.names",sort=FALSE,all.x=TRUE))
+            CGI.bed.intT<-as.data.frame(merge(x=bedtab,y=tT_filt,by.x="Name",by.y="row.names",sort=FALSE,all.x=TRUE))
             CGI.bed.intT<-CGI.bed.intT[,!colnames(CGI.bed.intT) %in% "Name"]
-            write.table(CGI.bed.intT,file=paste0(bedshort,".limma.bed"),sep="\t",quote=FALSE,row.names=FALSE)
-            save(CGI.bed.intT,file=paste0(bedshort,".limma.RData"))
+            write.table(CGI.bed.intT,file=paste0(bedshort,".limma_unfiltered.bed"),sep="\t",quote=FALSE,row.names=FALSE)
+            save(CGI.bed.intT,file=paste0(bedshort,".limma_unfiltered.RData"))
+            CGI.bed.intT_filt<-CGI.bed.intT[,!is.na(CGI.bed.intT$adj.P.Val)]
+            if(nrow(CGI.bed.intT_filt)>0){
+            write.table(CGI.bed.intT_filt,file=paste0(bedshort,".limma_filtered.bed"),sep="\t",quote=FALSE,row.names=FALSE)}
 
     ####### add nearest gene information
             genMod<-commandArgs(trailingOnly=TRUE)[6]
             if (genMod!='NA' & file.exists(genMod)){
                 message(sprintf("Processing gene models in %s",genMod))
 
+                system('mkdir -p ',file.path(wdir,"temp"))
 
-                system(paste0('bedtools sort -i ', genMod,'  > ' ,wdir ,'/genes.sorted.bed'))
-                system(paste0('sed -i \'/CHROM/d\' ',wdir,'/',bedshort,".limma.bed"))
-                system(paste0('bedtools sort -i ',wdir,'/', bedshort,".limma.bed",' > ',wdir,'/',bedshort,".limma.sorted.bed"))
+                system(paste0('bedtools sort -i ', genMod,'  > ' ,wdir ,'/temp/genes.sorted.bed'))
+                system(paste0('sed -i \'/CHROM/d\' ',wdir,'/temp/',bedshort,".limma.bed"))
+                system(paste0('bedtools sort -i ',wdir,'/temp/', bedshort,".limma.bed",' > ',wdir,'/temp/',bedshort,".limma.sorted.bed"))
 
-                system(paste0('bedtools closest -D b -a ',wdir,'/',bedshort,".limma.sorted.bed",' -b ', wdir ,'/genes.sorted.bed',' > ',wdir,'/',bedshort,'.limma.closest.bed'))
+                system(paste0('bedtools closest -D b -a ',wdir,'/temp/',bedshort,".limma.sorted.bed",' -b ', wdir ,'/temp/genes.sorted.bed',' > ',wdir,'/temp/',bedshort,'.limma.closest.bed'))
 
-                DMR.filt.an<-fread(paste0(wdir,'/',bedshort,'.limma.closest.bed'),header=FALSE,sep="\t")
+                DMR.filt.an<-fread(paste0(wdir,'/temp/',bedshort,'.limma.closest.bed'),header=FALSE,sep="\t")
                 DMR.filt.an<-DMR.filt.an[,c(1:17,18:21,23,30),with=FALSE]
                 colnames(DMR.filt.an)<-c(colnames(CGI.bed.intT),"ChrEns","StartEns","EndEns","ENST","StrandEns","Dist")
 
@@ -186,11 +204,12 @@ if (length(readLines(bedF))==0) {message("No DMRs found.")}else{
                 bm<-getBM(attributes=c("ensembl_gene_id","ensembl_transcript_id","external_gene_name","description"),filters="ensembl_transcript_id",values=DMR.filt.an$ENST,mart=ens.xx)
 
                 DMR.filt.an2<-merge(x=DMR.filt.an,y=bm,by.x="ENST",by.y="ensembl_transcript_id",all.x=TRUE,allow.cartesian=TRUE)
-                write.table(DMR.filt.an2,file="metilene.limma.annotated.txt",row.names=FALSE,quote=FALSE,sep="\t")
-                DMR.filt.an2.pos<-DMR.filt.an2[DMR.filt.an2$MeanDiff>0,]
-                if(nrow(DMR.filt.an2.pos)>0){write.table(DMR.filt.an2.pos,file="metilene.limma.annotated.UP.txt",row.names=FALSE,quote=FALSE,sep="\t")}
-                DMR.filt.an2.neg<-DMR.filt.an2[DMR.filt.an2$MeanDiff<0,] 
-                if(nrow(DMR.filt.an2.neg)>0){write.table(DMR.filt.an2.neg,file="metilene.limma.annotated.DOWN.txt",row.names=FALSE,quote=FALSE,sep="\t")}
+                write.table(DMR.filt.an2,file="metilene.limma.annotated_unfiltered.txt",row.names=FALSE,quote=FALSE,sep="\t")
+                DMR.filt.an2.pos<-DMR.filt.an2[DMR.filt.an2$MeanDiff>0&!is.na(DMR.filt.an2$adj.P.Val),]
+                if(nrow(DMR.filt.an2.pos)>0){write.table(DMR.filt.an2.pos,file="metilene.limma.annotated_filtered.UP.txt",row.names=FALSE,quote=FALSE,sep="\t")}
+                DMR.filt.an2.neg<-DMR.filt.an2[DMR.filt.an2$MeanDiff<0&!is.na(DMR.filt.an2$adj.P.Val),] 
+                if(nrow(DMR.filt.an2.neg)>0){write.table(DMR.filt.an2.neg,file="metilene.limma.annotated_filtered.DOWN.txt",row.names=FALSE,quote=FALSE,sep="\t")}
+
 
             } else {message("No gene models file was provided.")}
 

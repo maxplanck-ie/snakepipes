@@ -578,8 +578,8 @@ if sampleInfo:
             MetCG=os.path.join("aux_files",re.sub('_sampleSheet.[a-z]{3}$','.metilene.CpGlist.bed',os.path.basename(sampleInfo))),
             sampleInfo=sampleInfo
         output:
-            LimBed='{}/singleCpG.metilene.limma.bed'.format(get_outdir("metilene_out")),
-            LimAnnot='{}/metilene.limma.annotated.txt'.format(get_outdir("metilene_out"))
+            LimBed='{}/singleCpG.metilene.limma_unfiltered.bed'.format(get_outdir("metilene_out")),
+            LimAnnot='{}/metilene.limma.annotated_unfiltered.txt'.format(get_outdir("metilene_out"))
         params:
             DMRout=os.path.join(outdir,'{}'.format(get_outdir("metilene_out"))),
             gene_mod=genes_bed,

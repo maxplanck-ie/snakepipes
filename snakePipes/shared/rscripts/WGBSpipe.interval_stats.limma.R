@@ -171,18 +171,11 @@ if(nrow(bedtab.CC)==0) {message("None of the genomic intervals passed the filter
             save(bedtab,limdat.LG.inCGI,CGI.limdat.CC,CGI.limdat.CC.Means,file=paste0(bedshort,".aggCpG.RData"))
 
         }else{
-            tT_filt<-tT_filt[,c("logFC","t","adj.P.Val","B")]
             write.table(tT_filt,file=paste0(bedshort,".CGI.limdat.CC.tT_filt.txt"),sep="\t",quote=FALSE)
 
             nrow(tT_filt)
             nrow(CGI.limdat.CC.logit)
             nrow(tT_filt)/nrow(CGI.limdat.CC.logit)
-
-            CGI.limdat.CC.Diff<-summarize(group_by(CGI.limdat.CC.Means,IntID),Diff=(Beta.Mean[1]-Beta.Mean[2]))
-            tT_filt.Diff0.2<-tT_filt[rownames(tT_filt) %in% CGI.limdat.CC.Diff$IntID[abs(CGI.limdat.CC.Diff$Diff)>=0.2],]
-
-            nrow(tT_filt.Diff0.2)
-            nrow(tT_filt.Diff0.2)/nrow(CGI.limdat.CC.logit)
 
             save(bedtab,limdat.LG.inCGI,CGI.limdat.CC,CGI.limdat.CC.Means,tT_filt,file=paste0(bedshort,".aggCpG.RData"))
 
