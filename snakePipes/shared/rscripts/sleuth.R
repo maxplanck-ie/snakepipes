@@ -64,7 +64,7 @@ tryCatch( { t2g = read.table(t2g_file, header=F) },
 if (exists("t2g")) {
  	colnames(t2g) <- c("target_id","ens_gene","ext_gene")
 	str(t2g)
-  
+
   ## add gene names
   so <- sleuth_prep(s2c, ~condition, target_mapping = t2g)
 } else {
