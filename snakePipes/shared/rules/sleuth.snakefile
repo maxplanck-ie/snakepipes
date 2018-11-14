@@ -23,4 +23,4 @@ rule sleuth_Salmon:
         "{params.indir} "
         "{params.outdir} "
         "{params.fdr} " + os.path.join(outdir,"{input.t2g}") +
-        ">{log.out} 2>{log.err}"
+        " >{log.out} 2>{log.err}"
