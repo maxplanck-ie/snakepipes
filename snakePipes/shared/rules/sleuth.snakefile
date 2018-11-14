@@ -25,4 +25,4 @@ rule sleuth_Salmon:
         "../{params.outdir} "
         "{params.fdr} "
         "../{input.t2g} "
-        "> {log.out} 2> {log.err}"
+        ">../{log.out} 2>../{log.err}"
