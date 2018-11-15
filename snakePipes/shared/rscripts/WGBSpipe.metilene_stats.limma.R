@@ -21,10 +21,10 @@ if (length(readLines(bedF))==0) {message("No DMRs found.")}else{
     auxF<-commandArgs(trailingOnly=TRUE)[3]
     message(sprintf("processing %s",auxF))
     auxbed<-read.table(auxF,header=FALSE,sep="\t",as.is=TRUE,quote="")
-    cnpool<-c("CHROM","START","END")#message(sprintf("processing %s",bedF))
-    colnames(auxbed)[1:3]<-cnpool#[1:ncol(bedtab)]
+    cnpool<-c("CHROM","START","END")
+    colnames(auxbed)[1:3]<-cnpool
     if(!unique(grepl("STRAND",colnames(auxbed)))){auxbed$STRAND<-"*"}
-    if(!unique(grepl("Name",colnames(auxbed)))){auxbed$Name<-paste(auxbed$CHROM,auxbed$START,sep="_")}#auxbed$END
+    if(!unique(grepl("Name",colnames(auxbed)))){auxbed$Name<-paste(auxbed$CHROM,auxbed$START,sep="_")}
 
 
     #load single CpG data, count NAs per row/CpG
@@ -86,7 +86,6 @@ if (length(readLines(bedF))==0) {message("No DMRs found.")}else{
     ### limma + ebayes + BH p value adjustment
 
         require("limma")
-        #library("carData")
         require("car")
         require("FactoMineR")
         require("reshape2")
@@ -159,12 +158,11 @@ if (length(readLines(bedF))==0) {message("No DMRs found.")}else{
         ggsave(paste0(bedshort,"_pvalue.distribution.png"))
 
 ### annotate top table with mean difference
-        meandatW<-dcast(data=CGI.limdat.CC.Means,ms~Group,value.var="Beta.Mean")
+        meandatW<-dcast(data=CGI.limdat.CC.Means,IntID~Group,value.var="Beta.Mean")
         if(sum(c("Control","Treatment") %in% colnames(meandatW))==2){meandatW$Diff<-with(meandatW,Treatment-Control)}
-        if(sum(c("WT","Mut") %in% colnames(meandatW))==2){meandatW$Diff<-with(meandatW,Mut-WT)}
-        else{meandatW$Diff<-meandatW[2]-meandatW[3]}
+        if(sum(c("WT","Mut") %in% colnames(meandatW))==2){meandatW$Diff<-with(meandatW,Mut-WT)}else{meandatW$Diff<-meandatW[,2]-meandatW[,3]}
 
-        tT$Diff<-meandatW$Diff[match(rownames(tT),meandatW$ms)]
+        tT$Diff<-meandatW$Diff[match(rownames(tT),meandatW$IntID)]
 
         tT$Filter<-"Fail"
         tT$Filter[tT$adj.P.Val<fdr&abs(tT$Diff)>=minAbsDiff]<-"Pass"
@@ -175,10 +173,11 @@ if (length(readLines(bedF))==0) {message("No DMRs found.")}else{
 
 #### filter top table according to thresholds
 
-        tT_filt<-tT[tT$adj.P.Val<fdr & abs(tT$Diff)>=minAbsDiff,!colnames(tT) %in% "Diff"]        
+        tT_filt<-tT[tT$adj.P.Val<fdr & abs(tT$Diff)>=minAbsDiff,]        
 
-        if(nrow(tT_filt)==0) {message("No metilene intervals were significantly differentially methylated.")}else{
-            tT_filt<-tT_filt[,c("logFC","t","","adj.P.Val","B")]
+        if(nrow(tT_filt)==0){message("No metilene intervals were significantly differentially methylated.")
+        } else {
+            tT_filt<-tT_filt[,c("logFC","t","adj.P.Val","B")]
             
             nrow(tT_filt)
             nrow(CGI.limdat.CC.logit)
@@ -190,7 +189,7 @@ if (length(readLines(bedF))==0) {message("No DMRs found.")}else{
             CGI.bed.intT<-CGI.bed.intT[,!colnames(CGI.bed.intT) %in% "Name"]
             write.table(CGI.bed.intT,file=paste0(bedshort,".limma_unfiltered.bed"),sep="\t",quote=FALSE,row.names=FALSE)
             save(CGI.bed.intT,file=paste0(bedshort,".limma_unfiltered.RData"))
-            CGI.bed.intT_filt<-CGI.bed.intT[,!is.na(CGI.bed.intT$adj.P.Val)]
+            CGI.bed.intT_filt<-CGI.bed.intT[!is.na(CGI.bed.intT$adj.P.Val),]
             if(nrow(CGI.bed.intT_filt)>0){
             write.table(CGI.bed.intT_filt,file=paste0(bedshort,".limma_filtered.bed"),sep="\t",quote=FALSE,row.names=FALSE)}
 
@@ -199,11 +198,11 @@ if (length(readLines(bedF))==0) {message("No DMRs found.")}else{
             if (genMod!='NA' & file.exists(genMod)){
                 message(sprintf("Processing gene models in %s",genMod))
 
-                system('mkdir -p ',file.path(wdir,"temp"))
+                
 
                 system(paste0('bedtools sort -i ', genMod,'  > ' ,wdir ,'/temp/genes.sorted.bed'))
-                system(paste0('sed -i \'/CHROM/d\' ',wdir,'/temp/',bedshort,".limma.bed"))
-                system(paste0('bedtools sort -i ',wdir,'/temp/', bedshort,".limma.bed",' > ',wdir,'/temp/',bedshort,".limma.sorted.bed"))
+                system(paste0('sed -i \'/CHROM/d\' ',wdir,'/',bedshort,".limma_unfiltered.bed"))
+                system(paste0('bedtools sort -i ',wdir,'/', bedshort,".limma_unfiltered.bed",' > ',wdir,'/temp/',bedshort,".limma.sorted.bed"))
 
                 system(paste0('bedtools closest -D b -a ',wdir,'/temp/',bedshort,".limma.sorted.bed",' -b ', wdir ,'/temp/genes.sorted.bed',' > ',wdir,'/temp/',bedshort,'.limma.closest.bed'))
 
@@ -228,7 +227,7 @@ if (length(readLines(bedF))==0) {message("No DMRs found.")}else{
 
             } else {message("No gene models file was provided.")}
 
-        }
-    }
-}
+        } # end if tT_filt has at least 1 row
+    } # end if any intervals passed filtering
+} #end if bed file has at least 1 line
 

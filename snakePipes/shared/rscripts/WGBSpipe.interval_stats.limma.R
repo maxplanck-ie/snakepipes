@@ -164,12 +164,11 @@ if(nrow(bedtab.CC)==0) {message("None of the genomic intervals passed the filter
         ggsave(paste0(bedshort,"_pvalue.distribution.png"))
 
 ### annotate top table with mean difference
-        meandatW<-dcast(data=CGI.limdat.CC.Means,ms~Group,value.var="Beta.Mean")
+        meandatW<-dcast(data=CGI.limdat.CC.Means,IntID~Group,value.var="Beta.Mean")
         if(sum(c("Control","Treatment") %in% colnames(meandatW))==2){meandatW$Diff<-with(meandatW,Treatment-Control)}
-        if(sum(c("WT","Mut") %in% colnames(meandatW))==2){meandatW$Diff<-with(meandatW,Mut-WT)}
-        else{meandatW$Diff<-meandatW[2]-meandatW[3]}
+        if(sum(c("WT","Mut") %in% colnames(meandatW))==2){meandatW$Diff<-with(meandatW,Mut-WT)}else{meandatW$Diff<-meandatW[,2]-meandatW[,3]}
 
-        tT$Diff<-meandatW$Diff[match(rownames(tT),meandatW$ms)]
+        tT$Diff<-meandatW$Diff[match(rownames(tT),meandatW$IntID)]
 
         tT$Filter<-"Fail"
         tT$Filter[tT$adj.P.Val<fdr&abs(tT$Diff)>=minAbsDiff]<-"Pass"

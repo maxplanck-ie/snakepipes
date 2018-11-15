@@ -28,7 +28,6 @@ mshort<-gsub(".CpG.filt2.bed","",basename(mdir))
 mdir<-mdir[match(sampleInfo$SampleID,mshort)]
 mshort<-gsub(".CpG.filt2.bed","",basename(mdir))
 
-#cC<-c(rep("NULL",3),"numeric",rep("NULL",3),"character")
 
 require(data.table)
 
@@ -71,7 +70,7 @@ if(nrow(limdat.LG.CC)==0){ message("None of the single CpG sites passed the filt
     limdat.LG.CC.L$Group<-sampleInfo$Group[match(limdat.LG.CC.L$SampleID,sampleInfo$SampleID)]
     limdat.LG.CC.Means<-data.table(summarize(group_by(limdat.LG.CC.L,ms,Group),Beta.Mean=mean(Beta)))
 
-    head(limdat.LG.CC.Means)
+    print(head(limdat.LG.CC.Means))
 
     if ("Control" %in% limdat.LG.CC.Means$Group){
         limdat.LG.CC.Means$Group<-factor(limdat.LG.CC.Means$Group)
@@ -137,10 +136,10 @@ if(nrow(limdat.LG.CC)==0){ message("None of the single CpG sites passed the filt
 ### annotate top table with mean difference
         meandatW<-dcast(data=limdat.LG.CC.Means,ms~Group,value.var="Beta.Mean")
         if(sum(c("Control","Treatment") %in% colnames(meandatW))==2){meandatW$Diff<-with(meandatW,Treatment-Control)}
-        if(sum(c("WT","Mut") %in% colnames(meandatW))==2){meandatW$Diff<-with(meandatW,Mut-WT)}
-        else{meandatW$Diff<-meandatW[2]-meandatW[3]}
+        if(sum(c("WT","Mut") %in% colnames(meandatW))==2){meandatW$Diff<-with(meandatW,Mut-WT)}else{meandatW$Diff<-meandatW[,2]-meandatW[,3]}
+        head(meandatW)
 
-        tT$Diff<-meandatW$Diff[match(rownames(tT),meandatW$ms)]
+        tT$Diff<-meandatW$Diff[match(tT$IntID,meandatW$ms)]
 
         tT$Filter<-"Fail"
         tT$Filter[tT$adj.P.Val<fdr&abs(tT$Diff)>=minAbsDiff]<-"Pass"
@@ -161,7 +160,7 @@ if(nrow(limdat.LG.CC)==0){ message("None of the single CpG sites passed the filt
 
 ###
             save(limdat.LG,file="limdat.LG.RData")
-            save(limdat.LG.CC.Means,limdat.LG.CC.Diff,tT_filt,file="singleCpG.RData")
+            save(limdat.LG.CC.Means,tT_filt,file="singleCpG.RData")
 
         }###end if topTable has at least 1 entry
 
