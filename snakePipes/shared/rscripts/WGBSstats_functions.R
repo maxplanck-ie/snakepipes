@@ -3,10 +3,9 @@
 print_sessionInfo<-function(mytext){
     message(mytext)
     sink("sessionInfo.txt")
-    sessionInfo()
+    print(sessionInfo())
     sink()
-    return()
-}
+    }
 
 
 

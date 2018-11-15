@@ -201,7 +201,7 @@ if (length(readLines(bedF))==0) {print_sessionInfo("No DMRs found.")}else{
             if (genMod!='NA' & file.exists(genMod)){
                 message(sprintf("Processing gene models in %s",genMod))
 
-                
+                system(paste0('mkdir -p ',file.path(wdir,"temp")))
 
                 system(paste0('bedtools sort -i ', genMod,'  > ' ,wdir ,'/temp/genes.sorted.bed'))
                 system(paste0('sed -i \'/CHROM/d\' ',wdir,'/',bedshort,".limma_unfiltered.bed"))
