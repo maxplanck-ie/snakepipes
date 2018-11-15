@@ -19,7 +19,7 @@ import snakePipes.parserCommon as parserCommon
 def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfile": None, "max_jobs": 5, "snakemake_options": "--use-conda", "tempdir": None,
                          "mode": "alignment-free,deepTools_qc", "downsample": False, "trim": False, "trim_prg": "cutadapt", "trim_options": None, "fastqc": False,
                          "library_type": 2, "mapping_prg": "STAR", "star_options": "--outBAMsortingBinsN 100", "hisat_options": None, "salmon_index_options": "--type quasi -k 31",
-                         "featurecounts_options": "-C -Q 10 --primary", "filter_annotation": None, "sample_info": None,
+                         "featurecounts_options": "-C -Q 10 --primary", "filter_annotation": None, "sampleSheet": None,
                          "bw_binsize": 25, "dnaContam": False, "plot_format": "png"}):
     """
     Parse arguments from the command line.
@@ -96,16 +96,16 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
                                " use --filter_annotation='-v pseudogene'; default: '%(default)s')",
                           default=defaults["filter_annotation"])
 
-    optional.add_argument("--DE",
-                          dest="sample_info",
+    optional.add_argument("--sampleSheet",
+                          dest="sampleSheet",
                           help="Information on samples (required for DE analysis); see "
-                               "'docs/content/sampleInfo.example.tsv' for example."
+                               "'docs/content/sampleSheet.example.tsv' for example."
                                " The column names in the tsv files are 'sample' and 'condition'.The first entry"
                                " defines which group of samples are control. "
                                " This way, the order of comparison and likewise the sign of values can be changed."
                                " The DE analysis might fail if your sample names begin with a number. So watch out"
                                " for that! (default: '%(default)s')",
-                          default=defaults["sample_info"])
+                          default=defaults["sampleSheet"])
 
     optional.add_argument("--dnaContam",
                           action="store_true",
