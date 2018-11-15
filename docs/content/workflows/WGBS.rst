@@ -14,7 +14,7 @@ There are two flags that allow skipping certain QC metric calculation, i.e. ``sk
 
 Methylation ratios are extracted (via `MethylDackel<https://github.com/dpryan79/MethylDackel>`__) for CpG positions in the reference genome with a minimum coverage (10x) and low snp allelic frequency (<0.25 illegitimate bases).
 If sample sheet is provided, logit-transformed beta values for CpG positions are tested for differential methylation using `limma<https://bioconductor.org/packages/release/bioc/html/limma.html>`__.
-Metilene is called to detect de novo DMRs. In addition to the nonparametric statistics output by metilene, limma-derived statistics are recalculated for DMRs, which are further annotated with nearest gene information.
+Metilene is called to detect de novo DMRs using parameters specified in the defaults dictionary. In addition to the nonparametric statistics output by metilene, limma-derived statistics are recalculated for DMRs, which are further annotated with nearest gene information.
 If bed file(s) with genomic intervals of interest are provided, methylation ratios are aggregated over those and limma is used on logit-transformed methylation ratios to test for differential methylation.
 
 Default filtering criteria for all statistical approaches are specified in the defaults.yaml as minimum absolute difference in methylation 0.2 (minAbsDiff) as well as FDR threshold (FDR) of 0.02. These values have been selected for a dataset with few events of differential methylation. The user is highly encouraged to rigorously inspect the resulting volcano plots and to adjust these filtering thresholds as appropriate for their dataset by providing an updated yaml file to the pipeline.
