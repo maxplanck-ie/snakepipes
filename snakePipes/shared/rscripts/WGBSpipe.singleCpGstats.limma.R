@@ -5,6 +5,9 @@ wdir<-commandArgs(trailingOnly=TRUE)[1]
 setwd(wdir)
 message(sprintf("working directory is %s",getwd()))
 
+importfunc<-commandArgs(trailingOnly=TRUE)[6]
+source(importfunc)
+
 
 options(stringsAsFactors=FALSE,na.rm=TRUE)
 require("limma")
@@ -45,7 +48,7 @@ limdat<-limdat[,c(1,match(sampleInfo$SampleID,colnames(limdat))),with=FALSE]
 limdat.LG<-limdat 
 limdat.LG[,2:ncol(limdat.LG)]<-limdat.LG[,2:ncol(limdat.LG)]/100
 limdat.LG.CC<-limdat.LG[complete.cases(limdat.LG),] 
-if(nrow(limdat.LG.CC)==0){ message("None of the single CpG sites passed the filtering.")}else{
+if(nrow(limdat.LG.CC)==0){ print_sessionInfo("None of the single CpG sites passed the filtering.")}else{
 
     limdat.LG.CC.logit<-logit(limdat.LG.CC[,2:ncol(limdat.LG.CC),with=FALSE],percents=FALSE,adjust=0.025) ##result is a data.frame
     rownames(limdat.LG.CC.logit)<-limdat.LG.CC$ms
@@ -137,7 +140,6 @@ if(nrow(limdat.LG.CC)==0){ message("None of the single CpG sites passed the filt
         meandatW<-dcast(data=limdat.LG.CC.Means,ms~Group,value.var="Beta.Mean")
         if(sum(c("Control","Treatment") %in% colnames(meandatW))==2){meandatW$Diff<-with(meandatW,Treatment-Control)}
         if(sum(c("WT","Mut") %in% colnames(meandatW))==2){meandatW$Diff<-with(meandatW,Mut-WT)}else{meandatW$Diff<-meandatW[,2]-meandatW[,3]}
-        head(meandatW)
 
         tT$Diff<-meandatW$Diff[match(tT$IntID,meandatW$ms)]
 
@@ -152,7 +154,7 @@ if(nrow(limdat.LG.CC)==0){ message("None of the single CpG sites passed the filt
 
         tT_filt<-tT[tT$adj.P.Val<fdr & abs(tT$Diff)>=minAbsDiff,] 
 
-        if(nrow(tT_filt)==0){ message("No CpG sites were significantly differentially methylated according to the thresholds.")}else{
+        if(nrow(tT_filt)==0){ print_sessionInfo("No CpG sites were significantly differentially methylated according to the thresholds.")}else{
             
             nrow(tT_filt)
             nrow(limdat.LG.CC.logit)
@@ -192,8 +194,8 @@ if(nrow(limdat.LG.CC)==0){ message("None of the single CpG sites passed the filt
 
             write.table(limdat.LG.CC.tw2,file="metilene.IN.txt",sep="\t",row.names=FALSE,quote=FALSE)
         } else {save(limdat.LG,file="limdat.LG.RData")
-                message('More than 2 sample groups were provided. No statistical inference will be computed.')}### end if exactly two sample groups were specified
+                print_sessionInfo('More than 2 sample groups were provided. No statistical inference will be computed.')}### end if exactly two sample groups were specified
 
-    
+  print_sessionInfo("Analysis completed succesfully.")  
 }###end if any CpGs passed filtering
 

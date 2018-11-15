@@ -5,6 +5,9 @@ wdir<-commandArgs(trailingOnly=TRUE)[1]
 setwd(wdir)
 message(sprintf("working directory is %s",getwd()))
 
+importfunc<-commandArgs(trailingOnly=TRUE)[8]
+source(importfunc)
+
 options(stringsAsFactors=FALSE,na.rm=TRUE)
 
 bedF<-commandArgs(trailingOnly=TRUE)[2]
@@ -71,7 +74,7 @@ bedtab$N.CG.tot<-N.CG.tot[match(bedtab$Name,limdat.LG.inCGI$IntID)]
 
 bedtab$CGI.NAf<-ifelse(bedtab$N.CG.NA>(0.8*bedtab$N.CG.tot),NA,1)
 bedtab.CC<-bedtab[complete.cases(bedtab),]
-if(nrow(bedtab.CC)==0) {message("None of the genomic intervals passed the filtering.")}else{
+if(nrow(bedtab.CC)==0) {print_sessionInfo("None of the genomic intervals passed the filtering.")}else{
 
     CGI.limdat<-as.data.frame(apply(limdat.LG.inCGI[,2:(ncol(limdat.LG.inCGI)-3)],2,function(X){ave(X,factor(limdat.LG.inCGI$IntID),FUN=function(X)mean(X,na.rm=TRUE))}),stringsAsFactors=FALSE)
 
@@ -100,7 +103,7 @@ if(nrow(bedtab.CC)==0) {message("None of the genomic intervals passed the filter
     if(nrow(x1$eig)>=2){
     pdf(paste0(bedshort,".CGI.limdat.CC.PCA.pdf"),paper="a4",bg="white") 
     plot.PCA(x1,choix="var")
-    dev.off()}else{message("There are not enough PC dimentions for a 2D plot.")}
+    dev.off()}else{print_sessionInfo("There are not enough PC dimentions for a 2D plot.")}
 
 #calculate row means
     spath<-commandArgs(trailingOnly=TRUE)[5]
@@ -181,7 +184,7 @@ if(nrow(bedtab.CC)==0) {message("None of the genomic intervals passed the filter
 
         tT_filt<-tT[tT$adj.P.Val<fdr & abs(tT$Diff)>=minAbsDiff,]  
 
-        if(nrow(tT_filt)==0) {message("No genomic intervals were significantly differentially methylated.")
+        if(nrow(tT_filt)==0) {print_sessionInfo("No genomic intervals were significantly differentially methylated.")
             save(bedtab,limdat.LG.inCGI,CGI.limdat.CC,CGI.limdat.CC.Means,file=paste0(bedshort,".aggCpG.RData"))
 
         }else{
@@ -194,7 +197,7 @@ if(nrow(bedtab.CC)==0) {message("None of the genomic intervals passed the filter
             save(bedtab,limdat.LG.inCGI,CGI.limdat.CC,CGI.limdat.CC.Means,tT_filt,file=paste0(bedshort,".aggCpG.RData"))
 
         }###end if topTable has at least 1 entry
-    } else {message('More than 2 sample groups were provided. No statistical inference will be computed.')}### end if exactly two sample groups were specified
-
+    } else {print_sessionInfo('More than 2 sample groups were provided. No statistical inference will be computed.')}### end if exactly two sample groups were specified
+    print_sessionInfo("Analysis completed succesfully.")
 }
 

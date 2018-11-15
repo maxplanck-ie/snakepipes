@@ -529,13 +529,14 @@ if sampleInfo:
             statdir=os.path.join(outdir,'{}'.format(get_outdir("singleCpG_stats_limma"))),
             sampleInfo=sampleInfo,
             diff=minAbsDiff,
-            fdr=FDR
+            fdr=FDR,
+            importfunc = os.path.join(workflow_rscripts, "WGBSstats_functions.R")
         log:
             err='{}/logs/CpG_stats.err'.format(get_outdir("singleCpG_stats_limma")),
             out='{}/logs/CpG_stats.out'.format(get_outdir("singleCpG_stats_limma"))
         threads: 1
         conda: CONDA_WGBS_ENV
-        shell: "Rscript --no-save --no-restore " + os.path.join(workflow_rscripts,'WGBSpipe.singleCpGstats.limma.R ') + "{params.statdir} {params.sampleInfo} "  + os.path.join(outdir,"methXT") + " {params.diff} {params.fdr} 1>{log.out} 2>{log.err}"
+        shell: "Rscript --no-save --no-restore " + os.path.join(workflow_rscripts,'WGBSpipe.singleCpGstats.limma.R ') + "{params.statdir} {params.sampleInfo} "  + os.path.join(outdir,"methXT") + " {params.diff} {params.fdr} {params.importfunc} 1>{log.out} 2>{log.err}"
 
     rule run_metilene:
         input:
@@ -584,13 +585,14 @@ if sampleInfo:
             DMRout=os.path.join(outdir,'{}'.format(get_outdir("metilene_out"))),
             gene_mod=genes_bed,
             diff=minAbsDiff,
-            fdr=FDR
+            fdr=FDR,
+            importfunc = os.path.join(workflow_rscripts, "WGBSstats_functions.R")
         log:
             err="{}/logs/cleanup_metilene.err".format(get_outdir("metilene_out")),
             out="{}/logs/cleanup_metilene.out".format(get_outdir("metilene_out"))
         threads: 1
         conda: CONDA_WGBS_ENV
-        shell: 'Rscript --no-save --no-restore ' + os.path.join(workflow_rscripts,'WGBSpipe.metilene_stats.limma.R ') + "{params.DMRout} " + os.path.join(outdir,"{input.MetBed}") +' ' + os.path.join(outdir,"{input.MetCG}") + ' ' + os.path.join(outdir,"{input.Limdat}") + " {input.sampleInfo} {params.gene_mod} {params.diff} {params.fdr} 1>{log.out} 2>{log.err}"
+        shell: 'Rscript --no-save --no-restore ' + os.path.join(workflow_rscripts,'WGBSpipe.metilene_stats.limma.R ') + "{params.DMRout} " + os.path.join(outdir,"{input.MetBed}") +' ' + os.path.join(outdir,"{input.MetCG}") + ' ' + os.path.join(outdir,"{input.Limdat}") + " {input.sampleInfo} {params.gene_mod} {params.diff} {params.fdr} {params.importfunc} 1>{log.out} 2>{log.err}"
 
 
 if intList:
@@ -621,7 +623,7 @@ if intList:
             output:
                 outFiles=run_int_aggStats(intList,sampleInfo)
             params:
-                auxshell=lambda wildcards,input:';'.join(['Rscript --no-save --no-restore ' + os.path.join(workflow_rscripts,'WGBSpipe.interval_stats.limma.R ') + os.path.join(outdir,'{}'.format(get_outdir("aggregate_stats_limma"))) + ' ' + li +' '+ aui +' ' + os.path.join(outdir,input.Limdat) + ' '  + input.sampleInfo + ' ' + str(minAbsDiff) + ' ' + str(FDR)  for li,aui in zip(intList,[os.path.join(outdir,"aux_files",re.sub('.fa',re.sub('.bed','.CpGlist.bed',os.path.basename(x)),os.path.basename(refG))) for x in intList])])
+                auxshell=lambda wildcards,input:';'.join(['Rscript --no-save --no-restore ' + os.path.join(workflow_rscripts,'WGBSpipe.interval_stats.limma.R ') + os.path.join(outdir,'{}'.format(get_outdir("aggregate_stats_limma"))) + ' ' + li +' '+ aui +' ' + os.path.join(outdir,input.Limdat) + ' '  + input.sampleInfo + ' ' + str(minAbsDiff) + ' ' + str(FDR) + os.path.join(workflow_rscripts, "WGBSstats_functions.R")  for li,aui in zip(intList,[os.path.join(outdir,"aux_files",re.sub('.fa',re.sub('.bed','.CpGlist.bed',os.path.basename(x)),os.path.basename(refG))) for x in intList])])
             log:
                 err="{}/logs/intAgg_stats.err".format(get_outdir("aggregate_stats_limma")),
                 out="{}/logs/intAgg_stats.out".format(get_outdir("aggregate_stats_limma"))

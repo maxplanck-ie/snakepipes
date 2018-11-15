@@ -7,11 +7,14 @@ message(sprintf("working directory is %s",getwd()))
 
 options(stringsAsFactors=FALSE,na.rm=TRUE)
 
+importfunc<-commandArgs(trailingOnly=TRUE)[9]
+source(importfunc)
+
 bedF<-commandArgs(trailingOnly=TRUE)[2]
 message(sprintf("processing %s",bedF))
 bedshort<-gsub(".bed","",basename(bedF))
 
-if (length(readLines(bedF))==0) {message("No DMRs found.")}else{
+if (length(readLines(bedF))==0) {print_sessionInfo("No DMRs found.")}else{
 
     bedtab<-read.table(bedF,header=FALSE,sep="\t",as.is=TRUE,quote="")
     colnames(bedtab)<-c("CHROM","START","END","qvalue","MeanDiff","NumCpGs","pMWU","p2DKS","meanA","meanB")
@@ -71,7 +74,7 @@ if (length(readLines(bedF))==0) {message("No DMRs found.")}else{
 
     bedtab$CGI.NAf<-ifelse(bedtab$N.CG.NA>(0.8*bedtab$N.CG.tot),NA,1)
     bedtab.CC<-bedtab[complete.cases(bedtab),]
-    if(nrow(bedtab.CC)==0) {message("None of the metilene intervals passed the filtering.")}else{
+    if(nrow(bedtab.CC)==0) {print_sessionInfo("None of the metilene intervals passed the filtering.")}else{
 
         CGI.limdat<-as.data.frame(apply(limdat.LG.inCGI[,2:(ncol(limdat.LG.inCGI)-3)],2,function(X){ave(X,factor(limdat.LG.inCGI$IntID),FUN=function(X)mean(X,na.rm=TRUE))}),stringsAsFactors=FALSE)
 
@@ -98,7 +101,7 @@ if (length(readLines(bedF))==0) {message("No DMRs found.")}else{
         if(nrow(x1$eig)>=2){
         pdf(paste0(bedshort,".CGI.limdat.CC.PCA.pdf"),paper="a4",bg="white") 
         plot.PCA(x1,choix="var")
-        dev.off()}else{message("There are not enough PC dimentions for a 2D plot.")}
+        dev.off()}else{print_sessionInfo("There are not enough PC dimentions for a 2D plot.")}
 
     #calculate row means
         spath<-commandArgs(trailingOnly=TRUE)[5]
@@ -175,7 +178,7 @@ if (length(readLines(bedF))==0) {message("No DMRs found.")}else{
 
         tT_filt<-tT[tT$adj.P.Val<fdr & abs(tT$Diff)>=minAbsDiff,]        
 
-        if(nrow(tT_filt)==0){message("No metilene intervals were significantly differentially methylated.")
+        if(nrow(tT_filt)==0){print_sessionInfo("No metilene intervals were significantly differentially methylated.")
         } else {
             tT_filt<-tT_filt[,c("logFC","t","adj.P.Val","B")]
             
@@ -225,9 +228,10 @@ if (length(readLines(bedF))==0) {message("No DMRs found.")}else{
                 if(nrow(DMR.filt.an2.neg)>0){write.table(DMR.filt.an2.neg,file="metilene.limma.annotated_filtered.DOWN.txt",row.names=FALSE,quote=FALSE,sep="\t")}
 
 
-            } else {message("No gene models file was provided.")}
+            } else {print_sessionInfo("No gene models file was provided.")}
 
         } # end if tT_filt has at least 1 row
     } # end if any intervals passed filtering
+    print_sessionInfo("Analysis completed succesfully.")
 } #end if bed file has at least 1 line
 
