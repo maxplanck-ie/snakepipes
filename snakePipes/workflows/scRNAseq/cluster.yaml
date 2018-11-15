@@ -6,7 +6,11 @@ combine_sample_counts:
     memory: 10G
 cluster_cells_raceid:
     memory: 6G
+cluster_cells_monocle:
+    memory: 6G
 annotation_bed2fasta:
     memory: 4G
 filter_cells_monocle:
-    memory: 4G
+    memory: 6G
+filter_cells_raceid:
+    memory: 6G
