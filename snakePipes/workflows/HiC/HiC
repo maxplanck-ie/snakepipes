@@ -111,7 +111,7 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
                           help="parameters to run hicDistVsCount. (default: '%(default)s')",
                           default=defaults["distVsCountParams"])
     optional.add_argument("--sampleSheet",
-                          dest="sample_sheet",
+                          dest="sampleSheet",
                           type=str,
                           metavar="STR",
                           help="A .tsv file containing sample names and associated groups. "

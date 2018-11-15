@@ -54,7 +54,7 @@ def run_Trimming(trim, fastqc):
         return([])
 
 # get samples to merge
-sample_dict = get_sampleSheet(sample_sheet)
+sample_dict = get_sampleSheet(sampleSheet)
 GROUPS = sample_dict.keys()
 
 def run_build_matrices():
