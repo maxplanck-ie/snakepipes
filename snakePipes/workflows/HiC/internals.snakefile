@@ -96,7 +96,6 @@ if trim:
         fastq_dir = "FASTQ_Cutadapt"
 
 def printToolsVersion(usedEnvs):
-    print(outdir)
     with open(outdir+"/toolsVersion.txt", 'w') as f:
         for item in usedEnvs:
               for line in open(os.path.join(maindir, "shared", "rules", item), 'r'):
