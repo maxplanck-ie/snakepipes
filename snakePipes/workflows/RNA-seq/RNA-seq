@@ -100,7 +100,7 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
                           dest="sampleSheet",
                           help="Information on samples (required for DE analysis); see "
                                "'docs/content/sampleSheet.example.tsv' for example."
-                               " The column names in the tsv files are 'sample' and 'condition'.The first entry"
+                               " The column names in the tsv files are 'name' and 'condition'.The first entry"
                                " defines which group of samples are control. "
                                " This way, the order of comparison and likewise the sign of values can be changed."
                                " The DE analysis might fail if your sample names begin with a number. So watch out"
