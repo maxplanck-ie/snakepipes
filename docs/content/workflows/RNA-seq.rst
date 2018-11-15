@@ -49,7 +49,7 @@ There is a configuration file in `snakePipes/workflows/RNA-seq/defaults.yaml`::
     trim_options:
     ## further options
     mode: alignment-free,deepTools_qc
-    sample_info:
+    sampleSheet:
     bw_binsize: 25
     fastqc: False
     featurecounts_options: -C -Q 10 --primary

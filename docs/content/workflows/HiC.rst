@@ -92,7 +92,7 @@ the config file description for the HiC workflow :
       #Chromosomes of interest to build matrix on them
       chromosomes:
       # a .tsv file contains names and replicates of samples. It is needed if merge_samples
-      sample_info:
+      sampleSheet:
       ################################################################################
       # Call snakemake directly, i.e. without using the wrapper script:
       #
