@@ -222,9 +222,9 @@ if (length(readLines(bedF))==0) {print_sessionInfo("No DMRs found.")}else{
 
                 DMR.filt.an2<-merge(x=DMR.filt.an,y=bm,by.x="ENST",by.y="ensembl_transcript_id",all.x=TRUE,allow.cartesian=TRUE)
                 write.table(DMR.filt.an2,file="metilene.limma.annotated_unfiltered.txt",row.names=FALSE,quote=FALSE,sep="\t")
-                DMR.filt.an2.pos<-DMR.filt.an2[DMR.filt.an2$MeanDiff>0&!is.na(DMR.filt.an2$adj.P.Val),]
+                DMR.filt.an2.pos<-DMR.filt.an2[DMR.filt.an2$MeanDiff>minAbsDiff&!is.na(DMR.filt.an2$adj.P.Val),]
                 if(nrow(DMR.filt.an2.pos)>0){write.table(DMR.filt.an2.pos,file="metilene.limma.annotated_filtered.UP.txt",row.names=FALSE,quote=FALSE,sep="\t")}
-                DMR.filt.an2.neg<-DMR.filt.an2[DMR.filt.an2$MeanDiff<0&!is.na(DMR.filt.an2$adj.P.Val),] 
+                DMR.filt.an2.neg<-DMR.filt.an2[DMR.filt.an2$MeanDiff<(-minAbsDiff)&!is.na(DMR.filt.an2$adj.P.Val),] 
                 if(nrow(DMR.filt.an2.neg)>0){write.table(DMR.filt.an2.neg,file="metilene.limma.annotated_filtered.DOWN.txt",row.names=FALSE,quote=FALSE,sep="\t")}
 
 
