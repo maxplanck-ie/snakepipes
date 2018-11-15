@@ -8,3 +8,5 @@ cluster_cells_raceid:
     memory: 6G
 annotation_bed2fasta:
     memory: 4G
+filter_cells_monocle:
+    memory: 4G
