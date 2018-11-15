@@ -42,8 +42,7 @@ rule plotEnrichment_allelic:
     input:
         bam = expand("allelic_bams/{sample}.{suffix}.sorted.bam", sample=samples, suffix = ['genome1', 'genome2']),
         bai = expand("allelic_bams/{sample}.{suffix}.sorted.bam.bai", sample=samples, suffix = ['genome1', 'genome2']),
-        gtf = "Annotation/genes.filtered.gtf",
-        gtf2= "Annotation/genes.filtered.transcripts.gtf"
+        gtf = "Annotation/genes.filtered.gtf"
     output:
         "deepTools_qc/plotEnrichment/plotEnrichment_allelic.tsv"
     conda:

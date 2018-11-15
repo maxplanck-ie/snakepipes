@@ -19,7 +19,7 @@ if paired:
         threads: 8
         conda: CONDA_SHARED_ENV
         shell: """
-            cutadapt {params.opts} -j {threads} -e 0.1 -q 16 -O 3 --trim-n --minimum-length 25 -a AGATCGGAAGAGC -A AGATCGGAAGAGC \
+            cutadapt -j {threads} -e 0.1 -q 16 -O 3 --trim-n --minimum-length 25 -a AGATCGGAAGAGC -A AGATCGGAAGAGC {params.opts} \
                 -o {output.r1} -p {output.r2} {input.r1} {input.r2} > {log.out} 2> {log.err}
             """
 else:
@@ -38,7 +38,7 @@ else:
         threads: 8
         conda: CONDA_SHARED_ENV
         shell: """
-            cutadapt {params.opts} -j {threads} -e 0.1 -q 16 -O 3 --trim-n --minimum-length 25 -a AGATCGGAAGAGC \
+            cutadapt -j {threads} -e 0.1 -q 16 -O 3 --trim-n --minimum-length 25 -a AGATCGGAAGAGC {params.opts} \
                 -o {output} {input.r1} > {log.out} 2> {log.err}
             """
 
