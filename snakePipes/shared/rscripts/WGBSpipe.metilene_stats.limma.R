@@ -192,7 +192,8 @@ if (length(readLines(bedF))==0) {print_sessionInfo("No DMRs found.")}else{
             CGI.bed.intT<-CGI.bed.intT[,!colnames(CGI.bed.intT) %in% "Name"]
             write.table(CGI.bed.intT,file=paste0(bedshort,".limma_unfiltered.bed"),sep="\t",quote=FALSE,row.names=FALSE)
             save(CGI.bed.intT,file=paste0(bedshort,".limma_unfiltered.RData"))
-            CGI.bed.intT_filt<-CGI.bed.intT[!is.na(CGI.bed.intT$adj.P.Val),]
+            CGI.bed.intT_filt<-CGI.bed.intT[CGI.bed.intT$adj.P.Val<fdr & abs(CGI.bed.intT$MeanDiff)>=minAbsDiff,]
+            CGI.bed.intT_filt<-CGI.bed.intT_filt[!is.na(CGI.bed.intT_filt$CHROM),]
             if(nrow(CGI.bed.intT_filt)>0){
             write.table(CGI.bed.intT_filt,file=paste0(bedshort,".limma_filtered.bed"),sep="\t",quote=FALSE,row.names=FALSE)}
 
@@ -222,9 +223,9 @@ if (length(readLines(bedF))==0) {print_sessionInfo("No DMRs found.")}else{
 
                 DMR.filt.an2<-merge(x=DMR.filt.an,y=bm,by.x="ENST",by.y="ensembl_transcript_id",all.x=TRUE,allow.cartesian=TRUE)
                 write.table(DMR.filt.an2,file="metilene.limma.annotated_unfiltered.txt",row.names=FALSE,quote=FALSE,sep="\t")
-                DMR.filt.an2.pos<-DMR.filt.an2[DMR.filt.an2$MeanDiff>minAbsDiff&!is.na(DMR.filt.an2$adj.P.Val),]
+                DMR.filt.an2.pos<-DMR.filt.an2[DMR.filt.an2$MeanDiff>=minAbsDiff&!is.na(DMR.filt.an2$adj.P.Val),]
                 if(nrow(DMR.filt.an2.pos)>0){write.table(DMR.filt.an2.pos,file="metilene.limma.annotated_filtered.UP.txt",row.names=FALSE,quote=FALSE,sep="\t")}
-                DMR.filt.an2.neg<-DMR.filt.an2[DMR.filt.an2$MeanDiff<(-minAbsDiff)&!is.na(DMR.filt.an2$adj.P.Val),] 
+                DMR.filt.an2.neg<-DMR.filt.an2[DMR.filt.an2$MeanDiff<=(-minAbsDiff)&!is.na(DMR.filt.an2$adj.P.Val),] 
                 if(nrow(DMR.filt.an2.neg)>0){write.table(DMR.filt.an2.neg,file="metilene.limma.annotated_filtered.DOWN.txt",row.names=FALSE,quote=FALSE,sep="\t")}
 
 
