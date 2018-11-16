@@ -5,7 +5,7 @@ def multiqc_input_check(return_value):
     infiles = []
     indir = ""
 
-    if not pipeline=="scrna-seq":
+    if not pipeline=="scrna-seq" and not fromBam:
         if paired:
             if trim:
                 infiles.append( expand("FastQC_trimmed/{sample}{read}_fastqc.html", sample = samples, read = reads) )

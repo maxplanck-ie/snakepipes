@@ -30,15 +30,6 @@ if not fromBam:
     if trim:
         include: os.path.join(maindir, "shared", "rules", "TrimGalore.snakefile")
 
-    # deeptools cmds
-    include: os.path.join(maindir, "shared", "tools" , "deeptools_cmds.snakefile")
-    ## bamCoverage_RPKM
-    include: os.path.join(maindir, "shared", "rules", "deepTools_RNA.snakefile")
-
-    ## sambamba
-    include:os.path.join(maindir, "shared", "rules", "sambamba.snakefile")
-    include:os.path.join(maindir, "shared", "rules", "RNA-seq_qc_report.snakefile")
-
     ## Allele-specific JOBS
     if "allelic-mapping" in mode:
         # Updated global vars if mode = "allelic-mapping"
@@ -74,19 +65,25 @@ if not fromBam:
         if sampleSheet:
             include: os.path.join(maindir, "shared", "rules", "sleuth.snakefile")
 
-    ## MultiQC
-    include: os.path.join(maindir, "shared", "rules", "multiQC.snakefile")
-
-    ##Genomic_contamination
-    include: os.path.join(maindir, "shared", "rules", "GenomicContamination.snakefile")
-
 else:
     fastqc=False
     trim=False
-    dnaContam=False
+    downsample=None
+    
     include: os.path.join(maindir, "shared", "rules", "LinkBam.snakefile")
-    include: os.path.join(maindir, "shared", "rules", "sambamba.snakefile")
-    sample_name = os.path.splitext(os.path.basename(sampleSheet))[0]
+
+## sambamba
+include:os.path.join(maindir, "shared", "rules", "sambamba.snakefile")
+
+##Genomic_contamination
+include: os.path.join(maindir, "shared", "rules", "GenomicContamination.snakefile")
+
+# deeptools cmds
+include: os.path.join(maindir, "shared", "tools" , "deeptools_cmds.snakefile")
+## bamCoverage_RPKM
+include: os.path.join(maindir, "shared", "rules", "deepTools_RNA.snakefile")
+
+include:os.path.join(maindir, "shared", "rules", "RNA-seq_qc_report.snakefile")
 
 ## filtered annotation (GTF)
 include: os.path.join(maindir, "shared", "rules", "filter_annotation.snakefile")
@@ -98,7 +95,8 @@ include: os.path.join(maindir, "shared", "rules", "featureCounts.snakefile")
 if sampleSheet:
     include: os.path.join(maindir, "shared", "rules", "DESeq2.snakefile")
 
-
+## MultiQC
+include: os.path.join(maindir, "shared", "rules", "multiQC.snakefile")
 
 ### conditional/optional rules #################################################
 ################################################################################
@@ -283,12 +281,10 @@ else:
             "Annotation/genes.annotated.bed",
             "Annotation/genes.filtered.bed",
             "Annotation/genes.filtered.gtf",
-            expand(mapping_prg+"/{sample}.bam", sample = samples),
-            expand(mapping_prg+"/{sample}.bam.bai", sample = samples),
-            expand("featureCounts/{sample}.counts.txt", sample=samples),
-            "featureCounts/counts.tsv",
-            "DESeq2_{}/DESeq2.session_info.txt".format(sample_name)
-
+            run_alignment(),
+            run_deepTools_qc(),
+            run_GenomicContamination(),
+            "multiQC/multiqc_report.html"
 
 ### execute after  finished ####################################################
 ################################################################################

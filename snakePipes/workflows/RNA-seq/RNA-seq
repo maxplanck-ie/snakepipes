@@ -154,6 +154,11 @@ def main():
     for mode in modeTemp:
         if mode not in validModes:
             sys.exit("{} is not a valid mode!\n".format(mode))
+    if args.fromBam and "alignment-free" in modeTemp:
+        sys.exit("\nalignment-free cannot be run from bam files - skip this mode or provide fastq files!\n")  
+    if args.fromBam:
+        args.mapping_prg = "EXTERNAL_BAM"
+            
     ## End workflow-specific checks
 
     # Handle YAML and log files
