@@ -6,13 +6,15 @@ output: html_document
 params:
     outdir: "Stats_reports"
     output_file: "Stats_reports/Stats_report.html"
-    stat_category: "single_CpG"
+    input_func: "WGBSstats_functions.R"
+    stat_category: "single_CpGs"
     sample_sheet: "dummy_sample_sheet"
     stat_input: "limdat.LG.RData"
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
+source(params$input_func)
 ```
 
 
@@ -64,7 +66,7 @@ include.graphics(pval_plot)
 ```
 
 Features were filtered using a threshold on minimum absolute difference in mean methylation `r system('grep minAbsDiff ../WGBS.config.yaml',intern=TRUE)` as well as a threshold on maximum FDR `r system('grep FDR ../WGBS.config.yaml',intern=TRUE)` to produce the list of statistically differentially methylated features.
-There were `r system(paste0('wc -l ',dir(params$outdir,pattern="*tT_filt.txt",full.names=TRUE)),intern=TRUE)` features passing these filters.
+There were `r get_nrow_topTable(params$outdir,params$stat_category)` features passing these filters.
 
 A volcano plot was produced to visualize the effect of threshold application onto the test results.
 
