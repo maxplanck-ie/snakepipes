@@ -1,20 +1,3 @@
-
-rule convertLibraryTypeSalmon:
-    input: "Annotation/genes.filtered.fa"
-    output: "Salmon/lib_type.txt"
-    params:
-        lib_str = "PE" if paired else "SE",
-        from_library_type = library_type,
-        from_prg = "featureCounts",
-        to_prg="Salmon",
-        tsv = os.path.join(maindir, "shared", "tools", "library_type.tsv"),
-        rscript = os.path.join(maindir, "shared", "rscripts", "library_type.R")
-    threads: 1
-    conda: CONDA_RNASEQ_ENV
-    shell:
-        "Rscript {params.rscript} {params.tsv} {params.lib_str} {params.from_library_type} {params.from_prg} {params.to_prg} > {output}"
-
-
 ## Salmon Index
 rule SalmonIndex:
     input:
@@ -36,6 +19,26 @@ rule SalmonIndex:
         """
 
 
+def getSalmon_libtype(paired, library_type):
+    """
+    Convert from a featureCounts library type to a HISAT2 option string
+    """
+    if paired:
+        if library_type == 1:
+            return "ISF"
+        elif library_type == 2:
+            return "ISR"
+        else:
+            return "IU"
+    else:
+        if library_type == 1:
+            return "SF"
+        elif library_type == 2:
+            return "SR"
+        else:
+            return "U"
+
+
 ## Salmon quant
 if paired:
     rule SalmonQuant:
@@ -43,7 +46,6 @@ if paired:
             r1 = fastq_dir+"/{sample}"+reads[0]+".fastq.gz",
             r2 = fastq_dir+"/{sample}"+reads[1]+".fastq.gz",
             bin = "Salmon/SalmonIndex/sa.bin",
-            lib_type = "Salmon/lib_type.txt"
         output:
             quant = "Salmon/{sample}/quant.sf",
             quant_genes = "Salmon/{sample}/quant.genes.sf"
@@ -52,16 +54,16 @@ if paired:
         params:
             outdir = "Salmon/{sample}",
             gtf = genes_gtf,
+            lib_type = getSalmon_libtype(paired, library_type)
         threads: 8
         conda: CONDA_RNASEQ_ENV
         shell:
-            "lib_type=$(cat {input.lib_type} ); echo \"lib_type=\"$lib_type 1>&2; "
             "salmon quant "
             "-p {threads} "
             "--numBootstraps 50 "
             "-g {params.gtf} "
             "-i Salmon/SalmonIndex "
-            "-l $lib_type "
+            "-l {params.lib_type} "
             "-1 {input.r1} -2 {input.r2} "
             "-o {params.outdir} "
 else:
@@ -69,7 +71,6 @@ else:
         input:
             fastq = fastq_dir+"/{sample}.fastq.gz",
             bin = "Salmon/SalmonIndex/sa.bin",
-            lib_type = "Salmon/lib_type.txt"
         output:
             quant = "Salmon/{sample}/quant.sf",
             quant_genes = "Salmon/{sample}/quant.genes.sf"
@@ -78,16 +79,16 @@ else:
         params:
             outdir = "Salmon/{sample}",
             gtf = genes_gtf,
+            lib_type = getSalmon_libtype(paired, library_type)
         threads: 8
         conda: CONDA_RNASEQ_ENV
         shell:
-            "lib_type=$(cat {input.lib_type} ); echo \"lib_type=\"$lib_type 1>&2; "
             "salmon quant "
             "-p {threads} "
             "--numBootstraps 50 "
             "-g {params.gtf} "
             "-i Salmon/SalmonIndex "
-            "-l $lib_type "
+            "-l {params.lib_type} "
             "-r {input.fastq} "
             "-o {params.outdir} "
 
