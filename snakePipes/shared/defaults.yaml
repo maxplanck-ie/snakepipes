@@ -6,5 +6,12 @@
 # Note that due to limitations in yaml.dump, only very basic structures are
 # permitted here.
 ################################################################################
-snakemake_options: '--use-conda --conda-prefix /package/anaconda3/envs'
+snakemake_options: ' --use-conda --conda-prefix /package/anaconda3/envs/ '
 tempdir: /data/extended/
+# The following are only needed if you use the --emailAddress option
+smtpServer:
+smtpPort: 0
+onlySSL: False
+emailSender:
+smtpUsername:
+smtpPassword:

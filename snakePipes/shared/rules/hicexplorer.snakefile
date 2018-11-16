@@ -50,7 +50,7 @@ if(RF_resolution is True):
         log:
             out = "HiC_matrices/logs/{sample}_"+matrixFile_suffix+".out",
             err = "HiC_matrices/logs/{sample}_"+matrixFile_suffix+".err"
-        threads: 15
+        threads: 10
         conda: CONDA_HIC_ENV
         shell:
             "hicBuildMatrix -s {input.R1} {input.R2} "
@@ -82,7 +82,7 @@ else:
         log:
             out = "HiC_matrices/logs/{sample}_"+matrixFile_suffix+".out",
             err = "HiC_matrices/logs/{sample}_"+matrixFile_suffix+".err"
-        threads: 15
+        threads: 10
         conda: CONDA_HIC_ENV
         shell:
             "hicBuildMatrix -s {input.R1} {input.R2} "

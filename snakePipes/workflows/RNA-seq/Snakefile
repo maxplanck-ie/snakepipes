@@ -95,7 +95,7 @@ include: os.path.join(maindir, "shared", "rules", "filter_annotation.snakefile")
 include: os.path.join(maindir, "shared", "rules", "featureCounts.snakefile")
 
 ## DESeq2
-if sample_info:
+if sampleSheet:
     include: os.path.join(maindir, "shared", "rules", "DESeq2.snakefile")
 
 
@@ -132,10 +132,10 @@ def run_alignment_free():
         "Salmon/counts.genes.tsv",
         expand("Salmon/{sample}/abundance.h5", sample=samples) ]
 
-        if sample_info:
-            sample_name = os.path.splitext(os.path.basename(sample_info))[0]
+        if sampleSheet:
+            sample_name = os.path.splitext(os.path.basename(sampleSheet))[0]
             file_list.append( ["DESeq2_Salmon_{}/DESeq2.session_info.txt".format(sample_name)])
-        if sample_info and check_replicates(sample_info):
+        if sampleSheet and check_replicates(sampleSheet):
             file_list.append( ["sleuth/so.rds"] )
 
         return(file_list)
@@ -153,8 +153,8 @@ def run_alignment():
         "featureCounts/counts.tsv",
         "QC_report/QC_report_all.tsv"
         ]
-        if sample_info:
-            sample_name = os.path.splitext(os.path.basename(sample_info))[0]
+        if sampleSheet:
+            sample_name = os.path.splitext(os.path.basename(sampleSheet))[0]
             file_list.append( ["DESeq2_{}/DESeq2.session_info.txt".format(sample_name)] )
         return(file_list)
     else:
@@ -185,8 +185,8 @@ def run_allelesp_mapping():
         expand("featureCounts/{sample}.allelic_counts.txt", sample=samples),
         "featureCounts/counts_allelic.tsv"
         ]
-        if sample_info:
-            sample_name = os.path.splitext(os.path.basename(sample_info))[0]
+        if sampleSheet:
+            sample_name = os.path.splitext(os.path.basename(sampleSheet))[0]
             file_list.append( ["DESeq2_{}/DESeq2.session_info.txt".format(sample_name)] )
         return(file_list)
     else:
@@ -236,7 +236,7 @@ onstart:
         print("fastq dir:", fastq_dir)
         print("filter annotation:", filter_annotation)
         print("FeatureCounts library type:", library_type)
-        print("Sample info:", sample_info)
+        print("Sample sheet:", sampleSheet)
         print("-" * 80, "\n")
 
         print("--- Environment ----------------------------------------------------------------")
@@ -269,7 +269,7 @@ if not fromBam:
             run_Trimming(trim, fastqc),
             "Annotation/genes.annotated.bed",
             "Annotation/genes.filtered.bed",
-#           "Annotation/genes.filtered.saf",    # this file is used for featureCounts later on!
+            "Annotation/genes.filtered.gtf",
             run_alignment_free(),            # Salmon
             run_alignment(),                 # classical mapping + counting
             run_allelesp_mapping(),        # allelic-mapping
@@ -283,13 +283,12 @@ else:
         input:
             "Annotation/genes.annotated.bed",
             "Annotation/genes.filtered.bed",
-#           "Annotation/genes.filtered.saf",    # this file is used for featureCounts later on!
+            "Annotation/genes.filtered.gtf",
             expand(mapping_prg+"/{sample}.bam", sample = samples),
             expand(mapping_prg+"/{sample}.bam.bai", sample = samples),
             expand("featureCounts/{sample}.counts.txt", sample=samples),
             "featureCounts/counts.tsv",
             "DESeq2_{}/DESeq2.session_info.txt".format(sample_name)
-
 
 
 ### execute after  finished ####################################################

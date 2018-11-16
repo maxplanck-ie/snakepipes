@@ -1,12 +1,11 @@
 import subprocess
 
 # MACS2 should be called on already filtered, e.g. duplicate-free, BAM files
-# for paired-end BAM files, Picard MarkDuplicates is fragment-based and
+# for paired-end BAM files, sambamba markdupes is fragment-based and
 # therefore superior to MACS2 mate 1-based duplicate detection
 
 
 ### MACS2 peak calling #########################################################
-
 
 if paired:
     rule MACS2:
@@ -22,15 +21,12 @@ if paired:
         params:
             fragment_length = lambda wildcards: cf.get_fragment_length("deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv", wildcards.chip_sample),
             genome_size = genome_size,
-            # TODO: test BAMPE mode and activate BAMPE for paired-end data and BAM for single-end data
-            # if results of BAMPE and BAM are in good agreement for paired-end data
-            # does BAMPE mode really extends each read pair or does it only estimate a mean fragment size? the latter would be no advantage over BAM mode
-            # format = "-f BAMPE" if paired else "-f BAM"
             broad_calling =
                 lambda wildcards: "--broad" if is_broad(wildcards.chip_sample) else "",
             control_param =
                 lambda wildcards: "-c filtered_bam/"+get_control(wildcards.chip_sample)+".filtered.bam" if get_control(wildcards.chip_sample)
                 else "",
+            bampe = lambda wildcards: TRUE if bamPE is True else []
         log:
             out = "MACS2/logs/MACS2.{chip_sample}.filtered.out",
             err = "MACS2/logs/MACS2.{chip_sample}.filtered.err"
@@ -87,7 +83,6 @@ else:
 rule MACS2_peak_qc:
     input:
         bam = "filtered_bam/{sample}.filtered.bam",
-        aln_metrics = "Picard_qc/AlignmentSummaryMetrics/{sample}.alignment_summary_metrics.txt",
         xls = "MACS2/{sample}.filtered.BAM_peaks.xls"
     output:
         qc = "MACS2/{sample}.filtered.BAM_peaks.qc.txt"
@@ -103,8 +98,8 @@ rule MACS2_peak_qc:
         # get the number of peaks
         peak_count=`wc -l < {params.peaks}`
 
-        # get the number of mapped reads from Picard CollectAlignmentSummaryMetrics output
-        mapped_reads=`egrep '^PAIR|UNPAIRED' {input.aln_metrics} | cut -f 6`
+        # get the number of mapped reads
+        mapped_reads=`samtools view -c -F 4 {input.bam}`
 
         # calculate the number of alignments overlapping the peaks
         # exclude reads flagged as unmapped (unmapped reads will be reported when using -L)
@@ -115,7 +110,7 @@ rule MACS2_peak_qc:
 
         # compute peak genome coverage
         peak_len=`awk '{{total+=$3-$2}}END{{print total}}' {params.peaks}`
-        genome_size=`awk '{{total+=$3-$2}}END{{print total}}' {params.peaks}`
+        genome_size=`awk '{{total+=$3-$2}}END{{print total}}' {params.genome_index}`
         genomecov=`bc -l <<< "$peak_len/$genome_size"`
 
         # write peak-based QC metrics to output file

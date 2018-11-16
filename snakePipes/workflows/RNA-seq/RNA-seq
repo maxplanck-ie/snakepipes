@@ -19,7 +19,7 @@ import snakePipes.parserCommon as parserCommon
 def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfile": None, "max_jobs": 5, "snakemake_options": "--use-conda", "tempdir": None,
                          "mode": "alignment-free,deepTools_qc", "downsample": False, "trim": False, "trim_prg": "cutadapt", "trim_options": None, "fastqc": False,
                          "library_type": 2, "mapping_prg": "STAR", "star_options": "--outBAMsortingBinsN 100", "hisat_options": None, "salmon_index_options": "--type quasi -k 31",
-                         "featurecounts_options": "-C -Q 10 --primary", "filter_annotation": None, "sample_info": None,
+                         "featurecounts_options": "-C -Q 10 --primary", "filter_annotation": None, "sampleSheet": None,
                          "bw_binsize": 25, "dnaContam": False, "plot_format": "png","fromBam": False, "paired": True}):
     """
     Parse arguments from the command line.
@@ -96,16 +96,16 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
                                " use --filter_annotation='-v pseudogene'; default: '%(default)s')",
                           default=defaults["filter_annotation"])
 
-    optional.add_argument("--DE",
-                          dest="sample_info",
+    optional.add_argument("--sampleSheet",
+                          dest="sampleSheet",
                           help="Information on samples (required for DE analysis); see "
-                               "'snakemake_workflows/shared/sampleInfo.example.tsv' for example."
-                               " The column names in the tsv files are 'sample' and 'condition'.The first entry"
+                               "'docs/content/sampleSheet.example.tsv' for example."
+                               " The column names in the tsv files are 'name' and 'condition'.The first entry"
                                " defines which group of samples are control. "
                                " This way, the order of comparison and likewise the sign of values can be changed."
                                " The DE analysis might fail if your sample names begin with a number. So watch out"
                                " for that! (default: '%(default)s')",
-                          default=defaults["sample_info"])
+                          default=defaults["sampleSheet"])
 
     optional.add_argument("--dnaContam",
                           action="store_true",
@@ -132,6 +132,7 @@ def main():
     # get command line arguments
     parser = parse_args(defaults)
     args = parser.parse_args()
+    args, defaults = cf.handleUserArgs(args, defaults, parse_args)
 
     # we also add these paths to config, although we don't use them in the Snakefile
     args.baseDir = baseDir
@@ -149,13 +150,10 @@ def main():
         args.SNPfile = os.path.abspath(args.SNPfile)
         args.Nmasked_index = os.path.abspath(args.Nmasked_index)
     modeTemp = args.mode.split(",")
-    validModes = set(["alignment", "alignment-free", "deepTools_qc"])
+    validModes = set(["alignment", "alignment-free", "deepTools_qc", "allelic-mapping"])
     for mode in modeTemp:
         if mode not in validModes:
             sys.exit("{} is not a valid mode!\n".format(mode))
-    # deepTools_qc requires alignment as input
-    if "deepTools_qc" in modeTemp and "alignment" not in modeTemp:
-        args.mode = "{},alignment".format(args.mode)
     ## End workflow-specific checks
 
     # Handle YAML and log files

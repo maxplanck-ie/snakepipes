@@ -17,7 +17,7 @@ rule CSAW:
         paired = paired,
         fragment_length = fragment_length,
         window_size = window_size,
-        importfunc = "shared/rscripts/DB_functions.R",
+        importfunc = os.path.join("shared", "rscripts", "DB_functions.R"),
         allele_info = allele_info
     log: "CSAW/CSAW.log"
     conda: CONDA_ATAC_ENV

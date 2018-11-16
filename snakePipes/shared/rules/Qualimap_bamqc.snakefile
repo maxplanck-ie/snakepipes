@@ -35,7 +35,7 @@ rule Qualimap_bamqc_symlink_txt:
         "Qualimap_qc/{sample}.filtered.bamqc_results.txt"
     conda: CONDA_DNA_MAPPING_ENV
     shell:
-        "( [ -f {output} ] || ln -s -r {input} {output} ) && touch -h {output}"
+        "( [ -f {output} ] || ln -s -r {input} {output} ) "
 
 
 rule Qualimap_bamqc_symlink_html:
@@ -45,4 +45,4 @@ rule Qualimap_bamqc_symlink_html:
         "Qualimap_qc/{sample}.filtered.bamqc_report.html"
     conda: CONDA_DNA_MAPPING_ENV
     shell:
-        "( [ -f {output} ] || ln -s -r {input} {output} ) && touch -h {output}"
+        "( [ -f {output} ] || ln -s -r {input} {output} ) "
