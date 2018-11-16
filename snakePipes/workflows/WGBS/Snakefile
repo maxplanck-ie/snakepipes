@@ -123,7 +123,7 @@ def get_outdir(folder_name):
 def run_CpG_stats(sampleInfo):
     if sampleInfo:
 
-        return (['{}/singleCpG.RData'.format(get_outdir("singleCpG_stats_limma")), '{}/limdat.LG.RData'.format(get_outdir("singleCpG_stats_limma")),'{}/metilene.IN.txt'.format(get_outdir("singleCpG_stats_limma"))])
+        return (['{}/singleCpG.RData'.format(get_outdir("singleCpG_stats_limma")), '{}/limdat.LG.RData'.format(get_outdir("singleCpG_stats_limma")),'{}/metilene.IN.txt'.format(get_outdir("singleCpG_stats_limma")),'{}/Stats_report.html'.format(get_outdir("singleCpG_stats_limma"))])
     else:
         return ([])
 
