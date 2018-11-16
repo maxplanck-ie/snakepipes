@@ -71,7 +71,7 @@ if not fromBam:
     if "alignment-free" in mode:
         include: os.path.join(maindir, "shared", "rules", "Salmon.snakefile")
         ## Sleuth (on Salmon)
-        if sample_info:
+        if sampleSheet:
             include: os.path.join(maindir, "shared", "rules", "sleuth.snakefile")
 
     ## MultiQC
@@ -86,7 +86,7 @@ else:
     dnaContam=False
     include: os.path.join(maindir, "shared", "rules", "LinkBam.snakefile")
     include: os.path.join(maindir, "shared", "rules", "sambamba.snakefile")
-    sample_name = os.path.splitext(os.path.basename(sample_info))[0]
+    sample_name = os.path.splitext(os.path.basename(sampleSheet))[0]
 
 ## filtered annotation (GTF)
 include: os.path.join(maindir, "shared", "rules", "filter_annotation.snakefile")
@@ -238,24 +238,23 @@ onstart:
         print("FeatureCounts library type:", library_type)
         print("Sample sheet:", sampleSheet)
         print("-" * 80, "\n")
-
+    
         print("--- Environment ----------------------------------------------------------------")
-        print("$TMPDIR: ",os.getenv('TMPDIR', ""))
-        print("$HOSTNAME: ",os.getenv('HOSTNAME', ""))
+        print("$TMPDIR: ", os.getenv('TMPDIR', ""))
+        print("$HOSTNAME: ", os.getenv('HOSTNAME', ""))
         print("-" * 80, "\n")
-
+    
     elif "verbose" in config and config["verbose"] and fromBam:
-        print("--- Workflow parameters --------------------------------------------------------",file=lo)
-        print("samples:"+ str(samples),file=lo)
-        print("input dir:"+ indir,file=lo)
+        print("--- Workflow parameters --------------------------------------------------------")
+        print("samples:" + str(samples))
+        print("input dir:" + indir)
         print("paired:", paired)
-        print("-" * 80,file=lo)#, "\n"
-
-        print("--- Environment ----------------------------------------------------------------",file=lo)
-        print("$TMPDIR: "+os.getenv('TMPDIR', ""),file=lo)
-        print("$HOSTNAME: "+os.getenv('HOSTNAME', ""),file=lo)
-        print("-" * 80,file=lo)#, "\n"
-
+        print("-" * 80)  # , "\n"
+    
+        print("--- Environment ----------------------------------------------------------------")
+        print("$TMPDIR: " + os.getenv('TMPDIR', ""))
+        print("$HOSTNAME: " + os.getenv('HOSTNAME', ""))
+        print("-" * 80,)
 
 ### main rule ##################################################################
 ################################################################################
