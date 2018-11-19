@@ -71,13 +71,13 @@ if(isTRUE(tximport)) {
   tx2gene <- read.delim(tx2gene_file, header = FALSE)
   tx2gene <- tx2gene[c(1,2)]
   # check setup table and import
-  countdata <- checktable(sample_sheet = sampleSheet, salmon_dir = dirname(countFilePath), tx2gene_annot = tx2gene)
+  countdata <- checktable(sampleSheet = sampleInfo, salmon_dir = dirname(countFilePath), tx2gene_annot = tx2gene)
 } else {
   ## Get data from featurecounts
   ## counts
   countdata <- read.table(countFilePath, header=TRUE, check.names = TRUE)
   # check setup table and grep colnames
-  countdata <- checktable(countdata, sample_sheet = sampleSheet, alleleSpecific = allelic_info)
+  countdata <- checktable(countdata, sampleSheet = sampleInfo, alleleSpecific = allelic_info)
 }
 
 ## ~~~~~~~ 3. run DESeq wrapper ~~~~~~~~

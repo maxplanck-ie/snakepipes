@@ -49,14 +49,14 @@ checktable <- function(countdata = NA, sampleSheet = NA, alleleSpecific = FALSE,
       print("Count table : ")
       print(coln)
       print("Setup table : ")
-      print(as.character(_sampleSheet[,1]))
+      print(as.character(sampleSheet[,1]))
       quit(save = "no", status = 1, runLast = FALSE)   # Exit 1
     } else {
         if(alleleSpecific) {
-            coln_allelic <- paste(rep(sampleInfo$name, each  = 3), c("all","genome1", "genome2"), sep = "_" )
+            coln_allelic <- paste(rep(sampleSheet$name, each  = 3), c("all","genome1", "genome2"), sep = "_" )
             countdata <- countdata[,coln_allelic]
         } else {
-            countdata <- countdata[,sampleInfo$name]
+            countdata <- countdata[,sampleSheet$name]
         }
     }
   }
@@ -66,7 +66,7 @@ checktable <- function(countdata = NA, sampleSheet = NA, alleleSpecific = FALSE,
 #' DEseq basic
 #'
 #' @param countdata count file from featurecounts
-#' @param coldata sampleInfo file
+#' @param coldata sampleSheet file
 #' @param fdr fdr cutoff for DE
 #'
 #' @return A list of dds and ddr objects
@@ -104,7 +104,7 @@ DESeq_basic <- function(countdata, coldata, fdr, alleleSpecific = FALSE, from_sa
 #' DESeq using allele-specific design
 #'
 #' @param countdata count file from featurecounts
-#' @param coldata sampleInfo file
+#' @param coldata sampleSheet file
 #' @param fdr fdr cutoff for DE
 #'
 #' @return A list of dds and ddr objects
@@ -122,8 +122,8 @@ DESeq_allelic <- function(countdata, coldata, fdr) {
 
     # create alleleSpecific design matrix
     design <- data.frame(name = colnames(rnasamp),
-                   allele = rep(c("genome1", "genome2"), nrow(sampleInfo)),
-                   condition = rep(sampleInfo$condition, each = 2) )
+                   allele = rep(c("genome1", "genome2"), nrow(sampleSheet)),
+                   condition = rep(sampleSheet$condition, each = 2) )
 
     # Run DESeq
     dds <- DESeq2::DESeqDataSetFromMatrix(rnasamp, colData = design,
@@ -140,7 +140,7 @@ DESeq_allelic <- function(countdata, coldata, fdr) {
 #'
 #' @param DEseqout output from DEseq_basic or DEseq_allelic wrapper
 #' @param countdata count file from featurecounts
-#' @param coldata sampleInfo file
+#' @param coldata sampleSheet file
 #' @param fdr fdr cutoff for DE
 #' @param outprefix prefix of output plots and files
 #' @param heatmap_topN top N genes to plot in the heatmap
