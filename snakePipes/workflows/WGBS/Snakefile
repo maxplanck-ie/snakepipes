@@ -1,4 +1,4 @@
-sampleSheetimport os
+import os
 import re
 from operator import is_not
 import glob
