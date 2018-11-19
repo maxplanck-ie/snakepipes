@@ -116,29 +116,29 @@ def calc_doc(intList,wcard,skipDOC):
         return ([])
 
 def get_outdir(folder_name):
-    sample_name = re.sub('_sampleSheet.[a-z]{3}$','',os.path.basename(sampleInfo))
+    sample_name = re.sub('_sampleSheet.[a-z]{3}$','',os.path.basename(sampleSheet))
     return("{}_{}".format(folder_name, sample_name))
 
 
-def run_CpG_stats(sampleInfo):
-    if sampleInfo:
+def run_CpG_stats(sampleSheet):
+    if sampleSheet:
 
         return (['{}/singleCpG.RData'.format(get_outdir("singleCpG_stats_limma")), '{}/limdat.LG.RData'.format(get_outdir("singleCpG_stats_limma")),'{}/metilene.IN.txt'.format(get_outdir("singleCpG_stats_limma"))])
     else:
         return ([])
 
-def run_metilene_all(sampleInfo):
-    if sampleInfo:
+def run_metilene_all(sampleSheet):
+    if sampleSheet:
         return (['{}/singleCpG.metilene.limma.bed'.format(get_outdir("metilene_out")),'{}/metilene.limma.annotated.txt'.format(get_outdir("metilene_out"))])
     else:
         return ([])
 
 
-def run_int_aggStats(intList,sampleInfo):
-    if intList and not sampleInfo:
+def run_int_aggStats(intList,sampleSheet):
+    if intList and not sampleSheet:
         int_dest=[re.sub('.bed','.CpGlist.bed',os.path.basename(x)) for x in intList]
         return ([os.path.join("aux_files",re.sub('.fa',w,os.path.basename(refG))) for w in int_dest])
-    if intList and sampleInfo:
+    if intList and sampleSheet:
             int_dest2=[re.sub('.bed','.aggCpG.RData',os.path.basename(x)) for x in intList]
             return ([os.path.join("{}".format(get_outdir("aggregate_stats_limma")),w) for w in int_dest2])
     else:
@@ -201,10 +201,10 @@ if not fromBam:
             run_deeptools(skipGCbias),
             expand("methXT/{sample}_CpG.bedGraph",sample=samples),
             expand("methXT/{sample}.CpG.filt2.bed",sample=samples),
-            run_CpG_stats(sampleInfo),
-            run_metilene_all(sampleInfo),
+            run_CpG_stats(sampleSheet),
+            run_metilene_all(sampleSheet),
             run_int_aggStats(intList,False),
-            run_int_aggStats(intList,sampleInfo)
+            run_int_aggStats(intList,sampleSheet)
 
 else:
     localrules:
@@ -222,10 +222,10 @@ else:
             run_deeptools(skipGCbias),
             expand("methXT/{sample}_CpG.bedGraph",sample=samples),
             expand("methXT/{sample}.CpG.filt2.bed",sample=samples),
-            run_CpG_stats(sampleInfo),
-            run_metilene_all(sampleInfo),
+            run_CpG_stats(sampleSheet),
+            run_metilene_all(sampleSheet),
             run_int_aggStats(intList,False),
-            run_int_aggStats(intList,sampleInfo)
+            run_int_aggStats(intList,sampleSheet)
 
 ### execute after workflow finished ############################################
 ################################################################################

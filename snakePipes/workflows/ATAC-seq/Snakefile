@@ -41,7 +41,7 @@ else:
 chip_samples = samples
 paired = True
 fragment_length = cf.get_fragment_length("deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv", chip_samples[0])
-if sample_info:
+if sampleSheet:
     include: os.path.join(maindir, "shared", "rules", "CSAW.snakefile")
 
 ## add outputs as asked
@@ -54,7 +54,7 @@ def run_deepTools_allelic():
     return(file_list)
 
 def run_CSAW():
-    if sample_info:
+    if sampleSheet:
         return(["CSAW/CSAW.session_info.txt"])
     else:
         return([])

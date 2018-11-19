@@ -29,8 +29,8 @@ convRef: False
 intList: []
 ###SNP black list (bed file)
 blackList:
-###sample Info
-sampleInfo:
+###sample Sheet
+sampleSheet:
 ###inclusion bounds for methylation extraction
 mbias_ignore: auto
 ## FASTQ file extension (default: ".fastq.gz")
