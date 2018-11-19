@@ -154,8 +154,8 @@ def main():
     for mode in modeTemp:
         if mode not in validModes:
             sys.exit("{} is not a valid mode!\n".format(mode))
-    if args.fromBam and "alignment-free" in modeTemp:
-        sys.exit("\nalignment-free cannot be run from bam files - skip this mode or provide fastq files!\n")  
+    if args.fromBam and ("alignment-free" in modeTemp or "allelic-mapping" in modeTemp):
+        sys.exit("\n--fromBam can only be used with modes \'alignment\' or \'deepTools_qc\' - use one of these modes or provide fastq files!\n")  
     if args.fromBam:
         args.mapping_prg = "EXTERNAL_BAM"
             
