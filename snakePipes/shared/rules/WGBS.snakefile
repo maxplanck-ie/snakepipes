@@ -541,8 +541,7 @@ if sampleInfo:
 
     rule CpG_report:
         input: 
-            Limdat='{}/limdat.LG.RData'.format(get_outdir("singleCpG_stats_limma")),
-            Gifnfo='{}/groupInfo.txt'.format(get_outdir("singleCpG_stats_limma"))
+            Limdat='{}/limdat.LG.RData'.format(get_outdir("singleCpG_stats_limma"))
         output:
             html='{}/Stats_report.html'.format(get_outdir("singleCpG_stats_limma"))
         params:
@@ -616,6 +615,28 @@ if sampleInfo:
         threads: 1
         conda: CONDA_WGBS_ENV
         shell: 'Rscript --no-save --no-restore ' + os.path.join(workflow_rscripts,'WGBSpipe.metilene_stats.limma.R ') + "{params.DMRout} " + os.path.join(outdir,"{input.MetBed}") +' ' + os.path.join(outdir,"{input.MetCG}") + ' ' + os.path.join(outdir,"{input.Limdat}") + " {input.sampleInfo} {params.gene_mod} {params.diff} {params.fdr} {params.importfunc} 1>{log.out} 2>{log.err}"
+
+
+    rule metilene_report:
+        input: 
+            MetBed='{}/singleCpG.metilene.bed'.format(get_outdir("metilene_out")),
+            LimBed='{}/singleCpG.metilene.limma_unfiltered.bed'.format(get_outdir("metilene_out"))
+        output:
+            html='{}/Stats_report.html'.format(get_outdir("metilene_out"))
+        params:
+            statdir=os.path.join(outdir,'{}'.format(get_outdir("metilene_out"))),
+            sampleInfo=sampleInfo,
+            importfunc = os.path.join(workflow_rscripts, "WGBSstats_functions.R"),
+            stat_cat="metilene_DMRs",
+            rmd_in=os.path.join(workflow_rscripts,"WGBS_stats_report_template.Rmd"),
+            rmd_out=os.path.join(outdir,"aux_files", "WGBS_stats_report_template.Rmd"),
+            outFull=lambda wildcards,output: os.path.join(outdir,output.html)
+        log:
+            err='{}/logs/stats_report.err'.format(get_outdir("metilene_out")),
+            out='{}/logs/stats_report.out'.format(get_outdir("metilene_out"))
+        conda: CONDA_RMD_ENV
+        threads: 1
+        shell: "cp -v {params.rmd_in} {params.rmd_out} ;Rscript -e 'rmarkdown::render(\"{params.rmd_out}\", params=list(outdir=\"{params.statdir}\", input_func=\"{params.importfunc}\", stat_category=\"{params.stat_cat}\",sample_sheet=\"{params.sampleInfo}\"), output_file=\"{params.outFull}\")' 1>{log.out} 2>{log.err}"
 
 
 if intList:

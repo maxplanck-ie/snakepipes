@@ -1,5 +1,4 @@
 ---
-title: "WGBS_singleCpG_stats_report"
 author: "`r Sys.info()[length(Sys.info())-1]`"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: html_document
@@ -9,6 +8,7 @@ params:
     input_func: "WGBSstats_functions.R"
     stat_category: "single_CpGs"
     sample_sheet: "dummy_sample_sheet"
+title: "`r paste0('WGBS ',params$stat_category,' stats report')`"
 ---
 
 ```{r setup, include=FALSE}

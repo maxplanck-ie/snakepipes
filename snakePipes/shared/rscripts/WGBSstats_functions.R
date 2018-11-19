@@ -12,7 +12,7 @@ get_nrow_input<-function(resdir,statscat){
         load(file.path(resdir,"limdat.LG.RData"))
         nri<-nrow(limdat.LG)
     } else if (statscat %in% "metilene_DMRs"){
-        nri<-system(paste0('wc -l ',file.path(resdir,"singleCpG.metilene.bed")))
+        nri<-length(readLines(file.path(resdir,"singleCpG.metilene.bed")))
     } else if (statscat %in% "user_intervals"){
         nri<-unlist(lapply(dir(resdir,pattern="*.aggCpG.RData",full.names=TRUE),function(X){load(X);nrow(bedtab)}))
     }
@@ -24,7 +24,7 @@ get_nrow_filtered<-function(resdir,statscat){
         load(file.path(resdir,"limdat.LG.RData"))
         nrf<-sum(complete.cases(limdat.LG))
     } else if (statscat %in% "metilene_DMRs"){
-        load(file.path("CGI.limdat.CC.RData"))
+        load(file.path(resdir,"CGI.limdat.CC.RData"))
         nrf<-nrow(CGI.limdat.CC)
     } else if (statscat %in% "user_intervals"){
         nrf<-unlist(lapply(dir(resdir,pattern="*.aggCpG.RData",full.names=TRUE),function(X){load(X);nrow(CGI.limdat.CC)}))
@@ -37,9 +37,9 @@ get_nrow_topTable<-function(resdir,statscat){
         load(file.path(resdir,"singleCpG.RData"))
         nrtt<-nrow(tT_filt)
     } else if (statscat %in% "metilene_DMRs"){
-        nrtt<-system(paste0('wc -l ',file.path(resdir,"singleCpG.metilene.limma_filtered.bed")),intern=TRUE)
+        nrtt<-length(readLines(file.path(resdir,"singleCpG.metilene.limma_filtered.bed")))
     } else if (statscat %in% "user_intervals"){
-        nrtt<-unlist(lapply(dir(resdir,pattern="*.tT_filt.txt",full.names=TRUE),function(X)system(paste0('wc -l ',X),intern=TRUE)))
+        nrtt<-unlist(lapply(dir(resdir,pattern="*.tT_filt.txt",full.names=TRUE),function(X)length(readLines(X))))
     }
     return(nrtt)
 }
