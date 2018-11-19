@@ -674,3 +674,24 @@ if intList:
             threads: 1
             conda: CONDA_WGBS_ENV
             shell: "{params.auxshell} 1>{log.out} 2>{log.err}"
+
+
+        rule intAgg_report:
+            input: 
+                outFiles=run_int_aggStats(intList,sampleInfo)
+            output:
+                html='{}/Stats_report.html'.format(get_outdir("aggregate_stats_limma"))
+            params:
+                statdir=os.path.join(outdir,'{}'.format(get_outdir("aggregate_stats_limma"))),
+                sampleInfo=sampleInfo,
+                importfunc = os.path.join(workflow_rscripts, "WGBSstats_functions.R"),
+                stat_cat="user_intervals",
+                rmd_in=os.path.join(workflow_rscripts,"WGBS_stats_report_template.Rmd"),
+                rmd_out=os.path.join(outdir,"aux_files", "WGBS_stats_report_template.Rmd"),
+                outFull=lambda wildcards,output: os.path.join(outdir,output.html)
+            log:
+                err='{}/logs/stats_report.err'.format(get_outdir("aggregate_stats_limma")),
+                out='{}/logs/stats_report.out'.format(get_outdir("aggregate_stats_limma"))
+            conda: CONDA_RMD_ENV
+            threads: 1
+            shell: "cp -v {params.rmd_in} {params.rmd_out} ;Rscript -e 'rmarkdown::render(\"{params.rmd_out}\", params=list(outdir=\"{params.statdir}\", input_func=\"{params.importfunc}\", stat_category=\"{params.stat_cat}\",sample_sheet=\"{params.sampleInfo}\"), output_file=\"{params.outFull}\")' 1>{log.out} 2>{log.err}"

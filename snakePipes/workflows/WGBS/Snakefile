@@ -144,12 +144,19 @@ def run_int_aggStats(intList,sampleInfo):
     else:
         return ([])
 
+
 def run_deeptools(skipGCbias):
     if not skipGCbias:
         return (expand("QC_metrics/{sample}.freq.txt", sample = samples, read = reads) + expand("QC_metrics/{sample}.GCbias.png", sample = samples, read = reads))
     else:
         return ([])
 
+
+def run_aggStats_report(intList,sampleInfo):
+    if intList and sampleInfo:
+        return(['{}/Stats_report.html'.format(get_outdir("aggregate_stats_limma"))])
+    else:
+        return([])
 
 
 ### include modules of other snakefiles ########################################
@@ -204,7 +211,8 @@ if not fromBam:
             run_CpG_stats(sampleInfo),
             run_metilene_all(sampleInfo),
             run_int_aggStats(intList,False),
-            run_int_aggStats(intList,sampleInfo)
+            run_int_aggStats(intList,sampleInfo),
+            run_aggStats_report(intList,sampleInfo)
 
 else:
     localrules:
@@ -225,7 +233,8 @@ else:
             run_CpG_stats(sampleInfo),
             run_metilene_all(sampleInfo),
             run_int_aggStats(intList,False),
-            run_int_aggStats(intList,sampleInfo)
+            run_int_aggStats(intList,sampleInfo),
+            run_aggStats_report(intList,sampleInfo)
 
 ### execute after workflow finished ############################################
 ################################################################################
