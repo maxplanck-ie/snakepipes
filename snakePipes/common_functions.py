@@ -226,11 +226,11 @@ def cleanLogs(d):
             os.remove(f)
 
 
-def check_sample_info_header(sample_info_file):
+def check_sample_info_header(sampleSheet_file):
     """
     return True in case sample info file contains column names 'name' and 'condition'
     """
-    ret = subprocess.check_output("cat " + sample_info_file + " | head -n1",
+    ret = subprocess.check_output("cat " + sampleSheet_file + " | head -n1",
                                   shell=True).decode()
 
     if "name" in ret.split() and "condition" in ret.split():
@@ -328,13 +328,13 @@ def checkCommonArguments(args, baseDir, outDir=False, createIndices=False):
             args.outdir = args.workingdir
     args.cluster_logs_dir = os.path.join(args.outdir, "cluster_logs")
     # 2. Sample info file
-    if 'sample_info' in args and args.sample_info:
-        if os.path.exists(os.path.abspath(args.sample_info)):
-            args.sample_info = os.path.abspath(args.sample_info)
+    if 'sampleSheet' in args and args.sampleSheet:
+        if os.path.exists(os.path.abspath(args.sampleSheet)):
+            args.sampleSheet = os.path.abspath(args.sampleSheet)
         else:
-            sys.exit("\nSample info file not found! (--DB {})\n".format(args.sample_info))
-        if not check_sample_info_header(args.sample_info):
-            sys.exit("ERROR: Please use 'name' and 'condition' as column headers in sample info file! ({})\n".format(args.sample_info))
+            sys.exit("\nSample info file not found! (--DB {})\n".format(args.sampleSheet))
+        if not check_sample_info_header(args.sampleSheet):
+            sys.exit("ERROR: Please use 'name' and 'condition' as column headers in sample info file! ({})\n".format(args.sampleSheet))
     # 3. get abspath from user provided genome/organism file
     if not createIndices:
         if not os.path.isfile(os.path.join(baseDir, "shared/organisms/{}.yaml".format(args.genome))) and os.path.isfile(args.genome):

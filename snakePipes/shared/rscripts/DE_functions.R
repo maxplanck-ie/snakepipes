@@ -4,7 +4,7 @@
 #' Check if names of the setup table are subset of the count matrix column names
 #'
 #' @param countdata data.frame with featurecounts output table
-#' @param sample_info sample info data frame from the samplesheet
+#' @param _sampleSheet sample info data frame from the samplesheet
 #' @param alleleSpecific TRUE/FALSE is the design allele-specific?
 #' @param salmon_dir directory path for salmon output files
 #' @param tx2gene_annot transcript ID to gene ID annotation
@@ -15,7 +15,7 @@
 #' @examples
 #'
 
-checktable <- function(countdata = NA, sample_info = NA, alleleSpecific = FALSE, salmon_dir = NA, tx2gene_annot = NA) {
+checktable <- function(countdata = NA, sampleSheet = NA, alleleSpecific = FALSE, salmon_dir = NA, tx2gene_annot = NA) {
 
   ## check whether colnames are allele-specific
   print(paste0("Allele-specific counts? : ", alleleSpecific))
@@ -30,7 +30,7 @@ checktable <- function(countdata = NA, sample_info = NA, alleleSpecific = FALSE,
   if(!is.na(salmon_dir)) {
 
     # mode = Salmon : check whether salmon output files exist in Salmon dir
-    files <- paste0(salmon_dir,"/",sample_info$name,".quant.sf")
+    files <- paste0(salmon_dir,"/",sampleSheet$name,".quant.sf")
     filecheck <- file.exists(files)
     if(!(all(filecheck == TRUE))) {
       cat("Error! The following File(s) don't exist : ")
@@ -44,12 +44,12 @@ checktable <- function(countdata = NA, sample_info = NA, alleleSpecific = FALSE,
 
   } else {
     # mode = Normal : check whether sample names in the samplesheet are also present in count table header
-    if ( !all( is.element(sort(sample_info[,1]), sort(coln)) )) {
+    if ( !all( is.element(sort(sampleSheet[,1]), sort(coln)) )) {
       cat("Error! Count table column names and setup table names do NOT match!\n")
       print("Count table : ")
       print(coln)
       print("Setup table : ")
-      print(as.character(sample_info[,1]))
+      print(as.character(_sampleSheet[,1]))
       quit(save = "no", status = 1, runLast = FALSE)   # Exit 1
     } else {
         if(alleleSpecific) {

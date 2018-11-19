@@ -3,7 +3,7 @@
 rule CSAW:
     input:
         macs2_output = expand("MACS2/{chip_sample}.filtered.BAM_peaks.xls", chip_sample = chip_samples),
-        sample_info = sample_info,
+        sampleSheet = sampleSheet,
         insert_size_metrics =
             "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv" if paired
             else []

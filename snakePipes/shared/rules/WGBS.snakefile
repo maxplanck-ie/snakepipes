@@ -7,7 +7,7 @@ import pandas
 
 ## function to get the name of the samplesheet and extend the name of the folder for all analyses relying on sample_info
 def get_outdir(folder_name):
-    sample_name = re.sub('_sampleSheet.[a-z]{3}$','',os.path.basename(sampleInfo))
+    sample_name = re.sub('_sampleSheet.[a-z]{3}$','',os.path.basename(sampleSheet))
     return("{}_{}".format(folder_name, sample_name))
 
 ## count the number of fields in the chromosome name and generate awk string
@@ -564,7 +564,7 @@ if sampleInfo:
         threads: 1
         conda: CONDA_WGBS_ENV
         shell: "bedtools intersect -wa -a {input.imdF} -b {input.MetBed} > {output.MetCG}  2>{log.err}"
-            
+
 
     rule cleanup_metilene:
         input:
