@@ -1,7 +1,9 @@
 ---
 author: "`r Sys.info()[length(Sys.info())-1]`"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
-output: html_document
+output: 
+    html_document:
+        fig_caption: yes
 params:
     outdir: "Stats_reports"
     output_file: "Stats_reports/Stats_report.html"
@@ -30,7 +32,7 @@ Out of  `r get_nrow_input(params$outdir,params$stat_category)` input features, `
 
 Components of variance were calculated using the filtered features and sample projections onto the two largest principle components were visualized:
 
-```{r}
+```{r, fig.cap=get_fig_cap(params$outdir,"PCA")}
 pca_plot<-dir(params$outdir,pattern="*PCA.png",full.names=TRUE)
 knitr::include_graphics(pca_plot)
 ```
@@ -41,10 +43,10 @@ The fist principal component is related to the correlation of methylation values
 
 Methylation values for filtered features were visualized in each sample group in form of density and violin plots.
 
-```{r}
-vplot<-dir(params$outdir,pattern="*dens.png",full.names=TRUE)
-dplot<-dir(params$outdir,pattern="*violin.png",full.names=TRUE)
-knitr::include_graphics(c(vplot,dplot))
+```{r, fig.cap=c(get_fig_cap(params$outdir,"density"),fig.cap=get_fig_cap(params$outdir,"violin"))}
+dplot<-dir(params$outdir,pattern="*dens.png",full.names=TRUE)
+vplot<-dir(params$outdir,pattern="*violin.png",full.names=TRUE)
+knitr::include_graphics(c(dplot,vplot))
 ```
 
 
@@ -53,7 +55,7 @@ knitr::include_graphics(c(vplot,dplot))
 Logit-transformed methylation values were input to statistical analysis by limma.   
 Pvalue distribution before and after adjustment for multiple hypothesis testing was plotted.
 
-```{r}
+```{r, fig.cap=get_fig_cap(params$outdir,"pvalue")}
 pval_plot<-dir(params$outdir,pattern="*pvalue.distribution.png",full.names=TRUE)
 knitr::include_graphics(pval_plot)
 ```
@@ -63,7 +65,7 @@ There were `r get_nrow_topTable(params$outdir,params$stat_category)` features pa
 
 A volcano plot was produced to visualize the effect of threshold application onto the test results.
 
-```{r}
+```{r, fig.cap=get_fig_cap(params$outdir,"volcano")}
 volcano_plot<-dir(params$outdir,pattern="*volcano.plot.png",full.names=TRUE)
 knitr::include_graphics(volcano_plot)
 ```

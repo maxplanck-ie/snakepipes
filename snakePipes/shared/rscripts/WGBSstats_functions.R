@@ -14,7 +14,7 @@ get_nrow_input<-function(resdir,statscat){
     } else if (statscat %in% "metilene_DMRs"){
         nri<-length(readLines(file.path(resdir,"singleCpG.metilene.bed")))
     } else if (statscat %in% "user_intervals"){
-        nri<-unlist(lapply(dir(resdir,pattern="*.aggCpG.RData",full.names=TRUE),function(X){load(X);nrow(bedtab)}))
+        nri<-unlist(lapply(dir(resdir,pattern="*.aggCpG.RData",full.names=TRUE),function(X){load(X);sprintf("%s (%s)",nrow(bedtab),gsub(".aggCpG.RData","",basename(X)))}))
     }
     return(nri)
 }
@@ -27,7 +27,7 @@ get_nrow_filtered<-function(resdir,statscat){
         load(file.path(resdir,"CGI.limdat.CC.RData"))
         nrf<-nrow(CGI.limdat.CC)
     } else if (statscat %in% "user_intervals"){
-        nrf<-unlist(lapply(dir(resdir,pattern="*.aggCpG.RData",full.names=TRUE),function(X){load(X);nrow(CGI.limdat.CC)}))
+        nrf<-unlist(lapply(dir(resdir,pattern="*.aggCpG.RData",full.names=TRUE),function(X){load(X);sprintf("%s (%s)",nrow(CGI.limdat.CC),gsub(".aggCpG.RData","",basename(X)))}))
     }
     return(nrf)
 }
@@ -39,9 +39,15 @@ get_nrow_topTable<-function(resdir,statscat){
     } else if (statscat %in% "metilene_DMRs"){
         nrtt<-length(readLines(file.path(resdir,"singleCpG.metilene.limma_filtered.bed")))
     } else if (statscat %in% "user_intervals"){
-        nrtt<-unlist(lapply(dir(resdir,pattern="*.tT_filt.txt",full.names=TRUE),function(X)length(readLines(X))))
+        nrtt<-unlist(lapply(dir(resdir,pattern="*.tT_filt.txt",full.names=TRUE),function(X)sprintf("%s (%s)",length(readLines(X)),gsub(".tT_filt.txt","",basename(X)))))
     }
     return(nrtt)
+}
+
+get_fig_cap<-function(resdir,plottype){
+    plotdict<-c("PCA"="*PCA.png","density"="*dens.png","violin"="*violin.png","pvalue"="*pvalue.distribution.png","volcano"="*volcano.plot.png")
+    fig_cap<-dir(resdir,pattern=plotdict[plottype],full.names=FALSE)
+    return(fig_cap)
 }
 
 
