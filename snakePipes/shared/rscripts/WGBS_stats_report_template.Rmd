@@ -31,7 +31,7 @@ Out of  `r get_nrow_input(params$outdir,params$stat_category)` input features, `
 Components of variance were calculated using the filtered features and sample projections onto the two largest principle components were visualized:
 
 ```{r}
-pca_plot<-dir(params$outdir,pattern="*PCA.pdf",full.names=TRUE)
+pca_plot<-dir(params$outdir,pattern="*PCA.png",full.names=TRUE)
 knitr::include_graphics(pca_plot)
 ```
 

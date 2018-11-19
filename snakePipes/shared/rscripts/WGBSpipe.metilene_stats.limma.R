@@ -99,7 +99,7 @@ if (length(readLines(bedF))==0) {print_sessionInfo("No DMRs found.")}else{
         x1<-PCA(CGI.limdat.CC,graph=FALSE)
 
         if(nrow(x1$eig)>=2){
-        pdf(paste0(bedshort,".CGI.limdat.CC.PCA.pdf"),paper="a4",bg="white") 
+        png(paste0(bedshort,".CGI.limdat.CC.PCA.png"),bg="white") 
         plot.PCA(x1,choix="var")
         dev.off()}else{print_sessionInfo("There are not enough PC dimentions for a 2D plot.")}
 
@@ -157,7 +157,7 @@ if (length(readLines(bedF))==0) {print_sessionInfo("No DMRs found.")}else{
         tT$IntID<-rownames(tT)
         plotdat<-melt(tT,measure.vars=c("P.Value","adj.P.Val"),value.name="pval",variable.name="Category",id.vars="IntID")
 
-        ggplot(data=plotdat)+geom_histogram(aes(x=pval,group=Category,fill=Category),binwidth=0.005)+theme(text = element_text(size=16),axis.text = element_text(size=12),axis.title = element_text(size=14))+scale_fill_manual(values=c("grey28","red","darkblue","darkgreen"))+geom_vline(aes(xintercept=0.02))
+        ggplot(data=plotdat)+geom_histogram(aes(x=pval,group=Category,fill=Category),binwidth=0.005)+theme(text = element_text(size=16),axis.text = element_text(size=12),axis.title = element_text(size=14))+scale_fill_manual(values=c("grey28","red","darkblue","darkgreen"))+geom_vline(aes(xintercept=as.numeric(fdr)))
         ggsave(paste0(bedshort,"_pvalue.distribution.png"))
 
 ### annotate top table with mean difference

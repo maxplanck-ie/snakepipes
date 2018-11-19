@@ -57,7 +57,7 @@ if(nrow(limdat.LG.CC)==0){ print_sessionInfo("None of the single CpG sites passe
     require("FactoMineR")
     x1<-PCA(limdat.LG.CC[,-1,with=FALSE],graph=FALSE)
 
-    pdf("limdat.LG.CC.PCA.pdf",paper="a4",bg="white")
+    png("limdat.LG.CC.PCA.png",bg="white")
     plot.PCA(x1,choix="var")
     dev.off()
 
@@ -133,7 +133,7 @@ if(nrow(limdat.LG.CC)==0){ print_sessionInfo("None of the single CpG sites passe
         tT$IntID<-rownames(tT)
         plotdat<-melt(tT,measure.vars=c("P.Value","adj.P.Val"),value.name="pval",variable.name="Category",id.vars="IntID")
 
-        ggplot(data=plotdat)+geom_histogram(aes(x=pval,group=Category,fill=Category),binwidth=0.005)+theme(text = element_text(size=16),axis.text = element_text(size=12),axis.title = element_text(size=14))+scale_fill_manual(values=c("grey28","red","darkblue","darkgreen"))+geom_vline(aes(xintercept=0.02))
+        ggplot(data=plotdat)+geom_histogram(aes(x=pval,group=Category,fill=Category),binwidth=0.005)+theme(text = element_text(size=16),axis.text = element_text(size=12),axis.title = element_text(size=14))+scale_fill_manual(values=c("grey28","red","darkblue","darkgreen"))+geom_vline(aes(xintercept=as.numeric(fdr)))
         ggsave("SingleCpG_pvalue.distribution.png")
 
 ### annotate top table with mean difference
