@@ -39,7 +39,7 @@ if(isTRUE(paired)) {
 pe_param <- csaw::readParam(max.frag = 500, pe = pe)  # Some CSAW functions explode the processor count with >1 core
 
 ## Read data
-chip_object <- readfiles_chip(sampleInfo = sampleInfo,
+chip_object <- readfiles_chip(sampleSheet = sampleInfo,
                               fragment_length = fraglength,
                               window_size = windowSize,
                               alleleSpecific = allelic_info,
