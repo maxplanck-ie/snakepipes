@@ -156,8 +156,8 @@ if(nrow(bedtab.CC)==0) {print_sessionInfo("None of the genomic intervals passed 
 
 
         ##read filters from commandline args
-        minAbsDiff<-commandArgs(trailingOnly=TRUE)[6]
-        fdr<-commandArgs(trailingOnly=TRUE)[7]
+        minAbsDiff<-as.numeric(commandArgs(trailingOnly=TRUE)[6])
+        fdr<-as.numeric(commandArgs(trailingOnly=TRUE)[7])
     
         tT<-topTable(fit.eB,2,p.value=1,number=Inf)
         tT$IntID<-rownames(tT)
