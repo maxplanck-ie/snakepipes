@@ -1,0 +1,71 @@
+---
+author: "`r Sys.info()[length(Sys.info())-1]`"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: 
+    html_document:
+        fig_caption: yes
+params:
+    outdir: "Stats_reports"
+    output_file: "Stats_reports/Stats_report.html"
+    input_func: "WGBSstats_functions.R"
+    stat_category: "single_CpGs"
+    sample_sheet: "dummy_sample_sheet"
+title: "`r paste0('WGBS ',params$stat_category,' stats report')`"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, out.width = '50%',out.height='50%')
+source(params$input_func)
+```
+
+
+### Overview
+
+This report summarizes statistical analysis of your `r params$stat_category` using group information provided in sample sheet `r params$sample_sheet`.    
+
+
+### Feature filtering
+
+Out of  `r get_nrow_input(params$outdir,params$stat_category)` input features, `r get_nrow_filtered(params$outdir,params$stat_category)` passed the coverage and replicate filtering criteria.   
+
+### Principal component analysis
+
+Components of variance were calculated using the filtered features and sample projections onto the two largest principle components were visualized:
+
+```{r, fig.cap=get_fig_cap(params$outdir,"PCA")}
+pca_plot<-dir(params$outdir,pattern="*PCA.png",full.names=TRUE)
+knitr::include_graphics(pca_plot)
+```
+
+The fist principal component is related to the correlation of methylation values by genomic position, i.e. neighbouring CpGs tend to have similar methylation status irrespectively of the studied contrast. If the experiment was successful, samples might separate on the second PC according to the experimental group.
+
+### Distribution of methylation values per group
+
+Methylation values for filtered features were visualized in each sample group in form of density and violin plots.
+
+```{r, fig.cap=c(get_fig_cap(params$outdir,"density"),fig.cap=get_fig_cap(params$outdir,"violin"))}
+dplot<-dir(params$outdir,pattern="*dens.png",full.names=TRUE)
+vplot<-dir(params$outdir,pattern="*violin.png",full.names=TRUE)
+knitr::include_graphics(c(dplot,vplot))
+```
+
+
+### Statistical inference and filtering
+
+Logit-transformed methylation values were input to statistical analysis by limma.   
+Pvalue distribution before and after adjustment for multiple hypothesis testing was plotted.
+
+```{r, fig.cap=get_fig_cap(params$outdir,"pvalue")}
+pval_plot<-dir(params$outdir,pattern="*pvalue.distribution.png",full.names=TRUE)
+knitr::include_graphics(pval_plot)
+```
+
+Features were filtered using a threshold on minimum absolute difference in mean methylation `r system('grep minAbsDiff ../WGBS.config.yaml',intern=TRUE)` as well as a threshold on maximum false discovery rate `r system('grep FDR ../WGBS.config.yaml',intern=TRUE)` to produce the list of statistically differentially methylated features.
+There were `r get_nrow_topTable(params$outdir,params$stat_category)` features passing these filters.
+
+A volcano plot was produced to visualize the effect of threshold application onto the test results.
+
+```{r, fig.cap=get_fig_cap(params$outdir,"volcano")}
+volcano_plot<-dir(params$outdir,pattern="*volcano.plot.png",full.names=TRUE)
+knitr::include_graphics(volcano_plot)
+```

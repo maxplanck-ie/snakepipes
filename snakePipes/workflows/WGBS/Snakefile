@@ -123,13 +123,14 @@ def get_outdir(folder_name):
 def run_CpG_stats(sampleSheet):
     if sampleSheet:
 
-        return (['{}/singleCpG.RData'.format(get_outdir("singleCpG_stats_limma")), '{}/limdat.LG.RData'.format(get_outdir("singleCpG_stats_limma")),'{}/metilene.IN.txt'.format(get_outdir("singleCpG_stats_limma"))])
+        return (['{}/singleCpG.RData'.format(get_outdir("singleCpG_stats_limma")), '{}/limdat.LG.RData'.format(get_outdir("singleCpG_stats_limma")),'{}/metilene.IN.txt'.format(get_outdir("singleCpG_stats_limma")),'{}/Stats_report.html'.format(get_outdir("singleCpG_stats_limma"))])
     else:
         return ([])
 
+
 def run_metilene_all(sampleSheet):
     if sampleSheet:
-        return (['{}/singleCpG.metilene.limma.bed'.format(get_outdir("metilene_out")),'{}/metilene.limma.annotated.txt'.format(get_outdir("metilene_out"))])
+        return (['{}/singleCpG.metilene.limma_unfiltered.bed'.format(get_outdir("metilene_out")),'{}/metilene.limma.annotated_unfiltered.txt'.format(get_outdir("metilene_out")),'{}/Stats_report.html'.format(get_outdir("metilene_out"))])
     else:
         return ([])
 
@@ -144,12 +145,19 @@ def run_int_aggStats(intList,sampleSheet):
     else:
         return ([])
 
+
 def run_deeptools(skipGCbias):
     if not skipGCbias:
         return (expand("QC_metrics/{sample}.freq.txt", sample = samples, read = reads) + expand("QC_metrics/{sample}.GCbias.png", sample = samples, read = reads))
     else:
         return ([])
 
+
+def run_aggStats_report(intList,sampleSheet):
+    if intList and sampleSheet:
+        return(['{}/Stats_report.html'.format(get_outdir("aggregate_stats_limma"))])
+    else:
+        return([])
 
 
 ### include modules of other snakefiles ########################################
@@ -204,7 +212,9 @@ if not fromBam:
             run_CpG_stats(sampleSheet),
             run_metilene_all(sampleSheet),
             run_int_aggStats(intList,False),
-            run_int_aggStats(intList,sampleSheet)
+            run_int_aggStats(intList,sampleSheet),
+            run_aggStats_report(intList,sampleSheet)
+
 
 else:
     localrules:
@@ -225,7 +235,9 @@ else:
             run_CpG_stats(sampleSheet),
             run_metilene_all(sampleSheet),
             run_int_aggStats(intList,False),
-            run_int_aggStats(intList,sampleSheet)
+            run_int_aggStats(intList,sampleSheet),
+            run_aggStats_report(intList,sampleSheet)
+
 
 ### execute after workflow finished ############################################
 ################################################################################

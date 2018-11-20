@@ -7,11 +7,14 @@ message(sprintf("working directory is %s",getwd()))
 
 options(stringsAsFactors=FALSE,na.rm=TRUE)
 
+importfunc<-commandArgs(trailingOnly=TRUE)[9]
+source(importfunc)
+
 bedF<-commandArgs(trailingOnly=TRUE)[2]
 message(sprintf("processing %s",bedF))
 bedshort<-gsub(".bed","",basename(bedF))
 
-if (length(readLines(bedF))==0) {message("No DMRs found.")}else{
+if (length(readLines(bedF))==0) {print_sessionInfo("No DMRs found.")}else{
 
     bedtab<-read.table(bedF,header=FALSE,sep="\t",as.is=TRUE,quote="")
     colnames(bedtab)<-c("CHROM","START","END","qvalue","MeanDiff","NumCpGs","pMWU","p2DKS","meanA","meanB")
@@ -21,10 +24,10 @@ if (length(readLines(bedF))==0) {message("No DMRs found.")}else{
     auxF<-commandArgs(trailingOnly=TRUE)[3]
     message(sprintf("processing %s",auxF))
     auxbed<-read.table(auxF,header=FALSE,sep="\t",as.is=TRUE,quote="")
-    cnpool<-c("CHROM","START","END")#message(sprintf("processing %s",bedF))
-    colnames(auxbed)[1:3]<-cnpool#[1:ncol(bedtab)]
+    cnpool<-c("CHROM","START","END")
+    colnames(auxbed)[1:3]<-cnpool
     if(!unique(grepl("STRAND",colnames(auxbed)))){auxbed$STRAND<-"*"}
-    if(!unique(grepl("Name",colnames(auxbed)))){auxbed$Name<-paste(auxbed$CHROM,auxbed$START,sep="_")}#auxbed$END
+    if(!unique(grepl("Name",colnames(auxbed)))){auxbed$Name<-paste(auxbed$CHROM,auxbed$START,sep="_")}
 
 
     #load single CpG data, count NAs per row/CpG
@@ -71,7 +74,7 @@ if (length(readLines(bedF))==0) {message("No DMRs found.")}else{
 
     bedtab$CGI.NAf<-ifelse(bedtab$N.CG.NA>(0.8*bedtab$N.CG.tot),NA,1)
     bedtab.CC<-bedtab[complete.cases(bedtab),]
-    if(nrow(bedtab.CC)==0) {message("None of the metilene intervals passed the filtering.")}else{
+    if(nrow(bedtab.CC)==0) {print_sessionInfo("None of the metilene intervals passed the filtering.")}else{
 
         CGI.limdat<-as.data.frame(apply(limdat.LG.inCGI[,2:(ncol(limdat.LG.inCGI)-3)],2,function(X){ave(X,factor(limdat.LG.inCGI$IntID),FUN=function(X)mean(X,na.rm=TRUE))}),stringsAsFactors=FALSE)
 
@@ -86,7 +89,6 @@ if (length(readLines(bedF))==0) {message("No DMRs found.")}else{
     ### limma + ebayes + BH p value adjustment
 
         require("limma")
-        #library("carData")
         require("car")
         require("FactoMineR")
         require("reshape2")
@@ -97,9 +99,9 @@ if (length(readLines(bedF))==0) {message("No DMRs found.")}else{
         x1<-PCA(CGI.limdat.CC,graph=FALSE)
 
         if(nrow(x1$eig)>=2){
-        pdf(paste0(bedshort,".CGI.limdat.CC.PCA.pdf"),paper="a4",bg="white")
+        png(paste0(bedshort,".CGI.limdat.CC.PCA.png"),bg="white") 
         plot.PCA(x1,choix="var")
-        dev.off()}else{message("There are not enough PC dimentions for a 2D plot.")}
+        dev.off()}else{print_sessionInfo("There are not enough PC dimentions for a 2D plot.")}
 
     #calculate row means
         spath<-commandArgs(trailingOnly=TRUE)[5]
@@ -146,35 +148,69 @@ if (length(readLines(bedF))==0) {message("No DMRs found.")}else{
 
         fit<-lmFit(CGI.limdat.CC.logit,design)
         fit.eB<-eBayes(fit)
-        tT.FDR5<-topTable(fit.eB,2,p.value=0.05,number=Inf)
-        if(nrow(tT.FDR5)==0) {message("No metilene intervals were significantly differentially methylated.")}else{
-            tT.FDR5<-tT.FDR5[,c("logFC","t","adj.P.Val","B")]
-            write.table(tT.FDR5,file=paste0(bedshort,".CGI.limdat.CC.tT.FDR5.txt"),sep="\t",quote=FALSE)
 
-            nrow(tT.FDR5)
+        ##read filters from commandline args
+        minAbsDiff<-as.numeric(commandArgs(trailingOnly=TRUE)[7])
+        fdr<-as.numeric(commandArgs(trailingOnly=TRUE)[8])
+    
+        tT<-topTable(fit.eB,2,p.value=1,number=Inf)
+        tT$IntID<-rownames(tT)
+        plotdat<-melt(tT,measure.vars=c("P.Value","adj.P.Val"),value.name="pval",variable.name="Category",id.vars="IntID")
+
+        ggplot(data=plotdat)+geom_histogram(aes(x=pval,group=Category,fill=Category),binwidth=0.005)+theme(text = element_text(size=16),axis.text = element_text(size=12),axis.title = element_text(size=14))+scale_fill_manual(values=c("grey28","red","darkblue","darkgreen"))+geom_vline(aes(xintercept=as.numeric(fdr)))
+        ggsave(paste0(bedshort,"_pvalue.distribution.png"))
+
+### annotate top table with mean difference
+        meandatW<-dcast(data=CGI.limdat.CC.Means,IntID~Group,value.var="Beta.Mean")
+        if(sum(c("Control","Treatment") %in% colnames(meandatW))==2){meandatW$Diff<-with(meandatW,Treatment-Control)}
+        if(sum(c("WT","Mut") %in% colnames(meandatW))==2){meandatW$Diff<-with(meandatW,Mut-WT)}else{meandatW$Diff<-meandatW[,2]-meandatW[,3]}
+
+        tT$Diff<-meandatW$Diff[match(rownames(tT),meandatW$IntID)]
+
+        tT$Filter<-"Fail"
+        tT$Filter[tT$adj.P.Val<fdr&abs(tT$Diff)>=minAbsDiff]<-"Pass"
+
+        ggplot(data=tT)+geom_point(aes(x=Diff,y=-log10(adj.P.Val),color=Filter))+theme(text = element_text(size=16),axis.text = element_text(size=12),axis.title = element_text(size=14))+xlab("Mean difference")+scale_color_manual(values=c("grey28","red","darkblue","darkgreen"))
+        ggsave(paste0(bedshort,"_volcano.plot.png"))
+
+
+#### filter top table according to thresholds
+
+        tT_filt<-tT[tT$adj.P.Val<fdr & abs(tT$Diff)>=minAbsDiff,]        
+
+        if(nrow(tT_filt)==0){print_sessionInfo("No metilene intervals were significantly differentially methylated.")
+        } else {
+            tT_filt<-tT_filt[,c("logFC","t","adj.P.Val","B")]
+            
+            nrow(tT_filt)
             nrow(CGI.limdat.CC.logit)
-            nrow(tT.FDR5)/nrow(CGI.limdat.CC.logit)
+            nrow(tT_filt)/nrow(CGI.limdat.CC.logit)
 
 
     #annotate metilene output with this information
-            CGI.bed.intT<-as.data.frame(merge(x=bedtab,y=tT.FDR5,by.x="Name",by.y="row.names",sort=FALSE,all.x=TRUE))
+            CGI.bed.intT<-as.data.frame(merge(x=bedtab,y=tT_filt,by.x="Name",by.y="row.names",sort=FALSE,all.x=TRUE))
             CGI.bed.intT<-CGI.bed.intT[,!colnames(CGI.bed.intT) %in% "Name"]
-            write.table(CGI.bed.intT,file=paste0(bedshort,".limma.bed"),sep="\t",quote=FALSE,row.names=FALSE)
-            save(CGI.bed.intT,file=paste0(bedshort,".limma.RData"))
+            write.table(CGI.bed.intT,file=paste0(bedshort,".limma_unfiltered.bed"),sep="\t",quote=FALSE,row.names=FALSE)
+            save(CGI.bed.intT,file=paste0(bedshort,".limma_unfiltered.RData"))
+            CGI.bed.intT_filt<-CGI.bed.intT[CGI.bed.intT$adj.P.Val<fdr & abs(CGI.bed.intT$MeanDiff)>=minAbsDiff,]
+            CGI.bed.intT_filt<-CGI.bed.intT_filt[!is.na(CGI.bed.intT_filt$CHROM),]
+            if(nrow(CGI.bed.intT_filt)>0){
+            write.table(CGI.bed.intT_filt,file=paste0(bedshort,".limma_filtered.bed"),sep="\t",quote=FALSE,row.names=FALSE)}
 
     ####### add nearest gene information
             genMod<-commandArgs(trailingOnly=TRUE)[6]
             if (genMod!='NA' & file.exists(genMod)){
                 message(sprintf("Processing gene models in %s",genMod))
 
+                system(paste0('mkdir -p ',file.path(wdir,"temp")))
 
-                system(paste0('bedtools sort -i ', genMod,'  > ' ,wdir ,'/genes.sorted.bed'))
-                system(paste0('sed -i \'/CHROM/d\' ',wdir,'/',bedshort,".limma.bed"))
-                system(paste0('bedtools sort -i ',wdir,'/', bedshort,".limma.bed",' > ',wdir,'/',bedshort,".limma.sorted.bed"))
+                system(paste0('bedtools sort -i ', genMod,'  > ' ,wdir ,'/temp/genes.sorted.bed'))
+                system(paste0('sed -i \'/CHROM/d\' ',wdir,'/',bedshort,".limma_unfiltered.bed"))
+                system(paste0('bedtools sort -i ',wdir,'/', bedshort,".limma_unfiltered.bed",' > ',wdir,'/temp/',bedshort,".limma.sorted.bed"))
 
-                system(paste0('bedtools closest -D b -a ',wdir,'/',bedshort,".limma.sorted.bed",' -b ', wdir ,'/genes.sorted.bed',' > ',wdir,'/',bedshort,'.limma.closest.bed'))
+                system(paste0('bedtools closest -D b -a ',wdir,'/temp/',bedshort,".limma.sorted.bed",' -b ', wdir ,'/temp/genes.sorted.bed',' > ',wdir,'/temp/',bedshort,'.limma.closest.bed'))
 
-                DMR.filt.an<-fread(paste0(wdir,'/',bedshort,'.limma.closest.bed'),header=FALSE,sep="\t")
+                DMR.filt.an<-fread(paste0(wdir,'/temp/',bedshort,'.limma.closest.bed'),header=FALSE,sep="\t")
                 DMR.filt.an<-DMR.filt.an[,c(1:17,18:21,23,30),with=FALSE]
                 colnames(DMR.filt.an)<-c(colnames(CGI.bed.intT),"ChrEns","StartEns","EndEns","ENST","StrandEns","Dist")
 
@@ -186,14 +222,15 @@ if (length(readLines(bedF))==0) {message("No DMRs found.")}else{
                 bm<-getBM(attributes=c("ensembl_gene_id","ensembl_transcript_id","external_gene_name","description"),filters="ensembl_transcript_id",values=DMR.filt.an$ENST,mart=ens.xx)
 
                 DMR.filt.an2<-merge(x=DMR.filt.an,y=bm,by.x="ENST",by.y="ensembl_transcript_id",all.x=TRUE,allow.cartesian=TRUE)
-                write.table(DMR.filt.an2,file="metilene.limma.annotated.txt",row.names=FALSE,quote=FALSE,sep="\t")
-                DMR.filt.an2.pos<-DMR.filt.an2[DMR.filt.an2$MeanDiff>0,]
-                if(nrow(DMR.filt.an2.pos)>0){write.table(DMR.filt.an2.pos,file="metilene.limma.annotated.UP.txt",row.names=FALSE,quote=FALSE,sep="\t")}
-                DMR.filt.an2.neg<-DMR.filt.an2[DMR.filt.an2$MeanDiff<0,]
-                if(nrow(DMR.filt.an2.neg)>0){write.table(DMR.filt.an2.neg,file="metilene.limma.annotated.DOWN.txt",row.names=FALSE,quote=FALSE,sep="\t")}
+                write.table(DMR.filt.an2,file="metilene.limma.annotated_unfiltered.txt",row.names=FALSE,quote=FALSE,sep="\t")
+                DMR.filt.an2.pos<-DMR.filt.an2[DMR.filt.an2$MeanDiff>=minAbsDiff&!is.na(DMR.filt.an2$adj.P.Val),]
+                if(nrow(DMR.filt.an2.pos)>0){write.table(DMR.filt.an2.pos,file="metilene.limma.annotated_filtered.UP.txt",row.names=FALSE,quote=FALSE,sep="\t")}
+                DMR.filt.an2.neg<-DMR.filt.an2[DMR.filt.an2$MeanDiff<=(-minAbsDiff)&!is.na(DMR.filt.an2$adj.P.Val),] 
+                if(nrow(DMR.filt.an2.neg)>0){write.table(DMR.filt.an2.neg,file="metilene.limma.annotated_filtered.DOWN.txt",row.names=FALSE,quote=FALSE,sep="\t")}
+            } else {print_sessionInfo("No gene models file was provided.")}
 
-            } else {message("No gene models file was provided.")}
+        } # end if tT_filt has at least 1 row
+    } # end if any intervals passed filtering
+    print_sessionInfo("Analysis completed succesfully.")
+} #end if bed file has at least 1 line
 
-        }
-    }
-}

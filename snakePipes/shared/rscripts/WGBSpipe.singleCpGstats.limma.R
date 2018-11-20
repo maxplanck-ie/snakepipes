@@ -5,6 +5,9 @@ wdir<-commandArgs(trailingOnly=TRUE)[1]
 setwd(wdir)
 message(sprintf("working directory is %s",getwd()))
 
+importfunc<-commandArgs(trailingOnly=TRUE)[6]
+source(importfunc)
+
 
 options(stringsAsFactors=FALSE,na.rm=TRUE)
 require("limma")
@@ -28,7 +31,6 @@ mshort<-gsub(".CpG.filt2.bed","",basename(mdir))
 mdir<-mdir[match(sampleSheet$name,mshort)]
 mshort<-gsub(".CpG.filt2.bed","",basename(mdir))
 
-#cC<-c(rep("NULL",3),"numeric",rep("NULL",3),"character")
 
 require(data.table)
 
@@ -45,9 +47,8 @@ limdat<-limdat[,c(1,match(sampleSheet$name,colnames(limdat))),with=FALSE]
 
 limdat.LG<-limdat
 limdat.LG[,2:ncol(limdat.LG)]<-limdat.LG[,2:ncol(limdat.LG)]/100
-limdat.LG.CC<-limdat.LG[complete.cases(limdat.LG),]
-if(nrow(limdat.LG.CC)==0){ message("None of the single CpG sites passed the filtering.")}else{
-
+limdat.LG.CC<-limdat.LG[complete.cases(limdat.LG),] 
+if(nrow(limdat.LG.CC)==0){ print_sessionInfo("None of the single CpG sites passed the filtering.")}else{
     limdat.LG.CC.logit<-logit(limdat.LG.CC[,2:ncol(limdat.LG.CC),with=FALSE],percents=FALSE,adjust=0.025) ##result is a data.frame
     rownames(limdat.LG.CC.logit)<-limdat.LG.CC$ms
 
@@ -55,7 +56,7 @@ if(nrow(limdat.LG.CC)==0){ message("None of the single CpG sites passed the filt
     require("FactoMineR")
     x1<-PCA(limdat.LG.CC[,-1,with=FALSE],graph=FALSE)
 
-    pdf("limdat.LG.CC.PCA.pdf",paper="a4",bg="white")
+    png("limdat.LG.CC.PCA.png",bg="white")
     plot.PCA(x1,choix="var")
     dev.off()
 
@@ -71,7 +72,7 @@ if(nrow(limdat.LG.CC)==0){ message("None of the single CpG sites passed the filt
     limdat.LG.CC.L$Group<-sampleSheet$condition[match(limdat.LG.CC.L$SampleID,sampleSheet$name)]
     limdat.LG.CC.Means<-data.table(summarize(group_by(limdat.LG.CC.L,ms,Group),Beta.Mean=mean(Beta)))
 
-    head(limdat.LG.CC.Means)
+    print(head(limdat.LG.CC.Means))
 
     if ("Control" %in% limdat.LG.CC.Means$Group){
         limdat.LG.CC.Means$Group<-factor(limdat.LG.CC.Means$Group)
@@ -122,29 +123,48 @@ if(nrow(limdat.LG.CC)==0){ message("None of the single CpG sites passed the filt
         fit<-lmFit(limdat.LG.CC.logit,design)
         fit.eB<-eBayes(fit)
 
+##read filters from commandline args
+        minAbsDiff<-commandArgs(trailingOnly=TRUE)[4]
+        fdr<-commandArgs(trailingOnly=TRUE)[5]
+    
+        tT<-topTable(fit.eB,2,p.value=1,number=Inf)
+        tT$IntID<-rownames(tT)
+        plotdat<-melt(tT,measure.vars=c("P.Value","adj.P.Val"),value.name="pval",variable.name="Category",id.vars="IntID")
 
-        tT.FDR5<-topTable(fit.eB,2,p.value=0.05,number=Inf)
-        if(nrow(tT.FDR5)==0){ message("No CpG sites were significantly differentially methylated.")}else{
-            tT.FDR5<-tT.FDR5[,c("logFC","t","adj.P.Val","B")]
-            write.table(tT.FDR5,file="limdat.LG.CC.tT.FDR5.txt",sep="\t",quote=FALSE)
+        ggplot(data=plotdat)+geom_histogram(aes(x=pval,group=Category,fill=Category),binwidth=0.005)+theme(text = element_text(size=16),axis.text = element_text(size=12),axis.title = element_text(size=14))+scale_fill_manual(values=c("grey28","red","darkblue","darkgreen"))+geom_vline(aes(xintercept=as.numeric(fdr)))
+        ggsave("SingleCpG_pvalue.distribution.png")
+
+### annotate top table with mean difference
+        meandatW<-dcast(data=limdat.LG.CC.Means,ms~Group,value.var="Beta.Mean")
+        if(sum(c("Control","Treatment") %in% colnames(meandatW))==2){meandatW$Diff<-with(meandatW,Treatment-Control)}
+        if(sum(c("WT","Mut") %in% colnames(meandatW))==2){meandatW$Diff<-with(meandatW,Mut-WT)}else{meandatW$Diff<-meandatW[,2]-meandatW[,3]}
+
+        tT$Diff<-meandatW$Diff[match(tT$IntID,meandatW$ms)]
+
+        tT$Filter<-"Fail"
+        tT$Filter[tT$adj.P.Val<fdr&abs(tT$Diff)>=minAbsDiff]<-"Pass"
+
+        ggplot(data=tT)+geom_point(aes(x=Diff,y=-log10(adj.P.Val),color=Filter))+theme(text = element_text(size=16),axis.text = element_text(size=12),axis.title = element_text(size=14))+xlab("Mean difference")+scale_color_manual(values=c("grey28","red","darkblue","darkgreen"))
+        ggsave("SingleCpG_volcano.plot.png")
 
 
+#### filter top table according to thresholds
 
-            nrow(tT.FDR5)
+        tT_filt<-tT[tT$adj.P.Val<fdr & abs(tT$Diff)>=minAbsDiff,] 
+
+        if(nrow(tT_filt)==0){ print_sessionInfo("No CpG sites were significantly differentially methylated according to the thresholds.")}else{
+            
+            nrow(tT_filt)
             nrow(limdat.LG.CC.logit)
-            nrow(tT.FDR5)/nrow(limdat.LG.CC.logit)
+            nrow(tT_filt)/nrow(limdat.LG.CC.logit)
 
 ###
-            limdat.LG.CC.Diff<-summarize(group_by(limdat.LG.CC.Means,ms),Diff=(Beta.Mean[1]-Beta.Mean[2]))#this is just used for filtering, direction not important
-            tT.FDR5.Diff0.2<-tT.FDR5[rownames(tT.FDR5) %in% limdat.LG.CC.Diff$ms[abs(limdat.LG.CC.Diff$Diff)>=0.2],]
-
-            nrow(tT.FDR5.Diff0.2)
-            nrow(tT.FDR5.Diff0.2)/nrow(limdat.LG.CC.logit)
-
             save(limdat.LG,file="limdat.LG.RData")
-            save(limdat.LG.CC.Means,limdat.LG.CC.Diff,tT.FDR5,file="singleCpG.RData")
+            save(limdat.LG.CC.Means,tT_filt,file="singleCpG.RData")
 
         }###end if topTable has at least 1 entry
+
+#### prepare metilene input
 
             limdat.LG.CC.tw<-limdat.LG.CC
 
@@ -172,7 +192,8 @@ if(nrow(limdat.LG.CC)==0){ message("None of the single CpG sites passed the filt
 
             write.table(limdat.LG.CC.tw2,file="metilene.IN.txt",sep="\t",row.names=FALSE,quote=FALSE)
         } else {save(limdat.LG,file="limdat.LG.RData")
-                message('More than 2 sample groups were provided. No statistical inference will be computed.')}### end if exactly two sample groups were specified
+                print_sessionInfo('More than 2 sample groups were provided. No statistical inference will be computed.')}### end if exactly two sample groups were specified
 
-
+  print_sessionInfo("Analysis completed succesfully.")  
 }###end if any CpGs passed filtering
+
