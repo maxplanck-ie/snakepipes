@@ -1,7 +1,7 @@
 SalmonIndex:
-  memory: 18G
+  memory: 2G
 SalmonQuant:
-  memory: 14G
+  memory: 2G
 bamPE_fragment_size:
   memory: 10G
 HISAT2:
@@ -11,4 +11,6 @@ STAR:
 create_annotation_bed:
     memory: 4G
 annotation_bed2fasta:
+    memory: 4G
+sleuth_Salmon:
     memory: 4G

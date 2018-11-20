@@ -54,7 +54,7 @@ def run_Trimming(trim, fastqc):
         return([])
 
 # get samples to merge
-sample_dict = get_sampleInfo(sample_info)
+sample_dict = get_sampleSheet(sampleSheet)
 GROUPS = sample_dict.keys()
 
 def run_build_matrices():
@@ -124,7 +124,7 @@ onstart:
         print("$TMPDIR: ",os.getenv('TMPDIR', ""))
         print("$HOSTNAME: ",os.getenv('HOSTNAME', ""))
         print("-" * 80, "\n")
-
+        print(smaple_dict)
 ### main rule ##################################################################
 ################################################################################
 localrules: FASTQ
@@ -146,3 +146,6 @@ onsuccess:
     cf.cleanLogs(outdir)
     if "verbose" in config and config["verbose"]:
         print("\n--- Hi-C workflow finished successfully! --------------------------------\n")
+    if toolsVersion:
+        usedEnvs = [CONDA_SHARED_ENV, CONDA_HIC_ENV]
+        printToolsVersion(usedEnvs)

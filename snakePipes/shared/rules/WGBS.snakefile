@@ -7,7 +7,7 @@ import pandas
 
 ## function to get the name of the samplesheet and extend the name of the folder for all analyses relying on sample_info
 def get_outdir(folder_name):
-    sample_name = re.sub('_sampleSheet.[a-z]{3}$','',os.path.basename(sampleInfo))
+    sample_name = re.sub('_sampleSheet.[a-z]{3}$','',os.path.basename(sampleSheet))
     return("{}_{}".format(folder_name, sample_name))
 
 ## count the number of fields in the chromosome name and generate awk string
@@ -502,7 +502,7 @@ else:
         shell: "Rscript --no-save --no-restore " + os.path.join(workflow_rscripts,'WGBSpipe.POM.filt.R ') + "{params.methDir} {input.methTab};bedtools intersect -v -a {params.OUTtemp} -b {input.blackListF} > {output.tabFilt} 1>{log.out} 2>{log.err}"
 
 
-if sampleInfo or intList:
+if sampleSheet or intList:
     rule make_CG_bed:
         input:
             pozF="aux_files/"+re.sub('.fa*','.poz.gz',os.path.basename(refG))
@@ -517,7 +517,7 @@ if sampleInfo or intList:
         shell: 'grep "+"' + " {input.pozF}  | awk {params.awkCmd}" + ' - | tr " " "\\t" | sort -k 1,1 -k2,2n - > ' + "{output.imdF}"
 
 
-if sampleInfo:
+if sampleSheet:
     rule CpG_stats:
         input: expand("methXT/{sample}.CpG.filt2.bed",sample=samples)
         output:
@@ -527,7 +527,7 @@ if sampleInfo:
             Gifnfo='{}/groupInfo.txt'.format(get_outdir("singleCpG_stats_limma"))
         params:
             statdir=os.path.join(outdir,'{}'.format(get_outdir("singleCpG_stats_limma"))),
-            sampleInfo=sampleInfo,
+            sampleSheet=sampleSheet,
             diff=minAbsDiff,
             fdr=FDR,
             importfunc = os.path.join(workflow_rscripts, "WGBSstats_functions.R")
@@ -536,7 +536,7 @@ if sampleInfo:
             out='{}/logs/CpG_stats.out'.format(get_outdir("singleCpG_stats_limma"))
         threads: 1
         conda: CONDA_WGBS_ENV
-        shell: "Rscript --no-save --no-restore " + os.path.join(workflow_rscripts,'WGBSpipe.singleCpGstats.limma.R ') + "{params.statdir} {params.sampleInfo} "  + os.path.join(outdir,"methXT") + " {params.diff} {params.fdr} {params.importfunc} 1>{log.out} 2>{log.err}"
+        shell: "Rscript --no-save --no-restore " + os.path.join(workflow_rscripts,'WGBSpipe.singleCpGstats.limma.R ') + "{params.statdir} {params.sampleSheet} "  + os.path.join(outdir,"methXT") + " {params.diff} {params.fdr} {params.importfunc} 1>{log.out} 2>{log.err}"
 
 
     rule CpG_report:
@@ -546,7 +546,7 @@ if sampleInfo:
             html='{}/Stats_report.html'.format(get_outdir("singleCpG_stats_limma"))
         params:
             statdir=os.path.join(outdir,'{}'.format(get_outdir("singleCpG_stats_limma"))),
-            sampleInfo=sampleInfo,
+            sampleSheet=sampleSheet,
             importfunc = os.path.join(workflow_rscripts, "WGBSstats_functions.R"),
             stat_cat="single_CpGs",
             rmd_in=os.path.join(workflow_rscripts,"WGBS_stats_report_template.Rmd"),
@@ -557,7 +557,7 @@ if sampleInfo:
             out='{}/logs/stats_report.out'.format(get_outdir("singleCpG_stats_limma"))
         conda: CONDA_RMD_ENV
         threads: 1
-        shell: "cp -v {params.rmd_in} {params.rmd_out} ;Rscript -e 'rmarkdown::render(\"{params.rmd_out}\", params=list(outdir=\"{params.statdir}\", input_func=\"{params.importfunc}\", stat_category=\"{params.stat_cat}\",sample_sheet=\"{params.sampleInfo}\"), output_file=\"{params.outFull}\")' 1>{log.out} 2>{log.err}"
+        shell: "cp -v {params.rmd_in} {params.rmd_out} ;Rscript -e 'rmarkdown::render(\"{params.rmd_out}\", params=list(outdir=\"{params.statdir}\", input_func=\"{params.importfunc}\", stat_category=\"{params.stat_cat}\",sample_sheet=\"{params.sampleSheet}\"), output_file=\"{params.outFull}\")' 1>{log.out} 2>{log.err}"
 
 
     rule run_metilene:
@@ -584,7 +584,7 @@ if sampleInfo:
             MetBed='{}/singleCpG.metilene.bed'.format(get_outdir("metilene_out")),
             imdF="aux_files/"+re.sub('.fa*','.CpG.bed',os.path.basename(refG))
         output:
-            MetCG=os.path.join("aux_files",re.sub('_sampleSheet.[a-z]{3}$','.metilene.CpGlist.bed',os.path.basename(sampleInfo)))
+            MetCG=os.path.join("aux_files",re.sub('_sampleSheet.[a-z]{3}$','.metilene.CpGlist.bed',os.path.basename(sampleSheet)))
         params:
             auxdir=os.path.join(outdir,"aux_files")
         log:
@@ -592,14 +592,14 @@ if sampleInfo:
         threads: 1
         conda: CONDA_WGBS_ENV
         shell: "bedtools intersect -wa -a {input.imdF} -b {input.MetBed} > {output.MetCG}  2>{log.err}"
-            
+
 
     rule cleanup_metilene:
         input:
             Limdat='{}/limdat.LG.RData'.format(get_outdir("singleCpG_stats_limma")),
             MetBed='{}/singleCpG.metilene.bed'.format(get_outdir("metilene_out")),
-            MetCG=os.path.join("aux_files",re.sub('_sampleSheet.[a-z]{3}$','.metilene.CpGlist.bed',os.path.basename(sampleInfo))),
-            sampleInfo=sampleInfo
+            MetCG=os.path.join("aux_files",re.sub('_sampleSheet.[a-z]{3}$','.metilene.CpGlist.bed',os.path.basename(sampleSheet))),
+            sampleSheet=sampleSheet
         output:
             LimBed='{}/singleCpG.metilene.limma_unfiltered.bed'.format(get_outdir("metilene_out")),
             LimAnnot='{}/metilene.limma.annotated_unfiltered.txt'.format(get_outdir("metilene_out"))
@@ -614,7 +614,7 @@ if sampleInfo:
             out="{}/logs/cleanup_metilene.out".format(get_outdir("metilene_out"))
         threads: 1
         conda: CONDA_WGBS_ENV
-        shell: 'Rscript --no-save --no-restore ' + os.path.join(workflow_rscripts,'WGBSpipe.metilene_stats.limma.R ') + "{params.DMRout} " + os.path.join(outdir,"{input.MetBed}") +' ' + os.path.join(outdir,"{input.MetCG}") + ' ' + os.path.join(outdir,"{input.Limdat}") + " {input.sampleInfo} {params.gene_mod} {params.diff} {params.fdr} {params.importfunc} 1>{log.out} 2>{log.err}"
+        shell: 'Rscript --no-save --no-restore ' + os.path.join(workflow_rscripts,'WGBSpipe.metilene_stats.limma.R ') + "{params.DMRout} " + os.path.join(outdir,"{input.MetBed}") +' ' + os.path.join(outdir,"{input.MetCG}") + ' ' + os.path.join(outdir,"{input.Limdat}") + " {input.sampleSheet} {params.gene_mod} {params.diff} {params.fdr} {params.importfunc} 1>{log.out} 2>{log.err}"
 
 
     rule metilene_report:
@@ -625,7 +625,7 @@ if sampleInfo:
             html='{}/Stats_report.html'.format(get_outdir("metilene_out"))
         params:
             statdir=os.path.join(outdir,'{}'.format(get_outdir("metilene_out"))),
-            sampleInfo=sampleInfo,
+            sampleSheet=sampleSheet,
             importfunc = os.path.join(workflow_rscripts, "WGBSstats_functions.R"),
             stat_cat="metilene_DMRs",
             rmd_in=os.path.join(workflow_rscripts,"WGBS_stats_report_template.Rmd"),
@@ -636,7 +636,7 @@ if sampleInfo:
             out='{}/logs/stats_report.out'.format(get_outdir("metilene_out"))
         conda: CONDA_RMD_ENV
         threads: 1
-        shell: "cp -v {params.rmd_in} {params.rmd_out} ;Rscript -e 'rmarkdown::render(\"{params.rmd_out}\", params=list(outdir=\"{params.statdir}\", input_func=\"{params.importfunc}\", stat_category=\"{params.stat_cat}\",sample_sheet=\"{params.sampleInfo}\"), output_file=\"{params.outFull}\")' 1>{log.out} 2>{log.err}"
+        shell: "cp -v {params.rmd_in} {params.rmd_out} ;Rscript -e 'rmarkdown::render(\"{params.rmd_out}\", params=list(outdir=\"{params.statdir}\", input_func=\"{params.importfunc}\", stat_category=\"{params.stat_cat}\",sample_sheet=\"{params.sampleSheet}\"), output_file=\"{params.outFull}\")' 1>{log.out} 2>{log.err}"
 
 
 if intList:
@@ -656,18 +656,18 @@ if intList:
         shell: "{params.auxshell} 2>{log.err}"
 
 
-    if sampleInfo:
+    if sampleSheet:
         rule intAgg_stats:
             input:
                 Limdat='{}/limdat.LG.RData'.format(get_outdir("singleCpG_stats_limma")),
                 intList=intList,
                 refG=refG,
-                sampleInfo=sampleInfo,
+                sampleSheet=sampleSheet,
                 aux=run_int_aggStats(intList,False)
             output:
-                outFiles=run_int_aggStats(intList,sampleInfo)
+                outFiles=run_int_aggStats(intList,sampleSheet)
             params:
-                auxshell=lambda wildcards,input:';'.join(['Rscript --no-save --no-restore ' + os.path.join(workflow_rscripts,'WGBSpipe.interval_stats.limma.R ') + os.path.join(outdir,'{}'.format(get_outdir("aggregate_stats_limma"))) + ' ' + li +' '+ aui +' ' + os.path.join(outdir,input.Limdat) + ' '  + input.sampleInfo + ' ' + str(minAbsDiff) + ' ' + str(FDR) + ' ' + os.path.join(workflow_rscripts, "WGBSstats_functions.R")  for li,aui in zip(intList,[os.path.join(outdir,"aux_files",re.sub('.fa',re.sub('.bed','.CpGlist.bed',os.path.basename(x)),os.path.basename(refG))) for x in intList])])
+                auxshell=lambda wildcards,input:';'.join(['Rscript --no-save --no-restore ' + os.path.join(workflow_rscripts,'WGBSpipe.interval_stats.limma.R ') + os.path.join(outdir,'{}'.format(get_outdir("aggregate_stats_limma"))) + ' ' + li +' '+ aui +' ' + os.path.join(outdir,input.Limdat) + ' '  + input.sampleSheet + ' ' + str(minAbsDiff) + ' ' + str(FDR) + ' ' + os.path.join(workflow_rscripts, "WGBSstats_functions.R")  for li,aui in zip(intList,[os.path.join(outdir,"aux_files",re.sub('.fa',re.sub('.bed','.CpGlist.bed',os.path.basename(x)),os.path.basename(refG))) for x in intList])])
             log:
                 err="{}/logs/intAgg_stats.err".format(get_outdir("aggregate_stats_limma")),
                 out="{}/logs/intAgg_stats.out".format(get_outdir("aggregate_stats_limma"))
@@ -678,12 +678,12 @@ if intList:
 
         rule intAgg_report:
             input: 
-                outFiles=run_int_aggStats(intList,sampleInfo)
+                outFiles=run_int_aggStats(intList,sampleSheet)
             output:
                 html='{}/Stats_report.html'.format(get_outdir("aggregate_stats_limma"))
             params:
                 statdir=os.path.join(outdir,'{}'.format(get_outdir("aggregate_stats_limma"))),
-                sampleInfo=sampleInfo,
+                sampleSheet=sampleSheet,
                 importfunc = os.path.join(workflow_rscripts, "WGBSstats_functions.R"),
                 stat_cat="user_intervals",
                 rmd_in=os.path.join(workflow_rscripts,"WGBS_stats_report_template.Rmd"),
@@ -694,4 +694,4 @@ if intList:
                 out='{}/logs/stats_report.out'.format(get_outdir("aggregate_stats_limma"))
             conda: CONDA_RMD_ENV
             threads: 1
-            shell: "cp -v {params.rmd_in} {params.rmd_out} ;Rscript -e 'rmarkdown::render(\"{params.rmd_out}\", params=list(outdir=\"{params.statdir}\", input_func=\"{params.importfunc}\", stat_category=\"{params.stat_cat}\",sample_sheet=\"{params.sampleInfo}\"), output_file=\"{params.outFull}\")' 1>{log.out} 2>{log.err}"
+            shell: "cp -v {params.rmd_in} {params.rmd_out} ;Rscript -e 'rmarkdown::render(\"{params.rmd_out}\", params=list(outdir=\"{params.statdir}\", input_func=\"{params.importfunc}\", stat_category=\"{params.stat_cat}\",sample_sheet=\"{params.sampleSheet}\"), output_file=\"{params.outFull}\")' 1>{log.out} 2>{log.err}"

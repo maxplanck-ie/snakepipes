@@ -95,7 +95,7 @@ if (length(readLines(bedF))==0) {print_sessionInfo("No DMRs found.")}else{
         require("ggplot2")
         require("dplyr")
 
-        CGI.limdat.CC.logit<-logit(CGI.limdat.CC,percents=FALSE,adjust=0.025) 
+        CGI.limdat.CC.logit<-logit(CGI.limdat.CC,percents=FALSE,adjust=0.025)
         x1<-PCA(CGI.limdat.CC,graph=FALSE)
 
         if(nrow(x1$eig)>=2){
@@ -105,11 +105,11 @@ if (length(readLines(bedF))==0) {print_sessionInfo("No DMRs found.")}else{
 
     #calculate row means
         spath<-commandArgs(trailingOnly=TRUE)[5]
-        sampleInfo<-read.table(spath,header=TRUE,sep="\t",as.is=TRUE)
+        sampleSheet<-read.table(spath,header=TRUE,sep="\t",as.is=TRUE)
     #calculate and save row means
         CGI.limdat.CC$IntID<-rownames(CGI.limdat.CC)
         CGI.limdat.CC.L<-melt(CGI.limdat.CC,id.vars="IntID",value.name="Beta",variable.name="SampleID")
-        CGI.limdat.CC.L$Group<-sampleInfo$Group[match(CGI.limdat.CC.L$SampleID,sampleInfo$SampleID)]
+        CGI.limdat.CC.L$Group<-sampleSheet$condition[match(CGI.limdat.CC.L$SampleID,sampleSheet$name)]
         CGI.limdat.CC.Means<-data.table(summarize(group_by(CGI.limdat.CC.L,IntID,Group),Beta.Mean=mean(Beta)))
         save(CGI.limdat.CC,file="CGI.limdat.CC.RData")
 
@@ -134,15 +134,15 @@ if (length(readLines(bedF))==0) {print_sessionInfo("No DMRs found.")}else{
         design<-as.data.frame(matrix(ncol=2,nrow=(ncol(CGI.limdat.CC.logit))),stringsAsFactors=FALSE)
         colnames(design)<-c("Intercept","Group")
         rownames(design)<-colnames(CGI.limdat.CC.logit)
-        if("Control" %in% sampleInfo$Group){
-            gp<-factor(sampleInfo$Group[match(colnames(CGI.limdat.CC.logit),sampleInfo$SampleID)])
+        if("Control" %in% sampleSheet$condition){
+            gp<-factor(sampleSheet$condition[match(colnames(CGI.limdat.CC.logit),sampleSheet$name)])
             gp<-relevel(gp,ref="Control")
             design$Group<-as.numeric(gp)}
-        if("WT" %in% sampleInfo$Group){
-            gp<-factor(sampleInfo$Group[match(colnames(CGI.limdat.CC.logit),sampleInfo$SampleID)])
+        if("WT" %in% sampleSheet$condition){
+            gp<-factor(sampleSheet$condition[match(colnames(CGI.limdat.CC.logit),sampleSheet$name)])
             gp<-relevel(gp,ref="WT")
             design$Group<-as.numeric(gp)}
-        else{design$Group<-as.numeric(factor(sampleInfo$Group))}
+        else{design$Group<-as.numeric(factor(sampleSheet$condition))}
         design$Intercept<-1
         design<-as.matrix(design)
 
@@ -227,8 +227,6 @@ if (length(readLines(bedF))==0) {print_sessionInfo("No DMRs found.")}else{
                 if(nrow(DMR.filt.an2.pos)>0){write.table(DMR.filt.an2.pos,file="metilene.limma.annotated_filtered.UP.txt",row.names=FALSE,quote=FALSE,sep="\t")}
                 DMR.filt.an2.neg<-DMR.filt.an2[DMR.filt.an2$MeanDiff<=(-minAbsDiff)&!is.na(DMR.filt.an2$adj.P.Val),] 
                 if(nrow(DMR.filt.an2.neg)>0){write.table(DMR.filt.an2.neg,file="metilene.limma.annotated_filtered.DOWN.txt",row.names=FALSE,quote=FALSE,sep="\t")}
-
-
             } else {print_sessionInfo("No gene models file was provided.")}
 
         } # end if tT_filt has at least 1 row

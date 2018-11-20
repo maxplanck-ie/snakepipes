@@ -32,8 +32,8 @@ bigWigType: both
 ## Median/mean fragment length, only relevant for single-end data (default: 200)
 fragment_length: 200
 verbose: false
-# sampleInfo_DB
-sample_info:
+# sampleSheet_DB
+sampleSheet:
 # window_size
 window_size: 150
 ################################################################################

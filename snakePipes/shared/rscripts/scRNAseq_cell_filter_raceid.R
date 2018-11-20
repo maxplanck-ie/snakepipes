@@ -40,12 +40,12 @@ png("Expdata.ColumnSums.png")
     }
 dev.off()
 
-##make sample info
+##make sample sheet
 
-sampleInfo<-data.frame(colnames(expdat),stringsAsFactors=FALSE)
-colnames(sampleInfo)<-"SampleID"
-rownames(sampleInfo)<-sampleInfo$SampleID
-save(sampleInfo,file="sampleInfo.RData")
+sampleSheet<-data.frame(colnames(expdat),stringsAsFactors=FALSE)
+colnames(sampleSheet)<-"name"
+rownames(sampleSheet)<-sampleSheet$name
+save(sampleSheet,file="sampleSheet.RData")
 
 
 #######################
@@ -62,15 +62,15 @@ metrics.tab$gene_universe<-NA
 
 for(i in seq_along(minT)){
     minTi=minT[i]
-    
+
     sc<-SCseq(expdat)
     sc<-filterdata(sc,mintotal=minTi,minexpr=minE,minnumber=minN)
     save(sc,file=paste0("sc.minT",minTi,".RData"))
-    
+
     metrics.tab$num_cells[i]<-ncol(sc@ndata)
     metrics.tab$gene_universe[i]<-length(sc@genes)
     metrics.tab$medGPC[i]<-median(apply(sc@ndata[sc@genes,],2,function(X)sum(X>=minE,na.rm=TRUE)))
-    
+
 
 
     print(paste0(i,"_processed"))
@@ -88,6 +88,3 @@ ggplot(plotdat)+geom_line(aes(x=minT,y=gene_universe),size=1)+theme(axis.text=el
 ggsave("gene_universevsminT.downscaled.png")
 
 write.table(metrics.tab,file="metrics.tab.txt",row.names=FALSE,sep="\t",quote=FALSE)
-
-
-

@@ -1,12 +1,12 @@
 library("sleuth")
 library("dplyr")
-library("biomaRt")
+#library("biomaRt")
 
 args = commandArgs(trailingOnly=TRUE)
 
 ## Debug only !!!
 ## t2g_file = "snakemake_workflows/shared/organisms/dm6.t2g"
-## sample_info_file = "sampleInfo.tsv"
+## sample_info_file = "sampleSheet.tsv"
 ## indir = "Salmon"
 ## outdir = "sleuth"
 
@@ -66,7 +66,7 @@ if (exists("t2g")) {
 	str(t2g)
 
   ## add gene names
-  so <- sleuth_prep(s2c, ~ condition, target_mapping = t2g)
+  so <- sleuth_prep(s2c, ~condition, target_mapping = t2g)
 } else {
   ## construct sleuth object
   so = sleuth_prep(s2c, ~ condition)
