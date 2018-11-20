@@ -130,7 +130,7 @@ def run_CpG_stats(sampleSheet):
 
 def run_metilene_all(sampleSheet):
     if sampleSheet:
-        return (['{}/singleCpG.metilene.limma.bed'.format(get_outdir("metilene_out")),'{}/metilene.limma.annotated.txt'.format(get_outdir("metilene_out")),'{}/Stats_report.html'.format(get_outdir("metilene_out"))])
+        return (['{}/singleCpG.metilene.limma_unfiltered.bed'.format(get_outdir("metilene_out")),'{}/metilene.limma.annotated_unfiltered.txt'.format(get_outdir("metilene_out")),'{}/Stats_report.html'.format(get_outdir("metilene_out"))])
     else:
         return ([])
 
@@ -153,8 +153,8 @@ def run_deeptools(skipGCbias):
         return ([])
 
 
-def run_aggStats_report(intList,sampleInfo):
-    if intList and sampleInfo:
+def run_aggStats_report(intList,sampleSheet):
+    if intList and sampleSheet:
         return(['{}/Stats_report.html'.format(get_outdir("aggregate_stats_limma"))])
     else:
         return([])
@@ -212,7 +212,8 @@ if not fromBam:
             run_CpG_stats(sampleSheet),
             run_metilene_all(sampleSheet),
             run_int_aggStats(intList,False),
-            run_int_aggStats(intList,sampleSheet)
+            run_int_aggStats(intList,sampleSheet),
+            run_aggStats_report(intList,sampleSheet)
 
 
 else:
@@ -234,7 +235,8 @@ else:
             run_CpG_stats(sampleSheet),
             run_metilene_all(sampleSheet),
             run_int_aggStats(intList,False),
-            run_int_aggStats(intList,sampleSheet)
+            run_int_aggStats(intList,sampleSheet),
+            run_aggStats_report(intList,sampleSheet)
 
 
 ### execute after workflow finished ############################################
