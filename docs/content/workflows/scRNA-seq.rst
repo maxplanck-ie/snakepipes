@@ -79,6 +79,8 @@ The default configuration file is listed below and can be found in `snakePipes/w
     verbose: False
     plot_format: pdf
     dnaContam: False
+    ## Parameters for th statistical analysis
+    cell_filter_metric: gene_universe
     #Option to skip RaceID to save time
     skipRaceID: False
 
@@ -179,8 +181,10 @@ Filtered_cells_monocle
 
 The poisson-rescaled count matrix is read and converted into a monocle dataset. A range of transcript counts per cell thresholds (from 1000 to 5000 by 500) are applied to filter cells and the resulting R objects are written to minT*.mono.set.RData. For every cell filtering threshold, several metrics are collected and written to metrics.tab.txt: number of retained cells, median number of expressed genes per cell (GPC), size of the total gene universe. Plots of median GPC as well as gene universe size as functions of the cell filtering threshold are written to medGPCvsminT.downscaled.png and gene_universevsminT.downscaled.png, respectively.
 
-The optimal cell filtering threshold for the subsequent analyses is selected as the value that results in the largest gene universe size. Gene expression dispersions are calculated for the corresponding monocle object and the trend plot is written to mono.set.*.disp.estim.png. A first iteration of cell clustering with default settings resutls in a rho-delta plot written to mono.set.*.rho_delta.png and a tSNE plot with cell cluster colouring written to mono.set.*.tsne.auto.Cluster.png. Rho and delta are now re-evaluated and set to the 80th and the 95th percentiles of the original distributions, respectively. Cells are reclustered and the corresponding tSNE plot is written to mono.set.*.tsne.thd.Cluster.png. The monocle object containing the updated clustering information is written to minT*.mono.set.RData. It is also converted to a seurat object and the clustering information is transferred. The seurat object is saved as minT*.seuset.RData. The tSNE plot with clustering information produced with seurat is written to minT*.seuset.tSNE.png.
+The optimal cell filtering threshold for the subsequent analyses is selected as the value that results in maximizing a gene expression metric choosable from "gene_universe" (default) and "medGPC". Using gene universe tends to maximize the overall cell diversity while using median genes per cell (medGPC) maximizes the information content per cell.
+Gene expression dispersions are calculated for the corresponding monocle object and the trend plot is written to mono.set.*.disp.estim.png. A first iteration of cell clustering with default settings resutls in a rho-delta plot written to mono.set.*.rho_delta.png and a tSNE plot with cell cluster colouring written to mono.set.*.tsne.auto.Cluster.png. Rho and delta are now re-evaluated and set to the 80th and the 95th percentiles of the original distributions, respectively. Cells are reclustered and the corresponding tSNE plot is written to mono.set.*.tsne.thd.Cluster.png. The monocle object containing the updated clustering information is written to minT*.mono.set.RData. It is also converted to a seurat object and the clustering information is transferred. The seurat object is saved as minT*.seuset.RData. The tSNE plot with clustering information produced with seurat is written to minT*.seuset.tSNE.png.
  Top10 as well as top2 markers are calculated for each cell cluster and written to minT*.Top10markers.txt and minT*.Top2markers.txt, respectively. The corresponding heatmaps are written to minT*.Top10markers.heatmap.png and minT*.Top2markers.heatmap.png, respectively. For the top2 marker list, violin as well as feature plots are produced and saved under Top2.clu*.violin.png and Top2.clu*.featurePlot.png, respectively. The R session info is written to sessionInfo.txt.
+Statistical procedures and results are summarized in Stats_report.html.
 
 Filtered_cells_RaceID
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -188,7 +192,7 @@ Filtered_cells_RaceID
 Cell filtering, metrics collection and threshold selection are done as above only using RaceID package functions, where applicable.
 
 Clustering is done with RaceID default settings. The fully processed RaceID object is written to sc.minT*.RData, the tsne plot with the clustering information to sc.minT*.tsne.clu.png.
-Top 10 and top 2 markers are calculated, and the resulting plots and tables written out as above. Violin and feature plots are generated for the top2 marker list and saved to files as in the description above. Session info is written to sessionInfo.txt
+Top 10 and top 2 markers are calculated, and the resulting plots and tables written out as above. Violin and feature plots are generated for the top2 marker list and saved to files as in the description above. Session info is written to sessionInfo.txt. Statistical procedures and results are summarized in Stats_report.html.
 
 
 Example images

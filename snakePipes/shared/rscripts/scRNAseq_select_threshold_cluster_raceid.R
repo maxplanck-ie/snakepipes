@@ -85,7 +85,8 @@ for(i in seq_along(unique(top2$Cluster))){
     plotdat$Cluster<-factor(plotdat$Cluster,levels=as.character(unique(plotdat$Cluster))[order(as.numeric(unique(plotdat$Cluster)))])
     ggplot(data=plotdat)+geom_violin(aes(x=Cluster,y=NormExpr,fill=Cluster))+geom_boxplot(aes(x=Cluster,y=NormExpr),width=0.1)+ggtitle(paste0("Cluster ",clu))+facet_wrap(~GeneID)
     ggsave(paste0("Top2.clu",clu,".violin.png"),width=12,height=6)
-    pdf(paste0("Top2.clu",clu,".featurePlot.pdf"),bg="white",onefile=TRUE)
+    png(paste0("Top2.clu",clu,".featurePlot.png"),bg="white",onefile=TRUE)
+    par(mfrow=c(1,2))
     plotexpmap(sc,g=rownames(subdat)[1],n=rownames(subdat)[1],logsc=TRUE,fr=FALSE)
     if(nrow(subdat)>1){
     plotexpmap(sc,g=rownames(subdat)[2],n=rownames(subdat)[2],logsc=TRUE,fr=FALSE)}

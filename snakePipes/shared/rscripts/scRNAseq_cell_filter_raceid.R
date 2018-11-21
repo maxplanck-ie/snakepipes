@@ -69,7 +69,7 @@ for(i in seq_along(minT)){
 
     metrics.tab$num_cells[i]<-ncol(sc@ndata)
     metrics.tab$gene_universe[i]<-length(sc@genes)
-    metrics.tab$medGPC[i]<-median(apply(sc@ndata[sc@genes,],2,function(X)sum(X>=minE,na.rm=TRUE)))
+    metrics.tab$medGPC[i]<-median(apply((sc@ndata*minTi)[sc@genes,],2,function(X)sum(X>=minE,na.rm=TRUE)))
 
 
 
