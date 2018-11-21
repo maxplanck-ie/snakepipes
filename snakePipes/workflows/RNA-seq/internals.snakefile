@@ -54,13 +54,8 @@ else:
     infiles = sorted(glob.glob(os.path.join(str(indir or ''), '*'+bam_ext)))
     samples = cf.get_sample_names_bam(infiles,bam_ext)
 
-if sampleSheet and not os.path.isfile(sampleSheet):
-    print("ERROR: Cannot find sample sheet file! ("+sampleSheet+")\n")
-    exit(1)
-
-if sampleSheet and not cf.check_sample_info_header(sampleSheet):
-    print("ERROR: Please use 'name' and 'condition' as column headers in sample sheet file! ("+sampleSheet+")\n")
-    exit(1)
+if sampleSheet:
+    cf.check_sample_info_header(sampleSheet)
 
 if sampleSheet and not check_replicates(sampleSheet):
     print("\nWarning! Sleuth cannot be invoked without replicates! Only DESeq2 is used...\n")

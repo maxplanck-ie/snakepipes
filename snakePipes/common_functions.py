@@ -230,13 +230,18 @@ def check_sample_info_header(sampleSheet_file):
     """
     return True in case sample info file contains column names 'name' and 'condition'
     """
+    if not os.path.isfile(sampleSheet_file):
+        print("ERROR: Cannot find sample info file! ("+sampleSheet_file+")\n")
+        exit(1)
+
     ret = subprocess.check_output("cat " + sampleSheet_file + " | head -n1",
                                   shell=True).decode()
 
     if "name" in ret.split() and "condition" in ret.split():
-        return True
+        print("Sample sheet found and format is ok!\n")
     else:
-        return False
+        print("ERROR: Please use 'name' and 'condition' as column headers in sample info file! ("+sampleSheet+")\n")
+        exit(1)
 
 
 def setDefaults(fileName):
