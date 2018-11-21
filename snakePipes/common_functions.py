@@ -226,7 +226,7 @@ def cleanLogs(d):
             os.remove(f)
 
 
-def check_sampleSheet_header(sampleSheet_file):
+def check_sample_info_header(sampleSheet_file):
     """
     return True in case sample info file contains column names 'name' and 'condition'
     """
@@ -333,7 +333,11 @@ def checkCommonArguments(args, baseDir, outDir=False, createIndices=False):
             args.sampleSheet = os.path.abspath(args.sampleSheet)
         else:
             sys.exit("\nSample info file not found! (--DB {})\n".format(args.sampleSheet))
+<<<<<<< HEAD
         if not check_sampleSheet_header(args.sampleSheet):
+=======
+        if not check_sample_info_header(args.sampleSheet):
+>>>>>>> refs/remotes/origin/develop
             sys.exit("ERROR: Please use 'name' and 'condition' as column headers in sample info file! ({})\n".format(args.sampleSheet))
     # 3. get abspath from user provided genome/organism file
     if not createIndices:

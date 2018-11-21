@@ -1,13 +1,14 @@
 ## function to get the name of the samplesheet and extend the name of the folder DESeq2 to DESeq2_[name]
-def get_outdir(folder_name,sample_sheet):
-    sample_name = os.path.splitext(os.path.basename(str(sample_sheet)))[0]
+def get_outdir(folder_name):
+    sample_name = os.path.splitext(os.path.basename(str(sampleSheet)))[0]
+
     return("{}_{}".format(folder_name, sample_name))
 
 ## DESeq2 (on featureCounts)
 rule DESeq2:
     input:
         counts_table = lambda wildcards : "featureCounts/counts_allelic.tsv" if 'allelic-mapping' in mode else "featureCounts/counts.tsv",
-        sample_info = sampleSheet,
+        sampleSheet = sampleSheet,
         symbol_file = "Annotation/genes.filtered.symbol" #get_symbol_file
     output:
         "{}/DESeq2.session_info.txt".format(get_outdir("DESeq2",sampleSheet))
@@ -28,7 +29,7 @@ rule DESeq2:
     shell:
         "cd {params.outdir} && "
         "Rscript {params.script} "
-        "{input.sample_info} " # 1
+        "{input.sampleSheet} " # 1
         "../{input.counts_table} " # 2
         "{params.fdr} " # 3
         "../{input.symbol_file} " # 4
@@ -43,7 +44,7 @@ rule DESeq2:
 rule DESeq2_Salmon:
     input:
         counts_table = "Salmon/counts.tsv",
-        sample_info = sampleSheet,
+        sampleSheet = sampleSheet,
         tx2gene_file = "Annotation/genes.filtered.t2g",
         symbol_file = "Annotation/genes.filtered.symbol" #get_symbol_file
     output:
@@ -65,7 +66,7 @@ rule DESeq2_Salmon:
     shell:
         "cd {params.outdir} && "
         "Rscript {params.script} "
-        "{input.sample_info} " # 1
+        "{input.sampleSheet} " # 1
         "../{input.counts_table} " # 2
         "{params.fdr} " # 3
         "../{input.symbol_file} " # 4

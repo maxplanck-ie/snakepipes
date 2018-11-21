@@ -14,8 +14,10 @@ There are two flags that allow skipping certain QC metric calculation, i.e. ``sk
 
 Methylation ratios are extracted (via `MethylDackel<https://github.com/dpryan79/MethylDackel>`__) for CpG positions in the reference genome with a minimum coverage (10x) and low snp allelic frequency (<0.25 illegitimate bases).
 If sample sheet is provided, logit-transformed beta values for CpG positions are tested for differential methylation using `limma<https://bioconductor.org/packages/release/bioc/html/limma.html>`__.
-Metilene is called to detect de novo DMRs. In addition to the nonparametric statistics output by metilene, limma-derived statistics are recalculated for DMRs, which are further annotated with nearest gene information.
+Metilene is called to detect de novo DMRs using parameters specified in the defaults dictionary. In addition to the nonparametric statistics output by metilene, limma-derived statistics are recalculated for DMRs, which are further annotated with nearest gene information.
 If bed file(s) with genomic intervals of interest are provided, methylation ratios are aggregated over those and limma is used on logit-transformed methylation ratios to test for differential methylation.
+
+Default filtering criteria for all statistical approaches are specified in the defaults.yaml as minimum absolute difference in methylation 0.2 (minAbsDiff) as well as FDR threshold (FDR) of 0.02. These values have been selected for a dataset with few events of differential methylation. The user is highly encouraged to rigorously inspect the resulting volcano plots and to adjust these filtering thresholds as appropriate for their dataset by providing an updated yaml file to the pipeline.
 
 
 .. image:: ../images/WGBS_pipeline.png
@@ -76,6 +78,13 @@ Workflow configuration file
 	###Flags to control skipping of certain QC calculations
 	skipDOC: False
 	skipGCbias: False
+	###Metilene DMR calling parameters:
+	maxDist: 300
+	minCpGs: 10
+	minMethDiff: 0
+	###Thresholds for filtering of statistical comparisons:
+	minAbsDiff: 0.2
+	FDR: 0.02
 
 
 Understanding the outputs
@@ -119,13 +128,14 @@ In addition to the FASTQ module results (see :doc:`running_snakePipes`), the wor
 
 - **QC_metrics**: contains output files from conversion rate, flagstat, depth of coverage, GCbias and methylation bias calculations. The QC report in pdf format collecting those metrics in tabular form is also found in this folder.
 
-- **singleCpG_stats_limma_<suffix>**: contains output files from the single CpG differential methylation analysis module. A PCA plot for all samples as well as density and violin plots per sample group are output, provided any sites pass cross-replicate filtering. A t-test on logit-transformed group means is output to GroupMean.ttest.txt. If any differentially methylated sites at 5%FDR are detected, these are output to  limdat.LG.CC.tT.FDR5.txt with corresponding limma statistics. The table with methylation ratios merged from replicates is saved to limdat.LG.RData. A table formatted as metilene input is written to metilene.IN.txt.
+- **singleCpG_stats_limma_<suffix>**: contains output files from the single CpG differential methylation analysis module. A PCA plot for all samples as well as density and violin plots per sample group are output, provided any sites pass cross-replicate filtering. A t-test on logit-transformed group means is output to GroupMean.ttest.txt. Differential methylation stastistics are calculated by applying limma on logit-transformed Beta values. Pvalue distribution and volcano plot are output. The table with methylation ratios merged from replicates is saved to limdat.LG.RData. Table of mean methylation ratios per group (used for plotting) as well as top Table of filtered differentially methylated sites are written to the serialized R object singleCpG.RData. A table formatted as metilene input is written to metilene.IN.txt. R session info is written to sessionInfo.txt. Statistical results are summarized in the Stats report.
 
-- **aggregate_stats_limma_<suffix>**: contains output files from the user-provided target interval differential methylation analysis module. A table with methylation ratios for single CpG positions output by the single CpG stat module is intersected with the bed file provided by the user. Single CpG methylation ratios are averaged over the intervals so that each replicate obtains one aggregate (mean) methylation value per genomic interval provided by the user, as long as at least 20% of the CpGs in that interval were extracted and passed filtering. The new table of methylation ratios per genomic interval is subjected to an analysis analogous to the singleCpG stats module, so that a PCA plot for all samples is output, alongside a table of differentially methylated intervals (*tT.FDR5.txt) and an R object storing the original data (*.aggCpG.RData). Files are prefixed with a prefix extracted from the bed file name provided by the user.
+- **aggregate_stats_limma_<suffix>**: contains output files from the user-provided target interval differential methylation analysis module. A table with methylation ratios for single CpG positions output by the single CpG stat module is intersected with the bed file provided by the user. Single CpG methylation ratios are averaged over the intervals so that each replicate obtains one aggregate (mean) methylation value per genomic interval provided by the user, as long as at least 20% of the CpGs in that interval were extracted and passed filtering. Otherwise the interval is considered undetected and filtered out. The new table of methylation ratios per genomic interval is subjected to an analysis analogous to the singleCpG stats module, so that a PCA plot for all samples is output, alongside a table of differentially methylated intervals (*tT_filt.txt) and an R object storing the original data (*.aggCpG.RData). A pvalue distribution plot as well as a volcano plot are produced. Files are prefixed with a prefix extracted from the bed file name provided by the user. R session info is written to sessionInfo.txt. Statistical results are summarized in the Stats report.
 
 - aux_files: contains a number of intermediate auxiliary files e.g. the index of genomic CpGs as well as bed files containing CpG annotation of interval files provided by the user.
 
-- **metilene_out_<suffix>**: contains output files from metilene analysis. The original metilene output is stored in singleCpG.metilene.bed. Genomic intervals output by metilene are processed similarly as the genomic intervals provided by the user with the aggregate stats limma module. A PCA plot as well as violin and density plots are output. A table of differentially methylated intervals is written to singleCpG.metilene.CGI.limdat.CC.tT.FDR5.txt and the methylation table is stored in singleCpG.metilene.limma.RData. The differentially methylated regions (at FDR <5%) are further annotated with their closest gene using annotation as defined by the genes_bed entry of the organism dictionary. Gene IDs and gene symbols are added with biomaRt and the final annotated table is written to metilene.limma.annotated.txt. The table is split into regions with upregulated (metilene.limma.annotated.UP.txt)  and downregulated (metilene.limma.annotated.DOWN.txt) methylation.
+- **metilene_out_<suffix>**: contains output files from metilene analysis. The original metilene output is stored in singleCpG.metilene.bed. Genomic intervals output by metilene are processed similarly as the genomic intervals provided by the user with the aggregate stats limma module. A PCA plot as well as violin and density plots are output. A merge of the original metilene output with the top Table produced by limma and obtained by applying the filtering thresholds minAbsDiff (default 0.2) and FDR (default 0.02) is written to singleCpG.metilene.limma_unfiltered.bed and stored in singleCpG.metilene.limma_unfiltered.RData. All regions are further annotated with their closest gene using annotation as defined by the genes_bed entry of the organism dictionary. Gene IDs and gene symbols are added with biomaRt and the final annotated table is written to metilene.limma.annotated_unfiltered.txt. Annotated regions passing the filtering thresholds are divided into regions with positive methylation difference ("metilene.limma.annotated_filtered.UP.txt") and regions with negative methylation difference ("metilene.limma.annotated_filtered.DOWN.txt"). Unannotated filtered regions are written to singleCpG.metilene.limma_filtered.bed.
+Diagnostic plots and session info are produced as described above. Statistical results are summarized in the Stats report.
 
 
 Example output plots
@@ -136,6 +146,10 @@ Using data from Habibi et al., Cell Stem Cell 2013 corresponding to mouse chr6:4
 .. image:: ../images/limdat.LG.CC.PCA.png
 
 .. image:: ../images/Beta.MeanXgroup.all.violin.png
+
+.. image:: ../images/SingleCpG_pvalue.distribution.png
+
+.. image:: ../images/SingleCpG_volcano.plot.png
 
 
 Command line options

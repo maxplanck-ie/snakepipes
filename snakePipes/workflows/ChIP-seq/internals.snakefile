@@ -64,12 +64,12 @@ if not os.path.isfile(samples_config):
     print("ERROR: Cannot find samples file ("+samples_config+")")
     exit(1)
 
-if sample_info and not os.path.isfile(sample_info):
-    print("ERROR: Cannot find sample info file! ("+sample_info+")\n")
+if sampleSheet and not os.path.isfile(sampleSheet):
+    print("ERROR: Cannot find sample info file! ("+sampleSheet+")\n")
     exit(1)
 
-if sample_info and not cf.check_sample_info_header(sample_info):
-    print("ERROR: Please use 'name' and 'condition' as column headers in sample info file! ("+sample_info+")\n")
+if sampleSheet and not cf.check_sample_info_header(sampleSheet):
+    print("ERROR: Please use 'name' and 'condition' as column headers in sample info file! ("+sampleSheet+")\n")
     exit(1)
 
 chip_dict = {}

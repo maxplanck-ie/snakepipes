@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 ## ChIPseq differential binding workflow
 
-sampleInfoFilePath <- snakemake@input[["sample_info"]]  #"samplesheet.tab"
+sampleInfoFilePath <- snakemake@input[["sampleSheet"]]  #"samplesheet.tab"
 insert_size_metrics <- snakemake@input[["insert_size_metrics"]] # bamPEFragmentSize output
 fdr <- as.numeric(snakemake@params[["fdr"]])
 paired <- as.logical(snakemake@params[["paired"]])
@@ -39,7 +39,7 @@ if(isTRUE(paired)) {
 pe_param <- csaw::readParam(max.frag = 500, pe = pe)  # Some CSAW functions explode the processor count with >1 core
 
 ## Read data
-chip_object <- readfiles_chip(sampleInfo = sampleInfo,
+chip_object <- readfiles_chip(sampleSheet = sampleInfo,
                               fragment_length = fraglength,
                               window_size = windowSize,
                               alleleSpecific = allelic_info,
