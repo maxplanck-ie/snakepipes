@@ -17,9 +17,11 @@ mtab<-commandArgs(trailingOnly=TRUE)[2]
 
 load(mtab)
 
-##select 'best' threshold
+metric<-commandArgs(trailingOnly=TRUE)[3]
 
-minTi<-metrics.tab$minT[which.max(metrics.tab$gene_universe)]
+##select 'best' threshold
+metrics.tab<-metrics.tab[order(metrics.tab$minT,decreasing=TRUE),]
+minTi<-metrics.tab$minT[which.max(metrics.tab[,metric])]
 
 load(paste0("sc.minT",minTi,".RData"))
 
