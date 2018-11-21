@@ -77,8 +77,14 @@ For the top2 marker list, feature plots and violin plots were generated.
 
 
 ```{r}
-fplot<-dir(params$outdir,pattern="*featurePlot.png",full.names=TRUE)
+png(file.path(params$outdir,"dummy_plot.png"))
+plot.new()
+dev.off()
+fplot1<-dir(params$outdir,pattern="Top1st.+featurePlot.png",full.names=TRUE)
+fplot2<-gsub("Top1st","Top2nd",fplot1)
+fplot2[!file.exists(fplot2)]<-file.path(params$outdir,"dummy_plot.png")
 vplot<-dir(params$outdir,pattern="*violin.png",full.names=TRUE)
 
-knitr::include_graphics(rbind(fplot,vplot))
+
+knitr::include_graphics(rbind(fplot1,fplot2,vplot))
 ```
