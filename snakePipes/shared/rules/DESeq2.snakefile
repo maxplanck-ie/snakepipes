@@ -1,5 +1,5 @@
 ## function to get the name of the samplesheet and extend the name of the folder DESeq2 to DESeq2_[name]
-def get_outdir(folder_name):
+def get_outdir(folder_name,sampleSheet):
     sample_name = os.path.splitext(os.path.basename(str(sampleSheet)))[0]
 
     return("{}_{}".format(folder_name, sample_name))
