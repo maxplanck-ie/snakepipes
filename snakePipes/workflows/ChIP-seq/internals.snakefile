@@ -106,20 +106,46 @@ chip_samples_wo_ctrl = list(sorted(chip_samples_wo_ctrl))
 chip_samples = sorted(chip_samples_w_ctrl + chip_samples_wo_ctrl)
 all_samples = sorted(control_samples + chip_samples)
 
-# consistency check whether all required files exist for all samples
-for sample in all_samples:
-    req_files = [
-        os.path.join(workingdir, "filtered_bam/"+sample+".filtered.bam"),
-        os.path.join(workingdir, "filtered_bam/"+sample+".filtered.bam.bai")
-    ]
+if not fromBam:
+#    infiles = sorted(glob.glob(os.path.join(indir, '*'+ext)))
+#    samples = cf.get_sample_names(infiles,ext,reads)
 
-    # check for all samples whether all required files exist
-    for file in req_files:
-        if not os.path.isfile(file):
-            print('ERROR: Required file "{}" for sample "{}" specified in '
-                  'configuration file is NOT available.'.format(file, sample))
-            exit(1)
+#    paired = cf.is_paired(infiles,ext,reads)
+    if paired:
+        if not os.path.isfile(os.path.join(workingdir, "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv")):
+            sys.exit('ERROR: {} is required but not present\n'.format(os.path.join(workingdir, "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv")))
 
-if paired:
-    if not os.path.isfile(os.path.join(workingdir, "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv")):
-        sys.exit('ERROR: {} is required but not present\n'.format(os.path.join(workingdir, "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv")))
+    #if not paired:
+    #    reads = [""]
+        
+    # consistency check whether all required files exist for all samples
+    for sample in all_samples:
+        req_files = [
+            os.path.join(workingdir, "filtered_bam/"+sample+".filtered.bam"),
+            os.path.join(workingdir, "filtered_bam/"+sample+".filtered.bam.bai")
+            ]
+
+        # check for all samples whether all required files exist
+        for file in req_files:
+            if not os.path.isfile(file):
+                print('ERROR: Required file "{}" for sample "{}" specified in '
+                      'configuration file is NOT available.'.format(file, sample))
+                exit(1)
+
+        
+else:
+    bamFiles = sorted(glob.glob(os.path.join(str(fromBam or ''), '*'+bam_ext)))
+    bamSamples = cf.get_sample_names_bam(bamFiles,bam_ext)
+    
+    bamDict = dict.fromkeys(bamSamples)
+    
+    print(bamFiles)
+    print(bamSamples)
+    
+    for sample in all_samples:
+        if sample not in bamDict:
+            sys.exit("No bam file found for chip sample {}!".format(sample))
+
+
+
+exit(1)

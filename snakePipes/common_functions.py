@@ -324,8 +324,11 @@ def checkCommonArguments(args, baseDir, outDir=False, createIndices=False):
             else:
                 sys.exit("\nError! Input dir not found! ({})\n".format(args.indir))
         else:
-            if os.path.exists(args.workingdir):
+            if not args.fromBam and os.path.exists(args.workingdir):
                 args.workingdir = os.path.abspath(args.workingdir)
+            elif args.fromBam and os.path.exists(args.fromBam):
+                os.makedirs(args.workingdir, exist_ok=True)
+                args.fromBam =  os.path.abspath(args.fromBam)
             else:
                 sys.exit("\nError! Working-dir (-d) dir not found! ({})\n".format(args.workingdir))
             args.outdir = args.workingdir

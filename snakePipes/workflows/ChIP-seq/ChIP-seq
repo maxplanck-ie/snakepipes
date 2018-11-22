@@ -16,7 +16,8 @@ import snakePipes.parserCommon as parserCommon
 
 
 def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfile": None, "max_jobs": 5, "snakemake_options": "--use-conda", "tempdir": None,
-                         "paired": True, "bamPE": False, "bw_binsize": 25, "sampleSheet": "", "window_size": 150, "predict_chip_dict": False, "bigWigType": "both"}):
+                         "paired": True, "bamPE": False, "bw_binsize": 25, "sampleSheet": "", "window_size": 150, "predict_chip_dict": False, "bigWigType": "both",
+                         "fromBam": ""}):
     """
     Parse arguments from the command line.
     """
@@ -82,6 +83,12 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
                           dest="predict_chip_dict",
                           action="store_true",
                           help="Use existing bam files to predict a chip-seq sample configuration file. Write it to the workingdir")
+
+    optional.add_argument("--fromBam",
+                         dest="fromBam",
+                         help="Start the pipeline from processed bam files found in the specified directory. "
+                              "The working-dir (-d) will be used as new output dir in this case.",
+                         default=defaults["fromBam"])
 
     return parser
 

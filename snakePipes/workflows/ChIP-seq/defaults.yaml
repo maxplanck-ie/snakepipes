@@ -36,6 +36,9 @@ verbose: false
 sampleSheet:
 # window_size
 window_size: 150
+#### Flag to control the pipeline entry point
+bam_ext: '.filtered.bam'
+fromBam:
 ################################################################################
 # Call snakemake directly, i.e. without using the wrapper script:
 #
