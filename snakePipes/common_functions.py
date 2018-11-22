@@ -231,17 +231,15 @@ def check_sample_info_header(sampleSheet_file):
     return True in case sample info file contains column names 'name' and 'condition'
     """
     if not os.path.isfile(sampleSheet_file):
-        print("ERROR: Cannot find sample info file! ("+sampleSheet_file+")\n")
-        exit(1)
-
+        sys.exit("ERROR: Cannot find sample info file! (--sampleSheet {})\n".format(sampleSheet_file))
+    sampleSheet_file = os.path.abspath(sampleSheet_file)
     ret = subprocess.check_output("cat " + sampleSheet_file + " | head -n1",
                                   shell=True).decode()
-
     if "name" in ret.split() and "condition" in ret.split():
         print("Sample sheet found and format is ok!\n")
     else:
-        print("ERROR: Please use 'name' and 'condition' as column headers in sample info file! ("+sampleSheet+")\n")
-        exit(1)
+        sys.exit("ERROR: Please use 'name' and 'condition' as column headers in sample info file! ({})\n".format(sampleSheet_file))
+    return sampleSheet_file
 
 
 def setDefaults(fileName):
@@ -334,16 +332,8 @@ def checkCommonArguments(args, baseDir, outDir=False, createIndices=False):
     args.cluster_logs_dir = os.path.join(args.outdir, "cluster_logs")
     # 2. Sample info file
     if 'sampleSheet' in args and args.sampleSheet:
-        if os.path.exists(os.path.abspath(args.sampleSheet)):
-            args.sampleSheet = os.path.abspath(args.sampleSheet)
-        else:
-            sys.exit("\nSample info file not found! (--DB {})\n".format(args.sampleSheet))
-<<<<<<< HEAD
-        if not check_sampleSheet_header(args.sampleSheet):
-=======
-        if not check_sample_info_header(args.sampleSheet):
->>>>>>> refs/remotes/origin/develop
-            sys.exit("ERROR: Please use 'name' and 'condition' as column headers in sample info file! ({})\n".format(args.sampleSheet))
+        args.sampleSheet = check_sample_info_header(args.sampleSheet)
+
     # 3. get abspath from user provided genome/organism file
     if not createIndices:
         if not os.path.isfile(os.path.join(baseDir, "shared/organisms/{}.yaml".format(args.genome))) and os.path.isfile(args.genome):
