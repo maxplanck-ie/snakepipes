@@ -33,10 +33,18 @@ if downsample:
                 seqtk sample -s 100 {input} {params.num_reads} | pigz -p {threads} -9 > {output}
                 """
 else:
-    rule FASTQ:
+    rule FASTQ1:
         input:
-            indir+"/{sample}{read}"+ext
+            indir+"/{sample}"+reads[0]+ext
         output:
-            "FASTQ/{sample}{read}.fastq.gz"
+            "FASTQ/{sample}"+reads[0]+".fastq.gz"
+        shell:
+            "( [ -f {output} ] || ln -s -r {input} {output} )"
+
+    rule FASTQ2:
+        input:
+            indir+"/{sample}"+reads[1]+ext
+        output:
+            "FASTQ/{sample}"+reads[1]+".fastq.gz"
         shell:
             "( [ -f {output} ] || ln -s -r {input} {output} )"

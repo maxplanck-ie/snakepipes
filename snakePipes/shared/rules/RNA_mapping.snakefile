@@ -54,7 +54,7 @@ if mapping_prg.upper().find("HISAT2") >=0:
     else:
         rule HISAT2:
             input:
-                fastq_dir+"/{sample}.fastq.gz",
+                fastq_dir+"/{sample}"+reads[0]+".fastq.gz"
             output:
                 align_summary = mapping_prg+"/{sample}.HISAT2_summary.txt",
                 bam = temp(mapping_prg+"/{sample}.sorted.bam"),
@@ -114,7 +114,7 @@ elif mapping_prg.upper().find("STAR") >=0:
     else:
         rule STAR:
             input:
-                fastq_dir+"/{sample}.fastq.gz"
+                fastq_dir+"/{sample}"+reads[0]+".fastq.gz"
             output:
                 bam = temp(mapping_prg+"/{sample}.sorted.bam")
             params:

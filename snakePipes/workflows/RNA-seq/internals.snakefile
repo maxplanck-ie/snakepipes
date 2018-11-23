@@ -48,9 +48,6 @@ samples = cf.get_sample_names(infiles,ext,reads)
 
 paired = cf.is_paired(infiles,ext,reads)
 
-if not paired:
-    reads = [""]
-
 if sampleSheet and not os.path.isfile(sampleSheet):
     print("ERROR: Cannot find sample sheet file! ("+sampleSheet+")\n")
     exit(1)

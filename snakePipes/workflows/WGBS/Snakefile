@@ -185,7 +185,8 @@ onstart:
 ################################################################################
 if not fromBam:
     localrules:
-        FASTQ,
+        FASTQ1,
+        FASTQ2,
         produce_report
 
     rule all:
