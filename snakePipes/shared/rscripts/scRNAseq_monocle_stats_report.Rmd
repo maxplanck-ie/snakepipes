@@ -1,0 +1,88 @@
+---
+author: "`r Sys.info()[length(Sys.info())-1]`"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: 
+    html_document:
+        fig_caption: yes
+params:
+    outdir: "Stats_reports"
+    output_file: "Stats_reports/Stats_report.html"
+    metric: "gene_universe"
+title: "Monocle stats report"
+---
+
+This report summarizes statistical analyses of your single cell data stored in `r params$outdir`.    
+
+###Cell filtering
+
+The distribution of total transcript counts per cell (TPC) in unnormalized data was plotted.   
+
+```{r}
+knitr::include_graphics(file.path(params$outdir,"Expdata.ColumnSums.png"))
+```
+
+Cell filtering thresholds from 1000 through 5000 by 500 TPC were used to filter cells and count genes expressed in at least 4 cells at at least 2 counts (genes per cell, GPC). The total number of genes in the cell population was counted as number of rows in the filtered dataset.   
+
+The resulting counts were summarized for every threshold.   
+
+```{r}
+load(file.path(params$outdir,"metrics.tab.RData"))
+knitr::kable(metrics.tab)
+```
+
+```{r}
+knitr::include_graphics(file.path(params$outdir,"medGPCvsminT.downscaled.png"))
+knitr::include_graphics(file.path(params$outdir,"gene_universevsminT.downscaled.png"))
+
+```
+
+###Threshold selection
+
+Cell filtering threshold is selected such that the (first) maximum `r params$metric` is obtained. The underlying reasoning assumes that the maximum value of `r params$metric` retains  `r ifelse(params$metric %in% "gene_universe","most cell types in the data","cells with the highest information content")`. For the current dataset, `r gsub(".disp.estim.png","",gsub("mono.set.","",dir(params$outdir,pattern=".disp.estim.png",full.names=FALSE)))` TPC threshold-filtered data was further analyzed.
+
+###Cell clustering
+
+Negative binomial model was applied to untransformed counts and gene-wise dispersions were estimated and genes selected for unsupervised clustering highlighted. 
+
+```{r}
+knitr::include_graphics(dir(params$outdir,pattern="*.disp.estim.png",full.names=TRUE))
+```
+
+Tsne maps were calculated with default settings. Cell clustering was first run with default settings to generate a rho-delta plot. 
+
+```{r}
+knitr::include_graphics(dir(params$outdir,pattern="*.rho_delta.png",full.names=TRUE))
+```
+
+Rho and delta were then selected as the 0.8 and 0.95 percentile, respectively, and clustering was rerun using selected values as thresholds for cluster calling. Tsne plots with automated and recalculated threshold labels were plotted.
+
+```{r}
+b<-dir(params$outdir,pattern="*.tsne.auto.Cluster.png",full.names=TRUE)
+a<-dir(params$outdir,pattern="*.tsne.thd.Cluster.png",full.names=TRUE)
+knitr::include_graphics(c(b,a))
+```
+
+The resulting monocle object was then converted to a seurat object and cluster identities as well as tsne coordinates were copied over. A control tsne plot was generated.
+
+```{r}
+knitr::include_graphics(dir(params$outdir,pattern="*.seuset.tSNE.png",full.names=TRUE))
+```
+
+###Cluster marker discovery
+
+Top 10 and top 2 markers for each cluster were selected from genes differentially expressed between each cluster and the remaining cells using default settings. Obtained genes were reported in tables `r dir(params$outdir,pattern="*Top10markers.txt",full.names=FALSE)` and `r dir(params$outdir,pattern="*Top2markers.txt",full.names=FALSE)`, respectively.
+Gene expression of the genes from both lists was plotted on heatmaps. The heatmap of top2 cluster markers is plotted below.
+
+```{r}
+knitr::include_graphics(dir(params$outdir,pattern="*Top2markers.heatmap.png",full.names=TRUE))
+```
+
+For the top2 marker list, feature plots and violin plots were generated.
+
+
+```{r}
+fplot<-dir(params$outdir,pattern="*featurePlot.png",full.names=TRUE)
+vplot<-dir(params$outdir,pattern="*violin.png",full.names=TRUE)
+
+knitr::include_graphics(rbind(fplot,vplot))
+```

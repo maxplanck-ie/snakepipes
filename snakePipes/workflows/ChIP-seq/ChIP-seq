@@ -16,7 +16,7 @@ import snakePipes.parserCommon as parserCommon
 
 
 def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfile": None, "max_jobs": 5, "snakemake_options": "--use-conda", "tempdir": None,
-                         "paired": True, "bamPE": False, "bw_binsize": 25, "sample_info": "", "window_size": 150, "predict_chip_dict": False, "bigWigType": "both"}):
+                         "paired": True, "bamPE": False, "bw_binsize": 25, "sampleSheet": "", "window_size": 150, "predict_chip_dict": False, "bigWigType": "both"}):
     """
     Parse arguments from the command line.
     """
@@ -59,15 +59,15 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
                           type=int,
                           default=defaults["bw_binsize"])
 
-    optional.add_argument("--DB",
-                          dest="sample_info",
+    optional.add_argument("--sampleSheet",
+                          dest="sampleSheet",
                           help="Information on samples (If differential binding analysis required); see "
-                               "'docs/content/sampleInfo.example.tsv' for example. "
+                               "'docs/content/sampleSheet.example.tsv' for example. "
                                "IMPORTANT: The first entry defines which group of samples are control. "
                                "By this, the order of comparison and likewise the sign of values can be changed! "
                                "Also, the condition `control` should only be used for input samples (control peaks "
                                "are not evaluated for differential binding) (default: '%(default)s')",
-                          default=defaults["sample_info"])
+                          default=defaults["sampleSheet"])
 
     optional.add_argument("--DB_windowSize",
                           dest="window_size",

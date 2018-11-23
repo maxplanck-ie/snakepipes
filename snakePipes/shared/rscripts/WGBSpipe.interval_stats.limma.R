@@ -5,6 +5,9 @@ wdir<-commandArgs(trailingOnly=TRUE)[1]
 setwd(wdir)
 message(sprintf("working directory is %s",getwd()))
 
+importfunc<-commandArgs(trailingOnly=TRUE)[8]
+source(importfunc)
+
 options(stringsAsFactors=FALSE,na.rm=TRUE)
 
 bedF<-commandArgs(trailingOnly=TRUE)[2]
@@ -71,7 +74,7 @@ bedtab$N.CG.tot<-N.CG.tot[match(bedtab$Name,limdat.LG.inCGI$IntID)]
 
 bedtab$CGI.NAf<-ifelse(bedtab$N.CG.NA>(0.8*bedtab$N.CG.tot),NA,1)
 bedtab.CC<-bedtab[complete.cases(bedtab),]
-if(nrow(bedtab.CC)==0) {message("None of the genomic intervals passed the filtering.")}else{
+if(nrow(bedtab.CC)==0) {print_sessionInfo("None of the genomic intervals passed the filtering.")}else{
 
     CGI.limdat<-as.data.frame(apply(limdat.LG.inCGI[,2:(ncol(limdat.LG.inCGI)-3)],2,function(X){ave(X,factor(limdat.LG.inCGI$IntID),FUN=function(X)mean(X,na.rm=TRUE))}),stringsAsFactors=FALSE)
 
@@ -98,17 +101,17 @@ if(nrow(bedtab.CC)==0) {message("None of the genomic intervals passed the filter
     x1<-PCA(CGI.limdat.CC,graph=FALSE)
 
     if(nrow(x1$eig)>=2){
-    pdf(paste0(bedshort,".CGI.limdat.CC.PCA.pdf"),paper="a4",bg="white") 
+    png(paste0(bedshort,".CGI.limdat.CC.PCA.png"),bg="white") 
     plot.PCA(x1,choix="var")
-    dev.off()}else{message("There are not enough PC dimentions for a 2D plot.")}
+    dev.off()}else{print_sessionInfo("There are not enough PC dimentions for a 2D plot.")}
 
 #calculate row means
     spath<-commandArgs(trailingOnly=TRUE)[5]
-    sampleInfo<-read.table(spath,header=TRUE,sep="\t",as.is=TRUE)
+    sampleSheet<-read.table(spath,header=TRUE,sep="\t",as.is=TRUE)
 #calculate and save row means
     CGI.limdat.CC$IntID<-rownames(CGI.limdat.CC)
     CGI.limdat.CC.L<-melt(CGI.limdat.CC,id.vars="IntID",value.name="Beta",variable.name="SampleID")
-    CGI.limdat.CC.L$Group<-sampleInfo$Group[match(CGI.limdat.CC.L$SampleID,sampleInfo$SampleID)]
+    CGI.limdat.CC.L$Group<-sampleSheet$condition[match(CGI.limdat.CC.L$SampleID,sampleSheet$name)]
     CGI.limdat.CC.Means<-data.table(summarize(group_by(CGI.limdat.CC.L,IntID,Group),Beta.Mean=mean(Beta)))
 
 
@@ -136,43 +139,64 @@ if(nrow(bedtab.CC)==0) {message("None of the genomic intervals passed the filter
         design<-as.data.frame(matrix(ncol=2,nrow=(ncol(CGI.limdat.CC.logit))),stringsAsFactors=FALSE)
         colnames(design)<-c("Intercept","Group")
         rownames(design)<-colnames(CGI.limdat.CC.logit)
-        if("Control" %in% sampleInfo$Group){
-            gp<-factor(sampleInfo$Group[match(colnames(CGI.limdat.CC.logit),sampleInfo$SampleID)])
+        if("Control" %in% sampleSheet$condition){
+            gp<-factor(sampleSheet$condition[match(colnames(CGI.limdat.CC.logit),sampleSheet$name)])
             gp<-relevel(gp,ref="Control")
             design$Group<-as.numeric(gp)}
-        if("WT" %in% sampleInfo$Group){
-            gp<-factor(sampleInfo$Group[match(colnames(CGI.limdat.CC.logit),sampleInfo$SampleID)])
+        if("WT" %in% sampleSheet$condition){
+            gp<-factor(sampleSheet$condition[match(colnames(CGI.limdat.CC.logit),sampleSheet$name)])
             gp<-relevel(gp,ref="WT")
             design$Group<-as.numeric(gp)}
-        else{design$Group<-as.numeric(factor(sampleInfo$Group))}
+        else{design$Group<-as.numeric(factor(sampleSheet$condition))}
         design$Intercept<-1
         design<-as.matrix(design)
 
         fit<-lmFit(CGI.limdat.CC.logit,design)
         fit.eB<-eBayes(fit)
 
-        tT.FDR5<-topTable(fit.eB,2,p.value=0.05,number=Inf)
-        if(nrow(tT.FDR5)==0) {message("No genomic intervals were significantly differentially methylated.")
+
+        ##read filters from commandline args
+        minAbsDiff<-as.numeric(commandArgs(trailingOnly=TRUE)[6])
+        fdr<-as.numeric(commandArgs(trailingOnly=TRUE)[7])
+    
+        tT<-topTable(fit.eB,2,p.value=1,number=Inf)
+        tT$IntID<-rownames(tT)
+        plotdat<-melt(tT,measure.vars=c("P.Value","adj.P.Val"),value.name="pval",variable.name="Category",id.vars="IntID")
+
+        ggplot(data=plotdat)+geom_histogram(aes(x=pval,group=Category,fill=Category),binwidth=0.005)+theme(text = element_text(size=16),axis.text = element_text(size=12),axis.title = element_text(size=14))+scale_fill_manual(values=c("grey28","red","darkblue","darkgreen"))+geom_vline(aes(xintercept=as.numeric(fdr)))
+        ggsave(paste0(bedshort,"_pvalue.distribution.png"))
+
+### annotate top table with mean difference
+        meandatW<-dcast(data=CGI.limdat.CC.Means,IntID~Group,value.var="Beta.Mean")
+        if(sum(c("Control","Treatment") %in% colnames(meandatW))==2){meandatW$Diff<-with(meandatW,Treatment-Control)}
+        if(sum(c("WT","Mut") %in% colnames(meandatW))==2){meandatW$Diff<-with(meandatW,Mut-WT)}else{meandatW$Diff<-meandatW[,2]-meandatW[,3]}
+
+        tT$Diff<-meandatW$Diff[match(rownames(tT),meandatW$IntID)]
+
+        tT$Filter<-"Fail"
+        tT$Filter[tT$adj.P.Val<fdr&abs(tT$Diff)>=minAbsDiff]<-"Pass"
+
+        ggplot(data=tT)+geom_point(aes(x=Diff,y=-log10(adj.P.Val),color=Filter))+theme(text = element_text(size=16),axis.text = element_text(size=12),axis.title = element_text(size=14))+xlab("Mean difference")+scale_color_manual(values=c("grey28","red","darkblue","darkgreen"))
+        ggsave(paste0(bedshort,"_volcano.plot.png"))
+
+
+#### filter top table according to thresholds
+
+        tT_filt<-tT[tT$adj.P.Val<fdr & abs(tT$Diff)>=minAbsDiff,]  
+
+        if(nrow(tT_filt)==0) {print_sessionInfo("No genomic intervals were significantly differentially methylated.")
             save(bedtab,limdat.LG.inCGI,CGI.limdat.CC,CGI.limdat.CC.Means,file=paste0(bedshort,".aggCpG.RData"))
 
         }else{
-            tT.FDR5<-tT.FDR5[,c("logFC","t","adj.P.Val","B")]
-            write.table(tT.FDR5,file=paste0(bedshort,".CGI.limdat.CC.tT.FDR5.txt"),sep="\t",quote=FALSE)
+            write.table(tT_filt,file=paste0(bedshort,".CGI.limdat.CC.tT_filt.txt"),sep="\t",quote=FALSE)
 
-            nrow(tT.FDR5)
+            nrow(tT_filt)
             nrow(CGI.limdat.CC.logit)
-            nrow(tT.FDR5)/nrow(CGI.limdat.CC.logit)
+            nrow(tT_filt)/nrow(CGI.limdat.CC.logit)
 
-            CGI.limdat.CC.Diff<-summarize(group_by(CGI.limdat.CC.Means,IntID),Diff=(Beta.Mean[1]-Beta.Mean[2]))
-            tT.FDR5.Diff0.2<-tT.FDR5[rownames(tT.FDR5) %in% CGI.limdat.CC.Diff$IntID[abs(CGI.limdat.CC.Diff$Diff)>=0.2],]
-
-            nrow(tT.FDR5.Diff0.2)
-            nrow(tT.FDR5.Diff0.2)/nrow(CGI.limdat.CC.logit)
-
-            save(bedtab,limdat.LG.inCGI,CGI.limdat.CC,CGI.limdat.CC.Means,tT.FDR5,file=paste0(bedshort,".aggCpG.RData"))
+            save(bedtab,limdat.LG.inCGI,CGI.limdat.CC,CGI.limdat.CC.Means,tT_filt,file=paste0(bedshort,".aggCpG.RData"))
 
         }###end if topTable has at least 1 entry
-    } else {message('More than 2 sample groups were provided. No statistical inference will be computed.')}### end if exactly two sample groups were specified
-
+    } else {print_sessionInfo('More than 2 sample groups were provided. No statistical inference will be computed.')}### end if exactly two sample groups were specified
+    print_sessionInfo("Analysis completed succesfully.")
 }
-

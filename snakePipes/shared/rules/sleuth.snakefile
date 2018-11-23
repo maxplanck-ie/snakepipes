@@ -3,7 +3,7 @@ rule sleuth_Salmon:
     input:
         quant_files = expand("Salmon/{sample}/abundance.h5", sample=samples),
         t2g = "Annotation/genes.filtered.t2g",
-        sample_info = sample_info
+        sampleSheet = sampleSheet
     output:
         "sleuth/so.rds"
     benchmark:
@@ -19,7 +19,7 @@ rule sleuth_Salmon:
     conda: CONDA_RNASEQ_ENV
     shell:
         "Rscript {params.script} "
-        "{input.sample_info} "
+        "{input.sampleSheet} "
         "{params.indir} "
         "{params.outdir} "
         "{params.fdr} " + os.path.join(outdir,"{input.t2g}") +

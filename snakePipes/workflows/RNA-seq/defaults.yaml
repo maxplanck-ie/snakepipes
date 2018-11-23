@@ -46,7 +46,7 @@ dnaContam: False
 ## supported mappers: STAR HISAT2
 mapping_prg: STAR
 ## N.B., setting --outBAMsortingBinsN too high can result in cryptic errors
-star_options: --outBAMsortingBinsN 30
+star_options: --outBAMsortingBinsN 30 --limitBAMsortRAM 1073741824 #10G
 hisat_options:
 verbose: False
 plot_format: png
