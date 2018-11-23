@@ -34,7 +34,7 @@ trim_prg: cutadapt
 trim_options:
 ## further options
 mode: alignment-free,deepTools_qc
-sample_info:
+sampleSheet:
 bw_binsize: 25
 fastqc: False
 featurecounts_options: -C -Q 10 --primary

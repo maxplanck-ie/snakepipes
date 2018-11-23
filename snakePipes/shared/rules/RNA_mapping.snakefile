@@ -4,16 +4,16 @@ def getHISAT_libtype(paired, library_type):
     """
     if paired:
         if library_type == 1:
-            return "--rna-strandedness FR"
+            return "--rna-strandness FR"
         elif library_type == 2:
-            return "--rna-strandedness RF"
+            return "--rna-strandness RF"
         else:
             return ""
     else:
         if library_type == 1:
-            return "--rna-strandedness F"
+            return "--rna-strandness F"
         elif library_type == 2:
-            return "--rna-strandedness R"
+            return "--rna-strandness R"
         else:
             return ""
 
@@ -31,9 +31,7 @@ if mapping_prg.upper().find("HISAT2") >=0:
                 align_summary = mapping_prg+"/{sample}.HISAT2_summary.txt",
                 bam = temp(mapping_prg+"/{sample}.sorted.bam"),
                 splice = mapping_prg+"/{sample}/splice_sites.txt",
-                met = mapping_prg+"/{sample}/metrics.txt",
-                unconc = mapping_prg+"/{sample}/un-conc.fastq.gz",
-                alconc = mapping_prg+"/{sample}/al-conc.fastq.gz"
+                met = mapping_prg+"/{sample}/metrics.txt"
             params:
                 lib_type = getHISAT_libtype(paired, library_type),
                 input_splice = known_splicesites,
@@ -50,10 +48,8 @@ if mapping_prg.upper().find("HISAT2") >=0:
                     --known-splicesite-infile {params.input_splice} \
                     -1 {input.r1} -2 {input.r2} \
                     --novel-splicesite-outfile {output.splice} \
-                    --met-file {output.met} \
-                    --un-conc-gz {output.unconc} \
-                    --al-conc-gz {output.alconc} 2> {output.align_summary} \
-                | samtools sort -m {params.samsort_memory} | -T ${{TMPDIR}}{wildcards.sample} -@ {threads} -O bam -o {output.bam} -
+                    --met-file {output.met} 2> {output.align_summary} \
+                | samtools sort -m {params.samsort_memory} -T ${{TMPDIR}}{wildcards.sample} -@ {threads} -O bam -o {output.bam} -
                 """
     else:
         rule HISAT2:
@@ -63,9 +59,7 @@ if mapping_prg.upper().find("HISAT2") >=0:
                 align_summary = mapping_prg+"/{sample}.HISAT2_summary.txt",
                 bam = temp(mapping_prg+"/{sample}.sorted.bam"),
                 splice = mapping_prg+"/{sample}/splice_sites.txt",
-                met = mapping_prg+"/{sample}/metrics.txt",
-                un = mapping_prg+"/{sample}/un.fastq.gz",
-                al = mapping_prg+"/{sample}/al.fastq.gz"
+                met = mapping_prg+"/{sample}/metrics.txt"
             params:
                 lib_type = getHISAT_libtype(paired, library_type),
                 input_splice = known_splicesites,
@@ -82,9 +76,7 @@ if mapping_prg.upper().find("HISAT2") >=0:
                     --known-splicesite-infile {params.input_splice} \
                     -U {input[0]} \
                     --novel-splicesite-outfile {output.splice} \
-                    --met-file {output.met} \
-                    --un-gz {output.un} \
-                    --al-gz {output.al} 2> {output.align_summary} \
+                    --met-file {output.met} 2> {output.align_summary} \
                 | samtools sort -m {params.samsort_memory} -T ${{TMPDIR}}{wildcards.sample} -@ {threads} -O bam -o {output.bam} -
                 """
 elif mapping_prg.upper().find("STAR") >=0:
