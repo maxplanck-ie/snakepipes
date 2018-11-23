@@ -328,7 +328,7 @@ def checkCommonArguments(args, baseDir, outDir=False, createIndices=False):
                 args.workingdir = os.path.abspath(args.workingdir)
             elif args.fromBam and os.path.exists(args.fromBam):
                 os.makedirs(args.workingdir, exist_ok=True)
-                args.fromBam =  os.path.abspath(args.fromBam)
+                args.fromBam = os.path.abspath(args.fromBam)
             else:
                 sys.exit("\nError! Working-dir (-d) dir not found! ({})\n".format(args.workingdir))
             args.outdir = args.workingdir
