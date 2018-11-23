@@ -173,7 +173,6 @@ localrules: FASTQ1, FASTQ2
 
 rule all:
     input:
-        expand("FASTQ/{sample}{read}.fastq.gz", sample = samples, read = reads),
         run_FastQC(fastqc),
         run_Trimming(trim, fastqc),
         expand(mapping_prg+"/{sample}.bam", sample = samples),

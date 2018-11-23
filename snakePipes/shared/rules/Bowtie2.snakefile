@@ -29,7 +29,7 @@ if paired:
 else:
     rule Bowtie2:
         input:
-            fastq_dir+"/{sample}.fastq.gz"
+            fastq_dir+"/{sample}"+reads[0]+".fastq.gz"
         output:
             align_summary = "Bowtie2/{sample}.Bowtie2_summary.txt",
             bam = temp("Bowtie2/{sample}.sorted.bam")
