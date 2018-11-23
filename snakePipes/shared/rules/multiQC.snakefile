@@ -4,26 +4,19 @@ from os import path
 def multiqc_input_check(return_value):
     infiles = []
     indir = ""
+    readsIdx = 1
+    if paired:
+        readsIdx = 2
 
     if not pipeline=="scrna-seq":
-        if paired:
-            if trim:
-                infiles.append( expand("FastQC_trimmed/{sample}{read}_fastqc.html", sample = samples, read = reads) )
-                indir += " FastQC_trimmed "
-                infiles.append( expand(fastq_dir+"/{sample}{read}.fastq.gz", sample = samples, read = reads) )
-                indir += fastq_dir + " "
-            elif fastqc:
-                infiles.append( expand("FastQC/{sample}{read}_fastqc.html", sample = samples, read = reads) )
-                indir +=" FastQC "
-        else:
-            if trim:
-                infiles.append( expand("FastQC_trimmed/{sample}_fastqc.html", sample = samples) )
-                indir += " FastQC_trimmed "
-                infiles.append( expand(fastq_dir+"/{sample}.fastq.gz", sample = samples) )
-                indir += fastq_dir + " "
-            elif fastqc:
-                infiles.append( expand("FastQC/{sample}_fastqc.html", sample = samples) )
-                indir +=" FastQC "
+        if trim:
+            infiles.append( expand("FastQC_trimmed/{sample}{read}_fastqc.html", sample = samples, read = reads[:readsIdx]) )
+            indir += " FastQC_trimmed "
+            infiles.append( expand(fastq_dir+"/{sample}{read}.fastq.gz", sample = samples, read = reads[:readsIdx]) )
+            indir += fastq_dir + " "
+        elif fastqc:
+            infiles.append( expand("FastQC/{sample}{read}_fastqc.html", sample = samples, read = reads[:readsIdx]) )
+            indir +=" FastQC "
 
     if pipeline=="dna-mapping":
         # pipeline is DNA-mapping

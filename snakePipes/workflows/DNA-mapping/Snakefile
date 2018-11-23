@@ -75,18 +75,23 @@ else:
 
 ### conditional/optional rules #################################################
 ################################################################################
+
+idxRange = 1
+if paired:
+    idxRange = 2
+
 def run_FastQC(fastqc):
     if fastqc:
-        return( expand("FastQC/{sample}{read}_fastqc.html", sample = samples, read = reads) )
+        return( expand("FastQC/{sample}{read}_fastqc.html", sample = samples, read = reads[:idxRange]) )
     else:
         return([])
 
 def run_Trimming(trim, fastqc):
     if trim and fastqc:
-        return( expand(fastq_dir+"/{sample}{read}.fastq.gz", sample = samples, read = reads) +
-                expand("FastQC_trimmed/{sample}{read}_fastqc.html", sample = samples, read = reads) )
+        return( expand(fastq_dir+"/{sample}{read}.fastq.gz", sample = samples, read = reads[:idxRange]) +
+                expand("FastQC_trimmed/{sample}{read}_fastqc.html", sample = samples, read = reads[:idxRange]) )
     elif trim:
-        return( expand(fastq_dir+"/{sample}{read}.fastq.gz", sample = samples, read = reads) )
+        return( expand(fastq_dir+"/{sample}{read}.fastq.gz", sample = samples, read = reads[:idxRange]) )
     else:
         return([])
 
