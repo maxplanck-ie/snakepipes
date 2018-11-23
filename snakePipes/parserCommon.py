@@ -182,7 +182,7 @@ def snpArguments(defaults):
 
 
 # DNA-mapping options added
-def commonOptions(grp, defaults, bw=True, plots=True, fromBam = False):
+def commonOptions(grp, defaults, bw=True, plots=True):
     """
     Common options found in many workflows
     grp is an argument group that's simply appended to
@@ -194,34 +194,34 @@ def commonOptions(grp, defaults, bw=True, plots=True, fromBam = False):
                          help="Downsample the given number of reads randomly from of each FASTQ file (default: '%(default)s')",
                          type=int,
                          default=defaults["downsample"])
-    
+
         grp.add_argument("--trim",
                          dest="trim",
                          action="store_true",
                          help="Activate fastq read trimming. If activated, Illumina adaptors are trimmed by default. "
                          "Additional parameters can be specified under --trim_options (default: '%(default)s')",
                          default=defaults["trim"])
-    
+
         grp.add_argument("--trim_prg",
                          dest="trim_prg",
                          choices=['cutadapt', 'trimgalore'],
                          help="Trimming program to use: Cutadapt or TrimGalore (default: '%(default)s')",
                          default=defaults["trim_prg"])
-    
+
         grp.add_argument("--trim_options",
                          dest="trim_options",
                          metavar="STR",
                          type=str,
                          help="Additional option string for trimming program of choice. (default: '%(default)s')",
                          default=defaults["trim_options"])
-    
+
         grp.add_argument("--fastqc",
                          dest="fastqc",
                          action="store_true",
                          help="Run FastQC read quality control (default: '%(default)s')",
                          default=defaults["fastqc"])
-    
-    if fromBam or bw:
+
+    if bw:
         grp.add_argument("--bw-binsize",
                          dest="bw_binsize",
                          metavar="INT",
@@ -229,7 +229,7 @@ def commonOptions(grp, defaults, bw=True, plots=True, fromBam = False):
                          type=int,
                          default=defaults["bw_binsize"])
 
-    if fromBam or plots:
+    if plots:
         grp.add_argument("--plotFormat",
                          dest="plot_format",
                          choices=['png', 'pdf', 'None'],
