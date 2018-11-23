@@ -145,7 +145,3 @@ else:
     for sample in all_samples:
         if sample not in bamDict:
             sys.exit("No bam file found for chip sample {}!".format(sample))
-
-
-
-exit(1)
