@@ -30,6 +30,9 @@ if not fromBam:
     if trim:
         include: os.path.join(maindir, "shared", "rules", "TrimGalore.snakefile")
 
+    ## sambamba
+    include:os.path.join(maindir, "shared", "rules", "sambamba.snakefile")
+
     ## Allele-specific JOBS
     if "allelic-mapping" in mode:
         # Updated global vars if mode = "allelic-mapping"
@@ -71,9 +74,6 @@ else:
     downsample=None
     
     include: os.path.join(maindir, "shared", "rules", "LinkBam.snakefile")
-
-## sambamba
-include:os.path.join(maindir, "shared", "rules", "sambamba.snakefile")
 
 ##Genomic_contamination
 include: os.path.join(maindir, "shared", "rules", "GenomicContamination.snakefile")

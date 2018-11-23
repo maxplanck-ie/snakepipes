@@ -39,6 +39,7 @@ window_size: 150
 #### Flag to control the pipeline entry point
 bam_ext: '.filtered.bam'
 fromBam:
+plot_format: png
 ################################################################################
 # Call snakemake directly, i.e. without using the wrapper script:
 #

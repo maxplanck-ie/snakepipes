@@ -89,7 +89,16 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
                          help="Start the pipeline from processed bam files found in the specified directory. "
                               "The working-dir (-d) will be used as new output dir in this case.",
                          default=defaults["fromBam"])
+    optional.add_argument("--plotFormat",
+                         dest="plot_format",
+                         choices=['png', 'pdf', 'None'],
+                         metavar="STR",
+                         type=str,
+                         help="Format of the output plots from deepTools. Select 'none' for no plots (default: '%(default)s')",
+                         default=defaults["plot_format"])
 
+    #parserCommon.commonOptions(optional, defaults,fromBam=True)
+    
     return parser
 
 

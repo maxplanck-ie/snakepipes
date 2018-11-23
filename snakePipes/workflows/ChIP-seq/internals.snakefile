@@ -5,9 +5,6 @@ import re
 import yaml
 
 
-## Main variables ##############################################################
-
-
 ### Functions ##################################################################
 
 def get_control(sample):
@@ -66,6 +63,9 @@ if not os.path.isfile(samples_config):
 
 if sampleSheet:
     cf.check_sample_info_header(sampleSheet)
+    if not cf.check_replicates(sampleSheet):
+        print("\nWarning! CSAW cannot be invoked without replicates!\n")
+        sys.exit()
 
 chip_dict = {}
 with open(samples_config, "r") as f:
@@ -138,3 +138,7 @@ else:
     for sample in all_samples:
         if sample not in bamDict:
             sys.exit("No bam file found for chip sample {}!".format(sample))
+    mapping_prg="EXTERNAL_BAM"
+    indir = fromBam
+    samples = all_samples
+    downsample = None

@@ -140,28 +140,43 @@ def is_paired(infiles, ext, reads):
     return paired
 
 
-def get_fragment_length(infile, sampleName):
+def check_replicates(sample_info_file):
     """
-    Return median insert size from a metrics file created by
-    deeptools bamPEFragmentSize.
-    Read the 37 column text file, grep the row corresponding to the sample and
-    return the entry from 6th column (Frag. Len. Median)
+    return True if each condition has at least 2 replicates
+    this check is eg. necessary for sleuth
     """
-    with open(infile, "r") as f:
-        for line in f:
-            line = line.strip()
-            if line.startswith("filtered_bam/{}".format(sampleName)):
-                try:
-                    median = line.split()[5]
-                    return int(float(median))
-                except TypeError:
-                    print("ERROR: File", infile, "is NOT an output from bamPEFragmentSize.\n")
-                    exit(1)
-            else:
-                pass
-    # no match in infile
-    print("ERROR: File", infile, "is NOT an output from bamPEFragmentSize.\n")
-    exit(1)
+    ret = subprocess.check_output(
+            "cat "+sample_info_file+"| awk '/^\S*$/{next;}{if (NR==1){ col=0; for (i=1;i<=NF;i++) if ($i~\"condition\") col=i}; if (NR>1) print $col}' | sort | uniq -c | awk '{if ($1>1) ok++}END{if (NR>1 && ok>=NR) print \"REPLICATES_OK\"}'",
+            shell=True).decode()
+
+    if ret.find("REPLICATES_OK") >=0:
+        return True
+    else:
+        return False
+
+
+# def get_fragment_length(infile, sampleName):
+#     """
+#     Return median insert size from a metrics file created by
+#     deeptools bamPEFragmentSize.
+#     Read the 37 column text file, grep the row corresponding to the sample and
+#     return the entry from 6th column (Frag. Len. Median)
+#     """
+#     with open(infile, "r") as f:
+#         for line in f:
+#             line = line.strip()
+#             if line.startswith("filtered_bam/{}".format(sampleName)):
+#                 try:
+#                     median = line.split()[5]
+#                     return int(float(median))
+#                 except TypeError:
+#                     print("ERROR: File", infile, "is NOT an output from bamPEFragmentSize.\n")
+#                     exit(1)
+#             else:
+#                 pass
+#     # no match in infile
+#     print("ERROR: File", infile, "is NOT an output from bamPEFragmentSize.\n")
+#     exit(1)
 
 
 def make_temp_dir(tempdir, fallback_dir, verbose=False):
