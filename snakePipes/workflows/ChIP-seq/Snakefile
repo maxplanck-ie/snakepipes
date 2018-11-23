@@ -18,6 +18,10 @@ include: os.path.join(workflow.basedir, "internals.snakefile")
 
 ### include modules of other snakefiles ########################################
 ################################################################################
+# fromBam
+if fromBam:
+	 include: os.path.join(maindir, "shared", "rules", "LinkBam.snakefile")
+	 
 # deeptools cmds
 include: os.path.join(maindir, "shared", "tools" , "deeptools_cmds.snakefile")
 
@@ -44,6 +48,13 @@ else:
 if allele_info == 'FALSE':
     include: os.path.join(maindir, "shared", "rules", "histoneHMM.snakefile")
 
+# CSAW for differential binding (if sampleinfo specified)
+if sampleSheet:
+    include: os.path.join(maindir, "shared", "rules", "CSAW.snakefile")
+
+def run_fromBam(fromBam)
+	
+
 def run_bamPE(bamPE):
     if bamPE:
         file_list = expand("MACS2/{chip_sample}.filtered.BAMPE_peaks.xls",
@@ -59,10 +70,6 @@ def run_histoneHMM(allele_info):
     else:
         file_list = []
     return(file_list)
-
-# CSAW for differential binding (if sampleinfo specified)
-if sampleSheet:
-    include: os.path.join(maindir, "shared", "rules", "CSAW.snakefile")
 
 def run_deepTools():
     file_list = []
@@ -134,6 +141,7 @@ onstart:
 ################################################################################
 rule all:
     input:
+    	run_fromBam(fromBam),
         run_deepTools(),
         expand("MACS2/{chip_sample}.filtered.BAM_peaks.xls", chip_sample = chip_samples),
         expand("MACS2/{chip_sample}.filtered.BAM_peaks.qc.txt", chip_sample = chip_samples),

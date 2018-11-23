@@ -19,6 +19,16 @@ rule sambamba_markdup:
            sambamba markdup -t {threads} --sort-buffer-size=6000 --overflow-list-size 600000 {input} {output} 2> {log.err} > {log.out}
            """
 ## get statistics
+rule sambamba_flagstat_sorted:
+       input:
+           mapping_prg+"/{sample}.sorted.bam"
+       output:
+           "Sambamba/{sample}.sorted.markdup.txt"
+       conda: CONDA_SHARED_ENV
+       shell: """
+           sambamba flagstat -p {input} > {output}
+           """
+
 rule sambamba_flagstat:
        input:
            mapping_prg+"/{sample}.bam"

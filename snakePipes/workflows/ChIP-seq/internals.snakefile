@@ -107,17 +107,10 @@ chip_samples = sorted(chip_samples_w_ctrl + chip_samples_wo_ctrl)
 all_samples = sorted(control_samples + chip_samples)
 
 if not fromBam:
-#    infiles = sorted(glob.glob(os.path.join(indir, '*'+ext)))
-#    samples = cf.get_sample_names(infiles,ext,reads)
-
-#    paired = cf.is_paired(infiles,ext,reads)
     if paired:
         if not os.path.isfile(os.path.join(workingdir, "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv")):
             sys.exit('ERROR: {} is required but not present\n'.format(os.path.join(workingdir, "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv")))
 
-    #if not paired:
-    #    reads = [""]
-        
     # consistency check whether all required files exist for all samples
     for sample in all_samples:
         req_files = [
