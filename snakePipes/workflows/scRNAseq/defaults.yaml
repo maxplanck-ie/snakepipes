@@ -45,6 +45,8 @@ bw_binsize: 10
 verbose: False
 plot_format: pdf
 dnaContam: False
+## Parameters for th statistical analysis
+cell_filter_metric: gene_universe
 #Option to skip RaceID to save time
 skipRaceID: False
 ################################################################################

@@ -6,7 +6,7 @@ args = commandArgs(trailingOnly=TRUE)
 
 ## Debug only !!!
 ## t2g_file = "snakemake_workflows/shared/organisms/dm6.t2g"
-## sample_info_file = "sampleInfo.tsv"
+## sample_info_file = "sampleSheet.tsv"
 ## indir = "Salmon"
 ## outdir = "sleuth"
 

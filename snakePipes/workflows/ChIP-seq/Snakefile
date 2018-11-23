@@ -61,7 +61,7 @@ def run_histoneHMM(allele_info):
     return(file_list)
 
 # CSAW for differential binding (if sampleinfo specified)
-if sample_info:
+if sampleSheet:
     include: os.path.join(maindir, "shared", "rules", "CSAW.snakefile")
 
 def run_deepTools():
@@ -95,7 +95,7 @@ def run_deepTools_allelic():
     return(file_list)
 
 def run_CSAW():
-    if sample_info:
+    if sampleSheet:
         return( ["CSAW/CSAW.session_info.txt"] )
     else:
         return([])

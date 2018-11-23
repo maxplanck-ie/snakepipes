@@ -29,8 +29,8 @@ convRef: False
 intList: []
 ###SNP black list (bed file)
 blackList:
-###sample Info
-sampleInfo:
+###sample Sheet
+sampleSheet:
 ###inclusion bounds for methylation extraction
 mbias_ignore: auto
 ## FASTQ file extension (default: ".fastq.gz")
@@ -52,6 +52,13 @@ bam_ext: '.PCRrm.bam'
 ###Flags to control skipping of certain QC calculations
 skipDOC: False
 skipGCbias: False
+###Metilene DMR calling parameters:
+maxDist: 300
+minCpGs: 10
+minMethDiff: 0
+###Thresholds for filtering of statistical comparisons:
+minAbsDiff: 0.2
+FDR: 0.02
 ################################################################################
 # Call snakemake directly, i.e. without using the wrapper script:
 #

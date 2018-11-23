@@ -22,3 +22,5 @@ CpG_filt:
     memory: 6G
 get_ran_CG:
     memory: 3G
+CpG_report:
+    memory: 3G

@@ -41,12 +41,12 @@ png("Expdata.ColumnSums.png")
     }
 dev.off()
 
-##make sample info
+##make sample sheet
 
-sampleInfo<-data.frame(colnames(expdat),stringsAsFactors=FALSE)
-colnames(sampleInfo)<-"SampleID"
-rownames(sampleInfo)<-sampleInfo$SampleID
-save(sampleInfo,file="sampleInfo.RData")
+sampleSheet<-data.frame(colnames(expdat),stringsAsFactors=FALSE)
+colnames(sampleSheet)<-"name"
+rownames(sampleSheet)<-sampleSheet$name
+save(sampleSheet,file="sampleSheet.RData")
 
 
 
@@ -65,12 +65,12 @@ metrics.tab$gene_universe<-NA
 
 for(i in seq_along(minT)){
     minTi=minT[i]
-    
+
 ####monocle
-    pd <- new("AnnotatedDataFrame", data = sampleInfo)
+    pd <- new("AnnotatedDataFrame", data = sampleSheet)
     mono.set <- newCellDataSet(as.matrix(expdat),phenoData = pd ,lowerDetectionLimit=1,expressionFamily=negbinomial.size())
     save(mono.set,file=paste0("minT",minTi,".mono.set.RData"))
-    
+
     pData(mono.set)$TPC <- Matrix::colSums(exprs(mono.set))
     mono.set<-mono.set[,pData(mono.set)$TPC >= minTi]
     metrics.tab$num_cells[i]<-ncol(mono.set)
@@ -86,7 +86,7 @@ for(i in seq_along(minT)){
     save(mono.set,file=paste0("minT",minTi,".mono.set.RData"))
 
     metrics.tab$medGPC[i]<-median(pData(mono.set)$num_genes_expressed,na.rm=TRUE)
- 
+
     print(paste0(i,"_processed"))
 
     }
@@ -102,6 +102,3 @@ ggplot(plotdat)+geom_line(aes(x=minT,y=gene_universe),size=1)+theme(axis.text=el
 ggsave("gene_universevsminT.downscaled.png")
 
 write.table(metrics.tab,file="metrics.tab.txt",row.names=FALSE,sep="\t",quote=FALSE)
-
-
-

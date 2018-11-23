@@ -66,7 +66,8 @@ def run_RaceID(skipRaceID):
     if not skipRaceID:
         file_list = [
         "Filtered_cells_RaceID/metrics.tab.RData",
-        "Filtered_cells_RaceID/sessionInfo.txt"
+        "Filtered_cells_RaceID/sessionInfo.txt",
+        'Filtered_cells_RaceID/Stats_report.html'
         ]
         return(file_list)
     else:
@@ -128,7 +129,8 @@ rule all:
         run_deeptools_qc(),
         "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv",
         expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample = samples),
-        "multiQC/multiqc_report.html"
+        "multiQC/multiqc_report.html",
+        'Filtered_cells_monocle/Stats_report.html'
 
 
 ### execute after workflow finished ############################################
