@@ -68,13 +68,25 @@ def run_histoneHMM(allele_info):
         file_list = []
     return(file_list)
 
-def run_deepTools():
+def run_deepTools_qc(fromBam):
+    fileList = []
+    if fromBam:
+        file_list = ["deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv"]
+        if len(samples) <= 20:
+            file_list.append( ["deepTools_qc/plotCoverage/read_coverage.tsv"] )
+        if len(samples)>1 and len(samples)<=20:
+            file_list.append( [
+                "deepTools_qc/plotCorrelation/correlation.pearson.read_coverage.tsv",
+                "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage.tsv",
+                "deepTools_qc/plotPCA/PCA.read_coverage.tsv" ])
+        file_list.append(expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample = samples))
+    return (file_list)
+
+def run_deepTools_ChIP():
     file_list = []
     for chip_sample in chip_samples_w_ctrl:
         control_name = get_control_name(chip_sample)
-        file_list.append([
-        "deepTools_ChIP/plotFingerprint/plotFingerprint.metrics.txt"
-        ])
+        file_list.append(["deepTools_ChIP/plotFingerprint/plotFingerprint.metrics.txt"])
         # get bigwigtype
         if bigWigType == "subtract" or bigWigType == "both":
             file_list.append(["deepTools_ChIP/bamCompare/"+chip_sample+".filtered.subtract."+control_name+".bw"])
@@ -138,7 +150,8 @@ onstart:
 ################################################################################
 rule all:
     input:
-        run_deepTools(),
+    	run_deepTools_qc(fromBam),
+        run_deepTools_ChIP(),
         expand("MACS2/{chip_sample}.filtered.BAM_peaks.xls", chip_sample = chip_samples),
         expand("MACS2/{chip_sample}.filtered.BAM_peaks.qc.txt", chip_sample = chip_samples),
         ## run bamPE if asked

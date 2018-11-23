@@ -106,13 +106,12 @@ def run_deepTools_qc():
             "deepTools_qc/plotCorrelation/correlation.pearson.read_coverage.tsv",
             "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage.tsv",
             "deepTools_qc/plotPCA/PCA.read_coverage.tsv" ])
-        file_list.append(expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample = samples))
         if 'allelic-mapping' in mode:
             file_list.append( [
                 "deepTools_qc/plotCorrelation/correlation.pearson.read_coverage_allelic.tsv",
                 "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage_allelic.tsv",
                 "deepTools_qc/plotPCA/PCA.read_coverage_allelic.tsv" ] )
-
+	file_list.append(expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample = samples))
     return (file_list)
 
 def run_Qualimap():
