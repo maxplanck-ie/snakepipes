@@ -118,7 +118,7 @@ def main():
 
     # Local argument checks
     if args.predict_chip_dict:
-        cf.predict_chip_dict(args.workingdir,args.bam_ext,args.fromBam)
+        cf.predict_chip_dict(args.workingdir,bamExt=args.bam_ext,fromBam=args.fromBam)
 
     if args.samples_config is not None and os.path.exists(os.path.abspath(args.samples_config)):
         args.samples_config = os.path.abspath(args.samples_config)
