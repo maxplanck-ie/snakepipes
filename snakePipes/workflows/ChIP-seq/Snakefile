@@ -72,6 +72,7 @@ def run_deepTools_qc(fromBam):
     fileList = []
     if fromBam:
         file_list = ["deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv"]
+        file_list.append([expand("bamCoverage/{sample}.filtered.seq_depth_norm.bw", sample = samples)])
         if len(samples) <= 20:
             file_list.append( ["deepTools_qc/plotCoverage/read_coverage.tsv"] )
         if len(samples)>1 and len(samples)<=20:
