@@ -339,13 +339,18 @@ def checkCommonArguments(args, baseDir, outDir=False, createIndices=False):
             else:
                 sys.exit("\nError! Input dir not found! ({})\n".format(args.indir))
         else:
-            if not args.fromBam and os.path.exists(args.workingdir):
-                args.workingdir = os.path.abspath(args.workingdir)
-            elif args.fromBam and os.path.exists(args.fromBam):
-                os.makedirs(args.workingdir, exist_ok=True)
-                args.fromBam = os.path.abspath(args.fromBam)
+            if args.fromBam
+                if os.path.exists(args.fromBam):
+                    os.makedirs(args.workingdir, exist_ok=True)
+                    args.workingdir = os.path.abspath(args.workingdir)
+                    args.fromBam = os.path.abspath(args.fromBam)
+                else:
+                    sys.exit("\nError! Directory with bam files (--fromBam) not found! ({})\n".format(args.fromBam))
             else:
-                sys.exit("\nError! Working-dir (-d) dir not found! ({})\n".format(args.workingdir))
+                if os.path.exists(args.workingdir):
+                    args.workingdir = os.path.abspath(args.workingdir)
+                else:
+                    sys.exit("\nError! Working-dir (-d) dir not found! ({})\n".format(args.workingdir))
             args.outdir = args.workingdir
     args.cluster_logs_dir = os.path.join(args.outdir, "cluster_logs")
     # 2. Sample info file
