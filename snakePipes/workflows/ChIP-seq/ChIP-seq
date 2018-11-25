@@ -17,7 +17,7 @@ import snakePipes.parserCommon as parserCommon
 
 def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfile": None, "max_jobs": 5, "snakemake_options": "--use-conda", "tempdir": None,
                          "paired": True, "bamPE": False, "bw_binsize": 25, "sampleSheet": "", "window_size": 150, "predict_chip_dict": False, "bigWigType": "both",
-                         "fromBam": ""}):
+                         "fromBam": "", "bam_ext": ".bam"}):
     """
     Parse arguments from the command line.
     """
@@ -118,7 +118,7 @@ def main():
 
     # Local argument checks
     if args.predict_chip_dict:
-        cf.predict_chip_dict(args.workingdir,bamExt=defaults['bam_ext'],fromBam=args.fromBam)
+        cf.predict_chip_dict(args.workingdir,bamExt=args.bam_ext,fromBam=args.fromBam)
 
     if args.samples_config is not None and os.path.exists(os.path.abspath(args.samples_config)):
         args.samples_config = os.path.abspath(args.samples_config)
