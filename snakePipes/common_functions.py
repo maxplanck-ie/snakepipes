@@ -512,7 +512,7 @@ def runAndCleanup(args, cmd, logfile_name, temp_path):
         sendEmail(args, 0)
 
 
-def predict_chip_dict(wdir):
+def predict_chip_dict(wdir,bamExt,fromBam=False):
     """
     Predict a chip_dict from bam files under filtered_bam/ from DNA-mapping workflow
     ChIP input/control samples are identified from pattern 'input' (case ignored)
@@ -521,8 +521,11 @@ def predict_chip_dict(wdir):
     """
     pat1 = re.compile(r"input.*$", re.IGNORECASE)
     pat2 = re.compile(r"^.*input", re.IGNORECASE)
-    infiles = sorted(glob.glob(os.path.join(wdir, 'filtered_bam/', '*.bam')))
-    samples = get_sample_names(infiles, ".filtered.bam", ['', ''])
+    if fromBam:
+        infiles = sorted(glob.glob(os.path.join(wdir, '*'+bam_ext)))
+    else:
+        infiles = sorted(glob.glob(os.path.join(wdir, 'filtered_bam/', '*.bam')))
+    samples = get_sample_names_bam(infiles, bamExt)
 
     chip_dict_pred = {}
     chip_dict_pred["chip_dict"] = {}
