@@ -522,7 +522,7 @@ def predict_chip_dict(wdir,bamExt,fromBam=None):
     pat1 = re.compile(r"input.*$", re.IGNORECASE)
     pat2 = re.compile(r"^.*input", re.IGNORECASE)
     if fromBam:
-        infiles = sorted(glob.glob(os.path.join(fromBam, '*'+bam_ext)))
+        infiles = sorted(glob.glob(os.path.join(fromBam, '*'+bamExt)))
     else:
         infiles = sorted(glob.glob(os.path.join(wdir, 'filtered_bam/', '*.bam')))
     samples = get_sample_names_bam(infiles, bamExt)
