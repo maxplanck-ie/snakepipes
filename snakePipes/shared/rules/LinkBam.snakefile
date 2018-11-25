@@ -10,7 +10,7 @@ rule samtools_index_external:
     input:
         mapping_prg+"/{sample}.bam"
     output:
-        mapping_prg+"{sample}.bam.bai"
+        mapping_prg+"/{sample}.bam.bai"
     conda: CONDA_SHARED_ENV
     shell: "samtools index {input}"
 
