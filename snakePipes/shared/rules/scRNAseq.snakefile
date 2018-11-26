@@ -5,7 +5,7 @@ rule fastq_barcode:
             R1 = "FASTQ/{sample}"+reads[0]+".fastq.gz",
             R2 = "FASTQ/{sample}"+reads[1]+".fastq.gz"
         output:
-            R2_barcoded = "FASTQ_barcoded/{sample}.fastq.gz"
+            R2_barcoded = "FASTQ_barcoded/{sample}"+reads[0]+".fastq.gz"
         params:
             UMI_length = UMI_length,
             UMI_offset = UMI_offset,

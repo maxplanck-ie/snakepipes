@@ -1,7 +1,0 @@
-type	RSeQC	TopHat2	HISAT2	htseq-count	featureCounts	Salmon
-PE	1++,1--,2+-,2-+	fr-secondstrand	FR	yes	1	ISF
-PE	1+-,1-+,2++,2—	fr-firststrand	RF	reverse	2	ISR
-PE	NA	fr-unstranded	NA	no	0	IU
-SE	++,--	fr-secondstrand	F	yes	1	SF
-SE	+-,-+	fr-firststrand	R	reverse	2	SR
-SE	NA	fr-unstranded	NA	no	0	U
