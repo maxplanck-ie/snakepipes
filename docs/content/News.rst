@@ -23,7 +23,9 @@ snakePipes 1.1.0
    * Stats reports were implemented for RaceID and Monocle/Seurat so that folders Filtered_cells_RaceID and Filtered_cells_monocle now contain a Stats_report.html.
    * User can select a metric to maximize during cell filtering (cell_filter_metric, default: gene_universe).
    * For calculating median GPC, RaceID counts are multiplied by the TPC threshold applied (similar to 'downscaling' in RaceID2).
-
+ * all sample sheets now need to have a "name" and a "condition" column, that was not consistent before
+ * consistent --sampleSheet [FILE] cmdl option to invoke differential analysis mode (RNA-seq, ChIP-seq, ATAC-seq), --DE/--DB were dropped
+ 
 snakePipes 1.0.0 (king cobra) released
 --------------------------------------
 
