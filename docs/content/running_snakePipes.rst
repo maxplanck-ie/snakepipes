@@ -52,7 +52,7 @@ The ChIP-seq workflow would follow up from the DNA-mapping outputs and perform p
 .. _sampleinfo:
 
 The sample sheet
------------------
+----------------
 
 Most of the workflows allow users to perform grouped operations as an option, for example
 differential expression analysis in RNA-seq workflow, differential binding analysis in

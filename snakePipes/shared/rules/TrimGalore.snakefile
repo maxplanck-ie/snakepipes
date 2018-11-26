@@ -25,9 +25,9 @@ if paired:
 else:
     rule cutadapt:
         input:
-            r1 = fastq_indir_trim+"/{sample}.fastq.gz",
+            r1 = fastq_indir_trim+"/{sample}"+reads[0]+".fastq.gz",
         output:
-            "FASTQ_Cutadapt/{sample}.fastq.gz",
+            "FASTQ_Cutadapt/{sample}"+reads[0]+".fastq.gz",
         params:
             opts = str(trim_options or '')
         log:
@@ -71,9 +71,9 @@ if paired:
 else:
     rule TrimGalore:
         input:
-            fastq_indir_trim+"/{sample}.fastq.gz"
+            fastq_indir_trim+"/{sample}"+reads[0]+".fastq.gz"
         output:
-            "FASTQ_TrimGalore/{sample}.fastq.gz"
+            "FASTQ_TrimGalore/{sample}"+reads[0]+".fastq.gz"
         params:
             tmp = "FASTQ_TrimGalore/{sample}_trimmed.fq.gz",
             opts = str(trim_options or '')

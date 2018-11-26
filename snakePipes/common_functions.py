@@ -332,7 +332,7 @@ def checkCommonArguments(args, baseDir, outDir=False, createIndices=False):
         if os.path.exists(os.path.abspath(args.sampleSheet)):
             args.sampleSheet = os.path.abspath(args.sampleSheet)
         else:
-            sys.exit("\nSample info file not found! (--DB {})\n".format(args.sampleSheet))
+            sys.exit("\nSample info file not found! (--sampleSheet {})\n".format(args.sampleSheet))
         if not check_sample_info_header(args.sampleSheet):
             sys.exit("ERROR: Please use 'name' and 'condition' as column headers in sample info file! ({})\n".format(args.sampleSheet))
     # 3. get abspath from user provided genome/organism file

@@ -41,7 +41,7 @@ if mapping_prg == "Bowtie2":
     else:
         rule Bowtie2_allele:
             input:
-                r1 = fastq_dir+"/{sample}.fastq.gz",
+                r1 = fastq_dir+"/{sample}"+reads[0]+".fastq.gz",
                 index = bowtie2_index_allelic
             output:
                 align_summary = mapping_prg+"/{sample}.Bowtie2_summary.txt",
