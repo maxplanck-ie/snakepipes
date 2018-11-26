@@ -4,7 +4,7 @@ snakePipes News
 snakePipes 1.1.0
 ----------------
 
-**14.11.18**
+**26.11.18**
 
  * A wide number of bug fixes to scRNA-seq and other pipelines. In particular, many memory limits were updated.
  * An optional email can be sent upon pipeline completion.
