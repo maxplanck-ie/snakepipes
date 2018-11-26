@@ -23,7 +23,9 @@ include: os.path.join(maindir, "shared", "rules", "FASTQ.snakefile")
 include: os.path.join(maindir, "shared", "rules", "RNA_mapping.snakefile")
 include: os.path.join(maindir, "shared", "rules", "scRNAseq.snakefile")
 fastqc = True
+paired = True
 include: os.path.join(maindir, "shared", "rules", "FastQC.snakefile")
+paired = False
 include: os.path.join(maindir, "shared", "rules", "filter_annotation.snakefile")
 include: os.path.join(maindir, "shared", "tools" , "deeptools_cmds.snakefile")
 include: os.path.join(maindir, "shared", "rules", "deepTools_RNA.snakefile")
@@ -108,8 +110,7 @@ onstart:
 localrules: FASTQ1, FASTQ2
 rule all:
     input:
-        expand("FASTQ/{sample}{read}.fastq.gz", sample = samples, read = reads),
-        expand("FASTQ_barcoded/{sample}.fastq.gz", sample = samples),
+        expand("FASTQ_barcoded/{sample}{read}.fastq.gz", sample = samples, read=reads[0]),
         run_Trimming(trim),
         expand("FastQC/{sample}{read}_fastqc.html", sample = samples, read=reads),
         expand(mapping_prg+"/{sample}.bam", sample = samples),
