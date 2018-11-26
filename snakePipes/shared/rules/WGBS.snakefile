@@ -518,13 +518,29 @@ if sampleSheet or intList:
 
 
 if sampleSheet:
-    rule CpG_stats:
+    rule prep_for_stats:
         input: expand("methXT/{sample}.CpG.filt2.bed",sample=samples)
         output:
-            RDatAll='{}/singleCpG.RData'.format(get_outdir("singleCpG_stats_limma")),
             Limdat='{}/limdat.LG.RData'.format(get_outdir("singleCpG_stats_limma")),
             MetIN='{}/metilene.IN.txt'.format(get_outdir("singleCpG_stats_limma")),
             Gifnfo='{}/groupInfo.txt'.format(get_outdir("singleCpG_stats_limma"))
+        params:
+            statdir=os.path.join(outdir,'{}'.format(get_outdir("singleCpG_stats_limma"))),
+            sampleSheet=sampleSheet,
+            importfunc = os.path.join(workflow_rscripts, "WGBSstats_functions.R")
+        log:
+            err='{}/logs/prep_for_stats.err'.format(get_outdir("singleCpG_stats_limma")),
+            out='{}/logs/prep_for_stats.out'.format(get_outdir("singleCpG_stats_limma"))
+        threads: 1
+        conda: CONDA_WGBS_ENV
+        shell: "Rscript --no-save --no-restore " + os.path.join(workflow_rscripts,'WGBSpipe.prep_data_for_stats.R ') + "{params.statdir} {params.sampleSheet} "  + os.path.join(outdir,"methXT") + " {params.importfunc} 1>{log.out} 2>{log.err}"
+
+
+    rule CpG_stats:
+        input: 
+            Limdat='{}/limdat.LG.RData'.format(get_outdir("singleCpG_stats_limma"))
+        output:
+            RDatAll='{}/singleCpG.RData'.format(get_outdir("singleCpG_stats_limma"))
         params:
             statdir=os.path.join(outdir,'{}'.format(get_outdir("singleCpG_stats_limma"))),
             sampleSheet=sampleSheet,
@@ -541,7 +557,8 @@ if sampleSheet:
 
     rule CpG_report:
         input: 
-            Limdat='{}/limdat.LG.RData'.format(get_outdir("singleCpG_stats_limma"))
+            Limdat='{}/limdat.LG.RData'.format(get_outdir("singleCpG_stats_limma")),
+            RDatAll='{}/singleCpG.RData'.format(get_outdir("singleCpG_stats_limma"))
         output:
             html='{}/Stats_report.html'.format(get_outdir("singleCpG_stats_limma"))
         params:
