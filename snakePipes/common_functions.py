@@ -230,10 +230,9 @@ def check_sample_info_header(sampleSheet_file):
     """
     return True in case sample info file contains column names 'name' and 'condition'
     """
-    ret = subprocess.check_output("cat " + sampleSheet_file + " | head -n1",
-                                  shell=True).decode()
+    ret = open(sampleSheet_file).read().split("\n")[0].split()
 
-    if "name" in ret.split() and "condition" in ret.split():
+    if "name" in ret and "condition" in ret:
         return True
     else:
         return False
