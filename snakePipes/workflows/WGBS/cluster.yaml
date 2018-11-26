@@ -25,4 +25,4 @@ get_ran_CG:
 CpG_report:
     memory: 3G
 intAgg_report:
-    memory: 3G
+    memory: 6G
