@@ -95,6 +95,22 @@ Apart from the common workflow options (see :ref:`running_snakePipes`), followin
 .. note:: snp_file and Nmasked_index file could be specified in case you already have this and would like to re-run the analysis on new data. In case you are running the allele-specific analysis for the first time, you would need a VCF file and the name of the two strains. In this case the `snp_file` as well as the `Nmasked_index` files would be automatically created by the workflow using SNPsplit.
 
 
+Differential expression
+-----------------------
+
+Like the other workflows, differential expression can be performed using the ``--sampleSheet`` option and supplying a sample sheet like that below::
+
+    name    condition
+    sample1      eworo
+    sample2      eworo
+    SRR7013047      eworo
+    SRR7013048      OreR
+    SRR7013049      OreR
+    SRR7013050      OreR
+
+.. note:: The first entry defines which group of samples are control. This way, the order of comparison and likewise the sign of values can be changed. The DE analysis might fail if your sample names begin with a number. So watch out for that! 
+
+
 Analysis modes
 --------------
 
@@ -151,13 +167,7 @@ Assuming both ``alignment-free`` mode has have been run togather with ``deepTool
     ├── bamCoverage
     │   ├── logs
     │   ├── sample1.coverage.bw
-    │   ├── sample1.RPKM.bw
-    │   ├── sample2.coverage.bw
-    │   ├── sample2.RPKM.bw
-    │   ├── sample3.coverage.bw
-    │   ├── sample3.RPKM.bw
-    │   ├── sample4.coverage.bw
-    │   ├── sample4.RPKM.bw
+    │   └── sample1.RPKM.bw
     ├── cluster_logs
     ├── deepTools_qc
     │   ├── bamPEFragmentSize
@@ -177,13 +187,7 @@ Assuming both ``alignment-free`` mode has have been run togather with ``deepTool
     │   └── DEseq_basic_plots.pdf
     ├── FASTQ
     │   ├── sample1_R1.fastq.gz
-    │   ├── sample1_R2.fastq.gz
-    │   ├── sample2_R1.fastq.gz
-    │   ├── sample2_R2.fastq.gz
-    │   ├── sample3_R1.fastq.gz
-    │   ├── sample3_R2.fastq.gz
-    │   ├── sample4_R1.fastq.gz
-    │   ├── sample4_R2.fastq.gz
+    │   └── sample1_R2.fastq.gz
     ├── multiQC
     │   ├── multiqc_data
     │   ├── multiQC.err
@@ -205,32 +209,14 @@ Assuming both ``alignment-free`` mode has have been run togather with ``deepTool
     │   ├── sample1
     │   ├── sample1.quant.genes.sf
     │   ├── sample1.quant.sf
-    │   ├── sample2
-    │   ├── sample2.quant.genes.sf
-    │   ├── sample2.quant.sf
-    │   ├── sample3
-    │   ├── sample3.quant.genes.sf
-    │   ├── sample3.quant.sf
-    │   ├── sample4
-    │   ├── sample4.quant.genes.sf
-    │   ├── sample4.quant.sf
     │   ├── TPM.genes.tsv
     │   └── TPM.tsv
     ├── sleuth
     │   └── logs
-    ├── STAR
-    │   ├── sample1
-    │   ├── sample1.bam
-    │   ├── sample1.bam.bai
-    │   ├── sample2
-    │   ├── sample2.bam
-    │   ├── sample2.bam.bai
-    │   ├── sample3
-    │   ├── sample3.bam
-    │   ├── sample3.bam.bai
-    │   ├── sample4
-    │   ├── sample4.bam
-    │   ├── sample4.bam.bai
+    └── STAR
+        ├── sample1
+        ├── sample1.bam
+        └── sample1.bam.bai
 
 Apart from the common module outputs (see :doc:`running_snakePipes`), the workflow would produce the following folders:
 
