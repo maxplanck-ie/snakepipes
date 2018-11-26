@@ -16,7 +16,7 @@ import snakePipes.parserCommon as parserCommon
 
 
 def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfile": None, "max_jobs": 5, "snakemake_options": "--use-conda", "tempdir": None,
-                         "bw_binsize": 25, "fragmentSize_cutoff": 150, "sample_info": None}):
+                         "fragmentSize_cutoff": 150, "sampleSheet": None}):
     """
     Parse arguments from the command line.
     """
@@ -32,13 +32,6 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
 
     # Workflow options
     optional = parser.add_argument_group('Options')
-    optional.add_argument("--bw-binsize",
-                          dest="bw_binsize",
-                          metavar="INT",
-                          help="bin size of output files in bigWig format (default: '%(default)s')",
-                          type=int,
-                          default=defaults["bw_binsize"])
-
     optional.add_argument("--fragmentSize-cutoff",
                           dest="fragmentSize_cutoff",
                           metavar="INT",
@@ -46,15 +39,10 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
                           type=int,
                           default=defaults['fragmentSize_cutoff'])
 
-    optional.add_argument("--DOC",
-                          dest="sample_info",
-                          help="Information on samples (If differential binding analysis required); see "
-                               "'snakepipes/shared/sampleInfo.example.tsv' for example. "
-                               "IMPORTANT: The first entry defines which group of samples are control. "
-                               "By this, the order of comparison and likewise the sign of values can be changed! "
-                               "Also, the condition `control` should not be used (reserved to mark input samples "
-                               "in the ChIP-Seq workflow (default: '%(default)s')",
-                          default=defaults["sample_info"])
+    optional.add_argument("--sampleSheet",
+                          dest="sampleSheet",
+                          help="Invoke differential accessibility analysis by providing information on samples; see 'docs/content/sampleSheet.example.tsv' for example. IMPORTANT: The first entry defines which group of samples are control. With this, the order of comparison and likewise the sign of values can be changed! Also, the condition `control` should not be used (reserved to mark input samples in the ChIP-Seq workflow (default: '%(default)s').",
+                          default=defaults["sampleSheet"])
 
     return parser
 
@@ -65,6 +53,7 @@ def main():
     # get command line arguments
     parser = parse_args(defaults)
     args = parser.parse_args()
+    args, defaults = cf.handleUserArgs(args, defaults, parse_args)
 
     # we also add these paths to config, although we don't use them in the Snakefile
     args.baseDir = baseDir

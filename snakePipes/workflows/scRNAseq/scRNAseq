@@ -17,9 +17,9 @@ import snakePipes.parserCommon as parserCommon
 
 
 def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfile": None, "max_jobs": 5, "snakemake_options": "--use-conda", "tempdir": None,
-                         "downsample": False, "trim": False, "trim_options": "-a A{'30'}", "cell_names": None,
+                         "downsample": False, "trim": False, "trim_options": "-a A{'30'}", "cell_names": None, "star_options": "--outBAMsortingBinsN 30 --twopassMode Basic",
                          "filter_annotation": "-v -P 'decay|pseudogene' ", "barcode_file": None, "barcode_pattern": "NNNNNNXXXXXX", "split_lib": False,
-                         "bw_binsize": 10, "plot_format": "png"}):
+                         "bw_binsize": 10, "plot_format": "png", "cell_filter_metric": "gene_universe", "skipRaceID": False}):
     """
     Parse arguments from the command line.
     """
@@ -56,6 +56,13 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
                           help="Options passed to the selected trimmer, e.g. use --trim_options='-a A{30}' "
                           "for polyA trimming with cutadapt (default: '%(default)s')",
                           default=defaults["trim_options"])
+
+    optional.add_argument("--star_options",
+                          dest="star_options",
+                          metavar="STR",
+                          help="STAR option string, e.g.: '--twopassMode Basic' (default: '%(default)s')",
+                          type=str,
+                          default=defaults["star_options"])
 
     optional.add_argument("--cell_barcode_file",
                           dest="barcode_file",
@@ -107,7 +114,21 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
                           metavar="STR",
                           type=str,
                           help="Format of the output plots from deeptools. Select 'none' for no plot (default: '%(default)s')",
-                          default=defaults["plot_format"])
+                          default=defaults["plot_format"]),
+
+    optional.add_argument("--cell_filter_metric",
+                          dest="cell_filter_metric",
+                          choices=['gene_universe', 'medGPC'],
+                          metavar="STR",
+                          type=str,
+                          help="The metric to maximise when selecting a cell filtering threshold (default: '%(default)s')",
+                          default=defaults["cell_filter_metric"])
+
+    optional.add_argument("--skipRaceID",
+                          dest="skipRaceID",
+                          action="store_true",
+                          default=defaults["skipRaceID"],
+                          help="Skip RaceID analysis.")
 
     return parser
 
@@ -118,6 +139,7 @@ def main():
     # get command line arguments
     parser = parse_args(defaults)
     args = parser.parse_args()
+    args, defaults = cf.handleUserArgs(args, defaults, parse_args)
 
     # we also add these paths to config, although we don't use them in the Snakefile
     args.baseDir = baseDir

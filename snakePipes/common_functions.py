@@ -18,13 +18,14 @@ def set_env_yamls():
     return {'CONDA_SHARED_ENV': 'envs/shared.yaml',
             'CONDA_CREATE_INDEX_ENV': 'envs/createIndices.yaml',
             'CONDA_RNASEQ_ENV': 'envs/rna_seq.yaml',
+            'CONDA_scRNASEQ_ENV': 'envs/sc_rna_seq.yaml',
             'CONDA_DNA_MAPPING_ENV': 'envs/dna_mapping.yaml',
             'CONDA_CHIPSEQ_ENV': 'envs/chip_seq.yaml',
             'CONDA_ATAC_ENV': 'envs/atac_seq.yaml',
             'CONDA_HIC_ENV': 'envs/hic.yaml',
-            'CondaEnvironment': 'envs/wgbs.yaml',
-            'mCtCondaEnvironment': 'envs/methylCtools.yaml',
-            'RmdCondaEnvironment': 'envs/rmarkdown.yaml'}
+            'CONDA_WGBS_ENV': 'envs/wgbs.yaml',
+            'CONDA_PY27_ENV': 'envs/python27.yaml',
+            'CONDA_RMD_ENV': 'envs/rmarkdown.yaml'}
 
 
 def merge_dicts(x, y):
@@ -91,15 +92,20 @@ def get_sample_names(infiles, ext, reads):
     """
     Get sample names without file extensions
     """
-    s = []
+    s = set()
+    lext = len(ext)
+    l0 = len(reads[0])
+    l1 = len(reads[1])
     for x in infiles:
-        x = os.path.basename(x).replace(ext, "")
-        try:
-            x = x.replace(reads[0], "").replace(reads[1], "")
-        except IndexError:
-            pass
-        s.append(x)
-    return sorted(list(set(s)))
+        x = os.path.basename(x)[:-lext]
+        if x.endswith(reads[0]):
+            x = x[:-l0]
+        elif x.endswith(reads[1]):
+            x = x[:-l1]
+        else:
+            continue
+        s.add(x)
+    return sorted(list(s))
 
 
 def get_sample_names_bam(infiles, bam_ext):
@@ -123,9 +129,7 @@ def is_paired(infiles, ext, reads):
         fname = os.path.basename(infile).replace(ext, "")
         m = re.match("^(.+)(" + reads[0] + "|" + reads[1] + ")$", fname)
         if m:
-            # print(m.group())
             bname = m.group(1)
-            # print(bname)
             if bname not in infiles_dic:
                 infiles_dic[bname] = [infile]
             else:
@@ -222,14 +226,13 @@ def cleanLogs(d):
             os.remove(f)
 
 
-def check_sample_info_header(sample_info_file):
+def check_sample_info_header(sampleSheet_file):
     """
     return True in case sample info file contains column names 'name' and 'condition'
     """
-    ret = subprocess.check_output("cat " + sample_info_file + " | head -n1",
-                                  shell=True).decode()
+    ret = open(sampleSheet_file).read().split("\n")[0].split()
 
-    if "name" in ret.split() and "condition" in ret.split():
+    if "name" in ret and "condition" in ret:
         return True
     else:
         return False
@@ -248,6 +251,52 @@ def setDefaults(fileName):
     globalDefaults = load_configfile(os.path.join(baseDir, "shared/defaults.yaml"), False)
     defaults = merge_dicts(defaults, globalDefaults)
     return baseDir, workflowDir, defaults
+
+
+def handleUserArgs(args, defaults, args_func):
+    """
+    If a user supplies a custom YAML file then that must then replace the defaults.
+    However command line options need to take precedence, so update defaults and
+    simply reparse the command line options (with args_func().parse_args())
+    """
+    if args.configfile:
+        if not os.path.exists(args.configfile):
+            sys.exit("\nError! Provided configfile (-c) not found! ({})\n".format(args.configfile))
+        user_config = load_configfile(args.configfile, False)
+        defaults = merge_dicts(defaults, user_config)
+        parser = args_func(defaults)
+        args = parser.parse_args()
+    defaults.update(vars(args))
+    return args, defaults
+
+
+def sendEmail(args, returnCode):
+    """
+    Try to send an email to the user. Errors must be non-fatal.
+    """
+    try:
+        import smtplib
+        from email.message import EmailMessage
+        msg = EmailMessage()
+        msg['Subject'] = "Snakepipes completed"
+        msg['From'] = args.emailSender
+        msg['To'] = args.emailAddress
+        if returnCode == 0:
+            msg.set_content("The pipeline finished successfully\n")
+        else:
+            msg.set_content("The pipeline failed with exit code {}\n".format(returnCode))
+
+        if args.onlySSL:
+            s = smtplib.SMTP_SSL(args.smtpServer, port=args.smtpPort)
+        else:
+            s = smtplib.SMTP(args.smtpServer, port=args.smtpPort)
+        if args.smtpUsername:
+            s.login(args.smtpUsername, args.smtpPassword)
+        s.send_message(msg)
+        s.quit()
+    except:
+        sys.stderr.write("An error occured while sending the email.\n")
+        pass
 
 
 def checkCommonArguments(args, baseDir, outDir=False, createIndices=False):
@@ -277,21 +326,25 @@ def checkCommonArguments(args, baseDir, outDir=False, createIndices=False):
                 sys.exit("\nError! Working-dir (-d) dir not found! ({})\n".format(args.workingdir))
             args.outdir = args.workingdir
     args.cluster_logs_dir = os.path.join(args.outdir, "cluster_logs")
-    # 2. Config file
-    if args.configfile and not os.path.exists(args.configfile):
-        sys.exit("\nError! Provided configfile (-c) not found! ({})\n".format(args.configfile))
-    # 3. Sample info file
-    if 'sample_info' in args and args.sample_info:
-        if os.path.exists(os.path.abspath(args.sample_info)):
-            args.sample_info = os.path.abspath(args.sample_info)
+    # 2. Sample info file
+    if 'sampleSheet' in args and args.sampleSheet:
+        if os.path.exists(os.path.abspath(args.sampleSheet)):
+            args.sampleSheet = os.path.abspath(args.sampleSheet)
         else:
-            sys.exit("\nSample info file not found! (--DB {})\n".format(args.sample_info))
-        if not check_sample_info_header(args.sample_info):
-            sys.exit("ERROR: Please use 'name' and 'condition' as column headers in sample info file! ({})\n".format(args.sample_info))
-    # 4. get abspath from user provided genome/organism file
+            sys.exit("\nSample info file not found! (--sampleSheet {})\n".format(args.sampleSheet))
+        if not check_sample_info_header(args.sampleSheet):
+            sys.exit("ERROR: Please use 'name' and 'condition' as column headers in sample info file! ({})\n".format(args.sampleSheet))
+    # 3. get abspath from user provided genome/organism file
     if not createIndices:
         if not os.path.isfile(os.path.join(baseDir, "shared/organisms/{}.yaml".format(args.genome))) and os.path.isfile(args.genome):
             args.genome = os.path.abspath(args.genome)
+
+    if args.emailAddress:
+        # Must have at least an email server specified
+        if args.smtpServer == "" or not args.smtpServer:
+            sys.exit("Sorry, there is no SMTP server specified in defaults.yaml. Please specify one with --smtpServer")
+        if args.emailSender == "" or not args.emailSender:
+            sys.exit("Sorry, there is no email sender specified in defaults.yaml. Please specify one with --emailSender")
 
 
 def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
@@ -302,18 +355,12 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
     workflowName = os.path.basename(callingScript)
     snakemake_path = os.path.dirname(os.path.abspath(callingScript))
 
-    # merge configuration dicts
-    config = defaults   # 1) form defaults.yaml
-    if args.configfile:
-        user_config = load_configfile(args.configfile, False)
-        config = merge_dicts(config, user_config)  # 2) from user_config.yaml
-    config_wrap = config_diff(vars(args), defaults)  # 3) from wrapper parameters
-    config = merge_dicts(config, config_wrap)
-
     # Ensure the log directory exists
     os.makedirs(args.cluster_logs_dir, exist_ok=True)
 
     # save to configs.yaml in outdir
+    config = defaults
+    config.update(vars(args))  # This allows modifications of args after handling a user config file to still make it to the YAML given to snakemake!
     write_configfile(os.path.join(args.outdir, '{}.config.yaml'.format(workflowName)), config)
 
     # merge cluster config files: 1) global one, 2) workflow specific one, 3) user provided one
@@ -324,6 +371,14 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
         user_cluster_config = load_configfile(args.cluster_configfile, False)
         cluster_config = merge_dicts(cluster_config, user_cluster_config)  # merge/override variables from user_config.yaml
     write_configfile(os.path.join(args.outdir, '{}.cluster_config.yaml'.format(workflowName)), cluster_config)
+
+    # Save the organism YAML file as {PIPELINE}_organism.yaml
+    orgyaml = os.path.join(baseDir, "shared/organisms/{}.yaml".format(args.genome))
+    if not os.path.isfile(orgyaml):
+        orgyaml = args.genome
+    organismYAMLname = os.path.join(args.outdir, "{}_organism.yaml".format(workflowName))
+    if workflowName != "createIndices" and os.path.abspath(organismYAMLname) != os.path.abspath(orgyaml):
+        shutil.copyfile(orgyaml, organismYAMLname)
 
     if args.notemp:
         args.snakemake_options += " --notemp"
@@ -419,6 +474,8 @@ def runAndCleanup(args, cmd, logfile_name, temp_path):
     # Exit with an error if snakemake encountered an error
     if p.returncode != 0:
         sys.stderr.write("Error: snakemake returned an error code of {}, so processing is incomplete!\n".format(p.returncode))
+        if args.emailAddress:
+            sendEmail(args, p.returncode)
         sys.exit(p.returncode)
 
     # remove temp dir
@@ -426,6 +483,10 @@ def runAndCleanup(args, cmd, logfile_name, temp_path):
         shutil.rmtree(temp_path, ignore_errors=True)
         if args.verbose:
             print("Temp directory removed ({})!\n".format(temp_path))
+
+    # Send email if desired
+    if args.emailAddress:
+        sendEmail(args, 0)
 
 
 def predict_chip_dict(wdir):
@@ -478,8 +539,7 @@ def predict_chip_dict(wdir):
         if len(prefix_matches) > 0:
             final_matches = prefix_matches
 
-        if len(suffix_matches) > 0 and (len(prefix_matches) == 0 or
-                                        len(suffix_matches) < len(prefix_matches)):
+        if len(suffix_matches) > 0 and (len(prefix_matches) == 0 or len(suffix_matches) < len(prefix_matches)):
             final_matches = suffix_matches
 
         if len(prefix_matches) == len(suffix_matches) and len(prefix_matches) > 0:

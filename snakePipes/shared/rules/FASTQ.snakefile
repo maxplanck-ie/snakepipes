@@ -4,8 +4,8 @@ if downsample:
     if paired:
         rule FASTQdownsample:
             input:
-                r1 = indir+"/{sample}"+reads[0]+".fastq.gz",
-                r2 = indir+"/{sample}"+reads[1]+".fastq.gz"
+                r1 = indir+"/{sample}"+reads[0]+ext,
+                r2 = indir+"/{sample}"+reads[1]+ext
             output:
                 r1 = "FASTQ/{sample}"+reads[0]+".fastq.gz",
                 r2 = "FASTQ/{sample}"+reads[1]+".fastq.gz"
@@ -22,7 +22,7 @@ if downsample:
     else:
         rule FASTQdownsample:
             input:
-                indir+"/{sample}.fastq.gz"
+                indir+"/{sample}"+ext
             output:
                 fq = "FASTQ/{sample}.fastq.gz",
             threads: 12
@@ -33,10 +33,18 @@ if downsample:
                 seqtk sample -s 100 {input} {params.num_reads} | pigz -p {threads} -9 > {output}
                 """
 else:
-    rule FASTQ:
+    rule FASTQ1:
         input:
-            indir+"/{sample}{read}.fastq.gz"
+            indir+"/{sample}"+reads[0]+ext
         output:
-            "FASTQ/{sample}{read}.fastq.gz"
+            "FASTQ/{sample}"+reads[0]+".fastq.gz"
         shell:
-            "( [ -f {output} ] || ln -s -r {input} {output} ) && touch -h {output}"
+            "( [ -f {output} ] || ln -s -r {input} {output} )"
+
+    rule FASTQ2:
+        input:
+            indir+"/{sample}"+reads[1]+ext
+        output:
+            "FASTQ/{sample}"+reads[1]+".fastq.gz"
+        shell:
+            "( [ -f {output} ] || ln -s -r {input} {output} )"

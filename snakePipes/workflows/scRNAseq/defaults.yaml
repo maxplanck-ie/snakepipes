@@ -32,6 +32,8 @@ downsample:
 trim: False
 trim_prg: cutadapt
 trim_options: -a A{'30'}
+## N.B., setting --outBAMsortingBinsN too high can result in cryptic errors
+star_options: "--outBAMsortingBinsN 30 --twopassMode Basic"
 ## further options
 filter_annotation: "-v -P 'decay|pseudogene' "
 barcode_file:
@@ -43,6 +45,10 @@ bw_binsize: 10
 verbose: False
 plot_format: pdf
 dnaContam: False
+## Parameters for th statistical analysis
+cell_filter_metric: gene_universe
+#Option to skip RaceID to save time
+skipRaceID: False
 ################################################################################
 # Call snakemake directly, i.e. without using the wrapper script:
 #

@@ -3,7 +3,7 @@
 rule CSAW:
     input:
         macs2_output = expand("MACS2/{chip_sample}.filtered.BAM_peaks.xls", chip_sample = chip_samples),
-        sample_info = sample_info,
+        sampleSheet = sampleSheet,
         insert_size_metrics =
             "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv" if paired
             else []
@@ -17,7 +17,7 @@ rule CSAW:
         paired = paired,
         fragment_length = fragment_length,
         window_size = window_size,
-        importfunc = "shared/rscripts/DB_functions.R",
+        importfunc = os.path.join("shared", "rscripts", "DB_functions.R"),
         allele_info = allele_info
     log: "CSAW/CSAW.log"
     conda: CONDA_ATAC_ENV

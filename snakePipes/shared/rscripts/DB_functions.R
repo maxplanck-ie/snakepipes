@@ -3,33 +3,33 @@
 
 #' Read the Files and Count windows for ChIP-Seq Samples
 #'
-#' @param sampleInfo tsvfile with sample information
+#' @param sampleSheet tsvfile with sample information
 #' @param fragment_length fragment length of sequencing
 #' @param window_size window size to count the reads in
 #' @param alleleSpecific TRUE/FALSE whether samples have to be compared with allele-specific design
 #' @param pe.param parameters to read bam files
-#' @return chipCountObject : a list with window counts and sampleinfo
+#' @return chipCountObject : a list with window counts and sampleSheet
 #' @export
 #' @examples
 #' readfiles_chip(csvFile = "testBAMs/testSampleSheet.csv", refAllele = "pat")
 #'
-readfiles_chip <- function(sampleInfo, fragment_length, window_size, alleleSpecific = FALSE, pe.param){
+readfiles_chip <- function(sampleSheet, fragment_length, window_size, alleleSpecific = FALSE, pe.param){
 
     # check that not >2 conditions are given
-    if(length(unique(sampleInfo$condition)) > 2 ) {
+    if(length(unique(sampleSheet$condition)) > 2 ) {
         stop("only up to 2 conditions can be used for Differential binding analysis")
     }
     if( isTRUE(alleleSpecific) ) {
         message("Mode : AlleleSpecific")
         # make allele-specific model matrix for edgeR
-        design <- data.frame(name = rep(sampleInfo$name, each = 2),
-                       condition = factor(rep(sampleInfo$condition, each = 2)),
-                       allele = factor(rep(c("genome1", "genome2"), nrow(sampleInfo)) )
+        design <- data.frame(name = rep(sampleSheet$name, each = 2),
+                       condition = factor(rep(sampleSheet$condition, each = 2)),
+                       allele = factor(rep(c("genome1", "genome2"), nrow(sampleSheet)) )
                        )
         design$allele <- relevel(design$allele, "genome1")
         design$condition <- droplevels(design$condition)
 
-        if(length(unique(sampleInfo$condition)) == 1 ) {
+        if(length(unique(sampleSheet$condition)) == 1 ) {
             # for 1 samples, use normal design
             message("1 sample used : comparing genome2 to genome1")
             designm <- model.matrix(~ allele, data = design)
@@ -43,19 +43,19 @@ readfiles_chip <- function(sampleInfo, fragment_length, window_size, alleleSpeci
 
         # define bam files to read
         bam.files <- list.files("allelic_bams",
-                        pattern = paste0(sampleInfo$name,".genome[1-2].sorted.bam$", collapse = "|"),
+                        pattern = paste0(sampleSheet$name,".genome[1-2].sorted.bam$", collapse = "|"),
                         full.names = TRUE )
     } else {
         message("Mode : Differential Binding")
         # make model matrix for differential binding
-        design <- data.frame(name = sampleInfo$name,
-                       condition = factor(sampleInfo$condition ) )
+        design <- data.frame(name = sampleSheet$name,
+                       condition = factor(sampleSheet$condition ) )
         design$condition <- relevel(design$condition, ref = as.character(design$condition[1]))# make the first entry the base level
         designm <- model.matrix(~condition, data = design)
         designType <- "condition"
         # define bam files to read
         bam.files <- list.files("filtered_bam",
-                                pattern = paste0(sampleInfo$name,".filtered.bam$", collapse = "|"),
+                                pattern = paste0(sampleSheet$name,".filtered.bam$", collapse = "|"),
                                 full.names = TRUE )
     }
 
@@ -67,7 +67,7 @@ readfiles_chip <- function(sampleInfo, fragment_length, window_size, alleleSpeci
     counts <- csaw::windowCounts(bam.files = bam.files, param = pe.param, ext = fragment_length, spacing = window_size, filter = mincount)
 
     # output
-    chipCountObject <- list(windowCounts = counts, sampleInfo = sampleInfo,
+    chipCountObject <- list(windowCounts = counts, sampleSheet = sampleSheet,
                             design = designm, designType = designType, pe.param = pe.param)
     return(chipCountObject)
 }
@@ -174,8 +174,8 @@ tmmNormalize_chip <- function(chipCountObject, binsize, plotfile){
     ## MDS plot to check for replicate variability
     for (top in c(100, 500, 1000, 5000)) {
         limma::plotMDS(adj.counts, main = top,
-                   col = as.numeric(chipCountObject$sampleInfo$condition),
-                   labels = chipCountObject$sampleInfo$name, top = top)
+                   col = as.numeric(chipCountObject$sampleSheet$condition),
+                   labels = chipCountObject$sampleSheet$name, top = top)
     }
     dev.off()
 
@@ -188,7 +188,7 @@ tmmNormalize_chip <- function(chipCountObject, binsize, plotfile){
 #'
 #' @param chipCountObject output from tmmNormalize_chip
 #' @param plotfile file with output plots
-#' @param tfname which TF to extract results for (must match with the name in sampleInfo)
+#' @param tfname which TF to extract results for (must match with the name in sampleSheet)
 #' @return chipResultObject with differentially bound regions
 #' @export
 #' @examples

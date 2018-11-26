@@ -28,9 +28,12 @@ if(file.exists(tx2gene_file)) {
   tximport <- FALSE
 }
 
+rmdTemplate <- args[8]
 topN <- 50
 ## include functions
 library(ggplot2)
+library(rmarkdown)
+library(knitcitations)
 source(importfunc)
 
 ## fix default FDR significance threshold
@@ -68,31 +71,81 @@ if(isTRUE(tximport)) {
   tx2gene <- read.delim(tx2gene_file, header = FALSE)
   tx2gene <- tx2gene[c(1,2)]
   # check setup table and import
-  countdata <- checktable(sample_info = sampleInfo, salmon_dir = dirname(countFilePath), tx2gene_annot = tx2gene)
+  countdata <- checktable(sampleSheet = sampleInfo, salmon_dir = dirname(countFilePath), tx2gene_annot = tx2gene)
 } else {
   ## Get data from featurecounts
   ## counts
   countdata <- read.table(countFilePath, header=TRUE, check.names = TRUE)
   # check setup table and grep colnames
-  countdata <- checktable(countdata, sample_info = sampleInfo, alleleSpecific = allelic_info)
+  countdata <- checktable(countdata, sampleSheet = sampleInfo, alleleSpecific = allelic_info)
 }
 
 ## ~~~~~~~ 3. run DESeq wrapper ~~~~~~~~
 seqout <- DESeq_basic(countdata, coldata = sampleInfo, fdr = fdr, alleleSpecific = allelic_info, from_salmon = tximport)
 
-DESeq_downstream(DEseqout = seqout, countdata, sampleInfo,
-             fdr = fdr, outprefix = "DEseq_basic", heatmap_topN = topN,
-             geneNamesFile = geneNamesFilePath)
+DESeq_writeOutput(DEseqout = seqout,
+                fdr = fdr, outprefix = "DEseq_basic",
+                geneNamesFile = geneNamesFilePath)
+
+#DESeq_downstream(DEseqout = seqout, countdata, sampleInfo,
+#             fdr = fdr, outprefix = "DEseq_basic", heatmap_topN = topN,
+#             geneNamesFile = geneNamesFilePath)
 
 ## Run allele-sepecific DESeq wrapper (if asked for)
 if (isTRUE(allelic_info)) {
     seqout_allelic <- DESeq_allelic(countdata, coldata = sampleInfo, fdr = fdr)
 
-    DESeq_downstream(DEseqout = seqout_allelic, countdata, sampleInfo,
-                 fdr = fdr, outprefix = "DEseq_allelic", heatmap_topN = topN,
+    DESeq_writeOutput(DEseqout = seqout_allelic,
+                 fdr = fdr, outprefix = "DEseq_allelic",
                  geneNamesFile = geneNamesFilePath)
+
+#    DESeq_downstream(DEseqout = seqout_allelic, countdata, sampleInfo,
+#                 fdr = fdr, outprefix = "DEseq_allelic", heatmap_topN = topN,
+#                 geneNamesFile = geneNamesFilePath)
     }
 
+## ~~~~~~~ 4 .  Create report ~~~~~~~~~~~~~~
+
+bib <- c(
+    knitcitations = citation('knitcitations'),
+    DT = citation('DT'),
+    ggplot2 = citation('ggplot2'),
+    knitr = citation('knitr')[3],
+    rmarkdown = citation('rmarkdown'),
+    pheatmap = citation('pheatmap'),
+    RColorBrewer = citation('RColorBrewer'),
+    DESeq2 = citation('DESeq2'))
+
+write.bibtex(bib, file = 'citations.bib')
+file.copy(rmdTemplate, to = 'DESeq2_report.Rmd')
+
+outprefix = "DEseq_basic"
+render('DESeq2_report.Rmd',
+              output_format = "html_document",
+              clean = TRUE,
+              params = list(
+                  DEseqoutRdata = paste0(outprefix, "_DESeq.Rdata"),
+                  ddr.df = paste0(outprefix, "_DEresults.tsv"),
+                  countdata = countFilePath,
+                  coldata = sampleInfo,
+                  fdr = 0.05,
+                  heatmap_topN = 20,
+                  geneNamesFile = geneNamesFilePath))
+
+if (isTRUE(allelic_info)) {
+    outprefix = "DEseq_allelic"
+    render('DESeq2_report.Rmd',
+                  output_format = "html_document",
+                  clean = TRUE,
+                  params = list(
+                      DEseqoutRdata = paste0(outprefix, "_DESeq.Rdata"),
+                      ddr.df = paste0(outprefix, "_DEresults.tsv"),
+                      countdata = countFilePath,
+                      coldata = sampleInfo,
+                      fdr = 0.05,
+                      heatmap_topN = 20,
+                      geneNamesFile = geneNamesFilePath))
+}
 
 ## ~~~~~~ 4. report on versions used ~~~~~
 sink("DESeq2.session_info.txt")

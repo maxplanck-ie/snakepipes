@@ -1,9 +1,7 @@
 name: WGBS-env-0.1.0
-
 channels:
-  - bioconda
   - conda-forge
-
+  - bioconda
 dependencies:
   - bwameth=0.2.1
   - methyldackel=0.3.0

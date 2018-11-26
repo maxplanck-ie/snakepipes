@@ -16,7 +16,7 @@ import snakePipes.parserCommon as parserCommon
 
 
 def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfile": None, "max_jobs": 5, "snakemake_options": "--use-conda", "tempdir": None,
-                         "paired": True, "bw_binsize": 25, "sample_info": "", "window_size": 150, "predict_chip_dict": False}):
+                         "paired": True, "bamPE": False, "bw_binsize": 25, "sampleSheet": "", "window_size": 150, "predict_chip_dict": False, "bigWigType": "both"}):
     """
     Parse arguments from the command line.
     """
@@ -38,8 +38,19 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
     optional.add_argument("--single-end",
                           dest="paired",
                           action="store_false",
-                          help="input data is single-end, not paired-end",
+                          help="Input data is single-end, not paired-end",
                           default=defaults["paired"])
+
+    optional.add_argument("--BAMPE",
+                          dest="bamPE",
+                          action="store_true",
+                          help="Use the BAMPE mode of macs2, on top of the BAM mode. The BAMPE mode would use the fragment sizes present in BAM file, and output the files under 'macs2' folder with an extention 'BAMPE_peaks.xls'. The default macs2 rule under snakePipes uses the fragment sizes estimated from deepTools, and produces files with an extention 'BAM_peaks.xls'. (default: '%(default)s')",
+                          default=defaults["bamPE"])
+
+    optional.add_argument("--bigWigType",
+                          dest="bigWigType",
+                          help="Type of bigWig file to create. Options are: 'subtract' (control-subtracted ChIP coverage), 'log2ratio' (for log2 ratio of ChIP over control) or 'both' (create both set of bed files). Note that the allele-specific mode currently only produces 'log2ratio' bigwigs. (default: '%(default)s')",
+                          default=defaults["bigWigType"])
 
     optional.add_argument("--bw-binsize",
                           dest="bw_binsize",
@@ -48,15 +59,15 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
                           type=int,
                           default=defaults["bw_binsize"])
 
-    optional.add_argument("--DB",
-                          dest="sample_info",
+    optional.add_argument("--sampleSheet",
+                          dest="sampleSheet",
                           help="Information on samples (If differential binding analysis required); see "
-                               "'snakepipes/shared/sampleInfo.example.tsv' for example. "
+                               "'docs/content/sampleSheet.example.tsv' for example. "
                                "IMPORTANT: The first entry defines which group of samples are control. "
                                "By this, the order of comparison and likewise the sign of values can be changed! "
                                "Also, the condition `control` should only be used for input samples (control peaks "
                                "are not evaluated for differential binding) (default: '%(default)s')",
-                          default=defaults["sample_info"])
+                          default=defaults["sampleSheet"])
 
     optional.add_argument("--DB_windowSize",
                           dest="window_size",
@@ -66,7 +77,7 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
                                "while large window sizes (~500 bp) should be used for broad marks (eg. H3K27me3) "
                                "(default: '%(default)s')",
                           default=defaults["window_size"])
-    
+
     optional.add_argument("--predict_chip_dict",
                           dest="predict_chip_dict",
                           action="store_true",
@@ -81,6 +92,7 @@ def main():
     # get command line arguments
     parser = parse_args(defaults)
     args = parser.parse_args()
+    args, defaults = cf.handleUserArgs(args, defaults, parse_args)
 
     # we also add these paths to config, although we don't use them in the Snakefile
     args.baseDir = baseDir

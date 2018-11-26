@@ -17,7 +17,7 @@ import snakePipes.parserCommon as parserCommon
 
 def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfile":None, "max_jobs": 12, "nthreads": 8, "snakemake_options": "--use-conda", "tempdir": None,
                          "downsample": None, "trimReads": "user", "fqcin": None, "adapterSeq": "AGATCGGAAGAGC", "nextera": False, "trimThreshold": 10, "trimOtherArgs": None, "convrefpath": None,
-                         "convRef": False, "intList": [], "blackList": None, "sampleInfo": None, "mbias_ignore": "auto", "fromBam": False, "skipDOC": False, "skipGCbias": False}):
+                         "convRef": False, "intList": [], "blackList": None, "sampleSheet": None, "mbias_ignore": "auto", "fromBam": False, "skipDOC": False, "skipGCbias": False}):
     """
     Parse arguments from the command line.
     """
@@ -41,7 +41,7 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
                           type=int,
                           default=defaults["downsample"])
 
-    optional.add_argument("--trimReads",
+    optional.add_argument("--trim",
                           dest="trimReads",
                           action="store",
                           choices=['auto', 'user', 'None'],
@@ -117,13 +117,13 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
                           help="Bed file(s) with positions to mask for methylation calling. Useful for masking SNPs in your strain of interest. (default: '%(default)s')",
                           default=defaults["blackList"])
 
-    optional.add_argument("--sampleInfo",
-                          dest="sampleInfo",
+    optional.add_argument("--sampleSheet",
+                          dest="sampleSheet",
                           metavar="STR",
                           action='store',
                           type=str,
-                          help="Text file with sample information to use for statistical analysis. (default: '%(default)s')",
-                          default=defaults["sampleInfo"])
+                          help="Perform differential methylation analysis between groups of samples by providing a text file with sample information to use for statistical analysis. (default: '%(default)s')",
+                          default=defaults["sampleSheet"])
 
     optional.add_argument("--mbias",
                           dest="mbias_ignore",
@@ -157,6 +157,7 @@ def main():
     # get command line arguments
     parser = parse_args(defaults)
     args = parser.parse_args()
+    args, defaults = cf.handleUserArgs(args, defaults, parse_args)
 
     # we also add these paths to config, although we don't use them in the Snakefile
     args.baseDir = baseDir

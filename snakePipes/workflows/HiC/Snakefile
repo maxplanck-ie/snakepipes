@@ -53,14 +53,8 @@ def run_Trimming(trim, fastqc):
     else:
         return([])
 
-def run_CollectInsertSizeMetrics(paired):
-    if paired:
-        return( expand("Picard_qc/InsertSizeMetrics/{sample}.insert_size_metrics.txt", sample = samples) )
-    else:
-        return([])
-
 # get samples to merge
-sample_dict = get_sampleInfo(sample_info)
+sample_dict = get_sampleSheet(sampleSheet)
 GROUPS = sample_dict.keys()
 
 def run_build_matrices():
@@ -130,10 +124,10 @@ onstart:
         print("$TMPDIR: ",os.getenv('TMPDIR', ""))
         print("$HOSTNAME: ",os.getenv('HOSTNAME', ""))
         print("-" * 80, "\n")
-
+        print(smaple_dict)
 ### main rule ##################################################################
 ################################################################################
-localrules: FASTQ
+localrules: FASTQ1, FASTQ2
 
 rule all:
     input:
@@ -152,3 +146,6 @@ onsuccess:
     cf.cleanLogs(outdir)
     if "verbose" in config and config["verbose"]:
         print("\n--- Hi-C workflow finished successfully! --------------------------------\n")
+    if toolsVersion:
+        usedEnvs = [CONDA_SHARED_ENV, CONDA_HIC_ENV]
+        printToolsVersion(usedEnvs)

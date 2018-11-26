@@ -3,6 +3,7 @@ import snakePipes.common_functions as cf
 
 ### snakemake_workflows initialization ########################################
 maindir = os.path.dirname(os.path.dirname(workflow.basedir))
+workflow_rscripts=os.path.join(maindir, "shared", "rscripts")
 
 # load conda ENVs (path is relative to "shared/rules" directory)
 globals().update(cf.set_env_yamls())
@@ -22,7 +23,9 @@ include: os.path.join(maindir, "shared", "rules", "FASTQ.snakefile")
 include: os.path.join(maindir, "shared", "rules", "RNA_mapping.snakefile")
 include: os.path.join(maindir, "shared", "rules", "scRNAseq.snakefile")
 fastqc = True
+paired = True
 include: os.path.join(maindir, "shared", "rules", "FastQC.snakefile")
+paired = False
 include: os.path.join(maindir, "shared", "rules", "filter_annotation.snakefile")
 include: os.path.join(maindir, "shared", "tools" , "deeptools_cmds.snakefile")
 include: os.path.join(maindir, "shared", "rules", "deepTools_RNA.snakefile")
@@ -61,6 +64,17 @@ def run_deeptools_qc():
                            "deepTools_qc/plotPCA/PCA.bed_coverage.tsv"] )
     return(file_list)
 
+def run_RaceID(skipRaceID):
+    if not skipRaceID:
+        file_list = [
+        "Filtered_cells_RaceID/metrics.tab.RData",
+        "Filtered_cells_RaceID/sessionInfo.txt",
+        'Filtered_cells_RaceID/Stats_report.html'
+        ]
+        return(file_list)
+    else:
+        return([])
+
 ### execute before workflow starts #############################################
 ################################################################################
 onstart:
@@ -93,28 +107,31 @@ onstart:
 
 ### main rule ##################################################################
 ################################################################################
-localrules: FASTQ
+localrules: FASTQ1, FASTQ2
 rule all:
     input:
-        expand("FASTQ/{sample}{read}.fastq.gz", sample = samples, read = reads),
-        expand("FASTQ_barcoded/{sample}.fastq.gz", sample = samples),
+        expand("FASTQ_barcoded/{sample}{read}.fastq.gz", sample = samples, read=reads[0]),
         run_Trimming(trim),
         expand("FastQC/{sample}{read}_fastqc.html", sample = samples, read=reads),
         expand(mapping_prg+"/{sample}.bam", sample = samples),
         expand(mapping_prg+"/{sample}.bam.bai", sample = samples),
         "Sambamba/flagstat_report_all.tsv",
+        "Annotation/genes.annotated.bed",
         "Annotation/genes.filtered.bed",
-        "Annotation/genes.filtered.gtf",
-        "Annotation/genes.filtered.transcripts.gtf",      
+        "Annotation/genes.filtered.gtf",   
         expand("Counts/{sample}.raw_counts.txt",sample = samples),
         expand("Counts/{sample}.featureCounts_summary.txt",sample = samples),
         expand("Counts/{sample}.corrected.txt",sample = samples),
         "Results/all_samples.gencode_genomic.corrected_merged.csv",
         "QC_report/QC_report.all_samples.libstats_reads.tsv",
+        "Filtered_cells_monocle/metrics.tab.RData",
+        "Filtered_cells_monocle/sessionInfo.txt",
+        run_RaceID(skipRaceID),
         run_deeptools_qc(),
         "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv",
         expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample = samples),
-        "multiQC/multiqc_report.html"
+        "multiQC/multiqc_report.html",
+        'Filtered_cells_monocle/Stats_report.html'
 
 
 ### execute after workflow finished ############################################

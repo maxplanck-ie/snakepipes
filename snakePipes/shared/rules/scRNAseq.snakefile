@@ -5,7 +5,7 @@ rule fastq_barcode:
             R1 = "FASTQ/{sample}"+reads[0]+".fastq.gz",
             R2 = "FASTQ/{sample}"+reads[1]+".fastq.gz"
         output:
-            R2_barcoded = "FASTQ_barcoded/{sample}.fastq.gz"
+            R2_barcoded = "FASTQ_barcoded/{sample}"+reads[0]+".fastq.gz"
         params:
             UMI_length = UMI_length,
             UMI_offset = UMI_offset,
@@ -101,6 +101,108 @@ rule combine_sample_counts:
     conda: CONDA_RNASEQ_ENV
     shell:
         "Rscript {params.merge_script} Counts/ {output.merged_matrix} {output.used_cell_names_file} {params.split} {params.sample_cell_names} """
+
+
+rule filter_cells_monocle:
+        input: 
+            merged_matrix = "Results/all_samples.gencode_genomic.corrected_merged.csv"
+        output:
+            metrics_tab = "Filtered_cells_monocle/metrics.tab.RData"
+        params:
+            wdir=os.path.join(outdir,"Filtered_cells_monocle"),
+            fINpath=lambda wildcards,input: os.path.join(outdir,input.merged_matrix)
+        log:
+            err='Filtered_cells_monocle/logs/filt_cells.err',
+            out='Filtered_cells_monocle/logs/filt_cells.out'
+        threads: 1
+        conda: CONDA_scRNASEQ_ENV
+        shell: "Rscript --no-save --no-restore " + os.path.join(workflow_rscripts,'scRNAseq_cell_filter_monocle.R ') + "{params.wdir} {params.fINpath} 1>{log.out} 2>{log.err}"
+
+
+rule cluster_cells_monocle:
+        input: 
+            metrics_tab = "Filtered_cells_monocle/metrics.tab.RData"
+        output:
+            dummy="Filtered_cells_monocle/sessionInfo.txt"
+        params:
+            wdir=os.path.join(outdir,"Filtered_cells_monocle"),
+            fINpath=lambda wildcards,input: os.path.join(outdir,input.metrics_tab),
+            err='Filtered_cells_monocle/logs/cluster_cells.err',
+            out='Filtered_cells_monocle/logs/cluster_cells.out',
+            metric=cell_filter_metric
+        threads: 1
+        conda: CONDA_scRNASEQ_ENV
+        shell: "Rscript --no-save --no-restore " + os.path.join(workflow_rscripts,'scRNAseq_select_threshold_cluster_monocle.R ') + "{params.wdir} {params.fINpath} {params.metric} 1>{params.out} 2>{params.err}"
+
+rule monocle_report:
+    input: 
+        dummy="Filtered_cells_monocle/sessionInfo.txt"
+    output:
+        html='Filtered_cells_monocle/Stats_report.html'
+    params:
+        statdir=os.path.join(outdir,"Filtered_cells_monocle"),
+        rmd_in=os.path.join(workflow_rscripts,"scRNAseq_monocle_stats_report.Rmd"),
+        rmd_out=os.path.join(outdir, "scRNAseq_monocle_stats_report.Rmd"),
+        outFull=lambda wildcards,output: os.path.join(outdir,output.html),
+        metric=cell_filter_metric
+    log:
+        err='Filtered_cells_monocle/logs/stats_report.err',
+        out='Filtered_cells_monocle/logs/stats_report.out'
+    conda: CONDA_RMD_ENV
+    threads: 1
+    shell: "cp -v {params.rmd_in} {params.rmd_out} ;Rscript -e 'rmarkdown::render(\"{params.rmd_out}\", params=list(outdir=\"{params.statdir}\",metric=\"{params.metric}\"), output_file=\"{params.outFull}\")' 1>{log.out} 2>{log.err}"
+
+
+if not skipRaceID:
+    rule filter_cells_raceid:
+            input: 
+                merged_matrix = "Results/all_samples.gencode_genomic.corrected_merged.csv"
+            output:
+                metrics_tab = "Filtered_cells_RaceID/metrics.tab.RData"
+            params:
+                wdir=os.path.join(outdir,"Filtered_cells_RaceID"),
+                fINpath=lambda wildcards,input: os.path.join(outdir,input.merged_matrix)
+            log:
+                err='Filtered_cells_RaceID/logs/filt_cells.err',
+                out='Filtered_cells_RaceID/logs/filt_cells.out'
+            threads: 1
+            conda: CONDA_scRNASEQ_ENV
+            shell: "Rscript --no-save --no-restore " + os.path.join(workflow_rscripts,'scRNAseq_cell_filter_raceid.R ') + "{params.wdir} {params.fINpath} 1>{log.out} 2>{log.err}"
+
+
+    rule cluster_cells_raceid:
+            input: 
+                metrics_tab = "Filtered_cells_RaceID/metrics.tab.RData"
+            output:
+                dummy="Filtered_cells_RaceID/sessionInfo.txt"
+            params:
+                wdir=os.path.join(outdir,"Filtered_cells_RaceID"),
+                fINpath=lambda wildcards,input: os.path.join(outdir,input.metrics_tab),
+                err='Filtered_cells_RaceID/logs/cluster_cells.err',
+                out='Filtered_cells_RaceID/logs/cluster_cells.out',
+                metric=cell_filter_metric
+            threads: 1
+            conda: CONDA_scRNASEQ_ENV
+            shell: "Rscript --no-save --no-restore " + os.path.join(workflow_rscripts,'scRNAseq_select_threshold_cluster_raceid.R ') + "{params.wdir} {params.fINpath} {params.metric} 1>{params.out} 2>{params.err}"
+
+
+    rule raceid_report:
+        input: 
+            dummy="Filtered_cells_RaceID/sessionInfo.txt"
+        output:
+            html='Filtered_cells_RaceID/Stats_report.html'
+        params:
+            statdir=os.path.join(outdir,"Filtered_cells_RaceID"),
+            rmd_in=os.path.join(workflow_rscripts,"scRNAseq_raceid_stats_report.Rmd"),
+            rmd_out=os.path.join(outdir, "scRNAseq_raceid_stats_report.Rmd"),
+            outFull=lambda wildcards,output: os.path.join(outdir,output.html),
+            metric=cell_filter_metric
+        log:
+            err='Filtered_cells_RaceID/logs/stats_report.err',
+            out='Filtered_cells_RaceID/logs/stats_report.out'
+        conda: CONDA_RMD_ENV
+        threads: 1
+        shell: "cp -v {params.rmd_in} {params.rmd_out} ;Rscript -e 'rmarkdown::render(\"{params.rmd_out}\", params=list(outdir=\"{params.statdir}\",metric=\"{params.metric}\"), output_file=\"{params.outFull}\")' 1>{log.out} 2>{log.err}"
 
 
 rule sc_QC_metrics:

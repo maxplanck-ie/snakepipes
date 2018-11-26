@@ -9,7 +9,7 @@ maindir = os.path.dirname(os.path.dirname(workflow.basedir))
 globals().update(cf.set_env_yamls())
 
 # load config file
-globals().update(cf.load_configfile(workflow.overwrite_configfile,config["verbose"]))
+globals().update(cf.load_configfile(workflow.overwrite_configfile, config["verbose"]))
 # load organism-specific data, i.e. genome indices, annotation, etc.
 globals().update(cf.load_organism_data(genome, maindir, config["verbose"]))
 
@@ -23,7 +23,7 @@ include: os.path.join(workflow.basedir, "internals.snakefile")
 ### include modules of other snakefiles ########################################
 ################################################################################
 # Import deeptools cmds
-include: os.path.join(maindir, "shared", "tools" , "deeptools_cmds.snakefile")
+include: os.path.join(maindir, "shared", "tools", "deeptools_cmds.snakefile")
 
 # ATAC-seq open chromatin
 include: os.path.join(maindir, "shared", "rules", "ATAC.snakefile")
@@ -32,7 +32,7 @@ include: os.path.join(maindir, "shared", "rules", "ATAC.snakefile")
 include: os.path.join(maindir, "shared", "rules", "ATAC_qc.snakefile")
 
 # flags for allelic mode
-if os.path.isdir(os.path.join(workingdir,'allelic_bams') ) and os.listdir(os.path.join(workingdir,'allelic_bams') ) != []:
+if os.path.isdir(os.path.join(workingdir, 'allelic_bams')) and os.listdir(os.path.join(workingdir, 'allelic_bams')) != []:
     allele_info = 'TRUE'
 else:
     allele_info = 'FALSE'
@@ -41,7 +41,7 @@ else:
 chip_samples = samples
 paired = True
 fragment_length = cf.get_fragment_length("deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv", chip_samples[0])
-if sample_info:
+if sampleSheet:
     include: os.path.join(maindir, "shared", "rules", "CSAW.snakefile")
 
 ## add outputs as asked
@@ -54,8 +54,8 @@ def run_deepTools_allelic():
     return(file_list)
 
 def run_CSAW():
-    if sample_info:
-        return( ["CSAW/CSAW.session_info.txt"] )
+    if sampleSheet:
+        return(["CSAW/CSAW.session_info.txt"])
     else:
         return([])
 
@@ -66,7 +66,7 @@ onstart:
     if "verbose" in config and config["verbose"]:
         print("--- Workflow parameters --------------------------------------------------------")
         print("samples:", samples)
-        print("ATAC fragment cutoff: ", atac_fragment_cutoff)
+        print("ATAC fragment cutoff: ", fragmentSize_cutoff)
         print("-" * 80, "\n")
 
         print("--- Environment ----------------------------------------------------------------")
@@ -104,6 +104,6 @@ rule all:
 ### execute after workflow finished ############################################
 ################################################################################
 onsuccess:
-    cf.cleanLogs(outdir)
+    cf.cleanLogs(workingdir)
     if "verbose" in config and config["verbose"]:
         print("\n--- ATAC OpenChrom workflow finished successfully! --------------------------------\n")
