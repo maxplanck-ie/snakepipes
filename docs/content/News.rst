@@ -1,6 +1,12 @@
 snakePipes News
 ===============
 
+snakePipes 1.1.1
+----------------
+
+ * Fixed some conda environments so they could all be solved in a reasonable amount of time.
+ * Updated some WGBS memory limits
+
 snakePipes 1.1.0
 ----------------
 
