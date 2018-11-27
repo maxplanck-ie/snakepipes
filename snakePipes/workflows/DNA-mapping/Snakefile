@@ -111,7 +111,7 @@ def run_deepTools_qc():
                 "deepTools_qc/plotCorrelation/correlation.pearson.read_coverage_allelic.tsv",
                 "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage_allelic.tsv",
                 "deepTools_qc/plotPCA/PCA.read_coverage_allelic.tsv" ] )
-	file_list.append(expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample = samples))
+    file_list.append(expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample = samples))
     return (file_list)
 
 def run_Qualimap():
