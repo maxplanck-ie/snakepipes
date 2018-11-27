@@ -29,6 +29,7 @@ get_nrow_filtered<-function(resdir,statscat){
     } else if (statscat %in% "user_intervals"){
         nrf<-unlist(lapply(dir(resdir,pattern="*.aggCpG.RData",full.names=TRUE),function(X){load(X);sprintf("%s (%s)",nrow(CGI.limdat.CC),gsub(".aggCpG.RData","",basename(X)))}))
     }
+    if(is.null(nrf)){nrf<-0}
     return(nrf)
 }
 
@@ -41,6 +42,7 @@ get_nrow_topTable<-function(resdir,statscat){
     } else if (statscat %in% "user_intervals"){
         nrtt<-unlist(lapply(dir(resdir,pattern="*.tT_filt.txt",full.names=TRUE),function(X)sprintf("%s (%s)",length(readLines(X)),gsub(".tT_filt.txt","",basename(X)))))
     }
+    if(is.null(nrtt)){nrtt<-0}
     return(nrtt)
 }
 
