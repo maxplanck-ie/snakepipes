@@ -540,7 +540,8 @@ if sampleSheet:
         input: 
             Limdat='{}/limdat.LG.RData'.format(get_outdir("singleCpG_stats_limma"))
         output:
-            RDatAll='{}/singleCpG.RData'.format(get_outdir("singleCpG_stats_limma"))
+            RDatAll='{}/singleCpG.RData'.format(get_outdir("singleCpG_stats_limma")),
+            sinfo='{}/sessionInfo.txt'.format(get_outdir("singleCpG_stats_limma"))
         params:
             statdir=os.path.join(outdir,'{}'.format(get_outdir("singleCpG_stats_limma"))),
             sampleSheet=sampleSheet,
@@ -558,7 +559,7 @@ if sampleSheet:
     rule CpG_report:
         input: 
             Limdat='{}/limdat.LG.RData'.format(get_outdir("singleCpG_stats_limma")),
-            RDatAll='{}/singleCpG.RData'.format(get_outdir("singleCpG_stats_limma"))
+            sinfo='{}/sessionInfo.txt'.format(get_outdir("singleCpG_stats_limma"))
         output:
             html='{}/Stats_report.html'.format(get_outdir("singleCpG_stats_limma"))
         params:
@@ -682,7 +683,8 @@ if intList:
                 sampleSheet=sampleSheet,
                 aux=run_int_aggStats(intList,False)
             output:
-                outFiles=run_int_aggStats(intList,sampleSheet)
+                outFiles=run_int_aggStats(intList,sampleSheet),
+                sinfo='{}/sessionInfo.txt'.format(get_outdir("aggregate_stats_limma"))
             params:
                 auxshell=lambda wildcards,input:';'.join(['Rscript --no-save --no-restore ' + os.path.join(workflow_rscripts,'WGBSpipe.interval_stats.limma.R ') + os.path.join(outdir,'{}'.format(get_outdir("aggregate_stats_limma"))) + ' ' + li +' '+ aui +' ' + os.path.join(outdir,input.Limdat) + ' '  + input.sampleSheet + ' ' + str(minAbsDiff) + ' ' + str(FDR) + ' ' + os.path.join(workflow_rscripts, "WGBSstats_functions.R")  for li,aui in zip(intList,[os.path.join(outdir,"aux_files",re.sub('.fa',re.sub('.bed','.CpGlist.bed',os.path.basename(x)),os.path.basename(refG))) for x in intList])])
             log:
@@ -695,7 +697,7 @@ if intList:
 
         rule intAgg_report:
             input: 
-                outFiles=run_int_aggStats(intList,sampleSheet)
+                outFiles='{}/sessionInfo.txt'.format(get_outdir("aggregate_stats_limma"))
             output:
                 html='{}/Stats_report.html'.format(get_outdir("aggregate_stats_limma"))
             params:
