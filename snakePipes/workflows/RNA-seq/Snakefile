@@ -196,8 +196,9 @@ def run_deepTools_qc():
         expand("bamCoverage/{sample}.RPKM.bw", sample = samples),
         expand("bamCoverage/{sample}.coverage.bw", sample = samples),
         "deepTools_qc/plotEnrichment/plotEnrichment.tsv",
-        "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv",
         expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample = samples)]
+        if paired:
+            file_list.append("deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv")
         if len(samples)>1:
             file_list.append( ["deepTools_qc/multiBigwigSummary/coverage.bed.npz",
                               "deepTools_qc/plotCorrelation/correlation.pearson.bed_coverage.tsv",
@@ -256,8 +257,9 @@ onstart:
 
 ### main rule ##################################################################
 ################################################################################
+
 if not fromBam:
-    localrules: FASTQ
+    localrules: FASTQ1, FASTQ2
 
     rule all:
         input:

@@ -29,9 +29,6 @@ infiles = sorted(glob.glob(os.path.join(str(indir or ''), '*'+ext)))
 
 paired = cf.is_paired(infiles,ext,reads)
 
-if not paired:
-    reads = [""]
-
 samples = cf.get_sample_names(infiles,ext,reads)
 
 del infiles

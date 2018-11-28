@@ -40,6 +40,7 @@ else:
     infiles = sorted(glob.glob(os.path.join(str(indir or ''), '*'+bam_ext)))
     samples = cf.get_sample_names_bam(infiles,bam_ext)
 
+
 if sampleSheet:
     cf.check_sample_info_header(sampleSheet)
 

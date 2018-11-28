@@ -4,6 +4,9 @@ from os import path
 def multiqc_input_check(return_value):
     infiles = []
     indir = ""
+    readsIdx = 1
+    if paired:
+        readsIdx = 2
 
     if not pipeline=="scrna-seq" and not fromBam:
         if paired:
@@ -24,7 +27,6 @@ def multiqc_input_check(return_value):
             elif fastqc:
                 infiles.append( expand("FastQC/{sample}_fastqc.html", sample = samples) )
                 indir +=" FastQC "
-
     if pipeline=="dna-mapping":
         # pipeline is DNA-mapping
         infiles.append( expand("Bowtie2/{sample}.Bowtie2_summary.txt", sample = samples) +

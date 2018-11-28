@@ -73,7 +73,7 @@ As you can see above, the same control can be used for multiple samples.
 Differential Binding analysis
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you wish to perform differential binding analysis between two group of samples, for example wild-type vs Knock-outs, via snakePipes. You would require a sample-sheet.
+If you wish to perform differential binding analysis between two group of samples, for example wild-type vs Knock-outs, via snakePipes. You would require a sample-sheet and the ``--sampleSheet`` option.
 
 The sample sheet is a tab-separated file with two columns, named name and condition. An example is below::
 

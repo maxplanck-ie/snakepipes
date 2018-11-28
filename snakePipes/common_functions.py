@@ -248,9 +248,8 @@ def check_sample_info_header(sampleSheet_file):
     if not os.path.isfile(sampleSheet_file):
         sys.exit("ERROR: Cannot find sample info file! (--sampleSheet {})\n".format(sampleSheet_file))
     sampleSheet_file = os.path.abspath(sampleSheet_file)
-    ret = subprocess.check_output("cat " + sampleSheet_file + " | head -n1",
-                                  shell=True).decode()
-    if "name" in ret.split() and "condition" in ret.split():
+    ret = open(sampleSheet_file).read().split("\n")[0].split()
+    if "name" in ret and "condition" in ret:
         print("Sample sheet found and format is ok!\n")
     else:
         sys.exit("ERROR: Please use 'name' and 'condition' as column headers in sample info file! ({})\n".format(sampleSheet_file))
@@ -356,7 +355,6 @@ def checkCommonArguments(args, baseDir, outDir=False, createIndices=False):
     # 2. Sample info file
     if 'sampleSheet' in args and args.sampleSheet:
         args.sampleSheet = check_sample_info_header(args.sampleSheet)
-
     # 3. get abspath from user provided genome/organism file
     if not createIndices:
         if not os.path.isfile(os.path.join(baseDir, "shared/organisms/{}.yaml".format(args.genome))) and os.path.isfile(args.genome):

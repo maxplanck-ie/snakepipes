@@ -12,6 +12,8 @@ downsample_reads:
     memory: 6G
 conv_rate:
     memory: 6G
+prep_for_stats:
+    memory: 30G
 CpG_stats:
     memory: 30G
 cleanup_metilene:
@@ -24,3 +26,5 @@ get_ran_CG:
     memory: 3G
 CpG_report:
     memory: 3G
+intAgg_report:
+    memory: 6G
