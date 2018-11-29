@@ -39,7 +39,7 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
     optional.add_argument("--single-end",
                           dest="paired",
                           action="store_false",
-                          help="input data is single-end, not paired-end",
+                          help="Input data is single-end, not paired-end",
                           default=defaults["paired"])
 
     optional.add_argument("--BAMPE",

@@ -127,7 +127,7 @@ onstart:
         print(smaple_dict)
 ### main rule ##################################################################
 ################################################################################
-localrules: FASTQ
+localrules: FASTQ1, FASTQ2
 
 rule all:
     input:

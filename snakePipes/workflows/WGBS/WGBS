@@ -122,7 +122,7 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
                           metavar="STR",
                           action='store',
                           type=str,
-                          help="Invoke Differential Methylation module between groups of samples by providing a text file with sample information to use for statistical analysis. (default: '%(default)s')",
+                          help="Perform differential methylation analysis between groups of samples by providing a text file with sample information to use for statistical analysis. (default: '%(default)s')",
                           default=defaults["sampleSheet"])
 
     optional.add_argument("--mbias",

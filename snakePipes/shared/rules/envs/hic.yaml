@@ -5,5 +5,5 @@ channels:
 dependencies:
  - hicexplorer = 2.1.4
  - bwa = 0.7.17
- - samtools = 1.8
- - python-dateutil = 2.7.3
+ - samtools = 1.9
+ - python-dateutil = 2.7.5

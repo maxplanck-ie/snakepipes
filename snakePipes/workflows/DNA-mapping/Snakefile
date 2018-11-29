@@ -75,18 +75,23 @@ else:
 
 ### conditional/optional rules #################################################
 ################################################################################
+
+idxRange = 1
+if paired:
+    idxRange = 2
+
 def run_FastQC(fastqc):
     if fastqc:
-        return( expand("FastQC/{sample}{read}_fastqc.html", sample = samples, read = reads) )
+        return( expand("FastQC/{sample}{read}_fastqc.html", sample = samples, read = reads[:idxRange]) )
     else:
         return([])
 
 def run_Trimming(trim, fastqc):
     if trim and fastqc:
-        return( expand(fastq_dir+"/{sample}{read}.fastq.gz", sample = samples, read = reads) +
-                expand("FastQC_trimmed/{sample}{read}_fastqc.html", sample = samples, read = reads) )
+        return( expand(fastq_dir+"/{sample}{read}.fastq.gz", sample = samples, read = reads[:idxRange]) +
+                expand("FastQC_trimmed/{sample}{read}_fastqc.html", sample = samples, read = reads[:idxRange]) )
     elif trim:
-        return( expand(fastq_dir+"/{sample}{read}.fastq.gz", sample = samples, read = reads) )
+        return( expand(fastq_dir+"/{sample}{read}.fastq.gz", sample = samples, read = reads[:idxRange]) )
     else:
         return([])
 
@@ -111,7 +116,7 @@ def run_deepTools_qc():
                 "deepTools_qc/plotCorrelation/correlation.pearson.read_coverage_allelic.tsv",
                 "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage_allelic.tsv",
                 "deepTools_qc/plotPCA/PCA.read_coverage_allelic.tsv" ] )
-	file_list.append(expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample = samples))
+    file_list.append(expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample = samples))
     return (file_list)
 
 def run_Qualimap():
@@ -168,11 +173,10 @@ onstart:
 
 ### main rule ##################################################################
 ################################################################################
-localrules: FASTQ
+localrules: FASTQ1, FASTQ2
 
 rule all:
     input:
-        expand("FASTQ/{sample}{read}.fastq.gz", sample = samples, read = reads),
         run_FastQC(fastqc),
         run_Trimming(trim, fastqc),
         expand(mapping_prg+"/{sample}.bam", sample = samples),
