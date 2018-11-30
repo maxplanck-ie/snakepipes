@@ -9,7 +9,7 @@ print_sessionInfo<-function(mytext){
 
 get_nrow_input<-function(resdir,statscat){
     if(statscat %in% "single_CpGs"){
-        load(file.path(resdir,"limdat.LG.RData"))
+        load(file.path(gsub("singleCpG_stats_limma","merged_methylation_data",resdir),"limdat.LG.RData"))
         nri<-nrow(limdat.LG)
     } else if (statscat %in% "metilene_DMRs"){
         nri<-length(readLines(file.path(resdir,"singleCpG.metilene.bed")))
@@ -21,7 +21,7 @@ get_nrow_input<-function(resdir,statscat){
 
 get_nrow_filtered<-function(resdir,statscat){
     if(statscat %in% "single_CpGs"){
-        load(file.path(resdir,"limdat.LG.RData"))
+        load(file.path(gsub("singleCpG_stats_limma","merged_methylation_data",resdir),"limdat.LG.RData"))
         nrf<-sum(complete.cases(limdat.LG))
     } else if (statscat %in% "metilene_DMRs"){
         load(file.path(resdir,"CGI.limdat.CC.RData"))
