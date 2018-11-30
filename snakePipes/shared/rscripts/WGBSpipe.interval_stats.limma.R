@@ -195,8 +195,8 @@ if(nrow(bedtab.CC)==0) {print_sessionInfo("None of the genomic intervals passed 
             nrow(tT_filt)/nrow(CGI.limdat.CC.logit)
 
             save(bedtab,limdat.LG.inCGI,CGI.limdat.CC,CGI.limdat.CC.Means,tT_filt,file=paste0(bedshort,".aggCpG.RData"))
-
+        print_sessionInfo("Analysis completed succesfully.")
         }###end if topTable has at least 1 entry
     } else {print_sessionInfo('More than 2 sample groups were provided. No statistical inference will be computed.')}### end if exactly two sample groups were specified
-    print_sessionInfo("Analysis completed succesfully.")
+    
 }
