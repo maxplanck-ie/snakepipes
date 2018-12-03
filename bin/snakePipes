@@ -209,15 +209,15 @@ def createCondaEnvs(args):
                 subprocess.check_call(cmd)
 
         # Ignore site-packages
-        if args.noSitePackages:
+        if args.noSitePackages and not args.info:
             fixSitePy(os.path.join(condaDirUse, h))
 
     # We can't actually install GATK with conda, which is annoying
-    if gatkEnv and not args.skipGATK:
+    if gatkEnv and not args.skipGATK and not args.info:
         registerGATK(gatkEnv)
 
     # Ignore site-packages in this env
-    if args.noSitePackages:
+    if args.noSitePackages and not args.info:
         fixSitePy(rootDir)
 
 
