@@ -1,5 +1,5 @@
 MACS2:
-    memory: 2G
+    memory: 8G
 histoneHMM:
     memory: 4G
 CSAW:

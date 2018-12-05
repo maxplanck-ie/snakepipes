@@ -6,6 +6,7 @@ snakePipes 1.1.2
 
  * A number of minor bug fixes and enhancements in the HiC and WGBS pipelines
  * The RNA-seq pipeline now uses samtools for sorting. This should avoid issues with STAR running out of memory during the output sorting step.
+ * Increased the memory allocation for MACS2 to 8GB
 
 snakePipes 1.1.1
 ----------------
