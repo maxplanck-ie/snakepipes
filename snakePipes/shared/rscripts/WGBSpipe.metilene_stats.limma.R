@@ -76,6 +76,7 @@ if (length(readLines(bedF))==0) {print_sessionInfo("No DMRs found.")}else{
     bedtab.CC<-bedtab[complete.cases(bedtab),]
     if(nrow(bedtab.CC)==0) {print_sessionInfo("None of the metilene intervals passed the filtering.")}else{
 
+        limdat.LG.inCGI<-limdat.LG.inCGI[complete.cases(limdat.LG.inCGI),] ##to be consistent with metilene input!
         CGI.limdat<-as.data.frame(apply(limdat.LG.inCGI[,2:(ncol(limdat.LG.inCGI)-3)],2,function(X){ave(X,factor(limdat.LG.inCGI$IntID),FUN=function(X)mean(X,na.rm=TRUE))}),stringsAsFactors=FALSE)
 
         CGI.limdat$IntID<-limdat.LG.inCGI$IntID
@@ -83,8 +84,7 @@ if (length(readLines(bedF))==0) {print_sessionInfo("No DMRs found.")}else{
         rownames(CGI.limdat)<-CGI.limdat$IntID
         CGI.limdat<-CGI.limdat[,-grep("IntID",colnames(CGI.limdat))]
 
-        CGI.limdat.CC<-CGI.limdat[bedtab.CC$Name,]
-
+        CGI.limdat.CC<-CGI.limdat[bedtab.CC$Name,] ##this applies the bedtab$CGI.NAf filter
     ####for differential interval methylation
     ### limma + ebayes + BH p value adjustment
 
@@ -137,12 +137,10 @@ if (length(readLines(bedF))==0) {print_sessionInfo("No DMRs found.")}else{
         if("Control" %in% sampleSheet$condition){
             gp<-factor(sampleSheet$condition[match(colnames(CGI.limdat.CC.logit),sampleSheet$name)])
             gp<-relevel(gp,ref="Control")
-            design$Group<-as.numeric(gp)}
-        if("WT" %in% sampleSheet$condition){
+            design$Group<-as.numeric(gp)} else if("WT" %in% sampleSheet$condition){
             gp<-factor(sampleSheet$condition[match(colnames(CGI.limdat.CC.logit),sampleSheet$name)])
             gp<-relevel(gp,ref="WT")
-            design$Group<-as.numeric(gp)}
-        else{design$Group<-as.numeric(factor(sampleSheet$condition))}
+            design$Group<-as.numeric(gp)}else{design$Group<-as.numeric(factor(sampleSheet$condition))}
         design$Intercept<-1
         design<-as.matrix(design)
 
@@ -162,8 +160,7 @@ if (length(readLines(bedF))==0) {print_sessionInfo("No DMRs found.")}else{
 
 ### annotate top table with mean difference
         meandatW<-dcast(data=CGI.limdat.CC.Means,IntID~Group,value.var="Beta.Mean")
-        if(sum(c("Control","Treatment") %in% colnames(meandatW))==2){meandatW$Diff<-with(meandatW,Treatment-Control)}
-        if(sum(c("WT","Mut") %in% colnames(meandatW))==2){meandatW$Diff<-with(meandatW,Mut-WT)}else{meandatW$Diff<-meandatW[,2]-meandatW[,3]}
+        if(sum(c("Control","Treatment") %in% colnames(meandatW))==2){meandatW$Diff<-with(meandatW,Treatment-Control)} else if(sum(c("WT","Mut") %in% colnames(meandatW))==2){meandatW$Diff<-with(meandatW,Mut-WT)}else{meandatW$Diff<-meandatW[,2]-meandatW[,3]}
 
         tT$Diff<-meandatW$Diff[match(rownames(tT),meandatW$IntID)]
 
