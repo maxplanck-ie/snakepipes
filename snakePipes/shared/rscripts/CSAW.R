@@ -1,5 +1,6 @@
 #!/usr/bin/env Rscript
 ## ChIPseq differential binding workflow
+.libPaths(R.home("library"))
 
 sampleInfoFilePath <- snakemake@input[["sampleSheet"]]  #"samplesheet.tab"
 insert_size_metrics <- snakemake@input[["insert_size_metrics"]] # bamPEFragmentSize output

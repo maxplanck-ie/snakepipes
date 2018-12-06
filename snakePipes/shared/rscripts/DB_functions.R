@@ -13,6 +13,9 @@
 #' @examples
 #' readfiles_chip(csvFile = "testBAMs/testSampleSheet.csv", refAllele = "pat")
 #'
+
+.libPaths(R.home("library"))
+
 readfiles_chip <- function(sampleSheet, fragment_length, window_size, alleleSpecific = FALSE, pe.param){
 
     # check that not >2 conditions are given

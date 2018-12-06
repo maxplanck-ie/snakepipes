@@ -1,4 +1,7 @@
 #run in R3.4.0
+
+.libPaths(R.home("library"))
+
 #set working directory
 wdir<-commandArgs(trailingOnly=TRUE)[1]
 #system(paste0('mkdir -p ',wdir)) #for debugging
