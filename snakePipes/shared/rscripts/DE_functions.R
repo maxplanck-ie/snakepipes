@@ -15,6 +15,8 @@
 #' @examples
 #'
 
+.libPaths(R.home("library"))
+
 checktable <- function(countdata = NA, sampleSheet = NA, alleleSpecific = FALSE, salmon_dir = NA, tx2gene_annot = NA) {
 
   ## check whether colnames are allele-specific

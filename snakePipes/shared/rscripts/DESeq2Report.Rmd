@@ -26,6 +26,7 @@ params:
 
 ```{r setup}
 #### Libraries needed
+.libPaths(R.home('library'))
 
 ## Bioconductor
 library('DESeq2')

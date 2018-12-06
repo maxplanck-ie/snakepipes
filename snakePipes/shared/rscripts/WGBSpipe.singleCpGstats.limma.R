@@ -1,3 +1,5 @@
+.libPaths(R.home("library"))
+
 #run in R-3.3.1
 #set working directory
 wdir<-commandArgs(trailingOnly=TRUE)[1]
