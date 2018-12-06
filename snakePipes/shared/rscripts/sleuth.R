@@ -1,3 +1,5 @@
+.libPaths(R.home("library"))
+
 library("sleuth")
 library("dplyr")
 #library("biomaRt")

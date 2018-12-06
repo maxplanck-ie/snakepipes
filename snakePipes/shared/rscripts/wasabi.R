@@ -1,3 +1,5 @@
+.libPaths(R.home("library"))
+
 library(wasabi)
 
 args = commandArgs(trailingOnly=TRUE)

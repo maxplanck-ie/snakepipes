@@ -14,6 +14,8 @@ title: "`r paste0('WGBS ',params$stat_category,' stats report')`"
 ---
 
 ```{r setup, include=FALSE}
+.libPaths(R.home("library"))
+
 knitr::opts_chunk$set(echo = FALSE, out.width = '50%',out.height='50%')
 source(params$input_func)
 ```
