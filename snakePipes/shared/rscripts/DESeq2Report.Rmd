@@ -458,16 +458,16 @@ plotCounts_gg <- function(i, dds, intgroup) {
     ## Change in version 1.15.3
     ## It might not be necessary to have any of this if else, but I'm not
     ## sure that plotCounts(returnData) will always return the 'group' variable.
-    if('group' %in% colnames(data)) {
+    if('condition' %in% colnames(data)) {
         data$group <- group
     } else {
         data <- cbind(data, data.frame('group' = group))
     }
 
-    ggplot(data, aes(x = group, y = count)) + geom_point() + ylab('Normalized count') + ggtitle(i) + coord_trans(y = "log10") + theme(axis.text.x = element_text(angle = 90, hjust = 1))
+    ggplot(data, aes(x = group, y = count)) + geom_jitter(width=0.2) + ylab('Normalized count') + ggtitle(i) + coord_trans(y = "log10") + theme(axis.text.x = element_text(angle = 90, hjust = 1))
 }
 for(i in head(features, nBestFeatures)) {
-    print(plotCounts_gg(i, dds = dds, intgroup = intgroup))
+    print(plotCounts_gg(i, dds = dds, intgroup = intgroup[2:length(intgroup)]))
 }
 ```
 
