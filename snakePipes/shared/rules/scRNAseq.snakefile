@@ -1,9 +1,9 @@
 ### add barcodes from R1 to R2 #########
 
 rule fastq_barcode:
-        input:
-            R1 = "FASTQ/{sample}"+reads[0]+".fastq.gz",
-            R2 = "FASTQ/{sample}"+reads[1]+".fastq.gz"
+        input: ## remember that we swapped reads[] in internals.snakefile in this workflow!!!
+            R2 = "FASTQ/{sample}"+reads[0]+".fastq.gz",
+            R1 = "FASTQ/{sample}"+reads[1]+".fastq.gz"
         output:
             R2_barcoded = "FASTQ_barcoded/{sample}"+reads[0]+".fastq.gz"
         params:

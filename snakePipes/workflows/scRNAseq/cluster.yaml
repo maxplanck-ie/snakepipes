@@ -1,5 +1,5 @@
 STAR:
-    memory: 3200M
+    memory: 3500M
 sc_bam_featureCounts_genomic:
     memory: 4G
 combine_sample_counts:
