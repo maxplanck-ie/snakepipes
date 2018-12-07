@@ -1,3 +1,5 @@
+.libPaths(R.home("library"))
+
 ##to be called by WGBS stats Rscripts
 
 print_sessionInfo<-function(mytext){
