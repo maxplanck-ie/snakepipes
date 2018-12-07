@@ -139,4 +139,4 @@ rule all:
 onsuccess:
     cf.cleanLogs(outdir)
     if "verbose" in config and config["verbose"]:
-        print("\n--- scRNAseq-mapcount workflow finished successfully! --------------------------------\n")
+        print("\n--- scRNAseq workflow finished successfully! --------------------------------\n")
