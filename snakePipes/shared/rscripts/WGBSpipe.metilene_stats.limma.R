@@ -228,9 +228,9 @@ if (length(readLines(bedF))==0) {print_sessionInfo("No DMRs found.")}else{
                 DMR.filt.an2.neg<-DMR.filt.an2[DMR.filt.an2$MeanDiff<=(-minAbsDiff)&!is.na(DMR.filt.an2$adj.P.Val),] 
                 if(nrow(DMR.filt.an2.neg)>0){write.table(DMR.filt.an2.neg,file="metilene.limma.annotated_filtered.DOWN.txt",row.names=FALSE,quote=FALSE,sep="\t")}
             } else {print_sessionInfo("No gene models file was provided.")}
-
+        print_sessionInfo("Analysis completed succesfully.")
         } # end if tT_filt has at least 1 row
     } # end if any intervals passed filtering
-    print_sessionInfo("Analysis completed succesfully.")
+    
 } #end if bed file has at least 1 line
 

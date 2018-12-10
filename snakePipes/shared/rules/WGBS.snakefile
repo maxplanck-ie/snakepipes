@@ -521,11 +521,11 @@ if sampleSheet:
     rule prep_for_stats:
         input: expand("methXT/{sample}.CpG.filt2.bed",sample=samples)
         output:
-            Limdat='{}/limdat.LG.RData'.format(get_outdir("singleCpG_stats_limma")),
-            MetIN='{}/metilene.IN.txt'.format(get_outdir("singleCpG_stats_limma")),
-            Gifnfo='{}/groupInfo.txt'.format(get_outdir("singleCpG_stats_limma"))
+            Limdat='{}/limdat.LG.RData'.format(get_outdir("merged_methylation_data")),
+            MetIN='{}/metilene.IN.txt'.format(get_outdir("merged_methylation_data")),
+            Gifnfo='{}/groupInfo.txt'.format(get_outdir("merged_methylation_data"))
         params:
-            statdir=os.path.join(outdir,'{}'.format(get_outdir("singleCpG_stats_limma"))),
+            statdir=os.path.join(outdir,'{}'.format(get_outdir("merged_methylation_data"))),
             sampleSheet=sampleSheet,
             importfunc = os.path.join(workflow_rscripts, "WGBSstats_functions.R")
         log:
@@ -538,12 +538,13 @@ if sampleSheet:
 
     rule CpG_stats:
         input: 
-            Limdat='{}/limdat.LG.RData'.format(get_outdir("singleCpG_stats_limma"))
+            Limdat='{}/limdat.LG.RData'.format(get_outdir("merged_methylation_data"))
         output:
             RDatAll='{}/singleCpG.RData'.format(get_outdir("singleCpG_stats_limma")),
             sinfo='{}/sessionInfo.txt'.format(get_outdir("singleCpG_stats_limma"))
         params:
             statdir=os.path.join(outdir,'{}'.format(get_outdir("singleCpG_stats_limma"))),
+            datdir=os.path.join(outdir,'{}'.format(get_outdir("merged_methylation_data"))),
             sampleSheet=sampleSheet,
             diff=minAbsDiff,
             fdr=FDR,
@@ -553,13 +554,13 @@ if sampleSheet:
             out='{}/logs/CpG_stats.out'.format(get_outdir("singleCpG_stats_limma"))
         threads: 1
         conda: CONDA_WGBS_ENV
-        shell: "Rscript --no-save --no-restore " + os.path.join(workflow_rscripts,'WGBSpipe.singleCpGstats.limma.R ') + "{params.statdir} {params.sampleSheet} "  + os.path.join(outdir,"methXT") + " {params.diff} {params.fdr} {params.importfunc} 1>{log.out} 2>{log.err}"
+        shell: "Rscript --no-save --no-restore " + os.path.join(workflow_rscripts,'WGBSpipe.singleCpGstats.limma.R ') + "{params.statdir} {params.sampleSheet} {params.datdir} {params.diff} {params.fdr} {params.importfunc} 1>{log.out} 2>{log.err}"
 
 
     rule CpG_report:
         input: 
-            Limdat='{}/limdat.LG.RData'.format(get_outdir("singleCpG_stats_limma")),
-            sinfo='{}/sessionInfo.txt'.format(get_outdir("singleCpG_stats_limma"))
+            Limdat='{}/limdat.LG.RData'.format(get_outdir("merged_methylation_data")),
+            sinfo='{}/singleCpG.RData'.format(get_outdir("singleCpG_stats_limma"))
         output:
             html='{}/Stats_report.html'.format(get_outdir("singleCpG_stats_limma"))
         params:
@@ -580,8 +581,8 @@ if sampleSheet:
 
     rule run_metilene:
         input:
-            MetIN='{}/metilene.IN.txt'.format(get_outdir("singleCpG_stats_limma")),
-            Ginfo='{}/groupInfo.txt'.format(get_outdir("singleCpG_stats_limma"))
+            MetIN='{}/metilene.IN.txt'.format(get_outdir("merged_methylation_data")),
+            Ginfo='{}/groupInfo.txt'.format(get_outdir("merged_methylation_data"))
         output:
             MetBed='{}/singleCpG.metilene.bed'.format(get_outdir("metilene_out"))
         params:
@@ -614,7 +615,7 @@ if sampleSheet:
 
     rule cleanup_metilene:
         input:
-            Limdat='{}/limdat.LG.RData'.format(get_outdir("singleCpG_stats_limma")),
+            Limdat='{}/limdat.LG.RData'.format(get_outdir("merged_methylation_data")),
             MetBed='{}/singleCpG.metilene.bed'.format(get_outdir("metilene_out")),
             MetCG=os.path.join("aux_files",re.sub('_sampleSheet.[a-z]{3}$','.metilene.CpGlist.bed',os.path.basename(sampleSheet))),
             sampleSheet=sampleSheet
@@ -677,7 +678,7 @@ if intList:
     if sampleSheet:
         rule intAgg_stats:
             input:
-                Limdat='{}/limdat.LG.RData'.format(get_outdir("singleCpG_stats_limma")),
+                Limdat='{}/limdat.LG.RData'.format(get_outdir("merged_methylation_data")),
                 intList=intList,
                 refG=refG,
                 sampleSheet=sampleSheet,
