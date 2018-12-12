@@ -195,6 +195,8 @@ def run_deepTools_qc():
         file_list = [
         expand("bamCoverage/{sample}.RPKM.bw", sample = samples),
         expand("bamCoverage/{sample}.coverage.bw", sample = samples),
+        expand("bamCoverage/{sample}.uniqueMappings.fwd.bw", sample = samples),
+        expand("bamCoverage/{sample}.uniqueMappings.rev.bw", sample = samples),
         "deepTools_qc/plotEnrichment/plotEnrichment.tsv",
         expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample = samples)]
         if paired:
