@@ -18,6 +18,8 @@ This report summarizes statistical analyses of your single cell data stored in `
 The distribution of total transcript counts per cell (TPC) in unnormalized data was plotted.   
 
 ```{r}
+.libPaths(R.home("library"))
+
 knitr::include_graphics(file.path(params$outdir,"Expdata.ColumnSums.png"))
 ```
 
