@@ -510,7 +510,7 @@ def runAndCleanup(args, cmd, logfile_name, temp_path):
         sendEmail(args, 0)
 
 
-def predict_chip_dict(wdir,bamExt,fromBam=None):
+def predict_chip_dict(wdir, bamExt, fromBam=None):
     """
     Predict a chip_dict from bam files under filtered_bam/ from DNA-mapping workflow
     ChIP input/control samples are identified from pattern 'input' (case ignored)
@@ -520,7 +520,7 @@ def predict_chip_dict(wdir,bamExt,fromBam=None):
     pat1 = re.compile(r"input.*$", re.IGNORECASE)
     pat2 = re.compile(r"^.*input", re.IGNORECASE)
     if fromBam:
-        infiles = sorted(glob.glob(os.path.join(fromBam, '*'+bamExt)))
+        infiles = sorted(glob.glob(os.path.join(fromBam, '*' + bamExt)))
     else:
         infiles = sorted(glob.glob(os.path.join(wdir, 'filtered_bam/', '*.bam')))
     samples = get_sample_names_bam(infiles, bamExt)
@@ -583,7 +583,7 @@ def predict_chip_dict(wdir,bamExt,fromBam=None):
             chip_dict_pred["chip_dict"][i]['broad'] = True
         else:
             chip_dict_pred["chip_dict"][i]['broad'] = False
-    
+
     write_configfile(os.path.join(wdir, "chip_seq_sample_config.yaml"), chip_dict_pred)
     print("---------------------------------------------------------------------------------------")
     print("Chip-seq sample configuration is written to file ", os.path.join(wdir, "chip_seq_sample_config.yaml"))
