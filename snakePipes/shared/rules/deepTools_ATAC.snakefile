@@ -2,8 +2,8 @@
 
 rule bamCompare_subtract:
     input:
-        chip_bam = os.path.join(outdir_MACS2, "{sample}.short.cleaned.bam"),
-        chip_bai = os.path.join(outdir_MACS2, "{sample}.short.cleaned.bam.bai")
+        bam = os.path.join(outdir_MACS2, "{sample}.short.cleaned.bam"),
+        bai = os.path.join(outdir_MACS2, "{sample}.short.cleaned.bam.bai")
     output:
         "deepTools_ATAC/bamCompare/{sample}.filtered.bw"
     params:

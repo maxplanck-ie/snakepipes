@@ -54,10 +54,10 @@ else:
             control =
                 lambda wildcards: "filtered_bam/"+get_control(wildcards.chip_sample)+".filtered.bam" if get_control(wildcards.chip_sample)
                 else [],
+            insert_size_metrics = "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv"
         output:
             peaks = "MACS2/{chip_sample}.filtered.BAM_peaks.xls",
         params:
-            fragment_length = fragment_length,
             genome_size = int(genome_size),
             broad_calling =
                 lambda wildcards: "--broad" if is_broad(wildcards.chip_sample)
@@ -73,7 +73,7 @@ else:
         conda: CONDA_CHIPSEQ_ENV
         shell: """
             macs2 callpeak -t {input.chip} {params.control_param} -f BAM -g {params.genome_size} --keep-dup all --outdir MACS2 \
-                --name {wildcards.chip_sample}.filtered.BAM --nomodel --extsize {params.fragment_length} {params.broad_calling} > {log.out} 2> {log.err}
+                --name {wildcards.chip_sample}.filtered.BAM --nomodel --extsize  $(cat {input.insert_size_metrics} | grep filtered_bam/{wildcards.chip_sample}.filtered.bam | awk '{{printf("%i",$6)}}') {params.broad_calling} > {log.out} 2> {log.err}
             """
 
 

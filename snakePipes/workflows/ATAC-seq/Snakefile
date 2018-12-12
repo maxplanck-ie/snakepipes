@@ -25,6 +25,10 @@ include: os.path.join(workflow.basedir, "internals.snakefile")
 # Import deeptools cmds
 include: os.path.join(maindir, "shared", "tools", "deeptools_cmds.snakefile")
 
+if fromBam:
+    include: os.path.join(maindir, "shared", "rules", "LinkBam.snakefile")
+    include: os.path.join(maindir, "shared", "rules", "deepTools_qc.snakefile")
+
 # Import deeptools ATAC
 include: os.path.join(maindir, "shared", "rules", "deepTools_ATAC.snakefile")
 
@@ -46,7 +50,7 @@ else:
 # needs a "ChIP-sample" variable, here all samples are ChIP-Samples
 chip_samples = samples
 paired = True
-fragment_length = cf.get_fragment_length("deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv", chip_samples[0])
+#fragment_length = cf.get_fragment_length("deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv", chip_samples[0])
 if sampleSheet:
     include: os.path.join(maindir, "shared", "rules", "CSAW.snakefile")
 
@@ -64,6 +68,21 @@ def run_CSAW():
         return(["CSAW/CSAW.session_info.txt"])
     else:
         return([])
+
+def run_deepTools_qc(fromBam):
+    fileList = []
+    if fromBam:
+        file_list = ["deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv"]
+        file_list.append([expand("bamCoverage/{sample}.filtered.seq_depth_norm.bw", sample = samples)])
+        if len(samples) <= 20:
+            file_list.append( ["deepTools_qc/plotCoverage/read_coverage.tsv"] )
+        if len(samples)>1 and len(samples)<=20:
+            file_list.append( [
+                "deepTools_qc/plotCorrelation/correlation.pearson.read_coverage.tsv",
+                "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage.tsv",
+                "deepTools_qc/plotPCA/PCA.read_coverage.tsv" ])
+        file_list.append(expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample = samples))
+    return (file_list)
 
 
 ### execute before workflow starts #############################################
@@ -107,7 +126,8 @@ rule all:
         ## run csaw if asked for
         run_CSAW(),
         "multiQC/multiqc_report.html",
-        expand("deepTools_ATAC/bamCompare/{sample}.filtered.bw",sample=samples)
+        expand("deepTools_ATAC/bamCompare/{sample}.filtered.bw",sample=samples),
+        run_deepTools_qc(fromBam)
 
 ### execute after workflow finished ############################################
 ################################################################################
