@@ -79,7 +79,6 @@ def get_sampleSheet(sample_sheet):
             else:
                 sample_dict[k]=[v]
     else:
-        print ('no sampleSheet has been proveded')
         sample_dict['merged'] = []
         for sample in samples:
             sample_dict['merged'].append(sample)

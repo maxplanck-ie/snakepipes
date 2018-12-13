@@ -1,3 +1,5 @@
+.libPaths(R.home("library"))
+
 library(tools)
 
 args <- commandArgs(trailingOnly=T)
