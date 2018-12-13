@@ -92,25 +92,27 @@ elif mapping_prg.upper().find("STAR") >=0:
                 gtf = genes_gtf,
                 index = star_index,
                 prefix = mapping_prg+"/{sample}/{sample}.",
+                samsort_memory = '2G',
                 sample_dir = mapping_prg+"/{sample}"
             benchmark:
                 mapping_prg+"/.benchmark/STAR.{sample}.benchmark"
             threads: 20  # 3.2G per core
             conda: CONDA_RNASEQ_ENV
-            shell:
-                "( [ -d {params.sample_dir} ] || mkdir -p {params.sample_dir} ) && "
-                "STAR "
-                "--runThreadN {threads} "
-                "{params.star_options} "
-                "--sjdbOverhang 100 "
-                "--readFilesCommand zcat "
-                "--outSAMunmapped Within "
-                "--outSAMtype BAM SortedByCoordinate "
-                "--sjdbGTFfile {params.gtf} "
-                "--genomeDir {params.index} "
-                "--readFilesIn {input.r1} {input.r2} "
-                "--outFileNamePrefix {params.prefix} "
-                "&& mv {params.prefix}Aligned.sortedByCoord.out.bam {output.bam} "
+            shell: """
+                ( [ -d {params.sample_dir} ] || mkdir -p {params.sample_dir} )
+                STAR --runThreadN {threads} \
+                    {params.star_options} \
+                    --sjdbOverhang 100 \
+                    --readFilesCommand zcat \
+                    --outSAMunmapped Within \
+                    --outSAMtype BAM Unsorted \
+                    --outStd BAM_Unsorted \
+                    --sjdbGTFfile {params.gtf} \
+                    --genomeDir {params.index} \
+                    --readFilesIn {input.r1} {input.r2} \
+                    --outFileNamePrefix {params.prefix} \
+                | samtools sort -m {params.samsort_memory} -T ${{TMPDIR}}{wildcards.sample} -@ {threads} -O bam -o {output.bam} -
+                """
     else:
         rule STAR:
             input:
@@ -122,22 +124,24 @@ elif mapping_prg.upper().find("STAR") >=0:
                 gtf = genes_gtf,
                 index = star_index,
                 prefix = mapping_prg+"/{sample}/{sample}.",
+                samsort_memory = '2G',
                 sample_dir = mapping_prg+"/{sample}"
             benchmark:
                 mapping_prg+"/.benchmark/STAR.{sample}.benchmark"
             threads: 20  # 3.2G per core
             conda: CONDA_RNASEQ_ENV
-            shell:
-                "( [ -d {params.sample_dir} ] || mkdir -p {params.sample_dir} ) && "
-                "STAR "
-                "--runThreadN {threads} "
-                "{params.star_options} "
-                "--sjdbOverhang 100 "
-                "--readFilesCommand zcat "
-                "--outSAMunmapped Within "
-                "--outSAMtype BAM SortedByCoordinate "
-                "--sjdbGTFfile {params.gtf} "
-                "--genomeDir {params.index} "
-                "--readFilesIn {input} "
-                "--outFileNamePrefix {params.prefix} "
-                "&& mv {params.prefix}Aligned.sortedByCoord.out.bam {output.bam} "
+            shell: """
+                ( [ -d {params.sample_dir} ] || mkdir -p {params.sample_dir} )
+                STAR --runThreadN {threads} \
+                    {params.star_options} \
+                    --sjdbOverhang 100 \
+                    --readFilesCommand zcat \
+                    --outSAMunmapped Within \
+                    --outSAMtype BAM Unsorted \
+                    --outStd BAM_Unsorted \
+                    --sjdbGTFfile {params.gtf} \
+                    --genomeDir {params.index} \
+                    --readFilesIn {input} \
+                    --outFileNamePrefix {params.prefix} \
+                | samtools sort -m {params.samsort_memory} -T ${{TMPDIR}}{wildcards.sample} -@ {threads} -O bam -o {output.bam} -
+                """
