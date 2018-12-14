@@ -8,6 +8,9 @@ samples = [ os.path.basename(x).replace('.filtered.bam','') for x in samples ]
 
 if sampleSheet:
     cf.check_sample_info_header(sampleSheet)
+    if not cf.check_replicates(sampleSheet):
+        print("\nWarning! CSAW cannot be invoked without replicates!\n")
+        sys.exit()
 
 if not fromBam:
     if paired:
