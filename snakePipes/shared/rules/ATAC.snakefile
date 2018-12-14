@@ -22,8 +22,8 @@ rule filterCoveragePerScaffolds:
     output:
         whitelist = os.path.join(outdir_MACS2, "{sample}.chrom.whitelist"),
         shortbai = temp(os.path.join(outdir_MACS2, "{sample}.short.bam.bai")),
-        bam = temp(os.path.join(outdir_MACS2, "{sample}.short.cleaned.bam")),
-        bai = temp(os.path.join(outdir_MACS2, "{sample}.short.cleaned.bam.bai"))
+        bam = os.path.join(outdir_MACS2, "{sample}.short.cleaned.bam"),
+        bai = os.path.join(outdir_MACS2, "{sample}.short.cleaned.bam.bai")
     params:
         count_cutoff = int(fragmentCount_cutoff) * 2 # must contain more than 2 reads, i.e. 1 fragment
     threads: 6

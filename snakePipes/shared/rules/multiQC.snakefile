@@ -38,6 +38,9 @@ def multiqc_input_check(return_value):
         if qualimap:
             infiles.append( expand("Qualimap_qc/{sample}.filtered.bamqc_results.txt", sample = samples) )
             indir += " Qualimap_qc "
+    elif pipeline=="ATAC-seq":
+        infiles.append( expand("MACS2/{sample}.short.metrics", sample = samples))
+        indir += " MACS2"
     elif pipeline=="rna-seq":
         # must be RNA-mapping, add files as per the mode
         if not "alignment-free" in mode:
