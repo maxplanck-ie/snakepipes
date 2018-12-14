@@ -6,6 +6,8 @@ snp_split:
     memory: 10G
 bamCoverage:
     memory: 5G
+bamCoverage_unique_mappings:
+    memory: 5G
 bamCoverage_RPKM:
     memory: 5G
 bamCoverage_coverage:
