@@ -36,3 +36,5 @@ del infiles
 if not samples:
     print("\n  Error! NO samples found in dir "+str(indir or '')+"!!!\n\n")
     exit(1)
+
+fromBam = None

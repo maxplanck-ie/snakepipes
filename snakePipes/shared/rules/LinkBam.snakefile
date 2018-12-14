@@ -42,4 +42,3 @@ rule sambamba_flagstat:
        shell: """
            sambamba flagstat -p {input} > {output}
            """
-
