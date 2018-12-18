@@ -125,7 +125,6 @@ rule all:
         run_deepTools_allelic(),
         ## run csaw if asked for
         run_CSAW(),
-        "multiQC/multiqc_report.html",
         expand("deepTools_ATAC/bamCompare/{sample}.filtered.bw",sample=samples),
         run_deepTools_qc(fromBam),
         expand(os.path.join(outdir_MACS2, "{sample}.short.cleaned.bam"),sample=samples),
