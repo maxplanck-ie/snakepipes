@@ -475,14 +475,13 @@ if blackList is None:
         output:
             tabFilt="methXT/{sample}.CpG.filt2.bed"
         params:
-            methDir=os.path.join(outdir,"methXT"),
             OUTtemp=lambda wildcards,input: os.path.join(outdir,re.sub('_CpG.bedGraph','.CpG.filt.bed',input.methTab))
         log:
             err="methXT/logs/{sample}.CpG_filt.err",
             out="methXT/logs/{sample}.CpG_filt.out"
         threads: 1
         conda: CONDA_WGBS_ENV
-        shell: "Rscript --no-save --no-restore " + os.path.join(workflow_rscripts,'WGBSpipe.POM.filt.R ') + "{params.methDir} {input.methTab};mv -v {params.OUTtemp} {output.tabFilt} 1>{log.out} 2>{log.err}"
+        shell: "awk '(NR>1)' {input.methTab} | awk '{{ print $0, $5+$6, $1"_"$2}}' | tr " " "\t" | sed '1i chr\tstart\tend\tBeta\tM\tU\tCov\tms' > {params.OUTtemp};mv -v {params.OUTtemp} {output.tabFilt} 1>{log.out} 2>{log.err}"
 
 else:
     rule CpG_filt:
@@ -492,14 +491,13 @@ else:
         output:
             tabFilt="methXT/{sample}.CpG.filt2.bed"
         params:
-            methDir=os.path.join(outdir,"methXT"),
             OUTtemp=lambda wildcards,input: os.path.join(outdir,re.sub('_CpG.bedGraph','.CpG.filt.bed',input.methTab))
         log:
             err="methXT/logs/{sample}.CpG_filt.err",
             out="methXT/logs/{sample}.CpG_filt.out"
         threads: 1
         conda: CONDA_WGBS_ENV
-        shell: "Rscript --no-save --no-restore " + os.path.join(workflow_rscripts,'WGBSpipe.POM.filt.R ') + "{params.methDir} {input.methTab};bedtools intersect -v -a {params.OUTtemp} -b {input.blackListF} > {output.tabFilt} 1>{log.out} 2>{log.err}"
+        shell: "awk '(NR>1)' {input.methTab} | awk '{{ print $0, $5+$6, $1"_"$2}}' | tr " " "\t" | sed '1i chr\tstart\tend\tBeta\tM\tU\tCov\tms' > {params.OUTtemp};bedtools intersect -v -a {params.OUTtemp} -b {input.blackListF} > {output.tabFilt} 1>{log.out} 2>{log.err}"
 
 
 if sampleSheet or intList:
