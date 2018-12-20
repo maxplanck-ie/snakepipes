@@ -40,3 +40,4 @@ plot_format: png
 fragment_length: 
 trim:
 fastqc:
+qval: 0.001

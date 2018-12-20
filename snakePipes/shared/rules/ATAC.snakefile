@@ -46,7 +46,7 @@ rule callOpenChromatin:
         directory = outdir_MACS2,
         genome_size = int(genome_size),
         name='{sample}',
-        qval_cutoff='--qvalue 0.001',
+        qval_cutoff=qval,
         nomodel='--nomodel',
         write_bdg='--bdg',
         fileformat='--format BAMPE'
@@ -61,7 +61,7 @@ rule callOpenChromatin:
             --name {params.name}.filtered.BAM \
             --outdir {params.directory} \
             {params.fileformat} \
-            {params.qval_cutoff} \
+            -- qvalue {params.qval_cutoff} \
             {params.nomodel} \
             {params.write_bdg} > {log.out} 2> {log.err}
         """

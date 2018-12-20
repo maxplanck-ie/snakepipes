@@ -16,7 +16,7 @@ import snakePipes.parserCommon as parserCommon
 
 
 def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfile": None, "max_jobs": 5, "snakemake_options": "--use-conda", "tempdir": None,
-                         "fragmentSize_cutoff": 150, "fromBam": "" , "sampleSheet": None}):
+                         "fragmentSize_cutoff": 150, "fromBam": "" ,"qval": 0.001 ,"sampleSheet": None}):
     """
     Parse arguments from the command line.
     """
@@ -38,6 +38,15 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
                           help="Size threshold for filtering of nucleosomal fragments(default: '%(default)s')",
                           type=int,
                           default=defaults['fragmentSize_cutoff'])
+
+
+    optional.add_argument("--qval",
+                          dest="qval",
+                          metavar="INT",
+                          help="qvalue threshold for MACS2(default: '%(default)s')",
+                          type=int,
+                          default=defaults['qval'])
+
 
     optional.add_argument("--sampleSheet",
                           dest="sampleSheet",
