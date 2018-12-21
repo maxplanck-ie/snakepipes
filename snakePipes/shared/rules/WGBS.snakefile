@@ -481,7 +481,7 @@ if blackList is None:
             out="methXT/logs/{sample}.CpG_filt.out"
         threads: 1
         conda: CONDA_WGBS_ENV
-        shell: '''awk \'(NR>1)\' {input.methTab} | awk \'{ print $0, $5+$6, $1\"_\"$2}\' | tr " " "\t" | sed \'1i chr\tstart\tend\tBeta\tM\tU\tCov\tms\' > {params.OUTtemp};mv -v {params.OUTtemp} {output.tabFilt} 1>{log.out} 2>{log.err}'''
+        shell: '''awk \'(NR>1)\' {input.methTab} | awk \'{{ print $0, $5+$6, $1\"_\"$2}}\' | tr " " "\t" | sed \'1i chr\tstart\tend\tBeta\tM\tU\tCov\tms\' > {params.OUTtemp};mv -v {params.OUTtemp} {output.tabFilt} 1>{log.out} 2>{log.err}'''
 
 else:
     rule CpG_filt:
@@ -497,7 +497,7 @@ else:
             out="methXT/logs/{sample}.CpG_filt.out"
         threads: 1
         conda: CONDA_WGBS_ENV
-        shell: '''awk \'(NR>1)\' {input.methTab} | awk \'{ print $0, $5+$6, $1\"_\"$2}\' | tr " " "\t" | sed \'1i chr\tstart\tend\tBeta\tM\tU\tCov\tms\' > {params.OUTtemp};bedtools intersect -v -a {params.OUTtemp} -b {input.blackListF} > {output.tabFilt} 1>{log.out} 2>{log.err}'''
+        shell: '''awk \'(NR>1)\' {input.methTab} | awk \'{{ print $0, $5+$6, $1\"_\"$2}}\' | tr " " "\t" | sed \'1i chr\tstart\tend\tBeta\tM\tU\tCov\tms\' > {params.OUTtemp};bedtools intersect -v -a {params.OUTtemp} -b {input.blackListF} > {output.tabFilt} 1>{log.out} 2>{log.err}'''
 
 
 if sampleSheet or intList:
