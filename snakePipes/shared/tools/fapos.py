@@ -140,10 +140,10 @@ def mod_fapos(sysargv):
 
     if args.qf:
         sys.stderr.write("%s end: position index generated\n" % nicetime())
+        sys.stderr.write("program version %s \n" % __version__)
 
 
 if __name__ == "__main__":
     import sys
     mod_fapos(sys.argv[1:])
-    from fapos import __version__
-    print('version' + __version__)
+    
