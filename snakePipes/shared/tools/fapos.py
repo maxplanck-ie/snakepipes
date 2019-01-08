@@ -25,7 +25,7 @@ def mod_fapos(sysargv):
     def nicetime():
         return datetime.datetime.now().strftime("[fapos %Y-%m-%d %H:%M:%S]")
 
-    __version__="0.9.4"
+    __version__ = "0.9.4"
 
     #######################################
     # arguments, filehandles
@@ -145,4 +145,5 @@ def mod_fapos(sysargv):
 if __name__ == "__main__":
     import sys
     mod_fapos(sys.argv[1:])
+    from fapos import __version__
     print('version' + __version__)
