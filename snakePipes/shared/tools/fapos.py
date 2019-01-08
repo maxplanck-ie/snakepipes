@@ -145,3 +145,4 @@ def mod_fapos(sysargv):
 if __name__ == "__main__":
     import sys
     mod_fapos(sys.argv[1:])
+    print('version' + __version__)
