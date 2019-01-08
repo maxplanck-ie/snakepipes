@@ -22,8 +22,8 @@ rule filterCoveragePerScaffolds:
     output:
         whitelist = os.path.join(outdir_MACS2, "{sample}.chrom.whitelist"),
         shortbai = temp(os.path.join(outdir_MACS2, "{sample}.short.bam.bai")),
-        bam = temp(os.path.join(outdir_MACS2, "{sample}.short.cleaned.bam")),
-        bai = temp(os.path.join(outdir_MACS2, "{sample}.short.cleaned.bam.bai"))
+        bam = os.path.join(outdir_MACS2, "{sample}.short.cleaned.bam"),
+        bai = os.path.join(outdir_MACS2, "{sample}.short.cleaned.bam.bai")
     params:
         count_cutoff = int(fragmentCount_cutoff) * 2 # must contain more than 2 reads, i.e. 1 fragment
     threads: 6
@@ -46,7 +46,7 @@ rule callOpenChromatin:
         directory = outdir_MACS2,
         genome_size = int(genome_size),
         name='{sample}',
-        qval_cutoff='--qvalue 0.001',
+        qval_cutoff=qval,
         nomodel='--nomodel',
         write_bdg='--bdg',
         fileformat='--format BAMPE'
@@ -61,7 +61,7 @@ rule callOpenChromatin:
             --name {params.name}.filtered.BAM \
             --outdir {params.directory} \
             {params.fileformat} \
-            {params.qval_cutoff} \
+            -- qvalue {params.qval_cutoff} \
             {params.nomodel} \
             {params.write_bdg} > {log.out} 2> {log.err}
         """

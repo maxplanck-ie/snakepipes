@@ -140,28 +140,43 @@ def is_paired(infiles, ext, reads):
     return paired
 
 
-def get_fragment_length(infile, sampleName):
+def check_replicates(sample_info_file):
     """
-    Return median insert size from a metrics file created by
-    deeptools bamPEFragmentSize.
-    Read the 37 column text file, grep the row corresponding to the sample and
-    return the entry from 6th column (Frag. Len. Median)
+    return True if each condition has at least 2 replicates
+    this check is eg. necessary for sleuth
     """
-    with open(infile, "r") as f:
-        for line in f:
-            line = line.strip()
-            if line.startswith("filtered_bam/{}".format(sampleName)):
-                try:
-                    median = line.split()[5]
-                    return int(float(median))
-                except TypeError:
-                    print("ERROR: File", infile, "is NOT an output from bamPEFragmentSize.\n")
-                    exit(1)
-            else:
-                pass
-    # no match in infile
-    print("ERROR: File", infile, "is NOT an output from bamPEFragmentSize.\n")
-    exit(1)
+    ret = subprocess.check_output(
+        "cat " + sample_info_file + "| awk '/^[:space:]$/{next;}{if (NR==1){ col=0; for (i=1;i<=NF;i++) if ($i~\"condition\") col=i}; if (NR>1) print $col}' | sort | uniq -c | awk '{if ($1>1) ok++}END{if (NR>1 && ok>=NR) print \"REPLICATES_OK\"}'",
+        shell=True).decode()
+
+    if ret.find("REPLICATES_OK") >= 0:
+        return True
+    else:
+        return False
+
+
+# def get_fragment_length(infile, sampleName):
+#     """
+#     Return median insert size from a metrics file created by
+#     deeptools bamPEFragmentSize.
+#     Read the 37 column text file, grep the row corresponding to the sample and
+#     return the entry from 6th column (Frag. Len. Median)
+#     """
+#     with open(infile, "r") as f:
+#         for line in f:
+#             line = line.strip()
+#             if line.startswith("filtered_bam/{}".format(sampleName)):
+#                 try:
+#                     median = line.split()[5]
+#                     return int(float(median))
+#                 except TypeError:
+#                     print("ERROR: File", infile, "is NOT an output from bamPEFragmentSize.\n")
+#                     exit(1)
+#             else:
+#                 pass
+#     # no match in infile
+#     print("ERROR: File", infile, "is NOT an output from bamPEFragmentSize.\n")
+#     exit(1)
 
 
 def make_temp_dir(tempdir, fallback_dir, verbose=False):
@@ -230,12 +245,15 @@ def check_sample_info_header(sampleSheet_file):
     """
     return True in case sample info file contains column names 'name' and 'condition'
     """
+    if not os.path.isfile(sampleSheet_file):
+        sys.exit("ERROR: Cannot find sample info file! (--sampleSheet {})\n".format(sampleSheet_file))
+    sampleSheet_file = os.path.abspath(sampleSheet_file)
     ret = open(sampleSheet_file).read().split("\n")[0].split()
-
     if "name" in ret and "condition" in ret:
-        return True
+        print("Sample sheet found and format is ok!\n")
     else:
-        return False
+        sys.exit("ERROR: Please use 'name' and 'condition' as column headers in sample info file! ({})\n".format(sampleSheet_file))
+    return sampleSheet_file
 
 
 def setDefaults(fileName):
@@ -320,20 +338,23 @@ def checkCommonArguments(args, baseDir, outDir=False, createIndices=False):
             else:
                 sys.exit("\nError! Input dir not found! ({})\n".format(args.indir))
         else:
-            if os.path.exists(args.workingdir):
-                args.workingdir = os.path.abspath(args.workingdir)
+            if args.fromBam:
+                if os.path.exists(args.fromBam):
+                    os.makedirs(args.workingdir, exist_ok=True)
+                    args.workingdir = os.path.abspath(args.workingdir)
+                    args.fromBam = os.path.abspath(args.fromBam)
+                else:
+                    sys.exit("\nError! Directory with bam files (--fromBam) not found! ({})\n".format(args.fromBam))
             else:
-                sys.exit("\nError! Working-dir (-d) dir not found! ({})\n".format(args.workingdir))
+                if os.path.exists(args.workingdir):
+                    args.workingdir = os.path.abspath(args.workingdir)
+                else:
+                    sys.exit("\nError! Working-dir (-d) dir not found! ({})\n".format(args.workingdir))
             args.outdir = args.workingdir
     args.cluster_logs_dir = os.path.join(args.outdir, "cluster_logs")
     # 2. Sample info file
     if 'sampleSheet' in args and args.sampleSheet:
-        if os.path.exists(os.path.abspath(args.sampleSheet)):
-            args.sampleSheet = os.path.abspath(args.sampleSheet)
-        else:
-            sys.exit("\nSample info file not found! (--sampleSheet {})\n".format(args.sampleSheet))
-        if not check_sample_info_header(args.sampleSheet):
-            sys.exit("ERROR: Please use 'name' and 'condition' as column headers in sample info file! ({})\n".format(args.sampleSheet))
+        args.sampleSheet = check_sample_info_header(args.sampleSheet)
     # 3. get abspath from user provided genome/organism file
     if not createIndices:
         if not os.path.isfile(os.path.join(baseDir, "shared/organisms/{}.yaml".format(args.genome))) and os.path.isfile(args.genome):
@@ -489,7 +510,7 @@ def runAndCleanup(args, cmd, logfile_name, temp_path):
         sendEmail(args, 0)
 
 
-def predict_chip_dict(wdir):
+def predict_chip_dict(wdir, bamExt, fromBam=None):
     """
     Predict a chip_dict from bam files under filtered_bam/ from DNA-mapping workflow
     ChIP input/control samples are identified from pattern 'input' (case ignored)
@@ -498,8 +519,11 @@ def predict_chip_dict(wdir):
     """
     pat1 = re.compile(r"input.*$", re.IGNORECASE)
     pat2 = re.compile(r"^.*input", re.IGNORECASE)
-    infiles = sorted(glob.glob(os.path.join(wdir, 'filtered_bam/', '*.bam')))
-    samples = get_sample_names(infiles, ".filtered.bam", ['', ''])
+    if fromBam:
+        infiles = sorted(glob.glob(os.path.join(fromBam, '*' + bamExt)))
+    else:
+        infiles = sorted(glob.glob(os.path.join(wdir, 'filtered_bam/', '*.bam')))
+    samples = get_sample_names_bam(infiles, bamExt)
 
     chip_dict_pred = {}
     chip_dict_pred["chip_dict"] = {}

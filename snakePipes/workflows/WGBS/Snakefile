@@ -36,7 +36,8 @@ if fromBam:
 if not 'genes_bed' in globals():
     genes_bed='NA'
 
-#this_script_dir = os.path.dirname(os.path.realpath(__file__))
+if sampleSheet:
+    cf.check_sample_info_header(sampleSheet)
 
 ### Sample init #############################################################
 if not fromBam:
