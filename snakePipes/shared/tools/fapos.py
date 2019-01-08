@@ -25,10 +25,12 @@ def mod_fapos(sysargv):
     def nicetime():
         return datetime.datetime.now().strftime("[fapos %Y-%m-%d %H:%M:%S]")
 
+    __version__ = "0.9.4"
+
     #######################################
     # arguments, filehandles
 
-    parser = argparse.ArgumentParser(prog="methylCtools fapos", version="0.9.4", description="creates cytosine position index for defined context")
+    parser = argparse.ArgumentParser(prog="methylCtools fapos", description="creates cytosine position index for defined context")
     parser.add_argument("-s", "--silent", dest="qf", action="store_false", help="do not show status messages")
 
     groupinput = parser.add_argument_group("input files, required")
@@ -138,6 +140,7 @@ def mod_fapos(sysargv):
 
     if args.qf:
         sys.stderr.write("%s end: position index generated\n" % nicetime())
+        sys.stderr.write("program version %s \n" % __version__)
 
 
 if __name__ == "__main__":
