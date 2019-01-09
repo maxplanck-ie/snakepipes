@@ -115,7 +115,7 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
     optional.add_argument("--fromBam",
                          dest="fromBam",
                          action="store_true",
-                         help="Start pipeline from processed bam files after PCR duplicate removal.",default=defaults["fromBam"])
+                         help=argparse.SUPPRESS,default=defaults["fromBam"])
 
     optional.add_argument("--single-end",
                           dest="paired",

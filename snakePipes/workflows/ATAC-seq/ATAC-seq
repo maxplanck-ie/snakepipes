@@ -55,12 +55,11 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
 
     optional.add_argument("--fromBam",
                          dest="fromBam",
-                         help="Start the pipeline from processed bam files found in the specified directory. "
-                              "The working-dir (-d) will be used as new output dir in this case.",
+                         help=argparse.SUPPRESS,
                          default=defaults["fromBam"])
     optional.add_argument("--fromBamExt",
                          dest="bam_ext",
-                         help="bam file extension that is ignored to get sample names",
+                         help=argparse.SUPPRESS,
                          default=defaults["bam_ext"])
 
     return parser
