@@ -1,5 +1,5 @@
 STAR:
-    memory: 3500M
+    memory: 6G
 sc_bam_featureCounts_genomic:
     memory: 4G
 bamPE_fragment_size:
