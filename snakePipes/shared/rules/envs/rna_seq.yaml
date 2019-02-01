@@ -24,5 +24,5 @@ dependencies:
  - r-dt
  - r-rcolorbrewer
  - bioconductor-deseq2=1.18.1
+ - r-rcpp >= 0.12.13
  - r-knitcitations
-
