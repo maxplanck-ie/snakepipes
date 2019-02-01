@@ -10,6 +10,8 @@
 # args 6 : T/F whether or not the workflow is allele-sepecific
 # args 7 : tx2gene file for salmon --> DESeq mode
 
+.libPaths(R.home("library"))
+
 args = commandArgs(TRUE)
 
 

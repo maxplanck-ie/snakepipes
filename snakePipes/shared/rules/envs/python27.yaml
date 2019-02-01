@@ -1,5 +1,0 @@
-name: py27Env-0.1.0
-channels:
-  - conda-forge
-dependencies:
-  - python=2.7

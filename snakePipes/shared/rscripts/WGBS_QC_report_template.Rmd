@@ -9,6 +9,8 @@ params:
 ---
 
 ```{r setup, include=FALSE}
+.libPaths(R.home("library"))
+
 knitr::opts_chunk$set(echo = FALSE)
 ```
 

@@ -8,6 +8,7 @@ dependencies:
  - ucsc-bedtogenepred=357
  - ucsc-genepredtobed=357
  - ucsc-gtftoGenepred=357
+ - samtools=1.9
  - subread=1.6.1
  - hisat2=2.1.0
  - star=2.6.1b

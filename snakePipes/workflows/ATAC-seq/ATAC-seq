@@ -16,7 +16,7 @@ import snakePipes.parserCommon as parserCommon
 
 
 def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfile": None, "max_jobs": 5, "snakemake_options": "--use-conda", "tempdir": None,
-                         "fragmentSize_cutoff": 150, "sampleSheet": None}):
+                         "fragmentSize_cutoff": 150, "fromBam": "" ,"qval": 0.001 ,"sampleSheet": None}):
     """
     Parse arguments from the command line.
     """
@@ -39,10 +39,28 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
                           type=int,
                           default=defaults['fragmentSize_cutoff'])
 
+
+    optional.add_argument("--qval",
+                          dest="qval",
+                          metavar="INT",
+                          help="qvalue threshold for MACS2(default: '%(default)s')",
+                          type=int,
+                          default=defaults['qval'])
+
+
     optional.add_argument("--sampleSheet",
                           dest="sampleSheet",
                           help="Invoke differential accessibility analysis by providing information on samples; see 'docs/content/sampleSheet.example.tsv' for example. IMPORTANT: The first entry defines which group of samples are control. With this, the order of comparison and likewise the sign of values can be changed! Also, the condition `control` should not be used (reserved to mark input samples in the ChIP-Seq workflow (default: '%(default)s').",
                           default=defaults["sampleSheet"])
+
+    optional.add_argument("--fromBam",
+                         dest="fromBam",
+                         help=argparse.SUPPRESS,
+                         default=defaults["fromBam"])
+    optional.add_argument("--fromBamExt",
+                         dest="bam_ext",
+                         help=argparse.SUPPRESS,
+                         default=defaults["bam_ext"])
 
     return parser
 

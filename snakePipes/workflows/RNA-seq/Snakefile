@@ -18,66 +18,78 @@ include: os.path.join(workflow.basedir, "internals.snakefile")
 
 ### include modules of other snakefiles ########################################
 ################################################################################
-## FASTQ: either downsample FASTQ files or create symlinks to input files
-include: os.path.join(maindir, "shared", "rules", "FASTQ.snakefile")
+if not fromBam:
+    ## FASTQ: either downsample FASTQ files or create symlinks to input files
+    include: os.path.join(maindir, "shared", "rules", "FASTQ.snakefile")
 
-## FastQC
-if fastqc:
-    include: os.path.join(maindir, "shared", "rules", "FastQC.snakefile")
+    ## FastQC
+    if fastqc:
+        include: os.path.join(maindir, "shared", "rules", "FastQC.snakefile")
 
-## Trim
-if trim:
-    include: os.path.join(maindir, "shared", "rules", "TrimGalore.snakefile")
+    ## Trim
+    if trim:
+        include: os.path.join(maindir, "shared", "rules", "TrimGalore.snakefile")
 
-## filtered annotation (GTF)
-include: os.path.join(maindir, "shared", "rules", "filter_annotation.snakefile")
+    ## sambamba
+    include:os.path.join(maindir, "shared", "rules", "sambamba.snakefile")
+
+    ## Allele-specific JOBS
+    if "allelic-mapping" in mode:
+        # Updated global vars if mode = "allelic-mapping"
+        if allele_mode == 'create_and_map':
+            star_index_allelic = 'snp_genome/star_Nmasked/Genome'
+            if len(strains) == 1:
+                allele_hybrid = 'single'
+                snp_file = "snp_genome/all_SNPs_" + strains[0] + "_" + genome + ".txt.gz"
+            elif len(strains) == 2:
+                allele_hybrid = 'dual'
+                snp_file = "snp_genome/all_" + strains[1] + "_SNPs_" + strains[0] + "_reference.based_on_" + genome + ".txt"
+
+            include: os.path.join(maindir, "shared", "rules", "masked_genomeIndex.snakefile")
+        elif allele_mode == 'map_only':
+            star_index_allelic = Nmasked_index
+            snp_file = SNPfile
+        ## mapping rules
+        include: os.path.join(maindir, "shared", "rules", "RNA_mapping_allelic.snakefile")
+        ## SNPsplit
+        include: os.path.join(maindir, "shared", "rules", "SNPsplit.snakefile")
+        ## featureCounts_allelic
+        include: os.path.join(maindir, "shared", "rules", "featureCounts_allelic.snakefile")
+        # deepTools QC
+        include: os.path.join(maindir, "shared", "rules", "deepTools_RNA_allelic.snakefile")
+    else:
+        # HISAT2/STAR
+        include: os.path.join(maindir, "shared", "rules", "RNA_mapping.snakefile")
+
+    ## Salmon
+    if "alignment-free" in mode:
+        include: os.path.join(maindir, "shared", "rules", "Salmon.snakefile")
+        ## Sleuth (on Salmon)
+        if sampleSheet:
+            include: os.path.join(maindir, "shared", "rules", "sleuth.snakefile")
+
+else:
+    fastqc=False
+    trim=False
+    downsample=None
+    
+    include: os.path.join(maindir, "shared", "rules", "LinkBam.snakefile")
+
+##Genomic_contamination
+include: os.path.join(maindir, "shared", "rules", "GenomicContamination.snakefile")
 
 # deeptools cmds
 include: os.path.join(maindir, "shared", "tools" , "deeptools_cmds.snakefile")
 ## bamCoverage_RPKM
 include: os.path.join(maindir, "shared", "rules", "deepTools_RNA.snakefile")
 
-## sambamba
-include:os.path.join(maindir, "shared", "rules", "sambamba.snakefile")
 include:os.path.join(maindir, "shared", "rules", "RNA-seq_qc_report.snakefile")
 
-## Allele-specific JOBS
-if "allelic-mapping" in mode:
-    # Updated global vars if mode = "allelic-mapping"
-    if allele_mode == 'create_and_map':
-        star_index_allelic = 'snp_genome/star_Nmasked/Genome'
-        if len(strains) == 1:
-            allele_hybrid = 'single'
-            snp_file = "snp_genome/all_SNPs_" + strains[0] + "_" + genome + ".txt.gz"
-        elif len(strains) == 2:
-            allele_hybrid = 'dual'
-            snp_file = "snp_genome/all_" + strains[1] + "_SNPs_" + strains[0] + "_reference.based_on_" + genome + ".txt"
+## filtered annotation (GTF)
+include: os.path.join(maindir, "shared", "rules", "filter_annotation.snakefile")
 
-        include: os.path.join(maindir, "shared", "rules", "masked_genomeIndex.snakefile")
-    elif allele_mode == 'map_only':
-        star_index_allelic = Nmasked_index
-        snp_file = SNPfile
-    ## mapping rules
-    include: os.path.join(maindir, "shared", "rules", "RNA_mapping_allelic.snakefile")
-    ## SNPsplit
-    include: os.path.join(maindir, "shared", "rules", "SNPsplit.snakefile")
-    ## featureCounts_allelic
-    include: os.path.join(maindir, "shared", "rules", "featureCounts_allelic.snakefile")
-    # deepTools QC
-    include: os.path.join(maindir, "shared", "rules", "deepTools_RNA_allelic.snakefile")
-else:
-    # HISAT2/STAR
-    include: os.path.join(maindir, "shared", "rules", "RNA_mapping.snakefile")
-    ## featureCounts
-    include: os.path.join(maindir, "shared", "rules", "featureCounts.snakefile")
-
-
-## Salmon
-if "alignment-free" in mode:
-    include: os.path.join(maindir, "shared", "rules", "Salmon.snakefile")
-    ## Sleuth (on Salmon)
-    if sampleSheet:
-        include: os.path.join(maindir, "shared", "rules", "sleuth.snakefile")
+## featureCounts
+include: os.path.join(maindir, "shared", "rules", "featureCounts.snakefile")
 
 ## DESeq2
 if sampleSheet:
@@ -85,9 +97,6 @@ if sampleSheet:
 
 ## MultiQC
 include: os.path.join(maindir, "shared", "rules", "multiQC.snakefile")
-
-##Genomic_contamination
-include: os.path.join(maindir, "shared", "rules", "GenomicContamination.snakefile")
 
 ### conditional/optional rules #################################################
 ################################################################################
@@ -186,6 +195,8 @@ def run_deepTools_qc():
         file_list = [
         expand("bamCoverage/{sample}.RPKM.bw", sample = samples),
         expand("bamCoverage/{sample}.coverage.bw", sample = samples),
+        expand("bamCoverage/{sample}.uniqueMappings.fwd.bw", sample = samples),
+        expand("bamCoverage/{sample}.uniqueMappings.rev.bw", sample = samples),
         "deepTools_qc/plotEnrichment/plotEnrichment.tsv",
         expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample = samples)]
         if paired:
@@ -216,7 +227,7 @@ def run_GenomicContamination():
 ### execute before  starts #####################################################
 ################################################################################
 onstart:
-    if "verbose" in config and config["verbose"]:
+    if "verbose" in config and config["verbose"] and not fromBam:
         print()
         print("--- Workflow parameters --------------------------------------------------------")
         print("mode:", mode)
@@ -228,33 +239,56 @@ onstart:
         print("FeatureCounts library type:", library_type)
         print("Sample sheet:", sampleSheet)
         print("-" * 80, "\n")
-
+    
         print("--- Environment ----------------------------------------------------------------")
-        print("$TMPDIR: ",os.getenv('TMPDIR', ""))
-        print("$HOSTNAME: ",os.getenv('HOSTNAME', ""))
+        print("$TMPDIR: ", os.getenv('TMPDIR', ""))
+        print("$HOSTNAME: ", os.getenv('HOSTNAME', ""))
         print("-" * 80, "\n")
-
+    
+    elif "verbose" in config and config["verbose"] and fromBam:
+        print("--- Workflow parameters --------------------------------------------------------")
+        print("samples:" + str(samples))
+        print("input dir:" + indir)
+        print("paired:", paired)
+        print("-" * 80)  # , "\n"
+    
+        print("--- Environment ----------------------------------------------------------------")
+        print("$TMPDIR: " + os.getenv('TMPDIR', ""))
+        print("$HOSTNAME: " + os.getenv('HOSTNAME', ""))
+        print("-" * 80,)
 
 ### main rule ##################################################################
 ################################################################################
-localrules: FASTQ1, FASTQ2
 
-rule all:
-    input:
-       # expand("FASTQ/{sample}{read}.fastq.gz", sample = samples, read = reads),
-        run_FastQC(fastqc),
-        run_Trimming(trim, fastqc),
-        "Annotation/genes.annotated.bed",
-        "Annotation/genes.filtered.bed",
-        "Annotation/genes.filtered.gtf",
-        run_alignment_free(),            # Salmon
-        run_alignment(),                 # classical mapping + counting
-        run_allelesp_mapping(),        # allelic-mapping
-        make_nmasked_genome(),
-        run_deepTools_qc(),
-        run_GenomicContamination(),
-        "multiQC/multiqc_report.html"
+if not fromBam:
+    localrules: FASTQ1, FASTQ2
 
+    rule all:
+        input:
+           # expand("FASTQ/{sample}{read}.fastq.gz", sample = samples, read = reads),
+            run_FastQC(fastqc),
+            run_Trimming(trim, fastqc),
+            "Annotation/genes.annotated.bed",
+            "Annotation/genes.filtered.bed",
+            "Annotation/genes.filtered.gtf",
+            run_alignment_free(),            # Salmon
+            run_alignment(),                 # classical mapping + counting
+            run_allelesp_mapping(),        # allelic-mapping
+            make_nmasked_genome(),
+            run_deepTools_qc(),
+            run_GenomicContamination(),
+            "multiQC/multiqc_report.html"
+
+else:
+    rule all:
+        input:
+            "Annotation/genes.annotated.bed",
+            "Annotation/genes.filtered.bed",
+            "Annotation/genes.filtered.gtf",
+            run_alignment(),
+            run_deepTools_qc(),
+            run_GenomicContamination(),
+            "multiQC/multiqc_report.html"
 
 ### execute after  finished ####################################################
 ################################################################################

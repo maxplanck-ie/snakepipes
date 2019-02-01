@@ -1,4 +1,7 @@
 #run in R3.4.0
+
+.libPaths(R.home("library"))
+
 #set working directory
 wdir<-commandArgs(trailingOnly=TRUE)[1]
 #system(paste0('mkdir -p ',wdir)) #for debugging
@@ -69,6 +72,7 @@ seuset <- RunTSNE(object = seuset,dims.use = 1:5,do.fast = TRUE) ##just to initi
 seuset@dr$tsne@cell.embeddings<-t(mono.set@reducedDimA)
 colnames(seuset@dr$tsne@cell.embeddings)<-c("tSNE_1","tSNE_2")
 rownames(seuset@dr$tsne@cell.embeddings)<-rownames(pData(mono.set))
+save(seuset,file=paste0("minT",minTi,".seuset.RData"))
 TSNEPlot(object = seuset) #group.by="ident",plot.order
 ggsave(paste0("minT",minTi,".seuset.tSNE.png"))
 

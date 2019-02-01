@@ -212,7 +212,7 @@ rule get_ran_CG:
     log:
         err="aux_files/logs/get_ran_CG.err"
     threads: 1
-    conda: CONDA_PY27_ENV
+    conda: CONDA_SHARED_ENV
     shell: 'set +o pipefail; ' + os.path.join(workflow_tools,'methylCtools') + " fapos {input.refG}  " + re.sub('.gz','',"{output.pozF}") + ';cat '+ re.sub('.gz','',"{output.pozF}") +' | grep "+" -' + " | shuf | head -n 1000000 | awk {params.awkCmd}" + ' - | tr " " "\\t" | sort -k 1,1 -k2,2n - > ' + "{output.ranCG} 2>{log.err}"
 
 
@@ -475,14 +475,13 @@ if blackList is None:
         output:
             tabFilt="methXT/{sample}.CpG.filt2.bed"
         params:
-            methDir=os.path.join(outdir,"methXT"),
             OUTtemp=lambda wildcards,input: os.path.join(outdir,re.sub('_CpG.bedGraph','.CpG.filt.bed',input.methTab))
         log:
             err="methXT/logs/{sample}.CpG_filt.err",
             out="methXT/logs/{sample}.CpG_filt.out"
         threads: 1
         conda: CONDA_WGBS_ENV
-        shell: "Rscript --no-save --no-restore " + os.path.join(workflow_rscripts,'WGBSpipe.POM.filt.R ') + "{params.methDir} {input.methTab};mv -v {params.OUTtemp} {output.tabFilt} 1>{log.out} 2>{log.err}"
+        shell: '''awk \'(NR>1)\' {input.methTab} | awk \'{{ print $0, $5+$6, $1\"_\"$2}}\' | tr " " "\t" | sed \'1i chr\tstart\tend\tBeta\tM\tU\tCov\tms\' > {params.OUTtemp};mv -v {params.OUTtemp} {output.tabFilt} 1>{log.out} 2>{log.err}'''
 
 else:
     rule CpG_filt:
@@ -492,14 +491,13 @@ else:
         output:
             tabFilt="methXT/{sample}.CpG.filt2.bed"
         params:
-            methDir=os.path.join(outdir,"methXT"),
             OUTtemp=lambda wildcards,input: os.path.join(outdir,re.sub('_CpG.bedGraph','.CpG.filt.bed',input.methTab))
         log:
             err="methXT/logs/{sample}.CpG_filt.err",
             out="methXT/logs/{sample}.CpG_filt.out"
         threads: 1
         conda: CONDA_WGBS_ENV
-        shell: "Rscript --no-save --no-restore " + os.path.join(workflow_rscripts,'WGBSpipe.POM.filt.R ') + "{params.methDir} {input.methTab};bedtools intersect -v -a {params.OUTtemp} -b {input.blackListF} > {output.tabFilt} 1>{log.out} 2>{log.err}"
+        shell: '''awk \'(NR>1)\' {input.methTab} | awk \'{{ print $0, $5+$6, $1\"_\"$2}}\' | tr " " "\t" | sed \'1i chr\tstart\tend\tBeta\tM\tU\tCov\tms\' > {params.OUTtemp};bedtools intersect -v -a {params.OUTtemp} -b {input.blackListF} > {output.tabFilt} 1>{log.out} 2>{log.err}'''
 
 
 if sampleSheet or intList:
@@ -521,11 +519,11 @@ if sampleSheet:
     rule prep_for_stats:
         input: expand("methXT/{sample}.CpG.filt2.bed",sample=samples)
         output:
-            Limdat='{}/limdat.LG.RData'.format(get_outdir("singleCpG_stats_limma")),
-            MetIN='{}/metilene.IN.txt'.format(get_outdir("singleCpG_stats_limma")),
-            Gifnfo='{}/groupInfo.txt'.format(get_outdir("singleCpG_stats_limma"))
+            Limdat='{}/limdat.LG.RData'.format(get_outdir("merged_methylation_data")),
+            MetIN='{}/metilene.IN.txt'.format(get_outdir("merged_methylation_data")),
+            Gifnfo='{}/groupInfo.txt'.format(get_outdir("merged_methylation_data"))
         params:
-            statdir=os.path.join(outdir,'{}'.format(get_outdir("singleCpG_stats_limma"))),
+            statdir=os.path.join(outdir,'{}'.format(get_outdir("merged_methylation_data"))),
             sampleSheet=sampleSheet,
             importfunc = os.path.join(workflow_rscripts, "WGBSstats_functions.R")
         log:
@@ -538,12 +536,13 @@ if sampleSheet:
 
     rule CpG_stats:
         input: 
-            Limdat='{}/limdat.LG.RData'.format(get_outdir("singleCpG_stats_limma"))
+            Limdat='{}/limdat.LG.RData'.format(get_outdir("merged_methylation_data"))
         output:
             RDatAll='{}/singleCpG.RData'.format(get_outdir("singleCpG_stats_limma")),
             sinfo='{}/sessionInfo.txt'.format(get_outdir("singleCpG_stats_limma"))
         params:
             statdir=os.path.join(outdir,'{}'.format(get_outdir("singleCpG_stats_limma"))),
+            datdir=os.path.join(outdir,'{}'.format(get_outdir("merged_methylation_data"))),
             sampleSheet=sampleSheet,
             diff=minAbsDiff,
             fdr=FDR,
@@ -553,13 +552,13 @@ if sampleSheet:
             out='{}/logs/CpG_stats.out'.format(get_outdir("singleCpG_stats_limma"))
         threads: 1
         conda: CONDA_WGBS_ENV
-        shell: "Rscript --no-save --no-restore " + os.path.join(workflow_rscripts,'WGBSpipe.singleCpGstats.limma.R ') + "{params.statdir} {params.sampleSheet} "  + os.path.join(outdir,"methXT") + " {params.diff} {params.fdr} {params.importfunc} 1>{log.out} 2>{log.err}"
+        shell: "Rscript --no-save --no-restore " + os.path.join(workflow_rscripts,'WGBSpipe.singleCpGstats.limma.R ') + "{params.statdir} {params.sampleSheet} {params.datdir} {params.diff} {params.fdr} {params.importfunc} 1>{log.out} 2>{log.err}"
 
 
     rule CpG_report:
         input: 
-            Limdat='{}/limdat.LG.RData'.format(get_outdir("singleCpG_stats_limma")),
-            sinfo='{}/sessionInfo.txt'.format(get_outdir("singleCpG_stats_limma"))
+            Limdat='{}/limdat.LG.RData'.format(get_outdir("merged_methylation_data")),
+            sinfo='{}/singleCpG.RData'.format(get_outdir("singleCpG_stats_limma"))
         output:
             html='{}/Stats_report.html'.format(get_outdir("singleCpG_stats_limma"))
         params:
@@ -580,8 +579,8 @@ if sampleSheet:
 
     rule run_metilene:
         input:
-            MetIN='{}/metilene.IN.txt'.format(get_outdir("singleCpG_stats_limma")),
-            Ginfo='{}/groupInfo.txt'.format(get_outdir("singleCpG_stats_limma"))
+            MetIN='{}/metilene.IN.txt'.format(get_outdir("merged_methylation_data")),
+            Ginfo='{}/groupInfo.txt'.format(get_outdir("merged_methylation_data"))
         output:
             MetBed='{}/singleCpG.metilene.bed'.format(get_outdir("metilene_out"))
         params:
@@ -614,7 +613,7 @@ if sampleSheet:
 
     rule cleanup_metilene:
         input:
-            Limdat='{}/limdat.LG.RData'.format(get_outdir("singleCpG_stats_limma")),
+            Limdat='{}/limdat.LG.RData'.format(get_outdir("merged_methylation_data")),
             MetBed='{}/singleCpG.metilene.bed'.format(get_outdir("metilene_out")),
             MetCG=os.path.join("aux_files",re.sub('_sampleSheet.[a-z]{3}$','.metilene.CpGlist.bed',os.path.basename(sampleSheet))),
             sampleSheet=sampleSheet
@@ -677,7 +676,7 @@ if intList:
     if sampleSheet:
         rule intAgg_stats:
             input:
-                Limdat='{}/limdat.LG.RData'.format(get_outdir("singleCpG_stats_limma")),
+                Limdat='{}/limdat.LG.RData'.format(get_outdir("merged_methylation_data")),
                 intList=intList,
                 refG=refG,
                 sampleSheet=sampleSheet,

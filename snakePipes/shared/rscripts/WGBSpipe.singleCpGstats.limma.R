@@ -1,3 +1,5 @@
+.libPaths(R.home("library"))
+
 #run in R-3.3.1
 #set working directory
 wdir<-commandArgs(trailingOnly=TRUE)[1]
@@ -21,7 +23,8 @@ sampleSheet<-read.table(spath,header=TRUE,sep="\t",as.is=TRUE)
 if(!"PlottingID" %in% colnames(sampleSheet)){sampleSheet$PlottingID<-sampleSheet$name}
 
 require(data.table)
-load("limdat.LG.RData")
+dpath<-commandArgs(trailingOnly=TRUE)[3]
+load(file.path(dpath,"limdat.LG.RData"))
 limdat.LG.CC<-limdat.LG[complete.cases(limdat.LG),] 
 limdat.LG.CC.logit<-logit(limdat.LG.CC[,2:ncol(limdat.LG.CC),with=FALSE],percents=FALSE,adjust=0.025) ##result is a data.frame
 rownames(limdat.LG.CC.logit)<-limdat.LG.CC$ms
@@ -131,12 +134,13 @@ if(length(levels(limdat.LG.CC.Means$Group))==2){
         nrow(tT_filt)/nrow(limdat.LG.CC.logit)
 
         save(limdat.LG.CC.Means,tT_filt,file="singleCpG.RData")
+        print_sessionInfo("Analysis completed succesfully.")
 
     }###end if topTable has at least 1 entry
 
 
 } else {print_sessionInfo('More than 2 sample groups were provided. No statistical inference will be computed.')}### end if exactly two sample groups were specified
 
-print_sessionInfo("Analysis completed succesfully.")  
+  
 
 

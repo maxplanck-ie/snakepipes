@@ -43,6 +43,9 @@ if not cf.is_paired(infiles,ext,reads):
 ## After barcode transfer to R2 we have only single end data / R2
 ## but we need to keep "reads" for rule fastq_barcode
 paired = False
+## we swap read extensions as we continue in SE mode but with R2
+##some rules use a hardcoded reads[0] for SE
+reads = reads[::-1]
 
 ### barcode pattern extraction #################################################
 pattern = re.compile("[N]+")

@@ -9,20 +9,6 @@ import re
 
 ### Functions ##################################################################
 
-def check_replicates(sample_info_file):
-    """
-    return True if each condition has at least 2 replicates
-    this check is eg. necessary for sleuth
-    """
-    ret = subprocess.check_output(
-            "cat "+sample_info_file+"| awk '/^\S*$/{next;}{if (NR==1){ col=0; for (i=1;i<=NF;i++) if ($i~\"condition\") col=i}; if (NR>1) print $col}' | sort | uniq -c | awk '{if ($1>1) ok++}END{if (NR>1 && ok>=NR) print \"REPLICATES_OK\"}'",
-            shell=True).decode()
-
-    if ret.find("REPLICATES_OK") >=0:
-        return True
-    else:
-        return False
-
 
 ## Variable defaults ##########################################################
 
@@ -42,19 +28,21 @@ if trim:
 
 
 ### Initialization #############################################################
+if not fromBam:
+    infiles = sorted(glob.glob(os.path.join(indir, '*'+ext)))
+    samples = cf.get_sample_names(infiles,ext,reads)
 
-infiles = sorted(glob.glob(os.path.join(indir, '*'+ext)))
-samples = cf.get_sample_names(infiles,ext,reads)
+    paired = cf.is_paired(infiles,ext,reads)
 
-paired = cf.is_paired(infiles,ext,reads)
+    if not paired:
+        reads = [""]
+else:
+    infiles = sorted(glob.glob(os.path.join(str(indir or ''), '*'+bam_ext)))
+    samples = cf.get_sample_names_bam(infiles,bam_ext)
 
-if sampleSheet and not os.path.isfile(sampleSheet):
-    print("ERROR: Cannot find sample sheet file! ("+sampleSheet+")\n")
-    exit(1)
 
-if sampleSheet and not cf.check_sample_info_header(sampleSheet):
-    print("ERROR: Please use 'name' and 'condition' as column headers in sample sheet file! ("+sampleSheet+")\n")
-    exit(1)
+if sampleSheet:
+    cf.check_sample_info_header(sampleSheet)
 
-if sampleSheet and not check_replicates(sampleSheet):
+if sampleSheet and not cf.check_replicates(sampleSheet):
     print("\nWarning! Sleuth cannot be invoked without replicates! Only DESeq2 is used...\n")

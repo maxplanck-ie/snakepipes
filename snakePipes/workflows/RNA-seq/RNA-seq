@@ -20,7 +20,7 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
                          "mode": "alignment-free,deepTools_qc", "downsample": False, "trim": False, "trim_prg": "cutadapt", "trim_options": None, "fastqc": False,
                          "library_type": 2, "mapping_prg": "STAR", "star_options": "--outBAMsortingBinsN 100", "hisat_options": None, "salmon_index_options": "--type quasi -k 31",
                          "featurecounts_options": "-C -Q 10 --primary", "filter_annotation": None, "sampleSheet": None,
-                         "bw_binsize": 25, "dnaContam": False, "plot_format": "png"}):
+                         "bw_binsize": 25, "dnaContam": False, "plot_format": "png","fromBam": False, "paired": True}):
     """
     Parse arguments from the command line.
     """
@@ -112,6 +112,17 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
                           help="Returns a plot which presents the proportion of the intergenic reads (default: '%(default)s')",
                           default=defaults["dnaContam"])
 
+    optional.add_argument("--fromBam",
+                         dest="fromBam",
+                         action="store_true",
+                         help=argparse.SUPPRESS,default=defaults["fromBam"])
+
+    optional.add_argument("--single-end",
+                          dest="paired",
+                          action="store_false",
+                          help="input data is single-end, not paired-end",
+                          default=defaults["paired"])
+
     return parser
 
 
@@ -143,6 +154,11 @@ def main():
     for mode in modeTemp:
         if mode not in validModes:
             sys.exit("{} is not a valid mode!\n".format(mode))
+    if args.fromBam and ("alignment-free" in modeTemp or "allelic-mapping" in modeTemp):
+        sys.exit("\n--fromBam can only be used with modes \'alignment\' or \'deepTools_qc\' - use one of these modes or provide fastq files!\n")  
+    if args.fromBam:
+        args.mapping_prg = "EXTERNAL_BAM"
+            
     ## End workflow-specific checks
 
     # Handle YAML and log files

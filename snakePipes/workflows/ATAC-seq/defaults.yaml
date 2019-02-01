@@ -29,3 +29,15 @@ sampleSheet:
 # window_size
 window_size: 20
 fragmentCount_cutoff: 1
+#### Flag to control the pipeline entry point
+bam_ext: '.filtered.bam'
+fromBam: 
+## Bin size of output files in bigWig format
+bw_binsize: 25
+paired: True
+plot_format: png
+## Median/mean fragment length, only relevant for single-end data (default: 200)
+fragment_length: 
+trim:
+fastqc:
+qval: 0.001

@@ -36,7 +36,8 @@ if fromBam:
 if not 'genes_bed' in globals():
     genes_bed='NA'
 
-#this_script_dir = os.path.dirname(os.path.realpath(__file__))
+if sampleSheet:
+    cf.check_sample_info_header(sampleSheet)
 
 ### Sample init #############################################################
 if not fromBam:
@@ -123,7 +124,7 @@ def get_outdir(folder_name):
 def run_CpG_stats(sampleSheet):
     if sampleSheet:
 
-        return (['{}/singleCpG.RData'.format(get_outdir("singleCpG_stats_limma")), '{}/limdat.LG.RData'.format(get_outdir("singleCpG_stats_limma")),'{}/metilene.IN.txt'.format(get_outdir("singleCpG_stats_limma")),'{}/Stats_report.html'.format(get_outdir("singleCpG_stats_limma"))])
+        return (['{}/singleCpG.RData'.format(get_outdir("singleCpG_stats_limma")), '{}/limdat.LG.RData'.format(get_outdir("merged_methylation_data")),'{}/metilene.IN.txt'.format(get_outdir("merged_methylation_data")),'{}/Stats_report.html'.format(get_outdir("singleCpG_stats_limma"))])
     else:
         return ([])
 

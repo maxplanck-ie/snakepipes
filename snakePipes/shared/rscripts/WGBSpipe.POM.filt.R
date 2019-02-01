@@ -1,3 +1,5 @@
+.libPaths(R.home("library"))
+
 #run in R-3.3.1
 #a few lines of code from methylCtools bcall2beta by Hovestadt et al. 2014 were retained 
 #CpG position handling and coverage and Beta calculations by Katarzyna Sikora

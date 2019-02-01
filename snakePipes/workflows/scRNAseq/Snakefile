@@ -45,8 +45,8 @@ if trim:
 def run_Trimming(trim):
     if trim:
         file_list = [
-        expand(fastq_dir+"/{sample}.fastq.gz", sample = samples),
-        expand("FastQC_trimmed/{sample}_fastqc.html", sample = samples)
+        expand(fastq_dir+"/{sample}"+reads[0]+".fastq.gz", sample = samples),
+        expand("FastQC_trimmed/{sample}"+reads[0]+"_fastqc.html", sample = samples)
         ]
         return(file_list)
     else:
@@ -139,4 +139,4 @@ rule all:
 onsuccess:
     cf.cleanLogs(outdir)
     if "verbose" in config and config["verbose"]:
-        print("\n--- scRNAseq-mapcount workflow finished successfully! --------------------------------\n")
+        print("\n--- scRNAseq workflow finished successfully! --------------------------------\n")

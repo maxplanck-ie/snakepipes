@@ -26,6 +26,8 @@ genome:
 ext: '.fastq.gz'
 ## paired-end read name extension (default: ["_R1", "_R2"])
 reads: ["_R1","_R2"]
+## assume paired end reads
+paired: True
 ## Number of reads to downsample from each FASTQ file
 downsample:
 ## Options for trimming
@@ -46,13 +48,16 @@ dnaContam: False
 ## supported mappers: STAR HISAT2
 mapping_prg: STAR
 ## N.B., setting --outBAMsortingBinsN too high can result in cryptic errors
-star_options: --outBAMsortingBinsN 30 --limitBAMsortRAM 1073741824 #10G
+star_options: 
 hisat_options:
 verbose: False
 plot_format: png
 # for allele-spcific mapping
 snp_file:
 Nmasked_index:
+#### Flag to control the pipeline entry point
+fromBam: False
+bam_ext: '.bam'
 ################################################################################
 # Call snakemake directly, i.e. without using the wrapper script:
 #
