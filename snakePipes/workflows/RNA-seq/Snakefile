@@ -63,15 +63,11 @@ if not fromBam:
         include: os.path.join(maindir, "shared", "rules", "RNA_mapping_allelic.snakefile")
         ## SNPsplit
         include: os.path.join(maindir, "shared", "rules", "SNPsplit.snakefile")
-        ## featureCounts_allelic
-        include: os.path.join(maindir, "shared", "rules", "featureCounts_allelic.snakefile")
         # deepTools QC
         include: os.path.join(maindir, "shared", "rules", "deepTools_RNA_allelic.snakefile")
     else:
         # HISAT2/STAR
         include: os.path.join(maindir, "shared", "rules", "RNA_mapping.snakefile")
-        ## featureCounts
-        include: os.path.join(maindir, "shared", "rules", "featureCounts.snakefile")
 
     ## Salmon
     if "alignment-free" in mode:
@@ -86,6 +82,13 @@ else:
     downsample=None
 
     include: os.path.join(maindir, "shared", "rules", "LinkBam.snakefile")
+
+if "allelic-mapping" in mode:
+    ## featureCounts_allelic
+    include: os.path.join(maindir, "shared", "rules", "featureCounts_allelic.snakefile")
+else:
+    ## non-allelic featureCounts
+    include: os.path.join(maindir, "shared", "rules", "featureCounts.snakefile")
 
 ##Genomic_contamination
 include: os.path.join(maindir, "shared", "rules", "GenomicContamination.snakefile")
