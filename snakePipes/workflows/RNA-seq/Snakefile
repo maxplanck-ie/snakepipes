@@ -18,6 +18,16 @@ include: os.path.join(workflow.basedir, "internals.snakefile")
 
 ### include modules of other snakefiles ########################################
 ################################################################################
+
+# deeptools cmds
+include: os.path.join(maindir, "shared", "tools" , "deeptools_cmds.snakefile")
+
+## filtered annotation (GTF)
+include: os.path.join(maindir, "shared", "rules", "filter_annotation.snakefile")
+
+## bamCoverage_RPKM
+include: os.path.join(maindir, "shared", "rules", "deepTools_RNA.snakefile")
+
 if not fromBam:
     ## FASTQ: either downsample FASTQ files or create symlinks to input files
     include: os.path.join(maindir, "shared", "rules", "FASTQ.snakefile")
@@ -60,6 +70,8 @@ if not fromBam:
     else:
         # HISAT2/STAR
         include: os.path.join(maindir, "shared", "rules", "RNA_mapping.snakefile")
+        ## featureCounts
+        include: os.path.join(maindir, "shared", "rules", "featureCounts.snakefile")
 
     ## Salmon
     if "alignment-free" in mode:
@@ -72,24 +84,14 @@ else:
     fastqc=False
     trim=False
     downsample=None
-    
+
     include: os.path.join(maindir, "shared", "rules", "LinkBam.snakefile")
 
 ##Genomic_contamination
 include: os.path.join(maindir, "shared", "rules", "GenomicContamination.snakefile")
 
-# deeptools cmds
-include: os.path.join(maindir, "shared", "tools" , "deeptools_cmds.snakefile")
-## bamCoverage_RPKM
-include: os.path.join(maindir, "shared", "rules", "deepTools_RNA.snakefile")
-
+## QC report
 include:os.path.join(maindir, "shared", "rules", "RNA-seq_qc_report.snakefile")
-
-## filtered annotation (GTF)
-include: os.path.join(maindir, "shared", "rules", "filter_annotation.snakefile")
-
-## featureCounts
-include: os.path.join(maindir, "shared", "rules", "featureCounts.snakefile")
 
 ## DESeq2
 if sampleSheet:
@@ -239,19 +241,19 @@ onstart:
         print("FeatureCounts library type:", library_type)
         print("Sample sheet:", sampleSheet)
         print("-" * 80, "\n")
-    
+
         print("--- Environment ----------------------------------------------------------------")
         print("$TMPDIR: ", os.getenv('TMPDIR', ""))
         print("$HOSTNAME: ", os.getenv('HOSTNAME', ""))
         print("-" * 80, "\n")
-    
+
     elif "verbose" in config and config["verbose"] and fromBam:
         print("--- Workflow parameters --------------------------------------------------------")
         print("samples:" + str(samples))
         print("input dir:" + indir)
         print("paired:", paired)
         print("-" * 80)  # , "\n"
-    
+
         print("--- Environment ----------------------------------------------------------------")
         print("$TMPDIR: " + os.getenv('TMPDIR', ""))
         print("$HOSTNAME: " + os.getenv('HOSTNAME', ""))
