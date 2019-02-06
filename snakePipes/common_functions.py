@@ -518,12 +518,9 @@ def predict_chip_dict(wdir, input_pattern_str, bamExt, fromBam=None):
     chip_dict is written as yaml to current workflow workingdir
     predicts whether a sample is broad or narrow based on histone mark pattern
     """
-    t_list = re.split(',| |\||;',input_pattern_str)
-    print(t_list)
-    pat = "|".join(t_list)
+    pat = "|".join(re.split(',| |\||;',input_pattern_str))
     input_pat = r".*("+pat+")"
     clean_pat = r""+pat+"" 
-    print(input_pat, " ", clean_pat)
     pat1 = re.compile(clean_pat, re.IGNORECASE)
     
     if fromBam:
@@ -551,7 +548,7 @@ def predict_chip_dict(wdir, input_pattern_str, bamExt, fromBam=None):
         if i in input_samples:
             continue
 
-        print("\n sample: ", i)
+        print("\n sample: ", i,)
         matches_sim = dict()
         for j in input_samples:
             c_clean = pat1.sub("",j)
@@ -563,11 +560,10 @@ def predict_chip_dict(wdir, input_pattern_str, bamExt, fromBam=None):
         for key, value in sorted(matches_sim.items(), key=lambda k: (k[1],k[0]),reverse=True):
             if value>=sim:
                 final_matches.add(key)
-                print("   top match by score: %s = %s" % (key,value))
+                print("   top matching input sample by score: %s = %s" % (key,value))
                 sim = value
 
         tmp = ':'.join(list(final_matches))
-        print(" final:", tmp)
 
         if len(final_matches) > 1:
             tmp = "__PLEASE_SELECT_ONLY_ONE_CONTROL__:" + tmp
@@ -581,9 +577,10 @@ def predict_chip_dict(wdir, input_pattern_str, bamExt, fromBam=None):
         else:
             chip_dict_pred["chip_dict"][i]['broad'] = False
 
-    write_configfile(os.path.join(wdir, "chip_seq_sample_config.yaml"), chip_dict_pred)
+    outfile = os.path.join(wdir, "chip_seq_sample_config.PREDICTED.yaml")
+    write_configfile(outfile, chip_dict_pred)
     print("---------------------------------------------------------------------------------------")
-    print("Chip-seq sample configuration is written to file ", os.path.join(wdir, "chip_seq_sample_config.yaml"))
+    print("Chip-seq sample configuration is written to file ", outfile)
     print("Please check and modify this file - this is just a guess! Then run the workflow with it.")
     print("---------------------------------------------------------------------------------------")
     sys.exit(0)
