@@ -511,21 +511,19 @@ def runAndCleanup(args, cmd, logfile_name, temp_path):
         sendEmail(args, 0)
 
 
-def predict_chip_dict(wdir, bamExt, fromBam=None):
+def predict_chip_dict(wdir, input_pattern_str, bamExt, fromBam=None):
     """
     Predict a chip_dict from bam files under filtered_bam/ from DNA-mapping workflow
     ChIP input/control samples are identified from pattern 'input' (case ignored)
     chip_dict is written as yaml to current workflow workingdir
     predicts whether a sample is broad or narrow based on histone mark pattern
     """
-    t = "input|H3$|H4$"
-    t_list = re.split(',| |\||;',t)
+    t_list = re.split(',| |\||;',input_pattern_str)
     print(t_list)
     pat = "|".join(t_list)
-    #input_pattern = r".*(input|H3$|H4$)"
     input_pat = r".*("+pat+")"
     clean_pat = r""+pat+"" 
-    print(input_pat)
+    print(input_pat, " ", clean_pat)
     pat1 = re.compile(clean_pat, re.IGNORECASE)
     
     if fromBam:
@@ -557,9 +555,7 @@ def predict_chip_dict(wdir, bamExt, fromBam=None):
         matches_sim = dict()
         for j in input_samples:
             c_clean = pat1.sub("",j)
-            #c_clean = j
             sim1 = fuzz.ratio(c_clean,i) + fuzz.partial_ratio(c_clean,i) + fuzz.token_sort_ratio(c_clean,i) + fuzz.token_set_ratio(c_clean,i) 
-            print(c_clean)
             matches_sim[j] = sim1/4 
         
         sim=0

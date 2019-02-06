@@ -16,7 +16,7 @@ import snakePipes.parserCommon as parserCommon
 
 
 def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfile": None, "max_jobs": 5, "snakemake_options": "--use-conda", "tempdir": None,
-                         "paired": True, "bamPE": False, "bw_binsize": 25, "sampleSheet": "", "window_size": 150, "predict_chip_dict": False, "bigWigType": "both",
+                         "paired": True, "bamPE": False, "bw_binsize": 25, "sampleSheet": "", "window_size": 150, "predict_chip_dict": "input", "bigWigType": "both",
                          "fromBam": "", "bam_ext": ".bam"}):
     """
     Parse arguments from the command line.
@@ -81,9 +81,12 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
 
     optional.add_argument("--predict_chip_dict",
                           dest="predict_chip_dict",
-                          action="store_true",
-                          help="Use existing bam files to predict a chip-seq sample configuration file. Write it to the workingdir")
-
+                          nargs='?',
+                          action='store',
+                          help="Use existing bam files to predict a chip-seq sample configuration file. Write it to the workingdir. "
+                               "Use given pattern to detect input samples (default: '%(default)s')",
+                          default= None,
+                          const="input")
     optional.add_argument("--fromBam",
                          dest="fromBam",
                          help=argparse.SUPPRESS,
@@ -120,8 +123,9 @@ def main():
     cf.checkCommonArguments(args, baseDir)
 
     # Local argument checks
-    if args.predict_chip_dict:
-        cf.predict_chip_dict(args.workingdir,args.bam_ext,args.fromBam)
+    print(args.predict_chip_dict)
+    if args.predict_chip_dict is not None:
+        cf.predict_chip_dict(args.workingdir,args.predict_chip_dict,args.bam_ext,args.fromBam)
 
     if args.samples_config is not None and os.path.exists(os.path.abspath(args.samples_config)):
         args.samples_config = os.path.abspath(args.samples_config)
