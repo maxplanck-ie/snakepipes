@@ -208,7 +208,7 @@ def checkAlleleParams(args):
             # if no SNPfile, check for a VCF file
             if os.path.exists(args.VCFfile):
                 # check for strain ID
-                if args.strains is '':
+                if args.strains == '':
                     print("\nError! Please specify strain ID to extract from given VCF file for Allele-specific mapping! ({})\n".format(args.VCFfile))
                     exit(1)
                 else:
