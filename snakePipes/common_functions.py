@@ -9,6 +9,7 @@ import yaml
 import glob
 import sys
 import shutil
+from fuzzywuzzy import fuzz
 
 
 def set_env_yamls():
@@ -517,8 +518,16 @@ def predict_chip_dict(wdir, bamExt, fromBam=None):
     chip_dict is written as yaml to current workflow workingdir
     predicts whether a sample is broad or narrow based on histone mark pattern
     """
-    pat1 = re.compile(r"input.*$", re.IGNORECASE)
-    pat2 = re.compile(r"^.*input", re.IGNORECASE)
+    t = "input|H3$|H4$"
+    t_list = re.split(',| |\||;',t)
+    print(t_list)
+    pat = "|".join(t_list)
+    #input_pattern = r".*(input|H3$|H4$)"
+    input_pat = r".*("+pat+")"
+    clean_pat = r""+pat+"" 
+    print(input_pat)
+    pat1 = re.compile(clean_pat, re.IGNORECASE)
+    
     if fromBam:
         infiles = sorted(glob.glob(os.path.join(fromBam, '*' + bamExt)))
     else:
@@ -534,43 +543,35 @@ def predict_chip_dict(wdir, bamExt, fromBam=None):
 
     input_samples = set([])
     for i in samples:
-        if re.match(r".*input.*", i, re.IGNORECASE):
+        if re.match(input_pat, i, re.IGNORECASE):
             print("...found: ", i)
             input_samples.add(i)
 
     print("\nTry to find corresponding ChIP samples...")
-    final_matches = set()
+    
     for i in samples:
         if i in input_samples:
             continue
 
         print("\n sample: ", i)
-
-        prefix_matches = set([])
-        suffix_matches = set([])
-
+        matches_sim = dict()
         for j in input_samples:
-            c_prefix = pat1.sub("", j)
-            c_suffix = pat2.sub("", j)
-
-            if re.match(r"^" + c_prefix + ".*", i, re.IGNORECASE):
-                prefix_matches.add(j)
-            if re.match(r".*" + c_suffix + "$", i, re.IGNORECASE):
-                suffix_matches.add(j)
-
+            c_clean = pat1.sub("",j)
+            #c_clean = j
+            sim1 = fuzz.ratio(c_clean,i) + fuzz.partial_ratio(c_clean,i) + fuzz.token_sort_ratio(c_clean,i) + fuzz.token_set_ratio(c_clean,i) 
+            print(c_clean)
+            matches_sim[j] = sim1/4 
+        
+        sim=0
         final_matches = set([])
-
-        if len(prefix_matches) > 0:
-            final_matches = prefix_matches
-
-        if len(suffix_matches) > 0 and (len(prefix_matches) == 0 or len(suffix_matches) < len(prefix_matches)):
-            final_matches = suffix_matches
-
-        if len(prefix_matches) == len(suffix_matches) and len(prefix_matches) > 0:
-            final_matches = set(prefix_matches).update(suffix_matches)
+        for key, value in sorted(matches_sim.items(), key=lambda k: (k[1],k[0]),reverse=True):
+            if value>=sim:
+                final_matches.add(key)
+                print("   top match by score: %s = %s" % (key,value))
+                sim = value
 
         tmp = ':'.join(list(final_matches))
-        print("   pref:", prefix_matches, " suf:", suffix_matches, " final:", tmp)
+        print(" final:", tmp)
 
         if len(final_matches) > 1:
             tmp = "__PLEASE_SELECT_ONLY_ONE_CONTROL__:" + tmp
