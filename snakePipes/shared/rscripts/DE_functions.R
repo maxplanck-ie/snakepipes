@@ -124,8 +124,8 @@ DESeq_allelic <- function(countdata, coldata, fdr) {
 
     # create alleleSpecific design matrix
     design <- data.frame(name = colnames(rnasamp),
-                   allele = rep(c("genome1", "genome2"), nrow(sampleSheet)),
-                   condition = rep(sampleSheet$condition, each = 2) )
+                   allele = rep(c("genome1", "genome2"), nrow(coldata)),
+                   condition = rep(coldata$condition, each = 2) )
 
     # Run DESeq
     dds <- DESeq2::DESeqDataSetFromMatrix(rnasamp, colData = design,
