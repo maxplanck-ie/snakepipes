@@ -583,4 +583,3 @@ def predict_chip_dict(wdir, input_pattern_str, bamExt, fromBam=None):
     print("Chip-seq sample configuration is written to file ", outfile)
     print("Please check and modify this file - this is just a guess! Then run the workflow with it.")
     print("---------------------------------------------------------------------------------------")
-    sys.exit(0)
