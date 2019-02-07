@@ -9,6 +9,7 @@ import yaml
 import glob
 import sys
 import shutil
+from fuzzywuzzy import fuzz
 
 
 def set_env_yamls():
@@ -510,15 +511,19 @@ def runAndCleanup(args, cmd, logfile_name, temp_path):
         sendEmail(args, 0)
 
 
-def predict_chip_dict(wdir, bamExt, fromBam=None):
+def predict_chip_dict(wdir, input_pattern_str, bamExt, fromBam=None):
     """
-    Predict a chip_dict from bam files under filtered_bam/ from DNA-mapping workflow
-    ChIP input/control samples are identified from pattern 'input' (case ignored)
-    chip_dict is written as yaml to current workflow workingdir
+    Predict a chip_dict from set of bam files
+    ChIP input/control samples are identified from input_pattern (default: 'input')
+    for each sample then the best input sample (by fuzzywuzzy score) is selected
+    chip_dict is written as yaml to workflow workingdir
     predicts whether a sample is broad or narrow based on histone mark pattern
     """
-    pat1 = re.compile(r"input.*$", re.IGNORECASE)
-    pat2 = re.compile(r"^.*input", re.IGNORECASE)
+    pat = "|".join(re.split(',| |\\||;', input_pattern_str))
+    input_pat = r".*(" + pat + ")"
+    clean_pat = r"" + pat + ""
+    pat1 = re.compile(clean_pat, re.IGNORECASE)
+
     if fromBam:
         infiles = sorted(glob.glob(os.path.join(fromBam, '*' + bamExt)))
     else:
@@ -534,43 +539,32 @@ def predict_chip_dict(wdir, bamExt, fromBam=None):
 
     input_samples = set([])
     for i in samples:
-        if re.match(r".*input.*", i, re.IGNORECASE):
+        if re.match(input_pat, i, re.IGNORECASE):
             print("...found: ", i)
             input_samples.add(i)
 
     print("\nTry to find corresponding ChIP samples...")
-    final_matches = set()
+
     for i in samples:
         if i in input_samples:
             continue
 
-        print("\n sample: ", i)
-
-        prefix_matches = set([])
-        suffix_matches = set([])
-
+        print("\n sample: ", i,)
+        matches_sim = {}
         for j in input_samples:
-            c_prefix = pat1.sub("", j)
-            c_suffix = pat2.sub("", j)
+            c_clean = pat1.sub("", j)
+            sim1 = fuzz.ratio(c_clean, i) + fuzz.partial_ratio(c_clean, i) + fuzz.token_sort_ratio(c_clean, i) + fuzz.token_set_ratio(c_clean, i)
+            matches_sim[j] = sim1 / 4
 
-            if re.match(r"^" + c_prefix + ".*", i, re.IGNORECASE):
-                prefix_matches.add(j)
-            if re.match(r".*" + c_suffix + "$", i, re.IGNORECASE):
-                suffix_matches.add(j)
-
+        sim = 0
         final_matches = set([])
-
-        if len(prefix_matches) > 0:
-            final_matches = prefix_matches
-
-        if len(suffix_matches) > 0 and (len(prefix_matches) == 0 or len(suffix_matches) < len(prefix_matches)):
-            final_matches = suffix_matches
-
-        if len(prefix_matches) == len(suffix_matches) and len(prefix_matches) > 0:
-            final_matches = set(prefix_matches).update(suffix_matches)
+        for key, value in sorted(matches_sim.items(), key=lambda k: (k[1], k[0]), reverse=True):
+            if value >= sim:
+                final_matches.add(key)
+                print("   top matching input sample by score: %s = %s" % (key, value))
+                sim = value
 
         tmp = ':'.join(list(final_matches))
-        print("   pref:", prefix_matches, " suf:", suffix_matches, " final:", tmp)
 
         if len(final_matches) > 1:
             tmp = "__PLEASE_SELECT_ONLY_ONE_CONTROL__:" + tmp
@@ -584,9 +578,9 @@ def predict_chip_dict(wdir, bamExt, fromBam=None):
         else:
             chip_dict_pred["chip_dict"][i]['broad'] = False
 
-    write_configfile(os.path.join(wdir, "chip_seq_sample_config.yaml"), chip_dict_pred)
+    outfile = os.path.join(wdir, "chip_seq_sample_config.PREDICTED.yaml")
+    write_configfile(outfile, chip_dict_pred)
     print("---------------------------------------------------------------------------------------")
-    print("Chip-seq sample configuration is written to file ", os.path.join(wdir, "chip_seq_sample_config.yaml"))
+    print("Chip-seq sample configuration is written to file ", outfile)
     print("Please check and modify this file - this is just a guess! Then run the workflow with it.")
     print("---------------------------------------------------------------------------------------")
-    sys.exit(0)

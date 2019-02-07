@@ -18,6 +18,7 @@ requirements:
     - snakemake >=5.2.3
     - pandas
     - graphviz
+    - fuzzywuzzy
 
 test:
   commands:
