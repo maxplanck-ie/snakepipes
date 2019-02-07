@@ -515,15 +515,15 @@ def predict_chip_dict(wdir, input_pattern_str, bamExt, fromBam=None):
     """
     Predict a chip_dict from set of bam files
     ChIP input/control samples are identified from input_pattern (default: 'input')
-    for each sample then the best input sample (by fuzzywuzzy score) is selected    
+    for each sample then the best input sample (by fuzzywuzzy score) is selected
     chip_dict is written as yaml to workflow workingdir
     predicts whether a sample is broad or narrow based on histone mark pattern
     """
-    pat = "|".join(re.split(',| |\||;',input_pattern_str))
-    input_pat = r".*("+pat+")"
-    clean_pat = r""+pat+"" 
+    pat = "|".join(re.split(',| |\\||;', input_pattern_str))
+    input_pat = r".*(" + pat + ")"
+    clean_pat = r"" + pat + ""
     pat1 = re.compile(clean_pat, re.IGNORECASE)
-    
+
     if fromBam:
         infiles = sorted(glob.glob(os.path.join(fromBam, '*' + bamExt)))
     else:
@@ -544,7 +544,7 @@ def predict_chip_dict(wdir, input_pattern_str, bamExt, fromBam=None):
             input_samples.add(i)
 
     print("\nTry to find corresponding ChIP samples...")
-    
+
     for i in samples:
         if i in input_samples:
             continue
@@ -552,16 +552,16 @@ def predict_chip_dict(wdir, input_pattern_str, bamExt, fromBam=None):
         print("\n sample: ", i,)
         matches_sim = {}
         for j in input_samples:
-            c_clean = pat1.sub("",j)
-            sim1 = fuzz.ratio(c_clean,i) + fuzz.partial_ratio(c_clean,i) + fuzz.token_sort_ratio(c_clean,i) + fuzz.token_set_ratio(c_clean,i) 
-            matches_sim[j] = sim1/4 
-        
-        sim=0
+            c_clean = pat1.sub("", j)
+            sim1 = fuzz.ratio(c_clean, i) + fuzz.partial_ratio(c_clean, i) + fuzz.token_sort_ratio(c_clean, i) + fuzz.token_set_ratio(c_clean, i)
+            matches_sim[j] = sim1 / 4
+
+        sim = 0
         final_matches = set([])
-        for key, value in sorted(matches_sim.items(), key=lambda k: (k[1],k[0]),reverse=True):
-            if value>=sim:
+        for key, value in sorted(matches_sim.items(), key=lambda k: (k[1], k[0]), reverse=True):
+            if value >= sim:
                 final_matches.add(key)
-                print("   top matching input sample by score: %s = %s" % (key,value))
+                print("   top matching input sample by score: %s = %s" % (key, value))
                 sim = value
 
         tmp = ':'.join(list(final_matches))
