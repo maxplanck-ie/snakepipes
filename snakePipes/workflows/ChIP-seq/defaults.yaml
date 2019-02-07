@@ -40,7 +40,6 @@ window_size: 150
 bam_ext: '.filtered.bam'
 fromBam:
 plot_format: png
-predict_chip_dict:
 ################################################################################
 # Call snakemake directly, i.e. without using the wrapper script:
 #
