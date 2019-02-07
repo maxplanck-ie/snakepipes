@@ -513,9 +513,10 @@ def runAndCleanup(args, cmd, logfile_name, temp_path):
 
 def predict_chip_dict(wdir, input_pattern_str, bamExt, fromBam=None):
     """
-    Predict a chip_dict from bam files under filtered_bam/ from DNA-mapping workflow
-    ChIP input/control samples are identified from pattern 'input' (case ignored)
-    chip_dict is written as yaml to current workflow workingdir
+    Predict a chip_dict from set of bam files
+    ChIP input/control samples are identified from input_pattern (default: 'input')
+    for each sample then the best input sample (by fuzzywuzzy score) is selected    
+    chip_dict is written as yaml to workflow workingdir
     predicts whether a sample is broad or narrow based on histone mark pattern
     """
     pat = "|".join(re.split(',| |\||;',input_pattern_str))
@@ -549,7 +550,7 @@ def predict_chip_dict(wdir, input_pattern_str, bamExt, fromBam=None):
             continue
 
         print("\n sample: ", i,)
-        matches_sim = dict()
+        matches_sim = {}
         for j in input_samples:
             c_clean = pat1.sub("",j)
             sim1 = fuzz.ratio(c_clean,i) + fuzz.partial_ratio(c_clean,i) + fuzz.token_sort_ratio(c_clean,i) + fuzz.token_set_ratio(c_clean,i) 
