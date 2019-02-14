@@ -22,16 +22,13 @@ include: os.path.join(workflow.basedir, "internals.snakefile")
 include: os.path.join(maindir, "shared", "rules", "FASTQ.snakefile")
 include: os.path.join(maindir, "shared", "rules", "RNA_mapping.snakefile")
 include: os.path.join(maindir, "shared", "rules", "scRNAseq.snakefile")
-fastqc = True
 paired = True
 include: os.path.join(maindir, "shared", "rules", "FastQC.snakefile")
 paired = False
 include: os.path.join(maindir, "shared", "rules", "filter_annotation.snakefile")
 include: os.path.join(maindir, "shared", "tools" , "deeptools_cmds.snakefile")
 include: os.path.join(maindir, "shared", "rules", "deepTools_RNA.snakefile")
-paired = True
 include: os.path.join(maindir, "shared", "rules", "multiQC.snakefile")
-paired = False
 include:os.path.join(maindir, "shared", "rules", "sambamba.snakefile")
 include:os.path.join(maindir, "shared", "rules", "RNA-seq_qc_report.snakefile")
 
