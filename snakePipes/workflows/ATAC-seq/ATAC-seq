@@ -4,7 +4,7 @@ __description__ = """
 MPI-IE workflow for ATAC-seq Analysis
 
 usage example:
-    ATAC-seq -d working-dir mm10 samples.yaml
+    ATAC-seq -d working-dir mm10
 """
 
 import argparse
