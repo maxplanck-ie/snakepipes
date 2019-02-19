@@ -76,6 +76,8 @@ else:
         params:
             QCfolder="HiC_matrices/QCplots/{sample}_QC/",
             bin_size = bin_size,
+            res_seq = get_restriction_seq(enzyme),
+            dang_seq = get_dangling_seq(enzyme),
             region = lambda wildcards: "--region " + str(restrict_region) if restrict_region else "",
             min_dist = MIN_RS_DISTANCE,
             max_dist = MAX_RS_DISTANCE
@@ -87,6 +89,8 @@ else:
         shell:
             "hicBuildMatrix -s {input.R1} {input.R2} "
             "-bs {params.bin_size} "
+            "--restrictionSequence {params.res_seq} "
+            "--danglingSequence {params.dang_seq} "
             "--minDistance {params.min_dist} "
             "--maxDistance {params.max_dist} "
             "--QCfolder {params.QCfolder} "
