@@ -4,6 +4,7 @@ import snakePipes.common_functions as cf
 
 ### snakemake_workflows initialization ########################################
 maindir = os.path.dirname(os.path.dirname(workflow.basedir))
+workflow_rscripts=os.path.join(maindir, "shared", "rscripts")
 
 # load conda ENVs (path is relative to "shared/rules" directory)
 globals().update(cf.set_env_yamls())
@@ -115,6 +116,8 @@ onstart:
 ### main rule ##################################################################
 ################################################################################
 #print(expand(os.path.join(outdir_MACS2, "{sample}"), sample = samples))
+localrules:
+    filterMetricsToHtml
 rule all:
     input:
         #expand(os.path.join(outdir_MACS2, "{sample}.short.bam"), sample = samples),
@@ -128,7 +131,8 @@ rule all:
         expand("deepTools_ATAC/bamCompare/{sample}.filtered.bw",sample=samples),
         run_deepTools_qc(fromBam),
         expand(os.path.join(outdir_MACS2, "{sample}.short.cleaned.bam"),sample=samples),
-        expand(os.path.join(outdir_MACS2, "{sample}.short.cleaned.bam.bai"),sample=samples)
+        expand(os.path.join(outdir_MACS2, "{sample}.short.cleaned.bam.bai"),sample=samples),
+        "Filtering_metrics/Filtering_report.html"
 
 ### execute after workflow finished ############################################
 ################################################################################
