@@ -402,16 +402,29 @@ else:
             threads: 1
             shell: os.path.join(workflow_tools,'conversionRate_KS.sh ')+ "{params.pfx} {output.R12cr} 1>{log.out} 2>{log.err}"
 
-rule get_flagstat:
-    input:
-        bam="bams/{sample}.sorted.bam"
-    output:
-        fstat="QC_metrics/{sample}.flagstat"
-    log:
-        err="QC_metrics/logs/{sample}.get_flagstat.err"
-    threads: 1
-    conda: CONDA_SHARED_ENV
-    shell: "samtools flagstat {input.bam} > {output.fstat} 2>{log.err}"
+
+if fromBam:
+    rule get_flagstat:
+        input:
+            bam="bams/{sample}"+bam_ext
+        output:
+            fstat="QC_metrics/{sample}.flagstat"
+        log:
+            err="QC_metrics/logs/{sample}.get_flagstat.err"
+        threads: 1
+        conda: CONDA_SHARED_ENV
+        shell: "samtools flagstat {input.bam} > {output.fstat} 2>{log.err}"
+else:
+    rule get_flagstat:
+        input:
+            bam="bams/{sample}.sorted.bam"
+        output:
+            fstat="QC_metrics/{sample}.flagstat"
+        log:
+            err="QC_metrics/logs/{sample}.get_flagstat.err"
+        threads: 1
+        conda: CONDA_SHARED_ENV
+        shell: "samtools flagstat {input.bam} > {output.fstat} 2>{log.err}"
 
 rule produce_report:
     input:
