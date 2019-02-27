@@ -404,14 +404,14 @@ else:
 
 rule get_flagstat:
     input:
-        rmDupbam="bams/{sample}"+bam_ext
+        bam="bams/{sample}.sorted.bam"
     output:
         fstat="QC_metrics/{sample}.flagstat"
     log:
         err="QC_metrics/logs/{sample}.get_flagstat.err"
     threads: 1
     conda: CONDA_SHARED_ENV
-    shell: "samtools flagstat {input.rmDupbam} > {output.fstat} 2>{log.err}"
+    shell: "samtools flagstat {input.bam} > {output.fstat} 2>{log.err}"
 
 rule produce_report:
     input:
