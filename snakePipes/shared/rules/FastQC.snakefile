@@ -20,17 +20,16 @@ else:
         input:
             "FASTQ/{sample}"+reads[0]+".fastq.gz"
         output:
-            "FastQC/{sample}_fastqc.html"
+            "FastQC/{sample}"+reads[0]+"_fastqc.html"
         params:
             reads=reads[0]
         log:
-            out = "FastQC/logs/FastQC.{sample}.out",
-            err = "FastQC/logs/FastQC.{sample}.err"
+            out = "FastQC/logs/FastQC.{sample}"+reads[0]+".out",
+            err = "FastQC/logs/FastQC.{sample}"+reads[0]+".err"
         benchmark:
-            "FastQC/.benchmark/FastQC.{sample}.benchmark"
+            "FastQC/.benchmark/FastQC.{sample}"+reads[0]+".benchmark"
         threads: 2
         conda: CONDA_SHARED_ENV
         shell: """
             fastqc -o FastQC {input} > {log.out} 2> {log.err}
-            mv FastQC/{wildcards.sample}{params.reads}.html {output}
             """
