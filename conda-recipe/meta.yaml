@@ -8,13 +8,12 @@ source:
 build:
   number: 0
   noarch: python
-  skip: True  # [not py3k]
 
 requirements:
   build:
-    - python
+    - python >=3
   run:
-    - python
+    - python >=3
     - snakemake >=5.2.3
     - pandas
     - graphviz

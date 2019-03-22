@@ -22,7 +22,8 @@ setup(
     install_requires=[
         "snakemake >= 5.2.0",
         "psutil",
-        "pandas"
+        "pandas",
+        "fuzzywuzzy"
     ],
     zip_safe=False,
 )
