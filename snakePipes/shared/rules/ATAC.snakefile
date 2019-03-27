@@ -76,7 +76,7 @@ rule callOpenChromatin:
             --name {params.name}.filtered.BAM \
             --outdir {params.directory} \
             {params.fileformat} \
-            -- qvalue {params.qval_cutoff} \
+            --qvalue {params.qval_cutoff} \
             {params.nomodel} \
             {params.write_bdg} > {log.out} 2> {log.err}
         """
