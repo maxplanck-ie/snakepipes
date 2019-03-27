@@ -11,8 +11,8 @@ if paired:
     rule writeFragmentSize:
         input: "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv"
         output: "MACS2/fragmentSize.metrix.tsv"
-    
-    
+
+
     rule MACS2:
         input:
             chip = "filtered_bam/{chip_sample}.filtered.bam",
@@ -61,8 +61,7 @@ else:
             chip = "filtered_bam/{chip_sample}.filtered.bam",
             control =
                 lambda wildcards: "filtered_bam/"+get_control(wildcards.chip_sample)+".filtered.bam" if get_control(wildcards.chip_sample)
-                else [],
-            insert_size_metrics = "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv"
+                else []
         output:
             peaks = "MACS2/{chip_sample}.filtered.BAM_peaks.xls",
         params:
@@ -81,7 +80,8 @@ else:
         conda: CONDA_CHIPSEQ_ENV
         shell: """
             macs2 callpeak -t {input.chip} {params.control_param} -f BAM -g {params.genome_size} --keep-dup all --outdir MACS2 \
-                --name {wildcards.chip_sample}.filtered.BAM --nomodel --extsize  $(cat {input.insert_size_metrics} | grep filtered_bam/{wildcards.chip_sample}.filtered.bam | awk '{{printf("%i",$6)}}') {params.broad_calling} > {log.out} 2> {log.err}
+                --name {wildcards.chip_sample}.filtered.BAM \
+                {params.broad_calling} > {log.out} 2> {log.err}
             """
 
 
