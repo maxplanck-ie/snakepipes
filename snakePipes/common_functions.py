@@ -48,7 +48,7 @@ def sanity_dict_clean(myDict):
 
 def load_configfile(configfile, verbose, info='Config'):
     with open(configfile, "r") as f:
-        config = yaml.load(f, Loader=FullLoader)
+        config = yaml.load(f, Loader=yaml.FullLoader)
 
     config = sanity_dict_clean(config)
 
