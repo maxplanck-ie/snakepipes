@@ -18,6 +18,7 @@ requirements:
     - pandas
     - graphviz
     - fuzzywuzzy
+    - wget
 
 test:
   commands:
