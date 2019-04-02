@@ -69,7 +69,7 @@ if sampleSheet:
 
 chip_dict = {}
 with open(samples_config, "r") as f:
-    chip_dict_tmp = yaml.load(f)
+    chip_dict_tmp = yaml.load(f, Loader=FullLoader)
     if "chip_dict" in chip_dict_tmp and chip_dict_tmp["chip_dict"] :
         chip_dict = chip_dict_tmp["chip_dict"]
     else:
