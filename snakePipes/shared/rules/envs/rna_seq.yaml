@@ -3,7 +3,7 @@ channels:
  - conda-forge
  - bioconda
 dependencies:
- - bedtools = 2.27.1
+ - bedtools = 2.28.0
  - ucsc-genepredtogtf = 377
  - ucsc-bedtogenepred = 377
  - ucsc-genepredtobed = 377
