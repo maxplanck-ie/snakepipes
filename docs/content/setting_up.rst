@@ -4,7 +4,7 @@ Setting up snakePipes
 Unlike many other pipelines, setting up snakePipes is easy! All you need is a *linux system* with *python3-conda* installation.
 
 Installing conda with python3
---------------------------
+-----------------------------
 
 Follow the instructions `here <https://conda.io/docs/user-guide/install/index.html>`__ to install either
 miniconda or anaconda. A minimal version (miniconda) is enough for snakePipes. Get the miniconda installer `here <https://conda.io/miniconda.html>`__.
@@ -26,7 +26,7 @@ Next, install snakePipes.
 
 
 Installing snakePipes
-----------------------
+---------------------
 
 The easiest way to install snakePipes is via our conda channel. The following command install snakePipes and also creates a conda virtual environment named `snakePipes`, which you can then activate via `source activate snakePipes`.
 
