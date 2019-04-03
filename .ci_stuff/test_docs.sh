@@ -1,3 +1,5 @@
 #!/bin/bash
-cd docs
-make html
+export PATH="$HOME/miniconda/bin:$PATH"
+hash -r
+
+cd docs && make html

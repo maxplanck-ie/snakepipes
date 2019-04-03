@@ -3,6 +3,9 @@ python:
   - "3.6"
 jobs:
   include:
+    - stage: flake
+      env:
+        - TESTDOCS="0"
     - stage: testdocs
       env:
         - TESTDOCS="1"
