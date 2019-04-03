@@ -1,9 +1,5 @@
-version: 2
-formats: all
 conda:
   environment: docs/environment.yaml
 python:
   version: 3.7
-  install:
-    - method: setuptools
-      path: .
+  pip_install: true
