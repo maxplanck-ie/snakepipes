@@ -1,2 +1,11 @@
+name: snakepipes
+channels:
+  - conda-forge
+dependencies:
+ - python 3
  - pyyaml >= 5.1
  - sphinx-argparse
+ - mock
+ - pip:
+   - sphinx
+   - sphinx_rtd_theme
