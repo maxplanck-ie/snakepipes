@@ -118,7 +118,7 @@ The WGBS pipeline invoked with reads as input, providing a sample sheet as well 
 
 Aggregate stats will be calculated if user provides at least one bed file with genomic intervals of interest. Differential methylation analysis (singleCpG stats) or DMR detection (metilene_out) will only be run if user provides a sample sheet. It is possible to rerun the differential methylation analysis multiple times using different sample sheet files at a time (e.g. to specify different sample subsets or different contrasts). The name of the sample sheet is appended to the respective result folders (in this case: "example").
 
-In addition to the FASTQ module results (see :doc:`running_snakePipes`), the workflow produces the following outputs:
+In addition to the FASTQ module results (see `Running snakePipes`_), the workflow produces the following outputs:
 
 - **FASTQ_downsampled**: contains read files downsampled to 5mln reads. These are used to calculate conversion rate which would otherwise take a very long time.
 

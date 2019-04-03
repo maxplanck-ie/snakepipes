@@ -10,7 +10,7 @@ The ATAC-seq pipeline takes one or more BAM files and attempts to find accessibl
 
 .. image:: ../images/ATACseq_pipeline.png
 
-.. note:: The **CSAW** step will be skipped if there is no ``sample_info`` tsv file (see :doc:`running_snakePipes`).
+.. note:: The **CSAW** step will be skipped if there is no ``sample_info`` tsv file (see `Running snakePipes`_).
 
 Input requirements
 ------------------

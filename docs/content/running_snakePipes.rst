@@ -27,7 +27,7 @@ The :ref:`ChIP-seq` workflow requires the files to be processed via the :ref:`DN
 
 * ``-j 10`` defines 10 jobs to be run in parallel on the cluster (see below).
 
-* ``hs37d5`` is the name of the genome (keyword for the yaml). The yaml file corresponding to this genome should exist as ``snakePipes/shared/organisms/hs37d5.yaml``. (see `Setting up snakePipes`_ for details).
+* ``hs37d5`` is the name of the genome (keyword for the yaml). The yaml file corresponding to this genome should exist as ``snakePipes/shared/organisms/hs37d5.yaml``. (see :ref:`setting_up` for details).
 
 All individual jobs of the workflow will be submitted to the Grid engine using the command specified under /shared/cluster.yaml. The parameter ``-j`` defines the number of jobs to be run in parallel, while the number of threads per job is hard-coded in the workflows.
 

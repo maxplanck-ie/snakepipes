@@ -167,7 +167,7 @@ Following up on the DNA-mapping module results (see :doc:`DNA-mapping`), the wor
 
 * **deepTools_ChIP**: Contains output from two of the deepTools modules. The `bamCompare <https://deeptools.readthedocs.io/en/develop/content/tools/bamCompare.html>`__ output contains the input-normalized coverage files for the samples, which is very useful for downstream analysis, such as visualization in IGV and plotting the heatmaps. The `plotFingerPrint <https://deeptools.readthedocs.io/en/develop/content/tools/plotFingerprint.html>`__ output is a useful QC plot to assess signal enrichment in the ChIP samples.
 
-* **MACS2**: This folder contains the output of `MACS2 <https://github.com/taoliu/MACS>`__ on the ChIP samples, MACS2 would perform either a **narrow** or **broad** peak calling on the samples, as indicated by the ChIP sample configuration file (see :ref:`config`). The outputs files would contain the respective tags (**narrowPeak** or **broadPeak**).
+* **MACS2**: This folder contains the output of `MACS2 <https://github.com/taoliu/MACS>`__ on the ChIP samples, MACS2 would perform either a **narrow** or **broad** peak calling on the samples, as indicated by the ChIP sample configuration file (see :ref:`ChIPconfig`). The outputs files would contain the respective tags (**narrowPeak** or **broadPeak**).
 
 * **histoneHMM**: This folder contains the output of `histoneHMM<https://github.com/matthiasheinig/histoneHMM>`__. This folder will only exist if you have broad marks.
 
