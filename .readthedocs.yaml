@@ -1,5 +1,5 @@
 conda:
-  environment: docs/environment.yaml
+  file: docs/environment.yaml
 python:
   version: 3.7
   pip_install: true
