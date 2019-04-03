@@ -5,5 +5,5 @@ export PATH="$HOME/miniconda/bin:$PATH"
 hash -r
 conda config --set always_yes yes --set changeps1 no
 
-conda install --yes -c conda-forge -c bioconda snakemake fuzzywuzzy mock sphinx sphinx-argparse
+conda install --yes --quiet -c conda-forge -c bioconda snakemake fuzzywuzzy mock sphinx sphinx-argparse
 pip install sphinx-rtd-theme
