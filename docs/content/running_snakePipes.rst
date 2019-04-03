@@ -15,7 +15,7 @@ A **typical ChIP-seq analysis** of human samples starts from paired-end FASTQ fi
     my_H3K27ac_sample_R1.fastq.gz  my_H3K27me3_sample_R1.fastq.gz  my_Input_sample_R1.fastq.gz
     my_H3K27ac_sample_R2.fastq.gz  my_H3K27me3_sample_R2.fastq.gz  my_Input_sample_R2.fastq.gz
 
-The :doc:`ChIP-seq` workflow requires the files to be processed via the :doc:`DNA-mapping` workflow first. We therefore run the DNA-mapping workflow :
+The :ref:`ChIP-seq` workflow requires the files to be processed via the :ref:`DNA-mapping` workflow first. We therefore run the DNA-mapping workflow :
 
 .. code:: bash
 

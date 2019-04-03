@@ -1,7 +1,7 @@
 snakePipes
 ==========
 
-snakePipes are pipelines built using `snakemake <snakemake.readthedocs.io>`__ and *python* for the analysis of epigenomic datasets.
+snakePipes are pipelines built using `snakemake <snakemake.readthedocs.io>`__ and *python* for the analysis of epigenomic datasets. For a change log please see :ref:`snakePipes News`
 
 Below is the list of pipelines available in snakePipes
 ------------------------------------------------------

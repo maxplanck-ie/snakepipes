@@ -18,7 +18,7 @@ Input requirements
 
 The only requirement is a directory of gzipped fastq files. Files could be single or paired end, and the read extensions could be modified using the keys in the `defaults.yaml` file below.
 
-.. _config:
+.. _RNAconfig:
 
 Configuration file
 ~~~~~~~~~~~~~~~~~~
@@ -88,7 +88,7 @@ Apart from the common workflow options (see :ref:`running_snakePipes`), followin
 
 * **plot_format**: You can switch the type of plot produced by all deeptools modules using this option. Possible choices : png, pdf, svg, eps, plotly
 
-* **snp_file**: For the ``allelic-mapping`` mode. The ``snp_file`` is the file produced by `SNPsplit <>`__ after creating a dual-hybrid genome. The file has the suffix ````.
+* **snp_file**: For the ``allelic-mapping`` mode. The ``snp_file`` is the file produced by `SNPsplit <https://www.bioinformatics.babraham.ac.uk/projects/SNPsplit/>`__ after creating a dual-hybrid genome. The file has the suffix ``.vcf``.
 
 * **Nmasked_index**: For the ``allelic-mapping`` mode. The ``Nmasked_index`` refers to the **basename** of the index file created using STAR, on the SNPsplit output.
 

@@ -92,7 +92,7 @@ The differential binding module utilizes the R package `CSAW <https://bioconduct
 
 .. note:: If you name a group of samples as "control" in the sample sheet, the peaks present in these samples would not be used to create the union of peaks for testing. This is useful for conditions where you want to test between two groups, but only on the peaks from one group.
 
-.. _config:
+.. _ChIPconfig:
 
 Configuration file
 ~~~~~~~~~~~~~~~~~~
