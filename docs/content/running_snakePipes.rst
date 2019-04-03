@@ -27,7 +27,7 @@ The :ref:`ChIP-seq` workflow requires the files to be processed via the :ref:`DN
 
 * ``-j 10`` defines 10 jobs to be run in parallel on the cluster (see below).
 
-* ``hs37d5`` is the name of the genome (keyword for the yaml). The yaml file corresponding to this genome should exist as `snakePipes/shared/organisms/hs37d5.yaml`. (see :doc:`content/setting_up` for details).
+* ``hs37d5`` is the name of the genome (keyword for the yaml). The yaml file corresponding to this genome should exist as ``snakePipes/shared/organisms/hs37d5.yaml``. (see `Setting up snakePipes`_ for details).
 
 All individual jobs of the workflow will be submitted to the Grid engine using the command specified under /shared/cluster.yaml. The parameter ``-j`` defines the number of jobs to be run in parallel, while the number of threads per job is hard-coded in the workflows.
 
@@ -45,7 +45,7 @@ Once the DNA-mapping run is finished sucessfully. We can run the ChIP-seq analys
 
 * ``hs37d5`` is the name of the genome (keyword for the yaml).
 
-* ``chip-samples.yaml`` is a yaml file that defines for each ChIP sample, the corresponding control (input) sample and the type of mark (broad/sharp). See :doc:`ChIP-seq` for more details on how to setup this yaml file.
+* ``chip-samples.yaml`` is a yaml file that defines for each ChIP sample, the corresponding control (input) sample and the type of mark (broad/sharp). See :ref:`ChIP-seq` for more details on how to setup this yaml file.
 
 The ChIP-seq workflow would follow up from the DNA-mapping outputs and perform peak calling, create ChIP-input normalized coverage files and also perform differential (control-test) analysis if a sample information file is provided (see below).
 
@@ -81,18 +81,18 @@ All of the snakePipes workflows that begin with a FASTQ file, perform the same p
 .. note:: The DNA-mapping and RNA-mapping pipelines can take either single, or paired-end FASTQ files. For paired-end data, the reads ``R1`` and ``R2`` are expected to have the suffix ``_R1`` and ``_R2`` respectively, which can be modified in the ``defaults.yaml`` file using the ``reads`` key, to your needs. For example, files downloaded from NCBI would normally have the extention ``.1.fastq.gz`` and ``.2.fastq.gz``. Also, please check the ``ext`` key in the configuration file if you wish to modify the read extension (default is ``.fastq.gz``).
 
 
-* **Quality/adapter trimming** (optional): If ``--trim`` is selected, the `trimming` rule would run the selected program (either `Trimgalore <https://www.bioinformatics.babraham.ac.uk/projects/trim_galore/>`__, or `Cutadapt <https://journal.embnet.org/index.php/embnetjournal/article/view/200/479>`__) on the files in the FASTQ folder, and would produce another folder with name `FASTQ_<program>`, where <program> is either `Cutadapt` or `Trimgalore`.
+* **Quality/adapter trimming** (optional): If ``--trim`` is selected, the ``trimming`` rule would run the selected program (either `Trimgalore <https://www.bioinformatics.babraham.ac.uk/projects/trim_galore/>`__, or `Cutadapt <https://journal.embnet.org/index.php/embnetjournal/article/view/200/479>`__) on the files in the FASTQ folder, and would produce another folder with name ``FASTQ_<program>``, where <program> is either ``Cutadapt`` or ``Trimgalore``.
 
 
-* **FastQC** (optional): If ``--fastqc`` is specified, the `FASTQC` rule would run `FastQC <https://www.bioinformatics.babraham.ac.uk/projects/fastqc/>`__ on the input files and store the output under `FastQC` folder. If trimming is specified, FastQC is always produced on trimmed files, and stored under `FastQC_trimmed` folder.
+* **FastQC** (optional): If ``--fastqc`` is specified, the ``FASTQC`` rule would run `FastQC <https://www.bioinformatics.babraham.ac.uk/projects/fastqc/>`__ on the input files and store the output under ``FastQC`` folder. If trimming is specified, FastQC is always produced on trimmed files, and stored under ``FastQC_trimmed`` folder.
 
 * **--snakemake_options**: All wrappers contain a ``--snakemake_options`` parameter, which is quite useful as it can be used to pass on any arguments directly to snakemake. One use case is to perform a *dry run*, i.e. to check which programs would be executed and which outputs would be created by the workflow, without actually running it. This can be executed via ``--snakemake_options -np``. This would also print the commands to be used during the run.
 
 
-* **--DAG**: All workflows can produce a `directed acyclic graph <https://en.wikipedia.org/wiki/Directed_acyclic_graph>`__ of themselves, using the `--DAG` option in the wrappers. This could be useful in reporting/presenting the results.
+* **--DAG**: All workflows can produce a `directed acyclic graph <https://en.wikipedia.org/wiki/Directed_acyclic_graph>`__ of themselves, using the ``--DAG`` option in the wrappers. This could be useful in reporting/presenting the results.
 
 
-* **--tempdir and --notemp**: These options control where the temporary/intermediate processing files are written during the workflow (option: ``--tempdir``) and whether they are to be kept after the workflow is finished (option: `--notemp`). Normally the temporary files are removed after analysis.
+* **--tempdir and --notemp**: These options control where the temporary/intermediate processing files are written during the workflow (option: ``--tempdir``) and whether they are to be kept after the workflow is finished (option: ``--notemp``). Normally the temporary files are removed after analysis.
 
 
 .. note:: It's useful to configure the ``--tempdir`` during setup of snakePipes, such that it points to an appropriate temporary folder on your machine/cluster.
@@ -120,7 +120,7 @@ Quality-Checks
 
 All workflows under snakePipes employ various quality-checks (QC) to inform users of the data quality.
 
-* **MultiQC** : All workflows in snakePipes output a `MultiQC` folder, which summerizes the QC metrics obtained from various tools in the workflow via `MultiQC <https://multiqc.info/>`__, in an interactive HTML report. This output is quite useful to compare samples and get an overview of the data quality from all samples.
+* **MultiQC** : All workflows in snakePipes output a ``MultiQC`` folder, which summerizes the QC metrics obtained from various tools in the workflow via `MultiQC <https://multiqc.info/>`__, in an interactive HTML report. This output is quite useful to compare samples and get an overview of the data quality from all samples.
 
 * **deepTools**: `deepTools<deeptools.readthedocs.io>`__ are a popular set of tools that perform QC, normalization and visualization of NGS data. In snakePipes, most workflows (except HiC and scRNAseq) contain outputs from various deepTools modules on the samples. The coverage files (bigWigs), are also generated by deepTools (bamCoverage and bamCompare modules). Therefore, it's useful to look at the deepTools documentation before inspecting these results.
 

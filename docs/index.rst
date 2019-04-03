@@ -1,7 +1,7 @@
 snakePipes
 ==========
 
-snakePipes are pipelines built using `snakemake <snakemake.readthedocs.io>`__ and *python* for the analysis of epigenomic datasets. For a change log please see :ref:`snakePipes News`
+snakePipes are pipelines built using `snakemake <snakemake.readthedocs.io>`__ and *python* for the analysis of epigenomic datasets.
 
 Below is the list of pipelines available in snakePipes
 ------------------------------------------------------
@@ -93,7 +93,7 @@ Contents:
    content/workflows/RNA-seq.rst
    content/workflows/scRNA-seq.rst
    content/workflows/WGBS.rst
-   ChangeLog.rst
+   content/News.rst
 
 
 Indices and tables
