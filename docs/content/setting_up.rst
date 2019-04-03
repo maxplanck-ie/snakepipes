@@ -173,9 +173,10 @@ Download premade indices
 
 For the sake of convenience, we provide premade indices for the following organisms:
 
- - `Human <https://zenodo.org/record/1477929#.W-BexRwh3mE>`_
- - `Mouse <https://zenodo.org/record/1475957#.W-BexBwh3mE>`_
- - `Fruit fly <https://zenodo.org/record/1478017#.W-Bexhwh3mE>`_
+ - `Human (GRCh38) <https://zenodo.org/record/1477929#.W-BexRwh3mE>`_
+ - `Mouse (GRCm38/mm10) <https://zenodo.org/record/1475957#.W-BexBwh3mE>`_
+ - `Mouse (GRCm37/mm9) <https://zenodo.org/record/1475957#.W-BexBwh3mE>`_
+ - `Fruit fly (dm6) <https://zenodo.org/record/1478017#.W-Bexhwh3mE>`_
 
 To use these, simply download and extract them. You will then need to modify the provided YAML file to indicate exactly where the indices are located (i.e., replace `/data/processing/ryan` with whatever is appropriate).
 
@@ -232,3 +233,16 @@ Below are some of the workflow defaults from the DNA-mapping pipeline. Empty sec
     dedup: false
     ## Retain only reads with at least the given mapping quality
     mapq: 0
+
+Test data
+---------
+
+Test data for the various workflows is available at the following locations:
+
+ - `DNA mapping <https://zenodo.org/record/1346303>`_
+ - `ChIP-seq <https://zenodo.org/record/2624281>`_
+ - `ATAC-seq <https://zenodo.org/record/2624323>_`
+ - `RNA-seq <https://zenodo.org/record/2624408>`_
+ - `HiC <https://zenodo.org/record/2624479>`_
+ - `WGBS <https://zenodo.org/record/2624498>`_
+ - `scRNA-seq <https://zenodo.org/record/2624518>`_

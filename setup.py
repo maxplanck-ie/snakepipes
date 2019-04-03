@@ -23,7 +23,8 @@ setup(
         "snakemake >= 5.2.0",
         "psutil",
         "pandas",
-        "fuzzywuzzy"
+        "fuzzywuzzy",
+        "pyyaml >= 5.1"
     ],
     zip_safe=False,
 )
