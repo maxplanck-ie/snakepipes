@@ -6,7 +6,6 @@ snakePipes 1.2.0
 
  * A number of minor bug fixes across all of the pipelines
  * Updates of all tool versions and switching to R 3.5.1
- * 
 
 snakePipes 1.1.2
 ----------------
@@ -24,8 +23,6 @@ snakePipes 1.1.1
 
 snakePipes 1.1.0
 ----------------
-
-**26.11.18**
 
  * A wide number of bug fixes to scRNA-seq and other pipelines. In particular, many memory limits were updated.
  * An optional email can be sent upon pipeline completion.
