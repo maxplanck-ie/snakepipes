@@ -124,7 +124,7 @@ Configure the organisms
 -----------------------
 
 For each organism of your choice, create a file called ``shared/organisms/<organism>.yaml`` and
-fill the paths to the required files next to the corresponding yaml entry. For common organisms, the required files are downloaded and the yaml entries can be created automatically via the workflow ``createIndicies``.
+fill the paths to the required files next to the corresponding yaml entry. For common organisms, the required files are downloaded and the yaml entries can be created automatically via the workflow ``createIndices``.
 
 The yaml files look like this after the setup (an example from drosophila genome ``dm3``) :
 
