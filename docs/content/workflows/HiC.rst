@@ -110,7 +110,7 @@ the config file description for the HiC workflow :
 Structure of output directory
 -----------------------------
 
-In addition to the FASTQ module results (see `Running snakePipes`_), the workflow produces the following outputs::
+In addition to the FASTQ module results (see :ref:`running_snakePipes`), the workflow produces the following outputs::
 
     .
     |--BWA

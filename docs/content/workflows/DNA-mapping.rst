@@ -93,7 +93,7 @@ The DNA mapping pipeline will generate output of the following structure::
     │   └── multiqc_data
     └── Sambamba
 
-In addition to the FASTQ module results (see `Running snakePipes`_), the workflow produces the following outputs:
+In addition to the FASTQ module results (see :ref:`running_snakePipes`), the workflow produces the following outputs:
 
  * **Bowtie2** : Contains the BAM files after mapping with `Bowtie2 <http://bowtie-bio.sourceforge.net/bowtie2/index.shtml>`__ and indexed by `Samtools <http://www.htslib.org/>`__.
 

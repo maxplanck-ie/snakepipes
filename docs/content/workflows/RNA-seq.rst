@@ -70,7 +70,7 @@ There is a configuration file in `snakePipes/workflows/RNA-seq/defaults.yaml`::
     Nmasked_index:
 
 
-Apart from the common workflow options (see `Running snakePipes`_), following parameters are useful to consider:
+Apart from the common workflow options (see :ref:`running_snakePipes`), following parameters are useful to consider:
 
 * **mapping_prg**: You can choose either `STAR <https://github.com/alexdobin/STAR>`__ or `HISAT2 <https://ccb.jhu.edu/software/hisat2/index.shtml>`__. While HISAT2 mapping is usually faster than STAR, we keep STAR as the default aliger due to it's superior accuracy (see `this paper<https://www.nature.com/nmeth/journal/v14/n2/abs/nmeth.4106.html>`__).
 
@@ -218,7 +218,7 @@ Assuming both ``alignment-free`` mode has have been run togather with ``deepTool
         ├── sample1.bam
         └── sample1.bam.bai
 
-Apart from the common module outputs (see `Running snakePipes`_), the workflow would produce the following folders:
+Apart from the common module outputs (see :ref:`running_snakePipes`), the workflow would produce the following folders:
 
 * **Annotation**: This folder would contain the GTF and BED files used for analysis. In case the file has been filtered using the ``--filter_annotation`` option (see :ref:`RNAconfig`), this would contain the filtered files.
 
