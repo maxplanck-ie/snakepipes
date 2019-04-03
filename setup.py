@@ -19,12 +19,5 @@ setup(
     url='https://github.com/maxplanck-ie/snakepipes',
     license='GPL v3',
     description='Snakemake workflows and wrappers for NGS data processing from the MPI-IE',
-    install_requires=[
-        "snakemake >= 5.2.0",
-        "psutil",
-        "pandas",
-        "fuzzywuzzy",
-        "pyyaml >= 5.1"
-    ],
     zip_safe=False,
 )
