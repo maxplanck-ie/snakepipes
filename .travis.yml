@@ -23,4 +23,4 @@ install:
 script:
   - if [[ ${STAGE:-"0"} == "0" ]] ; then flake8 --ignore=E501,E722 --exclude docs/conf.py . ; fi
   - if [[ ${STAGE:-"0"} == "1" ]] ; then bash .ci_stuff/test_docs.sh ; fi
-  - if [[ ${STAGE:-"0"} == "1" ]] ; then bash .ci_stuff/test_dag.sh ; fi
+  - if [[ ${STAGE:-"0"} == "2" ]] ; then bash .ci_stuff/test_dag.sh ; fi

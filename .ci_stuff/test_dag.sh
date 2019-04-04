@@ -22,10 +22,10 @@ touch SE_input/sample1_R1.fastq.gz \
 
 # DNA mapping
 rm -rf output && mkdir output
-DNA-mapping -i PE_input -o output mm10 --snakemake_options "--dryrun"
+DNA-mapping -i PE_input -o output mm10 --snakemake_options " --dryrun"
 rm -rf output && mkdir output
-DNA-mapping -i PE_input -o output mm10 --snakemake_options "--dryrun" --trim --mapq 20 --dedup --properpairs
+DNA-mapping -i PE_input -o output mm10 --snakemake_options " --dryrun" --trim --mapq 20 --dedup --properpairs
 rm -rf output && mkdir output
-DNA-mapping -i SE_input -o output mm10 --snakemake_options "--dryrun"
+DNA-mapping -i SE_input -o output mm10 --snakemake_options " --dryrun"
 rm -rf output && mkdir output
-DNA-mapping -i SE_input -o output mm10 --snakemake_options "--dryrun" --trim --mapq 20 --dedup --properpairs
+DNA-mapping -i SE_input -o output mm10 --snakemake_options " --dryrun" --trim --mapq 20 --dedup --properpairs
