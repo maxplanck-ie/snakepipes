@@ -1,3 +1,5 @@
+.. _setting_up:
+
 Setting up snakePipes
 =====================
 
@@ -45,7 +47,7 @@ If you wish to modify snakePipes you can install it via pip, using our `GitHub r
 
     pip install --user --upgrade git+https://github.com/maxplanck-ie/snakepipes@develop
 
-Instead of providing the URL to `pip`, you can also `**clone**<https://help.github.com/articles/cloning-a-repository/>`__ our `GitHub repository <https://github.com/maxplanck-ie/snakepipes>`__ on your computer, and modify the code before running snakePipes. Please see :doc:`advanced_usage` for more information on how to modify and extend snakePipes workflows.
+Instead of providing the URL to `pip`, you can also `**clone** <https://help.github.com/articles/cloning-a-repository/>`__ our `GitHub repository <https://github.com/maxplanck-ie/snakepipes>`__ on your computer, and modify the code before running snakePipes. Please see :doc:`advanced_usage` for more information on how to modify and extend snakePipes workflows.
 
 .. note:: There is a difference between installing via conda or installing via pip. The python  installation from user's `$PATH` is ignored when installing via conda (first method) while is considered when installing via pip. You must use the `--develop` option later when you run `snakePipes createEnvs`.
 

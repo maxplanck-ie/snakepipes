@@ -7,13 +7,13 @@ WGBS
 What it does
 ------------
 
-Optionally trimmed reads are mapped to reference genome using a bisulfite-specific aligner (`bwa-meth<https://github.com/brentp/bwa-meth>`__).
+Optionally trimmed reads are mapped to reference genome using a bisulfite-specific aligner (`bwa-meth <https://github.com/brentp/bwa-meth>`__).
 Quality metrics are collected and synthesized in a QC report, including bisulfite conversion rate, mapping rate, percentage CpGs covered a least 10x, methylation bias.
 
 There are two flags that allow skipping certain QC metric calculation, i.e. ``skipDOC`` and ``skipGCbias``. These deactivate the GATK-dependent calculation of depth of coverage and the deepTools-dependent calculation of GC bias,respectively, e.g. in case these metrics are known from another source.
 
-Methylation ratios are extracted (via `MethylDackel<https://github.com/dpryan79/MethylDackel>`__) for CpG positions in the reference genome with a minimum coverage (10x) and low snp allelic frequency (<0.25 illegitimate bases).
-If sample sheet is provided, logit-transformed beta values for CpG positions are tested for differential methylation using `limma<https://bioconductor.org/packages/release/bioc/html/limma.html>`__.
+Methylation ratios are extracted (via `MethylDackel <https://github.com/dpryan79/MethylDackel>`__) for CpG positions in the reference genome with a minimum coverage (10x) and low snp allelic frequency (<0.25 illegitimate bases).
+If sample sheet is provided, logit-transformed beta values for CpG positions are tested for differential methylation using `limma <https://bioconductor.org/packages/release/bioc/html/limma.html>`__.
 Metilene is called to detect de novo DMRs using parameters specified in the defaults dictionary. In addition to the nonparametric statistics output by metilene, limma-derived statistics are recalculated for DMRs, which are further annotated with nearest gene information.
 If bed file(s) with genomic intervals of interest are provided, methylation ratios are aggregated over those and limma is used on logit-transformed methylation ratios to test for differential methylation.
 
