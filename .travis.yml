@@ -9,6 +9,9 @@ jobs:
     - stage: testdocs
       env:
         - STAGE="1"
+    - stage: testdag
+      env:
+        - STAGE="2"
 
 # setup conda
 before_install:
