@@ -47,11 +47,11 @@ If you wish to modify snakePipes you can install it via pip, using our `GitHub r
 
     pip install --user --upgrade git+https://github.com/maxplanck-ie/snakepipes@develop
 
-Instead of providing the URL to `pip`, you can also **`clone <https://help.github.com/articles/cloning-a-repository/>`__** our `GitHub repository <https://github.com/maxplanck-ie/snakepipes>`__ on your computer, and modify the code before running snakePipes. Please see :doc:`advanced_usage` for more information on how to modify and extend snakePipes workflows.
+Instead of providing the URL to ``pip``, you can also `clone <https://help.github.com/articles/cloning-a-repository/>`__ our `GitHub repository <https://github.com/maxplanck-ie/snakepipes>`__ on your computer, and modify the code before running snakePipes. Please see :doc:`advanced_usage` for more information on how to modify and extend snakePipes workflows.
 
-.. note:: There is a difference between installing via conda or installing via pip. The python  installation from user's `$PATH` is ignored when installing via conda (first method) while is considered when installing via pip. You must use the `--develop` option later when you run `snakePipes createEnvs`.
+.. note:: There is a difference between installing via conda or installing via pip. The python  installation from user's ``$PATH`` is ignored when installing via conda (first method) while is considered when installing via pip. You must use the ``--develop`` option later when you run ``snakePipes createEnvs``.
 
-.. note:: Using the --user argument would install the program into `~/.local/bin/`. So make sure to have it in your $PATH before executing any workflow.
+.. note:: Using the --user argument would install the program into ``~/.local/bin/``. So make sure to have it in your $PATH before executing any workflow.
 
 Snakemake and pandas are installed as requirements. Ensure you have everything working by testing these commands:
 
@@ -96,11 +96,11 @@ All the tools required for running various pipelines are installed via various c
 
 .. note::
 
-    `snakePipes createEnvs` will also set the `snakemake_options:` line in the global snakePipes
-    `defaults.yaml` files. If you have already modified this then use the `--keepCondaDir` option.
+    ``snakePipes createEnvs`` will also set the ``snakemake_options:`` line in the global snakePipes
+    ``defaults.yaml`` files. If you have already modified this then use the ``--keepCondaDir`` option.
 
 .. warning::
-   If you installed with `pip` you must use the `--develop` option.
+   If you installed with ``pip`` you must use the ``--develop`` option.
 
 The place where the conda envs are created (and therefore the tools are installed) is defined in ``snakePipes/defaults.yaml``
 file on our GitHub repository. You can modify it to suite your needs.
@@ -110,14 +110,14 @@ Here are the content of *defaults.yaml*::
     snakemake_options: '--use-conda --conda-prefix /data/general/scratch/conda_envs'
     tempdir: /data/extended/
 
-The `tempdir` path should be changed to a suitable directory that can hold the temporary files during pipeline execution.
+The ``tempdir`` path should be changed to a suitable directory that can hold the temporary files during pipeline execution.
 
 .. note::
 
     Whenever you change the `snakemake_options:` line in `defaults.yaml`, you should run
     `snakePipes createEnvs` to ensure that the conda environments are then created.
 
-Running `snakePipes createEnvs` is not strictly required, but facilitates multiple users using the same snakePipes installation.
+Running ``snakePipes createEnvs`` is not strictly required, but facilitates multiple users using the same snakePipes installation.
 
 
 .. _organisms:
@@ -180,7 +180,7 @@ For the sake of convenience, we provide premade indices for the following organi
  - `Mouse (GRCm37/mm9) <https://zenodo.org/record/2624558>`__
  - `Fruit fly (dm6) <https://zenodo.org/record/1478017>`__
 
-To use these, simply download and extract them. You will then need to modify the provided YAML file to indicate exactly where the indices are located (i.e., replace `/data/processing/ryan` with whatever is appropriate).
+To use these, simply download and extract them. You will then need to modify the provided YAML file to indicate exactly where the indices are located (i.e., replace ``/data/processing/ryan`` with whatever is appropriate).
 
 .. _cluster:
 

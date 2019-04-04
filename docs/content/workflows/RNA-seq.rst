@@ -16,14 +16,14 @@ differential expression) using the *allelic-mapping* mode.
 Input requirements
 ------------------
 
-The only requirement is a directory of gzipped fastq files. Files could be single or paired end, and the read extensions could be modified using the keys in the `defaults.yaml` file below.
+The only requirement is a directory of gzipped fastq files. Files could be single or paired end, and the read extensions could be modified using the keys in the ``defaults.yaml`` file below.
 
 .. _RNAconfig:
 
 Configuration file
 ~~~~~~~~~~~~~~~~~~
 
-There is a configuration file in `snakePipes/workflows/RNA-seq/defaults.yaml`::
+There is a configuration file in ``snakePipes/workflows/RNA-seq/defaults.yaml``::
 
     ## General/Snakemake parameters, only used/set by wrapper or in Snakemake cmdl, but not in Snakefile
     pipeline: rna-seq
@@ -92,7 +92,7 @@ Apart from the common workflow options (see :ref:`running_snakePipes`), followin
 
 * **Nmasked_index**: For the ``allelic-mapping`` mode. The ``Nmasked_index`` refers to the **basename** of the index file created using STAR, on the SNPsplit output.
 
-.. note:: snp_file and Nmasked_index file could be specified in case you already have this and would like to re-run the analysis on new data. In case you are running the allele-specific analysis for the first time, you would need a VCF file and the name of the two strains. In this case the `snp_file` as well as the `Nmasked_index` files would be automatically created by the workflow using SNPsplit.
+.. note:: snp_file and Nmasked_index file could be specified in case you already have this and would like to re-run the analysis on new data. In case you are running the allele-specific analysis for the first time, you would need a VCF file and the name of the two strains. In this case the ``snp_file`` as well as the ``Nmasked_index`` files would be automatically created by the workflow using SNPsplit.
 
 
 Differential expression
@@ -114,7 +114,7 @@ Like the other workflows, differential expression can be performed using the ``-
 Analysis modes
 --------------
 
-Following analysis (*modes*) are possible using the RNA-seq workflow:
+Following analysis (**modes**) are possible using the RNA-seq workflow:
 
 "alignment"
 ~~~~~~~~~~~
@@ -129,7 +129,7 @@ analysis is then performed using **DESeq2**.
 
 **allelic-mapping** mode follows a similar process as the "mapping" mode, however the
 alignment performed on an allele-masked genome, followed by allele-specific splitting
-of mapped files. Gene-level quantification is performed for each allele using *featureCounts*.
+of mapped files. Gene-level quantification is performed for each allele using **featureCounts**.
 Allele-specific, gene-level differential expression analysis is then performed using **DESeq2**.
 
 .. note:: **allelic-mapping** mode is mutually exclusive with **mapping** mode
@@ -146,7 +146,7 @@ differential expression (using **wasabi**, followed by **DESeq2**).
 ~~~~~~~~~~~~~~
 
 The pipeline provides multiple quality controls through deepTools, which can be triggered
-using the *deepTools_qc* mode. It's a very useful add-on with any of the other modes.
+using the **deepTools_qc** mode. It's a very useful add-on with any of the other modes.
 
 .. note:: Since most deeptools functions require an aligned (BAM) file, the deepTools_qc mode will additionally perform the alignment of the fastq files. However this would not interfere with operations of the other modes.
 

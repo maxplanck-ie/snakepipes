@@ -12,7 +12,7 @@ The scRNA-seq pipeline is intended to process CEL-Seq2 data, though it may be ab
 2. mapping read 2,
 3. quantification at the single cell level.
 
-UMIs in the read headers are used to avoid counting PCR duplicates. A number of bigWig and QC plots (e.g., from `plotEnrichment`) are generated as well.
+UMIs in the read headers are used to avoid counting PCR duplicates. A number of bigWig and QC plots (e.g., from ``plotEnrichment``) are generated as well.
 
 .. image:: ../images/scRNAseq_pipeline.png
 
@@ -24,7 +24,7 @@ The primary input requirement is a directory of paired-end fastq files. In addit
 Cell barcodes
 ~~~~~~~~~~~~~
 
-The format of the cell barcodes file is shown below. Note that the default file is included in the snakePipes source code under `snakePipes/workflows/scRNAseq`. This file is automatically used if you leave :code:`barcode_file` empty.
+The format of the cell barcodes file is shown below. Note that the default file is included in the snakePipes source code under ``snakePipes/workflows/scRNAseq``. This file is automatically used if you leave :code:`barcode_file` empty.
 
 ::
 
@@ -45,7 +45,7 @@ Predefined cell barcodes are required right now. However it is planned to make t
 Configuration file
 ~~~~~~~~~~~~~~~~~~
 
-The default configuration file is listed below and can be found in `snakePipes/workflows/scRNAseq/defaults.yaml`::
+The default configuration file is listed below and can be found in ``snakePipes/workflows/scRNAseq/defaults.yaml``::
 
     pipeline: scrna-seq
     outdir:
@@ -85,13 +85,13 @@ The default configuration file is listed below and can be found in `snakePipes/w
     skipRaceID: False
 
 
-While some of these can be changed on the command line, you may find it useful to change `barcode_pattern` and `barcode_file` if you find that you need to change them frequently.
+While some of these can be changed on the command line, you may find it useful to change ``barcode_pattern`` and ``barcode_file`` if you find that you need to change them frequently.
 
 Barcode pattern
 ~~~~~~~~~~~~~~~
 
 The scRNA-seq pipeline requires barcodes at 5' end of read 1. The default barcode_pattern takes the first 6 bases as UMI (NNNNNN) and the following 6 bases as cell barcode (XXXXXX).
-If your read/barcode layout requires additional *'Don't care'* positions eg. before stretches of N one can indicate these with ``.``
+If your read/barcode layout requires additional **'Don't care'** positions eg. before stretches of N one can indicate these with ``.``
 
 Barcode file
 ~~~~~~~~~~~~~~~
@@ -102,7 +102,7 @@ Only specify a file if you use other than the default CEL-seq2 barcodes.
 Trimming
 ~~~~~~~~
 
-It is recommended to use the :code:`--trim` option as this uses cutadapt to trim remaining adapters *and* poly-A tails from read 2 (see defaults for `--trim_options`).
+It is recommended to use the :code:`--trim` option as this uses cutadapt to trim remaining adapters *and* poly-A tails from read 2 (see defaults for ``--trim_options``).
 
 Pseudogene filter
 ~~~~~~~~~~~~~~~~~
@@ -159,20 +159,20 @@ The following will be produced in the output directory::
     |-- FASTQ_barcoded
     `-- FASTQ
 
-The `Annotation` directory contains a filtered version of your original GTF file, with pseudogenes removed by default.
-The `bamCoverage` directory contains a bigwig track for each sample (not per cell!). This can be used eg. in IGV to check where your reads map in general.
-The `Counts` directory contains 4 sets of counts: UMIs/feature/cell (.umis.txt), reads/feature/cell (.reads.txt), corrected number of UMIs/feature/cell (corrected.txt) and raw counts per cell per UMI per feature (raw_counts.txt). Of these, the values in corrected.txt should be used for further analysis and the others for quality control.
-The `deeptools_qc` directory contains additional QC reports and plots. The `FASTQC` directory can be used to verify eg. the barcode layout of read 1.
-The `QC_report` directory contains additional QC stats as tables and plots.
+ - The **Annotation** directory contains a filtered version of your original GTF file, with pseudogenes removed by default.
+ - The **bamCoverage** directory contains a bigwig track for each sample (not per cell!). This can be used eg. in IGV to check where your reads map in general.
+ - The **Counts** directory contains 4 sets of counts: UMIs/feature/cell (.umis.txt), reads/feature/cell (.reads.txt), corrected number of UMIs/feature/cell (corrected.txt) and raw counts per cell per UMI per feature (raw_counts.txt). Of these, the values in corrected.txt should be used for further analysis and the others for quality control.
+ - The **deeptools_qc** directory contains additional QC reports and plots. The ``FASTQC`` directory can be used to verify eg. the barcode layout of read 1.
+ - The **QC_report** directory contains additional QC stats as tables and plots.
 
 Understanding the outputs
 -------------------------
 
 - **Main result:** the genes per cell count table with poisson-corrected counts can be found under ``Results/all_samples.gencode_genomic.corrected_merged.csv``
 
-- corresponding annotation files are: ``Annotation/genes.filtered.bed`` and ``Annotation/genes.filtered.gtf``, respectively.
+- Corresponding annotation files are: ``Annotation/genes.filtered.bed`` and ``Annotation/genes.filtered.gtf``, respectively.
 
-- the folders ``QC_report``, ``FASTQC``, ``deeptools_qc`` and ``multiQC`` contain various QC tables and plots.
+- The folders ``QC_report``, ``FASTQC``, ``deeptools_qc`` and ``multiQC`` contain various QC tables and plots.
 
 - **Sambamba** and **STAR_genomic** directories contain the output file from duplicate marking and genomic alignments, respectively.
 

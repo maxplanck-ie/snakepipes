@@ -9,7 +9,7 @@ Pipelines under snakePipes are designed in a way such that all workflows are con
 An example with ChIP-seq data
 ------------------------------
 
-A **typical ChIP-seq analysis** of human samples starts from paired-end FASTQ files in the directory `input-dir`:
+A **typical ChIP-seq analysis** of human samples starts from paired-end FASTQ files in the directory ``input-dir``:
 
 .. code:: bash
 
@@ -31,7 +31,7 @@ The :ref:`ChIP-seq` workflow requires the files to be processed via the :ref:`DN
 
 * ``hs37d5`` is the name of the genome (keyword for the yaml). The yaml file corresponding to this genome should exist as ``snakePipes/shared/organisms/hs37d5.yaml``. (see :ref:`setting_up` for details).
 
-All individual jobs of the workflow will be submitted to the Grid engine using the command specified under /shared/cluster.yaml. The parameter ``-j`` defines the number of jobs to be run in parallel, while the number of threads per job is hard-coded in the workflows.
+All individual jobs of the workflow will be submitted to the Grid engine using the command specified under ``shared/cluster.yaml``. The parameter ``-j`` defines the number of jobs to be run in parallel, while the number of threads per job is hard-coded in the workflows.
 
 **To run the workflow locally**, use the parameter ``--local`` for local mode and the parameter ``-j 10`` to specify the maximal number of used CPU threads (here: 10).
 

@@ -164,10 +164,10 @@ Using AWS or other cloud platforms
 
 There is nothing particularly special about performing computations on AWS or other cloud platforms. Below are a few recommendations, using AWS as an example:
 
- 1. Use a small compute node for initial installation. On AWS a `t2.small` node is sufficient for general installation since conda will need 1-2GB RAM for dependency resolution during setup.
+ 1. Use a small compute node for initial installation. On AWS a ``t2.small`` node is sufficient for general installation since conda will need 1-2GB RAM for dependency resolution during setup.
  2. If you can need to create custom indices, then you will need a node with at least 80GB RAM and 10 cores.
- 3. Ensure that you install snakePipes on a separate EBS (or equivalent) storage block. We found that a 200GB `/data` partition was most convenient. This absolutely must not be the `/` partition, as mounting such a persistent image on other instances will result in paths being changed, which result in needing to modify large numbers of files.
- 4. It's usually sufficient to use a single large (e.g., `m5.24xlarge`) compute node, with 100+ cores and a few hundred GB RAM. This allows one to use the `--local` option and not have to deal with the hassle of setting up a proper cluster on AWS. Make sure the then set `-j` to the number of available cores on the node, so snakePipes can make the most efficient use of the resources (and minimize your bill).
+ 3. Ensure that you install snakePipes on a separate EBS (or equivalent) storage block. We found that a 200GB ``/data`` partition was most convenient. This absolutely must not be the ``/`` partition, as mounting such a persistent image on other instances will result in paths being changed, which result in needing to modify large numbers of files.
+ 4. It's usually sufficient to use a single large (e.g., ``m5.24xlarge``) compute node, with 100+ cores and a few hundred GB RAM. This allows one to use the ``--local`` option and not have to deal with the hassle of setting up a proper cluster on AWS. Make sure the then set ``-j`` to the number of available cores on the node, so snakePipes can make the most efficient use of the resources (and minimize your bill).
 
 Below is an example of running the RNA-seq pipeline on AWS using the resources outlined above. Note that it's best to store your input/output data on a separate storage block, since its lifetime is likely to be shorter than that of the indices.
 
@@ -226,11 +226,11 @@ Then a larger instance can be spun up and the `RNA-seq` pipeline run as normal.
 Receiving emails upon pipeline completion
 -----------------------------------------
 
-SnakePipes can send an email to the user once a pipeline is complete if users specify `--emailAddress`. In order for this to work, the following values need to be set in `defaults.yaml`:
+SnakePipes can send an email to the user once a pipeline is complete if users specify ``--emailAddress``. In order for this to work, the following values need to be set in ``defaults.yaml``:
 
 :smtpServer: The address of the outgoing SMTP server
 :smtpPort: The port on the SMTP server to use (0 means to use the standard port)
 :onlySSL: Set this to "True" if your SMTP server requires a full SSL connection from the beginning.
 :emailSender: The name of the "user" that sends emails (e.g., snakepipes@your-domain.com)
 
-There are two additional parameters that can be set: `smtpUsername` and `smtpPassword`. These are relevant to SMTP servers that require authentication to send emails. On shared systems, it's important to ensure that other users cannot read your defaults.yaml file if it includes your password!
+There are two additional parameters that can be set: ``smtpUsername`` and ``smtpPassword``. These are relevant to SMTP servers that require authentication to send emails. On shared systems, it's important to ensure that other users cannot read your defaults.yaml file if it includes your password!
