@@ -17,7 +17,7 @@ import snakePipes.parserCommon as parserCommon
 
 def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfile": None, "max_jobs": 5, "snakemake_options": "--use-conda", "tempdir": None,
                          "paired": True, "bamPE": False, "bw_binsize": 25, "sampleSheet": "", "window_size": 150, "predict_chip_dict": None, "bigWigType": "both",
-                         "fromBam": "", "bam_ext": ".bam"}):
+                         "plot_format": "png", "fromBam": "", "bam_ext": ".bam"}):
     """
     Parse arguments from the command line.
     """

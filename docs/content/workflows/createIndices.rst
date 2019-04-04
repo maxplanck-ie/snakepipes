@@ -20,7 +20,7 @@ The pipeline has two required inputs: a fasta file or URL and a GTF file or URL.
 Configuration file
 ~~~~~~~~~~~~~~~~~~
 
-There is a configuration file in `snakePipes/workflows/createIndices/defaults.yaml`::
+There is a configuration file in ``snakePipes/workflows/createIndices/defaults.yaml``::
 
     pipeline: createIndices
     outdir:
@@ -48,7 +48,7 @@ These values are most conveniently set on the command line.
 Output structure
 ----------------
 
-The following structure will be created in the designated `outdir`::
+The following structure will be created in the designated ``outdir``::
 
     .
     ├── annotation
@@ -70,9 +70,9 @@ The following structure will be created in the designated `outdir`::
     ├── HISAT2Index
     └── STARIndex
 
-These files are used internally within snakePipes and don't require further inspection. The `createIndices_run-1.log` file contains a full log and will include the URLs or file paths that you specified. Wither the `annotation/blacklist.bed` file exists is dependent upon whether you specified one. The `genome_fasta/effectiveSize` fill will have the effective genome size (if you didn't specify it, the number of non-N bases in the genome will be used).
+These files are used internally within snakePipes and don't require further inspection. The ``createIndices_run-1.log`` file contains a full log and will include the URLs or file paths that you specified. Whether the ``annotation/blacklist.bed`` file exists is dependent upon whether you specified one. The ``genome_fasta/effectiveSize`` fill will have the effective genome size (if you didn't specify it, the number of non-N bases in the genome will be used).
 
-In addition to these, an organism yaml file will be created. Its location can be found with `snakePipes info`.
+In addition to these, an organism yaml file will be created. Its location can be found with ``snakePipes info``.
 
 Command line options
 --------------------

@@ -44,9 +44,9 @@ This will create a new conda environment called "snakePipes" into which snakePip
 * ``source activate snakePipes`` to activate the appropriate conda environment.
 * ``snakePipes createEnvs`` to create the various environments and register GATK.
 
-Indicies and annotations needed to run the workflows could be created by a simple command :
+Indices and annotations needed to run the workflows could be created by a simple command :
 
-``createIndicies --genomeURL <path/url to your genome fasta> --gtfURL <path/url to genes.gtf> -o <output_dir> <name>``
+``createIndices --genomeURL <path/url to your genome fasta> --gtfURL <path/url to genes.gtf> -o <output_dir> <name>``
 
 where `name` refers to the name/id of your genome (specify as you wish).
 
