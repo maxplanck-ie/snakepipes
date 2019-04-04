@@ -1,17 +1,10 @@
 language: python
 python:
   - "3.6"
-jobs:
-  include:
-    - stage: flake
-      env:
-        - STAGE="0"
-    - stage: testdocs
-      env:
-        - STAGE="1"
-    - stage: testdag
-      env:
-        - STAGE="2"
+env:
+  - STAGE="0"
+  - STAGE="1"
+  - STAGE="2"
 
 # setup conda
 before_install:
