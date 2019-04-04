@@ -60,10 +60,10 @@ if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 822 ]; then exit 1 ; fi
 
 # ChIP-seq
 WC=`ChIP-seq -d BAM_input --snakemake_options " --dryrun" mm10 .ci_stuff/ChIP.sample_config.yaml | tee /dev/stderr | wc -l`
-if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 268 ]; then exit 1 ; fi
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 270 ]; then exit 1 ; fi
 WC=`ChIP-seq -d BAM_input --snakemake_options " --dryrun" --single-end mm10 .ci_stuff/ChIP.sample_config.yaml | tee /dev/stderr | wc -l`
-if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 268 ]; then exit 1 ; fi
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 270 ]; then exit 1 ; fi
 WC=`ChIP-seq -d BAM_input --snakemake_options " --dryrun" --bigWigType log2ratio mm10 .ci_stuff/ChIP.sample_config.yaml | tee /dev/stderr | wc -l`
-if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 222 ]; then exit 1 ; fi
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 224 ]; then exit 1 ; fi
 
 rm -rf SE_input PE_input BAM_input output
