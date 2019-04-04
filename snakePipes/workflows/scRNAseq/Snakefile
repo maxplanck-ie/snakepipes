@@ -23,7 +23,6 @@ include: os.path.join(maindir, "shared", "rules", "FASTQ.snakefile")
 include: os.path.join(maindir, "shared", "rules", "RNA_mapping.snakefile")
 include: os.path.join(maindir, "shared", "rules", "scRNAseq.snakefile")
 paired = True
-fastqc = True
 include: os.path.join(maindir, "shared", "rules", "FastQC.snakefile")
 paired = False
 include: os.path.join(maindir, "shared", "rules", "filter_annotation.snakefile")
