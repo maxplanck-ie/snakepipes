@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
-#export PATH="$HOME/miniconda/bin:$PATH"
-#hash -r
-#python -m pip install --no-deps --ignore-installed .
+export PATH="$HOME/miniconda/bin:$PATH"
+hash -r
+python -m pip install --no-deps --ignore-installed .
 
 
 # Needed by DNA, HiC, RNA-seq, WGBS and scRNA-seq workflows
