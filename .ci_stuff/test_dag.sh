@@ -1,9 +1,8 @@
 #!/bin/bash
-set -e
+set -ex
 export PATH="$HOME/miniconda/bin:$PATH"
 hash -r
 python -m pip install --no-deps --ignore-installed .
-
 
 # Needed by DNA, HiC, RNA-seq, WGBS and scRNA-seq workflows
 mkdir -p PE_input
@@ -50,7 +49,7 @@ touch BAM_input/sample1.bam \
 mkdir -p output
 
 # DNA mapping
-WC=`DNA-mapping -i PE_input -o output mm10 --snakemake_options " --dryrun" | tee /dev/stderr | wc -l`
+WC=`DNA-mapping -i PE_input -o output mm10 --verbose --snakemake_options " --dryrun" | tee /dev/stderr | wc -l`
 if [[ $WC -ne 734 || ${PIPESTATUS[0]} -ne 0 ]]; then exit 1 ; fi
 WC=`DNA-mapping -i PE_input -o output mm10 --snakemake_options " --dryrun" --trim --mapq 20 --dedup --properpairs | tee /dev/stderr | wc -l`
 if [[ $WC -ne 936 || ${PIPESTATUS[0]} -ne 0 ]]; then exit 1 ; fi
