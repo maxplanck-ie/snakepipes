@@ -50,7 +50,7 @@ mkdir -p output
 
 # DNA mapping
 WC=`DNA-mapping -i PE_input -o output mm10 --snakemake_options " --dryrun" | tee /dev/stderr | wc -l`
-if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 734 ]; then exit 1 ; fi
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 736 ]; then exit 1 ; fi
 WC=`DNA-mapping -i PE_input -o output mm10 --snakemake_options " --dryrun" --trim --mapq 20 --dedup --properpairs | tee /dev/stderr | wc -l`
 if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 936 ]; then exit 1 ; fi
 WC=`DNA-mapping -i SE_input -o output mm10 --snakemake_options " --dryrun" | tee /dev/stderr | wc -l`
