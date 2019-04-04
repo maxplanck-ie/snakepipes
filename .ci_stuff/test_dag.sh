@@ -49,21 +49,21 @@ touch BAM_input/sample1.bam \
 mkdir -p output
 
 # DNA mapping
-WC=`DNA-mapping -i PE_input -o output mm10 --verbose --snakemake_options " --dryrun" | tee /dev/stderr | wc -l`
-if [[ $WC -ne 734 || ${PIPESTATUS[0]} -ne 0 ]]; then exit 1 ; fi
+WC=`DNA-mapping -i PE_input -o output mm10 --snakemake_options " --dryrun" | tee /dev/stderr | wc -l`
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 734 ]; then exit 1 ; fi
 WC=`DNA-mapping -i PE_input -o output mm10 --snakemake_options " --dryrun" --trim --mapq 20 --dedup --properpairs | tee /dev/stderr | wc -l`
-if [[ $WC -ne 936 || ${PIPESTATUS[0]} -ne 0 ]]; then exit 1 ; fi
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 936 ]; then exit 1 ; fi
 WC=`DNA-mapping -i SE_input -o output mm10 --snakemake_options " --dryrun" | tee /dev/stderr | wc -l`
-if [[ $WC -ne 684 || ${PIPESTATUS[0]} -ne 0 ]]; then exit 1 ; fi
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 684 ]; then exit 1 ; fi
 WC=`DNA-mapping -i SE_input -o output mm10 --snakemake_options " --dryrun" --trim --mapq 20 --dedup --properpairs | tee /dev/stderr | wc -l`
-if [[ $WC -ne 820 || ${PIPESTATUS[0]} -ne 0 ]]; then exit 1 ; fi
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 820 ]; then exit 1 ; fi
 
 # ChIP-seq
 WC=`ChIP-seq -d BAM_input --snakemake_options " --dryrun" mm10 .ci_stuff/ChIP.sample_config.yaml | tee /dev/stderr | wc -l`
-if [[ $WC -ne 268 || ${PIPESTATUS[0]} -ne 0 ]]; then exit 1 ; fi
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 268 ]; then exit 1 ; fi
 WC=`ChIP-seq -d BAM_input --snakemake_options " --dryrun" --single-end mm10 .ci_stuff/ChIP.sample_config.yaml | tee /dev/stderr | wc -l`
-if [[ $WC -ne 268 || ${PIPESTATUS[0]} -ne 0 ]]; then exit 1 ; fi
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 268 ]; then exit 1 ; fi
 WC=`ChIP-seq -d BAM_input --snakemake_options " --dryrun" --bigWigType log2ratio mm10 .ci_stuff/ChIP.sample_config.yaml | tee /dev/stderr | wc -l`
-if [[ $WC -ne 222 || ${PIPESTATUS[0]} -ne 0 ]]; then exit 1 ; fi
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 222 ]; then exit 1 ; fi
 
 rm -rf SE_input PE_input BAM_input output
