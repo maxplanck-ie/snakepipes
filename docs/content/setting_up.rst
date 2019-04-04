@@ -3,7 +3,7 @@
 Setting up snakePipes
 =====================
 
-Unlike many other pipelines, setting up snakePipes is easy! All you need is a *linux system* with *python3-conda* installation.
+Unlike many other pipelines, setting up snakePipes is easy! All you need is a *linux/OSX system* with *python3-conda* installation.
 
 Installing conda with python3
 -----------------------------
@@ -30,7 +30,7 @@ Next, install snakePipes.
 Installing snakePipes
 ---------------------
 
-The easiest way to install snakePipes is via our conda channel. The following command install snakePipes and also creates a conda virtual environment named `snakePipes`, which you can then activate via `source activate snakePipes`.
+The easiest way to install snakePipes is via our conda channel. The following command install snakePipes and also creates a conda virtual environment named ``snakePipes``, which you can then activate via ``source activate snakePipes``.
 
 .. code:: bash
 
@@ -47,7 +47,7 @@ If you wish to modify snakePipes you can install it via pip, using our `GitHub r
 
     pip install --user --upgrade git+https://github.com/maxplanck-ie/snakepipes@develop
 
-Instead of providing the URL to `pip`, you can also `**clone** <https://help.github.com/articles/cloning-a-repository/>`__ our `GitHub repository <https://github.com/maxplanck-ie/snakepipes>`__ on your computer, and modify the code before running snakePipes. Please see :doc:`advanced_usage` for more information on how to modify and extend snakePipes workflows.
+Instead of providing the URL to `pip`, you can also **`clone <https://help.github.com/articles/cloning-a-repository/>`__** our `GitHub repository <https://github.com/maxplanck-ie/snakepipes>`__ on your computer, and modify the code before running snakePipes. Please see :doc:`advanced_usage` for more information on how to modify and extend snakePipes workflows.
 
 .. note:: There is a difference between installing via conda or installing via pip. The python  installation from user's `$PATH` is ignored when installing via conda (first method) while is considered when installing via pip. You must use the `--develop` option later when you run `snakePipes createEnvs`.
 
@@ -102,7 +102,7 @@ All the tools required for running various pipelines are installed via various c
 .. warning::
    If you installed with `pip` you must use the `--develop` option.
 
-The place where the conda envs are created (and therefore the tools are installed) is defined in `snakePipes/defaults.yaml`
+The place where the conda envs are created (and therefore the tools are installed) is defined in ``snakePipes/defaults.yaml``
 file on our GitHub repository. You can modify it to suite your needs.
 
 Here are the content of *defaults.yaml*::
@@ -166,7 +166,7 @@ The yaml files look like this after the setup (an example from drosophila genome
           aligner is not used. We nevertheless recommended providing all the files, to allow
           more flexible analysis.
 
-After setting up the yamls, we can execute a snakePipes workflow on the organism of choice by referring to the **organism** as `dm3`, where the keyword **dm3** matches the name of the yaml file (dm3.yaml).
+After setting up the yamls, we can execute a snakePipes workflow on the organism of choice by referring to the **organism** as ``dm3``, where the keyword **dm3** matches the name of the yaml file (dm3.yaml).
 
 .. note:: The name of the yaml file (except the .yaml suffix) is used as keyword to refer to the organism while running the workflows.
 
@@ -175,10 +175,10 @@ Download premade indices
 
 For the sake of convenience, we provide premade indices for the following organisms:
 
- - `Human (GRCh38) <https://zenodo.org/record/1477929>`_
- - `Mouse (GRCm38/mm10) <https://zenodo.org/record/1475957>`_
- - `Mouse (GRCm37/mm9) <https://zenodo.org/record/2624558>`_
- - `Fruit fly (dm6) <https://zenodo.org/record/1478017>`_
+ - `Human (GRCh38) <https://zenodo.org/record/1477929>`__
+ - `Mouse (GRCm38/mm10) <https://zenodo.org/record/1475957>`__
+ - `Mouse (GRCm37/mm9) <https://zenodo.org/record/2624558>`__
+ - `Fruit fly (dm6) <https://zenodo.org/record/1478017>`__
 
 To use these, simply download and extract them. You will then need to modify the provided YAML file to indicate exactly where the indices are located (i.e., replace `/data/processing/ryan` with whatever is appropriate).
 
@@ -198,7 +198,7 @@ The ``cluster.yaml`` file contains both the default memory requirements as well 
 
 If you have cloned the repository locally, the file is located under ``snakePipes/shared/``.
 
-You can change the default per-core memory allocation if needed here. Importantly, the ``snakemake_cluster_cmd`` option must be changed to match your needs. Whatever command you specify must include a `{cluster.memory}` option and a ``{threads}`` option. You can specify other required options here as well. The ``snakemake_latency_wait`` value defines how long snakemake should wait for files to appear before throwing an error. The default of 300 seconds is typically reasonable when a file system such as `NFS <https://en.wikipedia.org/wiki/Network_File_System>`__ is in use.
+You can change the default per-core memory allocation if needed here. Importantly, the ``snakemake_cluster_cmd`` option must be changed to match your needs. Whatever command you specify must include a ``{cluster.memory}`` option and a ``{threads}`` option. You can specify other required options here as well. The ``snakemake_latency_wait`` value defines how long snakemake should wait for files to appear before throwing an error. The default of 300 seconds is typically reasonable when a file system such as `NFS <https://en.wikipedia.org/wiki/Network_File_System>`__ is in use.
 
 .. _workflowOpts:
 
@@ -241,10 +241,10 @@ Test data
 
 Test data for the various workflows is available at the following locations:
 
- - `DNA mapping <https://zenodo.org/record/1346303>`_
- - `ChIP-seq <https://zenodo.org/record/2624281>`_
- - `ATAC-seq <https://zenodo.org/record/2624323>_`
- - `RNA-seq <https://zenodo.org/record/2624408>`_
- - `HiC <https://zenodo.org/record/2624479>`_
- - `WGBS <https://zenodo.org/record/2624498>`_
- - `scRNA-seq <https://zenodo.org/record/2624518>`_
+ - `DNA mapping <https://zenodo.org/record/1346303>`__
+ - `ChIP-seq <https://zenodo.org/record/2624281>`__
+ - `ATAC-seq <https://zenodo.org/record/2624323>`__
+ - `RNA-seq <https://zenodo.org/record/2624408>`__
+ - `HiC <https://zenodo.org/record/2624479>`__
+ - `WGBS <https://zenodo.org/record/2624498>`__
+ - `scRNA-seq <https://zenodo.org/record/2624518>`__
