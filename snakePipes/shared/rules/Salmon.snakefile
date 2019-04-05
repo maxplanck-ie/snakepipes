@@ -69,7 +69,7 @@ if paired:
 else:
     rule SalmonQuant:
         input:
-            fastq = fastq_dir+"/{sample}.fastq.gz",
+            fastq = fastq_dir+"/{sample}"+reads[0]+".fastq.gz",
             bin = "Salmon/SalmonIndex/sa.bin",
         output:
             quant = "Salmon/{sample}/quant.sf",

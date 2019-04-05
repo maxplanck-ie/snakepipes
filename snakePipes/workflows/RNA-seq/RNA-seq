@@ -120,7 +120,7 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
     optional.add_argument("--single-end",
                           dest="paired",
                           action="store_false",
-                          help="input data is single-end, not paired-end",
+                          help="input data is single-end, not paired-end. This is only used if --fromBam is specified.",
                           default=defaults["paired"])
 
     return parser

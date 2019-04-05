@@ -1,8 +1,8 @@
 #!/bin/bash
 set -ex
-export PATH="$HOME/miniconda/bin:$PATH"
-hash -r
-python -m pip install --no-deps --ignore-installed .
+#export PATH="$HOME/miniconda/bin:$PATH"
+#hash -r
+#python -m pip install --no-deps --ignore-installed .
 
 # Needed by DNA, HiC, RNA-seq, WGBS and scRNA-seq workflows
 mkdir -p PE_input
@@ -65,5 +65,49 @@ WC=`ChIP-seq -d BAM_input --tempdir /tmp --snakemake_options " --dryrun" --singl
 if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 268 ]; then exit 1 ; fi
 WC=`ChIP-seq -d BAM_input --tempdir /tmp --snakemake_options " --dryrun" --bigWigType log2ratio mm10 .ci_stuff/ChIP.sample_config.yaml | tee /dev/stderr | wc -l`
 if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 222 ]; then exit 1 ; fi
+
+# ATAC-seq
+WC=`ATAC-seq -d BAM_input --tempdir /tmp --snakemake_options " --dryrun" mm10 | tee /dev/stderr | wc -l`
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 336 ]; then exit 1 ; fi
+WC=`ATAC-seq -d BAM_input --tempdir /tmp --snakemake_options " --dryrun" --fragmentSize-cutoff 120 --qval 0.1 mm10 | tee /dev/stderr | wc -l`
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 336 ]; then exit 1 ; fi
+
+# RNA-seq
+WC=`RNA-seq -i PE_input -o output --tempdir /tmp --snakemake_options " --dryrun" mm10 | tee /dev/stderr | wc -l`
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 889 ]; then exit 1 ; fi
+WC=`RNA-seq -i PE_input -o output --tempdir /tmp --snakemake_options " --dryrun" -m "alignment" mm10 | tee /dev/stderr | wc -l`
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 578 ]; then exit 1 ; fi
+WC=`RNA-seq -i PE_input -o output --tempdir /tmp --snakemake_options " --dryrun" -m "alignment,deepTools_qc" --trim mm10 | tee /dev/stderr | wc -l`
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 1052 ]; then exit 1 ; fi
+WC=`RNA-seq -i SE_input -o output --tempdir /tmp --snakemake_options " --dryrun" mm10 | tee /dev/stderr | wc -l`
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 828 ]; then exit 1 ; fi
+WC=`RNA-seq -i SE_input -o output --tempdir /tmp --snakemake_options " --dryrun" -m "alignment" mm10 | tee /dev/stderr | wc -l`
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 528 ]; then exit 1 ; fi
+WC=`RNA-seq -i SE_input -o output --tempdir /tmp --snakemake_options " --dryrun" -m "alignment,deepTools_qc" --trim mm10 | tee /dev/stderr | wc -l`
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 925 ]; then exit 1 ; fi
+
+# HiC - fails
+WC=`HiC -i PE_input -o output --tempdir /tmp --snakemake_options " --dryrun" mm10 | tee /dev/stderr | wc -l`
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 889 ]; then exit 1 ; fi
+WC=`HiC -i PE_input -o output --tempdir /tmp --snakemake_options " --dryrun" --trim mm10 | tee /dev/stderr | wc -l`
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 889 ]; then exit 1 ; fi
+WC=`HiC -i PE_input -o output --tempdir /tmp --snakemake_options " --dryrun" --enzyme DpnII mm10 | tee /dev/stderr | wc -l`
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 889 ]; then exit 1 ; fi
+WC=`HiC -i PE_input -o output --tempdir /tmp --snakemake_options " --dryrun" --noTAD mm10 | tee /dev/stderr | wc -l`
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 889 ]; then exit 1 ; fi
+
+# scRNA-seq
+WC=`scRNAseq -i PE_input -o output --tempdir /tmp --snakemake_options " --dryrun" mm10 | tee /dev/stderr | wc -l`
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 1080 ]; then exit 1 ; fi
+WC=`scRNAseq -i PE_input -o output --tempdir /tmp --snakemake_options " --dryrun" --skipRaceID --split_lib mm10 | tee /dev/stderr | wc -l`
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 1051 ]; then exit 1 ; fi
+
+# WGBS
+WC=`WGBS -i PE_input -o output --tempdir /tmp --snakemake_options " --dryrun" mm10 | tee /dev/stderr | wc -l`
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 1080 ]; then exit 1 ; fi
+WC=`WGBS -i PE_input -o output --tempdir /tmp --snakemake_options " --dryrun" --trim mm10 | tee /dev/stderr | wc -l`
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 1080 ]; then exit 1 ; fi
+WC=`WGBS -i PE_input -o output --tempdir /tmp --snakemake_options " --dryrun" --trim --skipDOC --skipGCbias --nextera mm10 | tee /dev/stderr | wc -l`
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 1080 ]; then exit 1 ; fi
 
 rm -rf SE_input PE_input BAM_input output
