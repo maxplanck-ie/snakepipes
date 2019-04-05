@@ -49,21 +49,21 @@ touch BAM_input/sample1.bam \
 mkdir -p output
 
 # DNA mapping
-WC=`DNA-mapping -i PE_input -o output mm10 --snakemake_options " --dryrun" | tee /dev/stderr | wc -l`
-if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 736 ]; then exit 1 ; fi
-WC=`DNA-mapping -i PE_input -o output mm10 --snakemake_options " --dryrun" --trim --mapq 20 --dedup --properpairs | tee /dev/stderr | wc -l`
-if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 938 ]; then exit 1 ; fi
-WC=`DNA-mapping -i SE_input -o output mm10 --snakemake_options " --dryrun" | tee /dev/stderr | wc -l`
-if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 686 ]; then exit 1 ; fi
-WC=`DNA-mapping -i SE_input -o output mm10 --snakemake_options " --dryrun" --trim --mapq 20 --dedup --properpairs | tee /dev/stderr | wc -l`
-if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 822 ]; then exit 1 ; fi
+WC=`DNA-mapping -i PE_input -o output --tempdir /tmp mm10 --snakemake_options " --dryrun" | tee /dev/stderr | wc -l`
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 734 ]; then exit 1 ; fi
+WC=`DNA-mapping -i PE_input -o output --tempdir /tmp mm10 --snakemake_options " --dryrun" --trim --mapq 20 --dedup --properpairs | tee /dev/stderr | wc -l`
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 936 ]; then exit 1 ; fi
+WC=`DNA-mapping -i SE_input -o output --tempdir /tmp mm10 --snakemake_options " --dryrun" | tee /dev/stderr | wc -l`
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 684 ]; then exit 1 ; fi
+WC=`DNA-mapping -i SE_input -o output --tempdir /tmp mm10 --snakemake_options " --dryrun" --trim --mapq 20 --dedup --properpairs | tee /dev/stderr | wc -l`
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 820 ]; then exit 1 ; fi
 
 # ChIP-seq
-WC=`ChIP-seq -d BAM_input --snakemake_options " --dryrun" mm10 .ci_stuff/ChIP.sample_config.yaml | tee /dev/stderr | wc -l`
-if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 270 ]; then exit 1 ; fi
-WC=`ChIP-seq -d BAM_input --snakemake_options " --dryrun" --single-end mm10 .ci_stuff/ChIP.sample_config.yaml | tee /dev/stderr | wc -l`
-if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 270 ]; then exit 1 ; fi
-WC=`ChIP-seq -d BAM_input --snakemake_options " --dryrun" --bigWigType log2ratio mm10 .ci_stuff/ChIP.sample_config.yaml | tee /dev/stderr | wc -l`
-if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 224 ]; then exit 1 ; fi
+WC=`ChIP-seq -d BAM_input --tempdir /tmp --snakemake_options " --dryrun" mm10 .ci_stuff/ChIP.sample_config.yaml | tee /dev/stderr | wc -l`
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 268 ]; then exit 1 ; fi
+WC=`ChIP-seq -d BAM_input --tempdir /tmp --snakemake_options " --dryrun" --single-end mm10 .ci_stuff/ChIP.sample_config.yaml | tee /dev/stderr | wc -l`
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 268 ]; then exit 1 ; fi
+WC=`ChIP-seq -d BAM_input --tempdir /tmp --snakemake_options " --dryrun" --bigWigType log2ratio mm10 .ci_stuff/ChIP.sample_config.yaml | tee /dev/stderr | wc -l`
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 222 ]; then exit 1 ; fi
 
 rm -rf SE_input PE_input BAM_input output
