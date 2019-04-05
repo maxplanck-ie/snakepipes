@@ -1,8 +1,10 @@
 #!/bin/bash
 set -ex
-#export PATH="$HOME/miniconda/bin:$PATH"
-#hash -r
-#python -m pip install --no-deps --ignore-installed .
+if [[ ${CI:-"false"} == "true" ]]; then
+    export PATH="$HOME/miniconda/bin:$PATH"
+    hash -r
+    python -m pip install --no-deps --ignore-installed .
+fi
 
 # Needed by DNA, HiC, RNA-seq, WGBS and scRNA-seq workflows
 mkdir -p PE_input
@@ -88,13 +90,13 @@ if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 925 ]; then exit 1 ; fi
 
 # HiC - fails
 WC=`HiC -i PE_input -o output --tempdir /tmp --snakemake_options " --dryrun" mm10 | tee /dev/stderr | wc -l`
-if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 889 ]; then exit 1 ; fi
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 522 ]; then exit 1 ; fi
 WC=`HiC -i PE_input -o output --tempdir /tmp --snakemake_options " --dryrun" --trim mm10 | tee /dev/stderr | wc -l`
-if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 889 ]; then exit 1 ; fi
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 724 ]; then exit 1 ; fi
 WC=`HiC -i PE_input -o output --tempdir /tmp --snakemake_options " --dryrun" --enzyme DpnII mm10 | tee /dev/stderr | wc -l`
-if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 889 ]; then exit 1 ; fi
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 522 ]; then exit 1 ; fi
 WC=`HiC -i PE_input -o output --tempdir /tmp --snakemake_options " --dryrun" --noTAD mm10 | tee /dev/stderr | wc -l`
-if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 889 ]; then exit 1 ; fi
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 460 ]; then exit 1 ; fi
 
 # scRNA-seq
 WC=`scRNAseq -i PE_input -o output --tempdir /tmp --snakemake_options " --dryrun" mm10 | tee /dev/stderr | wc -l`
@@ -104,10 +106,8 @@ if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 1051 ]; then exit 1 ; fi
 
 # WGBS
 WC=`WGBS -i PE_input -o output --tempdir /tmp --snakemake_options " --dryrun" mm10 | tee /dev/stderr | wc -l`
-if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 1080 ]; then exit 1 ; fi
-WC=`WGBS -i PE_input -o output --tempdir /tmp --snakemake_options " --dryrun" --trim mm10 | tee /dev/stderr | wc -l`
-if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 1080 ]; then exit 1 ; fi
-WC=`WGBS -i PE_input -o output --tempdir /tmp --snakemake_options " --dryrun" --trim --skipDOC --skipGCbias --nextera mm10 | tee /dev/stderr | wc -l`
-if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 1080 ]; then exit 1 ; fi
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 906 ]; then exit 1 ; fi
+WC=`WGBS -i PE_input -o output --tempdir /tmp --snakemake_options " --dryrun" --skipDOC --skipGCbias --nextera mm10 | tee /dev/stderr | wc -l`
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 788 ]; then exit 1 ; fi
 
 rm -rf SE_input PE_input BAM_input output
