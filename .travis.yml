@@ -1,22 +1,19 @@
 language: python
 python:
   - "3.6"
-jobs:
-  include:
-    - stage: flake
-      env:
-        - TESTDOCS="0"
-    - stage: testdocs
-      env:
-        - TESTDOCS="1"
+env:
+  - STAGE="0"
+  - STAGE="1"
+  - STAGE="2"
 
 # setup conda
 before_install:
-  - if [[ ${TESTDOCS:-"0"} == "1" ]] ; then bash .ci_stuff/setup_conda.sh ; fi
+  - if [[ ${STAGE:-"0"} != "0" ]] ; then bash .ci_stuff/setup_conda.sh ; fi
 
 install:
   - pip install flake8
 
 script:
-  - if [[ ${TESTDOCS:-"0"} == "0" ]] ; then flake8 --ignore=E501,E722 --exclude docs/conf.py . ; fi
-  - if [[ ${TESTDOCS:-"0"} == "1" ]] ; then bash .ci_stuff/test_docs.sh ; fi
+  - if [[ ${STAGE:-"0"} == "0" ]] ; then flake8 --ignore=E501,E722 --exclude docs/conf.py . ; fi
+  - if [[ ${STAGE:-"0"} == "1" ]] ; then bash .ci_stuff/test_docs.sh ; fi
+  - if [[ ${STAGE:-"0"} == "2" ]] ; then bash .ci_stuff/test_dag.sh ; fi

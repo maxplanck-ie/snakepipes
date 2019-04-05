@@ -23,8 +23,6 @@ workingdir:
 genome:
 ## paired end data?
 paired: true
-## BAMPE mode?
-bamPE: false
 ## Bin size of output files in bigWig format
 bw_binsize: 25
 ## type of bigwig file to create

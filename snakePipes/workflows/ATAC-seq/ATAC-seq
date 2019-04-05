@@ -44,7 +44,7 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
                           dest="qval",
                           metavar="INT",
                           help="qvalue threshold for MACS2(default: '%(default)s')",
-                          type=int,
+                          type=float,
                           default=defaults['qval'])
 
 
