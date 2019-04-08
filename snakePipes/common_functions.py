@@ -146,7 +146,7 @@ def check_replicates(sample_info_file):
     this check is eg. necessary for sleuth
     """
     ret = subprocess.check_output(
-        "sed '1s/^/rownames\t/' " + sample_info_file + " | awk '/^\S*$/{next;}{if (NR==1){ col=0; for (i=1;i<=NF;i++) if ($i~\"condition\") col=i}; if (NR>1) print $col}' | sort | uniq -c | awk '{if ($1>1) ok++}END{if (NR>1 && ok>=NR) print \"REPLICATES_OK\"}'",
+        "sed '1s/^/rownames\t/' " + sample_info_file + " | awk '/^[[:space:]]$/{next;}{if (NR==1){ col=0; for (i=1;i<=NF;i++) if ($i~\"condition\") col=i}; if (NR>1) print $col}' | sort | uniq -c | awk '{if ($1>1) ok++}END{if (NR>1 && ok>=NR) print \"REPLICATES_OK\"}'",
         shell=True).decode()
 
     if ret.find("REPLICATES_OK") >= 0:
