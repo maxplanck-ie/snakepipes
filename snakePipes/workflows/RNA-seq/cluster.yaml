@@ -16,3 +16,5 @@ sleuth_Salmon:
     memory: 4G
 DESeq2:
     memory: 5G
+DESeq2_Salmon:
+    memory: 3G
