@@ -38,7 +38,7 @@ rule sambamba_flagstat:
            mapping_prg+"/{sample}.bam"
        output:
            "Sambamba/{sample}.markdup.txt"
-       conda: CONDA_SHARED_ENV
+       conda: CONDA_SAMBAMBA_ENV
        shell: """
            sambamba flagstat -p {input} > {output}
            """

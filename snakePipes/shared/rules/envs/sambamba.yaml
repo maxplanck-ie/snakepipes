@@ -1,0 +1,6 @@
+name: sambamba_environment_1.0
+channels:
+ - conda-forge
+ - bioconda
+dependencies:
+ - sambamba = 0.6.6
