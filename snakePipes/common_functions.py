@@ -25,7 +25,8 @@ def set_env_yamls():
             'CONDA_ATAC_ENV': 'envs/atac_seq.yaml',
             'CONDA_HIC_ENV': 'envs/hic.yaml',
             'CONDA_WGBS_ENV': 'envs/wgbs.yaml',
-            'CONDA_RMD_ENV': 'envs/rmarkdown.yaml'}
+            'CONDA_RMD_ENV': 'envs/rmarkdown.yaml',
+            'CONDA_SAMBAMBA_ENV': 'envs/sambamba.yaml'}
 
 
 def merge_dicts(x, y):

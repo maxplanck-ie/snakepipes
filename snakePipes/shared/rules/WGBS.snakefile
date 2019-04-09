@@ -184,7 +184,7 @@ if not fromBam:
         params:
             tempdir=tempfile.mkdtemp(suffix='',prefix='',dir=tempdir)
         threads: nthreads
-        conda: CONDA_SHARED_ENV
+        conda: CONDA_SAMBAMBA_ENV
         shell: "sambamba markdup --remove-duplicates -t {threads} --tmpdir {params.tempdir} {input.sbam} {output.rmDupbam} 1>{log.out} 2>{log.err}"
 
 rule index_PCRrm_bam:

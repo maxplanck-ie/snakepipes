@@ -14,7 +14,7 @@ rule sambamba_markdup:
            out=mapping_prg + "/logs/{sample}.sambamba_markdup.out",
            err=mapping_prg + "/logs/{sample}.sambamba_markdup.err"
        benchmark: mapping_prg + "/.benchmark/sambamba_markdup.{sample}.benchmark"
-       conda: CONDA_SHARED_ENV
+       conda: CONDA_SAMBAMBA_ENV
        shell: """
            sambamba markdup -t {threads} --sort-buffer-size=6000 --overflow-list-size 600000 {input} {output} 2> {log.err} > {log.out}
            """
@@ -24,7 +24,7 @@ rule sambamba_flagstat_sorted:
            mapping_prg+"/{sample}.sorted.bam"
        output:
            "Sambamba/{sample}.sorted.markdup.txt"
-       conda: CONDA_SHARED_ENV
+       conda: CONDA_SAMBAMBA_ENV
        shell: """
            sambamba flagstat -p {input} > {output}
            """
@@ -34,7 +34,7 @@ rule sambamba_flagstat:
            mapping_prg+"/{sample}.bam"
        output:
            "Sambamba/{sample}.markdup.txt"
-       conda: CONDA_SHARED_ENV
+       conda: CONDA_SAMBAMBA_ENV
        shell: """
            sambamba flagstat -p {input} > {output}
            """
