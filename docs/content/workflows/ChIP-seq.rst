@@ -90,10 +90,11 @@ For comparison between two conditions, the name you assign to "condition" is not
 The differential binding module utilizes the R package `CSAW <https://bioconductor.org/packages/release/bioc/html/csaw.html>`__ to detect significantly different peaks between two conditions. The analysis is performed on a "union" of peaks from all samples mentioned in the sample sheet. This merged set of regions are provided as an output inside the **CSAW** folder as the file ``DiffBinding_allregions.bed``. All differentially bound regions are available in ``CSAW/DiffBinding_significant.bed``. The default threshold used by the workflow to test for differential binding is ``p < 0.05``
 
 
-.. note:: If you name a group of samples as "control" in the sample sheet, the peaks present in these samples would not be used to create the union of peaks for testing. This is useful for conditions where you want to test between two groups, but only on the peaks from one group.
-
-
 If the user provides additional columns between 'name' and 'condition' in the sample sheet, the variables stored there will be used as blocking factors in the order they appear in the sample sheet. Condition will be the final column and it will be used for any statistical inference. 
+
+
+.. note:: In order to include or exclude peaks from selected samples in the union of peaks used in the differential binding analysis, the user must provide an additional column named 'UseRegions' and set it to True or False, accordingly. This column must supersede the 'condition' column in the column order. 
+
 
 .. _ChIPconfig:
 

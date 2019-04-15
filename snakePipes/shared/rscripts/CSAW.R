@@ -63,9 +63,10 @@ makeQCplots_chip(bam.file = first_bam, outplot = "QCplots_first_sample.pdf", pe.
 print(paste0("Making QC plots for last sample : ", last_bam))
 makeQCplots_chip(bam.file = last_bam, outplot = "QCplots_last_sample.pdf", pe.param = pe_param)
 
-## merge all peaks from the samples mentioned in sampleinfo to test (exclude "Control")
+## merge all peaks from the samples mentioned in sampleinfo to test (exclude those with 'False' in the UseRegions column)
 # get files to read from MACS
-fnames <- sampleInfo[!grepl("control",sampleInfo$condition,ignore.case=TRUE),]$name
+if (!is.null(sampleInfo$UseRegions)){
+    fnames <- sampleInfo$name[sampleInfo$UseRegions]} else {fnames<-sampleInfo$name}
 
 allpeaks <- lapply(fnames, function(x) {
     narrow <- paste0("../MACS2/",x,".filtered.BAM_peaks.narrowPeak")
