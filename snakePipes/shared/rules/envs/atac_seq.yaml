@@ -10,3 +10,4 @@ dependencies:
  - gawk = 4.2.1
  - r-kernsmooth = 2.23_15
  - r-statmod = 1.4.30
+ - bioconductor-genomeinfodbdata
