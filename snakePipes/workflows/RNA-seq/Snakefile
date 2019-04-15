@@ -266,7 +266,10 @@ onstart:
 ################################################################################
 
 if not fromBam:
-    localrules: FASTQ1, FASTQ2
+    if paired:
+        localrules: FASTQ1, FASTQ2
+    else:
+        localrules: FASTQ1
 
     rule all:
         input:
