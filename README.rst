@@ -19,6 +19,8 @@ snakePipes are flexible and powerful workflows built using `snakemake <snakemake
 
 .. image:: ./docs/content/images/snakePipes.png
    :scale: 20 %
+   :height: 100px
+   :width: 100 px
    :align: right
 
 Workflows available
