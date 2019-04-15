@@ -1,4 +1,4 @@
-name: Rmd-env-0.1.0
+name: Rmd-env-1.0.0
 channels:
   - conda-forge
   - bioconda
@@ -6,4 +6,4 @@ dependencies:
   - r-rmarkdown
   - r-pander
   - r-stringi
-  - pandoc=1.19.2
+  - pandoc = 2.7.1

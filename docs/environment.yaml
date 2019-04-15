@@ -1,0 +1,8 @@
+name: snakepipes
+channels:
+  - conda-forge
+dependencies:
+ - python >=3.6
+ - pyyaml >= 5.1
+ - sphinx-argparse
+ - pip

@@ -96,7 +96,7 @@ def envInfo():
         condaDir = os.path.join(condaDir, "envs")
 
     f = open(os.path.join(baseDir, "shared/defaults.yaml"))
-    cf = yaml.load(f)
+    cf = yaml.load(f, Loader=yaml.FullLoader)
     f.close()
 
     _ = cf['snakemake_options'].split(" ")
@@ -158,7 +158,7 @@ def createCondaEnvs(args):
     gatkEnv = None
 
     f = open(os.path.join(baseDir, "shared/defaults.yaml"))
-    cf = yaml.load(f)
+    cf = yaml.load(f, Loader=yaml.FullLoader)
     f.close()
     _ = cf['snakemake_options'].split(" ")
     try:

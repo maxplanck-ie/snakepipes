@@ -3,11 +3,11 @@ channels:
  - conda-forge
  - bioconda
 dependencies:
- - umi_tools=0.5.3
- - r-stringr=1.3.1
- - bioconductor-monocle=2.8.0
- - r-data.table=1.11.4
- - r-seurat=2.3.4
- - r-dplyr=0.7.6
- - r-raceid=0.1.1
- - r-rgl
+ - umi_tools = 0.5.5
+ - r-stringr = 1.4.0
+ - bioconductor-monocle = 2.10.0
+ - r-data.table = 1.12.0
+ - r-seurat = 2.3.4
+ - r-gtools = 3.8.1
+ - r-dplyr = 0.8.0.1
+ - r-raceid = 0.1.3

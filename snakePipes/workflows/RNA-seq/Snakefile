@@ -113,11 +113,14 @@ def run_FastQC(fastqc):
 
 
 def run_Trimming(trim, fastqc):
+    readsUse = reads
+    if not paired:
+        readsUse = [reads[0]]
     if trim and fastqc:
-        return( expand(fastq_dir+"/{sample}{read}.fastq.gz", sample = samples, read = reads) +
-                expand("FastQC_trimmed/{sample}{read}_fastqc.html", sample = samples, read = reads) )
+        return( expand(fastq_dir+"/{sample}{read}.fastq.gz", sample = samples, read = readsUse) +
+                expand("FastQC_trimmed/{sample}{read}_fastqc.html", sample = samples, read = readsUse) )
     elif trim:
-        return( expand(fastq_dir+"/{sample}{read}.fastq.gz", sample = samples, read = reads) )
+        return( expand(fastq_dir+"/{sample}{read}.fastq.gz", sample = samples, read = readsUse) )
     else:
         return([])
 

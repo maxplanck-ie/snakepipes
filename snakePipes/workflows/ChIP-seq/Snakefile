@@ -52,14 +52,6 @@ if allele_info == 'FALSE':
 if sampleSheet:
     include: os.path.join(maindir, "shared", "rules", "CSAW.snakefile")
 
-def run_bamPE(bamPE):
-    if bamPE:
-        file_list = expand("MACS2/{chip_sample}.filtered.BAMPE_peaks.xls",
-                            chip_sample = chip_samples)
-    else:
-        file_list = []
-    return(file_list)
-
 def run_histoneHMM(allele_info):
     if allele_info == 'FALSE':
         ## run histoneHMM broad enrichment calling only for samples annotated as *broad*
@@ -155,8 +147,6 @@ rule all:
         run_deepTools_ChIP(),
         expand("MACS2/{chip_sample}.filtered.BAM_peaks.xls", chip_sample = chip_samples),
         expand("MACS2/{chip_sample}.filtered.BAM_peaks.qc.txt", chip_sample = chip_samples),
-        ## run bamPE if asked
-        run_bamPE(bamPE),
         # run histoneHMM if allelic_bams are absent (since it gives index error without allele_specific index)
         run_histoneHMM(allele_info),
         ## run deeptools-allelic only if dir "allelic_bams" present and non empty
