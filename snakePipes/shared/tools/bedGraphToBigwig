@@ -4,14 +4,14 @@ import pyBigWig
 import sys
 import os
 
-fai = open(sys.argv[1])
+fai = open(sys.argv[2])
 hdr = []
 for line in fai:
     cols = line.strip().split()
     hdr.append((cols[0], int(cols[1])))
 fai.close()
 
-bg = open(sys.argv[2])
+bg = open(sys.argv[1])
 bwM = pyBigWig.open(sys.argv[3], "w")
 bwC = pyBigWig.open(sys.argv[4], "w")
 
