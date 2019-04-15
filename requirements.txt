@@ -2,3 +2,4 @@ snakemake >= 5.2.3
 psutil
 pandas
 fuzzywuzzy
+pyyaml >= 5.1

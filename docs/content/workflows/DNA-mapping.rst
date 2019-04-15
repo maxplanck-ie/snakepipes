@@ -13,12 +13,12 @@ This is the primary DNA-mapping pipeline. It can be used both alone or upstream 
 Input requirements
 ------------------
 
-The only requirement is a directory of gzipped fastq files. Files could be single or paired end, and the read extensions could be modified using the keys in the `defaults.yaml` file below.
+The only requirement is a directory of gzipped fastq files. Files could be single or paired end, and the read extensions could be modified using the keys in the ``defaults.yaml`` file below.
 
 Configuration file
 ~~~~~~~~~~~~~~~~~~
 
-There is a configuration file in `snakePipes/workflows/DNA-mapping/defaults.yaml`::
+There is a configuration file in ``snakePipes/workflows/DNA-mapping/defaults.yaml``::
 
     ## General/Snakemake parameters, only used/set by wrapper or in Snakemake cmdl, but not in Snakefile
     pipeline: dna-mapping
@@ -69,7 +69,7 @@ There is a configuration file in `snakePipes/workflows/DNA-mapping/defaults.yaml
     qualimap: false
     verbose: false
 
-Many of these options can be more conveniently set on the command-line (e.g., `--qualimap` sets `qualimap: true`). However, you may need to change the `reads:` setting if your paired-end files are not denoted by `sample_R1.fastq.gz` and `sample_R2.fastq.gz`, but rather `sample_1.fastq.gz` and `sample_2.fastq.gz`.
+Many of these options can be more conveniently set on the command-line (e.g., ``--qualimap`` sets ``qualimap: true``). However, you may need to change the ``reads:`` setting if your paired-end files are not denoted by ``sample_R1.fastq.gz`` and ``sample_R2.fastq.gz``, but rather ``sample_1.fastq.gz`` and ``sample_2.fastq.gz``.
 
 Understanding the outputs
 --------------------------
@@ -93,12 +93,12 @@ The DNA mapping pipeline will generate output of the following structure::
     │   └── multiqc_data
     └── Sambamba
 
-In addition to the FASTQ module results (see :doc:`running_snakePipes`), the workflow produces the following outputs:
+In addition to the FASTQ module results (see :ref:`running_snakePipes`), the workflow produces the following outputs:
 
  * **Bowtie2** : Contains the BAM files after mapping with `Bowtie2 <http://bowtie-bio.sourceforge.net/bowtie2/index.shtml>`__ and indexed by `Samtools <http://www.htslib.org/>`__.
 
 
- * **filtered_bam** : Contains the BAM files filtered by the provided criteria, such as mapping quality (`--mapq`) or PCR duplicates (`--dedup`). This file is used for most downstream analysis in the DNA-mapping and ChIP-seq/ATAC-seq pipeline.
+ * **filtered_bam** : Contains the BAM files filtered by the provided criteria, such as mapping quality (``--mapq``) or PCR duplicates (``--dedup``). This file is used for most downstream analysis in the DNA-mapping and ChIP-seq/ATAC-seq pipeline.
 
 
  * **bamCoverage** : Contains the coverage files (`bigWig format <https://genome.ucsc.edu/goldenpath/help/bigWig.html>`__) produced from the BAM files by `deepTools bamCoverage <https://deeptools.readthedocs.io/en/develop/content/tools/bamCoverage.html>`__ . The files are either raw, or 1x normalized (by sequencing depth). They are useful for plotting and inspecting the data in IGV.

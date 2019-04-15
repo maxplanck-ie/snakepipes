@@ -10,7 +10,7 @@ The ATAC-seq pipeline takes one or more BAM files and attempts to find accessibl
 
 .. image:: ../images/ATACseq_pipeline.png
 
-.. note:: The **CSAW** step will be skipped if there is no ``sample_info`` tsv file (see :doc:`running_snakePipes`).
+.. note:: The **CSAW** step will be skipped if there is no ``sample_info`` tsv file (see :ref:`running_snakePipes`).
 
 Input requirements
 ------------------
@@ -137,8 +137,8 @@ Currently the ATAC-seq workflow performs detection of open chromatin regions via
 Where to find final bam files and biwgwigs
 ------------------------------------------
 
-Bam files with the extention filtered.bam are only filtered for PCR duplicates. The final bam files filtered additionally for fragment size and used as direct input to MACS2 are found in the MACS2 folder with the exention `.short.cleaned.bam`.
-Bigwig files calculated from these bam files are found under deepTools_ATAC/bamCompare with the extention .`filtered.bw`.
+Bam files with the extention filtered.bam are only filtered for PCR duplicates. The final bam files filtered additionally for fragment size and used as direct input to MACS2 are found in the MACS2 folder with the exention ``.short.cleaned.bam``.
+Bigwig files calculated from these bam files are found under deepTools_ATAC/bamCompare with the extention ``.filtered.bw``.
 
 
 Command line options

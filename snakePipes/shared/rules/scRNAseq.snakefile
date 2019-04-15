@@ -98,7 +98,7 @@ rule combine_sample_counts:
         merge_script = workflow.basedir+"/scRNAseq_merge_coutt_files2.R",
         split = split_lib,
         sample_cell_names = str(cell_names or '')
-    conda: CONDA_RNASEQ_ENV
+    conda: CONDA_scRNASEQ_ENV
     shell:
         "Rscript {params.merge_script} Counts/ {output.merged_matrix} {output.used_cell_names_file} {params.split} {params.sample_cell_names} """
 

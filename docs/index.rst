@@ -93,7 +93,7 @@ Contents:
    content/workflows/RNA-seq.rst
    content/workflows/scRNA-seq.rst
    content/workflows/WGBS.rst
-   ChangeLog.rst
+   content/News.rst
 
 
 Indices and tables
