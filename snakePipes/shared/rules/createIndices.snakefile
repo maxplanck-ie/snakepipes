@@ -126,7 +126,7 @@ rule makeKnownSpliceSites:
     conda: CONDA_RNASEQ_ENV
     threads: 10
     shell: """
-        extract_splice_sites.py {input} > {output}
+        hista2_extract_splice_sites.py {input} > {output}
         """
 
 
