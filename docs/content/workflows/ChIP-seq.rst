@@ -92,6 +92,8 @@ The differential binding module utilizes the R package `CSAW <https://bioconduct
 
 .. note:: If you name a group of samples as "control" in the sample sheet, the peaks present in these samples would not be used to create the union of peaks for testing. This is useful for conditions where you want to test between two groups, but only on the peaks from one group.
 
+If the user provides additional columns between 'name' and 'condition' in the sample sheet, the variables stored there will be used as blocking factors in the order they appear in the sample sheet. Condition will be the final column and it will be used for any statistical inference. 
+
 .. _config:
 
 Configuration file
