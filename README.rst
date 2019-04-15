@@ -15,7 +15,8 @@ snakePipes
     :alt: Citation
 
 
-snakePipes are flexible and powerful workflows built using `snakemake <snakemake.readthedocs.io>`__ that simplify the analysis of NGS data. <img style="float: right;" src="https://raw.githubusercontent.com/maxplanck-ie/snakepipes/master/snakePipes.png">
+snakePipes are flexible and powerful workflows built using `snakemake <snakemake.readthedocs.io>`__ that simplify the analysis of NGS data. <img style="float: right; width:200px;height:200px" src="./snakePipes.png" >
+
 
 
 Workflows available
