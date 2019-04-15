@@ -124,7 +124,7 @@ In addition to the FASTQ module results (see :ref:`running_snakePipes`), the wor
 
 - **bams**: contains bam files obtained through read alignment with bwa-meth and the PCR duplicate removal with sambamba, as well as matching bam index files.
 
-- **methXT**: contains counts of methylated and unmethylated reads per CpG position in the genome in the bedGraph format as output by methylDackel using filtering thresholds (\*_CpG.bedGraph files). Contains also the 'filtered' \*.CpG.filt2.bed files, after applying redundant coverage filtering or masking CpG positions intersecting a bed file with SNP positions if provided by the user. The latter are used in the downstream statistical analysis.
+- **methXT**: contains counts of methylated and unmethylated reads per CpG position in the genome in the bedGraph format as output by methylDackel using filtering thresholds (\*_CpG.bedGraph files). Contains also the 'filtered' \*.CpG.filt2.bed files, after applying redundant coverage filtering or masking CpG positions intersecting a bed file with SNP positions if provided by the user. The latter are used in the downstream statistical analysis. This also contains bigWig files containing the methylation percentage and coverage for use in tools like IGV and deepTools.
 
 - **QC_metrics**: contains output files from conversion rate, flagstat, depth of coverage, GCbias and methylation bias calculations. The QC report in pdf format collecting those metrics in tabular form is also found in this folder.
 

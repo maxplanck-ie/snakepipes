@@ -1,0 +1,48 @@
+#!/usr/bin/env python
+'''Convert a bedGraph file from MethylDackel to two bigWig files'''
+import pyBigWig
+import sys
+import os
+
+fai = open(sys.argv[1])
+hdr = []
+for line in fai:
+    cols = line.strip().split()
+    hdr.append((cols[0], int(cols[1])))
+fai.close()
+
+bg = open(sys.argv[2])
+bwM = pyBigWig.open(sys.argv[3], "w")
+bwC = pyBigWig.open(sys.argv[4], "w")
+
+bwM.addHeader(hdr)
+bwC.addHeader(hdr)
+
+chrom = None
+starts = []
+ends = []
+valuesM = []
+valuesC = []
+for line in bg:
+    if line.startswith("#"):
+        continue
+    cols = line.strip().split()
+    if chrom and chrom != col[0]:
+        bwM.addEntries([chrom] * len(starts), starts, ends=ends, values=valuesM)
+        bwC.addEntries([chrom] * len(starts), starts, ends=ends, values=valuesC)
+        chrom = cols[0]
+        starts = []
+        ends = []
+        valuesM = []
+        valuesC = []
+    starts.append(int(cols[1]) - 1)
+    ends.append(int(cols[2]))
+    valuesM.append(float(cols[3]))
+    valuesC.append(int(cols[4]) + int(cols[5]))
+
+bwM.addEntries([chrom] * len(starts), starts, ends=ends, values=valuesM)
+bwC.addEntries([chrom] * len(starts), starts, ends=ends, values=valuesC)
+
+bg.close()
+bwM.close()
+bwC.close()
