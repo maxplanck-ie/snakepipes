@@ -17,7 +17,8 @@ snakePipes
 
 snakePipes are flexible and powerful workflows built using `snakemake <snakemake.readthedocs.io>`__ that simplify the analysis of NGS data.
 
-![snakepipes_logo](https://raw.githubusercontent.com/maxplanck-ie/snakepipes/docs_vivek/snakePipes.png)
+.. image:: ./docs/content/images/snakePipes.png
+   :width: 600
 
 Workflows available
 --------------------
