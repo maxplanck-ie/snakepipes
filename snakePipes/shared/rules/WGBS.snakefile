@@ -734,6 +734,8 @@ rule bedGraphToBigWig:
     output:
         "methXT/{sample}_CpG.methylation.bw",
         "methXT/{sample}_CpG.coverage.bw"
+    log:
+        err='methXT/logs/{sample}_bedGraphToBigWig.stderr'
     threads: 1
     conda: CONDA_SHARED_ENV
-    shell: os.path.join(workflow_tools, "bedGraphToBigwig") + " {input[0]} {input[1]} {output[0]} {output[1]}"
+    shell: os.path.join(workflow_tools, "bedGraphToBigwig") + " {input[0]} {input[1]} {output[0]} {output[1]} 2> {log.err}"

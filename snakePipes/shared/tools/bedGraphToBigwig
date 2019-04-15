@@ -24,7 +24,7 @@ ends = []
 valuesM = []
 valuesC = []
 for line in bg:
-    if line.startswith("#"):
+    if line.startswith("track "):
         continue
     cols = line.strip().split()
     if chrom and chrom != col[0]:
