@@ -1,0 +1,6 @@
+name: GATK-env-0.1.0
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - gatk = 3.5

@@ -18,7 +18,7 @@ bwC = pyBigWig.open(sys.argv[4], "w")
 bwM.addHeader(hdr)
 bwC.addHeader(hdr)
 
-chrom = None
+chrom = []
 starts = []
 ends = []
 valuesM = []
@@ -27,21 +27,23 @@ for line in bg:
     if line.startswith("track "):
         continue
     cols = line.strip().split()
-    if chrom and chrom != col[0]:
-        bwM.addEntries([chrom] * len(starts), starts, ends=ends, values=valuesM)
-        bwC.addEntries([chrom] * len(starts), starts, ends=ends, values=valuesC)
-        chrom = cols[0]
+    if len(chrom) and chrom[0] != cols[0]:
+        bwM.addEntries(chrom, starts, ends=ends, values=valuesM)
+        bwC.addEntries(chrom, starts, ends=ends, values=valuesC)
+        chrom = []
         starts = []
         ends = []
         valuesM = []
         valuesC = []
-    starts.append(int(cols[1]) - 1)
+    chrom.append(cols[0])
+    starts.append(int(cols[1]))
     ends.append(int(cols[2]))
     valuesM.append(float(cols[3]))
-    valuesC.append(int(cols[4]) + int(cols[5]))
+    valuesC.append(float(cols[4]) + float(cols[5]))
 
-bwM.addEntries([chrom] * len(starts), starts, ends=ends, values=valuesM)
-bwC.addEntries([chrom] * len(starts), starts, ends=ends, values=valuesC)
+if chrom:
+    bwM.addEntries(chrom, starts, ends=ends, values=valuesM)
+    bwC.addEntries(chrom, starts, ends=ends, values=valuesC)
 
 bg.close()
 bwM.close()
