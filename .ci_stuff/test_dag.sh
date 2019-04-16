@@ -107,8 +107,8 @@ if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 1051 ]; then exit 1 ; fi
 
 # WGBS
 WC=`WGBS -i PE_input -o output --tempdir /tmp --snakemake_options " --dryrun" .ci_stuff/organism.yaml | tee /dev/stderr | wc -l`
-if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 956 ]; then exit 1 ; fi
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 962 ]; then exit 1 ; fi
 WC=`WGBS -i PE_input -o output --tempdir /tmp --snakemake_options " --dryrun" --skipDOC --skipGCbias --nextera .ci_stuff/organism.yaml | tee /dev/stderr | wc -l`
-if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 838 ]; then exit 1 ; fi
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 844 ]; then exit 1 ; fi
 
 rm -rf SE_input PE_input BAM_input output /tmp/genes.gtf /tmp/genome.fa /tmp/genome.fa.fai
