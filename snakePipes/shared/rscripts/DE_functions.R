@@ -79,21 +79,25 @@ checktable <- function(countdata = NA, sampleSheet = NA, alleleSpecific = FALSE,
 #'
 
 DESeq_basic <- function(countdata, coldata, fdr, alleleSpecific = FALSE, from_salmon = FALSE) {
+    cnames.sub<-unique(colnames(coldata)[2:which(colnames(coldata) %in% "condition")])
+    d<-as.formula(noquote(paste0("~",paste(cnames.sub,collapse="+"))))
+    
     # Normal DESeq
     print("Performing basic DESeq: test vs control")
     if(isTRUE(from_salmon)) {
       print("Using input from tximport")
         dds <- DESeq2::DESeqDataSetFromTximport(countdata,
-                                  colData = coldata, design = ~ condition)
+                                  colData = coldata, design =d)
+                
     } else {
       print("Using input from count table")
       if(isTRUE(alleleSpecific)) {
           rnasamp <- dplyr::select(countdata, dplyr::ends_with("_all"))
           dds <- DESeq2::DESeqDataSetFromMatrix(countData = rnasamp,
-                                    colData = coldata, design = ~condition)
+                                    colData = coldata, design =d)
       } else {
           dds <- DESeq2::DESeqDataSetFromMatrix(countData = countdata,
-                                    colData = coldata, design = ~condition)
+                                    colData = coldata, design =d)
       }
     }
     dds <- DESeq2::DESeq(dds)
