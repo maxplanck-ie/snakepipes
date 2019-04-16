@@ -154,7 +154,7 @@ def check_replicates(sample_info_file):
     for idx, line in enumerate(f):
         cols = line.strip().split("\t")
         if idx == 0:
-            if not "condition" in cols or not "name" in cols:
+            if "condition" not in cols or "name" not in cols:
                 sys.exit("ERROR: Please use 'name' and 'condition' as column headers in the sample info file ({})!\n".format(sample_info_file))
             conditionCol = cols.index("condition")
             nCols = len(cols)
