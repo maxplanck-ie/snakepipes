@@ -163,11 +163,11 @@ def check_replicates(sample_info_file):
             # Sometimes there's a column of row names, which lack a header
             if len(cols) != nCols and len(cols) - 1 != nCols:
                 sys.exit("ERROR: there's a mismatch between the number of columns in the header and body of {}!\n".format(sample_info_file))
-            if len(cols) - 1 = nCols:
+            if len(cols) - 1 == nCols:
                 conditionCol += 1
-        if cons[conditionCol] not in d:
-            d[conditionCol] = 0
-        d[conditionCol] += 1
+        if cols[conditionCol] not in d:
+            d[cols[conditionCol]] = 0
+        d[cols[conditionCol]] += 1
     f.close()
 
     for k, v in d.items():
