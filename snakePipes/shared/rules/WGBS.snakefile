@@ -2,7 +2,6 @@ import os
 import re
 from operator import is_not
 import tempfile
-import pandas
 
 
 ## function to get the name of the samplesheet and extend the name of the folder for all analyses relying on sample_info
@@ -310,7 +309,7 @@ if not skipDOC:
                 err="QC_metrics/logs/{sample}.depth_of_cov.err",
                 out="QC_metrics/logs/{sample}.depth_of_cov.out"
             threads: 1
-            conda: CONDA_WGBS_ENV
+            conda: CONDA_GATK_ENV
             shell: "gatk -Xmx30g -Djava.io.tmpdir={params.tempdir} -T DepthOfCoverage -R {input.irefG} -o {params.OUTlist0} -I {input.rmDupBam} -ct 0 -ct 1 -ct 2 -ct 5 -ct 10 -ct 15 -ct 20 -ct 30 -ct 50  -omitBaseOutput -mmq 10 --partitionType sample ; gatk -Xmx30g -Djava.io.tmpdir={params.tempdir}  -T DepthOfCoverage -R {input.irefG} -o {params.OUTlist1} -I {input.rmDupBam} -ct 0 -ct 1 -ct 2 -ct 5 -ct 10 -ct 15 -ct 20 -ct 30 -ct 50  -omitBaseOutput -mmq 10 --partitionType sample -L {input.ranCG}; {params.auxshell} 1>{log.out} 2>{log.err}"
 
 
@@ -332,7 +331,7 @@ if not skipDOC:
                 err="QC_metrics/logs/{sample}.depth_of_cov.err",
                 out="QC_metrics/logs/{sample}.depth_of_cov.out"
             threads: 1
-            conda: CONDA_WGBS_ENV
+            conda: CONDA_GATK_ENV
             shell: "gatk -Xmx30g -Djava.io.tmpdir={params.tempdir} -T DepthOfCoverage -R {input.irefG} -o {params.OUTlist0} -I {input.rmDupBam} -ct 0 -ct 1 -ct 2 -ct 5 -ct 10 -ct 15 -ct 20 -ct 30 -ct 50  -omitBaseOutput -mmq 10 --partitionType sample ; gatk -Xmx30g -Djava.io.tmpdir={params.tempdir}  -T DepthOfCoverage -R {input.irefG} -o {params.OUTlist1} -I {input.rmDupBam} -ct 0 -ct 1 -ct 2 -ct 5 -ct 10 -ct 15 -ct 20 -ct 30 -ct 50  -omitBaseOutput -mmq 10 --partitionType sample -L {input.ranCG} 1>{log.out} 2>{log.err}"
 
 if not trimReads is None and not fromBam:
@@ -726,3 +725,17 @@ if intList:
             conda: CONDA_RMD_ENV
             threads: 1
             shell: "cp -v {params.rmd_in} {params.rmd_out} ;Rscript -e 'rmarkdown::render(\"{params.rmd_out}\", params=list(outdir=\"{params.statdir}\", input_func=\"{params.importfunc}\", stat_category=\"{params.stat_cat}\",sample_sheet=\"{params.sampleSheet}\"), output_file=\"{params.outFull}\")' 1>{log.out} 2>{log.err}"
+
+
+rule bedGraphToBigWig:
+    input: 
+        "methXT/{sample}_CpG.bedGraph",
+        genome_index
+    output:
+        "methXT/{sample}_CpG.methylation.bw",
+        "methXT/{sample}_CpG.coverage.bw"
+    log:
+        err='methXT/logs/{sample}_bedGraphToBigWig.stderr'
+    threads: 1
+    conda: CONDA_SHARED_ENV
+    shell: os.path.join(workflow_tools, "bedGraphToBigwig") + " {input[0]} {input[1]} {output[0]} {output[1]} 2> {log.err}"

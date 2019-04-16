@@ -192,7 +192,7 @@ def createCondaEnvs(args):
         f.close()
         h = md5hash.hexdigest()
 
-        if 'wgbs' in env:
+        if 'gatk' in env:
             gatkEnv = os.path.join(condaDirUse, h)
 
         sys.stderr.write("Creating environment from {} in {}\n".format(os.path.join(baseDir, "shared/rules", env), condaDirUse))

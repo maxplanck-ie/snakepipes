@@ -26,6 +26,7 @@ def set_env_yamls():
             'CONDA_HIC_ENV': 'envs/hic.yaml',
             'CONDA_WGBS_ENV': 'envs/wgbs.yaml',
             'CONDA_RMD_ENV': 'envs/rmarkdown.yaml',
+            'CONDA_GATK_ENV': 'envs/gatk.yaml',
             'CONDA_SAMBAMBA_ENV': 'envs/sambamba.yaml'}
 
 
@@ -251,7 +252,7 @@ def check_sample_info_header(sampleSheet_file):
     sampleSheet_file = os.path.abspath(sampleSheet_file)
     ret = open(sampleSheet_file).read().split("\n")[0].split()
     if "name" in ret and "condition" in ret:
-        print("Sample sheet found and format is ok!\n")
+        sys.stderr.write("Sample sheet found and format is ok!\n")
     else:
         sys.exit("ERROR: Please use 'name' and 'condition' as column headers in sample info file! ({})\n".format(sampleSheet_file))
     return sampleSheet_file
