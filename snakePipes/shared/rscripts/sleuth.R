@@ -21,18 +21,21 @@ t2g_file = args[[5]]
 setwd(outdir)
 getwd()
 
-sample_info = read.table(sample_info_file, header=T)[,1:2]
-colnames(sample_info) = c("sample", "condition")
+sample_info = read.table(sample_info_file, header=T)#[,1:2]
+cnames.sub<-unique(colnames(sample_info)[2:which(colnames(sample_info) %in% "condition")])
+d<-as.formula(noquote(paste0("~",paste(cnames.sub,collapse="+"))))
+colnames(sample_info)[colnames(sample_info) %in% "name"] ="sample"
 print(sample_info)
 sample_info$sample
 
 sample_id = list.dirs(file.path(indir), recursive=F, full.names=F)
-sample_id = sort(sample_id[grep(".benchmark|SalmonIndex", sample_id, invert=T)])
-sample_id = intersect(sample_info$sample, sample_id) # get only those sample that are defined in the sampleInfo!
-sample_id
+sample_id = sort(sample_id[grep('[^benchmark][^SalmonIndex]', sample_id, invert=F)])
+#sample_id = intersect(sample_info$sample, sample_id) # get only those sample that are defined in the sampleInfo!
+sample_id<-sample_id[match(sample_info$sample,sample_id)]
+print(sample_id)
 
 salmon_dirs = sapply(sample_id, function(id) file.path(indir, id))
-salmon_dirs
+print(salmon_dirs)
 
 s2c = mutate(sample_info, path=salmon_dirs)
 ## reorder conditions (for Wald test later on: order of comparison important for fold change)
@@ -41,37 +44,18 @@ if ( s2c$condition[[1]] != levels(s2c$condition)[[1]] ) {
 }
 print(s2c)
 
-
-# ## get gene names from Biomart ###############################################
-# mart <- biomaRt::useMart(biomart = "ENSEMBL_MART_ENSEMBL",
-#                          dataset = "dmelanogaster_gene_ensembl",
-#                          host = 'ensembl.org')
-#
-# t2g <- biomaRt::getBM(attributes = c("ensembl_transcript_id", "ensembl_gene_id",
-#                                      "external_gene_name"), mart = mart)
-#
-# t2g <- dplyr::rename(t2g, target_id = ensembl_transcript_id,
-#                      ens_gene = ensembl_gene_id, ext_gene = external_gene_name)
-#
-# write.table(t2g, "dm6.t2g", col.names=T, row.names=F, sep="\t", quote=F)
-#
-################################################################################
-
 ## get gene names / symbol names
-tryCatch( { t2g = read.table(t2g_file, header=F) },
-          error = function(e) { print("No t2g file available!") },
-          finally = {}
-)
+tryCatch( { t2g = read.table(t2g_file, header=F) },error = function(e) { print('No t2g file available!') },finally = {})
 
-if (exists("t2g")) {
+if (exists('t2g')) {
  	colnames(t2g) <- c("target_id","ens_gene","ext_gene")
 	str(t2g)
 
   ## add gene names
-  so <- sleuth_prep(s2c, ~condition, target_mapping = t2g)
+  so <- sleuth_prep(s2c, full_model=d, target_mapping = t2g)
 } else {
   ## construct sleuth object
-  so = sleuth_prep(s2c, ~ condition)
+  so = sleuth_prep(s2c, full_model=d)
 }
 
 ## model expression responding on condition

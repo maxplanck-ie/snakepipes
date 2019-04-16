@@ -10,16 +10,23 @@ fraglength <- as.numeric(snakemake@params[["fragment_length"]])  # used when the
 windowSize <- as.numeric(snakemake@params[["window_size"]])
 importfunc <- snakemake@params[["importfunc"]]  #"DB_functions.R"
 allelic_info <- as.logical(snakemake@params[["allele_info"]])
+outdir<-snakemake@params[["outdir"]]
+
+##set up a primitive log
+logfile <- file(snakemake@log[["err"]], open="wt")
+sink(logfile, type="message")
+
 
 ## create output directory
 
 # include functions
-sink("CSAW/CSAW.log", append=TRUE)
+#sink("CSAW/CSAW.log", append=TRUE)
 source(paste(snakemake@config[["baseDir"]], snakemake@params[["importfunc"]], sep="/"))
 suppressPackageStartupMessages(library(GenomicRanges))
 ## fix default FDR significance threshold
 if ( is.na(fdr) ) fdr <- 0.05
-if (!dir.exists("CSAW")) dir.create("CSAW")
+if (!dir.exists(outdir)) dir.create(outdir)
+setwd(outdir)
 
 ## print the info
 cat(paste("Working dir:", getwd(), "\n"))
@@ -51,18 +58,19 @@ first_bam <- head(SummarizedExperiment::colData(chip_object$windowCounts)$bam.fi
 last_bam <- tail(SummarizedExperiment::colData(chip_object$windowCounts)$bam.files, n = 1)
 
 print(paste0("Making QC plots for first sample : ", first_bam))
-makeQCplots_chip(bam.file = first_bam, outplot = "CSAW/QCplots_first_sample.pdf", pe.param = pe_param)
+makeQCplots_chip(bam.file = first_bam, outplot = "QCplots_first_sample.pdf", pe.param = pe_param)
 
 print(paste0("Making QC plots for last sample : ", last_bam))
-makeQCplots_chip(bam.file = last_bam, outplot = "CSAW/QCplots_last_sample.pdf", pe.param = pe_param)
+makeQCplots_chip(bam.file = last_bam, outplot = "QCplots_last_sample.pdf", pe.param = pe_param)
 
-## merge all peaks from the samples mentioned in sampleinfo to test (exclude "Control")
+## merge all peaks from the samples mentioned in sampleinfo to test (exclude those with 'False' in the UseRegions column)
 # get files to read from MACS
-fnames <- sampleInfo[sampleInfo$condition != "control",]$name
+if (!is.null(sampleInfo$UseRegions)){
+    fnames <- sampleInfo$name[sampleInfo$UseRegions]} else {fnames<-sampleInfo$name}
 
 allpeaks <- lapply(fnames, function(x) {
-    narrow <- paste0("MACS2/",x,".filtered.BAM_peaks.narrowPeak")
-    broad <- paste0("MACS2/",x,".filtered.BAM_peaks.broadPeak")
+    narrow <- paste0("../MACS2/",x,".filtered.BAM_peaks.narrowPeak")
+    broad <- paste0("../MACS2/",x,".filtered.BAM_peaks.broadPeak")
     # first look for narrowpeak then braod peak
     if(file.exists(narrow)) {
         bed <- read.delim(narrow, header = FALSE)
@@ -86,25 +94,27 @@ chip_object$windowCounts <- chip_object$windowCounts[keep,]
 
 ## TMM normalize
 print("Normalizing using TMM (using 10kb background counts)")
-chip_object <- tmmNormalize_chip(chip_object, binsize = 10000, plotfile = "CSAW/TMM_normalizedCounts.pdf")
+chip_object <- tmmNormalize_chip(chip_object, binsize = 10000, plotfile = "TMM_normalizedCounts.pdf")
 
 ## get DB regions
 print("Performing differential binding")
-chip_results <- getDBregions_chip(chip_object, plotfile = "CSAW/DiffBinding_modelfit.pdf")
+chip_results <- getDBregions_chip(chip_object, plotfile = "DiffBinding_modelfit.pdf")
 
 ## write output
 print("Writing output")
-writeOutput_chip(chip_results, outfile_prefix = "CSAW/DiffBinding", fdrcutoff = fdr)
+writeOutput_chip(chip_results, outfile_prefix = "DiffBinding", fdrcutoff = fdr)
 
 
 ## save data
 print("Saving data")
-sink()
-save(chip_object, chip_results, file = "CSAW/DiffBinding_analysis.Rdata")
+#sink()
+save(chip_object, chip_results, file = "DiffBinding_analysis.Rdata")
 
+sink(type="message")
+close(logfile)
 #### SESSION INFO
 
-sink("CSAW/CSAW.session_info.txt")
+sink("CSAW.session_info.txt")
 sessionInfo()
 sink()
 

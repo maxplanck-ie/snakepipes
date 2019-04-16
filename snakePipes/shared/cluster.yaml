@@ -16,6 +16,8 @@ bamCoverage_coverage:
     memory: 5G
 bamCoverage_raw:
     memory: 5G
+CSAW:
+    memory: 3G
 plotCorrelation_pearson:
     memory: 3G
 plotCorrelation_spearman:

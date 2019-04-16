@@ -255,6 +255,8 @@ This plot shows the fitting of [dispersion](https://en.wikipedia.org/wiki/Statis
 
 # MA plots
 
+The formula used to model gene expression in this analysis is `r paste(design(dds),collapse="")`.
+
 This section contains three MA plots (see [Wikipedia](https://en.wikipedia.org/wiki/MA_plot)) that compare the mean of the normalized counts against the log fold change. They show one point per feature. The points are shown in red if the feature has an adjusted p-value less than `alpha`, that is, the statistically significant features are shown in red.
 
 ```{r 'MAplotalpha'}
