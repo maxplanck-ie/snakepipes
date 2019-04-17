@@ -113,7 +113,7 @@ bib <- c(
     DT = citation('DT'),
     ggplot2 = citation('ggplot2'),
     knitr = citation('knitr')[3],
-    rmarkdown = citation('rmarkdown'),
+    rmarkdown = citation('rmarkdown')[1],
     pheatmap = citation('pheatmap'),
     RColorBrewer = citation('RColorBrewer'),
     DESeq2 = citation('DESeq2'))
@@ -122,6 +122,7 @@ write.bibtex(bib, file = 'citations.bib')
 file.copy(rmdTemplate, to = 'DESeq2_report.Rmd')
 
 outprefix = "DEseq_basic"
+cite_options(citation_format = "text",style = "html",cite.style = "numeric",hyperlink = TRUE)
 render('DESeq2_report.Rmd',
               output_format = "html_document",
               clean = TRUE,
