@@ -512,5 +512,5 @@ Citations made with `knitcitations` `r citep(bib[['knitcitations']])`. The [BibT
 
 ```{r bibliography, results='asis', echo=FALSE, warning = FALSE}
 ## Print bibliography
-bibliography()
+bibliography(style="html")
 ```
