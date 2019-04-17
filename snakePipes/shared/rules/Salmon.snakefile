@@ -7,8 +7,7 @@ rule SalmonIndex:
     benchmark:
         "Salmon/.benchmark/Salmon.index.benchmark"
     params:
-        salmon_index_options = salmon_index_options,
-        sasamp = 1
+        salmon_index_options = salmon_index_options
     log:
         out = "Salmon/SalmonIndex/SalmonIndex.out",
         err = "Salmon/SalmonIndex/SalmonIndex.err",
