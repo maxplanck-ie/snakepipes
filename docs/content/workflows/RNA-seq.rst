@@ -190,52 +190,52 @@ Assuming the pipline was run with ``--mode 'alignment-free,alignment,deepTools_q
     │   │   ├── correlation.spearman.bed_coverage.heatmap.png
     │   │   └── correlation.spearman.bed_coverage.tsv
     │   ├── plotEnrichment
-	│   │   ├── plotEnrichment.png
-	│   │   └── plotEnrichment.tsv
+    │   │   ├── plotEnrichment.png
+    │   │   └── plotEnrichment.tsv
     │   └── plotPCA
-	│       ├── PCA.bed_coverage.png
-	│       └── PCA.bed_coverage.tsv
+    │       ├── PCA.bed_coverage.png
+    │       └── PCA.bed_coverage.tsv
     ├── DESeq2_Salmon_sampleSheet
     │   ├── DESeq2_Salmon.err
     │   ├── DESeq2_Salmon.out
-	│   ├── citations.bib
-	│   ├── DESeq2_report_files
-	│   ├── DESeq2_report.html
-	│   ├── DESeq2_report.Rmd
-	│   ├── DESeq2.session_info.txt
-	│   ├── DEseq_basic_counts_DESeq2.normalized.tsv
-	│   ├── DEseq_basic_DEresults.tsv
-	│   └── DEseq_basic_DESeq.Rdata
+    │   ├── citations.bib
+    │   ├── DESeq2_report_files
+    │   ├── DESeq2_report.html
+    │   ├── DESeq2_report.Rmd
+    │   ├── DESeq2.session_info.txt
+    │   ├── DEseq_basic_counts_DESeq2.normalized.tsv
+    │   ├── DEseq_basic_DEresults.tsv
+    │   └── DEseq_basic_DESeq.Rdata
     ├── DESeq2_sampleSheet
     │   ├── DESeq2.err
     │   ├── DESeq2.out
-	│   ├── citations.bib
-	│   ├── DESeq2_report_files
-	│   ├── DESeq2_report.html
-	│   ├── DESeq2_report.Rmd
-	│   ├── DESeq2.session_info.txt
-	│   ├── DEseq_basic_counts_DESeq2.normalized.tsv
-	│   ├── DEseq_basic_DEresults.tsv
-	│   └── DEseq_basic_DESeq.Rdata
+    │   ├── citations.bib
+    │   ├── DESeq2_report_files
+    │   ├── DESeq2_report.html
+    │   ├── DESeq2_report.Rmd
+    │   ├── DESeq2.session_info.txt
+    │   ├── DEseq_basic_counts_DESeq2.normalized.tsv
+    │   ├── DEseq_basic_DEresults.tsv
+    │   └── DEseq_basic_DESeq.Rdata
     ├── FASTQ
     │   ├── sample1_R1.fastq.gz
     │   └── sample1_R2.fastq.gz
-	├── featureCounts
-	│   ├── counts.tsv
-	│   ├── sample1.counts.txt
-	│   ├── sample1.counts.txt.summary
-	│   ├── sample1.err
-	│   ├── sample1.out
+    ├── featureCounts
+    │   ├── counts.tsv
+    │   ├── sample1.counts.txt
+    │   ├── sample1.counts.txt.summary
+    │   ├── sample1.err
+    │   ├── sample1.out
     ├── multiQC
     │   ├── multiqc_data
     │   ├── multiQC.err
     │   ├── multiQC.out
     │   └── multiqc_report.html
-	├── QC_report
-	│   └── QC_report_all.tsv
+    ├── QC_report
+    │   └── QC_report_all.tsv
     ├── RNA-seq.cluster_config.yaml
     ├── RNA-seq.config.yaml
-	├── RNA-seq_organism.yaml
+    ├── RNA-seq_organism.yaml
     ├── RNA-seq_pipeline.pdf
     ├── RNA-seq_run-1.log
     ├── Salmon
@@ -251,14 +251,14 @@ Assuming the pipline was run with ``--mode 'alignment-free,alignment,deepTools_q
     │   ├── sample1.quant.sf
     │   ├── TPM.genes.tsv
     │   └── TPM.tsv
-	├── sleuth_Salmon_sampleSheet
-	│   ├── logs
-	│   ├── MA-plot.pdf
-	│   ├── sleuth_live.R
-	│   ├── so.rds
-	│   └── Wald-test.results.tsv
+    ├── sleuth_Salmon_sampleSheet
+    │   ├── logs
+    │   ├── MA-plot.pdf
+    │   ├── sleuth_live.R
+    │   ├── so.rds
+    │   └── Wald-test.results.tsv
     └── STAR
-  		├── logs
+  	    ├── logs
         ├── sample1
         ├── sample1.bam
         └── sample1.bam.bai
@@ -275,7 +275,7 @@ Apart from the common module outputs (see :ref:`running_snakePipes`), the workfl
 
 * **deepTools_QC**: (produced in the mode *deepTools_QC*) This contains the quality checks specific for RNA-seq, performed via deepTools. The output folders are names after various deepTools functions and the outputs are explained under `deepTools documentation <deeptools.readthedocs.io>`__. In short, they show the insert size distribution(**bamPEFragmentSize**), mapping statistics (**estimateReadFiltering**), sample-to-sample correlations and PCA (**multiBigwigSummary, plotCorrelation, plotPCA**), and read enrichment on various genic features (**plotEnrichment**)
 
-* **DESeq2_[sampleSheet]/DESeq2_Salmon_[sampleSheet]**: (produced in the modes *alignment* or *alignment-free*, only if a sample-sheet is provided.) This folder contains the HTML result report **DESeq2_report.html**, the annotated output file from DESeq2 (**DEseq_basic_DEresults.tsv**) and normalized counts for all samples, produced via DEseq2 (**DEseq_basic_counts_DESeq2.normalized.tsv**) as well as Rdata file(**DEseq_basic_DESeq.Rdata**) with the R objects ``dds <- DESeq2::DESeq(dds)`` and ``ddr <- DDESeq2::results(dds,alpha = fdr)``. **DESeq2_[sampleSheet]** uses gene counts from ``featureCounts/counts.tsv``, whereas **DESeq2_Salmon_[sampleSheet]** uses transcript counts from ``Salmon/counts.tsv`` that are merged via tximport in R.
+* **DESeq2_[sampleSheet]/DESeq2_Salmon_[sampleSheet]**: (produced in the modes *alignment* or *alignment-free*, only if a sample-sheet is provided.) The folder contains the HTML result report **DESeq2_report.html**, the annotated output file from DESeq2 (**DEseq_basic_DEresults.tsv**) and normalized counts for all samples, produced via DEseq2 (**DEseq_basic_counts_DESeq2.normalized.tsv**) as well as an Rdata file (**DEseq_basic_DESeq.Rdata**) with the R objects ``dds <- DESeq2::DESeq(dds)`` and ``ddr <- DDESeq2::results(dds,alpha = fdr)``. **DESeq2_[sampleSheet]** uses gene counts from ``featureCounts/counts.tsv``, whereas **DESeq2_Salmon_[sampleSheet]** uses transcript counts from ``Salmon/counts.tsv`` that are merged via tximport in R.
 
 * **Salmon**: (produced in mode *alignment-free*) This folder contains transcript-level (``counts.tsv``)and gene-level (``counts.genes.tsv``) counts estimated by the tool `Salmon <https://salmon.readthedocs.io/en/latest/salmon.html>`__ .
 
