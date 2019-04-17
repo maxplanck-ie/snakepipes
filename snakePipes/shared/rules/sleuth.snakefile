@@ -10,7 +10,7 @@ rule sleuth_Salmon:
     output:
         "sleuth_Salmon_{}/so.rds".format(sample_name)
     benchmark:
-        "sleuth/.benchmark/sleuth.Salmon.benchmark"
+        "sleuth_Salmon_{}/.benchmark/sleuth.Salmon.benchmark".format(sample_name)
     params:
         script=os.path.join(maindir, "shared", "rscripts", "sleuth.R"),
         indir = os.path.join(outdir,"Salmon"),
