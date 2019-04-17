@@ -122,7 +122,7 @@ Following analysis (**modes**) are possible using the RNA-seq workflow:
 
 In this mode,
 the pipeline uses one of the selected aligners to create BAM files, followed by
-gene-level quantification using **featurecounts**. Gene-level differential expression
+gene-level quantification using **featureCounts**. Gene-level differential expression
 analysis is then performed using **DESeq2**.
 
 "allelic-mapping"
@@ -156,7 +156,7 @@ using the **deepTools_qc** mode. It's a very useful add-on with any of the other
 Understanding the outputs
 ---------------------------
 
-Assuming both ``alignment-free`` mode has have been run togather with ``deepTools_QC`` on a set of FASTQ files, the structure of the output directory would look like this ::
+Assuming the pipline was run with ``--mode 'alignment-free,alignment,deepTools_qc'`` on a set of FASTQ files, the structure of the output directory would look like this (files are shown only for one sample) ::
 
     ├── Annotation
     │   ├── filter_command.txt
@@ -166,44 +166,78 @@ Assuming both ``alignment-free`` mode has have been run togather with ``deepTool
     │   ├── genes.filtered.gtf
     │   ├── genes.filtered.symbol
     │   ├── genes.filtered.t2g
-    │   └── genes.filtered.transcripts.gtf
     ├── bamCoverage
     │   ├── logs
     │   ├── sample1.coverage.bw
-    │   └── sample1.RPKM.bw
+    │   ├── sample1.RPKM.bw
+    │   ├── sample1.uniqueMappings.fwd.bw
+    │   └── sample1.uniqueMappings.rev.bw
     ├── cluster_logs
     ├── deepTools_qc
     │   ├── bamPEFragmentSize
+    │   │   ├── fragmentSize.metric.tsv
+    │   │   └── fragmentSizes.png
     │   ├── estimateReadFiltering
+    │   │   └── sample1_filtering_estimation.txt
     │   ├── logs
     │   ├── multiBigwigSummary
     │   ├── plotCorrelation
+    │   │   ├── correlation.pearson.bed_coverage.heatmap.png
+    │   │   ├── correlation.pearson.bed_coverage.tsv
+    │   │   ├── correlation.spearman.bed_coverage.heatmap.png
+    │   │   └── correlation.spearman.bed_coverage.tsv
     │   ├── plotEnrichment
+	│   │   ├── plotEnrichment.png
+	│   │   └── plotEnrichment.tsv
     │   └── plotPCA
+	│       ├── PCA.bed_coverage.png
+	│       └── PCA.bed_coverage.tsv
     ├── DESeq2_Salmon_sampleSheet
     │   ├── DESeq2_Salmon.err
     │   ├── DESeq2_Salmon.out
-    │   ├── DESeq2.session_info.txt
-    │   ├── DEseq_basic_counts_DESeq2.normalized.tsv
-    │   ├── DEseq_basic_DEresults.tsv
-    │   ├── DEseq_basic_DESeq.Rdata
-    │   └── DEseq_basic_plots.pdf
+	│   ├── citations.bib
+	│   ├── DESeq2_report_files
+	│   ├── DESeq2_report.html
+	│   ├── DESeq2_report.Rmd
+	│   ├── DESeq2.session_info.txt
+	│   ├── DEseq_basic_counts_DESeq2.normalized.tsv
+	│   ├── DEseq_basic_DEresults.tsv
+	│   └── DEseq_basic_DESeq.Rdata
+    ├── DESeq2_sampleSheet
+    │   ├── DESeq2.err
+    │   ├── DESeq2.out
+	│   ├── citations.bib
+	│   ├── DESeq2_report_files
+	│   ├── DESeq2_report.html
+	│   ├── DESeq2_report.Rmd
+	│   ├── DESeq2.session_info.txt
+	│   ├── DEseq_basic_counts_DESeq2.normalized.tsv
+	│   ├── DEseq_basic_DEresults.tsv
+	│   └── DEseq_basic_DESeq.Rdata
     ├── FASTQ
     │   ├── sample1_R1.fastq.gz
     │   └── sample1_R2.fastq.gz
+	├── featureCounts
+	│   ├── counts.tsv
+	│   ├── sample1.counts.txt
+	│   ├── sample1.counts.txt.summary
+	│   ├── sample1.err
+	│   ├── sample1.out
     ├── multiQC
     │   ├── multiqc_data
     │   ├── multiQC.err
     │   ├── multiQC.out
     │   └── multiqc_report.html
-    ├── pipeline.pdf
+	├── QC_report
+	│   └── QC_report_all.tsv
     ├── RNA-seq.cluster_config.yaml
     ├── RNA-seq.config.yaml
+	├── RNA-seq_organism.yaml
+    ├── RNA-seq_pipeline.pdf
     ├── RNA-seq_run-1.log
     ├── Salmon
     │   ├── counts.genes.tsv
     │   ├── counts.tsv
-    │   ├── lib_type.txt
     │   ├── Salmon_counts.log
     │   ├── Salmon_genes_counts.log
     │   ├── Salmon_genes_TPM.log
@@ -214,9 +248,14 @@ Assuming both ``alignment-free`` mode has have been run togather with ``deepTool
     │   ├── sample1.quant.sf
     │   ├── TPM.genes.tsv
     │   └── TPM.tsv
-    ├── sleuth
-    │   └── logs
+	├── sleuth_Salmon_sampleSheet
+	│   ├── logs
+	│   ├── MA-plot.pdf
+	│   ├── sleuth_live.R
+	│   ├── so.rds
+	│   └── Wald-test.results.tsv
     └── STAR
+  		├── logs
         ├── sample1
         ├── sample1.bam
         └── sample1.bam.bai
@@ -233,11 +272,11 @@ Apart from the common module outputs (see :ref:`running_snakePipes`), the workfl
 
 * **deepTools_QC**: (produced in the mode *deepTools_QC*) This contains the quality checks specific for RNA-seq, performed via deepTools. The output folders are names after various deepTools functions and the outputs are explained under `deepTools documentation <deeptools.readthedocs.io>`__. In short, they show the insert size distribution(**bamPEFragmentSize**), mapping statistics (**estimateReadFiltering**), sample-to-sample correlations and PCA (**multiBigwigSummary, plotCorrelation, plotPCA**), and read enrichment on various genic features (**plotEnrichment**)
 
-* **DESeq2**: (produced in the mode *alignment*, only if a sample-sheet is provided) This folder contains the annotated output file from DESeq2 (**DEseq_basic_DEresults.tsv**) and normalized counts for all samples, produced via DEseq2 (**DEseq_basic_counts_DESeq2.normalized.tsv**), along with an output report **DEseq_basic_plots.pdf**
+* **DESeq2_[sampleSheet]/DESeq2_Salmon_[sampleSheet]**: (produced in the modes *alignment* or *alignment-free*, only if a sample-sheet is provided.) This folder contains the HTML result report **DESeq2_report.html**, the annotated output file from DESeq2 (**DEseq_basic_DEresults.tsv**) and normalized counts for all samples, produced via DEseq2 (**DEseq_basic_counts_DESeq2.normalized.tsv**) as well as Rdata file(**DEseq_basic_DESeq.Rdata**) with the R objects ``dds <- DESeq2::DESeq(dds)`` and ``ddr <- DDESeq2::results(dds,alpha = fdr)``. **DESeq2_[sampleSheet]** uses gene counts from ``featureCounts/counts.tsv``, whereas **DESeq2_Salmon_[sampleSheet]** uses transcript counts from ``Salmon/counts.tsv`` that are merged via tximport in R.
 
 * **Salmon**: (produced in mode *alignment-free*) This folder contains transcript-level (``counts.tsv``)and gene-level (``counts.genes.tsv``) counts estimated by the tool `Salmon <https://salmon.readthedocs.io/en/latest/salmon.html>`__ .
 
-* **sleuth** (produced in mode *alignment-free*, only if a sample-sheet is provided) This folder contains a transcript-level differential expression output produced using the tool `Sleuth <https://pachterlab.github.io/sleuth/about>`__ .
+* **sleuth_Salmon_[sampleSheet]** (produced in mode *alignment-free*, only if a sample-sheet is provided) This folder contains a transcript-level differential expression output produced using the tool `Sleuth <https://pachterlab.github.io/sleuth/about>`__ .
 
 
 Command line options
