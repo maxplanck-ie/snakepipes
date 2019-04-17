@@ -15,7 +15,7 @@ rule SalmonIndex:
     threads: 16
     conda: CONDA_RNASEQ_ENV
     shell: """
-        salmon index --sasamp {params.sasamp} -p {threads} -t {input} -i Salmon/SalmonIndex {params.salmon_index_options} > {log.out} 2> {log.err}
+        salmon index -p {threads} -t {input} -i Salmon/SalmonIndex {params.salmon_index_options} > {log.out} 2> {log.err}
         """
 
 

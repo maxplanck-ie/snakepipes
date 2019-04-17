@@ -70,7 +70,7 @@ There is a configuration file in ``snakePipes/workflows/RNA-seq/defaults.yaml``:
     Nmasked_index:
 
 
-Apart from the common workflow options (see :ref:`running_snakePipes`), following parameters are useful to consider:
+Apart from the common workflow options (see :ref:`running_snakePipes`), the following parameters are useful to consider:
 
 * **mapping_prg**: You can choose either `STAR <https://github.com/alexdobin/STAR>`__ or `HISAT2 <https://ccb.jhu.edu/software/hisat2/index.shtml>`__. While HISAT2 mapping is usually faster than STAR, we keep STAR as the default aliger due to it's superior accuracy (see `this paper <https://www.nature.com/nmeth/journal/v14/n2/abs/nmeth.4106.html>`__).
 
@@ -142,6 +142,8 @@ In this mode,
 the pipeline uses **salmon** to perform transcript-level expression quantification. This mode
 performs both transcript-level differential expression (using **Sleuth**), and gene-level
 differential expression (using **wasabi**, followed by **DESeq2**).
+
+.. note:: The salmon index is recreated each time in alignment-free mode. This is done to facilitate changing how the GTF file is filtered, which necessitates reindexing.
 
 "deepTools_qc"
 ~~~~~~~~~~~~~~
