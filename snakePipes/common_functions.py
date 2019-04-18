@@ -308,9 +308,6 @@ def handleUserArgs(args, defaults, args_func):
         parser = args_func(defaults)
         args = parser.parse_args()
     defaults.update(vars(args))
-    if 'snakemake_options' in defaults and isinstance(defaults['snakemake_options'], list):
-        defaults['snakemake_options'] = ' '.join(defaults['snakemake_options'])
-    print("snakemake_options is now {}".format(defaults.get('snakemake_options') or ''))
     return args, defaults
 
 
@@ -427,6 +424,8 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
     if workflowName != "createIndices" and os.path.abspath(organismYAMLname) != os.path.abspath(orgyaml):
         shutil.copyfile(orgyaml, organismYAMLname)
 
+    if isinstance(args.snakemake_options, list):
+        args.snakemake_options = ' '.join(args.snakemake_options)
     if args.notemp:
         args.snakemake_options += " --notemp"
 
