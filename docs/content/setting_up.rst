@@ -175,10 +175,10 @@ Download premade indices
 
 For the sake of convenience, we provide premade indices for the following organisms:
 
- - `Human (GRCh38, Gencode release 29) <https://zenodo.org/record/1477929>`__
- - `Mouse (GRCm38/mm10, Gencode release m19) <https://zenodo.org/record/1475957>`__
- - `Mouse (GRCm37/mm9, Gencode release 1) <https://zenodo.org/record/2624558>`__
- - `Fruit fly (dm6, Ensembl release 94) <https://zenodo.org/record/1478017>`__
+ - `Human (GRCh38, Gencode release 29) <https://zenodo.org/record/2650763>`__
+ - `Mouse (GRCm38/mm10, Gencode release m19) <https://zenodo.org/record/2650854>`__
+ - `Mouse (GRCm37/mm9, Gencode release 1) <https://zenodo.org/record/2650849>`__
+ - `Fruit fly (dm6, Ensembl release 94) <https://zenodo.org/record/2650762>`__
 
 To use these, simply download and extract them. You will then need to modify the provided YAML file to indicate exactly where the indices are located (i.e., replace ``/data/processing/ryan`` with whatever is appropriate).
 
