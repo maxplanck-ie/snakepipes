@@ -30,7 +30,7 @@ Next, install snakePipes.
 Installing snakePipes
 ---------------------
 
-The easiest way to install snakePipes is via our conda channel. The following command install snakePipes and also creates a conda virtual environment named ``snakePipes``, which you can then activate via ``source activate snakePipes``.
+The easiest way to install snakePipes is via our conda channel. The following command install snakePipes and also creates a conda virtual environment named ``snakePipes``, which you can then activate via ``conda activate snakePipes``.
 
 .. code:: bash
 
