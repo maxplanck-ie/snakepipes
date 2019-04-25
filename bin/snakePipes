@@ -240,6 +240,8 @@ def main(args):
         info()
     elif args.command == 'envInfo':
         envInfo()
+    elif args.command == 'flushOrganisms':
+        flushOrganisms()
     else:
         createCondaEnvs(args)
 
