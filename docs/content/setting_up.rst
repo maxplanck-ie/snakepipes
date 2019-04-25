@@ -8,7 +8,7 @@ Unlike many other pipelines, setting up snakePipes is easy! All you need is a *l
 Installing conda with python3
 -----------------------------
 
-Follow the instructions `here <https://conda.io/projects/conda/en/latest/user-guide/install/index.html`__ to install either
+Follow the instructions `here <https://conda.io/projects/conda/en/latest/user-guide/install/index.html>`__ to install either
 miniconda or anaconda. A minimal version (miniconda) is enough for snakePipes. Get the miniconda installer `here <https://conda.io/miniconda.html>`__.
 
 After installation, check your python path and version :
