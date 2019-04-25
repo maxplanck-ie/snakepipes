@@ -41,11 +41,10 @@ else:
         shell:
             "( [ -f {output} ] || ln -s -r {input} {output} )"
 
-    if paired:
-        rule FASTQ2:
-            input:
-                indir+"/{sample}"+reads[1]+ext
-            output:
-                "FASTQ/{sample}"+reads[1]+".fastq.gz"
-            shell:
-                "( [ -f {output} ] || ln -s -r {input} {output} )"
+    rule FASTQ2:
+        input:
+            indir+"/{sample}"+reads[1]+ext
+        output:
+            "FASTQ/{sample}"+reads[1]+".fastq.gz"
+        shell:
+            "( [ -f {output} ] || ln -s -r {input} {output} )"
