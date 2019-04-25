@@ -53,6 +53,16 @@ Instead of providing the URL to ``pip``, you can also `clone <https://help.githu
 
 .. note:: Using the --user argument would install the program into ``~/.local/bin/``. So make sure to have it in your $PATH before executing any workflow.
 
+Next, activate snakePipes.
+
+
+Activate snakePipes
+---------------------
+.. code:: bash
+
+    conda activate snakePipes
+
+    
 Snakemake and pandas are installed as requirements. Ensure you have everything working by testing these commands:
 
 .. code-block:: bash
