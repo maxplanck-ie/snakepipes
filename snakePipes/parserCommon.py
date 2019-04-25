@@ -90,7 +90,7 @@ def mainArguments(defaults, workingDir=False, createIndices=False):
                          default=False,
                          help="run workflow locally; default: jobs are submitted to Slurm queue (default: '%(default)s')")
 
-    general.add_argument("--notemp",
+    general.add_argument("--keepTemp",
                          action="store_true",
                          help="Prevent snakemake from removing files marked as being temporary (typically intermediate files that are rarely needed by end users). This is mostly useful for debugging problems.")
 

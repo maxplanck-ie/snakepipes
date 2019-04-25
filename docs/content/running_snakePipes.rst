@@ -94,7 +94,7 @@ All of the snakePipes workflows that begin with a FASTQ file, perform the same p
 * **--DAG**: All workflows can produce a `directed acyclic graph <https://en.wikipedia.org/wiki/Directed_acyclic_graph>`__ of themselves, using the ``--DAG`` option in the wrappers. This could be useful in reporting/presenting the results.
 
 
-* **--tempdir and --notemp**: These options control where the temporary/intermediate processing files are written during the workflow (option: ``--tempdir``) and whether they are to be kept after the workflow is finished (option: ``--notemp``). Normally the temporary files are removed after analysis.
+* **--tempdir and --keepTemp**: These options control where the temporary/intermediate processing files are written during the workflow (option: ``--tempdir``) and whether they are to be kept after the workflow is finished (option: ``--keepTemp``). Normally the temporary files are removed after analysis.
 
 
 .. note:: It's useful to configure the ``--tempdir`` during setup of snakePipes, such that it points to an appropriate temporary folder on your machine/cluster.

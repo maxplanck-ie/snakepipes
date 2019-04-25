@@ -426,7 +426,7 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
 
     if isinstance(args.snakemake_options, list):
         args.snakemake_options = ' '.join(args.snakemake_options)
-    if args.notemp:
+    if args.keepTemp:
         args.snakemake_options += " --notemp"
 
     snakemake_cmd = """

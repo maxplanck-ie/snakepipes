@@ -6,6 +6,8 @@ snakePipes 1.2.0
 
  * A number of minor bug fixes across all of the pipelines
  * Updates of all tool versions and switching to R 3.5.1
+ * A ``snakePipes flushOrganisms`` option was added to remove the default organism YAML files.
+ * Renamed ``--notemp`` to ``--keepTemp``, which should be less confusing
 
 snakePipes 1.1.2
 ----------------
