@@ -26,6 +26,7 @@ def set_env_yamls():
             'CONDA_HIC_ENV': 'envs/hic.yaml',
             'CONDA_WGBS_ENV': 'envs/wgbs.yaml',
             'CONDA_RMD_ENV': 'envs/rmarkdown.yaml',
+            'CONDA_GATK_ENV': 'envs/gatk.yaml',
             'CONDA_SAMBAMBA_ENV': 'envs/sambamba.yaml'}
 
 
@@ -146,14 +147,35 @@ def check_replicates(sample_info_file):
     return True if each condition has at least 2 replicates
     this check is eg. necessary for sleuth
     """
-    ret = subprocess.check_output(
-        "cat " + sample_info_file + "| awk '/^[[:space:]]$/{next;}{if (NR==1){ col=0; for (i=1;i<=NF;i++) if ($i~\"condition\") col=i}; if (NR>1) print $col}' | sort | uniq -c | awk '{if ($1>1) ok++}END{if (NR>1 && ok>=NR) print \"REPLICATES_OK\"}'",
-        shell=True).decode()
+    f = open(sample_info_file)
+    conditionCol = None
+    nCols = None
+    d = dict()
+    for idx, line in enumerate(f):
+        cols = line.strip().split("\t")
+        if idx == 0:
+            if "condition" not in cols or "name" not in cols:
+                sys.exit("ERROR: Please use 'name' and 'condition' as column headers in the sample info file ({})!\n".format(sample_info_file))
+            conditionCol = cols.index("condition")
+            nCols = len(cols)
+            continue
+        elif idx == 1:
+            # Sometimes there's a column of row names, which lack a header
+            if len(cols) != nCols and len(cols) - 1 != nCols:
+                sys.exit("ERROR: there's a mismatch between the number of columns in the header and body of {}!\n".format(sample_info_file))
+            if len(cols) - 1 == nCols:
+                conditionCol += 1
+        if cols[conditionCol] not in d:
+            d[cols[conditionCol]] = 0
+        d[cols[conditionCol]] += 1
+    f.close()
 
-    if ret.find("REPLICATES_OK") >= 0:
-        return True
-    else:
-        return False
+    for k, v in d.items():
+        if v < 2:
+            sys.stderr.write("ERROR: The {} group has no replicates!\n".format(k))
+            return False
+
+    return True
 
 
 # def get_fragment_length(infile, sampleName):
@@ -251,7 +273,7 @@ def check_sample_info_header(sampleSheet_file):
     sampleSheet_file = os.path.abspath(sampleSheet_file)
     ret = open(sampleSheet_file).read().split("\n")[0].split()
     if "name" in ret and "condition" in ret:
-        print("Sample sheet found and format is ok!\n")
+        sys.stderr.write("Sample sheet found and format is ok!\n")
     else:
         sys.exit("ERROR: Please use 'name' and 'condition' as column headers in sample info file! ({})\n".format(sampleSheet_file))
     return sampleSheet_file
@@ -402,6 +424,8 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
     if workflowName != "createIndices" and os.path.abspath(organismYAMLname) != os.path.abspath(orgyaml):
         shutil.copyfile(orgyaml, organismYAMLname)
 
+    if isinstance(args.snakemake_options, list):
+        args.snakemake_options = ' '.join(args.snakemake_options)
     if args.notemp:
         args.snakemake_options += " --notemp"
 

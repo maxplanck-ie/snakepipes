@@ -25,4 +25,5 @@ dependencies:
  - r-dt
  - r-rcolorbrewer
  - bioconductor-deseq2 = 1.22.1
+ - bioconductor-tximport = 1.10.0
  - r-knitcitations

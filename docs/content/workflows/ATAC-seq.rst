@@ -39,6 +39,12 @@ An example is below::
 
 .. note:: This sample sheet has the same requirements as the sample sheet in the ChIP-seq workflow, and also uses the same tool (CSAW) with a narrow default window size.
 
+If the user provides additional columns between 'name' and 'condition' in the sample sheet, the variables stored there will be used as blocking factors in the order they appear in the sample sheet. Condition will be the final column and it will be used for any statistical inference. 
+
+
+.. note:: In order to include or exclude peaks from selected samples in the union of peaks used in the differential binding analysis, the user must provide an additional column named 'UseRegions' and set it to True or False, accordingly. This column must supersede the 'condition' column in the column order. 
+
+
 Configuration file
 ~~~~~~~~~~~~~~~~~~
 

@@ -53,10 +53,13 @@ print(head(limdat.LG.CC.Means))
 
 if ("Control" %in% limdat.LG.CC.Means$Group){
     limdat.LG.CC.Means$Group<-factor(limdat.LG.CC.Means$Group)
-    limdat.LG.CC.Means$Group<-relevel(limdat.LG.CC.Means$Group,ref="Control")}
-if ("WT" %in% limdat.LG.CC.Means$Group){
+    limdat.LG.CC.Means$Group<-relevel(limdat.LG.CC.Means$Group,ref="Control")
+} else if ("WT" %in% limdat.LG.CC.Means$Group){
     limdat.LG.CC.Means$Group<-factor(limdat.LG.CC.Means$Group)
-    limdat.LG.CC.Means$Group<-relevel(limdat.LG.CC.Means$Group,ref="WT")} #else {limdat.LG.CC.Means$Group<-factor(limdat.LG.CC.Means$Group)}
+    limdat.LG.CC.Means$Group<-relevel(limdat.LG.CC.Means$Group,ref="WT")
+} else {
+    limdat.LG.CC.Means$Group<-factor(limdat.LG.CC.Means$Group)
+}
 
 ##density plots
 ggplot(data=limdat.LG.CC.Means,aes(x=Beta.Mean))+geom_density(aes(group=Group,colour=Group,fill=Group),alpha=0.3)+ggtitle("Single CpG sites")+
@@ -68,6 +71,7 @@ ggplot(data=limdat.LG.CC.Means)+geom_violin(aes(x=Group,y=Beta.Mean,fill=Group))
 theme(text = element_text(size=16),axis.text = element_text(size=12),axis.title = element_text(size=14),axis.text.x = element_text(angle = 90, hjust = 1))+xlab("Mean methylation ratio")+scale_fill_manual(values=c("grey28","red","darkblue","darkgreen"))
 ggsave("Beta.MeanXgroup.all.violin.png")
 
+print(levels(limdat.LG.CC.Means$Group))
 if(length(levels(limdat.LG.CC.Means$Group))==2){
 
     sink("GroupMean.ttest.txt")
