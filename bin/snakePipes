@@ -59,7 +59,20 @@ def parse_arguments():
                                   action='store_true',
                                   help='Prevent conda from looking at anything installed in a users home directory. While this is convenient to ensure that ONLY packages installed by snakePipes are used, it means that you will occasionally get scary-looking warning messages when you try to create new conda environments.')
 
+
+    subparsers.add_parser('flushOrganisms',
+                          help='Flush all installed organism YAML files. This is only advisable when performing a clean installation.')
+
     return parser
+
+
+def flushOrganisms():
+    """
+    Remove all organism YAML files.
+    """
+    baseDir = os.path.dirname(snakePipes.__file__)
+    for f in glob.glob(os.path.join(baseDir, "shared/organisms/*.yaml")):
+        os.remove(f)
 
 
 def info():
@@ -227,6 +240,8 @@ def main(args):
         info()
     elif args.command == 'envInfo':
         envInfo()
+    elif args.command == 'flushOrganisms':
+        flushOrganisms()
     else:
         createCondaEnvs(args)
 
