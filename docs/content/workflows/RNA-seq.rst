@@ -263,6 +263,8 @@ Assuming the pipline was run with ``--mode 'alignment-free,alignment,deepTools_q
         ├── sample1.bam
         └── sample1.bam.bai
 
+.. note:: The ``_sampleSheet`` suffix for the ``DESeq2_sampleSheet`` and ``sleuth_Salmon_sampleSheet`` is drawn from the name of the sample sheet you use. So if you instead named the sample sheet ``mySampleSheet.txt`` then the folders would be named ``DESeq2_mySampleSheet`` and ``sleuth_Salmon_mySampleSheet``. This facilitates using multiple sample sheets.
+
 Apart from the common module outputs (see :ref:`running_snakePipes`), the workflow would produce the following folders:
 
 * **Annotation**: This folder would contain the GTF and BED files used for analysis. In case the file has been filtered using the ``--filter_annotation`` option (see :ref:`RNAconfig`), this would contain the filtered files.
