@@ -15,6 +15,21 @@ rule filterFragments:
         --maxFragmentLength {params.cutoff}
         """
 
+rule filterMetricsToHtml:
+    input: 
+        expand(os.path.join(outdir_MACS2,"{sample}.short.metrics"),sample=samples)
+    output:
+        tmpFile=os.path.join(outdir,"aux_files","ATACseq_QC_report_template.Rmd"),
+        QCrep='Filtering_metrics/Filtering_report.html'
+    #params:
+     #   auxdir=os.path.join(outdir,"aux_files")
+    log:
+        err="Filtering_metrics/logs/produce_report.err",
+        out="Filtering_metrics/logs/produce_report.out"
+    conda: CONDA_RMD_ENV
+    threads: 1
+    shell: "cp -v " + os.path.join(workflow_rscripts,"ATACseq_QC_report_template.Rmd")+ " {output.tmpFile}" + ';Rscript -e "rmarkdown::render(\''+os.path.join(outdir,"aux_files", "ATACseq_QC_report_template.Rmd")+'\', params=list(QCdir=\'"' + os.path.join(outdir,"Filtering_metrics") +'"\' ), output_file =\'"'+ os.path.join(outdir,"Filtering_metrics",'Filtering_report.html"\'')+')"' + " 1>{log.out} 2>{log.err}"
+
 # MACS2 BAMPE fails if there is just one fragment mapped
 rule filterCoveragePerScaffolds:
     input:
@@ -22,8 +37,8 @@ rule filterCoveragePerScaffolds:
     output:
         whitelist = os.path.join(outdir_MACS2, "{sample}.chrom.whitelist"),
         shortbai = temp(os.path.join(outdir_MACS2, "{sample}.short.bam.bai")),
-        bam = temp(os.path.join(outdir_MACS2, "{sample}.short.cleaned.bam")),
-        bai = temp(os.path.join(outdir_MACS2, "{sample}.short.cleaned.bam.bai"))
+        bam = os.path.join(outdir_MACS2, "{sample}.short.cleaned.bam"),
+        bai = os.path.join(outdir_MACS2, "{sample}.short.cleaned.bam.bai")
     params:
         count_cutoff = int(fragmentCount_cutoff) * 2 # must contain more than 2 reads, i.e. 1 fragment
     threads: 6
@@ -46,7 +61,7 @@ rule callOpenChromatin:
         directory = outdir_MACS2,
         genome_size = int(genome_size),
         name='{sample}',
-        qval_cutoff='--qvalue 0.001',
+        qval_cutoff=qval,
         nomodel='--nomodel',
         write_bdg='--bdg',
         fileformat='--format BAMPE'
@@ -61,7 +76,7 @@ rule callOpenChromatin:
             --name {params.name}.filtered.BAM \
             --outdir {params.directory} \
             {params.fileformat} \
-            {params.qval_cutoff} \
+            --qvalue {params.qval_cutoff} \
             {params.nomodel} \
             {params.write_bdg} > {log.out} 2> {log.err}
         """

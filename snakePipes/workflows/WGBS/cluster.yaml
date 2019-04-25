@@ -12,6 +12,8 @@ downsample_reads:
     memory: 6G
 conv_rate:
     memory: 6G
+methyl_extract:
+    memory: 3G
 prep_for_stats:
     memory: 30G
 CpG_stats:

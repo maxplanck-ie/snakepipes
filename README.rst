@@ -17,6 +17,12 @@ snakePipes
 
 snakePipes are flexible and powerful workflows built using `snakemake <snakemake.readthedocs.io>`__ that simplify the analysis of NGS data.
 
+.. image:: ./docs/content/images/snakePipes.png
+   :scale: 20 %
+   :height: 100px
+   :width: 100 px
+   :align: right
+
 Workflows available
 --------------------
 
@@ -41,12 +47,12 @@ Afterward, simply run the following:
 
 This will create a new conda environment called "snakePipes" into which snakePipes is installed. You will then need to create the conda environments needed by the various workflows. To facilitate this we provide the `snakePipes` commands:
 
-* ``source activate snakePipes`` to activate the appropriate conda environment.
+* ``conda activate snakePipes`` to activate the appropriate conda environment.
 * ``snakePipes createEnvs`` to create the various environments and register GATK.
 
-Indicies and annotations needed to run the workflows could be created by a simple command :
+Indices and annotations needed to run the workflows could be created by a simple command :
 
-``createIndicies --genomeURL <path/url to your genome fasta> --gtfURL <path/url to genes.gtf> -o <output_dir> <name>``
+``createIndices --genomeURL <path/url to your genome fasta> --gtfURL <path/url to genes.gtf> -o <output_dir> <name>``
 
 where `name` refers to the name/id of your genome (specify as you wish).
 

@@ -1,6 +1,6 @@
 package:
   name: snakepipes
-  version: 1.1.2
+  version: 1.2.0
 
 source:
   path: ../
@@ -8,16 +8,18 @@ source:
 build:
   number: 0
   noarch: python
-  skip: True  # [not py3k]
 
 requirements:
   build:
-    - python
+    - python >=3
   run:
-    - python
+    - python >=3
     - snakemake >=5.2.3
     - pandas
     - graphviz
+    - fuzzywuzzy
+    - pyyaml >=5.1
+    - wget
 
 test:
   commands:
@@ -27,3 +29,4 @@ about:
   home: 'https://snakepipes.readthedocs.org'
   license: GPL3
   summary: NGS processing pipelines from the MPI-IE
+  license_file: LICENSE.txt

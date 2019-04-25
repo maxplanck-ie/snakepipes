@@ -36,7 +36,8 @@ if fromBam:
 if not 'genes_bed' in globals():
     genes_bed='NA'
 
-#this_script_dir = os.path.dirname(os.path.realpath(__file__))
+if sampleSheet:
+    cf.check_sample_info_header(sampleSheet)
 
 ### Sample init #############################################################
 if not fromBam:
@@ -59,8 +60,12 @@ if not fromBam:
             with io.TextIOWrapper(gzip.open(INfile, 'r')) as f:
                 file_content = f.readline().strip()
             read_root=re.sub('_R1.fastq.gz','',os.path.basename(INfile))
-            PL=re.sub('@','',file_content).split(":")[0]
-            PU=re.sub('@','',file_content).split(":")[2]
+            try:
+                PL=re.sub('@','',file_content).split(":")[0]
+                PU=re.sub('@','',file_content).split(":")[2]
+            except:
+                PL="Illumina"
+                PU="Illumina"
             RG='@RG"\\t"ID:1"\\t"SM:'+read_root+'"\\t"LB:'+read_root+'"\\t"PL:'+PL+'"\\t"PU:'+PU
             RG_dict[read_root]=RG
         return RG_dict
@@ -210,6 +215,8 @@ if not fromBam:
             run_deeptools(skipGCbias),
             expand("methXT/{sample}_CpG.bedGraph",sample=samples),
             expand("methXT/{sample}.CpG.filt2.bed",sample=samples),
+            expand("methXT/{sample}_CpG.methylation.bw",sample=samples),
+            expand("methXT/{sample}_CpG.coverage.bw",sample=samples),
             run_CpG_stats(sampleSheet),
             run_metilene_all(sampleSheet),
             run_int_aggStats(intList,False),
@@ -233,6 +240,8 @@ else:
             run_deeptools(skipGCbias),
             expand("methXT/{sample}_CpG.bedGraph",sample=samples),
             expand("methXT/{sample}.CpG.filt2.bed",sample=samples),
+            expand("methXT/{sample}_CpG.methylation.bw",sample=samples),
+            expand("methXT/{sample}_CpG.coverage.bw",sample=samples),
             run_CpG_stats(sampleSheet),
             run_metilene_all(sampleSheet),
             run_int_aggStats(intList,False),

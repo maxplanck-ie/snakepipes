@@ -45,19 +45,20 @@ readfiles_chip <- function(sampleSheet, fragment_length, window_size, alleleSpec
         }
 
         # define bam files to read
-        bam.files <- list.files("allelic_bams",
+        bam.files <- list.files("../allelic_bams",
                         pattern = paste0(sampleSheet$name,".genome[1-2].sorted.bam$", collapse = "|"),
                         full.names = TRUE )
     } else {
         message("Mode : Differential Binding")
+        cnames.sub<-unique(colnames(sampleSheet)[2:which(colnames(sampleSheet) %in% "condition")])
+        d<-as.formula(noquote(paste0("~",paste(cnames.sub,collapse="+"))))
         # make model matrix for differential binding
-        design <- data.frame(name = sampleSheet$name,
-                       condition = factor(sampleSheet$condition ) )
-        design$condition <- relevel(design$condition, ref = as.character(design$condition[1]))# make the first entry the base level
-        designm <- model.matrix(~condition, data = design)
+        sampleSheet$condition = factor(sampleSheet$condition )
+        sampleSheet$condition <- relevel(sampleSheet$condition, ref = as.character(sampleSheet$condition[1]))# make the first entry the base level
+        designm <- model.matrix(d, data = sampleSheet)
         designType <- "condition"
         # define bam files to read
-        bam.files <- list.files("filtered_bam",
+        bam.files <- list.files("../filtered_bam",
                                 pattern = paste0(sampleSheet$name,".filtered.bam$", collapse = "|"),
                                 full.names = TRUE )
     }

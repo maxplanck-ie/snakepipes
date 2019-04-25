@@ -56,7 +56,7 @@ Tsne maps were calculated with default settings. Cell clustering was first run w
 knitr::include_graphics(dir(params$outdir,pattern="*.rho_delta.png",full.names=TRUE))
 ```
 
-Rho and delta were then selected as the 0.8 and 0.95 percentile, respectively, and clustering was rerun using selected values as thresholds for cluster calling. Tsne plots with automated and recalculated threshold labels were plotted.
+Rho and delta were then selected as the 0.9 and 0.99 percentile, respectively, and clustering was rerun using selected values as thresholds for cluster calling. Tsne plots with automated and recalculated threshold labels were plotted.
 
 ```{r}
 b<-dir(params$outdir,pattern="*.tsne.auto.Cluster.png",full.names=TRUE)

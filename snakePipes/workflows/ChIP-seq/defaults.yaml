@@ -23,8 +23,6 @@ workingdir:
 genome:
 ## paired end data?
 paired: true
-## BAMPE mode?
-bamPE: false
 ## Bin size of output files in bigWig format
 bw_binsize: 25
 ## type of bigwig file to create
@@ -36,6 +34,10 @@ verbose: false
 sampleSheet:
 # window_size
 window_size: 150
+#### Flag to control the pipeline entry point
+bam_ext: '.filtered.bam'
+fromBam:
+plot_format: png
 ################################################################################
 # Call snakemake directly, i.e. without using the wrapper script:
 #

@@ -1,5 +1,5 @@
 STAR:
-    memory: 3500M
+    memory: 6G
 sc_bam_featureCounts_genomic:
     memory: 4G
 bamPE_fragment_size:
@@ -13,6 +13,6 @@ cluster_cells_monocle:
 annotation_bed2fasta:
     memory: 4G
 filter_cells_monocle:
-    memory: 6G
+    memory: 16G
 filter_cells_raceid:
-    memory: 6G
+    memory: 12G

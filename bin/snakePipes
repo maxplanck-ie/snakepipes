@@ -59,7 +59,20 @@ def parse_arguments():
                                   action='store_true',
                                   help='Prevent conda from looking at anything installed in a users home directory. While this is convenient to ensure that ONLY packages installed by snakePipes are used, it means that you will occasionally get scary-looking warning messages when you try to create new conda environments.')
 
+
+    subparsers.add_parser('flushOrganisms',
+                          help='Flush all installed organism YAML files. This is only advisable when performing a clean installation.')
+
     return parser
+
+
+def flushOrganisms():
+    """
+    Remove all organism YAML files.
+    """
+    baseDir = os.path.dirname(snakePipes.__file__)
+    for f in glob.glob(os.path.join(baseDir, "shared/organisms/*.yaml")):
+        os.remove(f)
 
 
 def info():
@@ -96,7 +109,7 @@ def envInfo():
         condaDir = os.path.join(condaDir, "envs")
 
     f = open(os.path.join(baseDir, "shared/defaults.yaml"))
-    cf = yaml.load(f)
+    cf = yaml.load(f, Loader=yaml.FullLoader)
     f.close()
 
     _ = cf['snakemake_options'].split(" ")
@@ -158,7 +171,7 @@ def createCondaEnvs(args):
     gatkEnv = None
 
     f = open(os.path.join(baseDir, "shared/defaults.yaml"))
-    cf = yaml.load(f)
+    cf = yaml.load(f, Loader=yaml.FullLoader)
     f.close()
     _ = cf['snakemake_options'].split(" ")
     try:
@@ -192,7 +205,7 @@ def createCondaEnvs(args):
         f.close()
         h = md5hash.hexdigest()
 
-        if 'wgbs' in env:
+        if 'gatk' in env:
             gatkEnv = os.path.join(condaDirUse, h)
 
         sys.stderr.write("Creating environment from {} in {}\n".format(os.path.join(baseDir, "shared/rules", env), condaDirUse))
@@ -227,6 +240,8 @@ def main(args):
         info()
     elif args.command == 'envInfo':
         envInfo()
+    elif args.command == 'flushOrganisms':
+        flushOrganisms()
     else:
         createCondaEnvs(args)
 

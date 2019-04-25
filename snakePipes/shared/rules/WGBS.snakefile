@@ -2,7 +2,6 @@ import os
 import re
 from operator import is_not
 import tempfile
-import pandas
 
 
 ## function to get the name of the samplesheet and extend the name of the folder for all analyses relying on sample_info
@@ -184,7 +183,7 @@ if not fromBam:
         params:
             tempdir=tempfile.mkdtemp(suffix='',prefix='',dir=tempdir)
         threads: nthreads
-        conda: CONDA_SHARED_ENV
+        conda: CONDA_SAMBAMBA_ENV
         shell: "sambamba markdup --remove-duplicates -t {threads} --tmpdir {params.tempdir} {input.sbam} {output.rmDupbam} 1>{log.out} 2>{log.err}"
 
 rule index_PCRrm_bam:
@@ -212,7 +211,7 @@ rule get_ran_CG:
     log:
         err="aux_files/logs/get_ran_CG.err"
     threads: 1
-    conda: CONDA_PY27_ENV
+    conda: CONDA_SHARED_ENV
     shell: 'set +o pipefail; ' + os.path.join(workflow_tools,'methylCtools') + " fapos {input.refG}  " + re.sub('.gz','',"{output.pozF}") + ';cat '+ re.sub('.gz','',"{output.pozF}") +' | grep "+" -' + " | shuf | head -n 1000000 | awk {params.awkCmd}" + ' - | tr " " "\\t" | sort -k 1,1 -k2,2n - > ' + "{output.ranCG} 2>{log.err}"
 
 
@@ -310,7 +309,7 @@ if not skipDOC:
                 err="QC_metrics/logs/{sample}.depth_of_cov.err",
                 out="QC_metrics/logs/{sample}.depth_of_cov.out"
             threads: 1
-            conda: CONDA_WGBS_ENV
+            conda: CONDA_GATK_ENV
             shell: "gatk -Xmx30g -Djava.io.tmpdir={params.tempdir} -T DepthOfCoverage -R {input.irefG} -o {params.OUTlist0} -I {input.rmDupBam} -ct 0 -ct 1 -ct 2 -ct 5 -ct 10 -ct 15 -ct 20 -ct 30 -ct 50  -omitBaseOutput -mmq 10 --partitionType sample ; gatk -Xmx30g -Djava.io.tmpdir={params.tempdir}  -T DepthOfCoverage -R {input.irefG} -o {params.OUTlist1} -I {input.rmDupBam} -ct 0 -ct 1 -ct 2 -ct 5 -ct 10 -ct 15 -ct 20 -ct 30 -ct 50  -omitBaseOutput -mmq 10 --partitionType sample -L {input.ranCG}; {params.auxshell} 1>{log.out} 2>{log.err}"
 
 
@@ -332,7 +331,7 @@ if not skipDOC:
                 err="QC_metrics/logs/{sample}.depth_of_cov.err",
                 out="QC_metrics/logs/{sample}.depth_of_cov.out"
             threads: 1
-            conda: CONDA_WGBS_ENV
+            conda: CONDA_GATK_ENV
             shell: "gatk -Xmx30g -Djava.io.tmpdir={params.tempdir} -T DepthOfCoverage -R {input.irefG} -o {params.OUTlist0} -I {input.rmDupBam} -ct 0 -ct 1 -ct 2 -ct 5 -ct 10 -ct 15 -ct 20 -ct 30 -ct 50  -omitBaseOutput -mmq 10 --partitionType sample ; gatk -Xmx30g -Djava.io.tmpdir={params.tempdir}  -T DepthOfCoverage -R {input.irefG} -o {params.OUTlist1} -I {input.rmDupBam} -ct 0 -ct 1 -ct 2 -ct 5 -ct 10 -ct 15 -ct 20 -ct 30 -ct 50  -omitBaseOutput -mmq 10 --partitionType sample -L {input.ranCG} 1>{log.out} 2>{log.err}"
 
 if not trimReads is None and not fromBam:
@@ -402,16 +401,29 @@ else:
             threads: 1
             shell: os.path.join(workflow_tools,'conversionRate_KS.sh ')+ "{params.pfx} {output.R12cr} 1>{log.out} 2>{log.err}"
 
-rule get_flagstat:
-    input:
-        rmDupbam="bams/{sample}"+bam_ext
-    output:
-        fstat="QC_metrics/{sample}.flagstat"
-    log:
-        err="QC_metrics/logs/{sample}.get_flagstat.err"
-    threads: 1
-    conda: CONDA_SHARED_ENV
-    shell: "samtools flagstat {input.rmDupbam} > {output.fstat} 2>{log.err}"
+
+if fromBam:
+    rule get_flagstat:
+        input:
+            bam="bams/{sample}"+bam_ext
+        output:
+            fstat="QC_metrics/{sample}.flagstat"
+        log:
+            err="QC_metrics/logs/{sample}.get_flagstat.err"
+        threads: 1
+        conda: CONDA_SHARED_ENV
+        shell: "samtools flagstat {input.bam} > {output.fstat} 2>{log.err}"
+else:
+    rule get_flagstat:
+        input:
+            bam="bams/{sample}.sorted.bam"
+        output:
+            fstat="QC_metrics/{sample}.flagstat"
+        log:
+            err="QC_metrics/logs/{sample}.get_flagstat.err"
+        threads: 1
+        conda: CONDA_SHARED_ENV
+        shell: "samtools flagstat {input.bam} > {output.fstat} 2>{log.err}"
 
 rule produce_report:
     input:
@@ -475,14 +487,13 @@ if blackList is None:
         output:
             tabFilt="methXT/{sample}.CpG.filt2.bed"
         params:
-            methDir=os.path.join(outdir,"methXT"),
             OUTtemp=lambda wildcards,input: os.path.join(outdir,re.sub('_CpG.bedGraph','.CpG.filt.bed',input.methTab))
         log:
             err="methXT/logs/{sample}.CpG_filt.err",
             out="methXT/logs/{sample}.CpG_filt.out"
         threads: 1
         conda: CONDA_WGBS_ENV
-        shell: "Rscript --no-save --no-restore " + os.path.join(workflow_rscripts,'WGBSpipe.POM.filt.R ') + "{params.methDir} {input.methTab};mv -v {params.OUTtemp} {output.tabFilt} 1>{log.out} 2>{log.err}"
+        shell: '''awk \'(NR>1)\' {input.methTab} | awk \'{{ print $0, $5+$6, $1\"_\"$2}}\' | tr " " "\t" | sed \'1i chr\tstart\tend\tBeta\tM\tU\tCov\tms\' > {params.OUTtemp};mv -v {params.OUTtemp} {output.tabFilt} 1>{log.out} 2>{log.err}'''
 
 else:
     rule CpG_filt:
@@ -492,14 +503,13 @@ else:
         output:
             tabFilt="methXT/{sample}.CpG.filt2.bed"
         params:
-            methDir=os.path.join(outdir,"methXT"),
             OUTtemp=lambda wildcards,input: os.path.join(outdir,re.sub('_CpG.bedGraph','.CpG.filt.bed',input.methTab))
         log:
             err="methXT/logs/{sample}.CpG_filt.err",
             out="methXT/logs/{sample}.CpG_filt.out"
         threads: 1
         conda: CONDA_WGBS_ENV
-        shell: "Rscript --no-save --no-restore " + os.path.join(workflow_rscripts,'WGBSpipe.POM.filt.R ') + "{params.methDir} {input.methTab};bedtools intersect -v -a {params.OUTtemp} -b {input.blackListF} > {output.tabFilt} 1>{log.out} 2>{log.err}"
+        shell: '''awk \'(NR>1)\' {input.methTab} | awk \'{{ print $0, $5+$6, $1\"_\"$2}}\' | tr " " "\t" | sed \'1i chr\tstart\tend\tBeta\tM\tU\tCov\tms\' > {params.OUTtemp};bedtools intersect -v -a {params.OUTtemp} -b {input.blackListF} > {output.tabFilt} 1>{log.out} 2>{log.err}'''
 
 
 if sampleSheet or intList:
@@ -715,3 +725,17 @@ if intList:
             conda: CONDA_RMD_ENV
             threads: 1
             shell: "cp -v {params.rmd_in} {params.rmd_out} ;Rscript -e 'rmarkdown::render(\"{params.rmd_out}\", params=list(outdir=\"{params.statdir}\", input_func=\"{params.importfunc}\", stat_category=\"{params.stat_cat}\",sample_sheet=\"{params.sampleSheet}\"), output_file=\"{params.outFull}\")' 1>{log.out} 2>{log.err}"
+
+
+rule bedGraphToBigWig:
+    input: 
+        "methXT/{sample}_CpG.bedGraph",
+        genome_index
+    output:
+        "methXT/{sample}_CpG.methylation.bw",
+        "methXT/{sample}_CpG.coverage.bw"
+    log:
+        err='methXT/logs/{sample}_bedGraphToBigWig.stderr'
+    threads: 1
+    conda: CONDA_SHARED_ENV
+    shell: os.path.join(workflow_tools, "bedGraphToBigwig") + " {input[0]} {input[1]} {output[0]} {output[1]} 2> {log.err}"
