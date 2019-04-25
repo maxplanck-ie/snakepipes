@@ -47,7 +47,7 @@ Afterward, simply run the following:
 
 This will create a new conda environment called "snakePipes" into which snakePipes is installed. You will then need to create the conda environments needed by the various workflows. To facilitate this we provide the `snakePipes` commands:
 
-* ``source activate snakePipes`` to activate the appropriate conda environment.
+* ``conda activate snakePipes`` to activate the appropriate conda environment.
 * ``snakePipes createEnvs`` to create the various environments and register GATK.
 
 Indices and annotations needed to run the workflows could be created by a simple command :

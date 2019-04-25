@@ -30,7 +30,7 @@ Next, install snakePipes.
 Installing snakePipes
 ---------------------
 
-The easiest way to install snakePipes is via our conda channel. The following command install snakePipes and also creates a conda virtual environment named ``snakePipes``, which you can then activate via ``source activate snakePipes``.
+The easiest way to install snakePipes is via our conda channel. The following command install snakePipes and also creates a conda virtual environment named ``snakePipes``, which you can then activate via ``conda activate snakePipes``.
 
 .. code:: bash
 
@@ -59,13 +59,13 @@ Testing whether the installation went fine
 
 After installation, you can activate the snakePipes environment via
 
-.. code-block:: bash
+.. code:: bash
 
-    source activate snakePipes
+    conda activate snakePipes
 
 In case you installed conda using the latest version of conda installers (eg. minicoda `4.5.*` or later), the `conda` command might not be available inside an environment. To enable this, export the path to conda/bin in your $PATH (or append the path manually in your `bashrc`)
 
-.. code-block:: bash
+.. code:: bash
 
     export PATH="/path/to/miniconda3/bin:$PATH"
 
