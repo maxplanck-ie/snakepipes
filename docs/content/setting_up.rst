@@ -53,7 +53,23 @@ Instead of providing the URL to ``pip``, you can also `clone <https://help.githu
 
 .. note:: Using the --user argument would install the program into ``~/.local/bin/``. So make sure to have it in your $PATH before executing any workflow.
 
-Snakemake and pandas are installed as requirements. Ensure you have everything working by testing these commands:
+
+Testing whether the installation went fine
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+After installation, you can activate the snakePipes environment via
+
+.. code-block:: bash
+
+    source activate snakePipes
+
+In case you installed conda using the latest version of conda installers (eg. minicoda `4.5.*` or later), the `conda` command might not be available inside an environment. To enable this, export the path to conda/bin in your $PATH (or append the path manually in your `bashrc`)
+
+.. code-block:: bash
+
+    export PATH="/path/to/miniconda3/bin:$PATH"
+
+Snakemake and pandas are installed along with snakePipes as requirements. Ensure you have them working by testing these commands:
 
 .. code-block:: bash
 
