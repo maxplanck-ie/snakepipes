@@ -20,4 +20,5 @@ setup(
     license='GPL v3',
     description='Snakemake workflows and wrappers for NGS data processing from the MPI-IE',
     zip_safe=False,
+    data_files=[("", ["LICENSE.txt"])]
 )
