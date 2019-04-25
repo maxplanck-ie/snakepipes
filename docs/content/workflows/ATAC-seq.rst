@@ -96,7 +96,7 @@ Understanding the outputs
 Assuming a sample sheet is used, the following will be **added** to the working directory::
 
     .
-    ├── CSAW
+    ├── CSAW_sampleSheet
     │   ├── CSAW.log
     │   ├── CSAW.session_info.txt
     │   ├── DiffBinding_allregions.bed
@@ -136,6 +136,8 @@ Currently the ATAC-seq workflow performs detection of open chromatin regions via
     * percentage of the genome covered by peaks.
 
 * **deepTools_ATAC**: contains the output of `plotFingerPrint <https://deeptools.readthedocs.io/en/develop/content/tools/plotFingerprint.html>`__, which is a useful QC plot to assess signal enrichment between the ATAC-seq samples.
+
+.. note:: The ``_sampleSheet`` suffix for the ``CSAW_sampleSheet`` is drawn from the name of the sample sheet you use. So if you instead named the sample sheet ``mySampleSheet.txt`` then the folder would be named ``CSAW_mySampleSheet``. This facilitates using multiple sample sheets.
 
 
 Where to find final bam files and biwgwigs
