@@ -8,7 +8,7 @@ Unlike many other pipelines, setting up snakePipes is easy! All you need is a *l
 Installing conda with python3
 -----------------------------
 
-Follow the instructions `here <https://conda.io/projects/conda/en/latest/user-guide/install/index.html>`__ to install either
+Follow the instructions `here <https://conda.io/docs/user-guide/install/index.html>`__ to install either
 miniconda or anaconda. A minimal version (miniconda) is enough for snakePipes. Get the miniconda installer `here <https://conda.io/miniconda.html>`__.
 
 After installation, check your python path and version :
@@ -53,32 +53,28 @@ Instead of providing the URL to ``pip``, you can also `clone <https://help.githu
 
 .. note:: Using the --user argument would install the program into ``~/.local/bin/``. So make sure to have it in your $PATH before executing any workflow.
 
-Next, activate snakePipes.
 
+Testing whether the installation went fine
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Activate snakePipes
----------------------
+After installation, you can activate the snakePipes environment via
+
 .. code:: bash
 
     conda activate snakePipes
 
-    
-Snakemake and pandas are installed as requirements. Ensure you have everything working by testing these commands:
+In case you installed conda using the latest version of conda installers (eg. minicoda `4.5.*` or later), the `conda` command might not be available inside an environment. To enable this, export the path to conda/bin in your $PATH (or append the path manually in your `bashrc`)
+
+.. code:: bash
+
+    export PATH="/path/to/miniconda3/bin:$PATH"
+
+Snakemake and pandas are installed along with snakePipes as requirements. Ensure you have them working by testing these commands:
 
 .. code-block:: bash
 
     snakemake --help
     snakePipes --help
-
-
-Remove example organism YAML files
-----------------------------------
-
-There are a number of example organism YAML files (see the next section). You will likely want to remove these as follows:
-
-.. code:: bash
-
-    snakePipes flushOrganisms
 
 
 Inspect and modify the setup files

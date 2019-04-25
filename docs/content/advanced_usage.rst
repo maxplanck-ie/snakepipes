@@ -204,7 +204,7 @@ Below is an example of running the RNA-seq pipeline on AWS using the resources o
     conda config --set always_yes yes --set changeps1 no
     conda update -q conda
     conda create -n snakePipes -c mpi-ie -c conda-forge -c bioconda snakePipes
-    source activate snakePipes
+    conda activate snakePipes
     rm Miniconda3-latest-Linux-x86_64.sh
 
     # setup snakePipes
@@ -220,7 +220,7 @@ Then a larger instance can be spun up and the `RNA-seq` pipeline run as normal.
     mount /dev/sdf1 /data
     chown ec2-user /data
     export PATH=/data/snakePipes/bin:$PATH
-    source activate snakePipes
+    conda activate snakePipes
     RNA-seq -m alignment -i /data/data -o /data/output --local -j 192 /data/indices/GRCm28.yaml
 
 Receiving emails upon pipeline completion
