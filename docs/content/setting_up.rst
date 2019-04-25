@@ -61,6 +61,16 @@ Snakemake and pandas are installed as requirements. Ensure you have everything w
     snakePipes --help
 
 
+Remove example organism YAML files
+----------------------------------
+
+There are a number of example organism YAML files (see the next section). You will likely want to remove these as follows:
+
+.. code:: bash
+
+    snakePipes flushOrganisms
+
+
 Inspect and modify the setup files
 ----------------------------------
 
