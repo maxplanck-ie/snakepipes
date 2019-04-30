@@ -93,7 +93,7 @@ if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 857 ]; then exit 1 ; fi
 WC=`HiC -i PE_input -o output --tempdir /tmp --snakemake_options " --dryrun --conda-prefix /tmp" .ci_stuff/organism.yaml | tee /dev/stderr | grep -v "Conda environment" | wc -l`
 if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 522 ]; then exit 1 ; fi
 WC=`HiC -i PE_input -o output --tempdir /tmp --snakemake_options " --dryrun --conda-prefix /tmp" --trim .ci_stuff/organism.yaml | tee /dev/stderr | grep -v "Conda environment" | wc -l`
-if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 724 ]; then exit 1 ; fi
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 590 ]; then exit 1 ; fi
 WC=`HiC -i PE_input -o output --tempdir /tmp --snakemake_options " --dryrun --conda-prefix /tmp" --enzyme DpnII .ci_stuff/organism.yaml | tee /dev/stderr | grep -v "Conda environment" | wc -l`
 if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 522 ]; then exit 1 ; fi
 WC=`HiC -i PE_input -o output --tempdir /tmp --snakemake_options " --dryrun --conda-prefix /tmp" --noTAD .ci_stuff/organism.yaml | tee /dev/stderr | grep -v "Conda environment" | wc -l`
