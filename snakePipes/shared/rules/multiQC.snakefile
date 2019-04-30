@@ -10,7 +10,7 @@ def multiqc_input_check(return_value):
 
     if not pipeline=="scrna-seq" and ("fromBam" not in globals() or not fromBam):
         if paired:
-            if trim:
+            if trim and fastqc:
                 infiles.append( expand("FastQC_trimmed/{sample}{read}_fastqc.html", sample = samples, read = reads) )
                 indir += " FastQC_trimmed "
                 infiles.append( expand(fastq_dir+"/{sample}{read}.fastq.gz", sample = samples, read = reads) )
@@ -19,7 +19,7 @@ def multiqc_input_check(return_value):
                 infiles.append( expand("FastQC/{sample}{read}_fastqc.html", sample = samples, read = reads) )
                 indir +=" FastQC "
         else:
-            if trim:
+            if trim and fastqc:
                 infiles.append( expand("FastQC_trimmed/{sample}"+reads[0]+"_fastqc.html", sample = samples) )
                 indir += " FastQC_trimmed "
                 infiles.append( expand(fastq_dir+"/{sample}"+reads[0]+".fastq.gz", sample = samples) )
@@ -62,10 +62,12 @@ def multiqc_input_check(return_value):
         if trim:
             infiles.append( expand("FastQC_trimmed/{sample}"+reads[0]+"_fastqc.html", sample = samples) )
             indir += " FastQC_trimmed "
+        else:
+            infiles.append( expand("FastQC/{sample}{read}_fastqc.html", sample = samples, read = reads) )
+            indir +=" FastQC "
+
         infiles.append( expand(fastq_dir+"/{sample}"+reads[0]+".fastq.gz", sample = samples) )
         indir += fastq_dir + " "
-        infiles.append( expand("FastQC/{sample}{read}_fastqc.html", sample = samples, read = reads) )
-        indir +=" FastQC "
         infiles.append( expand(mapping_prg+"/{sample}.bam", sample = samples) +
         expand("Sambamba/{sample}.markdup.txt", sample = samples) +
         expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt", sample=samples))
