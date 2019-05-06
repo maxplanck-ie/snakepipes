@@ -65,6 +65,7 @@ sampleInfo$condition <- relevel(sampleInfo$condition, ref = as.character(sampleI
 #    sampleInfo[grepl("^[0-9]", sampleInfo$name),]$name <- paste0("X", sampleInfo[grepl("^[0-9]", sampleInfo$name),]$name)
 #}
 sampleInfo$name <- make.names(sampleInfo$name)
+rownames(sampleInfo)<-sampleInfo$name
 
 ## ~~~~~~ 2. Check if data is in proper order  ~~~~~
 if(isTRUE(tximport)) {
