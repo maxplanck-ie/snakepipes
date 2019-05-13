@@ -199,13 +199,14 @@ def commonOptions(grp, defaults, bw=True, plots=True):
                      dest="trim",
                      action="store_true",
                      help="Activate fastq read trimming. If activated, Illumina adaptors are trimmed by default. "
-                     "Additional parameters can be specified under --trim_options (default: '%(default)s')",
+                     "Additional parameters can be specified under --trim_options. (default: '%(default)s')",
                      default=defaults["trim"])
 
     grp.add_argument("--trim_prg",
                      dest="trim_prg",
                      choices=['cutadapt', 'trimgalore'],
-                     help="Trimming program to use: Cutadapt or TrimGalore (default: '%(default)s')",
+                     help="Trimming program to use: Cutadapt or TrimGalore. Note that if you change this you may "
+                     "need to change --trim_options to match! (default: '%(default)s')",
                      default=defaults["trim_prg"])
 
     grp.add_argument("--trim_options",

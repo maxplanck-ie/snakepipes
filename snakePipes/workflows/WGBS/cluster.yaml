@@ -1,31 +1,19 @@
-conv_ref:
-    memory: 20G
-depth_of_cov:
-    memory: 30G
-calc_Mbias:
-    memory: 3G
-map_reads:
-    memory: 20G
-rm_dupes:
-    memory: 3G
-downsample_reads:
+metileneReport:
     memory: 6G
-conv_rate:
-    memory: 6G
-methyl_extract:
+DepthOfCov:
     memory: 3G
+DepthOfCovGenome:
+    memory: 3G
+markDupes:
+    memory: 3G
+CpG_filt:
+    memory: 6G
 prep_for_stats:
     memory: 30G
 CpG_stats:
     memory: 30G
-cleanup_metilene:
-    memory: 20G
 intAgg_stats:
     memory: 30G
-CpG_filt:
-    memory: 6G
-get_ran_CG:
-    memory: 3G
 CpG_report:
     memory: 3G
 intAgg_report:

@@ -1,0 +1,132 @@
+---
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: html_document
+title: "WGBS Metilene QC and Analysis Summarization"
+---
+
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+.libPaths(R.home("library"))
+
+suppressMessages(require(GenomicRanges))
+suppressMessages(require(GenomicFeatures))
+suppressMessages(require(dplyr))
+suppressMessages(require(tidyr))
+suppressMessages(require(ggplot2))
+
+inputFile = snakemake@input[[1]]
+gtfFile = snakemake@params[["genes_gtf"]]
+FDR = snakemake@params[["FDR"]]
+minMethDiff = snakemake@params[["minMethDiff"]]
+# Only a single output file is allows for Rmd files
+outputTxtFile = sprintf("%s/DMRs.annotated.txt", snakemake@params[["outdir"]])
+outputDiffMethyl = sprintf("%s/MethylationDensity.png", snakemake@params[["outdir"]])
+outputQValue = sprintf("%s/QValueDistribution.png", snakemake@params[["outdir"]])
+outputVolcano = sprintf("%s/Volcano.png", snakemake@params[["outdir"]])
+d = read.delim(inputFile)
+```
+
+# Overview
+
+This report summarizes the differentially methylated region (DMR) calling with metilene of the samples specified in **`r snakemake@params[["sampleSheet"]]`**.
+
+# DMR annotation
+
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+# Read in the input data
+d = read.delim(inputFile)
+colnames(d) = c("CHROM", "START", "END", "qvalue", "MeanDiff", "NumCpGs", "pMWU", "p2DKS", "meanA", "meanB")
+gr = GRanges(seqnames=d$CHROM,
+             ranges=IRanges(start=d$START, end=d$END),
+             mcols=d[,c(4:10)])
+# Fix meta data column names
+colnames(elementMetadata(gr)) = gsub("mcols.", "", colnames(elementMetadata(gr)))
+
+# Get the genes
+gtf = makeTxDbFromGFF(gtfFile, format="gtf")
+g = genes(gtf)
+
+################################
+# Annotated DMRs
+################################
+# Make annotate with the nearest gene and its distnace
+og = distanceToNearest(gr, g, ignore.strand=FALSE, select="all")
+d = t(sapply(split(og, queryHits(og)), function(x) {
+      gnames = paste0(g$gene_id[subjectHits(x)], collapse=",")
+      distances = paste0(elementMetadata(x)$distance, collapse=",")
+      return(as.character(c(gnames, distances)))
+}))
+gr$NearestGene = as.character(d[,1])   
+gr$DistanceToNearestGene = as.character(d[,2])
+
+# Write some output
+d = as.data.frame(gr)
+colnames(d)[1] = c("chrom")
+
+# Filter output by FDR threshold and MeanDiff
+IDX = which(d$qvalue < FDR)
+write.table(d[IDX,c(1:3, 6:14)], file=outputTxtFile, sep="\t", col.names=T, row.names=F, quote=F)
+```
+
+The genome annotation in **`r gtfFile`** was used to annotated DMRs according to their proximity to genes. The results for the **`r length(IDX)`** candidate DMRs passing the FDR and methylation difference threshold are stored in **`r outputTxtFile`**.
+
+# Distribution of methylation values per group
+
+Averge methylation values for candidate DMRs in each of the groups are plotted below and stored in **`r outputDiffMethyl`**. In general, the starkness of the difference in the distributions should correlate to the number of candiate DMRs.
+
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+# Select the mean* columns, strip "mean" and make long
+d = as.data.frame(elementMetadata(gr)) %>% select(starts_with("mean", ignore.case=FALSE)) %>% 
+  rename_all(funs(gsub("^mean", "", .))) %>% gather("Group", "MeanMethylation")
+
+g = ggplot(d, aes(x=MeanMethylation, fill=Group, color=Group)) + geom_density(alpha=0.3)
+g = g + theme(text=element_text(size=16),
+              axis.text = element_text(size=12),
+              axis.title = element_text(size=14))
+g = g + xlab("Mean methylation ratio")
+g = g + scale_fill_manual(values=c("grey28", "red", "darkblue", "darkgreen"))
+g = g + scale_colour_manual(values=c("grey28", "red", "darkblue", "darkgreen"))
+g = g + xlim(0,1)
+ggsave(outputDiffMethyl, plot=g)
+g
+```
+
+# Q-value distribution
+
+Q values should ideally show an enrichment around 0 and 1 with an otherwise approximately uniform distribution elsewhere. If you do not see this, then there was likely a batch effect in the data or other QC issues with some of the samples. The vertical line at **`r FDR`** indicates the specified significance threshold. The following plot is saved as **`r outputQValue`**.
+
+```{r echo=FALSE, warnings=FALSE, messages=FALSE}
+d = as.data.frame(elementMetadata(gr)) %>% select("qvalue")
+g = ggplot(d, aes(x=qvalue)) + geom_histogram(binwidth=0.005)
+g = g + theme(text=element_text(size=16),
+              axis.text = element_text(size=12),
+              axis.title = element_text(size=14))
+g = g + xlab("Q value")
+g = g + geom_vline(aes(xintercept=as.numeric(FDR)))
+ggsave(outputQValue, plot=g)
+g
+```
+
+# Volcano plot
+
+Volcano plots show the relationship between the effect size (methylation change) and Q value. Typically an increase in the former results in an increase in the significance of the latter. Here, the values are colored according to the FDR (**`r FDR`**) and **`r minMethDiff`**. The following plot is also saved as **`r outputVolcano`**.
+
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+d = as.data.frame(elementMetadata(gr))
+d$Significant = ifelse(d$qvalue < FDR & abs(d$MeanDiff) > minMethDiff, "Yes", "No")
+g = ggplot(d, aes(x=MeanDiff, y=-log10(d$qvalue))) + geom_point(aes(color=Significant))
+g = g + theme(text=element_text(size=16),
+              axis.text=element_text(size=12),
+              axis.title=element_text(size=14))
+g = g + labs(x="Mean methylation difference", y="-log10(Q value)")
+g = g + scale_color_manual(values=c("grey28", "red", "darkblue", "darkgreen"))
+ggsave(outputVolcano, plot=g)
+g
+```
+
+# Session information
+
+The following packages were used to produce this report:
+
+```{r echo=FALSE}
+sessionInfo()
+```

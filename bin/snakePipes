@@ -51,10 +51,6 @@ def parse_arguments():
                                   action='store_true',
                                   help='Only print the environments that would be created, don\'t actually create them.')
 
-    createEnvsParser.add_argument('--skipGATK',
-                                  action='store_true',
-                                  help='Skip registering GATK')
-
     createEnvsParser.add_argument('--noSitePackages',
                                   action='store_true',
                                   help='Prevent conda from looking at anything installed in a users home directory. While this is convenient to ensure that ONLY packages installed by snakePipes are used, it means that you will occasionally get scary-looking warning messages when you try to create new conda environments.')
@@ -224,10 +220,6 @@ def createCondaEnvs(args):
         # Ignore site-packages
         if args.noSitePackages and not args.info:
             fixSitePy(os.path.join(condaDirUse, h))
-
-    # We can't actually install GATK with conda, which is annoying
-    if gatkEnv and not args.skipGATK and not args.info:
-        registerGATK(gatkEnv)
 
     # Ignore site-packages in this env
     if args.noSitePackages and not args.info:

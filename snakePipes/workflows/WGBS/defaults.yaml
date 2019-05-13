@@ -16,15 +16,10 @@ configfile:
 cluster_configfile:
 local: False
 max_jobs: 12
-nthreads: 8
 ## directory with fastq or bam files
 indir:
-## directory with fastqc files for auto quality trimming
-fqcin:
 ## Genome information
 genome:
-convrefpath:
-convRef: False
 ###list of bed files to process
 intList: []
 ###SNP black list (bed file)
@@ -40,12 +35,15 @@ reads: [_R1, _R2]
 ## Number of reads to downsample from each FASTQ file
 downsample:
 ## Options for trimming
-trimReads: 'user'
-adapterSeq: AGATCGGAAGAGC
-nextera: False
-trimThreshold: 10
-trimOtherArgs: ""
+trim: False
+trim_prg: cutadapt
+trim_options:
+## Bin size of output files in bigWig format
+bw_binsize: 25
+## Run FASTQC read quality control
+fastqc: false
 verbose: False
+plot_format: 'png'
 #### Flag to control the pipeline entry point
 fromBam: False
 bam_ext: '.PCRrm.bam'
@@ -57,8 +55,10 @@ maxDist: 300
 minCpGs: 10
 minMethDiff: 0
 ###Thresholds for filtering of statistical comparisons:
-minAbsDiff: 0.2
-FDR: 0.02
+minAbsDiff: 0.1
+FDR: 0.1
+###MethylDackel options
+MethylDackelOptions: '--mergeContext --maxVariantFrac 0.25 --minDepth 4'
 ################################################################################
 # Call snakemake directly, i.e. without using the wrapper script:
 #
