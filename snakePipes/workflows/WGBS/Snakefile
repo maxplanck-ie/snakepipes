@@ -68,10 +68,13 @@ def run_Trimming(trim, fastqc):
         return([])
 
 def get_outdir(folder_name):
-    sample_name = os.path.basename(sampleSheet)
-    if "." in sample_name:
-        idx = sample_name.rindex(".")
-        sample_name = sample_name[:idx]
+    if sampleSheet:
+        sample_name = os.path.basename(sampleSheet)
+        if "." in sample_name:
+            idx = sample_name.rindex(".")
+            sample_name = sample_name[:idx]
+    else:
+        sample_name = ""
     return("{}_{}".format(folder_name, sample_name))
 
 
