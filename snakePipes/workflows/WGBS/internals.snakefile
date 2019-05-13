@@ -54,6 +54,9 @@ def getGroups(sampleSheet):
 
     Mut and Treatment come last, otherwise the lexographic order is returned
     """
+    if not sampleSheet:
+        return ["WT", "Mut"]
+
     groups = set()
     conditionIdx = None
     f = open(sampleSheet)
