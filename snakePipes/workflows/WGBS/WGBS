@@ -37,7 +37,7 @@ def bounded01(x):
 
 def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfile":None, "max_jobs": 12, "snakemake_options": "--use-conda", "tempdir": None,
                          "downsample": None, "trim": False, "trim_prg": "cutadapt", "trim_options": "", "maxDist": 300, "minCpGs": 10, "minMethDiff": 0, "minAbsDiff": 0.1, "FDR": 0.1,
-                         "MethylDackelOptions": "--mergeContext --maxVariantFrac 0.25 --minDepth 4", "fastqc": False,
+                         "MethylDackelOptions": "--mergeContext --maxVariantFrac 0.25 --minDepth 4", "fastqc": False, 'bw_binsize': 25, 'plot_format': 'png', "bam_ext": '.PCRrm.bam',
                          "intList": [], "blackList": None, "sampleSheet": None, "mbias_ignore": "auto", "fromBam": False, "skipDOC": False, "skipGCbias": False}):
     """
     Parse arguments from the command line.
