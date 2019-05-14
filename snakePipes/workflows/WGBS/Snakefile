@@ -25,7 +25,7 @@ include: os.path.join(workflow.basedir, "internals.snakefile")
 ### include modules of other snakefiles ########################################
 ################################################################################
 
-metileneGroups = ""  # Just for rendering of the WGBS snakefile
+metileneGroups = "unused"  # Just for rendering of the WGBS snakefile
 if sampleSheet:
     cf.check_sample_info_header(sampleSheet)
     metileneGroups = getGroups(sampleSheet)

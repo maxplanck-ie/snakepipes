@@ -276,7 +276,7 @@ rule get_flagstat:
     shell: "samtools flagstat {input} > {output} 2>{log.err}"
 
 
-# TODO: Coverage stuff isn't very useful, use plotCoverage instead
+# TODO: CpG coverage stuff isn't very useful, use plotCoverage instead
 rule produce_report:
     input:
         Coverage=calc_doc(skipDOC),
@@ -291,7 +291,6 @@ rule produce_report:
     script: "../rscripts/WGBS_QC_report_template.Rmd"
 
 
-# TODO: make this a checkpoint, mbias should be run regardless
 if mbias_ignore=="auto":
     rule methyl_extract:
         input:
@@ -383,28 +382,28 @@ rule prep_for_stats:
 
 # TODO, make temp?
 # TODO: integrate
-rule CpG_stats:
-    input: 
-        Limdat='{}/limdat.LG.RData'.format(get_outdir("limma"))
-    output:
-        RDatAll='{}/singleCpG.RData'.format(get_outdir("limma")),
-        sinfo='{}/sessionInfo.txt'.format(get_outdir("limma"))
-    params:
-        statdir=os.path.join(outdir,'{}'.format(get_outdir("limma"))),
-        datdir=os.path.join(outdir,'{}'.format(get_outdir("limma"))),
-        script=os.path.join(workflow_rscripts,'WGBSpipe.singleCpGstats.limma.R'),
-        sampleSheet=sampleSheet,
-        diff=minAbsDiff,
-        fdr=FDR,
-        importfunc = os.path.join(workflow_rscripts, "WGBSstats_functions.R")
-    log:
-        err='{}/logs/CpG_stats.err'.format(get_outdir("limma")),
-        out='{}/logs/CpG_stats.out'.format(get_outdir("limma"))
-    threads: 1
-    conda: CONDA_WGBS_ENV
-    shell: """
-        Rscript --no-save --no-restore {params.script} {params.statdir} {params.sampleSheet} {params.datdir} {params.diff} {params.fdr} {params.importfunc} 1>{log.out} 2>{log.err}
-        """
+#rule CpG_stats:
+#    input: 
+#        Limdat='{}/limdat.LG.RData'.format(get_outdir("limma"))
+#    output:
+#        RDatAll='{}/singleCpG.RData'.format(get_outdir("limma")),
+#        sinfo='{}/sessionInfo.txt'.format(get_outdir("limma"))
+#    params:
+#        statdir=os.path.join(outdir,'{}'.format(get_outdir("limma"))),
+#        datdir=os.path.join(outdir,'{}'.format(get_outdir("limma"))),
+#        script=os.path.join(workflow_rscripts,'WGBSpipe.singleCpGstats.limma.R'),
+#        sampleSheet=sampleSheet,
+#        diff=minAbsDiff,
+#        fdr=FDR,
+#        importfunc = os.path.join(workflow_rscripts, "WGBSstats_functions.R")
+#    log:
+#        err='{}/logs/CpG_stats.err'.format(get_outdir("limma")),
+#        out='{}/logs/CpG_stats.out'.format(get_outdir("limma"))
+#    threads: 1
+#    conda: CONDA_WGBS_ENV
+#    shell: """
+#        Rscript --no-save --no-restore {params.script} {params.statdir} {params.sampleSheet} {params.datdir} {params.diff} {params.fdr} {params.importfunc} 1>{log.out} 2>{log.err}
+#        """
 
 
 # TODO: make temp?
@@ -483,63 +482,63 @@ rule metileneReport:
 
 # TODO: imdF needs to be relabeled
 # TODO: rewrite shell script
-rule get_CG_per_int:
-    input:
-        intList=intList,
-        refG=genome_fasta,
-        imdF="aux_files/"+re.sub('.fa*','.CpG.bed',os.path.basename(genome_fasta))
-    output:
-        outList=run_int_aggStats(intList,False)
-    log:
-        err="aux_files/logs/get_CG_per_int.err"
-    params:
-        auxshell=lambda wildcards,input,output: ';'.join(["bedtools intersect -wa -a "+ input.imdF + " -b " + bli + ' > ' + oli  for bli,oli in zip(input.intList,output.outList) ])
-    threads: 1
-    conda: CONDA_WGBS_ENV
-    shell: "{params.auxshell} 2>{log.err}"
+#rule get_CG_per_int:
+#    input:
+#        intList=intList,
+#        refG=genome_fasta,
+#        imdF="aux_files/"+re.sub('.fa*','.CpG.bed',os.path.basename(genome_fasta))
+#    output:
+#        outList=run_int_aggStats(intList,False)
+#    log:
+#        err="aux_files/logs/get_CG_per_int.err"
+#    params:
+#        auxshell=lambda wildcards,input,output: ';'.join(["bedtools intersect -wa -a "+ input.imdF + " -b " + bli + ' > ' + oli  for bli,oli in zip(input.intList,output.outList) ])
+#    threads: 1
+#    conda: CONDA_WGBS_ENV
+#    shell: "{params.auxshell} 2>{log.err}"
 
 
-# TODO: rewrite
-rule intAgg_stats:
-    input:
-        Limdat='{}/limdat.LG.RData'.format(get_outdir("limma")),
-        intList=intList,
-        refG=genome_fasta,
-        sampleSheet=sampleSheet,
-        aux=run_int_aggStats(intList,False)
-    output:
-        outFiles=run_int_aggStats(intList,sampleSheet),
-        sinfo='{}/sessionInfo.txt'.format(get_outdir("aggregate_stats_limma"))
-    params:
-        auxshell=lambda wildcards,input:';'.join(['Rscript --no-save --no-restore ' + os.path.join(workflow_rscripts,'WGBSpipe.interval_stats.limma.R ') + os.path.join(outdir,'{}'.format(get_outdir("aggregate_stats_limma"))) + ' ' + li +' '+ aui +' ' + os.path.join(outdir,input.Limdat) + ' '  + input.sampleSheet + ' ' + str(minAbsDiff) + ' ' + str(FDR) + ' ' + os.path.join(workflow_rscripts, "WGBSstats_functions.R")  for li,aui in zip(intList,[os.path.join(outdir,"aux_files",re.sub('.fa',re.sub('.bed','.CpGlist.bed',os.path.basename(x)),os.path.basename(genome_fasta))) for x in intList])])
-    log:
-        err="{}/logs/intAgg_stats.err".format(get_outdir("aggregate_stats_limma")),
-        out="{}/logs/intAgg_stats.out".format(get_outdir("aggregate_stats_limma"))
-    threads: 1
-    conda: CONDA_WGBS_ENV
-    shell: "{params.auxshell} 1>{log.out} 2>{log.err}"
+## TODO: rewrite
+#rule intAgg_stats:
+#    input:
+#        Limdat='{}/limdat.LG.RData'.format(get_outdir("limma")),
+#        intList=intList,
+#        refG=genome_fasta,
+#        sampleSheet=sampleSheet,
+#        aux=run_int_aggStats(intList,False)
+#    output:
+#        outFiles=run_int_aggStats(intList,sampleSheet),
+#        sinfo='{}/sessionInfo.txt'.format(get_outdir("aggregate_stats_limma"))
+#    params:
+#        auxshell=lambda wildcards,input:';'.join(['Rscript --no-save --no-restore ' + os.path.join(workflow_rscripts,'WGBSpipe.interval_stats.limma.R ') + os.path.join(outdir,'{}'.format(get_outdir("aggregate_stats_limma"))) + ' ' + li +' '+ aui +' ' + os.path.join(outdir,input.Limdat) + ' '  + input.sampleSheet + ' ' + str(minAbsDiff) + ' ' + str(FDR) + ' ' + os.path.join(workflow_rscripts, "WGBSstats_functions.R")  for li,aui in zip(intList,[os.path.join(outdir,"aux_files",re.sub('.fa',re.sub('.bed','.CpGlist.bed',os.path.basename(x)),os.path.basename(genome_fasta))) for x in intList])])
+#    log:
+#        err="{}/logs/intAgg_stats.err".format(get_outdir("aggregate_stats_limma")),
+#        out="{}/logs/intAgg_stats.out".format(get_outdir("aggregate_stats_limma"))
+#    threads: 1
+#    conda: CONDA_WGBS_ENV
+#    shell: "{params.auxshell} 1>{log.out} 2>{log.err}"
 
 
-# TODO:
-rule intAgg_report:
-    input: 
-        outFiles='{}/sessionInfo.txt'.format(get_outdir("aggregate_stats_limma"))
-    output:
-        html='{}/Stats_report.html'.format(get_outdir("aggregate_stats_limma"))
-    params:
-        statdir=os.path.join(outdir,'{}'.format(get_outdir("aggregate_stats_limma"))),
-        sampleSheet=sampleSheet,
-        importfunc = os.path.join(workflow_rscripts, "WGBSstats_functions.R"),
-        stat_cat="user_intervals",
-        rmd_in=os.path.join(workflow_rscripts,"WGBS_stats_report_template.Rmd"),
-        rmd_out=os.path.join(outdir,"aux_files", "WGBS_stats_report_template.Rmd"),
-        outFull=lambda wildcards,output: os.path.join(outdir,output.html)
-    log:
-        err='{}/logs/stats_report.err'.format(get_outdir("aggregate_stats_limma")),
-        out='{}/logs/stats_report.out'.format(get_outdir("aggregate_stats_limma"))
-    conda: CONDA_RMD_ENV
-    threads: 1
-    shell: "cp -v {params.rmd_in} {params.rmd_out} ;Rscript -e 'rmarkdown::render(\"{params.rmd_out}\", params=list(outdir=\"{params.statdir}\", input_func=\"{params.importfunc}\", stat_category=\"{params.stat_cat}\",sample_sheet=\"{params.sampleSheet}\"), output_file=\"{params.outFull}\")' 1>{log.out} 2>{log.err}"
+## TODO:
+#rule intAgg_report:
+#    input: 
+#        outFiles='{}/sessionInfo.txt'.format(get_outdir("aggregate_stats_limma"))
+#    output:
+#        html='{}/Stats_report.html'.format(get_outdir("aggregate_stats_limma"))
+#    params:
+#        statdir=os.path.join(outdir,'{}'.format(get_outdir("aggregate_stats_limma"))),
+#        sampleSheet=sampleSheet,
+#        importfunc = os.path.join(workflow_rscripts, "WGBSstats_functions.R"),
+#        stat_cat="user_intervals",
+#        rmd_in=os.path.join(workflow_rscripts,"WGBS_stats_report_template.Rmd"),
+#        rmd_out=os.path.join(outdir,"aux_files", "WGBS_stats_report_template.Rmd"),
+#        outFull=lambda wildcards,output: os.path.join(outdir,output.html)
+#    log:
+#        err='{}/logs/stats_report.err'.format(get_outdir("aggregate_stats_limma")),
+#        out='{}/logs/stats_report.out'.format(get_outdir("aggregate_stats_limma"))
+#    conda: CONDA_RMD_ENV
+#    threads: 1
+#    shell: "cp -v {params.rmd_in} {params.rmd_out} ;Rscript -e 'rmarkdown::render(\"{params.rmd_out}\", params=list(outdir=\"{params.statdir}\", input_func=\"{params.importfunc}\", stat_category=\"{params.stat_cat}\",sample_sheet=\"{params.sampleSheet}\"), output_file=\"{params.outFull}\")' 1>{log.out} 2>{log.err}"
 
 
 rule bedGraphToBigWig:
