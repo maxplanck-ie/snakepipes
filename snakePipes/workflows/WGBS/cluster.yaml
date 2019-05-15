@@ -1,3 +1,5 @@
+bwameth:
+    memory: 2G
 metileneReport:
     memory: 6G
 DepthOfCov:
