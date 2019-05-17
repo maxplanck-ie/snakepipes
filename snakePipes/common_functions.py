@@ -374,7 +374,7 @@ def checkCommonArguments(args, baseDir, outDir=False, createIndices=False):
                 else:
                     sys.exit("\nError! Working-dir (-d) dir not found! ({})\n".format(args.workingdir))
             args.outdir = args.workingdir
-    args.cluster_logs_dir = os.path.join(args.outdir, "cluster_logs")
+    #args.cluster_logs_dir = os.path.join(args.outdir, "cluster_logs")
     # 2. Sample info file
     if 'sampleSheet' in args and args.sampleSheet:
         args.sampleSheet = check_sample_info_header(args.sampleSheet)
@@ -400,7 +400,7 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
     snakemake_path = os.path.dirname(os.path.abspath(callingScript))
 
     # Ensure the log directory exists
-    os.makedirs(args.cluster_logs_dir, exist_ok=True)
+    #os.makedirs(args.cluster_logs_dir, exist_ok=True)
 
     # save to configs.yaml in outdir
     config = defaults
@@ -414,6 +414,9 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
     if args.cluster_configfile:
         user_cluster_config = load_configfile(args.cluster_configfile, False)
         cluster_config = merge_dicts(cluster_config, user_cluster_config)  # merge/override variables from user_config.yaml
+    if "logDir" in cluster_config["__default__"]:
+        os.makedirs(cluster_config["__default__"]["logDir"], exist_ok=True)
+
     write_configfile(os.path.join(args.outdir, '{}.cluster_config.yaml'.format(workflowName)), cluster_config)
 
     # Save the organism YAML file as {PIPELINE}_organism.yaml
@@ -457,9 +460,7 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
     if not args.local:
         snakemake_cmd += ["--cluster-config",
                           os.path.join(args.outdir, '{}.cluster_config.yaml'.format(workflowName)),
-                          "--cluster", "'" + cluster_config["snakemake_cluster_cmd"],
-                          args.cluster_logs_dir, "--name {rule}.snakemake'"]
-
+                          "--cluster", "'" + cluster_config["snakemake_cluster_cmd"],"'"]
     return snakemake_cmd
 
 
