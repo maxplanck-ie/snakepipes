@@ -2,6 +2,7 @@ snakePipes News
 ===============
 
 snakePipes 1.2.1
+----------------
 
  * Fixed a typo in ``createIndices``.
  * Implemented complex experimental design in RNAseq (differential gene expression), ChIP/ATACseq (differential binding).
