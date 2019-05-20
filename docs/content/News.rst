@@ -1,6 +1,10 @@
 snakePipes News
 ===============
 
+snakePipes 1.2.1
+
+ * Fixed a typo in ``createIndices``.
+
 snakePipes 1.2.0
 ----------------
 
