@@ -158,7 +158,7 @@ rule all:
 ### execute after workflow finished ############################################
 ################################################################################
 onsuccess:
-    cf.cleanLogs(workingdir)
+    cf.cleanLogs(workingdir,cluster_config)
     if "verbose" in config and config["verbose"]:
         print("\n--- ChIP-seq workflow finished successfully! -----------------------------------\n")
 
