@@ -1,10 +1,8 @@
 snakemake_latency_wait: 300
-snakemake_cluster_cmd: module load slurm; SlurmEasy --mem-per-cpu {cluster.memory} --threads {threads} --log {logDir} --name {rule}.snakemake
+snakemake_cluster_cmd: module load slurm; SlurmEasy --mem-per-cpu {cluster.memory} --threads {threads} --log {snakePipes_cluster_logDir} --name {rule}.snakemake
+snakePipes_cluster_logDir: cluster_logs
 __default__:
     memory: 1G
-    ## key "logDir" is checked if present in common_funtions.commonYAMLandLogs() 
-    ## and directory is created in wrapper before snakemake execution 
-    logDir: cluster_logs
 FASTQdownsample:
     memory: 3G
 snp_split:

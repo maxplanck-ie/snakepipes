@@ -250,14 +250,15 @@ def checkAlleleParams(args):
     return allele_mode
 
 
-def cleanLogs(d):
+def cleanLogs(d,cluster_config):
     """
     Remove all empty log files, both in cluster_logs/ and */logs/
     """
-    for f in glob.glob(os.path.join(d, "cluster_logs", "*")):
-        s = os.stat(f)
-        if s.st_size == 0:
-            os.remove(f)
+    if "snakePipes_cluster_logDir" in cluster_config:
+        for f in glob.glob(os.path.join(d, cluster_config["snakePipes_cluster_logDir"], "*")):
+            s = os.stat(f)
+            if s.st_size == 0:
+                os.remove(f)
     for f in glob.glob(os.path.join(d, "*", "logs", "*")):
         s = os.stat(f)
         if s.st_size == 0:
@@ -374,7 +375,6 @@ def checkCommonArguments(args, baseDir, outDir=False, createIndices=False):
                 else:
                     sys.exit("\nError! Working-dir (-d) dir not found! ({})\n".format(args.workingdir))
             args.outdir = args.workingdir
-    # args.cluster_logs_dir = os.path.join(args.outdir, "cluster_logs")
     # 2. Sample info file
     if 'sampleSheet' in args and args.sampleSheet:
         args.sampleSheet = check_sample_info_header(args.sampleSheet)
@@ -399,9 +399,6 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
     workflowName = os.path.basename(callingScript)
     snakemake_path = os.path.dirname(os.path.abspath(callingScript))
 
-    # Ensure the log directory exists
-    # os.makedirs(args.cluster_logs_dir, exist_ok=True)
-
     # save to configs.yaml in outdir
     config = defaults
     config.update(vars(args))  # This allows modifications of args after handling a user config file to still make it to the YAML given to snakemake!
@@ -414,9 +411,17 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
     if args.cluster_configfile:
         user_cluster_config = load_configfile(args.cluster_configfile, False)
         cluster_config = merge_dicts(cluster_config, user_cluster_config)  # merge/override variables from user_config.yaml
-    if "logDir" in cluster_config["__default__"]:
-        os.makedirs(cluster_config["__default__"]["logDir"], exist_ok=True)
-
+    # Ensure the log directory exists
+    if re.search("\{snakePipes_cluster_logDir\}",cluster_config["snakemake_cluster_cmd"]):
+        if "snakePipes_cluster_logDir" in cluster_config:
+            if re.search("^/",cluster_config["snakePipes_cluster_logDir"]):
+                os.makedirs(cluster_config["snakePipes_cluster_logDir"], exist_ok=True)
+            else:
+                os.makedirs(os.path.join(args.outdir,cluster_config["snakePipes_cluster_logDir"]), exist_ok=True)         
+            cluster_config["snakemake_cluster_cmd"] = re.sub("\{snakePipes_cluster_logDir\}",cluster_config["snakePipes_cluster_logDir"],cluster_config["snakemake_cluster_cmd"])
+        else:
+            sys.exit("\nPlease provide a key 'snakePipes_cluster_logDir' and value in the cluster configuration file!\n")
+            
     write_configfile(os.path.join(args.outdir, '{}.cluster_config.yaml'.format(workflowName)), cluster_config)
 
     # Save the organism YAML file as {PIPELINE}_organism.yaml
@@ -458,12 +463,9 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
         snakemake_cmd.append("--printshellcmds")
 
     if not args.local:
-        cluster_cmd = cluster_config["snakemake_cluster_cmd"]
-        if re.search("{logDir}",cluster_cmd):
-            cluster_cmd = re.sub("{logDir}",cluster_config["__default__"]["logDir"])
         snakemake_cmd += ["--cluster-config",
                           os.path.join(args.outdir, '{}.cluster_config.yaml'.format(workflowName)),
-                          "--cluster", "'" + cluster_cmd, "'"]
+                          "--cluster", "'" + cluster_config["snakemake_cluster_cmd"], "'"]
     return snakemake_cmd
 
 
