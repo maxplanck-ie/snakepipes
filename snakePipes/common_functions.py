@@ -374,7 +374,7 @@ def checkCommonArguments(args, baseDir, outDir=False, createIndices=False):
                 else:
                     sys.exit("\nError! Working-dir (-d) dir not found! ({})\n".format(args.workingdir))
             args.outdir = args.workingdir
-    #args.cluster_logs_dir = os.path.join(args.outdir, "cluster_logs")
+    # args.cluster_logs_dir = os.path.join(args.outdir, "cluster_logs")
     # 2. Sample info file
     if 'sampleSheet' in args and args.sampleSheet:
         args.sampleSheet = check_sample_info_header(args.sampleSheet)
@@ -400,7 +400,7 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
     snakemake_path = os.path.dirname(os.path.abspath(callingScript))
 
     # Ensure the log directory exists
-    #os.makedirs(args.cluster_logs_dir, exist_ok=True)
+    # os.makedirs(args.cluster_logs_dir, exist_ok=True)
 
     # save to configs.yaml in outdir
     config = defaults
@@ -458,9 +458,12 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
         snakemake_cmd.append("--printshellcmds")
 
     if not args.local:
+        cluster_cmd = cluster_config["snakemake_cluster_cmd"]
+        if re.search("{logDir}",cluster_cmd):
+            cluster_cmd = re.sub("{logDir}",cluster_config["__default__"]["logDir"])
         snakemake_cmd += ["--cluster-config",
                           os.path.join(args.outdir, '{}.cluster_config.yaml'.format(workflowName)),
-                          "--cluster", "'" + cluster_config["snakemake_cluster_cmd"],"'"]
+                          "--cluster", "'" + cluster_cmd, "'"]
     return snakemake_cmd
 
 
