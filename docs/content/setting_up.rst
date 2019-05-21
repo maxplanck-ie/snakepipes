@@ -222,11 +222,14 @@ option must be changed to match your needs (see table below). Whatever command y
 a ``{cluster.memory}`` option and a ``{threads}`` option. You can specify other required options here as well. 
 The ``snakemake_latency_wait`` value defines how long snakemake should wait for files to appear 
 before throwing an error. The default of 300 seconds is typically reasonable when a file system such as 
-`NFS <https://en.wikipedia.org/wiki/Network_File_System>`__ is in use.
+`NFS <https://en.wikipedia.org/wiki/Network_File_System>`__ is in use. Please also note that there are additional memory 
+settings for each workflow in ``snakePipes/workflows/[workflow]/cluster.yaml`` that you might need to adjust. 
+Upon execution, these files are merged.
 
-``snakePipes_cluster_logDir:`` is given separate to make sure the directory exists before execution. 
-A relative path is relative to the ouput directory of the workflow. If you want, you can also give a 
-absolute log directory.
+``snakePipes_cluster_logDir:`` can be used like a wildcard in `snakemake_cluster_cmd` to specify the directory 
+for the stdout and stderr files from a job that is running on the cluster. This is given separate to make sure 
+the directory exists before execution. A relative path is treated relative to the ouput directory of the workflow. 
+If you want, you can also give an absolute log directory starting with /.
 
 ==================== ======================================================================================
  Scheduler/Queuing        snakemake_cluster_cmd example                                                                                                    
