@@ -255,7 +255,10 @@ def cleanLogs(d, cluster_config):
     Remove all empty log files, both in cluster_logs/ and */logs/
     """
     if "snakePipes_cluster_logDir" in cluster_config:
-        for f in glob.glob(os.path.join(d, cluster_config["snakePipes_cluster_logDir"], "*")):
+        path = os.path.join(d, cluster_config["snakePipes_cluster_logDir"], "*")
+        if re.search("^/", cluster_config["snakePipes_cluster_logDir"]):
+            path = os.path.join(cluster_config["snakePipes_cluster_logDir"], "*")
+        for f in glob.glob(path):
             s = os.stat(f)
             if s.st_size == 0:
                 os.remove(f)

@@ -134,6 +134,6 @@ rule all:
 ### execute after workflow finished ############################################
 ################################################################################
 onsuccess:
-    cf.cleanLogs(outdir)
+    cf.cleanLogs(outdir, cluster_config)
     if "verbose" in config and config["verbose"]:
         print("\n--- scRNAseq workflow finished successfully! --------------------------------\n")
