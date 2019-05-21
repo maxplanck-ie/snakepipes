@@ -1,6 +1,15 @@
 snakePipes News
 ===============
 
+snakePipes 1.2.1
+----------------
+
+ * Fixed a typo in ``createIndices``.
+ * Implemented complex experimental design in RNAseq (differential gene expression), ChIP/ATACseq (differential binding).
+ * Fixed an issue with ggplot2 and log transformation in RNAseq report Rmd.
+ * fastqc folder is created and its content will be added to multiqc only if fastqc flag is called.
+ * fastqc-trimmed folder is created and its content will be added to multiqc only if both fastqc and trim flags are called. 
+
 snakePipes 1.2.0
 ----------------
 
@@ -40,7 +49,7 @@ snakePipes 1.1.0
    * Automatic reports are generated in every folder containing results of statistical analysis (single CpG stats, metilene DMR stats, user interval aggregate stats), as long as sample sheet is provided.
    * R sessionInfo() is now printed at the end of the statistical analysis.
 
- * scRNAseq: 
+ * scRNAseq:
 
    * An extention to the pipeline now takes the processed csv file from Results folder as input and runs cell filtering with a range of total transcript thresholds using monocle and subsequently runs clustering, produces tsne visualizations, calculates top 2 and top10 markers per cluster and produces heatmap visualizations for these using monocle/seurat. If the skipRaceID flag is set to False (default), all of the above are also executed using RaceID.
    * Stats reports were implemented for RaceID and Monocle/Seurat so that folders Filtered_cells_RaceID and Filtered_cells_monocle now contain a Stats_report.html.
@@ -49,7 +58,7 @@ snakePipes 1.1.0
 
  * all sample sheets now need to have a "name" and a "condition" column, that was not consistent before
  * consistent --sampleSheet [FILE] options to invoke differential analysis mode (RNA-seq, ChIP-seq, ATAC-seq), --DE/--DB were dropped
- 
+
 snakePipes 1.0.0 (king cobra) released
 --------------------------------------
 
