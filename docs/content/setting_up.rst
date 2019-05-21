@@ -208,7 +208,8 @@ Configure your cluster
 The ``cluster.yaml`` file contains both the default memory requirements as well as two options passed to snakemake that control how jobs are submitted to the cluster and files are retrieved::
 
     snakemake_latency_wait: 300
-    snakemake_cluster_cmd: module load slurm; SlurmEasy --mem-per-cpu {cluster.memory} --threads {threads} --log
+    snakemake_cluster_cmd: module load slurm; SlurmEasy --mem-per-cpu {cluster.memory} --threads {threads} --log {snakePipes_cluster_logDir} --name {rule}.snakemake 
+    snakePipes_cluster_logDir: cluster_logs
     __default__:
         memory: 8G
     snp_split:
@@ -216,7 +217,26 @@ The ``cluster.yaml`` file contains both the default memory requirements as well 
 
 If you have cloned the repository locally, the file is located under ``snakePipes/shared/``.
 
-You can change the default per-core memory allocation if needed here. Importantly, the ``snakemake_cluster_cmd`` option must be changed to match your needs. Whatever command you specify must include a ``{cluster.memory}`` option and a ``{threads}`` option. You can specify other required options here as well. The ``snakemake_latency_wait`` value defines how long snakemake should wait for files to appear before throwing an error. The default of 300 seconds is typically reasonable when a file system such as `NFS <https://en.wikipedia.org/wiki/Network_File_System>`__ is in use.
+You can change the default per-core memory allocation if needed here. Importantly, the ``snakemake_cluster_cmd`` 
+option must be changed to match your needs. Whatever command you specify must include a ``{cluster.memory}`` 
+option and a ``{threads}`` option. You can specify other required options here as well. 
+The ``snakemake_latency_wait`` value defines how long snakemake should wait for files to appear 
+before throwing an error. The default of 300 seconds is typically reasonable when a file system such as 
+`NFS <https://en.wikipedia.org/wiki/Network_File_System>`__ is in use.
+
++------------------------------+--------------------------------------------------------------------------------------------------------------------------------+
+| Scheduler/Queuing            |                cmd examples                                                                                                    |
++==============================+================================================================================================================================+
+|`slurm`                       |  ```module load slurm; SlurmEasy --mem-per-cpu {cluster.memory}                                                                |
+|                              |  --threads {threads} --log {snakePipes_cluster_logDir} --name {rule}.snakemake```                                              |
++------------------------------+--------------------------------------------------------------------------------------------------------------------------------+
+|`PBS/Torque`                  | module load slurm; SlurmEasy --mem-per-cpu {cluster.memory}                                                                    |
+|                              |  --threads {threads} --log {snakePipes_cluster_logDir} --name {rule}.snakemake                                                 |
++------------------------------+--------------------------------------------------------------------------------------------------------------------------------+
+|`SGE`                         | Use the DNA mapping output and run ChIP/Input normalization                                                                    |
+|                              | and peak calling                                                                                                               |
++------------------------------+--------------------------------------------------------------------------------------------------------------------------------+
+
 
 .. _workflowOpts:
 

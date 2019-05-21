@@ -250,7 +250,7 @@ def checkAlleleParams(args):
     return allele_mode
 
 
-def cleanLogs(d,cluster_config):
+def cleanLogs(d, cluster_config):
     """
     Remove all empty log files, both in cluster_logs/ and */logs/
     """
@@ -411,17 +411,16 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
     if args.cluster_configfile:
         user_cluster_config = load_configfile(args.cluster_configfile, False)
         cluster_config = merge_dicts(cluster_config, user_cluster_config)  # merge/override variables from user_config.yaml
-    # Ensure the log directory exists
-    if re.search("\{snakePipes_cluster_logDir\}",cluster_config["snakemake_cluster_cmd"]):
+    # Ensure the cluster log directory exists
+    if re.search("\\{snakePipes_cluster_logDir\\}", cluster_config["snakemake_cluster_cmd"]):
         if "snakePipes_cluster_logDir" in cluster_config:
-            if re.search("^/",cluster_config["snakePipes_cluster_logDir"]):
+            if re.search("^/", cluster_config["snakePipes_cluster_logDir"]):
                 os.makedirs(cluster_config["snakePipes_cluster_logDir"], exist_ok=True)
             else:
-                os.makedirs(os.path.join(args.outdir,cluster_config["snakePipes_cluster_logDir"]), exist_ok=True)         
-            cluster_config["snakemake_cluster_cmd"] = re.sub("\{snakePipes_cluster_logDir\}",cluster_config["snakePipes_cluster_logDir"],cluster_config["snakemake_cluster_cmd"])
+                os.makedirs(os.path.join(args.outdir, cluster_config["snakePipes_cluster_logDir"]), exist_ok=True)
+            cluster_config["snakemake_cluster_cmd"] = re.sub("\\{snakePipes_cluster_logDir\\}", cluster_config["snakePipes_cluster_logDir"], cluster_config["snakemake_cluster_cmd"])
         else:
             sys.exit("\nPlease provide a key 'snakePipes_cluster_logDir' and value in the cluster configuration file!\n")
-            
     write_configfile(os.path.join(args.outdir, '{}.cluster_config.yaml'.format(workflowName)), cluster_config)
 
     # Save the organism YAML file as {PIPELINE}_organism.yaml
