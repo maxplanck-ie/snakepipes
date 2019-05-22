@@ -31,7 +31,9 @@ if trim:
 
 # BAM filtering
 include: os.path.join(maindir, "shared", "rules", "bam_filtering.snakefile")
-
+#umi_tools dedup
+if umidedup:
+    include: os.path.join(maindir, "shared", "rules", "umi_tools.snakefile")
 #Sambamba Markdup
 include: os.path.join(maindir, "shared", "rules", "sambamba.snakefile")
 
