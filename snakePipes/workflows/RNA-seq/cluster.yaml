@@ -19,4 +19,4 @@ DESeq2:
 DESeq2_Salmon:
     memory: 3G
 create_snpgenome:
-    memory: 10G
+    memory: 30G
