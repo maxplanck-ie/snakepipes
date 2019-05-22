@@ -134,3 +134,7 @@ onsuccess:
     cf.write_configfile(yamlPath, organismDictionary)
     if "verbose" in config and config["verbose"]:
         print("\n--- index creation workflow finished successfully! --------------------------------\n")
+
+onerror:
+    print("\n !!! ERROR in index creation workflow! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
+

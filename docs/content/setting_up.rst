@@ -224,7 +224,6 @@ The ``snakemake_latency_wait`` value defines how long snakemake should wait for 
 before throwing an error. The default of 300 seconds is typically reasonable when a file system such as 
 `NFS <https://en.wikipedia.org/wiki/Network_File_System>`__ is in use. Please also note that there are additional memory 
 settings for each workflow in ``snakePipes/workflows/[workflow]/cluster.yaml`` that you might need to adjust. 
-Upon execution, these files are merged.
 
 ``snakePipes_cluster_logDir:`` can be used like a wildcard in `snakemake_cluster_cmd` to specify the directory 
 for the stdout and stderr files from a job that is running on the cluster. This is given separate to make sure 

@@ -76,10 +76,6 @@ else:
 ### conditional/optional rules #################################################
 ################################################################################
 
-idxRange = 1
-if paired:
-    idxRange = 2
-
 def run_FastQC(fastqc):
     if fastqc:
         return( expand("FastQC/{sample}{read}_fastqc.html", sample = samples, read = reads[:idxRange]) )
@@ -191,10 +187,13 @@ rule all:
         run_allelesp_mapping(),
         "multiQC/multiqc_report.html"
 
-
 ### execute after workflow finished ############################################
 ################################################################################
 onsuccess:
     cf.cleanLogs(outdir, cluster_config)
     if "verbose" in config and config["verbose"]:
         print("\n--- DNA mapping workflow finished successfully! --------------------------------\n")
+        
+onerror:
+    print("\n !!! ERROR in DNA mapping workflow! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
+

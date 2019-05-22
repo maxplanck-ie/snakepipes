@@ -140,3 +140,7 @@ onsuccess:
     cf.cleanLogs(workingdir, cluster_config)
     if "verbose" in config and config["verbose"]:
         print("\n--- ATAC OpenChrom workflow finished successfully! --------------------------------\n")
+        
+onerror:
+    print("\n !!! ERROR in ATAC OpenChrom workflow! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
+

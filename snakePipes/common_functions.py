@@ -219,6 +219,13 @@ def make_temp_dir(tempdir, fallback_dir, verbose=False):
     return temp_path
 
 
+def remove_temp_dir(tempdir):
+    for f in glob.glob(os.path.join(tempdir, "*")):
+        os.remove(f)
+        print("removed temp file: "+f)
+    shutil.rmtree(tempdir, ignore_errors=True)
+    print("temp dir removed: "+tempdir)
+
 def checkAlleleParams(args):
     # first some sanity checks
     mode = list(map(str.strip, re.split(',|;', args.mode)))
@@ -402,6 +409,8 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
     workflowName = os.path.basename(callingScript)
     snakemake_path = os.path.dirname(os.path.abspath(callingScript))
 
+    os.makedirs(args.outdir, exist_ok=True)
+
     # save to configs.yaml in outdir
     config = defaults
     config.update(vars(args))  # This allows modifications of args after handling a user config file to still make it to the YAML given to snakemake!
@@ -468,7 +477,7 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
         snakemake_cmd += ["--cluster-config",
                           os.path.join(args.outdir, '{}.cluster_config.yaml'.format(workflowName)),
                           "--cluster", "'" + cluster_config["snakemake_cluster_cmd"], "'"]
-    return snakemake_cmd
+    return  " ".join(snakemake_cmd)
 
 
 def logAndExport(args, workflowName):
@@ -485,15 +494,10 @@ def logAndExport(args, workflowName):
     # append the new run number to the file name
     logfile_name = "{}_run-{}.log".format(workflowName, n)
 
-    # create local temp dir and add this path to environment as $TMPDIR variable
-    # on SLURM: $TMPDIR is set, created and removed by SlurmEasy on cluster node
-    temp_path = make_temp_dir(args.tempdir, args.outdir)
-    snakemake_exports = ["export", "TMPDIR='{}'".format(temp_path), "&&"]
-
-    return snakemake_exports, logfile_name, temp_path
+    return logfile_name
 
 
-def runAndCleanup(args, cmd, logfile_name, temp_path):
+def runAndCleanup(args, cmd, logfile_name):
     """
     Actually run snakemake. Kill its child processes on error.
     Also clean up when finished.
@@ -531,12 +535,6 @@ def runAndCleanup(args, cmd, logfile_name, temp_path):
         if args.emailAddress:
             sendEmail(args, p.returncode)
         sys.exit(p.returncode)
-
-    # remove temp dir
-    if (temp_path != "" and os.path.exists(temp_path)):
-        shutil.rmtree(temp_path, ignore_errors=True)
-        if args.verbose:
-            print("Temp directory removed ({})!\n".format(temp_path))
 
     # Send email if desired
     if args.emailAddress:

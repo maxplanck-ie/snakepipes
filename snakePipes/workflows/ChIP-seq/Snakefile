@@ -162,6 +162,9 @@ onsuccess:
     if "verbose" in config and config["verbose"]:
         print("\n--- ChIP-seq workflow finished successfully! -----------------------------------\n")
 
+onerror:
+    print("\n !!! ERROR in ChIP-seq workflow! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
+
 
 ## benchmark ###################################################################
 ## rule benchmark:
