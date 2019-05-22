@@ -26,7 +26,7 @@ if allele_hybrid == 'dual':
         output:
             genome1 = "snp_genome/" + strains[0] + '_SNP_filtering_report.txt',
             genome2 = "snp_genome/" + strains[1] + '_SNP_filtering_report.txt',
-            snpgenome_dir = SNPdir,
+            snpgenome_dir = directory(SNPdir),
             snpfile = snp_file
         params:
             strain1 = strains[0],
@@ -49,7 +49,7 @@ else:
             genome = GENOMEDIR
         output:
             genome1 = "snp_genome/" + strains[0] + '_SNP_filtering_report.txt',
-            snpgenome_dir = SNPdir,
+            snpgenome_dir = directory(SNPdir),
             snpfile = snp_file
         params:
             strain1 = strains[0],
