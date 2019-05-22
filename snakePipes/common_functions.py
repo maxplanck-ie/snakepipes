@@ -219,13 +219,6 @@ def make_temp_dir(tempdir, fallback_dir, verbose=False):
     return temp_path
 
 
-def remove_temp_dir(tempdir):
-    for f in glob.glob(os.path.join(tempdir, "*")):
-        os.remove(f)
-        print("removed temp file: "+f)
-    shutil.rmtree(tempdir, ignore_errors=True)
-    print("temp dir removed: "+tempdir)
-
 def checkAlleleParams(args):
     # first some sanity checks
     mode = list(map(str.strip, re.split(',|;', args.mode)))
@@ -477,7 +470,7 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
         snakemake_cmd += ["--cluster-config",
                           os.path.join(args.outdir, '{}.cluster_config.yaml'.format(workflowName)),
                           "--cluster", "'" + cluster_config["snakemake_cluster_cmd"], "'"]
-    return  " ".join(snakemake_cmd)
+    return " ".join(snakemake_cmd)
 
 
 def logAndExport(args, workflowName):
