@@ -54,7 +54,6 @@ mate_orientation: --fr
 insert_size_max: 1000
 bowtie_opts:
 umidedup: False
-umidedup_tag:
 umidedup_sep: "_"
 umidedup_opts: --paired
 plot_format: png

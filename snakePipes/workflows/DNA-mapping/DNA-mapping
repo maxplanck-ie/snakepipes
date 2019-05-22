@@ -26,8 +26,7 @@ def parse_args(defaults={"verbose": False, "configfile": None,
                          "gcbias": False, "bw_binsize": 25, "mapq": 0,
                          "plot_format": "png", "bowtie_opts": "",
                          "umidedup": False, "umidedup_opts": "",
-                         "umidedup_sep": "_", "umidedup_tag": "",
-                         "mate_orientation": "--fr"}):
+                         "umidedup_sep": "_", "mate_orientation": "--fr"}):
     """
     Parse arguments from the command line.
     """
@@ -69,10 +68,6 @@ def parse_args(defaults={"verbose": False, "configfile": None,
                           help="To run `umi_tools dedup`."
                           "(default: '%(default)s')",
                           default=defaults["umidedup"])
-    optional.add_argument("--umidedup_tag",
-                          help="umi tag that will be passed to umi_tools."
-                          "(default: '%(default)s')",
-                          default=defaults["umidedup_tag"])
 
     optional.add_argument("--umidedup_sep",
                           help="umi separation character "
