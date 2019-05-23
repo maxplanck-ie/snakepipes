@@ -57,6 +57,7 @@ checktable <- function(countdata = NA, sampleSheet = NA, alleleSpecific = FALSE,
         if(alleleSpecific) {
             coln_allelic <- paste(rep(sampleSheet$name, each  = 3), c("all","genome1", "genome2"), sep = "_" )
             countdata <- countdata[,coln_allelic]
+            rownames(sampleSheet)<-NULL
         } else {
             countdata <- countdata[,sampleSheet$name]
         }
