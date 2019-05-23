@@ -66,7 +66,7 @@ makeQCplots_chip(bam.file = last_bam, outplot = "QCplots_last_sample.pdf", pe.pa
 ## merge all peaks from the samples mentioned in sampleinfo to test (exclude those with 'False' in the UseRegions column)
 # get files to read from MACS
 if (!is.null(sampleInfo$UseRegions)){
-    fnames <- sampleInfo$name[sampleInfo$UseRegions]} else {fnames<-sampleInfo$name}
+    fnames <- sampleInfo$name[as.logical(sampleInfo$UseRegions)]} else {fnames<-sampleInfo$name}
 
 allpeaks <- lapply(fnames, function(x) {
     narrow <- paste0("../MACS2/",x,".filtered.BAM_peaks.narrowPeak")
