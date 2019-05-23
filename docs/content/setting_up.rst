@@ -126,9 +126,6 @@ file on our GitHub repository. You can modify it to suite your needs.
 Here are the content of *defaults.yaml*::
 
     snakemake_options: '--use-conda --conda-prefix /data/general/scratch/conda_envs'
-    tempdir: /data/extended/
-
-The ``tempdir`` path should be changed to a suitable directory that can hold the temporary files during pipeline execution.
 
 .. note::
 
