@@ -7,7 +7,7 @@ bamPE_fragment_size:
 HISAT2:
     memory: 6G
 STAR:
-    memory: 30G
+    memory: 6G
 create_annotation_bed:
     memory: 4G
 annotation_bed2fasta:
@@ -22,3 +22,5 @@ create_snpgenome:
     memory: 30G
 star_index:
     memory: 15G
+STAR_allele:
+    memory: 30G
