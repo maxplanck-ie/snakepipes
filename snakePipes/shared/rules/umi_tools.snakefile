@@ -3,8 +3,8 @@ if umibarcode:
     if paired:
         rule umi_extract:
             input:
-                r1 = "FASTQ/downsample_{sample}"+reads[0]+".fastq.gz" if downsample else "originalFASTQ/{sample}"+reads[0]+".fastq.gz",
-                r2 = "FASTQ/downsample_{sample}"+reads[1]+".fastq.gz" if downsample else "originalFASTQ/{sample}"+reads[1]+".fastq.gz"
+                r1 = "originalFASTQ/downsample_{sample}"+reads[0]+".fastq.gz" if downsample else "originalFASTQ/{sample}"+reads[0]+".fastq.gz",
+                r2 = "originalFASTQ/downsample_{sample}"+reads[1]+".fastq.gz" if downsample else "originalFASTQ/{sample}"+reads[1]+".fastq.gz"
             output:
                 r1 = "FASTQ/{sample}"+reads[0]+".fastq.gz",
                 r2 = "FASTQ/{sample}"+reads[1]+".fastq.gz"
@@ -23,7 +23,7 @@ if umibarcode:
     else:
         rule umi_extract:
             input:
-                r1 = "FASTQ/downsample_{sample}"+reads[0]+".fastq.gz" if downsample else "originalFASTQ/{sample}"+reads[0]+".fastq.gz",
+                r1 = "originalFASTQ/downsample_{sample}"+reads[0]+".fastq.gz" if downsample else "originalFASTQ/{sample}"+reads[0]+".fastq.gz",
             output:
                 r1 = "FASTQ/{sample}"+reads[0]+".fastq.gz",
             params:
@@ -41,7 +41,7 @@ if umibarcode:
 else:
     rule FASTQ1:
           input:
-              "FASTQ/downsample_{sample}"+reads[0]+".fastq.gz" if downsample else "originalFASTQ/{sample}"+reads[0]+".fastq.gz"
+              "originalFASTQ/downsample_{sample}"+reads[0]+".fastq.gz" if downsample else "originalFASTQ/{sample}"+reads[0]+".fastq.gz"
           output:
               "FASTQ/{sample}"+reads[0]+".fastq.gz"
           shell:
@@ -49,7 +49,7 @@ else:
 
     rule FASTQ2:
           input:
-              "FASTQ/downsample_{sample}"+reads[1]+".fastq.gz" if downsample else "originalFASTQ/{sample}"+reads[1]+".fastq.gz"
+              "originalFASTQ/downsample_{sample}"+reads[1]+".fastq.gz" if downsample else "originalFASTQ/{sample}"+reads[1]+".fastq.gz"
           output:
               "FASTQ/{sample}"+reads[1]+".fastq.gz"
           shell:

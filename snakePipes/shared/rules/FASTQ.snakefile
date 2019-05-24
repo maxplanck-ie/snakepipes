@@ -21,8 +21,8 @@ if downsample:
                 r1 = "originalFASTQ/{sample}"+reads[0]+".fastq.gz",
                 r2 = "originalFASTQ/{sample}"+reads[1]+".fastq.gz"
             output:
-                r1 = temp("FASTQ/downsample_{sample}"+reads[0]+".fastq.gz"),
-                r2 = temp("FASTQ/downsample_{sample}"+reads[1]+".fastq.gz")
+                r1 = temp("originalFASTQ/downsample_{sample}"+reads[0]+".fastq.gz"),
+                r2 = temp("originalFASTQ/downsample_{sample}"+reads[1]+".fastq.gz")
             params:
                 num_reads = downsample
             benchmark:
@@ -38,7 +38,7 @@ if downsample:
             input:
                 "originalFASTQ/{sample}.fastq.gz"
             output:
-                fq = temp("FASTQ/downsample_{sample}.fastq.gz"),
+                fq = temp("originalFASTQ/downsample_{sample}.fastq.gz"),
             threads: 12
             params:
                 num_reads = downsample
