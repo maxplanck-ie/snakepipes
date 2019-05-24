@@ -1,4 +1,4 @@
-rule FASTQ1:
+rule origFASTQ1:
       input:
           indir+"/{sample}"+reads[0]+ext
       output:
@@ -6,7 +6,7 @@ rule FASTQ1:
       shell:
           "( [ -f {output} ] || ln -s -r {input} {output} )"
 
-rule FASTQ2:
+rule origFASTQ2:
       input:
           indir+"/{sample}"+reads[1]+ext
       output:

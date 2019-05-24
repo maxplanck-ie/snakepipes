@@ -31,9 +31,9 @@ if trim:
 
 # BAM filtering
 include: os.path.join(maindir, "shared", "rules", "bam_filtering.snakefile")
+
 #umi_tools extract and dedup
-if umidedup or umibarcode:
-    include: os.path.join(maindir, "shared", "rules", "umi_tools.snakefile")
+include: os.path.join(maindir, "shared", "rules", "umi_tools.snakefile")
 #Sambamba Markdup
 include: os.path.join(maindir, "shared", "rules", "sambamba.snakefile")
 
@@ -182,16 +182,16 @@ rule all:
         run_FastQC(fastqc),
         run_Trimming(trim, fastqc),
         expand(mapping_prg+"/{sample}.bam", sample = samples),
-        expand("Sambamba/{sample}.markdup.txt", sample = samples),
-        expand("filtered_bam/{sample}.filtered.bam", sample = samples),
-        expand("bamCoverage/{sample}.seq_depth_norm.bw", sample = samples),
-        expand("bamCoverage/{sample}.filtered.seq_depth_norm.bw", sample = samples),
-        run_computeGCBias(gcbias),
-        run_deepTools_qc(),
-        run_Qualimap(),
-        make_nmasked_genome(),
-        run_allelesp_mapping(),
-        "multiQC/multiqc_report.html"
+    #    expand("Sambamba/{sample}.markdup.txt", sample = samples),
+    #    expand("filtered_bam/{sample}.filtered.bam", sample = samples),
+    #    expand("bamCoverage/{sample}.seq_depth_norm.bw", sample = samples),
+    #    expand("bamCoverage/{sample}.filtered.seq_depth_norm.bw", sample = samples),
+    #    run_computeGCBias(gcbias),
+    #    run_deepTools_qc(),
+    #    run_Qualimap(),
+    #    make_nmasked_genome(),
+    #    run_allelesp_mapping(),
+    #    "multiQC/multiqc_report.html"
 
 
 ### execute after workflow finished ############################################
