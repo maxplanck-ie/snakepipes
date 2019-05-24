@@ -53,7 +53,8 @@ else:
             snpfile = snp_file
         params:
             strain1 = strains[0],
-            SNPpath = os.path.abspath(VCFfile)
+            SNPpath = os.path.abspath(VCFfile),
+            temp_out="snp_genome/all_SNPs_" + strains[0] + "_GRCm38.txt.gz"
         log:
             out = "SNPsplit_createSNPgenome.out",
             err = "SNPsplit_createSNPgenome.err"
@@ -63,8 +64,8 @@ else:
             " SNPsplit_genome_preparation"
             " --genome_build {BASENAME}"
             " --reference_genome {input.genome} --vcf_file {params.SNPpath}"
-            " --strain {params.strain1} > {log.out} 2> {log.err}"
-            "&& cd ../"
+            " --strain {params.strain1} > {log.out} 2> {log.err}; ln -s {params.temp_out} {output.snpfile}"
+            " && cd ../"
 
 if mapping_prg == "STAR":
     rule star_index:
