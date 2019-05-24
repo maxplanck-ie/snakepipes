@@ -122,7 +122,7 @@ rule all:
 ### execute after workflow finished ############################################
 ################################################################################
 onsuccess:
-    cf.cleanLogs(outdir)
+    cf.cleanLogs(outdir, cluster_config)
     f = open(os.path.join(outdir, "genome_fasta", "effectiveSize"))
     organismDictionary['genome_size'] = int(f.read().strip())
     f.close()
@@ -134,3 +134,7 @@ onsuccess:
     cf.write_configfile(yamlPath, organismDictionary)
     if "verbose" in config and config["verbose"]:
         print("\n--- index creation workflow finished successfully! --------------------------------\n")
+
+onerror:
+    print("\n !!! ERROR in index creation workflow! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
+

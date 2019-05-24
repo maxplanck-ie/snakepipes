@@ -43,13 +43,15 @@ if mapping_prg.upper().find("HISAT2") >=0:
             threads: 10
             conda: CONDA_RNASEQ_ENV
             shell: """
+                MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX);
                 hisat2 -p {threads} {params.hisat_options} \
                     {params.lib_type} -x {params.idx} \
                     --known-splicesite-infile {params.input_splice} \
                     -1 {input.r1} -2 {input.r2} \
                     --novel-splicesite-outfile {output.splice} \
                     --met-file {output.met} 2> {output.align_summary} \
-                | samtools sort -m {params.samsort_memory} -T ${{TMPDIR}}{wildcards.sample} -@ {threads} -O bam -o {output.bam} -
+                | samtools sort -m {params.samsort_memory} -T $MYTEMP/{wildcards.sample} -@ {threads} -O bam -o {output.bam} -;
+                rm -rf $MYTEMP
                 """
     else:
         rule HISAT2:
@@ -71,13 +73,15 @@ if mapping_prg.upper().find("HISAT2") >=0:
             threads: 10
             conda: CONDA_RNASEQ_ENV
             shell: """
+                MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX);
                 hisat2 -p {threads} {params.hisat_options} \
                     {params.lib_type} -x {params.idx} \
                     --known-splicesite-infile {params.input_splice} \
                     -U {input[0]} \
                     --novel-splicesite-outfile {output.splice} \
                     --met-file {output.met} 2> {output.align_summary} \
-                | samtools sort -m {params.samsort_memory} -T ${{TMPDIR}}{wildcards.sample} -@ {threads} -O bam -o {output.bam} -
+                | samtools sort -m {params.samsort_memory} -T $MYTEMP/{wildcards.sample} -@ {threads} -O bam -o {output.bam} -;
+                rm -rf $MYTEMP
                 """
 elif mapping_prg.upper().find("STAR") >=0:
     if paired:
@@ -99,6 +103,7 @@ elif mapping_prg.upper().find("STAR") >=0:
             threads: 20  # 3.2G per core
             conda: CONDA_RNASEQ_ENV
             shell: """
+                MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX);
                 ( [ -d {params.sample_dir} ] || mkdir -p {params.sample_dir} )
                 STAR --runThreadN {threads} \
                     {params.star_options} \
@@ -111,7 +116,8 @@ elif mapping_prg.upper().find("STAR") >=0:
                     --genomeDir {params.index} \
                     --readFilesIn {input.r1} {input.r2} \
                     --outFileNamePrefix {params.prefix} \
-                | samtools sort -m {params.samsort_memory} -T ${{TMPDIR}}{wildcards.sample} -@ {threads} -O bam -o {output.bam} -
+                | samtools sort -m {params.samsort_memory} -T $MYTEMP/{wildcards.sample} -@ {threads} -O bam -o {output.bam} -;
+                rm -rf $MYTEMP
                 """
     else:
         rule STAR:
@@ -131,6 +137,7 @@ elif mapping_prg.upper().find("STAR") >=0:
             threads: 20  # 3.2G per core
             conda: CONDA_RNASEQ_ENV
             shell: """
+                MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX);
                 ( [ -d {params.sample_dir} ] || mkdir -p {params.sample_dir} )
                 STAR --runThreadN {threads} \
                     {params.star_options} \
@@ -143,5 +150,6 @@ elif mapping_prg.upper().find("STAR") >=0:
                     --genomeDir {params.index} \
                     --readFilesIn {input} \
                     --outFileNamePrefix {params.prefix} \
-                | samtools sort -m {params.samsort_memory} -T ${{TMPDIR}}{wildcards.sample} -@ {threads} -O bam -o {output.bam} -
+                | samtools sort -m {params.samsort_memory} -T $MYTEMP/{wildcards.sample} -@ {threads} -O bam -o {output.bam} -;
+                rm -rf $MYTEMP
                 """
