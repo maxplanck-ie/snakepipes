@@ -26,7 +26,8 @@ def parse_args(defaults={"verbose": False, "configfile": None,
                          "gcbias": False, "bw_binsize": 25, "mapq": 0,
                          "plot_format": "png", "bowtie_opts": "",
                          "umidedup": False, "umidedup_opts": "",
-                         "umidedup_sep": "_", "mate_orientation": "--fr"}):
+                         "umidedup_sep": "_", "umibarcode": False,
+                         "bcpattern": "", "mate_orientation": "--fr"}):
     """
     Parse arguments from the command line.
     """
@@ -61,6 +62,19 @@ def parse_args(defaults={"verbose": False, "configfile": None,
                           "you may need to escape the first - "
                           "(e.g., '--very-fast'). (default: '%(default)s')",
                           default=defaults["bowtie_opts"])
+
+    optional.add_argument("--umibc",
+                          dest="umibarcode",
+                          action="store_true",
+                          help="To extract umi barcode from fastq file."
+                          "(default: '%(default)s')",
+                          default=defaults["umibarcode"])
+
+    optional.add_argument("--bcpattern",
+                          dest="bcpattern",
+                          help="The pattern to be considered for the barcode."
+                          "(default: '%(default)s')",
+                          default=defaults["bcpattern"])
 
     optional.add_argument("--umidedup",
                           dest="umidedup",
