@@ -1,6 +1,12 @@
 snakePipes News
 ===============
 
+snakePipes 1.2.2
+----------------
+
+ * Fixed a bug in the ATAC-seq environment where GenomeInfoDbData was missing.
+ * Also an occasional issue with CSAW
+
 snakePipes 1.2.1
 ----------------
 
