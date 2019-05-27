@@ -1,6 +1,11 @@
 snakePipes News
 ===============
 
+snakePipes 1.2.3
+----------------
+
+ * Fixed a minor issue with ``createIndices`` wherein the extended GTF file was malformated. If you ran into an issue computing genomic contamination then simply delete the extended GTF file and rerun create indices.
+
 snakePipes 1.2.2
 ----------------
 
