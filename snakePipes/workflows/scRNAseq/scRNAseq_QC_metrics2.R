@@ -152,10 +152,10 @@ sc_dat <- sc_dat %>% group_by(sample) %>% mutate(sample_reads = sum(READS_UNIQFE
 
 num_samples=length(levels(factor(sc_dat$sample)))
 print(num_samples)
-height=1000;
+height=6;
 
 if (num_samples>4){
-	height <- height + (num_samples-4)*50;
+	height <- height + as.integer(max(1,as.integer(num_samples/2)-2) * 1.5);
 }
 
 print(height)
@@ -193,14 +193,14 @@ if (!is.null(plot_format)){
 	ggsave(plot=p,filename=paste(out_prefix,".plate_cRPM.",plot_format,sep=""),device=plot_format,dpi=200)
 }
 
-
+print("here")
 p<-ggplot(sc_dat,aes(x=x,y=y,fill=UMI))+ 
 		geom_tile() + 
 		facet_wrap(~sample,ncol = libs_per_plate,scales = "free") + 
 		#scale_fill_gradient2(low="red",mid="blue",high="cyan",limits=c(min(sc_dat$cell_transcripts),max(sc_dat$cell_transcripts)),midpoint=mean(sc_dat$cell_transcripts,trim=0.05)) + 
 		scale_fill_gradientn(colors=c("red","blue","cyan"),
-				values=rescale(c(0,median(sc_dat$UMI)*0.75,max(sc_dat$UMI))),
-				limits=c(0,max(sc_dat$UMI)),space = "Lab") +
+				values=rescale(c(0,median(sc_dat$UMI)*0.75,quantile(sc_dat$UMI,probs=0.99))),
+				limits=c(0,quantile(sc_dat$UMI,probs=0.99)),space = "Lab",oob=squish) +
     	scale_y_continuous(breaks=-seq(1,15,2),labels = as.character(seq(2,16,2))) +
     	scale_x_continuous(breaks=seq(2,(max(sc_dat$cell_idx-1)%/%16)+1,2),labels = as.character(seq(2,(max(sc_dat$cell_idx-1)%/%16)+1,2))) +
 		theme_minimal() + 
@@ -215,7 +215,7 @@ p<-ggplot(sc_dat,aes(x=x,y=y,fill=UMI))+
 		theme(legend.text = element_text(colour="grey90", size = 16, face = "bold"))
 
 if (!is.null(plot_format)){
-	ggsave(plot=p,filename=paste(out_prefix,".plate_abs_transcripts.",plot_format,sep=""),device=plot_format,dpi=200)
+	ggsave(plot=p,filename=paste(out_prefix,".plate_abs_transcripts.",plot_format,sep=""),device=plot_format,dpi=200,height=height)
 }
 
 
