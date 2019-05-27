@@ -16,11 +16,20 @@ import snakePipes.common_functions as cf
 import snakePipes.parserCommon as parserCommon
 
 
-def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfile": None, "max_jobs": 5, "snakemake_options": "--use-conda", "tempdir": None,
-                         "downsample": False, "trim": False, "trim_prg": "cutadapt", "trim_options": "", "fastqc": False,
-                         "bin_size": 10000, "RF_resolution": False, "enzyme": "HindIII", "restrict_region": None,
-                         "merge_samples": False, "nbins_toMerge": 0, "tadparams": '--thresholdComparisons 0.01',
-                         "noTAD": False, "noCorrect": False, "distVsCount": False, "distVsCountParams": None}):
+def parse_args(defaults={"verbose": False, "configfile": None,
+                         "cluster_configfile": None, "max_jobs": 5,
+                         "snakemake_options": "--use-conda", "tempdir": None,
+                         "downsample": False, "trim": False, "fastqc": False,
+                         "trim_prg": "cutadapt", "trim_options": "",
+                         "bin_size": 10000, "RF_resolution": False,
+                         "enzyme": "HindIII", "restrict_region": None,
+                         "merge_samples": False, "nbins_toMerge": 0,
+                         "tadparams": '--thresholdComparisons 0.01',
+                         "noTAD": False, "noCorrect": False,
+                         "distVsCount": False, "distVsCountParams": None,
+                         "umidedup": False, "umidedup_opts": "",
+                         "bcpattern": "", "umidedup_sep": "_",
+                         "umibarcode": False}):
     """
     Parse arguments from the command line.
     """

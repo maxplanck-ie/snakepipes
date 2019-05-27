@@ -28,6 +28,10 @@ include: os.path.join(maindir, "shared", "rules", "filter_annotation.snakefile")
 ## bamCoverage_RPKM
 include: os.path.join(maindir, "shared", "rules", "deepTools_RNA.snakefile")
 
+#umi_tools
+include: os.path.join(maindir, "shared", "rules", "umi_tools.snakefile")
+
+
 if not fromBam:
     ## FASTQ: either downsample FASTQ files or create symlinks to input files
     include: os.path.join(maindir, "shared", "rules", "FASTQ.snakefile")

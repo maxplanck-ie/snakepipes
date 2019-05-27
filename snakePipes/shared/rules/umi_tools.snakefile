@@ -55,7 +55,7 @@ else:
           shell:
               "( [ -f {output} ] || ln -s -r {input} {output} )"
 
-
+#If DNA-mapping:
 if umidedup:
     rule filter_reads:
         input:

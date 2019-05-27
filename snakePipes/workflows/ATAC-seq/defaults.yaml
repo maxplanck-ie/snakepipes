@@ -31,13 +31,19 @@ window_size: 20
 fragmentCount_cutoff: 1
 #### Flag to control the pipeline entry point
 bam_ext: '.filtered.bam'
-fromBam: 
+fromBam:
 ## Bin size of output files in bigWig format
 bw_binsize: 25
 paired: True
 plot_format: png
 ## Median/mean fragment length, only relevant for single-end data (default: 200)
-fragment_length: 
+fragment_length:
 trim:
 fastqc:
 qval: 0.001
+#umi_tools
+umibarcode: False
+bcpattern: NNNNCCCCCCCCC #default: 4 base umi barcode, 9 base cell barcode (eg. RELACS barcode)
+umidedup: False
+umidedup_sep: "_"
+umidedup_opts: --paired
