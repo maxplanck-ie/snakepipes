@@ -18,7 +18,8 @@ rule CSAW:
         fragment_length = fragment_length,
         window_size = window_size,
         importfunc = os.path.join("shared", "rscripts", "DB_functions.R"),
-        allele_info = allele_info
+        allele_info = allele_info,
+        yaml_path=samples_config
     log: 
         out = os.path.join(outdir,"CSAW_{}/logs/CSAW.out".format(sample_name)),
         err = os.path.join(outdir,"CSAW_{}/logs/CSAW.err".format(sample_name))
