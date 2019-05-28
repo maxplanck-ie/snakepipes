@@ -57,12 +57,12 @@ rule MACS2_peak_qc:
         bai = os.path.join(outdir_MACS2, "{sample}.short.cleaned.bam.bai"),
         xls = os.path.join(outdir_MACS2, '{sample}.filtered.BAM_peaks.xls')
     output:
-        qc = os.path.join(outdir_ATACqc, "{sample}.short.cleaned.BAM_peaks.qc.txt")
+        qc = os.path.join(outdir_ATACqc, "{sample}.filtered.BAM_peaks.qc.txt")
     params:
-        peaks = os.path.join(outdir_MACS2, '{sample}.short.cleaned.BAM_peaks.narrowPeak'),
+        peaks = os.path.join(outdir_MACS2, '{sample}.filtered.BAM_peaks.narrowPeak'),
         genome_index = genome_index
     benchmark:
-        os.path.join(outdir_ATACqc, ".benchmark/ATAC_qc.{sample}.short.cleaned.benchmark")
+        os.path.join(outdir_ATACqc, ".benchmark/ATAC_qc.{sample}.filtered.benchmark")
     conda: CONDA_ATAC_ENV
     shell: """
         # get the number of peaks
