@@ -124,6 +124,7 @@ if (!is.null(cell_names_path)){
 
 str(sc_dat)
 
+## simple way to adjust height of plots to the number of samples  
 num_samples=length(levels(factor(sc_dat$sample)))
 print(num_samples)
 height=6;
@@ -131,9 +132,6 @@ height=6;
 if (num_samples>4){
 	height <- height + as.integer(max(1,as.integer(num_samples/2)-2) * 1);
 }
-
-print(height)
-
 
 libs_per_plate = 2
 if (is_split_library) libs_per_plate = 4
@@ -194,7 +192,6 @@ if (!is.null(plot_format)){
 	ggsave(plot=p,filename=paste(out_prefix,".plate_cRPM.",plot_format,sep=""),device=plot_format,dpi=200,height=height)
 }
 
-print("here")
 p<-ggplot(sc_dat,aes(x=x,y=y,fill=UMI))+ 
 		geom_tile() + 
 		facet_wrap(~sample,ncol = libs_per_plate) + 
