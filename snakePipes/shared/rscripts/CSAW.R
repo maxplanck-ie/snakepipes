@@ -72,7 +72,7 @@ if (!is.null(sampleInfo$UseRegions)){
 ##filter out input using yaml
 library(yaml)
 y<-read_yaml(yaml_path)
-input_list<-unique(unlist(lapply(z[[1]],function(X)X[["control"]])))
+input_list<-unique(unlist(lapply(y[[1]],function(X)X[["control"]])))
 if(!is.null(input_list)&&!(input_list=="")){
     fnames<-fnames[!fnames %in% input_list]
 }
