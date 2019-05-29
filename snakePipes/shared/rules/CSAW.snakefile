@@ -4,9 +4,7 @@ rule CSAW:
     input:
         macs2_output = expand("MACS2/{chip_sample}.filtered.BAM_peaks.xls", chip_sample = chip_samples),
         sampleSheet = sampleSheet,
-        insert_size_metrics =
-           os.path.join(outdir, "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv") if paired
-            else []
+        insert_size_metrics ="deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv" if paired else []
     output:
         "CSAW_{}/CSAW.session_info.txt".format(sample_name), "CSAW_{}/DiffBinding_analysis.Rdata".format(sample_name)
     benchmark:
