@@ -17,7 +17,8 @@ rule CSAW:
         window_size = window_size,
         importfunc = os.path.join("shared", "rscripts", "DB_functions.R"),
         allele_info = allele_info,
-        yaml_path=samples_config
+        yaml_path=samples_config,
+        insert_size_metrics=os.path.join(outdir,"deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv") if paired else []
     log: 
         out = os.path.join(outdir,"CSAW_{}/logs/CSAW.out".format(sample_name)),
         err = os.path.join(outdir,"CSAW_{}/logs/CSAW.err".format(sample_name))
