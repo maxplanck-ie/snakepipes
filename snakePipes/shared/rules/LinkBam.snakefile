@@ -17,11 +17,11 @@ rule samtools_index_external:
 
 rule link_bam_bai_external:
     input:
-        bam = mapping_prg+"/{sample}.bam",
+        bam = mapping_prg+"/{sample.bam}",
         bai = mapping_prg+"/{sample}.bam.bai"
     output:
-        bam_out = "filtered_bam/{sample}.filtered.bam",
-        bai_out = "filtered_bam/{sample}.filtered.bam.bai",
+        bam_out = "filtered_bam/{sample}.bam",
+        bai_out = "filtered_bam/{sample}.bam.bai",
     shell:
         "( [ -f {output.bam_out} ] || ( ln -s -r {input.bam} {output.bam_out} && ln -s -r {input.bai} {output.bai_out} ) )"
 
