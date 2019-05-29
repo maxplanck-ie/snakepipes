@@ -28,7 +28,7 @@ if fastqc:
 
 # trimming
 if trim:
-    include: os.path.join(maindir, "shared", "rules", "TrimGalore.snakefile")
+    include: os.path.join(maindir, "shared", "rules", "trimming.snakefile")
 
 # HiCExplorer
 include: os.path.join(maindir, "shared", "rules", "hicexplorer.snakefile")

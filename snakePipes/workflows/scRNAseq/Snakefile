@@ -34,7 +34,7 @@ include:os.path.join(maindir, "shared", "rules", "RNA-seq_qc_report.snakefile")
 
 # TrimGalore
 if trim:
-    include: os.path.join(maindir, "shared", "rules", "TrimGalore.snakefile")
+    include: os.path.join(maindir, "shared", "rules", "trimming.snakefile")
 
 ### conditional/optional rules #################################################
 ################################################################################

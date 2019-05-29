@@ -27,7 +27,7 @@ if fastqc:
 
 # trimming
 if trim:
-    include: os.path.join(maindir, "shared", "rules", "TrimGalore.snakefile")
+    include: os.path.join(maindir, "shared", "rules", "trimming.snakefile")
 
 # BAM filtering
 include: os.path.join(maindir, "shared", "rules", "bam_filtering.snakefile")

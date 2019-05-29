@@ -36,7 +36,7 @@ if fastqc:
 
 # trimming
 if trim:
-    include: os.path.join(maindir, "shared", "rules", "TrimGalore.snakefile")
+    include: os.path.join(maindir, "shared", "rules", "trimming.snakefile")
 
 ### conditional/optional rules #################################################
 #some of those definitions are used to generate output strings for some of the rules
