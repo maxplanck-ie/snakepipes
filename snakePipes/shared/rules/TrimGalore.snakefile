@@ -43,6 +43,50 @@ else:
             """
 
 
+### fastp #################################################################
+if paired:
+    rule fastp:
+        input:
+            r1 = fastq_indir_trim+"/{sample}"+reads[0]+".fastq.gz",
+            r2 = fastq_indir_trim+"/{sample}"+reads[1]+".fastq.gz"
+        output:
+            r1 = "FASTQ_fastp/{sample}"+reads[0]+".fastq.gz",
+            r2 = "FASTQ_fastp/{sample}"+reads[1]+".fastq.gz",
+            json = "FASTQ_fastp/{sample}fastp.json",
+            html = "FASTQ_fastp/{sample}fastp.html"
+        params:
+            opts = str(trim_options or '')
+        log:
+            out = "FASTQ_fastp/logs/fastp.{sample}.out",
+            err = "FASTQ_fastp/logs/fastp.{sample}.err"
+        benchmark:
+            "FASTQ_fastp/.benchmark/fastp.{sample}.benchmark"
+        threads: 8
+        conda: CONDA_SHARED_ENV
+        shell: """
+            fastp -w {threads} -i {input[0]} -I {input[1]} -o {output[0]} -O {output[1]} -j {output[2]} -h {output[3]} {params.opts} > {log.out} 2> {log.err}
+            """
+else:
+    rule fastp:
+            r1 = fastq_indir_trim+"/{sample}"+reads[0]+".fastq.gz"
+        output:
+            r1 = "FASTQ_fastp/{sample}"+reads[0]+".fastq.gz",
+            json = "FASTQ_fastp/{sample}fastp.json",
+            html = "FASTQ_fastp/{sample}fastp.html"
+        params:
+            opts = str(trim_options or '')
+        log:
+            out = "FASTQ_fastp/logs/fastp.{sample}.out",
+            err = "FASTQ_fastp/logs/fastp.{sample}.err"
+        benchmark:
+            "FASTQ_fastp/.benchmark/fastp.{sample}.benchmark"
+        threads: 8
+        conda: CONDA_SHARED_ENV
+        shell: """
+            fastp -w {threads} -i {input[0]} -o {output[0]} -j {output[1]} -h {output[2]} {params.opts} > {log.out} 2> {log.err}
+            """
+
+
 ### TrimGalore #################################################################
 
 if paired:

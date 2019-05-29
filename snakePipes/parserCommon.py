@@ -204,8 +204,8 @@ def commonOptions(grp, defaults, bw=True, plots=True):
 
     grp.add_argument("--trim_prg",
                      dest="trim_prg",
-                     choices=['cutadapt', 'trimgalore'],
-                     help="Trimming program to use: Cutadapt or TrimGalore. Note that if you change this you may "
+                     choices=['cutadapt', 'trimgalore', 'fastp'],
+                     help="Trimming program to use: Cutadapt, TrimGalore, or fastp. Note that if you change this you may "
                      "need to change --trim_options to match! (default: '%(default)s')",
                      default=defaults["trim_prg"])
 

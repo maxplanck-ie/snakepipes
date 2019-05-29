@@ -18,13 +18,15 @@ import subprocess
 fastq_dir = "FASTQ_barcoded"
 
 if trim:
-	fastq_indir_trim = "FASTQ_barcoded"
-	if trim_prg == "trimgalore":
-		fastq_dir = "FASTQ_TrimGalore"
-	elif trim_prg == "cutadapt":
-		fastq_dir = "FASTQ_Cutadapt"
+    fastq_indir_trim = "FASTQ_barcoded"
+    if trim_prg == "trimgalore":
+        fastq_dir = "FASTQ_TrimGalore"
+    elif trim_prg == "cutadapt":
+        fastq_dir = "FASTQ_Cutadapt"
+    elif trim_prg == "fastp":
+        fastq_dir = "FASTQ_fastp"
 else:
-	fastq_indir_trim = None
+    fastq_indir_trim = None
 	
 mapping_prg = "STAR_genomic"
 
@@ -51,17 +53,17 @@ reads = reads[::-1]
 pattern = re.compile("[N]+")
 
 if pattern.search(barcode_pattern) is not None:
-	UMI_offset = pattern.search(barcode_pattern).start() + 1 
-	UMI_length = pattern.search(barcode_pattern).end() - UMI_offset + 1
+    UMI_offset = pattern.search(barcode_pattern).start() + 1 
+    UMI_length = pattern.search(barcode_pattern).end() - UMI_offset + 1
 else:
-	print("Provided barcode pattern does not contain any 'N'! Exit...\n")
-	exit(1)
+    print("Provided barcode pattern does not contain any 'N'! Exit...\n")
+    exit(1)
 
 pattern = re.compile("[X]+")
 
 if pattern.search(barcode_pattern) is not None:
-	CELLI_offset = pattern.search(barcode_pattern).start() + 1
-	CELLI_length = pattern.search(barcode_pattern).end() - CELLI_offset + 1 
+    CELLI_offset = pattern.search(barcode_pattern).start() + 1
+    CELLI_length = pattern.search(barcode_pattern).end() - CELLI_offset + 1 
 else:
-	print("Provided barcode pattern does not contain any 'X'! Exit...\n")
-	exit(1)
+    print("Provided barcode pattern does not contain any 'X'! Exit...\n")
+    exit(1)

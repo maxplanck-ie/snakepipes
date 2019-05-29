@@ -35,9 +35,9 @@ reads: [_R1, _R2]
 ## Number of reads to downsample from each FASTQ file
 downsample:
 ## Options for trimming
-trim: False
-trim_prg: cutadapt
-trim_options:
+trim: True
+trim_prg: 'fastp'
+trim_options: '-q 5 -l 30 -M 5'
 ## Bin size of output files in bigWig format
 bw_binsize: 25
 ## Run FASTQC read quality control

@@ -93,6 +93,8 @@ if trim:
         fastq_dir = "FASTQ_TrimGalore"
     elif trim_prg == "cutadapt":
         fastq_dir = "FASTQ_Cutadapt"
+    elif trim_prg == "fastp":
+        fastq_dir = "FASTQ_fastp"
 
 def printToolsVersion(usedEnvs):
     with open(outdir+"/toolsVersion.txt", 'w') as f:

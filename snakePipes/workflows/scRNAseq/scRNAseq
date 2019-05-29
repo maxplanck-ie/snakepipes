@@ -54,7 +54,7 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
                           metavar="STR",
                           type=str,
                           help="Options passed to the selected trimmer, e.g. use --trim_options='-a A{30}' "
-                          "for polyA trimming with cutadapt (default: '%(default)s')",
+                          "for polyA trimming with Cutadapt (default: '%(default)s')",
                           default=defaults["trim_options"])
 
     optional.add_argument("--star_options",
