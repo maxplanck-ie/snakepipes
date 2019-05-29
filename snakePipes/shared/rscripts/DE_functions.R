@@ -57,6 +57,7 @@ checktable <- function(countdata = NA, sampleSheet = NA, alleleSpecific = FALSE,
         if(alleleSpecific) {
             coln_allelic <- paste(rep(sampleSheet$name, each  = 3), c("all","genome1", "genome2"), sep = "_" )
             countdata <- countdata[,coln_allelic]
+
         } else {
             countdata <- countdata[,sampleSheet$name]
         }
@@ -93,6 +94,7 @@ DESeq_basic <- function(countdata, coldata, fdr, alleleSpecific = FALSE, from_sa
       print("Using input from count table")
       if(isTRUE(alleleSpecific)) {
           rnasamp <- dplyr::select(countdata, dplyr::ends_with("_all"))
+          rownames(coldata)<-colnames(rnasamp)
           dds <- DESeq2::DESeqDataSetFromMatrix(countData = rnasamp,
                                     colData = coldata, design =d)
       } else {
@@ -130,6 +132,7 @@ DESeq_allelic <- function(countdata, coldata, fdr) {
     design <- data.frame(name = colnames(rnasamp),
                    allele = rep(c("genome1", "genome2"), nrow(coldata)),
                    condition = rep(coldata$condition, each = 2) )
+    rownames(design)<-colnames(rnasamp)
 
     # Run DESeq
     dds <- DESeq2::DESeqDataSetFromMatrix(rnasamp, colData = design,

@@ -4,7 +4,9 @@ channels:
  - bioconda
 dependencies:
  - samtools = 1.9
+ - bioconductor-genomeinfodbdata = 1.2.1
  - bioconductor-csaw = 1.16.1
+ - bioconductor-genomeinfodbdata = 1.2.1
  - bioconductor-genomicranges = 1.34.0
  - macs2 = 2.1.2  #python 2
  - gawk = 4.2.1

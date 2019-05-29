@@ -18,3 +18,14 @@ DESeq2:
     memory: 5G
 DESeq2_Salmon:
     memory: 3G
+create_snpgenome:
+    memory: 30G
+star_index:
+    memory: 15G
+STAR_allele:
+    memory: 30G
+Salmon_TPM:
+    memory: 5G
+Salmon_counts:
+    memory: 5G
+
