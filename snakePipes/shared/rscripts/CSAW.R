@@ -11,7 +11,7 @@ windowSize <- as.numeric(snakemake@params[["window_size"]])
 importfunc <- snakemake@params[["importfunc"]]  #"DB_functions.R"
 allelic_info <- as.logical(snakemake@params[["allele_info"]])
 outdir<-snakemake@params[["outdir"]]
-yamlpath<-snakemake@params[["yaml_path"]]
+yaml_path<-snakemake@params[["yaml_path"]]
 
 ##set up a primitive log
 logfile <- file(snakemake@log[["err"]], open="wt")
