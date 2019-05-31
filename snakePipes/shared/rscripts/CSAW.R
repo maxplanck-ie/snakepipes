@@ -54,16 +54,6 @@ chip_object <- readfiles_chip(sampleSheet = sampleInfo,
                               alleleSpecific = allelic_info,
                               pe.param = pe_param)
 
-## make QC plot for first and last sample
-first_bam <- head(SummarizedExperiment::colData(chip_object$windowCounts)$bam.files, n = 1)
-last_bam <- tail(SummarizedExperiment::colData(chip_object$windowCounts)$bam.files, n = 1)
-
-print(paste0("Making QC plots for first sample : ", first_bam))
-makeQCplots_chip(bam.file = first_bam, outplot = "QCplots_first_sample.pdf", pe.param = pe_param)
-
-print(paste0("Making QC plots for last sample : ", last_bam))
-makeQCplots_chip(bam.file = last_bam, outplot = "QCplots_last_sample.pdf", pe.param = pe_param)
-
 ## merge all peaks from the samples mentioned in sampleinfo to test (exclude those with 'False' in the UseRegions column)
 # get files to read from MACS
 if (!is.null(sampleInfo$UseRegions)){
@@ -77,6 +67,18 @@ if(!is.null(input_list)&&!(input_list=="")){
     fnames<-fnames[!fnames %in% input_list]
 }
 
+## make QC plot for first and last sample --- after excluding inputs
+bam.files <- list.files("../allelic_bams",pattern = paste0(fnames,".genome[1-2].sorted.bam$", collapse = "|"),full.names = TRUE )
+first_bam <- bam.files[1]
+last_bam <- bam.files[legth(bam.files)]
+
+print(paste0("Making QC plots for first sample : ", first_bam))
+makeQCplots_chip(bam.file = first_bam, outplot = "QCplots_first_sample.pdf", pe.param = pe_param)
+
+print(paste0("Making QC plots for last sample : ", last_bam))
+makeQCplots_chip(bam.file = last_bam, outplot = "QCplots_last_sample.pdf", pe.param = pe_param)
+
+###
 allpeaks <- lapply(fnames, function(x) {
     narrow <- paste0("../MACS2/",x,".filtered.BAM_peaks.narrowPeak")
     broad <- paste0("../MACS2/",x,".filtered.BAM_peaks.broadPeak")
