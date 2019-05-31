@@ -61,7 +61,6 @@ def run_histoneHMM(allele_info):
     return(file_list)
 
 def run_deepTools_qc(fromBam):
-    file_list = []
     if fromBam:
         file_list = ["deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv"]
         file_list.append([expand("bamCoverage/{sample}.filtered.seq_depth_norm.bw", sample = samples)])
@@ -73,6 +72,8 @@ def run_deepTools_qc(fromBam):
                 "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage.tsv",
                 "deepTools_qc/plotPCA/PCA.read_coverage.tsv" ])
         file_list.append(expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample = samples))
+    else:
+        file_list = []
     return(file_list)
 
 def run_deepTools_ChIP():

@@ -173,7 +173,7 @@ rule estimate_read_filtering:
 rule computeGCBias:
     input:
         bam = "filtered_bam/{sample}.filtered.bam",
-        bai = "filtered_bam/{sample}.filtered.bam.bai",
+        bai = "filtered_bam/{sample}.filtered.bam.bai"
     output:
         png = "deepTools_qc/computeGCBias/{sample}.filtered.GCBias.png",
         tsv = "deepTools_qc/computeGCBias/{sample}.filtered.GCBias.freq.tsv"

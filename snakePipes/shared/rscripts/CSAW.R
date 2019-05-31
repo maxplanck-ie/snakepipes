@@ -3,7 +3,7 @@
 .libPaths(R.home("library"))
 
 sampleInfoFilePath <- snakemake@input[["sampleSheet"]]  #"samplesheet.tab"
-insert_size_metrics <- snakemake@input[["insert_size_metrics"]] # bamPEFragmentSize output
+insert_size_metrics <- snakemake@params[["insert_size_metrics"]] # bamPEFragmentSize output
 fdr <- as.numeric(snakemake@params[["fdr"]])
 paired <- as.logical(snakemake@params[["paired"]])
 fraglength <- as.numeric(snakemake@params[["fragment_length"]])  # used when the data is not paired end
@@ -11,6 +11,7 @@ windowSize <- as.numeric(snakemake@params[["window_size"]])
 importfunc <- snakemake@params[["importfunc"]]  #"DB_functions.R"
 allelic_info <- as.logical(snakemake@params[["allele_info"]])
 outdir<-snakemake@params[["outdir"]]
+yaml_path<-snakemake@params[["yaml_path"]]
 
 ##set up a primitive log
 logfile <- file(snakemake@log[["err"]], open="wt")
@@ -67,6 +68,14 @@ makeQCplots_chip(bam.file = last_bam, outplot = "QCplots_last_sample.pdf", pe.pa
 # get files to read from MACS
 if (!is.null(sampleInfo$UseRegions)){
     fnames <- sampleInfo$name[as.logical(sampleInfo$UseRegions)]} else {fnames<-sampleInfo$name}
+
+##filter out input using yaml
+library(yaml)
+y<-read_yaml(yaml_path)
+input_list<-unique(unlist(lapply(y[[1]],function(X)X[["control"]])))
+if(!is.null(input_list)&&!(input_list=="")){
+    fnames<-fnames[!fnames %in% input_list]
+}
 
 allpeaks <- lapply(fnames, function(x) {
     narrow <- paste0("../MACS2/",x,".filtered.BAM_peaks.narrowPeak")
