@@ -24,3 +24,8 @@ rule CSAW:
         err = os.path.join(outdir,"CSAW_{}/logs/CSAW.err".format(sample_name))
     conda: CONDA_ATAC_ENV
     script: "../rscripts/CSAW.R"
+
+#rule calc_matrix_CSAW:
+#    input:
+#        csaw_in = "CSAW_{}/CSAW.session_info.txt".format(sample_name),
+#        bams = 
