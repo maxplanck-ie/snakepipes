@@ -15,7 +15,7 @@ else:
 def getref_fileList(dir):
     fl = glob.glob(dir + "/*.fa")
     flist = ','.join(fl)
-    return(fl)
+    return(flist)
 
 
 ## Create masked genome
@@ -54,7 +54,8 @@ else:
         params:
             strain1 = strains[0],
             SNPpath = os.path.abspath(VCFfile),
-            temp_out="snp_genome/all_SNPs_" + strains[0] + "_GRCm38.txt.gz"
+            temp_out="all_SNPs_" + strains[0] + "_GRCm38.txt.gz",
+            out_bname=os.path.basename(snp_file)
         log:
             out = "SNPsplit_createSNPgenome.out",
             err = "SNPsplit_createSNPgenome.err"
@@ -64,8 +65,9 @@ else:
             " SNPsplit_genome_preparation"
             " --genome_build {BASENAME}"
             " --reference_genome {input.genome} --vcf_file {params.SNPpath}"
-            " --strain {params.strain1} > {log.out} 2> {log.err}; ln -s {params.temp_out} {output.snpfile}"
-            " && cd ../"
+            " --strain {params.strain1} > {log.out} 2> {log.err}&& ln -sn "
+            "{params.temp_out} {params.out_bname} >> {log.out} 2>> {log.err} "
+            "&& cd ../ "
 
 if mapping_prg == "STAR":
     rule star_index:
