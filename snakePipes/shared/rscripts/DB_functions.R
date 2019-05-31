@@ -282,19 +282,21 @@ writeOutput_chip <- function(chipResultObject, outfile_prefix, fdrcutoff){
     tabx<-as.data.frame(merged$region,stringsAsFactors=FALSE)
     tabx$name<-rownames(tabx)
     full_res<-as.data.frame(merge(x=tabx,y=tabcom,by.x="name",by.y="name"),stringsAsFactors=FALSE) 
+    full_res<-full_res[,c(2:ncol(full_res),1)]
+    print(sprintf("Colnames of result file are %s",colnames(full_res)))
     ##filter full result for FDR and LFC and write to output
     full_res.filt<-subset(full_res,(FDR<=fdrcutoff)&(abs(best.logFC)>=1))
     if(nrow(full_res.filt)>0){
-    write.table(full_res.filt,file="Filtered.results.bed",row.names=FALSE,sep="\t",quote=FALSE)}
+    write.table(full_res.filt,file="Filtered.results.bed",row.names=FALSE,col.names=FALSE,sep="\t",quote=FALSE)}
     res.filt.up<-subset(full_res.filt,direction %in% "up")
     if(nrow(res.filt.up)>0){
-    write.table(res.filt.up,file="Filtered.results.UP.bed",row.names=FALSE,sep="\t",quote=FALSE)}
+    write.table(res.filt.up,file="Filtered.results.UP.bed",row.names=FALSE,col.names=FALSE,sep="\t",quote=FALSE)}
     res.filt.down<-subset(full_res.filt,direction %in% "down")
     if(nrow(res.filt.down)>0){
-    write.table(res.filt.down,file="Filtered.results.DOWN.bed",row.names=FALSE,sep="\t",quote=FALSE)}
+    write.table(res.filt.down,file="Filtered.results.DOWN.bed",row.names=FALSE,col.names=FALSE,sep="\t",quote=FALSE)}
     res.filt.mixed<-subset(full_res.filt,direction %in% "mixed")
     if(nrow(res.filt.mixed)>0){
-    write.table(res.filt.mixed,file="Filtered.results.MIXED.bed",row.names=FALSE,sep="\t",quote=FALSE)}
+    write.table(res.filt.mixed,file="Filtered.results.MIXED.bed",row.names=FALSE,col.names=FALSE,sep="\t",quote=FALSE)}
 }
 
 
