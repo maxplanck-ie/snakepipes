@@ -279,9 +279,9 @@ writeOutput_chip <- function(chipResultObject, outfile_prefix, fdrcutoff){
     ##merge regions with stats
     print(head(as.data.frame(merged$region)))
     print(head(tabcom))
-    tabx<-as.data.frame(merged$region)
+    tabx<-as.data.frame(merged$region,stringsAsFactors=FALSE)
     tabx$name<-rownames(tabx)
-    full_res<-merge(x=tabx,y=tabcom,by.x="name",by.y="name")
+    full_res<-as.data.frame(merge(x=tabx,y=tabcom,by.x="name",by.y="name"),stringsAsFactors=FALSE)    
     ##filter full result for FDR and LFC and write to output
     full_res.filt<-subset(full_res,(FDR<=fdrcutoff&&abs(best.logFC)>=1))
     if(nrow(full_res.filt)>0){
