@@ -70,13 +70,13 @@ if(!is.null(input_list)&&!(input_list=="")){
 ## make QC plot for first and last sample --- after excluding inputs
 bam.files <- list.files("../allelic_bams",pattern = paste0(fnames,".genome[1-2].sorted.bam$", collapse = "|"),full.names = TRUE )
 first_bam <- bam.files[1]
-last_bam <- bam.files[legth(bam.files)]
+last_bam <- bam.files[length(bam.files)]
 
 print(paste0("Making QC plots for first sample : ", first_bam))
-makeQCplots_chip(bam.file = first_bam, outplot = "QCplots_first_sample.pdf", pe.param = pe_param)
+#makeQCplots_chip(bam.file = first_bam, outplot = "QCplots_first_sample.pdf", pe.param = pe_param)
 
 print(paste0("Making QC plots for last sample : ", last_bam))
-makeQCplots_chip(bam.file = last_bam, outplot = "QCplots_last_sample.pdf", pe.param = pe_param)
+#makeQCplots_chip(bam.file = last_bam, outplot = "QCplots_last_sample.pdf", pe.param = pe_param)
 
 ###
 allpeaks <- lapply(fnames, function(x) {
