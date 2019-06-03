@@ -35,3 +35,5 @@ plotPCA_allelic:
     memory: 4G
 snp_split:
     memory: 10G
+plot_heatmap_CSAW_up:
+    memory: 10G
