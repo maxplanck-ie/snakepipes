@@ -44,8 +44,10 @@ if paired:
         threads: 20
         conda: CONDA_WGBS_ENV
         shell: """
-            bwameth.py --threads {threads} --reference {params.bwameth_index} {input.r1} {input.r2} 2> {log.err} | \
-	        samtools sort -T ${{TMPDIR}}/{wildcards.sample} -m 3G -@ 4 -o {output.sbam}
+            MYTEMP=$(mktemp -d "${{TMPDIR:-/tmp}}"/snakepipes.XXXXXXXXXX)
+            bwameth.py --threads {threads} --reference "{params.bwameth_index}" "{input.r1}" "{input.r2}" 2> {log.err} | \
+	        samtools sort -T "$MYTEMP"/{wildcards.sample} -m 3G -@ 4 -o "{output.sbam}"
+            rm -rf "$MYTEMP"
             """
 else:
     rule bwameth:
@@ -61,8 +63,10 @@ else:
         threads: 20
         conda: CONDA_WGBS_ENV
         shell: """
-            bwameth.py --threads {threads} --reference {params.bwameth_index} {input.r1} 2> {log.err} | \
-	        samtools sort -T ${{TMPDIR}}/{wildcards.sample} -m 3G -@ 4 -o {output.sbam}
+            MYTEMP=$(mktemp -d "${{TMPDIR:-/tmp}}"/snakepipes.XXXXXXXXXX)
+            bwameth.py --threads {threads} --reference "{params.bwameth_index}" "{input.r1}" 2> {log.err} | \
+	        samtools sort -T "$MYTEMP/{wildcards.sample}" -m 3G -@ 4 -o "{output.sbam}"
+            rm -rf "$MYTEMP"
             """
 
 
@@ -75,7 +79,9 @@ rule index_bam:
         err="bwameth/logs/{sample}.index_bam.err",
         out="bwameth/logs/{sample}.index_bam.out"
     conda: CONDA_SHARED_ENV
-    shell: "samtools index {input} 1>{log.out} 2>{log.err}"
+    shell: """
+        samtools index "{input}" >{log.out} 2>{log.err}
+        """
 
 
 rule markDupes:
@@ -89,7 +95,11 @@ rule markDupes:
         out="bwameth/logs/{sample}.rm_dupes.out"
     threads: 10
     conda: CONDA_SAMBAMBA_ENV
-    shell: "sambamba markdup -t {threads} --tmpdir ${{TMPDIR}}{wildcards.sample} {input[0]} {output} 1>{log.out} 2>{log.err}"
+    shell: """
+        MYTEMP=$(mktemp -d "${{TMPDIR:-/tmp}}"/snakepipes.XXXXXXXXXX)
+        sambamba markdup -t {threads} --tmpdir "$MYTEMP/{wildcards.sample}" "{input[0]}" "{output}" >{log.out} 2>{log.err}
+        rm -rf "$MYTEMP"
+        """
 
 
 rule index_PCRrm_bam:
@@ -103,7 +113,7 @@ rule index_PCRrm_bam:
         out="bwameth/logs/{sample}.index_PCRrm_bam.out"
     threads: 1
     conda: CONDA_SHARED_ENV
-    shell: "samtools index {input} 1>{log.out} 2>{log.err}"
+    shell: "samtools index "{input}" 1>{log.out} 2>{log.err}"
 
 
 # TODO: I'm not sure how useful this really is. We could just run plotCoverage instead.
