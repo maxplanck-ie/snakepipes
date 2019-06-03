@@ -53,7 +53,7 @@ def calc_doc(skipDOC):
         return ([])
 
 def run_FastQC(fastqc):
-    if fastqc:
+    if fastqc and fromBAM:
         return( expand("FastQC/{sample}{read}_fastqc.html", sample = samples, read = reads[:idxRange]) )
     else:
         return([])
@@ -131,36 +131,23 @@ if not fromBam:
     localrules:
         FASTQ1,
         FASTQ2
-
-    rule all:
-        input:
-            run_FastQC(fastqc),
-            expand("bwameth/{sample}.PCRrm.bam", sample = samples),
-            expand("QC_metrics/{sample}.Mbias.txt", sample=samples),
-            calc_doc(skipDOC),
-            'QC_metrics/QC_report.html',
-            run_deeptools(skipGCbias),
-            expand("MethylDackel/{sample}_CpG.bedGraph", sample=samples),
-            expand("MethylDackel/{sample}_CpG.methylation.bw", sample=samples),
-            expand("MethylDackel/{sample}_CpG.coverage.bw", sample=samples),
-            run_CpG_stats(sampleSheet),
-            run_metilene_all(sampleSheet),
 else:
     localrules:
         link_bam
 
-    rule all:
-        input:
-            expand("bwameth/{sample}.PCRrm.bam", sample = samples),
-            expand("QC_metrics/{sample}.Mbias.txt", sample=samples),
-            calc_doc(skipDOC),
-            'QC_metrics/QC_report.html',
-            run_deeptools(skipGCbias),
-            expand("MethylDackel/{sample}_CpG.bedGraph", sample=samples),
-            expand("MethylDackel/{sample}_CpG.methylation.bw", sample=samples),
-            expand("MethylDackel/{sample}_CpG.coverage.bw", sample=samples),
-            run_CpG_stats(sampleSheet),
-            run_metilene_all(sampleSheet),
+rule all:
+    input:
+        run_FastQC(fastqc),
+        expand("bwameth/{sample}.PCRrm.bam", sample = samples),
+        expand("QC_metrics/{sample}.Mbias.txt", sample=samples),
+        calc_doc(skipDOC),
+        'QC_metrics/QC_report.html',
+        run_deeptools(skipGCbias),
+        expand("MethylDackel/{sample}_CpG.bedGraph", sample=samples),
+        expand("MethylDackel/{sample}_CpG.methylation.bw", sample=samples),
+        expand("MethylDackel/{sample}_CpG.coverage.bw", sample=samples),
+        run_CpG_stats(sampleSheet),
+        run_metilene_all(sampleSheet),
 
 
 ### execute after workflow finished ############################################
