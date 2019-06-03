@@ -3,9 +3,6 @@ import re
 from operator import is_not
 import tempfile
 
-# N.B., this needs a `get_outdir()` function from the importing Snakefile
-tempdir=outdir
-
 ###symlink bams if this is the starting point
 if fromBam:
     rule link_bam:
@@ -375,7 +372,6 @@ else:
             """
 
 
-# TODO: remove limma stuff
 rule prep_for_stats:
     input:
         expressionFiles=expand("MethylDackel/{sample}.CpG.filt2.bed", sample=samples)
