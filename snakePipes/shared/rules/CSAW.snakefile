@@ -49,8 +49,10 @@ if allele_info == 'FALSE':
         output:
             image = "CSAW_{}/CSAW.UP.heatmap.png".format(sample_name),
             sorted_regions = "CSAW_{}/CSAW.UP.sortedRegions.bed".format(sample_name)
+        params:
+            smpl_label=' '.join(filtered_dict.keys())
         log:
             out = os.path.join(outdir,"CSAW_{}/logs/deeptools_heatmap.out".format(sample_name)),
             err = os.path.join(outdir,"CSAW_{}/logs/deeptools_heatmap.err".format(sample_name))
         conda: CONDA_SHARED_ENV
-        shell: "if [ -r {input.matrix} ]; then plotHeatmap --matrixFile {input.matrix} --outFileSortedRegions {output.sorted_regions} --outFileName {output.image} --startLabel Start --endLabel End --legendLocation lower-center -x 'Scaled peak length' ;fi >{log.out} 2>{log.err}"
+        shell: "if [ -r {input.matrix} ]; then plotHeatmap --matrixFile {input.matrix} --outFileSortedRegions {output.sorted_regions} --outFileName {output.image} --startLabel Start --endLabel End --legendLocation lower-center -x 'Scaled peak length' --labelRotation 90 --samplesLabel {params.smpl_label} ;fi >{log.out} 2>{log.err}"
