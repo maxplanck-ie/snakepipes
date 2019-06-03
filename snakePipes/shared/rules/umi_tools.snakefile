@@ -59,8 +59,8 @@ else:
 if umidedup:
     rule filter_reads:
         input:
-            bamfile = "filtered_bam/{sample}.filtered.tmp.bam",
-            indexfile = "filtered_bam/{sample}.filtered.tmp.bam.bai"
+            bamfile = "filtered_bam/{sample}.filtered.tmp.bam" if mapping_prg == "Bowtie2" else mapping_prg+"/{sample}.bam",
+            indexfile = "filtered_bam/{sample}.filtered.tmp.bam.bai" if mapping_prg == "Bowtie2" else mapping_prg+"/{sample}.bam.bai"
         output:
             bamfile = "filtered_bam/{sample}.filtered.bam"
         params:
@@ -80,7 +80,7 @@ if umidedup:
 else:
     rule filter_reads:
         input:
-            bamfile = "filtered_bam/{sample}.filtered.tmp.bam",
+            bamfile = "filtered_bam/{sample}.filtered.tmp.bam" if mapping_prg == "Bowtie2" else mapping_prg+"/{sample}.bam",
         output:
             bamfile = "filtered_bam/{sample}.filtered.bam"
         conda:
