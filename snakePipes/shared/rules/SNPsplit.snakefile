@@ -57,7 +57,11 @@ rule BAMsort_allelic:
     threads:
         12
     conda: CONDA_SHARED_ENV
-    shell: "samtools sort -@ {threads} -T ${{TMPDIR}} -O bam -o {output} {input}"
+    shell: """
+        MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX);
+        samtools sort -@ {threads} -T $MYTEMP -O bam -o {output} {input};
+        rm -rf $MYTEMP
+        """
 
 # index the sorted files
 rule BAMindex_allelic:

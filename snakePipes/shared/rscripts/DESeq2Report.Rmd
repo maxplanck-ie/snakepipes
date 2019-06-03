@@ -467,7 +467,7 @@ plotCounts_gg <- function(i, dds, intgroup) {
         data <- cbind(data, data.frame('group' = group))
     }
 
-    ggplot(data, aes(x = group, y = count)) + geom_jitter(width=0.2) + ylab('Normalized count') + ggtitle(i) + coord_trans(y = "log10") + theme(axis.text.x = element_text(angle = 90, hjust = 1))
+    ggplot(data, aes(x = group, y = log10(count))) + geom_jitter(width=0.2) + ylab('Log10(Normalized count + 0.5)') + ggtitle(i) + theme(axis.text.x = element_text(angle = 90, hjust = 1))
 }
 for(i in head(features, nBestFeatures)) {
     print(plotCounts_gg(i, dds = dds, intgroup = intgroup[2:length(intgroup)]))

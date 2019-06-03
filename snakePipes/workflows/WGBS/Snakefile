@@ -166,7 +166,10 @@ else:
 ### execute after workflow finished ############################################
 ################################################################################
 onsuccess:
-    cf.cleanLogs(outdir)
+    cf.cleanLogs(outdir, cluster_config)
     if "verbose" in config and config["verbose"]:
         with open (os.path.join(outdir, 'pipeline.log'),"a") as lo:
             print("--- WGBS workflow finished successfully! --------------------------------",file=lo)#\n \n
+
+onerror:
+    print("\n !!! ERROR in WGBS workflow! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")

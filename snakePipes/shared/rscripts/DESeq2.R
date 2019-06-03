@@ -65,6 +65,7 @@ sampleInfo$condition <- relevel(sampleInfo$condition, ref = as.character(sampleI
 #    sampleInfo[grepl("^[0-9]", sampleInfo$name),]$name <- paste0("X", sampleInfo[grepl("^[0-9]", sampleInfo$name),]$name)
 #}
 sampleInfo$name <- make.names(sampleInfo$name)
+rownames(sampleInfo)<-sampleInfo$name
 
 ## ~~~~~~ 2. Check if data is in proper order  ~~~~~
 if(isTRUE(tximport)) {
@@ -119,11 +120,11 @@ bib <- c(
     DESeq2 = citation('DESeq2'))
 
 write.bibtex(bib, file = 'citations.bib')
-file.copy(rmdTemplate, to = 'DESeq2_report.Rmd')
+file.copy(rmdTemplate, to = 'DESeq2_report_basic.Rmd')
 
 outprefix = "DEseq_basic"
 cite_options(citation_format = "text",style = "html",cite.style = "numeric",hyperlink = TRUE)
-render('DESeq2_report.Rmd',
+render('DESeq2_report_basic.Rmd',
               output_format = "html_document",
               clean = TRUE,
               params = list(
@@ -136,8 +137,9 @@ render('DESeq2_report.Rmd',
                   geneNamesFile = geneNamesFilePath))
 
 if (isTRUE(allelic_info)) {
+    file.copy(rmdTemplate, to = 'DESeq2_report_allelic.Rmd')
     outprefix = "DEseq_allelic"
-    render('DESeq2_report.Rmd',
+    render('DESeq2_report_allelic.Rmd',
                   output_format = "html_document",
                   clean = TRUE,
                   params = list(

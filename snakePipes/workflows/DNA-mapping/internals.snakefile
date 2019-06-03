@@ -40,3 +40,7 @@ if not samples:
     exit(1)
 
 fromBam = None
+
+idxRange = 1
+if paired:
+    idxRange = 2

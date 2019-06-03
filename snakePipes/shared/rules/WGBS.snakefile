@@ -4,6 +4,7 @@ from operator import is_not
 import tempfile
 
 # N.B., this needs a `get_outdir()` function from the importing Snakefile
+tempdir=outdir
 
 ###symlink bams if this is the starting point
 if fromBam:
