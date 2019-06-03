@@ -44,16 +44,17 @@ else:
 
 
 ### fastp #################################################################
+# TODO: (1) ensure that multiQC sees the json files (2) remove reads[0] from the json file for MultiQC rendering
 if paired:
     rule fastp:
         input:
-            r1 = fastq_indir_trim+"/{sample}"+reads[0]+".fastq.gz",
-            r2 = fastq_indir_trim+"/{sample}"+reads[1]+".fastq.gz"
+            fastq_indir_trim+"/{sample}"+reads[0]+".fastq.gz",
+            fastq_indir_trim+"/{sample}"+reads[1]+".fastq.gz"
         output:
-            r1 = "FASTQ_fastp/{sample}"+reads[0]+".fastq.gz",
-            r2 = "FASTQ_fastp/{sample}"+reads[1]+".fastq.gz",
-            json = "FASTQ_fastp/{sample}fastp.json",
-            html = "FASTQ_fastp/{sample}fastp.html"
+            "FASTQ_fastp/{sample}"+reads[0]+".fastq.gz",
+            "FASTQ_fastp/{sample}"+reads[1]+".fastq.gz",
+            "FASTQ_fastp/{sample}fastp.json",
+            "FASTQ_fastp/{sample}fastp.html"
         params:
             opts = str(trim_options or '')
         log:
@@ -68,11 +69,12 @@ if paired:
             """
 else:
     rule fastp:
-            r1 = fastq_indir_trim+"/{sample}"+reads[0]+".fastq.gz"
+        input:
+            fastq_indir_trim+"/{sample}"+reads[0]+".fastq.gz"
         output:
-            r1 = "FASTQ_fastp/{sample}"+reads[0]+".fastq.gz",
-            json = "FASTQ_fastp/{sample}fastp.json",
-            html = "FASTQ_fastp/{sample}fastp.html"
+            "FASTQ_fastp/{sample}"+reads[0]+".fastq.gz",
+            "FASTQ_fastp/{sample}fastp.json",
+            "FASTQ_fastp/{sample}fastp.html"
         params:
             opts = str(trim_options or '')
         log:

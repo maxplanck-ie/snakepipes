@@ -81,10 +81,7 @@ def get_outdir(folder_name):
 
 def run_CpG_stats(sampleSheet):
     if sampleSheet:
-        return (['{}/singleCpG.RData'.format(get_outdir("limma")),
-                 '{}/limdat.LG.RData'.format(get_outdir("limma")),
-                 '{}/metilene.IN.txt'.format(get_outdir("metilene")),
-                 '{}/Stats_report.html'.format(get_outdir("limma"))])
+        return (['{}/Stats_report.html'.format(get_outdir("DSS"))])
     else:
         return ([])
 
@@ -96,29 +93,11 @@ def run_metilene_all(sampleSheet):
         return ([])
 
 
-def run_int_aggStats(intList,sampleSheet):
-    if intList and not sampleSheet:
-        int_dest=[re.sub('.bed', '.CpGlist.bed', os.path.basename(x)) for x in intList]
-        return ([os.path.join("aux_files", re.sub('.fa', w, os.path.basename(genome_fasta))) for w in int_dest])
-    if intList and sampleSheet:
-            int_dest2=[re.sub('.bed', '.aggCpG.RData', os.path.basename(x)) for x in intList]
-            return ([os.path.join("{}".format(get_outdir("aggregate_stats_limma")), w) for w in int_dest2])
-    else:
-        return ([])
-
-
 def run_deeptools(skipGCbias):
     if not skipGCbias:
         return (expand("QC_metrics/{sample}.freq.txt", sample = samples, read = reads) + expand("QC_metrics/{sample}.GCbias.png", sample = samples, read = reads))
     else:
         return ([])
-
-
-def run_aggStats_report(intList,sampleSheet):
-    if intList and sampleSheet:
-        return(['{}/Stats_report.html'.format(get_outdir("aggregate_stats_limma"))])
-    else:
-        return([])
 
 
 ### include modules of other snakefiles ########################################
@@ -164,11 +143,8 @@ if not fromBam:
             expand("MethylDackel/{sample}_CpG.bedGraph", sample=samples),
             expand("MethylDackel/{sample}_CpG.methylation.bw", sample=samples),
             expand("MethylDackel/{sample}_CpG.coverage.bw", sample=samples),
-#            run_CpG_stats(sampleSheet),
+            run_CpG_stats(sampleSheet),
             run_metilene_all(sampleSheet),
-#            run_int_aggStats(intList, False),
-#            run_int_aggStats(intList, sampleSheet),
-#            run_aggStats_report(intList, sampleSheet)
 else:
     localrules:
         link_bam
@@ -183,11 +159,8 @@ else:
             expand("MethylDackel/{sample}_CpG.bedGraph", sample=samples),
             expand("MethylDackel/{sample}_CpG.methylation.bw", sample=samples),
             expand("MethylDackel/{sample}_CpG.coverage.bw", sample=samples),
-#            run_CpG_stats(sampleSheet),
+            run_CpG_stats(sampleSheet),
             run_metilene_all(sampleSheet),
-#            run_int_aggStats(intList, False),
-#            run_int_aggStats(intList, sampleSheet),
-#            run_aggStats_report(intList, sampleSheet)
 
 
 ### execute after workflow finished ############################################

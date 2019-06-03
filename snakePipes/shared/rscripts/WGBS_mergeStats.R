@@ -26,10 +26,6 @@ expressionDFs = lapply(sampleSheet$name, function(sampleName) {
 fullMatrix = Reduce(function(...) merge(..., all=T, by="ms", sort=FALSE), expressionDFs)
 rm(expressionDFs)
 
-# Export ratios for limma
-fullMatrix[,2:ncol(fullMatrix)] = fullMatrix[,2:ncol(fullMatrix)] / 100
-save(fullMatrix, file=snakemake@output[["LimmaData"]])
-
 if (nrow(fullMatrix) == 0) {
     print_sessionInfo("None of the single CpG sites passed the filtering.")
 } else {
