@@ -110,7 +110,9 @@ rule index_PCRrm_bam:
         out="bwameth/logs/{sample}.index_PCRrm_bam.out"
     threads: 1
     conda: CONDA_SHARED_ENV
-    shell: "samtools index "{input}" 1>{log.out} 2>{log.err}"
+    shell: """
+        samtools index "{input}" 1>{log.out} 2>{log.err}
+        """
 
 
 # TODO: I'm not sure how useful this really is. We could just run plotCoverage instead.
