@@ -106,7 +106,7 @@ def run_deepTools_allelic():
 
 def run_CSAW():
     if sampleSheet:
-        return( ["CSAW_{}/CSAW.session_info.txt".format(sample_name),"CSAW_{}/CSAW.UP.matrix".format(sample_name), "CSAW_{}/CSAW.UP.heatmap.png".format(sample_name)] )
+        return( ["CSAW_{}/CSAW.session_info.txt".format(sample_name),"CSAW_{}/CSAW.UP.log2r.matrix".format(sample_name), "CSAW_{}/CSAW.UP.log2r.heatmap.png".format(sample_name),"CSAW_{}/CSAW.UP.substr.matrix".format(sample_name), "CSAW_{}/CSAW.UP.substr.heatmap.png".format(sample_name)] )
     else:
         return([])
 
