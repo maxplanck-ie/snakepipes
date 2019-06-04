@@ -29,19 +29,18 @@ if allele_info == 'FALSE':
     rule calc_matrix_log2r_CSAW_up:
         input:
             csaw_in = "CSAW_{}/CSAW.session_info.txt".format(sample_name),
-            bigwigs = expand("deepTools_ChIP/bamCompare/{chip_sample}.filtered.log2ratio.over_{control_name}.bw",zip,chip_sample=chip_samples,control_name=control_names),
+            bigwigs = expand("deepTools_ChIP/bamCompare/{chip_sample}.filtered.log2ratio.over_{control_name}.bw",zip,chip_sample=filtered_dict.keys(),control_name=filtered_dict.values()),
             sampleSheet = sampleSheet
         output:
             matrix = "CSAW_{}/CSAW.UP.log2r.matrix".format(sample_name)
         params:
-            bigwigs = expand("deepTools_ChIP/bamCompare/{chip_sample}.filtered.log2ratio.over_{control_name}.bw",zip,chip_sample=filtered_dict.keys(),control_name=filtered_dict.values()),
             bed_up = "CSAW_{}/Filtered.results.UP.bed".format(sample_name)
         log:
             out = os.path.join(outdir,"CSAW_{}/logs/deeptools_matrix.log2r.out".format(sample_name)),
             err = os.path.join(outdir,"CSAW_{}/logs/deeptools_matrix.log2r.err".format(sample_name))
         threads: 8
         conda: CONDA_SHARED_ENV
-        shell: "if [ -r {params.bed_up} ]; then computeMatrix scale-regions -S {params.bigwigs} -R {params.bed_up} -m 1000 -b 200 -a 200 -o {output.matrix} -p {threads};fi >{log.out} 2>{log.err}"
+        shell: "if [ -r {params.bed_up} ]; then computeMatrix scale-regions -S {input.bigwigs} -R {params.bed_up} -m 1000 -b 200 -a 200 -o {output.matrix} -p {threads};fi >{log.out} 2>{log.err}"
 
     rule plot_heatmap_log2r_CSAW_up:
         input:
@@ -60,21 +59,20 @@ if allele_info == 'FALSE':
     rule calc_matrix_substr_CSAW_up:
         input:
             csaw_in = "CSAW_{}/CSAW.session_info.txt".format(sample_name),
-            bigwigs = expand("deepTools_ChIP/bamCompare/{chip_sample}.filtered.subtract.{control_name}.bw",zip,chip_sample=chip_samples,control_name=control_names),
+            bigwigs = expand("deepTools_ChIP/bamCompare/{chip_sample}.filtered.subtract.{control_name}.bw",zip,chip_sample=filtered_dict.keys(),control_name=filtered_dict.values()),
             sampleSheet = sampleSheet
         output:
             matrix = "CSAW_{}/CSAW.UP.substr.matrix".format(sample_name)
         params:
-            bigwigs = expand("deepTools_ChIP/bamCompare/{chip_sample}.filtered.subtract.{control_name}.bw",zip,chip_sample=filtered_dict.keys(),control_name=filtered_dict.values()),
             bed_up = "CSAW_{}/Filtered.results.UP.bed".format(sample_name)
         log:
             out = os.path.join(outdir,"CSAW_{}/logs/deeptools_matrix.substr.out".format(sample_name)),
             err = os.path.join(outdir,"CSAW_{}/logs/deeptools_matrix.substr.err".format(sample_name))
         threads: 8
         conda: CONDA_SHARED_ENV
-        shell: "if [ -r {params.bed_up} ]; then computeMatrix scale-regions -S {params.bigwigs} -R {params.bed_up} -m 1000 -b 200 -a 200 -o {output.matrix} -p {threads};fi >{log.out} 2>{log.err}"
+        shell: "if [ -r {params.bed_up} ]; then computeMatrix scale-regions -S {input.bigwigs} -R {params.bed_up} -m 1000 -b 200 -a 200 -o {output.matrix} -p {threads};fi >{log.out} 2>{log.err}"
 
-    rule plot_heatmap_log2r_CSAW_up:
+    rule plot_heatmap_substr_CSAW_up:
         input:
             matrix = "CSAW_{}/CSAW.UP.substr.matrix".format(sample_name)
         output:
