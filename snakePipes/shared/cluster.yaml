@@ -16,7 +16,7 @@ bamCoverage_raw:
 create_snpgenome:
     memory: 30G
 CSAW:
-    memory: 3G
+    memory: 10G
 FASTQdownsample:
     memory: 3G
 plotCorrelation_pearson:
