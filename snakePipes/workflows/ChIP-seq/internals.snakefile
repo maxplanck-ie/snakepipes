@@ -165,4 +165,5 @@ def filter_dict(sampleSheet,input_dict):
     output_dict = dict((k,v) for k,v in input_dict.items() if k in names_sub)
     return(output_dict)
 
-filtered_dict = filter_dict(sampleSheet,dict(zip(chip_samples, control_names)))
+if sampleSheet:
+    filtered_dict = filter_dict(sampleSheet,dict(zip(chip_samples, control_names)))
