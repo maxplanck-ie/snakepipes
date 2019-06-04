@@ -21,8 +21,12 @@ FASTQdownsample:
     memory: 3G
 plotCorrelation_pearson:
     memory: 3G
+plotCorrelation_pearson_allelic:
+    memory: 5G
 plotCorrelation_spearman:
     memory: 3G
+plotCorrelation_spearman_allelic:
+    memory: 2G
 plotCoverage:
     memory: 1G
 plotEnrichment:
