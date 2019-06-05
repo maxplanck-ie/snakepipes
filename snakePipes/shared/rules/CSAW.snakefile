@@ -7,7 +7,7 @@ rule CSAW:
         sampleSheet = sampleSheet,
         insert_size_metrics ="deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv" if paired else []
     output:
-        "CSAW_{}/CSAW.session_info.txt".format(sample_name), "CSAW_{}/DiffBinding_analysis.Rdata".format(sample_name)
+        "CSAW_{}/CSAW.session_info.txt".format(sample_name), "CSAW_{}/DiffBinding_analysis.Rdata".format(sample_name),expand("CSAW_{}".format(sample_name)+"/Filtered.results.{change_dir}.bed",change_dir=change_direction)
     benchmark:
         "CSAW_{}/.benchmark/CSAW.benchmark".format(sample_name)
     params:
@@ -71,7 +71,7 @@ if allele_info == 'FALSE':
             err = os.path.join(outdir,"CSAW_{}".format(sample_name)+"/logs/deeptools_matrix.cov.{change_dir}.err")
         threads: 8
         conda: CONDA_SHARED_ENV
-        shell: "if [ -r {params.bed_in} ]; then computeMatrix scale-regions -S {input.bigwigs} -R {params.bed_up} -m 1000 -b 200 -a 200 -o {output.matrix} -p {threads};fi >{log.out} 2>{log.err}"
+        shell: "if [ -r {params.bed_in} ]; then computeMatrix scale-regions -S {input.bigwigs} -R {params.bed_in} -m 1000 -b 200 -a 200 -o {output.matrix} -p {threads};fi >{log.out} 2>{log.err}"
 
     rule plot_heatmap_cov_CSAW:
         input:
