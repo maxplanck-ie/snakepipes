@@ -106,7 +106,7 @@ def run_deepTools_allelic():
 
 def run_CSAW():
     if sampleSheet:
-        return( ["CSAW_{}/CSAW.session_info.txt".format(sample_name),expand("CSAW_{}/CSAW.{change_dir}.log2r.matrix".format(sample_name),change_dir=change_direction), expand("CSAW_{}/CSAW.{change_dir}.log2r.heatmap.png".format(sample_name),change_dir=change_direction)),expand("CSAW_{}/CSAW.{change_dir}.cov.matrix".format(sample_name),change_dir=change_direction)), expand("CSAW_{}/CSAW.{change_dir}.cov.heatmap.png".format(sample_name),change_dir=change_direction)), expand("CSAW_{}/Filtered.results.{change_dir}_withNearestGene.bed".format(sample_name),change_dir=change_direction)] )
+        return( ["CSAW_{}/CSAW.session_info.txt".format(sample_name),expand("CSAW_{}/CSAW.{change_dir}.log2r.matrix".format(sample_name),change_dir=change_direction), expand("CSAW_{}/CSAW.{change_dir}.log2r.heatmap.png".format(sample_name),change_dir=change_direction),expand("CSAW_{}/CSAW.{change_dir}.cov.matrix".format(sample_name),change_dir=change_direction), expand("CSAW_{}/CSAW.{change_dir}.cov.heatmap.png".format(sample_name),change_dir=change_direction), expand("CSAW_{}/Filtered.results.{change_dir}_withNearestGene.bed".format(sample_name),change_dir=change_direction)] )
     else:
         return([])
 
