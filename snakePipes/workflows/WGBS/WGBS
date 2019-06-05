@@ -17,7 +17,7 @@ import snakePipes.parserCommon as parserCommon
 
 def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfile":None, "max_jobs": 12, "nthreads": 8, "snakemake_options": "--use-conda", "tempdir": None,
                          "downsample": None, "trimReads": "user", "fqcin": None, "adapterSeq": "AGATCGGAAGAGC", "nextera": False, "trimThreshold": 10, "trimOtherArgs": None, "convrefpath": None,
-                         "convRef": False, "intList": [], "blackList": None, "sampleSheet": None, "mbias_ignore": "auto", "fromBam": False, "skipDOC": False, "skipGCbias": False}):
+                         "convRef": False, "intList": [], "blackList": None, "sampleSheet": None, "mbias_ignore": "auto", "fromBam": False, "bam_ext": ".bam", "skipDOC": False, "skipGCbias": False}):
     """
     Parse arguments from the command line.
     """
@@ -137,6 +137,11 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
                          dest="fromBam",
                          action="store_true",
                          help=argparse.SUPPRESS,default=defaults["fromBam"])
+
+    optional.add_argument("--fromBamExt",
+                         dest="bam_ext",
+                         help=argparse.SUPPRESS,
+                         default=defaults["bam_ext"])
 
     optional.add_argument("--skipDOC",
                          dest="skipDOC",
