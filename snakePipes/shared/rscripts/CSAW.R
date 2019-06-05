@@ -48,6 +48,15 @@ if(isTRUE(paired)) {
 pe_param <- csaw::readParam(max.frag = 500, pe = pe)  # Some CSAW functions explode the processor count with >1 core
 
 ## Read data
+##filter out input using yaml
+library(yaml)
+y<-read_yaml(yaml_path)
+input_list<-unique(unlist(lapply(y[[1]],function(X)X[["control"]])))
+if(!is.null(input_list)&&!(input_list=="")){
+    sampleInfo<-subset(sampleInfo,!(name %in% input_list))
+}
+
+
 chip_object <- readfiles_chip(sampleSheet = sampleInfo,
                               fragment_length = fraglength,
                               window_size = windowSize,
@@ -68,14 +77,6 @@ makeQCplots_chip(bam.file = last_bam, outplot = "QCplots_last_sample.pdf", pe.pa
 # get files to read from MACS
 if (!is.null(sampleInfo$UseRegions)){
     fnames <- sampleInfo$name[as.logical(sampleInfo$UseRegions)]} else {fnames<-sampleInfo$name}
-
-##filter out input using yaml
-library(yaml)
-y<-read_yaml(yaml_path)
-input_list<-unique(unlist(lapply(y[[1]],function(X)X[["control"]])))
-if(!is.null(input_list)&&!(input_list=="")){
-    fnames<-fnames[!fnames %in% input_list]
-}
 
 allpeaks <- lapply(fnames, function(x) {
     narrow <- paste0("../MACS2/",x,".filtered.BAM_peaks.narrowPeak")
