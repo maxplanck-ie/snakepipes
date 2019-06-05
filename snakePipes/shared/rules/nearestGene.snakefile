@@ -11,4 +11,4 @@ rule get_nearest_gene:
     log:
         err= "AnnotatedResults_{}".format(sample_name)+"/logs/bedtools_closest.{change_dir}.err",
     conda: CONDA_RNASEQ_ENV
-    shell: "if [ -r {input.bed} ]; then bedtools closest -D b -a <( sort -k1,1 -k2,2n {input.bed} ) -b <( sort -k1,1 -k2,2n {params.genes_bed} ) > {output.annotated_bed};fi 2> {log.err}"
+    shell: "if [ -r {input.bed} ]; then bedtools closest -D b -a <( bedtools sort -i {input.bed} ) -b <( bedtools sort -i {params.genes_bed} ) > {output.annotated_bed};fi 2> {log.err}"
