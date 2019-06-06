@@ -2,7 +2,7 @@
 author: "`r Sys.info()[length(Sys.info())-1]`"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: 
-    html_document:
+    rmarkdown::html_document:
         fig_caption: yes
 params:
     outdir: "Stats_reports"
