@@ -287,16 +287,16 @@ writeOutput_chip <- function(chipResultObject, outfile_prefix, fdrcutoff,lfccuto
     ##filter full result for FDR and LFC and write to output
     full_res.filt<-subset(full_res,(FDR<=fdrcutoff)&(abs(best.logFC)>=lfccutoff))
     if(nrow(full_res.filt)>0){
-    write.table(full_res.filt,file="Filtered.results.bed",row.names=FALSE,col.names=FALSE,sep="\t",quote=FALSE)}else{touch("Filtered.results.bed")}
+    write.table(full_res.filt,file="Filtered.results.bed",row.names=FALSE,col.names=FALSE,sep="\t",quote=FALSE)}else{system("touch Filtered.results.bed")}
     res.filt.up<-subset(full_res.filt,direction %in% "up")
     if(nrow(res.filt.up)>0){
-    write.table(res.filt.up,file="Filtered.results.UP.bed",row.names=FALSE,col.names=FALSE,sep="\t",quote=FALSE)}else{touch("Filtered.results.UP.bed")}
+    write.table(res.filt.up,file="Filtered.results.UP.bed",row.names=FALSE,col.names=FALSE,sep="\t",quote=FALSE)}else{system("touch Filtered.results.UP.bed")}
     res.filt.down<-subset(full_res.filt,direction %in% "down")
     if(nrow(res.filt.down)>0){
-    write.table(res.filt.down,file="Filtered.results.DOWN.bed",row.names=FALSE,col.names=FALSE,sep="\t",quote=FALSE)}else{touch("Filtered.results.DOWN.bed")}
+    write.table(res.filt.down,file="Filtered.results.DOWN.bed",row.names=FALSE,col.names=FALSE,sep="\t",quote=FALSE)}else{system("touch Filtered.results.DOWN.bed")}
     res.filt.mixed<-subset(full_res.filt,direction %in% "mixed")
     if(nrow(res.filt.mixed)>0){
-    write.table(res.filt.mixed,file="Filtered.results.MIXED.bed",row.names=FALSE,col.names=FALSE,sep="\t",quote=FALSE)}else{touch("Filtered.results.MIXED.bed")}
+    write.table(res.filt.mixed,file="Filtered.results.MIXED.bed",row.names=FALSE,col.names=FALSE,sep="\t",quote=FALSE)}else{system("touch Filtered.results.MIXED.bed")}
 }
 
 
