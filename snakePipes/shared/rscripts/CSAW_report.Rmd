@@ -30,8 +30,8 @@ This report summarizes statistical analysis of binding events using group inform
 
 ```{r data_load}
 DBdata<-file.path(params$outdir,"DiffBinding_analysis.Rdata")
-library(GenomicRanges)
-library(csaw)
+library(GenomicRanges,quietly=TRUE)
+library(csaw,quietly=TRUE)
 load(DBdata)
 ```
 
@@ -47,7 +47,7 @@ chip_object$design
 ```
 
 The original windows were merged into `r length(chip_results$mergedRegions$region)` regions, for which p values were combined and FDR estimates were obtained after adjustment for multiple testing. 
-The absolute log fold change of the window with smallest pvalue belonging to a merged region was reported as best log fold change for that region.
+The absolute log fold change of the window with the smallest p value belonging to a merged region was reported as best log fold change for that region.
 
 ### Filtering of results
 
@@ -65,7 +65,7 @@ lfccutoff<-as.numeric(params$lfc)
 full_res.filt<-subset(full_res,(FDR<=fdrcutoff)&(abs(best.logFC)>=lfccutoff))
 ```
 
-Applying FDR threshold of `r params$fdr` and absolute (best) log fold change threshold of `r params$lfc` result in a final list of `r nrow(full_res.filt)` merged regions.   
+Applying FDR threshold of `r params$fdr` and absolute (best) log fold change threshold of `r params$lfc` resulted in a final list of `r nrow(full_res.filt)` merged regions.   
 Numbers of regions showing different direction change were as follows:
 
 ```{r direction_list}
@@ -80,8 +80,8 @@ Heatmaps obtained using log2 ratio of ChIP signal over input were as follows:
 
 ```{r plot_l2r, fig.cap=c("UP","DOWN")}
 if(!params$pipeline %in% "chip-seq"){message("ChIP signal enrichment over input is only available for ChIP-seq workflow!")}else{
-    knitr::include_graphics(file.path(params$outdir,"CSAW.UP.log2r.heatmap.png"))
-    knitr::include_graphics(file.path(params$outdir,"CSAW.DOWN.log2r.heatmap.png"))}
+    knitr::include_graphics(cbind(file.path(params$outdir,"CSAW.UP.log2r.heatmap.png"),file.path(params$outdir,"CSAW.DOWN.log2r.heatmap.png")))
+    }
 
 ```
 
@@ -89,11 +89,10 @@ Heatmaps obtained using depth-normalized coverage were as follows:
 
 
 ```{r plot_cov, fig.cap=c("UP","DOWN")}
-knitr::include_graphics(file.path(params$outdir,"CSAW.UP.cov.heatmap.png"))
-knitr::include_graphics(file.path(params$outdir,"CSAW.DOWN.cov.heatmap.png"))
+knitr::include_graphics(cbind(file.path(params$outdir,"CSAW.UP.cov.heatmap.png"),file.path(params$outdir,"CSAW.DOWN.cov.heatmap.png")))
 ```
 
-Tables with differentially bound regions annotated with distance to nearest gene can be found in folder `r paste0("AnnotatedResults_",gsub("\\.[a-z]{3}$","",basename(params$sample_sheet)))`.
+Tables with differentially bound regions annotated with distance to nearest gene can be found in folder `r paste0("AnnotatedResults_",gsub("\\.[a-z]{3}$","",basename(params$sample_sheet)))`.   
 
 
   
