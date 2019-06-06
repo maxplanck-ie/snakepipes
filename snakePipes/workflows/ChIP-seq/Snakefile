@@ -149,6 +149,10 @@ onstart:
 
 ### main rule ##################################################################
 ################################################################################
+if sampleSheet:
+    localrules:
+        CSAW_report
+
 rule all:
     input:
     	run_deepTools_qc(fromBam),

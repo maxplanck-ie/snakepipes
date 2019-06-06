@@ -18,8 +18,6 @@ title: "`r paste0('CSAW differential binding stats report')`"
 .libPaths(R.home("library"))
 
 knitr::opts_chunk$set(echo = FALSE, out.width = '30%',out.height='30%')
-#knitr::opts_knit$set(root.dir=params$outdir)
-#knitr::opts_knit$get('root.dir')
 
 ```
 
@@ -32,12 +30,12 @@ This report summarizes statistical analysis of binding events using group inform
 
 ```{r data_load}
 DBdata<-file.path(params$outdir,"DiffBinding_analysis.Rdata")
-if(is.na(file.info(DBdata)$size)|file.info(DBdata)$size!=0){
-    stop("Output of differential binding analysis not found or empty!")}
+library(GenomicRanges)
+library(csaw)
 load(DBdata)
 ```
 
-There were `r length(chip_object$windowCounts)` genomic bins of size `r width(chip_object$windowCounts)[1]` intersecting MACS2 peaks.   
+Input to the differential binding analysis were `r length(chip_object$windowCounts)` genomic bins of size `r width(chip_object$windowCounts)[1]` bp having any overlap to the union of MACS2 peaks from all samples listed in the sample sheet.   
 Size factors were calculated via TMM normalization of read counts obtained for 10kb genomic bins and amounted to `r chip_object$normFactors`.   
 
 ### Statistical analysis
@@ -48,8 +46,8 @@ Statistical model was fit according to the following design:
 chip_object$design
 ```
 
-The original windows were merged into `r length(chip_results$mergedRegions)` regions, for which p values were combined and FDR estimates were obtained after adjustment for multiple testing. 
-The maximal absolute log fold change of a window belonging to a merged region was reported as best log fold change for that region.
+The original windows were merged into `r length(chip_results$mergedRegions$region)` regions, for which p values were combined and FDR estimates were obtained after adjustment for multiple testing. 
+The absolute log fold change of the window with smallest pvalue belonging to a merged region was reported as best log fold change for that region.
 
 ### Filtering of results
 
@@ -67,8 +65,8 @@ lfccutoff<-as.numeric(params$lfc)
 full_res.filt<-subset(full_res,(FDR<=fdrcutoff)&(abs(best.logFC)>=lfccutoff))
 ```
 
-Applying FDR threshold of 'r params$fdr' and absolute log fold change threshold of `r params$lfc` result in a final list of `r nrow(full_res.filt)` merged regions.   
-Counts of regions showing direction change were as follows:
+Applying FDR threshold of `r params$fdr` and absolute (best) log fold change threshold of `r params$lfc` result in a final list of `r nrow(full_res.filt)` merged regions.   
+Numbers of regions showing different direction change were as follows:
 
 ```{r direction_list}
 table(full_res.filt$direction)
@@ -80,21 +78,22 @@ Deeptools matrices were computed for the filtered lists of merged regions showin
 
 Heatmaps obtained using log2 ratio of ChIP signal over input were as follows:
 
-```{r plot_l2r, caption=c("UP","DOWN","MIXED")}
+```{r plot_l2r, fig.cap=c("UP","DOWN")}
 if(!params$pipeline %in% "chip-seq"){message("ChIP signal enrichment over input is only available for ChIP-seq workflow!")}else{
-    knitr::includeGraphics(file.path(outdir,"CSAW.UP.log2r.heatmap.png"))
-    knitr::includeGraphics(file.path(outdir,"CSAW.DOWN.log2r.heatmap.png"))
-    knitr::includeGraphics(file.path(outdir,"CSAW.MIXED.log2r.heatmap.png"))}
+    knitr::include_graphics(file.path(params$outdir,"CSAW.UP.log2r.heatmap.png"))
+    knitr::include_graphics(file.path(params$outdir,"CSAW.DOWN.log2r.heatmap.png"))}
+
 ```
+
 Heatmaps obtained using depth-normalized coverage were as follows:
 
-```{r plot_cov, caption=c("UP","DOWN","MIXED")}
-knitr::includeGraphics(file.path(outdir,"CSAW.UP.cov.heatmap.png"))
-knitr::includeGraphics(file.path(outdir,"CSAW.DOWN.cov.heatmap.png"))
-knitr::includeGraphics(file.path(outdir,"CSAW.MIXED.cov.heatmap.png"))
+
+```{r plot_cov, fig.cap=c("UP","DOWN")}
+knitr::include_graphics(file.path(params$outdir,"CSAW.UP.cov.heatmap.png"))
+knitr::include_graphics(file.path(params$outdir,"CSAW.DOWN.cov.heatmap.png"))
 ```
 
-Tables with differentially bound regions annotated with distance to nearest gene can be found in folder `r paste0("AnnotatedResults_",gsub("\\.[a-z]{3}$","",params$sample_sheet))`.
+Tables with differentially bound regions annotated with distance to nearest gene can be found in folder `r paste0("AnnotatedResults_",gsub("\\.[a-z]{3}$","",basename(params$sample_sheet)))`.
 
 
   
