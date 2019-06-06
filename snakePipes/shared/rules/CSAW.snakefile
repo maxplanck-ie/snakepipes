@@ -12,7 +12,8 @@ rule CSAW:
         "CSAW_{}/.benchmark/CSAW.benchmark".format(sample_name)
     params:
         outdir =os.path.join(outdir,"CSAW_{}".format(sample_name)),
-        fdr = 0.05,
+        fdr = fdr,
+        absBestLFC=absBestLFC,
         paired = paired,
         fragment_length = fragment_length,
         window_size = window_size,

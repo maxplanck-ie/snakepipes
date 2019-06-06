@@ -255,7 +255,7 @@ getDBregions_chip <- function(chipCountObject, plotfile = NULL){
 #' writeOutput_chip(chipResultObject, outfile_prefix)
 #'
 
-writeOutput_chip <- function(chipResultObject, outfile_prefix, fdrcutoff){
+writeOutput_chip <- function(chipResultObject, outfile_prefix, fdrcutoff,lfccutoff){
     # get merged regions
     merged <- chipResultObject$mergedRegions
     tabcom <- chipResultObject$combinedPvalues
@@ -285,7 +285,7 @@ writeOutput_chip <- function(chipResultObject, outfile_prefix, fdrcutoff){
     full_res<-full_res[,c(2:ncol(full_res),1)]
     print(sprintf("Colnames of result file are %s",colnames(full_res)))
     ##filter full result for FDR and LFC and write to output
-    full_res.filt<-subset(full_res,(FDR<=fdrcutoff)&(abs(best.logFC)>=1))
+    full_res.filt<-subset(full_res,(FDR<=fdrcutoff)&(abs(best.logFC)>=lfccutoff))
     if(nrow(full_res.filt)>0){
     write.table(full_res.filt,file="Filtered.results.bed",row.names=FALSE,col.names=FALSE,sep="\t",quote=FALSE)}else{touch("Filtered.results.bed")}
     res.filt.up<-subset(full_res.filt,direction %in% "up")

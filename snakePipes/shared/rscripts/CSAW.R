@@ -5,6 +5,7 @@
 sampleInfoFilePath <- snakemake@input[["sampleSheet"]]  #"samplesheet.tab"
 insert_size_metrics <- snakemake@params[["insert_size_metrics"]] # bamPEFragmentSize output
 fdr <- as.numeric(snakemake@params[["fdr"]])
+lfc <- as.numeric(snakemake@params[["absBestLFC"]])
 paired <- as.logical(snakemake@params[["paired"]])
 fraglength <- as.numeric(snakemake@params[["fragment_length"]])  # used when the data is not paired end
 windowSize <- as.numeric(snakemake@params[["window_size"]])
@@ -33,6 +34,7 @@ setwd(outdir)
 cat(paste("Working dir:", getwd(), "\n"))
 cat(paste("Sample info CSV:", sampleInfoFilePath, "\n"))
 cat(paste("FDR:", fdr, "\n"))
+cat(paste("LFC:", lfc, "\n"))
 cat(paste("paired-end? :", paired, "\n"))
 cat(paste("allele-specific? :", allelic_info, "\n"))
 
@@ -112,7 +114,7 @@ chip_results <- getDBregions_chip(chip_object, plotfile = "DiffBinding_modelfit.
 
 ## write output
 print("Writing output")
-writeOutput_chip(chip_results, outfile_prefix = "DiffBinding", fdrcutoff = fdr)
+writeOutput_chip(chip_results, outfile_prefix = "DiffBinding", fdrcutoff = fdr,lfccutoff=lfc)
 
 
 ## save data
