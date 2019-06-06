@@ -57,12 +57,12 @@ def parse_args(defaults={"verbose": False, "configFile": None, "clusterConfigFil
                           "for polyA trimming with Cutadapt (default: '%(default)s')",
                           default=defaults["trimmerOptions"])
 
-    optional.add_argument("--star_options",
-                          dest="star_options",
+    optional.add_argument("--starOptions",
+                          dest="starOptions",
                           metavar="STR",
                           help="STAR option string, e.g.: '--twopassMode Basic' (default: '%(default)s')",
                           type=str,
-                          default=defaults["star_options"])
+                          default=defaults["starOptions"])
 
     optional.add_argument("--cell_barcode_file",
                           dest="barcode_file",

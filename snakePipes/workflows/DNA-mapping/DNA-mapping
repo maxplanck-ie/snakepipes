@@ -126,7 +126,7 @@ def main():
     filt = ""
     if args.dedup:
         filt += "-F 1024 "
-    if args.properpairs:
+    if args.properPairs:
         filt += "-f 2 "
     if args.mapq is not None and args.mapq > 0:
         filt += "-q {} ".format(args.mapq)
