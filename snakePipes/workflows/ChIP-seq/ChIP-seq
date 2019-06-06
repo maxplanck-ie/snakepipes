@@ -100,12 +100,12 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
                           dest="fdr",
                           help="FDR threshold to apply for filtering DB regions"
                                "(default: '%(default)s')",
-                          default=defaults["window_size"])
+                          default=defaults["fdr"])
     optional.add_argument("--LFC",
                           dest="absBestLFC",
                           help="Log fold change threshold to apply for filtering DB regions"
                                "(default: '%(default)s')",
-                          default=defaults["window_size"])
+                          default=defaults["absBestLFC"])
 
     #parserCommon.commonOptions(optional, defaults,fromBam=True)
     

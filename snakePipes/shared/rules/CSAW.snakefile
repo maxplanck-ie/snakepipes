@@ -11,7 +11,7 @@ rule CSAW:
     benchmark:
         "CSAW_{}/.benchmark/CSAW.benchmark".format(sample_name)
     params:
-        outdir =os.path.join(outdir,"CSAW_{}".format(sample_name)),
+        outdir=os.path.join(outdir,"CSAW_{}".format(sample_name)),
         fdr = fdr,
         absBestLFC=absBestLFC,
         paired = paired,
@@ -38,7 +38,7 @@ rule CSAW_report:
         pipeline=pipeline,
         fdr=fdr,
         lfc=absBestLFC,
-        outdir="CSAW_{}".format(sample_name),
+        outdir=os.path.join(outdir,"CSAW_{}".format(sample_name)),
         sampleSheet=sampleSheet,
         outFull=lambda wildcards,output: os.path.join(outdir,output.outfile)
     log:

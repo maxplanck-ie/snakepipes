@@ -18,7 +18,9 @@ title: "`r paste0('CSAW differential binding stats report')`"
 .libPaths(R.home("library"))
 
 knitr::opts_chunk$set(echo = FALSE, out.width = '30%',out.height='30%')
-source(params$input_func)
+#knitr::opts_knit$set(root.dir=params$outdir)
+#knitr::opts_knit$get('root.dir')
+
 ```
 
 
@@ -28,11 +30,11 @@ This report summarizes statistical analysis of binding events using group inform
 
 ### Analysis input
 
-```{r}
-DBdata<-paste0("CSAW_",gsub("\\.[a-z]{3}$","",params$sample_sheet))
-if(is.na(file.info(DBdata)$size))|file.info(DBdata)$size!=0){
-    message("Output of differential binding analysis not found or empty!")}else{
-    load(DBdata)}
+```{r data_load}
+DBdata<-file.path(params$outdir,"DiffBinding_analysis.Rdata")
+if(is.na(file.info(DBdata)$size)|file.info(DBdata)$size!=0){
+    stop("Output of differential binding analysis not found or empty!")}
+load(DBdata)
 ```
 
 There were `r length(chip_object$windowCounts)` genomic bins of size `r width(chip_object$windowCounts)[1]` intersecting MACS2 peaks.   
@@ -42,7 +44,7 @@ Size factors were calculated via TMM normalization of read counts obtained for 1
 
 Statistical model was fit according to the following design:
 
-```{r}
+```{r design_used}
 chip_object$design
 ```
 
@@ -51,7 +53,7 @@ The maximal absolute log fold change of a window belonging to a merged region wa
 
 ### Filtering of results
 
-```{r}
+```{r filter_results}
 merged<-chip_results$mergedRegions
 tabcom<-chip_results$combinedPvalues
 merged$region$score <- -10*log10(tabcom$FDR)
@@ -68,7 +70,7 @@ full_res.filt<-subset(full_res,(FDR<=fdrcutoff)&(abs(best.logFC)>=lfccutoff))
 Applying FDR threshold of 'r params$fdr' and absolute log fold change threshold of `r params$lfc` result in a final list of `r nrow(full_res.filt)` merged regions.   
 Counts of regions showing direction change were as follows:
 
-```{r}
+```{r direction_list}
 table(full_res.filt$direction)
 ```
 
@@ -78,7 +80,7 @@ Deeptools matrices were computed for the filtered lists of merged regions showin
 
 Heatmaps obtained using log2 ratio of ChIP signal over input were as follows:
 
-```{r, caption=c("UP","DOWN","MIXED")}
+```{r plot_l2r, caption=c("UP","DOWN","MIXED")}
 if(!params$pipeline %in% "chip-seq"){message("ChIP signal enrichment over input is only available for ChIP-seq workflow!")}else{
     knitr::includeGraphics(file.path(outdir,"CSAW.UP.log2r.heatmap.png"))
     knitr::includeGraphics(file.path(outdir,"CSAW.DOWN.log2r.heatmap.png"))
@@ -86,7 +88,7 @@ if(!params$pipeline %in% "chip-seq"){message("ChIP signal enrichment over input 
 ```
 Heatmaps obtained using depth-normalized coverage were as follows:
 
-```{r, caption=c("UP","DOWN","MIXED")}
+```{r plot_cov, caption=c("UP","DOWN","MIXED")}
 knitr::includeGraphics(file.path(outdir,"CSAW.UP.cov.heatmap.png"))
 knitr::includeGraphics(file.path(outdir,"CSAW.DOWN.cov.heatmap.png"))
 knitr::includeGraphics(file.path(outdir,"CSAW.MIXED.cov.heatmap.png"))
