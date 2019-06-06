@@ -4,10 +4,10 @@ from operator import is_not
 import tempfile
 
 ###symlink bams if this is the starting point
-if fromBam:
+if fromBAM:
     rule link_bam:
         input:
-            indir + "/{sample}" + bam_ext
+            indir + "/{sample}" + bamExt
         output:
             "bwameth/{sample}.PCRrm.bam"
         shell:
@@ -207,11 +207,11 @@ rule calc_GCbias:
         "bwameth/{sample}.PCRrm.bam.bai"
     output:
         GCbiasTXT="QC_metrics/{sample}.freq.txt",
-        GCbiasPNG="QC_metrics/{sample}.GCbias." + plot_format
+        GCbiasPNG="QC_metrics/{sample}.GCbias." + plotFormat
     params:
         genomeSize=genome_size,
         twobitpath=genome_2bit,
-        plot_format=plot_format
+        plotFormat=plotFormat
     log:
         out="QC_metrics/logs/{sample}.calc_GCbias.out"
     threads: 20
@@ -226,7 +226,7 @@ rule DepthOfCov:
     input:
         "bwameth/{sample}.PCRrm.bam",
         "bwameth/{sample}.PCRrm.bam.bai",
-        intList if intList else "aux_files/randomCpG.bed"
+        "aux_files/randomCpG.bed"
     output:
         "QC_metrics/{sample}.doc.sample_summary",
     params:
@@ -301,7 +301,7 @@ rule produce_report:
     script: "../rscripts/WGBS_QC_report_template.Rmd"
 
 
-if mbias_ignore=="auto":
+if mbias=="auto":
     rule methyl_extract:
         input:
             "bwameth/{sample}.PCRrm.bam",
@@ -331,18 +331,18 @@ else:
         params:
             genome=genome_fasta,
             MethylDackelOptions=MethylDackelOptions,
-            mbias_ignore=mbias_ignore
+            mbias=mbias
         log:
             err="MethylDackel/logs/{sample}.methyl_extract.err",
             out="MethylDackel/logs/{sample}.methyl_extract.out"
         threads: 10
         conda: CONDA_WGBS_ENV
         shell: """
-            MethylDackel extract -o MethylDackel/{wildcards.sample} {params.mbias_ignore} -@ {threads} {params.genome} {input[0]} 1>{log.out} 2>{log.err}
+            MethylDackel extract -o MethylDackel/{wildcards.sample} {params.mbias} -@ {threads} {params.genome} {input[0]} 1>{log.out} 2>{log.err}
             """
 
 
-if blackList is None:
+if blacklist is None:
     rule CpG_filt:
         input:
             "MethylDackel/{sample}_CpG.bedGraph"
@@ -357,8 +357,8 @@ if blackList is None:
 else:
     rule CpG_filt:
         input:
-            methTab="MethylDackel/{sample}_CpG.bedGraph",
-            blackListF=blackList
+            "MethylDackel/{sample}_CpG.bedGraph",
+            blacklist
         output:
             temp("MethylDackel/{sample}.CpG.filt2.bed"),
             temp("MethylDackel/{sample}.CpG.filt2.bed.temp")
@@ -374,6 +374,7 @@ else:
             """
 
 
+# TODO: this is really slow, it shouldn't take more than a few minutes.
 rule prep_for_stats:
     input:
         expressionFiles=expand("MethylDackel/{sample}.CpG.filt2.bed", sample=samples)
@@ -390,6 +391,7 @@ rule prep_for_stats:
 
 
 # TODO: allow changing smoothing parameters
+# This is currently allotted 5GB per thread
 rule DSS:
     input:
         bedGraphs=expand("MethylDackel/{sample}.CpG.filt2.bed", sample=samples)
@@ -403,6 +405,8 @@ rule DSS:
         minCpGs=minCpGs,
         minMethDiff=minMethDiff,
         FDR=FDR
+    threads: 10
+    benchmark: '{}/.benchmark/DSS.benchmark'.format(get_outdir("DSS"))
     conda: CONDA_WGBS_ENV
     script: "../rscripts/WGBS_DSS.Rmd"
 
@@ -423,6 +427,7 @@ rule run_metilene:
     log:
         err="{}/logs/run_metilene.err".format(get_outdir("metilene"))
     threads: 10
+    benchmark: '{}/.benchmark/run_metilene.benchmark'.format(get_outdir("metilene"))
     conda: CONDA_WGBS_ENV
     shell: """
         echo -e "chrom\tstart\tend\tq-value\tmean methylation difference\tnCpGs\tp (MWU)\tp (2D KS)\tmean_{params.groups[0]}\tmean_{params.groups[1]}" > {output}
@@ -450,6 +455,7 @@ rule metileneReport:
         minMethDiff=minMethDiff,
         FDR=FDR
     threads: 1
+    benchmark: '{}/.benchmark/metileneReport.benchmark'.format(get_outdir("metilene"))
     conda: CONDA_WGBS_ENV
     script: "../rscripts/WGBS_metileneQC.Rmd"
 

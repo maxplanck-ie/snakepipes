@@ -11,11 +11,11 @@ rule bamCompare_log2_genome1:
         "deepTools_ChIP/bamCompare/allele_specific/{chip_sample}.genome1.log2ratio.over_{control_name}.bw"#, chip_sample = chip_samples, suffix = ['genome1', 'genome2'])
     conda: CONDA_SHARED_ENV
     params:
-        bw_binsize = bw_binsize,
+        bwBinSize = bwBinSize,
         ignoreForNorm = "--ignoreForNormalization " + ignore_forNorm if ignore_forNorm else "",
         read_extension = "--extendReads" if paired
-                         else "--extendReads "+str(fragment_length),
-        blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed
+                         else "--extendReads " + str(fragmentLength),
+        blacklist = "--blackListFileName " + blacklist_bed if blacklist_bed
                     else "",
     log:
         out = "deepTools_ChIP/logs/bamCompare.log2ratio.{chip_sample}.{control_name}.genome1.out",
@@ -35,11 +35,11 @@ rule bamCompare_log2_genome2:
         "deepTools_ChIP/bamCompare/allele_specific/{chip_sample}.genome2.log2ratio.over_{control_name}.bw"
     conda: CONDA_SHARED_ENV
     params:
-        bw_binsize = bw_binsize,
+        bwBinSize = bwBinSize,
         ignoreForNorm = "--ignoreForNormalization " + ignore_forNorm if ignore_forNorm else "",
         read_extension = "--extendReads" if paired
-                         else "--extendReads "+str(fragment_length),
-        blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed
+                         else "--extendReads " + str(fragmentLength),
+        blacklist = "--blackListFileName " + blacklist_bed if blacklist_bed
                     else "",
     log:
         out = "deepTools_ChIP/logs/bamCompare.log2ratio.{chip_sample}.{control_name}.genome2.out",
@@ -65,7 +65,7 @@ rule plotEnrichment_allelic:
         blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed
                     else "",
         read_extension = "--extendReads" if paired
-                         else "--extendReads "+str(fragment_length)
+                         else "--extendReads " + str(fragmentLength)
     log:
         out = "deepTools_ChIP/logs/plotEnrichment_allelic.out",
         err = "deepTools_ChIP/logs/plotEnrichment_allelic.err"
@@ -89,7 +89,7 @@ rule plotFingerprint_allelic:
         blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed
                     else "",
         read_extension = "--extendReads" if paired
-                         else "--extendReads "+str(fragment_length),
+                         else "--extendReads " + str(fragmentLength),
         png = "--plotFile deepTools_ChIP/plotFingerprint/plotFingerprint_allelic.png" if (len(all_samples)<=20)
               else "",
         jsd = ""

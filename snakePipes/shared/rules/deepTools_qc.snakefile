@@ -8,11 +8,11 @@ rule bamCoverage:
     output:
         "bamCoverage/{sample}.seq_depth_norm.bw"
     params:
-        bw_binsize = bw_binsize,
+        bwBinSize = bwBinSize,
         genome_size = int(genome_size),
         ignoreForNorm = "--ignoreForNormalization {}".format(ignore_forNorm) if ignore_forNorm else "",
         read_extension = "--extendReads" if paired
-                         else "--extendReads {}".format(fragment_length),
+                         else "--extendReads {}".format(fragmentLength),
         blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed else "",
     log:
         out = "bamCoverage/logs/bamCoverage.{sample}.out",
@@ -33,11 +33,11 @@ rule bamCoverage_filtered:
     output:
         "bamCoverage/{sample}.filtered.seq_depth_norm.bw"
     params:
-        bw_binsize = bw_binsize,
+        bwBinSize = bwBinSize,
         genome_size = int(genome_size),
         ignoreForNorm = "--ignoreForNormalization {}".format(ignore_forNorm) if ignore_forNorm else "",
         read_extension = "--extendReads" if paired
-                         else "--extendReads {}".format(fragment_length),
+                         else "--extendReads {}".format(fragmentLength),
         blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed
                     else "",
     log:
@@ -63,9 +63,9 @@ rule plotCoverage:
     params:
         labels = " ".join(samples),
         read_extension = "--extendReads" if paired
-                         else "--extendReads {}".format(fragment_length),
-        plotcmd = "" if plot_format == 'None' else
-                    "--plotFile deepTools_qc/plotCoverage/read_coverage.{}".format(plot_format)
+                         else "--extendReads {}".format(fragmentLength),
+        plotcmd = "" if plotFormat == 'None' else
+                    "--plotFile deepTools_qc/plotCoverage/read_coverage.{}".format(plotFormat)
     log:
         out = "deepTools_qc/logs/plotCoverage.out",
         err = "deepTools_qc/logs/plotCoverage.err"
@@ -87,7 +87,7 @@ rule multiBamSummary:
         labels = " ".join(samples),
         blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed else "",
         read_extension = "--extendReads" if paired
-                         else "--extendReads {}".format(fragment_length)
+                         else "--extendReads {}".format(fragmentLength)
     log:
         out = "deepTools_qc/logs/multiBamSummary.out",
         err = "deepTools_qc/logs/multiBamSummary.err"
@@ -107,8 +107,8 @@ rule plotCorrelation_pearson:
     output:
         "deepTools_qc/plotCorrelation/correlation.pearson.read_coverage.tsv"
     params:
-        plotcmd = "" if plot_format == 'None' else
-            "--plotFile deepTools_qc/plotCorrelation/correlation.pearson.read_coverage.heatmap.{}".format(plot_format),
+        plotcmd = "" if plotFormat == 'None' else
+            "--plotFile deepTools_qc/plotCorrelation/correlation.pearson.read_coverage.heatmap.{}".format(plotFormat),
         title='fragment'
     log:
         out = "deepTools_qc/logs/plotCorrelation_pearson.out",
@@ -125,8 +125,8 @@ rule plotCorrelation_spearman:
     output:
         "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage.tsv"
     params:
-        plotcmd = "" if plot_format == 'None' else
-            "--plotFile deepTools_qc/plotCorrelation/correlation.spearman.read_coverage.heatmap.{}".format(plot_format),
+        plotcmd = "" if plotFormat == 'None' else
+            "--plotFile deepTools_qc/plotCorrelation/correlation.spearman.read_coverage.heatmap.{}".format(plotFormat),
         title='fragment'
     log:
         out = "deepTools_qc/logs/plotCorrelation_spearman.out",
@@ -143,8 +143,8 @@ rule plotPCA:
     output:
         "deepTools_qc/plotPCA/PCA.read_coverage.tsv"
     params:
-        plotcmd = "" if plot_format == 'None' else
-                "--plotFile deepTools_qc/plotPCA/PCA.read_coverage.{}".format(plot_format),
+        plotcmd = "" if plotFormat == 'None' else
+                "--plotFile deepTools_qc/plotPCA/PCA.read_coverage.{}".format(plotFormat),
         title='fragment'
     log:
         out = "deepTools_qc/logs/plotPCA.out",
@@ -179,11 +179,11 @@ rule computeGCBias:
         tsv = "deepTools_qc/computeGCBias/{sample}.filtered.GCBias.freq.tsv"
     params:
         paired = paired,
-        fragment_length = fragment_length,
+        fragmentLength = fragmentLength,
         genome_size = int(genome_size),
         genome_2bit = genome_2bit,
         blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed else "",
-        median_fragment_length = "" if paired else "-fragmentLength {}".format(fragment_length),
+        median_fragment_length = "" if paired else "-fragmentLength {}".format(fragmentLength),
         sampleSize = downsample if downsample and downsample < 10000000 else 10000000
     log:
         out = "deepTools_qc/logs/computeGCBias.{sample}.filtered.out",
@@ -202,8 +202,8 @@ rule bamPE_fragment_size:
     output:
         "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv"
     params:
-        plotcmd = "" if plot_format == 'None' else
-                "-o deepTools_qc/bamPEFragmentSize/fragmentSizes.{}".format(plot_format)
+        plotcmd = "" if plotFormat == 'None' else
+                "-o deepTools_qc/bamPEFragmentSize/fragmentSizes.{}".format(plotFormat)
     log:
         out = "deepTools_qc/logs/bamPEFragmentSize.out",
         err = "deepTools_qc/logs/bamPEFragmentSize.err"

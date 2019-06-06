@@ -52,10 +52,10 @@ There is a configuration file in ``snakePipes/workflows/ATACseq/defaults.yaml``:
 
     ## General/Snakemake parameters, only used/set by wrapper or in Snakemake cmdl, but not in Snakefile
     pipeline: ATAC-seq
-    configfile:
-    cluster_configfile:
+    configFile:
+    clusterConfigFile:
     local: false
-    max_jobs: 5
+    maxJobs: 5
     ## workingdir need to be required DNA-mapping output dir, 'outdir' is set to workingdir internally
     workingdir:
     ## preconfigured target genomes (mm9,mm10,dm3,...) , see /path/to/snakemake_workflows/shared/organisms/
@@ -70,14 +70,14 @@ There is a configuration file in ``snakePipes/workflows/ATACseq/defaults.yaml``:
     window_size: 20
     fragmentCount_cutoff: 1
     #### Flag to control the pipeline entry point
-    bam_ext: '.filtered.bam'
-    fromBam: 
+    bamExt: '.filtered.bam'
+    fromBAM: 
     ## Bin size of output files in bigWig format
-    bw_binsize: 25
+    bwBinSize: 25
     paired: True
-    plot_format: png
+    plotFormat: png
     ## Median/mean fragment length, only relevant for single-end data (default: 200)
-    fragment_length: 
+    fragmentLength: 
     trim:
     fastqc:
     qval: 0.001

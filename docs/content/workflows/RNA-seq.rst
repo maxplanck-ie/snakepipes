@@ -28,10 +28,10 @@ There is a configuration file in ``snakePipes/workflows/RNA-seq/defaults.yaml``:
     ## General/Snakemake parameters, only used/set by wrapper or in Snakemake cmdl, but not in Snakefile
     pipeline: rna-seq
     outdir:
-    configfile:
-    cluster_configfile:
+    configFile:
+    clusterConfigFile:
     local: False
-    max_jobs: 5
+    maxJobs: 5
     ## directory with fastq files
     indir:
     ## preconfigured target genomes (mm9,mm10,dm3,...) , see /path/to/snakemake_workflows/shared/organisms/
@@ -45,16 +45,16 @@ There is a configuration file in ``snakePipes/workflows/RNA-seq/defaults.yaml``:
     downsample:
     ## Options for trimming
     trim: False
-    trim_prg: cutadapt
-    trim_options:
+    trimmer: cutadapt
+    trimmerOptions:
     ## further options
     mode: alignment-free,deepTools_qc
     sampleSheet:
-    bw_binsize: 25
+    bwBinSize: 25
     fastqc: False
     featurecounts_options: -C -Q 10 --primary
     filter_annotation:
-    fragment_length: 200
+    fragmentLength: 200
     library_type: 2
     salmon_index_options: --type quasi -k 31
     dnaContam: False
@@ -64,7 +64,7 @@ There is a configuration file in ``snakePipes/workflows/RNA-seq/defaults.yaml``:
     star_options: --outBAMsortingBinsN 30
     hisat_options:
     verbose: False
-    plot_format: png
+    plotFormat: png
     # for allele-spcific mapping
     snp_file:
     Nmasked_index:
@@ -86,7 +86,7 @@ Apart from the common workflow options (see :ref:`running_snakePipes`), the foll
 
 * **dnaContam**: Enable this to test for possible DNA contamination in your RNA-seq samples. DNA contamination is quantified as the fraction of reads falling into intronic and intergenic regions, compared to those falling into exons. Enabling this option would produce a directory called ``GenomicContamination`` with ``.tsv`` files containing this information.
 
-* **plot_format**: You can switch the type of plot produced by all deeptools modules using this option. Possible choices : png, pdf, svg, eps, plotly
+* **plotFormat**: You can switch the type of plot produced by all deeptools modules using this option. Possible choices : png, pdf, svg, eps, plotly
 
 * **snp_file**: For the ``allelic-mapping`` mode. The ``snp_file`` is the file produced by `SNPsplit <https://www.bioinformatics.babraham.ac.uk/projects/SNPsplit/>`__ after creating a dual-hybrid genome. The file has the suffix ``.vcf``.
 

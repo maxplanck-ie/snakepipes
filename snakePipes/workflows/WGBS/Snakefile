@@ -15,7 +15,7 @@ workflow_rscripts=os.path.join(maindir, "shared", "rscripts")
 globals().update(cf.set_env_yamls())
 
 # load config file
-globals().update(cf.load_configfile(workflow.overwrite_configfile,config["verbose"]))
+globals().update(cf.load_configfile(workflow.overwrite_configfile, config["verbose"]))
 # load organism-specific data, i.e. genome indices, annotation, etc.
 globals().update(cf.load_organism_data(genome, maindir, config["verbose"]))
 
@@ -80,7 +80,7 @@ def get_outdir(folder_name):
 
 
 def run_CpG_stats(sampleSheet):
-    if sampleSheet:
+    if sampleSheet and computeDMLs:
         return (['{}/Stats_report.html'.format(get_outdir("DSS"))])
     else:
         return ([])
@@ -103,7 +103,7 @@ def run_deeptools(skipGCbias):
 ### include modules of other snakefiles ########################################
 ##some rules depend on the definitions above
 ################################################################################
-if not fromBam:
+if not fromBAM:
     # FASTQ: either downsample FASTQ files or create symlinks to input files
     include: os.path.join(maindir, "shared", "rules", "FASTQ.snakefile")
 
@@ -127,7 +127,7 @@ onstart:
 
 ### main rule ##################################################################
 ################################################################################
-if not fromBam:
+if not fromBAM:
     localrules:
         FASTQ1,
         FASTQ2

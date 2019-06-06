@@ -16,10 +16,10 @@ import snakePipes.common_functions as cf
 import snakePipes.parserCommon as parserCommon
 
 
-def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfile": None, "max_jobs": 5, "snakemake_options": "--use-conda", "tempdir": None,
-                         "mode": "mapping", "downsample": False, "trim": False, "trim_prg": "cutadapt", "trim_options": "", "fastqc": False,
-                         "qualimap": False, "dedup": False, "properpairs": False, "insert_size_max": 1000, "gcbias": False,
-                         "bw_binsize": 25, "mapq": 0, "plot_format": "png", "bowtie_opts": "", "mate_orientation": "--fr"}):
+def parse_args(defaults={"verbose": False, "configFile": None, "clusterConfigFile": None, "maxJobs": 5, "snakemakeOptions": "--use-conda", "tempDir": None,
+                         "mode": "mapping", "downsample": False, "trim": False, "trimmer": "cutadapt", "trimmerOptions": "", "fastqc": False,
+                         "qualimap": False, "dedup": False, "properPairs": False, "insertSizeMax": 1000, "gcbias": False,
+                         "bwBinSize": 25, "mapq": 0, "plotFormat": "png", "bowtie_opts": "", "mateOrientation": "--fr"}):
     """
     Parse arguments from the command line.
     """
@@ -52,9 +52,9 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
                           "the first - (e.g., '\--very-fast'). Default: '%(default)s'.",
                           default=defaults["bowtie_opts"])
 
-    optional.add_argument("--mate_orientation",
+    optional.add_argument("--mateOrientation",
                           help="The --fr, --ff, or --rf option for bowtie2 (default: '%(default)s')",
-                          default=defaults["mate_orientation"])
+                          default=defaults["mateOrientation"])
 
     optional.add_argument("--qualimap",
                           dest="qualimap",
@@ -69,11 +69,10 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
                           "recommended for ChIP-seq data (default: '%(default)s')",
                           default=defaults["dedup"])
 
-    optional.add_argument("--properpairs",
-                          dest="properpairs",
+    optional.add_argument("--properPairs",
                           action="store_true",
                           help="retain only reads mapping in proper pairs (default: '%(default)s')",
-                          default=defaults["properpairs"])
+                          default=defaults["properPairs"])
 
     optional.add_argument("--mapq",
                           dest="mapq",
@@ -83,12 +82,10 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
                           type=int,
                           default=defaults["mapq"])
 
-    optional.add_argument("--insert-size",
-                          dest="insert_size_max",
-                          metavar="INT",
+    optional.add_argument("--insertSizeMax",
                           help="Maximum insert size allowed during mapping (default: '%(default)s')",
                           type=int,
-                          default=defaults["insert_size_max"])
+                          default=defaults["insertSizeMax"])
 
     optional.add_argument("--gcbias",
                           dest="gcbias",

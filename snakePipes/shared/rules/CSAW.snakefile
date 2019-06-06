@@ -13,7 +13,7 @@ rule CSAW:
         outdir =os.path.join(outdir,"CSAW_{}".format(sample_name)),
         fdr = 0.05,
         paired = paired,
-        fragment_length = fragment_length,
+        fragmentLength = fragmentLength,
         window_size = window_size,
         importfunc = os.path.join("shared", "rscripts", "DB_functions.R"),
         allele_info = allele_info,

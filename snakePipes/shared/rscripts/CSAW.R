@@ -6,7 +6,7 @@ sampleInfoFilePath <- snakemake@input[["sampleSheet"]]  #"samplesheet.tab"
 insert_size_metrics <- snakemake@params[["insert_size_metrics"]] # bamPEFragmentSize output
 fdr <- as.numeric(snakemake@params[["fdr"]])
 paired <- as.logical(snakemake@params[["paired"]])
-fraglength <- as.numeric(snakemake@params[["fragment_length"]])  # used when the data is not paired end
+fraglength <- as.numeric(snakemake@params[["fragmentLength"]])  # used when the data is not paired end
 windowSize <- as.numeric(snakemake@params[["window_size"]])
 importfunc <- snakemake@params[["importfunc"]]  #"DB_functions.R"
 allelic_info <- as.logical(snakemake@params[["allele_info"]])
@@ -49,7 +49,7 @@ pe_param <- csaw::readParam(max.frag = 500, pe = pe)  # Some CSAW functions expl
 
 ## Read data
 chip_object <- readfiles_chip(sampleSheet = sampleInfo,
-                              fragment_length = fraglength,
+                              fragmentLength = fraglength,
                               window_size = windowSize,
                               alleleSpecific = allelic_info,
                               pe.param = pe_param)

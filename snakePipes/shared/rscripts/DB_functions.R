@@ -4,7 +4,7 @@
 #' Read the Files and Count windows for ChIP-Seq Samples
 #'
 #' @param sampleSheet tsvfile with sample information
-#' @param fragment_length fragment length of sequencing
+#' @param fragmentLength fragment length of sequencing
 #' @param window_size window size to count the reads in
 #' @param alleleSpecific TRUE/FALSE whether samples have to be compared with allele-specific design
 #' @param pe.param parameters to read bam files
@@ -16,7 +16,7 @@
 
 .libPaths(R.home("library"))
 
-readfiles_chip <- function(sampleSheet, fragment_length, window_size, alleleSpecific = FALSE, pe.param){
+readfiles_chip <- function(sampleSheet, fragmentLength, window_size, alleleSpecific = FALSE, pe.param){
 
     # check that not >2 conditions are given
     if(length(unique(sampleSheet$condition)) > 2 ) {
@@ -68,7 +68,7 @@ readfiles_chip <- function(sampleSheet, fragment_length, window_size, alleleSpec
     # readFiles using CSAW
     mincount <- 20
     message(paste0("Counting reads in windows.. windows with total counts < ", mincount, " are discarded"))
-    counts <- csaw::windowCounts(bam.files = bam.files, param = pe.param, ext = fragment_length, spacing = window_size, filter = mincount)
+    counts <- csaw::windowCounts(bam.files = bam.files, param = pe.param, ext = fragmentLength, spacing = window_size, filter = mincount)
 
     # output
     chipCountObject <- list(windowCounts = counts, sampleSheet = sampleSheet,

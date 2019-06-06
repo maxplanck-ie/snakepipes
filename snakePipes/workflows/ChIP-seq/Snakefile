@@ -9,9 +9,9 @@ maindir = os.path.dirname(os.path.dirname(workflow.basedir))
 globals().update(cf.set_env_yamls())
 
 # load config file
-globals().update(cf.load_configfile(workflow.overwrite_configfile,config["verbose"]))
+globals().update(cf.load_configfile(workflow.overwrite_configfile, config["verbose"]))
 # load organism-specific data, i.e. genome indices, annotation, etc.
-globals().update(cf.load_organism_data(genome,maindir,config["verbose"]))
+globals().update(cf.load_organism_data(genome, maindir, config["verbose"]))
 
 # do workflow specific stuff now
 include: os.path.join(workflow.basedir, "internals.snakefile")
@@ -20,8 +20,8 @@ include: os.path.join(workflow.basedir, "internals.snakefile")
 ################################################################################
 # deeptools cmds
 include: os.path.join(maindir, "shared", "tools" , "deeptools_cmds.snakefile")
-# fromBam
-if fromBam:
+# fromBAM
+if fromBAM:
     include: os.path.join(maindir, "shared", "rules", "LinkBam.snakefile")
     include: os.path.join(maindir, "shared", "rules", "deepTools_qc.snakefile")
 
@@ -60,8 +60,8 @@ def run_histoneHMM(allele_info):
         file_list = []
     return(file_list)
 
-def run_deepTools_qc(fromBam):
-    if fromBam:
+def run_deepTools_qc(fromBAM):
+    if fromBAM:
         file_list = ["deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv"]
         file_list.append([expand("bamCoverage/{sample}.filtered.seq_depth_norm.bw", sample = samples)])
         if len(samples) <= 20:
@@ -144,7 +144,7 @@ onstart:
 ################################################################################
 rule all:
     input:
-    	run_deepTools_qc(fromBam),
+    	run_deepTools_qc(fromBAM),
         run_deepTools_ChIP(),
         expand("MACS2/{chip_sample}.filtered.BAM_peaks.xls", chip_sample = chip_samples),
         expand("MACS2/{chip_sample}.filtered.BAM_peaks.qc.txt", chip_sample = chip_samples),

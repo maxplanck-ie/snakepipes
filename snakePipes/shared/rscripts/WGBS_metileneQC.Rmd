@@ -45,18 +45,27 @@ colnames(elementMetadata(gr)) = gsub("mcols.", "", colnames(elementMetadata(gr))
 gtf = makeTxDbFromGFF(gtfFile, format="gtf")
 g = genes(gtf)
 
+# Subset g to only contain seqlevels in gr
+seqlevels(g, pruning.mode="tidy") = intersect(seqlevels(g), seqlevels(gr))
+
 ################################
 # Annotated DMRs
 ################################
-# Make annotate with the nearest gene and its distnace
+# Annotate with the nearest gene and its distnace
 og = distanceToNearest(gr, g, ignore.strand=FALSE, select="all")
 d = t(sapply(split(og, queryHits(og)), function(x) {
+      idx = queryHits(x)[1]
       gnames = paste0(g$gene_id[subjectHits(x)], collapse=",")
       distances = paste0(elementMetadata(x)$distance, collapse=",")
-      return(as.character(c(gnames, distances)))
+      return(as.character(c(idx, gnames, distances)))
 }))
-gr$NearestGene = as.character(d[,1])   
-gr$DistanceToNearestGene = as.character(d[,2])
+d = as.data.frame(d)
+colnames(d) = c("idx", "NearestGene", "DistanceToNearestGene")
+d$idx = as.numeric(d$idx)
+gr$NearestGene = as.character("")
+gr$DistanceToNearestGene = as.character("")
+gr$NearestGene[d$idx] = d$NearestGene
+gr$DistanceToNearestGene[d$idx] = d$DistanceToNearestGene
 
 # Write some output
 d = as.data.frame(gr)

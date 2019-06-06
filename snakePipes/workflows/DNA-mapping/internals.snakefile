@@ -17,11 +17,11 @@ strains = list(map( str.strip, re.split(',|;', config["strains"]) ))
 fastq_dir = "FASTQ"
 if trim:
     fastq_indir_trim = "FASTQ"
-    if trim_prg == "trimgalore":
+    if trimmer == "trimgalore":
         fastq_dir = "FASTQ_TrimGalore"
-    elif trim_prg == "cutadapt":
+    elif trimmer == "cutadapt":
         fastq_dir = "FASTQ_Cutadapt"
-    elif trim_prg == "fastp":
+    elif trimmer == "fastp":
         fastq_dir = "FASTQ_fastp"
 
 
@@ -39,7 +39,7 @@ if not samples:
     print("\n  Error! NO samples found in dir "+str(indir or '')+"!!!\n\n")
     exit(1)
 
-fromBam = None
+fromBAM = None
 
 idxRange = 1
 if paired:

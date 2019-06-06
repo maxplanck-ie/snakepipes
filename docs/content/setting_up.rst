@@ -114,7 +114,7 @@ All the tools required for running various pipelines are installed via various c
 
 .. note::
 
-    ``snakePipes createEnvs`` will also set the ``snakemake_options:`` line in the global snakePipes
+    ``snakePipes createEnvs`` will also set the ``snakemakeOptions:`` line in the global snakePipes
     ``defaults.yaml`` files. If you have already modified this then use the ``--keepCondaDir`` option.
 
 .. warning::
@@ -125,11 +125,11 @@ file on our GitHub repository. You can modify it to suite your needs.
 
 Here are the content of *defaults.yaml*::
 
-    snakemake_options: '--use-conda --conda-prefix /data/general/scratch/conda_envs'
+    snakemakeOptions: '--use-conda --conda-prefix /data/general/scratch/conda_envs'
 
 .. note::
 
-    Whenever you change the `snakemake_options:` line in `defaults.yaml`, you should run
+    Whenever you change the `snakemakeOptions:` line in `defaults.yaml`, you should run
     `snakePipes createEnvs` to ensure that the conda environments are then created.
 
 Running ``snakePipes createEnvs`` is not strictly required, but facilitates multiple users using the same snakePipes installation.
@@ -275,10 +275,10 @@ Below are some of the workflow defaults from the DNA-mapping pipeline. Empty sec
     downsample:
     ## Options for trimming
     trim: False
-    trim_prg: cutadapt
-    trim_options:
+    trimmer: cutadapt
+    trimmerOptions:
     ## Bin size of output files in bigWig format
-    bw_binsize: 25
+    bwBinSize: 25
     ## Run FASTQC read quality control
     fastqc: false
     ## Run computeGCBias quality control

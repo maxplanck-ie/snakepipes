@@ -14,9 +14,7 @@ prep_for_stats:
     memory: 30G
 CpG_stats:
     memory: 30G
-intAgg_stats:
-    memory: 30G
 CpG_report:
-    memory: 3G
-intAgg_report:
     memory: 6G
+DSS:
+    memory: 5G

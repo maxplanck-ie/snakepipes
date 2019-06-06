@@ -19,11 +19,11 @@ fastq_dir = "FASTQ_barcoded"
 
 if trim:
     fastq_indir_trim = "FASTQ_barcoded"
-    if trim_prg == "trimgalore":
+    if trimmer == "trimgalore":
         fastq_dir = "FASTQ_TrimGalore"
-    elif trim_prg == "cutadapt":
+    elif trimmer == "cutadapt":
         fastq_dir = "FASTQ_Cutadapt"
-    elif trim_prg == "fastp":
+    elif trimmer == "fastp":
         fastq_dir = "FASTQ_fastp"
 else:
     fastq_indir_trim = None

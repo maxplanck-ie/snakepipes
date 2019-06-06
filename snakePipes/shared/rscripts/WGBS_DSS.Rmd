@@ -24,6 +24,7 @@ maxDist = snakemake@params[['maxDist']]
 minCpGs = snakemake@params[['minCpGs']]
 minMethDiff = snakemake@params[['minMethDiff']]
 FDR = snakemake@params[['FDR']]
+BPPARAM = MulticoreParam(workers = snakemake@threads, progressbar=TRUE)
 
 odmls = sprintf("%s/DMLs.txt", snakemake@params[["odir"]])
 odmrs = sprintf("%s/DMRs.txt", snakemake@params[["odir"]])
@@ -44,10 +45,9 @@ This report summarizes the differentially methylated loci (DML) and regions (DMR
 # DMLs and QC
 
 ```{r echo=FALSE, warning=FALSE, message=FALSE}
-# TODO: use multiple cores
-bs = read.bismark(infiles, colData=ss)
+bs = read.bismark(infiles, colData=ss, BPPARAM=BPPARAM, BACKEND="HDF5Array") # nThread?
 sampleNames(bs) = as.character(ss$name)
-dmlT = DMLtest(bs, group1=g1, group2=g2, smoothing=smoothing, smoothing.span=smoothingSpan)
+dmlT = DMLtest(bs, group1=g1, group2=g2, smoothing=smoothing, smoothing.span=smoothingSpan, BPPARAM=BPPARAM)
 dmls = callDML(dmlT, delta=minMethDiff)
 dmls = dmls[which(dmls$fdr < FDR), ]
 write.table(dmls, file=odmls, quote=FALSE, sep="\t", row.names=FALSE)

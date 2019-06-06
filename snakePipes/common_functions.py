@@ -17,17 +17,16 @@ def set_env_yamls():
     This defines the global variables describing where the conda env yaml files are
     """
     return {'CONDA_SHARED_ENV': 'envs/shared.yaml',
-            'CONDA_CREATE_INDEX_ENV': 'envs/createIndices.yaml',
-            'CONDA_RNASEQ_ENV': 'envs/rna_seq.yaml',
-            'CONDA_scRNASEQ_ENV': 'envs/sc_rna_seq.yaml',
-            'CONDA_DNA_MAPPING_ENV': 'envs/dna_mapping.yaml',
-            'CONDA_CHIPSEQ_ENV': 'envs/chip_seq.yaml',
-            'CONDA_ATAC_ENV': 'envs/atac_seq.yaml',
-            'CONDA_HIC_ENV': 'envs/hic.yaml',
-            'CONDA_WGBS_ENV': 'envs/wgbs.yaml',
-            'CONDA_RMD_ENV': 'envs/rmarkdown.yaml',
-            'CONDA_GATK_ENV': 'envs/gatk.yaml',
-            'CONDA_SAMBAMBA_ENV': 'envs/sambamba.yaml'}
+    'CONDA_CREATE_INDEX_ENV': 'envs/createIndices.yaml',
+    'CONDA_RNASEQ_ENV': 'envs/rna_seq.yaml',
+    'CONDA_scRNASEQ_ENV': 'envs/sc_rna_seq.yaml',
+    'CONDA_DNA_MAPPING_ENV': 'envs/dna_mapping.yaml',
+    'CONDA_CHIPSEQ_ENV': 'envs/chip_seq.yaml',
+    'CONDA_ATAC_ENV': 'envs/atac_seq.yaml',
+    'CONDA_HIC_ENV': 'envs/hic.yaml',
+    'CONDA_WGBS_ENV': 'envs/wgbs.yaml',
+    'CONDA_RMD_ENV': 'envs/rmarkdown.yaml',
+    'CONDA_SAMBAMBA_ENV': 'envs/sambamba.yaml'}
 
 
 def merge_dicts(x, y):
@@ -48,23 +47,23 @@ def sanity_dict_clean(myDict):
     return myDict
 
 
-def load_configfile(configfile, verbose, info='Config'):
-    with open(configfile, "r") as f:
+def load_configfile(configFile, verbose, info='Config'):
+    with open(configFile, "r") as f:
         config = yaml.load(f, Loader=yaml.FullLoader)
 
     config = sanity_dict_clean(config)
 
     if verbose:
         print("\n--- " + info + " ---------------------------------------------------------------------")
-        print("config file: {}".format(configfile))
+        print("config file: {}".format(configFile))
         for k, v in sorted(config.items()):
             print("{}: {}".format(k, v))
         print("-" * 80, "\n")
     return config
 
 
-def write_configfile(configfile, config):
-    with open(configfile, 'w') as f:
+def write_configfile(configFile, config):
+    with open(configFile, 'w') as f:
         yaml.dump(config, f, default_flow_style=False)
 
 
@@ -110,13 +109,13 @@ def get_sample_names(infiles, ext, reads):
     return sorted(list(s))
 
 
-def get_sample_names_bam(infiles, bam_ext):
+def get_sample_names_bam(infiles, bamExt):
     """
     Get sample names without file extensions
     """
     s = []
     for x in infiles:
-        x = os.path.basename(x).replace(bam_ext, "")
+        x = os.path.basename(x).replace(bamExt, "")
         s.append(x)
     return sorted(list(set(s)))
 
@@ -179,37 +178,13 @@ def check_replicates(sample_info_file):
     return True
 
 
-# def get_fragment_length(infile, sampleName):
-#     """
-#     Return median insert size from a metrics file created by
-#     deeptools bamPEFragmentSize.
-#     Read the 37 column text file, grep the row corresponding to the sample and
-#     return the entry from 6th column (Frag. Len. Median)
-#     """
-#     with open(infile, "r") as f:
-#         for line in f:
-#             line = line.strip()
-#             if line.startswith("filtered_bam/{}".format(sampleName)):
-#                 try:
-#                     median = line.split()[5]
-#                     return int(float(median))
-#                 except TypeError:
-#                     print("ERROR: File", infile, "is NOT an output from bamPEFragmentSize.\n")
-#                     exit(1)
-#             else:
-#                 pass
-#     # no match in infile
-#     print("ERROR: File", infile, "is NOT an output from bamPEFragmentSize.\n")
-#     exit(1)
-
-
-def make_temp_dir(tempdir, fallback_dir, verbose=False):
+def make_temp_dir(tempDir, fallback_dir, verbose=False):
     try:
-        output = subprocess.check_output("mktemp -d -p " + tempdir + "/ tmp.snakemake.XXXXXXXX", shell=True, stderr=subprocess.STDOUT)
+        output = subprocess.check_output("mktemp -d -p " + tempDir + "/ tmp.snakemake.XXXXXXXX", shell=True, stderr=subprocess.STDOUT)
         temp_path = output.decode().rstrip() + "/"
     except subprocess.CalledProcessError:
         try:
-            print("\nFailed to create temp dir under temp path prefix (" + tempdir + ")! Try fallback: " + fallback_dir + "/ ...")
+            print("\nFailed to create temp dir under temp path prefix (" + tempDir + ")! Try fallback: " + fallback_dir + "/ ...")
             output = subprocess.check_output("mktemp -d -p " + fallback_dir + "/ tmp.snakemake.XXXXXXXX", shell=True, stderr=subprocess.STDOUT)
             temp_path = output.decode().rstrip() + "/"
         except subprocess.CalledProcessError:
@@ -305,10 +280,10 @@ def handleUserArgs(args, defaults, args_func):
     However command line options need to take precedence, so update defaults and
     simply reparse the command line options (with args_func().parse_args())
     """
-    if args.configfile:
-        if not os.path.exists(args.configfile):
-            sys.exit("\nError! Provided configfile (-c) not found! ({})\n".format(args.configfile))
-        user_config = load_configfile(args.configfile, False)
+    if args.configFile:
+        if not os.path.exists(args.configFile):
+            sys.exit("\nError! Provided configFile (-c) not found! ({})\n".format(args.configFile))
+        user_config = load_configfile(args.configFile, False)
         defaults = merge_dicts(defaults, user_config)
         parser = args_func(defaults)
         args = parser.parse_args()
@@ -366,13 +341,13 @@ def checkCommonArguments(args, baseDir, outDir=False, createIndices=False):
             else:
                 sys.exit("\nError! Input dir not found! ({})\n".format(args.indir))
         else:
-            if args.fromBam:
-                if os.path.exists(args.fromBam):
+            if args.fromBAM:
+                if os.path.exists(args.fromBAM):
                     os.makedirs(args.workingdir, exist_ok=True)
                     args.workingdir = os.path.abspath(args.workingdir)
-                    args.fromBam = os.path.abspath(args.fromBam)
+                    args.fromBAM = os.path.abspath(args.fromBAM)
                 else:
-                    sys.exit("\nError! Directory with bam files (--fromBam) not found! ({})\n".format(args.fromBam))
+                    sys.exit("\nError! Directory with bam files (--fromBAM) not found! ({})\n".format(args.fromBAM))
             else:
                 if os.path.exists(args.workingdir):
                     args.workingdir = os.path.abspath(args.workingdir)
@@ -414,8 +389,8 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
     cluster_config = load_configfile(os.path.join(baseDir, "shared/cluster.yaml"), False)
     cluster_config = merge_dicts(cluster_config, load_configfile(os.path.join(workflowDir, "cluster.yaml"), False), )
 
-    if args.cluster_configfile:
-        user_cluster_config = load_configfile(args.cluster_configfile, False)
+    if args.clusterConfigFile:
+        user_cluster_config = load_configfile(args.clusterConfigFile, False)
         cluster_config = merge_dicts(cluster_config, user_cluster_config)  # merge/override variables from user_config.yaml
     # Ensure the cluster log directory exists
     if re.search("\\{snakePipes_cluster_logDir\\}", cluster_config["snakemake_cluster_cmd"]):
@@ -437,20 +412,20 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
     if workflowName != "createIndices" and os.path.abspath(organismYAMLname) != os.path.abspath(orgyaml):
         shutil.copyfile(orgyaml, organismYAMLname)
 
-    if isinstance(args.snakemake_options, list):
-        args.snakemake_options = ' '.join(args.snakemake_options)
+    if isinstance(args.snakemakeOptions, list):
+        args.snakemakeOptions = ' '.join(args.snakemakeOptions)
     if args.keepTemp:
-        args.snakemake_options += " --notemp"
+        args.snakemakeOptions += " --notemp"
 
     snakemake_cmd = """
-                    {snakemake} {snakemake_options} --latency-wait {latency_wait} --snakefile {snakefile} --jobs {max_jobs} --directory {workingdir} --configfile {configfile} --keep-going
+                    {snakemake} {snakemakeOptions} --latency-wait {latency_wait} --snakefile {snakefile} --jobs {maxJobs} --directory {workingdir} --configfile {configFile} --keep-going
                     """.format(snakemake=os.path.join(snakemake_path, "snakemake"),
                                latency_wait=cluster_config["snakemake_latency_wait"],
                                snakefile=os.path.join(workflowDir, "Snakefile"),
-                               max_jobs=args.max_jobs,
+                               maxJobs=args.maxJobs,
                                workingdir=args.workingdir,
-                               snakemake_options=str(args.snakemake_options or ''),
-                               configfile=os.path.join(args.outdir, '{}.config.yaml'.format(workflowName))).split()
+                               snakemakeOptions=str(args.snakemakeOptions or ''),
+                               configFile=os.path.join(args.outdir, '{}.config.yaml'.format(workflowName))).split()
 
     # Produce the DAG if desired
     if args.createDAG:
@@ -535,7 +510,7 @@ def runAndCleanup(args, cmd, logfile_name):
         sendEmail(args, 0)
 
 
-def predict_chip_dict(wdir, input_pattern_str, bamExt, fromBam=None):
+def predict_chip_dict(wdir, input_pattern_str, bamExt, fromBAM=None):
     """
     Predict a chip_dict from set of bam files
     ChIP input/control samples are identified from input_pattern (default: 'input')
@@ -548,8 +523,8 @@ def predict_chip_dict(wdir, input_pattern_str, bamExt, fromBam=None):
     clean_pat = r"" + pat + ""
     pat1 = re.compile(clean_pat, re.IGNORECASE)
 
-    if fromBam:
-        infiles = sorted(glob.glob(os.path.join(fromBam, '*' + bamExt)))
+    if fromBAM:
+        infiles = sorted(glob.glob(os.path.join(fromBAM, '*' + bamExt)))
     else:
         infiles = sorted(glob.glob(os.path.join(wdir, 'filtered_bam/', '*.bam')))
     samples = get_sample_names_bam(infiles, bamExt)

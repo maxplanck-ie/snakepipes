@@ -67,22 +67,20 @@ def mainArguments(defaults, workingDir=False, createIndices=False):
                          help="verbose output (default: '%(default)s')",
                          default=defaults["verbose"])
 
-    general.add_argument("-c", "--configfile",
-                         dest="configfile",
+    general.add_argument("-c", "--configFile",
                          help="configuration file: config.yaml (default: '%(default)s')",
-                         default=defaults["configfile"])
+                         default=defaults["configFile"])
 
-    general.add_argument("--cluster_configfile",
-                         dest="cluster_configfile",
+    general.add_argument("--clusterConfigFile",
                          help="configuration file for cluster usage. In absence, the default options "
                          "from shared/cluster.yaml and workflows/[workflow]/cluster.yaml would be selected (default: '%(default)s')",
-                         default=defaults["cluster_configfile"])
+                         default=defaults["clusterConfigFile"])
 
     general.add_argument("-j", "--jobs",
-                         dest="max_jobs",
+                         dest="maxJobs",
                          metavar="INT",
                          help="maximum number of concurrently submitted Slurm jobs / cores if workflow is run locally (default: '%(default)s')",
-                         type=int, default=defaults["max_jobs"])
+                         type=int, default=defaults["maxJobs"])
 
     general.add_argument("--local",
                          dest="local",
@@ -94,13 +92,10 @@ def mainArguments(defaults, workingDir=False, createIndices=False):
                          action="store_true",
                          help="Prevent snakemake from removing files marked as being temporary (typically intermediate files that are rarely needed by end users). This is mostly useful for debugging problems.")
 
-    general.add_argument("--snakemake_options",
-                         dest="snakemake_options",
-                         metavar="STR",
-                         type=str,
+    general.add_argument("--snakemakeOptions",
                          action="append",
-                         help="Snakemake options to be passed directly to snakemake, e.g. use --snakemake_options='--dryrun --rerun-incomplete --unlock --forceall'. WARNING! ONLY EXPERT USERS SHOULD CHANGE THIS! THE DEFAULT VALUE WILL BE APPENDED RATHER THAN OVERWRITTEN! (default: '%(default)s')",
-                         default=[defaults["snakemake_options"]])
+                         help="Snakemake options to be passed directly to snakemake, e.g. use --snakemakeOptions='--dryrun --rerun-incomplete --unlock --forceall'. WARNING! ONLY EXPERT USERS SHOULD CHANGE THIS! THE DEFAULT VALUE WILL BE APPENDED RATHER THAN OVERWRITTEN! (default: '%(default)s')",
+                         default=[defaults["snakemakeOptions"]])
 
     general.add_argument("--DAG",
                          dest="createDAG",
@@ -193,22 +188,20 @@ def commonOptions(grp, defaults, bw=True, plots=True):
                      dest="trim",
                      action="store_true",
                      help="Activate fastq read trimming. If activated, Illumina adaptors are trimmed by default. "
-                     "Additional parameters can be specified under --trim_options. (default: '%(default)s')",
+                     "Additional parameters can be specified under --trimmerOptions. (default: '%(default)s')",
                      default=defaults["trim"])
 
-    grp.add_argument("--trim_prg",
-                     dest="trim_prg",
+    grp.add_argument("--trimmer",
+                     dest="trimmer",
                      choices=['cutadapt', 'trimgalore', 'fastp'],
                      help="Trimming program to use: Cutadapt, TrimGalore, or fastp. Note that if you change this you may "
-                     "need to change --trim_options to match! (default: '%(default)s')",
-                     default=defaults["trim_prg"])
+                     "need to change --trimmerOptions to match! (default: '%(default)s')",
+                     default=defaults["trimmer"])
 
-    grp.add_argument("--trim_options",
-                     dest="trim_options",
-                     metavar="STR",
-                     type=str,
+    grp.add_argument("--trimmerOptions",
+                     dest="trimmerOptions",
                      help="Additional option string for trimming program of choice. (default: '%(default)s')",
-                     default=defaults["trim_options"])
+                     default=defaults["trimmerOptions"])
 
     grp.add_argument("--fastqc",
                      dest="fastqc",
@@ -218,17 +211,15 @@ def commonOptions(grp, defaults, bw=True, plots=True):
 
     if bw:
         grp.add_argument("--bw-binsize",
-                         dest="bw_binsize",
-                         metavar="INT",
+                         dest="bwBinSize",
                          help="Bin size of output files in bigWig format (default: '%(default)s')",
                          type=int,
-                         default=defaults["bw_binsize"])
+                         default=defaults["bwBinSize"])
 
     if plots:
         grp.add_argument("--plotFormat",
-                         dest="plot_format",
                          choices=['png', 'pdf', 'None'],
                          metavar="STR",
                          type=str,
                          help="Format of the output plots from deepTools. Select 'none' for no plots (default: '%(default)s')",
-                         default=defaults["plot_format"])
+                         default=defaults["plotFormat"])

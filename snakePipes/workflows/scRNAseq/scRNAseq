@@ -16,10 +16,10 @@ import snakePipes.common_functions as cf
 import snakePipes.parserCommon as parserCommon
 
 
-def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfile": None, "max_jobs": 5, "snakemake_options": "--use-conda", "tempdir": None,
-                         "downsample": False, "trim": False, "trim_options": "-a A{'30'}", "cell_names": None, "star_options": "--outBAMsortingBinsN 30 --twopassMode Basic",
+def parse_args(defaults={"verbose": False, "configFile": None, "clusterConfigFile": None, "maxJobs": 5, "snakemakeOptions": "--use-conda", "tempDir": None,
+                         "downsample": False, "trim": False, "trimmerOptions": "-a A{'30'}", "cell_names": None, "starOptions": "--outBAMsortingBinsN 30 --twopassMode Basic",
                          "filter_annotation": "-v -P 'decay|pseudogene' ", "barcode_file": None, "barcode_pattern": "NNNNNNXXXXXX", "split_lib": False,
-                         "bw_binsize": 10, "plot_format": "png", "cell_filter_metric": "gene_universe", "skipRaceID": False}):
+                         "bwBinSize": 10, "plotFormat": "png", "cell_filter_metric": "gene_universe", "skipRaceID": False}):
     """
     Parse arguments from the command line.
     """
@@ -49,13 +49,13 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
                           default=defaults["trim"],
                           help="Activate trimming with Cutadapt. Default: no Trimming!")
 
-    optional.add_argument("--trim_options",
-                          dest="trim_options",
+    optional.add_argument("--trimmerOptions",
+                          dest="trimmerOptions",
                           metavar="STR",
                           type=str,
-                          help="Options passed to the selected trimmer, e.g. use --trim_options='-a A{30}' "
+                          help="Options passed to the selected trimmer, e.g. use --trimmerOptions='-a A{30}' "
                           "for polyA trimming with Cutadapt (default: '%(default)s')",
-                          default=defaults["trim_options"])
+                          default=defaults["trimmerOptions"])
 
     optional.add_argument("--star_options",
                           dest="star_options",
@@ -101,20 +101,19 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
                           "cell names and plate/library information for all fastq files! (default: '%(default)s')",
                           default=defaults["cell_names"])
 
-    optional.add_argument("--bw-binsize",
-                          dest="bw_binsize",
-                          metavar="INT",
+    optional.add_argument("--bwBinSize",
+                          dest="bwBinSize",
                           help="Bin size of output files in bigWig format (default: '%(default)s')",
                           type=int,
-                          default=defaults["bw_binsize"])
+                          default=defaults["bwBinSize"])
 
     optional.add_argument("--plotFormat",
-                          dest="plot_format",
+                          dest="plotFormat",
                           choices=['png', 'pdf', 'None'],
                           metavar="STR",
                           type=str,
                           help="Format of the output plots from deeptools. Select 'none' for no plot (default: '%(default)s')",
-                          default=defaults["plot_format"]),
+                          default=defaults["plotFormat"]),
 
     optional.add_argument("--cell_filter_metric",
                           dest="cell_filter_metric",

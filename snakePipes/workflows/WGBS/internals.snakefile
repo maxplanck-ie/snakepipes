@@ -13,17 +13,17 @@ import sys
 fastq_dir = "FASTQ"
 if trim:
     fastq_indir_trim = "FASTQ"
-    if trim_prg == "trimgalore":
+    if trimmer == "trimgalore":
         fastq_dir = "FASTQ_TrimGalore"
-    elif trim_prg == "cutadapt":
+    elif trimmer == "cutadapt":
         fastq_dir = "FASTQ_Cutadapt"
-    elif trim_prg == "fastp":
+    elif trimmer == "fastp":
         fastq_dir = "FASTQ_fastp"
 
 ### Initialization #############################################################
 
 # Disable trimming if BAM files are input
-if fromBam:
+if fromBAM:
     trim = False
     fastqc = False
 
@@ -31,7 +31,7 @@ if fromBam:
 if not 'genes_bed' in globals():
     genes_bed='NA'
 
-if not fromBam:
+if not fromBAM:
     infiles = sorted(glob.glob(os.path.join(str(indir or ''), '*{}'.format(ext))))
     samples = cf.get_sample_names(infiles, ext, reads)
     paired = cf.is_paired(infiles, ext, reads)
@@ -43,8 +43,8 @@ if not fromBam:
         sys.exit("Error! Paired-end samples not detected. "
                  "WGBS workflow currently works only with paired-end samples {}!!!\n".format(str(indir or '')))
 else:
-    infiles = sorted(glob.glob(os.path.join(str(indir or ''), '*{}'.format(bam_ext))))
-    samples = cf.get_sample_names_bam(infiles, bam_ext)
+    infiles = sorted(glob.glob(os.path.join(str(indir or ''), '*{}'.format(bamExt))))
+    samples = cf.get_sample_names_bam(infiles, bamExt)
 
 if not samples:
     sys.exit("\n  Error! NO samples found in dir {}!!!\n".format(str(indir or '')))

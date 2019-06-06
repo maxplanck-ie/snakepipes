@@ -28,7 +28,7 @@ Input requirements
 This pipeline requires paired-end reads fastq files and a genome alias, for which ``bwa-meth`` index has been built.
 Optional inputs include bed files with genomic intervals of interest, used to aggregate single CpG values over; a sample sheet with grouping information to use in differential methylation analysis; a blacklist bed file with genomic positions corresponding to known snps to mask single CpG methylation values.
 
-It is possible to use pipeline-compatible bam files as input. For that, the user has to use the ``--fromBam`` flag and provide the bam file extention if not matched by the default. Note that this will disable calculating conversion rate as this steps requires fastq.gz input. This is an experimental feature.
+It is possible to use pipeline-compatible bam files as input. For that, the user has to use the ``--fromBAM`` flag and provide the bam file extention if not matched by the default. Note that this will disable calculating conversion rate as this steps requires fastq.gz input. This is an experimental feature.
 
 
 Workflow configuration file
@@ -38,10 +38,10 @@ Workflow configuration file
 
 	## General/Snakemake parameters, only used/set by wrapper or in Snakemake cmdl, but not in Snakefile
 	outdir:
-	configfile:
-	cluster_configfile:
+	configFile:
+	clusterConfigFile:
 	local: False
-	max_jobs: 12
+	maxJobs: 12
 	nthreads: 8
 	## directory with fastq or bam files
 	indir:
@@ -49,16 +49,12 @@ Workflow configuration file
 	fqcin:
 	## Genome information
 	genome:
-	convrefpath:
-	convRef: False
-	###list of bed files to process
-	intList: []
 	###SNP black list (bed file)
-	blackList:
+	blacklist:
 	###sample Info
 	sampleInfo:
 	###inclusion bounds for methylation extraction
-	mbias_ignore: auto
+	mbias: auto
 	## FASTQ file extension (default: ".fastq.gz")
 	ext: '.fastq.gz'
 	## paired-end read name extension (default: ['_R1', "_R2"])
@@ -66,15 +62,13 @@ Workflow configuration file
 	## Number of reads to downsample from each FASTQ file
 	downsample:
 	## Options for trimming
-	trimReads: 'user'
-	adapterSeq: AGATCGGAAGAGC
-	nextera: False
+	trimmer: 'fastp'
 	trimThreshold: 10
 	trimOtherArgs: ""
 	verbose: False
 	#### Flag to control the pipeline entry point
-	fromBam: False
-	bam_ext: '.PCRrm.bam'
+	fromBAM: False
+	bamExt: '.PCRrm.bam'
 	###Flags to control skipping of certain QC calculations
 	skipDOC: False
 	skipGCbias: False

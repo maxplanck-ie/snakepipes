@@ -49,10 +49,10 @@ The default configuration file is listed below and can be found in ``snakePipes/
 
     pipeline: scrna-seq
     outdir:
-    configfile:
-    cluster_configfile:
+    configFile:
+    clusterConfigFile:
     local: False
-    max_jobs: 5
+    maxJobs: 5
     ## directory with fastq files
     indir:
     ## preconfigured target genomes (mm9,mm10,dm3,...) , see /path/to/snakemake_workflows/shared/organisms/
@@ -66,8 +66,8 @@ The default configuration file is listed below and can be found in ``snakePipes/
     downsample:
     ## Options for trimming
     trim: False
-    trim_prg: cutadapt
-    trim_options: -a A{'30'}
+    trimmer: cutadapt
+    trimmerOptions: -a A{'30'}
     ## further options
     filter_annotation: "-v -P 'decay|pseudogene' "
     barcode_file:
@@ -75,9 +75,9 @@ The default configuration file is listed below and can be found in ``snakePipes/
     split_lib: False
     cell_names:
     library_type: 1
-    bw_binsize: 10
+    bwBinSize: 10
     verbose: False
-    plot_format: pdf
+    plotFormat: pdf
     dnaContam: False
     ## Parameters for th statistical analysis
     cell_filter_metric: gene_universe
@@ -102,7 +102,7 @@ Only specify a file if you use other than the default CEL-seq2 barcodes.
 Trimming
 ~~~~~~~~
 
-It is recommended to use the :code:`--trim` option as this uses cutadapt to trim remaining adapters *and* poly-A tails from read 2 (see defaults for ``--trim_options``).
+It is recommended to use the :code:`--trim` option as this uses cutadapt to trim remaining adapters *and* poly-A tails from read 2 (see defaults for ``--trimmerOptions``).
 
 Pseudogene filter
 ~~~~~~~~~~~~~~~~~

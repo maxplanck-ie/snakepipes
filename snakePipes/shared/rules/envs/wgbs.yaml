@@ -1,5 +1,6 @@
 name: WGBS-env-0.1.0
 channels:
+  - mpi-ie
   - conda-forge
   - bioconda
 dependencies:
@@ -16,4 +17,4 @@ dependencies:
   - bioconductor-genomicranges = 1.34.0
   - bioconductor-genomicfeatures = 1.34.1
   - bioconductor-biomart = 2.38.0
-  - bioconductor-dss = 2.30.0
+  - bioconductor-dss >= 2.33.0

@@ -9,9 +9,9 @@ workflow_rscripts=os.path.join(maindir, "shared", "rscripts")
 globals().update(cf.set_env_yamls())
 
 # load config file
-globals().update(cf.load_configfile(workflow.overwrite_configfile,config["verbose"]))
+globals().update(cf.load_configfile(workflow.overwrite_configfile, config["verbose"]))
 # load organism-specific data, i.e. genome indices, annotation, etc.
-globals().update(cf.load_organism_data(genome,maindir,config["verbose"]))
+globals().update(cf.load_organism_data(genome, maindir, config["verbose"]))
 
 # do workflow specific stuff now
 include: os.path.join(workflow.basedir, "internals.snakefile")
@@ -87,7 +87,7 @@ onstart:
         print("Trimming:", trim)
         print("Input directory for mapping:", fastq_dir)
         print("Input directory for trimming:", fastq_indir_trim)
-        print("BigWig bin size:", bw_binsize)
+        print("BigWig bin size:", bwBinSize)
         print("Barcode pattern:", barcode_pattern)
         print("Barcode file:", barcode_file)
         print("UMI_LEN:",UMI_length)

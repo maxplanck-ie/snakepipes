@@ -12,7 +12,7 @@ if sampleSheet:
         print("\nWarning! CSAW cannot be invoked without replicates!\n")
         sys.exit()
 
-if not fromBam:
+if not fromBAM:
     if paired:
         if not os.path.isfile(os.path.join(workingdir, "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv")):
             sys.exit('ERROR: {} is required but not present\n'.format(os.path.join(workingdir, "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv")))
@@ -33,8 +33,8 @@ if not fromBam:
 
         
 else:
-    bamFiles = sorted(glob.glob(os.path.join(str(fromBam or ''), '*'+bam_ext)))
-    bamSamples = cf.get_sample_names_bam(bamFiles,bam_ext)
+    bamFiles = sorted(glob.glob(os.path.join(str(fromBAM or ''), '*' + bamExt)))
+    bamSamples = cf.get_sample_names_bam(bamFiles, bamExt)
     
     
     bamDict = dict.fromkeys(bamSamples)
@@ -43,6 +43,6 @@ else:
     print(bamSamples)
     
     mapping_prg="EXTERNAL_BAM"
-    indir = fromBam
+    indir = fromBAM
     samples=bamSamples
     downsample = None

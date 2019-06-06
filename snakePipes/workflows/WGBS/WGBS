@@ -35,10 +35,10 @@ def bounded01(x):
     return x
 
 
-def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfile":None, "max_jobs": 12, "snakemake_options": "--use-conda", "tempdir": None,
-                         "downsample": None, "trim": True, "trim_prg": "fastp", "trim_options": "-q 5 -l 30 -M 5", "maxDist": 300, "minCpGs": 10, "minMethDiff": 0, "minAbsDiff": 0.1, "FDR": 0.1,
-                         "MethylDackelOptions": "--mergeContext --maxVariantFrac 0.25 --minDepth 4", "fastqc": False, 'bw_binsize': 25, 'plot_format': 'png', "bam_ext": '.PCRrm.bam',
-                         "intList": [], "blackList": None, "sampleSheet": None, "mbias_ignore": "auto", "fromBam": False, "skipDOC": False, "skipGCbias": False}):
+def parse_args(defaults={"verbose": False, "configFile": None, "clusterConfigFile":None, "maxJobs": 12, "snakemakeOptions": "--use-conda", "tempDir": None,
+                         "downsample": None, "trim": True, "trimmer": "fastp", "trimmerOptions": "-q 5 -l 30 -M 5", "maxDist": 300, "minCpGs": 10, "minMethDiff": 0, "minAbsDiff": 0.1, "FDR": 0.1,
+                         "MethylDackelOptions": "--mergeContext --maxVariantFrac 0.25 --minDepth 4", "fastqc": False, 'bwBinSize': 25, 'plotFormat': 'png', "bamExt": '.bam',
+                         "blacklist": None, "sampleSheet": None, "mbias": "auto", "fromBAM": False, "skipDOC": False, "skipGCbias": False, "computeDMLs": False}):
     """
     Parse arguments from the command line.
     """
@@ -58,50 +58,47 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
     parserCommon.commonOptions(optional, defaults)
 
 
-    optional.add_argument("--intList",
-                          dest="intList",
-                          action='append',
-                          help="BED file(s) with target intervals to confine the analysis on. Use multiple times to pass multiple bed files. (default: '%(default)s')",
-                          default=defaults["intList"])
-
-    optional.add_argument("--blackList",
-                          dest="blackList",
-                          action='store',
+    optional.add_argument("--blacklist",
+                          dest="blacklist",
                           help="Bed file(s) with positions to mask for methylation calling. Useful for masking SNPs in your strain of interest. (default: '%(default)s')",
-                          default=defaults["blackList"])
+                          default=defaults["blacklist"])
 
     optional.add_argument("--sampleSheet",
                           dest="sampleSheet",
-                          action='store',
                           help="Perform differential methylation analysis between groups of samples by providing a text file with sample information to use for statistical analysis. (default: '%(default)s')",
                           default=defaults["sampleSheet"])
 
+    # TODO: expand help message
     optional.add_argument("--mbias",
-                          dest="mbias_ignore",
-                          action='store',
+                          dest="mbias",
                           help="Number of nucleotides with methylation bias to ignore during methylation extraction. In the *auto* mode this number is automaticaly calculated by MethylDackel (default: '%(default)s')",
-                          default=defaults["mbias_ignore"])
+                          default=defaults["mbias"])
 
+    # TODO
     optional.add_argument("--maxDist",
                           type=minOne,
                           help="The maximum distance between CpGs in a DMR (for metilene, default: '%(default)s')",
                           default=defaults["maxDist"])
 
+    # TODO
     optional.add_argument("--minCpGs",
                           type=minOne,
                           help="The minimum number of CpGs in a DMR (for metilene, default: '%(default)s')",
                           default=defaults["minCpGs"])
 
+    # TODO
     optional.add_argument("--minMethDiff",
                           type=float,
                           help="The minimum methylation change in methylation for CpG inclusion in DMR detection (for metilene, default: '%(default)s')",
                           default=defaults["minMethDiff"])
 
+    # TODO
     optional.add_argument("--minAbsDiff",
                           type=float,
                           help="The minimum methylation for returned DMRs (default: '%(default)s')",
                           default=defaults["minAbsDiff"])
 
+    # TODO
     optional.add_argument("--FDR",
                           type=float,
                           help="FDR threshold for returned DMRs (default: '%(default)s')",
@@ -111,18 +108,27 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
                           help="Options to pass to MethylDackel extract (default: '%(default)s')",
                           default=defaults["MethylDackelOptions"])
 
-    optional.add_argument("--fromBam",
-                         dest="fromBam",
-                         action="store_true",
-                         help=argparse.SUPPRESS,default=defaults["fromBam"])
+    optional.add_argument("--fromBAM",
+                         help="If specified, the input is taking from BAM files containing alignments rather than fastq files. See also --bamExt.",
+                         action="store_true")
+
+    optional.add_argument("--bamExt",
+                          help="If --fromBAM is specified, this is the expected file extension. Removing it yields sample names. Default: '%(default)s'",
+                          default=defaults["bamExt"])
+
+    optional.add_argument("--paired",
+                          help="If --fromBAM is specified, this indicates that the input BAM files contain paired-end data. The option is ignored unless --fromBAM is given.",
+                          action="store_true")
+
+    optional.add_argument("--computeDMLs",
+                          action="store_true",
+                          help="Compute differentially methylated loci (DMLs) and regions using DSS. Note that this is currently VERY slow.")
 
     optional.add_argument("--skipDOC",
-                         dest="skipDOC",
                          action="store_true",
-                         help="Skip depth of coverage calculation with GATK.",default=defaults["skipDOC"])
+                         help="Skip depth of coverage calculation with deepTools.",default=defaults["skipDOC"])
 
     optional.add_argument("--skipGCbias",
-                         dest="skipGCbias",
                          action="store_true",
                          help="Skip GC bias calculation with deepTools.",default=defaults["skipGCbias"])
 
