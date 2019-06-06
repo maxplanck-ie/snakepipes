@@ -2,7 +2,7 @@
 author: "`r Sys.info()[length(Sys.info())-1]`"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: 
-    rmarkdown::html_document:
+    html_document:
         fig_caption: yes
 params:
     outdir: "Stats_reports"
@@ -17,7 +17,7 @@ title: "`r paste0('CSAW differential binding stats report')`"
 ```{r setup, include=FALSE}
 .libPaths(R.home("library"))
 
-knitr::opts_chunk$set(echo = FALSE, out.width = '30%',out.height='30%')
+knitr::opts_chunk$set(echo = FALSE)
 
 ```
 
@@ -74,13 +74,13 @@ table(full_res.filt$direction)
 
 ### Visualizing the results
 
-Deeptools matrices were computed for the filtered lists of merged regions showing different change directions and visualized as heatmaps with summary profiles.
+Deeptools matrices were computed for the filtered lists of merged regions showing different change directions and visualized as heatmaps with summary profiles. For this purpose, merged regions were all scaled to 1kb, and an extention of 0.2kb was added on each side.
 
 Heatmaps obtained using log2 ratio of ChIP signal over input were as follows:
 
-```{r plot_l2r, fig.cap=c("UP","DOWN")}
+```{r plot_l2r,fig.show='hold',fig.align='center', out.width ='40%',out.height='30%',fig.cap="UP and DOWN regions using log2 ratio."}
 if(!params$pipeline %in% "chip-seq"){message("ChIP signal enrichment over input is only available for ChIP-seq workflow!")}else{
-    knitr::include_graphics(rbind(file.path(params$outdir,"CSAW.UP.log2r.heatmap.png"),file.path(params$outdir,"CSAW.DOWN.log2r.heatmap.png")))
+    knitr::include_graphics(c(file.path(params$outdir,"CSAW.UP.log2r.heatmap.png"),file.path(params$outdir,"CSAW.DOWN.log2r.heatmap.png")))
     }
 
 ```
@@ -88,8 +88,8 @@ if(!params$pipeline %in% "chip-seq"){message("ChIP signal enrichment over input 
 Heatmaps obtained using depth-normalized coverage were as follows:
 
 
-```{r plot_cov, fig.cap=c("UP","DOWN")}
-knitr::include_graphics(rbind(file.path(params$outdir,"CSAW.UP.cov.heatmap.png"),file.path(params$outdir,"CSAW.DOWN.cov.heatmap.png")))
+```{r plot_cov, fig.show='hold',fig.align='center', out.width ='40%',out.height='30%',fig.cap="UP and DOWN regions using coverage."}
+knitr::include_graphics(c(file.path(params$outdir,"CSAW.UP.cov.heatmap.png"),file.path(params$outdir,"CSAW.DOWN.cov.heatmap.png")))
 ```
 
 Tables with differentially bound regions annotated with distance to nearest gene can be found in folder `r paste0("AnnotatedResults_",gsub("\\.[a-z]{3}$","",basename(params$sample_sheet)))`.   
