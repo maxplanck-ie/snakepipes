@@ -17,16 +17,16 @@ def set_env_yamls():
     This defines the global variables describing where the conda env yaml files are
     """
     return {'CONDA_SHARED_ENV': 'envs/shared.yaml',
-    'CONDA_CREATE_INDEX_ENV': 'envs/createIndices.yaml',
-    'CONDA_RNASEQ_ENV': 'envs/rna_seq.yaml',
-    'CONDA_scRNASEQ_ENV': 'envs/sc_rna_seq.yaml',
-    'CONDA_DNA_MAPPING_ENV': 'envs/dna_mapping.yaml',
-    'CONDA_CHIPSEQ_ENV': 'envs/chip_seq.yaml',
-    'CONDA_ATAC_ENV': 'envs/atac_seq.yaml',
-    'CONDA_HIC_ENV': 'envs/hic.yaml',
-    'CONDA_WGBS_ENV': 'envs/wgbs.yaml',
-    'CONDA_RMD_ENV': 'envs/rmarkdown.yaml',
-    'CONDA_SAMBAMBA_ENV': 'envs/sambamba.yaml'}
+            'CONDA_CREATE_INDEX_ENV': 'envs/createIndices.yaml',
+            'CONDA_RNASEQ_ENV': 'envs/rna_seq.yaml',
+            'CONDA_scRNASEQ_ENV': 'envs/sc_rna_seq.yaml',
+            'CONDA_DNA_MAPPING_ENV': 'envs/dna_mapping.yaml',
+            'CONDA_CHIPSEQ_ENV': 'envs/chip_seq.yaml',
+            'CONDA_ATAC_ENV': 'envs/atac_seq.yaml',
+            'CONDA_HIC_ENV': 'envs/hic.yaml',
+            'CONDA_WGBS_ENV': 'envs/wgbs.yaml',
+            'CONDA_RMD_ENV': 'envs/rmarkdown.yaml',
+            'CONDA_SAMBAMBA_ENV': 'envs/sambamba.yaml'}
 
 
 def merge_dicts(x, y):
