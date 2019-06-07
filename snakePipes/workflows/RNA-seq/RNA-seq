@@ -18,7 +18,7 @@ import snakePipes.parserCommon as parserCommon
 
 def parse_args(defaults={"verbose": False, "configFile": None, "clusterConfigFile": None, "maxJobs": 5, "snakemakeOptions": "--use-conda", "tempDir": None,
                          "mode": "alignment,deepTools_qc", "downsample": False, "trim": False, "trimmer": "cutadapt", "trimmerOptions": None, "fastqc": False,
-                         "library_type": 2, "aligner": "STAR", "alignerOptions": None, "salmon_index_options": "--type quasi -k 31",
+                         "libraryType": 2, "aligner": "STAR", "alignerOptions": None, "salmon_index_options": "--type quasi -k 31",
                          "featureCountsOptions": "-C -Q 10 --primary", "filter_annotation": None, "sampleSheet": None,
                          "bwBinSize": 25, "dnaContam": False, "plotFormat": "png","fromBAM": False, "paired": True}):
     """
@@ -38,22 +38,18 @@ def parse_args(defaults={"verbose": False, "configFile": None, "clusterConfigFil
     # Workflow options
     optional = parser.add_argument_group('Options')
     optional.add_argument("-m", "--mode",
-                          dest="mode",
                           help="workflow running modes (available: 'alignment-free, alignment, allelic-mapping, deepTools_qc')"
                           " (default: '%(default)s')",
                           default=defaults["mode"])
 
     parserCommon.commonOptions(optional, defaults, bw=True)
 
-    optional.add_argument("--library_type",
-                          dest="library_type",
-                          metavar="",
+    optional.add_argument("--libraryType",
                           help="user provided library type strand specificity. featurCounts style: 0, 1, 2 (Illumina TruSeq); default: '%(default)s')",
                           type=int,
-                          default=defaults["library_type"])
+                          default=defaults["libraryType"])
 
     optional.add_argument("--aligner",
-                          dest="aligner",
                           help="Program used for mapping: STAR or HISAT2 (default: '%(default)s'). If you change this, please change --alignerOptions to match.",
                           default=defaults["aligner"])
 
@@ -62,24 +58,20 @@ def parse_args(defaults={"verbose": False, "configFile": None, "clusterConfigFil
                           default=defaults["alignerOptions"])
 
     optional.add_argument("--salmon_index_options",
-                          dest="salmon_index_options",
                           help="Salmon index options, e.g. '--type fmd' (default: '%(default)s')",
                           default=defaults["salmon_index_options"])
 
     optional.add_argument("--featureCountsOptions",
-                          dest="featureCountsOptions",
                           help="featureCounts option string. The options '-p -B'"
                                " are always used for paired-end data (default: '%(default)s')",
                           default=defaults["featureCountsOptions"])
 
     optional.add_argument("--filter_annotation",
-                          dest="filter_annotation",
                           help="filter annotation GTF by grep for use with Salmon, e.g."
                                " use --filter_annotation='-v pseudogene'; default: '%(default)s')",
                           default=defaults["filter_annotation"])
 
     optional.add_argument("--sampleSheet",
-                          dest="sampleSheet",
                           help="Information on samples (required for DE analysis); see "
                                "'docs/content/sampleSheet.example.tsv' for example."
                                " The column names in the tsv files are 'name' and 'condition'. The first entry"

@@ -40,7 +40,7 @@ barcode_file:
 barcode_pattern: "NNNNNNXXXXXX"
 split_lib: False
 cell_names:
-library_type: 1
+libraryType: 1
 bwBinSize: 10
 verbose: False
 plotFormat: pdf

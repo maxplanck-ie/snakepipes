@@ -74,7 +74,7 @@ The default configuration file is listed below and can be found in ``snakePipes/
     barcode_pattern: "NNNNNNXXXXXX"
     split_lib: False
     cell_names:
-    library_type: 1
+    libraryType: 1
     bwBinSize: 10
     verbose: False
     plotFormat: pdf
@@ -114,7 +114,7 @@ Here we assume you provide eg. a gencode or ensemble annotation file (via genes_
 Library Type
 ~~~~~~~~~~~~
 
-The CEL-seq2 protocol produces reads where read 2 maps in sense direction (:code:`library_type: 1`). After barcodes are transferred to read 2, the workflow continues in single-end mode.
+The CEL-seq2 protocol produces reads where read 2 maps in sense direction (:code:`libraryType: 1`). After barcodes are transferred to read 2, the workflow continues in single-end mode.
 
 Split lib
 ~~~~~~~~~

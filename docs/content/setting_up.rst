@@ -171,7 +171,7 @@ The yaml files look like this after the setup (an example from drosophila genome
     # OPTIONAL. For QC and filtering of regions in multiple workflows.
     blacklist_bed:
     # STRING. Name of the chromosomes to ignore for calculation of normalization factors for coverage files
-    ignore_forNorm: "U Uextra X XHet YHet dmel_mitochondrion_genome"
+    ignoreForNormalization: "U Uextra X XHet YHet dmel_mitochondrion_genome"
 
 .. warning:: Do not edit the yaml keywords corresponding to each required entry.
 

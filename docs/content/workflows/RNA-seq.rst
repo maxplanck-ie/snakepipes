@@ -55,7 +55,7 @@ There is a configuration file in ``snakePipes/workflows/RNA-seq/defaults.yaml``:
     featureCountsOptions: -C -Q 10 --primary
     filter_annotation:
     fragmentLength: 200
-    library_type: 2
+    libraryType: 2
     salmon_index_options: --type quasi -k 31
     dnaContam: False
     ## supported mappers: STAR HISAT2
@@ -79,7 +79,7 @@ Apart from the common workflow options (see :ref:`running_snakePipes`), the foll
 
 * **filter_annotation**: Options you can pass on to filter the original `GTF file <http://genome.ucsc.edu/goldenPath/help/customTrack.html#GTF>`__. This is useful in case you want to filter certain kind of transcripts (such as pseudogenes) before running the counts/DE analysis.
 
-* **library_type**: The default library-type is suitable for most RNAseq protocols (using Illumina `Tru-Seq <https://www.illumina.com/products/by-type/sequencing-kits/library-prep-kits/truseq-rna-v2.html>`__). Change this option in case you have a different strandednes.
+* **libraryType**: The default library-type is suitable for most RNAseq protocols (using Illumina `Tru-Seq <https://www.illumina.com/products/by-type/sequencing-kits/library-prep-kits/truseq-rna-v2.html>`__). Change this option in case you have a different strandednes.
 
 * **salmon_index_options**: In the ``alignment-free`` mode (see below), this option allows you to change the type of index created by salmon. New users can leave it to default.
 

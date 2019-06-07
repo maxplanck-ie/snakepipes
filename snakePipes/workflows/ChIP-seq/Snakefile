@@ -137,7 +137,7 @@ onstart:
         print("Gene annotation BED:", genes_bed)
         print("Gene annotation GTF:", genes_gtf)
         print("Blacklist regions BED:", blacklist_bed)
-        print("Ignore for normalization (bigwigs):", ignore_forNorm)
+        print("Ignore for normalization (bigwigs):", ignoreForNormalization)
         print("-" * 80, "\n")
 
 ### main rule ##################################################################

@@ -8,7 +8,7 @@ rule featureCounts:
     output:
         "featureCounts/{sample}.counts.txt"
     params:
-        libtype = library_type,
+        libtype = libraryType,
         paired_opt = lambda wildcards: "-p -B " if paired else "",
         opts = config["featureCountsOptions"],
     log:

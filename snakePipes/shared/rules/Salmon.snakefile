@@ -18,21 +18,21 @@ rule SalmonIndex:
         """
 
 
-def getSalmon_libtype(paired, library_type):
+def getSalmon_libtype(paired, libraryType):
     """
     Convert from a featureCounts library type to a HISAT2 option string
     """
     if paired:
-        if library_type == 1:
+        if libraryType == 1:
             return "ISF"
-        elif library_type == 2:
+        elif libraryType == 2:
             return "ISR"
         else:
             return "IU"
     else:
-        if library_type == 1:
+        if libraryType == 1:
             return "SF"
-        elif library_type == 2:
+        elif libraryType == 2:
             return "SR"
         else:
             return "U"
@@ -53,18 +53,12 @@ if paired:
         params:
             outdir = "Salmon/{sample}",
             gtf = genes_gtf,
-            lib_type = getSalmon_libtype(paired, library_type)
+            lib_type = getSalmon_libtype(paired, libraryType)
         threads: 8
         conda: CONDA_RNASEQ_ENV
-        shell:
-            "salmon quant "
-            "-p {threads} "
-            "--numBootstraps 50 "
-            "-g {params.gtf} "
-            "-i Salmon/SalmonIndex "
-            "-l {params.lib_type} "
-            "-1 {input.r1} -2 {input.r2} "
-            "-o {params.outdir} "
+        shell: """
+            salmon quant -p {threads} --numBootstraps 50 -g {params.gtf} -i Salmon/SalmonIndex -l {params.lib_type} -1 {input.r1} -2 {input.r2} -o {params.outdir}
+            """
 else:
     rule SalmonQuant:
         input:
@@ -78,18 +72,12 @@ else:
         params:
             outdir = "Salmon/{sample}",
             gtf = genes_gtf,
-            lib_type = getSalmon_libtype(paired, library_type)
+            lib_type = getSalmon_libtype(paired, libraryType)
         threads: 8
         conda: CONDA_RNASEQ_ENV
-        shell:
-            "salmon quant "
-            "-p {threads} "
-            "--numBootstraps 50 "
-            "-g {params.gtf} "
-            "-i Salmon/SalmonIndex "
-            "-l {params.lib_type} "
-            "-r {input.fastq} "
-            "-o {params.outdir} "
+        shell: """
+            salmon quant -p {threads} --numBootstraps 50 -g {params.gtf} -i Salmon/SalmonIndex -l {params.lib_type} -r {input.fastq} -o {params.outdir}
+            """
 
 
 rule Salmon_symlinks:

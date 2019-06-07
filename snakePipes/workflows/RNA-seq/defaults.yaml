@@ -42,7 +42,7 @@ fastqc: False
 featureCountsOptions: -C -Q 10 --primary
 filter_annotation:
 fragmentLength: 200
-library_type: 2
+libraryType: 2
 salmon_index_options: --type quasi -k 31
 dnaContam: False
 ## supported mappers: STAR HISAT2

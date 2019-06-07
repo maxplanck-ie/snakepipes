@@ -12,7 +12,7 @@ rule bamCompare_log2_genome1:
     conda: CONDA_SHARED_ENV
     params:
         bwBinSize = bwBinSize,
-        ignoreForNorm = "--ignoreForNormalization " + ignore_forNorm if ignore_forNorm else "",
+        ignoreForNorm = "--ignoreForNormalization " + ignoreForNormalization if ignoreForNormalization else "",
         read_extension = "--extendReads" if paired
                          else "--extendReads " + str(fragmentLength),
         blacklist = "--blackListFileName " + blacklist_bed if blacklist_bed
@@ -36,7 +36,7 @@ rule bamCompare_log2_genome2:
     conda: CONDA_SHARED_ENV
     params:
         bwBinSize = bwBinSize,
-        ignoreForNorm = "--ignoreForNormalization " + ignore_forNorm if ignore_forNorm else "",
+        ignoreForNorm = "--ignoreForNormalization " + ignoreForNormalization if ignoreForNormalization else "",
         read_extension = "--extendReads" if paired
                          else "--extendReads " + str(fragmentLength),
         blacklist = "--blackListFileName " + blacklist_bed if blacklist_bed

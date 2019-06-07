@@ -10,7 +10,7 @@ rule bamCoverage_allelic:
     params:
         bwBinSize = bwBinSize,
         genome_size = int(genome_size),
-        ignoreForNorm = "--ignoreForNormalization " + ignore_forNorm if ignore_forNorm else "",
+        ignoreForNorm = "--ignoreForNormalization " + ignoreForNormalization if ignoreForNormalization else "",
         read_extension = "--extendReads" if paired
                          else "--extendReads " + str(fragmentLength),
         blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed

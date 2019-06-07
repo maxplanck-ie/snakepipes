@@ -12,7 +12,7 @@ if bigWigType == "subtract" or bigWigType == "both":
         params:
             bwBinSize = bwBinSize,
             genome_size = genome_size,
-            ignoreForNorm = "--ignoreForNormalization {}".format(ignore_forNorm) if ignore_forNorm else "",
+            ignoreForNorm = "--ignoreForNormalization {}".format(ignoreForNormalization) if ignoreForNormalization else "",
             read_extension = "--extendReads" if paired else "--extendReads {}".format(fragmentLength),
             blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed else ""
         log:
@@ -36,7 +36,7 @@ if bigWigType == "log2ratio" or bigWigType == "both":
             "deepTools_ChIP/bamCompare/{chip_sample}.filtered.log2ratio.over_{control_name}.bw"
         params:
             bwBinSize = bwBinSize,
-            ignoreForNorm = "--ignoreForNormalization {}".format(ignore_forNorm) if ignore_forNorm else "",
+            ignoreForNorm = "--ignoreForNormalization {}".format(ignoreForNormalization) if ignoreForNormalization else "",
             read_extension = "--extendReads" if paired else "--extendReads {}".format(fragmentLength),
             blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed else ""
         log:

@@ -29,7 +29,7 @@ effectiveGenomeSize: 0
 ## Regions to blacklist in the ChIP-seq and related workflows
 blacklist:
 ## Regions to ignore during normalization (e.g., with bamCompare)
-ignore_forNorm:
+ignoreForNormalization:
 ################################################################################
 # Call snakemake directly, i.e. without using the wrapper script:
 #

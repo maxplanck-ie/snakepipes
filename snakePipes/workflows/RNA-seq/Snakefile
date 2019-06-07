@@ -244,7 +244,7 @@ onstart:
         print("read extension:", reads)
         print("fastq dir:", fastq_dir)
         print("filter annotation:", filter_annotation)
-        print("FeatureCounts library type:", library_type)
+        print("FeatureCounts library type:", libraryType)
         print("Sample sheet:", sampleSheet)
         print("-" * 80, "\n")
 

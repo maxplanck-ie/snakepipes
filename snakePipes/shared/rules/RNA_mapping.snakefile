@@ -1,18 +1,18 @@
-def getHISAT_libtype(paired, library_type):
+def getHISAT_libtype(paired, libraryType):
     """
     Convert from a featureCounts library type to a HISAT2 option string
     """
     if paired:
-        if library_type == 1:
+        if libraryType == 1:
             return "--rna-strandness FR"
-        elif library_type == 2:
+        elif libraryType == 2:
             return "--rna-strandness RF"
         else:
             return ""
     else:
-        if library_type == 1:
+        if libraryType == 1:
             return "--rna-strandness F"
-        elif library_type == 2:
+        elif libraryType == 2:
             return "--rna-strandness R"
         else:
             return ""
@@ -33,7 +33,7 @@ if aligner.upper().find("HISAT2") >=0:
                 splice = aligner+"/{sample}/splice_sites.txt",
                 met = aligner+"/{sample}/metrics.txt"
             params:
-                lib_type = getHISAT_libtype(paired, library_type),
+                lib_type = getHISAT_libtype(paired, libraryType),
                 input_splice = known_splicesites,
                 alignerOptions = str(alignerOptions or ''),
                 samsort_memory = '2G',
@@ -63,7 +63,7 @@ if aligner.upper().find("HISAT2") >=0:
                 splice = aligner+"/{sample}/splice_sites.txt",
                 met = aligner+"/{sample}/metrics.txt"
             params:
-                lib_type = getHISAT_libtype(paired, library_type),
+                lib_type = getHISAT_libtype(paired, libraryType),
                 input_splice = known_splicesites,
                 alignerOptions = str(alignerOptions or ''),
                 samsort_memory = '2G',
