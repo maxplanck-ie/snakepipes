@@ -16,7 +16,7 @@ import snakePipes.parserCommon as parserCommon
 
 
 def parse_args(defaults={"verbose": False, "configFile": None, "clusterConfigFile": None, "maxJobs": 5, "snakemakeOptions": "--use-conda", "tempDir": None,
-                         "paired": True, "bwBinSize": 25, "sampleSheet": "", "window_size": 150, "predict_chip_dict": None, "bigWigType": "both",
+                         "paired": True, "bwBinSize": 25, "sampleSheet": "", "windowSize": 150, "predict_chip_dict": None, "bigWigType": "both",
                          "plotFormat": "png", "bamExt": ".filtered.bam"}):
     """
     Parse arguments from the command line.
@@ -64,14 +64,14 @@ def parse_args(defaults={"verbose": False, "configFile": None, "clusterConfigFil
                                "are not evaluated for differential binding) (default: '%(default)s')",
                           default=defaults["sampleSheet"])
 
-    optional.add_argument("--DB_windowSize",
-                          dest="window_size",
+    optional.add_argument("--windowSize",
+                          dest="windowSize",
                           help="Window size to counts reads in (If differential binding analysis required); "
                                "Default size is suitable for most transcription factors and sharp histone marks. "
                                "Small window sizes (~20bp) should be used for very narrow transcription factor peaks, "
                                "while large window sizes (~500 bp) should be used for broad marks (eg. H3K27me3) "
                                "(default: '%(default)s')",
-                          default=defaults["window_size"])
+                          default=defaults["windowSize"])
 
     optional.add_argument("--predict_chip_dict",
                           dest="predict_chip_dict",

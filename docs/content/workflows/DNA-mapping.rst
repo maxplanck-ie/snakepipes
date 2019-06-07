@@ -56,12 +56,12 @@ There is a configuration file in ``snakePipes/workflows/DNA-mapping/defaults.yam
     ## Retain only reads with at least the given mapping quality
     mapq: 0
     ## Retain only reads mapping in proper pairs
-    properpairs: false
+    properPairs: false
     ## Mate orientation in paired-end experiments for Bowtie2 mapping
     ## (default "--fr" is appropriate for Illumina sequencing)
-    mate_orientation: --fr
+    mateOrientation: --fr
     ## other Bowtie2 stuff
-    insert_size_max: 1000
+    insertSizeMax: 1000
     bowtie_opts:
     plotFormat: png
     ## Median/mean fragment length, only relevant for single-end data (default: 200)

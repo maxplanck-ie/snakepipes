@@ -7,7 +7,7 @@ insert_size_metrics <- snakemake@params[["insert_size_metrics"]] # bamPEFragment
 fdr <- as.numeric(snakemake@params[["fdr"]])
 paired <- as.logical(snakemake@params[["paired"]])
 fraglength <- as.numeric(snakemake@params[["fragmentLength"]])  # used when the data is not paired end
-windowSize <- as.numeric(snakemake@params[["window_size"]])
+windowSize <- as.numeric(snakemake@params[["windowSize"]])
 importfunc <- snakemake@params[["importfunc"]]  #"DB_functions.R"
 allelic_info <- as.logical(snakemake@params[["allele_info"]])
 outdir<-snakemake@params[["outdir"]]

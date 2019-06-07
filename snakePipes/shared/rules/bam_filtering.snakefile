@@ -12,7 +12,7 @@ rule samtools_filter:
         bam = "filtered_bam/{sample}.filtered.bam"
     params:
         dedup = dedup,
-        properpairs = properpairs,
+        properPairs = properPairs,
         mapq = mapq
     log:
         out = "filtered_bam/logs/samtools_filter.{sample}.out",
@@ -24,7 +24,7 @@ rule samtools_filter:
     shell: """
         filter=""
         if [ "{params.dedup}" == "True" ] ; then filter="$filter -F 1024"; fi
-        if [ "{params.properpairs}" == "True" ] ; then filter="$filter -f 2"; fi
+        if [ "{params.properPairs}" == "True" ] ; then filter="$filter -f 2"; fi
         if [ "{params.mapq}" != "0" ] ; then filter="$filter -q {params.mapq}"; fi
         if [[ -z $filter ]] ; then ln -s -r {input[0]} {output.bam} ;
         else

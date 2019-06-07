@@ -26,8 +26,8 @@ fragmentSize_cutoff: 150
 verbose: false
 # sampleSheet_DB
 sampleSheet:
-# window_size
-window_size: 20
+# windowSize
+windowSize: 20
 fragmentCount_cutoff: 1
 #### Flag to control the pipeline entry point
 bamExt: '.filtered.bam'

@@ -158,7 +158,7 @@ onstart:
         print("paired:", paired)
         print("read extension:", reads)
         print("fastq dir:", fastq_dir)
-        print("maximum insert size (Bowtie2 -X):", insert_size_max)
+        print("maximum insert size (Bowtie2 -X):", insertSizeMax)
         print("-" * 80, "\n")
 
         print("--- Environment ----------------------------------------------------------------")

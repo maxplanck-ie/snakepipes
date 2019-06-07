@@ -52,7 +52,7 @@ There is a configuration file in ``snakePipes/workflows/RNA-seq/defaults.yaml``:
     sampleSheet:
     bwBinSize: 25
     fastqc: False
-    featurecounts_options: -C -Q 10 --primary
+    featureCountsOptions: -C -Q 10 --primary
     filter_annotation:
     fragmentLength: 200
     library_type: 2
@@ -76,7 +76,7 @@ Apart from the common workflow options (see :ref:`running_snakePipes`), the foll
 
 * **star_options/hisat_options**: Options to pass on to your chosen aligner. Note that library type and junction definitions doesn't have to be passed to the aligners as options, as they are handeled either automatically, or via other parameters.
 
-* **featurecounts_options**: Options to pass to featureCounts (in case the ``alignment`` or ``allelic-mapping`` mode is used). Note that the paired-end information is automatically passed to featurecounts via the workflow, and the summerization is always performed at **gene level**, since the workflow assumes that featurecounts output is being used for gene-level differential expression analysis. If you wish to perform a **transcript-level** DE analysis, please choose the mode **alignment-free**.
+* **featureCountsOptions**: Options to pass to featureCounts (in case the ``alignment`` or ``allelic-mapping`` mode is used). Note that the paired-end information is automatically passed to featurecounts via the workflow, and the summerization is always performed at **gene level**, since the workflow assumes that featurecounts output is being used for gene-level differential expression analysis. If you wish to perform a **transcript-level** DE analysis, please choose the mode **alignment-free**.
 
 * **filter_annotation**: Options you can pass on to filter the original `GTF file <http://genome.ucsc.edu/goldenPath/help/customTrack.html#GTF>`__. This is useful in case you want to filter certain kind of transcripts (such as pseudogenes) before running the counts/DE analysis.
 

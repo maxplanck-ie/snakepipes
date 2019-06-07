@@ -66,8 +66,8 @@ There is a configuration file in ``snakePipes/workflows/ATACseq/defaults.yaml``:
     verbose: false
     # sampleSheet_DB
     sampleSheet:
-    # window_size
-    window_size: 20
+    # windowSize
+    windowSize: 20
     fragmentCount_cutoff: 1
     #### Flag to control the pipeline entry point
     bamExt: '.filtered.bam'
@@ -82,9 +82,9 @@ There is a configuration file in ``snakePipes/workflows/ATACseq/defaults.yaml``:
     fastqc:
     qval: 0.001
 
-Useful parameters are ``fragmentSize_cutoff`` and ``window_size``, also available from commandline.  
+Useful parameters are ``fragmentSize_cutoff`` and ``windowSize``, also available from commandline.  
 
-* **window_size**: is the size of windows to test differential binding using CSAW. The default small window size is sufficient for most analysis, since an ATAC-seq peak is sharp.
+* **windowSize**: is the size of windows to test differential binding using CSAW. The default small window size is sufficient for most analysis, since an ATAC-seq peak is sharp.
 
 * **fragmentCount_cutoff**: refers to the minimum number of counts a chromosome must have to be included in the MACS2 analysis. It is introduced to avoid errors in the peak calling step and should only be changed if MACS2 fails.
 

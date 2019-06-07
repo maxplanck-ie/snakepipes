@@ -12,7 +12,7 @@ rule featureCounts_allele:
     params:
         libtype = library_type,
         paired_opt = lambda wildcards: "-p -B " if paired else "",
-        opts = config["featurecounts_options"],
+        opts = config["featureCountsOptions"],
     log:
         out = "featureCounts/{sample}.out",
         err = "featureCounts/{sample}.err"

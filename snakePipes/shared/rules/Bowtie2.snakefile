@@ -10,8 +10,8 @@ if paired:
         params:
             bowtie2_index=bowtie2_index,
             bowtie_opts = str(bowtie_opts or ''),
-            mate_orientation = mate_orientation,
-            insert_size_max = insert_size_max
+            mateOrientation = mateOrientation,
+            insertSizeMax = insertSizeMax
         benchmark:
             "Bowtie2/.benchmark/Bowtie2.{sample}.benchmark"
         threads: 24  # 1G per core
@@ -19,9 +19,9 @@ if paired:
         shell: """
             MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX);
             bowtie2 \
-            -X {params.insert_size_max} \
+            -X {params.insertSizeMax} \
             -x {params.bowtie2_index} -1 {input.r1} -2 {input.r2} \
-            {params.bowtie_opts} {params.mate_orientation} \
+            {params.bowtie_opts} {params.mateOrientation} \
             --rg-id {wildcards.sample} --rg CN:mpi-ie_deep_sequencing_unit \
             --rg DS:{wildcards.sample} --rg PL:ILLUMINA --rg SM:{wildcards.sample} \
             -p {threads} \

@@ -19,7 +19,7 @@ import snakePipes.parserCommon as parserCommon
 def parse_args(defaults={"verbose": False, "configFile": None, "clusterConfigFile": None, "maxJobs": 5, "snakemakeOptions": "--use-conda", "tempDir": None,
                          "mode": "alignment,deepTools_qc", "downsample": False, "trim": False, "trimmer": "cutadapt", "trimmerOptions": None, "fastqc": False,
                          "library_type": 2, "mapping_prg": "STAR", "star_options": "--outBAMsortingBinsN 100", "hisat_options": None, "salmon_index_options": "--type quasi -k 31",
-                         "featurecounts_options": "-C -Q 10 --primary", "filter_annotation": None, "sampleSheet": None,
+                         "featureCountsOptions": "-C -Q 10 --primary", "filter_annotation": None, "sampleSheet": None,
                          "bwBinSize": 25, "dnaContam": False, "plotFormat": "png","fromBAM": False, "paired": True}):
     """
     Parse arguments from the command line.
@@ -76,17 +76,15 @@ def parse_args(defaults={"verbose": False, "configFile": None, "clusterConfigFil
     optional.add_argument("--salmon_index_options",
                           dest="salmon_index_options",
                           metavar="STR",
-                          type=str,
                           help="Salmon index options, e.g. '--type fmd' (default: '%(default)s')",
                           default=defaults["salmon_index_options"])
 
-    optional.add_argument("--featurecounts_options",
-                          dest="featurecounts_options",
+    optional.add_argument("--featureCountsOptions",
+                          dest="featureCountsOptions",
                           metavar="STR",
-                          type=str,
                           help="featureCounts option string. The options '-p -B'"
                                " are always used for paired-end data (default: '%(default)s')",
-                          default=defaults["featurecounts_options"])
+                          default=defaults["featureCountsOptions"])
 
     optional.add_argument("--filter_annotation",
                           dest="filter_annotation",

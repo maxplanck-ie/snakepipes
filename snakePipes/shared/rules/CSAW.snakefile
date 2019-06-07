@@ -14,7 +14,7 @@ rule CSAW:
         fdr = 0.05,
         paired = paired,
         fragmentLength = fragmentLength,
-        window_size = window_size,
+        windowSize = windowSize,
         importfunc = os.path.join("shared", "rscripts", "DB_functions.R"),
         allele_info = allele_info,
         yaml_path=samples_config,

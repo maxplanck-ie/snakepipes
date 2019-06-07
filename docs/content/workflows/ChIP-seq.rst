@@ -123,10 +123,10 @@ There is a configuration file in ``snakePipes/workflows/ChIP-seq/defaults.yaml``
     verbose: false
     # sampleInfo_DB
     sample_info:
-    # window_size
-    window_size: 150
+    # windowSize
+    windowSize: 150
 
-The only parameters that are useful to change are ``bwBinSize``, ``fragmentLength``, and ``window_size``. Note however that those can be more conveniently changed on the command line.
+The only parameters that are useful to change are ``bwBinSize``, ``fragmentLength``, and ``windowSize``. Note however that those can be more conveniently changed on the command line.
 
 Understanding the outputs
 ---------------------------
