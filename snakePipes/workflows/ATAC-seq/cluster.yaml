@@ -3,4 +3,4 @@ ATAC_qc:
 MACS2:
     memory: 8G
 CSAW:
-    memory: 15G
+    memory: 20G
