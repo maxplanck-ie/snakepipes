@@ -3,8 +3,8 @@
 
 rule bamCoverage:
     input:
-        bam = mapping_prg+"/{sample}.bam",
-        bai = mapping_prg+"/{sample}.bam.bai"
+        bam = aligner+"/{sample}.bam",
+        bai = aligner+"/{sample}.bam.bai"
     output:
         "bamCoverage/{sample}.seq_depth_norm.bw"
     params:
@@ -158,8 +158,8 @@ rule plotPCA:
 
 rule estimate_read_filtering:
     input:
-        bam = mapping_prg+"/{sample}.bam",
-        bai = mapping_prg+"/{sample}.bam.bai"
+        bam = aligner+"/{sample}.bam",
+        bai = aligner+"/{sample}.bam.bai"
     output:
         "deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt"
     log:

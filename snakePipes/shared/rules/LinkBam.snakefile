@@ -2,24 +2,24 @@ rule link_bam:
     input:
         indir + "/{sample}" + bamExt
     output:
-        mapping_prg + "/{sample}.bam"
+        aligner + "/{sample}.bam"
     shell:
         "( [ -f {output} ] || ln -s -r {input} {output} )"
 
 
 rule samtools_index_external:
     input:
-        mapping_prg + "/{sample}.bam"
+        aligner + "/{sample}.bam"
     output:
-        mapping_prg + "/{sample}.bam.bai"
+        aligner + "/{sample}.bam.bai"
     conda: CONDA_SHARED_ENV
     shell: "samtools index {input}"
 
 
 rule link_bam_bai_external:
     input:
-        bam = mapping_prg + "/{sample}.bam",
-        bai = mapping_prg + "/{sample}.bam.bai"
+        bam = aligner + "/{sample}.bam",
+        bai = aligner + "/{sample}.bam.bai"
     output:
         bam_out = "filtered_bam/{sample}.filtered.bam",
         bai_out = "filtered_bam/{sample}.filtered.bam.bai",
@@ -29,7 +29,7 @@ rule link_bam_bai_external:
 
 rule sambamba_flagstat:
        input:
-           mapping_prg + "/{sample}.bam"
+           aligner + "/{sample}.bam"
        output:
            "Sambamba/{sample}.markdup.txt"
        conda: CONDA_SAMBAMBA_ENV

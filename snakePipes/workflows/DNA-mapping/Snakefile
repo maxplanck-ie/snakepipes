@@ -175,7 +175,7 @@ rule all:
     input:
         run_FastQC(fastqc),
         run_Trimming(trim, fastqc),
-        expand(mapping_prg+"/{sample}.bam", sample = samples),
+        expand(aligner + "/{sample}.bam", sample = samples),
         expand("Sambamba/{sample}.markdup.txt", sample = samples),
         expand("filtered_bam/{sample}.filtered.bam", sample = samples),
         expand("bamCoverage/{sample}.seq_depth_norm.bw", sample = samples),

@@ -8,7 +8,7 @@ def getbw_idxbase(file):
     return(fpath)
 
 ### Bowtie2 ####################################################################
-if mapping_prg == "Bowtie2":
+if aligner == "Bowtie2":
     if paired:
         rule Bowtie2_allele:
             input:
@@ -16,15 +16,15 @@ if mapping_prg == "Bowtie2":
                 r2 = fastq_dir+"/{sample}"+reads[1]+".fastq.gz",
                 index = bowtie2_index_allelic
             output:
-                align_summary = mapping_prg+"/{sample}.Bowtie2_summary.txt",
-                bam = temp(mapping_prg+"/{sample}.sorted.bam")
+                align_summary = aligner+"/{sample}.Bowtie2_summary.txt",
+                bam = temp(aligner+"/{sample}.sorted.bam")
             params:
                 bowtie_opts = str(bowtie_opts or ''),
                 mateOrientation = mateOrientation,
                 insertSizeMax = insertSizeMax,
                 idxbase = getbw_idxbase(bowtie2_index_allelic)
             benchmark:
-                mapping_prg+"/.benchmark/Bowtie2.{sample}.benchmark"
+                aligner+"/.benchmark/Bowtie2.{sample}.benchmark"
             threads: 24  # 1G per core
             conda: CONDA_DNA_MAPPING_ENV
             shell: """
@@ -47,13 +47,13 @@ if mapping_prg == "Bowtie2":
                 r1 = fastq_dir+"/{sample}"+reads[0]+".fastq.gz",
                 index = bowtie2_index_allelic
             output:
-                align_summary = mapping_prg+"/{sample}.Bowtie2_summary.txt",
-                bam = temp(mapping_prg+"/{sample}.sorted.bam")
+                align_summary = aligner+"/{sample}.Bowtie2_summary.txt",
+                bam = temp(aligner+"/{sample}.sorted.bam")
             params:
                 bowtie_opts = str(bowtie_opts or ''),
                 idxbase = getbw_idxbase(bowtie2_index_allelic)
             benchmark:
-                mapping_prg+"/.benchmark/Bowtie2.{sample}.benchmark"
+                aligner+"/.benchmark/Bowtie2.{sample}.benchmark"
             threads: 24  # 1G per core
             conda: CONDA_DNA_MAPPING_ENV
             shell: """

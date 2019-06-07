@@ -41,11 +41,11 @@ def multiqc_input_check(return_value):
     elif pipeline=="rna-seq":
         # must be RNA-mapping, add files as per the mode
         if "alignment" in mode or "deepTools_qc" in mode:
-            infiles.append( expand(mapping_prg+"/{sample}.bam", sample = samples) +
+            infiles.append( expand(aligner+"/{sample}.bam", sample = samples) +
                     expand("Sambamba/{sample}.markdup.txt", sample = samples) +
                     expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample=samples)+ 
                     expand("featureCounts/{sample}.counts.txt", sample = samples))
-            indir += mapping_prg + " featureCounts "
+            indir += aligner + " featureCounts "
             indir += " Sambamba "
             indir += " deepTools_qc "   
         if "allelic-mapping" in mode:
@@ -67,10 +67,10 @@ def multiqc_input_check(return_value):
 
         infiles.append( expand(fastq_dir+"/{sample}"+reads[0]+".fastq.gz", sample = samples) )
         indir += fastq_dir + " "
-        infiles.append( expand(mapping_prg+"/{sample}.bam", sample = samples) +
+        infiles.append( expand(aligner+"/{sample}.bam", sample = samples) +
         expand("Sambamba/{sample}.markdup.txt", sample = samples) +
         expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt", sample=samples))
-        indir += mapping_prg
+        indir += aligner
         indir += " Sambamba "
         indir += " deepTools_qc "
 

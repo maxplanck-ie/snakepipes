@@ -59,10 +59,9 @@ There is a configuration file in ``snakePipes/workflows/RNA-seq/defaults.yaml``:
     salmon_index_options: --type quasi -k 31
     dnaContam: False
     ## supported mappers: STAR HISAT2
-    mapping_prg: STAR
+    aligner: STAR
     ## N.B., setting --outBAMsortingBinsN too high can result in cryptic errors
-    star_options: --outBAMsortingBinsN 30
-    hisat_options:
+    alignerOptions:
     verbose: False
     plotFormat: png
     # for allele-spcific mapping
@@ -72,9 +71,9 @@ There is a configuration file in ``snakePipes/workflows/RNA-seq/defaults.yaml``:
 
 Apart from the common workflow options (see :ref:`running_snakePipes`), the following parameters are useful to consider:
 
-* **mapping_prg**: You can choose either `STAR <https://github.com/alexdobin/STAR>`__ or `HISAT2 <https://ccb.jhu.edu/software/hisat2/index.shtml>`__. While HISAT2 mapping is usually faster than STAR, we keep STAR as the default aliger due to it's superior accuracy (see `this paper <https://www.nature.com/nmeth/journal/v14/n2/abs/nmeth.4106.html>`__).
+* **aligner**: You can choose either `STAR <https://github.com/alexdobin/STAR>`__ or `HISAT2 <https://ccb.jhu.edu/software/hisat2/index.shtml>`__. While HISAT2 requires less memory than STAR, we keep STAR as the default aligner due to its superior accuracy (see `this paper <https://www.nature.com/nmeth/journal/v14/n2/abs/nmeth.4106.html>`__). Make sure that ``--alignerOptions`` matches this.
 
-* **star_options/hisat_options**: Options to pass on to your chosen aligner. Note that library type and junction definitions doesn't have to be passed to the aligners as options, as they are handeled either automatically, or via other parameters.
+* **alignerOptions**: Options to pass on to your chosen aligner. Note that library type and junction definitions doesn't have to be passed to the aligners as options, as they are handeled either automatically, or via other parameters.
 
 * **featureCountsOptions**: Options to pass to featureCounts (in case the ``alignment`` or ``allelic-mapping`` mode is used). Note that the paired-end information is automatically passed to featurecounts via the workflow, and the summerization is always performed at **gene level**, since the workflow assumes that featurecounts output is being used for gene-level differential expression analysis. If you wish to perform a **transcript-level** DE analysis, please choose the mode **alignment-free**.
 

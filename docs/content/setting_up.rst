@@ -270,7 +270,7 @@ Below are some of the workflow defaults from the DNA-mapping pipeline. Empty sec
     reads: [_R1, _R2]
     ## mapping mode
     mode: mapping
-    mapping_prg: Bowtie2
+    aligner: Bowtie2
     ## Number of reads to downsample from each FASTQ file
     downsample:
     ## Options for trimming

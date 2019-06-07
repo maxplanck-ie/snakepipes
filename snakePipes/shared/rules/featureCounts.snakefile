@@ -3,7 +3,7 @@
 
 rule featureCounts:
     input:
-        bam = mapping_prg+"/{sample}.bam",
+        bam = aligner + "/{sample}.bam",
         gtf = "Annotation/genes.filtered.gtf",
     output:
         "featureCounts/{sample}.counts.txt"

@@ -1,7 +1,7 @@
 rule bamCoverage_unique_mappings:
     input:
-        bam = mapping_prg+"/{sample}.bam",
-        bai = mapping_prg+"/{sample}.bam.bai"
+        bam = aligner+"/{sample}.bam",
+        bai = aligner+"/{sample}.bam.bai"
     output:
         bw_fwd = "bamCoverage/{sample}.uniqueMappings.fwd.bw",
         bw_rev = "bamCoverage/{sample}.uniqueMappings.rev.bw",
@@ -20,8 +20,8 @@ rule bamCoverage_unique_mappings:
 
 rule bamCoverage_RPKM:
     input:
-        bam = mapping_prg+"/{sample}.bam",
-        bai = mapping_prg+"/{sample}.bam.bai"
+        bam = aligner+"/{sample}.bam",
+        bai = aligner+"/{sample}.bam.bai"
     output:
         "bamCoverage/{sample}.RPKM.bw"
     conda:
@@ -39,8 +39,8 @@ rule bamCoverage_RPKM:
 
 rule bamCoverage_raw:
     input:
-        bam = mapping_prg+"/{sample}.bam",
-        bai = mapping_prg+"/{sample}.bam.bai"
+        bam = aligner+"/{sample}.bam",
+        bai = aligner+"/{sample}.bam.bai"
     output:
         "bamCoverage/{sample}.coverage.bw"
     conda:
@@ -58,8 +58,8 @@ rule bamCoverage_raw:
 
 rule plotEnrichment:
     input:
-        bam = expand(mapping_prg+"/{sample}.bam", sample=samples),
-        bai = expand(mapping_prg+"/{sample}.bam.bai", sample=samples),
+        bam = expand(aligner+"/{sample}.bam", sample=samples),
+        bai = expand(aligner+"/{sample}.bam.bai", sample=samples),
         gtf = "Annotation/genes.filtered.gtf"
     output:
         "deepTools_qc/plotEnrichment/plotEnrichment.tsv",
@@ -160,8 +160,8 @@ rule plotPCA:
 ########deepTools estimateReadFiltering#########################
 rule estimateReadFiltering:
     input:
-        bam = mapping_prg+"/{sample}.bam",
-        bai = mapping_prg+"/{sample}.bam.bai",
+        bam = aligner+"/{sample}.bam",
+        bai = aligner+"/{sample}.bam.bai",
     output:
         "deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt"
     log:
@@ -175,8 +175,8 @@ rule estimateReadFiltering:
 #######InsertSizeMetrics###############
 rule bamPE_fragment_size:
     input:
-        bams = expand(mapping_prg+"/{sample}.bam", sample=samples),
-        bais = expand(mapping_prg+"/{sample}.bam.bai", sample=samples)
+        bams = expand(aligner+"/{sample}.bam", sample=samples),
+        bais = expand(aligner+"/{sample}.bam.bai", sample=samples)
     output:
         "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv"
     params:

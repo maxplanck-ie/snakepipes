@@ -33,7 +33,7 @@ trim: False
 trimmer: cutadapt
 trimmerOptions: -a A{'30'}
 ## N.B., setting --outBAMsortingBinsN too high can result in cryptic errors
-starOptions: "--outBAMsortingBinsN 30 --twopassMode Basic"
+alignerOptions: "--outBAMsortingBinsN 30 --twopassMode Basic"
 ## further options
 filter_annotation: "-v -P 'decay|pseudogene' "
 barcode_file:

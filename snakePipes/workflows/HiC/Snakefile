@@ -134,7 +134,7 @@ rule all:
         expand("FASTQ/{sample}{read}.fastq.gz", sample = samples, read = reads),
         run_FastQC(fastqc),
         run_Trimming(trim, fastqc),
-        expand(mapping_prg+"/{sample}{read}.bam", sample = samples, read = reads),
+        expand(aligner + "/{sample}{read}.bam", sample = samples, read = reads),
         run_build_matrices(),
         expand("HiC_matrices/QCplots/{sample}_QC/QC.log", sample = samples),
         run_dist_vs_count(),

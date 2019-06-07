@@ -69,7 +69,7 @@ else:
             "{params.temp_out} {params.out_bname} >> {log.out} 2>> {log.err} "
             "&& cd ../ "
 
-if mapping_prg == "STAR":
+if aligner == "STAR":
     rule star_index:
         input:
             snpgenome_dir = SNPdir
@@ -92,7 +92,7 @@ if mapping_prg == "STAR":
             " --sjdbGTFfile {params.gtf}"
             " > {log.out} 2> {log.err}"
 
-elif mapping_prg == "Bowtie2":
+elif aligner == "Bowtie2":
     rule bowtie2_index:
         input:
             snpgenome_dir = SNPdir

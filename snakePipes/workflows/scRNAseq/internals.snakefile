@@ -28,9 +28,7 @@ if trim:
 else:
     fastq_indir_trim = None
 	
-mapping_prg = "STAR_genomic"
-
-hisat_options = ""
+aligner = "STAR_genomic"
 
 ### Initialization #############################################################
 

@@ -18,7 +18,7 @@ import snakePipes.parserCommon as parserCommon
 
 def parse_args(defaults={"verbose": False, "configFile": None, "clusterConfigFile": None, "maxJobs": 5, "snakemakeOptions": "--use-conda", "tempDir": None,
                          "mode": "alignment,deepTools_qc", "downsample": False, "trim": False, "trimmer": "cutadapt", "trimmerOptions": None, "fastqc": False,
-                         "library_type": 2, "mapping_prg": "STAR", "star_options": "--outBAMsortingBinsN 100", "hisat_options": None, "salmon_index_options": "--type quasi -k 31",
+                         "library_type": 2, "aligner": "STAR", "alignerOptions": None, "salmon_index_options": "--type quasi -k 31",
                          "featureCountsOptions": "-C -Q 10 --primary", "filter_annotation": None, "sampleSheet": None,
                          "bwBinSize": 25, "dnaContam": False, "plotFormat": "png","fromBAM": False, "paired": True}):
     """
@@ -52,44 +52,28 @@ def parse_args(defaults={"verbose": False, "configFile": None, "clusterConfigFil
                           type=int,
                           default=defaults["library_type"])
 
-    optional.add_argument("--mapping_prg",
-                          dest="mapping_prg",
-                          metavar="STR",
-                          help="Program used for mapping: STAR or HISAT2 (default: '%(default)s')",
-                          type=str,
-                          default=defaults["mapping_prg"])
+    optional.add_argument("--aligner",
+                          dest="aligner",
+                          help="Program used for mapping: STAR or HISAT2 (default: '%(default)s'). If you change this, please change --alignerOptions to match.",
+                          default=defaults["aligner"])
 
-    optional.add_argument("--star_options",
-                          dest="star_options",
-                          metavar="STR",
-                          help="STAR option string, e.g.: '--twopassMode Basic' (default: '%(default)s')",
-                          type=str,
-                          default=defaults["star_options"])
-
-    optional.add_argument("--hisat_options",
-                          dest="hisat_options",
-                          metavar="STR",
-                          help="HISAT2 option string (default: '%(default)s')",
-                          type=str,
-                          default=defaults["hisat_options"])
+    optional.add_argument("--alignerOptions",
+                          help="STAR or hisat2 option string, e.g.: '--twopassMode Basic' (default: '%(default)s')",
+                          default=defaults["alignerOptions"])
 
     optional.add_argument("--salmon_index_options",
                           dest="salmon_index_options",
-                          metavar="STR",
                           help="Salmon index options, e.g. '--type fmd' (default: '%(default)s')",
                           default=defaults["salmon_index_options"])
 
     optional.add_argument("--featureCountsOptions",
                           dest="featureCountsOptions",
-                          metavar="STR",
                           help="featureCounts option string. The options '-p -B'"
                                " are always used for paired-end data (default: '%(default)s')",
                           default=defaults["featureCountsOptions"])
 
     optional.add_argument("--filter_annotation",
                           dest="filter_annotation",
-                          metavar="STR",
-                          type=str,
                           help="filter annotation GTF by grep for use with Salmon, e.g."
                                " use --filter_annotation='-v pseudogene'; default: '%(default)s')",
                           default=defaults["filter_annotation"])
@@ -154,7 +138,7 @@ def main():
     if args.fromBAM and ("alignment-free" in modeTemp or "allelic-mapping" in modeTemp):
         sys.exit("\n--fromBAM can only be used with modes \'alignment\' or \'deepTools_qc\' - use one of these modes or provide fastq files!\n")  
     if args.fromBAM:
-        args.mapping_prg = "EXTERNAL_BAM"
+        args.aligner = "EXTERNAL_BAM"
             
     ## End workflow-specific checks
 

@@ -58,7 +58,7 @@ the config file description for the HiC workflow :
       ext: '.fastq.gz'
       ## paired-end read name extension (default: ['_R1', "_R2"])
       reads: ['_R1', '_R2']
-      mapping_prg: BWA
+      aligner: BWA
       ## Number of reads to downsample from each FASTQ file
       downsample:
       ## Options for trimming and fastqc

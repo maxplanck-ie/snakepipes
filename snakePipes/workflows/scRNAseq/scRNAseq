@@ -17,7 +17,7 @@ import snakePipes.parserCommon as parserCommon
 
 
 def parse_args(defaults={"verbose": False, "configFile": None, "clusterConfigFile": None, "maxJobs": 5, "snakemakeOptions": "--use-conda", "tempDir": None,
-                         "downsample": False, "trim": False, "trimmerOptions": "-a A{'30'}", "cell_names": None, "starOptions": "--outBAMsortingBinsN 30 --twopassMode Basic",
+                         "downsample": False, "trim": False, "trimmerOptions": "-a A{'30'}", "cell_names": None, "alignerOptions": "--outBAMsortingBinsN 30 --twopassMode Basic",
                          "filter_annotation": "-v -P 'decay|pseudogene' ", "barcode_file": None, "barcode_pattern": "NNNNNNXXXXXX", "split_lib": False,
                          "bwBinSize": 10, "plotFormat": "png", "cell_filter_metric": "gene_universe", "skipRaceID": False}):
     """
@@ -57,12 +57,10 @@ def parse_args(defaults={"verbose": False, "configFile": None, "clusterConfigFil
                           "for polyA trimming with Cutadapt (default: '%(default)s')",
                           default=defaults["trimmerOptions"])
 
-    optional.add_argument("--starOptions",
-                          dest="starOptions",
-                          metavar="STR",
+    optional.add_argument("--alignerOptions",
+                          dest="alignerOptions",
                           help="STAR option string, e.g.: '--twopassMode Basic' (default: '%(default)s')",
-                          type=str,
-                          default=defaults["starOptions"])
+                          default=defaults["alignerOptions"])
 
     optional.add_argument("--cell_barcode_file",
                           dest="barcode_file",

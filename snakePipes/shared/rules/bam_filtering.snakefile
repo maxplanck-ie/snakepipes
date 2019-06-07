@@ -6,7 +6,7 @@
 
 rule samtools_filter:
     input:
-        mapping_prg+"/{sample}.bam",
+        aligner+"/{sample}.bam",
         "filter_rules"
     output:
         bam = "filtered_bam/{sample}.filtered.bam"

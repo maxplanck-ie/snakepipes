@@ -42,7 +42,7 @@ else:
     print(bamFiles)
     print(bamSamples)
     
-    mapping_prg="EXTERNAL_BAM"
+    aligner = "EXTERNAL_BAM"
     indir = fromBAM
-    samples=bamSamples
+    samples = bamSamples
     downsample = None
