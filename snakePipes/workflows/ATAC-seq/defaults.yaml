@@ -41,3 +41,8 @@ fragment_length:
 trim:
 fastqc:
 qval: 0.001
+##dummy string to skip filtering annotation
+filter_annotation:
+##parameters to filter DB regions on
+fdr: 0.05
+absBestLFC: 1

@@ -15,8 +15,6 @@ bamCoverage_raw:
     memory: 5G
 create_snpgenome:
     memory: 30G
-CSAW:
-    memory: 3G
 FASTQdownsample:
     memory: 3G
 plotCorrelation_pearson:
@@ -38,4 +36,6 @@ plotPCA:
 plotPCA_allelic:
     memory: 4G
 snp_split:
+    memory: 10G
+plot_heatmap_CSAW_up:
     memory: 10G
