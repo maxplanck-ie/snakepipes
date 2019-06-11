@@ -111,9 +111,9 @@ if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 559 ]; then exit 1 ; fi
 
 # scRNA-seq
 WC=`scRNAseq -i PE_input -o output --tempdir /tmp --snakemake_options " --dryrun --conda-prefix /tmp" .ci_stuff/organism.yaml | tee /dev/stderr | grep -v "Conda environment" | wc -l`
-if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 1179 ]; then exit 1 ; fi
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 1279 ]; then exit 1 ; fi
 WC=`scRNAseq -i PE_input -o output --tempdir /tmp --snakemake_options " --dryrun --conda-prefix /tmp" --skipRaceID --split_lib .ci_stuff/organism.yaml | tee /dev/stderr | grep -v "Conda environment" | wc -l`
-if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 1150 ]; then exit 1 ; fi
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 1250 ]; then exit 1 ; fi
 
 # WGBS
 WC=`WGBS -i PE_input -o output --tempdir /tmp --snakemake_options " --dryrun --conda-prefix /tmp" .ci_stuff/organism.yaml | tee /dev/stderr | grep -v "Conda environment" | wc -l`
