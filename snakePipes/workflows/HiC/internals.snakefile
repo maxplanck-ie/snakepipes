@@ -82,7 +82,7 @@ def get_sampleSheet(sample_sheet):
         sample_dict['merged'] = []
         for sample in samples:
             sample_dict['merged'].append(sample)
-
+    print(sample_dict)
     return sample_dict
 
 ## trim
