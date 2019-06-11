@@ -4,3 +4,5 @@ MACS2:
     memory: 8G
 CSAW:
     memory: 30G
+plot_heatmap_cov_CSAW:
+    memory: 5G
