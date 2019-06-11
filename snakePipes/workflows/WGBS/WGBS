@@ -39,7 +39,7 @@ def parse_args(defaults={"verbose": False, "configFile": None, "clusterConfigFil
                          "downsample": None, "trim": True, "trimmer": "fastp", "trimmerOptions": "-q 5 -l 30 -M 5", "maxDist": 300, "minCpGs": 10, "minMethDiff": 0.1, "FDR": 0.1,
                          "MethylDackelOptions": "--mergeContext --maxVariantFrac 0.25 --minDepth 4", "fastqc": False, 'bwBinSize': 25, 'plotFormat': 'png', "bamExt": '.bam',
                          "reads": ["_R1", "_R2"],
-                         "blacklist": None, "sampleSheet": None, "manualMethylationBias": False, "fromBAM": False, "skipDOC": False, "skipGCbias": False, "computeDMLs": False}):
+                         "blacklist": None, "sampleSheet": None, "noAuthMethylationBias": False, "fromBAM": False, "skipDOC": False, "skipGCbias": False, "computeDMLs": False}):
     """
     Parse arguments from the command line.
     """
@@ -73,25 +73,21 @@ def parse_args(defaults={"verbose": False, "configFile": None, "clusterConfigFil
                           action="store_true",
                           help="If specified, MethylDackel mbias will NOT be run and the suggested parameters from it will NOT be used for methylation extraction. You can instead supply them manually in --MethylDackelOptions.")
 
-    # TODO
     optional.add_argument("--maxDist",
                           type=minOne,
                           help="The maximum distance between CpGs in a DMR (for metilene, default: '%(default)s')",
                           default=defaults["maxDist"])
 
-    # TODO
     optional.add_argument("--minCpGs",
                           type=minOne,
                           help="The minimum number of CpGs in a DMR (for metilene, default: '%(default)s')",
                           default=defaults["minCpGs"])
 
-    # TODO
     optional.add_argument("--minMethDiff",
                           type=float,
                           help="The minimum methylation change in methylation for CpG inclusion in DMR detection (for metilene, default: '%(default)s')",
                           default=defaults["minMethDiff"])
 
-    # TODO
     optional.add_argument("--FDR",
                           type=float,
                           help="FDR threshold for returned DMRs (default: '%(default)s')",
