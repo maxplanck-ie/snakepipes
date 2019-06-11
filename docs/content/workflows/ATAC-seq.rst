@@ -39,10 +39,20 @@ An example is below::
 
 .. note:: This sample sheet has the same requirements as the sample sheet in the ChIP-seq workflow, and also uses the same tool (CSAW) with a narrow default window size.
 
+For comparison between two conditions, the name you assign to "condition" is not relevant, but rather the order is. The group mentioned first (in the above case "wild-type") would be used as a "control" and the group mentioned later would be used as "test".
+
 If the user provides additional columns between 'name' and 'condition' in the sample sheet, the variables stored there will be used as blocking factors in the order they appear in the sample sheet. Condition will be the final column and it will be used for any statistical inference. 
 
 
-.. note:: In order to include or exclude peaks from selected samples in the union of peaks used in the differential binding analysis, the user must provide an additional column named 'UseRegions' and set it to True or False, accordingly. This column must supersede the 'condition' column in the column order. 
+The differential binding module utilizes the R package `CSAW <https://bioconductor.org/packages/release/bioc/html/csaw.html>`__ to detect significantly different peaks between two conditions. The analysis is performed on a "union" of peaks from all samples mentioned in the sample sheet. This merged set of regions are provided as an output inside the **CSAW** folder as the file ``DiffBinding_allregions.bed``. All differentially bound regions are available in ``CSAW/DiffBinding_significant.bed``. Two thresholds are applied to produce `Filtered.results.bed`: FDR (default `` 0.05 ``) as well as absolute log fold change (`` 1 ``). These can be specified either in the defaults.yaml dictionary or via commandline parameters '--FDR' and '--LFC'. Additionally, filtered results are split into up to 3 bed files, representing direction change (UP, DOWN, or MIXED).
+
+.. note:: In order to include or exclude peaks from selected samples in the union of peaks used in the differential binding analysis, the user may provide an additional column named 'UseRegions' and set it to True or False, accordingly. This column must supersede the 'condition' column in the column order. 
+
+Merged regions from filtered results with any direction change are further used to produce deepTools heatmaps, using log2 ratio of chip signal to input or depth-normalized coverage. For this purpose, the regions are rescaled to 1kb, and extended by 0.2kb on each side.
+
+An html report summarizing the differential binding analysis is produced in the same folder.
+
+Filtered results are also annotated with the distance to the closest gene using bedtools closest and written as '.txt' files to the AnnotatedResults_* folder.
 
 
 Configuration file
@@ -81,6 +91,11 @@ There is a configuration file in ``snakePipes/workflows/ATACseq/defaults.yaml``:
     trim:
     fastqc:
     qval: 0.001
+    ##dummy string to skip filtering annotation
+    filter_annotation:
+    ##parameters to filter DB regions on
+    fdr: 0.05
+    absBestLFC: 1
 
 Useful parameters are ``fragmentSize_cutoff`` and ``window_size``, also available from commandline.  
 
