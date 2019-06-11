@@ -133,6 +133,12 @@ There is a configuration file in ``snakePipes/workflows/ChIP-seq/defaults.yaml``
     sample_info:
     # window_size
     window_size: 150
+    plot_format: png
+    ##dummy string to skip filtering annotation
+    filter_annotation:
+    ##parameters to filter DB regions on
+    fdr: 0.05
+    absBestLFC: 1
 
 The only parameters that are useful to change are ``bw_binsize``, ``fragment_length``, and ``window_size``. Note however that those can be more conveniently changed on the command line.
 
