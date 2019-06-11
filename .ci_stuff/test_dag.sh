@@ -72,7 +72,7 @@ if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 222 ]; then exit 1 ; fi
 # ATAC-seq
 WC=`ATAC-seq -d BAM_input --snakemakeOptions " --dryrun --conda-prefix /tmp" .ci_stuff/organism.yaml | tee /dev/stderr | grep -v "Conda environment" | wc -l`
 if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 336 ]; then exit 1 ; fi
-WC=`ATAC-seq -d BAM_input --snakemakeOptions " --dryrun --conda-prefix /tmp" --fragmentSize-cutoff 120 --qval 0.1 .ci_stuff/organism.yaml | tee /dev/stderr | grep -v "Conda environment" | wc -l`
+WC=`ATAC-seq -d BAM_input --snakemakeOptions " --dryrun --conda-prefix /tmp" --maxFragmentSize 120 --qval 0.1 .ci_stuff/organism.yaml | tee /dev/stderr | grep -v "Conda environment" | wc -l`
 if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 336 ]; then exit 1 ; fi
 
 # RNA-seq
