@@ -73,7 +73,8 @@ As you can see above, the same control can be used for multiple samples.
 Differential Binding analysis
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you wish to perform differential binding analysis between two group of samples, for example wild-type vs Knock-outs, via snakePipes. You would require a sample-sheet and the ``--sampleSheet`` option.
+If you wish to perform differential binding analysis between two group of samples, for example wild-type vs Knock-outs, via snakePipes. You would require a sample-sheet and the ``--sampleSheet`` option. Sample sheet may contain only a subset of samples used in the previous steps e.g. for peak calling.
+In addition, input samples are filtered out prior to the analysis using the sample configuration yaml (see above).
 
 The sample sheet is a tab-separated file with two columns, named name and condition. An example is below::
 
@@ -87,13 +88,20 @@ The sample sheet is a tab-separated file with two columns, named name and condit
 
 For comparison between two conditions, the name you assign to "condition" is not relevant, but rather the order is. The group mentioned first (in the above case "wild-type") would be used as a "control" and the group mentioned later would be used as "test".
 
-The differential binding module utilizes the R package `CSAW <https://bioconductor.org/packages/release/bioc/html/csaw.html>`__ to detect significantly different peaks between two conditions. The analysis is performed on a "union" of peaks from all samples mentioned in the sample sheet. This merged set of regions are provided as an output inside the **CSAW** folder as the file ``DiffBinding_allregions.bed``. All differentially bound regions are available in ``CSAW/DiffBinding_significant.bed``. The default threshold used by the workflow to test for differential binding is ``p < 0.05``
+The differential binding module utilizes the R package `CSAW <https://bioconductor.org/packages/release/bioc/html/csaw.html>`__ to detect significantly different peaks between two conditions. The analysis is performed on a "union" of peaks from all samples mentioned in the sample sheet. This merged set of regions are provided as an output inside the **CSAW** folder as the file ``DiffBinding_allregions.bed``. All differentially bound regions are available in ``CSAW/DiffBinding_significant.bed``. Two thresholds are applied to produce `Filtered.results.bed`: FDR (default `` 0.05 ``) as well as absolute log fold change (`` 1 ``). These can be specified either in the defaults.yaml dictionary or via commandline parameters '--FDR' and '--LFC'. Additionally, filtered results are split into up to 3 bed files, representing direction change (UP, DOWN, or MIXED).
 
 
 If the user provides additional columns between 'name' and 'condition' in the sample sheet, the variables stored there will be used as blocking factors in the order they appear in the sample sheet. Condition will be the final column and it will be used for any statistical inference. 
 
 
-.. note:: In order to include or exclude peaks from selected samples in the union of peaks used in the differential binding analysis, the user must provide an additional column named 'UseRegions' and set it to True or False, accordingly. This column must supersede the 'condition' column in the column order. 
+.. note:: In order to include or exclude peaks from selected samples in the union of peaks used in the differential binding analysis, the user may provide an additional column named 'UseRegions' and set it to True or False, accordingly. This column must supersede the 'condition' column in the column order. 
+
+
+Merged regions from filtered results with any direction change are further used to produce deepTools heatmaps, using log2 ratio of chip signal to input or depth-normalized coverage. For this purpose, the regions are rescaled to 1kb, and extended by 0.2kb on each side.
+
+An html report summarizing the differential binding analysis is produced in the same folder.
+
+Filtered results are also annotated with the distance to the closest gene using bedtools closest and written as '.txt' files to the AnnotatedResults_* folder.
 
 
 .. _ChIPconfig:
