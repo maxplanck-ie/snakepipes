@@ -118,7 +118,7 @@ rule index_PCRrm_bam:
 # TODO: I'm not sure how useful this really is. We could just run plotCoverage instead.
 rule getRandomCpGs:
     output:
-        temp("aux_files/randomCpG.bed")
+        temp("QC_metrics/randomCpG.bed")
     params:
         genome_fasta=genome_fasta
     run:
@@ -226,7 +226,7 @@ rule DepthOfCov:
     input:
         "bwameth/{sample}.PCRrm.bam",
         "bwameth/{sample}.PCRrm.bam.bai",
-        "aux_files/randomCpG.bed"
+        "QC_metrics/randomCpG.bed"
     output:
         "QC_metrics/{sample}.doc.sample_summary",
     params:
@@ -296,12 +296,12 @@ rule produce_report:
     output:
         QCrep='QC_metrics/QC_report.html'
     params:
-        auxdir=os.path.join(outdir, "aux_files")
+        auxdir=os.path.join(outdir, "QC_metrics")
     conda: CONDA_RMD_ENV
     script: "../rscripts/WGBS_QC_report_template.Rmd"
 
 
-if mbias=="auto":
+if not noAutoMethylationBias:
     rule methyl_extract:
         input:
             "bwameth/{sample}.PCRrm.bam",
@@ -330,15 +330,14 @@ else:
             "MethylDackel/{sample}_CpG.bedGraph"
         params:
             genome=genome_fasta,
-            MethylDackelOptions=MethylDackelOptions,
-            mbias=mbias
+            MethylDackelOptions=MethylDackelOptions
         log:
             err="MethylDackel/logs/{sample}.methyl_extract.err",
             out="MethylDackel/logs/{sample}.methyl_extract.out"
         threads: 10
         conda: CONDA_WGBS_ENV
         shell: """
-            MethylDackel extract -o MethylDackel/{wildcards.sample} {params.mbias} -@ {threads} {params.genome} {input[0]} 1>{log.out} 2>{log.err}
+            MethylDackel extract -o MethylDackel/{wildcards.sample} {params.MethylDackelOptions} -@ {threads} {params.genome} {input[0]} 1>{log.out} 2>{log.err}
             """
 
 

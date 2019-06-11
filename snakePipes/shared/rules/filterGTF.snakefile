@@ -50,7 +50,7 @@ rule filter_annotation_bed:
     output:
         bed_filtered = "Annotation/genes.filtered.bed"
     params:
-        pattern = str(filter_annotation or '\'\''),
+        pattern = str(filterGTF or '\'\''),
         cmd = "Annotation/filter_command.txt"
     shell:
         """

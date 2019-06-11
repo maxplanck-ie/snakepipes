@@ -19,7 +19,7 @@ if aligner == "Bowtie2":
                 align_summary = aligner+"/{sample}.Bowtie2_summary.txt",
                 bam = temp(aligner+"/{sample}.sorted.bam")
             params:
-                bowtie_opts = str(bowtie_opts or ''),
+                alignerOpts = str(alignerOpts or ''),
                 mateOrientation = mateOrientation,
                 insertSizeMax = insertSizeMax,
                 idxbase = getbw_idxbase(bowtie2_index_allelic)
@@ -32,7 +32,7 @@ if aligner == "Bowtie2":
                 bowtie2 \
                 -X {params.insertSizeMax} \
                 -x {params.idxbase} -1 {input.r1} -2 {input.r2} \
-                {params.bowtie_opts} {params.mateOrientation} \
+                {params.alignerOpts} {params.mateOrientation} \
                 --rg-id {wildcards.sample} --rg CN:mpi-ie_deep_sequencing_unit \
                 --rg DS:{wildcards.sample} --rg PL:ILLUMINA --rg SM:{wildcards.sample} \
                 -p {threads} \
@@ -50,7 +50,7 @@ if aligner == "Bowtie2":
                 align_summary = aligner+"/{sample}.Bowtie2_summary.txt",
                 bam = temp(aligner+"/{sample}.sorted.bam")
             params:
-                bowtie_opts = str(bowtie_opts or ''),
+                alignerOpts = str(alignerOpts or ''),
                 idxbase = getbw_idxbase(bowtie2_index_allelic)
             benchmark:
                 aligner+"/.benchmark/Bowtie2.{sample}.benchmark"
@@ -61,7 +61,7 @@ if aligner == "Bowtie2":
                 bowtie2 \
                 -x {params.idxbase} -U {input.r1} \
                 --reorder \
-                {params.bowtie_opts} \
+                {params.alignerOpts} \
                 --rg-id {wildcards.sample} --rg CN:mpi-ie_deep_sequencing_unit \
                 --rg DS:{wildcards.sample} --rg PL:ILLUMINA --rg SM:{wildcards.sample} \
                 -p {threads} \

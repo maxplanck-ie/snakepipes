@@ -31,14 +31,15 @@ def bounded01(x):
     """
     x = float(x)
     if x < 0 or x >= 1:
-        raise argparse.ArgumentTypeError("The values for --minMethDiff, --minAbsDiff, and --FDR must be between 0 and 1")
+        raise argparse.ArgumentTypeError("The values for --minMethDiff and --FDR must be between 0 and 1")
     return x
 
 
 def parse_args(defaults={"verbose": False, "configFile": None, "clusterConfigFile":None, "maxJobs": 12, "snakemakeOptions": "--use-conda", "tempDir": None,
-                         "downsample": None, "trim": True, "trimmer": "fastp", "trimmerOptions": "-q 5 -l 30 -M 5", "maxDist": 300, "minCpGs": 10, "minMethDiff": 0, "minAbsDiff": 0.1, "FDR": 0.1,
+                         "downsample": None, "trim": True, "trimmer": "fastp", "trimmerOptions": "-q 5 -l 30 -M 5", "maxDist": 300, "minCpGs": 10, "minMethDiff": 0.1, "FDR": 0.1,
                          "MethylDackelOptions": "--mergeContext --maxVariantFrac 0.25 --minDepth 4", "fastqc": False, 'bwBinSize': 25, 'plotFormat': 'png', "bamExt": '.bam',
-                         "blacklist": None, "sampleSheet": None, "mbias": "auto", "fromBAM": False, "skipDOC": False, "skipGCbias": False, "computeDMLs": False}):
+                         "reads": ["_R1", "_R2"],
+                         "blacklist": None, "sampleSheet": None, "manualMethylationBias": False, "fromBAM": False, "skipDOC": False, "skipGCbias": False, "computeDMLs": False}):
     """
     Parse arguments from the command line.
     """
@@ -68,11 +69,9 @@ def parse_args(defaults={"verbose": False, "configFile": None, "clusterConfigFil
                           help="Perform differential methylation analysis between groups of samples by providing a text file with sample information to use for statistical analysis. (default: '%(default)s')",
                           default=defaults["sampleSheet"])
 
-    # TODO: expand help message
-    optional.add_argument("--mbias",
-                          dest="mbias",
-                          help="Number of nucleotides with methylation bias to ignore during methylation extraction. In the *auto* mode this number is automaticaly calculated by MethylDackel (default: '%(default)s')",
-                          default=defaults["mbias"])
+    optional.add_argument("--manualMethylationBias",
+                          action="store_true",
+                          help="If specified, MethylDackel mbias will NOT be run and the suggested parameters from it will NOT be used for methylation extraction. You can instead supply them manually in --MethylDackelOptions.")
 
     # TODO
     optional.add_argument("--maxDist",
@@ -91,12 +90,6 @@ def parse_args(defaults={"verbose": False, "configFile": None, "clusterConfigFil
                           type=float,
                           help="The minimum methylation change in methylation for CpG inclusion in DMR detection (for metilene, default: '%(default)s')",
                           default=defaults["minMethDiff"])
-
-    # TODO
-    optional.add_argument("--minAbsDiff",
-                          type=float,
-                          help="The minimum methylation for returned DMRs (default: '%(default)s')",
-                          default=defaults["minAbsDiff"])
 
     # TODO
     optional.add_argument("--FDR",

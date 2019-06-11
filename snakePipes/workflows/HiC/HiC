@@ -20,6 +20,7 @@ def parse_args(defaults={"verbose": False, "configFile": None, "clusterConfigFil
                          "downsample": False, "trim": False, "trimmer": "cutadapt", "trimmerOptions": "", "fastqc": False,
                          "bin_size": 10000, "RF_resolution": False, "enzyme": "HindIII", "restrict_region": None,
                          "merge_samples": False, "nbins_toMerge": 0, "tadparams": '--thresholdComparisons 0.01',
+                         "reads": ["_R1", "_R2"],
                          "noTAD": False, "noCorrect": False, "distVsCount": False, "distVsCountParams": None}):
     """
     Parse arguments from the command line.

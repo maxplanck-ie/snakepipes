@@ -67,6 +67,12 @@ def mainArguments(defaults, workingDir=False, createIndices=False):
                          help="verbose output (default: '%(default)s')",
                          default=defaults["verbose"])
 
+    if not workingDir and not createIndices:
+        general.add_argument("--reads",
+                             help="Suffix used to denote reads 1 and 2 for paired-end data. This should typically be either '_1' '_2' or '_R1' '_R2' (default: '%(default)s). "
+                             "Note that you should NOT separate the values by a comma (use a space) or enclose them in brackets.",
+                             default=defaults["reads"])
+
     general.add_argument("-c", "--configFile",
                          help="configuration file: config.yaml (default: '%(default)s')",
                          default=defaults["configFile"])
@@ -144,29 +150,16 @@ def snpArguments(defaults):
     parser = argparse.ArgumentParser(add_help=False)
     snpargs = parser.add_argument_group('Allele-specific mapping arguments')
     snpargs.add_argument("--VCFfile",
-                         metavar="STR",
-                         help="VCF file to create N-masked genomes (default: 'None')",
-                         default='',
-                         type=str)
+                         help="VCF file to create N-masked genomes (default: 'None')")
 
     snpargs.add_argument("--strains",
-                         dest="strains",
-                         metavar="STR",
-                         help="Name or ID of SNP strains separated by comma (default: 'None')",
-                         default='',
-                         type=str)
+                         help="Name or ID of SNP strains separated by comma (default: 'None')")
 
     snpargs.add_argument("--SNPfile",
-                         metavar="STR",
-                         help="File containing SNP locations (default: 'None')",
-                         default='',
-                         type=str)
+                         help="File containing SNP locations (default: 'None')")
 
-    snpargs.add_argument("--Nmasked_index",
-                         metavar="STR",
-                         help="N-masked index of the reference genome (default: 'None')",
-                         default='',
-                         type=str)
+    snpargs.add_argument("--NMaskedIndex",
+                         help="N-masked index of the reference genome (default: 'None')")
 
     return parser
 

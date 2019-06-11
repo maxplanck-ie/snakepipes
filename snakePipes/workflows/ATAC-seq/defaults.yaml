@@ -21,14 +21,15 @@ workingdir:
 ## preconfigured target genomes (mm9,mm10,dm3,...) , see /path/to/snakemake_workflows/shared/organisms/
 ## Value can be also path to your own genome config file!
 genome:
-## The maximum fragment size to retain. This should typically be the size of a nucleosome
-fragmentSize_cutoff: 150
+## The maximum fragment size to retain. This should typically be the size of a nucleosome. A minimal size can also be specified, though a value of 1 should typically be used.
+maxFragmentSize: 150
+minFragmentSize: 0
 verbose: false
 # sampleSheet_DB
 sampleSheet:
 # windowSize
 windowSize: 20
-fragmentCount_cutoff: 1
+fragmentCountThreshold: 1
 #### Flag to control the pipeline entry point
 bamExt: '.filtered.bam'
 fromBAM: 

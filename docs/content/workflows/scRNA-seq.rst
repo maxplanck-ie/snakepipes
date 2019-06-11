@@ -69,7 +69,7 @@ The default configuration file is listed below and can be found in ``snakePipes/
     trimmer: cutadapt
     trimmerOptions: -a A{'30'}
     ## further options
-    filter_annotation: "-v -P 'decay|pseudogene' "
+    filterGTF: "-v -P 'decay|pseudogene' "
     barcode_file:
     barcode_pattern: "NNNNNNXXXXXX"
     split_lib: False
@@ -108,7 +108,7 @@ Pseudogene filter
 ~~~~~~~~~~~~~~~~~
 
 As default, transcripts or genes that contain that are related to biotypes like 'pseudogene' or 'decay' are filtered out before tag counting (see
-:code:`--filter_annotation` default).
+:code:`--filterGTF` default).
 Here we assume you provide eg. a gencode or ensemble annotation file (via genes_gtf in the organism configuration yaml) that contains this information.
 
 Library Type

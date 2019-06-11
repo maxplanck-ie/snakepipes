@@ -54,15 +54,15 @@ if "allelic-mapping" in mode:
         bowtie2_index_allelic = 'snp_genome/bowtie2_Nmasked/Genome.1.bt2'
         if len(strains) == 1:
             allele_hybrid = 'single'
-            snp_file = "snp_genome/all_SNPs_" + strains[0] + "_" + genome + ".txt.gz"
+            SNPFile = "snp_genome/all_SNPs_" + strains[0] + "_" + genome + ".txt.gz"
         elif len(strains) == 2:
             allele_hybrid = 'dual'
-            snp_file = "snp_genome/all_" + strains[1] + "_SNPs_" + strains[0] + "_reference.based_on_" + genome + ".txt"
+            SNPFile = "snp_genome/all_" + strains[1] + "_SNPs_" + strains[0] + "_reference.based_on_" + genome + ".txt"
 
         include: os.path.join(maindir, "shared", "rules", "masked_genomeIndex.snakefile")
     elif allele_mode == 'map_only':
-        bowtie2_index_allelic = Nmasked_index
-        snp_file = SNPfile
+        bowtie2_index_allelic = NMaskedIndex
+        SNPFile = SNPfile
     ## mapping rules
     include: os.path.join(maindir, "shared", "rules", "Bowtie2_allelic.snakefile")
     ## SNPsplit
@@ -127,7 +127,7 @@ def make_nmasked_genome():
         genome1 = "snp_genome/" + strains[0] + '_SNP_filtering_report.txt'
         file_list = [
                 genome1,
-                snp_file,
+                SNPFile,
                 bowtie2_index_allelic
                 ]
         return(file_list)

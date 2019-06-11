@@ -3,7 +3,7 @@
 if aligner == "Bowtie2":
     rule snp_split:
         input:
-            snp = snp_file,
+            snp = SNPFile,
             bam = "filtered_bam/{sample}.filtered.bam"
         output:
             temp("filtered_bam/{sample}.filtered.sortedByName.bam"),
@@ -18,7 +18,7 @@ if aligner == "Bowtie2":
 elif aligner == "STAR":
     rule snp_split:
         input:
-            snp = snp_file,
+            snp = SNPFile,
             bam = aligner+"/{sample}.bam"
         output:
             temp(aligner+"/{sample}.sortedByName.bam"),

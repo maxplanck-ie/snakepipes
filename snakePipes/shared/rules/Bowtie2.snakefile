@@ -9,7 +9,7 @@ if paired:
             bam = temp("Bowtie2/{sample}.sorted.bam")# removing since we keep the sambamba output (dupmarked)
         params:
             bowtie2_index=bowtie2_index,
-            bowtie_opts = str(bowtie_opts or ''),
+            alignerOpts = str(alignerOpts or ''),
             mateOrientation = mateOrientation,
             insertSizeMax = insertSizeMax
         benchmark:
@@ -21,7 +21,7 @@ if paired:
             bowtie2 \
             -X {params.insertSizeMax} \
             -x {params.bowtie2_index} -1 {input.r1} -2 {input.r2} \
-            {params.bowtie_opts} {params.mateOrientation} \
+            {params.alignerOpts} {params.mateOrientation} \
             --rg-id {wildcards.sample} --rg CN:mpi-ie_deep_sequencing_unit \
             --rg DS:{wildcards.sample} --rg PL:ILLUMINA --rg SM:{wildcards.sample} \
             -p {threads} \
@@ -39,7 +39,7 @@ else:
             bam = temp("Bowtie2/{sample}.sorted.bam")
         params:
             bowtie2_index=bowtie2_index,
-            bowtie_opts = str(bowtie_opts or '')
+            alignerOpts = str(alignerOpts or '')
         benchmark:
             "Bowtie2/.benchmark/Bowtie2.{sample}.benchmark"
         threads: 24  # 1G per core
@@ -48,7 +48,7 @@ else:
             MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX);
             bowtie2 \
             -x {params.bowtie2_index} -U {input} \
-            {params.bowtie_opts} \
+            {params.alignerOpts} \
             --rg-id {wildcards.sample} --rg CN:mpi-ie_deep_sequencing_unit \
             --rg DS:{wildcards.sample} --rg PL:ILLUMINA --rg SM:{wildcards.sample} \
             -p {threads} \

@@ -53,10 +53,10 @@ There is a configuration file in ``snakePipes/workflows/RNA-seq/defaults.yaml``:
     bwBinSize: 25
     fastqc: False
     featureCountsOptions: -C -Q 10 --primary
-    filter_annotation:
+    filterGTF:
     fragmentLength: 200
     libraryType: 2
-    salmon_index_options: --type quasi -k 31
+    salmonIndexOptions: --type quasi -k 31
     dnaContam: False
     ## supported mappers: STAR HISAT2
     aligner: STAR
@@ -65,8 +65,8 @@ There is a configuration file in ``snakePipes/workflows/RNA-seq/defaults.yaml``:
     verbose: False
     plotFormat: png
     # for allele-spcific mapping
-    snp_file:
-    Nmasked_index:
+    SNPFile:
+    NMaskedIndex:
 
 
 Apart from the common workflow options (see :ref:`running_snakePipes`), the following parameters are useful to consider:
@@ -77,21 +77,21 @@ Apart from the common workflow options (see :ref:`running_snakePipes`), the foll
 
 * **featureCountsOptions**: Options to pass to featureCounts (in case the ``alignment`` or ``allelic-mapping`` mode is used). Note that the paired-end information is automatically passed to featurecounts via the workflow, and the summerization is always performed at **gene level**, since the workflow assumes that featurecounts output is being used for gene-level differential expression analysis. If you wish to perform a **transcript-level** DE analysis, please choose the mode **alignment-free**.
 
-* **filter_annotation**: Options you can pass on to filter the original `GTF file <http://genome.ucsc.edu/goldenPath/help/customTrack.html#GTF>`__. This is useful in case you want to filter certain kind of transcripts (such as pseudogenes) before running the counts/DE analysis.
+* **filterGTF**: Options you can pass on to filter the original `GTF file <http://genome.ucsc.edu/goldenPath/help/customTrack.html#GTF>`__. This is useful in case you want to filter certain kind of transcripts (such as pseudogenes) before running the counts/DE analysis.
 
 * **libraryType**: The default library-type is suitable for most RNAseq protocols (using Illumina `Tru-Seq <https://www.illumina.com/products/by-type/sequencing-kits/library-prep-kits/truseq-rna-v2.html>`__). Change this option in case you have a different strandednes.
 
-* **salmon_index_options**: In the ``alignment-free`` mode (see below), this option allows you to change the type of index created by salmon. New users can leave it to default.
+* **salmonIndexOptions**: In the ``alignment-free`` mode (see below), this option allows you to change the type of index created by salmon. New users can leave it to default.
 
 * **dnaContam**: Enable this to test for possible DNA contamination in your RNA-seq samples. DNA contamination is quantified as the fraction of reads falling into intronic and intergenic regions, compared to those falling into exons. Enabling this option would produce a directory called ``GenomicContamination`` with ``.tsv`` files containing this information.
 
 * **plotFormat**: You can switch the type of plot produced by all deeptools modules using this option. Possible choices : png, pdf, svg, eps, plotly
 
-* **snp_file**: For the ``allelic-mapping`` mode. The ``snp_file`` is the file produced by `SNPsplit <https://www.bioinformatics.babraham.ac.uk/projects/SNPsplit/>`__ after creating a dual-hybrid genome. The file has the suffix ``.vcf``.
+* **SNPFile**: For the ``allelic-mapping`` mode. The ``SNPFile`` is the file produced by `SNPsplit <https://www.bioinformatics.babraham.ac.uk/projects/SNPsplit/>`__ after creating a dual-hybrid genome. The file has the suffix ``.vcf``.
 
-* **Nmasked_index**: For the ``allelic-mapping`` mode. The ``Nmasked_index`` refers to the **basename** of the index file created using STAR, on the SNPsplit output.
+* **NMaskedIndex**: For the ``allelic-mapping`` mode. The ``NMaskedIndex`` refers to the **basename** of the index file created using STAR, on the SNPsplit output.
 
-.. note:: snp_file and Nmasked_index file could be specified in case you already have this and would like to re-run the analysis on new data. In case you are running the allele-specific analysis for the first time, you would need a VCF file and the name of the two strains. In this case the ``snp_file`` as well as the ``Nmasked_index`` files would be automatically created by the workflow using SNPsplit.
+.. note:: SNPFile and NMaskedIndex file could be specified in case you already have this and would like to re-run the analysis on new data. In case you are running the allele-specific analysis for the first time, you would need a VCF file and the name of the two strains. In this case the ``SNPFile`` as well as the ``NMaskedIndex`` files would be automatically created by the workflow using SNPsplit.
 
 
 Differential expression
@@ -266,7 +266,7 @@ Assuming the pipline was run with ``--mode 'alignment-free,alignment,deepTools_q
 
 Apart from the common module outputs (see :ref:`running_snakePipes`), the workflow would produce the following folders:
 
-* **Annotation**: This folder would contain the GTF and BED files used for analysis. In case the file has been filtered using the ``--filter_annotation`` option (see :ref:`RNAconfig`), this would contain the filtered files.
+* **Annotation**: This folder would contain the GTF and BED files used for analysis. In case the file has been filtered using the ``--filterGTGTFF`` option (see :ref:`RNAconfig`), this would contain the filtered files.
 
 * **STAR/HISAT2**: (not produced in mode *alignment-free*) This would contain the output of RNA-alignment by STAR or HISAT2 (indexed `BAM files <http://samtools.github.io/hts-specs/SAMv1.pdf>`__).
 

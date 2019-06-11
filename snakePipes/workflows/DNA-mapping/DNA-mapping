@@ -19,7 +19,7 @@ import snakePipes.parserCommon as parserCommon
 def parse_args(defaults={"verbose": False, "configFile": None, "clusterConfigFile": None, "maxJobs": 5, "snakemakeOptions": "--use-conda", "tempDir": None,
                          "mode": "mapping", "downsample": False, "trim": False, "trimmer": "cutadapt", "trimmerOptions": "", "fastqc": False,
                          "qualimap": False, "dedup": False, "properPairs": False, "insertSizeMax": 1000, "gcbias": False,
-                         "bwBinSize": 25, "mapq": 0, "plotFormat": "png", "bowtie_opts": "", "mateOrientation": "--fr"}):
+                         "bwBinSize": 25, "mapq": 0, "plotFormat": "png", "alignerOpts": "", "mateOrientation": "--fr"}):
     """
     Parse arguments from the command line.
     """
@@ -45,12 +45,12 @@ def parse_args(defaults={"verbose": False, "configFile": None, "clusterConfigFil
 
     parserCommon.commonOptions(optional, defaults)
 
-    optional.add_argument("--bowtie_opts",
+    optional.add_argument("--alignerOpts",
                           help="Options that will be passed to bowtie2. You can specify things such as `--local` or "
                           "`--very-sensitive` here. The mate orientation and maximum insert size are specified "
                           "elsewhere. Read group information is set automatically. Note that you may need to escape "
                           "the first - (e.g., '\--very-fast'). Default: '%(default)s'.",
-                          default=defaults["bowtie_opts"])
+                          default=defaults["alignerOpts"])
 
     optional.add_argument("--mateOrientation",
                           help="The --fr, --ff, or --rf option for bowtie2 (default: '%(default)s')",
@@ -119,7 +119,7 @@ def main():
         args.VCFfile = os.path.abspath(args.VCFfile)
     elif args.allele_mode == "map_only":
         args.SNPfile = os.path.abspath(args.SNPfile)
-        args.Nmasked_index = os.path.abspath(args.Nmasked_index)
+        args.NMaskedIndex = os.path.abspath(args.NMaskedIndex)
 
     # clean up filtered_bam if needed appropriate
     os.makedirs(args.outdir, exist_ok=True)

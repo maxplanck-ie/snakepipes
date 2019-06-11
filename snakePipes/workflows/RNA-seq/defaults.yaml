@@ -40,10 +40,10 @@ sampleSheet:
 bwBinSize: 25
 fastqc: False
 featureCountsOptions: -C -Q 10 --primary
-filter_annotation:
+filterGTF:
 fragmentLength: 200
 libraryType: 2
-salmon_index_options: --type quasi -k 31
+salmonIndexOptions: --type quasi -k 31
 dnaContam: False
 ## supported mappers: STAR HISAT2
 aligner: STAR
@@ -51,8 +51,8 @@ alignerOptions:
 verbose: False
 plotFormat: png
 # for allele-spcific mapping
-snp_file:
-Nmasked_index:
+SNPFile:
+NMaskedIndex:
 #### Flag to control the pipeline entry point
 fromBAM: False
 bamExt: '.bam'

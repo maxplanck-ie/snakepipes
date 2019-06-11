@@ -27,7 +27,7 @@ if allele_hybrid == 'dual':
             genome1 = "snp_genome/" + strains[0] + '_SNP_filtering_report.txt',
             genome2 = "snp_genome/" + strains[1] + '_SNP_filtering_report.txt',
             snpgenome_dir = directory(SNPdir),
-            snpfile = snp_file
+            SNPFile = SNPFile
         params:
             strain1 = strains[0],
             strain2 = strains[1],
@@ -50,12 +50,12 @@ else:
         output:
             genome1 = "snp_genome/" + strains[0] + '_SNP_filtering_report.txt',
             snpgenome_dir = directory(SNPdir),
-            snpfile = snp_file
+            SNPFile = SNPFile
         params:
             strain1 = strains[0],
             SNPpath = os.path.abspath(VCFfile),
             temp_out=temp("all_SNPs_" + strains[0] + "_GRCm38.txt.gz"),
-            out_bname=os.path.basename(snp_file)
+            out_bname=os.path.basename(SNPFile)
         log:
             out = "SNPsplit_createSNPgenome.out",
             err = "SNPsplit_createSNPgenome.err"

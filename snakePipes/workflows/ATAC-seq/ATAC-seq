@@ -16,7 +16,8 @@ import snakePipes.parserCommon as parserCommon
 
 
 def parse_args(defaults={"verbose": False, "configFile": None, "clusterConfigFile": None, "maxJobs": 5, "snakemakeOptions": "--use-conda", "tempDir": None,
-                         "fragmentSize_cutoff": 150, "fromBAM": "" ,"qval": 0.001 ,"sampleSheet": None, "bamExt": "filtered.bam"}):
+                         "reads": ["_R1", "_R2"],
+                         "maxFragmentSize": 150, "minFragmentSize": 0, "fromBAM": "" ,"qval": 0.001 ,"sampleSheet": None, "bamExt": "filtered.bam"}):
     """
     Parse arguments from the command line.
     """
@@ -32,13 +33,15 @@ def parse_args(defaults={"verbose": False, "configFile": None, "clusterConfigFil
 
     # Workflow options
     optional = parser.add_argument_group('Options')
-    optional.add_argument("--fragmentSize-cutoff",
-                          dest="fragmentSize_cutoff",
-                          metavar="INT",
-                          help="Size threshold for filtering of nucleosomal fragments(default: '%(default)s')",
+    optional.add_argument("--maxFragmentSize",
+                          help="Maximum size of (typically nucleosomal) fragments for inclusion in the analysis (default: '%(default)s')",
                           type=int,
-                          default=defaults['fragmentSize_cutoff'])
+                          default=defaults['maxFragmentSize'])
 
+    optional.add_argument("--minFragmentSize",
+                          help="Minimum size of (typically nucleosomal) fragments for inclusion in the analysis (default: '%(default)s')",
+                          type=int,
+                          default=defaults['minFragmentSize'])
 
     optional.add_argument("--qval",
                           dest="qval",

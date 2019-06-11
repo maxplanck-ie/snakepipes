@@ -18,7 +18,8 @@ import snakePipes.parserCommon as parserCommon
 
 def parse_args(defaults={"verbose": False, "configFile": None, "clusterConfigFile": None, "maxJobs": 5, "snakemakeOptions": "--use-conda", "tempDir": None,
                          "downsample": False, "trim": False, "trimmerOptions": "-a A{'30'}", "cell_names": None, "alignerOptions": "--outBAMsortingBinsN 30 --twopassMode Basic",
-                         "filter_annotation": "-v -P 'decay|pseudogene' ", "barcode_file": None, "barcode_pattern": "NNNNNNXXXXXX", "split_lib": False,
+                         "filterGTF": "-v -P 'decay|pseudogene' ", "barcode_file": None, "barcode_pattern": "NNNNNNXXXXXX", "split_lib": False,
+                         "reads": ["_R1", "_R2"],
                          "bwBinSize": 10, "plotFormat": "png", "cell_filter_metric": "gene_universe", "skipRaceID": False}):
     """
     Parse arguments from the command line.
@@ -84,13 +85,12 @@ def parse_args(defaults={"verbose": False, "configFile": None, "clusterConfigFil
                           help="Set this option if only 96 out of 192 barcodes were used per sample.",
                           default=defaults["split_lib"])
 
-    optional.add_argument("--filter_annotation",
-                          dest="filter_annotation",
-                          metavar="STR",
+    optional.add_argument("--filterGTF",
+                          dest="filterGTF",
                           type=str,
-                          help="filter annotation GTF by grep for feature counting, e.g. use --filter_annotation='-v pseudogene'; "
+                          help="filter annotation GTF by grep for feature counting, e.g. use --filterGTF='-v pseudogene'; "
                           "(default: '%(default)s')",
-                          default=defaults["filter_annotation"])
+                          default=defaults["filterGTF"])
 
     optional.add_argument("--cell_names",
                           dest="cell_names",

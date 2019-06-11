@@ -62,7 +62,7 @@ There is a configuration file in ``snakePipes/workflows/DNA-mapping/defaults.yam
     mateOrientation: --fr
     ## other Bowtie2 stuff
     insertSizeMax: 1000
-    bowtie_opts:
+    alignerOpts:
     plotFormat: png
     ## Median/mean fragment length, only relevant for single-end data (default: 200)
     fragmentLength: 200

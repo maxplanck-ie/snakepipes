@@ -18,8 +18,9 @@ import snakePipes.parserCommon as parserCommon
 
 def parse_args(defaults={"verbose": False, "configFile": None, "clusterConfigFile": None, "maxJobs": 5, "snakemakeOptions": "--use-conda", "tempDir": None,
                          "mode": "alignment,deepTools_qc", "downsample": False, "trim": False, "trimmer": "cutadapt", "trimmerOptions": None, "fastqc": False,
-                         "libraryType": 2, "aligner": "STAR", "alignerOptions": None, "salmon_index_options": "--type quasi -k 31",
-                         "featureCountsOptions": "-C -Q 10 --primary", "filter_annotation": None, "sampleSheet": None,
+                         "libraryType": 2, "aligner": "STAR", "alignerOptions": None, "salmonIndexOptions": "--type quasi -k 31",
+                         "featureCountsOptions": "-C -Q 10 --primary", "filterGTF": None, "sampleSheet": None,
+                         "reads": ["_R1", "_R2"],
                          "bwBinSize": 25, "dnaContam": False, "plotFormat": "png","fromBAM": False, "paired": True}):
     """
     Parse arguments from the command line.
@@ -57,19 +58,19 @@ def parse_args(defaults={"verbose": False, "configFile": None, "clusterConfigFil
                           help="STAR or hisat2 option string, e.g.: '--twopassMode Basic' (default: '%(default)s')",
                           default=defaults["alignerOptions"])
 
-    optional.add_argument("--salmon_index_options",
+    optional.add_argument("--salmonIndexOptions",
                           help="Salmon index options, e.g. '--type fmd' (default: '%(default)s')",
-                          default=defaults["salmon_index_options"])
+                          default=defaults["salmonIndexOptions"])
 
     optional.add_argument("--featureCountsOptions",
                           help="featureCounts option string. The options '-p -B'"
                                " are always used for paired-end data (default: '%(default)s')",
                           default=defaults["featureCountsOptions"])
 
-    optional.add_argument("--filter_annotation",
+    optional.add_argument("--filterGTF",
                           help="filter annotation GTF by grep for use with Salmon, e.g."
-                               " use --filter_annotation='-v pseudogene'; default: '%(default)s')",
-                          default=defaults["filter_annotation"])
+                               " use --filterGTF='-v pseudogene'; default: '%(default)s')",
+                          default=defaults["filterGTF"])
 
     optional.add_argument("--sampleSheet",
                           help="Information on samples (required for DE analysis); see "
@@ -121,7 +122,7 @@ def main():
         args.VCFfile = os.path.abspath(args.VCFfile)
     elif args.allele_mode == "map_only":
         args.SNPfile = os.path.abspath(args.SNPfile)
-        args.Nmasked_index = os.path.abspath(args.Nmasked_index)
+        args.NMaskedIndex = os.path.abspath(args.NMaskedIndex)
     modeTemp = args.mode.split(",")
     validModes = set(["alignment", "alignment-free", "deepTools_qc", "allelic-mapping"])
     for mode in modeTemp:

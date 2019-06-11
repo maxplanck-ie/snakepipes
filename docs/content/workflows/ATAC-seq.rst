@@ -62,13 +62,14 @@ There is a configuration file in ``snakePipes/workflows/ATACseq/defaults.yaml``:
     ## Value can be also path to your own genome config file!
     genome:
     ## The maximum fragment size to retain. This should typically be the size of a nucleosome
-    fragmentSize_cutoff: 150
+    maxFragmentSize: 150
+    minFragmentSize: 0
     verbose: false
     # sampleSheet_DB
     sampleSheet:
     # windowSize
     windowSize: 20
-    fragmentCount_cutoff: 1
+    fragmentCountThreshold: 1
     #### Flag to control the pipeline entry point
     bamExt: '.filtered.bam'
     fromBAM: 
@@ -82,11 +83,11 @@ There is a configuration file in ``snakePipes/workflows/ATACseq/defaults.yaml``:
     fastqc:
     qval: 0.001
 
-Useful parameters are ``fragmentSize_cutoff`` and ``windowSize``, also available from commandline.  
+Useful parameters are ``maxFragmentSize``, ``minFragmentSize`` and ``windowSize``, also available from commandline.  
 
 * **windowSize**: is the size of windows to test differential binding using CSAW. The default small window size is sufficient for most analysis, since an ATAC-seq peak is sharp.
 
-* **fragmentCount_cutoff**: refers to the minimum number of counts a chromosome must have to be included in the MACS2 analysis. It is introduced to avoid errors in the peak calling step and should only be changed if MACS2 fails.
+* **fragmentCountThreshold**: refers to the minimum number of counts a chromosome must have to be included in the MACS2 analysis. It is introduced to avoid errors in the peak calling step and should only be changed if MACS2 fails.
 
 * **Qval**: a value provided to MACS2 that affects the number and width of the resulting peaks.
 

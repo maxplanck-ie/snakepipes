@@ -25,7 +25,7 @@ blacklist:
 ###sample Sheet
 sampleSheet:
 ###inclusion bounds for methylation extraction
-mbias: auto
+manualMethylationBias: False
 ## FASTQ file extension (default: ".fastq.gz")
 ext: '.fastq.gz'
 ## paired-end read name extension (default: ['_R1', "_R2"])
@@ -52,10 +52,9 @@ skipGCbias: False
 ###Metilene DMR calling parameters:
 maxDist: 300
 minCpGs: 10
-minMethDiff: 0
-###Thresholds for filtering of statistical comparisons:
-minAbsDiff: 0.1
+###Thresholds for filtering of statistical comparisons (DMRs and DMLs)
 FDR: 0.1
+minMethDiff: 0.1
 computeDMLs: False
 ###MethylDackel options
 MethylDackelOptions: '--mergeContext --maxVariantFrac 0.25 --minDepth 4'
