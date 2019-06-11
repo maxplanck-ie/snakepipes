@@ -17,7 +17,7 @@ import snakePipes.parserCommon as parserCommon
 
 def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfile": None, "max_jobs": 5, "snakemake_options": "--use-conda", "tempdir": None,
                          "paired": True, "bw_binsize": 25, "sampleSheet": "", "window_size": 150, "predict_chip_dict": None, "bigWigType": "both",
-                         "plot_format": "png", "fromBam": "", "bam_ext": ".bam"}):
+                         "plot_format": "png", "fromBam": "", "bam_ext": ".bam", "fdr": 0.05, "absBestLFC": 1}):
     """
     Parse arguments from the command line.
     """
@@ -96,6 +96,16 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
                          type=str,
                          help="Format of the output plots from deepTools. Select 'none' for no plots (default: '%(default)s')",
                          default=defaults["plot_format"])
+    optional.add_argument("--FDR",
+                          dest="fdr",
+                          help="FDR threshold to apply for filtering DB regions"
+                               "(default: '%(default)s')",
+                          default=defaults["fdr"])
+    optional.add_argument("--LFC",
+                          dest="absBestLFC",
+                          help="Log fold change threshold to apply for filtering DB regions"
+                               "(default: '%(default)s')",
+                          default=defaults["absBestLFC"])
 
     #parserCommon.commonOptions(optional, defaults,fromBam=True)
     

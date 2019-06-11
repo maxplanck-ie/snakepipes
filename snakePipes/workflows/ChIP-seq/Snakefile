@@ -1,9 +1,11 @@
 import os
 import snakePipes.common_functions as cf
+import itertools
 
 
 ### snakemake_workflows initialization ########################################
 maindir = os.path.dirname(os.path.dirname(workflow.basedir))
+workflow_rscripts=os.path.join(maindir, "shared", "rscripts")
 
 # load conda ENVs (path is relative to "shared/rules" directory)
 globals().update(cf.set_env_yamls())
@@ -51,6 +53,8 @@ if allele_info == 'FALSE':
 # CSAW for differential binding (if sampleinfo specified)
 if sampleSheet:
     include: os.path.join(maindir, "shared", "rules", "CSAW.snakefile")
+    include: os.path.join(maindir, "shared", "rules", "nearestGene.snakefile")
+    include: os.path.join(maindir, "shared", "rules", "filter_annotation.snakefile")
 
 def run_histoneHMM(allele_info):
     if allele_info == 'FALSE':
@@ -61,7 +65,6 @@ def run_histoneHMM(allele_info):
     return(file_list)
 
 def run_deepTools_qc(fromBam):
-    file_list = []
     if fromBam:
         file_list = ["deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv"]
         file_list.append([expand("bamCoverage/{sample}.filtered.seq_depth_norm.bw", sample = samples)])
@@ -73,6 +76,8 @@ def run_deepTools_qc(fromBam):
                 "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage.tsv",
                 "deepTools_qc/plotPCA/PCA.read_coverage.tsv" ])
         file_list.append(expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample = samples))
+    else:
+        file_list = []
     return(file_list)
 
 def run_deepTools_ChIP():
@@ -105,7 +110,10 @@ def run_deepTools_allelic():
 
 def run_CSAW():
     if sampleSheet:
-        return( ["CSAW_{}/CSAW.session_info.txt".format(sample_name)] )
+        file_list=["CSAW_{}/CSAW.session_info.txt".format(sample_name),"Annotation/genes.filtered.symbol","Annotation/genes.filtered.t2g","CSAW_{}/CSAW.Stats_report.html".format(sample_name)]
+        file_list.append([os.path.join("CSAW_{}".format(sample_name), x) for x in list(itertools.chain.from_iterable([expand("CSAW.{change_dir}.log2r.matrix",change_dir=change_direction),expand("CSAW.{change_dir}.log2r.heatmap.png",change_dir=change_direction),expand("CSAW.{change_dir}.cov.matrix",change_dir=change_direction),expand("CSAW.{change_dir}.cov.heatmap.png",change_dir=change_direction)]))])
+        file_list.append([os.path.join("AnnotatedResults_{}".format(sample_name), x) for x in list(itertools.chain.from_iterable([expand("Filtered.results.{change_dir}_withNearestGene.txt",change_dir=change_direction)]))])
+        return( file_list )
     else:
         return([])
 
@@ -141,6 +149,10 @@ onstart:
 
 ### main rule ##################################################################
 ################################################################################
+if sampleSheet:
+    localrules:
+        CSAW_report
+
 rule all:
     input:
     	run_deepTools_qc(fromBam),

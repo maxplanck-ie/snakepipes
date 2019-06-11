@@ -64,7 +64,7 @@ if(length(Mapdir>0)){
 
     for(i in seq_along(bamRepL)){
 
-    tabi<-read.table(Mapdir[i],header=TRUE,sep="\t",skip=1,quote="",as.is=TRUE)
+    tabi<-read.table(Mapdir[i],header=TRUE,sep="\t",skip=1,quote="",as.is=TRUE,comment.char="")
     tabi$Pct_Retained<-tabi$"Reads.Remaining"/tabi$"Total.Initial.Reads"*100
 
     bamRepL[[i]]<-tabi

@@ -3,14 +3,16 @@
 .libPaths(R.home("library"))
 
 sampleInfoFilePath <- snakemake@input[["sampleSheet"]]  #"samplesheet.tab"
-insert_size_metrics <- snakemake@input[["insert_size_metrics"]] # bamPEFragmentSize output
+insert_size_metrics <- snakemake@params[["insert_size_metrics"]] # bamPEFragmentSize output
 fdr <- as.numeric(snakemake@params[["fdr"]])
+lfc <- as.numeric(snakemake@params[["absBestLFC"]])
 paired <- as.logical(snakemake@params[["paired"]])
 fraglength <- as.numeric(snakemake@params[["fragment_length"]])  # used when the data is not paired end
 windowSize <- as.numeric(snakemake@params[["window_size"]])
 importfunc <- snakemake@params[["importfunc"]]  #"DB_functions.R"
 allelic_info <- as.logical(snakemake@params[["allele_info"]])
 outdir<-snakemake@params[["outdir"]]
+yaml_path<-snakemake@params[["yaml_path"]]
 
 ##set up a primitive log
 logfile <- file(snakemake@log[["err"]], open="wt")
@@ -32,6 +34,7 @@ setwd(outdir)
 cat(paste("Working dir:", getwd(), "\n"))
 cat(paste("Sample info CSV:", sampleInfoFilePath, "\n"))
 cat(paste("FDR:", fdr, "\n"))
+cat(paste("LFC:", lfc, "\n"))
 cat(paste("paired-end? :", paired, "\n"))
 cat(paste("allele-specific? :", allelic_info, "\n"))
 
@@ -47,6 +50,15 @@ if(isTRUE(paired)) {
 pe_param <- csaw::readParam(max.frag = 500, pe = pe)  # Some CSAW functions explode the processor count with >1 core
 
 ## Read data
+##filter out input using yaml
+library(yaml)
+y<-read_yaml(yaml_path)
+input_list<-unique(unlist(lapply(y[[1]],function(X)X[["control"]])))
+if(!is.null(input_list)&&!(input_list=="")){
+    sampleInfo<-subset(sampleInfo,!(name %in% input_list))
+}
+
+
 chip_object <- readfiles_chip(sampleSheet = sampleInfo,
                               fragment_length = fraglength,
                               window_size = windowSize,
@@ -102,7 +114,7 @@ chip_results <- getDBregions_chip(chip_object, plotfile = "DiffBinding_modelfit.
 
 ## write output
 print("Writing output")
-writeOutput_chip(chip_results, outfile_prefix = "DiffBinding", fdrcutoff = fdr)
+writeOutput_chip(chip_results, outfile_prefix = "DiffBinding", fdrcutoff = fdr,lfccutoff=lfc)
 
 
 ## save data

@@ -225,7 +225,7 @@ getDBregions_chip <- function(chipCountObject, plotfile = NULL){
     if(chipCountObject$designType != "condition") {
         results <- edgeR::glmQLFTest(fit, coef = paste0("allelegenome2"))
     } else {
-        results <- edgeR::glmQLFTest(fit, coef = 2)
+        results <- edgeR::glmQLFTest(fit, coef = paste0("condition",unique(chipCountObject$sampleSheet$condition)[2]))
     }
 
     # Merge DB windows into regions: Using quick and dirty method
@@ -255,7 +255,7 @@ getDBregions_chip <- function(chipCountObject, plotfile = NULL){
 #' writeOutput_chip(chipResultObject, outfile_prefix)
 #'
 
-writeOutput_chip <- function(chipResultObject, outfile_prefix, fdrcutoff){
+writeOutput_chip <- function(chipResultObject, outfile_prefix, fdrcutoff,lfccutoff){
     # get merged regions
     merged <- chipResultObject$mergedRegions
     tabcom <- chipResultObject$combinedPvalues
@@ -276,6 +276,27 @@ writeOutput_chip <- function(chipResultObject, outfile_prefix, fdrcutoff){
     } else {
         warning("output empty! please lower the fdr threshold.")
     }
+    ##merge regions with stats
+    print(head(as.data.frame(merged$region)))
+    print(head(tabcom))
+    tabx<-as.data.frame(merged$region,stringsAsFactors=FALSE)
+    tabx$name<-rownames(tabx)
+    full_res<-as.data.frame(merge(x=tabx,y=tabcom,by.x="name",by.y="name"),stringsAsFactors=FALSE) 
+    full_res<-full_res[,c(2:ncol(full_res),1)]
+    print(sprintf("Colnames of result file are %s",colnames(full_res)))
+    ##filter full result for FDR and LFC and write to output
+    full_res.filt<-subset(full_res,(FDR<=fdrcutoff)&(abs(best.logFC)>=lfccutoff))
+    if(nrow(full_res.filt)>0){
+    write.table(full_res.filt,file="Filtered.results.bed",row.names=FALSE,col.names=FALSE,sep="\t",quote=FALSE)}else{system("touch Filtered.results.bed")}
+    res.filt.up<-subset(full_res.filt,direction %in% "up")
+    if(nrow(res.filt.up)>0){
+    write.table(res.filt.up,file="Filtered.results.UP.bed",row.names=FALSE,col.names=FALSE,sep="\t",quote=FALSE)}else{system("touch Filtered.results.UP.bed")}
+    res.filt.down<-subset(full_res.filt,direction %in% "down")
+    if(nrow(res.filt.down)>0){
+    write.table(res.filt.down,file="Filtered.results.DOWN.bed",row.names=FALSE,col.names=FALSE,sep="\t",quote=FALSE)}else{system("touch Filtered.results.DOWN.bed")}
+    res.filt.mixed<-subset(full_res.filt,direction %in% "mixed")
+    if(nrow(res.filt.mixed)>0){
+    write.table(res.filt.mixed,file="Filtered.results.MIXED.bed",row.names=FALSE,col.names=FALSE,sep="\t",quote=FALSE)}else{system("touch Filtered.results.MIXED.bed")}
 }
 
 

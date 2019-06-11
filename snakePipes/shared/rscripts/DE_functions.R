@@ -139,7 +139,7 @@ DESeq_allelic <- function(countdata, coldata, fdr) {
                               design = ~allele + condition + allele:condition)
     rownames(dds) <- rownames(rnasamp)
     dds <- DESeq2::DESeq(dds,betaPrior = FALSE)
-    ddr <- DESeq2::results(dds, contrast = c("allele", "genome2", "genome1"))
+    ddr <- DESeq2::results(dds, name=paste0("allelegenome2.condition",unique(coldata$condition)[2]))
     output <- list(dds = dds, ddr = ddr)
     return(output)
 }
