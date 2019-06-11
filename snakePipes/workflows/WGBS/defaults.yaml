@@ -25,7 +25,7 @@ blacklist:
 ###sample Sheet
 sampleSheet:
 ###inclusion bounds for methylation extraction
-manualMethylationBias: False
+noAutoMethylationBias: False
 ## FASTQ file extension (default: ".fastq.gz")
 ext: '.fastq.gz'
 ## paired-end read name extension (default: ['_R1', "_R2"])

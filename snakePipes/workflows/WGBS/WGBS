@@ -69,8 +69,9 @@ def parse_args(defaults={"verbose": False, "configFile": None, "clusterConfigFil
                           help="Perform differential methylation analysis between groups of samples by providing a text file with sample information to use for statistical analysis. (default: '%(default)s')",
                           default=defaults["sampleSheet"])
 
-    optional.add_argument("--manualMethylationBias",
+    optional.add_argument("--noAutoMethylationBias",
                           action="store_true",
+                          default=defaults["noAutoMethylationBias"],
                           help="If specified, MethylDackel mbias will NOT be run and the suggested parameters from it will NOT be used for methylation extraction. You can instead supply them manually in --MethylDackelOptions.")
 
     optional.add_argument("--maxDist",
