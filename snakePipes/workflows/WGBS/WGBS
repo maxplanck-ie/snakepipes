@@ -39,7 +39,7 @@ def parse_args(defaults={"verbose": False, "configFile": None, "clusterConfigFil
                          "downsample": None, "trim": True, "trimmer": "fastp", "trimmerOptions": "-q 5 -l 30 -M 5", "maxDist": 300, "minCpGs": 10, "minMethDiff": 0.1, "FDR": 0.1,
                          "MethylDackelOptions": "--mergeContext --maxVariantFrac 0.25 --minDepth 4", "fastqc": False, 'bwBinSize': 25, 'plotFormat': 'png', "bamExt": '.bam',
                          "reads": ["_R1", "_R2"],
-                         "blacklist": None, "sampleSheet": None, "noAuthMethylationBias": False, "fromBAM": False, "skipDOC": False, "skipGCbias": False, "computeDMLs": False}):
+                         "blacklist": None, "sampleSheet": None, "noAutoMethylationBias": False, "fromBAM": False, "skipDOC": False, "skipGCbias": False, "computeDMLs": False}):
     """
     Parse arguments from the command line.
     """
