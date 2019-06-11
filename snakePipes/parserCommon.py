@@ -150,15 +150,19 @@ def snpArguments(defaults):
     parser = argparse.ArgumentParser(add_help=False)
     snpargs = parser.add_argument_group('Allele-specific mapping arguments')
     snpargs.add_argument("--VCFfile",
+                         default='',
                          help="VCF file to create N-masked genomes (default: 'None')")
 
     snpargs.add_argument("--strains",
+                         default='',
                          help="Name or ID of SNP strains separated by comma (default: 'None')")
 
     snpargs.add_argument("--SNPfile",
+                         default='',
                          help="File containing SNP locations (default: 'None')")
 
     snpargs.add_argument("--NMaskedIndex",
+                         default='',
                          help="N-masked index of the reference genome (default: 'None')")
 
     return parser
