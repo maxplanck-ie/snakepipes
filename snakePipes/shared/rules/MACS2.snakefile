@@ -44,6 +44,7 @@ if paired:
                 --outdir MACS2 \
                 --name {wildcards.chip_sample}.filtered.BAM \
                 --nomodel \
+                --mfold {mfold}\
                 --extsize $(cat {input.insert_size_metrics} | grep filtered_bam/{wildcards.chip_sample}.filtered.bam | awk '{{printf("%i",$6)}}') \
                 {params.broad_calling} > {log.out} 2> {log.err}
 
@@ -79,7 +80,7 @@ else:
         conda: CONDA_CHIPSEQ_ENV
         shell: """
             macs2 callpeak -t {input.chip} {params.control_param} -f BAM -g {params.genome_size} --keep-dup all --outdir MACS2 \
-                --name {wildcards.chip_sample}.filtered.BAM \
+                --name {wildcards.chip_sample}.filtered.BAM --mfold {mfold}\
                 {params.broad_calling} > {log.out} 2> {log.err}
             """
 
