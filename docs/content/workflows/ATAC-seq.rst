@@ -22,6 +22,8 @@ When running the ATAC-seq pipeline, please specify the output directory of DNA-m
 
 * **sampleSheet.tsv** (OPTIONAL) is only needed to test for differential binding.
 
+.. _diffBinding:
+
 Differential open chromatin analysis
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -45,7 +47,7 @@ If the user provides additional columns between 'name' and 'condition' in the sa
 
 The differential binding module utilizes the R package `CSAW <https://bioconductor.org/packages/release/bioc/html/csaw.html>`__ to detect significantly different peaks between two conditions.
 The analysis is performed on a union of peaks from all samples mentioned in the sample sheet. 
-This merged set of regions are provided as an output inside the **CSAW** folder as the file 'DiffBinding_allregions.bed'. 
+This merged set of regions are provided as an output inside the **CSAW_sampleSheet** folder as the file 'DiffBinding_allregions.bed'. 
 All differentially bound regions are available in 'CSAW/DiffBinding_significant.bed' . 
 Two thresholds are applied to produce ``Filtered.results.bed`` : FDR (default ``0.05`` ) as well as absolute log fold change (``1``). These can be specified either in the defaults.yaml dictionary or via commandline parameters '--FDR' and '--LFC'. Additionally, filtered results are split into up to 3 bed files, representing direction change (UP, DOWN, or MIXED).
 
@@ -57,6 +59,8 @@ An html report summarizing the differential binding analysis is produced in the 
 
 Filtered results are also annotated with the distance to the closest gene using bedtools closest and written as '.txt' files to the AnnotatedResults_* folder.
 
+
+.. _ATACconfig:
 
 Configuration file
 ~~~~~~~~~~~~~~~~~~
@@ -147,6 +151,7 @@ Assuming a sample sheet is used, the following will be **added** to the working 
         └── sample2.filtered.BAM_peaks.qc.txt
 
 Currently the ATAC-seq workflow performs detection of open chromatin regions via `MACS2 <https://github.com/taoliu/MACS>`__, and if a sample sheet is provided, the detection of differential open chromatin sites via `CSAW <https://bioconductor.org/packages/release/bioc/html/csaw.html>`__. There are additionally log files in most of the directories. The various outputs are documented in the CSAW and MACS2 documentation.
+For more information on the contents of the **CSAW_sampleSheet** folder, see section :ref:`diffBinding` .
 
 * **MACS2_QC**: contains a number of QC metrics that we find useful, namely :
     * the number of peaks
