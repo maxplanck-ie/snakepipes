@@ -44,7 +44,7 @@ if allele_info == 'FALSE':
                 err = os.path.join(outdir,"CSAW_{}".format(sample_name)+"/logs/deeptools_matrix.log2r.{change_dir}.err")
             threads: 8
             conda: CONDA_SHARED_ENV
-            shell: "if [ -r {params.bed_in} ]; then computeMatrix scale-regions -S {input.bigwigs} -R {params.bed_in} -m 1000 -b 200 -a 200 -o {output.matrix} -p {threads};fi >{log.out} 2>{log.err}"
+            shell: "if [ -s {params.bed_in} ]; then computeMatrix scale-regions -S {input.bigwigs} -R {params.bed_in} -m 1000 -b 200 -a 200 -o {output.matrix} -p {threads};fi >{log.out} 2>{log.err}"
 
         rule plot_heatmap_log2r_CSAW:
             input:
@@ -58,7 +58,7 @@ if allele_info == 'FALSE':
                 out = os.path.join(outdir,"CSAW_{}".format(sample_name)+"/logs/deeptools_heatmap.log2r.{change_dir}.out"),
                 err = os.path.join(outdir,"CSAW_{}".format(sample_name)+"/logs/deeptools_heatmap.log2r{change_dir}.err")
             conda: CONDA_SHARED_ENV
-            shell: "if [ -r {input.matrix} ]; then plotHeatmap --matrixFile {input.matrix} --outFileSortedRegions {output.sorted_regions} --outFileName {output.image} --startLabel Start --endLabel End --legendLocation lower-center -x 'Scaled peak length' --labelRotation 90 --samplesLabel {params.smpl_label} ;fi >{log.out} 2>{log.err}"
+            shell: "if [ -s {input.matrix} ]; then plotHeatmap --matrixFile {input.matrix} --outFileSortedRegions {output.sorted_regions} --outFileName {output.image} --startLabel Start --endLabel End --legendLocation lower-center -x 'Scaled peak length' --labelRotation 90 --samplesLabel {params.smpl_label} ;fi >{log.out} 2>{log.err}"
 
     rule calc_matrix_cov_CSAW:
         input:
@@ -74,7 +74,7 @@ if allele_info == 'FALSE':
             err = os.path.join(outdir,"CSAW_{}".format(sample_name)+"/logs/deeptools_matrix.cov.{change_dir}.err")
         threads: 8
         conda: CONDA_SHARED_ENV
-        shell: "if [ -r {params.bed_in} ]; then computeMatrix scale-regions -S {input.bigwigs} -R {params.bed_in} -m 1000 -b 200 -a 200 -o {output.matrix} -p {threads};fi >{log.out} 2>{log.err}"
+        shell: "if [ -s {params.bed_in} ]; then computeMatrix scale-regions -S {input.bigwigs} -R {params.bed_in} -m 1000 -b 200 -a 200 -o {output.matrix} -p {threads};fi >{log.out} 2>{log.err}"
 
     rule plot_heatmap_cov_CSAW:
         input:
@@ -88,7 +88,7 @@ if allele_info == 'FALSE':
             out = os.path.join(outdir,"CSAW_{}".format(sample_name)+"/logs/deeptools_heatmap.cov.{change_dir}.out"),
             err = os.path.join(outdir,"CSAW_{}".format(sample_name)+"/logs/deeptools_heatmap.cov.{change_dir}.err")
         conda: CONDA_SHARED_ENV
-        shell: "if [ -r {input.matrix} ]; then plotHeatmap --matrixFile {input.matrix} --outFileSortedRegions {output.sorted_regions} --outFileName {output.image} --startLabel Start --endLabel End --legendLocation lower-center -x 'Scaled peak length' --labelRotation 90 --samplesLabel {params.smpl_label} ;fi >{log.out} 2>{log.err}"
+        shell: "if [ -s {input.matrix} ]; then plotHeatmap --matrixFile {input.matrix} --outFileSortedRegions {output.sorted_regions} --outFileName {output.image} --startLabel Start --endLabel End --legendLocation lower-center -x 'Scaled peak length' --labelRotation 90 --samplesLabel {params.smpl_label} ;fi >{log.out} 2>{log.err}"
 
     rule CSAW_report:
         input:
