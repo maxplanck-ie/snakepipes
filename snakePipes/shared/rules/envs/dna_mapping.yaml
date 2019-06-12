@@ -6,4 +6,3 @@ dependencies:
  - bowtie2 = 2.3.5
  - qualimap = 2.2.2b
  - samtools = 1.9
- - umi_tools = 0.5.1

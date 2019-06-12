@@ -13,7 +13,7 @@ if umibarcode:
             log:
                 out = "FASTQ/logs/{sample}_log.out",
                 err = "FASTQ/logs/{sample}_log.err"
-            conda: CONDA_DNA_MAPPING_ENV
+            conda: CONDA_SHARED_ENV
             shell:"""
                 umi_tools extract -I {input.r1} --read2-in={input.r2} \
                 --bc-pattern={params.bcpattern} --stdout={output.r1} \
@@ -31,8 +31,7 @@ if umibarcode:
             log:
                 out = "FASTQ/logs/{sample}_log.out",
                 err = "FASTQ/logs/{sample}_log.err"
-            conda:
-                CONDA_DNA_MAPPING_ENV
+            conda: CONDA_SHARED_ENV
             shell: """
                 umi_tools extract -I {input.r1} --stdout={output.r1} \
                 --bc-pattern={params.bcpattern} -L {log.out} -E {log.err}
@@ -69,8 +68,7 @@ if umidedup:
         log:
             out = "filtered_bam/logs/umi_dedup.{sample}.out",
             err = "filtered_bam/logs/umi_dedup.{sample}.err"
-        conda:
-            CONDA_DNA_MAPPING_ENV
+        conda: CONDA_SHARED_ENV
         shell: """
             umi_tools dedup -I {input.bamfile} \
             -S {output.bamfile} -L {log.out} -E {log.err} \
@@ -83,8 +81,7 @@ else:
             bamfile = "filtered_bam/{sample}.filtered.tmp.bam" if mapping_prg == "Bowtie2" else mapping_prg+"/{sample}.bam",
         output:
             bamfile = "filtered_bam/{sample}.filtered.bam"
-        conda:
-            CONDA_DNA_MAPPING_ENV
+        conda: CONDA_SHARED_ENV
         shell: """
             ln -s -r {input.bamfile} {output.bamfile}
             """
