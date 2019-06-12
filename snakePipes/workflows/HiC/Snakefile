@@ -124,7 +124,7 @@ onstart:
         print("$TMPDIR: ",os.getenv('TMPDIR', ""))
         print("$HOSTNAME: ",os.getenv('HOSTNAME', ""))
         print("-" * 80, "\n")
-        print(smaple_dict)
+        print(sample_dict)
 ### main rule ##################################################################
 ################################################################################
 localrules: FASTQ1, FASTQ2

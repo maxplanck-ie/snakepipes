@@ -117,12 +117,12 @@ rule merge_bins:
      input:
          "HiC_matrices/{sample}_"+matrixFile_suffix+matrix_format
      output:
-         matrix = "HiC_matrices/{sample}_Mbins"+str(nbins_toMerge)+"_"+matrixFile_suffix+matrix_format
+         matrix = "HiC_matrices/{sample}_Mbins" + str(nbins_toMerge) + "_" + matrixFile_suffix+matrix_format
      params:
          num_bins=nbins_toMerge
      log:
-         out = "HiC_matrices/logs/{sample}_Mbins"+str(nbins_toMerge)+"_"+matrixFile_suffix+".out",
-         err = "HiC_matrices/logs/{sample}_Mbins"+str(nbins_toMerge)+"_"+matrixFile_suffix+".err"
+         out = "HiC_matrices/logs/{sample}_Mbins" + str(nbins_toMerge) + "_" + matrixFile_suffix+".out",
+         err = "HiC_matrices/logs/{sample}_Mbins" + str(nbins_toMerge) + "_" + matrixFile_suffix+".err"
      conda: CONDA_HIC_ENV
      shell:
          "hicMergeMatrixBins -m {input} -nb {params.num_bins} -o {output.matrix} >{log.out} 2>{log.err} "
