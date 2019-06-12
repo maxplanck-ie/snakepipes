@@ -43,7 +43,7 @@ For comparison between two conditions, the name you assign to "condition" is not
 
 If the user provides additional columns between 'name' and 'condition' in the sample sheet, the variables stored there will be used as blocking factors in the order they appear in the sample sheet. Condition will be the final column and it will be used for any statistical inference. 
 
-The differential binding module utilizes the R package `CSAW <https://bioconductor.org/release/bioc/html/csaw.html>`__ to detect significantly different peaks between two conditions.
+The differential binding module utilizes the R package `CSAW <https://bioconductor.org/packages/release/bioc/html/csaw.html>`__ to detect significantly different peaks between two conditions.
 The analysis is performed on a union of peaks from all samples mentioned in the sample sheet. 
 This merged set of regions are provided as an output inside the **CSAW** folder as the file 'DiffBinding_allregions.bed'. 
 All differentially bound regions are available in 'CSAW/DiffBinding_significant.bed' . 
