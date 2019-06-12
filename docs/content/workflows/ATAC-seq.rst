@@ -22,7 +22,7 @@ When running the ATAC-seq pipeline, please specify the output directory of DNA-m
 
 * **sampleSheet.tsv** (OPTIONAL) is only needed to test for differential binding.
 
-.. _diffBinding:
+.. _diffOpenChrom:
 
 Differential open chromatin analysis
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -151,7 +151,7 @@ Assuming a sample sheet is used, the following will be **added** to the working 
         └── sample2.filtered.BAM_peaks.qc.txt
 
 Currently the ATAC-seq workflow performs detection of open chromatin regions via `MACS2 <https://github.com/taoliu/MACS>`__, and if a sample sheet is provided, the detection of differential open chromatin sites via `CSAW <https://bioconductor.org/packages/release/bioc/html/csaw.html>`__. There are additionally log files in most of the directories. The various outputs are documented in the CSAW and MACS2 documentation.
-For more information on the contents of the **CSAW_sampleSheet** folder, see section :ref:`diffBinding` .
+For more information on the contents of the **CSAW_sampleSheet** folder, see section :ref:`diffOpenChrom` .
 
 * **MACS2_QC**: contains a number of QC metrics that we find useful, namely :
     * the number of peaks
