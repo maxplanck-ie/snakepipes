@@ -8,5 +8,7 @@ diagnostic_plot:
     memory: 2G
 map_fastq_single_end:
     memory: 3G
+merge_bins:
+    memory: 7G
 merge_matrices:
     memory: 3G
