@@ -1,6 +1,12 @@
-map_fastq_single_end:
-    memory: 3G
-CollectInsertSizeMetrics:
-    memory: 1G
 build_matrix:
     memory: 9G
+call_tads:
+    memory: 3G
+correct_matrix:
+    memory: 7G
+diagnostic_plot:
+    memory: 2G
+map_fastq_single_end:
+    memory: 3G
+merge_matrices:
+    memory: 3G
