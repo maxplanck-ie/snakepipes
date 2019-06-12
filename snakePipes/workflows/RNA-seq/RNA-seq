@@ -18,7 +18,7 @@ import snakePipes.parserCommon as parserCommon
 
 def parse_args(defaults={"verbose": False, "configfile": None,
                          "cluster_configfile": None, "max_jobs": 5,
-                         "snakemake_options": "--use-conda", "tempdir": None,
+                         "snakemake_options": "--use-conda",
                          "mode": "alignment-free,deepTools_qc",
                          "downsample": False, "trim": False,
                          "trim_prg": "cutadapt", "trim_options": None,
