@@ -18,15 +18,18 @@ rule featureCounts_allele:
         err = "featureCounts/{sample}.err"
     threads: 8
     conda: CONDA_RNASEQ_ENV
-    shell:
-        " featureCounts"
-        " {params.paired_opt}{params.opts}"
-        " -T {threads}"
-        " -s {params.libtype}"
-        " -a {input.gtf}"
-        " -o {output}"
-        " --tmpDir ${{TMPDIR}}"
-        " {input.bam} {input.allele1} {input.allele2} > {log.out} 2> {log.err}"
+    shell: """
+        MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX);
+        featureCounts \
+        {params.paired_opt}{params.opts} \
+        -T {threads} \
+        -s {params.libtype} \
+        -a {input.gtf} \
+        -o {output} \
+        --tmpDir $MYTEMP \
+        {input.bam} {input.allele1} {input.allele2} > {log.out} 2> {log.err};
+        rm -rf $MYTEMP
+        """
 
 rule merge_featureCounts:
     input:

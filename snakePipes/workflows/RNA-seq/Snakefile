@@ -305,6 +305,10 @@ else:
 ### execute after  finished ####################################################
 ################################################################################
 onsuccess:
-    cf.cleanLogs(outdir)
+    cf.cleanLogs(outdir, cluster_config)
     if "verbose" in config and config["verbose"]:
         print("\n--- RNA-seq workflow finished successfully! ------------------------------------\n")
+        
+onerror:
+    print("\n !!! ERROR in RNA-seq workflow! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
+

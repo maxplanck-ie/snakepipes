@@ -23,6 +23,7 @@ if mapping_prg == "STAR":
             threads: 12
             conda: CONDA_RNASEQ_ENV
             shell: """
+                MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX);
                 ( [ -d {params.sample_dir} ] || mkdir -p {params.sample_dir} )
                 STAR {params.star_options} \
                     --runThreadN {threads} \
@@ -44,7 +45,8 @@ if mapping_prg == "STAR":
                     --alignIntronMin 1 \
                     --alignIntronMax 1000000 \
                     --alignMatesGapMax 1000000 \
-                | samtools sort -m {params.samsort_memory} -T ${{TMPDIR}}{wildcards.sample} -@ {threads} -O bam -o {output} -
+                | samtools sort -m {params.samsort_memory} -T $MYTEMP/{wildcards.sample} -@ {threads} -O bam -o {output} -;
+                rm -rf $MYTEMP
                 """
     else:
         rule STAR_allele:
@@ -65,6 +67,7 @@ if mapping_prg == "STAR":
             threads: 12
             conda: CONDA_RNASEQ_ENV
             shell: """
+                MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX);
                 ( [ -d {params.sample_dir} ] || mkdir -p {params.sample_dir} )
                 STAR {params.star_options} \
                     --runThreadN {threads} \
@@ -86,7 +89,8 @@ if mapping_prg == "STAR":
                     --alignIntronMin 1 \
                     --alignIntronMax 1000000 \
                     --alignMatesGapMax 1000000 \
-                | samtools sort -m {params.samsort_memory} -T ${{TMPDIR}}{wildcards.sample} -@ {threads} -O bam -o {output} -
+                | samtools sort -m {params.samsort_memory} -T $MYTEMP/{wildcards.sample} -@ {threads} -O bam -o {output} -;
+                rm -rf $MYTEMP
                 """
 else:
     print("Only STAR is implemented for Allele-specific mapping")

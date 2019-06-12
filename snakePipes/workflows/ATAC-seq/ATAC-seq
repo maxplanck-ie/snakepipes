@@ -23,6 +23,7 @@ def parse_args(defaults={"verbose": False, "configfile": None,
                          "bam_ext": "filtered.bam", "umidedup": False,
                          "umidedup_opts": "", "umidedup_sep": "_",
                          "umibarcode": False, "bcpattern": ""}):
+
     """
     Parse arguments from the command line.
     """
@@ -67,6 +68,16 @@ def parse_args(defaults={"verbose": False, "configfile": None,
                          dest="bam_ext",
                          help=argparse.SUPPRESS,
                          default=defaults["bam_ext"])
+    optional.add_argument("--FDR",
+                          dest="fdr",
+                          help="FDR threshold to apply for filtering DB regions"
+                               "(default: '%(default)s')",
+                          default=defaults["fdr"])
+    optional.add_argument("--LFC",
+                          dest="absBestLFC",
+                          help="Log fold change threshold to apply for filtering DB regions"
+                               "(default: '%(default)s')",
+                          default=defaults["absBestLFC"])
 
     return parser
 
@@ -87,12 +98,10 @@ def main():
 
     # Handle YAML and log files
     snakemake_cmd = cf.commonYAMLandLogs(baseDir, workflowDir, defaults, args, __file__)
-    snakemake_exports, logfile_name, temp_path = cf.logAndExport(args, os.path.basename(__file__))
-
-    cmd = " ".join(snakemake_exports + snakemake_cmd)
+    logfile_name = cf.logAndExport(args, os.path.basename(__file__))
 
     # Run everything
-    cf.runAndCleanup(args, cmd, logfile_name, temp_path)
+    cf.runAndCleanup(args, snakemake_cmd, logfile_name)
 
 
 if __name__ == "__main__":

@@ -77,8 +77,10 @@ def parse_args(defaults={"verbose": False, "configfile": None,
                           dest="restrict_region",
                           type=str,
                           metavar="STR",
-                          help="Restrict building of HiC Matrix to given region [Chr:Start-End]. "
-                          "Only one chromosome can also be specified (default: '%(default)s')",
+                          help="Restrict building of HiC Matrix to given "
+                               "region [Chr:Start-End]. "
+                               "Only one chromosome can also be specified "
+                               "(default: '%(default)s')",
                           default=defaults["restrict_region"])
 
     optional.add_argument("--merge_samples",
@@ -129,6 +131,7 @@ def parse_args(defaults={"verbose": False, "configfile": None,
                                "between samples for biological effects. "
                                "The plot is create using the tool "
                                "'hicDistVsCount'. (default: '%(default)s')",
+
                           default=defaults["distVsCount"])
 
     optional.add_argument("--distVsCount_params",
@@ -142,11 +145,12 @@ def parse_args(defaults={"verbose": False, "configfile": None,
                           type=str,
                           metavar="STR",
                           help="A .tsv file containing sample names and "
-                          "associated groups. If provided, the file would be "
-                          "used to identify groups to merge the samples. "
-                          "An example can be found at "
-                          "'docs/content/sampleSheet.example.tsv'"
-                          "(default: None)")
+                               "associated groups. If provided, the file would be "
+                               "used to identify groups to merge the samples. "
+                               "An example can be found at "
+                               "'docs/content/sampleSheet.example.tsv'"
+                               "(default: None)")
+
 
     return parser
 
@@ -167,12 +171,10 @@ def main():
 
     # Handle YAML and log files
     snakemake_cmd = cf.commonYAMLandLogs(baseDir, workflowDir, defaults, args, __file__)
-    snakemake_exports, logfile_name, temp_path = cf.logAndExport(args, os.path.basename(__file__))
-
-    cmd = " ".join(snakemake_exports + snakemake_cmd)
+    logfile_name = cf.logAndExport(args, os.path.basename(__file__))
 
     # Run everything
-    cf.runAndCleanup(args, cmd, logfile_name, temp_path)
+    cf.runAndCleanup(args, snakemake_cmd, logfile_name)
 
 
 if __name__ == "__main__":

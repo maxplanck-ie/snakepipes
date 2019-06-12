@@ -3,6 +3,8 @@ import re
 from operator import is_not
 import tempfile
 
+### hack until Devon's refactoring of WGBS is merged
+tempdir=outdir
 
 ## function to get the name of the samplesheet and extend the name of the folder for all analyses relying on sample_info
 def get_outdir(folder_name):

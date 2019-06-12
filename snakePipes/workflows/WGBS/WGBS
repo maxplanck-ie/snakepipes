@@ -23,10 +23,11 @@ def parse_args(defaults={"verbose": False, "configfile": None,
                          "trimThreshold": 10, "trimOtherArgs": None, "convrefpath": None,
                          "convRef": False, "intList": [], "blackList": None,
                          "sampleSheet": None, "mbias_ignore": "auto", "fromBam": False,
-                         "skipDOC": False, "skipGCbias": False,
+                         "skipDOC": False, "skipGCbias": False, "bam_ext": ".bam",
                          "umidedup": False, "umidedup_opts": "",
                          "bcpattern": "", "umidedup_sep": "_",
                          "umibarcode": False}):
+
     """
     Parse arguments from the command line.
     """
@@ -148,6 +149,11 @@ def parse_args(defaults={"verbose": False, "configfile": None,
                          action="store_true",
                          help=argparse.SUPPRESS,default=defaults["fromBam"])
 
+    optional.add_argument("--fromBamExt",
+                         dest="bam_ext",
+                         help=argparse.SUPPRESS,
+                         default=defaults["bam_ext"])
+
     optional.add_argument("--skipDOC",
                          dest="skipDOC",
                          action="store_true",
@@ -211,12 +217,10 @@ def main():
 
     # Handle YAML and log files
     snakemake_cmd = cf.commonYAMLandLogs(baseDir, workflowDir, defaults, args, __file__)
-    snakemake_exports, logfile_name, temp_path = cf.logAndExport(args, os.path.basename(__file__))
-
-    cmd = " ".join(snakemake_exports + snakemake_cmd)
+    logfile_name = cf.logAndExport(args, os.path.basename(__file__))
 
     # Run everything
-    cf.runAndCleanup(args, cmd, logfile_name, temp_path)
+    cf.runAndCleanup(args, snakemake_cmd, logfile_name)
 
 
 if __name__ == "__main__":

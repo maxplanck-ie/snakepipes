@@ -102,12 +102,6 @@ def mainArguments(defaults, workingDir=False, createIndices=False):
                          help="Snakemake options to be passed directly to snakemake, e.g. use --snakemake_options='--dryrun --rerun-incomplete --unlock --forceall'. WARNING! ONLY EXPERT USERS SHOULD CHANGE THIS! THE DEFAULT VALUE WILL BE APPENDED RATHER THAN OVERWRITTEN! (default: '%(default)s')",
                          default=[defaults["snakemake_options"]])
 
-    general.add_argument("--tempdir",
-                         dest="tempdir",
-                         type=str,
-                         help="used prefix path for temporary directory created via mktemp. Created temp dir gets exported as $TMPDIR and is removed at the end of this wrapper! (default: '%(default)s')",
-                         default=defaults["tempdir"])
-
     general.add_argument("--DAG",
                          dest="createDAG",
                          action="store_true",
