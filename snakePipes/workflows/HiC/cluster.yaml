@@ -3,7 +3,7 @@ build_matrix:
 call_tads:
     memory: 3G
 correct_matrix:
-    memory: 3G
+    memory: 7G
 diagnostic_plot:
     memory: 2G
 map_fastq_single_end:
