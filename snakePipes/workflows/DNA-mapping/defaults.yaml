@@ -53,6 +53,11 @@ mate_orientation: --fr
 ## other Bowtie2 stuff
 insert_size_max: 1000
 bowtie_opts:
+umibarcode: False
+bcpattern: NNNNCCCCCCCCC #default: 4 base umi barcode, 9 base cell barcode (eg. RELACS barcode)
+umidedup: False
+umidedup_sep: "_"
+umidedup_opts: --paired
 plot_format: png
 ## Median/mean fragment length, only relevant for single-end data (default: 200)
 fragment_length: 200

@@ -24,7 +24,7 @@ if fromBam:
         input:
             indir+"/{sample}"+bam_ext
         output:
-            "bams/{sample}"+bam_ext
+            mapping_prg+"/{sample}"+bam_ext
         shell:
             "( [ -f {output} ] || ln -s -r {input} {output} ) " #&& touch -h {output}"
 
@@ -128,10 +128,10 @@ if not trimReads is None:
             R2cut="FASTQ_Cutadapt/{sample}"+reads[1]+".fastq.gz",
             crefG=crefG
         output:
-            sbam=temp("bams/{sample}.sorted.bam")
+            sbam=temp(mapping_prg+"/{sample}.sorted.bam")
         log:
-            err="bams/logs/{sample}.map_reads.err",
-            out="bams/logs/{sample}.map_reads.out"
+            err=mapping_prg+"/logs/{sample}.map_reads.err",
+            out=mapping_prg+"/logs/{sample}.map_reads.out"
         params:
             tempdir=tempfile.mkdtemp(suffix='',prefix="{sample}",dir=tempdir),
             sortThreads=min(nthreads,4),
@@ -149,10 +149,10 @@ if trimReads is None and not fromBam:
             R2="FASTQ/{sample}"+reads[1]+".fastq.gz",
             crefG=crefG
         output:
-            sbam=temp("bams/{sample}.sorted.bam")
+            sbam=temp(mapping_prg+"/{sample}.sorted.bam")
         log:
-            err="bams/logs/{sample}.map_reads.err",
-            out="bams/logs/{sample}.map_reads.out"
+            err=mapping_prg+"/logs/{sample}.map_reads.err",
+            out=mapping_prg+"/logs/{sample}.map_reads.out"
         params:
             tempdir=tempfile.mkdtemp(suffix='',prefix="{sample}",dir=tempdir),
             sortThreads=min(nthreads,4),
@@ -164,24 +164,24 @@ if trimReads is None and not fromBam:
 if not fromBam:
     rule index_bam:
         input:
-            sbam="bams/{sample}.sorted.bam"
+            sbam=mapping_prg+"/{sample}.sorted.bam"
         output:
-            sbami=temp("bams/{sample}.sorted.bam.bai")
+            sbami=temp(mapping_prg+"/{sample}.sorted.bam.bai")
         log:
-            err="bams/logs/{sample}.index_bam.err",
-            out="bams/logs/{sample}.index_bam.out"
+            err=mapping_prg+"/logs/{sample}.index_bam.err",
+            out=mapping_prg+"/logs/{sample}.index_bam.out"
         conda: CONDA_SHARED_ENV
         shell: "samtools index {input.sbam} 1>{log.out} 2>{log.err}"
 
     rule rm_dupes:
         input:
-            sbami="bams/{sample}.sorted.bam.bai",
-            sbam="bams/{sample}.sorted.bam"
+            sbami=mapping_prg+"/{sample}.sorted.bam.bai",
+            sbam=mapping_prg+"/{sample}.sorted.bam"
         output:
-            rmDupbam="bams/{sample}.PCRrm.bam"
+            rmDupbam=mapping_prg+"/{sample}.PCRrm.bam"
         log:
-            err="bams/logs/{sample}.rm_dupes.err",
-            out="bams/logs/{sample}.rm_dupes.out"
+            err=mapping_prg+"/logs/{sample}.rm_dupes.err",
+            out=mapping_prg+"/logs/{sample}.rm_dupes.out"
         params:
             tempdir=tempfile.mkdtemp(suffix='',prefix='',dir=tempdir)
         threads: nthreads
@@ -190,13 +190,13 @@ if not fromBam:
 
 rule index_PCRrm_bam:
     input:
-        sbam="bams/{sample}"+bam_ext
+        sbam=mapping_prg+"/{sample}"+bam_ext
     output:
-        sbami="bams/{sample}"+bam_ext+".bai"
+        sbami=mapping_prg+"/{sample}"+bam_ext+".bai"
     params:
     log:
-        err="bams/logs/{sample}.index_PCRrm_bam.err",
-        out="bams/logs/{sample}.index_PCRrm_bam.out"
+        err=mapping_prg+"/logs/{sample}.index_PCRrm_bam.err",
+        out=mapping_prg+"/logs/{sample}.index_PCRrm_bam.out"
     threads: 1
     conda: CONDA_SHARED_ENV
     shell: "samtools index {input.sbam} 1>{log.out} 2>{log.err}"
@@ -220,8 +220,8 @@ rule get_ran_CG:
 rule calc_Mbias:
     input:
         refG=refG,
-        rmDupBam="bams/{sample}"+bam_ext,
-        sbami="bams/{sample}"+bam_ext+".bai"
+        rmDupBam=mapping_prg+"/{sample}"+bam_ext,
+        sbami=mapping_prg+"/{sample}"+bam_ext+".bai"
     output:
         mbiasTXT="QC_metrics/{sample}.Mbias.txt"
     log:
@@ -257,8 +257,8 @@ if convRef:
         rule calc_GCbias:
             input:
                 refG=refG,
-                rmDupBam="bams/{sample}"+bam_ext,
-                sbami="bams/{sample}"+bam_ext+".bai",
+                rmDupBam=mapping_prg+"/{sample}"+bam_ext,
+                sbami=mapping_prg+"/{sample}"+bam_ext+".bai",
                 gsize="aux_files/gsize.txt",
                 twobit="aux_files/"+ re.sub(".fa",".2bit",os.path.basename(refG))
             output:
@@ -275,8 +275,8 @@ else:
         rule calc_GCbias:
             input:
                 refG=refG,
-                rmDupBam="bams/{sample}"+bam_ext,
-                sbami="bams/{sample}"+bam_ext+".bai"
+                rmDupBam=mapping_prg+"/{sample}"+bam_ext,
+                sbami=mapping_prg+"/{sample}"+bam_ext+".bai"
             output:
                 GCbiasTXT="QC_metrics/{sample}.freq.txt",
                 GCbiasPNG="QC_metrics/{sample}.GCbias.png"
@@ -294,8 +294,8 @@ if not skipDOC:
         rule depth_of_cov:
             input:
                 irefG=crefG if convRef is True else refG,
-                rmDupBam="bams/{sample}"+bam_ext,
-                sbami="bams/{sample}"+bam_ext+".bai",
+                rmDupBam=mapping_prg+"/{sample}"+bam_ext,
+                sbami=mapping_prg+"/{sample}"+bam_ext+".bai",
                 ranCG=os.path.join("aux_files",re.sub('.fa','.poz.ran1M.sorted.bed',os.path.basename(refG))),
                 intList=intList
             output:
@@ -319,8 +319,8 @@ if not skipDOC:
         rule depth_of_cov:
             input:
                 irefG=crefG if convRef is True else refG,
-                rmDupBam="bams/{sample}"+bam_ext,
-                sbami="bams/{sample}"+bam_ext+".bai",
+                rmDupBam=mapping_prg+"/{sample}"+bam_ext,
+                sbami=mapping_prg+"/{sample}"+bam_ext+".bai",
                 ranCG=os.path.join("aux_files",re.sub('.fa','.poz.ran1M.sorted.bed',os.path.basename(refG)))
             output:
                 outFileList=calc_doc(intList,True,skipDOC)
@@ -407,7 +407,7 @@ else:
 if fromBam:
     rule get_flagstat:
         input:
-            bam="bams/{sample}"+bam_ext
+            bam=mapping_prg+"/{sample}"+bam_ext
         output:
             fstat="QC_metrics/{sample}.flagstat"
         log:
@@ -418,7 +418,7 @@ if fromBam:
 else:
     rule get_flagstat:
         input:
-            bam="bams/{sample}.sorted.bam"
+            bam=mapping_prg+"/{sample}.sorted.bam"
         output:
             fstat="QC_metrics/{sample}.flagstat"
         log:
@@ -448,8 +448,8 @@ rule produce_report:
 if mbias_ignore=="auto":
     rule methyl_extract:
         input:
-            rmDupbam="bams/{sample}"+bam_ext,
-            sbami="bams/{sample}"+bam_ext+".bai",
+            rmDupbam=mapping_prg+"/{sample}"+bam_ext,
+            sbami=mapping_prg+"/{sample}"+bam_ext+".bai",
             refG=refG,
             mbiasTXT="QC_metrics/{sample}.Mbias.txt"
         output:
@@ -467,8 +467,8 @@ if mbias_ignore=="auto":
 else:
     rule methyl_extract:
         input:
-            rmDupbam="bams/{sample}"+bam_ext,
-            sbami="bams/{sample}"+bam_ext+".bai",
+            rmDupbam=mapping_prg+"/{sample}"+bam_ext,
+            sbami=mapping_prg+"/{sample}"+bam_ext+".bai",
             refG=refG
         output:
             methTab="methXT/{sample}_CpG.bedGraph"
@@ -549,7 +549,7 @@ if sampleSheet:
 
 
     rule CpG_stats:
-        input: 
+        input:
             Limdat='{}/limdat.LG.RData'.format(get_outdir("merged_methylation_data"))
         output:
             RDatAll='{}/singleCpG.RData'.format(get_outdir("singleCpG_stats_limma")),
@@ -570,7 +570,7 @@ if sampleSheet:
 
 
     rule CpG_report:
-        input: 
+        input:
             Limdat='{}/limdat.LG.RData'.format(get_outdir("merged_methylation_data")),
             sinfo='{}/singleCpG.RData'.format(get_outdir("singleCpG_stats_limma"))
         output:
@@ -649,7 +649,7 @@ if sampleSheet:
 
 
     rule metilene_report:
-        input: 
+        input:
             MetBed='{}/singleCpG.metilene.bed'.format(get_outdir("metilene_out")),
             LimBed='{}/singleCpG.metilene.limma_unfiltered.bed'.format(get_outdir("metilene_out"))
         output:
@@ -709,7 +709,7 @@ if intList:
 
 
         rule intAgg_report:
-            input: 
+            input:
                 outFiles='{}/sessionInfo.txt'.format(get_outdir("aggregate_stats_limma"))
             output:
                 html='{}/Stats_report.html'.format(get_outdir("aggregate_stats_limma"))
@@ -730,7 +730,7 @@ if intList:
 
 
 rule bedGraphToBigWig:
-    input: 
+    input:
         "methXT/{sample}_CpG.bedGraph",
         genome_index
     output:

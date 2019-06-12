@@ -16,11 +16,20 @@ import snakePipes.common_functions as cf
 import snakePipes.parserCommon as parserCommon
 
 
-def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfile": None, "max_jobs": 5, "snakemake_options": "--use-conda", "tempdir": None,
-                         "downsample": False, "trim": False, "trim_prg": "cutadapt", "trim_options": "", "fastqc": False,
-                         "bin_size": 10000, "RF_resolution": False, "enzyme": "HindIII", "restrict_region": None,
-                         "merge_samples": False, "nbins_toMerge": 0, "tadparams": '--thresholdComparisons 0.01',
-                         "noTAD": False, "noCorrect": False, "distVsCount": False, "distVsCountParams": None}):
+def parse_args(defaults={"verbose": False, "configfile": None,
+                         "cluster_configfile": None, "max_jobs": 5,
+                         "snakemake_options": "--use-conda", "tempdir": None,
+                         "downsample": False, "trim": False, "fastqc": False,
+                         "trim_prg": "cutadapt", "trim_options": "",
+                         "bin_size": 10000, "RF_resolution": False,
+                         "enzyme": "HindIII", "restrict_region": None,
+                         "merge_samples": False, "nbins_toMerge": 0,
+                         "tadparams": '--thresholdComparisons 0.01',
+                         "noTAD": False, "noCorrect": False,
+                         "distVsCount": False, "distVsCountParams": None,
+                         "umidedup": False, "umidedup_opts": "",
+                         "bcpattern": "", "umidedup_sep": "_",
+                         "umibarcode": False}):
     """
     Parse arguments from the command line.
     """
@@ -51,7 +60,8 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
     optional.add_argument("--enzyme",
                           dest="enzyme",
                           choices=['DpnII', 'HindIII'],
-                          help="Which enzyme was used to create Hi-C library (default: '%(default)s')",
+                          help="Which enzyme was used to create Hi-C "
+                               "library (default: '%(default)s')",
                           default=defaults["enzyme"])
 
     optional.add_argument("--bin_size",
@@ -76,18 +86,19 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
     optional.add_argument("--merge_samples",
                           dest="merge_samples",
                           action="store_true",
-                          help="Merge the HiC matrices and create a new "
-                               "matrix. If this option is specified togather "
-                               "with `--sampleInfo` (see below), the samples "
-                               "would be merged based on the defined groups. "
+                          help="Merge the HiC matrices and create a new matrix."
+                               " If this option is specified togather with "
+                               "`--sampleInfo` (see below), the samples would "
+                               "be merged based on the defined groups. "
                                "(default: '%(default)s')",
                           default=defaults["merge_samples"])
 
     optional.add_argument("--merge_bins",
                           dest="nbins_toMerge",
                           type=int,
-                          help="If > 0 , create a lower resolution HiC matrix for each sample "
-                          "by merging the given number of bins. (default: '%(default)s')",
+                          help="If > 0 , create a lower resolution HiC matrix "
+                               "for each sample by merging the given number "
+                               "of bins. (default: '%(default)s')",
                           default=defaults["nbins_toMerge"])
 
     optional.add_argument("--findTADs_params",
@@ -117,9 +128,10 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
                           help="Produce a plot of the ICE-corrected HiC "
                                "counts as a function of distance. This plot "
                                "could be used for QC as well as comparison "
-                               "between samples for biological effects. The "
-                               "plot is create using the tool 'hicDistVsCount'"
-                               ". (default: '%(default)s')",
+                               "between samples for biological effects. "
+                               "The plot is create using the tool "
+                               "'hicDistVsCount'. (default: '%(default)s')",
+
                           default=defaults["distVsCount"])
 
     optional.add_argument("--distVsCount_params",
@@ -133,11 +145,12 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
                           type=str,
                           metavar="STR",
                           help="A .tsv file containing sample names and "
-                               "associated groups. If provided, the file "
-                               "would be used to identify groups to merge the "
-                               "samples. An example can be found at "
+                               "associated groups. If provided, the file would be "
+                               "used to identify groups to merge the samples. "
+                               "An example can be found at "
                                "'docs/content/sampleSheet.example.tsv'"
                                "(default: None)")
+
 
     return parser
 
