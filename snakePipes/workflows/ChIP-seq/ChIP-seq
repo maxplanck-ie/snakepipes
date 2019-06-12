@@ -96,6 +96,14 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
                          type=str,
                          help="Format of the output plots from deepTools. Select 'none' for no plots (default: '%(default)s')",
                          default=defaults["plot_format"])
+    optional.add_argument("--mfold",
+                         dest="mfold",
+                         metavar="INT INT",
+                         type=str,
+                         help="Select the regions within MFOLD range of high-confidence enrichment ratio against background to build model." 
+                              "Fold-enrichment in regions must be lower than upper limit, and higher than the lower limit. Use as \"-m 10 30\"." 
+                              "This setting is only used while building the shifting model. Tweaking it is not recommended. DEFAULT:5 50 (default: '%(default)s')",
+                         default="0 50")
 
     #parserCommon.commonOptions(optional, defaults,fromBam=True)
     
