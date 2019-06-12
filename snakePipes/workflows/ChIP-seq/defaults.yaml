@@ -34,6 +34,8 @@ verbose: false
 sampleSheet:
 # window_size
 window_size: 150
+# mfold
+mfold: "0 50"
 #### Flag to control the pipeline entry point
 bam_ext: '.filtered.bam'
 fromBam:
