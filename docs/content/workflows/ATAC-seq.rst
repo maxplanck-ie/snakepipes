@@ -47,7 +47,7 @@ The differential binding module utilizes the R package `CSAW <https://bioconduct
 The analysis is performed on a union of peaks from all samples mentioned in the sample sheet. 
 This merged set of regions are provided as an output inside the **CSAW** folder as the file 'DiffBinding_allregions.bed'. 
 All differentially bound regions are available in 'CSAW/DiffBinding_significant.bed' . 
-Two thresholds are applied to produce `` Filtered.results.bed `` : FDR (default `` 0.05 `` ) as well as absolute log fold change (`` 1 ``). These can be specified either in the defaults.yaml dictionary or via commandline parameters '--FDR' and '--LFC'. Additionally, filtered results are split into up to 3 bed files, representing direction change (UP, DOWN, or MIXED).
+Two thresholds are applied to produce `` Filtered.results.bed `` : FDR (default ``0.05`` ) as well as absolute log fold change (``1``). These can be specified either in the defaults.yaml dictionary or via commandline parameters '--FDR' and '--LFC'. Additionally, filtered results are split into up to 3 bed files, representing direction change (UP, DOWN, or MIXED).
 
 .. note:: In order to include or exclude peaks from selected samples in the union of peaks used in the differential binding analysis, the user may provide an additional column named 'UseRegions' and set it to True or False, accordingly. This column must supersede the 'condition' column in the column order. 
 
