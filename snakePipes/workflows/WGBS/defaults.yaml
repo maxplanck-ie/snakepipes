@@ -65,6 +65,7 @@ bcpattern: NNNNCCCCCCCCC #default: 4 base umi barcode, 9 base cell barcode (eg. 
 umidedup: False
 umidedup_sep: "_"
 umidedup_opts: --paired
+mapping_prg: bwameth
 ################################################################################
 # Call snakemake directly, i.e. without using the wrapper script:
 #

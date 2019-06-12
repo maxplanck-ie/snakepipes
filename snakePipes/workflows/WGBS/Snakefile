@@ -209,7 +209,7 @@ if not fromBam:
             expand("FASTQ/{sample}{read}.fastq.gz", sample = samples, read = reads),
             expand("FASTQ_downsampled/{sample}{read}.fastq.gz", sample = samples, read = reads),
             convert_refG(convRef),
-            expand("bams/{sample}.PCRrm.bam", sample = samples),
+            expand(mapping_prg+"/{sample}.PCRrm.bam", sample = samples),
             expand("QC_metrics/{sample}.Mbias.txt",sample=samples),
             os.path.join("aux_files",re.sub('.fa','.poz.ran1M.sorted.bed',os.path.basename(refG))),
             calc_doc(intList,False,skipDOC),
@@ -234,7 +234,7 @@ else:
     rule all:
         input:
             convert_refG(convRef),
-            expand("bams/{sample}"+bam_ext, sample = samples),
+            expand(mapping_prg+"/{sample}"+bam_ext, sample = samples),
             expand("QC_metrics/{sample}.Mbias.txt",sample=samples),
             os.path.join("aux_files",re.sub('.fa','.poz.ran1M.sorted.bed',os.path.basename(refG))),
             calc_doc(intList,False,skipDOC),
