@@ -180,6 +180,7 @@ The ChIP-seq pipeline will generate additional output as follows::
         ├── sample2.filtered.BAMPE_peaks.broadPeak
         ├── sample2.filtered.BAMPE_peaks.gappedPeak
         └── sample2.filtered.BAMPE_peaks.xls
+    
 
 
 Following up on the DNA-mapping module results (see :doc:`DNA-mapping`), the workflow produces the following output directories :
@@ -191,6 +192,7 @@ Following up on the DNA-mapping module results (see :doc:`DNA-mapping`), the wor
 * **histoneHMM**: This folder contains the output of `histoneHMM <https://github.com/matthiasheinig/histoneHMM>`__. This folder will only exist if you have broad marks.
 
 * **CSAW_sampleSheet**: This folder is created optionally, if you provide a sample sheet for differential binding analysis. (see :ref:`diffBinding`)
+* **AnnotatedResults_sampleSheet**: This folder is created optionally, if you provide a sample sheet for differential binding analysis. (see :ref:`diffBinding`). Differentially bound regions annotated with distance to nearest gene are stored here.
 
 .. note:: Although in case of broad marks, we also perform the MACS2 `broadpeak` analysis (output available as ``MACS2/<sample>.filtered.BAM_peaks.broadPeak``), we would recommend using the histoneHMM outputs in these cases, since histoneHMM produces better results than MACS2 for broad peaks.
 

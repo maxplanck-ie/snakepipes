@@ -93,7 +93,7 @@ if allele_info == 'FALSE':
     rule CSAW_report:
         input:
             csaw_in = "CSAW_{}/CSAW.session_info.txt".format(sample_name),
-            heatmap_in=lambda wildcards: expand("CSAW_{}".format(sample_name)+"/CSAW.{change_dir}.cov.heatmap.png",change_dir=change_direction) if pipeline in 'ATAC-seq' else [expand("CSAW_{}".format(sample_name)+"/CSAW.{change_dir}.cov.heatmap.png",change_dir=change_direction),expand("CSAW_{}".format(sample_name)+"/CSAW.{change_dir}.log2r.heatmap.png",change_dir=change_direction)]
+            heatmap_in=lambda wildcards: expand("CSAW_{}".format(sample_name)+"/CSAW.{change_dir}.cov.heatmap.png",change_dir=['UP','DOWN']) if pipeline in 'ATAC-seq' else [expand("CSAW_{}".format(sample_name)+"/CSAW.{change_dir}.cov.heatmap.png",change_dir=['UP','DOWN']),expand("CSAW_{}".format(sample_name)+"/CSAW.{change_dir}.log2r.heatmap.png",change_dir=['UP','DOWN'])]
         output:
             outfile="CSAW_{}/CSAW.Stats_report.html".format(sample_name)
         params:
