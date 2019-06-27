@@ -54,7 +54,7 @@ mate_orientation: --fr
 insert_size_max: 1000
 bowtie_opts:
 umibarcode: False
-bcpattern: NNNNCCCCCCCCC #default: 4 base umi barcode, 9 base cell barcode (eg. RELACS barcode)
+bcpattern: NNNNCCCCCCCC #default: 4 base umi barcode, 8 base cell barcode (eg. RELACS barcode)
 umidedup: False
 umidedup_sep: "_"
 umidedup_opts:
