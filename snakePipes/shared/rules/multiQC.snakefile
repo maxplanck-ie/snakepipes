@@ -75,7 +75,7 @@ def multiqc_input_check(return_value):
         indir += " deepTools_qc "
     elif pipeline == "WGBS":
         if trim:
-            infiles.append(expand(trimmer + "/{sample}{read}_R1.fastq.gz", sample = samples))
+            infiles.append(expand(trimmer + "/{sample}{read}.fastq.gz", sample = samples, read = reads))
             indir += " {}".format(trimmer)
         if fastqc and trimmedr:
             infiles.append( expand("FastQC_trimmed/{sample}{read}_fastqc.html", sample = samples, read = reads) )
