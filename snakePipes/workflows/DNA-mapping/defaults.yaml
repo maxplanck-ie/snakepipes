@@ -57,7 +57,7 @@ umibarcode: False
 bcpattern: NNNNCCCCCCCCC #default: 4 base umi barcode, 9 base cell barcode (eg. RELACS barcode)
 umidedup: False
 umidedup_sep: "_"
-umidedup_opts: --paired
+umidedup_opts:
 plot_format: png
 ## Median/mean fragment length, only relevant for single-end data (default: 200)
 fragment_length: 200

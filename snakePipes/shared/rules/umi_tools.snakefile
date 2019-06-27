@@ -63,7 +63,8 @@ if umidedup:
         output:
             bamfile = "filtered_bam/{sample}.filtered.bam"
         params:
-            umitools_options = str(umidedup_opts),
+            umitools_options = str(umidedup_opts or ''),
+            umitools_paired = "--paired " if paired else " ",
             umi_sep = str(umidedup_sep),
         log:
             out = "filtered_bam/logs/umi_dedup.{sample}.out",
@@ -73,7 +74,7 @@ if umidedup:
             umi_tools dedup -I {input.bamfile} \
             -S {output.bamfile} -L {log.out} -E {log.err} \
             --umi-separator {params.umi_sep} \
-            {params.umitools_options}
+            {params.umitools_paired} {params.umitools_options}
             """
 else:
     rule filter_reads:
