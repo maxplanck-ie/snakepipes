@@ -1,13 +1,20 @@
 ---
-title: "WGBS_QC_report"
+title: "WGBS QC Report"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
-output: html_document
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    code_folding: hide
 ---
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 .libPaths(R.home("library"))
 require(pander)
 require(ggplot2)
+require(car)
+require(FactoMineR)
+require(bsseq)
 ```
 
 # Conversion rate
@@ -16,7 +23,7 @@ Commercial bisulfite conversion kits claim an efficiency of >98%. In practice, t
 Incomplete bisulfite conversion will result in uninterpretable methylation values.
 Bisulfite conversion rate is calculated on cytosines in a CHH context.
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
+```{r message=FALSE, warning=FALSE}
 if (length(snakemake@input[["ConversionRate"]] > 0)) {
     d = sapply(snakemake@input[["ConversionRate"]], function(x) read.table(x, header=FALSE, sep="\t", quote="", as.is=TRUE))
     d = as.data.frame(t(d), stringsAsFactors=FALSE)
@@ -33,7 +40,7 @@ if (length(snakemake@input[["ConversionRate"]] > 0)) {
 
 A good mapping rate of 80-90% indicates successful library construction. Low mapping rates may reflect issues with sample contamination, damaged starting material, or that you aligned a non-directional library with directional settings. "Filtered" alignments are due to less than 44% of the the read sequence being aligned (i.e., the alignment is likely incorrect and is thus being ignored).
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
+```{r message=FALSE, warning=FALSE}
 if (length(snakemake@input[["fstat"]] > 0)) {
     fl = lapply(snakemake@input[["fstat"]], function(x) read.table(x, header=FALSE, sep="\t", quote="", as.is=TRUE))
     totals = sapply(fl, function(x) {
@@ -55,7 +62,7 @@ if (length(snakemake@input[["fstat"]] > 0)) {
                    Filtered=filtered,
                    FilteredPercent=100*filtered/totals)
     rownames(d) = gsub(".flagstat", "", sapply(snakemake@input[["fstat"]], basename))
-    pander(d, style='simple')
+    pander(d, style='simple', split.table=Inf)
 } else {
     message('No flagstat files found!')
 }
@@ -65,7 +72,7 @@ if (length(snakemake@input[["fstat"]] > 0)) {
 
 Observed PCR duplication rate on a PCR-free protocol should be low, not exceeding 10-15%. Higher duplication rates might reflect low-input samples and/or lower library complexity.
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
+```{r message=FALSE, warning=FALSE}
 if (length(snakemake@input[["fstat"]] > 0)) {
     fl = lapply(snakemake@input[["fstat"]], function(x) read.table(x, header=FALSE, sep="\t", quote="", as.is=TRUE))
     totals = sapply(fl, function(x) {
@@ -89,23 +96,25 @@ if (length(snakemake@input[["fstat"]] > 0)) {
 
 Genome-wide coverage is calculated with deepTools plotCoverage. Note that mean coverage values should be intrepreted in the context of the skewness in the plot below. The table indicates the mean, standard deviation, minimum, median and maximum coverage of randomly sampled bins in the genome. Additionally, the 25, 50 (median) and 75% coverage value is indicated.
 
-```{r echo=FALSE, warning=FALSE, message=FALSE}
-# TODO: replace with deepTools
+```{r warning=FALSE, message=FALSE}
 if(length(snakemake@input[["Coverage"]])) {
     infile = snakemake@input[["Coverage"]][1]
     d = read.delim(infile, as.is=TRUE)
-    rownames(d) = gsub(".PCRrm", "", rownames(d))
+    rownames(d) = gsub(".markdup", "", rownames(d))
     d = d[,c(1:(ncol(d)-1))]
     colnames(d) = c("Mean", "Std. Dev.", "Min.", "25%", "Median", "75%", "Max.")
-    pander(d, style='simple')
+    pander(d, style='simple', split.table=Inf)
 } else {
     message('No information on genome-wide depth of coverage found. If you specified the skipDOC flag, this is expected outcome. Otherwise, an error might have occuarred.')
 }
 ```
 
-```{r echo=FALSE, warning=FALSE, message=FALSE}
+```{r warning=FALSE, message=FALSE}
 if(length(snakemake@input[["Coverage"]])) {
-    knitr::include_graphics(sprintf("%s/%s", getwd(), snakemake@input[["Coverage"]][2]))
+    infile = snakemake@input[["Coverage"]][3]
+    d = read.delim(infile, as.is=TRUE)
+    d$Sample = gsub(".markdup", "", d$Sample)
+    ggplot(d, aes(x=Threshold, y=Percent)) + geom_line(aes(color=Sample, linetype=Sample)) + labs(x="Coverage (reads/fragments per base)", y="Fraction of the genome")
 }
 ```
 
@@ -113,40 +122,56 @@ if(length(snakemake@input[["Coverage"]])) {
 
 Fraction of CpG dinucleotides covered by reads with MAPQ >=5, using a random sampling of 1 million CpGs.
 
-```{r echo=FALSE, warning=FALSE, message=FALSE}
-# TODO: replace with deepTools once the new release is out.
+```{r warning=FALSE, message=FALSE}
 if(length(snakemake@input[["Coverage"]])) {
-    # CpG metrics are the first half and Genomic the second
-    L = length(snakemake@input[["Coverage"]])
-    infiles = snakemake@input[["Coverage"]][3:L]
-
-    fl = lapply(infiles, read.delim)
-    names(fl) = gsub(".doc.sample_summary", "", sapply(snakemake@input[["Coverage"]][3:L], basename))
-    d = data.frame(AverageDepth=sapply(fl, function(x) x$readCount))
-    row.names(d) = names(fl)
-    pander(d, style='simple')
+    infile = snakemake@input[["Coverage"]][4]
+    d = read.delim(infile, as.is=TRUE)
+    rownames(d) = gsub(".markdup", "", rownames(d))
+    d = d[,c(1:(ncol(d)-1))]
+    colnames(d) = c("Mean", "Std. Dev.", "Min.", "25%", "Median", "75%", "Max.")
+    pander(d, style='simple', split.table=Inf)
 } else {
     message('No information on genome-wide depth of coverage found. If you specified the skipDOC flag, this is expected outcome. Otherwise, an error might have occuarred.')
 }
 ```
 
-```{r echo=FALSE, warning=FALSE, message=FALSE}
+```{r warning=FALSE, message=FALSE}
 if(length(snakemake@input[["Coverage"]])) {
-    # Make some plots
-    v = lapply(fl, function(x) {
-        # Convert the percentageX headers to X values
-        X = colnames(x)[2:ncol(x)]
-        X = as.numeric(gsub("percentage", "", X))
-        Y = unlist(x)[2:ncol(x)]
-        data.frame(X=X, Y=Y)
-        })
-    v = as.data.frame(do.call(rbind, v))
-    v$Sample = rep(names(fl), each=ncol(fl[[1]])-1)
-
-    g = ggplot(v, aes(x=X, y=Y, color=Sample)) + geom_line()
-    g = g + labs(x="Fold Coverage", y="Percentage of CpGs")
-    g
+    infile = snakemake@input[["Coverage"]][6]
+    d = read.delim(infile, as.is=TRUE)
+    d$Sample = gsub(".markdup", "", d$Sample)
+    ggplot(d, aes(x=Threshold, y=Percent)) + geom_line(aes(color=Sample, linetype=Sample)) + labs(x="Coverage (reads/fragments per base)", y="Fraction of CpGs")
 }
+```
+
+# PCA
+
+A PCA of the coverage and methylation level of your samples is shown below. Only positions with a minimum coverage of `r snakemake@params[["minCoverage"]]` have been used.
+
+```{r warning=FALSE, message=FALSE}
+bs = read.bismark(snakemake@input[["bedGraphs"]], BACKEND="HDF5Array")  # colData?
+RMV <- which(DelayedMatrixStats::rowSums2(getCoverage(bs, type="Cov") < snakemake@params[["minCoverage"]]) != 0)
+if(length(RMV)) {
+    bs = bs[-RMV,]
+}
+sampleNames(bs) = gsub("MethylDackel/", "", sampleNames(bs))
+sampleNames(bs) = gsub("_CpG.bedGraph", "", sampleNames(bs))
+save.image(file="QC_metrics/Session.RData")
+
+methyl = logit(getBSseq(bs, type="M") / getBSseq(bs, type="Cov"), adjust=1e-3)
+rv = DelayedMatrixStats::rowVars(methyl)
+tot = min(1000, length(rv))
+IDX = order(rv, decreasing=TRUE)[1:tot]
+x = PCA(t(methyl[IDX,]), graph=FALSE)
+plot.PCA(x, choix="ind", title="PCA of methylation values")
+```
+
+```{r warning=FALSE, message=FALSE}
+coverage = getBSseq(bs, type="Cov")
+rv = DelayedMatrixStats::rowVars(coverage)
+IDX = order(rv, decreasing=TRUE)[1:tot]
+x = PCA(t(coverage), graph=FALSE)
+plot.PCA(x, choix="ind", title="PCA of coverage")
 ```
 
 # Methylation bias
@@ -154,14 +179,14 @@ if(length(snakemake@input[["Coverage"]])) {
 Library construction of standard directional BS-Seq samples often consist of several steps including sonication, end-repair, A-tailing and adapter ligation. Since the end-repair step typically uses unmethylated cytosines for the fill-in reaction the filled-in bases will generally appear unmethylated after bisulfite conversion irrespective of their true genomic methylation state. (from sequencing.qcfail.com)
 Values are obtained via MethylDackel.
 
-```{r echo=FALSE, warning=FALSE, message=FALSE}
-# TODO: pandoc is turning -- into an emdash/endash
+```{r warning=FALSE, message=FALSE}
 if(length(snakemake@input[["mbiasTXT"]])) {
     fl = lapply(snakemake@input[["mbiasTXT"]], function(x) read.table(x, header=FALSE, sep="\t"))
     bounds = sapply(fl, function(x) gsub("Suggested inclusion options: ", "", x$V1, fixed=T))
     tab = data.frame("Trimming Bounds" = bounds)
     sampleNames = gsub(".Mbias.txt", "", basename(snakemake@input[["mbiasTXT"]]))
     rownames(tab) = sampleNames
+    tab[,1] = sprintf("`%s`", tab[,1])  # This prevents pandoc from converting to en-dashes
     colnames(tab) = "Trimming Bounds"
     pander(tab, style='simple')
 } else {

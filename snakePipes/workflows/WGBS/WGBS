@@ -38,8 +38,8 @@ def bounded01(x):
 def parse_args(defaults={"verbose": False, "configFile": None, "clusterConfigFile":None, "maxJobs": 12, "snakemakeOptions": "--use-conda", "tempDir": None,
                          "downsample": None, "trim": True, "trimmer": "fastp", "trimmerOptions": "-q 5 -l 30 -M 5", "maxDist": 300, "minCpGs": 10, "minMethDiff": 0.1, "FDR": 0.1,
                          "MethylDackelOptions": "--mergeContext --maxVariantFrac 0.25 --minDepth 4", "fastqc": False, 'bwBinSize': 25, 'plotFormat': 'png', "bamExt": '.bam',
-                         "reads": ["_R1", "_R2"],
-                         "blacklist": None, "sampleSheet": None, "noAutoMethylationBias": False, "fromBAM": False, "skipDOC": False, "skipGCbias": False, "computeDMLs": False}):
+                         "reads": ["_R1", "_R2"], "DMRprograms": "metilene,dmrseq", "minCoverage": 5,
+                         "blacklist": None, "sampleSheet": None, "noAutoMethylationBias": False, "fromBAM": False, "skipDOC": False}):
     """
     Parse arguments from the command line.
     """
@@ -89,13 +89,18 @@ def parse_args(defaults={"verbose": False, "configFile": None, "clusterConfigFil
                           help="The minimum methylation change in methylation for CpG inclusion in DMR detection (for metilene, default: '%(default)s')",
                           default=defaults["minMethDiff"])
 
+    optional.add_argument("--minCoverage",
+                          type=int,
+                          help="The minimum coverage needed for across all samples for a CpG to be used in DMR calling and PCA. Note that you can change this value without overwritting the DMR output.  Default: '%(default)i'",
+                          default=defaults["minCoverage"])
+
     optional.add_argument("--FDR",
                           type=float,
                           help="FDR threshold for returned DMRs (default: '%(default)s')",
                           default=defaults["FDR"])
 
     optional.add_argument("--MethylDackelOptions",
-                          help="Options to pass to MethylDackel extract (default: '%(default)s')",
+                          help="Options to pass to MethylDackel extract. You are highly advised NOT to set a minimum coverage at this step. Default: '%(default)s'",
                           default=defaults["MethylDackelOptions"])
 
     optional.add_argument("--fromBAM",
@@ -110,17 +115,17 @@ def parse_args(defaults={"verbose": False, "configFile": None, "clusterConfigFil
                           help="If --fromBAM is specified, this indicates that the input BAM files contain paired-end data. The option is ignored unless --fromBAM is given.",
                           action="store_true")
 
-    optional.add_argument("--computeDMLs",
-                          action="store_true",
-                          help="Compute differentially methylated loci (DMLs) and regions using DSS. Note that this is currently VERY slow.")
+    optional.add_argument("--DMRprograms",
+                          help="If a sample sheet is provided, use the specified DMR-calling programs. Multiple programs can be comma-separated with no spaces (e.g., 'metilene,dmrseq,dss'). The available programs are metilene, dmrseq, and DSS (note that this is very slow). Default: %(default)s.",
+                          default=defaults["DMRprograms"])
 
     optional.add_argument("--skipDOC",
                          action="store_true",
                          help="Skip depth of coverage calculation with deepTools.",default=defaults["skipDOC"])
 
-    optional.add_argument("--skipGCbias",
+    optional.add_argument("--GCbias",
                          action="store_true",
-                         help="Skip GC bias calculation with deepTools.",default=defaults["skipGCbias"])
+                         help="Perform GC bias calculation with deepTools.")
 
     return parser
 

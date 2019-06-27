@@ -73,6 +73,18 @@ def multiqc_input_check(return_value):
         indir += aligner
         indir += " Sambamba "
         indir += " deepTools_qc "
+    elif pipeline == "WGBS":
+        if trim:
+            infiles.append(expand(trimmer + "/{sample}{read}_R1.fastq.gz", sample = samples))
+            indir += " {}".format(trimmer)
+        if fastqc and trimmedr:
+            infiles.append( expand("FastQC_trimmed/{sample}{read}_fastqc.html", sample = samples, read = reads) )
+            indir += " FastQC_trimmed "
+        elif fastqc:
+            infiles.append( expand("FastQC/{sample}{read}_fastqc.html", sample = samples, read = reads) )
+            indir += " FastQC"
+        infiles.append( expand("QC_metrics/{sample}.flagstat", sample = samples) )
+        indir += " QC_metrics"
 
     if return_value == "infiles":
         return(infiles)

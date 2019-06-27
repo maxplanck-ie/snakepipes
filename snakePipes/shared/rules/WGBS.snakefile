@@ -9,7 +9,7 @@ if fromBAM:
         input:
             indir + "/{sample}" + bamExt
         output:
-            "bwameth/{sample}.PCRrm.bam"
+            "bwameth/{sample}.markdup.bam"
         shell:
             "( [ -f {output} ] || ln -s -r {input} {output} ) "
 
@@ -86,7 +86,7 @@ rule markDupes:
         "bwameth/{sample}.sorted.bam",
         "bwameth/{sample}.sorted.bam.bai"
     output:
-        "bwameth/{sample}.PCRrm.bam"
+        "bwameth/{sample}.markdup.bam"
     log:
         err="bwameth/logs/{sample}.rm_dupes.err",
         out="bwameth/logs/{sample}.rm_dupes.out"
@@ -99,15 +99,15 @@ rule markDupes:
         """
 
 
-rule index_PCRrm_bam:
+rule indexMarkDupes:
     input:
-        "bwameth/{sample}.PCRrm.bam"
+        "bwameth/{sample}.markdup.bam"
     output:
-        "bwameth/{sample}.PCRrm.bam.bai"
+        "bwameth/{sample}.markdup.bam.bai"
     params:
     log:
-        err="bwameth/logs/{sample}.index_PCRrm_bam.err",
-        out="bwameth/logs/{sample}.index_PCRrm_bam.out"
+        err="bwameth/logs/{sample}.indexMarkDupes.err",
+        out="bwameth/logs/{sample}.indexMarkDupes.out"
     threads: 1
     conda: CONDA_SHARED_ENV
     shell: """
@@ -115,7 +115,6 @@ rule index_PCRrm_bam:
         """
 
 
-# TODO: I'm not sure how useful this really is. We could just run plotCoverage instead.
 rule getRandomCpGs:
     output:
         temp("QC_metrics/randomCpG.bed")
@@ -169,8 +168,8 @@ rule getRandomCpGs:
 
 rule calc_Mbias:
     input:
-        "bwameth/{sample}.PCRrm.bam",
-        "bwameth/{sample}.PCRrm.bam.bai"
+        "bwameth/{sample}.markdup.bam",
+        "bwameth/{sample}.markdup.bam.bai"
     output:
         "QC_metrics/{sample}.Mbias.txt"
     params:
@@ -186,8 +185,8 @@ rule calc_Mbias:
 
 rule calcCHHbias:
     input:
-        "bwameth/{sample}.PCRrm.bam",
-        "bwameth/{sample}.PCRrm.bam.bai"
+        "bwameth/{sample}.markdup.bam",
+        "bwameth/{sample}.markdup.bam.bai"
     output:
         temp("QC_metrics/{sample}.CHH.Mbias.txt")
     params:
@@ -203,80 +202,68 @@ rule calcCHHbias:
 
 rule calc_GCbias:
     input:
-        "bwameth/{sample}.PCRrm.bam",
-        "bwameth/{sample}.PCRrm.bam.bai"
+        BAMS=expand("bwameth/{sample}.markdup.bam", sample=samples),
+        BAIS=expand("bwameth/{sample}.markdup.bam.bai", sample=samples),
     output:
-        GCbiasTXT="QC_metrics/{sample}.freq.txt",
-        GCbiasPNG="QC_metrics/{sample}.GCbias." + plotFormat
+        "QC_metrics/GCbias.freq.txt",
+        "QC_metrics/GCbias." + plotFormat
     params:
         genomeSize=genome_size,
-        twobitpath=genome_2bit,
-        plotFormat=plotFormat
+        twobitpath=genome_2bit
     log:
-        out="QC_metrics/logs/{sample}.calc_GCbias.out"
+        out="QC_metrics/logs/calc_GCbias.out"
     threads: 20
     conda: CONDA_SHARED_ENV
     shell: """
-        computeGCBias -b {input[0]} --effectiveGenomeSize {params.genomeSize} -g {params.twobitpath} -l 300 --GCbiasFrequenciesFile {output.GCbiasTXT} -p {threads} --biasPlot {output.GCbiasPNG}
+        computeGCBias -b {input.BAMS} --effectiveGenomeSize {params.genomeSize} -g {params.twobitpath} -l 300 --GCbiasFrequenciesFile {output[0]} -p {threads} --biasPlot {output[1]}
         """
 
 
-# TODO: plotCoverage would be better
 rule DepthOfCov:
     input:
-        "bwameth/{sample}.PCRrm.bam",
-        "bwameth/{sample}.PCRrm.bam.bai",
-        "QC_metrics/randomCpG.bed"
+        BAMS=expand("bwameth/{sample}.markdup.bam", sample=samples),
+        BAIS=expand("bwameth/{sample}.markdup.bam.bai", sample=samples),
+        BED="QC_metrics/randomCpG.bed"
     output:
-        "QC_metrics/{sample}.doc.sample_summary",
+        "QC_metrics/CpGCoverage.txt",
+        "QC_metrics/CpGCoverage.png",
+        "QC_metrics/CpGCoverage.coverageMetrics.txt"
     params:
-        options="-F 'mapping_quality > 4 and not duplicate and not failed_quality_control' -c 0 -q 10",
-        thresholds="-T 0 -T 1 -T 2 -T 5 -T 10 -T 15 -T 20 -T 30 -T 50"
-    threads: 10
+        options="--minMappingQuality 10 --smartLabels --samFlagExclude 256",
+        thresholds="-ct 0 -ct 1 -ct 2 -ct 5 -ct 10 -ct 15 -ct 20 -ct 30 -ct 50"
+    threads: 20
     log:
-        err="QC_metrics/logs/{sample}.DepthOfCov.err",
-    conda: CONDA_SAMBAMBA_ENV
+        err="QC_metrics/logs/DepthOfCov.err"
+    conda: CONDA_SHARED_ENV
     shell: """
-        # sambamba depth returns a table of per-position depth metrics
-        # The awk command keeps the header and averages these to global metrics
-        sambamba depth region --combined {params.options} {params.thresholds} -t {threads} -m -L {input[2]} {input[0]} 2> {log.err} \
-            | cut -f 4,6- \
-            | awk '{{ if(NR==1) {{ \
-                        print \
-                      }} else {{ \
-                        for(i=1; i<=NF; i++) vals[i]+=$i \
-                      }} \
-                   }} \
-                   END{{ \
-                     printf("%f", vals[1] / (NR - 1)); \
-                     for(i=2; i<=NF; i++) {{ \
-                       printf("\t%f", vals[i] / (NR - 1)) \
-                     }} \
-                     OFS=""; print("") \
-                   }}' \
-            > {output}
+        plotCoverage -b {input.BAMS} -p {threads} --outCoverageMetrics {output[2]} --BED {input.BED} \
+            {params.thresholds} {params.options} -o {output[1]} > {output[0]} 2> {log.err}
         """
 
 
 rule DepthOfCovGenome:
     input:
-        BAMS=expand("bwameth/{sample}.PCRrm.bam", sample=samples),
-        BAIS=expand("bwameth/{sample}.PCRrm.bam.bai", sample=samples)
+        BAMS=expand("bwameth/{sample}.markdup.bam", sample=samples),
+        BAIS=expand("bwameth/{sample}.markdup.bam.bai", sample=samples)
     output:
-        "QC_metrics/genomeCoverage.sample_summary",
-        "QC_metrics/genomeCoverage.png"
+        "QC_metrics/genomeCoverage.txt",
+        "QC_metrics/genomeCoverage.png",
+        "QC_metrics/genomeCoverage.coverageMetrics.txt"
+    params:
+        options="--minMappingQuality 10 --smartLabels --samFlagExclude 256",
+        thresholds="-ct 0 -ct 1 -ct 2 -ct 5 -ct 10 -ct 15 -ct 20 -ct 30 -ct 50"
     threads: 20
     log:
         err="QC_metrics/logs/DepthOfCovGenome.err"
     conda: CONDA_SHARED_ENV
     shell: """
-        plotCoverage -b {input.BAMS} -p {threads} --minMappingQuality 10 --smartLabels -o {output[1]} > {output[0]} 2> {log.err}
+        plotCoverage -b {input.BAMS} -p {threads} {params.thresholds} {params.options} --outCoverageMetrics {output[2]} -o {output[1]} > {output[0]} 2> {log.err}
         """
 
 
 rule get_flagstat:
     input:
-        "bwameth/{sample}.PCRrm.bam"
+        "bwameth/{sample}.markdup.bam"
     output:
         "QC_metrics/{sample}.flagstat"
     log:
@@ -286,9 +273,9 @@ rule get_flagstat:
     shell: "samtools flagstat {input} > {output} 2>{log.err}"
 
 
-# TODO: CpG coverage stuff isn't very useful, use plotCoverage instead
-rule produce_report:
+rule produceReport:
     input:
+        bedGraphs=expand("MethylDackel/{sample}_CpG.bedGraph", sample=samples),
         Coverage=calc_doc(skipDOC),
         ConversionRate=expand("QC_metrics/{sample}.conv.rate.txt", sample=samples),
         mbiasTXT=expand("QC_metrics/{sample}.Mbias.txt", sample=samples),
@@ -296,16 +283,17 @@ rule produce_report:
     output:
         QCrep='QC_metrics/QC_report.html'
     params:
-        auxdir=os.path.join(outdir, "QC_metrics")
-    conda: CONDA_RMD_ENV
+        auxdir=os.path.join(outdir, "QC_metrics"),
+        minCoverage=minCoverage
+    conda: CONDA_WGBS_ENV
     script: "../rscripts/WGBS_QC_report_template.Rmd"
 
 
 if not noAutoMethylationBias:
     rule methyl_extract:
         input:
-            "bwameth/{sample}.PCRrm.bam",
-            "bwameth/{sample}.PCRrm.bam.bai",
+            "bwameth/{sample}.markdup.bam",
+            "bwameth/{sample}.markdup.bam.bai",
             "QC_metrics/{sample}.Mbias.txt"
         output:
             "MethylDackel/{sample}_CpG.bedGraph"
@@ -324,8 +312,8 @@ if not noAutoMethylationBias:
 else:
     rule methyl_extract:
         input:
-            "bwameth/{sample}.PCRrm.bam",
-            "bwameth/{sample}.PCRrm.bam.bai"
+            "bwameth/{sample}.markdup.bam",
+            "bwameth/{sample}.markdup.bam.bai"
         output:
             "MethylDackel/{sample}_CpG.bedGraph"
         params:
@@ -341,82 +329,72 @@ else:
             """
 
 
-if blacklist is None:
-    rule CpG_filt:
-        input:
-            "MethylDackel/{sample}_CpG.bedGraph"
-        output:
-            temp("MethylDackel/{sample}.CpG.filt2.bed")
-        threads: 1
-        conda: CONDA_WGBS_ENV
-        shell: """
-            echo -e "chr\tstart\tend\tBeta\tM\tU\tCov\tms" > {output}
-            awk '{{if(NR>1) print $0, $5+$6, $1"_"$2}}' {input} | tr " " "\t" >> {output}
-            """
-else:
-    rule CpG_filt:
-        input:
-            "MethylDackel/{sample}_CpG.bedGraph",
-            blacklist
-        output:
-            temp("MethylDackel/{sample}.CpG.filt2.bed"),
-            temp("MethylDackel/{sample}.CpG.filt2.bed.temp")
-        log:
-            err="MethylDackel/logs/{sample}.CpG_filt.err",
-            out="MethylDackel/logs/{sample}.CpG_filt.out"
-        threads: 1
-        conda: CONDA_WGBS_ENV
-        shell: """
-            echo -e "chr\tstart\tend\tBeta\tM\tU\tCov\tms" > {output[1]}
-            awk '{{if(NR>1) print $0, $5+$6, $1"_"$2}}' {input[0]} | tr " " "\t" >> {output[1]}
-            bedtools intersect -v -a {output[1]} -b {input[1]} > {output[0]} 1>{log.out} 2>{log.err}
-            """
-
-
-# TODO: this is really slow, it shouldn't take more than a few minutes.
-rule prep_for_stats:
+rule prepForMetilene:
     input:
-        expressionFiles=expand("MethylDackel/{sample}.CpG.filt2.bed", sample=samples)
+        bedGraphs=expand("MethylDackel/{sample}_CpG.bedGraph", sample=samples)
     output:
-        MetileneIN='{}/metilene.IN.txt'.format(get_outdir("metilene"))
+        MetileneIN='{}/metilene.IN.txt'.format(get_outdir("metilene", minCoverage))
     params:
         sampleSheet=sampleSheet,
-        importfunc="WGBSstats_functions.R"
+        groups=metileneGroups,
+        minCoverage=minCoverage,
+        blacklist=blacklist
     log:
-        err='{}/logs/prep_for_stats.err'.format(get_outdir("metilene")),
-    threads: 1
+        err='{}/logs/prep_for_stats.err'.format(get_outdir("metilene", minCoverage)),
+    threads: 10
     conda: CONDA_WGBS_ENV
     script: "../rscripts/WGBS_mergeStats.R"
 
 
-# TODO: allow changing smoothing parameters
-# This is currently allotted 5GB per thread
 rule DSS:
     input:
-        bedGraphs=expand("MethylDackel/{sample}.CpG.filt2.bed", sample=samples)
+        bedGraphs=expand("MethylDackel/{sample}_CpG.bedGraph", sample=samples)
     output:
-        '{}/Stats_report.html'.format(get_outdir("DSS"))
+        '{}/Stats_report.html'.format(get_outdir("DSS", minCoverage))
     params:
-        odir=get_outdir("DSS"),
+        blacklist=blacklist,
+        odir=get_outdir("DSS", minCoverage),
         sampleSheet=sampleSheet,
         groups=metileneGroups,
         maxDist=maxDist,
         minCpGs=minCpGs,
         minMethDiff=minMethDiff,
+        minCoverage=minCoverage,
         FDR=FDR
     threads: 10
-    benchmark: '{}/.benchmark/DSS.benchmark'.format(get_outdir("DSS"))
+    benchmark: '{}/.benchmark/DSS.benchmark'.format(get_outdir("DSS", minCoverage))
     conda: CONDA_WGBS_ENV
     script: "../rscripts/WGBS_DSS.Rmd"
+
+
+rule dmrseq:
+    input:
+        bedGraphs=expand("MethylDackel/{sample}_CpG.bedGraph", sample=samples)
+    output:
+        '{}/Stats_report.html'.format(get_outdir("dmrseq", minCoverage))
+    params:
+        blacklist=blacklist,
+        odir=get_outdir("dmrseq", minCoverage),
+        sampleSheet=sampleSheet,
+        groups=metileneGroups,
+        maxDist=maxDist,
+        minCpGs=minCpGs,
+        minMethDiff=minMethDiff,
+        minCoverage=minCoverage,
+        FDR=FDR
+    threads: 10
+    benchmark: '{}/.benchmark/dmrseq.benchmark'.format(get_outdir("dmrseq", minCoverage))
+    conda: CONDA_WGBS_ENV
+    script: "../rscripts/WGBS_dmrseq.Rmd"
 
 
 # metileneGroups is provided by the calling snakeFile
 # These are NOT filtered
 rule run_metilene:
     input:
-        MetIN='{}/metilene.IN.txt'.format(get_outdir("metilene"))
+        MetIN='{}/metilene.IN.txt'.format(get_outdir("metilene", minCoverage))
     output:
-        MetBed='{}/DMRs.txt'.format(get_outdir("metilene"))
+        MetBed='{}/DMRs.txt'.format(get_outdir("metilene", minCoverage))
     params:
         groups=metileneGroups,
         maxDist=maxDist,
@@ -424,9 +402,9 @@ rule run_metilene:
         minMethDiff=minMethDiff,
         FDR=FDR
     log:
-        err="{}/logs/run_metilene.err".format(get_outdir("metilene"))
+        err="{}/logs/run_metilene.err".format(get_outdir("metilene", minCoverage))
     threads: 10
-    benchmark: '{}/.benchmark/run_metilene.benchmark'.format(get_outdir("metilene"))
+    benchmark: '{}/.benchmark/run_metilene.benchmark'.format(get_outdir("metilene", minCoverage))
     conda: CONDA_WGBS_ENV
     shell: """
         echo -e "chrom\tstart\tend\tq-value\tmean methylation difference\tnCpGs\tp (MWU)\tp (2D KS)\tmean_{params.groups[0]}\tmean_{params.groups[1]}" > {output}
@@ -441,20 +419,20 @@ rule run_metilene:
         """
 
 
-# Annotates the DMRs and produces QC plots
+# Annotates the metilene DMRs and produces QC plots
 rule metileneReport:
     input:
-        '{}/DMRs.txt'.format(get_outdir("metilene")),
+        '{}/DMRs.txt'.format(get_outdir("metilene", minCoverage)),
     output:
-        HTML='{}/Stats_report.html'.format(get_outdir("metilene"))
+        HTML='{}/Stats_report.html'.format(get_outdir("metilene", minCoverage))
     params:
         genes_gtf=genes_gtf,
-        outdir=get_outdir("metilene"),
+        outdir=get_outdir("metilene", minCoverage),
         sampleSheet=sampleSheet,
         minMethDiff=minMethDiff,
         FDR=FDR
     threads: 1
-    benchmark: '{}/.benchmark/metileneReport.benchmark'.format(get_outdir("metilene"))
+    benchmark: '{}/.benchmark/metileneReport.benchmark'.format(get_outdir("metilene", minCoverage))
     conda: CONDA_WGBS_ENV
     script: "../rscripts/WGBS_metileneQC.Rmd"
 

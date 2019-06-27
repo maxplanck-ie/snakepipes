@@ -42,15 +42,26 @@ if trim:
 #some of those definitions are used to generate output strings for some of the rules
 ################################################################################
 
+pipeline = "WGBS"
+
+if DMRprograms:
+    DMRprograms = DMRprograms.split(",")
+else:
+    DMRprograms = set()  # To allow "foo in DMRprograms"
+
 # TODO: Still needed?
 idxRange = 2 if paired else 1
 def calc_doc(skipDOC):
     if not skipDOC:
-        return (["QC_metrics/genomeCoverage.sample_summary",
+        return (["QC_metrics/genomeCoverage.txt",
                  "QC_metrics/genomeCoverage.png",
-                 expand("QC_metrics/{sample}.doc.sample_summary", sample=samples)])
+                 "QC_metrics/genomeCoverage.coverageMetrics.txt",
+                 "QC_metrics/CpGCoverage.txt",
+                 "QC_metrics/CpGCoverage.png",
+                 "QC_metrics/CpGCoverage.coverageMetrics.txt"])
     else:
         return ([])
+
 
 def run_FastQC(fastqc):
     if fastqc and fromBAM:
@@ -58,17 +69,8 @@ def run_FastQC(fastqc):
     else:
         return([])
 
-# Is this actually used?
-def run_Trimming(trim, fastqc):
-    if trim and fastqc:
-        return(expand(fastq_dir + "/{sample}{read}.fastq.gz", sample=samples, read=reads[:idxRange]) +
-               expand("FastQC_trimmed/{sample}{read}_fastqc.html", sample=samples, read=reads[:idxRange]))
-    elif trim:
-        return(expand(fastq_dir + "/{sample}{read}.fastq.gz", sample=samples, read=reads[:idxRange]) )
-    else:
-        return([])
 
-def get_outdir(folder_name):
+def get_outdir(folder_name, minCoverage):
     if sampleSheet:
         sample_name = os.path.basename(sampleSheet)
         if "." in sample_name:
@@ -76,26 +78,25 @@ def get_outdir(folder_name):
             sample_name = sample_name[:idx]
     else:
         sample_name = ""
-    return("{}_{}".format(folder_name, sample_name))
+    return("{}_{}_minCoverage{}".format(folder_name, sample_name, minCoverage))
 
 
-def run_CpG_stats(sampleSheet):
-    if sampleSheet and computeDMLs:
-        return (['{}/Stats_report.html'.format(get_outdir("DSS"))])
-    else:
-        return ([])
+def run_DMRs(sampleSheet, minCoverage, DMRprograms):
+    output = []
+    if not sampleSheet:
+        return output
+    if "DSS" in DMRprograms:
+        output.append('{}/Stats_report.html'.format(get_outdir("DSS", minCoverage)))
+    if "metilene" in DMRprograms:
+        output.append('{}/Stats_report.html'.format(get_outdir("metilene", minCoverage)))
+    if "dmrseq" in DMRprograms:
+        output.append('{}/Stats_report.html'.format(get_outdir("dmrseq", minCoverage)))
+    return output
 
 
-def run_metilene_all(sampleSheet):
-    if sampleSheet:
-        return (['{}/Stats_report.html'.format(get_outdir("metilene"))])
-    else:
-        return ([])
-
-
-def run_deeptools(skipGCbias):
-    if not skipGCbias:
-        return (expand("QC_metrics/{sample}.freq.txt", sample = samples, read = reads) + expand("QC_metrics/{sample}.GCbias.png", sample = samples, read = reads))
+def run_deeptools(GCbias):
+    if GCbias:
+        return (expand("QC_metrics/GCbias.freq.txt", sample = samples, read = reads) + expand("QC_metrics/GCbias.png", sample = samples, read = reads))
     else:
         return ([])
 
@@ -110,20 +111,22 @@ if not fromBAM:
 # WGBS
 include: os.path.join(maindir, "shared", "rules", "WGBS.snakefile")
 
+# MultiQC
+include: os.path.join(maindir, "shared", "rules", "multiQC.snakefile")
+
 ### execute before workflow starts #############################################
 ################################################################################
 onstart:
-    with open (os.path.join(outdir, 'pipeline.log'),"a") as lo:
-        if "verbose" in config and config["verbose"]:
-            print("--- Workflow parameters --------------------------------------------------------",file=lo)
-            print("samples:"+ str(samples),file=lo)
-            print("input dir:"+ indir,file=lo)
-            print("-" * 80,file=lo)#, "\n"
+    if "verbose" in config and config["verbose"]:
+        print("--- Workflow parameters --------------------------------------------------------",file=lo)
+        print("samples:"+ str(samples),file=lo)
+        print("input dir:"+ indir,file=lo)
+        print("-" * 80,file=lo)#, "\n"
 
-            print("--- Environment ----------------------------------------------------------------",file=lo)
-            print("$TMPDIR: "+os.getenv('TMPDIR', ""),file=lo)
-            print("$HOSTNAME: "+os.getenv('HOSTNAME', ""),file=lo)
-            print("-" * 80,file=lo)#, "\n"
+        print("--- Environment ----------------------------------------------------------------",file=lo)
+        print("$TMPDIR: "+os.getenv('TMPDIR', ""),file=lo)
+        print("$HOSTNAME: "+os.getenv('HOSTNAME', ""),file=lo)
+        print("-" * 80,file=lo)#, "\n"
 
 ### main rule ##################################################################
 ################################################################################
@@ -138,16 +141,16 @@ else:
 rule all:
     input:
         run_FastQC(fastqc),
-        expand("bwameth/{sample}.PCRrm.bam", sample = samples),
+        expand("bwameth/{sample}.markdup.bam", sample = samples),
         expand("QC_metrics/{sample}.Mbias.txt", sample=samples),
         calc_doc(skipDOC),
         'QC_metrics/QC_report.html',
-        run_deeptools(skipGCbias),
+        run_deeptools(GCbias),
         expand("MethylDackel/{sample}_CpG.bedGraph", sample=samples),
         expand("MethylDackel/{sample}_CpG.methylation.bw", sample=samples),
         expand("MethylDackel/{sample}_CpG.coverage.bw", sample=samples),
-        run_CpG_stats(sampleSheet),
-        run_metilene_all(sampleSheet),
+        run_DMRs(sampleSheet, minCoverage, DMRprograms),
+        'multiQC/multiqc_report.html'
 
 
 ### execute after workflow finished ############################################
@@ -155,8 +158,7 @@ rule all:
 onsuccess:
     cf.cleanLogs(outdir, cluster_config)
     if "verbose" in config and config["verbose"]:
-        with open (os.path.join(outdir, 'pipeline.log'),"a") as lo:
-            print("--- WGBS workflow finished successfully! --------------------------------",file=lo)#\n \n
+        print("--- WGBS workflow finished successfully! --------------------------------",file=lo)#\n \n
 
 onerror:
     print("\n !!! ERROR in WGBS workflow! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")

@@ -48,14 +48,14 @@ bamExt: '.bam'
 paired: True
 ###Flags to control skipping of certain QC calculations
 skipDOC: False
-skipGCbias: False
-###Metilene DMR calling parameters:
+GCbias: False
+###Thresholds for filtering of statistical comparisons (DMRs and DMLs)
+DMRprograms: 'metilene,dmrseq'
 maxDist: 300
 minCpGs: 10
-###Thresholds for filtering of statistical comparisons (DMRs and DMLs)
+minCoverage: 5
 FDR: 0.1
 minMethDiff: 0.1
-computeDMLs: False
 ###MethylDackel options
 MethylDackelOptions: '--mergeContext --maxVariantFrac 0.25 --minDepth 4'
 ################################################################################

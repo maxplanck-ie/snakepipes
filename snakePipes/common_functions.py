@@ -454,7 +454,7 @@ def logAndExport(args, workflowName):
     Set up logging and exports (TMPDIR)
     """
     # Write snakemake_cmd to log file
-    fnames = glob.glob(os.path.join(args.outdir, '{}_run-[0-9*].log'.format(workflowName)))
+    fnames = glob.glob(os.path.join(args.outdir, '{}_run-[0-9]*.log'.format(workflowName)))
     if len(fnames) == 0:
         n = 1  # no matching files, this is the first run
     else:

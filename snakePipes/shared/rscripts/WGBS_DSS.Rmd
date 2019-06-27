@@ -13,7 +13,6 @@ require("ggplot2")
 require("FactoMineR")
 require("car")
 
-infiles = snakemake@input[['bedGraphs']]
 sampleSheet = snakemake@params[['sampleSheet']]
 groups = snakemake@params[['groups']]
 ##smoothing = snakemake@params[['smoothing']]
@@ -23,6 +22,7 @@ smoothingSpan = 500
 maxDist = snakemake@params[['maxDist']]
 minCpGs = snakemake@params[['minCpGs']]
 minMethDiff = snakemake@params[['minMethDiff']]
+minCoverage = snakemake@params[['minCoverage']]
 FDR = snakemake@params[['FDR']]
 BPPARAM = MulticoreParam(workers = snakemake@threads, progressbar=TRUE)
 
@@ -31,7 +31,6 @@ odmrs = sprintf("%s/DMRs.txt", snakemake@params[["odir"]])
 ordata = sprintf("%s/Session.RData", snakemake@params[["odir"]])
 
 ss = read.delim(sampleSheet)
-#infiles = sprintf("MethylDackel/%s.CpG.filt2.bed", ss$name)
 infiles = sprintf("MethylDackel/%s_CpG.bedGraph", ss$name)
 
 g1 = which(ss$condition == groups[1])
@@ -47,6 +46,18 @@ This report summarizes the differentially methylated loci (DML) and regions (DMR
 ```{r echo=FALSE, warning=FALSE, message=FALSE}
 bs = read.bismark(infiles, colData=ss, BPPARAM=BPPARAM, BACKEND="HDF5Array") # nThread?
 sampleNames(bs) = as.character(ss$name)
+bptasks(BPPARAM) = 0L  # read.bismark resets this for some reason
+
+if(length(blacklist)) {
+    bl = import.bed(blacklist)
+    bs = subsetByOverlaps(bs, bl, invert=TRUE)
+}
+
+RMV <- which(DelayedMatrixStats::rowSums2(getCoverage(bs, type="Cov") < minCoverage) != 0)
+if(length(RMV)) {
+    bs = bs[-RMV,]
+}
+
 dmlT = DMLtest(bs, group1=g1, group2=g2, smoothing=smoothing, smoothing.span=smoothingSpan, BPPARAM=BPPARAM)
 dmls = callDML(dmlT, delta=minMethDiff)
 dmls = dmls[which(dmls$fdr < FDR), ]

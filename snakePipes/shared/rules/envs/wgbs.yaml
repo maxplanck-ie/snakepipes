@@ -14,7 +14,12 @@ dependencies:
   - r-rmarkdown
   - r-dplyr = 0.8.0.1
   - r-tidyr
+  - r-pander
+  - bioconductor-bsseq
   - bioconductor-genomicranges = 1.34.0
   - bioconductor-genomicfeatures = 1.34.1
   - bioconductor-biomart = 2.38.0
   - bioconductor-dss >= 2.33.0
+  - bioconductor-dmrseq = 1.2.1
+  - bioconductor-rtracklayer = 1.42.1
+  - bioconductor-biocparallel = 1.16.6
