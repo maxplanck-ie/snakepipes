@@ -23,6 +23,7 @@ maxDist = snakemake@params[['maxDist']]
 minCpGs = snakemake@params[['minCpGs']]
 minMethDiff = snakemake@params[['minMethDiff']]
 minCoverage = snakemake@params[['minCoverage']]
+blacklist = snakemake@params[['blacklist']]
 FDR = snakemake@params[['FDR']]
 BPPARAM = MulticoreParam(workers = snakemake@threads, progressbar=TRUE)
 
@@ -64,6 +65,11 @@ dmls = dmls[which(dmls$fdr < FDR), ]
 write.table(dmls, file=odmls, quote=FALSE, sep="\t", row.names=FALSE)
 dmrs = callDMR(dmlT, delta=minMethDiff, dis.merge=maxDist, minCG=minCpGs)
 write.table(dmrs, file=odmrs, quote=FALSE, sep="\t", row.names=FALSE)
+
+# This ensures that nrow(dmrs) doesn't ever throw an error
+dmls = ifelse(is.null(dmls), matrix(NA, nrow=0, ncol=1), dmls)
+dmrs = ifelse(is.null(dmrs), matrix(NA, nrow=0, ncol=1), dmrs)
+save.image(file=ordata)
 ```
 
 Using a minimum methylation difference of `r minMethDiff` and FDR of `r FDR` there are a total of `r nrow(dmls)` DMLs. The DMLs are saved in `r odmls`. The distribution of the methylation changes at these is show below. Note that assymmetric changes in the distribution indicate global shifts in methylation between the groups.
