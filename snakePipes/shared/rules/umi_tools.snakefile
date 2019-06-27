@@ -56,7 +56,7 @@ else:
 
 #If DNA-mapping:
 if umidedup:
-    rule filter_reads:
+    rule filter_reads_umi:
         input:
             bamfile = "filtered_bam/{sample}.filtered.tmp.bam" if mapping_prg == "Bowtie2" else mapping_prg+"/{sample}.bam",
             indexfile = "filtered_bam/{sample}.filtered.tmp.bam.bai" if mapping_prg == "Bowtie2" else mapping_prg+"/{sample}.bam.bai"
@@ -65,7 +65,7 @@ if umidedup:
         params:
             umitools_options = str(umidedup_opts or ''),
             umitools_paired = "--paired " if paired else " ",
-            umi_sep = str(umidedup_sep),
+            umi_sep = str(umidedup_sep      ),
         log:
             out = "filtered_bam/logs/umi_dedup.{sample}.out",
             err = "filtered_bam/logs/umi_dedup.{sample}.err"
