@@ -111,7 +111,7 @@ if(nrow(dmls) > 0) {
 A PCA of the sample is indicated below. It uses the logit-transformed methylation values.
 
 ```{r echo=FALSE, warning=FALSE, message=FALSE}
-if (nrow(dmls) > 0) {
+if(nrow(dmls) > 0) {
   x = PCA(logit(getBSseq(bs, type="M") / (1e-3 + getBSseq(bs, type="Cov")), adjust=1e-3), graph=FALSE)
   plot.PCA(x, choix="var")
 } else {

@@ -33,7 +33,7 @@ reads: [_R1, _R2]
 ## Number of reads to downsample from each FASTQ file
 downsample:
 ## Options for trimming
-trim: True
+trim: False
 trimmer: 'fastp'
 trimmerOptions: '-q 5 -l 30 -M 5'
 ## Bin size of output files in bigWig format
