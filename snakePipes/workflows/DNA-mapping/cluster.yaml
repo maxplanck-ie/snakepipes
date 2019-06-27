@@ -12,3 +12,6 @@ CollectInsertSizeMetrics:
     memory: 1G
 filter_reads:
     memory: 3G
+filter_reads_umi:
+    memory: 5G
+    
