@@ -112,7 +112,7 @@ rule Salmon_TPM:
     input:
         expand("Salmon/{sample}.quant.sf", sample=samples)
     output:
-        "Salmon/TPM.tsv"
+        "Salmon/TPM.transcripts.tsv"
     benchmark:
         "Salmon/.benchmark/Salmon_TPM.benchmark"
     log:
@@ -140,7 +140,7 @@ rule Salmon_counts:
     input:
         expand("Salmon/{sample}.quant.sf", sample=samples)
     output:
-        "Salmon/counts.tsv"
+        "Salmon/counts.transcripts.tsv"
     benchmark:
         "Salmon/.benchmark/Salmon_counts.benchmark"
     log:
@@ -161,7 +161,7 @@ rule Salmon_genes_counts:
         "Salmon/Salmon_genes_counts.log"
     conda: CONDA_RNASEQ_ENV
     shell:
-        "Rscript "+os.path.join(maindir, "shared", "rscripts", "merge_count_tables.R")+" Name TPM {output} {input} "
+        "Rscript "+os.path.join(maindir, "shared", "rscripts", "merge_count_tables.R")+" Name NumReads {output} {input} "
 
 
 ## Prepare Salmon output for Sleuth
