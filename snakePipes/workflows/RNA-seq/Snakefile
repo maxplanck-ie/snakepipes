@@ -136,9 +136,9 @@ def run_alignment_free():
         "Salmon/SalmonIndex/sa.bin",
         expand("Salmon/{sample}.quant.sf", sample=samples),
         expand("Salmon/{sample}.quant.genes.sf", sample=samples),
-        "Salmon/TPM.tsv",
+        "Salmon/TPM.transcripts.tsv",
         "Salmon/TPM.genes.tsv",
-        "Salmon/counts.tsv",
+        "Salmon/counts.transcripts.tsv",
         "Salmon/counts.genes.tsv",
         expand("Salmon/{sample}/abundance.h5", sample=samples) ]
 
