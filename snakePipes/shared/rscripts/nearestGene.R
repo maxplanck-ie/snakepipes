@@ -21,7 +21,7 @@ size_v<-unlist(lapply(flist,function(X)file.info(X)$size))
 
 if(any(is.na(size_v),sum(size_v==0)>0)){message('Some of the input files are nonexistent or empty!')
 
-        touch(output_bed)
+       system(paste0('touch ',output_bed))
 
     }else{
 

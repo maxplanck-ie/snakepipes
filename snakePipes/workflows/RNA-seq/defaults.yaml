@@ -48,7 +48,7 @@ dnaContam: False
 ## supported mappers: STAR HISAT2
 mapping_prg: STAR
 ## N.B., setting --outBAMsortingBinsN too high can result in cryptic errors
-star_options: 
+star_options:
 hisat_options:
 verbose: False
 plot_format: png
@@ -58,6 +58,12 @@ Nmasked_index:
 #### Flag to control the pipeline entry point
 fromBam: False
 bam_ext: '.bam'
+#umi_tools
+umibarcode: False
+bcpattern: NNNNCCCCCCCCC #default: 4 base umi barcode, 9 base cell barcode (eg. RELACS barcode)
+umidedup: False
+umidedup_sep: "_"
+umidedup_opts: --paired
 ################################################################################
 # Call snakemake directly, i.e. without using the wrapper script:
 #

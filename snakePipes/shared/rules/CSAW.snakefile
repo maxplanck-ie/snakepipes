@@ -27,26 +27,6 @@ rule CSAW:
     conda: CONDA_ATAC_ENV
     script: "../rscripts/CSAW.R"
 
-rule CSAW_report:
-    input:
-        csaw_in = "CSAW_{}/CSAW.session_info.txt".format(sample_name)
-    output:
-        outfile="CSAW_{}/CSAW.Stats_report.html".format(sample_name)
-    params:
-        rmd_in=os.path.join(workflow_rscripts,"CSAW_report.Rmd"),
-        rmd_out=os.path.join(outdir, "CSAW_report.Rmd"),
-        pipeline=pipeline,
-        fdr=fdr,
-        lfc=absBestLFC,
-        outdir=os.path.join(outdir,"CSAW_{}".format(sample_name)),
-        sampleSheet=sampleSheet,
-        outFull=lambda wildcards,output: os.path.join(outdir,output.outfile)
-    log:
-       out = os.path.join(outdir,"CSAW_{}/logs/report.out".format(sample_name)),
-       err = os.path.join(outdir,"CSAW_{}/logs/report.err".format(sample_name))
-    conda: CONDA_ATAC_ENV
-    shell: "cp -v {params.rmd_in} {params.rmd_out} ;Rscript -e 'rmarkdown::render(\"{params.rmd_out}\", params=list(outdir=\"{params.outdir}\", pipeline=\"{params.pipeline}\", fdr=\"{params.fdr}\",lfc=\"{params.lfc}\",sample_sheet=\"{params.sampleSheet}\"), output_file=\"{params.outFull}\")' 1>{log.out} 2>{log.err}"
-    
 
 if allele_info == 'FALSE':
     if pipeline in 'chip-seq':
@@ -64,7 +44,7 @@ if allele_info == 'FALSE':
                 err = os.path.join(outdir,"CSAW_{}".format(sample_name)+"/logs/deeptools_matrix.log2r.{change_dir}.err")
             threads: 8
             conda: CONDA_SHARED_ENV
-            shell: "if [ -r {params.bed_in} ]; then computeMatrix scale-regions -S {input.bigwigs} -R {params.bed_in} -m 1000 -b 200 -a 200 -o {output.matrix} -p {threads};fi >{log.out} 2>{log.err}"
+            shell: "if [ -s {params.bed_in} ]; then computeMatrix scale-regions -S {input.bigwigs} -R {params.bed_in} -m 1000 -b 200 -a 200 -o {output.matrix} -p {threads};fi >{log.out} 2>{log.err}"
 
         rule plot_heatmap_log2r_CSAW:
             input:
@@ -78,7 +58,7 @@ if allele_info == 'FALSE':
                 out = os.path.join(outdir,"CSAW_{}".format(sample_name)+"/logs/deeptools_heatmap.log2r.{change_dir}.out"),
                 err = os.path.join(outdir,"CSAW_{}".format(sample_name)+"/logs/deeptools_heatmap.log2r{change_dir}.err")
             conda: CONDA_SHARED_ENV
-            shell: "if [ -r {input.matrix} ]; then plotHeatmap --matrixFile {input.matrix} --outFileSortedRegions {output.sorted_regions} --outFileName {output.image} --startLabel Start --endLabel End --legendLocation lower-center -x 'Scaled peak length' --labelRotation 90 --samplesLabel {params.smpl_label} ;fi >{log.out} 2>{log.err}"
+            shell: "if [ -s {input.matrix} ]; then plotHeatmap --matrixFile {input.matrix} --outFileSortedRegions {output.sorted_regions} --outFileName {output.image} --startLabel Start --endLabel End --legendLocation lower-center -x 'Scaled peak length' --labelRotation 90 --samplesLabel {params.smpl_label} ;fi >{log.out} 2>{log.err}"
 
     rule calc_matrix_cov_CSAW:
         input:
@@ -94,7 +74,7 @@ if allele_info == 'FALSE':
             err = os.path.join(outdir,"CSAW_{}".format(sample_name)+"/logs/deeptools_matrix.cov.{change_dir}.err")
         threads: 8
         conda: CONDA_SHARED_ENV
-        shell: "if [ -r {params.bed_in} ]; then computeMatrix scale-regions -S {input.bigwigs} -R {params.bed_in} -m 1000 -b 200 -a 200 -o {output.matrix} -p {threads};fi >{log.out} 2>{log.err}"
+        shell: "if [ -s {params.bed_in} ]; then computeMatrix scale-regions -S {input.bigwigs} -R {params.bed_in} -m 1000 -b 200 -a 200 -o {output.matrix} -p {threads};fi >{log.out} 2>{log.err}"
 
     rule plot_heatmap_cov_CSAW:
         input:
@@ -108,4 +88,25 @@ if allele_info == 'FALSE':
             out = os.path.join(outdir,"CSAW_{}".format(sample_name)+"/logs/deeptools_heatmap.cov.{change_dir}.out"),
             err = os.path.join(outdir,"CSAW_{}".format(sample_name)+"/logs/deeptools_heatmap.cov.{change_dir}.err")
         conda: CONDA_SHARED_ENV
-        shell: "if [ -r {input.matrix} ]; then plotHeatmap --matrixFile {input.matrix} --outFileSortedRegions {output.sorted_regions} --outFileName {output.image} --startLabel Start --endLabel End --legendLocation lower-center -x 'Scaled peak length' --labelRotation 90 --samplesLabel {params.smpl_label} ;fi >{log.out} 2>{log.err}"
+        shell: "if [ -s {input.matrix} ]; then plotHeatmap --matrixFile {input.matrix} --outFileSortedRegions {output.sorted_regions} --outFileName {output.image} --startLabel Start --endLabel End --legendLocation lower-center -x 'Scaled peak length' --labelRotation 90 --samplesLabel {params.smpl_label} ;fi >{log.out} 2>{log.err}"
+
+    rule CSAW_report:
+        input:
+            csaw_in = "CSAW_{}/CSAW.session_info.txt".format(sample_name),
+            heatmap_in=lambda wildcards: expand("CSAW_{}".format(sample_name)+"/CSAW.{change_dir}.cov.heatmap.png",change_dir=['UP','DOWN']) if pipeline in 'ATAC-seq' else [expand("CSAW_{}".format(sample_name)+"/CSAW.{change_dir}.cov.heatmap.png",change_dir=['UP','DOWN']),expand("CSAW_{}".format(sample_name)+"/CSAW.{change_dir}.log2r.heatmap.png",change_dir=['UP','DOWN'])]
+        output:
+            outfile="CSAW_{}/CSAW.Stats_report.html".format(sample_name)
+        params:
+            rmd_in=os.path.join(workflow_rscripts,"CSAW_report.Rmd"),
+            rmd_out=os.path.join(outdir, "CSAW_report.Rmd"),
+            pipeline=pipeline,
+            fdr=fdr,
+            lfc=absBestLFC,
+            outdir=os.path.join(outdir,"CSAW_{}".format(sample_name)),
+            sampleSheet=sampleSheet,
+            outFull=lambda wildcards,output: os.path.join(outdir,output.outfile)
+        log:
+           out = os.path.join(outdir,"CSAW_{}/logs/report.out".format(sample_name)),
+           err = os.path.join(outdir,"CSAW_{}/logs/report.err".format(sample_name))
+        conda: CONDA_ATAC_ENV
+        shell: "cp -v {params.rmd_in} {params.rmd_out} ;Rscript -e 'rmarkdown::render(\"{params.rmd_out}\", params=list(outdir=\"{params.outdir}\", pipeline=\"{params.pipeline}\", fdr=\"{params.fdr}\",lfc=\"{params.lfc}\",sample_sheet=\"{params.sampleSheet}\"), output_file=\"{params.outFull}\")' 1>{log.out} 2>{log.err}"

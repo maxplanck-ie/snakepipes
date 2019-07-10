@@ -30,6 +30,9 @@ if fastqc:
 if trim:
     include: os.path.join(maindir, "shared", "rules", "TrimGalore.snakefile")
 
+#umi_tools
+include: os.path.join(maindir, "shared", "rules", "umi_tools.snakefile")
+
 # HiCExplorer
 include: os.path.join(maindir, "shared", "rules", "hicexplorer.snakefile")
 

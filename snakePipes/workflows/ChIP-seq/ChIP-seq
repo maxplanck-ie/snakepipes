@@ -15,9 +15,14 @@ import snakePipes.common_functions as cf
 import snakePipes.parserCommon as parserCommon
 
 
-def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfile": None, "max_jobs": 5, "snakemake_options": "--use-conda", "tempdir": None,
-                         "paired": True, "bw_binsize": 25, "sampleSheet": "", "window_size": 150, "predict_chip_dict": None, "bigWigType": "both",
-                         "plot_format": "png", "fromBam": "", "bam_ext": ".bam", "fdr": 0.05, "absBestLFC": 1}):
+def parse_args(defaults={"verbose": False, "configfile": None,
+                         "cluster_configfile": None, "max_jobs": 5,
+                         "snakemake_options": "--use-conda", "paired": True,
+                         "bw_binsize": 25, "sampleSheet": "",
+                         "window_size": 150, "predict_chip_dict": None,
+                         "bigWigType": "both", "plot_format": "png",
+                         "fromBam": "", "bam_ext": ".bam", "fdr": 0.05,
+                         "absBestLFC": 1}):
     """
     Parse arguments from the command line.
     """
@@ -108,7 +113,7 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
                           default=defaults["absBestLFC"])
 
     #parserCommon.commonOptions(optional, defaults,fromBam=True)
-    
+
     return parser
 
 

@@ -1,14 +1,28 @@
+rule origFASTQ1:
+      input:
+          indir+"/{sample}"+reads[0]+ext
+      output:
+          "originalFASTQ/{sample}"+reads[0]+".fastq.gz"
+      shell:
+          "( [ -f {output} ] || ln -s -r {input} {output} )"
 
+rule origFASTQ2:
+      input:
+          indir+"/{sample}"+reads[1]+ext
+      output:
+          "originalFASTQ/{sample}"+reads[1]+".fastq.gz"
+      shell:
+          "( [ -f {output} ] || ln -s -r {input} {output} )"
 
 if downsample:
     if paired:
         rule FASTQdownsample:
             input:
-                r1 = indir+"/{sample}"+reads[0]+ext,
-                r2 = indir+"/{sample}"+reads[1]+ext
+                r1 = "originalFASTQ/{sample}"+reads[0]+".fastq.gz",
+                r2 = "originalFASTQ/{sample}"+reads[1]+".fastq.gz"
             output:
-                r1 = "FASTQ/{sample}"+reads[0]+".fastq.gz",
-                r2 = "FASTQ/{sample}"+reads[1]+".fastq.gz"
+                r1 = temp("originalFASTQ/downsample_{sample}"+reads[0]+".fastq.gz"),
+                r2 = temp("originalFASTQ/downsample_{sample}"+reads[1]+".fastq.gz")
             params:
                 num_reads = downsample
             benchmark:
@@ -22,9 +36,9 @@ if downsample:
     else:
         rule FASTQdownsample:
             input:
-                indir+"/{sample}"+ext
+                "originalFASTQ/{sample}.fastq.gz"
             output:
-                fq = "FASTQ/{sample}.fastq.gz",
+                fq = temp("originalFASTQ/downsample_{sample}.fastq.gz"),
             threads: 12
             params:
                 num_reads = downsample
@@ -32,19 +46,3 @@ if downsample:
             shell: """
                 seqtk sample -s 100 {input} {params.num_reads} | pigz -p {threads} -9 > {output}
                 """
-else:
-    rule FASTQ1:
-        input:
-            indir+"/{sample}"+reads[0]+ext
-        output:
-            "FASTQ/{sample}"+reads[0]+".fastq.gz"
-        shell:
-            "( [ -f {output} ] || ln -s -r {input} {output} )"
-
-    rule FASTQ2:
-        input:
-            indir+"/{sample}"+reads[1]+ext
-        output:
-            "FASTQ/{sample}"+reads[1]+".fastq.gz"
-        shell:
-            "( [ -f {output} ] || ln -s -r {input} {output} )"
