@@ -66,20 +66,21 @@ write.table(dmls, file=odmls, quote=FALSE, sep="\t", row.names=FALSE)
 if(nrow(dmlT) > 0) {
     dmrs = callDMR(dmlT, delta=minMethDiff, dis.merge=maxDist, minCG=minCpGs)
 } else {
-    dmrs = NULL
+    dmrs = matrix(NA, nrow=0, ncol=1)
 }
-save.image(file=ordata)
 write.table(dmrs, file=odmrs, quote=FALSE, sep="\t", row.names=FALSE)
 
 # This ensures that nrow(dmrs) doesn't ever throw an error
 dmls = ifelse(is.null(dmls), matrix(NA, nrow=0, ncol=1), dmls)
-dmrs = ifelse(is.null(dmrs), matrix(NA, nrow=0, ncol=1), dmrs)
+if(is.null(dmrs)) {
+    dmrs = matrix(NA, nrow=0, ncol=1)
+}
 ```
 
 Using a minimum methylation difference of `r minMethDiff` and FDR of `r FDR` there are a total of `r nrow(dmls)` DMLs. The DMLs are saved in `r odmls`. The distribution of the methylation changes at these is show below. Note that assymmetric changes in the distribution indicate global shifts in methylation between the groups.
 
 ```{r echo=FALSE, warning=FALSE, message=FALSE}
-if(nrow(dmls) > 0) {
+if(!is.null(dmls) && !is.list(dmls) && nrow(dmls) > 0) {
   g = ggplot(dmlT, aes(x=diff)) + geom_histogram() + labs(x="Methylation Difference (per-CpG)")
   g = g + geom_vline(xintercept=minMethDiff) + geom_vline(xintercept=-1*minMethDiff)
   g
@@ -91,7 +92,7 @@ if(nrow(dmls) > 0) {
 Similarly, the test statistic, which is used to compute the p-value, is shown below. Its interpretation is the same as that above.
 
 ```{r echo=FALSE, warning=FALSE, message=FALSE}
-if(nrow(dmls) > 0) {
+if(!is.null(dmls) && !is.list(dmls) && nrow(dmls) > 0) {
   ggplot(dmlT, aes(x=stat)) + geom_histogram() + labs(x="Test statistic (per-CpG)")
 } else {
   message('No DMLs found.')
@@ -101,19 +102,8 @@ if(nrow(dmls) > 0) {
 The p-value distribution for the DMLs should be relatively flat with a spike near 0 and possibly 1. If there's a notable slope or bump elsewhere then there is likely a confounding variable missing from your design (the WGBS pipeline does not currently support complex designs).
 
 ```{r echo=FALSE, warning=FALSE, message=FALSE}
-if(nrow(dmls) > 0) {
+if(!is.null(dmls) && !is.list(dmls) && nrow(dmls) > 0) {
   ggplot(dmlT, aes(x=pval)) + geom_histogram() + labs(x="Unadjusted p-value (per-CpG)")
-} else {
-  message('No DMLs found.')
-}
-```
-
-A PCA of the sample is indicated below. It uses the logit-transformed methylation values.
-
-```{r echo=FALSE, warning=FALSE, message=FALSE}
-if(nrow(dmls) > 0) {
-  x = PCA(logit(getBSseq(bs, type="M") / (1e-3 + getBSseq(bs, type="Cov")), adjust=1e-3), graph=FALSE)
-  plot.PCA(x, choix="var")
 } else {
   message('No DMLs found.')
 }
@@ -124,7 +114,7 @@ if(nrow(dmls) > 0) {
 DMR calling functions on the output of DML testing, in essence by looking for neighboring DMLs and merging them together into regions. If we consider a minimum methylation difference of `r minMethDiff`, a maximum distance between CpGs of `r maxDist` and then regions with at least `r minCpGs` CpGs, there are a total of `r nrow(dmrs)` DMRs. These are saved in `r odmrs`. The distribution of DMR lengths is shown below. In general there should be relatively few small (<100 bases) DMRs with a bump in enrichment somewhere between 100 bases and 10kb.
 
 ```{r echo=FALSE, warning=FALSE, message=FALSE}
-if(nrow(dmrs) > 0) {
+if(!is.null(dmrs) && nrow(dmrs) > 0) {
   ggplot(dmrs, aes(x=length)) + geom_histogram() + labs(x="DMR length (bases)")
 } else {
   message("No DMRs found.")
@@ -134,7 +124,7 @@ if(nrow(dmrs) > 0) {
 There is typically an exponentially decreasing relationship between the number of DMRs found and the number of CpGs in them, which is shown below.
 
 ```{r echo=FALSE, warning=FALSE, message=FALSE}
-if(nrow(dmrs) > 0) {
+if(!is.null(dmrs) && nrow(dmrs) > 0) {
   ggplot(dmrs, aes(x=nCG)) + geom_histogram() + labs(x="CpGs per DMR")
 } else {
   message("No DMRs found.")
@@ -144,7 +134,7 @@ if(nrow(dmrs) > 0) {
 As with DMLs, there can often be an assymmetry in the distribution of methylation changes in DMRs. Such assymmetries indicate a global shift in methylation changes.
 
 ```{r echo=FALSE, warning=FALSE, message=FALSE}
-if(nrow(dmrs) > 0) {
+if(!is.null(dmrs) && nrow(dmrs) > 0) {
   g = ggplot(dmrs, aes(x=diff.Methy)) + geom_histogram() + labs(x="Methylation Difference (per-DMR)")
   g = g + geom_vline(xintercept=minMethDiff) + geom_vline(xintercept=-1*minMethDiff)
   g
@@ -156,7 +146,7 @@ if(nrow(dmrs) > 0) {
 If there were DMRs, the first 10 (assuming there were that many) ordered by the sum of test statistics.
 
 ```{r echo=FALSE, warning=FALSE, message=FALSE}
-if(nrow(dmrs) > 0) {
+if(!is.null(dmrs) && nrow(dmrs) > 0) {
   foo = min(10, nrow(dmrs))
   for(i in 1:foo) {
     print(showOneDMR(dmrs[i,], bs))
