@@ -16,7 +16,8 @@ if umibarcode:
             conda: CONDA_SHARED_ENV
             shell:"""
                 umi_tools extract -I {input.r1} --read2-in={input.r2} \
-                --bc-pattern={params.bcpattern} --stdout={output.r1} \
+                --bc-pattern={params.bcpattern} --bc-pattern2={params.bcpattern}\
+                --stdout={output.r1} \
                 --read2-out={output.r2} -L {log.out} -E {log.err}
                 """
 
