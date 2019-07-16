@@ -33,7 +33,7 @@ if mapping_prg == "Bowtie2":
                 -X {params.insert_size_max} \
                 -x {params.idxbase} -1 {input.r1} -2 {input.r2} \
                 {params.bowtie_opts} {params.mate_orientation} \
-                --rg-id {wildcards.sample} --rg CN:mpi-ie_deep_sequencing_unit \
+                --rg-id {wildcards.sample} \
                 --rg DS:{wildcards.sample} --rg PL:ILLUMINA --rg SM:{wildcards.sample} \
                 -p {threads} \
                 2> {output.align_summary} | \
@@ -62,7 +62,7 @@ if mapping_prg == "Bowtie2":
                 -x {params.idxbase} -U {input.r1} \
                 --reorder \
                 {params.bowtie_opts} \
-                --rg-id {wildcards.sample} --rg CN:mpi-ie_deep_sequencing_unit \
+                --rg-id {wildcards.sample} \
                 --rg DS:{wildcards.sample} --rg PL:ILLUMINA --rg SM:{wildcards.sample} \
                 -p {threads} \
                 2> {output.align_summary} | \
