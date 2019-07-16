@@ -1,11 +1,11 @@
 bamCoverage:
     memory: 4G
 bamCoverage_filtered:
-    memory: 4G
+    memory: 4G  
 bamPE_fragment_size:
     memory: 10G
 bowtie2:
-    memory: 4G
+    memory: 1G
 CollectAlignmentSummaryMetrics:
     memory: 2G
 CollectInsertSizeMetrics:
