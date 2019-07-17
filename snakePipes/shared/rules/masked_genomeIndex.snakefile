@@ -54,6 +54,7 @@ else:
         params:
             strain1 = strains[0],
             SNPpath = os.path.abspath(VCFfile),
+
             temp_out=temp("all_SNPs_" + strains[0] + "_GRCm38.txt.gz"),
             out_bname=os.path.basename(SNPFile)
         log:

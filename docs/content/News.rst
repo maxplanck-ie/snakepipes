@@ -1,6 +1,10 @@
 snakePipes News
 ===============
 
+snakePipes published
+--------------------
+snakePipes was published: https://www.ncbi.nlm.nih.gov/pubmed/31134269
+
 snakePipes 1.2.1
 ----------------
 

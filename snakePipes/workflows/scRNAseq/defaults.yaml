@@ -49,6 +49,12 @@ dnaContam: False
 cell_filter_metric: gene_universe
 #Option to skip RaceID to save time
 skipRaceID: False
+#umi_tools options:
+umibarcode: False
+bcpattern: NNNNCCCCCCCCC #default: 4 base umi barcode, 9 base cell barcode (eg. RELACS barcode)
+umidedup: False
+umidedup_sep: "_"
+umidedup_opts: --paired
 ################################################################################
 # Call snakemake directly, i.e. without using the wrapper script:
 #

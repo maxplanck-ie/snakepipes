@@ -31,8 +31,6 @@ sampleSheet:
 windowSize: 20
 fragmentCountThreshold: 1
 #### Flag to control the pipeline entry point
-bamExt: '.filtered.bam'
-fromBAM: 
 ## Bin size of output files in bigWig format
 bwBinSize: 25
 paired: True
@@ -42,3 +40,16 @@ fragmentLength:
 trim:
 fastqc:
 qval: 0.001
+
+#umi_tools
+umibarcode: False
+bcpattern: NNNNCCCCCCCCC #default: 4 base umi barcode, 9 base cell barcode (eg. RELACS barcode)
+umidedup: False
+umidedup_sep: "_"
+umidedup_opts: --paired
+
+##dummy string to skip filtering annotation
+filter_annotation:
+##parameters to filter DB regions on
+fdr: 0.05
+absBestLFC: 1

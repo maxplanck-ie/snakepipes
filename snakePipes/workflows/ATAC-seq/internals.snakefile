@@ -46,3 +46,27 @@ else:
     indir = fromBAM
     samples = bamSamples
     downsample = None
+
+##filter sample dictionary by the subset of samples listed in the 'name' column of the sample sheet
+def filter_dict(sampleSheet):
+    f=open(sampleSheet,"r")
+    nameCol = None
+    nCols = None
+    names_sub=[]
+    for idx, line in enumerate(f):
+        cols = line.strip().split("\t")
+        if idx == 0:
+            nameCol = cols.index("name")
+            nCols = len(cols)
+            continue
+        elif idx == 1:
+            if len(cols) - 1 == nCols:
+                nameCol += 1
+        if not len(line.strip()) == 0:
+            names_sub.append(line.split('\t')[nameCol])      
+    f.close()
+    output_dict = dict(zip(names_sub, [""]*len(names_sub)))
+    return(output_dict)
+
+if sampleSheet:
+    filtered_dict = filter_dict(sampleSheet)

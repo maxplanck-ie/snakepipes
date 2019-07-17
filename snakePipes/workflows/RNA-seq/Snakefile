@@ -28,7 +28,11 @@ include: os.path.join(maindir, "shared", "rules", "filterGTF.snakefile")
 ## bamCoverage_RPKM
 include: os.path.join(maindir, "shared", "rules", "deepTools_RNA.snakefile")
 
-if not fromBAM:
+#umi_tools
+include: os.path.join(maindir, "shared", "rules", "umi_tools.snakefile")
+
+
+if not fromBam:
     ## FASTQ: either downsample FASTQ files or create symlinks to input files
     include: os.path.join(maindir, "shared", "rules", "FASTQ.snakefile")
 
@@ -132,9 +136,9 @@ def run_alignment_free():
         "Salmon/SalmonIndex/sa.bin",
         expand("Salmon/{sample}.quant.sf", sample=samples),
         expand("Salmon/{sample}.quant.genes.sf", sample=samples),
-        "Salmon/TPM.tsv",
+        "Salmon/TPM.transcripts.tsv",
         "Salmon/TPM.genes.tsv",
-        "Salmon/counts.tsv",
+        "Salmon/counts.transcripts.tsv",
         "Salmon/counts.genes.tsv",
         expand("Salmon/{sample}/abundance.h5", sample=samples) ]
 
@@ -153,8 +157,8 @@ def run_alignment():
     if "alignment" in mode:
         file_list = [
         "Sambamba/flagstat_report_all.tsv",
-        expand(aligner + "/{sample}.bam", sample = samples),
-        expand(aligner + "/{sample}.bam.bai", sample = samples),
+        expand("filtered_bam/{sample}.filtered.bam", sample = samples),
+        expand("filtered_bam/{sample}.filtered.bam.bai", sample = samples),
         expand("featureCounts/{sample}.counts.txt", sample=samples),
         "featureCounts/counts.tsv",
         "QC_report/QC_report_all.tsv"

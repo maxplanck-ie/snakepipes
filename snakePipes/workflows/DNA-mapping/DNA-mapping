@@ -16,10 +16,19 @@ import snakePipes.common_functions as cf
 import snakePipes.parserCommon as parserCommon
 
 
-def parse_args(defaults={"verbose": False, "configFile": None, "clusterConfigFile": None, "maxJobs": 5, "snakemakeOptions": "--use-conda", "tempDir": None,
-                         "mode": "mapping", "downsample": False, "trim": False, "trimmer": "cutadapt", "trimmerOptions": "", "fastqc": False,
-                         "qualimap": False, "dedup": False, "properPairs": False, "insertSizeMax": 1000, "gcbias": False, "reads": ["_R1", "_R2"],
-                         "bwBinSize": 25, "mapq": 0, "plotFormat": "png", "alignerOpts": "", "mateOrientation": "--fr"}):
+def parse_args(defaults={"verbose": False, "configFile": None,
+                         "clusterConfigFile": None, "maxJobs": 5,
+                         "snakemakeOptions": "--use-conda", "tempDir": None,
+                         "mode": "mapping", "downsample": False, "trim": False,
+                         "trimmer": "cutadapt", "trimmerOptions": "", "fastqc": False,
+                         "qualimap": False, "dedup": False,
+                         "properPairs": False, "insertSizeMax": 1000,
+                         "gcbias": False, "reads": ["_R1", "_R2"],
+                         "bwBinSize": 25, "mapq": 0, "plotFormat": "png",
+                         "alignerOpts": "", "mateOrientation": "--fr",
+                         "umidedup": False, "umidedup_opts": "",
+                         "umidedup_sep": "_", "umibarcode": False,
+                         "bcpattern": "", "mate_orientation": "--fr"}):
     """
     Parse arguments from the command line.
     """
@@ -39,8 +48,8 @@ def parse_args(defaults={"verbose": False, "configFile": None, "clusterConfigFil
     optional = parser.add_argument_group('Options')
     optional.add_argument("-m", "--mode",
                           dest="mode",
-                          help="workflow running modes (available: 'mapping, allelic-mapping')"
-                          " (default: '%(default)s')",
+                          help="workflow running modes (available: 'mapping,"
+                          "allelic-mapping')(default: '%(default)s')",
                           default=defaults["mode"])
 
     parserCommon.commonOptions(optional, defaults)
@@ -65,8 +74,9 @@ def parse_args(defaults={"verbose": False, "configFile": None, "clusterConfigFil
     optional.add_argument("--dedup",
                           dest="dedup",
                           action="store_true",
-                          help="retain only de-duplicated reads/read pairs (given single-/paired-end data), "
-                          "recommended for ChIP-seq data (default: '%(default)s')",
+                          help="retain only de-duplicated reads/read pairs "
+                          "(given single-/paired-end data), recommended for "
+                          "ChIP-seq data (default: '%(default)s')",
                           default=defaults["dedup"])
 
     optional.add_argument("--properPairs",
@@ -77,8 +87,10 @@ def parse_args(defaults={"verbose": False, "configFile": None, "clusterConfigFil
     optional.add_argument("--mapq",
                           dest="mapq",
                           metavar="INT",
-                          help="retain only reads with at least the given mapping quality. We recommend using"
-                          "mapq of 3 or more for ChIP-seq to remove all true multimapping reads. (default: '%(default)s')",
+                          help="retain only reads with at least the given "
+                          "mapping quality. We recommend using"
+                          "mapq of 3 or more for ChIP-seq to remove all true "
+                          "multimapping reads. (default: '%(default)s')",
                           type=int,
                           default=defaults["mapq"])
 
@@ -90,8 +102,10 @@ def parse_args(defaults={"verbose": False, "configFile": None, "clusterConfigFil
     optional.add_argument("--gcbias",
                           dest="gcbias",
                           action="store_true",
-                          help="run computeGCBias quality control (long runtime!). Note that "
-                          "gcbias analysis is skipped if downsampling is specified (default: '%(default)s')",
+                          help="run computeGCBias quality control "
+                          "(long runtime!). Note that gcbias analysis is "
+                          "skipped if downsampling is specified "
+                          "(default: '%(default)s')",
                           default=defaults["gcbias"])
 
     return parser
@@ -126,7 +140,9 @@ def main():
     filt = ""
     if args.dedup:
         filt += "-F 1024 "
-    if args.properPairs:
+        assert args.umidedup is False, "\nPlease use either --umidedup (UMI-tools dedup) or --dedup (via sambamba and samtools)!\n"
+        "should be called!"
+    if args.properpairs:
         filt += "-f 2 "
     if args.mapq is not None and args.mapq > 0:
         filt += "-q {} ".format(args.mapq)
@@ -146,6 +162,7 @@ def main():
     ## End workflow-specific clode
 
     # Handle YAML and log files
+
     snakemake_cmd = cf.commonYAMLandLogs(baseDir, workflowDir, defaults, args, __file__)
     logfile_name = cf.logAndExport(args, os.path.basename(__file__))
 

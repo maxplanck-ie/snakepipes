@@ -15,9 +15,17 @@ import snakePipes.common_functions as cf
 import snakePipes.parserCommon as parserCommon
 
 
-def parse_args(defaults={"verbose": False, "configFile": None, "clusterConfigFile": None, "maxJobs": 5, "snakemakeOptions": "--use-conda", "tempDir": None,
+def parse_args(defaults={"verbose": False, "configFile": None,
+                         "clusterConfigFile": None, "maxJobs": 5,
+                         "snakemakeOptions": "--use-conda", "tempDir": None,
                          "reads": ["_R1", "_R2"],
-                         "maxFragmentSize": 150, "minFragmentSize": 0, "fromBAM": "" ,"qval": 0.001 ,"sampleSheet": None, "bamExt": "filtered.bam"}):
+                         "maxFragmentSize": 150, "minFragmentSize": 0,
+                         "fromBAM": "" ,"qval": 0.001 ,"sampleSheet": None,
+                         "bamExt": "filtered.bam", "fdr": 0.05,
+                         "absBestLFC": 1, "umidedup": False,
+                         "umidedup_opts": "", "umidedup_sep": "_",
+                         "umibarcode": False, "bcpattern": ""}):
+
     """
     Parse arguments from the command line.
     """
@@ -60,6 +68,18 @@ def parse_args(defaults={"verbose": False, "configFile": None, "clusterConfigFil
                          dest="bamExt",
                          help=argparse.SUPPRESS,
                          default=defaults["bamExt"])
+
+    optional.add_argument("--FDR",
+                          dest="fdr",
+                          help="FDR threshold to apply for filtering DB regions"
+                               "(default: '%(default)s')",
+                          default=defaults["fdr"])
+
+    optional.add_argument("--LFC",
+                          dest="absBestLFC",
+                          help="Log fold change threshold to apply for filtering DB regions"
+                               "(default: '%(default)s')",
+                          default=defaults["absBestLFC"])
 
     return parser
 

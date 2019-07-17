@@ -15,6 +15,7 @@ import snakePipes.common_functions as cf
 import snakePipes.parserCommon as parserCommon
 
 
+<<<<<<< HEAD
 def minOne(x):
     """
     Ensure x is an integer >=1
@@ -35,11 +36,18 @@ def bounded01(x):
     return x
 
 
-def parse_args(defaults={"verbose": False, "configFile": None, "clusterConfigFile":None, "maxJobs": 12, "snakemakeOptions": "--use-conda", "tempDir": None,
-                         "downsample": None, "trim": True, "trimmer": "fastp", "trimmerOptions": "-q 5 -l 30 -M 5", "maxDist": 300, "minCpGs": 10, "minMethDiff": 0.1, "FDR": 0.1,
-                         "MethylDackelOptions": "--mergeContext --maxVariantFrac 0.25 --minDepth 4", "fastqc": False, 'bwBinSize': 25, 'plotFormat': 'png', "bamExt": '.bam',
-                         "reads": ["_R1", "_R2"], "DMRprograms": "metilene,dmrseq", "minCoverage": 5,
-                         "blacklist": None, "sampleSheet": None, "noAutoMethylationBias": False, "fromBAM": False, "skipDOC": False}):
+def parse_args(defaults={"verbose": False, "configFile": None,
+                         "clusterConfigFile":None, "maxJobs": 12,
+                         "snakemakeOptions": "--use-conda", "tempDir": None,
+                         "downsample": None, "trim": True, "trimmer": "fastp",
+                         "trimmerOptions": "-q 5 -l 30 -M 5", "maxDist": 300,
+                         "minCpGs": 10, "minMethDiff": 0.1, "FDR": 0.1,
+                         "MethylDackelOptions": "--mergeContext --maxVariantFrac 0.25 --minDepth 4",
+                         "fastqc": False, 'bwBinSize': 25, 'plotFormat': 'png',
+                         "bamExt": '.bam', "reads": ["_R1", "_R2"],
+                         "DMRprograms": "metilene,dmrseq", "minCoverage": 5,
+                         "blacklist": None, "sampleSheet": None,
+                         "noAutoMethylationBias": False, "fromBAM": False, "skipDOC": False}):
     """
     Parse arguments from the command line.
     """
@@ -57,7 +65,6 @@ def parse_args(defaults={"verbose": False, "configFile": None, "clusterConfigFil
     optional = parser.add_argument_group('Options')
 
     parserCommon.commonOptions(optional, defaults)
-
 
     optional.add_argument("--blacklist",
                           dest="blacklist",
@@ -119,6 +126,11 @@ def parse_args(defaults={"verbose": False, "configFile": None, "clusterConfigFil
                           help="If a sample sheet is provided, use the specified DMR-calling programs. Multiple programs can be comma-separated with no spaces (e.g., 'metilene,dmrseq,dss'). The available programs are metilene, dmrseq, and DSS (note that this is very slow). Default: %(default)s.",
                           default=defaults["DMRprograms"])
 
+    optional.add_argument("--fromBamExt",
+                         dest="bam_ext",
+                         help=argparse.SUPPRESS,
+                         default=defaults["bam_ext"])
+
     optional.add_argument("--skipDOC",
                          action="store_true",
                          help="Skip depth of coverage calculation with deepTools.",default=defaults["skipDOC"])
@@ -126,6 +138,37 @@ def parse_args(defaults={"verbose": False, "configFile": None, "clusterConfigFil
     optional.add_argument("--GCbias",
                          action="store_true",
                          help="Perform GC bias calculation with deepTools.")
+
+    optional.add_argument("--umibc",
+                          dest="umibarcode",
+                          action="store_true",
+                          help="To extract umi barcode from fastq file."
+                          "(default: '%(default)s')",
+                          default=defaults["umibarcode"])
+
+    optional.add_argument("--bcpattern",
+                         dest="bcpattern",
+                         help="The pattern to be considered for the barcode."
+                         "(default: '%(default)s')",
+                         default=defaults["bcpattern"])
+
+    optional.add_argument("--umidedup",
+                         dest="umidedup",
+                         action="store_true",
+                         help="To run `umi_tools dedup`."
+                         "(default: '%(default)s')",
+                         default=defaults["umidedup"])
+
+    optional.add_argument("--umidedup_sep",
+                         help="umi separation character "
+                         "that will be passed to umi_tools."
+                         "(default: '%(default)s')",
+                         default=defaults["umidedup_sep"])
+
+    optional.add_argument("--umidedup_opts",
+                         help="Options that will be passed to umi_tools."
+                         "(default: '%(default)s')",
+                         default=defaults["umidedup_opts"])
 
     return parser
 
@@ -137,7 +180,6 @@ def main():
     parser = parse_args(defaults)
     args = parser.parse_args()
     args, defaults = cf.handleUserArgs(args, defaults, parse_args)
-
     # we also add these paths to config, although we don't use them in the Snakefile
     args.baseDir = baseDir
 

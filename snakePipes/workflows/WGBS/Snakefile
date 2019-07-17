@@ -104,7 +104,9 @@ def run_deeptools(GCbias):
 ### include modules of other snakefiles ########################################
 ##some rules depend on the definitions above
 ################################################################################
-if not fromBAM:
+if not fromBam:
+    #umi_tools
+    include: os.path.join(maindir, "shared", "rules", "umi_tools.snakefile")
     # FASTQ: either downsample FASTQ files or create symlinks to input files
     include: os.path.join(maindir, "shared", "rules", "FASTQ.snakefile")
 

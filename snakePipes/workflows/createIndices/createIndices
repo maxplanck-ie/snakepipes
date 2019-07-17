@@ -16,7 +16,9 @@ import snakePipes.common_functions as cf
 import snakePipes.parserCommon as parserCommon
 
 
-def parse_args(defaults={"configFile": None, "clusterConfigFile": None, "maxJobs": 5, "snakemakeOptions": "--use-conda", "tempDir": None, "verbose": False}):
+def parse_args(defaults={"configFile": None, "clusterConfigFile": None,
+                         "maxJobs": 5, "snakemakeOptions": "--use-conda",
+                         "tempDir": None, "verbose": False}):
     """
     Parse arguments from the command line.
     """
@@ -40,7 +42,7 @@ def parse_args(defaults={"configFile": None, "clusterConfigFile": None, "maxJobs
 
     required.add_argument("--gtfURL",
                           help="URL or local path to where the genome annotation in GTF format is located. GFF is NOT supported. The file may optionally be gzipped. If this file is not specified, then RNA-seq related tools will NOT be usable.")
-    
+
     # Workflow options
     optional = parser.add_argument_group('Options')
     optional.add_argument("--tools",

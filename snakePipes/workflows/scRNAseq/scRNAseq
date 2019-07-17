@@ -16,11 +16,17 @@ import snakePipes.common_functions as cf
 import snakePipes.parserCommon as parserCommon
 
 
-def parse_args(defaults={"verbose": False, "configFile": None, "clusterConfigFile": None, "maxJobs": 5, "snakemakeOptions": "--use-conda", "tempDir": None,
-                         "downsample": False, "trim": False, "trimmerOptions": "-a A{'30'}", "cell_names": None, "alignerOptions": "--outBAMsortingBinsN 30 --twopassMode Basic",
-                         "filterGTF": "-v -P 'decay|pseudogene' ", "barcode_file": None, "barcode_pattern": "NNNNNNXXXXXX", "split_lib": False,
-                         "reads": ["_R1", "_R2"],
-                         "bwBinSize": 10, "plotFormat": "png", "cell_filter_metric": "gene_universe", "skipRaceID": False}):
+def parse_args(defaults={"verbose": False, "configFile": None,
+                         "clusterConfigFile": None, "maxJobs": 5,
+                         "snakemakeOptions": "--use-conda", "tempdir": None,
+                         "downsample": False, "trim": False,
+                         "trimOptions": "-a A{'30'}", "cell_names": None,
+                         "alignerOptions": "--outBAMsortingBinsN 30 --twopassMode Basic",
+                         "filterGTF": "-v -P 'decay|pseudogene' ",
+                         "barcode_file": None, "split_lib": False,
+                         "barcode_pattern": "NNNNNNXXXXXX", "bwBinSize": 10,
+                         "plotFormat": "png", "skipRaceID": False,
+                         "cell_filter_metric": "gene_universe"}):
     """
     Parse arguments from the command line.
     """

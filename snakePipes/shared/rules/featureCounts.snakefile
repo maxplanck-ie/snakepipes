@@ -3,7 +3,7 @@
 
 rule featureCounts:
     input:
-        bam = aligner + "/{sample}.bam",
+        bam = "filtered_bam/{sample}.filtered.bam",
         gtf = "Annotation/genes.filtered.gtf",
     output:
         "featureCounts/{sample}.counts.txt"

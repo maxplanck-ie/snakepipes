@@ -9,7 +9,7 @@ rule samtools_filter:
         aligner+"/{sample}.bam",
         "filter_rules"
     output:
-        bam = "filtered_bam/{sample}.filtered.bam"
+        bam = temp("filtered_bam/{sample}.filtered.tmp.bam")
     params:
         dedup = dedup,
         properPairs = properPairs,
@@ -35,10 +35,10 @@ rule samtools_filter:
 
 
 ### samtools_index #############################################################
-rule samtools_index_filtered:
+rule samtools_index_tmp_filtered:
     input:
-        "filtered_bam/{sample}.filtered.bam"
+        "filtered_bam/{sample}.filtered.tmp.bam"
     output:
-        "filtered_bam/{sample}.filtered.bam.bai"
+        temp("filtered_bam/{sample}.filtered.tmp.bam.bai")
     conda: CONDA_SHARED_ENV
     shell: "samtools index {input}"

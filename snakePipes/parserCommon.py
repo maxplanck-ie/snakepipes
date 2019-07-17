@@ -206,6 +206,37 @@ def commonOptions(grp, defaults, bw=True, plots=True):
                      help="Run FastQC read quality control (default: '%(default)s')",
                      default=defaults["fastqc"])
 
+    grp.add_argument("--bcExtract",
+                     dest="umibarcode",
+                     action="store_true",
+                     help="To extract umi barcode from fastq file via UMI-tools and add it to the read name "
+                     "(default: '%(default)s')",
+                     default=defaults["umibarcode"])
+
+    grp.add_argument("--bcPattern",
+                     dest="bcpattern",
+                     help="The pattern to be considered for the barcode. 'N' = UMI position (required) 'C' = barcode position (optional) "
+                     "(default: '%(default)s')",
+                     default=defaults["bcpattern"])
+
+    grp.add_argument("--umidedup",
+                     dest="umidedup",
+                     action="store_true",
+                     help="Deduplicate bam file based on UMIs via `umi_tools dedup` that are present in the read name. "
+                     "(default: '%(default)s')",
+                     default=defaults["umidedup"])
+
+    grp.add_argument("--umidedup_sep",
+                     help="umi separation character "
+                     "that will be passed to umi_tools."
+                     "(default: '%(default)s')",
+                     default=defaults["umidedup_sep"])
+
+    grp.add_argument("--umidedup_opts",
+                     help="Additional options that will be passed to umi_tools."
+                     "(default: '%(default)s')",
+                     default=defaults["umidedup_opts"])
+
     if bw:
         grp.add_argument("--bw-binsize",
                          dest="bwBinSize",

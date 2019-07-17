@@ -38,6 +38,11 @@ windowSize: 150
 bamExt: '.filtered.bam'
 fromBAM:
 plotFormat: png
+##dummy string to skip filtering annotation
+filter_annotation:
+##parameters to filter DB regions on
+fdr: 0.05
+absBestLFC: 1
 ################################################################################
 # Call snakemake directly, i.e. without using the wrapper script:
 #

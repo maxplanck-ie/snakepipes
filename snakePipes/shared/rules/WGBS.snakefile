@@ -9,7 +9,7 @@ if fromBAM:
         input:
             indir + "/{sample}" + bamExt
         output:
-            "bwameth/{sample}.markdup.bam"
+            "bwameth/{sample}"+bam_ext
         shell:
             "( [ -f {output} ] || ln -s -r {input} {output} ) "
 
@@ -65,7 +65,6 @@ else:
 	        samtools sort -T "$MYTEMP/{wildcards.sample}" -m 3G -@ 4 -o "{output.sbam}"
             rm -rf "$MYTEMP"
             """
-
 
 rule index_bam:
     input:

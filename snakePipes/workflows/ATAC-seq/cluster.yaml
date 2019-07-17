@@ -3,4 +3,6 @@ ATAC_qc:
 MACS2:
     memory: 8G
 CSAW:
-    memory: 4G
+    memory: 30G
+plot_heatmap_cov_CSAW:
+    memory: 5G

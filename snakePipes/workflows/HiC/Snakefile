@@ -30,6 +30,9 @@ if fastqc:
 if trim:
     include: os.path.join(maindir, "shared", "rules", "trimming.snakefile")
 
+#umi_tools
+include: os.path.join(maindir, "shared", "rules", "umi_tools.snakefile")
+
 # HiCExplorer
 include: os.path.join(maindir, "shared", "rules", "hicexplorer.snakefile")
 
@@ -124,7 +127,7 @@ onstart:
         print("$TMPDIR: ",os.getenv('TMPDIR', ""))
         print("$HOSTNAME: ",os.getenv('HOSTNAME', ""))
         print("-" * 80, "\n")
-        print(smaple_dict)
+        print(sample_dict)
 ### main rule ##################################################################
 ################################################################################
 localrules: FASTQ1, FASTQ2

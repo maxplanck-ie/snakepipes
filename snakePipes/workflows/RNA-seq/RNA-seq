@@ -16,12 +16,23 @@ import snakePipes.common_functions as cf
 import snakePipes.parserCommon as parserCommon
 
 
-def parse_args(defaults={"verbose": False, "configFile": None, "clusterConfigFile": None, "maxJobs": 5, "snakemakeOptions": "--use-conda", "tempDir": None,
-                         "mode": "alignment,deepTools_qc", "downsample": False, "trim": False, "trimmer": "cutadapt", "trimmerOptions": None, "fastqc": False,
-                         "libraryType": 2, "aligner": "STAR", "alignerOptions": None, "salmonIndexOptions": "--type quasi -k 31",
-                         "featureCountsOptions": "-C -Q 10 --primary", "filterGTF": None, "sampleSheet": None,
+<<<<<<< HEAD
+def parse_args(defaults={"verbose": False, "configFile": None,
+                         "clusterConfigFile": None, "maxJobs": 5,
+                         "snakemakeOptions": "--use-conda", "tempDir": None,
+                         "mode": "alignment,deepTools_qc", "downsample": False,
+                         "trim": False, "trimmer": "cutadapt",
+                         "trimmerOptions": None, "fastqc": False,
+                         "libraryType": 2, "aligner": "STAR",
+                         "alignerOptions": None, "salmonIndexOptions": "--type quasi -k 31",
+                         "featureCountsOptions": "-C -Q 10 --primary",
+                         "filterGTF": None, "sampleSheet": None,
                          "reads": ["_R1", "_R2"],
-                         "bwBinSize": 25, "dnaContam": False, "plotFormat": "png","fromBAM": False, "paired": True}):
+                         "bwBinSize": 25, "dnaContam": False, "plotFormat": "png",
+                         "fromBAM": False, "paired": True,
+                         "umidedup": False,
+                         "umidedup_opts": "", "bcpattern": "",
+                         "umidedup_sep": "_", "umibarcode": False}):
     """
     Parse arguments from the command line.
     """
@@ -128,11 +139,13 @@ def main():
     for mode in modeTemp:
         if mode not in validModes:
             sys.exit("{} is not a valid mode!\n".format(mode))
-    if args.fromBAM and ("alignment-free" in modeTemp or "allelic-mapping" in modeTemp):
-        sys.exit("\n--fromBAM can only be used with modes \'alignment\' or \'deepTools_qc\' - use one of these modes or provide fastq files!\n")  
-    if args.fromBAM:
-        args.aligner = "EXTERNAL_BAM"
-            
+    if "alignment" not in modeTemp and args.umidedup:
+        sys.exit("umidedup is only valid for \"alignment\" mode!\n")
+    if args.fromBam and ("alignment-free" in modeTemp or "allelic-mapping" in modeTemp):
+        sys.exit("\n--fromBam can only be used with modes \'alignment\' or \'deepTools_qc\' - use one of these modes or provide fastq files!\n")
+    if args.fromBam:
+        args.mapping_prg = "EXTERNAL_BAM"
+
     ## End workflow-specific checks
 
     # Handle YAML and log files
