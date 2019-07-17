@@ -142,7 +142,7 @@ def main():
         filt += "-F 1024 "
         assert args.umidedup is False, "\nPlease use either --umidedup (UMI-tools dedup) or --dedup (via sambamba and samtools)!\n"
         "should be called!"
-    if args.properpairs:
+    if args.properPairs:
         filt += "-f 2 "
     if args.mapq is not None and args.mapq > 0:
         filt += "-q {} ".format(args.mapq)
