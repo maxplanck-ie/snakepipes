@@ -47,9 +47,11 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          "DMRprograms": "metilene,dmrseq", "minCoverage": 5,
                          "blacklist": None, "sampleSheet": None,
                          "noAutoMethylationBias": False, "fromBAM": False, "skipDOC": False,
-                         "umidedup_opts": "",
+                         "umidedup": False,
+                         "umidedup_opts": "", "bcpattern": "",
                          "umidedup_sep": "_", "umibarcode": False,
                          "bcpattern": "", "mate_orientation": "--fr"}):
+
     """
     Parse arguments from the command line.
     """
