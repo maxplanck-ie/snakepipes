@@ -15,7 +15,6 @@ import snakePipes.common_functions as cf
 import snakePipes.parserCommon as parserCommon
 
 
-<<<<<<< HEAD
 def minOne(x):
     """
     Ensure x is an integer >=1
