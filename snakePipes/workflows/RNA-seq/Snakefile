@@ -32,7 +32,7 @@ include: os.path.join(maindir, "shared", "rules", "deepTools_RNA.snakefile")
 include: os.path.join(maindir, "shared", "rules", "umi_tools.snakefile")
 
 
-if not fromBam:
+if not fromBAM:
     ## FASTQ: either downsample FASTQ files or create symlinks to input files
     include: os.path.join(maindir, "shared", "rules", "FASTQ.snakefile")
 
@@ -110,8 +110,11 @@ include: os.path.join(maindir, "shared", "rules", "multiQC.snakefile")
 ### conditional/optional rules #################################################
 ################################################################################
 def run_FastQC(fastqc):
+    readsUse = reads
+    if not paired:
+        readsUse = [reads[0]]
     if fastqc:
-        return( expand("FastQC/{sample}{read}_fastqc.html", sample = samples, read = reads) )
+        return( expand("FastQC/{sample}{read}_fastqc.html", sample = samples, read = readsUse) )
     else:
         return([])
 
