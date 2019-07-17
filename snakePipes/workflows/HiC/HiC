@@ -16,7 +16,6 @@ import snakePipes.common_functions as cf
 import snakePipes.parserCommon as parserCommon
 
 
-<<<<<<< HEAD
 def parse_args(defaults={"verbose": False, "configFile": None,
                          "clusterConfigFile": None, "maxJobs": 5,
                          "snakemakeOptions": "--use-conda", "tempDir": None,
