@@ -128,7 +128,6 @@ onstart:
         print("$HOSTNAME: ",os.getenv('HOSTNAME', ""))
         print("-" * 80, "\n")
         print(sample_dict)
-        print(correctionMethod)
 ### main rule ##################################################################
 ################################################################################
 localrules: FASTQ1, FASTQ2
