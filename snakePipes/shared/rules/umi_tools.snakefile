@@ -78,15 +78,26 @@ if umidedup:
             {params.umitools_paired} {params.umitools_options}
             """
 else:
-    rule filter_reads:
-        input:
-            bamfile = "filtered_bam/{sample}.filtered.tmp.bam" if mapping_prg == "Bowtie2" else mapping_prg+"/{sample}.bam",
-        output:
-            bamfile = "filtered_bam/{sample}.filtered.bam"
-        conda: CONDA_SHARED_ENV
-        shell: """
-            mv {input.bamfile} {output.bamfile}
-            """
+    if pipeline == "dna-mapping":
+        rule filter_reads:
+            input:
+                bamfile = "filtered_bam/{sample}.filtered.tmp.bam"
+            output:
+                bamfile = "filtered_bam/{sample}.filtered.bam"
+            conda: CONDA_SHARED_ENV
+            shell: """
+                   mv {input.bamfile} {output.bamfile}
+                   """
+        else:
+            rule filter_reads:
+                input:
+                    bamfile = mapping_prg+"/{sample}.bam"
+                output:
+                    bamfile = "filtered_bam/{sample}.filtered.bam"
+                conda: CONDA_SHARED_ENV
+                shell: """
+                       ln -s {input.bamfile} {output.bamfile}
+                       """
 
 rule samtools_index_filtered:
     input:
