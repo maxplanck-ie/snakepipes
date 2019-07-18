@@ -85,7 +85,7 @@ else:
             bamfile = "filtered_bam/{sample}.filtered.bam"
         conda: CONDA_SHARED_ENV
         shell: """
-            ln -s -r {input.bamfile} {output.bamfile}
+            mv {input.bamfile} {output.bamfile}
             """
 
 rule samtools_index_filtered:

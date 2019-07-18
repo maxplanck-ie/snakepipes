@@ -52,7 +52,7 @@ properpairs: false
 mate_orientation: --fr
 ## other Bowtie2 stuff
 insert_size_max: 1000
-bowtie_opts:
+bowtie_opts: --rg CN:mpi-ie_deep_sequencing_unit
 umibarcode: False
 bcpattern: NNNNCCCCCCCC #default: 4 base umi barcode, 8 base cell barcode (eg. RELACS barcode)
 umidedup: False
