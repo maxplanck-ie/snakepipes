@@ -88,16 +88,16 @@ else:
             shell: """
                    mv {input.bamfile} {output.bamfile}
                    """
-        else:
-            rule filter_reads:
-                input:
-                    bamfile = mapping_prg+"/{sample}.bam"
-                output:
-                    bamfile = "filtered_bam/{sample}.filtered.bam"
-                conda: CONDA_SHARED_ENV
-                shell: """
-                       ln -s {input.bamfile} {output.bamfile}
-                       """
+    else:
+        rule filter_reads:
+            input:
+                bamfile = mapping_prg+"/{sample}.bam"
+            output:
+                bamfile = "filtered_bam/{sample}.filtered.bam"
+            conda: CONDA_SHARED_ENV
+            shell: """
+                   ln -s {input.bamfile} {output.bamfile}
+                   """
 
 rule samtools_index_filtered:
     input:
