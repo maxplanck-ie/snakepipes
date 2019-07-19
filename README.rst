@@ -18,6 +18,9 @@ snakePipes
 snakePipes are flexible and powerful workflows built using `snakemake <snakemake.readthedocs.io>`__ that simplify the analysis of NGS data.
 
 .. image:: ./docs/content/images/snakePipes_small.png
+   :scale: 20 %
+   :width: 100 px
+   :height: 100 px
    :align: right
 
 Workflows available
@@ -74,7 +77,7 @@ Citation
 
 If you adopt/run snakePipes for your analysis, cite it as follows :
 
-Bhardwaj, Vivek, Steffen Heyne, Katarzyna Sikora, Leily Rabbani, Michael Rauer, Fabian Kilpert, Andreas S. Richter, Devon P. Ryan, and Thomas Manke. 2019. “snakePipes: Facilitating Flexible, Scalable and Integrative Epigenomic Analysis.” Bioinformatics , May. `doi:10.1093/bioinformatics/btz436.<https://doi.org/10.1093/bioinformatics/btz436>`__
+Bhardwaj, Vivek, Steffen Heyne, Katarzyna Sikora, Leily Rabbani, Michael Rauer, Fabian Kilpert, Andreas S. Richter, Devon P. Ryan, and Thomas Manke. 2019. “snakePipes: Facilitating Flexible, Scalable and Integrative Epigenomic Analysis.” Bioinformatics , May. `doi:10.1093/bioinformatics/btz436 <https://doi.org/10.1093/bioinformatics/btz436>`__
 
 Note
 -------------
