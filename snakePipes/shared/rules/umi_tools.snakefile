@@ -78,7 +78,7 @@ if umidedup:
             {params.umitools_paired} {params.umitools_options}
             """
 else:
-    if pipeline == "dna-mapping":
+    if mapping_prg == "Bowtie2":
         rule filter_reads:
             input:
                 bamfile = "filtered_bam/{sample}.filtered.tmp.bam"
