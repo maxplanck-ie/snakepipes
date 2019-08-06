@@ -1,6 +1,11 @@
 snakePipes News
 ===============
 
+snakePipes 1.3.3
+----------------
+
+ * Updated citation for snakePipes
+
 snakePipes 1.2.2
 ----------------
 
