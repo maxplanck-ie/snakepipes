@@ -6,6 +6,7 @@ snakePipes 1.3.3
 
  * Updated citation for snakePipes
  * Fixed replicate check for samples with trailing spaces in names
+ * Fixed input filtering in CSAW
 
 snakePipes 1.2.2
 ----------------
