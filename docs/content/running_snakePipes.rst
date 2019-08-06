@@ -87,13 +87,13 @@ All of the snakePipes workflows that begin with a FASTQ file, perform the same p
 
 * **FastQC** (optional): If ``--fastqc`` is specified, the ``FASTQC`` rule would run `FastQC <https://www.bioinformatics.babraham.ac.uk/projects/fastqc/>`__ on the input files and store the output under ``FastQC`` folder. If trimming is specified, FastQC is always produced on trimmed files, and stored under ``FastQC_trimmed`` folder.
 
-* **--snakemake_options**: All wrappers contain a ``--snakemake_options`` parameter, which is quite useful as it can be used to pass on any arguments directly to snakemake. One use case is to perform a *dry run*, i.e. to check which programs would be executed and which outputs would be created by the workflow, without actually running it. This can be executed via ``--snakemake_options -np``. This would also print the commands to be used during the run.
+* **--snakemakeOptions**: All wrappers contain a ``--snakemakeOptions`` parameter, which is quite useful as it can be used to pass on any arguments directly to snakemake. One use case is to perform a *dry run*, i.e. to check which programs would be executed and which outputs would be created by the workflow, without actually running it. This can be executed via ``--snakemakeOptions="-np"``. This would also print the commands to be used during the run.
 
 * **--DAG**: All workflows can produce a `directed acyclic graph <https://en.wikipedia.org/wiki/Directed_acyclic_graph>`__ of themselves, using the ``--DAG`` option in the wrappers. This could be useful in reporting/presenting the results.
 
 * **--keepTemp**: This option control temporary/intermediate files are to be kept after the workflow is finished. Normally the temporary files are removed after analysis.
 
-* **--bw_binsize**: This option is available for most workflows, and refers to the bin size used to create the coverage files. `BigWig files <https://genome.ucsc.edu/goldenpath/help/bigWig.html>`__ are created by most workflows in order to allow downstream analysis and visualization of outputs. This argument controls the size of the bins in which the genome is divided for creating this file. The default is sufficient for most analysis.
+* **--bwBinSize**: This option is available for most workflows, and refers to the bin size used to create the coverage files. `BigWig files <https://genome.ucsc.edu/goldenpath/help/bigWig.html>`__ are created by most workflows in order to allow downstream analysis and visualization of outputs. This argument controls the size of the bins in which the genome is divided for creating this file. The default is sufficient for most analysis.
 
 * **Temporary directory/files**: Some tools need additonal space during runtime (eg. ``samtools sort -T [DIR] ...``). SnakePipes uses the core tool ``mktemp`` to create temporary directories in some rules. On Linux-based systems the global env variabale ``$TMPDIR`` is honored.
   On Mac OS and if $TMPDIR is empty, we fallback to `/tmp/` as the parent temporary directory. For performance reasons, it is recommended that the $TMPDIR points to a local drive (and not eg. an NFS share). Please make sure there is enough space! 

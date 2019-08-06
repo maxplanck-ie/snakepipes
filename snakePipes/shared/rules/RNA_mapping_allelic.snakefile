@@ -2,7 +2,7 @@
 
 
 ## allelic mapping using STAR
-if mapping_prg == "STAR":
+if aligner == "STAR":
     if paired:
         rule STAR_allele:
             input:
@@ -10,22 +10,22 @@ if mapping_prg == "STAR":
                 r2 = fastq_dir+"/{sample}"+reads[1]+".fastq.gz",
                 index = star_index_allelic
             output:
-                temp(mapping_prg+"/{sample}.sorted.bam")
+                temp(aligner+"/{sample}.sorted.bam")
             params:
-                star_options = str(star_options or ''),
+                alignerOptions = str(alignerOptions or ''),
                 gtf = genes_gtf,
-                prefix = mapping_prg+"/{sample}/{sample}.",
+                prefix = aligner+"/{sample}/{sample}.",
                 samsort_memory = '2G',
                 idx = os.path.dirname(star_index_allelic),
-                sample_dir = mapping_prg+"/{sample}"
+                sample_dir = aligner+"/{sample}"
             benchmark:
-                mapping_prg+"/.benchmark/STAR.{sample}.benchmark"
+                aligner+"/.benchmark/STAR.{sample}.benchmark"
             threads: 12
             conda: CONDA_RNASEQ_ENV
             shell: """
                 MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX);
                 ( [ -d {params.sample_dir} ] || mkdir -p {params.sample_dir} )
-                STAR {params.star_options} \
+                STAR {params.alignerOptions} \
                     --runThreadN {threads} \
                     --genomeDir {params.idx} \
                     --sjdbGTFfile {params.gtf} \
@@ -54,22 +54,22 @@ if mapping_prg == "STAR":
                 r1 = fastq_dir+"/{sample}.fastq.gz",
                 index = star_index_allelic
             output:
-                temp(mapping_prg+"/{sample}.sorted.bam")
+                temp(aligner+"/{sample}.sorted.bam")
             params:
-                star_options = str(star_options or ''),
+                alignerOptions = str(alignerOptions or ''),
                 gtf = genes_gtf,
                 idx = os.path.dirname(star_index_allelic),
-                prefix = mapping_prg+"/{sample}/{sample}.",
+                prefix = aligner+"/{sample}/{sample}.",
                 samsort_memory = '2G',
-                sample_dir = mapping_prg+"/{sample}"
+                sample_dir = aligner+"/{sample}"
             benchmark:
-                mapping_prg+"/.benchmark/STAR.{sample}.benchmark"
+                aligner+"/.benchmark/STAR.{sample}.benchmark"
             threads: 12
             conda: CONDA_RNASEQ_ENV
             shell: """
                 MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX);
                 ( [ -d {params.sample_dir} ] || mkdir -p {params.sample_dir} )
-                STAR {params.star_options} \
+                STAR {params.alignerOptions} \
                     --runThreadN {threads} \
                     --genomeDir {params.idx} \
                     --sjdbGTFfile {params.gtf} \

@@ -7,10 +7,10 @@ rule bamCompare_subtract:
     output:
         "deepTools_ATAC/bamCompare/{sample}.filtered.bw"
     params:
-        bw_binsize = bw_binsize,
+        bwBinSize = bwBinSize,
         genome_size = genome_size,
-        ignoreForNorm = "--ignoreForNormalization {}".format(ignore_forNorm) if ignore_forNorm else "",
-        read_extension = "--extendReads" if paired else "--extendReads {}".format(fragment_length),
+        ignoreForNorm = "--ignoreForNormalization {}".format(ignoreForNormalization) if ignoreForNormalization else "",
+        read_extension = "--extendReads" if paired else "--extendReads {}".format(fragmentLength),
         blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed else ""
     log:
         out = "deepTools_ATAC/logs/bamCompare.{sample}.filtered.out",

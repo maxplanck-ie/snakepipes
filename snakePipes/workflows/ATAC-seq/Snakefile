@@ -27,7 +27,7 @@ include: os.path.join(workflow.basedir, "internals.snakefile")
 # Import deeptools cmds
 include: os.path.join(maindir, "shared", "tools", "deeptools_cmds.snakefile")
 
-if fromBam:
+if fromBAM:
     include: os.path.join(maindir, "shared", "rules", "LinkBam.snakefile")
     include: os.path.join(maindir, "shared", "rules", "deepTools_qc.snakefile")
 
@@ -52,7 +52,6 @@ else:
 # needs a "ChIP-sample" variable, here all samples are ChIP-Samples
 chip_samples = samples
 paired = True
-#fragment_length = cf.get_fragment_length("deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv", chip_samples[0])
 if sampleSheet:
     include: os.path.join(maindir, "shared", "rules", "CSAW.snakefile")
     include: os.path.join(maindir, "shared", "rules", "nearestGene.snakefile")
@@ -76,9 +75,9 @@ def run_CSAW():
     else:
         return([])
 
-def run_deepTools_qc(fromBam):
+def run_deepTools_qc(fromBAM):
     file_list = []
-    if fromBam:
+    if fromBAM:
         file_list = ["deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv"]
         file_list.append([expand("bamCoverage/{sample}.filtered.seq_depth_norm.bw", sample = samples)])
         if len(samples) <= 20:
@@ -116,7 +115,7 @@ onstart:
         print("Gene annotation BED:", genes_bed)
         print("Gene annotation GTF:", genes_gtf)
         print("Blacklist regions BED:", blacklist_bed)
-        print("Ignore for normalization (bigwigs):", ignore_forNorm)
+        print("Ignore for normalization (bigwigs):", ignoreForNormalization)
         print("-" * 80, "\n")
 
 ### main rule ##################################################################
@@ -140,7 +139,7 @@ rule all:
         ## run csaw if asked for
         run_CSAW(),
         expand("deepTools_ATAC/bamCompare/{sample}.filtered.bw",sample=samples),
-        run_deepTools_qc(fromBam),
+        run_deepTools_qc(fromBAM),
         expand(os.path.join(outdir_MACS2, "{sample}.short.cleaned.bam"),sample=samples),
         expand(os.path.join(outdir_MACS2, "{sample}.short.cleaned.bam.bai"),sample=samples),
         "Filtering_metrics/Filtering_report.html"

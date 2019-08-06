@@ -4,7 +4,7 @@
 # In order to adjust some parameters, please either use the wrapper script
 # (eg. /path/to/snakemake_workflows/workflows/WGBS/WGBS)
 # or save a copy of this file, modify necessary parameters and then provide
-# this file to the wrapper or snakemake via '--configfile' option
+# this file to the wrapper or snakemake via '--configFile' option
 # (see below how to call the snakefile directly)
 #
 # Own parameters will be loaded during snakefile executiuon as well and hence
@@ -12,27 +12,20 @@
 ################################################################################
 ## General/Snakemake parameters, only used/set by wrapper or in Snakemake cmdl, but not in Snakefile
 outdir:
-configfile:
-cluster_configfile:
+configFile:
+clusterConfigFile:
 local: False
-max_jobs: 12
-nthreads: 8
+maxJobs: 12
 ## directory with fastq or bam files
 indir:
-## directory with fastqc files for auto quality trimming
-fqcin:
 ## Genome information
 genome:
-convrefpath:
-convRef: False
-###list of bed files to process
-intList: []
 ###SNP black list (bed file)
-blackList:
+blacklist:
 ###sample Sheet
 sampleSheet:
 ###inclusion bounds for methylation extraction
-mbias_ignore: auto
+noAutoMethylationBias: False
 ## FASTQ file extension (default: ".fastq.gz")
 ext: '.fastq.gz'
 ## paired-end read name extension (default: ['_R1', "_R2"])
@@ -40,41 +33,47 @@ reads: [_R1, _R2]
 ## Number of reads to downsample from each FASTQ file
 downsample:
 ## Options for trimming
-trimReads: 'user'
-adapterSeq: AGATCGGAAGAGC
-nextera: False
-trimThreshold: 10
-trimOtherArgs: ""
+trim: False
+trimmer: 'fastp'
+trimmerOptions: '-q 5 -l 30 -M 5'
+## Bin size of output files in bigWig format
+bwBinSize: 25
+## Run FASTQC read quality control
+fastqc: false
 verbose: False
+plotFormat: 'png'
 #### Flag to control the pipeline entry point
-fromBam: False
-bam_ext: '.PCRrm.bam'
+fromBAM: False
+bamExt: '.bam'
+paired: True
 ###Flags to control skipping of certain QC calculations
 skipDOC: False
-skipGCbias: False
-###Metilene DMR calling parameters:
+GCbias: False
+###Thresholds for filtering of statistical comparisons (DMRs and DMLs)
+DMRprograms: 'metilene,dmrseq'
 maxDist: 300
 minCpGs: 10
-minMethDiff: 0
-###Thresholds for filtering of statistical comparisons:
-minAbsDiff: 0.2
-FDR: 0.02
+minCoverage: 5
+FDR: 0.1
+minMethDiff: 0.1
+###MethylDackel options
+MethylDackelOptions: '--mergeContext --maxVariantFrac 0.25 --minDepth 4'
 ##umi_tools
 umibarcode: False
 bcpattern: NNNNCCCCCCCCC #default: 4 base umi barcode, 9 base cell barcode (eg. RELACS barcode)
 umidedup: False
 umidedup_sep: "_"
 umidedup_opts: --paired
-mapping_prg: bwameth
+aligner: bwameth
 ################################################################################
 # Call snakemake directly, i.e. without using the wrapper script:
 #
 # Please save a copy of this config yaml file and provide an adjusted config
-# via '--configfile' parameter!
+# via '--configFile' parameter!
 # example call:
 #
 # snakemake --snakefile /path/to/snakemake_workflows/workflows/WGBS/Snakefile
-#           --configfile /path/to/snakemake_workflows/workflows/WGBS/defaults.yaml
+#           --configFile /path/to/snakemake_workflows/workflows/WGBS/defaults.yaml
 #           --directory /path/to/outputdir
 #           --cores 32
 ################################################################################

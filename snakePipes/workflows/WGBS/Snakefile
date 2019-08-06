@@ -15,160 +15,96 @@ workflow_rscripts=os.path.join(maindir, "shared", "rscripts")
 globals().update(cf.set_env_yamls())
 
 # load config file
-globals().update(cf.load_configfile(workflow.overwrite_configfile,config["verbose"]))
-if not convRef:
-    # load organism-specific data, i.e. genome indices, annotation, etc.
-    globals().update(cf.load_organism_data(genome,maindir,config["verbose"]))
-    refG=genome_fasta
-    crefG=bwameth_index
-else:
-    refG=genome
-    crefG=os.path.join('aux_files',os.path.basename(refG))
+globals().update(cf.load_configfile(workflow.overwrite_configfile, config["verbose"]))
+# load organism-specific data, i.e. genome indices, annotation, etc.
+globals().update(cf.load_organism_data(genome, maindir, config["verbose"]))
 
-###switch off read trimming rules if bam input provided ## this might be moved to a more useful location in the future
-if trimReads=='None':
-    trimReads=None
+# do workflow specific stuff now
+include: os.path.join(workflow.basedir, "internals.snakefile")
 
-if fromBam:
-    trimReads=None
+### include modules of other snakefiles ########################################
+################################################################################
 
-##check if genes_bed is available
-if not 'genes_bed' in globals():
-    genes_bed='NA'
-
+metileneGroups = "unused"  # Just for rendering of the WGBS snakefile
 if sampleSheet:
     cf.check_sample_info_header(sampleSheet)
+    metileneGroups = getGroups(sampleSheet)
 
-### Sample init #############################################################
-if not fromBam:
-    infiles = sorted(glob.glob(os.path.join(str(indir or ''), '*'+ext)))
-    samples = cf.get_sample_names(infiles,ext,reads)
-    paired = cf.is_paired(infiles,ext,reads)
+# FastQC
+if fastqc:
+    include: os.path.join(maindir, "shared", "rules", "FastQC.snakefile")
 
-    if not samples:
-        logger.error("  Error! NO samples found in dir "+str(indir or '')+"!!!")#\n \n\n
-        exit(1)
-
-    if not paired:
-        logger.error(" Error! Paired-end samples not detected. "
-              "WGBS workflow currently works only with paired-end samples "+str(indir or '')+"!!!")#\n \n\n
-        exit(1)
-
-    def get_Read_Group(INfiles):
-        RG_dict={}
-        for INfile in INfiles:
-            with io.TextIOWrapper(gzip.open(INfile, 'r')) as f:
-                file_content = f.readline().strip()
-            read_root=re.sub('_R1.fastq.gz','',os.path.basename(INfile))
-            try:
-                PL=re.sub('@','',file_content).split(":")[0]
-                PU=re.sub('@','',file_content).split(":")[2]
-            except:
-                PL="Illumina"
-                PU="Illumina"
-            RG='@RG"\\t"ID:1"\\t"SM:'+read_root+'"\\t"LB:'+read_root+'"\\t"PL:'+PL+'"\\t"PU:'+PU
-            RG_dict[read_root]=RG
-        return RG_dict
-
-    RG_dict=get_Read_Group(infiles)
-    del infiles
-
-else:
-    infiles = sorted(glob.glob(os.path.join(str(indir or ''), '*'+bam_ext)))
-    samples = cf.get_sample_names_bam(infiles,bam_ext)
-    ###add checks for existing read group
-    del infiles
-
-
+# trimming
+if trim:
+    include: os.path.join(maindir, "shared", "rules", "trimming.snakefile")
 
 ### conditional/optional rules #################################################
 #some of those definitions are used to generate output strings for some of the rules
 ################################################################################
 
-if not fromBam:
+pipeline = "WGBS"
 
-    def run_cutadapt(trimReads):
-        if trimReads=='user':
-            return (expand("FASTQ_Cutadapt/{sample}{read}.fastq.gz", sample = samples, read = reads) + expand("FastQC_Cutadapt/{sample}{read}_fastqc.html", sample = samples, read = reads) )
-        elif trimReads=='auto':
-            return( expand("FastQC_In/{sample}.R12.ct.txt" ,sample = samples) + expand("FASTQ_Cutadapt/{sample}{read}.fastq.gz", sample = samples, read = reads) + expand("FastQC_Cutadapt/{sample}{read}_fastqc.html", sample = samples, read = reads) )
-        elif trimReads is None:
-            return([])
+if DMRprograms:
+    DMRprograms = DMRprograms.split(",")
+else:
+    DMRprograms = set()  # To allow "foo in DMRprograms"
 
-def convert_refG(convRef):
-    if convRef:
-        return ([os.path.join('aux_files',re.sub('.fa','.fa.bwameth.c2t.sa',os.path.basename(refG))),os.path.join('aux_files',re.sub('.fa','.fa.bwameth.c2t.amb',os.path.basename(refG)))])
-    else:
-        return([])
-
-def calc_doc(intList,wcard,skipDOC):
+# TODO: Still needed?
+idxRange = 2 if paired else 1
+def calc_doc(skipDOC):
     if not skipDOC:
-        if intList:
-            int_dest=[re.sub('.bed','.mean.doc.sample_summary',os.path.basename(x)) for x in intList]
-            int_dest[:0]=['mean.CG.doc.sample_summary']
-            int_dest[:0]=['mean.genome.doc.sample_summary']
-            if wcard:
-                return ([os.path.join('QC_metrics',w) for w in expand('{{sample}}.{sfix}',sfix=int_dest)])
-            else:
-                return ([os.path.join('QC_metrics',w) for w in expand('{sample}.{sfix}',sample=samples,sfix=int_dest)])
-        else:
-            int_dest=['.mean.genome.doc.sample_summary','.mean.CG.doc.sample_summary']
-            if wcard:
-                return ([os.path.join('QC_metrics',w) for w in expand('{{sample}}.{sfix}',sfix=int_dest)])
-            else:
-                return ([os.path.join('QC_metrics',w) for w in expand('{sample}.{sfix}',sample=samples,sfix=int_dest)])
-    else:
-        return ([])
-
-def get_outdir(folder_name):
-    sample_name = re.sub('_sampleSheet.[a-z]{3}$','',os.path.basename(sampleSheet))
-    return("{}_{}".format(folder_name, sample_name))
-
-
-def run_CpG_stats(sampleSheet):
-    if sampleSheet:
-
-        return (['{}/singleCpG.RData'.format(get_outdir("singleCpG_stats_limma")), '{}/limdat.LG.RData'.format(get_outdir("merged_methylation_data")),'{}/metilene.IN.txt'.format(get_outdir("merged_methylation_data")),'{}/Stats_report.html'.format(get_outdir("singleCpG_stats_limma"))])
+        return (["QC_metrics/genomeCoverage.txt",
+                 "QC_metrics/genomeCoverage.png",
+                 "QC_metrics/genomeCoverage.coverageMetrics.txt",
+                 "QC_metrics/CpGCoverage.txt",
+                 "QC_metrics/CpGCoverage.png",
+                 "QC_metrics/CpGCoverage.coverageMetrics.txt"])
     else:
         return ([])
 
 
-def run_metilene_all(sampleSheet):
-    if sampleSheet:
-        return (['{}/singleCpG.metilene.limma_unfiltered.bed'.format(get_outdir("metilene_out")),'{}/metilene.limma.annotated_unfiltered.txt'.format(get_outdir("metilene_out")),'{}/Stats_report.html'.format(get_outdir("metilene_out"))])
-    else:
-        return ([])
-
-
-def run_int_aggStats(intList,sampleSheet):
-    if intList and not sampleSheet:
-        int_dest=[re.sub('.bed','.CpGlist.bed',os.path.basename(x)) for x in intList]
-        return ([os.path.join("aux_files",re.sub('.fa',w,os.path.basename(refG))) for w in int_dest])
-    if intList and sampleSheet:
-            int_dest2=[re.sub('.bed','.aggCpG.RData',os.path.basename(x)) for x in intList]
-            return ([os.path.join("{}".format(get_outdir("aggregate_stats_limma")),w) for w in int_dest2])
-    else:
-        return ([])
-
-
-def run_deeptools(skipGCbias):
-    if not skipGCbias:
-        return (expand("QC_metrics/{sample}.freq.txt", sample = samples, read = reads) + expand("QC_metrics/{sample}.GCbias.png", sample = samples, read = reads))
-    else:
-        return ([])
-
-
-def run_aggStats_report(intList,sampleSheet):
-    if intList and sampleSheet:
-        return(['{}/Stats_report.html'.format(get_outdir("aggregate_stats_limma"))])
+def run_FastQC(fastqc):
+    if fastqc and fromBAM:
+        return( expand("FastQC/{sample}{read}_fastqc.html", sample = samples, read = reads[:idxRange]) )
     else:
         return([])
+
+
+def get_outdir(folder_name, minCoverage):
+    if sampleSheet:
+        sample_name = os.path.basename(sampleSheet)
+        if "." in sample_name:
+            idx = sample_name.rindex(".")
+            sample_name = sample_name[:idx]
+    else:
+        sample_name = ""
+    return("{}_{}_minCoverage{}".format(folder_name, sample_name, minCoverage))
+
+
+def run_DMRs(sampleSheet, minCoverage, DMRprograms):
+    output = []
+    if not sampleSheet:
+        return output
+    if "DSS" in DMRprograms:
+        output.append('{}/Stats_report.html'.format(get_outdir("DSS", minCoverage)))
+    if "metilene" in DMRprograms:
+        output.append('{}/Stats_report.html'.format(get_outdir("metilene", minCoverage)))
+    if "dmrseq" in DMRprograms:
+        output.append('{}/Stats_report.html'.format(get_outdir("dmrseq", minCoverage)))
+    return output
+
+
+def run_deeptools(GCbias):
+    if GCbias:
+        return (expand("QC_metrics/GCbias.freq.txt", sample = samples, read = reads) + expand("QC_metrics/GCbias.png", sample = samples, read = reads))
+    else:
+        return ([])
 
 
 ### include modules of other snakefiles ########################################
 ##some rules depend on the definitions above
 ################################################################################
-if not fromBam:
+if not fromBAM:
     #umi_tools
     include: os.path.join(maindir, "shared", "rules", "umi_tools.snakefile")
     # FASTQ: either downsample FASTQ files or create symlinks to input files
@@ -177,78 +113,46 @@ if not fromBam:
 # WGBS
 include: os.path.join(maindir, "shared", "rules", "WGBS.snakefile")
 
-# non-rule operations specific to the workflow
-include: os.path.join(workflow.basedir, "internals.snakefile")
-
+# MultiQC
+include: os.path.join(maindir, "shared", "rules", "multiQC.snakefile")
 
 ### execute before workflow starts #############################################
 ################################################################################
 onstart:
-    with open (os.path.join(outdir, 'pipeline.log'),"a") as lo:
-        if "verbose" in config and config["verbose"]:
-            print("--- Workflow parameters --------------------------------------------------------",file=lo)
-            print("samples:"+ str(samples),file=lo)
-            print("input dir:"+ indir,file=lo)
-            print("-" * 80,file=lo)#, "\n"
+    if "verbose" in config and config["verbose"]:
+        print("--- Workflow parameters --------------------------------------------------------",file=lo)
+        print("samples:"+ str(samples),file=lo)
+        print("input dir:"+ indir,file=lo)
+        print("-" * 80,file=lo)#, "\n"
 
-            print("--- Environment ----------------------------------------------------------------",file=lo)
-            print("$TMPDIR: "+os.getenv('TMPDIR', ""),file=lo)
-            print("$HOSTNAME: "+os.getenv('HOSTNAME', ""),file=lo)
-            print("-" * 80,file=lo)#, "\n"
+        print("--- Environment ----------------------------------------------------------------",file=lo)
+        print("$TMPDIR: "+os.getenv('TMPDIR', ""),file=lo)
+        print("$HOSTNAME: "+os.getenv('HOSTNAME', ""),file=lo)
+        print("-" * 80,file=lo)#, "\n"
 
 ### main rule ##################################################################
 ################################################################################
-if not fromBam:
+if not fromBAM:
     localrules:
         FASTQ1,
-        FASTQ2,
-        produce_report
-
-    rule all:
-        input:
-            expand("FASTQ/{sample}{read}.fastq.gz", sample = samples, read = reads),
-            expand("FASTQ_downsampled/{sample}{read}.fastq.gz", sample = samples, read = reads),
-            convert_refG(convRef),
-            expand(mapping_prg+"/{sample}.PCRrm.bam", sample = samples),
-            expand("QC_metrics/{sample}.Mbias.txt",sample=samples),
-            os.path.join("aux_files",re.sub('.fa','.poz.ran1M.sorted.bed',os.path.basename(refG))),
-            calc_doc(intList,False,skipDOC),
-            'QC_metrics/QC_report.html',
-            run_deeptools(skipGCbias),
-            expand("methXT/{sample}_CpG.bedGraph",sample=samples),
-            expand("methXT/{sample}.CpG.filt2.bed",sample=samples),
-            expand("methXT/{sample}_CpG.methylation.bw",sample=samples),
-            expand("methXT/{sample}_CpG.coverage.bw",sample=samples),
-            run_CpG_stats(sampleSheet),
-            run_metilene_all(sampleSheet),
-            run_int_aggStats(intList,False),
-            run_int_aggStats(intList,sampleSheet),
-            run_aggStats_report(intList,sampleSheet)
-
-
+        FASTQ2
 else:
     localrules:
-        link_bam,
-        produce_report
+        link_bam
 
-    rule all:
-        input:
-            convert_refG(convRef),
-            expand(mapping_prg+"/{sample}"+bam_ext, sample = samples),
-            expand("QC_metrics/{sample}.Mbias.txt",sample=samples),
-            os.path.join("aux_files",re.sub('.fa','.poz.ran1M.sorted.bed',os.path.basename(refG))),
-            calc_doc(intList,False,skipDOC),
-            'QC_metrics/QC_report.html',
-            run_deeptools(skipGCbias),
-            expand("methXT/{sample}_CpG.bedGraph",sample=samples),
-            expand("methXT/{sample}.CpG.filt2.bed",sample=samples),
-            expand("methXT/{sample}_CpG.methylation.bw",sample=samples),
-            expand("methXT/{sample}_CpG.coverage.bw",sample=samples),
-            run_CpG_stats(sampleSheet),
-            run_metilene_all(sampleSheet),
-            run_int_aggStats(intList,False),
-            run_int_aggStats(intList,sampleSheet),
-            run_aggStats_report(intList,sampleSheet)
+rule all:
+    input:
+        run_FastQC(fastqc),
+        expand("bwameth/{sample}.markdup.bam", sample = samples),
+        expand("QC_metrics/{sample}.Mbias.txt", sample=samples),
+        calc_doc(skipDOC),
+        'QC_metrics/QC_report.html',
+        run_deeptools(GCbias),
+        expand("MethylDackel/{sample}_CpG.bedGraph", sample=samples),
+        expand("MethylDackel/{sample}_CpG.methylation.bw", sample=samples),
+        expand("MethylDackel/{sample}_CpG.coverage.bw", sample=samples),
+        run_DMRs(sampleSheet, minCoverage, DMRprograms),
+        'multiQC/multiqc_report.html'
 
 
 ### execute after workflow finished ############################################
@@ -256,8 +160,7 @@ else:
 onsuccess:
     cf.cleanLogs(outdir, cluster_config)
     if "verbose" in config and config["verbose"]:
-        with open (os.path.join(outdir, 'pipeline.log'),"a") as lo:
-            print("--- WGBS workflow finished successfully! --------------------------------",file=lo)#\n \n
+        print("--- WGBS workflow finished successfully! --------------------------------",file=lo)#\n \n
 
 onerror:
     print("\n !!! ERROR in WGBS workflow! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")

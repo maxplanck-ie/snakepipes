@@ -9,9 +9,9 @@ workflow_rscripts=os.path.join(maindir, "shared", "rscripts")
 globals().update(cf.set_env_yamls())
 
 # load config file
-globals().update(cf.load_configfile(workflow.overwrite_configfile,config["verbose"]))
+globals().update(cf.load_configfile(workflow.overwrite_configfile, config["verbose"]))
 # load organism-specific data, i.e. genome indices, annotation, etc.
-globals().update(cf.load_organism_data(genome,maindir,config["verbose"]))
+globals().update(cf.load_organism_data(genome, maindir, config["verbose"]))
 
 # do workflow specific stuff now
 include: os.path.join(workflow.basedir, "internals.snakefile")
@@ -28,7 +28,7 @@ include: os.path.join(maindir, "shared", "rules", "scRNAseq.snakefile")
 paired = True
 include: os.path.join(maindir, "shared", "rules", "FastQC.snakefile")
 paired = False
-include: os.path.join(maindir, "shared", "rules", "filter_annotation.snakefile")
+include: os.path.join(maindir, "shared", "rules", "filterGTF.snakefile")
 include: os.path.join(maindir, "shared", "tools" , "deeptools_cmds.snakefile")
 include: os.path.join(maindir, "shared", "rules", "deepTools_RNA.snakefile")
 include: os.path.join(maindir, "shared", "rules", "multiQC.snakefile")
@@ -37,7 +37,7 @@ include:os.path.join(maindir, "shared", "rules", "RNA-seq_qc_report.snakefile")
 
 # TrimGalore
 if trim:
-    include: os.path.join(maindir, "shared", "rules", "TrimGalore.snakefile")
+    include: os.path.join(maindir, "shared", "rules", "trimming.snakefile")
 
 ### conditional/optional rules #################################################
 ################################################################################
@@ -90,7 +90,7 @@ onstart:
         print("Trimming:", trim)
         print("Input directory for mapping:", fastq_dir)
         print("Input directory for trimming:", fastq_indir_trim)
-        print("BigWig bin size:", bw_binsize)
+        print("BigWig bin size:", bwBinSize)
         print("Barcode pattern:", barcode_pattern)
         print("Barcode file:", barcode_file)
         print("UMI_LEN:",UMI_length)
@@ -113,8 +113,8 @@ rule all:
         expand("FASTQ_barcoded/{sample}{read}.fastq.gz", sample = samples, read=reads[0]),
         run_Trimming(trim),
         expand("FastQC/{sample}{read}_fastqc.html", sample = samples, read=reads),
-        expand(mapping_prg+"/{sample}.bam", sample = samples),
-        expand(mapping_prg+"/{sample}.bam.bai", sample = samples),
+        expand(aligner + "/{sample}.bam", sample = samples),
+        expand(aligner + "/{sample}.bam.bai", sample = samples),
         "Sambamba/flagstat_report_all.tsv",
         "Annotation/genes.annotated.bed",
         "Annotation/genes.filtered.bed",

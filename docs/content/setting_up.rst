@@ -114,7 +114,7 @@ All the tools required for running various pipelines are installed via various c
 
 .. note::
 
-    ``snakePipes createEnvs`` will also set the ``snakemake_options:`` line in the global snakePipes
+    ``snakePipes createEnvs`` will also set the ``snakemakeOptions:`` line in the global snakePipes
     ``defaults.yaml`` files. If you have already modified this then use the ``--keepCondaDir`` option.
 
 .. warning::
@@ -125,11 +125,11 @@ file on our GitHub repository. You can modify it to suite your needs.
 
 Here are the content of *defaults.yaml*::
 
-    snakemake_options: '--use-conda --conda-prefix /data/general/scratch/conda_envs'
+    snakemakeOptions: '--use-conda --conda-prefix /data/general/scratch/conda_envs'
 
 .. note::
 
-    Whenever you change the `snakemake_options:` line in `defaults.yaml`, you should run
+    Whenever you change the `snakemakeOptions:` line in `defaults.yaml`, you should run
     `snakePipes createEnvs` to ensure that the conda environments are then created.
 
 Running ``snakePipes createEnvs`` is not strictly required, but facilitates multiple users using the same snakePipes installation.
@@ -171,7 +171,7 @@ The yaml files look like this after the setup (an example from drosophila genome
     # OPTIONAL. For QC and filtering of regions in multiple workflows.
     blacklist_bed:
     # STRING. Name of the chromosomes to ignore for calculation of normalization factors for coverage files
-    ignore_forNorm: "U Uextra X XHet YHet dmel_mitochondrion_genome"
+    ignoreForNormalization: "U Uextra X XHet YHet dmel_mitochondrion_genome"
 
 .. warning:: Do not edit the yaml keywords corresponding to each required entry.
 
@@ -270,15 +270,15 @@ Below are some of the workflow defaults from the DNA-mapping pipeline. Empty sec
     reads: [_R1, _R2]
     ## mapping mode
     mode: mapping
-    mapping_prg: Bowtie2
+    aligner: Bowtie2
     ## Number of reads to downsample from each FASTQ file
     downsample:
     ## Options for trimming
     trim: False
-    trim_prg: cutadapt
-    trim_options:
+    trimmer: cutadapt
+    trimmerOptions:
     ## Bin size of output files in bigWig format
-    bw_binsize: 25
+    bwBinSize: 25
     ## Run FASTQC read quality control
     fastqc: false
     ## Run computeGCBias quality control

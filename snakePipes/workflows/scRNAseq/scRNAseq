@@ -16,16 +16,17 @@ import snakePipes.common_functions as cf
 import snakePipes.parserCommon as parserCommon
 
 
-def parse_args(defaults={"verbose": False, "configfile": None,
-                         "cluster_configfile": None, "max_jobs": 5,
-                         "snakemake_options": "--use-conda", "tempdir": None,
+def parse_args(defaults={"verbose": False, "configFile": None,
+                         "clusterConfigFile": None, "maxJobs": 5,
+                         "snakemakeOptions": "--use-conda", "tempdir": None,
                          "downsample": False, "trim": False,
-                         "trim_options": "-a A{'30'}", "cell_names": None,
-                         "star_options": "--outBAMsortingBinsN 30 --twopassMode Basic",
-                         "filter_annotation": "-v -P 'decay|pseudogene' ",
+                         "reads": ["_R1", "_R2"], "ext": ".fastq.gz", "ext": ".fastq.gz",
+                         "trimmerOptions": "-a A{'30'}", "cell_names": None,
+                         "alignerOptions": "--outBAMsortingBinsN 30 --twopassMode Basic",
+                         "filterGTF": "-v -P 'decay|pseudogene' ",
                          "barcode_file": None, "split_lib": False,
-                         "barcode_pattern": "NNNNNNXXXXXX", "bw_binsize": 10,
-                         "plot_format": "png", "skipRaceID": False,
+                         "barcode_pattern": "NNNNNNXXXXXX", "bwBinSize": 10,
+                         "plotFormat": "png", "skipRaceID": False,
                          "cell_filter_metric": "gene_universe"}):
     """
     Parse arguments from the command line.
@@ -56,20 +57,18 @@ def parse_args(defaults={"verbose": False, "configfile": None,
                           default=defaults["trim"],
                           help="Activate trimming with Cutadapt. Default: no Trimming!")
 
-    optional.add_argument("--trim_options",
-                          dest="trim_options",
+    optional.add_argument("--trimmerOptions",
+                          dest="trimmerOptions",
                           metavar="STR",
                           type=str,
-                          help="Options passed to the selected trimmer, e.g. use --trim_options='-a A{30}' "
-                          "for polyA trimming with cutadapt (default: '%(default)s')",
-                          default=defaults["trim_options"])
+                          help="Options passed to the selected trimmer, e.g. use --trimmerOptions='-a A{30}' "
+                          "for polyA trimming with Cutadapt (default: '%(default)s')",
+                          default=defaults["trimmerOptions"])
 
-    optional.add_argument("--star_options",
-                          dest="star_options",
-                          metavar="STR",
+    optional.add_argument("--alignerOptions",
+                          dest="alignerOptions",
                           help="STAR option string, e.g.: '--twopassMode Basic' (default: '%(default)s')",
-                          type=str,
-                          default=defaults["star_options"])
+                          default=defaults["alignerOptions"])
 
     optional.add_argument("--cell_barcode_file",
                           dest="barcode_file",
@@ -93,13 +92,12 @@ def parse_args(defaults={"verbose": False, "configfile": None,
                           help="Set this option if only 96 out of 192 barcodes were used per sample.",
                           default=defaults["split_lib"])
 
-    optional.add_argument("--filter_annotation",
-                          dest="filter_annotation",
-                          metavar="STR",
+    optional.add_argument("--filterGTF",
+                          dest="filterGTF",
                           type=str,
-                          help="filter annotation GTF by grep for feature counting, e.g. use --filter_annotation='-v pseudogene'; "
+                          help="filter annotation GTF by grep for feature counting, e.g. use --filterGTF='-v pseudogene'; "
                           "(default: '%(default)s')",
-                          default=defaults["filter_annotation"])
+                          default=defaults["filterGTF"])
 
     optional.add_argument("--cell_names",
                           dest="cell_names",
@@ -108,20 +106,19 @@ def parse_args(defaults={"verbose": False, "configfile": None,
                           "cell names and plate/library information for all fastq files! (default: '%(default)s')",
                           default=defaults["cell_names"])
 
-    optional.add_argument("--bw-binsize",
-                          dest="bw_binsize",
-                          metavar="INT",
+    optional.add_argument("--bwBinSize",
+                          dest="bwBinSize",
                           help="Bin size of output files in bigWig format (default: '%(default)s')",
                           type=int,
-                          default=defaults["bw_binsize"])
+                          default=defaults["bwBinSize"])
 
     optional.add_argument("--plotFormat",
-                          dest="plot_format",
+                          dest="plotFormat",
                           choices=['png', 'pdf', 'None'],
                           metavar="STR",
                           type=str,
                           help="Format of the output plots from deeptools. Select 'none' for no plot (default: '%(default)s')",
-                          default=defaults["plot_format"]),
+                          default=defaults["plotFormat"]),
 
     optional.add_argument("--cell_filter_metric",
                           dest="cell_filter_metric",

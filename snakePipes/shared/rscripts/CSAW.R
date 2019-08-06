@@ -7,8 +7,8 @@ insert_size_metrics <- snakemake@params[["insert_size_metrics"]] # bamPEFragment
 fdr <- as.numeric(snakemake@params[["fdr"]])
 lfc <- as.numeric(snakemake@params[["absBestLFC"]])
 paired <- as.logical(snakemake@params[["paired"]])
-fraglength <- as.numeric(snakemake@params[["fragment_length"]])  # used when the data is not paired end
-windowSize <- as.numeric(snakemake@params[["window_size"]])
+fraglength <- as.numeric(snakemake@params[["fragmentLength"]])  # used when the data is not paired end
+windowSize <- as.numeric(snakemake@params[["windowSize"]])
 importfunc <- snakemake@params[["importfunc"]]  #"DB_functions.R"
 allelic_info <- as.logical(snakemake@params[["allele_info"]])
 outdir<-snakemake@params[["outdir"]]
@@ -60,7 +60,7 @@ if(!is.null(input_list)&&!(input_list=="")){
 
 
 chip_object <- readfiles_chip(sampleSheet = sampleInfo,
-                              fragment_length = fraglength,
+                              fragmentLength = fraglength,
                               window_size = windowSize,
                               alleleSpecific = allelic_info,
                               pe.param = pe_param)

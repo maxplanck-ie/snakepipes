@@ -59,8 +59,8 @@ else:
 if umidedup:
     rule filter_reads_umi:
         input:
-            bamfile = "filtered_bam/{sample}.filtered.tmp.bam" if mapping_prg == "Bowtie2" else mapping_prg+"/{sample}.bam",
-            indexfile = "filtered_bam/{sample}.filtered.tmp.bam.bai" if mapping_prg == "Bowtie2" else mapping_prg+"/{sample}.bam.bai"
+            bamfile = "filtered_bam/{sample}.filtered.tmp.bam" if aligner == "Bowtie2" else aligner+"/{sample}.bam",
+            indexfile = "filtered_bam/{sample}.filtered.tmp.bam.bai" if aligner == "Bowtie2" else aligner+"/{sample}.bam.bai"
         output:
             bamfile = "filtered_bam/{sample}.filtered.bam"
         params:
@@ -78,7 +78,7 @@ if umidedup:
             {params.umitools_paired} {params.umitools_options}
             """
 else:
-    if mapping_prg == "Bowtie2":
+    if aligner == "Bowtie2":
         rule filter_reads:
             input:
                 bamfile = "filtered_bam/{sample}.filtered.tmp.bam"
@@ -91,7 +91,7 @@ else:
     else:
         rule filter_reads:
             input:
-                bamfile = mapping_prg+"/{sample}.bam"
+                bamfile = aligner+"/{sample}.bam"
             output:
                 bamfile = "filtered_bam/{sample}.filtered.bam"
             conda: CONDA_SHARED_ENV

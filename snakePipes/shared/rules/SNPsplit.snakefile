@@ -1,9 +1,9 @@
 
 ## get input bam depending on the mapping prog (use filtered bam in case of chip-seq data)
-if mapping_prg == "Bowtie2":
+if aligner == "Bowtie2":
     rule snp_split:
         input:
-            snp = snp_file,
+            snp = SNPFile,
             bam = "filtered_bam/{sample}.filtered.bam"
         output:
             temp("filtered_bam/{sample}.filtered.sortedByName.bam"),
@@ -15,13 +15,13 @@ if mapping_prg == "Bowtie2":
         shell:
             "SNPsplit {params.paired}"
             " -o {params.outdir} --snp_file {input.snp} {input.bam}"
-elif mapping_prg == "STAR":
+elif aligner == "STAR":
     rule snp_split:
         input:
-            snp = snp_file,
-            bam = mapping_prg+"/{sample}.bam"
+            snp = SNPFile,
+            bam = aligner+"/{sample}.bam"
         output:
-            temp(mapping_prg+"/{sample}.sortedByName.bam"),
+            temp(aligner+"/{sample}.sortedByName.bam"),
             expand("allelic_bams/{{sample}}.{suffix}.bam", suffix = ['allele_flagged', 'genome1', 'genome2', 'unassigned'])
         params:
             paired = '--paired' if paired else '',
@@ -32,7 +32,7 @@ elif mapping_prg == "STAR":
             " -o {params.outdir} --snp_file {input.snp} {input.bam}"
 
 # move the allele-specific bams to another folder
-if mapping_prg == "Bowtie2":
+if aligner == "Bowtie2":
     rule movebams:
         input:
             "allelic_bams/{sample}.filtered.{suffix}.bam"
