@@ -418,7 +418,7 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
         args.snakemakeOptions += " --notemp"
 
     snakemake_cmd = """
-                    export PYTHONNOUSERSITE=True && {snakemake} {snakemakeOptions} --latency-wait {latency_wait} --snakefile {snakefile} --jobs {maxJobs} --directory {workingdir} --configfile {configFile} --keep-going
+                    PYTHONNOUSERSITE=True {snakemake} {snakemakeOptions} --latency-wait {latency_wait} --snakefile {snakefile} --jobs {maxJobs} --directory {workingdir} --configfile {configFile} --keep-going
                     """.format(snakemake=os.path.join(snakemake_path, "snakemake"),
                                latency_wait=cluster_config["snakemake_latency_wait"],
                                snakefile=os.path.join(workflowDir, "Snakefile"),
@@ -432,7 +432,7 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
         oldVerbose = config['verbose']
         config['verbose'] = False
         write_configfile(os.path.join(args.outdir, '{}.config.yaml'.format(workflowName)), config)
-        DAGproc = subprocess.Popen(snakemake_cmd + ['--rulegraph'], stdout=subprocess.PIPE)
+        DAGproc = subprocess.Popen(snakemake_cmd + ['--rulegraph'], stdout=subprocess.PIPE, shell=True)
         _ = open("{}/{}_pipeline.pdf".format(args.outdir, workflowName), "wb")
         subprocess.check_call(["dot", "-Tpdf"], stdin=DAGproc.stdout, stdout=_)
         _.close()
@@ -451,7 +451,7 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
 
 def logAndExport(args, workflowName):
     """
-    Set up logging and exports (TMPDIR)
+    Set up logging
     """
     # Write snakemake_cmd to log file
     fnames = glob.glob(os.path.join(args.outdir, '{}_run-[0-9]*.log'.format(workflowName)))
