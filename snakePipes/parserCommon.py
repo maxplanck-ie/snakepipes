@@ -68,6 +68,10 @@ def mainArguments(defaults, workingDir=False, createIndices=False):
                          default=defaults["verbose"])
 
     if not workingDir and not createIndices:
+        general.add_argument("--ext",
+                             help="Suffix used by input fastq files (default: '%(default)s').",
+                             default=defaults["ext"])
+
         general.add_argument("--reads",
                              help="Suffix used to denote reads 1 and 2 for paired-end data. This should typically be either '_1' '_2' or '_R1' '_R2' (default: '%(default)s). "
                              "Note that you should NOT separate the values by a comma (use a space) or enclose them in brackets.",
