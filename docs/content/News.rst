@@ -8,6 +8,7 @@ snakePipes 1.3.3
  * Fixed replicate check for samples with trailing spaces in names
  * Fixed input filtering in CSAW
  * Several allele-specific RNAseq fixes
+ * ATACseq peakQC is now run on fragment-size filtered bam
 
 snakePipes 1.2.2
 ----------------
