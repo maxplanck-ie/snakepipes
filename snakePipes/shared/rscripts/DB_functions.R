@@ -225,7 +225,7 @@ getDBregions_chip <- function(chipCountObject, plotfile = NULL){
     if(chipCountObject$designType != "condition") {
         results <- edgeR::glmQLFTest(fit, coef = paste0("allelegenome2"))
     } else {
-        results <- edgeR::glmQLFTest(fit, coef = 2)
+        results <- edgeR::glmQLFTest(fit, coef = paste0("condition",unique(chipCountObject$sampleSheet$condition)[2]))
     }
 
     # Merge DB windows into regions: Using quick and dirty method
