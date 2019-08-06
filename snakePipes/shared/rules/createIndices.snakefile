@@ -88,7 +88,7 @@ rule extendCodingRegions:
     input: genes_gtf
     output: extended_coding_regions_gtf
     shell: """
-        grep -v "^#" {input} | awk 'BEGIN{{OFS="\t"}}{{if($3 == "gene" || $3 == "transcript") {{$4 -= 500; $5 += 500; if($4 < 1) {{$4 = 1}}; print}}}}' > {output}
+        grep -v "^#" {input} | awk 'BEGIN{{FS="\t"; OFS="\t"}}{{if($3 == "gene" || $3 == "transcript") {{$4 -= 500; $5 += 500; if($4 < 1) {{$4 = 1}}; print}}}}' > {output}
         """
 
 
