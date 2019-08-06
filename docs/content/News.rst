@@ -10,6 +10,7 @@ snakePipes 1.3.3
  * Several allele-specific RNAseq fixes
  * ATACseq peakQC is now run on fragment-size filtered bam
  * Fixed Salmon output (Number of Reads output in "*counts.tsv" files and file naming)
+ * Fixed CSAW QC plot error with single end reads
 
 snakePipes 1.2.2
 ----------------
