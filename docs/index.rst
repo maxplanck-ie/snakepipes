@@ -65,7 +65,9 @@ Citation
 
 If you adopt/run snakePipes for your analysis, cite it as follows :
 
-Bhardwaj V, Heyne S, Sikora K, Rabbani L, Rauer M, Kilpert F, et al. **snakePipes enable flexible, scalable and integrative epigenomic analysis.** bioRxiv. 2018. p. 407312. `doi:10.1101/407312 <https://www.biorxiv.org/content/early/2018/09/04/407312>`__
+Bhardwaj V, Heyne S, Sikora K, Rabbani L, Rauer M, Kilpert F, Richter AS, Ryan DP, Manke T. **snakePipes: facilitating flexible, scalable and integrative epigenomic analysis.** Bioinformatics. 2019 May 27. pii: btz436. doi:
+
+10.1093/bioinformatics/btz436. [Epub ahead of print] PubMed PMID: 31134269. https://www.ncbi.nlm.nih.gov/pubmed/31134269
 
 
 .. image:: content/images/logo_mpi-ie.jpg
