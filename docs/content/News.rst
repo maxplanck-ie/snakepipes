@@ -7,7 +7,7 @@ snakePipes 1.3.3
  * Updated citation for snakePipes
  * Fixed replicate check for samples with trailing spaces in names
  * Fixed input filtering in CSAW
- * Fixed DESeq2 basic report overwriting by the allele-specific report in allelic mode
+ * Several allele-specific RNAseq fixes
 
 snakePipes 1.2.2
 ----------------
