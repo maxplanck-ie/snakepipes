@@ -31,7 +31,7 @@ rule sambamba_flagstat_sorted:
 
 rule sambamba_flagstat:
        input:
-           mapping_prg+"/{sample}.bam"
+           "filtered_bam/{sample}.filtered.bam"
        output:
            "Sambamba/{sample}.markdup.txt"
        conda: CONDA_SAMBAMBA_ENV
