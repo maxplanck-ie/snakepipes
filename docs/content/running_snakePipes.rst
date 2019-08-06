@@ -72,6 +72,15 @@ groups in Hi-C workflow. For all this analysis, snakePipes needs a ``sampleSheet
 The name section referes to sample names (without the read suffix), while the condition
 section refers to sample group (control/test, male/female, normal/diseased etc..)
 
+Using BAM input
+---------------
+
+In many workflows it is possible to directly use BAM files as input by specifying ``--fromBAM``. Note that you must then specify whether you have paired-end (the default) or single-end data. This is typically done with the ``--single-end`` option.
+
+Changing read extensions or mate designators
+--------------------------------------------
+
+The default file names produced by Illumina sequencers are of the form ``<sample>_R1.fastq.gz`` and ``<sample_R2.fastq.gz``. However, sometimes public datasets will instead have a ``.fq.gz`` suffix or use ``_1`` and ``_2`` as mate designators. To enable this, the ``--ext`` option can be used to change ``.fastq.gz`` default suffix to ``.fq.gz`` and ``--reads`` to ``_1 _2``.
 
 Common considerations for all workflows
 ----------------------------------------
