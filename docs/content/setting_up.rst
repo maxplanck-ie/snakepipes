@@ -49,7 +49,7 @@ If you wish to modify snakePipes you can install it via pip from within a conda 
 
     conda create -n snakepipes python=3.7 snakemake pandas graphviz fuzzywuzzy
     conda activate snakepipes
-    pip install --upgrade git+https://github.com/maxplanck-ie/snakepipes@develop
+    pip install git+https://github.com/maxplanck-ie/snakepipes@develop
 
 Instead of providing the URL to ``pip``, you can also `clone <https://help.github.com/articles/cloning-a-repository/>`__ our `GitHub repository <https://github.com/maxplanck-ie/snakepipes>`__ on your computer, and modify the code before running snakePipes. Please see :doc:`advanced_usage` for more information on how to modify and extend snakePipes workflows.
 
