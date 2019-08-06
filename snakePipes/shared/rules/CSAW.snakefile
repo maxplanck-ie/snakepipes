@@ -4,9 +4,7 @@ rule CSAW:
     input:
         macs2_output = expand("MACS2/{chip_sample}.filtered.BAM_peaks.xls", chip_sample = chip_samples),
         sampleSheet = sampleSheet,
-        insert_size_metrics =
-           os.path.join(outdir, "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv") if paired
-            else []
+        insert_size_metrics ="deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv" if paired else []
     output:
         "CSAW_{}/CSAW.session_info.txt".format(sample_name), "CSAW_{}/DiffBinding_analysis.Rdata".format(sample_name)
     benchmark:
@@ -18,7 +16,9 @@ rule CSAW:
         fragment_length = fragment_length,
         window_size = window_size,
         importfunc = os.path.join("shared", "rscripts", "DB_functions.R"),
-        allele_info = allele_info
+        allele_info = allele_info,
+        yaml_path=lambda wildcards: samples_config if pipeline in 'chip-seq' else "",
+        insert_size_metrics=os.path.join(outdir,"deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv") if paired else []
     log: 
         out = os.path.join(outdir,"CSAW_{}/logs/CSAW.out".format(sample_name)),
         err = os.path.join(outdir,"CSAW_{}/logs/CSAW.err".format(sample_name))
