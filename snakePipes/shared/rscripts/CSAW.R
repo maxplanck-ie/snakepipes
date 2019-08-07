@@ -3,7 +3,7 @@
 .libPaths(R.home("library"))
 
 sampleInfoFilePath <- snakemake@input[["sampleSheet"]]  #"samplesheet.tab"
-insert_size_metrics <- insert_size_metrics <- snakemake@params[["insert_size_metrics"]] # bamPEFragmentSize output
+insert_size_metrics <- snakemake@params[["insert_size_metrics"]] # bamPEFragmentSize output
 fdr <- as.numeric(snakemake@params[["fdr"]])
 paired <- as.logical(snakemake@params[["paired"]])
 fraglength <- as.numeric(snakemake@params[["fragment_length"]])  # used when the data is not paired end
