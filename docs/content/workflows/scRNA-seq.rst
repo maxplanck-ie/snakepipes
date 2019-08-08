@@ -24,7 +24,7 @@ The primary input requirement is a directory of paired-end fastq files. In addit
 Cell barcodes
 ~~~~~~~~~~~~~
 
-The format of the cell barcodes file is shown below. Note that the default file is included in the snakePipes source code under ``snakePipes/workflows/scRNAseq``. This file is automatically used if you leave :code:`barcode_file` empty.
+The format of the cell barcodes file is shown below. Note that the default file is included in the snakePipes source code under ``snakePipes/workflows/scRNAseq``. This file is automatically used if you leave :code:`cellBarcodeFile` empty.
 
 ::
 
@@ -70,27 +70,27 @@ The default configuration file is listed below and can be found in ``snakePipes/
     trimmerOptions: -a A{'30'}
     ## further options
     filterGTF: "-v -P 'decay|pseudogene' "
-    barcode_file:
-    barcode_pattern: "NNNNNNXXXXXX"
-    split_lib: False
-    cell_names:
+    cellBarcodeFile:
+    cellBarcodePattern: "NNNNNNXXXXXX"
+    splitLib: False
+    cellNames:
     libraryType: 1
     bwBinSize: 10
     verbose: False
     plotFormat: pdf
     dnaContam: False
     ## Parameters for th statistical analysis
-    cell_filter_metric: gene_universe
+    cellFilterMetric: gene_universe
     #Option to skip RaceID to save time
     skipRaceID: False
 
 
-While some of these can be changed on the command line, you may find it useful to change ``barcode_pattern`` and ``barcode_file`` if you find that you need to change them frequently.
+While some of these can be changed on the command line, you may find it useful to change ``cellBarcodePattern`` and ``cellBarcodeFile`` if you find that you need to change them frequently.
 
 Barcode pattern
 ~~~~~~~~~~~~~~~
 
-The scRNA-seq pipeline requires barcodes at 5' end of read 1. The default barcode_pattern takes the first 6 bases as UMI (NNNNNN) and the following 6 bases as cell barcode (XXXXXX).
+The scRNA-seq pipeline requires barcodes at 5' end of read 1. The default cellBarcodePattern takes the first 6 bases as UMI (NNNNNN) and the following 6 bases as cell barcode (XXXXXX).
 If your read/barcode layout requires additional **'Don't care'** positions eg. before stretches of N one can indicate these with ``.``
 
 Barcode file

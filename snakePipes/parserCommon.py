@@ -211,38 +211,36 @@ def commonOptions(grp, defaults, bw=True, plots=True):
                      default=defaults["fastqc"])
 
     grp.add_argument("--bcExtract",
-                     dest="umibarcode",
+                     dest="UMIBarcode",
                      action="store_true",
                      help="To extract umi barcode from fastq file via UMI-tools and add it to the read name "
                      "(default: '%(default)s')",
-                     default=defaults["umibarcode"])
+                     default=defaults["UMIBarcode"])
 
     grp.add_argument("--bcPattern",
-                     dest="bcpattern",
                      help="The pattern to be considered for the barcode. 'N' = UMI position (required) 'C' = barcode position (optional) "
                      "(default: '%(default)s')",
-                     default=defaults["bcpattern"])
+                     default=defaults["bcPattern"])
 
-    grp.add_argument("--umidedup",
-                     dest="umidedup",
+    grp.add_argument("--UMIDedup",
                      action="store_true",
                      help="Deduplicate bam file based on UMIs via `umi_tools dedup` that are present in the read name. "
                      "(default: '%(default)s')",
-                     default=defaults["umidedup"])
+                     default=defaults["UMIDedup"])
 
-    grp.add_argument("--umidedup_sep",
+    grp.add_argument("--UMIDedupSep",
                      help="umi separation character "
                      "that will be passed to umi_tools."
                      "(default: '%(default)s')",
-                     default=defaults["umidedup_sep"])
+                     default=defaults["UMIDedupSep"])
 
-    grp.add_argument("--umidedup_opts",
+    grp.add_argument("--UMIDedupOpts",
                      help="Additional options that will be passed to umi_tools."
                      "(default: '%(default)s')",
-                     default=defaults["umidedup_opts"])
+                     default=defaults["UMIDedupOpts"])
 
     if bw:
-        grp.add_argument("--bw-binsize",
+        grp.add_argument("--bwBinSize",
                          dest="bwBinSize",
                          help="Bin size of output files in bigWig format (default: '%(default)s')",
                          type=int,

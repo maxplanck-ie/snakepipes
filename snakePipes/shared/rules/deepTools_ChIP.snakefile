@@ -13,7 +13,7 @@ if bigWigType == "subtract" or bigWigType == "both":
             bwBinSize = bwBinSize,
             genome_size = genome_size,
             ignoreForNorm = "--ignoreForNormalization {}".format(ignoreForNormalization) if ignoreForNormalization else "",
-            read_extension = "--extendReads" if paired else "--extendReads {}".format(fragmentLength),
+            read_extension = "--extendReads" if pairedEnd else "--extendReads {}".format(fragmentLength),
             blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed else ""
         log:
             out = "deepTools_ChIP/logs/bamCompare.subtract.{chip_sample}.filtered.subtract.{control_name}.out",
@@ -37,7 +37,7 @@ if bigWigType == "log2ratio" or bigWigType == "both":
         params:
             bwBinSize = bwBinSize,
             ignoreForNorm = "--ignoreForNormalization {}".format(ignoreForNormalization) if ignoreForNormalization else "",
-            read_extension = "--extendReads" if paired else "--extendReads {}".format(fragmentLength),
+            read_extension = "--extendReads" if pairedEnd else "--extendReads {}".format(fragmentLength),
             blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed else ""
         log:
             out = "deepTools_ChIP/logs/bamCompare.log2ratio.{chip_sample}.{control_name}.filtered.out",
@@ -62,7 +62,7 @@ rule plotEnrichment:
         genes_gtf = genes_gtf,
         labels = " ".join(all_samples),
         blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed else "",
-        read_extension = "--extendReads" if paired else "--extendReads {}".format(fragmentLength)
+        read_extension = "--extendReads" if pairedEnd else "--extendReads {}".format(fragmentLength)
     log:
         out = "deepTools_ChIP/logs/plotEnrichment.out",
         err = "deepTools_ChIP/logs/plotEnrichment.err"
@@ -84,7 +84,7 @@ rule plotFingerprint:
     params:
         labels = " ".join(all_samples),
         blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed else "",
-        read_extension = "--extendReads" if paired else "--extendReads {}".format(fragmentLength),
+        read_extension = "--extendReads" if pairedEnd else "--extendReads {}".format(fragmentLength),
         png = "--plotFile deepTools_ChIP/plotFingerprint/plotFingerprint.png" if (len(all_samples)<=20)
               else "",
         jsd = "--JSDsample filtered_bam/{}.filtered.bam".format(control_samples[0]) if (len(control_samples)>0)

@@ -36,25 +36,25 @@ trimmerOptions: -a A{'30'}
 alignerOptions: "--outBAMsortingBinsN 30 --twopassMode Basic"
 ## further options
 filterGTF: "-v -P 'decay|pseudogene' "
-barcode_file:
-barcode_pattern: "NNNNNNXXXXXX"
-split_lib: False
-cell_names:
+cellBarcodeFile:
+cellBarcodePattern: "NNNNNNXXXXXX"
+splitLib: False
+cellNames:
 libraryType: 1
 bwBinSize: 10
 verbose: False
 plotFormat: pdf
 dnaContam: False
 ## Parameters for th statistical analysis
-cell_filter_metric: gene_universe
+cellFilterMetric: gene_universe
 #Option to skip RaceID to save time
 skipRaceID: False
 #umi_tools options:
-umibarcode: False
-bcpattern: NNNNCCCCCCCCC #default: 4 base umi barcode, 9 base cell barcode (eg. RELACS barcode)
-umidedup: False
-umidedup_sep: "_"
-umidedup_opts: --paired
+UMIBarcode: False
+bcPattern: NNNNCCCCCCCCC #default: 4 base umi barcode, 9 base cell barcode (eg. RELACS barcode)
+UMIDedup: False
+UMIDedupSep: "_"
+UMIDedupOpts: --paired
 ################################################################################
 # Call snakemake directly, i.e. without using the wrapper script:
 #

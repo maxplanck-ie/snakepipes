@@ -38,19 +38,19 @@ trimmerOptions:
 fastqc: false
 verbose: False
 ## is the Matrix RF resolution?
-RF_resolution: false
+RFResolution: false
 # which restriction enzyme was used
 enzyme: HindIII
 # bin size in base pairs, if RF resolution is not required
-bin_size: 10000
+binSize: 10000
 # build matrix only for a given region chr:start-end
-restrict_region:
+restrictRegion:
 # Create files after merging a given number bins to be merged (default 0 = bins are not merged)
-nbins_toMerge: 0
+nBinsToMerge: 0
 # shall we merge the samples?
-merge_samples: false
+mergeSamples: false
 # parameters for hicFindTADs
-tadparams: '--thresholdComparisons 0.01'
+findTADParams: '--thresholdComparisons 0.01'
 # Should hicPlotDistVsCounts be run?
 distVsCount: false
 #Parameters to run hicPlotDistVsCounts
@@ -61,16 +61,16 @@ noTAD: false
 noCorrect: false
 #Chromosomes of interest to build matrix on them
 chromosomes:
-# a .tsv file contains names and replicates of samples. It is needed if merge_samples
+# a .tsv file contains names and replicates of samples. It is needed if mergeSamples
 sampleSheet:
 #print tools versions
 toolsVersion: True
 #umi_tools
-umibarcode: False
-bcpattern: NNNNCCCCCCCCC #default: 4 base umi barcode, 9 base cell barcode (eg. RELACS barcode)
-umidedup: False
-umidedup_sep: "_"
-umidedup_opts: --paired
+UMIBarcode: False
+bcPattern: NNNNCCCCCCCCC #default: 4 base umi barcode, 9 base cell barcode (eg. RELACS barcode)
+UMIDedup: False
+UMIDedupSep: "_"
+UMIDedupOpts: --paired
 ################################################################################
 # Call snakemake directly, i.e. without using the wrapper script:
 #

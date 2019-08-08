@@ -15,7 +15,7 @@ rule origFASTQ2:
           "( [ -f {output} ] || ln -s -r {input} {output} )"
 
 if downsample:
-    if paired:
+    if pairedEnd:
         rule FASTQdownsample:
             input:
                 r1 = "originalFASTQ/{sample}"+reads[0]+".fastq.gz",

@@ -68,19 +68,19 @@ the config file description for the HiC workflow :
       fastqc: false
       verbose: False
       ## is the Matrix RF resolution?
-      RF_resolution: false
+      RFResolution: false
       # which restriction enzyme was used
       enzyme: HindIII
       # bin size in base pairs, if RF resolution is not required
-      bin_size: 10000
+      binSize: 10000
       # build matrix only for a given region chr:start-end
-      restrict_region:
+      restrictRegion:
       # Create files after merging a given number bins to be merged (default 0 = bins are not merged)
-      nbins_toMerge: 0
+      nBinsToMerge: 0
       # shall we merge the samples?
-      merge_samples: false
+      mergeSamples: false
       # parameters for hicFindTADs
-      tadparams: '--thresholdComparisons 0.01'
+      findTADParams: '--thresholdComparisons 0.01'
       # Should hicPlotDistVsCounts be run?
       distVsCount: false
       #Parameters to run hicPlotDistVsCounts
@@ -91,7 +91,7 @@ the config file description for the HiC workflow :
       noCorrect: false
       #Chromosomes of interest to build matrix on them
       chromosomes:
-      # a .tsv file contains names and replicates of samples. It is needed if merge_samples
+      # a .tsv file contains names and replicates of samples. It is needed if mergeSamples
       sampleSheet:
       ################################################################################
       # Call snakemake directly, i.e. without using the wrapper script:

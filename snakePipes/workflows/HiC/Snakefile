@@ -63,9 +63,9 @@ GROUPS = sample_dict.keys()
 def run_build_matrices():
     file_list = []
     # SAMPLES TO MERGE??
-    if merge_samples:
-        if nbins_toMerge > 0:
-            suffix = "_Mbins" + str(nbins_toMerge) + "_" + matrixFile_suffix
+    if mergeSamples:
+        if nBinsToMerge > 0:
+            suffix = "_Mbins" + str(nBinsToMerge) + "_" + matrixFile_suffix
         else:
             suffix = "_" + matrixFile_suffix
 
@@ -80,8 +80,8 @@ def run_build_matrices():
                 file_list.append(expand("TADs/mergedSamples_{group}"+suffix+"_boundaries.bed", group=GROUPS))
 
     # BINS TO MERGE??
-    elif nbins_toMerge > 0:
-        suffix = "_Mbins" + str(nbins_toMerge) + "_" + matrixFile_suffix
+    elif nBinsToMerge > 0:
+        suffix = "_Mbins" + str(nBinsToMerge) + "_" + matrixFile_suffix
         file_list.append([
             expand("HiC_matrices/{sample}"+suffix+matrix_format, sample=samples),
             expand("HiC_matrices/QCplots/{sample}"+suffix+"_diagnostic_plot.pdf", sample=samples),

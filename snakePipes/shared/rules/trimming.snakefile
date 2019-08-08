@@ -1,7 +1,5 @@
-
-
 ### cutadapt #################################################################
-if paired:
+if pairedEnd:
     rule cutadapt:
         input:
             r1 = fastq_indir_trim+"/{sample}"+reads[0]+".fastq.gz",
@@ -45,7 +43,7 @@ else:
 
 ### fastp #################################################################
 # TODO: (1) ensure that multiQC sees the json files (2) remove reads[0] from the json file for MultiQC rendering
-if paired:
+if pairedEnd:
     rule fastp:
         input:
             fastq_indir_trim+"/{sample}"+reads[0]+".fastq.gz",
@@ -91,7 +89,7 @@ else:
 
 ### TrimGalore #################################################################
 
-if paired:
+if pairedEnd:
     rule TrimGalore:
         input:
             r1 = fastq_indir_trim+"/{sample}"+reads[0]+".fastq.gz",
@@ -137,7 +135,7 @@ else:
 
 ### FastQC_on_trimmed #######################################################
 
-if paired:
+if pairedEnd:
     rule FastQC_on_trimmed:
         input:
             fastq_dir+"/{sample}{read}.fastq.gz"

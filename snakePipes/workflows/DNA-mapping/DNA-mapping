@@ -23,12 +23,12 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          "trimmer": "cutadapt", "trimmerOptions": "", "fastqc": False,
                          "qualimap": False, "dedup": False, "ext": ".fastq.gz",
                          "properPairs": False, "insertSizeMax": 1000,
-                         "gcbias": False, "reads": ["_R1", "_R2"],
+                         "GCBias": False, "reads": ["_R1", "_R2"],
                          "bwBinSize": 25, "mapq": 0, "plotFormat": "png",
                          "alignerOpts": "", "mateOrientation": "--fr",
-                         "umidedup": False, "umidedup_opts": "",
-                         "umidedup_sep": "_", "umibarcode": False,
-                         "bcpattern": "", "mate_orientation": "--fr"}):
+                         "UMIDedup": False, "UMIDedupOpts": "",
+                         "UMIDedupSep": "_", "UMIBarcode": False,
+                         "bcPattern": ""}):
     """
     Parse arguments from the command line.
     """
@@ -99,14 +99,13 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                           type=int,
                           default=defaults["insertSizeMax"])
 
-    optional.add_argument("--gcbias",
-                          dest="gcbias",
+    optional.add_argument("--GCBias",
                           action="store_true",
                           help="run computeGCBias quality control "
-                          "(long runtime!). Note that gcbias analysis is "
+                          "(long runtime!). Note that GCBias analysis is "
                           "skipped if downsampling is specified "
                           "(default: '%(default)s')",
-                          default=defaults["gcbias"])
+                          default=defaults["GCBias"])
 
     return parser
 
@@ -140,7 +139,7 @@ def main():
     filt = ""
     if args.dedup:
         filt += "-F 1024 "
-        assert args.umidedup is False, "\nPlease use either --umidedup (UMI-tools dedup) or --dedup (via sambamba and samtools)!\n"
+        assert args.UMIDedup is False, "\nPlease use either --UMIDedup (UMI-tools dedup) or --dedup (via sambamba and samtools)!\n"
         "should be called!"
     if args.properPairs:
         filt += "-f 2 "

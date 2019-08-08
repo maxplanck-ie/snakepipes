@@ -9,7 +9,7 @@ def getbw_idxbase(file):
 
 ### Bowtie2 ####################################################################
 if aligner == "Bowtie2":
-    if paired:
+    if pairedEnd:
         rule Bowtie2_allele:
             input:
                 r1 = fastq_dir+"/{sample}"+reads[0]+".fastq.gz",

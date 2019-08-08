@@ -22,9 +22,9 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          "maxFragmentSize": 150, "minFragmentSize": 0,
                          "fromBAM": "" ,"qval": 0.001 ,"sampleSheet": None,
                          "bamExt": "filtered.bam", "fdr": 0.05,
-                         "absBestLFC": 1, "umidedup": False,
-                         "umidedup_opts": "", "umidedup_sep": "_",
-                         "umibarcode": False, "bcpattern": ""}):
+                         "absBestLFC": 1, "UMIDedup": False,
+                         "UMIDedupOpts": "", "UMIDedupSep": "_",
+                         "UMIBarcode": False, "bcPattern": ""}):
 
     """
     Parse arguments from the command line.

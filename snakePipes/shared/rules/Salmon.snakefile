@@ -18,11 +18,11 @@ rule SalmonIndex:
         """
 
 
-def getSalmon_libtype(paired, libraryType):
+def getSalmon_libtype(pairedEnd, libraryType):
     """
     Convert from a featureCounts library type to a HISAT2 option string
     """
-    if paired:
+    if pairedEnd:
         if libraryType == 1:
             return "ISF"
         elif libraryType == 2:
@@ -39,7 +39,7 @@ def getSalmon_libtype(paired, libraryType):
 
 
 ## Salmon quant
-if paired:
+if pairedEnd:
     rule SalmonQuant:
         input:
             r1 = fastq_dir+"/{sample}"+reads[0]+".fastq.gz",
@@ -53,7 +53,7 @@ if paired:
         params:
             outdir = "Salmon/{sample}",
             gtf = genes_gtf,
-            lib_type = getSalmon_libtype(paired, libraryType)
+            lib_type = getSalmon_libtype(pairedEnd, libraryType)
         threads: 8
         conda: CONDA_RNASEQ_ENV
         shell: """
@@ -72,7 +72,7 @@ else:
         params:
             outdir = "Salmon/{sample}",
             gtf = genes_gtf,
-            lib_type = getSalmon_libtype(paired, libraryType)
+            lib_type = getSalmon_libtype(pairedEnd, libraryType)
         threads: 8
         conda: CONDA_RNASEQ_ENV
         shell: """

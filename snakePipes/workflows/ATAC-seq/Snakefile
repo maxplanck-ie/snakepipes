@@ -51,7 +51,7 @@ else:
 # CSAW for differential binding (if sampleinfo specified)
 # needs a "ChIP-sample" variable, here all samples are ChIP-Samples
 chip_samples = samples
-paired = True
+pairedEnd = True
 if sampleSheet:
     include: os.path.join(maindir, "shared", "rules", "CSAW.snakefile")
     include: os.path.join(maindir, "shared", "rules", "nearestGene.snakefile")

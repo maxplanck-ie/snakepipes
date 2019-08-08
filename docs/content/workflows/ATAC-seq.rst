@@ -92,7 +92,7 @@ There is a configuration file in ``snakePipes/workflows/ATACseq/defaults.yaml``:
     fromBAM: 
     ## Bin size of output files in bigWig format
     bwBinSize: 25
-    paired: True
+    pairedEnd: True
     plotFormat: png
     ## Median/mean fragment length, only relevant for single-end data (default: 200)
     fragmentLength: 

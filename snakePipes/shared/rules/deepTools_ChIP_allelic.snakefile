@@ -13,7 +13,7 @@ rule bamCompare_log2_genome1:
     params:
         bwBinSize = bwBinSize,
         ignoreForNorm = "--ignoreForNormalization " + ignoreForNormalization if ignoreForNormalization else "",
-        read_extension = "--extendReads" if paired
+        read_extension = "--extendReads" if pairedEnd
                          else "--extendReads " + str(fragmentLength),
         blacklist = "--blackListFileName " + blacklist_bed if blacklist_bed
                     else "",
@@ -37,7 +37,7 @@ rule bamCompare_log2_genome2:
     params:
         bwBinSize = bwBinSize,
         ignoreForNorm = "--ignoreForNormalization " + ignoreForNormalization if ignoreForNormalization else "",
-        read_extension = "--extendReads" if paired
+        read_extension = "--extendReads" if pairedEnd
                          else "--extendReads " + str(fragmentLength),
         blacklist = "--blackListFileName " + blacklist_bed if blacklist_bed
                     else "",
@@ -64,7 +64,7 @@ rule plotEnrichment_allelic:
         labels = " ".join(expand("{sample}_{suffix}", sample = all_samples, suffix = ['genome1', 'genome2'])),
         blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed
                     else "",
-        read_extension = "--extendReads" if paired
+        read_extension = "--extendReads" if pairedEnd
                          else "--extendReads " + str(fragmentLength)
     log:
         out = "deepTools_ChIP/logs/plotEnrichment_allelic.out",
@@ -88,7 +88,7 @@ rule plotFingerprint_allelic:
         labels = " ".join(expand("{sample}_{suffix}", sample = all_samples, suffix = ['genome1', 'genome2'])),
         blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed
                     else "",
-        read_extension = "--extendReads" if paired
+        read_extension = "--extendReads" if pairedEnd
                          else "--extendReads " + str(fragmentLength),
         png = "--plotFile deepTools_ChIP/plotFingerprint/plotFingerprint_allelic.png" if (len(all_samples)<=20)
               else "",

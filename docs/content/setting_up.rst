@@ -279,7 +279,7 @@ Below are some of the workflow defaults from the DNA-mapping pipeline. Empty sec
     ## Run FASTQC read quality control
     fastqc: false
     ## Run computeGCBias quality control
-    gcbias: false
+    GCBias: false
     ## Retain only de-duplicated reads/read pairs
     dedup: false
     ## Retain only reads with at least the given mapping quality

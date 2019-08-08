@@ -11,7 +11,7 @@ rule bamCoverage_allelic:
         bwBinSize = bwBinSize,
         genome_size = int(genome_size),
         ignoreForNorm = "--ignoreForNormalization " + ignoreForNormalization if ignoreForNormalization else "",
-        read_extension = "--extendReads" if paired
+        read_extension = "--extendReads" if pairedEnd
                          else "--extendReads " + str(fragmentLength),
         blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed
                     else "",
@@ -34,7 +34,7 @@ rule plotCoverage_allelic:
         "deepTools_qc/plotCoverage/read_coverage_allelic.png"
     params:
         labels = " ".join(expand('{sample}.{suffix}', sample=samples, suffix = ['genome1', 'genome2'])),
-        read_extension = "--extendReads" if paired
+        read_extension = "--extendReads" if pairedEnd
                          else "--extendReads " + str(fragmentLength)
     log:
         out = "deepTools_qc/logs/plotCoverage_allelic.out",
@@ -57,7 +57,7 @@ rule multiBamSummary_allelic:
         labels = " ".join(expand('{sample}.{suffix}', sample=samples, suffix = ['genome1', 'genome2'])),
         blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed
                     else "",
-        read_extension = "--extendReads" if paired
+        read_extension = "--extendReads" if pairedEnd
                          else "--extendReads " + str(fragmentLength)
     log:
         out = "deepTools_qc/logs/multiBamSummary_allelic.out",

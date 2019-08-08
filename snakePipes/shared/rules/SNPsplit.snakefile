@@ -9,11 +9,11 @@ if aligner == "Bowtie2":
             temp("filtered_bam/{sample}.filtered.sortedByName.bam"),
             expand("allelic_bams/{{sample}}.filtered.{suffix}.bam", suffix = ['allele_flagged', 'genome1', 'genome2', 'unassigned'])
         params:
-            paired = '--paired' if paired else '',
+            pairedEnd = '--paired' if pairedEnd else '',
             outdir = "allelic_bams"
         conda: CONDA_SHARED_ENV
         shell:
-            "SNPsplit {params.paired}"
+            "SNPsplit {params.pairedEnd}"
             " -o {params.outdir} --snp_file {input.snp} {input.bam}"
 elif aligner == "STAR":
     rule snp_split:
@@ -24,11 +24,11 @@ elif aligner == "STAR":
             temp(aligner+"/{sample}.sortedByName.bam"),
             expand("allelic_bams/{{sample}}.{suffix}.bam", suffix = ['allele_flagged', 'genome1', 'genome2', 'unassigned'])
         params:
-            paired = '--paired' if paired else '',
+            pairedEnd = '--paired' if pairedEnd else '',
             outdir = "allelic_bams"
         conda: CONDA_SHARED_ENV
         shell:
-            "SNPsplit {params.paired}"
+            "SNPsplit {params.pairedEnd}"
             " -o {params.outdir} --snp_file {input.snp} {input.bam}"
 
 # move the allele-specific bams to another folder

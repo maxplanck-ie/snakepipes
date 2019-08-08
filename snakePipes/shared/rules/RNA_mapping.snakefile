@@ -1,8 +1,8 @@
-def getHISAT_libtype(paired, libraryType):
+def getHISAT_libtype(pairedEnd, libraryType):
     """
     Convert from a featureCounts library type to a HISAT2 option string
     """
-    if paired:
+    if pairedEnd:
         if libraryType == 1:
             return "--rna-strandness FR"
         elif libraryType == 2:
@@ -22,7 +22,7 @@ def getHISAT_libtype(paired, libraryType):
 ### HISAT2 #####################################################################
 
 if aligner.upper().find("HISAT2") >=0:
-    if paired:
+    if pairedEnd:
         rule HISAT2:
             input:
                 r1 = fastq_dir+"/{sample}"+reads[0]+".fastq.gz",
@@ -33,7 +33,7 @@ if aligner.upper().find("HISAT2") >=0:
                 splice = aligner+"/{sample}/splice_sites.txt",
                 met = aligner+"/{sample}/metrics.txt"
             params:
-                lib_type = getHISAT_libtype(paired, libraryType),
+                lib_type = getHISAT_libtype(pairedEnd, libraryType),
                 input_splice = known_splicesites,
                 alignerOptions = str(alignerOptions or ''),
                 samsort_memory = '2G',
@@ -63,7 +63,7 @@ if aligner.upper().find("HISAT2") >=0:
                 splice = aligner+"/{sample}/splice_sites.txt",
                 met = aligner+"/{sample}/metrics.txt"
             params:
-                lib_type = getHISAT_libtype(paired, libraryType),
+                lib_type = getHISAT_libtype(pairedEnd, libraryType),
                 input_splice = known_splicesites,
                 alignerOptions = str(alignerOptions or ''),
                 samsort_memory = '2G',
@@ -84,7 +84,7 @@ if aligner.upper().find("HISAT2") >=0:
                 rm -rf $MYTEMP
                 """
 elif aligner.upper().find("STAR") >=0:
-    if paired:
+    if pairedEnd:
         rule STAR:
             input:
                 r1 = fastq_dir+"/{sample}"+reads[0]+".fastq.gz",

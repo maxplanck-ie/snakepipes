@@ -75,7 +75,7 @@ section refers to sample group (control/test, male/female, normal/diseased etc..
 Using BAM input
 ---------------
 
-In many workflows it is possible to directly use BAM files as input by specifying ``--fromBAM``. Note that you must then specify whether you have paired-end (the default) or single-end data. This is typically done with the ``--single-end`` option.
+In many workflows it is possible to directly use BAM files as input by specifying ``--fromBAM``. Note that you must then specify whether you have paired-end (the default) or single-end data. This is typically done with the ``--singleEnd`` option.
 
 Changing read extensions or mate designators
 --------------------------------------------

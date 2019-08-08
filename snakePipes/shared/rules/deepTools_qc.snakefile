@@ -11,7 +11,7 @@ rule bamCoverage:
         bwBinSize = bwBinSize,
         genome_size = int(genome_size),
         ignoreForNorm = "--ignoreForNormalization {}".format(ignoreForNormalization) if ignoreForNormalization else "",
-        read_extension = "--extendReads" if paired
+        read_extension = "--extendReads" if pairedEnd
                          else "--extendReads {}".format(fragmentLength),
         blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed else "",
     log:
@@ -36,7 +36,7 @@ rule bamCoverage_filtered:
         bwBinSize = bwBinSize,
         genome_size = int(genome_size),
         ignoreForNorm = "--ignoreForNormalization {}".format(ignoreForNormalization) if ignoreForNormalization else "",
-        read_extension = "--extendReads" if paired
+        read_extension = "--extendReads" if pairedEnd
                          else "--extendReads {}".format(fragmentLength),
         blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed
                     else "",
@@ -62,7 +62,7 @@ rule plotCoverage:
         "deepTools_qc/plotCoverage/read_coverage.tsv"
     params:
         labels = " ".join(samples),
-        read_extension = "--extendReads" if paired
+        read_extension = "--extendReads" if pairedEnd
                          else "--extendReads {}".format(fragmentLength),
         plotcmd = "" if plotFormat == 'None' else
                     "--plotFile deepTools_qc/plotCoverage/read_coverage.{}".format(plotFormat)
@@ -86,7 +86,7 @@ rule multiBamSummary:
     params:
         labels = " ".join(samples),
         blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed else "",
-        read_extension = "--extendReads" if paired
+        read_extension = "--extendReads" if pairedEnd
                          else "--extendReads {}".format(fragmentLength)
     log:
         out = "deepTools_qc/logs/multiBamSummary.out",
@@ -178,12 +178,12 @@ rule computeGCBias:
         png = "deepTools_qc/computeGCBias/{sample}.filtered.GCBias.png",
         tsv = "deepTools_qc/computeGCBias/{sample}.filtered.GCBias.freq.tsv"
     params:
-        paired = paired,
+        pairedEnd = pairedEnd,
         fragmentLength = fragmentLength,
         genome_size = int(genome_size),
         genome_2bit = genome_2bit,
         blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed else "",
-        median_fragment_length = "" if paired else "-fragmentLength {}".format(fragmentLength),
+        median_fragment_length = "" if pairedEnd else "-fragmentLength {}".format(fragmentLength),
         sampleSize = downsample if downsample and downsample < 10000000 else 10000000
     log:
         out = "deepTools_qc/logs/computeGCBias.{sample}.filtered.out",
