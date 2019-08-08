@@ -138,17 +138,6 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          action="store_true",
                          help="Perform GC bias calculation with deepTools.")
 
-    optional.add_argument("--UMIBarcode",
-                          action="store_true",
-                          help="To extract umi barcode from fastq file."
-                          "(default: '%(default)s')",
-                          default=defaults["UMIbarcode"])
-
-    optional.add_argument("--bcPattern",
-                         help="The pattern to be considered for the barcode."
-                         "(default: '%(default)s')",
-                         default=defaults["bcPattern"])
-
     return parser
 
 
