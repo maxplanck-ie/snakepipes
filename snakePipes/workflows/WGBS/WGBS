@@ -47,10 +47,9 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          "DMRprograms": "metilene,dmrseq", "minCoverage": 5,
                          "blacklist": None, "sampleSheet": None,
                          "noAutoMethylationBias": False, "fromBAM": False, "skipDOC": False,
-                         "umidedup": False,
-                         "umidedup_opts": "", "bcpattern": "",
-                         "umidedup_sep": "_", "umibarcode": False,
-                         "bcpattern": "", "mate_orientation": "--fr"}):
+                         "UMIDedup": False,
+                         "UMIDedupOpts": "", "bcPattern": "",
+                         "UMIDedupSep": "_", "UMIBarcode": False}):
 
     """
     Parse arguments from the command line.
@@ -122,9 +121,10 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                           help="If --fromBAM is specified, this is the expected file extension. Removing it yields sample names. Default: '%(default)s'",
                           default=defaults["bamExt"])
 
-    optional.add_argument("--paired",
+    optional.add_argument("--singleEnd",
+                          dest="pairedEnd",
                           help="If --fromBAM is specified, this indicates that the input BAM files contain paired-end data. The option is ignored unless --fromBAM is given.",
-                          action="store_true")
+                          action="store_false")
 
     optional.add_argument("--DMRprograms",
                           help="If a sample sheet is provided, use the specified DMR-calling programs. Multiple programs can be comma-separated with no spaces (e.g., 'metilene,dmrseq,dss'). The available programs are metilene, dmrseq, and DSS (note that this is very slow). Default: %(default)s.",
@@ -138,18 +138,16 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          action="store_true",
                          help="Perform GC bias calculation with deepTools.")
 
-    optional.add_argument("--umibc",
-                          dest="umibarcode",
+    optional.add_argument("--UMIBarcode",
                           action="store_true",
                           help="To extract umi barcode from fastq file."
                           "(default: '%(default)s')",
-                          default=defaults["umibarcode"])
+                          default=defaults["UMIbarcode"])
 
-    optional.add_argument("--bcpattern",
-                         dest="bcpattern",
+    optional.add_argument("--bcPattern",
                          help="The pattern to be considered for the barcode."
                          "(default: '%(default)s')",
-                         default=defaults["bcpattern"])
+                         default=defaults["bcPattern"])
 
     return parser
 

@@ -28,10 +28,10 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          "filterGTF": None, "sampleSheet": None,
                          "reads": ["_R1", "_R2"], "ext": ".fastq.gz",
                          "bwBinSize": 25, "dnaContam": False, "plotFormat": "png",
-                         "fromBAM": False, "paired": True,
-                         "umidedup": False,
-                         "umidedup_opts": "", "bcpattern": "",
-                         "umidedup_sep": "_", "umibarcode": False}):
+                         "fromBAM": False, "pairedEnd": True,
+                         "UMIDedup": False,
+                         "UMIDedupOpts": "", "bcPattern": "",
+                         "UMIDedupSep": "_", "UMIBarcode": False}):
     """
     Parse arguments from the command line.
     """
@@ -101,11 +101,11 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          action="store_true",
                          help=argparse.SUPPRESS,default=defaults["fromBAM"])
 
-    optional.add_argument("--single-end",
-                          dest="paired",
+    optional.add_argument("--singleEnd",
+                          dest="pairedEnd",
                           action="store_false",
                           help="input data is single-end, not paired-end. This is only used if --fromBAM is specified.",
-                          default=defaults["paired"])
+                          default=defaults["pairedEnd"])
 
     return parser
 
@@ -138,8 +138,8 @@ def main():
     for mode in modeTemp:
         if mode not in validModes:
             sys.exit("{} is not a valid mode!\n".format(mode))
-    if "alignment" not in modeTemp and args.umidedup:
-        sys.exit("umidedup is only valid for \"alignment\" mode!\n")
+    if "alignment" not in modeTemp and args.UMIDedup:
+        sys.exit("UMIDedup is only valid for \"alignment\" mode!\n")
     if args.fromBAM and ("alignment-free" in modeTemp or "allelic-mapping" in modeTemp):
         sys.exit("\n--fromBAM can only be used with modes \'alignment\' or \'deepTools_qc\' - use one of these modes or provide fastq files!\n")
     if args.fromBAM:

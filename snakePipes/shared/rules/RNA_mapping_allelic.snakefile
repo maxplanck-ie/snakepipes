@@ -1,9 +1,6 @@
-
-
-
 ## allelic mapping using STAR
 if aligner == "STAR":
-    if paired:
+    if pairedEnd:
         rule STAR_allele:
             input:
                 r1 = fastq_dir+"/{sample}"+reads[0]+".fastq.gz",

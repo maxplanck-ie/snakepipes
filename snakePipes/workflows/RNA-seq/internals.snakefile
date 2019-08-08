@@ -35,7 +35,7 @@ if not fromBAM:
     infiles = sorted(glob.glob(os.path.join(indir, '*' + ext)))
     samples = cf.get_sample_names(infiles, ext, reads)
 
-    paired = cf.is_paired(infiles, ext, reads)
+    pairedEnd = cf.is_paired(infiles, ext, reads)
 else:
     infiles = sorted(glob.glob(os.path.join(str(indir or ''), '*' + bamExt)))
     samples = cf.get_sample_names_bam(infiles, bamExt)

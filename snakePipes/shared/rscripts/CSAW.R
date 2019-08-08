@@ -6,7 +6,7 @@ sampleInfoFilePath <- snakemake@input[["sampleSheet"]]  #"samplesheet.tab"
 insert_size_metrics <- snakemake@params[["insert_size_metrics"]] # bamPEFragmentSize output
 fdr <- as.numeric(snakemake@params[["fdr"]])
 lfc <- as.numeric(snakemake@params[["absBestLFC"]])
-paired <- as.logical(snakemake@params[["paired"]])
+pairedEnd <- as.logical(snakemake@params[["pairedEnd"]])
 fraglength <- as.numeric(snakemake@params[["fragmentLength"]])  # used when the data is not paired end
 windowSize <- as.numeric(snakemake@params[["windowSize"]])
 importfunc <- snakemake@params[["importfunc"]]  #"DB_functions.R"
@@ -35,14 +35,14 @@ cat(paste("Working dir:", getwd(), "\n"))
 cat(paste("Sample info CSV:", sampleInfoFilePath, "\n"))
 cat(paste("FDR:", fdr, "\n"))
 cat(paste("LFC:", lfc, "\n"))
-cat(paste("paired-end? :", paired, "\n"))
+cat(paste("paired-end? :", pairedEnd, "\n"))
 cat(paste("allele-specific? :", allelic_info, "\n"))
 
 ## sampleInfo (setup of the experiment)
 sampleInfo <- read.table(sampleInfoFilePath, header = TRUE, colClasses = c("character", "factor"))
 ## is paired end? : define read params
 pe = "none"
-if(isTRUE(paired)) {
+if(isTRUE(pairedEnd)) {
     pe = "both"
     d = read.delim(insert_size_metrics)
     fraglength = median(d[,6])

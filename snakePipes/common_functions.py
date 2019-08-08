@@ -124,7 +124,7 @@ def is_paired(infiles, ext, reads):
     """
     Check for paired-end input files
     """
-    paired = False
+    pairedEnd = False
     infiles_dic = {}
     for infile in infiles:
         fname = os.path.basename(infile).replace(ext, "")
@@ -136,9 +136,9 @@ def is_paired(infiles, ext, reads):
             else:
                 infiles_dic[bname].append(infile)
     if infiles_dic and max([len(x) for x in infiles_dic.values()]) == 2:
-        paired = True
+        pairedEnd = True
     # TODO: raise exception if single-end and paired-end files are mixed
-    return paired
+    return pairedEnd
 
 
 def check_replicates(sample_info_file):

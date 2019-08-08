@@ -11,7 +11,7 @@ rule featureCounts_allele:
         'featureCounts/{sample}.allelic_counts.txt'
     params:
         libtype = libraryType,
-        paired_opt = lambda wildcards: "-p -B " if paired else "",
+        paired_opt = lambda wildcards: "-p -B " if pairedEnd else "",
         opts = config["featureCountsOptions"],
     log:
         out = "featureCounts/{sample}.out",

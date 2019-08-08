@@ -34,12 +34,12 @@ if not 'genes_bed' in globals():
 if not fromBAM:
     infiles = sorted(glob.glob(os.path.join(str(indir or ''), '*{}'.format(ext))))
     samples = cf.get_sample_names(infiles, ext, reads)
-    paired = cf.is_paired(infiles, ext, reads)
+    pairedEnd = cf.is_paired(infiles, ext, reads)
 
     if not samples:
         sys.exit("Error! NO samples found in dir {}!!!\n".format(str(indir or '')))
 
-    if not paired:
+    if not pairedEnd:
         sys.exit("Error! Paired-end samples not detected. "
                  "WGBS workflow currently works only with paired-end samples {}!!!\n".format(str(indir or '')))
 else:

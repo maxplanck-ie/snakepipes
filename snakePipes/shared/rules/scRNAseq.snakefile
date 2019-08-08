@@ -57,7 +57,7 @@ rule sc_bam_featureCounts_genomic:
         counts_summary = "Counts/{sample}.featureCounts_summary.txt"
     params:
         count_script = workflow.basedir+"/scRNAseq_bam_featureCounts.sh",
-        bc_file = barcode_file,
+        bc_file = cellBarcodeFile,
         lib_type = libraryType
     threads: 
         5
@@ -98,8 +98,8 @@ rule combine_sample_counts:
         used_cell_names_file = "Results/all_samples.used_cells.tsv"
     params:
         merge_script = workflow.basedir+"/scRNAseq_merge_coutt_files2.R",
-        split = split_lib,
-        sample_cell_names = str(cell_names or '')
+        split = splitLib,
+        sample_cell_names = str(cellNames or '')
     conda: CONDA_scRNASEQ_ENV
     shell:
         "Rscript {params.merge_script} Counts/ {output.merged_matrix} {output.used_cell_names_file} {params.split} {params.sample_cell_names} """
@@ -131,7 +131,7 @@ rule cluster_cells_monocle:
             fINpath=lambda wildcards,input: os.path.join(outdir,input.metrics_tab),
             err='Filtered_cells_monocle/logs/cluster_cells.err',
             out='Filtered_cells_monocle/logs/cluster_cells.out',
-            metric=cell_filter_metric
+            metric=cellFilterMetric
         threads: 1
         conda: CONDA_scRNASEQ_ENV
         shell: "Rscript --no-save --no-restore " + os.path.join(workflow_rscripts,'scRNAseq_select_threshold_cluster_monocle.R ') + "{params.wdir} {params.fINpath} {params.metric} 1>{params.out} 2>{params.err}"
@@ -146,7 +146,7 @@ rule monocle_report:
         rmd_in=os.path.join(workflow_rscripts,"scRNAseq_monocle_stats_report.Rmd"),
         rmd_out=os.path.join(outdir, "scRNAseq_monocle_stats_report.Rmd"),
         outFull=lambda wildcards,output: os.path.join(outdir,output.html),
-        metric=cell_filter_metric
+        metric=cellFilterMetric
     log:
         err='Filtered_cells_monocle/logs/stats_report.err',
         out='Filtered_cells_monocle/logs/stats_report.out'
@@ -182,7 +182,7 @@ if not skipRaceID:
                 fINpath=lambda wildcards,input: os.path.join(outdir,input.metrics_tab),
                 err='Filtered_cells_RaceID/logs/cluster_cells.err',
                 out='Filtered_cells_RaceID/logs/cluster_cells.out',
-                metric=cell_filter_metric
+                metric=cellFilterMetric
             threads: 1
             conda: CONDA_scRNASEQ_ENV
             shell: "Rscript --no-save --no-restore " + os.path.join(workflow_rscripts,'scRNAseq_select_threshold_cluster_raceid.R ') + "{params.wdir} {params.fINpath} {params.metric} 1>{params.out} 2>{params.err}"
@@ -198,7 +198,7 @@ if not skipRaceID:
             rmd_in=os.path.join(workflow_rscripts,"scRNAseq_raceid_stats_report.Rmd"),
             rmd_out=os.path.join(outdir, "scRNAseq_raceid_stats_report.Rmd"),
             outFull=lambda wildcards,output: os.path.join(outdir,output.html),
-            metric=cell_filter_metric
+            metric=cellFilterMetric
         log:
             err='Filtered_cells_RaceID/logs/stats_report.err',
             out='Filtered_cells_RaceID/logs/stats_report.out'
@@ -220,7 +220,7 @@ rule sc_QC_metrics:
         plot_script = workflow.basedir+"/scRNAseq_QC_metrics2.R",
         out_prefix = "QC_report/QC_report.all_samples",
         plotFormat = plotFormat,
-        split = split_lib
+        split = splitLib
     conda: CONDA_RNASEQ_ENV
     shell:
         ""+workflow.basedir+"/scRNAseq_QC_metrics.sh {params.in_dir} {params.out_dir} >{output.summary};"

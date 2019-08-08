@@ -123,7 +123,7 @@ There is a configuration file in ``snakePipes/workflows/ChIP-seq/defaults.yaml``
     ## Value can be also path to your own genome config file!
     genome:
     ## paired end data?
-    paired: true
+    pairedEnd: true
     ## Bin size of output files in bigWig format
     bwBinSize: 25
     ## Median/mean fragment length, only relevant for single-end data (default: 200)

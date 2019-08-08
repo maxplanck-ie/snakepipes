@@ -50,7 +50,7 @@ else:
     DMRprograms = set()  # To allow "foo in DMRprograms"
 
 # TODO: Still needed?
-idxRange = 2 if paired else 1
+idxRange = 2 if pairedEnd else 1
 def calc_doc(skipDOC):
     if not skipDOC:
         return (["QC_metrics/genomeCoverage.txt",

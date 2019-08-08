@@ -21,7 +21,7 @@ matrix_format = ".h5"
 
 ## find out which resolution is it (RF or binsize)
 def get_matrixFile_suffix():
-    if(RF_resolution is True):
+    if(RFResolution is True):
         return("rf")
     else:
         return("bs")
@@ -44,7 +44,7 @@ def get_dangling_seq(name):
 
 ## merge all the HiC matrices and create new file if asked
 def merge_inputs():
-    if(merge_samples is True):
+    if(mergeSamples is True):
         return(["HiC_matrices/all_matrices_merged"+matrix_format #,"HiC_matrices/QCplots/all_matrices_merged_diagnostic_plot.pdf"
                ])
     else:
@@ -52,8 +52,8 @@ def merge_inputs():
 
 ## merge hic Bins if asked and create new files
 def get_merged_bins():
-    if(nbins_toMerge != 0):
-        return(expand("HiC_matrices/{sample}_"+matrixFile_suffix+"_m"+str(nbins_toMerge)+matrix_format, sample=samples))
+    if(nBinsToMerge != 0):
+        return(expand("HiC_matrices/{sample}_"+matrixFile_suffix+"_m"+str(nBinsToMerge)+matrix_format, sample=samples))
     else:
         return([])
 
@@ -107,14 +107,14 @@ def printToolsVersion(usedEnvs):
 ### Initialization #############################################################
 infiles = sorted(glob.glob(os.path.join(str(indir or ''), '*'+ext)))
 samples = cf.get_sample_names(infiles,ext,reads)
-paired = cf.is_paired(infiles,ext,reads)
+pairedEnd = cf.is_paired(infiles,ext,reads)
 del infiles
 
 if not samples:
     print("\n  Error! NO samples found in dir "+str(indir or '')+"!!!\n\n")
     exit(1)
 
-if not paired:
+if not pairedEnd:
     print("\n  Error! Paired-end samples not detected. "
           "Hi-C workflow requires paired-end samples "+str(indir or '')+"!!!\n\n")
     exit(1)

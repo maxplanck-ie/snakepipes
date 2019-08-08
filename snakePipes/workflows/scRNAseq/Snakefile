@@ -25,9 +25,9 @@ include: os.path.join(maindir, "shared", "rules", "umi_tools.snakefile")
 
 include: os.path.join(maindir, "shared", "rules", "RNA_mapping.snakefile")
 include: os.path.join(maindir, "shared", "rules", "scRNAseq.snakefile")
-paired = True
+pairedEnd = True
 include: os.path.join(maindir, "shared", "rules", "FastQC.snakefile")
-paired = False
+pairedEnd = False
 include: os.path.join(maindir, "shared", "rules", "filterGTF.snakefile")
 include: os.path.join(maindir, "shared", "tools" , "deeptools_cmds.snakefile")
 include: os.path.join(maindir, "shared", "rules", "deepTools_RNA.snakefile")
@@ -83,7 +83,7 @@ onstart:
         print("Input directory:", indir)
         print("Input files:", infiles)
         print("Samples:", samples)
-        print("Paired-end reads:", paired)
+        print("Paired-end reads:", pairedEnd)
         print("Read extension:", reads)
         print("Genome:", genome)
         print("Downsample:", downsample)
@@ -91,8 +91,8 @@ onstart:
         print("Input directory for mapping:", fastq_dir)
         print("Input directory for trimming:", fastq_indir_trim)
         print("BigWig bin size:", bwBinSize)
-        print("Barcode pattern:", barcode_pattern)
-        print("Barcode file:", barcode_file)
+        print("Barcode pattern:", cellBarcodePattern)
+        print("Barcode file:", cellBarcodeFile)
         print("UMI_LEN:",UMI_length)
         print("UMI_offset:",UMI_offset)
         print("CELLI_LEN:",CELLI_length)

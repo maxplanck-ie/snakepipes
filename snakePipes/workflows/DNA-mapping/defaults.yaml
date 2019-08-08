@@ -40,7 +40,7 @@ bwBinSize: 25
 ## Run FASTQC read quality control
 fastqc: false
 ## Run computeGCBias quality control
-gcbias: false
+GCBias: false
 ## Retain only de-duplicated reads/read pairs
 dedup: false
 ## Retain only reads with at least the given mapping quality
@@ -54,11 +54,11 @@ mateOrientation: --fr
 insertSizeMax: 1000
 alignerOpts:
 plotFormat: png
-umibarcode: False
-bcpattern: NNNNCCCCCCCC #default: 4 base umi barcode, 8 base cell barcode (eg. RELACS barcode)
-umidedup: False
-umidedup_sep: "_"
-umidedup_opts:
+UMIBarcode: False
+bcPattern: NNNNCCCCCCCC #default: 4 base umi barcode, 8 base cell barcode (eg. RELACS barcode)
+UMIDedup: False
+UMIDedupSep: "_"
+UMIDedupOpts:
 ## Median/mean fragment length, only relevant for single-end data (default: 200)
 fragmentLength: 200
 qualimap: false

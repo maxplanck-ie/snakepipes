@@ -26,7 +26,7 @@ rule conversionRate:
 
 
 ### bwameth ##########################################
-if paired:
+if pairedEnd:
     rule bwameth:
         input:
             r1=fastq_dir + "/{sample}" + reads[0] + ".fastq.gz",

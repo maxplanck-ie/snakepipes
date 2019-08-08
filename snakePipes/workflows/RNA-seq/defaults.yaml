@@ -27,7 +27,7 @@ ext: '.fastq.gz'
 ## paired-end read name extension (default: ["_R1", "_R2"])
 reads: ["_R1","_R2"]
 ## assume paired end reads
-paired: True
+pairedEnd: True
 ## Number of reads to downsample from each FASTQ file
 downsample:
 ## Options for trimming
@@ -57,11 +57,11 @@ NMaskedIndex:
 fromBAM: False
 bamExt: '.bam'
 #umi_tools
-umibarcode: False
-bcpattern: NNNNCCCCCCCCC #default: 4 base umi barcode, 9 base cell barcode (eg. RELACS barcode)
-umidedup: False
-umidedup_sep: "_"
-umidedup_opts: --paired
+UMIBarcode: False
+bcPattern: NNNNCCCCCCCCC #default: 4 base umi barcode, 9 base cell barcode (eg. RELACS barcode)
+UMIDedup: False
+UMIDedupSep: "_"
+UMIDedupOpts: --paired
 ################################################################################
 # Call snakemake directly, i.e. without using the wrapper script:
 #

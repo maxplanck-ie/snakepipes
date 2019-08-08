@@ -29,7 +29,7 @@ if trim:
 
 infiles = sorted(glob.glob(os.path.join(str(indir or ''), '*'+ext)))
 
-paired = cf.is_paired(infiles,ext,reads)
+pairedEnd = cf.is_paired(infiles,ext,reads)
 
 samples = cf.get_sample_names(infiles,ext,reads)
 
@@ -42,5 +42,5 @@ if not samples:
 fromBAM = None
 
 idxRange = 1
-if paired:
+if pairedEnd:
     idxRange = 2

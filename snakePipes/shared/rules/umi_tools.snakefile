@@ -1,6 +1,6 @@
 ##umi_tools###############
-if umibarcode:
-    if paired:
+if UMIBarcode:
+    if pairedEnd:
         rule umi_extract:
             input:
                 r1 = "originalFASTQ/downsample_{sample}"+reads[0]+".fastq.gz" if downsample else "originalFASTQ/{sample}"+reads[0]+".fastq.gz",
@@ -9,7 +9,7 @@ if umibarcode:
                 r1 = "FASTQ/{sample}"+reads[0]+".fastq.gz",
                 r2 = "FASTQ/{sample}"+reads[1]+".fastq.gz"
             params:
-                bcpattern = str(bcpattern)
+                bcpattern = str(bcPattern)
             log:
                 out = "FASTQ/logs/{sample}_log.out",
                 err = "FASTQ/logs/{sample}_log.err"
@@ -28,7 +28,7 @@ if umibarcode:
             output:
                 r1 = "FASTQ/{sample}"+reads[0]+".fastq.gz",
             params:
-                bcpattern = str(bcpattern)
+                bcpattern = str(bcPattern)
             log:
                 out = "FASTQ/logs/{sample}_log.out",
                 err = "FASTQ/logs/{sample}_log.err"
@@ -56,7 +56,7 @@ else:
               "( [ -f {output} ] || ln -s -r {input} {output} )"
 
 #If DNA-mapping:
-if umidedup:
+if UMIDedup:
     rule filter_reads_umi:
         input:
             bamfile = "filtered_bam/{sample}.filtered.tmp.bam" if aligner == "Bowtie2" else aligner+"/{sample}.bam",
@@ -64,9 +64,9 @@ if umidedup:
         output:
             bamfile = "filtered_bam/{sample}.filtered.bam"
         params:
-            umitools_options = str(umidedup_opts or ''),
-            umitools_paired = "--paired " if paired else " ",
-            umi_sep = str(umidedup_sep      ),
+            umitools_options = str(UMIDedupOpts or ''),
+            umitools_paired = "--paired " if pairedEnd else " ",
+            umi_sep = str(UMIDedupSep),
         log:
             out = "filtered_bam/logs/umi_dedup.{sample}.out",
             err = "filtered_bam/logs/umi_dedup.{sample}.err"

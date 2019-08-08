@@ -67,7 +67,7 @@ Workflow configuration file
 	#### Flag to control the pipeline entry point
 	fromBAM: False
 	bamExt: '.bam'
-	paired: True
+	pairedEnd: True
 	###Flags to control skipping of certain QC calculations
 	skipDOC: False
 	GCbias: False
@@ -81,11 +81,11 @@ Workflow configuration file
 	###MethylDackel options
 	MethylDackelOptions: '--mergeContext --maxVariantFrac 0.25 --minDepth 4'
 	##umi_tools
-	umibarcode: False
-	bcpattern: NNNNCCCCCCCCC #default: 4 base umi barcode, 9 base cell barcode (eg. RELACS barcode)
-	umidedup: False
-	umidedup_sep: "_"
-	umidedup_opts: --paired
+	UMIBarcode: False
+	bcPattern: NNNNCCCCCCCCC #default: 4 base umi barcode, 9 base cell barcode (eg. RELACS barcode)
+	UMIDedup: False
+	UMIDedupSep: "_"
+	UMIDedupOpts: --paired
 	aligner: bwameth
 
 Understanding the outputs

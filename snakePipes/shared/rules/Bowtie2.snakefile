@@ -1,5 +1,5 @@
 ### Bowtie2 ####################################################################
-if paired:
+if pairedEnd:
     rule Bowtie2:
         input:
             r1 = fastq_dir+"/{sample}"+reads[0]+".fastq.gz",

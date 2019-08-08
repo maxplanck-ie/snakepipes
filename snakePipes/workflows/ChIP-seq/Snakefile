@@ -126,7 +126,7 @@ onstart:
         print("control samples:", control_samples)
         print("ChIP samples w ctrl:", chip_samples_w_ctrl)
         print("ChIP samples wo ctrl:", chip_samples_wo_ctrl)
-        print("paired:", paired)
+        print("paired:", pairedEnd)
         print("-" * 80, "\n")
 
         print("--- Environment ----------------------------------------------------------------")

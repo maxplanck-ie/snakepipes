@@ -111,7 +111,7 @@ include: os.path.join(maindir, "shared", "rules", "multiQC.snakefile")
 ################################################################################
 def run_FastQC(fastqc):
     readsUse = reads
-    if not paired:
+    if not pairedEnd:
         readsUse = [reads[0]]
     if fastqc:
         return( expand("FastQC/{sample}{read}_fastqc.html", sample = samples, read = readsUse) )
@@ -121,7 +121,7 @@ def run_FastQC(fastqc):
 
 def run_Trimming(trim, fastqc):
     readsUse = reads
-    if not paired:
+    if not pairedEnd:
         readsUse = [reads[0]]
     if trim and fastqc:
         return( expand(fastq_dir+"/{sample}{read}.fastq.gz", sample = samples, read = readsUse) +
@@ -214,7 +214,7 @@ def run_deepTools_qc():
         expand("bamCoverage/{sample}.uniqueMappings.rev.bw", sample = samples),
         "deepTools_qc/plotEnrichment/plotEnrichment.tsv",
         expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample = samples)]
-        if paired:
+        if pairedEnd:
             file_list.append("deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv")
         if len(samples)>1:
             file_list.append( ["deepTools_qc/multiBigwigSummary/coverage.bed.npz",
@@ -247,7 +247,7 @@ onstart:
         print("--- Workflow parameters --------------------------------------------------------")
         print("mode:", mode)
         print("samples:", samples)
-        print("paired:", paired)
+        print("paired:", pairedEnd)
         print("read extension:", reads)
         print("fastq dir:", fastq_dir)
         print("filter GTF:", filterGTF)
@@ -264,7 +264,7 @@ onstart:
         print("--- Workflow parameters --------------------------------------------------------")
         print("samples:" + str(samples))
         print("input dir:" + indir)
-        print("paired:", paired)
+        print("paired:", pairedEnd)
         print("-" * 80)  # , "\n"
 
         print("--- Environment ----------------------------------------------------------------")

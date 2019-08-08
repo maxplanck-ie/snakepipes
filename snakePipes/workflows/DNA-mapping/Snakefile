@@ -93,9 +93,9 @@ def run_Trimming(trim, fastqc):
     else:
         return([])
 
-def run_computeGCBias(gcbias):
+def run_computeGCBias(GCBias):
     file_list = []
-    if gcbias:
+    if GCBias:
         if not downsample:
             file_list = expand("deepTools_qc/computeGCBias/{sample}.filtered.GCBias.png", sample = samples)
     return(file_list)
@@ -157,7 +157,7 @@ onstart:
     if "verbose" in config and config["verbose"]:
         print("--- Workflow parameters --------------------------------------------------------")
         print("samples:", samples)
-        print("paired:", paired)
+        print("paired:", pairedEnd)
         print("read extension:", reads)
         print("fastq dir:", fastq_dir)
         print("maximum insert size (Bowtie2 -X):", insertSizeMax)
@@ -182,7 +182,7 @@ rule all:
         expand("filtered_bam/{sample}.filtered.bam", sample = samples),
         expand("bamCoverage/{sample}.seq_depth_norm.bw", sample = samples),
         expand("bamCoverage/{sample}.filtered.seq_depth_norm.bw", sample = samples),
-        run_computeGCBias(gcbias),
+        run_computeGCBias(GCBias),
         run_deepTools_qc(),
         run_Qualimap(),
         make_nmasked_genome(),
