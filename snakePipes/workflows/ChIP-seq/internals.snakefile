@@ -138,6 +138,10 @@ else:
     for sample in all_samples:
         if sample not in bamDict:
             sys.exit("No bam file found for chip sample {}!".format(sample))
+    aligner = "EXTERNAL_BAM"
+    indir = fromBAM
+    samples = all_samples
+    downsample = None
 
 
 ##filter sample dictionary by the subset of samples listed in the 'name' column of the sample sheet
@@ -163,7 +167,3 @@ def filter_dict(sampleSheet,input_dict):
 
 if sampleSheet:
     filtered_dict = filter_dict(sampleSheet,dict(zip(chip_samples_w_ctrl, [ get_control_name(x) for x in chip_samples_w_ctrl ])))
-    aligner = "EXTERNAL_BAM"
-    indir = fromBAM
-    samples = all_samples
-    downsample = None
