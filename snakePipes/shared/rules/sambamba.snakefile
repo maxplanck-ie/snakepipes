@@ -31,11 +31,7 @@ rule sambamba_flagstat_sorted:
 
 rule sambamba_flagstat:
        input:
-<<<<<<< HEAD
-           "filtered_bam/{sample}.filtered.bam"
-=======
            aligner+"/{sample}.bam"
->>>>>>> f76ceedcf068a9398b83872d72412c4997b20878
        output:
            "Sambamba/{sample}.markdup.txt"
        conda: CONDA_SAMBAMBA_ENV
