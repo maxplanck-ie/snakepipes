@@ -1,38 +1,38 @@
 
 ## get input bam depending on the mapping prog (use filtered bam in case of chip-seq data)
-if mapping_prg == "Bowtie2":
+if aligner == "Bowtie2":
     rule snp_split:
         input:
-            snp = snp_file,
+            snp = SNPFile,
             bam = "filtered_bam/{sample}.filtered.bam"
         output:
             temp("filtered_bam/{sample}.filtered.sortedByName.bam"),
             expand("allelic_bams/{{sample}}.filtered.{suffix}.bam", suffix = ['allele_flagged', 'genome1', 'genome2', 'unassigned'])
         params:
-            paired = '--paired' if paired else '',
+            pairedEnd = '--paired' if pairedEnd else '',
             outdir = "allelic_bams"
         conda: CONDA_SHARED_ENV
         shell:
-            "SNPsplit {params.paired}"
+            "SNPsplit {params.pairedEnd}"
             " -o {params.outdir} --snp_file {input.snp} {input.bam}"
-elif mapping_prg == "STAR":
+elif aligner == "STAR":
     rule snp_split:
         input:
-            snp = snp_file,
-            bam = mapping_prg+"/{sample}.bam"
+            snp = SNPFile,
+            bam = aligner+"/{sample}.bam"
         output:
-            temp(mapping_prg+"/{sample}.sortedByName.bam"),
+            temp(aligner+"/{sample}.sortedByName.bam"),
             expand("allelic_bams/{{sample}}.{suffix}.bam", suffix = ['allele_flagged', 'genome1', 'genome2', 'unassigned'])
         params:
-            paired = '--paired' if paired else '',
+            pairedEnd = '--paired' if pairedEnd else '',
             outdir = "allelic_bams"
         conda: CONDA_SHARED_ENV
         shell:
-            "SNPsplit {params.paired}"
+            "SNPsplit {params.pairedEnd}"
             " -o {params.outdir} --snp_file {input.snp} {input.bam}"
 
 # move the allele-specific bams to another folder
-if mapping_prg == "Bowtie2":
+if aligner == "Bowtie2":
     rule movebams:
         input:
             "allelic_bams/{sample}.filtered.{suffix}.bam"
@@ -57,7 +57,11 @@ rule BAMsort_allelic:
     threads:
         12
     conda: CONDA_SHARED_ENV
-    shell: "samtools sort -@ {threads} -T ${{TMPDIR}} -O bam -o {output} {input}"
+    shell: """
+        MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX);
+        samtools sort -@ {threads} -T $MYTEMP -O bam -o {output} {input};
+        rm -rf $MYTEMP
+        """
 
 # index the sorted files
 rule BAMindex_allelic:

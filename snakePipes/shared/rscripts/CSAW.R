@@ -5,9 +5,10 @@
 sampleInfoFilePath <- snakemake@input[["sampleSheet"]]  #"samplesheet.tab"
 insert_size_metrics <- snakemake@params[["insert_size_metrics"]] # bamPEFragmentSize output
 fdr <- as.numeric(snakemake@params[["fdr"]])
-paired <- as.logical(snakemake@params[["paired"]])
-fraglength <- as.numeric(snakemake@params[["fragment_length"]])  # used when the data is not paired end
-windowSize <- as.numeric(snakemake@params[["window_size"]])
+lfc <- as.numeric(snakemake@params[["absBestLFC"]])
+pairedEnd <- as.logical(snakemake@params[["pairedEnd"]])
+fraglength <- as.numeric(snakemake@params[["fragmentLength"]])  # used when the data is not paired end
+windowSize <- as.numeric(snakemake@params[["windowSize"]])
 importfunc <- snakemake@params[["importfunc"]]  #"DB_functions.R"
 allelic_info <- as.logical(snakemake@params[["allele_info"]])
 outdir<-snakemake@params[["outdir"]]
@@ -33,14 +34,15 @@ setwd(outdir)
 cat(paste("Working dir:", getwd(), "\n"))
 cat(paste("Sample info CSV:", sampleInfoFilePath, "\n"))
 cat(paste("FDR:", fdr, "\n"))
-cat(paste("paired-end? :", paired, "\n"))
+cat(paste("LFC:", lfc, "\n"))
+cat(paste("paired-end? :", pairedEnd, "\n"))
 cat(paste("allele-specific? :", allelic_info, "\n"))
 
 ## sampleInfo (setup of the experiment)
 sampleInfo <- read.table(sampleInfoFilePath, header = TRUE, colClasses = c("character", "factor"))
 ## is paired end? : define read params
 pe = "none"
-if(isTRUE(paired)) {
+if(isTRUE(pairedEnd)) {
     pe = "both"
     d = read.delim(insert_size_metrics)
     fraglength = median(d[,6])
@@ -56,8 +58,9 @@ if(!is.null(input_list)&&!(input_list=="")){
     sampleInfo<-subset(sampleInfo,!(name %in% input_list))
 }
 
+
 chip_object <- readfiles_chip(sampleSheet = sampleInfo,
-                              fragment_length = fraglength,
+                              fragmentLength = fraglength,
                               window_size = windowSize,
                               alleleSpecific = allelic_info,
                               pe.param = pe_param)
@@ -112,7 +115,7 @@ chip_results <- getDBregions_chip(chip_object, plotfile = "DiffBinding_modelfit.
 
 ## write output
 print("Writing output")
-writeOutput_chip(chip_results, outfile_prefix = "DiffBinding", fdrcutoff = fdr)
+writeOutput_chip(chip_results, outfile_prefix = "DiffBinding", fdrcutoff = fdr,lfccutoff=lfc)
 
 
 ## save data

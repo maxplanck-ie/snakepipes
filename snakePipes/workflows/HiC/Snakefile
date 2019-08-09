@@ -9,9 +9,9 @@ maindir = os.path.dirname(os.path.dirname(workflow.basedir))
 globals().update(cf.set_env_yamls())
 
 # load config file
-globals().update(cf.load_configfile(workflow.overwrite_configfile,config["verbose"]))
+globals().update(cf.load_configfile(workflow.overwrite_configfile, config["verbose"]))
 # load organism-specific data, i.e. genome indices, annotation, etc.
-globals().update(cf.load_organism_data(genome,maindir,config["verbose"]))
+globals().update(cf.load_organism_data(genome, maindir, config["verbose"]))
 
 # do workflow specific stuff now
 include: os.path.join(workflow.basedir, "internals.snakefile")
@@ -28,7 +28,10 @@ if fastqc:
 
 # trimming
 if trim:
-    include: os.path.join(maindir, "shared", "rules", "TrimGalore.snakefile")
+    include: os.path.join(maindir, "shared", "rules", "trimming.snakefile")
+
+#umi_tools
+include: os.path.join(maindir, "shared", "rules", "umi_tools.snakefile")
 
 # HiCExplorer
 include: os.path.join(maindir, "shared", "rules", "hicexplorer.snakefile")
@@ -60,9 +63,9 @@ GROUPS = sample_dict.keys()
 def run_build_matrices():
     file_list = []
     # SAMPLES TO MERGE??
-    if merge_samples:
-        if nbins_toMerge > 0:
-            suffix = "_Mbins" + str(nbins_toMerge) + "_" + matrixFile_suffix
+    if mergeSamples:
+        if nBinsToMerge > 0:
+            suffix = "_Mbins" + str(nBinsToMerge) + "_" + matrixFile_suffix
         else:
             suffix = "_" + matrixFile_suffix
 
@@ -77,8 +80,8 @@ def run_build_matrices():
                 file_list.append(expand("TADs/mergedSamples_{group}"+suffix+"_boundaries.bed", group=GROUPS))
 
     # BINS TO MERGE??
-    elif nbins_toMerge > 0:
-        suffix = "_Mbins" + str(nbins_toMerge) + "_" + matrixFile_suffix
+    elif nBinsToMerge > 0:
+        suffix = "_Mbins" + str(nBinsToMerge) + "_" + matrixFile_suffix
         file_list.append([
             expand("HiC_matrices/{sample}"+suffix+matrix_format, sample=samples),
             expand("HiC_matrices/QCplots/{sample}"+suffix+"_diagnostic_plot.pdf", sample=samples),
@@ -134,7 +137,7 @@ rule all:
         expand("FASTQ/{sample}{read}.fastq.gz", sample = samples, read = reads),
         run_FastQC(fastqc),
         run_Trimming(trim, fastqc),
-        expand(mapping_prg+"/{sample}{read}.bam", sample = samples, read = reads),
+        expand(aligner + "/{sample}{read}.bam", sample = samples, read = reads),
         run_build_matrices(),
         expand("HiC_matrices/QCplots/{sample}_QC/QC.log", sample = samples),
         run_dist_vs_count(),
@@ -143,9 +146,12 @@ rule all:
 ### execute after workflow finished ############################################
 ################################################################################
 onsuccess:
-    cf.cleanLogs(outdir)
+    cf.cleanLogs(outdir, cluster_config)
     if "verbose" in config and config["verbose"]:
         print("\n--- Hi-C workflow finished successfully! --------------------------------\n")
     if toolsVersion:
         usedEnvs = [CONDA_SHARED_ENV, CONDA_HIC_ENV]
         printToolsVersion(usedEnvs)
+
+onerror:
+    print("\n !!! ERROR in HI-C workflow! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")

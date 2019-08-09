@@ -17,10 +17,10 @@ snakePipes
 
 snakePipes are flexible and powerful workflows built using `snakemake <snakemake.readthedocs.io>`__ that simplify the analysis of NGS data.
 
-.. image:: ./docs/content/images/snakePipes.png
+.. image:: ./docs/content/images/snakePipes_small.png
    :scale: 20 %
-   :height: 100px
    :width: 100 px
+   :height: 100 px
    :align: right
 
 Workflows available
@@ -48,7 +48,7 @@ Afterward, simply run the following:
 This will create a new conda environment called "snakePipes" into which snakePipes is installed. You will then need to create the conda environments needed by the various workflows. To facilitate this we provide the `snakePipes` commands:
 
 * ``conda activate snakePipes`` to activate the appropriate conda environment.
-* ``snakePipes createEnvs`` to create the various environments and register GATK.
+* ``snakePipes createEnvs`` to create the various environments.
 
 Indices and annotations needed to run the workflows could be created by a simple command :
 

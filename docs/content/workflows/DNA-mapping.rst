@@ -23,10 +23,10 @@ There is a configuration file in ``snakePipes/workflows/DNA-mapping/defaults.yam
     ## General/Snakemake parameters, only used/set by wrapper or in Snakemake cmdl, but not in Snakefile
     pipeline: dna-mapping
     outdir:
-    configfile:
-    cluster_configfile:
+    configFile:
+    clusterConfigFile:
     local: False
-    max_jobs: 5
+    maxJobs: 5
     ## directory with fastq files
     indir:
     ## preconfigured target genomes (mm9,mm10,dm3,...) , see /path/to/snakemake_workflows/shared/organisms/
@@ -38,34 +38,34 @@ There is a configuration file in ``snakePipes/workflows/DNA-mapping/defaults.yam
     reads: [_R1, _R2]
     ## mapping mode
     mode: mapping
-    mapping_prg: Bowtie2
+    aligner: Bowtie2
     ## Number of reads to downsample from each FASTQ file
     downsample:
     ## Options for trimming
     trim: False
-    trim_prg: cutadapt
-    trim_options:
+    trimmer: cutadapt
+    trimmerOptions:
     ## Bin size of output files in bigWig format
-    bw_binsize: 25
+    bwBinSize: 25
     ## Run FASTQC read quality control
     fastqc: false
     ## Run computeGCBias quality control
-    gcbias: false
+    GCBias: false
     ## Retain only de-duplicated reads/read pairs
     dedup: false
     ## Retain only reads with at least the given mapping quality
     mapq: 0
     ## Retain only reads mapping in proper pairs
-    properpairs: false
+    properPairs: false
     ## Mate orientation in paired-end experiments for Bowtie2 mapping
     ## (default "--fr" is appropriate for Illumina sequencing)
-    mate_orientation: --fr
+    mateOrientation: --fr
     ## other Bowtie2 stuff
-    insert_size_max: 1000
-    bowtie_opts:
-    plot_format: png
+    insertSizeMax: 1000
+    alignerOpts:
+    plotFormat: png
     ## Median/mean fragment length, only relevant for single-end data (default: 200)
-    fragment_length: 200
+    fragmentLength: 200
     qualimap: false
     verbose: false
 

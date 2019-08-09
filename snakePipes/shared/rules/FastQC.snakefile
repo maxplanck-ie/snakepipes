@@ -1,6 +1,4 @@
-
-
-if paired:
+if pairedEnd:
     rule FastQC:
         input:
             "FASTQ/{sample}{read}.fastq.gz"

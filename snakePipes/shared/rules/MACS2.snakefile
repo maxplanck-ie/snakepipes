@@ -7,7 +7,7 @@ import subprocess
 
 ### MACS2 peak calling #########################################################
 
-if paired:
+if pairedEnd:
     rule writeFragmentSize:
         input: "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv"
         output: "MACS2/fragmentSize.metrix.tsv"

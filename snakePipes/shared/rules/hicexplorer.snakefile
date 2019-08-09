@@ -31,7 +31,7 @@ rule map_fastq_single_end:
         "samtools view -Shb - > {output.out}  2>> {log.err}"
 
 ## Make HiC Matrix
-if(RF_resolution is True):
+if(RFResolution is True):
     rule build_matrix:
         input:
             R1 = "BWA/{sample}"+reads[0]+".bam",
@@ -44,7 +44,7 @@ if(RF_resolution is True):
              QCfolder="HiC_matrices/QCplots/{sample}_QC/",
              res_seq = get_restriction_seq(enzyme),
              dang_seq = get_dangling_seq(enzyme),
-             region = lambda wildcards: "--region " + str(restrict_region) if restrict_region else "",
+             region = lambda wildcards: "--region " + str(restrictRegion) if restrictRegion else "",
              min_dist = MIN_RS_DISTANCE,
              max_dist = MAX_RS_DISTANCE
         log:
@@ -75,10 +75,10 @@ else:
 
         params:
             QCfolder="HiC_matrices/QCplots/{sample}_QC/",
-            bin_size = bin_size,
+            bin_size = binSize,
             res_seq = get_restriction_seq(enzyme),
             dang_seq = get_dangling_seq(enzyme),
-            region = lambda wildcards: "--region " + str(restrict_region) if restrict_region else "",
+            region = lambda wildcards: "--region " + str(restrictRegion) if restrictRegion else "",
             min_dist = MIN_RS_DISTANCE,
             max_dist = MAX_RS_DISTANCE
         log:
@@ -117,12 +117,12 @@ rule merge_bins:
      input:
          "HiC_matrices/{sample}_"+matrixFile_suffix+matrix_format
      output:
-         matrix = "HiC_matrices/{sample}_Mbins"+str(nbins_toMerge)+"_"+matrixFile_suffix+matrix_format
+         matrix = "HiC_matrices/{sample}_Mbins" + str(nBinsToMerge) + "_" + matrixFile_suffix+matrix_format
      params:
-         num_bins=nbins_toMerge
+         num_bins=nBinsToMerge
      log:
-         out = "HiC_matrices/logs/{sample}_Mbins"+str(nbins_toMerge)+"_"+matrixFile_suffix+".out",
-         err = "HiC_matrices/logs/{sample}_Mbins"+str(nbins_toMerge)+"_"+matrixFile_suffix+".err"
+         out = "HiC_matrices/logs/{sample}_Mbins" + str(nBinsToMerge) + "_" + matrixFile_suffix+".out",
+         err = "HiC_matrices/logs/{sample}_Mbins" + str(nBinsToMerge) + "_" + matrixFile_suffix+".err"
      conda: CONDA_HIC_ENV
      shell:
          "hicMergeMatrixBins -m {input} -nb {params.num_bins} -o {output.matrix} >{log.out} 2>{log.err} "
@@ -177,7 +177,7 @@ rule call_tads:
         "TADs/{sample}_"+matrixFile_suffix+"_boundaries.bed"
     params:
         prefix="TADs/{sample}_"+matrixFile_suffix,
-        parameters=lambda wildcards: tadparams if tadparams else ""
+        parameters=lambda wildcards: findTADParams if findTADParams else ""
     threads: 10
     log:
         out = "TADs/logs/{sample}_findTADs.out",

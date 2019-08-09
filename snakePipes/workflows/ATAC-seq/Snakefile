@@ -1,5 +1,6 @@
 import os
 import snakePipes.common_functions as cf
+import itertools
 
 
 ### snakemake_workflows initialization ########################################
@@ -26,7 +27,7 @@ include: os.path.join(workflow.basedir, "internals.snakefile")
 # Import deeptools cmds
 include: os.path.join(maindir, "shared", "tools", "deeptools_cmds.snakefile")
 
-if fromBam:
+if fromBAM:
     include: os.path.join(maindir, "shared", "rules", "LinkBam.snakefile")
     include: os.path.join(maindir, "shared", "rules", "deepTools_qc.snakefile")
 
@@ -50,10 +51,11 @@ else:
 # CSAW for differential binding (if sampleinfo specified)
 # needs a "ChIP-sample" variable, here all samples are ChIP-Samples
 chip_samples = samples
-paired = True
-#fragment_length = cf.get_fragment_length("deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv", chip_samples[0])
+pairedEnd = True
 if sampleSheet:
     include: os.path.join(maindir, "shared", "rules", "CSAW.snakefile")
+    include: os.path.join(maindir, "shared", "rules", "nearestGene.snakefile")
+    include: os.path.join(maindir, "shared", "rules", "filter_annotation.snakefile")
 
 ## add outputs as asked
 def run_deepTools_allelic():
@@ -66,13 +68,16 @@ def run_deepTools_allelic():
 
 def run_CSAW():
     if sampleSheet:
-        return(["CSAW_{}/CSAW.session_info.txt".format(sample_name)])
+        file_list=["CSAW_{}/CSAW.session_info.txt".format(sample_name),"Annotation/genes.filtered.symbol","Annotation/genes.filtered.t2g","CSAW_{}/CSAW.Stats_report.html".format(sample_name)]
+        file_list.append([os.path.join("CSAW_{}".format(sample_name), x) for x in list(itertools.chain.from_iterable([expand("CSAW.{change_dir}.cov.matrix",change_dir=change_direction),expand("CSAW.{change_dir}.cov.heatmap.png",change_dir=change_direction)]))])
+        file_list.append([os.path.join("AnnotatedResults_{}".format(sample_name), x) for x in list(itertools.chain.from_iterable([expand("Filtered.results.{change_dir}_withNearestGene.txt",change_dir=change_direction)]))])
+        return( file_list )
     else:
         return([])
 
-def run_deepTools_qc(fromBam):
+def run_deepTools_qc(fromBAM):
     file_list = []
-    if fromBam:
+    if fromBAM:
         file_list = ["deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv"]
         file_list.append([expand("bamCoverage/{sample}.filtered.seq_depth_norm.bw", sample = samples)])
         if len(samples) <= 20:
@@ -110,14 +115,19 @@ onstart:
         print("Gene annotation BED:", genes_bed)
         print("Gene annotation GTF:", genes_gtf)
         print("Blacklist regions BED:", blacklist_bed)
-        print("Ignore for normalization (bigwigs):", ignore_forNorm)
+        print("Ignore for normalization (bigwigs):", ignoreForNormalization)
         print("-" * 80, "\n")
 
 ### main rule ##################################################################
 ################################################################################
 #print(expand(os.path.join(outdir_MACS2, "{sample}"), sample = samples))
-localrules:
-    filterMetricsToHtml
+if sampleSheet:
+    localrules:
+        CSAW_report,
+        filterMetricsToHtml
+else:
+    localrules:
+        filterMetricsToHtml
 rule all:
     input:
         #expand(os.path.join(outdir_MACS2, "{sample}.short.bam"), sample = samples),
@@ -129,7 +139,7 @@ rule all:
         ## run csaw if asked for
         run_CSAW(),
         expand("deepTools_ATAC/bamCompare/{sample}.filtered.bw",sample=samples),
-        run_deepTools_qc(fromBam),
+        run_deepTools_qc(fromBAM),
         expand(os.path.join(outdir_MACS2, "{sample}.short.cleaned.bam"),sample=samples),
         expand(os.path.join(outdir_MACS2, "{sample}.short.cleaned.bam.bai"),sample=samples),
         "Filtering_metrics/Filtering_report.html"
@@ -137,6 +147,10 @@ rule all:
 ### execute after workflow finished ############################################
 ################################################################################
 onsuccess:
-    cf.cleanLogs(workingdir)
+    cf.cleanLogs(workingdir, cluster_config)
     if "verbose" in config and config["verbose"]:
         print("\n--- ATAC OpenChrom workflow finished successfully! --------------------------------\n")
+        
+onerror:
+    print("\n !!! ERROR in ATAC OpenChrom workflow! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
+

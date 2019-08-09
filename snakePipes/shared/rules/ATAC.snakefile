@@ -5,14 +5,16 @@ rule filterFragments:
         shortBAM = temp(os.path.join(outdir_MACS2, "{sample}.short.bam")),
         metrics = os.path.join(outdir_MACS2, "{sample}.short.metrics")
     params:
-        cutoff = fragmentSize_cutoff
+        maxFragmentSize=maxFragmentSize,
+        minFragmentSize=maxFragmentSize
     threads: 6
     conda: CONDA_SHARED_ENV
     shell: """
         alignmentSieve --bam {input} \
         --outFile {output.shortBAM} -p {threads} \
         --filterMetrics {output.metrics} \
-        --maxFragmentLength {params.cutoff}
+        --maxFragmentLength {params.maxFragmentSize} \
+        --minFragmentLength {params.minFragmentSize}
         """
 
 rule filterMetricsToHtml:
@@ -21,8 +23,6 @@ rule filterMetricsToHtml:
     output:
         tmpFile=os.path.join(outdir,"aux_files","ATACseq_QC_report_template.Rmd"),
         QCrep='Filtering_metrics/Filtering_report.html'
-    #params:
-     #   auxdir=os.path.join(outdir,"aux_files")
     log:
         err="Filtering_metrics/logs/produce_report.err",
         out="Filtering_metrics/logs/produce_report.out"
@@ -40,7 +40,7 @@ rule filterCoveragePerScaffolds:
         bam = os.path.join(outdir_MACS2, "{sample}.short.cleaned.bam"),
         bai = os.path.join(outdir_MACS2, "{sample}.short.cleaned.bam.bai")
     params:
-        count_cutoff = int(fragmentCount_cutoff) * 2 # must contain more than 2 reads, i.e. 1 fragment
+        count_cutoff = int(fragmentCountThreshold) * 2 # must contain more than 2 reads, i.e. 1 fragment
     threads: 6
     conda: CONDA_SHARED_ENV
     shell: """

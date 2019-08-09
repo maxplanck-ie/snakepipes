@@ -1,7 +1,7 @@
 snakePipes
 ==========
 
-.. image:: content/images/snakePipes.png
+.. image:: content/images/snakePipes_small.png
    :scale: 20 %
    :height: 200px
    :width: 200 px

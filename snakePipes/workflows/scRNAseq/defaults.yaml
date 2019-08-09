@@ -4,7 +4,7 @@
 # In order to adjust some parameters, please either use the wrapper script
 # (eg. /path/to/snakemake_workflows/workflows/scRNAseq/scRNAseq-mapcount)
 # or save a copy of this file, modify necessary parameters and then provide
-# this file to the wrapper or snakmake via '--configfile' option
+# this file to the wrapper or snakmake via '--configFile' option
 # (see below how to call the snakefile directly)
 #
 # Own parameters will be loaded during snakefile executiuon as well and hence
@@ -13,10 +13,10 @@
 ## General/Snakemake parameters, only used/set by wrapper or in Snakemake cmdl, but not in Snakefile
 pipeline: scrna-seq
 outdir:
-configfile:
-cluster_configfile:
+configFile:
+clusterConfigFile:
 local: False
-max_jobs: 5
+maxJobs: 5
 ## directory with fastq files
 indir:
 ## preconfigured target genomes (mm9,mm10,dm3,...) , see /path/to/snakemake_workflows/shared/organisms/
@@ -30,34 +30,40 @@ reads: ["_R1","_R2"]
 downsample:
 ## Options for trimming
 trim: False
-trim_prg: cutadapt
-trim_options: -a A{'30'}
+trimmer: cutadapt
+trimmerOptions: -a A{'30'}
 ## N.B., setting --outBAMsortingBinsN too high can result in cryptic errors
-star_options: "--outBAMsortingBinsN 30 --twopassMode Basic"
+alignerOptions: "--outBAMsortingBinsN 30 --twopassMode Basic"
 ## further options
-filter_annotation: "-v -P 'decay|pseudogene' "
-barcode_file:
-barcode_pattern: "NNNNNNXXXXXX"
-split_lib: False
-cell_names:
-library_type: 1
-bw_binsize: 10
+filterGTF: "-v -P 'decay|pseudogene' "
+cellBarcodeFile:
+cellBarcodePattern: "NNNNNNXXXXXX"
+splitLib: False
+cellNames:
+libraryType: 1
+bwBinSize: 10
 verbose: False
-plot_format: pdf
+plotFormat: pdf
 dnaContam: False
 ## Parameters for th statistical analysis
-cell_filter_metric: gene_universe
+cellFilterMetric: gene_universe
 #Option to skip RaceID to save time
 skipRaceID: False
+#umi_tools options:
+UMIBarcode: False
+bcPattern: NNNNCCCCCCCCC #default: 4 base umi barcode, 9 base cell barcode (eg. RELACS barcode)
+UMIDedup: False
+UMIDedupSep: "_"
+UMIDedupOpts: --paired
 ################################################################################
 # Call snakemake directly, i.e. without using the wrapper script:
 #
 # Please save a copy of this config yaml file and provide an adjusted config
-# via '--configfile' parameter!
+# via '--configFile' parameter!
 # example call:
 #
 # snakemake --snakefile /path/to/snakemake_workflows/workflows/scRNAseq/Snakefile
-#           --configfile /path/to/snakemake_workflows/workflows/scRNAseq/defaults.yaml
+#           --configFile /path/to/snakemake_workflows/workflows/scRNAseq/defaults.yaml
 #           --directory /path/to/outputdir
 #           --cores 32
 ################################################################################

@@ -67,22 +67,30 @@ def mainArguments(defaults, workingDir=False, createIndices=False):
                          help="verbose output (default: '%(default)s')",
                          default=defaults["verbose"])
 
-    general.add_argument("-c", "--configfile",
-                         dest="configfile",
-                         help="configuration file: config.yaml (default: '%(default)s')",
-                         default=defaults["configfile"])
+    if not workingDir and not createIndices:
+        general.add_argument("--ext",
+                             help="Suffix used by input fastq files (default: '%(default)s').",
+                             default=defaults["ext"])
 
-    general.add_argument("--cluster_configfile",
-                         dest="cluster_configfile",
+        general.add_argument("--reads",
+                             help="Suffix used to denote reads 1 and 2 for paired-end data. This should typically be either '_1' '_2' or '_R1' '_R2' (default: '%(default)s). "
+                             "Note that you should NOT separate the values by a comma (use a space) or enclose them in brackets.",
+                             default=defaults["reads"])
+
+    general.add_argument("-c", "--configFile",
+                         help="configuration file: config.yaml (default: '%(default)s')",
+                         default=defaults["configFile"])
+
+    general.add_argument("--clusterConfigFile",
                          help="configuration file for cluster usage. In absence, the default options "
                          "from shared/cluster.yaml and workflows/[workflow]/cluster.yaml would be selected (default: '%(default)s')",
-                         default=defaults["cluster_configfile"])
+                         default=defaults["clusterConfigFile"])
 
     general.add_argument("-j", "--jobs",
-                         dest="max_jobs",
+                         dest="maxJobs",
                          metavar="INT",
                          help="maximum number of concurrently submitted Slurm jobs / cores if workflow is run locally (default: '%(default)s')",
-                         type=int, default=defaults["max_jobs"])
+                         type=int, default=defaults["maxJobs"])
 
     general.add_argument("--local",
                          dest="local",
@@ -94,19 +102,10 @@ def mainArguments(defaults, workingDir=False, createIndices=False):
                          action="store_true",
                          help="Prevent snakemake from removing files marked as being temporary (typically intermediate files that are rarely needed by end users). This is mostly useful for debugging problems.")
 
-    general.add_argument("--snakemake_options",
-                         dest="snakemake_options",
-                         metavar="STR",
-                         type=str,
+    general.add_argument("--snakemakeOptions",
                          action="append",
-                         help="Snakemake options to be passed directly to snakemake, e.g. use --snakemake_options='--dryrun --rerun-incomplete --unlock --forceall'. WARNING! ONLY EXPERT USERS SHOULD CHANGE THIS! THE DEFAULT VALUE WILL BE APPENDED RATHER THAN OVERWRITTEN! (default: '%(default)s')",
-                         default=[defaults["snakemake_options"]])
-
-    general.add_argument("--tempdir",
-                         dest="tempdir",
-                         type=str,
-                         help="used prefix path for temporary directory created via mktemp. Created temp dir gets exported as $TMPDIR and is removed at the end of this wrapper! (default: '%(default)s')",
-                         default=defaults["tempdir"])
+                         help="Snakemake options to be passed directly to snakemake, e.g. use --snakemakeOptions='--dryrun --rerun-incomplete --unlock --forceall'. WARNING! ONLY EXPERT USERS SHOULD CHANGE THIS! THE DEFAULT VALUE WILL BE APPENDED RATHER THAN OVERWRITTEN! (default: '%(default)s')",
+                         default=[defaults["snakemakeOptions"]])
 
     general.add_argument("--DAG",
                          dest="createDAG",
@@ -155,29 +154,20 @@ def snpArguments(defaults):
     parser = argparse.ArgumentParser(add_help=False)
     snpargs = parser.add_argument_group('Allele-specific mapping arguments')
     snpargs.add_argument("--VCFfile",
-                         metavar="STR",
-                         help="VCF file to create N-masked genomes (default: 'None')",
                          default='',
-                         type=str)
+                         help="VCF file to create N-masked genomes (default: 'None')")
 
     snpargs.add_argument("--strains",
-                         dest="strains",
-                         metavar="STR",
-                         help="Name or ID of SNP strains separated by comma (default: 'None')",
                          default='',
-                         type=str)
+                         help="Name or ID of SNP strains separated by comma (default: 'None')")
 
     snpargs.add_argument("--SNPfile",
-                         metavar="STR",
-                         help="File containing SNP locations (default: 'None')",
                          default='',
-                         type=str)
+                         help="File containing SNP locations (default: 'None')")
 
-    snpargs.add_argument("--Nmasked_index",
-                         metavar="STR",
-                         help="N-masked index of the reference genome (default: 'None')",
+    snpargs.add_argument("--NMaskedIndex",
                          default='',
-                         type=str)
+                         help="N-masked index of the reference genome (default: 'None')")
 
     return parser
 
@@ -199,21 +189,20 @@ def commonOptions(grp, defaults, bw=True, plots=True):
                      dest="trim",
                      action="store_true",
                      help="Activate fastq read trimming. If activated, Illumina adaptors are trimmed by default. "
-                     "Additional parameters can be specified under --trim_options (default: '%(default)s')",
+                     "Additional parameters can be specified under --trimmerOptions. (default: '%(default)s')",
                      default=defaults["trim"])
 
-    grp.add_argument("--trim_prg",
-                     dest="trim_prg",
-                     choices=['cutadapt', 'trimgalore'],
-                     help="Trimming program to use: Cutadapt or TrimGalore (default: '%(default)s')",
-                     default=defaults["trim_prg"])
+    grp.add_argument("--trimmer",
+                     dest="trimmer",
+                     choices=['cutadapt', 'trimgalore', 'fastp'],
+                     help="Trimming program to use: Cutadapt, TrimGalore, or fastp. Note that if you change this you may "
+                     "need to change --trimmerOptions to match! (default: '%(default)s')",
+                     default=defaults["trimmer"])
 
-    grp.add_argument("--trim_options",
-                     dest="trim_options",
-                     metavar="STR",
-                     type=str,
+    grp.add_argument("--trimmerOptions",
+                     dest="trimmerOptions",
                      help="Additional option string for trimming program of choice. (default: '%(default)s')",
-                     default=defaults["trim_options"])
+                     default=defaults["trimmerOptions"])
 
     grp.add_argument("--fastqc",
                      dest="fastqc",
@@ -221,19 +210,46 @@ def commonOptions(grp, defaults, bw=True, plots=True):
                      help="Run FastQC read quality control (default: '%(default)s')",
                      default=defaults["fastqc"])
 
+    grp.add_argument("--bcExtract",
+                     dest="UMIBarcode",
+                     action="store_true",
+                     help="To extract umi barcode from fastq file via UMI-tools and add it to the read name "
+                     "(default: '%(default)s')",
+                     default=defaults["UMIBarcode"])
+
+    grp.add_argument("--bcPattern",
+                     help="The pattern to be considered for the barcode. 'N' = UMI position (required) 'C' = barcode position (optional) "
+                     "(default: '%(default)s')",
+                     default=defaults["bcPattern"])
+
+    grp.add_argument("--UMIDedup",
+                     action="store_true",
+                     help="Deduplicate bam file based on UMIs via `umi_tools dedup` that are present in the read name. "
+                     "(default: '%(default)s')",
+                     default=defaults["UMIDedup"])
+
+    grp.add_argument("--UMIDedupSep",
+                     help="umi separation character "
+                     "that will be passed to umi_tools."
+                     "(default: '%(default)s')",
+                     default=defaults["UMIDedupSep"])
+
+    grp.add_argument("--UMIDedupOpts",
+                     help="Additional options that will be passed to umi_tools."
+                     "(default: '%(default)s')",
+                     default=defaults["UMIDedupOpts"])
+
     if bw:
-        grp.add_argument("--bw-binsize",
-                         dest="bw_binsize",
-                         metavar="INT",
+        grp.add_argument("--bwBinSize",
+                         dest="bwBinSize",
                          help="Bin size of output files in bigWig format (default: '%(default)s')",
                          type=int,
-                         default=defaults["bw_binsize"])
+                         default=defaults["bwBinSize"])
 
     if plots:
         grp.add_argument("--plotFormat",
-                         dest="plot_format",
                          choices=['png', 'pdf', 'None'],
                          metavar="STR",
                          type=str,
                          help="Format of the output plots from deepTools. Select 'none' for no plots (default: '%(default)s')",
-                         default=defaults["plot_format"])
+                         default=defaults["plotFormat"])
