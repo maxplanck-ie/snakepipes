@@ -68,7 +68,7 @@ else:
             " --reference_genome {input.genome} --vcf_file {params.SNPpath}"
             " --strain {params.strain1} > {log.out} 2> {log.err}&& cp "
             "{params.temp_out} {params.out_bname} >> {log.out} 2>> {log.err} "
-            "&& cd ../ "
+            "&& cd ../"
 
 if aligner == "STAR":
     rule star_index:

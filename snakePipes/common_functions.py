@@ -22,6 +22,7 @@ def set_env_yamls():
             'CONDA_scRNASEQ_ENV': 'envs/sc_rna_seq.yaml',
             'CONDA_DNA_MAPPING_ENV': 'envs/dna_mapping.yaml',
             'CONDA_CHIPSEQ_ENV': 'envs/chip_seq.yaml',
+            'CONDA_HISTONE_HMM_ENV': 'envs/histone_hmm.yaml',
             'CONDA_ATAC_ENV': 'envs/atac_seq.yaml',
             'CONDA_HIC_ENV': 'envs/hic.yaml',
             'CONDA_WGBS_ENV': 'envs/wgbs.yaml',
