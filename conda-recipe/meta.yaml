@@ -19,7 +19,6 @@ requirements:
     - graphviz
     - fuzzywuzzy
     - pyyaml >=5.1
-    - wget
 
 test:
   commands:

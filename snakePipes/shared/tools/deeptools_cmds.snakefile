@@ -10,7 +10,7 @@ bamcompare_log2_cmd = """
                --operation log2 \
                --scaleFactorsMethod readCount \
                {params.ignoreForNorm} \
-               --binSize {params.bw_binsize} \
+               --binSize {params.bwBinSize} \
                -p {threads} \
                {params.read_extension} \
                {params.blacklist} > {log.out} 2> {log.err}
@@ -24,7 +24,7 @@ bamcompare_subtract_cmd = """
                --operation subtract \
                --scaleFactorsMethod readCount \
                {params.ignoreForNorm} \
-               --binSize {params.bw_binsize} \
+               --binSize {params.bwBinSize} \
                -p {threads} \
                {params.read_extension} \
                {params.blacklist} > {log.out} 2> {log.err}
@@ -34,25 +34,25 @@ bamcompare_subtract_cmd = """
 bamcov_raw_cmd = """
     bamCoverage -b {input.bam} \
                 -o {output} \
-                --binSize {params.bw_binsize} \
+                --binSize {params.bwBinSize} \
                 -p {threads} > {log.out} 2> {log.err}
     """
 
 # bamCoverage RPKM
 bamcov_RPKM_cmd = """
     bamCoverage -b {input.bam} \
-    -o {output} --binSize {params.bw_binsize} \
+    -o {output} --binSize {params.bwBinSize} \
     -p {threads} --normalizeUsing RPKM > {log.out} 2> {log.err}
     """
 
 # bamCoverage RNA-seq unique mappings 
 bamcov_unique_cmd = """
     bamCoverage -b {input.bam} \
-    -o {output.bw_fwd} --binSize {params.bw_binsize} \
+    -o {output.bw_fwd} --binSize {params.bwBinSize} \
     --minMappingQuality 10 --samFlagExclude 2304 --filterRNAstrand forward \
     -p {threads} > {log.out} 2> {log.err}; \
     bamCoverage -b {input.bam} \
-    -o {output.bw_rev} --binSize {params.bw_binsize} \
+    -o {output.bw_rev} --binSize {params.bwBinSize} \
     --minMappingQuality 10 --samFlagExclude 2304 --filterRNAstrand reverse \
     -p {threads} >> {log.out} 2>> {log.err}; \
     
@@ -63,7 +63,7 @@ bamcov_unique_cmd = """
 bamcov_cmd = """
     bamCoverage -b {input.bam} \
                 -o {output} \
-                --binSize {params.bw_binsize} \
+                --binSize {params.bwBinSize} \
                 -p {threads} \
                 --normalizeUsing RPGC \
                 --effectiveGenomeSize {params.genome_size} \

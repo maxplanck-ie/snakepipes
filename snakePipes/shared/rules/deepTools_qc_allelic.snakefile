@@ -8,11 +8,11 @@ rule bamCoverage_allelic:
     output:
         "bamCoverage/allele_specific/{sample}.{suffix}.seq_depth_norm.bw"
     params:
-        bw_binsize = bw_binsize,
+        bwBinSize = bwBinSize,
         genome_size = int(genome_size),
-        ignoreForNorm = "--ignoreForNormalization " + ignore_forNorm if ignore_forNorm else "",
-        read_extension = "--extendReads" if paired
-                         else "--extendReads "+str(fragment_length),
+        ignoreForNorm = "--ignoreForNormalization " + ignoreForNormalization if ignoreForNormalization else "",
+        read_extension = "--extendReads" if pairedEnd
+                         else "--extendReads " + str(fragmentLength),
         blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed
                     else "",
     log:
@@ -34,8 +34,8 @@ rule plotCoverage_allelic:
         "deepTools_qc/plotCoverage/read_coverage_allelic.png"
     params:
         labels = " ".join(expand('{sample}.{suffix}', sample=samples, suffix = ['genome1', 'genome2'])),
-        read_extension = "--extendReads" if paired
-                         else "--extendReads "+str(fragment_length)
+        read_extension = "--extendReads" if pairedEnd
+                         else "--extendReads " + str(fragmentLength)
     log:
         out = "deepTools_qc/logs/plotCoverage_allelic.out",
         err = "deepTools_qc/logs/plotCoverage_allelic.err"
@@ -57,8 +57,8 @@ rule multiBamSummary_allelic:
         labels = " ".join(expand('{sample}.{suffix}', sample=samples, suffix = ['genome1', 'genome2'])),
         blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed
                     else "",
-        read_extension = "--extendReads" if paired
-                         else "--extendReads "+str(fragment_length)
+        read_extension = "--extendReads" if pairedEnd
+                         else "--extendReads " + str(fragmentLength)
     log:
         out = "deepTools_qc/logs/multiBamSummary_allelic.out",
         err = "deepTools_qc/logs/multiBamSummary_allelic.err"
@@ -77,8 +77,8 @@ rule plotCorrelation_pearson_allelic:
     output:
         "deepTools_qc/plotCorrelation/correlation.pearson.read_coverage_allelic.tsv"
     params:
-        plotcmd = "" if plot_format == 'None' else
-            "--plotFile " + "deepTools_qc/plotCorrelation/correlation.pearson.read_coverage_allelic.heatmap." + plot_format,
+        plotcmd = "" if plotFormat == 'None' else
+            "--plotFile " + "deepTools_qc/plotCorrelation/correlation.pearson.read_coverage_allelic.heatmap." + plotFormat,
         title='fragment'
     log:
         out = "deepTools_qc/logs/plotCorrelation_pearson_allelic.out",
@@ -95,8 +95,8 @@ rule plotCorrelation_spearman_allelic:
     output:
         "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage_allelic.tsv"
     params:
-        plotcmd = "" if plot_format == 'None' else
-            "--plotFile " + "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage_allelic.heatmap." + plot_format,
+        plotcmd = "" if plotFormat == 'None' else
+            "--plotFile " + "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage_allelic.heatmap." + plotFormat,
         title = 'fragment'
     log:
         out = "deepTools_qc/logs/plotCorrelation_spearman_allelic.out",
@@ -113,8 +113,8 @@ rule plotPCA_allelic:
     output:
         "deepTools_qc/plotPCA/PCA.read_coverage_allelic.tsv"
     params:
-        plotcmd = "" if plot_format == 'None' else
-                "--plotFile " + "deepTools_qc/plotPCA/PCA.read_coverage_allelic." + plot_format,
+        plotcmd = "" if plotFormat == 'None' else
+                "--plotFile " + "deepTools_qc/plotPCA/PCA.read_coverage_allelic." + plotFormat,
         title='fragment'
     log:
         out = "deepTools_qc/logs/plotPCA_allelic.out",

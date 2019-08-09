@@ -43,18 +43,15 @@ This way, the software used within snakePipes do not conflict with the software 
 Development installation
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you wish to modify snakePipes you can install it via pip, using our `GitHub repository <https://github.com/maxplanck-ie/snakepipes>`__ .
+If you wish to modify snakePipes you can install it via pip from within a conda environment, using our `GitHub repository <https://github.com/maxplanck-ie/snakepipes>`__ .
 
 .. code:: bash
 
-    pip install --user --upgrade git+https://github.com/maxplanck-ie/snakepipes@develop
+    conda create -n snakepipes python=3.7 snakemake pandas graphviz fuzzywuzzy
+    conda activate snakepipes
+    pip install git+https://github.com/maxplanck-ie/snakepipes@develop
 
 Instead of providing the URL to ``pip``, you can also `clone <https://help.github.com/articles/cloning-a-repository/>`__ our `GitHub repository <https://github.com/maxplanck-ie/snakepipes>`__ on your computer, and modify the code before running snakePipes. Please see :doc:`advanced_usage` for more information on how to modify and extend snakePipes workflows.
-
-.. note:: There is a difference between installing via conda or installing via pip. The python  installation from user's ``$PATH`` is ignored when installing via conda (first method) while is considered when installing via pip. You must use the ``--develop`` option later when you run ``snakePipes createEnvs``.
-
-.. note:: Using the --user argument would install the program into ``~/.local/bin/``. So make sure to have it in your $PATH before executing any workflow.
-
 
 Testing whether the installation went fine
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -114,7 +111,7 @@ All the tools required for running various pipelines are installed via various c
 
 .. note::
 
-    ``snakePipes createEnvs`` will also set the ``snakemake_options:`` line in the global snakePipes
+    ``snakePipes createEnvs`` will also set the ``snakemakeOptions:`` line in the global snakePipes
     ``defaults.yaml`` files. If you have already modified this then use the ``--keepCondaDir`` option.
 
 .. warning::
@@ -125,11 +122,11 @@ file on our GitHub repository. You can modify it to suite your needs.
 
 Here are the content of *defaults.yaml*::
 
-    snakemake_options: '--use-conda --conda-prefix /data/general/scratch/conda_envs'
+    snakemakeOptions: '--use-conda --conda-prefix /data/general/scratch/conda_envs'
 
 .. note::
 
-    Whenever you change the `snakemake_options:` line in `defaults.yaml`, you should run
+    Whenever you change the `snakemakeOptions:` line in `defaults.yaml`, you should run
     `snakePipes createEnvs` to ensure that the conda environments are then created.
 
 Running ``snakePipes createEnvs`` is not strictly required, but facilitates multiple users using the same snakePipes installation.
@@ -171,7 +168,7 @@ The yaml files look like this after the setup (an example from drosophila genome
     # OPTIONAL. For QC and filtering of regions in multiple workflows.
     blacklist_bed:
     # STRING. Name of the chromosomes to ignore for calculation of normalization factors for coverage files
-    ignore_forNorm: "U Uextra X XHet YHet dmel_mitochondrion_genome"
+    ignoreForNormalization: "U Uextra X XHet YHet dmel_mitochondrion_genome"
 
 .. warning:: Do not edit the yaml keywords corresponding to each required entry.
 
@@ -270,19 +267,19 @@ Below are some of the workflow defaults from the DNA-mapping pipeline. Empty sec
     reads: [_R1, _R2]
     ## mapping mode
     mode: mapping
-    mapping_prg: Bowtie2
+    aligner: Bowtie2
     ## Number of reads to downsample from each FASTQ file
     downsample:
     ## Options for trimming
     trim: False
-    trim_prg: cutadapt
-    trim_options:
+    trimmer: cutadapt
+    trimmerOptions:
     ## Bin size of output files in bigWig format
-    bw_binsize: 25
+    bwBinSize: 25
     ## Run FASTQC read quality control
     fastqc: false
     ## Run computeGCBias quality control
-    gcbias: false
+    GCBias: false
     ## Retain only de-duplicated reads/read pairs
     dedup: false
     ## Retain only reads with at least the given mapping quality

@@ -15,14 +15,14 @@ import snakePipes.common_functions as cf
 import snakePipes.parserCommon as parserCommon
 
 
-def parse_args(defaults={"verbose": False, "configfile": None,
-                         "cluster_configfile": None, "max_jobs": 5,
-                         "snakemake_options": "--use-conda", "paired": True,
-                         "bw_binsize": 25, "sampleSheet": "",
-                         "window_size": 150, "predict_chip_dict": None,
-                         "bigWigType": "both", "plot_format": "png",
-                         "fromBam": "", "bam_ext": ".bam", "fdr": 0.05,
-                         "absBestLFC": 1}):
+def parse_args(defaults={"verbose": False, "configFile": None,
+                         "clusterConfigFile": None, "maxJobs": 5,
+                         "snakemakeOptions": "--use-conda", "tempDir": None,
+                         "pairedEnd": True, "bwBinSize": 25, "sampleSheet": "",
+                         "windowSize": 150, "predictChIPDict": None,
+                         "bigWigType": "both",
+                         "plotFormat": "png", "bamExt": ".filtered.bam",
+                         "fdr": 0.05, "absBestLFC": 1}):
     """
     Parse arguments from the command line.
     """
@@ -41,26 +41,23 @@ def parse_args(defaults={"verbose": False, "configfile": None,
 
     # Workflow options
     optional = parser.add_argument_group('Options')
-    optional.add_argument("--single-end",
-                          dest="paired",
+    optional.add_argument("--singleEnd",
+                          dest="pairedEnd",
                           action="store_false",
                           help="Input data is single-end, not paired-end",
-                          default=defaults["paired"])
+                          default=not defaults["pairedEnd"])
 
     optional.add_argument("--bigWigType",
-                          dest="bigWigType",
                           help="Type of bigWig file to create. Options are: 'subtract' (control-subtracted ChIP coverage), 'log2ratio' (for log2 ratio of ChIP over control) or 'both' (create both set of bed files). Note that the allele-specific mode currently only produces 'log2ratio' bigwigs. (default: '%(default)s')",
                           default=defaults["bigWigType"])
 
-    optional.add_argument("--bw-binsize",
-                          dest="bw_binsize",
+    optional.add_argument("--bwBinSize",
                           metavar="INT",
                           help="bin size of output files in bigWig format (default: '%(default)s')",
                           type=int,
-                          default=defaults["bw_binsize"])
+                          default=defaults["bwBinSize"])
 
     optional.add_argument("--sampleSheet",
-                          dest="sampleSheet",
                           help="Information on samples (If differential binding analysis required); see "
                                "'docs/content/sampleSheet.example.tsv' for example. "
                                "IMPORTANT: The first entry defines which group of samples are control. "
@@ -69,38 +66,31 @@ def parse_args(defaults={"verbose": False, "configfile": None,
                                "are not evaluated for differential binding) (default: '%(default)s')",
                           default=defaults["sampleSheet"])
 
-    optional.add_argument("--DB_windowSize",
-                          dest="window_size",
+    optional.add_argument("--windowSize",
                           help="Window size to counts reads in (If differential binding analysis required); "
                                "Default size is suitable for most transcription factors and sharp histone marks. "
                                "Small window sizes (~20bp) should be used for very narrow transcription factor peaks, "
                                "while large window sizes (~500 bp) should be used for broad marks (eg. H3K27me3) "
                                "(default: '%(default)s')",
-                          default=defaults["window_size"])
+                          default=defaults["windowSize"])
 
-    optional.add_argument("--predict_chip_dict",
-                          dest="predict_chip_dict",
+    optional.add_argument("--predictChIPDict",
                           nargs='?',
                           action='store',
-                          help="Use existing bam files to predict a chip-seq sample configuration file. Write it to the workingdir. "
+                          help="Use existing bam files to predict a CHiP-seq sample configuration file. Write it to the workingdir. "
                                "If no value is given, samples that contain 'input' are used as ChIP input/ctrl. Provide a custom pattern like 'input,H3$,H4$' to change that!",
                           default= None,
                           const="input")
-    optional.add_argument("--fromBam",
-                         dest="fromBam",
-                         help=argparse.SUPPRESS,
-                         default=defaults["fromBam"])
-    optional.add_argument("--fromBamExt",
-                         dest="bam_ext",
-                         help=argparse.SUPPRESS,
-                         default=defaults["bam_ext"])
+
+    optional.add_argument("--bamExt",
+                          help=argparse.SUPPRESS,
+                          default=defaults["bamExt"])
+
     optional.add_argument("--plotFormat",
-                         dest="plot_format",
                          choices=['png', 'pdf', 'None'],
-                         metavar="STR",
-                         type=str,
                          help="Format of the output plots from deepTools. Select 'none' for no plots (default: '%(default)s')",
-                         default=defaults["plot_format"])
+                         default=defaults["plotFormat"])
+
     optional.add_argument("--FDR",
                           dest="fdr",
                           help="FDR threshold to apply for filtering DB regions"
@@ -111,8 +101,6 @@ def parse_args(defaults={"verbose": False, "configfile": None,
                           help="Log fold change threshold to apply for filtering DB regions"
                                "(default: '%(default)s')",
                           default=defaults["absBestLFC"])
-
-    #parserCommon.commonOptions(optional, defaults,fromBam=True)
 
     return parser
 
@@ -132,14 +120,14 @@ def main():
     cf.checkCommonArguments(args, baseDir)
 
     # Local argument checks
-    if args.predict_chip_dict is not None:
-        cf.predict_chip_dict(args.workingdir,args.predict_chip_dict,args.bam_ext,args.fromBam)
+    if args.predictChIPDict is not None:
+        cf.predict_chip_dict(args.workingdir, args.predictChIPDict, args.bamExt, args.fromBAM)
         sys.exit(0)
 
     if args.samples_config is not None and os.path.exists(os.path.abspath(args.samples_config)):
         args.samples_config = os.path.abspath(args.samples_config)
     else:
-        sys.exit("\nError! Sample config file not found! ({})\n Either create one or call the workflow with --predict_chip_dict!\n".format(args.samples_config))
+        sys.exit("\nError! Sample config file not found! ({})\n Either create one or call the workflow with --predictChIPDict!\n".format(args.samples_config))
 
     # Handle YAML and log files
     snakemake_cmd = cf.commonYAMLandLogs(baseDir, workflowDir, defaults, args, __file__)

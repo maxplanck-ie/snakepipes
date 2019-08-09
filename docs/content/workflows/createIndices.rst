@@ -24,10 +24,10 @@ There is a configuration file in ``snakePipes/workflows/createIndices/defaults.y
 
     pipeline: createIndices
     outdir:
-    configfile:
-    cluster_configfile:
+    configFile:
+    clusterConfigFile:
     local: false
-    max_jobs: 5
+    maxJobs: 5
     verbose: False
     ## Genome name used in snakePipes (no spaces!)
     genome:
@@ -41,7 +41,7 @@ There is a configuration file in ``snakePipes/workflows/createIndices/defaults.y
     ## Regions to blacklist in the ChIP-seq and related workflows
     blacklist:
     ## Regions to ignore during normalization (e.g., with bamCompare)
-    ignore_forNorm:
+    ignoreForNorm:
 
 These values are most conveniently set on the command line.
 

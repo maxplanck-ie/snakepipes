@@ -8,7 +8,7 @@ rule bamCoverage_unique_mappings:
     conda:
         CONDA_SHARED_ENV
     params:
-        bw_binsize = bw_binsize
+        bwBinSize = bwBinSize
     log:
         out="bamCoverage/logs/bamCoverage_uniqueMappings.{sample}.out",
         err="bamCoverage/logs/bamCoverage_uniqueMappings.{sample}.err"
@@ -27,7 +27,7 @@ rule bamCoverage_RPKM:
     conda:
         CONDA_SHARED_ENV
     params:
-        bw_binsize = bw_binsize
+        bwBinSize = bwBinSize
     log:
         out="bamCoverage/logs/bamCoverage_RPKM.{sample}.out",
         err="bamCoverage/logs/bamCoverage_RPKM.{sample}.err"
@@ -46,7 +46,7 @@ rule bamCoverage_raw:
     conda:
         CONDA_SHARED_ENV
     params:
-        bw_binsize = bw_binsize
+        bwBinSize = bwBinSize
     log:
         out="bamCoverage/logs/bamCoverage_coverage.{sample}.out",
         err="bamCoverage/logs/bamCoverage_coverage.{sample}.err"
@@ -67,8 +67,8 @@ rule plotEnrichment:
         CONDA_SHARED_ENV
     params:
         labels = " ".join(samples),
-        plotcmd = "" if plot_format == 'None' else
-            "--plotFile " + "deepTools_qc/plotEnrichment/plotEnrichment." + plot_format
+        plotcmd = "" if plotFormat == 'None' else
+            "--plotFile " + "deepTools_qc/plotEnrichment/plotEnrichment." + plotFormat
     log:
         out="deepTools_qc/logs/plotEnrichment.out",
         err="deepTools_qc/logs/plotEnrichment.err"
@@ -110,9 +110,9 @@ rule plotCorr_bed_pearson:
         err="deepTools_qc/logs/plotCorrelation_pearson.err"
     benchmark:
         "deepTools_qc/.benchmark/plotCorrelation_pearson.benchmark"
-    params:
-        plotcmd = "" if plot_format == 'None' else
-            "--plotFile " + "deepTools_qc/plotCorrelation/correlation.pearson.bed_coverage.heatmap." + plot_format,
+    params: 
+        plotcmd = "" if plotFormat == 'None' else
+            "--plotFile " + "deepTools_qc/plotCorrelation/correlation.pearson.bed_coverage.heatmap." + plotFormat,
         title='genes'
     shell: plotCorr_cmd
 
@@ -130,9 +130,9 @@ rule plotCorr_bed_spearman:
         err="deepTools_qc/logs/plotCorrelation_spearman.err"
     benchmark:
         "deepTools_qc/.benchmark/plotCorrelation_spearman.benchmark"
-    params:
-        plotcmd = "" if plot_format == 'None' else
-            "--plotFile " + "deepTools_qc/plotCorrelation/correlation.spearman.bed_coverage.heatmap." + plot_format,
+    params:        
+        plotcmd = "" if plotFormat == 'None' else
+            "--plotFile " + "deepTools_qc/plotCorrelation/correlation.spearman.bed_coverage.heatmap." + plotFormat,
         title='genes'
     shell: plotCorrSP_cmd
 
@@ -150,9 +150,9 @@ rule plotPCA:
         err="deepTools_qc/logs/plotPCA.err",
     benchmark:
         "deepTools_qc/.benchmark/plotPCA.benchmark"
-    params:
-        plotcmd = "" if plot_format == 'None' else
-                "--plotFile " + "deepTools_qc/plotPCA/PCA.bed_coverage." + plot_format,
+    params: 
+        plotcmd = "" if plotFormat == 'None' else
+                "--plotFile " + "deepTools_qc/plotPCA/PCA.bed_coverage." + plotFormat,
         title='genes'
     shell: plotPCA_cmd
 
@@ -166,7 +166,7 @@ rule estimateReadFiltering:
         "deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt"
     log:
         out = "deepTools_qc/logs/estimateReadFiltering.{sample}.out",
-        err = "bamCoverage/logs/estimateReadFiltering.{sample}.err"
+        err = "deepTools_qc/logs/estimateReadFiltering.{sample}.err"
     conda:
         CONDA_SHARED_ENV
     shell: estimateReadFiltering_cmd
@@ -180,8 +180,8 @@ rule bamPE_fragment_size:
     output:
         "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv"
     params:
-        plotcmd = "" if plot_format == 'None' else
-                "-o " + "deepTools_qc/bamPEFragmentSize/fragmentSizes." + plot_format,
+        plotcmd = "" if plotFormat == 'None' else
+                "-o " + "deepTools_qc/bamPEFragmentSize/fragmentSizes." + plotFormat,
     conda:
         CONDA_SHARED_ENV
     log:

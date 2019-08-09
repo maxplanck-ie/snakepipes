@@ -8,31 +8,31 @@ def getbw_idxbase(file):
     return(fpath)
 
 ### Bowtie2 ####################################################################
-if mapping_prg == "Bowtie2":
-    if paired:
+if aligner == "Bowtie2":
+    if pairedEnd:
         rule Bowtie2_allele:
             input:
                 r1 = fastq_dir+"/{sample}"+reads[0]+".fastq.gz",
                 r2 = fastq_dir+"/{sample}"+reads[1]+".fastq.gz",
                 index = bowtie2_index_allelic
             output:
-                align_summary = mapping_prg+"/{sample}.Bowtie2_summary.txt",
-                bam = temp(mapping_prg+"/{sample}.sorted.bam")
+                align_summary = aligner+"/{sample}.Bowtie2_summary.txt",
+                bam = temp(aligner+"/{sample}.sorted.bam")
             params:
-                bowtie_opts = str(bowtie_opts or ''),
-                mate_orientation = mate_orientation,
-                insert_size_max = insert_size_max,
+                alignerOpts = str(alignerOpts or ''),
+                mateOrientation = mateOrientation,
+                insertSizeMax = insertSizeMax,
                 idxbase = getbw_idxbase(bowtie2_index_allelic)
             benchmark:
-                mapping_prg+"/.benchmark/Bowtie2.{sample}.benchmark"
+                aligner+"/.benchmark/Bowtie2.{sample}.benchmark"
             threads: 24  # 1G per core
             conda: CONDA_DNA_MAPPING_ENV
             shell: """
                 MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX);
                 bowtie2 \
-                -X {params.insert_size_max} \
+                -X {params.insertSizeMax} \
                 -x {params.idxbase} -1 {input.r1} -2 {input.r2} \
-                {params.bowtie_opts} {params.mate_orientation} \
+                {params.alignerOpts} {params.mateOrientation} \
                 --rg-id {wildcards.sample} \
                 --rg DS:{wildcards.sample} --rg PL:ILLUMINA --rg SM:{wildcards.sample} \
                 -p {threads} \
@@ -47,13 +47,13 @@ if mapping_prg == "Bowtie2":
                 r1 = fastq_dir+"/{sample}"+reads[0]+".fastq.gz",
                 index = bowtie2_index_allelic
             output:
-                align_summary = mapping_prg+"/{sample}.Bowtie2_summary.txt",
-                bam = temp(mapping_prg+"/{sample}.sorted.bam")
+                align_summary = aligner+"/{sample}.Bowtie2_summary.txt",
+                bam = temp(aligner+"/{sample}.sorted.bam")
             params:
-                bowtie_opts = str(bowtie_opts or ''),
+                alignerOpts = str(alignerOpts or ''),
                 idxbase = getbw_idxbase(bowtie2_index_allelic)
             benchmark:
-                mapping_prg+"/.benchmark/Bowtie2.{sample}.benchmark"
+                aligner+"/.benchmark/Bowtie2.{sample}.benchmark"
             threads: 24  # 1G per core
             conda: CONDA_DNA_MAPPING_ENV
             shell: """
@@ -61,7 +61,7 @@ if mapping_prg == "Bowtie2":
                 bowtie2 \
                 -x {params.idxbase} -U {input.r1} \
                 --reorder \
-                {params.bowtie_opts} \
+                {params.alignerOpts} \
                 --rg-id {wildcards.sample} \
                 --rg DS:{wildcards.sample} --rg PL:ILLUMINA --rg SM:{wildcards.sample} \
                 -p {threads} \
