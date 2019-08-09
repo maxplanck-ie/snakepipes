@@ -269,7 +269,7 @@ onstart:
 ################################################################################
 
 if not fromBam:
-    localrules: FASTQ1, FASTQ2
+    localrules: FASTQ1, FASTQ2, Salmon_wasabi
 
     rule all:
         input:
@@ -288,6 +288,8 @@ if not fromBam:
             "multiQC/multiqc_report.html"
 
 else:
+    localrules: Salmon_wasabi
+
     rule all:
         input:
             "Annotation/genes.annotated.bed",
