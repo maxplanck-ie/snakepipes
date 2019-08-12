@@ -41,7 +41,7 @@ bamExt: '.filtered.bam'
 fromBAM:
 plotFormat: png
 ##dummy string to skip filtering annotation
-filter_annotation:
+filterGTF:
 ##parameters to filter DB regions on
 fdr: 0.05
 absBestLFC: 1
