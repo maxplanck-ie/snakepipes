@@ -54,7 +54,7 @@ if allele_info == 'FALSE':
 if sampleSheet:
     include: os.path.join(maindir, "shared", "rules", "CSAW.snakefile")
     include: os.path.join(maindir, "shared", "rules", "nearestGene.snakefile")
-    include: os.path.join(maindir, "shared", "rules", "filter_annotation.snakefile")
+    include: os.path.join(maindir, "shared", "rules", "filterGTF.snakefile")
 
 def run_histoneHMM(allele_info):
     if allele_info == 'FALSE':
