@@ -6,7 +6,8 @@
 # Note that due to limitations in yaml.dump, only very basic structures are
 # permitted here.
 ################################################################################
-snakemakeOptions: ' --use-conda --conda-prefix /package/anaconda3/envs/ '
+#snakemakeOptions: ' --use-conda --conda-prefix /package/anaconda3/envs/ '
+snakemakeOptions:  ' --use-conda --conda-prefix /data/processing/sikora/snakePipes_envs '
 tempDir: /data/extended/
 # The following are only needed if you use the --emailAddress option
 smtpServer:
