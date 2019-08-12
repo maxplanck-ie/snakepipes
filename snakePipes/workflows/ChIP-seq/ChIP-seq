@@ -98,11 +98,6 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                           help="Extention of provided bam files, will be substracted from basenames to obtain sample names.",
                           default=defaults["bamExt"])
 
-    optional.add_argument("--singleEnd",
-                          dest="pairedEnd",
-                          action="store_false",
-                          help="input data is single-end, not paired-end. This is only used if --fromBAM is specified.",
-                          default=defaults["pairedEnd"])
 
     optional.add_argument("--plotFormat",
                          choices=['png', 'pdf', 'None'],
