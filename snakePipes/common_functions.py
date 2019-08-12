@@ -416,7 +416,6 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
     if workflowName != "createIndices" and os.path.abspath(organismYAMLname) != os.path.abspath(orgyaml):
         shutil.copyfile(orgyaml, organismYAMLname)
 
-    
     if args.keepTemp:
         args.snakemakeOptions += " --notemp"
 
