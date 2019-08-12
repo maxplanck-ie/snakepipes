@@ -18,7 +18,7 @@ import snakePipes.parserCommon as parserCommon
 def parse_args(defaults={"verbose": False, "configFile": None,
                          "clusterConfigFile": None, "maxJobs": 5,
                          "snakemakeOptions": "--use-conda", "tempDir": None,
-                         "pairedEnd": True, "bwBinSize": 25, "sampleSheet": "",
+                         "pairedEnd": True, "bwBinSize": 25, "qval": 0.001, "sampleSheet": "",
                          "windowSize": 150, "predictChIPDict": None,
                          "bigWigType": "both",
                          "plotFormat": "png", "bamExt": ".filtered.bam",
@@ -56,6 +56,13 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                           help="bin size of output files in bigWig format (default: '%(default)s')",
                           type=int,
                           default=defaults["bwBinSize"])
+
+    optional.add_argument("--qval",
+                          dest="qval",
+                          metavar="INT",
+                          help="qvalue threshold for MACS2(default: '%(default)s')",
+                          type=float,
+                          default=defaults['qval'])
 
     optional.add_argument("--sampleSheet",
                           help="Information on samples (If differential binding analysis required); see "

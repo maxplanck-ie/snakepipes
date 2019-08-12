@@ -34,6 +34,8 @@ verbose: false
 sampleSheet:
 # windowSize
 windowSize: 150
+#MACS2 qvalue
+qval: 0.001
 #### Flag to control the pipeline entry point
 bamExt: '.filtered.bam'
 fromBAM:
