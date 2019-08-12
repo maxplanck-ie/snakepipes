@@ -35,13 +35,13 @@ fragmentCountThreshold: 1
 bwBinSize: 25
 pairedEnd: True
 plotFormat: png
+fromBAM:
 bamExt: .filtered.bam
 ## Median/mean fragment length, only relevant for single-end data (default: 200)
 fragmentLength: 
 trim:
 fastqc:
 qval: 0.001
-fromBAM:
 #umi_tools
 UMIBarcode: False
 bcPattern: NNNNCCCCCCCCC #default: 4 base umi barcode, 9 base cell barcode (eg. RELACS barcode)
