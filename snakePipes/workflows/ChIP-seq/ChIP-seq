@@ -91,7 +91,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
 
     optional.add_argument("--fromBAM",
                           dest="fromBAM",
-                          help="Input folder with bam files. If provided, the analysis will start from this point. If bam files contain single ends, please specify --singleEnd additionally.",
+                          help="Input folder with bam files. If provided, the analysis will start from this point. If bam files contain single ends, please specify --singleEnd additionally. (default: '%(default)s')",
                           default=defaults["fromBAM"])
 
     optional.add_argument("--bamExt",

@@ -66,7 +66,7 @@ chip_object <- readfiles_chip(sampleSheet = sampleInfo,
                               pe.param = pe_param)
 
 ## make QC plot for first and last sample
-if(pairedEnd){
+if(pairedEnd=="True"){
     first_bam <- head(SummarizedExperiment::colData(chip_object$windowCounts)$bam.files, n = 1)
     last_bam <- tail(SummarizedExperiment::colData(chip_object$windowCounts)$bam.files, n = 1)
 

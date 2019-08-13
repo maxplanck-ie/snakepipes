@@ -22,7 +22,7 @@ workingdir:
 ## Value can be also path to your own genome config file!
 genome:
 ## paired end data?
-pairedEnd: true
+pairedEnd: True
 ## Bin size of output files in bigWig format
 bwBinSize: 25
 ## type of bigwig file to create
