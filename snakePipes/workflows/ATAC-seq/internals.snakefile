@@ -12,24 +12,10 @@ if sampleSheet:
         print("\nWarning! CSAW cannot be invoked without replicates!\n")
         sys.exit()
 
-if fromBAM:
-    bamFiles = sorted(glob.glob(os.path.join(str(fromBAM or ''), '*' + bamExt)))
-    bamSamples = cf.get_sample_names_bam(bamFiles, bamExt)
-    
-    
-    bamDict = dict.fromkeys(bamSamples)
-    
-    print(bamFiles)
-    print(bamSamples)
-    
-    aligner = "EXTERNAL_BAM"
-    indir = fromBAM
-    samples = bamSamples
-    downsample = None
-
-    #if pairedEnd:
-        #if not os.path.isfile(os.path.join(workingdir, "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv")):
-            #sys.exit('ERROR: {} is required but not present\n'.format(os.path.join(workingdir, "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv")))
+if not fromBAM:
+    if pairedEnd:
+        if not os.path.isfile(os.path.join(workingdir, "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv")):
+            sys.exit('ERROR: {} is required but not present\n'.format(os.path.join(workingdir, "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv")))
 
     # consistency check whether all required files exist for all samples
     for sample in samples:
@@ -44,6 +30,21 @@ if fromBAM:
                 print('ERROR: Required file "{}" for sample "{}" specified in '
                       'configuration file is NOT available.'.format(file, sample))
                 exit(1)
+
+else:
+    bamFiles = sorted(glob.glob(os.path.join(str(fromBAM or ''), '*' + bamExt)))
+    bamSamples = cf.get_sample_names_bam(bamFiles, bamExt)
+    
+    
+    bamDict = dict.fromkeys(bamSamples)
+    
+    print(bamFiles)
+    print(bamSamples)
+    
+    aligner = "EXTERNAL_BAM"
+    indir = fromBAM
+    samples = bamSamples
+    downsample = None
 
 ##filter sample dictionary by the subset of samples listed in the 'name' column of the sample sheet
 def filter_dict(sampleSheet):
