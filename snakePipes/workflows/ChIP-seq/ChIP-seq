@@ -44,8 +44,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
     optional.add_argument("--singleEnd",
                           dest="pairedEnd",
                           action="store_false",
-                          help="Input data is single-end, not paired-end",
-                          default=not defaults["pairedEnd"])
+                          help="Input data is single-end, not paired-end")
 
     optional.add_argument("--bigWigType",
                           help="Type of bigWig file to create. Options are: 'subtract' (control-subtracted ChIP coverage), 'log2ratio' (for log2 ratio of ChIP over control) or 'both' (create both set of bed files). Note that the allele-specific mode currently only produces 'log2ratio' bigwigs. (default: '%(default)s')",
