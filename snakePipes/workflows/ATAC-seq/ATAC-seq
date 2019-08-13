@@ -20,7 +20,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          "snakemakeOptions": "--use-conda", "tempDir": None,
                          "reads": ["_R1", "_R2"],
                          "maxFragmentSize": 150, "minFragmentSize": 0,
-                         "fromBAM": "" ,"qval": 0.001 ,"sampleSheet": None,
+                         "fromBAM": False ,"qval": 0.001 ,"sampleSheet": None,
                          "bamExt": "filtered.bam", "fdr": 0.05,
                          "absBestLFC": 1, "UMIDedup": False,
                          "UMIDedupOpts": "", "UMIDedupSep": "_",
@@ -66,12 +66,12 @@ def parse_args(defaults={"verbose": False, "configFile": None,
 
     optional.add_argument("--fromBAM",
                           dest="fromBAM",
-                          help="Input folder with bam files. If provided, the analysis will start from this point.",
+                          help="Input folder with bam files. If provided, the analysis will start from this point. (default: '%(default)s')",
                           default=defaults["fromBAM"])
 
     optional.add_argument("--bamExt",
                          dest="bamExt",
-                         help="Extention of provided bam files, will be substracted from basenames to obtain sample names.",
+                         help="Extention of provided bam files, will be substracted from basenames to obtain sample names. (default: '%(default)s')",
                          default=defaults["bamExt"])
 
     optional.add_argument("--FDR",

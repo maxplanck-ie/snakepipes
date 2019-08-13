@@ -21,7 +21,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          "pairedEnd": True, "bwBinSize": 25, "qval": 0.001, "sampleSheet": "",
                          "windowSize": 150, "predictChIPDict": None,
                          "bigWigType": "both",
-                         "plotFormat": "png", "bamExt": ".filtered.bam",
+                         "plotFormat": "png","fromBAM": False, "bamExt": ".filtered.bam",
                          "fdr": 0.05, "absBestLFC": 1}):
     """
     Parse arguments from the command line.
@@ -95,7 +95,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                           default=defaults["fromBAM"])
 
     optional.add_argument("--bamExt",
-                          help="Extention of provided bam files, will be substracted from basenames to obtain sample names.",
+                          help="Extention of provided bam files, will be substracted from basenames to obtain sample names. (default: '%(default)s')",
                           default=defaults["bamExt"])
 
 
