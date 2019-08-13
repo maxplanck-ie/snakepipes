@@ -6,7 +6,7 @@ sampleInfoFilePath <- snakemake@input[["sampleSheet"]]  #"samplesheet.tab"
 insert_size_metrics <- snakemake@params[["insert_size_metrics"]] # bamPEFragmentSize output
 fdr <- as.numeric(snakemake@params[["fdr"]])
 lfc <- as.numeric(snakemake@params[["absBestLFC"]])
-pairedEnd <- as.logical(snakemake@params[["pairedEnd"]])
+pairedEnd <- as.logical(toupper(snakemake@params[["pairedEnd"]]))
 fraglength <- as.numeric(snakemake@params[["fragmentLength"]])  # used when the data is not paired end
 windowSize <- as.numeric(snakemake@params[["windowSize"]])
 importfunc <- snakemake@params[["importfunc"]]  #"DB_functions.R"
@@ -66,7 +66,7 @@ chip_object <- readfiles_chip(sampleSheet = sampleInfo,
                               pe.param = pe_param)
 
 ## make QC plot for first and last sample
-if(pairedEnd=="True"){
+if(isTRUE(pairedEnd)){
     first_bam <- head(SummarizedExperiment::colData(chip_object$windowCounts)$bam.files, n = 1)
     last_bam <- tail(SummarizedExperiment::colData(chip_object$windowCounts)$bam.files, n = 1)
 
