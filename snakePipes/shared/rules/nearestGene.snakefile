@@ -22,7 +22,8 @@ rule get_nearest_gene:
     output:
         annotated_bed="AnnotatedResults_{}".format(sample_name)+"/Filtered.results.{change_dir}_withNearestGene.txt"
     params:
-        pipeline=pipeline
+        pipeline=pipeline,
+        wdir="AnnotatedResults_{}".format(sample_name)
     log:
         err="AnnotatedResults_{}".format(sample_name)+"/logs/nearestGene.{change_dir}.err",
         out="AnnotatedResults_{}".format(sample_name)+"/logs/nearestGene.{change_dir}.out"
