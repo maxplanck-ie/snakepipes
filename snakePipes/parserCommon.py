@@ -224,22 +224,23 @@ def commonOptions(grp, defaults, bw=True, plots=True, preprocessing=False):
                      "(default: '%(default)s')",
                      default=defaults["bcPattern"])
 
-    grp.add_argument("--UMIDedup",
-                     action="store_true",
-                     help="Deduplicate bam file based on UMIs via `umi_tools dedup` that are present in the read name. "
-                     "(default: '%(default)s')",
-                     default=defaults["UMIDedup"])
+    if not preprocessing:
+        grp.add_argument("--UMIDedup",
+                         action="store_true",
+                         help="Deduplicate bam file based on UMIs via `umi_tools dedup` that are present in the read name. "
+                         "(default: '%(default)s')",
+                         default=defaults["UMIDedup"])
 
-    grp.add_argument("--UMIDedupSep",
-                     help="umi separation character "
-                     "that will be passed to umi_tools."
-                     "(default: '%(default)s')",
-                     default=defaults["UMIDedupSep"])
+        grp.add_argument("--UMIDedupSep",
+                         help="umi separation character "
+                         "that will be passed to umi_tools."
+                         "(default: '%(default)s')",
+                         default=defaults["UMIDedupSep"])
 
-    grp.add_argument("--UMIDedupOpts",
-                     help="Additional options that will be passed to umi_tools."
-                     "(default: '%(default)s')",
-                     default=defaults["UMIDedupOpts"])
+        grp.add_argument("--UMIDedupOpts",
+                         help="Additional options that will be passed to umi_tools."
+                         "(default: '%(default)s')",
+                         default=defaults["UMIDedupOpts"])
 
     if bw and not preprocessing:
         grp.add_argument("--bwBinSize",

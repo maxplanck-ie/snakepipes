@@ -21,9 +21,8 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          "snakemakeOptions": "--use-conda", "tempDir": None,
                          "fastqc": False, "optDedupDist": 2500,
                          "clumpifyOptions": "dupesubs=0 qin=33 markduplicates=t optical=t",
-                         "clumpifyMemory": "30G", "sampleSheet": "",
+                         "clumpifyMemory": "30G", "sampleSheet": None,
                          "ext": ".fastq.gz", "reads": ["_R1", "_R2"],
-                         "UMIDedup": False, "UMIDedupOpts": "",
                          "UMIDedupSep": "_", "UMIBarcode": False,
                          "bcPattern": ""}):
     """
@@ -93,7 +92,7 @@ def main():
     args.baseDir = baseDir
 
     # Common arguments
-    cf.checkCommonArguments(args, baseDir, outDir=True)
+    cf.checkCommonArguments(args, baseDir, outDir=True, preprocessing=True)
 
     # Handle YAML and log files
 
