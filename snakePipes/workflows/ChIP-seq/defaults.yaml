@@ -22,7 +22,7 @@ workingdir:
 ## Value can be also path to your own genome config file!
 genome:
 ## paired end data?
-pairedEnd: true
+pairedEnd: True
 ## Bin size of output files in bigWig format
 bwBinSize: 25
 ## type of bigwig file to create
@@ -34,12 +34,14 @@ verbose: false
 sampleSheet:
 # windowSize
 windowSize: 150
+#MACS2 qvalue
+qval: 0.001
 #### Flag to control the pipeline entry point
 bamExt: '.filtered.bam'
 fromBAM:
 plotFormat: png
 ##dummy string to skip filtering annotation
-filter_annotation:
+filterGTF:
 ##parameters to filter DB regions on
 fdr: 0.05
 absBestLFC: 1

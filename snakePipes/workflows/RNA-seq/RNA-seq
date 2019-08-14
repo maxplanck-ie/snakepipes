@@ -99,13 +99,13 @@ def parse_args(defaults={"verbose": False, "configFile": None,
 
     optional.add_argument("--fromBAM",
                          action="store_true",
-                         help=argparse.SUPPRESS,default=defaults["fromBAM"])
+                         help="Input folder with bam files. If provided, the analysis will start from this point. If bam files contain single ends, please specify --singleEnd additionally.",
+                         default=defaults["fromBAM"])
 
     optional.add_argument("--singleEnd",
                           dest="pairedEnd",
                           action="store_false",
-                          help="input data is single-end, not paired-end. This is only used if --fromBAM is specified.",
-                          default=defaults["pairedEnd"])
+                          help="input data is single-end, not paired-end. This is only used if --fromBAM is specified.")
 
     return parser
 

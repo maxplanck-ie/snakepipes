@@ -31,7 +31,6 @@ if not fromBAM:
                       'configuration file is NOT available.'.format(file, sample))
                 exit(1)
 
-        
 else:
     bamFiles = sorted(glob.glob(os.path.join(str(fromBAM or ''), '*' + bamExt)))
     bamSamples = cf.get_sample_names_bam(bamFiles, bamExt)

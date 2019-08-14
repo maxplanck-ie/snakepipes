@@ -22,6 +22,7 @@ def set_env_yamls():
             'CONDA_scRNASEQ_ENV': 'envs/sc_rna_seq.yaml',
             'CONDA_DNA_MAPPING_ENV': 'envs/dna_mapping.yaml',
             'CONDA_CHIPSEQ_ENV': 'envs/chip_seq.yaml',
+            'CONDA_HISTONE_HMM_ENV': 'envs/histone_hmm.yaml',
             'CONDA_ATAC_ENV': 'envs/atac_seq.yaml',
             'CONDA_HIC_ENV': 'envs/hic.yaml',
             'CONDA_WGBS_ENV': 'envs/wgbs.yaml',
@@ -380,6 +381,9 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
 
     os.makedirs(args.outdir, exist_ok=True)
 
+    if isinstance(args.snakemakeOptions, list):
+        args.snakemakeOptions = ' '.join(args.snakemakeOptions)
+
     # save to configs.yaml in outdir
     config = defaults
     config.update(vars(args))  # This allows modifications of args after handling a user config file to still make it to the YAML given to snakemake!
@@ -412,8 +416,6 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
     if workflowName != "createIndices" and os.path.abspath(organismYAMLname) != os.path.abspath(orgyaml):
         shutil.copyfile(orgyaml, organismYAMLname)
 
-    if isinstance(args.snakemakeOptions, list):
-        args.snakemakeOptions = ' '.join(args.snakemakeOptions)
     if args.keepTemp:
         args.snakemakeOptions += " --notemp"
 

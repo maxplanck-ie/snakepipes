@@ -18,10 +18,10 @@ import snakePipes.parserCommon as parserCommon
 def parse_args(defaults={"verbose": False, "configFile": None,
                          "clusterConfigFile": None, "maxJobs": 5,
                          "snakemakeOptions": "--use-conda", "tempDir": None,
-                         "pairedEnd": True, "bwBinSize": 25, "sampleSheet": "",
+                         "pairedEnd": True, "bwBinSize": 25, "qval": 0.001, "sampleSheet": "",
                          "windowSize": 150, "predictChIPDict": None,
                          "bigWigType": "both",
-                         "plotFormat": "png", "bamExt": ".filtered.bam",
+                         "plotFormat": "png","fromBAM": False, "bamExt": ".filtered.bam",
                          "fdr": 0.05, "absBestLFC": 1}):
     """
     Parse arguments from the command line.
@@ -44,8 +44,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
     optional.add_argument("--singleEnd",
                           dest="pairedEnd",
                           action="store_false",
-                          help="Input data is single-end, not paired-end",
-                          default=not defaults["pairedEnd"])
+                          help="Input data is single-end, not paired-end")
 
     optional.add_argument("--bigWigType",
                           help="Type of bigWig file to create. Options are: 'subtract' (control-subtracted ChIP coverage), 'log2ratio' (for log2 ratio of ChIP over control) or 'both' (create both set of bed files). Note that the allele-specific mode currently only produces 'log2ratio' bigwigs. (default: '%(default)s')",
@@ -56,6 +55,13 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                           help="bin size of output files in bigWig format (default: '%(default)s')",
                           type=int,
                           default=defaults["bwBinSize"])
+
+    optional.add_argument("--qval",
+                          dest="qval",
+                          metavar="INT",
+                          help="qvalue threshold for MACS2(default: '%(default)s')",
+                          type=float,
+                          default=defaults['qval'])
 
     optional.add_argument("--sampleSheet",
                           help="Information on samples (If differential binding analysis required); see "
@@ -82,9 +88,15 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                           default= None,
                           const="input")
 
+    optional.add_argument("--fromBAM",
+                          dest="fromBAM",
+                          help="Input folder with bam files. If provided, the analysis will start from this point. If bam files contain single ends, please specify --singleEnd additionally. (default: '%(default)s')",
+                          default=defaults["fromBAM"])
+
     optional.add_argument("--bamExt",
-                          help=argparse.SUPPRESS,
+                          help="Extention of provided bam files, will be substracted from basenames to obtain sample names. (default: '%(default)s')",
                           default=defaults["bamExt"])
+
 
     optional.add_argument("--plotFormat",
                          choices=['png', 'pdf', 'None'],

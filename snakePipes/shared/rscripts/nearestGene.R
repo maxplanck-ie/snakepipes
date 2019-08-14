@@ -44,7 +44,7 @@ if(any(is.na(size_v),sum(size_v==0)>0)){message('Some of the input files are non
 sink(type="message")
 close(logfile)
 
-sink("nearestGene.session_info.txt")
+sink(file.path(snakemake@params[["wdir"]],"nearestGene.session_info.txt"))
 sessionInfo()
 sink()
 
