@@ -18,7 +18,7 @@ import snakePipes.parserCommon as parserCommon
 def parse_args(defaults={"verbose": False, "configFile": None,
                          "clusterConfigFile": None, "maxJobs": 5,
                          "snakemakeOptions": "--use-conda", "tempDir": None,
-                         "pairedEnd": True, "bwBinSize": 25, "qval": 0.001, "sampleSheet": "",
+                         "pairedEnd": True, "fragmentLength":200, "bwBinSize": 25, "qval": 0.001, "sampleSheet": "",
                          "windowSize": 150, "predictChIPDict": None,
                          "bigWigType": "both",
                          "plotFormat": "png","fromBAM": False, "bamExt": ".filtered.bam",
@@ -49,6 +49,13 @@ def parse_args(defaults={"verbose": False, "configFile": None,
     optional.add_argument("--bigWigType",
                           help="Type of bigWig file to create. Options are: 'subtract' (control-subtracted ChIP coverage), 'log2ratio' (for log2 ratio of ChIP over control) or 'both' (create both set of bed files). Note that the allele-specific mode currently only produces 'log2ratio' bigwigs. (default: '%(default)s')",
                           default=defaults["bigWigType"])
+
+    optional.add_argument("--fragmentLength",
+                          metavar="INT",
+                          type=int,
+                          help="Fragment length in sequencing. Used only if --singleEnd."
+                               "(default: '%(default)s')",
+                          default=defaults["fragmentLength"])
 
     optional.add_argument("--bwBinSize",
                           metavar="INT",
