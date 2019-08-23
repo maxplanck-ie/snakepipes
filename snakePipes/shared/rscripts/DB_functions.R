@@ -87,7 +87,7 @@ readfiles_chip <- function(sampleSheet, fragmentLength, window_size, alleleSpeci
 #' makeQCplots_chip(bam.file, outplot)
 #'
 
-makeQCplots_chip <- function(bam.file, outplot, pe.param){
+makeQCplots_chip_PE <- function(bam.file, outplot, pe.param){
 
     ## Histogram to check frag size cutoff
     message("Checking fragment sizes")
@@ -125,6 +125,43 @@ makeQCplots_chip <- function(bam.file, outplot, pe.param){
 
     # cross correlation
     plot(0:max.delay, CCF, type = "l", ylab = "CCF", xlab = "Delay (bp)", main = "PE-Cross-correlation")
+
+    # coverage in windows
+    plot(xranged, collected, type = "l", col = "blue", xlim = c(-1000, 1000), lwd = 2,
+         xlab = "Distance (bp)", ylab = "Relative coverage per base")
+    abline(v = c(-150,200), col = "dodgerblue", lty = 2)
+    legend("topright", col = "dodgerblue", legend = "specified window size")
+
+    dev.off()
+
+}
+
+makeQCplots_chip_SE <- function(bam.file, outplot, pe.param){
+
+    ## Checking cross-correlation
+    message("Checking strand cross-correlation")
+    max.delay <- 500
+    dedup.on <- csaw::readParam(dedup = TRUE, minq = 20)
+    CCF <- csaw::correlateReads(bam.file, max.delay, param = dedup.on)
+
+    ## Choosing appropriate window size
+    message("Checking read distribution around putative peaks")
+    plotwc <- function(curbam){
+        windowed <- csaw::windowCounts(curbam, spacing = 50, param = pe.param, filter = 20)
+        rwsms <- rowSums(SummarizedExperiment::assay(windowed))
+        maxed <- csaw::findMaxima(SummarizedExperiment::rowRanges(windowed), range = 1000, metric = rwsms)
+        curbam.out <- csaw::profileSites(curbam, SummarizedExperiment::rowRanges(windowed)[maxed], param = pe.param)
+        return(curbam.out)
+    }
+    collected <- plotwc(bam.file)
+    xranged <- as.integer(names(collected))
+
+    ## plot
+    message("Plotting")
+    pdf(outplot)
+    
+    # cross correlation
+    plot(0:max.delay, CCF, type = "l", ylab = "CCF", xlab = "Delay (bp)", main = "SE-Cross-correlation")
 
     # coverage in windows
     plot(xranged, collected, type = "l", col = "blue", xlim = c(-1000, 1000), lwd = 2,
