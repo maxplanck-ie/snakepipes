@@ -31,12 +31,12 @@ if (!dir.exists(outdir)) dir.create(outdir)
 setwd(outdir)
 
 ## print the info
-cat(paste("Working dir:", getwd(), "\n"))
-cat(paste("Sample info CSV:", sampleInfoFilePath, "\n"))
-cat(paste("FDR:", fdr, "\n"))
-cat(paste("LFC:", lfc, "\n"))
-cat(paste("paired-end? :", pairedEnd, "\n"))
-cat(paste("allele-specific? :", allelic_info, "\n"))
+message(paste("Working dir:", getwd(), "\n"))
+message(paste("Sample info CSV:", sampleInfoFilePath, "\n"))
+message(paste("FDR:", fdr, "\n"))
+message(paste("LFC:", lfc, "\n"))
+message(paste("paired-end? :", pairedEnd, "\n"))
+message(paste("allele-specific? :", allelic_info, "\n"))
 
 ## sampleInfo (setup of the experiment)
 sampleInfo <- read.table(sampleInfoFilePath, header = TRUE, colClasses = c("character", "factor"))
@@ -69,11 +69,20 @@ chip_object <- readfiles_chip(sampleSheet = sampleInfo,
 first_bam <- head(SummarizedExperiment::colData(chip_object$windowCounts)$bam.files, n = 1)
 last_bam <- tail(SummarizedExperiment::colData(chip_object$windowCounts)$bam.files, n = 1)
 
-print(paste0("Making QC plots for first sample : ", first_bam))
-makeQCplots_chip(bam.file = first_bam, outplot = "QCplots_first_sample.pdf", pe.param = pe_param)
+if(isTRUE(pairedEnd)){
 
-print(paste0("Making QC plots for last sample : ", last_bam))
-makeQCplots_chip(bam.file = last_bam, outplot = "QCplots_last_sample.pdf", pe.param = pe_param)
+    message(paste0("Making QC plots for first sample : ", first_bam))
+    makeQCplots_chip_PE(bam.file = first_bam, outplot = "QCplots_first_sample.pdf", pe.param = pe_param)
+
+    message(paste0("Making QC plots for last sample : ", last_bam))
+    makeQCplots_chip_PE(bam.file = last_bam, outplot = "QCplots_last_sample.pdf", pe.param = pe_param)} else {
+
+    message(paste0("Making QC plots for first sample : ", first_bam))
+    makeQCplots_chip_SE(bam.file = first_bam, outplot = "QCplots_first_sample.pdf", pe.param = pe_param)
+
+    message(paste0("Making QC plots for last sample : ", last_bam))
+    makeQCplots_chip_SE(bam.file = last_bam, outplot = "QCplots_last_sample.pdf", pe.param = pe_param)
+}
 
 ## merge all peaks from the samples mentioned in sampleinfo to test (exclude those with 'False' in the UseRegions column)
 # get files to read from MACS
@@ -99,13 +108,13 @@ allpeaks <- lapply(fnames, function(x) {
 allpeaks <- Reduce(function(x,y) GenomicRanges::union(x,y), allpeaks)
 
 ## keep only these peaks for testing DB
-print(paste0("Filtering windows using MACS2 output : ", length(allpeaks) , " regions used (Union of peaks)"))
+message(paste0("Filtering windows using MACS2 output : ", length(allpeaks) , " regions used (Union of peaks)"))
 
 keep <- overlapsAny(SummarizedExperiment::rowRanges(chip_object$windowCounts), allpeaks)
 chip_object$windowCounts <- chip_object$windowCounts[keep,]
 
 ## TMM normalize
-print("Normalizing using TMM (using 10kb background counts)")
+message("Normalizing using TMM (using 10kb background counts)")
 chip_object <- tmmNormalize_chip(chip_object, binsize = 10000, plotfile = "TMM_normalizedCounts.pdf")
 
 ## get DB regions
@@ -113,12 +122,12 @@ print("Performing differential binding")
 chip_results <- getDBregions_chip(chip_object, plotfile = "DiffBinding_modelfit.pdf")
 
 ## write output
-print("Writing output")
+message("Writing output")
 writeOutput_chip(chip_results, outfile_prefix = "DiffBinding", fdrcutoff = fdr,lfccutoff=lfc)
 
 
 ## save data
-print("Saving data")
+message("Saving data")
 #sink()
 save(chip_object, chip_results, file = "DiffBinding_analysis.Rdata")
 

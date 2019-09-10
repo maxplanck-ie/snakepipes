@@ -16,7 +16,7 @@ rule histoneHMM:
         err = "histoneHMM/logs/histoneHMM.{sample}.filtered.err"
     benchmark:
         "histoneHMM/.benchmark/histoneHMM.{sample}.filtered.benchmark"
-    conda: CONDA_CHIPSEQ_ENV
+    conda: CONDA_HISTONE_HMM_ENV
     shell: """
         RHOME=`R RHOME`
         $RHOME/library/histoneHMM/bin/histoneHMM_call_regions.R -b 750 -c {params.genome_index} -o {params.prefix} -P 0.1 {input} > {log.out} 2> {log.err}

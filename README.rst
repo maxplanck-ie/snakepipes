@@ -79,6 +79,7 @@ If you adopt/run snakePipes for your analysis, cite it as follows :
 
 Bhardwaj, Vivek, Steffen Heyne, Katarzyna Sikora, Leily Rabbani, Michael Rauer, Fabian Kilpert, Andreas S. Richter, Devon P. Ryan, and Thomas Manke. 2019. “snakePipes: Facilitating Flexible, Scalable and Integrative Epigenomic Analysis.” Bioinformatics , May. `doi:10.1093/bioinformatics/btz436 <https://doi.org/10.1093/bioinformatics/btz436>`__
 
+
 Note
 -------------
 

@@ -44,7 +44,7 @@ if allele_info == 'FALSE':
                 err = os.path.join(outdir,"CSAW_{}".format(sample_name)+"/logs/deeptools_matrix.log2r.{change_dir}.err")
             threads: 8
             conda: CONDA_SHARED_ENV
-            shell: "if [ -s {params.bed_in} ]; then computeMatrix scale-regions -S {input.bigwigs} -R {params.bed_in} -m 1000 -b 200 -a 200 -o {output.matrix} -p {threads};fi >{log.out} 2>{log.err}"
+            shell: "if [ -s {params.bed_in} ]; then computeMatrix scale-regions -S {input.bigwigs} -R {params.bed_in} -m 1000 -b 200 -a 200 -o {output.matrix} -p {threads} ; fi >{log.out} 2>{log.err}"
 
         rule plot_heatmap_log2r_CSAW:
             input:
@@ -93,7 +93,7 @@ if allele_info == 'FALSE':
     rule CSAW_report:
         input:
             csaw_in = "CSAW_{}/CSAW.session_info.txt".format(sample_name),
-            heatmap_in=lambda wildcards: expand("CSAW_{}".format(sample_name)+"/CSAW.{change_dir}.cov.heatmap.png",change_dir=['UP','DOWN']) if pipeline in 'ATAC-seq' else [expand("CSAW_{}".format(sample_name)+"/CSAW.{change_dir}.cov.heatmap.png",change_dir=['UP','DOWN']),expand("CSAW_{}".format(sample_name)+"/CSAW.{change_dir}.log2r.heatmap.png",change_dir=['UP','DOWN'])]
+            heatmap_in=lambda wildcards: expand("CSAW_{}".format(sample_name)+"/CSAW.{change_dir}.cov.heatmap.png",change_dir=['UP','DOWN']) if pipeline in 'ATAC-seq' else expand("CSAW_{}".format(sample_name)+"/CSAW.{change_dir}.cov.heatmap.png",change_dir=['UP','DOWN']) + expand("CSAW_{}".format(sample_name)+"/CSAW.{change_dir}.log2r.heatmap.png",change_dir=['UP','DOWN'])
         output:
             outfile="CSAW_{}/CSAW.Stats_report.html".format(sample_name)
         params:
