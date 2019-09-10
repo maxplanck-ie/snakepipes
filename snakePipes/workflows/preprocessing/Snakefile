@@ -29,15 +29,18 @@ if not pairedEnd:
     readsUse = [reads[0]]
 
 deduped = expand("deduplicatedFASTQ/{sample}{RExt}{ext}", sample=samples, RExt=readsUse, ext=ext)
+print("initial indir: {}".format(indir))
 if (sampleSheet and sampleSheet != "") or optDedupDist:
     if sampleSheet and sampleSheet != "":
-        sampleDict = readSampleSheet(sampleSheet)
+        sampleDict, pairedEnd = readSampleSheet(sampleSheet, reads)
         samples = sampleDict.keys()
-        infiles = expand("deduplicatedFASTQ/{sample}{RExt}{ext}", sample=samples.keys(), RExt=readsUse, ext=ext)
+        if not pairedEnd:
+            readsUse = [reads[0]]
+        include: os.path.join(maindir, "shared", "rules", "preprocessing.snakefile")
+        infiles = expand("deduplicatedFASTQ/{sample}{RExt}{ext}", sample=samples, RExt=readsUse, ext=ext)
     else:
         infiles = expand("deduplicatedFASTQ/{sample}{RExt}{ext}", sample=samples, RExt=readsUse, ext=ext)
-
-    include: os.path.join(maindir, "shared", "rules", "preprocessing.snakefile")
+        include: os.path.join(maindir, "shared", "rules", "preprocessing.snakefile")
 
     indir = "deduplicatedFASTQ"
     deduped = infiles
@@ -79,7 +82,7 @@ onstart:
         print("samples:", samples)
         print("paired:", pairedEnd)
         print("read extension:", reads)
-        print("fastq dir:", fastq_dir)
+        print("fastq dir:", indir)
         print("Sample sheet:", sampleSheet)
         print("-" * 80, "\n")
 
