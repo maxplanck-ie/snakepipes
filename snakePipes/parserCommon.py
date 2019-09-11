@@ -73,6 +73,7 @@ def mainArguments(defaults, workingDir=False, createIndices=False, preprocessing
                              default=defaults["ext"])
 
         general.add_argument("--reads",
+                             nargs=2,
                              help="Suffix used to denote reads 1 and 2 for paired-end data. This should typically be either '_1' '_2' or '_R1' '_R2' (default: '%(default)s). "
                              "Note that you should NOT separate the values by a comma (use a space) or enclose them in brackets.",
                              default=defaults["reads"])

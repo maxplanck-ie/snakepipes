@@ -18,32 +18,28 @@ include: os.path.join(workflow.basedir, "internals.snakefile")
 ################################################################################
 
 # The order of steps is:
-# 1. Merge samples across lanes (preprocessing.snakefile)
-# 2. Deduplicate (preprocessing.snakefile)
+# 1. Merge samples across lanes (preprocessing.snakefile, mergedFASTQ)
+# 2. Deduplicate (preprocessing.snakefile, deduplicatedFASTQ)
 # 3. UMI extraction (umi_tools.snakefile)
 # 4. FastQC (FastQC.snakeFile)
 # 5. MultiQC
+# If there are no options given then this just symlinks the files a few times.
 
 readsUse = reads
 if not pairedEnd:
     readsUse = [reads[0]]
 
-deduped = expand("deduplicatedFASTQ/{sample}{RExt}{ext}", sample=samples, RExt=readsUse, ext=ext)
-print("initial indir: {}".format(indir))
-if (sampleSheet and sampleSheet != "") or optDedupDist:
-    if sampleSheet and sampleSheet != "":
-        sampleDict, pairedEnd = readSampleSheet(sampleSheet, reads)
-        samples = sampleDict.keys()
-        if not pairedEnd:
-            readsUse = [reads[0]]
-        include: os.path.join(maindir, "shared", "rules", "preprocessing.snakefile")
-        infiles = expand("deduplicatedFASTQ/{sample}{RExt}{ext}", sample=samples, RExt=readsUse, ext=ext)
-    else:
-        infiles = expand("deduplicatedFASTQ/{sample}{RExt}{ext}", sample=samples, RExt=readsUse, ext=ext)
-        include: os.path.join(maindir, "shared", "rules", "preprocessing.snakefile")
+if sampleSheet and sampleSheet != "":
+    sampleDict, pairedEnd = readSampleSheet(sampleSheet, reads)
+    samples = sampleDict.keys()
+    if not pairedEnd:
+        readsUse = [reads[0]]
+ 
+include: os.path.join(maindir, "shared", "rules", "preprocessing.snakefile")
+infiles = expand("deduplicatedFASTQ/{sample}{RExt}{ext}", sample=samples, RExt=readsUse, ext=ext)
 
-    indir = "deduplicatedFASTQ"
-    deduped = infiles
+indir = "deduplicatedFASTQ"
+deduped = infiles
 
 ## FASTQ: either downsample FASTQ files or create symlinks to input files
 include: os.path.join(maindir, "shared", "rules", "FASTQ.snakefile")
@@ -53,6 +49,7 @@ include: os.path.join(maindir, "shared", "rules", "umi_tools.snakefile")
 
 ## FastQC
 if fastqc:
+    trim = False  # the multiQC input checker needs this
     include: os.path.join(maindir, "shared", "rules", "FastQC.snakefile")
     include: os.path.join(maindir, "shared", "rules", "multiQC.snakefile")
 else:
@@ -68,9 +65,6 @@ def run_FastQC(fastqc):
         return(["multiQC/multiqc_report.html"] + expand("FastQC/{sample}{read}_fastqc.html", sample = samples, read = readsUse))
     else:
         return([])
-
-# run umi tools
-# run fastqc
 
 
 ### execute before  starts #####################################################
@@ -96,7 +90,7 @@ onstart:
 
 rule all:
     input:
-        deduped
+        deduped, run_FastQC(fastqc)
 
 ### execute after  finished ####################################################
 ################################################################################

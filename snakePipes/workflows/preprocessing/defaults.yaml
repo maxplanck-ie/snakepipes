@@ -32,7 +32,7 @@ pairedEnd: True
 downsample:
 sampleSheet:
 fastqc: False
-optDedupDist: 2500
+optDedupDist: 0
 clumpifyOptions: "dupesubs=0 qin=33 markduplicates=t optical=t"
 clumpifyMemory: "30G"
 verbose: False
