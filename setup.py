@@ -17,7 +17,7 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     url='https://github.com/maxplanck-ie/snakepipes',
-    license='GPL v3',
+    license='MIT',
     description='Snakemake workflows and wrappers for NGS data processing from the MPI-IE',
     zip_safe=False,
     data_files=[("", ["LICENSE.txt"])]
