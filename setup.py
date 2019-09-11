@@ -20,5 +20,5 @@ setup(
     license='MIT',
     description='Snakemake workflows and wrappers for NGS data processing from the MPI-IE',
     zip_safe=False,
-    data_files=[("", ["LICENSE.txt"])]
+    data_files=[("", ["LICENSE"])]
 )
