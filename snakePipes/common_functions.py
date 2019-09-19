@@ -436,10 +436,8 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
         oldVerbose = config['verbose']
         config['verbose'] = False
         write_configfile(os.path.join(args.outdir, '{}.config.yaml'.format(workflowName)), config)
-        DAGproc = subprocess.Popen(snakemake_cmd + ['--rulegraph'], stdout=subprocess.PIPE, shell=True)
-        _ = open("{}/{}_pipeline.pdf".format(args.outdir, workflowName), "wb")
-        subprocess.check_call(["dot", "-Tpdf"], stdin=DAGproc.stdout, stdout=_)
-        _.close()
+        DAGproc = subprocess.Popen(" ".join(snakemake_cmd + ["--rulegraph"]), stdout=subprocess.PIPE, shell=True)
+        subprocess.check_call("dot -Tpdf -o{}/{}_pipeline.pdf".format(args.outdir, workflowName), stdin=DAGproc.stdout, shell=True) #stdout=_)
         config['verbose'] = oldVerbose
         write_configfile(os.path.join(args.outdir, '{}.config.yaml'.format(workflowName)), config)
 
@@ -508,6 +506,10 @@ def runAndCleanup(args, cmd, logfile_name):
         if args.emailAddress:
             sendEmail(args, p.returncode)
         sys.exit(p.returncode)
+    else:
+        if os.path.exists(os.path.join(args.outdir, ".snakemake")):
+            import shutil
+            shutil.rmtree(os.path.join(args.outdir, ".snakemake"), ignore_errors=True)
 
     # Send email if desired
     if args.emailAddress:
