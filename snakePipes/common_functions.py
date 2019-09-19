@@ -437,7 +437,7 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
         config['verbose'] = False
         write_configfile(os.path.join(args.outdir, '{}.config.yaml'.format(workflowName)), config)
         DAGproc = subprocess.Popen(" ".join(snakemake_cmd + ["--rulegraph"]), stdout=subprocess.PIPE, shell=True)
-        subprocess.check_call("dot -Tpdf -o{}/{}_pipeline.pdf".format(args.outdir, workflowName), stdin=DAGproc.stdout, shell=True) #stdout=_)
+        subprocess.check_call("dot -Tpdf -o{}/{}_pipeline.pdf".format(args.outdir, workflowName), stdin=DAGproc.stdout, shell=True)
         config['verbose'] = oldVerbose
         write_configfile(os.path.join(args.outdir, '{}.config.yaml'.format(workflowName)), config)
 
