@@ -56,7 +56,8 @@ if optDedupDist > 0:
             output:
                 r1="deduplicatedFASTQ/{sample}" + reads[0] + ext,
                 r2="deduplicatedFASTQ/{sample}" + reads[1] + ext,
-                metrics="deduplicatedFASTQ/{sample}.metrics"
+                metrics="deduplicatedFASTQ/{sample}.metrics",
+                tempOut=temp("deduplicatedFASTQ/{sample}_temp.fq.gz")
             params:
                 R1=reads[0],
                 R2=reads[1],
@@ -74,16 +75,14 @@ if optDedupDist > 0:
                 clumpify.sh -Xmx{params.mem} \
                             {params.clumpifyOptions} \
                             in={input.r1} \
-                             in2={input.r2} \
-                            out=deduplicatedFASTQ/{wildcards.sample}_temp.fq.gz \
+                            in2={input.r2} \
+                            out={output.tempOut} \
                             dupedist={params.optDedupDist} \
                             threads={threads} > {log.stdout} 2> {log.stderr}
 
                 splitFastq --pigzThreads 4 --R1 {params.R1} --R2 {params.R2} --extension {params.extension} \
-                           deduplicatedFASTQ/{wildcards.sample}_temp.fq.gz \
+                           {output.tempOut} \
                            deduplicatedFASTQ/{wildcards.sample} > {output.metrics} 2>> {log.stderr}
-
-                rm deduplicatedFASTQ/{wildcards.sample}_temp.fq.gz
                 """
     else:
         rule clumpify:
@@ -91,7 +90,8 @@ if optDedupDist > 0:
                 r1="mergedFASTQ/{sample}" + reads[0] + ext,
             output:
                 r1="deduplicatedFASTQ/{sample}" + reads[0] + ext,
-                metrics="deduplicatedFASTQ/{sample}.metrics"
+                metrics="deduplicatedFASTQ/{sample}.metrics",
+                tempOut=temp("deduplicatedFASTQ/{sample}_temp.fq.gz")
             params:
                 R1=reads[0],
                 extension=ext,
@@ -108,15 +108,13 @@ if optDedupDist > 0:
                 clumpify.sh -Xmx{params.mem} \
                             {params.clumpifyOptions} \
                             in={input.r1} \
-                            out=deduplicatedFASTQ/{wildcards.sample}_temp.fq.gz \
+                            out={input.tempOut} \
                             dupedist={params.optDedupDist} \
                             threads={threads} > {log.stdout} 2> {log.stderr}
 
                 splitFastq --SE --pigzThreads 4 --R1 {params.R1} --extension {params.extension} \
-                           deduplicatedFASTQ/{wildcards.sample}_temp.fq.gz \
+                           {output.tempOut} \
                            deduplicatedFASTQ/{wildcards.sample} > {output.metrics} 2>> {log.stderr}
-
-                rm deduplicatedFASTQ/{wildcards.sample}_temp.fq.gz
                 """
 else:
     if pairedEnd:
@@ -140,3 +138,41 @@ else:
             shell: """
                 ln -s -r {input.r1} {output.r1}
                 """
+
+
+if fastqc and optDedupDist > 0:
+    rule splitFastq2YAML:
+        input:
+            expand("deduplicatedFASTQ/{sample}.metrics", sample=samples)
+        output:
+            "deduplicatedFASTQ/optical_dedup_mqc.json"
+        run:
+            import json
+
+            d = {
+                 "id": "custom_barplot",
+                 "section_name": "Optical Duplicates",
+                 "description": "The percentage of optical duplicates found in the original fastq files.",
+                 "plot_type": "bargraph",
+                 "pconfig": {
+                             "id": "custom_bargraph",
+                             "ylab": "Percentage optical duplicates",
+                            },
+                 "data": {}
+                }
+
+            for fname in input:
+                # name things according to the sample
+                sample = fname.split("/")[1][:-8]
+                f = open(fname)
+                cols = f.read().strip().split("\t")
+                cols = [int(x) for x in cols]
+                if cols[1] == 0:
+                    cols[1] = 1
+                d["data"][sample] = {"Optical Duplicates": cols[0],
+                                     "Non-Duplicates": cols[1]}
+                f.close()
+
+            o = open(output[0], "w")
+            json.dump(d, o)
+            o.close()
