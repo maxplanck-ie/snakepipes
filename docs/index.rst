@@ -99,6 +99,7 @@ Contents:
    content/workflows/ChIP-seq.rst
    content/workflows/ATAC-seq.rst
    content/workflows/HiC.rst
+   content/workflows/preprocessing.rst
    content/workflows/RNA-seq.rst
    content/workflows/scRNA-seq.rst
    content/workflows/WGBS.rst
