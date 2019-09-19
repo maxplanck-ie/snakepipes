@@ -140,39 +140,38 @@ else:
                 """
 
 
-if fastqc and optDedupDist > 0:
-    rule splitFastq2YAML:
-        input:
-            expand("deduplicatedFASTQ/{sample}.metrics", sample=samples)
-        output:
-            "deduplicatedFASTQ/optical_dedup_mqc.json"
-        run:
-            import json
+rule splitFastq2YAML:
+    input:
+        expand("deduplicatedFASTQ/{sample}.metrics", sample=samples)
+    output:
+        "deduplicatedFASTQ/optical_dedup_mqc.json"
+    run:
+        import json
 
-            d = {
-                 "id": "custom_barplot",
-                 "section_name": "Optical Duplicates",
-                 "description": "The percentage of optical duplicates found in the original fastq files.",
-                 "plot_type": "bargraph",
-                 "pconfig": {
-                             "id": "custom_bargraph",
-                             "ylab": "Percentage optical duplicates",
-                            },
-                 "data": {}
-                }
+        d = {
+             "id": "custom_barplot",
+             "section_name": "Optical Duplicates",
+             "description": "The percentage of optical duplicates found in the original fastq files.",
+             "plot_type": "bargraph",
+             "pconfig": {
+                         "id": "custom_bargraph",
+                         "ylab": "Percentage optical duplicates",
+                        },
+             "data": {}
+            }
 
-            for fname in input:
-                # name things according to the sample
-                sample = fname.split("/")[1][:-8]
-                f = open(fname)
-                cols = f.read().strip().split("\t")
-                cols = [int(x) for x in cols]
-                if cols[1] == 0:
-                    cols[1] = 1
-                d["data"][sample] = {"Optical Duplicates": cols[0],
-                                     "Non-Duplicates": cols[1]}
-                f.close()
+        for fname in input:
+            # name things according to the sample
+            sample = fname.split("/")[1][:-8]
+            f = open(fname)
+            cols = f.read().strip().split("\t")
+            cols = [int(x) for x in cols]
+            if cols[1] == 0:
+                cols[1] = 1
+            d["data"][sample] = {"Optical Duplicates": cols[0],
+                                 "Non-Duplicates": cols[1]}
+            f.close()
 
-            o = open(output[0], "w")
-            json.dump(d, o)
-            o.close()
+        o = open(output[0], "w")
+        json.dump(d, o)
+        o.close()

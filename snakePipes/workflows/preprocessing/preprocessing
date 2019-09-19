@@ -60,10 +60,11 @@ def parse_args(defaults={"verbose": False, "configFile": None,
 
     optional.add_argument("--clumpifyMemory",
                           help="This controls how much memory clumpify is instructed "
-                          "to use per-core, in GB. This may need to be increased if "
+                          "to use, in GB. This may need to be increased if "
                           "samples are particularly large or there are MANY optical "
-                          "duplicates. This is passed to both clumpify (e.g., as "
-                          "-Xmx30G) and the cluster (e.g., as 30G). "
+                          "duplicates. This is passed to clumpify (e.g., as "
+                          "-Xmx30G). You may additionally need to instruct your "
+                          "scheduler about the per-core memory usage (e.g., in cluster.yaml). "
                           "(default: '%(default)s')",
                           default=defaults["clumpifyMemory"])
 
