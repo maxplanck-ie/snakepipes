@@ -82,8 +82,13 @@ def config_diff(dict1, dict2):
 
 
 def load_organism_data(genome, maindir, verbose):
-    if os.path.isfile(os.path.join(maindir, "shared", "organisms", genome + ".yaml")):
-        organism = load_configfile(os.path.join(maindir, "shared", "organisms", genome + ".yaml"), verbose, "Genome")
+    # Load the global config file, which dictates where the organisms should be found
+    cfg = load_configfile(os.path.join(maindir, "shared", "defaults.yaml"), False, "defaults")
+
+    if os.path.isfile(os.path.join(maindir, cfg['organismsDir'], genome + ".yaml")):
+        organism = load_configfile(os.path.join(maindir, cfg['organismsDir'], genome + ".yaml"), verbose, "Genome")
+    elif os.path.isfile(os.path.join(cfg['organismsDir'], genome + ".yaml")):
+        organism = load_configfile(os.path.join(cfg['organismsDir'], genome + ".yaml"), verbose, "Genome")
     elif os.path.isfile(genome):
         organism = load_configfile(genome, verbose, "Genome (user)")
     else:
@@ -391,8 +396,12 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
     write_configfile(os.path.join(args.outdir, '{}.config.yaml'.format(workflowName)), config)
 
     # merge cluster config files: 1) global one, 2) workflow specific one, 3) user provided one
-    cluster_config = load_configfile(os.path.join(baseDir, "shared/cluster.yaml"), False)
-    cluster_config = merge_dicts(cluster_config, load_configfile(os.path.join(workflowDir, "cluster.yaml"), False), )
+    print("DEBUG {}".format(defaults))
+    if os.path.isfile(os.path.join(baseDir, defaults['clusterConfig'])):
+        cluster_config = load_configfile(os.path.join(baseDir, defaults['clusterConfig']), False)
+    else:
+        cluster_config = load_configfile(os.path.join(defaults['clusterConfig']), False)
+    cluster_config = merge_dicts(cluster_config, load_configfile(os.path.join(workflowDir), False), )
 
     if args.clusterConfigFile:
         user_cluster_config = load_configfile(args.clusterConfigFile, False)
