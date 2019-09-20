@@ -76,6 +76,10 @@ def multiqc_input_check(return_value):
     elif pipeline == "WGBS":
         infiles.append( expand("QC_metrics/{sample}.flagstat", sample = samples) )
         indir += " QC_metrics"
+    elif pipeline == "preprocessing":
+        if fastqc and optDedupDist > 0:
+            infiles.append("deduplicatedFASTQ/optical_dedup_mqc.json")
+            indir += " deduplicatedFASTQ"
 
     if return_value == "infiles":
         return(infiles)

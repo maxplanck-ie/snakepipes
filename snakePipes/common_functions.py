@@ -27,6 +27,7 @@ def set_env_yamls():
             'CONDA_HIC_ENV': 'envs/hic.yaml',
             'CONDA_WGBS_ENV': 'envs/wgbs.yaml',
             'CONDA_RMD_ENV': 'envs/rmarkdown.yaml',
+            'CONDA_PREPROCESSING_ENV': 'envs/preprocessing.yaml',
             'CONDA_SAMBAMBA_ENV': 'envs/sambamba.yaml'}
 
 
@@ -321,7 +322,7 @@ def sendEmail(args, returnCode):
         pass
 
 
-def checkCommonArguments(args, baseDir, outDir=False, createIndices=False):
+def checkCommonArguments(args, baseDir, outDir=False, createIndices=False, preprocessing=False):
     """
     Check the wrapper arguments
 
@@ -356,10 +357,10 @@ def checkCommonArguments(args, baseDir, outDir=False, createIndices=False):
                     sys.exit("\nError! Working-dir (-d) dir not found! ({})\n".format(args.workingdir))
             args.outdir = args.workingdir
     # 2. Sample info file
-    if 'sampleSheet' in args and args.sampleSheet:
+    if 'sampleSheet' in args and args.sampleSheet and not preprocessing:
         args.sampleSheet = check_sample_info_header(args.sampleSheet)
     # 3. get abspath from user provided genome/organism file
-    if not createIndices:
+    if not createIndices and not preprocessing:
         if not os.path.isfile(os.path.join(baseDir, "shared/organisms/{}.yaml".format(args.genome))) and os.path.isfile(args.genome):
             args.genome = os.path.abspath(args.genome)
 
@@ -409,12 +410,13 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
     write_configfile(os.path.join(args.outdir, '{}.cluster_config.yaml'.format(workflowName)), cluster_config)
 
     # Save the organism YAML file as {PIPELINE}_organism.yaml
-    orgyaml = os.path.join(baseDir, "shared/organisms/{}.yaml".format(args.genome))
-    if not os.path.isfile(orgyaml):
-        orgyaml = args.genome
-    organismYAMLname = os.path.join(args.outdir, "{}_organism.yaml".format(workflowName))
-    if workflowName != "createIndices" and os.path.abspath(organismYAMLname) != os.path.abspath(orgyaml):
-        shutil.copyfile(orgyaml, organismYAMLname)
+    if workflowName != "preprocessing":
+        orgyaml = os.path.join(baseDir, "shared/organisms/{}.yaml".format(args.genome))
+        if not os.path.isfile(orgyaml):
+            orgyaml = args.genome
+        organismYAMLname = os.path.join(args.outdir, "{}_organism.yaml".format(workflowName))
+        if workflowName != "createIndices" and os.path.abspath(organismYAMLname) != os.path.abspath(orgyaml):
+            shutil.copyfile(orgyaml, organismYAMLname)
 
     if args.keepTemp:
         args.snakemakeOptions += " --notemp"
@@ -434,10 +436,8 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
         oldVerbose = config['verbose']
         config['verbose'] = False
         write_configfile(os.path.join(args.outdir, '{}.config.yaml'.format(workflowName)), config)
-        DAGproc = subprocess.Popen(snakemake_cmd + ['--rulegraph'], stdout=subprocess.PIPE, shell=True)
-        _ = open("{}/{}_pipeline.pdf".format(args.outdir, workflowName), "wb")
-        subprocess.check_call(["dot", "-Tpdf"], stdin=DAGproc.stdout, stdout=_)
-        _.close()
+        DAGproc = subprocess.Popen(" ".join(snakemake_cmd + ["--rulegraph"]), stdout=subprocess.PIPE, shell=True)
+        subprocess.check_call("dot -Tpdf -o{}/{}_pipeline.pdf".format(args.outdir, workflowName), stdin=DAGproc.stdout, shell=True)
         config['verbose'] = oldVerbose
         write_configfile(os.path.join(args.outdir, '{}.config.yaml'.format(workflowName)), config)
 
@@ -506,6 +506,10 @@ def runAndCleanup(args, cmd, logfile_name):
         if args.emailAddress:
             sendEmail(args, p.returncode)
         sys.exit(p.returncode)
+    else:
+        if os.path.exists(os.path.join(args.outdir, ".snakemake")):
+            import shutil
+            shutil.rmtree(os.path.join(args.outdir, ".snakemake"), ignore_errors=True)
 
     # Send email if desired
     if args.emailAddress:

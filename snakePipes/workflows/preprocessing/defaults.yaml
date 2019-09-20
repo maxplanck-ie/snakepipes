@@ -1,0 +1,55 @@
+################################################################################
+# This file is the default configuration of the preprocessing workflow!
+#
+# In order to adjust some parameters, please either use the preprocessing command
+# or save a copy of this file, modify necessary parameters and then provide
+# this file to the wrapper or snakmake via '--configFile' option
+# (see below how to call the snakefile directly)
+#
+# Own parameters will be loaded during snakefile executiuon as well and hence
+# can be used in new/extended snakemake rules!
+################################################################################
+## General/Snakemake parameters, only used/set by wrapper or in Snakemake cmdl, but not in Snakefile
+pipeline: preprocessing
+outdir:
+configFile:
+clusterConfigFile:
+local: False
+maxJobs: 5
+tempDir:
+# This is just for compatibility with other pipelines, it's otherwise ignored
+aligner: "bowtie2"
+## directory with fastq files
+indir:
+## FASTQ file extension (default: ".fastq.gz")
+ext: '.fastq.gz'
+## paired-end read name extension (default: ["_R1", "_R2"])
+reads: ["_R1","_R2"]
+## assume paired end reads
+pairedEnd: True
+## Number of reads to downsample from each FASTQ file
+downsample:
+sampleSheet:
+fastqc: False
+optDedupDist: 0
+clumpifyOptions: "dupesubs=0 qin=33 markduplicates=t optical=t"
+clumpifyMemory: "30G"
+verbose: False
+#umi_tools
+UMIBarcode: False
+bcPattern: NNNNCCCCCCCCC #default: 4 base umi barcode, 9 base cell barcode (eg. RELACS barcode)
+UMIDedup: False
+UMIDedupSep: "_"
+UMIDedupOpts: --paired
+################################################################################
+# Call snakemake directly, i.e. without using the wrapper script:
+#
+# Please save a copy of this config yaml file and provide an adjusted config
+# via '--configFile' parameter!
+# example call:
+#
+# snakemake --snakefile /path/to/snakemake_workflows/workflows/preprocessing/Snakefile
+#           --configFile /path/to/snakemake_workflows/workflows/preprocessing/defaults.yaml
+#           --directory /path/to/outputdir
+#           --cores 32
+################################################################################

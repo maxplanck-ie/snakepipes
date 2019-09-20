@@ -1,5 +1,0 @@
-/home/sikora/.local/bin/DNA-mapping -i PE_input -o output .ci_stuff/organism.yaml --snakemakeOptions  --dryrun --conda-prefix /tmp
-
-PYTHONNOUSERSITE=True /home/sikora/.local/bin/snakemake --use-conda --conda-prefix /package/anaconda3/envs/ --dryrun --conda-prefix /tmp --latency-wait 300 --snakefile /home/sikora/.local/lib/python3.6/site-packages/snakePipes/workflows/DNA-mapping/Snakefile --jobs 5 --directory /data/manke/sikora/snakepipes/output --configfile /data/manke/sikora/snakepipes/output/DNA-mapping.config.yaml --keep-going --cluster-config /data/manke/sikora/snakepipes/output/DNA-mapping.cluster_config.yaml --cluster 'module load slurm; SlurmEasy --mem-per-cpu {cluster.memory} --threads {threads} --log cluster_logs --name {rule}.snakemake '
-
-/bin/sh: 1: /home/sikora/.local/bin/snakemake: not found

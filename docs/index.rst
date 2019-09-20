@@ -23,6 +23,7 @@ Pipeline                            Description
 :ref:`RNA-Seq`                  RNA-Seq workflow : From mapping to differential expression using DEseq2
 :ref:`scRNA-Seq`                Single-cell RNA-Seq (CEL-Seq2) workflow : From mapping to differential expression
 :ref:`WGBS`                     Whole-genome Bisulfite-Seq analysis workflow, from mapping to DMR calling and differential methylation analysis
+:ref:`preprocessing`            Merging technical replicates (e.g., across lanes), removing optical duplicates, running FastQC
 =============================== ===============================================================================================================
 
 Quick start
@@ -98,6 +99,7 @@ Contents:
    content/workflows/ChIP-seq.rst
    content/workflows/ATAC-seq.rst
    content/workflows/HiC.rst
+   content/workflows/preprocessing.rst
    content/workflows/RNA-seq.rst
    content/workflows/scRNA-seq.rst
    content/workflows/WGBS.rst

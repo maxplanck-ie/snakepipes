@@ -1,0 +1,104 @@
+import os
+import snakePipes.common_functions as cf
+
+
+### snakemake_workflows initialization ########################################
+maindir = os.path.dirname(os.path.dirname(workflow.basedir))
+
+# load conda ENVs (path is relative to "shared/rules" directory)
+globals().update(cf.set_env_yamls())
+
+# load config file
+globals().update(cf.load_configfile(workflow.overwrite_configfile, config["verbose"]))
+
+# do workflow specific stuff now
+include: os.path.join(workflow.basedir, "internals.snakefile")
+
+### include modules of other snakefiles ########################################
+################################################################################
+
+# The order of steps is:
+# 1. Merge samples across lanes (preprocessing.snakefile, mergedFASTQ)
+# 2. Deduplicate (preprocessing.snakefile, deduplicatedFASTQ)
+# 3. UMI extraction (umi_tools.snakefile)
+# 4. FastQC (FastQC.snakeFile)
+# 5. MultiQC
+# If there are no options given then this just symlinks the files a few times.
+
+readsUse = reads
+if not pairedEnd:
+    readsUse = [reads[0]]
+
+if sampleSheet and sampleSheet != "":
+    sampleDict, pairedEnd = readSampleSheet(sampleSheet, reads)
+    samples = sampleDict.keys()
+    if not pairedEnd:
+        readsUse = [reads[0]]
+ 
+include: os.path.join(maindir, "shared", "rules", "preprocessing.snakefile")
+infiles = expand("deduplicatedFASTQ/{sample}{RExt}{ext}", sample=samples, RExt=readsUse, ext=ext)
+
+indir = "deduplicatedFASTQ"
+deduped = infiles
+
+## FASTQ: either downsample FASTQ files or create symlinks to input files
+include: os.path.join(maindir, "shared", "rules", "FASTQ.snakefile")
+
+#umi_tools
+include: os.path.join(maindir, "shared", "rules", "umi_tools.snakefile")
+
+## FastQC
+if fastqc:
+    trim = False  # the multiQC input checker needs this
+    include: os.path.join(maindir, "shared", "rules", "FastQC.snakefile")
+    include: os.path.join(maindir, "shared", "rules", "multiQC.snakefile")
+else:
+    fastqc = False
+
+### conditional/optional rules #################################################
+################################################################################
+def run_FastQC(fastqc):
+    readsUse = reads
+    if not pairedEnd:
+        readsUse = [reads[0]]
+    if fastqc:
+        return(["multiQC/multiqc_report.html"] + expand("FastQC/{sample}{read}_fastqc.html", sample = samples, read = readsUse))
+    else:
+        return([])
+
+
+### execute before  starts #####################################################
+################################################################################
+onstart:
+    if "verbose" in config and config["verbose"]:
+        print()
+        print("--- Workflow parameters --------------------------------------------------------")
+        print("samples:", samples)
+        print("paired:", pairedEnd)
+        print("read extension:", reads)
+        print("fastq dir:", indir)
+        print("Sample sheet:", sampleSheet)
+        print("-" * 80, "\n")
+
+        print("--- Environment ----------------------------------------------------------------")
+        print("$TMPDIR: ", os.getenv('TMPDIR', ""))
+        print("$HOSTNAME: ", os.getenv('HOSTNAME', ""))
+        print("-" * 80, "\n")
+
+### main rule ##################################################################
+################################################################################
+
+rule all:
+    input:
+        deduped, run_FastQC(fastqc)
+
+### execute after  finished ####################################################
+################################################################################
+onsuccess:
+    cf.cleanLogs(outdir, cluster_config)
+    if "verbose" in config and config["verbose"]:
+        print("\n--- Preprocessing workflow finished successfully! ------------------------------------\n")
+        
+onerror:
+    print("\n !!! ERROR in preprocessing workflow! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
+
