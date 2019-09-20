@@ -15,7 +15,6 @@ if sampleSheet:
                 cat {input.r2} > {output.r2}
                 """
     else:
-        print("SE")
         rule mergeFastq:
             input:
                 r1=lambda wildcards: expand(initialIndir + "/{sample}", sample=sampleDict[wildcards.sample][0])
