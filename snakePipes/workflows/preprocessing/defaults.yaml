@@ -1,8 +1,7 @@
 ################################################################################
-# This file is the default configuration of the RNA-seq workflow!
+# This file is the default configuration of the preprocessing workflow!
 #
-# In order to adjust some parameters, please either use the wrapper script
-# (eg. /path/to/snakemake_workflows/workflows/RNA-seq/RNA-seq)
+# In order to adjust some parameters, please either use the preprocessing command
 # or save a copy of this file, modify necessary parameters and then provide
 # this file to the wrapper or snakmake via '--configFile' option
 # (see below how to call the snakefile directly)
@@ -18,7 +17,7 @@ clusterConfigFile:
 local: False
 maxJobs: 5
 tempDir:
-# This is just for compatibility with other pipelines
+# This is just for compatibility with other pipelines, it's otherwise ignored
 aligner: "bowtie2"
 ## directory with fastq files
 indir:
@@ -49,8 +48,8 @@ UMIDedupOpts: --paired
 # via '--configFile' parameter!
 # example call:
 #
-# snakemake --snakefile /path/to/snakemake_workflows/workflows/RNA-seq/Snakefile
-#           --configFile /path/to/snakemake_workflows/workflows/RNA-seq/defaults.yaml
+# snakemake --snakefile /path/to/snakemake_workflows/workflows/preprocessing/Snakefile
+#           --configFile /path/to/snakemake_workflows/workflows/preprocessing/defaults.yaml
 #           --directory /path/to/outputdir
 #           --cores 32
 ################################################################################
