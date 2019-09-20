@@ -396,7 +396,7 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
     write_configfile(os.path.join(args.outdir, '{}.config.yaml'.format(workflowName)), config)
 
     # merge cluster config files: 1) global one, 2) workflow specific one, 3) user provided one
-    print("DEBUG {}".format(defaults))
+    cfg = load_configfile(os.path.join(baseDir, "shared", "defaults.yaml"), False, "defaults")
     if os.path.isfile(os.path.join(baseDir, defaults['clusterConfig'])):
         cluster_config = load_configfile(os.path.join(baseDir, defaults['clusterConfig']), False)
     else:
