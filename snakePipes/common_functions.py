@@ -397,10 +397,10 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
 
     # merge cluster config files: 1) global one, 2) workflow specific one, 3) user provided one
     cfg = load_configfile(os.path.join(baseDir, "shared", "defaults.yaml"), False, "defaults")
-    if os.path.isfile(os.path.join(baseDir, defaults['clusterConfig'])):
-        cluster_config = load_configfile(os.path.join(baseDir, defaults['clusterConfig']), False)
+    if os.path.isfile(os.path.join(baseDir, cfg['clusterConfig'])):
+        cluster_config = load_configfile(os.path.join(baseDir, cfg['clusterConfig']), False)
     else:
-        cluster_config = load_configfile(os.path.join(defaults['clusterConfig']), False)
+        cluster_config = load_configfile(os.path.join(cfg['clusterConfig']), False)
     cluster_config = merge_dicts(cluster_config, load_configfile(os.path.join(workflowDir), False), )
 
     if args.clusterConfigFile:
