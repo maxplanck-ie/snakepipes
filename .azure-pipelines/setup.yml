@@ -1,9 +1,9 @@
 steps:
 - task: CondaEnvironment@1
   inputs:
-    createCustonEnvironment: true
+    createCustomEnvironment: true
     environmentName: foo
-    packageSpecs: snakemake fuzzywuzzy mock sphinx sphinx-argparse sphinx_rtd_theme flake8
+    packageSpecs: snakemake fuzzywuzzy mock sphinx sphinx-argparse sphinx_rtd_theme flake8 "python=3.7" pip
     installOptions: -c conda-forge -c bioconda --quiet
     createOptions: -c conda-forge -c bioconda --quiet --yes
     cleanEnvironment: true
