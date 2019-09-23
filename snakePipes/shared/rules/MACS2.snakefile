@@ -30,7 +30,8 @@ if pairedEnd:
             control_param =
                 lambda wildcards: "-c filtered_bam/"+get_control(wildcards.chip_sample)+".filtered.bam" if get_control(wildcards.chip_sample)
                 else "",
-            qval_cutoff=qval
+            qval_cutoff=qval,
+            mfold=mfold
         log:
             out = "MACS2/logs/MACS2.{chip_sample}.filtered.out",
             err = "MACS2/logs/MACS2.{chip_sample}.filtered.err"
@@ -45,7 +46,7 @@ if pairedEnd:
                 --outdir MACS2 \
                 --name {wildcards.chip_sample}.filtered.BAM \
                 --nomodel \
-                --mfold {mfold}\
+                --mfold {params.mfold}\
                 --extsize $(cat {input.insert_size_metrics} | grep filtered_bam/{wildcards.chip_sample}.filtered.bam | awk '{{printf("%i",$6)}}') \
                 {params.broad_calling} > {log.out} 2> {log.err}
 
