@@ -1,0 +1,58 @@
+pr:
+  autoCancel: true
+
+jobs:
+- job: 'flake'
+  pool:
+    vmImage: 'ubuntu-16.04'
+  strategy:
+    matrix:
+      Python37:
+        python.version: '3.7'
+    maxParallel: 1
+
+  steps:
+  - bash: echo "##vso[task.prependpath]/usr/share/miniconda/bin"
+    displayName: Add conda to PATH
+  - template: .azure-pipelines/setup.yml
+  - bash: |
+      source activate foo
+      flake8 --ignore=E501,E722 --exclude docs/conf.py .
+    displayName: flake8
+
+- job: 'CI_tests'
+  pool:
+    vmImage: 'ubuntu-16.04'
+  strategy:
+    matrix:
+      Python37:
+        python.version: '3.7'
+    maxParallel: 1
+
+  steps:
+  - bash: echo "##vso[task.prependpath]/usr/share/miniconda/bin"
+    displayName: Add conda to PATH
+  - template: .azure-pipelines/setup.yml
+  - bash: |
+      source activate foo
+      ./.ci_stuff/test_dag.sh
+    displayName: "CI test"
+
+- job: 'docs'
+  pool:
+    vmImage: 'ubuntu-16.04'
+  strategy:
+    matrix:
+      Python37:
+        python.version: '3.7'
+    maxParallel: 1
+
+  steps:
+  - bash: echo "##vso[task.prependpath]/usr/share/miniconda/bin"
+    displayName: Add conda to PATH
+  - template: .azure-pipelines/setup.yml
+  - bash: |
+      source activate foo
+      cd docs
+      make html
+    displayName: "make docs"
