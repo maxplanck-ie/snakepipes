@@ -3,4 +3,4 @@ channels:
  - conda-forge
  - bioconda
 dependencies:
- - r-histonehmm = 1.7-1
+ - r-histonehmm = 1.7.1
