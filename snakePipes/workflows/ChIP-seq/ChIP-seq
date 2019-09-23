@@ -15,14 +15,16 @@ import snakePipes.common_functions as cf
 import snakePipes.parserCommon as parserCommon
 
 
+
 def parse_args(defaults={"verbose": False, "configFile": None,
                          "clusterConfigFile": None, "maxJobs": 5,
                          "snakemakeOptions": "--use-conda", "tempDir": None,
                          "pairedEnd": True, "fragmentLength":200, "bwBinSize": 25, "qval": 0.001, "sampleSheet": "",
                          "windowSize": 150, "predictChIPDict": None,
-                         "bigWigType": "both",
+                         "bigWigType": "both", "mfold": "0 50",
                          "plotFormat": "png","fromBAM": False, "bamExt": ".filtered.bam",
                          "fdr": 0.05, "absBestLFC": 1}):
+
     """
     Parse arguments from the command line.
     """
@@ -110,6 +112,15 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          help="Format of the output plots from deepTools. Select 'none' for no plots (default: '%(default)s')",
                          default=defaults["plotFormat"])
 
+    optional.add_argument("--mfold",
+                         dest="mfold",
+                         metavar="INT INT",
+                         type=str,
+                         help="Select the regions within MFOLD range of high-confidence enrichment ratio against background to build model." 
+                              "Fold-enrichment in regions must be lower than upper limit, and higher than the lower limit. Use as \"-m 10 30\"." 
+                              "This setting is only used while building the shifting model. Tweaking it is not recommended. DEFAULT:5 50 (default: '%(default)s')",
+                         default=defaults["mfold"])
+
     optional.add_argument("--FDR",
                           dest="fdr",
                           help="FDR threshold to apply for filtering DB regions"
@@ -120,6 +131,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                           help="Log fold change threshold to apply for filtering DB regions"
                                "(default: '%(default)s')",
                           default=defaults["absBestLFC"])
+
 
     return parser
 

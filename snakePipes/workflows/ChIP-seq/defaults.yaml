@@ -32,6 +32,8 @@ fragmentLength: 200
 verbose: false
 # sampleSheet_DB
 sampleSheet:
+# mfold
+mfold: "0 50"
 # windowSize
 windowSize: 150
 #MACS2 qvalue
