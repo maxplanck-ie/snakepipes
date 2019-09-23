@@ -56,3 +56,39 @@ jobs:
       cd docs
       make html
     displayName: "make docs"
+
+- job: 'envs'
+  pool:
+    vmImage: 'ubuntu-16.04'
+  strategy:
+    matrix:
+      Python37:
+        python.version: '3.7'
+    maxParallel: 1
+
+  steps:
+  - bash: echo "##vso[task.prependpath]/usr/share/miniconda/bin"
+    displayName: Add conda to PATH
+  - template: .azure-pipelines/setup.yml
+  - bash: |
+      source activate foo
+      snakePipes createEnvs -i
+    displayName: "createEnvs"
+
+- job: 'envs_OSX'
+  pool:
+    vmImage: 'macOS-latest'
+  strategy:
+    matrix:
+      Python37:
+        python.version: '3.7'
+    maxParallel: 1
+
+  steps:
+  - bash: echo "##vso[task.prependpath]/usr/share/miniconda/bin"
+    displayName: Add conda to PATH
+  - template: .azure-pipelines/setup.yml
+  - bash: |
+      source activate foo
+      snakePipes createEnvs -i
+    displayName: "createEnvs"
