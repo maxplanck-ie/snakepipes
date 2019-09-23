@@ -72,7 +72,7 @@ jobs:
   - template: .azure-pipelines/setup.yml
   - bash: |
       source activate foo
-      snakePipes createEnvs -i
+      snakePipes createEnvs
     displayName: "createEnvs"
 
 - job: 'envs_OSX'
@@ -90,5 +90,5 @@ jobs:
   - template: .azure-pipelines/setup.yml
   - bash: |
       source activate foo
-      snakePipes createEnvs -i
+      snakePipes createEnvs
     displayName: "createEnvs"
