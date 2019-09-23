@@ -1,14 +1,15 @@
 steps:
-- task: CondaEnvironment@1
-  inputs:
-    createCustomEnvironment: true
-    environmentName: foo
-    packageSpecs: snakemake fuzzywuzzy mock sphinx sphinx-argparse sphinx_rtd_theme flake8 "python=3.7" pip
-    installOptions: -c conda-forge -c bioconda --quiet
-    createOptions: -c conda-forge -c bioconda --quiet --yes
-#- bash: |
-#    conda create -n foo -q --yes --quiet -c conda-forge -c bioconda snakemake fuzzywuzzy mock sphinx sphinx-argparse sphinx_rtd_theme flake8
-#  displayName: Installing dependencies
+#- task: CondaEnvironment@1
+#  inputs:
+#    createCustomEnvironment: true
+#    environmentName: foo
+#    packageSpecs: snakemake fuzzywuzzy mock sphinx sphinx-argparse sphinx_rtd_theme flake8 "python=3.7" pip
+#    installOptions: -c conda-forge -c bioconda --quiet
+#    createOptions: -c conda-forge -c bioconda --quiet --yes
+- bash: |
+    conda create -n foo -q --yes --quiet -c conda-forge -c bioconda snakemake fuzzywuzzy mock sphinx sphinx-argparse sphinx_rtd_theme flake8
+  displayName: Installing dependencies
 - bash: |
     source activate foo
     python -m pip install . --no-deps --ignore-installed -vvv
+  displayName: Installing snakePipes

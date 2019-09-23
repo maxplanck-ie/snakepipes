@@ -85,7 +85,7 @@ jobs:
     maxParallel: 1
 
   steps:
-  - bash: echo "##vso[task.prependpath]/usr/share/miniconda/bin"
+  - bash: echo "##vso[task.prependpath]$CONDA/bin"
     displayName: Add conda to PATH
   - template: .azure-pipelines/setup.yml
   - bash: |
