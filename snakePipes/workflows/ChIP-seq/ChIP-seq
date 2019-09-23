@@ -21,7 +21,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          "snakemakeOptions": "--use-conda", "tempDir": None,
                          "pairedEnd": True, "fragmentLength":200, "bwBinSize": 25, "qval": 0.001, "sampleSheet": "",
                          "windowSize": 150, "predictChIPDict": None,
-                         "bigWigType": "both", "mfold": [0, 50],
+                         "bigWigType": "both", "mfold": "0 50",
                          "plotFormat": "png","fromBAM": False, "bamExt": ".filtered.bam",
                          "fdr": 0.05, "absBestLFC": 1}):
 
