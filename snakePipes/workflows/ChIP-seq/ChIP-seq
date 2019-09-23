@@ -110,7 +110,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
     optional.add_argument("--plotFormat",
                          choices=['png', 'pdf', 'None'],
                          help="Format of the output plots from deepTools. Select 'none' for no plots (default: '%(default)s')",
-                         default=defaults["plot_format"])
+                         default=defaults["plotFormat"])
 
     optional.add_argument("--mfold",
                          dest="mfold",
