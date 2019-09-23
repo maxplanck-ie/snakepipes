@@ -160,7 +160,6 @@ def createCondaEnvs(args):
         condaDir = os.path.dirname(condaDir)
     else:
         condaDir = os.path.join(condaDir, "envs")
-    gatkEnv = None
 
     f = open(os.path.join(baseDir, "shared/defaults.yaml"))
     cf = yaml.load(f, Loader=yaml.FullLoader)
@@ -197,9 +196,6 @@ def createCondaEnvs(args):
         f.close()
         h = md5hash.hexdigest()
 
-        if 'gatk' in env:
-            gatkEnv = os.path.join(condaDirUse, h)
-
         sys.stderr.write("Creating environment from {} in {}\n".format(os.path.join(baseDir, "shared/rules", env), condaDirUse))
         cmd = ["conda", "env", "create", "--force", "--file", os.path.join(baseDir, "shared/rules", env)]
         if '--conda-prefix' in cf['snakemakeOptions'] and (args.condaDir or args.keepCondaDir):
@@ -212,6 +208,9 @@ def createCondaEnvs(args):
             if not os.path.exists(os.path.join(condaDirUse, h)) or args.force:
                 os.makedirs(os.path.join(condaDirUse, h), exist_ok=True)
                 subprocess.check_call(cmd)
+        else:
+            cmd[3] = "--info"
+            subprocess.check_call(cmd)
 
         # Ignore site-packages
         if args.noSitePackages and not args.info:
