@@ -17,7 +17,7 @@ import snakePipes.parserCommon as parserCommon
 
 def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfile": None, "max_jobs": 5, "snakemake_options": "--use-conda", "tempdir": None,
                          "paired": True, "bw_binsize": 25, "sampleSheet": "", "window_size": 150, "predict_chip_dict": None, "bigWigType": "both",
-                         "plot_format": "png", "fromBam": "", "bam_ext": ".bam"}):
+                         "plot_format": "png", "fromBam": "", "bam_ext": ".bam", "mfold": [0, 50]}):
     """
     Parse arguments from the command line.
     """
@@ -103,7 +103,7 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
                          help="Select the regions within MFOLD range of high-confidence enrichment ratio against background to build model." 
                               "Fold-enrichment in regions must be lower than upper limit, and higher than the lower limit. Use as \"-m 10 30\"." 
                               "This setting is only used while building the shifting model. Tweaking it is not recommended. DEFAULT:5 50 (default: '%(default)s')",
-                         default="0 50")
+                         default=defaults["mfold"])
 
     #parserCommon.commonOptions(optional, defaults,fromBam=True)
     
