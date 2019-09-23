@@ -2,7 +2,7 @@ pr:
   autoCancel: true
 
 jobs:
-- job: 'Linux flake'
+- job: 'flake'
   pool:
     vmImage: 'ubuntu-16.04'
   strategy:
@@ -20,7 +20,7 @@ jobs:
       flake8 --ignore=E501,E722 --exclude docs/conf.py .
     displayName: flake8
 
-- job: 'Linux CI tests'
+- job: 'CI_tests'
   pool:
     vmImage: 'ubuntu-16.04'
   strategy:
@@ -38,7 +38,7 @@ jobs:
       ./.ci_stuff/test_dag.sh
     displayName: "CI test"
 
-- job: 'Linux docs'
+- job: 'docs'
   pool:
     vmImage: 'ubuntu-16.04'
   strategy:
