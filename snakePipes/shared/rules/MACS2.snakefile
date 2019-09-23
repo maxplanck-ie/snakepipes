@@ -102,7 +102,7 @@ rule MACS2_peak_qc:
     params:
         peaks =
             lambda wildcards: "MACS2/{}.filtered.BAM_peaks.broadPeak".format(wildcards.sample) if is_broad(wildcards.sample)
-     snakePipes/shared/rules/envs/histone_hmm.yaml       else "MACS2/{}.filtered.BAM_peaks.narrowPeak".format(wildcards.sample),
+                              else "MACS2/{}.filtered.BAM_peaks.narrowPeak".format(wildcards.sample),
         genome_index = genome_index
     benchmark:
         "MACS2/.benchmark/MACS2_peak_qc.{sample}.filtered.benchmark"
