@@ -8,7 +8,7 @@ rule Qualimap_bamqc:
         html = "Qualimap_qc/{sample}.filtered/qualimapReport.html"
     params:
         outdir = "Qualimap_qc/{sample}.filtered",
-        collect_overlap_pairs = "--collect-overlap-pairs" if paired else ""
+        collect_overlap_pairs = "--collect-overlap-pairs" if pairedEnd else ""
     log:
         out = "Qualimap_qc/logs/Qualimap_bamqc.{sample}.filtered.out",
         err = "Qualimap_qc/logs/Qualimap_bamqc.{sample}.filtered.err"

@@ -11,4 +11,4 @@ genes_bed: "/data/repository/organisms/SchizoSPombe_ASM294v2_ensembl/Ensembl/rel
 genes_gtf: "/data/repository/organisms/SchizoSPombe_ASM294v2_ensembl/Ensembl/release-35/genes.gtf"
 extended_coding_regions_gtf: "/data/repository/organisms/SchizoSPombe_ASM294v2_ensembl/Ensembl/release-35/genes.slop.gtf"
 blacklist_bed:
-ignore_forNorm:
+ignoreForNormalization:

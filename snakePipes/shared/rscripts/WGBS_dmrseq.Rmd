@@ -1,0 +1,107 @@
+---
+title: "WGBS dmrseq QC and Analysis Summarization"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  html_document:
+    code_folding: hide
+---
+
+```{r warning=FALSE, message=FALSE, error=FALSE}
+.libPaths(R.home("library"))
+
+require("dmrseq")
+require("BiocParallel")
+require("ggplot2")
+
+sampleSheet = snakemake@params[['sampleSheet']]
+groups = snakemake@params[['groups']]
+
+# These aren't actually used yet
+maxDist = snakemake@params[['maxDist']]
+minCpGs = snakemake@params[['minCpGs']]
+minMethDiff = snakemake@params[['minMethDiff']]
+minCoverage = snakemake@params[['minCoverage']]
+FDR = snakemake@params[['FDR']]
+blacklist = snakemake@params[['blacklist']]
+
+BPPARAM = MulticoreParam(workers = snakemake@threads, progressbar=TRUE)
+
+odmrs = sprintf("%s/DMRs.txt", snakemake@params[["odir"]])
+ordata = sprintf("%s/Session.RData", snakemake@params[["odir"]])
+
+ss = read.delim(sampleSheet)
+row.names(ss) = as.character(ss$name)
+infiles = sprintf("MethylDackel/%s_CpG.bedGraph", ss$name)
+
+g1 = which(ss$condition == groups[1])
+g2 = which(ss$condition == groups[2])
+```
+
+# Overview
+
+This report summarizes the differentially methylated regions (DMR) called using dmrseq of the samples specified in **`r snakemake@params[["sampleSheet"]]`**.
+
+# DMRs and QC
+
+```{r loadData, warning=FALSE, message=FALSE, error=FALSE, results=FALSE}
+bs = read.bismark(infiles, colData=ss, BPPARAM=BPPARAM, BACKEND="HDF5Array", verbose=FALSE)
+bptasks(BPPARAM) = 0L  # read.bismark resets this for some reason
+
+# TODO: test this!
+if(length(blacklist)) {
+    bl = import.bed(blacklist)
+    bs = subsetByOverlaps(bs, bl, invert=TRUE)
+}
+
+RMV <- which(DelayedMatrixStats::rowSums2(getCoverage(bs, type="Cov") < minCoverage) != 0)
+if(length(RMV)) {
+    bs = bs[-RMV,]
+}
+
+regions = dmrseq(bs=bs, cutoff=0.05, testCovariate = "condition", BPPARAM=BPPARAM, verbose=FALSE)
+write.table(regions, file=odmrs, quote=FALSE, sep="\t", row.names=FALSE)
+save.image(file=ordata)
+```
+
+Using a minimum methylation difference of `r minMethDiff` and FDR of `r FDR` there are a total of `r length(regions)` DMRs. The distribution of the methylation changes at these is shown below. Note that assymmetric changes in the distribution indicate global shifts in methylation between the groups.
+
+```{r warning=FALSE, message=FALSE}
+if (length(regions) > 0) {
+  g = ggplot(as.data.frame(regions), aes(x=beta)) + geom_histogram() + labs(x="Methylation Difference (per-DMR)")
+  g = g + geom_vline(xintercept=minMethDiff) + geom_vline(xintercept=-1*minMethDiff)
+  g
+} else {
+  message('No DMRs found.')
+}
+```
+
+Similarly, the test statistic, which is used to compute the p-value, is shown below. Its interpretation is the same as that above.
+
+```{r warning=FALSE, message=FALSE}
+if (length(regions) > 0) {
+  g = ggplot(as.data.frame(regions), aes(x=stat)) + geom_histogram() + labs(x="Methylation Difference Statistic")
+  g
+} else { 
+  message('No DMRs found.')
+}
+```
+
+It can be useful to plot the unadjusted p-values for the DMRs to help in diagnosing cases where fewer statistically significant DMRs than expected are called. In general, the unadjusted p-value distribution should be fairly uniform, with an increase in counts near 0. Other distributions indicate that there may be confounding effects that should be incorporated in the statistical model.
+
+```{r warning=FALSE, message=FALSE}
+if (length(regions) > 0) {
+  g = ggplot(as.data.frame(regions), aes(x=pval)) + geom_histogram(bins=100) + labs(x="Unadjusted p-value")
+  g
+} else {
+  message('No DMRs found.')
+}
+```
+
+
+# Session Information
+
+This session has been saved to `r ordata` and session information is shown below:
+
+```{r echo=FALSE}
+sessionInfo()
+```

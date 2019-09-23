@@ -4,7 +4,7 @@
 # In order to adjust some parameters, please either use the wrapper script
 # (eg. /path/to/snakemake_workflows/workflows/ChIP-seq/ChIP-seq)
 # or save a copy of this file, modify necessary parameters and then provide
-# this file to the wrapper or snakmake via '--configfile' option
+# this file to the wrapper or snakmake via '--configFile' option
 # (see below how to call the snakefile directly)
 #
 # Own parameters will be loaded during snakefile executiuon as well and hence
@@ -12,43 +12,50 @@
 ################################################################################
 ## General/Snakemake parameters, only used/set by wrapper or in Snakemake cmdl, but not in Snakefile
 pipeline: chip-seq
-configfile:
-cluster_configfile:
+configFile:
+clusterConfigFile:
 local: false
-max_jobs: 5
+maxJobs: 5
 ## workingdir need to be required DNA-mapping output dir, 'outdir' is set to workingdir internally
 workingdir:
 ## preconfigured target genomes (mm9,mm10,dm3,...) , see /path/to/snakemake_workflows/shared/organisms/
 ## Value can be also path to your own genome config file!
 genome:
 ## paired end data?
-paired: true
+pairedEnd: True
 ## Bin size of output files in bigWig format
-bw_binsize: 25
+bwBinSize: 25
 ## type of bigwig file to create
 bigWigType: both
 ## Median/mean fragment length, only relevant for single-end data (default: 200)
-fragment_length: 200
+fragmentLength: 200
 verbose: false
 # sampleSheet_DB
 sampleSheet:
-# window_size
-window_size: 150
 # mfold
 mfold: "0 50"
+# windowSize
+windowSize: 150
+#MACS2 qvalue
+qval: 0.001
 #### Flag to control the pipeline entry point
-bam_ext: '.filtered.bam'
-fromBam:
-plot_format: png
+bamExt: '.filtered.bam'
+fromBAM:
+plotFormat: png
+##dummy string to skip filtering annotation
+filterGTF:
+##parameters to filter DB regions on
+fdr: 0.05
+absBestLFC: 1
 ################################################################################
 # Call snakemake directly, i.e. without using the wrapper script:
 #
 # Please save a copy of this config yaml file and provide an adjusted config
-# via '--configfile' parameter!
+# via '--configFile' parameter!
 # example call:
 #
 # snakemake --snakefile /path/to/snakemake_workflows/workflows/ChIP-seq/Snakefile
-#           --configfile /path/to/snakemake_workflows/workflows/ChIP-seq/defaults.yaml
+#           --configFile /path/to/snakemake_workflows/workflows/ChIP-seq/defaults.yaml
 #           --directory /path/to/outputdir
 #           --cores 32
 ################################################################################

@@ -34,7 +34,7 @@ the config file description for the HiC workflow :
       # In order to adjust some parameters, please either use the wrapper script
       # (eg. /path/to/snakemake_workflows/workflows/HiC/HiC)
       # or save a copy of this file, modify necessary parameters and then provide
-      # this file to the wrapper or snakmake via '--configfile' option
+      # this file to the wrapper or snakmake via '--configFile' option
       # (see below how to call the snakefile directly)
       #
       # Own parameters will be loaded during snakefile executiuon as well and hence
@@ -43,12 +43,12 @@ the config file description for the HiC workflow :
       ## General/Snakemake parameters, only used/set by wrapper or in Snakemake cmdl, but not in Snakefile
       pipeline: hic
       outdir:
-      configfile:
-      cluster_configfile:
+      configFile:
+      clusterConfigFile:
       #set to true if running locally
       local: False
       #number of threads
-      max_jobs: 5
+      maxJobs: 5
       ## directory with fastq files
       indir:
       ## preconfigured target genomes (mm9,mm10,dm3,...) , see /path/to/snakemake_workflows/shared/organisms/
@@ -58,29 +58,29 @@ the config file description for the HiC workflow :
       ext: '.fastq.gz'
       ## paired-end read name extension (default: ['_R1', "_R2"])
       reads: ['_R1', '_R2']
-      mapping_prg: BWA
+      aligner: BWA
       ## Number of reads to downsample from each FASTQ file
       downsample:
       ## Options for trimming and fastqc
       trim: False
-      trim_prg: cutadapt
-      trim_options:
+      trimmer: cutadapt
+      trimmerOptions:
       fastqc: false
       verbose: False
       ## is the Matrix RF resolution?
-      RF_resolution: false
+      RFResolution: false
       # which restriction enzyme was used
       enzyme: HindIII
       # bin size in base pairs, if RF resolution is not required
-      bin_size: 10000
+      binSize: 10000
       # build matrix only for a given region chr:start-end
-      restrict_region:
+      restrictRegion:
       # Create files after merging a given number bins to be merged (default 0 = bins are not merged)
-      nbins_toMerge: 0
+      nBinsToMerge: 0
       # shall we merge the samples?
-      merge_samples: false
+      mergeSamples: false
       # parameters for hicFindTADs
-      tadparams: '--thresholdComparisons 0.01'
+      findTADParams: '--thresholdComparisons 0.01'
       # Should hicPlotDistVsCounts be run?
       distVsCount: false
       #Parameters to run hicPlotDistVsCounts
@@ -91,17 +91,17 @@ the config file description for the HiC workflow :
       noCorrect: false
       #Chromosomes of interest to build matrix on them
       chromosomes:
-      # a .tsv file contains names and replicates of samples. It is needed if merge_samples
+      # a .tsv file contains names and replicates of samples. It is needed if mergeSamples
       sampleSheet:
       ################################################################################
       # Call snakemake directly, i.e. without using the wrapper script:
       #
       # Please save a copy of this config yaml file and provide an adjusted config
-      # via '--configfile' parameter!
+      # via '--configFile' parameter!
       # example call:
       #
       # snakemake --snakefile /path/to/snakemake_workflows/workflows/HiC/Snakefile
-      #           --configfile /path/to/snakemake_workflows/workflows/HiC/defaults.yaml
+      #           --configFile /path/to/snakemake_workflows/workflows/HiC/defaults.yaml
       #           --directory /path/to/outputdir
       #           --cores 32
       ################################################################################

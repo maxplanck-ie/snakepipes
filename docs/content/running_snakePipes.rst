@@ -72,6 +72,15 @@ groups in Hi-C workflow. For all this analysis, snakePipes needs a ``sampleSheet
 The name section referes to sample names (without the read suffix), while the condition
 section refers to sample group (control/test, male/female, normal/diseased etc..)
 
+Using BAM input
+---------------
+
+In many workflows it is possible to directly use BAM files as input by specifying ``--fromBAM``. Note that you must then specify whether you have paired-end (the default) or single-end data. This is typically done with the ``--singleEnd`` option.
+
+Changing read extensions or mate designators
+--------------------------------------------
+
+The default file names produced by Illumina sequencers are of the form ``<sample>_R1.fastq.gz`` and ``<sample_R2.fastq.gz``. However, sometimes public datasets will instead have a ``.fq.gz`` suffix or use ``_1`` and ``_2`` as mate designators. To enable this, the ``--ext`` option can be used to change ``.fastq.gz`` default suffix to ``.fq.gz`` and ``--reads`` to ``_1 _2``.
 
 Common considerations for all workflows
 ----------------------------------------
@@ -85,22 +94,18 @@ All of the snakePipes workflows that begin with a FASTQ file, perform the same p
 
 * **Quality/adapter trimming** (optional): If ``--trim`` is selected, the ``trimming`` rule would run the selected program (either `Trimgalore <https://www.bioinformatics.babraham.ac.uk/projects/trim_galore/>`__, or `Cutadapt <https://journal.embnet.org/index.php/embnetjournal/article/view/200/479>`__) on the files in the FASTQ folder, and would produce another folder with name ``FASTQ_<program>``, where <program> is either ``Cutadapt`` or ``Trimgalore``.
 
-
 * **FastQC** (optional): If ``--fastqc`` is specified, the ``FASTQC`` rule would run `FastQC <https://www.bioinformatics.babraham.ac.uk/projects/fastqc/>`__ on the input files and store the output under ``FastQC`` folder. If trimming is specified, FastQC is always produced on trimmed files, and stored under ``FastQC_trimmed`` folder.
 
-* **--snakemake_options**: All wrappers contain a ``--snakemake_options`` parameter, which is quite useful as it can be used to pass on any arguments directly to snakemake. One use case is to perform a *dry run*, i.e. to check which programs would be executed and which outputs would be created by the workflow, without actually running it. This can be executed via ``--snakemake_options -np``. This would also print the commands to be used during the run.
-
+* **--snakemakeOptions**: All wrappers contain a ``--snakemakeOptions`` parameter, which is quite useful as it can be used to pass on any arguments directly to snakemake. One use case is to perform a *dry run*, i.e. to check which programs would be executed and which outputs would be created by the workflow, without actually running it. This can be executed via ``--snakemakeOptions="-np"``. This would also print the commands to be used during the run.
 
 * **--DAG**: All workflows can produce a `directed acyclic graph <https://en.wikipedia.org/wiki/Directed_acyclic_graph>`__ of themselves, using the ``--DAG`` option in the wrappers. This could be useful in reporting/presenting the results.
 
+* **--keepTemp**: This option control temporary/intermediate files are to be kept after the workflow is finished. Normally the temporary files are removed after analysis.
 
-* **--tempdir and --keepTemp**: These options control where the temporary/intermediate processing files are written during the workflow (option: ``--tempdir``) and whether they are to be kept after the workflow is finished (option: ``--keepTemp``). Normally the temporary files are removed after analysis.
+* **--bwBinSize**: This option is available for most workflows, and refers to the bin size used to create the coverage files. `BigWig files <https://genome.ucsc.edu/goldenpath/help/bigWig.html>`__ are created by most workflows in order to allow downstream analysis and visualization of outputs. This argument controls the size of the bins in which the genome is divided for creating this file. The default is sufficient for most analysis.
 
-
-.. note:: It's useful to configure the ``--tempdir`` during setup of snakePipes, such that it points to an appropriate temporary folder on your machine/cluster.
-
-
-* **--bw_binsize**: This option is available for most workflows, and refers to the bin size used to create the coverage files. `BigWig files <https://genome.ucsc.edu/goldenpath/help/bigWig.html>`__ are created by most workflows in order to allow downstream analysis and visualization of outputs. This argument controls the size of the bins in which the genome is divided for creating this file. The default is sufficient for most analysis.
+* **Temporary directory/files**: Some tools need additonal space during runtime (eg. ``samtools sort -T [DIR] ...``). SnakePipes uses the core tool ``mktemp`` to create temporary directories in some rules. On Linux-based systems the global env variabale ``$TMPDIR`` is honored.
+  On Mac OS and if $TMPDIR is empty, we fallback to `/tmp/` as the parent temporary directory. For performance reasons, it is recommended that the $TMPDIR points to a local drive (and not eg. an NFS share). Please make sure there is enough space! 
 
 Logging of outputs
 ~~~~~~~~~~~~~~~~~~~

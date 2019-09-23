@@ -1,6 +1,42 @@
 snakePipes News
 ===============
 
+snakePipes 1.3.0
+----------------
+
+ * Overhauled WGBS pipeline
+ * Standardized options to be camelCase
+ * Further standardized options between pipelines
+ * UMI handling is now available in most pipelines
+ * The `--fromBAM` option is now available and documented
+ * Users can now change the read number indicator ("_R1" and "_R2" by default) as well as the fastq file extension on the command line.
+ * Added the preprocessing pipeline, prevented python packages in users' home directories from inadvertently being used.
+
+snakePipes published
+--------------------
+snakePipes was published: https://www.ncbi.nlm.nih.gov/pubmed/31134269
+
+snakePipes 1.2.3
+----------------
+
+ * Updated citation for snakePipes
+ * Fixed replicate check for samples with trailing spaces in names
+ * Fixed input filtering in CSAW
+ * Several allele-specific RNAseq fixes
+ * ATACseq peakQC is now run on fragment-size filtered bam
+ * Fixed Salmon output (Number of Reads output in "prefix_counts.tsv" files and file naming)
+ * Fixed CSAW QC plot error with single end reads
+ * Updated histone HMM environment to a working conda version
+ * Salmon_wasabi is now a localrule
+ 
+
+snakePipes 1.2.2
+----------------
+
+ * Fixed a bug in the ATAC-seq environment where GenomeInfoDbData was missing.
+ * Also an occasional issue with CSAW
+ 
+
 snakePipes 1.2.1
 ----------------
 
@@ -53,7 +89,7 @@ snakePipes 1.1.0
 
    * An extention to the pipeline now takes the processed csv file from Results folder as input and runs cell filtering with a range of total transcript thresholds using monocle and subsequently runs clustering, produces tsne visualizations, calculates top 2 and top10 markers per cluster and produces heatmap visualizations for these using monocle/seurat. If the skipRaceID flag is set to False (default), all of the above are also executed using RaceID.
    * Stats reports were implemented for RaceID and Monocle/Seurat so that folders Filtered_cells_RaceID and Filtered_cells_monocle now contain a Stats_report.html.
-   * User can select a metric to maximize during cell filtering (cell_filter_metric, default: gene_universe).
+   * User can select a metric to maximize during cell filtering (cellFilterMetric, default: gene_universe).
    * For calculating median GPC, RaceID counts are multiplied by the TPC threshold applied (similar to 'downscaling' in RaceID2).
 
  * all sample sheets now need to have a "name" and a "condition" column, that was not consistent before

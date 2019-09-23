@@ -124,18 +124,27 @@ if (!is.null(cell_names_path)){
 
 str(sc_dat)
 
+## simple way to adjust height of plots to the number of samples  
+num_samples=length(levels(factor(sc_dat$sample)))
+print(num_samples)
+height=6;
+
+if (num_samples>4){
+	height <- height + as.integer(max(1,as.integer(num_samples/2)-2) * 1);
+}
+
 libs_per_plate = 2
 if (is_split_library) libs_per_plate = 4
 
 
-p<-ggplot(dat=sc_dat,aes(x=(READS_UNIQFEAT),y=(UMI),color=sample))+geom_point(size=3,alpha=0.8) + 
+p<-ggplot(dat=sc_dat,aes(x=(READS_UNIQFEAT),y=(UMI),color=sample))+geom_point(size=1,alpha=0.8) + 
 	facet_wrap(~sample,ncol=libs_per_plate)+
 	xlab("reads on feature per cell")+
 	ylab("unique UMIs per cell (trancripts)")+
 	theme(strip.text.x = element_text(size = 12, colour = "black",face="bold"))
 
 if (!is.null(plot_format)){
-	ggsave(plot=p,filename=paste(out_prefix,".reads_UMI_plot.",plot_format,sep=""),device=plot_format,dpi=200)
+	ggsave(plot=p,filename=paste(out_prefix,".reads_UMI_plot.",plot_format,sep=""),device=plot_format,dpi=200,height=height)
 }
 
 
@@ -149,16 +158,6 @@ sc_dat <- sc_dat %>% group_by(sample) %>% mutate(sample_reads = sum(READS_UNIQFE
 		mutate(cRPM_zscore = (log2(cRPM+5)-mean(log2(cRPM+5),trim=0.01))/sd(log2(cRPM+5)),
 			   cUPM_zscore = (log2(cUPM+5)-mean(log2(cUPM+5),trim=0.01))/sd(log2(cUPM+5)),
 			   y=-((cell_idx-1)%%16),x=((cell_idx-1)%/%16)+1)
-
-num_samples=length(levels(factor(sc_dat$sample)))
-print(num_samples)
-height=1000;
-
-if (num_samples>4){
-	height <- height + (num_samples-4)*50;
-}
-
-print(height)
 
 p <- ggplot(sc_dat,aes(x=x,y=y,fill=cUPM_zscore))+ 
 		geom_tile() + 
@@ -174,7 +173,7 @@ p <- ggplot(sc_dat,aes(x=x,y=y,fill=cUPM_zscore))+
 		theme(plot.title = element_text(color="black", size=18, face="bold",hjust = 0.5))
 
 if (!is.null(plot_format)){
-	ggsave(plot=p,filename=paste(out_prefix,".plate_cUPM.",plot_format,sep=""),device=plot_format,dpi=200)
+	ggsave(plot=p,filename=paste(out_prefix,".plate_cUPM.",plot_format,sep=""),device=plot_format,dpi=200,height=height)
 }
 
 
@@ -190,32 +189,32 @@ p<-ggplot(sc_dat,aes(x=x,y=y,fill=cRPM_zscore))+
 		theme(plot.title = element_text(color="black", size=18, face="bold",hjust = 0.5))
 
 if (!is.null(plot_format)){
-	ggsave(plot=p,filename=paste(out_prefix,".plate_cRPM.",plot_format,sep=""),device=plot_format,dpi=200)
+	ggsave(plot=p,filename=paste(out_prefix,".plate_cRPM.",plot_format,sep=""),device=plot_format,dpi=200,height=height)
 }
-
 
 p<-ggplot(sc_dat,aes(x=x,y=y,fill=UMI))+ 
 		geom_tile() + 
-		facet_wrap(~sample,ncol = libs_per_plate,scales = "free") + 
+		facet_wrap(~sample,ncol = libs_per_plate) + 
 		#scale_fill_gradient2(low="red",mid="blue",high="cyan",limits=c(min(sc_dat$cell_transcripts),max(sc_dat$cell_transcripts)),midpoint=mean(sc_dat$cell_transcripts,trim=0.05)) + 
 		scale_fill_gradientn(colors=c("red","blue","cyan"),
-				values=rescale(c(0,median(sc_dat$UMI)*0.75,max(sc_dat$UMI))),
-				limits=c(0,max(sc_dat$UMI)),space = "Lab") +
+				values=rescale(c(0,median(sc_dat$UMI)*1.00,quantile(sc_dat$UMI,probs=0.95))),
+				limits=c(0,quantile(sc_dat$UMI,probs=0.95)),space = "Lab",oob=squish) +
     	scale_y_continuous(breaks=-seq(1,15,2),labels = as.character(seq(2,16,2))) +
     	scale_x_continuous(breaks=seq(2,(max(sc_dat$cell_idx-1)%/%16)+1,2),labels = as.character(seq(2,(max(sc_dat$cell_idx-1)%/%16)+1,2))) +
+    	coord_fixed(ratio = 0.5) +
 		theme_minimal() + 
-		theme(	strip.text.x = element_text(size = 16, colour = "white",face="bold"),
-				axis.text = element_text(size = 10, colour = "grey"),
+		theme(	strip.text.x = element_text(size = 8, colour = "white",face="bold"),
+				axis.text = element_text(size = 8, colour = "grey"),
 				axis.ticks.y = element_blank(),
 				plot.background = element_rect(fill = "black"),
 				panel.grid = element_blank() ) +
         ggtitle(paste("Total number of transcripts per cell \n","red color < median (n=",median(sc_dat$UMI),") > blue clolor",sep = "")) + 
-		theme(plot.title = element_text(color="white", size=18, face="bold",hjust = 0.5)) + 
-		theme(legend.title = element_text(colour="grey90", size=16, face="bold")) + 
-		theme(legend.text = element_text(colour="grey90", size = 16, face = "bold"))
+		theme(plot.title = element_text(color="white", size=10, face="bold",hjust = 0.5)) + 
+		theme(legend.title = element_text(colour="grey90", size=12, face="bold")) + 
+		theme(legend.text = element_text(colour="grey90", size = 12, face = "bold"))
 
 if (!is.null(plot_format)){
-	ggsave(plot=p,filename=paste(out_prefix,".plate_abs_transcripts.",plot_format,sep=""),device=plot_format,dpi=200)
+	ggsave(plot=p,filename=paste(out_prefix,".plate_abs_transcripts.",plot_format,sep=""),device=plot_format,dpi=200,height=height)
 }
 
 
