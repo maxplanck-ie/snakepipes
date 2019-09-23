@@ -209,7 +209,7 @@ def createCondaEnvs(args):
                 os.makedirs(os.path.join(condaDirUse, h), exist_ok=True)
                 subprocess.check_call(cmd)
         else:
-            cmd[3] = "--info"
+            cmd = ["conda", "create", "-n", h, "-d", "-c", "conda-forge", "-c", "bioconda", "--file", os.path.join(baseDir, "shared/rules", env)]
             subprocess.check_call(cmd)
 
         # Ignore site-packages
