@@ -76,10 +76,12 @@ Snakemake and pandas are installed along with snakePipes as requirements. Ensure
     snakePipes --help
 
 
-Inspect and modify the setup files
-----------------------------------
+Modify global options
+---------------------
 
-After installation of snakePipes, all files required to configure it would be installed in a default path. The path to these files can be displayed by running the following command:
+It is often useful to store organism YAML files and the cluster configuration file outside of snakePipes, so that these can be used across snakePipes versions without needing to make copies. Since snakePipes 1.3.0, this can be done by modifying the **defaults.yaml** file, the location of which is given by ``snakePipes info``. Instead of manually modifying this file, you may also use ``snakePipes config``. 
+
+To see the location of the various YAML files so you can manually inspect them, you can use:
 
 .. code:: bash
 
@@ -92,13 +94,11 @@ This would show the locations of:
  * **organisms/<organism>.yaml** : Defines genome indices and annotations for various organisms. See :ref:`organisms`
  * Workflow-specific defaults : Defines default options for our command line wrappers. See :ref:`workflowOpts`
 
-You can modify these files to suite your needs before creating the conda environments (see below).
-
 
 .. _conda:
 
-Install the conda environments
-------------------------------
+Create the conda environments
+-----------------------------
 
 All the tools required for running various pipelines are installed via various conda repositories
 (mainly bioconda). The following commands installs the tools and creates the respective conda environments.
@@ -107,7 +107,7 @@ All the tools required for running various pipelines are installed via various c
 
     snakePipes createEnvs
 
-.. note:: Creating the environments might take 1-2 hours. But it only has to be done once.
+.. note:: Creating the environments might take 1 hour. But it only has to be done once.
 
 .. note::
 
@@ -137,7 +137,7 @@ Running ``snakePipes createEnvs`` is not strictly required, but facilitates mult
 Configure the organisms
 -----------------------
 
-For each organism of your choice, create a file called ``shared/organisms/<organism>.yaml`` and
+For each organism of your choice, create a file called ``<organism>.yaml`` in the folder specified by ``organismsDir`` in **defaults.yaml** and
 fill the paths to the required files next to the corresponding yaml entry. For common organisms, the required files are downloaded and the yaml entries can be created automatically via the workflow ``createIndices``.
 
 The yaml files look like this after the setup (an example from drosophila genome ``dm3``) :
@@ -209,7 +209,7 @@ The ``cluster.yaml`` file contains both the default memory requirements as well 
     snp_split:
         memory: 10G
 
-If you have cloned the repository locally, the file is located under ``snakePipes/shared/``.
+The location of this file must be specified by the ``clusterConfig`` value in **defaults.yaml**.
 
 You can change the default per-core memory allocation if needed here. Importantly, the ``snakemake_cluster_cmd`` 
 option must be changed to match your needs (see table below). Whatever command you specify must include 
