@@ -90,5 +90,5 @@ jobs:
   - template: .azure-pipelines/setup.yml
   - bash: |
       source activate foo
-      snakePipes createEnvs
+      sudo snakePipes createEnvs
     displayName: "createEnvs"
