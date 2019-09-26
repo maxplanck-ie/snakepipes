@@ -84,7 +84,7 @@ def mainArguments(defaults, workingDir=False, createIndices=False, preprocessing
 
     general.add_argument("--clusterConfigFile",
                          help="configuration file for cluster usage. In absence, the default options "
-                         "from shared/cluster.yaml and workflows/[workflow]/cluster.yaml would be selected (default: '%(default)s')",
+                         "specified in defaults.yaml and workflows/[workflow]/cluster.yaml would be selected (default: '%(default)s')",
                          default=defaults["clusterConfigFile"])
 
     general.add_argument("-j", "--jobs",

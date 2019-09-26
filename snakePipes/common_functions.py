@@ -82,8 +82,13 @@ def config_diff(dict1, dict2):
 
 
 def load_organism_data(genome, maindir, verbose):
-    if os.path.isfile(os.path.join(maindir, "shared", "organisms", genome + ".yaml")):
-        organism = load_configfile(os.path.join(maindir, "shared", "organisms", genome + ".yaml"), verbose, "Genome")
+    # Load the global config file, which dictates where the organisms should be found
+    cfg = load_configfile(os.path.join(maindir, "shared", "defaults.yaml"), False, "defaults")
+
+    if os.path.isfile(os.path.join(maindir, cfg['organismsDir'], genome + ".yaml")):
+        organism = load_configfile(os.path.join(maindir, cfg['organismsDir'], genome + ".yaml"), verbose, "Genome")
+    elif os.path.isfile(os.path.join(cfg['organismsDir'], genome + ".yaml")):
+        organism = load_configfile(os.path.join(cfg['organismsDir'], genome + ".yaml"), verbose, "Genome")
     elif os.path.isfile(genome):
         organism = load_configfile(genome, verbose, "Genome (user)")
     else:
@@ -391,7 +396,11 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
     write_configfile(os.path.join(args.outdir, '{}.config.yaml'.format(workflowName)), config)
 
     # merge cluster config files: 1) global one, 2) workflow specific one, 3) user provided one
-    cluster_config = load_configfile(os.path.join(baseDir, "shared/cluster.yaml"), False)
+    cfg = load_configfile(os.path.join(baseDir, "shared", "defaults.yaml"), False, "defaults")
+    if os.path.isfile(os.path.join(baseDir, cfg['clusterConfig'])):
+        cluster_config = load_configfile(os.path.join(baseDir, cfg['clusterConfig']), False)
+    else:
+        cluster_config = load_configfile(os.path.join(cfg['clusterConfig']), False)
     cluster_config = merge_dicts(cluster_config, load_configfile(os.path.join(workflowDir, "cluster.yaml"), False), )
 
     if args.clusterConfigFile:
@@ -411,9 +420,12 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
 
     # Save the organism YAML file as {PIPELINE}_organism.yaml
     if workflowName != "preprocessing":
-        orgyaml = os.path.join(baseDir, "shared/organisms/{}.yaml".format(args.genome))
+        orgyaml = os.path.join(baseDir, cfg['organismsDir'], "{}.yaml".format(args.genome))
         if not os.path.isfile(orgyaml):
-            orgyaml = args.genome
+            if os.path.isfile(os.path.join(cfg['organismsDir'], "{}.yaml".format(args.genome))):
+                orgyaml = os.path.join(cfg['organismsDir'], "{}.yaml".format(args.genome))
+            else:
+                orgyaml = args.genome
         organismYAMLname = os.path.join(args.outdir, "{}_organism.yaml".format(workflowName))
         if workflowName != "createIndices" and os.path.abspath(organismYAMLname) != os.path.abspath(orgyaml):
             shutil.copyfile(orgyaml, organismYAMLname)

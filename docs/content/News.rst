@@ -8,9 +8,10 @@ snakePipes 1.3.0
  * Standardized options to be camelCase
  * Further standardized options between pipelines
  * UMI handling is now available in most pipelines
- * The `--fromBAM` option is now available and documented
+ * The ``--fromBAM`` option is now available and documented
  * Users can now change the read number indicator ("_R1" and "_R2" by default) as well as the fastq file extension on the command line.
  * Added the preprocessing pipeline, prevented python packages in users' home directories from inadvertently being used.
+ * Added a ``snakePipes config`` command that can be used in lieu of editing defaults.yaml
 
 snakePipes published
 --------------------
