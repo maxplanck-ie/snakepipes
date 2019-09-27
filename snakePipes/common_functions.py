@@ -441,7 +441,7 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
                                maxJobs=args.maxJobs,
                                workingdir=args.workingdir,
                                snakemakeOptions=str(args.snakemakeOptions or ''),
-                               tempDir=str(args.tempDir),
+                               tempDir=cfg["tempDir"],
                                configFile=os.path.join(args.outdir, '{}.config.yaml'.format(workflowName))).split()
 
     # Produce the DAG if desired
