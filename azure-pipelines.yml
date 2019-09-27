@@ -87,6 +87,11 @@ jobs:
   steps:
   - bash: echo "##vso[task.prependpath]$CONDA/bin"
     displayName: Add conda to PATH
+  - bash: |
+      if [ -f /Users/vsts/.conda/pkgs/urls.txt ]; then
+        sudo chown 501:20 /Users/vsts/.conda/pkgs/urls.txt
+      fi
+    displayName: Fix OSX permissions
   - template: .azure-pipelines/setup.yml
   - bash: |
       source activate foo

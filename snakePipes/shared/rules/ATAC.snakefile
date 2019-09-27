@@ -6,7 +6,7 @@ rule filterFragments:
         metrics = os.path.join(outdir_MACS2, "{sample}.short.metrics")
     params:
         maxFragmentSize=maxFragmentSize,
-        minFragmentSize=maxFragmentSize
+        minFragmentSize=minFragmentSize
     threads: 6
     conda: CONDA_SHARED_ENV
     shell: """
@@ -19,16 +19,16 @@ rule filterFragments:
 
 rule filterMetricsToHtml:
     input: 
-        expand(os.path.join(outdir_MACS2,"{sample}.short.metrics"),sample=samples)
+        expand(os.path.join(outdir_MACS2, "{sample}.short.metrics"), sample=samples)
     output:
-        tmpFile=os.path.join(outdir,"aux_files","ATACseq_QC_report_template.Rmd"),
         QCrep='Filtering_metrics/Filtering_report.html'
     log:
         err="Filtering_metrics/logs/produce_report.err",
         out="Filtering_metrics/logs/produce_report.out"
     conda: CONDA_RMD_ENV
     threads: 1
-    shell: "cp -v " + os.path.join(workflow_rscripts,"ATACseq_QC_report_template.Rmd")+ " {output.tmpFile}" + ';Rscript -e "rmarkdown::render(\''+os.path.join(outdir,"aux_files", "ATACseq_QC_report_template.Rmd")+'\', params=list(QCdir=\'"' + os.path.join(outdir,"Filtering_metrics") +'"\' ), output_file =\'"'+ os.path.join(outdir,"Filtering_metrics",'Filtering_report.html"\'')+')"' + " 1>{log.out} 2>{log.err}"
+    script: "../rscripts/ATACseq_QC_report_template.Rmd"
+
 
 # MACS2 BAMPE fails if there is just one fragment mapped
 rule filterCoveragePerScaffolds:

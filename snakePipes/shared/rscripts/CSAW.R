@@ -70,13 +70,12 @@ first_bam <- head(SummarizedExperiment::colData(chip_object$windowCounts)$bam.fi
 last_bam <- tail(SummarizedExperiment::colData(chip_object$windowCounts)$bam.files, n = 1)
 
 if(isTRUE(pairedEnd)){
-
     message(paste0("Making QC plots for first sample : ", first_bam))
     makeQCplots_chip_PE(bam.file = first_bam, outplot = "QCplots_first_sample.pdf", pe.param = pe_param)
 
     message(paste0("Making QC plots for last sample : ", last_bam))
-    makeQCplots_chip_PE(bam.file = last_bam, outplot = "QCplots_last_sample.pdf", pe.param = pe_param)} else {
-
+    makeQCplots_chip_PE(bam.file = last_bam, outplot = "QCplots_last_sample.pdf", pe.param = pe_param)
+} else {
     message(paste0("Making QC plots for first sample : ", first_bam))
     makeQCplots_chip_SE(bam.file = first_bam, outplot = "QCplots_first_sample.pdf", pe.param = pe_param)
 
@@ -86,8 +85,11 @@ if(isTRUE(pairedEnd)){
 
 ## merge all peaks from the samples mentioned in sampleinfo to test (exclude those with 'False' in the UseRegions column)
 # get files to read from MACS
-if (!is.null(sampleInfo$UseRegions)){
-    fnames <- sampleInfo$name[as.logical(sampleInfo$UseRegions)]} else {fnames<-sampleInfo$name}
+if (!is.null(sampleInfo$UseRegions)) {
+    fnames <- sampleInfo$name[as.logical(sampleInfo$UseRegions)]
+} else {
+    fnames<-sampleInfo$name
+}
 
 allpeaks <- lapply(fnames, function(x) {
     narrow <- paste0("../MACS2/",x,".filtered.BAM_peaks.narrowPeak")
@@ -104,6 +106,7 @@ allpeaks <- lapply(fnames, function(x) {
     bed.gr <- GRanges(seqnames = bed$V1, ranges = IRanges(start = bed$V2, end = bed$V3), name = bed$V4)
     return(bed.gr)
     })
+
 # merge
 allpeaks <- Reduce(function(x,y) GenomicRanges::union(x,y), allpeaks)
 
