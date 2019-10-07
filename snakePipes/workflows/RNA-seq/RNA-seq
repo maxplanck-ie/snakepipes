@@ -16,11 +16,22 @@ import snakePipes.common_functions as cf
 import snakePipes.parserCommon as parserCommon
 
 
-def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfile": None, "max_jobs": 5, "snakemake_options": "--use-conda", "tempdir": None,
-                         "mode": "alignment-free,deepTools_qc", "downsample": False, "trim": False, "trim_prg": "cutadapt", "trim_options": None, "fastqc": False,
-                         "library_type": 2, "mapping_prg": "STAR", "star_options": "--outBAMsortingBinsN 100", "hisat_options": None, "salmon_index_options": "--type quasi -k 31",
-                         "featurecounts_options": "-C -Q 10 --primary", "filter_annotation": None, "sampleSheet": None,
-                         "bw_binsize": 25, "dnaContam": False, "plot_format": "png","fromBam": False, "paired": True}):
+def parse_args(defaults={"verbose": False, "configFile": None,
+                         "clusterConfigFile": None, "maxJobs": 5,
+                         "snakemakeOptions": "--use-conda", "tempDir": None,
+                         "mode": "alignment,deepTools_qc", "downsample": False,
+                         "trim": False, "trimmer": "cutadapt",
+                         "trimmerOptions": None, "fastqc": False,
+                         "libraryType": 2, "aligner": "STAR",
+                         "alignerOptions": None, "salmonIndexOptions": "--type quasi -k 31",
+                         "featureCountsOptions": "-C -Q 10 --primary",
+                         "filterGTF": None, "sampleSheet": None,
+                         "reads": ["_R1", "_R2"], "ext": ".fastq.gz",
+                         "bwBinSize": 25, "dnaContam": False, "plotFormat": "png",
+                         "fromBAM": False, "pairedEnd": True,
+                         "UMIDedup": False,
+                         "UMIDedupOpts": "", "bcPattern": "",
+                         "UMIDedupSep": "_", "UMIBarcode": False}):
     """
     Parse arguments from the command line.
     """
@@ -38,66 +49,40 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
     # Workflow options
     optional = parser.add_argument_group('Options')
     optional.add_argument("-m", "--mode",
-                          dest="mode",
                           help="workflow running modes (available: 'alignment-free, alignment, allelic-mapping, deepTools_qc')"
                           " (default: '%(default)s')",
                           default=defaults["mode"])
 
     parserCommon.commonOptions(optional, defaults, bw=True)
 
-    optional.add_argument("--library_type",
-                          dest="library_type",
-                          metavar="",
+    optional.add_argument("--libraryType",
                           help="user provided library type strand specificity. featurCounts style: 0, 1, 2 (Illumina TruSeq); default: '%(default)s')",
                           type=int,
-                          default=defaults["library_type"])
+                          default=defaults["libraryType"])
 
-    optional.add_argument("--mapping_prg",
-                          dest="mapping_prg",
-                          metavar="STR",
-                          help="Program used for mapping: STAR or HISAT2 (default: '%(default)s')",
-                          type=str,
-                          default=defaults["mapping_prg"])
+    optional.add_argument("--aligner",
+                          help="Program used for mapping: STAR or HISAT2 (default: '%(default)s'). If you change this, please change --alignerOptions to match.",
+                          default=defaults["aligner"])
 
-    optional.add_argument("--star_options",
-                          dest="star_options",
-                          metavar="STR",
-                          help="STAR option string, e.g.: '--twopassMode Basic' (default: '%(default)s')",
-                          type=str,
-                          default=defaults["star_options"])
+    optional.add_argument("--alignerOptions",
+                          help="STAR or hisat2 option string, e.g.: '--twopassMode Basic' (default: '%(default)s')",
+                          default=defaults["alignerOptions"])
 
-    optional.add_argument("--hisat_options",
-                          dest="hisat_options",
-                          metavar="STR",
-                          help="HISAT2 option string (default: '%(default)s')",
-                          type=str,
-                          default=defaults["hisat_options"])
-
-    optional.add_argument("--salmon_index_options",
-                          dest="salmon_index_options",
-                          metavar="STR",
-                          type=str,
+    optional.add_argument("--salmonIndexOptions",
                           help="Salmon index options, e.g. '--type fmd' (default: '%(default)s')",
-                          default=defaults["salmon_index_options"])
+                          default=defaults["salmonIndexOptions"])
 
-    optional.add_argument("--featurecounts_options",
-                          dest="featurecounts_options",
-                          metavar="STR",
-                          type=str,
+    optional.add_argument("--featureCountsOptions",
                           help="featureCounts option string. The options '-p -B'"
                                " are always used for paired-end data (default: '%(default)s')",
-                          default=defaults["featurecounts_options"])
+                          default=defaults["featureCountsOptions"])
 
-    optional.add_argument("--filter_annotation",
-                          dest="filter_annotation",
-                          metavar="STR",
-                          type=str,
+    optional.add_argument("--filterGTF",
                           help="filter annotation GTF by grep for use with Salmon, e.g."
-                               " use --filter_annotation='-v pseudogene'; default: '%(default)s')",
-                          default=defaults["filter_annotation"])
+                               " use --filterGTF='-v pseudogene'; default: '%(default)s')",
+                          default=defaults["filterGTF"])
 
     optional.add_argument("--sampleSheet",
-                          dest="sampleSheet",
                           help="Information on samples (required for DE analysis); see "
                                "'docs/content/sampleSheet.example.tsv' for example."
                                " The column names in the tsv files are 'name' and 'condition'. The first entry"
@@ -112,16 +97,15 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
                           help="Returns a plot which presents the proportion of the intergenic reads (default: '%(default)s')",
                           default=defaults["dnaContam"])
 
-    optional.add_argument("--fromBam",
-                         dest="fromBam",
+    optional.add_argument("--fromBAM",
                          action="store_true",
-                         help=argparse.SUPPRESS,default=defaults["fromBam"])
+                         help="Input folder with bam files. If provided, the analysis will start from this point. If bam files contain single ends, please specify --singleEnd additionally.",
+                         default=defaults["fromBAM"])
 
-    optional.add_argument("--single-end",
-                          dest="paired",
+    optional.add_argument("--singleEnd",
+                          dest="pairedEnd",
                           action="store_false",
-                          help="input data is single-end, not paired-end. This is only used if --fromBam is specified.",
-                          default=defaults["paired"])
+                          help="input data is single-end, not paired-end. This is only used if --fromBAM is specified.")
 
     return parser
 
@@ -148,27 +132,27 @@ def main():
         args.VCFfile = os.path.abspath(args.VCFfile)
     elif args.allele_mode == "map_only":
         args.SNPfile = os.path.abspath(args.SNPfile)
-        args.Nmasked_index = os.path.abspath(args.Nmasked_index)
+        args.NMaskedIndex = os.path.abspath(args.NMaskedIndex)
     modeTemp = args.mode.split(",")
     validModes = set(["alignment", "alignment-free", "deepTools_qc", "allelic-mapping"])
     for mode in modeTemp:
         if mode not in validModes:
             sys.exit("{} is not a valid mode!\n".format(mode))
-    if args.fromBam and ("alignment-free" in modeTemp or "allelic-mapping" in modeTemp):
-        sys.exit("\n--fromBam can only be used with modes \'alignment\' or \'deepTools_qc\' - use one of these modes or provide fastq files!\n")  
-    if args.fromBam:
-        args.mapping_prg = "EXTERNAL_BAM"
-            
+    if "alignment" not in modeTemp and args.UMIDedup:
+        sys.exit("UMIDedup is only valid for \"alignment\" mode!\n")
+    if args.fromBAM and ("alignment-free" in modeTemp or "allelic-mapping" in modeTemp):
+        sys.exit("\n--fromBAM can only be used with modes \'alignment\' or \'deepTools_qc\' - use one of these modes or provide fastq files!\n")
+    if args.fromBAM:
+        args.aligner = "EXTERNAL_BAM"
+
     ## End workflow-specific checks
 
     # Handle YAML and log files
     snakemake_cmd = cf.commonYAMLandLogs(baseDir, workflowDir, defaults, args, __file__)
-    snakemake_exports, logfile_name, temp_path = cf.logAndExport(args, os.path.basename(__file__))
-
-    cmd = " ".join(snakemake_exports + snakemake_cmd)
+    logfile_name = cf.logAndExport(args, os.path.basename(__file__))
 
     # Run everything
-    cf.runAndCleanup(args, cmd, logfile_name, temp_path)
+    cf.runAndCleanup(args, snakemake_cmd, logfile_name)
 
 
 if __name__ == "__main__":

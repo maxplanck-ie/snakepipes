@@ -4,7 +4,7 @@ __description__ = """
 Create indices for use by snakePipes. A YAML file will be created by default in the default location where snakePipes looks for organism YAML files.
 
 usage example:
-    createIndices -o output-dir --genome ftp://ftp.ensembl.org/pub/release-93/fasta/mus_musculus/dna/Mus_musculus.GRCm38.dna_sm.primary_assembly.fa.gz --gtf ftp://ftp.ensembl.org/pub/release-93/gtf/mus_musculus/Mus_musculus.GRCm38.93.gtf.gz --blacklist blacklist.bed --ignore_forNorm ignore.txt GRCm38_release93
+    createIndices -o output-dir --genome ftp://ftp.ensembl.org/pub/release-93/fasta/mus_musculus/dna/Mus_musculus.GRCm38.dna_sm.primary_assembly.fa.gz --gtf ftp://ftp.ensembl.org/pub/release-93/gtf/mus_musculus/Mus_musculus.GRCm38.93.gtf.gz --blacklist blacklist.bed --ignoreForNormalization ignore.txt GRCm38_release93
 """
 
 
@@ -16,7 +16,9 @@ import snakePipes.common_functions as cf
 import snakePipes.parserCommon as parserCommon
 
 
-def parse_args(defaults={"configfile": None, "cluster_configfile": None, "max_jobs": 5, "snakemake_options": "--use-conda", "tempdir": None, "verbose": False}):
+def parse_args(defaults={"configFile": None, "clusterConfigFile": None,
+                         "maxJobs": 5, "snakemakeOptions": "--use-conda",
+                         "tempDir": None, "verbose": False}):
     """
     Parse arguments from the command line.
     """
@@ -40,7 +42,7 @@ def parse_args(defaults={"configfile": None, "cluster_configfile": None, "max_jo
 
     required.add_argument("--gtfURL",
                           help="URL or local path to where the genome annotation in GTF format is located. GFF is NOT supported. The file may optionally be gzipped. If this file is not specified, then RNA-seq related tools will NOT be usable.")
-    
+
     # Workflow options
     optional = parser.add_argument_group('Options')
     optional.add_argument("--tools",
@@ -56,7 +58,7 @@ def parse_args(defaults={"configfile": None, "cluster_configfile": None, "max_jo
     optional.add_argument("--blacklist",
                           help="An optional URL or local path to a file to use to blacklist regions (such as that provided by the ENCODE consortium).")
 
-    optional.add_argument("--ignore_forNorm",
+    optional.add_argument("--ignoreForNormalization",
                           help="An optional file list, with one entry per line, the chromosomes to ignore during normalization. These are typically sex chromosomes, mitochondrial DNA, and unplaced contigs.")
 
     optional.add_argument("--userYAML",
@@ -82,10 +84,10 @@ def main():
 
 
     ### Workflow-specific arguments
-    if args.ignore_forNorm:
-        args.ignore_forNorm = os.path.abspath(args.ignore_forNorm)
-        if not os.path.exists(args.ignore_forNorm):
-            sys.exit("The file specified by `--ignore_forNorm` does not exist!\n")
+    if args.ignoreForNormalization:
+        args.ignoreForNormalization = os.path.abspath(args.ignoreForNormalization)
+        if not os.path.exists(args.ignoreForNormalization):
+            sys.exit("The file specified by `--ignoreForNormalization` does not exist!\n")
     if args.blacklist:
         if os.path.exists(args.blacklist):
             args.blacklist = os.path.abspath(args.blacklist)
@@ -93,12 +95,10 @@ def main():
 
     # Handle YAML and log files
     snakemake_cmd = cf.commonYAMLandLogs(baseDir, workflowDir, defaults, args, __file__)
-    snakemake_exports, logfile_name, temp_path = cf.logAndExport(args, os.path.basename(__file__))
+    logfile_name = cf.logAndExport(args, os.path.basename(__file__))
 
-    cmd = " ".join(snakemake_exports + snakemake_cmd)
-
-    # Run everything
-    cf.runAndCleanup(args, cmd, logfile_name, temp_path)
+        # Run everything
+    cf.runAndCleanup(args, snakemake_cmd, logfile_name)
 
 
 if __name__ == "__main__":

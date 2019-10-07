@@ -18,17 +18,17 @@ import subprocess
 fastq_dir = "FASTQ_barcoded"
 
 if trim:
-	fastq_indir_trim = "FASTQ_barcoded"
-	if trim_prg == "trimgalore":
-		fastq_dir = "FASTQ_TrimGalore"
-	elif trim_prg == "cutadapt":
-		fastq_dir = "FASTQ_Cutadapt"
+    fastq_indir_trim = "FASTQ_barcoded"
+    if trimmer == "trimgalore":
+        fastq_dir = "FASTQ_TrimGalore"
+    elif trimmer == "cutadapt":
+        fastq_dir = "FASTQ_Cutadapt"
+    elif trimmer == "fastp":
+        fastq_dir = "FASTQ_fastp"
 else:
-	fastq_indir_trim = None
+    fastq_indir_trim = None
 	
-mapping_prg = "STAR_genomic"
-
-hisat_options = ""
+aligner = "STAR_genomic"
 
 ### Initialization #############################################################
 
@@ -42,7 +42,7 @@ if not cf.is_paired(infiles,ext,reads):
 
 ## After barcode transfer to R2 we have only single end data / R2
 ## but we need to keep "reads" for rule fastq_barcode
-paired = False
+pairedEnd = False
 ## we swap read extensions as we continue in SE mode but with R2
 ##some rules use a hardcoded reads[0] for SE
 reads = reads[::-1]
@@ -50,18 +50,18 @@ reads = reads[::-1]
 ### barcode pattern extraction #################################################
 pattern = re.compile("[N]+")
 
-if pattern.search(barcode_pattern) is not None:
-	UMI_offset = pattern.search(barcode_pattern).start() + 1 
-	UMI_length = pattern.search(barcode_pattern).end() - UMI_offset + 1
+if pattern.search(cellBarcodePattern) is not None:
+    UMI_offset = pattern.search(cellBarcodePattern).start() + 1 
+    UMI_length = pattern.search(cellBarcodePattern).end() - UMI_offset + 1
 else:
-	print("Provided barcode pattern does not contain any 'N'! Exit...\n")
-	exit(1)
+    print("Provided barcode pattern does not contain any 'N'! Exit...\n")
+    exit(1)
 
 pattern = re.compile("[X]+")
 
-if pattern.search(barcode_pattern) is not None:
-	CELLI_offset = pattern.search(barcode_pattern).start() + 1
-	CELLI_length = pattern.search(barcode_pattern).end() - CELLI_offset + 1 
+if pattern.search(cellBarcodePattern) is not None:
+    CELLI_offset = pattern.search(cellBarcodePattern).start() + 1
+    CELLI_length = pattern.search(cellBarcodePattern).end() - CELLI_offset + 1 
 else:
-	print("Provided barcode pattern does not contain any 'X'! Exit...\n")
-	exit(1)
+    print("Provided barcode pattern does not contain any 'X'! Exit...\n")
+    exit(1)

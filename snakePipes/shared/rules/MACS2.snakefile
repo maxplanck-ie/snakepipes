@@ -7,7 +7,7 @@ import subprocess
 
 ### MACS2 peak calling #########################################################
 
-if paired:
+if pairedEnd:
     rule writeFragmentSize:
         input: "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv"
         output: "MACS2/fragmentSize.metrix.tsv"
@@ -30,6 +30,8 @@ if paired:
             control_param =
                 lambda wildcards: "-c filtered_bam/"+get_control(wildcards.chip_sample)+".filtered.bam" if get_control(wildcards.chip_sample)
                 else "",
+            qval_cutoff=qval,
+            mfold=mfold
         log:
             out = "MACS2/logs/MACS2.{chip_sample}.filtered.out",
             err = "MACS2/logs/MACS2.{chip_sample}.filtered.err"
@@ -39,17 +41,18 @@ if paired:
         shell: """
             macs2 callpeak -t {input.chip} {params.control_param} \
                 -f BAM \
-                -g {params.genome_size} \
+                -g {params.genome_size} --qvalue {params.qval_cutoff}\
                 --keep-dup all \
                 --outdir MACS2 \
                 --name {wildcards.chip_sample}.filtered.BAM \
                 --nomodel \
+                --mfold {params.mfold}\
                 --extsize $(cat {input.insert_size_metrics} | grep filtered_bam/{wildcards.chip_sample}.filtered.bam | awk '{{printf("%i",$6)}}') \
                 {params.broad_calling} > {log.out} 2> {log.err}
 
             # also run MACS2 in paired-end mode BAMPE for comparison with single-end mode
             macs2 callpeak -t {input.chip} \
-                {params.control_param} -f BAMPE \
+                {params.control_param} -f BAMPE --qvalue {params.qval_cutoff}\
                 -g {params.genome_size} --keep-dup all \
                 --outdir MACS2 --name {wildcards.chip_sample}.filtered.BAMPE \
                 {params.broad_calling} > {log.out}.BAMPE 2> {log.err}.BAMPE
@@ -71,6 +74,9 @@ else:
             control_param =
                 lambda wildcards: "-c filtered_bam/"+get_control(wildcards.chip_sample)+".filtered.bam" if get_control(wildcards.chip_sample)
                 else "",
+            frag_size=fragmentLength,
+            mfold=mfold,
+            qval_cutoff=qval
         log:
             out = "MACS2/logs/MACS2.{chip_sample}.filtered.out",
             err = "MACS2/logs/MACS2.{chip_sample}.filtered.err"
@@ -78,8 +84,8 @@ else:
             "MACS2/.benchmark/MACS2.{chip_sample}.filtered.benchmark"
         conda: CONDA_CHIPSEQ_ENV
         shell: """
-            macs2 callpeak -t {input.chip} {params.control_param} -f BAM -g {params.genome_size} --keep-dup all --outdir MACS2 \
-                --name {wildcards.chip_sample}.filtered.BAM \
+            macs2 callpeak -t {input.chip} {params.control_param} -f BAM -g {params.genome_size} --qvalue {params.qval_cutoff} --keep-dup all --outdir MACS2 \
+                --name {wildcards.chip_sample}.filtered.BAM --mfold {params.mfold} --extsize {params.frag_size}\
                 {params.broad_calling} > {log.out} 2> {log.err}
             """
 
@@ -96,7 +102,7 @@ rule MACS2_peak_qc:
     params:
         peaks =
             lambda wildcards: "MACS2/{}.filtered.BAM_peaks.broadPeak".format(wildcards.sample) if is_broad(wildcards.sample)
-            else "MACS2/{}.filtered.BAM_peaks.narrowPeak".format(wildcards.sample),
+                              else "MACS2/{}.filtered.BAM_peaks.narrowPeak".format(wildcards.sample),
         genome_index = genome_index
     benchmark:
         "MACS2/.benchmark/MACS2_peak_qc.{sample}.filtered.benchmark"

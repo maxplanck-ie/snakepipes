@@ -15,9 +15,42 @@ import snakePipes.common_functions as cf
 import snakePipes.parserCommon as parserCommon
 
 
-def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfile":None, "max_jobs": 12, "nthreads": 8, "snakemake_options": "--use-conda", "tempdir": None,
-                         "downsample": None, "trimReads": "user", "fqcin": None, "adapterSeq": "AGATCGGAAGAGC", "nextera": False, "trimThreshold": 10, "trimOtherArgs": None, "convrefpath": None,
-                         "convRef": False, "intList": [], "blackList": None, "sampleSheet": None, "mbias_ignore": "auto", "fromBam": False, "skipDOC": False, "skipGCbias": False}):
+def minOne(x):
+    """
+    Ensure x is an integer >=1
+    """
+    x = int(x)
+    if x < 1:
+        raise argparse.ArgumentTypeError("Minimum value of 1 for --maxDist and --minCpGs")
+    return x
+
+
+def bounded01(x):
+    """
+    Ensure values are bounded [0, 1)
+    """
+    x = float(x)
+    if x < 0 or x >= 1:
+        raise argparse.ArgumentTypeError("The values for --minMethDiff and --FDR must be between 0 and 1")
+    return x
+
+
+def parse_args(defaults={"verbose": False, "configFile": None,
+                         "clusterConfigFile":None, "maxJobs": 12,
+                         "snakemakeOptions": "--use-conda", "tempDir": None,
+                         "downsample": None, "trim": True, "trimmer": "fastp",
+                         "trimmerOptions": "-q 5 -l 30 -M 5", "maxDist": 300,
+                         "minCpGs": 10, "minMethDiff": 0.1, "FDR": 0.1,
+                         "MethylDackelOptions": "--mergeContext --maxVariantFrac 0.25 --minDepth 4",
+                         "fastqc": False, 'bwBinSize': 25, 'plotFormat': 'png',
+                         "bamExt": '.bam', "reads": ["_R1", "_R2"], "ext": ".fastq.gz",
+                         "DMRprograms": "metilene,dmrseq", "minCoverage": 5,
+                         "blacklist": None, "sampleSheet": None,
+                         "noAutoMethylationBias": False, "fromBAM": False, "skipDOC": False,
+                         "UMIDedup": False,
+                         "UMIDedupOpts": "", "bcPattern": "",
+                         "UMIDedupSep": "_", "UMIBarcode": False}):
+
     """
     Parse arguments from the command line.
     """
@@ -34,119 +67,76 @@ def parse_args(defaults={"verbose": False, "configfile": None, "cluster_configfi
     # Workflow options
     optional = parser.add_argument_group('Options')
 
-    optional.add_argument("--downsample",
-                          dest="downsample",
-                          metavar="INT",
-                          help="downsample the given number of reads randomly from of each FASTQ file (default: '%(default)s')",
-                          type=int,
-                          default=defaults["downsample"])
+    parserCommon.commonOptions(optional, defaults)
 
-    optional.add_argument("--trim",
-                          dest="trimReads",
-                          action="store",
-                          choices=['auto', 'user', 'None'],
-                          help="Activate fastq read trimming. If activated, Illumina adaptors are trimmed by default. "
-                          "Additional parameters can be specified under --trimOtherArgs (default: '%(default)s')",
-                          default=defaults["trimReads"])
-
-    optional.add_argument("--fqcin",
-                          dest="fqcin",
-                          action="store",
-                          help="Folder with fastqc.zip files to automatically detect hard trimming threshold. (default: '%(default)s')",
-                          default=defaults["fqcin"])
-
-    optional.add_argument("-nt", "--nthreads",
-                          dest="nthreads",
-                          metavar="INT",
-                          help="number of threads to use for multi-threaded tasks. Please also check cluster-config for default per-job memory allocation. (default: '%(default)s')",
-                          type=int,
-                          default=defaults["nthreads"])
-
-    optional.add_argument("--adapterSeq",
-                          dest="adapterSeq",
-                          metavar="STR",
-                          type=str,
-                          help="Adapter sequence for cutadapt. (default: '%(default)s')",
-                          default=defaults["adapterSeq"])
-
-    optional.add_argument("--nextera",
-                          dest="nextera",
-                          action="store_true",
-                          help="Trim nextera adapters rather than TruSeq adapters (default: '%(default)s')",
-                          default=defaults["nextera"])
-
-    optional.add_argument("--trimThreshold",
-                          dest="trimThreshold",
-                          metavar="STR",
-                          type=str,
-                          help="Trimming threshold for cutadapt. (default: '%(default)s')",
-                          default=defaults["trimThreshold"])
-
-    optional.add_argument("--trimOtherArgs",
-                          dest="trimOtherArgs",
-                          metavar="STR",
-                          type=str,
-                          help="Additional arguments passed to cutadapt. (default: '%(default)s')",
-                          default=defaults["trimOtherArgs"])
-
-    optional.add_argument("--cref",
-                          dest="convrefpath",
-                          metavar="STR",
-                          type=str,
-                          help="Path to Bisulfite-converted reference genome. (default: '%(default)s')",
-                          default=defaults["convrefpath"])
-
-    optional.add_argument("--convRef",
-                          dest="convRef",
-                          action="store_true",
-                          help="In case a pre-converted reference-genome is not available. Convert the input reference genome. (default: '%(default)s')",
-                          default=defaults["convRef"])
-
-    optional.add_argument("--intList",
-                          dest="intList",
-                          metavar="STR",
-                          action='append',
-                          help="BED file(s) with target intervals to confine the analysis on. Use multiple times to pass multiple bed files. (default: '%(default)s')",
-                          default=defaults["intList"])
-
-    optional.add_argument("--blackList",
-                          dest="blackList",
-                          metavar="STR",
-                          action='store',
-                          type=str,
+    optional.add_argument("--blacklist",
+                          dest="blacklist",
                           help="Bed file(s) with positions to mask for methylation calling. Useful for masking SNPs in your strain of interest. (default: '%(default)s')",
-                          default=defaults["blackList"])
+                          default=defaults["blacklist"])
 
     optional.add_argument("--sampleSheet",
                           dest="sampleSheet",
-                          metavar="STR",
-                          action='store',
-                          type=str,
                           help="Perform differential methylation analysis between groups of samples by providing a text file with sample information to use for statistical analysis. (default: '%(default)s')",
                           default=defaults["sampleSheet"])
 
-    optional.add_argument("--mbias",
-                          dest="mbias_ignore",
-                          metavar="STR",
-                          action='store',
-                          type=str,
-                          help="Number of nucleotides with methylation bias to ignore during methylation extraction. In the *auto* mode this number is automaticaly calculated by MethylDackel (default: '%(default)s')",
-                          default=defaults["mbias_ignore"])
+    optional.add_argument("--noAutoMethylationBias",
+                          action="store_true",
+                          default=defaults["noAutoMethylationBias"],
+                          help="If specified, MethylDackel mbias will NOT be run and the suggested parameters from it will NOT be used for methylation extraction. You can instead supply them manually in --MethylDackelOptions.")
 
-    optional.add_argument("--fromBam",
-                         dest="fromBam",
-                         action="store_true",
-                         help=argparse.SUPPRESS,default=defaults["fromBam"])
+    optional.add_argument("--maxDist",
+                          type=minOne,
+                          help="The maximum distance between CpGs in a DMR (for metilene, default: '%(default)s')",
+                          default=defaults["maxDist"])
+
+    optional.add_argument("--minCpGs",
+                          type=minOne,
+                          help="The minimum number of CpGs in a DMR (for metilene, default: '%(default)s')",
+                          default=defaults["minCpGs"])
+
+    optional.add_argument("--minMethDiff",
+                          type=float,
+                          help="The minimum methylation change in methylation for CpG inclusion in DMR detection (for metilene, default: '%(default)s')",
+                          default=defaults["minMethDiff"])
+
+    optional.add_argument("--minCoverage",
+                          type=int,
+                          help="The minimum coverage needed for across all samples for a CpG to be used in DMR calling and PCA. Note that you can change this value without overwritting the DMR output.  Default: '%(default)i'",
+                          default=defaults["minCoverage"])
+
+    optional.add_argument("--FDR",
+                          type=float,
+                          help="FDR threshold for returned DMRs (default: '%(default)s')",
+                          default=defaults["FDR"])
+
+    optional.add_argument("--MethylDackelOptions",
+                          help="Options to pass to MethylDackel extract. You are highly advised NOT to set a minimum coverage at this step. Default: '%(default)s'",
+                          default=defaults["MethylDackelOptions"])
+
+    optional.add_argument("--fromBAM",
+                         help="If specified, the input is taking from BAM files containing alignments rather than fastq files. See also --bamExt.",
+                         action="store_true")
+
+    optional.add_argument("--bamExt",
+                          help="If --fromBAM is specified, this is the expected file extension. Removing it yields sample names. Default: '%(default)s'",
+                          default=defaults["bamExt"])
+
+    optional.add_argument("--singleEnd",
+                          dest="pairedEnd",
+                          help="If --fromBAM is specified, this indicates that the input BAM files contain paired-end data. The option is ignored unless --fromBAM is given.",
+                          action="store_false")
+
+    optional.add_argument("--DMRprograms",
+                          help="If a sample sheet is provided, use the specified DMR-calling programs. Multiple programs can be comma-separated with no spaces (e.g., 'metilene,dmrseq,dss'). The available programs are metilene, dmrseq, and DSS (note that this is very slow). Default: %(default)s.",
+                          default=defaults["DMRprograms"])
 
     optional.add_argument("--skipDOC",
-                         dest="skipDOC",
                          action="store_true",
-                         help="Skip depth of coverage calculation with GATK.",default=defaults["skipDOC"])
+                         help="Skip depth of coverage calculation with deepTools.",default=defaults["skipDOC"])
 
-    optional.add_argument("--skipGCbias",
-                         dest="skipGCbias",
+    optional.add_argument("--GCbias",
                          action="store_true",
-                         help="Skip GC bias calculation with deepTools.",default=defaults["skipGCbias"])
+                         help="Perform GC bias calculation with deepTools.")
 
     return parser
 
@@ -158,25 +148,18 @@ def main():
     parser = parse_args(defaults)
     args = parser.parse_args()
     args, defaults = cf.handleUserArgs(args, defaults, parse_args)
-
     # we also add these paths to config, although we don't use them in the Snakefile
     args.baseDir = baseDir
 
     # Common arguments
     cf.checkCommonArguments(args, baseDir, outDir=True)
 
-    ## Begin workflow-specific code
-    if args.nextera:
-        args.adapterSeq = "CTGTCTCTTATA"
-
     # Handle YAML and log files
     snakemake_cmd = cf.commonYAMLandLogs(baseDir, workflowDir, defaults, args, __file__)
-    snakemake_exports, logfile_name, temp_path = cf.logAndExport(args, os.path.basename(__file__))
-
-    cmd = " ".join(snakemake_exports + snakemake_cmd)
+    logfile_name = cf.logAndExport(args, os.path.basename(__file__))
 
     # Run everything
-    cf.runAndCleanup(args, cmd, logfile_name, temp_path)
+    cf.runAndCleanup(args, snakemake_cmd, logfile_name)
 
 
 if __name__ == "__main__":

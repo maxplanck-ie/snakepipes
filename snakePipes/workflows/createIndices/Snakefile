@@ -29,7 +29,7 @@ organismDictionary = {'genome_size': 0,
                       'genes_gtf': '',
                       'extended_coding_regions_gtf': '',
                       'blacklist_bed': '',
-                      'ignore_forNorm': ''}
+                      'ignoreForNormalization': ''}
 
 targets = [os.path.join(outdir, x) for x in ["genome_fasta/genome.fa",
                                              "genome_fasta/genome.fa.fai",
@@ -77,11 +77,11 @@ if blacklist:
     organismDictionary['blacklist_bed'] = os.path.join(outdir, "annotation/blacklist.bed")
 
 ignore = []
-if ignore_forNorm:
-    f = open(ignore_forNorm)
+if ignoreForNormalization:
+    f = open(ignoreForNormalization)
     ignore = [line.strip() for line in f]
     f.close()
-    organismDictionary['ignore_forNorm'] = " ".join(ignore)
+    organismDictionary['ignoreForNormalization'] = " ".join(ignore)
 
 if effectiveGenomeSize and effectiveGenomeSize > 0:
     os.makedirs(os.path.join(outdir, "genome_fasta"), exist_ok=True)
@@ -122,15 +122,19 @@ rule all:
 ### execute after workflow finished ############################################
 ################################################################################
 onsuccess:
-    cf.cleanLogs(outdir)
+    cf.cleanLogs(outdir, cluster_config)
     f = open(os.path.join(outdir, "genome_fasta", "effectiveSize"))
     organismDictionary['genome_size'] = int(f.read().strip())
     f.close()
     if not userYAML:
-        yamlPath = os.path.join(maindir, "shared", "organisms", "{}.yaml".format(genome))
-        cf.write_configfile(os.path.join(maindir, "shared", "organisms", "{}.yaml".format(genome)), organismDictionary)
+        yamlPath = os.path.join(maindir, organismsDir, "{}.yaml".format(genome))
     else:
         yamlPath = os.path.join(outdir, "{}.yaml".format(genome))
+    print("Storing the organism YAML file in {}".format(yamlPath))
     cf.write_configfile(yamlPath, organismDictionary)
     if "verbose" in config and config["verbose"]:
         print("\n--- index creation workflow finished successfully! --------------------------------\n")
+
+onerror:
+    print("\n !!! ERROR in index creation workflow! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
+

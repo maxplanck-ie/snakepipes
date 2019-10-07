@@ -37,6 +37,7 @@ All files needed to be modified in order to extend/modify a workflow, are availa
         ├── createIndices
         ├── DNA-mapping
         ├── HiC
+        ├── preprocessing
         ├── RNA-seq
         ├── scRNAseq
         └──WGBS
@@ -82,7 +83,7 @@ Finally, provide an adjusted config via ``--configfile`` parameter to snakemake!
 example call::
 
     snakemake --snakefile /path/to/snakemake_workflows/workflows/ATAC-seq/Snakefile
-              --configfile /path/to/snakemake_workflows/workflows/ATAC-seq/defaults.yaml
+              --configFile /path/to/snakemake_workflows/workflows/ATAC-seq/defaults.yaml
               --directory /path/to/outputdir
               --cores 32
 

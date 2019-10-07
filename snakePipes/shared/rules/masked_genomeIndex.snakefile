@@ -15,7 +15,7 @@ else:
 def getref_fileList(dir):
     fl = glob.glob(dir + "/*.fa")
     flist = ','.join(fl)
-    return(fl)
+    return(flist)
 
 
 ## Create masked genome
@@ -26,8 +26,8 @@ if allele_hybrid == 'dual':
         output:
             genome1 = "snp_genome/" + strains[0] + '_SNP_filtering_report.txt',
             genome2 = "snp_genome/" + strains[1] + '_SNP_filtering_report.txt',
-            snpgenome_dir = SNPdir,
-            snpfile = snp_file
+            snpgenome_dir = directory(SNPdir),
+            SNPFile = SNPFile
         params:
             strain1 = strains[0],
             strain2 = strains[1],
@@ -49,11 +49,14 @@ else:
             genome = GENOMEDIR
         output:
             genome1 = "snp_genome/" + strains[0] + '_SNP_filtering_report.txt',
-            snpgenome_dir = SNPdir,
-            snpfile = snp_file
+            snpgenome_dir = directory(SNPdir),
+            SNPFile = SNPFile
         params:
             strain1 = strains[0],
-            SNPpath = os.path.abspath(VCFfile)
+            SNPpath = os.path.abspath(VCFfile),
+
+            temp_out=temp("all_SNPs_" + strains[0] + "_GRCm38.txt.gz"),
+            out_bname=os.path.basename(SNPFile)
         log:
             out = "SNPsplit_createSNPgenome.out",
             err = "SNPsplit_createSNPgenome.err"
@@ -63,10 +66,11 @@ else:
             " SNPsplit_genome_preparation"
             " --genome_build {BASENAME}"
             " --reference_genome {input.genome} --vcf_file {params.SNPpath}"
-            " --strain {params.strain1} > {log.out} 2> {log.err}"
+            " --strain {params.strain1} > {log.out} 2> {log.err}&& cp "
+            "{params.temp_out} {params.out_bname} >> {log.out} 2>> {log.err} "
             "&& cd ../"
 
-if mapping_prg == "STAR":
+if aligner == "STAR":
     rule star_index:
         input:
             snpgenome_dir = SNPdir
@@ -89,7 +93,7 @@ if mapping_prg == "STAR":
             " --sjdbGTFfile {params.gtf}"
             " > {log.out} 2> {log.err}"
 
-elif mapping_prg == "Bowtie2":
+elif aligner == "Bowtie2":
     rule bowtie2_index:
         input:
             snpgenome_dir = SNPdir

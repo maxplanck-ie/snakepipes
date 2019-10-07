@@ -1,0 +1,89 @@
+---
+author: "`r Sys.info()[length(Sys.info())-1]`"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: 
+    html_document:
+        fig_caption: yes
+title: "`r paste0('CSAW differential binding stats report')`"
+---
+
+```{r setup, include=FALSE}
+.libPaths(R.home("library"))
+
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+
+### Overview
+
+This report summarizes statistical analysis of binding events using group information provided in sample sheet `r snakemake@params[["sample_sheet"]]`. 
+
+### Analysis input
+
+```{r data_load}
+DBdata<-file.path(snakemake@params[["outdir"]], "DiffBinding_analysis.Rdata")
+suppressMessages(require(GenomicRanges))
+suppressMessages(require(csaw))
+load(DBdata)
+```
+
+Input to the differential binding analysis were `r length(chip_object$windowCounts)` genomic bins of size `r width(chip_object$windowCounts)[1]` bp having any overlap to the union of MACS2 peaks from all samples listed in the sample sheet.   
+Size factors were calculated via TMM normalization of read counts obtained for 10kb genomic bins and amounted to `r chip_object$normFactors`.   
+
+### Statistical analysis
+
+Statistical model was fit according to the following design:
+
+```{r design_used}
+chip_object$design
+```
+
+The original windows were merged into `r length(chip_results$mergedRegions$region)` regions, for which p values were combined and FDR estimates were obtained after adjustment for multiple testing. 
+The absolute log fold change of the window with the smallest p value belonging to a merged region was reported as best log fold change for that region.
+
+### Filtering of results
+
+```{r filter_results}
+merged <- chip_results$mergedRegions
+tabcom <- chip_results$combinedPvalues
+merged$region$score <- -10 * log10(tabcom$FDR)
+names(merged$region) <- paste0("region", 1:length(merged$region))
+tabcom$name <- names(merged$region)
+tabx <- as.data.frame(merged$region, stringsAsFactors=FALSE)
+tabx$name <- rownames(tabx)
+full_res <- as.data.frame(merge(x=tabx, y=tabcom, by.x="name", by.y="name"), stringsAsFactors=FALSE)
+fdrcutoff <- as.numeric(snakemake@params[["fdr"]])
+lfccutoff <- as.numeric(snakemake@params[["lfc"]])
+full_res.filt <- subset(full_res, (FDR<=fdrcutoff) & (abs(best.logFC) >= lfccutoff))
+```
+
+Applying FDR threshold of `r snakemake@params[["fdr"]]` and absolute (best) log fold change threshold of `r snakemake@params[["lfc"]]` resulted in a final list of `r nrow(full_res.filt)` merged regions.   
+Numbers of regions showing different direction change were as follows:
+
+```{r direction_list}
+table(full_res.filt$direction)
+```
+
+### Visualizing the results
+
+Deeptools matrices were computed for the filtered lists of merged regions showing different change directions and visualized as heatmaps with summary profiles. For this purpose, merged regions were all scaled to 1kb, and an extention of 0.2kb was added on each side.
+
+Heatmaps obtained using log2 ratio of ChIP signal over input were as follows:
+
+```{r plot_l2r,fig.show='hold',fig.align='center', out.width ='40%',out.height='30%',fig.cap="UP and DOWN regions using log2 ratio."}
+if(!snakemake@params[["pipeline"]] %in% "chip-seq"){
+    message("ChIP signal enrichment over input is only available for ChIP-seq workflow!")
+}else{
+    knitr::include_graphics(c(file.path(snakemake@params[["outdir"]], "CSAW.UP.log2r.heatmap.png"),
+                              file.path(snakemake@params[["outdir"]], "CSAW.DOWN.log2r.heatmap.png")))
+}
+```
+
+Heatmaps obtained using depth-normalized coverage were as follows:
+
+```{r plot_cov, fig.show='hold',fig.align='center', out.width ='40%',out.height='30%',fig.cap="UP and DOWN regions using coverage."}
+knitr::include_graphics(c(file.path(snakemake@params[["outdir"]], "CSAW.UP.cov.heatmap.png"),
+                          file.path(snakemake@params[["outdir"]], "CSAW.DOWN.cov.heatmap.png")))
+```
+
+Tables with differentially bound regions annotated with distance to nearest gene can be found in folder `r paste0("AnnotatedResults_", gsub("\\.[a-zA-Z]{3}$", "", basename(snakemake@params[["sampleSheet"]])))`.

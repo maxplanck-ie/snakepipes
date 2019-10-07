@@ -43,18 +43,15 @@ This way, the software used within snakePipes do not conflict with the software 
 Development installation
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you wish to modify snakePipes you can install it via pip, using our `GitHub repository <https://github.com/maxplanck-ie/snakepipes>`__ .
+If you wish to modify snakePipes you can install it via pip from within a conda environment, using our `GitHub repository <https://github.com/maxplanck-ie/snakepipes>`__ .
 
 .. code:: bash
 
-    pip install --user --upgrade git+https://github.com/maxplanck-ie/snakepipes@develop
+    conda create -n snakepipes python=3.7 snakemake pandas graphviz fuzzywuzzy
+    conda activate snakepipes
+    pip install git+https://github.com/maxplanck-ie/snakepipes@develop
 
 Instead of providing the URL to ``pip``, you can also `clone <https://help.github.com/articles/cloning-a-repository/>`__ our `GitHub repository <https://github.com/maxplanck-ie/snakepipes>`__ on your computer, and modify the code before running snakePipes. Please see :doc:`advanced_usage` for more information on how to modify and extend snakePipes workflows.
-
-.. note:: There is a difference between installing via conda or installing via pip. The python  installation from user's ``$PATH`` is ignored when installing via conda (first method) while is considered when installing via pip. You must use the ``--develop`` option later when you run ``snakePipes createEnvs``.
-
-.. note:: Using the --user argument would install the program into ``~/.local/bin/``. So make sure to have it in your $PATH before executing any workflow.
-
 
 Testing whether the installation went fine
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -79,10 +76,12 @@ Snakemake and pandas are installed along with snakePipes as requirements. Ensure
     snakePipes --help
 
 
-Inspect and modify the setup files
-----------------------------------
+Modify global options
+---------------------
 
-After installation of snakePipes, all files required to configure it would be installed in a default path. The path to these files can be displayed by running the following command:
+It is often useful to store organism YAML files and the cluster configuration file outside of snakePipes, so that these can be used across snakePipes versions without needing to make copies. Since snakePipes 1.3.0, this can be done by modifying the **defaults.yaml** file, the location of which is given by ``snakePipes info``. Instead of manually modifying this file, you may also use ``snakePipes config``. 
+
+To see the location of the various YAML files so you can manually inspect them, you can use:
 
 .. code:: bash
 
@@ -95,13 +94,11 @@ This would show the locations of:
  * **organisms/<organism>.yaml** : Defines genome indices and annotations for various organisms. See :ref:`organisms`
  * Workflow-specific defaults : Defines default options for our command line wrappers. See :ref:`workflowOpts`
 
-You can modify these files to suite your needs before creating the conda environments (see below).
-
 
 .. _conda:
 
-Install the conda environments
-------------------------------
+Create the conda environments
+-----------------------------
 
 All the tools required for running various pipelines are installed via various conda repositories
 (mainly bioconda). The following commands installs the tools and creates the respective conda environments.
@@ -110,11 +107,11 @@ All the tools required for running various pipelines are installed via various c
 
     snakePipes createEnvs
 
-.. note:: Creating the environments might take 1-2 hours. But it only has to be done once.
+.. note:: Creating the environments might take 1 hour. But it only has to be done once.
 
 .. note::
 
-    ``snakePipes createEnvs`` will also set the ``snakemake_options:`` line in the global snakePipes
+    ``snakePipes createEnvs`` will also set the ``snakemakeOptions:`` line in the global snakePipes
     ``defaults.yaml`` files. If you have already modified this then use the ``--keepCondaDir`` option.
 
 .. warning::
@@ -125,14 +122,11 @@ file on our GitHub repository. You can modify it to suite your needs.
 
 Here are the content of *defaults.yaml*::
 
-    snakemake_options: '--use-conda --conda-prefix /data/general/scratch/conda_envs'
-    tempdir: /data/extended/
-
-The ``tempdir`` path should be changed to a suitable directory that can hold the temporary files during pipeline execution.
+    snakemakeOptions: '--use-conda --conda-prefix /data/general/scratch/conda_envs'
 
 .. note::
 
-    Whenever you change the `snakemake_options:` line in `defaults.yaml`, you should run
+    Whenever you change the `snakemakeOptions:` line in `defaults.yaml`, you should run
     `snakePipes createEnvs` to ensure that the conda environments are then created.
 
 Running ``snakePipes createEnvs`` is not strictly required, but facilitates multiple users using the same snakePipes installation.
@@ -143,7 +137,7 @@ Running ``snakePipes createEnvs`` is not strictly required, but facilitates mult
 Configure the organisms
 -----------------------
 
-For each organism of your choice, create a file called ``shared/organisms/<organism>.yaml`` and
+For each organism of your choice, create a file called ``<organism>.yaml`` in the folder specified by ``organismsDir`` in **defaults.yaml** and
 fill the paths to the required files next to the corresponding yaml entry. For common organisms, the required files are downloaded and the yaml entries can be created automatically via the workflow ``createIndices``.
 
 The yaml files look like this after the setup (an example from drosophila genome ``dm3``) :
@@ -174,7 +168,7 @@ The yaml files look like this after the setup (an example from drosophila genome
     # OPTIONAL. For QC and filtering of regions in multiple workflows.
     blacklist_bed:
     # STRING. Name of the chromosomes to ignore for calculation of normalization factors for coverage files
-    ignore_forNorm: "U Uextra X XHet YHet dmel_mitochondrion_genome"
+    ignoreForNormalization: "U Uextra X XHet YHet dmel_mitochondrion_genome"
 
 .. warning:: Do not edit the yaml keywords corresponding to each required entry.
 
@@ -208,15 +202,52 @@ Configure your cluster
 The ``cluster.yaml`` file contains both the default memory requirements as well as two options passed to snakemake that control how jobs are submitted to the cluster and files are retrieved::
 
     snakemake_latency_wait: 300
-    snakemake_cluster_cmd: module load slurm; SlurmEasy --mem-per-cpu {cluster.memory} --threads {threads} --log
+    snakemake_cluster_cmd: module load slurm; SlurmEasy --mem-per-cpu {cluster.memory} --threads {threads} --log {snakePipes_cluster_logDir} --name {rule}.snakemake 
+    snakePipes_cluster_logDir: cluster_logs
     __default__:
         memory: 8G
     snp_split:
         memory: 10G
 
-If you have cloned the repository locally, the file is located under ``snakePipes/shared/``.
+The location of this file must be specified by the ``clusterConfig`` value in **defaults.yaml**.
 
-You can change the default per-core memory allocation if needed here. Importantly, the ``snakemake_cluster_cmd`` option must be changed to match your needs. Whatever command you specify must include a ``{cluster.memory}`` option and a ``{threads}`` option. You can specify other required options here as well. The ``snakemake_latency_wait`` value defines how long snakemake should wait for files to appear before throwing an error. The default of 300 seconds is typically reasonable when a file system such as `NFS <https://en.wikipedia.org/wiki/Network_File_System>`__ is in use.
+You can change the default per-core memory allocation if needed here. Importantly, the ``snakemake_cluster_cmd`` 
+option must be changed to match your needs (see table below). Whatever command you specify must include 
+a ``{cluster.memory}`` option and a ``{threads}`` option. You can specify other required options here as well. 
+The ``snakemake_latency_wait`` value defines how long snakemake should wait for files to appear 
+before throwing an error. The default of 300 seconds is typically reasonable when a file system such as 
+`NFS <https://en.wikipedia.org/wiki/Network_File_System>`__ is in use. Please also note that there are additional memory 
+settings for each workflow in ``snakePipes/workflows/[workflow]/cluster.yaml`` that you might need to adjust. 
+
+``snakePipes_cluster_logDir:`` can be used like a wildcard in `snakemake_cluster_cmd` to specify the directory 
+for the stdout and stderr files from a job that is running on the cluster. This is given separate to make sure 
+the directory exists before execution. A relative path is treated relative to the ouput directory of the workflow. 
+If you want, you can also give an absolute log directory starting with /.
+
+==================== ======================================================================================
+ Scheduler/Queuing        snakemake_cluster_cmd example                                                                                                    
+==================== ======================================================================================
+ **slurm**            .. code:: bash                                                                                       
+                                          
+                        snakemake_cluster_cmd: module load slurm; sbatch --ntasks-per-node=1 
+                           -c {threads} -J {rule}.snakemake --mem-per-cpu={cluster.memory} 
+                           -p MYQUEUE -o {snakePipes_cluster_logDir}/{rule}.%j.out 
+                           -e {snakePipes_cluster_logDir}/{rule}.%j.err
+                        snakePipes_cluster_logDir: cluster_logs
+                        
+ **PBS/Torque**       .. code:: bash                                                                                       
+                                          
+                        snakemake_cluster_cmd: qsub -N {rule}.snakemake
+                           -q MYQUEUE -l pmem={cluster.memory} 
+                           -l walltime=20:00:00 -l nodes=1:ppn={cluster.threads} 
+                           -o {snakePipes_cluster_logDir}/{rule}.\$PBS_JOBID.out 
+                           -e {snakePipes_cluster_logDir}/{rule}.\$PBS_JOBID.err
+                        snakePipes_cluster_logDir: cluster_logs        
+                        
+ **SGE**              *Please send us a working example!*                
+==================== ======================================================================================
+
+
 
 .. _workflowOpts:
 
@@ -236,19 +267,19 @@ Below are some of the workflow defaults from the DNA-mapping pipeline. Empty sec
     reads: [_R1, _R2]
     ## mapping mode
     mode: mapping
-    mapping_prg: Bowtie2
+    aligner: Bowtie2
     ## Number of reads to downsample from each FASTQ file
     downsample:
     ## Options for trimming
     trim: False
-    trim_prg: cutadapt
-    trim_options:
+    trimmer: cutadapt
+    trimmerOptions:
     ## Bin size of output files in bigWig format
-    bw_binsize: 25
+    bwBinSize: 25
     ## Run FASTQC read quality control
     fastqc: false
     ## Run computeGCBias quality control
-    gcbias: false
+    GCBias: false
     ## Retain only de-duplicated reads/read pairs
     dedup: false
     ## Retain only reads with at least the given mapping quality

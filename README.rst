@@ -17,10 +17,10 @@ snakePipes
 
 snakePipes are flexible and powerful workflows built using `snakemake <snakemake.readthedocs.io>`__ that simplify the analysis of NGS data.
 
-.. image:: ./docs/content/images/snakePipes.png
+.. image:: ./docs/content/images/snakePipes_small.png
    :scale: 20 %
-   :height: 100px
    :width: 100 px
+   :height: 100 px
    :align: right
 
 Workflows available
@@ -48,7 +48,7 @@ Afterward, simply run the following:
 This will create a new conda environment called "snakePipes" into which snakePipes is installed. You will then need to create the conda environments needed by the various workflows. To facilitate this we provide the `snakePipes` commands:
 
 * ``conda activate snakePipes`` to activate the appropriate conda environment.
-* ``snakePipes createEnvs`` to create the various environments and register GATK.
+* ``snakePipes createEnvs`` to create the various environments.
 
 Indices and annotations needed to run the workflows could be created by a simple command :
 
@@ -77,7 +77,7 @@ Citation
 
 If you adopt/run snakePipes for your analysis, cite it as follows :
 
-Bhardwaj V, Heyne S, Sikora K, Rabbani L, Rauer M, Kilpert F, et al. **snakePipes enable flexible, scalable and integrative epigenomic analysis.** bioRxiv. 2018. p. 407312. `doi:10.1101/407312 <https://www.biorxiv.org/content/early/2018/09/04/407312>`__
+Bhardwaj, Vivek, Steffen Heyne, Katarzyna Sikora, Leily Rabbani, Michael Rauer, Fabian Kilpert, Andreas S. Richter, Devon P. Ryan, and Thomas Manke. 2019. “snakePipes: Facilitating Flexible, Scalable and Integrative Epigenomic Analysis.” Bioinformatics , May. `doi:10.1093/bioinformatics/btz436 <https://doi.org/10.1093/bioinformatics/btz436>`__
 
 
 Note

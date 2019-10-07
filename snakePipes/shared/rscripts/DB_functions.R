@@ -4,7 +4,7 @@
 #' Read the Files and Count windows for ChIP-Seq Samples
 #'
 #' @param sampleSheet tsvfile with sample information
-#' @param fragment_length fragment length of sequencing
+#' @param fragmentLength fragment length of sequencing
 #' @param window_size window size to count the reads in
 #' @param alleleSpecific TRUE/FALSE whether samples have to be compared with allele-specific design
 #' @param pe.param parameters to read bam files
@@ -16,7 +16,7 @@
 
 .libPaths(R.home("library"))
 
-readfiles_chip <- function(sampleSheet, fragment_length, window_size, alleleSpecific = FALSE, pe.param){
+readfiles_chip <- function(sampleSheet, fragmentLength, window_size, alleleSpecific = FALSE, pe.param){
 
     # check that not >2 conditions are given
     if(length(unique(sampleSheet$condition)) > 2 ) {
@@ -68,7 +68,7 @@ readfiles_chip <- function(sampleSheet, fragment_length, window_size, alleleSpec
     # readFiles using CSAW
     mincount <- 20
     message(paste0("Counting reads in windows.. windows with total counts < ", mincount, " are discarded"))
-    counts <- csaw::windowCounts(bam.files = bam.files, param = pe.param, ext = fragment_length, spacing = window_size, filter = mincount)
+    counts <- csaw::windowCounts(bam.files = bam.files, param = pe.param, ext = fragmentLength, spacing = window_size, filter = mincount)
 
     # output
     chipCountObject <- list(windowCounts = counts, sampleSheet = sampleSheet,
@@ -87,7 +87,7 @@ readfiles_chip <- function(sampleSheet, fragment_length, window_size, alleleSpec
 #' makeQCplots_chip(bam.file, outplot)
 #'
 
-makeQCplots_chip <- function(bam.file, outplot, pe.param){
+makeQCplots_chip_PE <- function(bam.file, outplot, pe.param){
 
     ## Histogram to check frag size cutoff
     message("Checking fragment sizes")
@@ -125,6 +125,43 @@ makeQCplots_chip <- function(bam.file, outplot, pe.param){
 
     # cross correlation
     plot(0:max.delay, CCF, type = "l", ylab = "CCF", xlab = "Delay (bp)", main = "PE-Cross-correlation")
+
+    # coverage in windows
+    plot(xranged, collected, type = "l", col = "blue", xlim = c(-1000, 1000), lwd = 2,
+         xlab = "Distance (bp)", ylab = "Relative coverage per base")
+    abline(v = c(-150,200), col = "dodgerblue", lty = 2)
+    legend("topright", col = "dodgerblue", legend = "specified window size")
+
+    dev.off()
+
+}
+
+makeQCplots_chip_SE <- function(bam.file, outplot, pe.param){
+
+    ## Checking cross-correlation
+    message("Checking strand cross-correlation")
+    max.delay <- 500
+    dedup.on <- csaw::readParam(dedup = TRUE, minq = 20)
+    CCF <- csaw::correlateReads(bam.file, max.delay, param = dedup.on)
+
+    ## Choosing appropriate window size
+    message("Checking read distribution around putative peaks")
+    plotwc <- function(curbam){
+        windowed <- csaw::windowCounts(curbam, spacing = 50, param = pe.param, filter = 20)
+        rwsms <- rowSums(SummarizedExperiment::assay(windowed))
+        maxed <- csaw::findMaxima(SummarizedExperiment::rowRanges(windowed), range = 1000, metric = rwsms)
+        curbam.out <- csaw::profileSites(curbam, SummarizedExperiment::rowRanges(windowed)[maxed], param = pe.param)
+        return(curbam.out)
+    }
+    collected <- plotwc(bam.file)
+    xranged <- as.integer(names(collected))
+
+    ## plot
+    message("Plotting")
+    pdf(outplot)
+    
+    # cross correlation
+    plot(0:max.delay, CCF, type = "l", ylab = "CCF", xlab = "Delay (bp)", main = "SE-Cross-correlation")
 
     # coverage in windows
     plot(xranged, collected, type = "l", col = "blue", xlim = c(-1000, 1000), lwd = 2,
@@ -225,7 +262,7 @@ getDBregions_chip <- function(chipCountObject, plotfile = NULL){
     if(chipCountObject$designType != "condition") {
         results <- edgeR::glmQLFTest(fit, coef = paste0("allelegenome2"))
     } else {
-        results <- edgeR::glmQLFTest(fit, coef = 2)
+        results <- edgeR::glmQLFTest(fit, coef = paste0("condition",unique(chipCountObject$sampleSheet$condition)[2]))
     }
 
     # Merge DB windows into regions: Using quick and dirty method
@@ -255,7 +292,7 @@ getDBregions_chip <- function(chipCountObject, plotfile = NULL){
 #' writeOutput_chip(chipResultObject, outfile_prefix)
 #'
 
-writeOutput_chip <- function(chipResultObject, outfile_prefix, fdrcutoff){
+writeOutput_chip <- function(chipResultObject, outfile_prefix, fdrcutoff,lfccutoff){
     # get merged regions
     merged <- chipResultObject$mergedRegions
     tabcom <- chipResultObject$combinedPvalues
@@ -276,6 +313,27 @@ writeOutput_chip <- function(chipResultObject, outfile_prefix, fdrcutoff){
     } else {
         warning("output empty! please lower the fdr threshold.")
     }
+    ##merge regions with stats
+    print(head(as.data.frame(merged$region)))
+    print(head(tabcom))
+    tabx<-as.data.frame(merged$region,stringsAsFactors=FALSE)
+    tabx$name<-rownames(tabx)
+    full_res<-as.data.frame(merge(x=tabx,y=tabcom,by.x="name",by.y="name"),stringsAsFactors=FALSE) 
+    full_res<-full_res[,c(2:ncol(full_res),1)]
+    print(sprintf("Colnames of result file are %s",colnames(full_res)))
+    ##filter full result for FDR and LFC and write to output
+    full_res.filt<-subset(full_res,(FDR<=fdrcutoff)&(abs(best.logFC)>=lfccutoff))
+    if(nrow(full_res.filt)>0){
+    write.table(full_res.filt,file="Filtered.results.bed",row.names=FALSE,col.names=FALSE,sep="\t",quote=FALSE)}else{system("touch Filtered.results.bed")}
+    res.filt.up<-subset(full_res.filt,direction %in% "up")
+    if(nrow(res.filt.up)>0){
+    write.table(res.filt.up,file="Filtered.results.UP.bed",row.names=FALSE,col.names=FALSE,sep="\t",quote=FALSE)}else{system("touch Filtered.results.UP.bed")}
+    res.filt.down<-subset(full_res.filt,direction %in% "down")
+    if(nrow(res.filt.down)>0){
+    write.table(res.filt.down,file="Filtered.results.DOWN.bed",row.names=FALSE,col.names=FALSE,sep="\t",quote=FALSE)}else{system("touch Filtered.results.DOWN.bed")}
+    res.filt.mixed<-subset(full_res.filt,direction %in% "mixed")
+    if(nrow(res.filt.mixed)>0){
+    write.table(res.filt.mixed,file="Filtered.results.MIXED.bed",row.names=FALSE,col.names=FALSE,sep="\t",quote=FALSE)}else{system("touch Filtered.results.MIXED.bed")}
 }
 
 

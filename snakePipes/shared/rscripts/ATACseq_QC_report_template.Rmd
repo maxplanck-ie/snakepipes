@@ -1,11 +1,8 @@
 ---
-title: "ATACseq_filtering_report"
+title: "ATAC-seq filtering report"
 author: "`r Sys.info()[length(Sys.info())-1]`"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: html_document
-params:
-    QCdir: "Filtering_metrics"
-    output_file: "Filtering_metrics/Filtering_report.html"
 ---
 
 ```{r setup, include=FALSE}
@@ -19,33 +16,33 @@ knitr::opts_chunk$set(echo = FALSE)
 Observed PCR duplication rate on a PCR-free protocol should be low, not exceeding 10-15%. Higher duplication rates might reflect low-input samples and/or lower library complexity.
 
 ```{r , echo=FALSE}
-QCdir<-params$QCdir
-Mapdir=dir(gsub("Filtering_metrics","Bowtie2/logs",QCdir),pattern="*_markdup.err$",full.names=TRUE,recursive=TRUE)
+QCdir <- snakemake@params[["QCdir"]]
+Mapdir = dir(gsub("Filtering_metrics", "Bowtie2/logs", QCdir), pattern="*_markdup.err$", full.names=TRUE, recursive=TRUE)
 if(length(Mapdir>0)){
 
-    Mapdir.short<-gsub(".sambamba_markdup.err","",basename(Mapdir))
+    Mapdir.short <- gsub(".sambamba_markdup.err", "", basename(Mapdir))
 
-    bamRepL<-vector("list",length(Mapdir))
-    names(bamRepL)<-Mapdir.short
+    bamRepL <- vector("list", length(Mapdir))
+    names(bamRepL) <- Mapdir.short
 
     for(i in seq_along(bamRepL)){
-
-    PE<-system(paste0('grep \"end pairs\" ',Mapdir[i]),intern=TRUE)
-    SE<-system(paste0('grep \"single ends\" ',Mapdir[i]),intern=TRUE)
-    dup<-system(paste0('grep \"found\" ',Mapdir[i]),intern=TRUE)
-    tabi<-as.data.frame(cbind(as.numeric(unlist(strsplit(PE,split=" "))[4]),as.numeric(unlist(strsplit(SE,split=" "))[7]),as.numeric(unlist(strsplit(dup,split=" "))[4])))
-    colnames(tabi)<-c("PE","SE","Dupes")
-    tabi$IN_dupes<-with(tabi,2*PE+SE)
-    tabi$Pct_dupes<-with(tabi,Dupes/IN_dupes*100)
-
-    bamRepL[[i]]<-tabi
-
+        PE <- system(paste0('grep \"end pairs\" ', Mapdir[i]), intern=TRUE)
+        SE <- system(paste0('grep \"single ends\" ', Mapdir[i]), intern=TRUE)
+        dup <- system(paste0('grep \"found\" ', Mapdir[i]), intern=TRUE)
+        tabi <- as.data.frame(cbind(as.numeric(unlist(strsplit(PE, split=" "))[4]), as.numeric(unlist(strsplit(SE, split=" "))[7]), as.numeric(unlist(strsplit(dup, split=" "))[4])))
+        colnames(tabi) <- c("PE", "SE", "Dupes")
+        tabi$IN_dupes <- with(tabi, 2 * PE + SE)
+        tabi$Pct_dupes <- with(tabi, Dupes / IN_dupes * 100)
+        bamRepL[[i]] <- tabi
     }
 
-    bamReptab<-as.data.frame(do.call(rbind,bamRepL),stringsAsFactors=FALSE)
+    bamReptab <- as.data.frame(do.call(rbind, bamRepL), stringsAsFactors=FALSE)
 
     require(pander)
-    pander(bamReptab,style='simple',caption="PCR duplication rate.")} else {message('No information on PCR duplicate removal found. If you started the pipeline from bam files, this is expected outcome. Otherwise, an error might have occured.')}
+    pander(bamReptab, style='simple', caption="PCR duplication rate.")
+} else {
+    message('No information on PCR duplicate removal found. If you started the pipeline from bam files, this is expected outcome. Otherwise, an error might have occured.')
+}
 ```
 
 ## Percentage of reads in fragment size bins
@@ -53,28 +50,23 @@ if(length(Mapdir>0)){
 A good enrichment of sequenced fragments passing the size filtering threshold (default: 100nt) indicates successful library construction.
 
 ```{r , echo=FALSE}
-QCdir<-params$QCdir
-Mapdir=dir(gsub("Filtering_metrics","MACS2",QCdir),pattern="*.short.metrics$",full.names=TRUE,recursive=TRUE)
+QCdir <- snakemake@params[["QCdir"]]
+Mapdir=dir(gsub("Filtering_metrics", "MACS2", QCdir), pattern="*.short.metrics$", full.names=TRUE, recursive=TRUE)
 if(length(Mapdir>0)){
-
-    Mapdir.short<-gsub(".short.metrics","",basename(Mapdir))
-
-    bamRepL<-vector("list",length(Mapdir))
-    names(bamRepL)<-Mapdir.short
-
+    Mapdir.short <- gsub(".short.metrics", "", basename(Mapdir))
+    bamRepL <- vector("list", length(Mapdir))
+    names(bamRepL) <- Mapdir.short
     for(i in seq_along(bamRepL)){
-
-    tabi<-read.table(Mapdir[i],header=TRUE,sep="\t",skip=1,quote="",as.is=TRUE)
-    tabi$Pct_Retained<-tabi$"Reads.Remaining"/tabi$"Total.Initial.Reads"*100
-
-    bamRepL[[i]]<-tabi
-
+        tabi <- read.table(Mapdir[i], header=TRUE, sep="\t", skip=1, quote="", as.is=TRUE, comment.char="")
+        tabi$Pct_Retained <- tabi$"Reads.Remaining" / tabi$"Total.Initial.Reads" * 100
+        bamRepL[[i]] <- tabi
     }
 
     bamReptab<-as.data.frame(do.call(rbind,bamRepL),stringsAsFactors=FALSE)
 
     library(pander)
-    pander(bamReptab,style='simple',caption="Percentage reads passing the size filtering threshold.")} else {message('No information on fragment size filtering found.')}
+    pander(bamReptab, style='simple', caption="Percentage reads passing the size filtering threshold.")
+} else {
+    message('No information on fragment size filtering found.')
+}
 ```
-
-
