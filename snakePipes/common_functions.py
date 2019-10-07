@@ -434,13 +434,14 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
         args.snakemakeOptions += " --notemp"
 
     snakemake_cmd = """
-                    PYTHONNOUSERSITE=True {snakemake} {snakemakeOptions} --latency-wait {latency_wait} --snakefile {snakefile} --jobs {maxJobs} --directory {workingdir} --configfile {configFile} --keep-going
+                    TMPDIR={tempDir} PYTHONNOUSERSITE=True {snakemake} {snakemakeOptions} --latency-wait {latency_wait} --snakefile {snakefile} --jobs {maxJobs} --directory {workingdir} --configfile {configFile} --keep-going
                     """.format(snakemake=os.path.join(snakemake_path, "snakemake"),
                                latency_wait=cluster_config["snakemake_latency_wait"],
                                snakefile=os.path.join(workflowDir, "Snakefile"),
                                maxJobs=args.maxJobs,
                                workingdir=args.workingdir,
                                snakemakeOptions=str(args.snakemakeOptions or ''),
+                               tempDir=cfg["tempDir"],
                                configFile=os.path.join(args.outdir, '{}.config.yaml'.format(workflowName))).split()
 
     # Produce the DAG if desired
