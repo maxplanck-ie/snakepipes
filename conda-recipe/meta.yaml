@@ -26,6 +26,6 @@ test:
 
 about:
   home: 'https://snakepipes.readthedocs.org'
-  license: GPL3
+  license: MIT
   summary: NGS processing pipelines from the MPI-IE
-  license_file: LICENSE.txt
+  license_file: LICENSE
