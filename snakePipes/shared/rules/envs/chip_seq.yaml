@@ -3,6 +3,5 @@ channels:
  - conda-forge
  - bioconda
 dependencies:
- - samtools = 1.9
- - macs2 = 2.1.2  #python 2
- - tabix = 0.2.6
+ - samtools = 1.9  # This should pull in tabix via htslib as well
+ - macs2 = 2.2.4
