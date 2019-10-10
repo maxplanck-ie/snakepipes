@@ -50,7 +50,6 @@ def sanity_dict_clean(myDict):
 
 
 def load_configfile(configFiles, verbose, info='Config'):
-    print("configFiles is {}".format(configFiles))
     with open(configFiles, "r") as f:
         config = yaml.load(f, Loader=yaml.FullLoader)
 
