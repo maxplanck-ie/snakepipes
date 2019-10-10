@@ -49,15 +49,15 @@ def sanity_dict_clean(myDict):
     return myDict
 
 
-def load_configfile(configFile, verbose, info='Config'):
-    with open(configFile, "r") as f:
+def load_configfile(configFiles, verbose, info='Config'):
+    with open(configFiles, "r") as f:
         config = yaml.load(f, Loader=yaml.FullLoader)
 
     config = sanity_dict_clean(config)
 
     if verbose:
         print("\n--- " + info + " ---------------------------------------------------------------------")
-        print("config file: {}".format(configFile))
+        print("config file: {}".format(configFiles))
         for k, v in sorted(config.items()):
             print("{}: {}".format(k, v))
         print("-" * 80, "\n")
