@@ -9,7 +9,7 @@ maindir = os.path.dirname(os.path.dirname(workflow.basedir))
 globals().update(cf.set_env_yamls())
 
 # load config file
-globals().update(cf.load_configfile(workflow.overwrite_configfile, config["verbose"]))
+globals().update(cf.load_configfile(workflow.overwrite_configfiles, config["verbose"]))
 
 # do workflow specific stuff now
 include: os.path.join(workflow.basedir, "internals.snakefile")

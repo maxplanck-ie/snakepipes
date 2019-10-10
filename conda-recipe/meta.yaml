@@ -14,7 +14,7 @@ requirements:
     - python >=3
   run:
     - python >=3
-    - snakemake >=5.2.3
+    - snakemake >=5.7
     - pandas
     - graphviz
     - fuzzywuzzy

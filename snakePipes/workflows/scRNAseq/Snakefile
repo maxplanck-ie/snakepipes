@@ -9,7 +9,7 @@ workflow_rscripts=os.path.join(maindir, "shared", "rscripts")
 globals().update(cf.set_env_yamls())
 
 # load config file
-globals().update(cf.load_configfile(workflow.overwrite_configfile, config["verbose"]))
+globals().update(cf.load_configfile(workflow.overwrite_configfiles, config["verbose"]))
 # load organism-specific data, i.e. genome indices, annotation, etc.
 globals().update(cf.load_organism_data(genome, maindir, config["verbose"]))
 
