@@ -1,6 +1,11 @@
 snakePipes News
 ===============
 
+snakePipes 1.3.1
+----------------
+
+ * Support for snakeMake 5.7.0
+
 snakePipes 1.3.0
 ----------------
 
