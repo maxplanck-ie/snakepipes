@@ -146,10 +146,10 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                           dest="correctionMethod",
                           type=str,
                           metavar="STR",
-                          help="Method to be used to balance the hic matrix. "
+                          help="Method to be used to balance the hic matrix."
+                               " Available options are KR and ICE. "
                                "(default: '%(default)s')",
                                default=defaults["correctionMethod"])
-
 
     return parser
 
