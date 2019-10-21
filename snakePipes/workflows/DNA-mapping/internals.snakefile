@@ -17,17 +17,19 @@ strains = list(map( str.strip, re.split(',|;', config["strains"]) ))
 fastq_dir = "FASTQ"
 if trim:
     fastq_indir_trim = "FASTQ"
-    if trim_prg == "trimgalore":
+    if trimmer == "trimgalore":
         fastq_dir = "FASTQ_TrimGalore"
-    elif trim_prg == "cutadapt":
+    elif trimmer == "cutadapt":
         fastq_dir = "FASTQ_Cutadapt"
+    elif trimmer == "fastp":
+        fastq_dir = "FASTQ_fastp"
 
 
 ### Initialization #############################################################
 
 infiles = sorted(glob.glob(os.path.join(str(indir or ''), '*'+ext)))
 
-paired = cf.is_paired(infiles,ext,reads)
+pairedEnd = cf.is_paired(infiles,ext,reads)
 
 samples = cf.get_sample_names(infiles,ext,reads)
 
@@ -37,8 +39,8 @@ if not samples:
     print("\n  Error! NO samples found in dir "+str(indir or '')+"!!!\n\n")
     exit(1)
 
-fromBam = None
+fromBAM = None
 
 idxRange = 1
-if paired:
+if pairedEnd:
     idxRange = 2

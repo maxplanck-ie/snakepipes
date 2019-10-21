@@ -9,9 +9,9 @@ maindir = os.path.dirname(os.path.dirname(workflow.basedir))
 globals().update(cf.set_env_yamls())
 
 # load config file
-globals().update(cf.load_configfile(workflow.overwrite_configfile,config["verbose"]))
+globals().update(cf.load_configfile(workflow.overwrite_configfiles[0], config["verbose"]))
 # load organism-specific data, i.e. genome indices, annotation, etc.
-globals().update(cf.load_organism_data(genome,maindir,config["verbose"]))
+globals().update(cf.load_organism_data(genome, maindir, config["verbose"]))
 
 # do workflow specific stuff now
 include: os.path.join(workflow.basedir, "internals.snakefile")
@@ -23,7 +23,7 @@ include: os.path.join(workflow.basedir, "internals.snakefile")
 include: os.path.join(maindir, "shared", "tools" , "deeptools_cmds.snakefile")
 
 ## filtered annotation (GTF)
-include: os.path.join(maindir, "shared", "rules", "filter_annotation.snakefile")
+include: os.path.join(maindir, "shared", "rules", "filterGTF.snakefile")
 
 ## bamCoverage_RPKM
 include: os.path.join(maindir, "shared", "rules", "deepTools_RNA.snakefile")
@@ -32,7 +32,7 @@ include: os.path.join(maindir, "shared", "rules", "deepTools_RNA.snakefile")
 include: os.path.join(maindir, "shared", "rules", "umi_tools.snakefile")
 
 
-if not fromBam:
+if not fromBAM:
     ## FASTQ: either downsample FASTQ files or create symlinks to input files
     include: os.path.join(maindir, "shared", "rules", "FASTQ.snakefile")
 
@@ -42,7 +42,7 @@ if not fromBam:
 
     ## Trim
     if trim:
-        include: os.path.join(maindir, "shared", "rules", "TrimGalore.snakefile")
+        include: os.path.join(maindir, "shared", "rules", "trimming.snakefile")
 
     ## sambamba
     include:os.path.join(maindir, "shared", "rules", "sambamba.snakefile")
@@ -54,15 +54,15 @@ if not fromBam:
             star_index_allelic = 'snp_genome/star_Nmasked/Genome'
             if len(strains) == 1:
                 allele_hybrid = 'single'
-                snp_file = "snp_genome/all_SNPs_" + strains[0] + "_" + genome + ".txt.gz"
+                SNPFile = "snp_genome/all_SNPs_" + strains[0] + "_" + genome + ".txt.gz"
             elif len(strains) == 2:
                 allele_hybrid = 'dual'
-                snp_file = "snp_genome/all_" + strains[1] + "_SNPs_" + strains[0] + "_reference.based_on_" + genome + ".txt"
+                SNPFile = "snp_genome/all_" + strains[1] + "_SNPs_" + strains[0] + "_reference.based_on_" + genome + ".txt"
 
             include: os.path.join(maindir, "shared", "rules", "masked_genomeIndex.snakefile")
         elif allele_mode == 'map_only':
-            star_index_allelic = Nmasked_index
-            snp_file = SNPfile
+            star_index_allelic = NMaskedIndex
+            SNPFile = SNPfile
         ## mapping rules
         include: os.path.join(maindir, "shared", "rules", "RNA_mapping_allelic.snakefile")
         ## SNPsplit
@@ -110,15 +110,18 @@ include: os.path.join(maindir, "shared", "rules", "multiQC.snakefile")
 ### conditional/optional rules #################################################
 ################################################################################
 def run_FastQC(fastqc):
+    readsUse = reads
+    if not pairedEnd:
+        readsUse = [reads[0]]
     if fastqc:
-        return( expand("FastQC/{sample}{read}_fastqc.html", sample = samples, read = reads) )
+        return( expand("FastQC/{sample}{read}_fastqc.html", sample = samples, read = readsUse) )
     else:
         return([])
 
 
 def run_Trimming(trim, fastqc):
     readsUse = reads
-    if not paired:
+    if not pairedEnd:
         readsUse = [reads[0]]
     if trim and fastqc:
         return( expand(fastq_dir+"/{sample}{read}.fastq.gz", sample = samples, read = readsUse) +
@@ -136,9 +139,9 @@ def run_alignment_free():
         "Salmon/SalmonIndex/sa.bin",
         expand("Salmon/{sample}.quant.sf", sample=samples),
         expand("Salmon/{sample}.quant.genes.sf", sample=samples),
-        "Salmon/TPM.tsv",
+        "Salmon/TPM.transcripts.tsv",
         "Salmon/TPM.genes.tsv",
-        "Salmon/counts.tsv",
+        "Salmon/counts.transcripts.tsv",
         "Salmon/counts.genes.tsv",
         expand("Salmon/{sample}/abundance.h5", sample=samples) ]
 
@@ -175,7 +178,7 @@ def make_nmasked_genome():
         genome1 = "snp_genome/" + strains[0] + '_SNP_filtering_report.txt'
         file_list = [
                 genome1,
-                snp_file,
+                SNPFile,
                 star_index_allelic,
                 ]
         return(file_list)
@@ -211,7 +214,7 @@ def run_deepTools_qc():
         expand("bamCoverage/{sample}.uniqueMappings.rev.bw", sample = samples),
         "deepTools_qc/plotEnrichment/plotEnrichment.tsv",
         expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample = samples)]
-        if paired:
+        if pairedEnd:
             file_list.append("deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv")
         if len(samples)>1:
             file_list.append( ["deepTools_qc/multiBigwigSummary/coverage.bed.npz",
@@ -239,16 +242,16 @@ def run_GenomicContamination():
 ### execute before  starts #####################################################
 ################################################################################
 onstart:
-    if "verbose" in config and config["verbose"] and not fromBam:
+    if "verbose" in config and config["verbose"] and not fromBAM:
         print()
         print("--- Workflow parameters --------------------------------------------------------")
         print("mode:", mode)
         print("samples:", samples)
-        print("paired:", paired)
+        print("paired:", pairedEnd)
         print("read extension:", reads)
         print("fastq dir:", fastq_dir)
-        print("filter annotation:", filter_annotation)
-        print("FeatureCounts library type:", library_type)
+        print("filter GTF:", filterGTF)
+        print("FeatureCounts library type:", libraryType)
         print("Sample sheet:", sampleSheet)
         print("-" * 80, "\n")
 
@@ -257,11 +260,11 @@ onstart:
         print("$HOSTNAME: ", os.getenv('HOSTNAME', ""))
         print("-" * 80, "\n")
 
-    elif "verbose" in config and config["verbose"] and fromBam:
+    elif "verbose" in config and config["verbose"] and fromBAM:
         print("--- Workflow parameters --------------------------------------------------------")
         print("samples:" + str(samples))
         print("input dir:" + indir)
-        print("paired:", paired)
+        print("paired:", pairedEnd)
         print("-" * 80)  # , "\n"
 
         print("--- Environment ----------------------------------------------------------------")
@@ -272,8 +275,9 @@ onstart:
 ### main rule ##################################################################
 ################################################################################
 
-if not fromBam:
-    localrules: FASTQ1, FASTQ2
+if not fromBAM:
+    localrules: FASTQ1, FASTQ2, Salmon_wasabi, sleuth_Salmon
+
 
     rule all:
         input:
@@ -292,6 +296,8 @@ if not fromBam:
             "multiQC/multiqc_report.html"
 
 else:
+    localrules: Salmon_wasabi
+
     rule all:
         input:
             "Annotation/genes.annotated.bed",

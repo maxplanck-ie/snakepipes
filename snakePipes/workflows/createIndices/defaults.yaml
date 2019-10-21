@@ -4,7 +4,7 @@
 # In order to adjust some parameters, please either use the wrapper script
 # (eg. /path/to/snakemake_workflows/workflows/createIndices/createIndices)
 # or save a copy of this file, modify necessary parameters and then provide
-# this file to the wrapper or snakmake via '--configfile' option
+# this file to the wrapper or snakmake via '--configFile' option
 # (see below how to call the snakefile directly)
 #
 # Own parameters will be loaded during snakefile executiuon as well and hence
@@ -12,10 +12,10 @@
 ################################################################################
 pipeline: createIndices
 outdir:
-configfile:
-cluster_configfile:
+configFile:
+clusterConfigFile:
 local: False
-max_jobs: 5
+maxJobs: 5
 verbose: False
 ## Genome name used in snakePipes (no spaces!)
 genome:
@@ -29,16 +29,16 @@ effectiveGenomeSize: 0
 ## Regions to blacklist in the ChIP-seq and related workflows
 blacklist:
 ## Regions to ignore during normalization (e.g., with bamCompare)
-ignore_forNorm:
+ignoreForNormalization:
 ################################################################################
 # Call snakemake directly, i.e. without using the wrapper script:
 #
 # Please save a copy of this config yaml file and provide an adjusted config
-# via '--configfile' parameter!
+# via '--configFile' parameter!
 # example call:
 #
 # snakemake --snakefile /path/to/snakemake_workflows/workflows/createIndices/Snakefile
-#           --configfile /path/to/snakemake_workflows/workflows/createIndices/defaults.yaml
+#           --configFile /path/to/snakemake_workflows/workflows/createIndices/defaults.yaml
 #           --directory /path/to/outputdir
 #           --cores 32
 ################################################################################

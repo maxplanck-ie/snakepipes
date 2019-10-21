@@ -77,7 +77,7 @@ with open(samples_config, "r") as f:
         exit(1)
     del chip_dict_tmp
 
-cf.write_configfile(os.path.join("chip_samples.yaml"),chip_dict)
+cf.write_configfile(os.path.join("chip_samples.yaml"), chip_dict)
 
 # create unique sets of control samples, ChIP samples with and without control
 control_samples = set()
@@ -106,8 +106,8 @@ chip_samples_wo_ctrl = list(sorted(chip_samples_wo_ctrl))
 chip_samples = sorted(chip_samples_w_ctrl + chip_samples_wo_ctrl)
 all_samples = sorted(control_samples + chip_samples)
 
-if not fromBam:
-    if paired:
+if not fromBAM:
+    if pairedEnd:
         if not os.path.isfile(os.path.join(workingdir, "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv")):
             sys.exit('ERROR: {} is required but not present\n'.format(os.path.join(workingdir, "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv")))
 
@@ -127,8 +127,8 @@ if not fromBam:
 
         
 else:
-    bamFiles = sorted(glob.glob(os.path.join(str(fromBam or ''), '*'+bam_ext)))
-    bamSamples = cf.get_sample_names_bam(bamFiles,bam_ext)
+    bamFiles = sorted(glob.glob(os.path.join(str(fromBAM or ''), '*' + bamExt)))
+    bamSamples = cf.get_sample_names_bam(bamFiles, bamExt)
     
     bamDict = dict.fromkeys(bamSamples)
     
@@ -138,8 +138,8 @@ else:
     for sample in all_samples:
         if sample not in bamDict:
             sys.exit("No bam file found for chip sample {}!".format(sample))
-    mapping_prg="EXTERNAL_BAM"
-    indir = fromBam
+    aligner = "EXTERNAL_BAM"
+    indir = fromBAM
     samples = all_samples
     downsample = None
 

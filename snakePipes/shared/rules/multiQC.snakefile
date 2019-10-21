@@ -5,11 +5,11 @@ def multiqc_input_check(return_value):
     infiles = []
     indir = ""
     readsIdx = 1
-    if paired:
+    if pairedEnd:
         readsIdx = 2
 
-    if not pipeline=="scrna-seq" and ("fromBam" not in globals() or not fromBam):
-        if paired:
+    if not pipeline=="scrna-seq" and ("fromBAM" not in globals() or not fromBAM):
+        if pairedEnd:
             if trim and fastqc:
                 infiles.append( expand("FastQC_trimmed/{sample}{read}_fastqc.html", sample = samples, read = reads) )
                 indir += " FastQC_trimmed "
@@ -41,11 +41,11 @@ def multiqc_input_check(return_value):
     elif pipeline=="rna-seq":
         # must be RNA-mapping, add files as per the mode
         if "alignment" in mode or "deepTools_qc" in mode:
-            infiles.append( expand(mapping_prg+"/{sample}.bam", sample = samples) +
+            infiles.append( expand(aligner+"/{sample}.bam", sample = samples) +
                     expand("Sambamba/{sample}.markdup.txt", sample = samples) +
                     expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample=samples)+ 
                     expand("featureCounts/{sample}.counts.txt", sample = samples))
-            indir += mapping_prg + " featureCounts "
+            indir += aligner + " featureCounts "
             indir += " Sambamba "
             indir += " deepTools_qc "   
         if "allelic-mapping" in mode:
@@ -67,12 +67,19 @@ def multiqc_input_check(return_value):
 
         infiles.append( expand(fastq_dir+"/{sample}"+reads[0]+".fastq.gz", sample = samples) )
         indir += fastq_dir + " "
-        infiles.append( expand(mapping_prg+"/{sample}.bam", sample = samples) +
+        infiles.append( expand(aligner+"/{sample}.bam", sample = samples) +
         expand("Sambamba/{sample}.markdup.txt", sample = samples) +
         expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt", sample=samples))
-        indir += mapping_prg
+        indir += aligner
         indir += " Sambamba "
         indir += " deepTools_qc "
+    elif pipeline == "WGBS":
+        infiles.append( expand("QC_metrics/{sample}.flagstat", sample = samples) )
+        indir += " QC_metrics"
+    elif pipeline == "preprocessing":
+        if fastqc and optDedupDist > 0:
+            infiles.append("deduplicatedFASTQ/optical_dedup_mqc.json")
+            indir += " deduplicatedFASTQ"
 
     if return_value == "infiles":
         return(infiles)

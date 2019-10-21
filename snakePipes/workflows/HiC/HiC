@@ -16,20 +16,21 @@ import snakePipes.common_functions as cf
 import snakePipes.parserCommon as parserCommon
 
 
-def parse_args(defaults={"verbose": False, "configfile": None,
-                         "cluster_configfile": None, "max_jobs": 5,
-                         "snakemake_options": "--use-conda", "tempdir": None,
-                         "downsample": False, "trim": False, "fastqc": False,
-                         "trim_prg": "cutadapt", "trim_options": "",
-                         "bin_size": 10000, "RF_resolution": False,
-                         "enzyme": "HindIII", "restrict_region": None,
-                         "merge_samples": False, "nbins_toMerge": 0,
-                         "tadparams": '--thresholdComparisons 0.01',
+def parse_args(defaults={"verbose": False, "configFile": None,
+                         "clusterConfigFile": None, "maxJobs": 5,
+                         "snakemakeOptions": "--use-conda", "tempDir": None,
+                         "downsample": False, "trim": False, "trimmer": "cutadapt",
+                         "trimmerOptions": "", "fastqc": False,
+                         "binSize": 10000, "RFResolution": False,
+                         "enzyme": "HindIII", "restrictRegion": None,
+                         "mergeSamples": False, "nBinsToMerge": 0,
+                         "findTADParams": '--thresholdComparisons 0.01',
+                         "reads": ["_R1", "_R2"], "ext": ".fastq.gz",
                          "noTAD": False, "noCorrect": False,
                          "distVsCount": False, "distVsCountParams": None,
-                         "umidedup": False, "umidedup_opts": "",
-                         "bcpattern": "", "umidedup_sep": "_",
-                         "umibarcode": False}):
+                         "UMIDedup": False, "UMIDedupOpts": "",
+                         "bcPattern": "", "UMIDedupSep": "_",
+                         "UMIBarcode": False}):
     """
     Parse arguments from the command line.
     """
@@ -48,74 +49,65 @@ def parse_args(defaults={"verbose": False, "configfile": None,
 
     parserCommon.commonOptions(optional, defaults, bw=False, plots=False)
 
-    optional.add_argument("--RF_resolution",
-                          dest="RF_resolution",
+    optional.add_argument("--RFResolution",
                           action="store_true",
                           help="Create Hi-C matrices at the restriction "
-                               "fragment resolution. Using `RF_resolution` "
-                               "would override the --bin_size argument. "
+                               "fragment resolution. Using `RFResolution` "
+                               "would override the --binSize argument. "
                                "(default: '%(default)s')",
-                          default=defaults["RF_resolution"])
+                          default=defaults["RFResolution"])
 
     optional.add_argument("--enzyme",
-                          dest="enzyme",
                           choices=['DpnII', 'HindIII'],
                           help="Which enzyme was used to create Hi-C "
                                "library (default: '%(default)s')",
                           default=defaults["enzyme"])
 
-    optional.add_argument("--bin_size",
-                          dest="bin_size",
+    optional.add_argument("--binSize",
                           type=int,
                           metavar="INT",
-                          help="Create Hi-C matrices at the given bin_size. "
+                          help="Create Hi-C matrices at the given binSize. "
                                "This option is mutally exclusive with the "
-                               "`--RF_resolution` option (default: '%(default)s')",
-                          default=defaults["bin_size"])
+                               "`--RFResolution` option (default: '%(default)s')",
+                          default=defaults["binSize"])
 
-    optional.add_argument("--restrict_region",
-                          dest="restrict_region",
+    optional.add_argument("--restrictRegion",
                           type=str,
                           metavar="STR",
                           help="Restrict building of HiC Matrix to given "
                                "region [Chr:Start-End]. "
                                "Only one chromosome can also be specified "
                                "(default: '%(default)s')",
-                          default=defaults["restrict_region"])
+                          default=defaults["restrictRegion"])
 
-    optional.add_argument("--merge_samples",
-                          dest="merge_samples",
+    optional.add_argument("--mergeSamples",
                           action="store_true",
                           help="Merge the HiC matrices and create a new matrix."
                                " If this option is specified togather with "
                                "`--sampleInfo` (see below), the samples would "
                                "be merged based on the defined groups. "
                                "(default: '%(default)s')",
-                          default=defaults["merge_samples"])
+                          default=defaults["mergeSamples"])
 
-    optional.add_argument("--merge_bins",
-                          dest="nbins_toMerge",
+    optional.add_argument("--nBinsToMerge",
                           type=int,
                           help="If > 0 , create a lower resolution HiC matrix "
                                "for each sample by merging the given number "
                                "of bins. (default: '%(default)s')",
-                          default=defaults["nbins_toMerge"])
+                          default=defaults["nBinsToMerge"])
 
-    optional.add_argument("--findTADs_params",
-                          dest="tadparams",
+    optional.add_argument("--findTADsParams",
                           type=str,
                           metavar="STR",
                           help="parameters for HiCFindTADs. (default: '%(default)s')",
-                          default=defaults["tadparams"])
+                          default=defaults["findTADParams"])
 
     optional.add_argument("--noTAD",
-                          dest="noTAD",
                           action="store_true",
                           help="Stop the pipeline before TAD calling. (default: '%(default)s')",
                           default=defaults["noTAD"])
 
     optional.add_argument("--noCorrect",
-                          dest="noCorrect",
                           action="store_true",
                           help="Stop the pipeline before ICE-correction "
                                "(i.e. run only upto building the matrix). "
@@ -123,7 +115,6 @@ def parse_args(defaults={"verbose": False, "configfile": None,
                           default=defaults["noCorrect"])
 
     optional.add_argument("--distVsCount",
-                          dest="distVsCount",
                           action="store_true",
                           help="Produce a plot of the ICE-corrected HiC "
                                "counts as a function of distance. This plot "
@@ -131,15 +122,14 @@ def parse_args(defaults={"verbose": False, "configfile": None,
                                "between samples for biological effects. "
                                "The plot is create using the tool "
                                "'hicDistVsCount'. (default: '%(default)s')",
-
                           default=defaults["distVsCount"])
 
-    optional.add_argument("--distVsCount_params",
-                          dest="distVsCountParams",
+    optional.add_argument("--distVsCountParams",
                           type=str,
                           metavar="STR",
                           help="parameters to run hicDistVsCount. (default: '%(default)s')",
                           default=defaults["distVsCountParams"])
+
     optional.add_argument("--sampleSheet",
                           dest="sampleSheet",
                           type=str,

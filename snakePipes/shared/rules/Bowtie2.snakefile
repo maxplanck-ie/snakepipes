@@ -1,5 +1,5 @@
 ### Bowtie2 ####################################################################
-if paired:
+if pairedEnd:
     rule Bowtie2:
         input:
             r1 = fastq_dir+"/{sample}"+reads[0]+".fastq.gz",
@@ -9,9 +9,9 @@ if paired:
             bam = temp("Bowtie2/{sample}.sorted.bam")# removing since we keep the sambamba output (dupmarked)
         params:
             bowtie2_index=bowtie2_index,
-            bowtie_opts = str(bowtie_opts or ''),
-            mate_orientation = mate_orientation,
-            insert_size_max = insert_size_max
+            alignerOpts = str(alignerOpts or ''),
+            mateOrientation = mateOrientation,
+            insertSizeMax = insertSizeMax
         benchmark:
             "Bowtie2/.benchmark/Bowtie2.{sample}.benchmark"
         threads: 24  # 1G per core
@@ -19,10 +19,10 @@ if paired:
         shell: """
             MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX);
             bowtie2 \
-            -X {params.insert_size_max} \
+            -X {params.insertSizeMax} \
             -x {params.bowtie2_index} -1 {input.r1} -2 {input.r2} \
-            {params.bowtie_opts} {params.mate_orientation} \
-            --rg-id {wildcards.sample} --rg CN:mpi-ie_deep_sequencing_unit \
+            {params.alignerOpts} {params.mateOrientation} \
+            --rg-id {wildcards.sample} \
             --rg DS:{wildcards.sample} --rg PL:ILLUMINA --rg SM:{wildcards.sample} \
             -p {threads} \
             2> {output.align_summary} | \
@@ -39,7 +39,7 @@ else:
             bam = temp("Bowtie2/{sample}.sorted.bam")
         params:
             bowtie2_index=bowtie2_index,
-            bowtie_opts = str(bowtie_opts or '')
+            alignerOpts = str(alignerOpts or '')
         benchmark:
             "Bowtie2/.benchmark/Bowtie2.{sample}.benchmark"
         threads: 24  # 1G per core
@@ -48,8 +48,8 @@ else:
             MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX);
             bowtie2 \
             -x {params.bowtie2_index} -U {input} \
-            {params.bowtie_opts} \
-            --rg-id {wildcards.sample} --rg CN:mpi-ie_deep_sequencing_unit \
+            {params.alignerOpts} \
+            --rg-id {wildcards.sample} \
             --rg DS:{wildcards.sample} --rg PL:ILLUMINA --rg SM:{wildcards.sample} \
             -p {threads} \
             2> {output.align_summary} | \
