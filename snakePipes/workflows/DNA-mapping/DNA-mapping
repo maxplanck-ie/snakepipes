@@ -16,18 +16,19 @@ import snakePipes.common_functions as cf
 import snakePipes.parserCommon as parserCommon
 
 
-def parse_args(defaults={"verbose": False, "configfile": None,
-                         "cluster_configfile": None, "max_jobs": 5,
-                         "snakemake_options": "--use-conda",
+def parse_args(defaults={"verbose": False, "configFile": None,
+                         "clusterConfigFile": None, "maxJobs": 5,
+                         "snakemakeOptions": "--use-conda", "tempDir": None,
                          "mode": "mapping", "downsample": False, "trim": False,
-                         "trim_prg": "cutadapt", "trim_options": "",
-                         "fastqc": False, "qualimap": False, "dedup": False,
-                         "properpairs": False, "insert_size_max": 1000,
-                         "gcbias": False, "bw_binsize": 25, "mapq": 0,
-                         "plot_format": "png", "bowtie_opts": "",
-                         "umidedup": False, "umidedup_opts": "",
-                         "umidedup_sep": "_", "umibarcode": False,
-                         "bcpattern": "", "mate_orientation": "--fr"}):
+                         "trimmer": "cutadapt", "trimmerOptions": "", "fastqc": False,
+                         "qualimap": False, "dedup": False, "ext": ".fastq.gz",
+                         "properPairs": False, "insertSizeMax": 1000,
+                         "GCBias": False, "reads": ["_R1", "_R2"],
+                         "bwBinSize": 25, "mapq": 0, "plotFormat": "png",
+                         "alignerOpts": "", "mateOrientation": "--fr",
+                         "UMIDedup": False, "UMIDedupOpts": "",
+                         "UMIDedupSep": "_", "UMIBarcode": False,
+                         "bcPattern": ""}):
     """
     Parse arguments from the command line.
     """
@@ -53,21 +54,16 @@ def parse_args(defaults={"verbose": False, "configfile": None,
 
     parserCommon.commonOptions(optional, defaults)
 
-    optional.add_argument("--bowtie_opts",
-                          help="Options that will be passed to bowtie2."
-                          "You can specify things such as `--local` or "
-                          "`--very-sensitive` here. The mate orientation and "
-                          "maximum insert size are specified elsewhere. Read "
-                          "group information is set automatically. Note that "
-                          "you may need to escape the first - "
-                          "(e.g., '--very-fast'). (default: '%(default)s')",
-                          default=defaults["bowtie_opts"])
+    optional.add_argument("--alignerOpts",
+                          help="Options that will be passed to bowtie2. You can specify things such as `--local` or "
+                          "`--very-sensitive` here. The mate orientation and maximum insert size are specified "
+                          "elsewhere. Read group information is set automatically. Note that you may need to escape "
+                          "the first - (e.g., '\--very-fast'). Default: '%(default)s'.",
+                          default=defaults["alignerOpts"])
 
-
-    optional.add_argument("--mate_orientation",
-                          help="The --fr, --ff, or --rf option for bowtie2 "
-                          "(default: '%(default)s')",
-                          default=defaults["mate_orientation"])
+    optional.add_argument("--mateOrientation",
+                          help="The --fr, --ff, or --rf option for bowtie2 (default: '%(default)s')",
+                          default=defaults["mateOrientation"])
 
     optional.add_argument("--qualimap",
                           dest="qualimap",
@@ -83,12 +79,10 @@ def parse_args(defaults={"verbose": False, "configfile": None,
                           "ChIP-seq data (default: '%(default)s')",
                           default=defaults["dedup"])
 
-    optional.add_argument("--properpairs",
-                          dest="properpairs",
+    optional.add_argument("--properPairs",
                           action="store_true",
-                          help="retain only reads mapping in proper pairs "
-                          "(default: '%(default)s')",
-                          default=defaults["properpairs"])
+                          help="retain only reads mapping in proper pairs (default: '%(default)s')",
+                          default=defaults["properPairs"])
 
     optional.add_argument("--mapq",
                           dest="mapq",
@@ -100,22 +94,18 @@ def parse_args(defaults={"verbose": False, "configfile": None,
                           type=int,
                           default=defaults["mapq"])
 
-    optional.add_argument("--insert-size",
-                          dest="insert_size_max",
-                          metavar="INT",
-                          help="Maximum insert size allowed during mapping "
-                          "(default: '%(default)s')",
+    optional.add_argument("--insertSizeMax",
+                          help="Maximum insert size allowed during mapping (default: '%(default)s')",
                           type=int,
-                          default=defaults["insert_size_max"])
+                          default=defaults["insertSizeMax"])
 
-    optional.add_argument("--gcbias",
-                          dest="gcbias",
+    optional.add_argument("--GCBias",
                           action="store_true",
                           help="run computeGCBias quality control "
-                          "(long runtime!). Note that gcbias analysis is "
+                          "(long runtime!). Note that GCBias analysis is "
                           "skipped if downsampling is specified "
                           "(default: '%(default)s')",
-                          default=defaults["gcbias"])
+                          default=defaults["GCBias"])
 
     return parser
 
@@ -142,16 +132,16 @@ def main():
         args.VCFfile = os.path.abspath(args.VCFfile)
     elif args.allele_mode == "map_only":
         args.SNPfile = os.path.abspath(args.SNPfile)
-        args.Nmasked_index = os.path.abspath(args.Nmasked_index)
+        args.NMaskedIndex = os.path.abspath(args.NMaskedIndex)
 
     # clean up filtered_bam if needed appropriate
     os.makedirs(args.outdir, exist_ok=True)
     filt = ""
     if args.dedup:
         filt += "-F 1024 "
-        assert args.umidedup is False, "\nPlease use either --umidedup (UMI-tools dedup) or --dedup (via sambamba and samtools)!\n"
+        assert args.UMIDedup is False, "\nPlease use either --UMIDedup (UMI-tools dedup) or --dedup (via sambamba and samtools)!\n"
         "should be called!"
-    if args.properpairs:
+    if args.properPairs:
         filt += "-f 2 "
     if args.mapq is not None and args.mapq > 0:
         filt += "-q {} ".format(args.mapq)

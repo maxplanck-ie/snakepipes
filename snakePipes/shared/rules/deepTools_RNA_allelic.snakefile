@@ -9,7 +9,7 @@ rule bamCoverage_RPKM_allelic:
     conda:
         CONDA_SHARED_ENV
     params:
-        bw_binsize = config["bw_binsize"]
+        bwBinSize = config["bwBinSize"]
     log:
         out="bamCoverage/allele_specific/logs/bamCoverage_RPKM.{sample}.{suffix}.out",
         err="bamCoverage/allele_specific/logs/bamCoverage_RPKM.{sample}.{suffix}.err",
@@ -28,7 +28,7 @@ rule bamCoverage_raw_allelic:
     conda:
         CONDA_SHARED_ENV
     params:
-        bw_binsize = bw_binsize
+        bwBinSize = bwBinSize
     log:
         out="bamCoverage/allele_specificlogs/bamCoverage_coverage.{sample}.{suffix}.out",
         err="bamCoverage/allele_specificlogs/bamCoverage_coverage.{sample}.{suffix}.err"
@@ -49,8 +49,8 @@ rule plotEnrichment_allelic:
         CONDA_SHARED_ENV
     params:
         labels = " ".join(expand('{sample}.{suffix}', sample=samples, suffix = ['genome1', 'genome2'])),
-        plotcmd = "" if plot_format == 'None' else
-            "--plotFile " + "deepTools_qc/plotEnrichment/plotEnrichment_allelic." + plot_format
+        plotcmd = "" if plotFormat == 'None' else
+            "--plotFile " + "deepTools_qc/plotEnrichment/plotEnrichment_allelic." + plotFormat
     log:
         out="deepTools_qc/logs/plotEnrichment_allelic.out",
         err="deepTools_qc/logs/plotEnrichment_allelic.err"
@@ -93,8 +93,8 @@ rule plotCorr_bed_pearson_allelic:
     benchmark:
         "deepTools_qc/.benchmark/plotCorrelation_pearson_allelic.benchmark"
     params:
-        plotcmd = "" if plot_format == 'None' else
-            "--plotFile " + "deepTools_qc/plotCorrelation/correlation.pearson.bed_coverage_allelic.heatmap." + plot_format,
+        plotcmd = "" if plotFormat == 'None' else
+            "--plotFile " + "deepTools_qc/plotCorrelation/correlation.pearson.bed_coverage_allelic.heatmap." + plotFormat,
         title='genes'
     shell: plotCorr_cmd
 
@@ -113,8 +113,8 @@ rule plotCorr_bed_spearman_allelic:
     benchmark:
         "deepTools_qc/.benchmark/plotCorrelation_spearman_allelic.benchmark"
     params:
-        plotcmd = "" if plot_format == 'None' else
-            "--plotFile " + "deepTools_qc/plotCorrelation/correlation.spearman.bed_coverage_allelic.heatmap." + plot_format,
+        plotcmd = "" if plotFormat == 'None' else
+            "--plotFile " + "deepTools_qc/plotCorrelation/correlation.spearman.bed_coverage_allelic.heatmap." + plotFormat,
         title='genes'
     shell: plotCorrSP_cmd
 
@@ -133,7 +133,7 @@ rule plotPCA_allelic:
     benchmark:
         "deepTools_qc/.benchmark/plotPCA_allelic.benchmark"
     params:
-        plotcmd = "" if plot_format == 'None' else
-                "--plotFile " + "deepTools_qc/plotPCA/PCA.bed_coverage_allelic." + plot_format,
+        plotcmd = "" if plotFormat == 'None' else
+                "--plotFile " + "deepTools_qc/plotPCA/PCA.bed_coverage_allelic." + plotFormat,
         title='genes'
     shell: plotPCA_cmd

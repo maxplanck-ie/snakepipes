@@ -8,9 +8,9 @@ maindir = os.path.dirname(os.path.dirname(workflow.basedir))
 globals().update(cf.set_env_yamls())
 
 # load config file
-globals().update(cf.load_configfile(workflow.overwrite_configfile,config["verbose"]))
+globals().update(cf.load_configfile(workflow.overwrite_configfiles[0], config["verbose"]))
 # load organism-specific data, i.e. genome indices, annotation, etc.
-globals().update(cf.load_organism_data(genome,maindir,config["verbose"]))
+globals().update(cf.load_organism_data(genome, maindir, config["verbose"]))
 
 # do workflow specific stuff now
 include: os.path.join(workflow.basedir, "internals.snakefile")
@@ -27,7 +27,7 @@ if fastqc:
 
 # trimming
 if trim:
-    include: os.path.join(maindir, "shared", "rules", "TrimGalore.snakefile")
+    include: os.path.join(maindir, "shared", "rules", "trimming.snakefile")
 
 # BAM filtering
 include: os.path.join(maindir, "shared", "rules", "bam_filtering.snakefile")
@@ -56,15 +56,15 @@ if "allelic-mapping" in mode:
         bowtie2_index_allelic = 'snp_genome/bowtie2_Nmasked/Genome.1.bt2'
         if len(strains) == 1:
             allele_hybrid = 'single'
-            snp_file = "snp_genome/all_SNPs_" + strains[0] + "_" + genome + ".txt.gz"
+            SNPFile = "snp_genome/all_SNPs_" + strains[0] + "_" + genome + ".txt.gz"
         elif len(strains) == 2:
             allele_hybrid = 'dual'
-            snp_file = "snp_genome/all_" + strains[1] + "_SNPs_" + strains[0] + "_reference.based_on_" + genome + ".txt"
+            SNPFile = "snp_genome/all_" + strains[1] + "_SNPs_" + strains[0] + "_reference.based_on_" + genome + ".txt"
 
         include: os.path.join(maindir, "shared", "rules", "masked_genomeIndex.snakefile")
     elif allele_mode == 'map_only':
-        bowtie2_index_allelic = Nmasked_index
-        snp_file = SNPfile
+        bowtie2_index_allelic = NMaskedIndex
+        SNPFile = SNPfile
     ## mapping rules
     include: os.path.join(maindir, "shared", "rules", "Bowtie2_allelic.snakefile")
     ## SNPsplit
@@ -93,9 +93,9 @@ def run_Trimming(trim, fastqc):
     else:
         return([])
 
-def run_computeGCBias(gcbias):
+def run_computeGCBias(GCBias):
     file_list = []
-    if gcbias:
+    if GCBias:
         if not downsample:
             file_list = expand("deepTools_qc/computeGCBias/{sample}.filtered.GCBias.png", sample = samples)
     return(file_list)
@@ -129,7 +129,7 @@ def make_nmasked_genome():
         genome1 = "snp_genome/" + strains[0] + '_SNP_filtering_report.txt'
         file_list = [
                 genome1,
-                snp_file,
+                SNPFile,
                 bowtie2_index_allelic
                 ]
         return(file_list)
@@ -157,10 +157,10 @@ onstart:
     if "verbose" in config and config["verbose"]:
         print("--- Workflow parameters --------------------------------------------------------")
         print("samples:", samples)
-        print("paired:", paired)
+        print("paired:", pairedEnd)
         print("read extension:", reads)
         print("fastq dir:", fastq_dir)
-        print("maximum insert size (Bowtie2 -X):", insert_size_max)
+        print("maximum insert size (Bowtie2 -X):", insertSizeMax)
         print("-" * 80, "\n")
 
         print("--- Environment ----------------------------------------------------------------")
@@ -177,12 +177,12 @@ rule all:
     input:
         run_FastQC(fastqc),
         run_Trimming(trim, fastqc),
-        expand(mapping_prg+"/{sample}.bam", sample = samples),
+        expand(aligner + "/{sample}.bam", sample = samples),
         expand("Sambamba/{sample}.markdup.txt", sample = samples),
         expand("filtered_bam/{sample}.filtered.bam", sample = samples),
         expand("bamCoverage/{sample}.seq_depth_norm.bw", sample = samples),
         expand("bamCoverage/{sample}.filtered.seq_depth_norm.bw", sample = samples),
-        run_computeGCBias(gcbias),
+        run_computeGCBias(GCBias),
         run_deepTools_qc(),
         run_Qualimap(),
         make_nmasked_genome(),

@@ -24,7 +24,7 @@ The primary input requirement is a directory of paired-end fastq files. In addit
 Cell barcodes
 ~~~~~~~~~~~~~
 
-The format of the cell barcodes file is shown below. Note that the default file is included in the snakePipes source code under ``snakePipes/workflows/scRNAseq``. This file is automatically used if you leave :code:`barcode_file` empty.
+The format of the cell barcodes file is shown below. Note that the default file is included in the snakePipes source code under ``snakePipes/workflows/scRNAseq``. This file is automatically used if you leave :code:`cellBarcodeFile` empty.
 
 ::
 
@@ -49,10 +49,10 @@ The default configuration file is listed below and can be found in ``snakePipes/
 
     pipeline: scrna-seq
     outdir:
-    configfile:
-    cluster_configfile:
+    configFile:
+    clusterConfigFile:
     local: False
-    max_jobs: 5
+    maxJobs: 5
     ## directory with fastq files
     indir:
     ## preconfigured target genomes (mm9,mm10,dm3,...) , see /path/to/snakemake_workflows/shared/organisms/
@@ -66,31 +66,31 @@ The default configuration file is listed below and can be found in ``snakePipes/
     downsample:
     ## Options for trimming
     trim: False
-    trim_prg: cutadapt
-    trim_options: -a A{'30'}
+    trimmer: cutadapt
+    trimmerOptions: -a A{'30'}
     ## further options
-    filter_annotation: "-v -P 'decay|pseudogene' "
-    barcode_file:
-    barcode_pattern: "NNNNNNXXXXXX"
-    split_lib: False
-    cell_names:
-    library_type: 1
-    bw_binsize: 10
+    filterGTF: "-v -P 'decay|pseudogene' "
+    cellBarcodeFile:
+    cellBarcodePattern: "NNNNNNXXXXXX"
+    splitLib: False
+    cellNames:
+    libraryType: 1
+    bwBinSize: 10
     verbose: False
-    plot_format: pdf
+    plotFormat: pdf
     dnaContam: False
     ## Parameters for th statistical analysis
-    cell_filter_metric: gene_universe
+    cellFilterMetric: gene_universe
     #Option to skip RaceID to save time
     skipRaceID: False
 
 
-While some of these can be changed on the command line, you may find it useful to change ``barcode_pattern`` and ``barcode_file`` if you find that you need to change them frequently.
+While some of these can be changed on the command line, you may find it useful to change ``cellBarcodePattern`` and ``cellBarcodeFile`` if you find that you need to change them frequently.
 
 Barcode pattern
 ~~~~~~~~~~~~~~~
 
-The scRNA-seq pipeline requires barcodes at 5' end of read 1. The default barcode_pattern takes the first 6 bases as UMI (NNNNNN) and the following 6 bases as cell barcode (XXXXXX).
+The scRNA-seq pipeline requires barcodes at 5' end of read 1. The default cellBarcodePattern takes the first 6 bases as UMI (NNNNNN) and the following 6 bases as cell barcode (XXXXXX).
 If your read/barcode layout requires additional **'Don't care'** positions eg. before stretches of N one can indicate these with ``.``
 
 Barcode file
@@ -102,19 +102,19 @@ Only specify a file if you use other than the default CEL-seq2 barcodes.
 Trimming
 ~~~~~~~~
 
-It is recommended to use the :code:`--trim` option as this uses cutadapt to trim remaining adapters *and* poly-A tails from read 2 (see defaults for ``--trim_options``).
+It is recommended to use the :code:`--trim` option as this uses cutadapt to trim remaining adapters *and* poly-A tails from read 2 (see defaults for ``--trimmerOptions``).
 
 Pseudogene filter
 ~~~~~~~~~~~~~~~~~
 
 As default, transcripts or genes that contain that are related to biotypes like 'pseudogene' or 'decay' are filtered out before tag counting (see
-:code:`--filter_annotation` default).
+:code:`--filterGTF` default).
 Here we assume you provide eg. a gencode or ensemble annotation file (via genes_gtf in the organism configuration yaml) that contains this information.
 
 Library Type
 ~~~~~~~~~~~~
 
-The CEL-seq2 protocol produces reads where read 2 maps in sense direction (:code:`library_type: 1`). After barcodes are transferred to read 2, the workflow continues in single-end mode.
+The CEL-seq2 protocol produces reads where read 2 maps in sense direction (:code:`libraryType: 1`). After barcodes are transferred to read 2, the workflow continues in single-end mode.
 
 Split lib
 ~~~~~~~~~

@@ -69,32 +69,33 @@ There is a configuration file in ``snakePipes/workflows/ATACseq/defaults.yaml``:
 
     ## General/Snakemake parameters, only used/set by wrapper or in Snakemake cmdl, but not in Snakefile
     pipeline: ATAC-seq
-    configfile:
-    cluster_configfile:
+    configFile:
+    clusterConfigFile:
     local: false
-    max_jobs: 5
+    maxJobs: 5
     ## workingdir need to be required DNA-mapping output dir, 'outdir' is set to workingdir internally
     workingdir:
     ## preconfigured target genomes (mm9,mm10,dm3,...) , see /path/to/snakemake_workflows/shared/organisms/
     ## Value can be also path to your own genome config file!
     genome:
     ## The maximum fragment size to retain. This should typically be the size of a nucleosome
-    fragmentSize_cutoff: 150
+    maxFragmentSize: 150
+    minFragmentSize: 0
     verbose: false
     # sampleSheet_DB
     sampleSheet:
-    # window_size
-    window_size: 20
-    fragmentCount_cutoff: 1
+    # windowSize
+    windowSize: 20
+    fragmentCountThreshold: 1
     #### Flag to control the pipeline entry point
-    bam_ext: '.filtered.bam'
-    fromBam: 
+    bamExt: '.filtered.bam'
+    fromBAM: 
     ## Bin size of output files in bigWig format
-    bw_binsize: 25
-    paired: True
-    plot_format: png
+    bwBinSize: 25
+    pairedEnd: True
+    plotFormat: png
     ## Median/mean fragment length, only relevant for single-end data (default: 200)
-    fragment_length: 
+    fragmentLength: 
     trim:
     fastqc:
     qval: 0.001
@@ -104,11 +105,11 @@ There is a configuration file in ``snakePipes/workflows/ATACseq/defaults.yaml``:
     fdr: 0.05
     absBestLFC: 1
 
-Useful parameters are ``fragmentSize_cutoff`` and ``window_size``, also available from commandline.  
+Useful parameters are ``maxFragmentSize``, ``minFragmentSize`` and ``windowSize``, also available from commandline.  
 
-* **window_size**: is the size of windows to test differential binding using CSAW. The default small window size is sufficient for most analysis, since an ATAC-seq peak is sharp.
+* **windowSize**: is the size of windows to test differential binding using CSAW. The default small window size is sufficient for most analysis, since an ATAC-seq peak is sharp.
 
-* **fragmentCount_cutoff**: refers to the minimum number of counts a chromosome must have to be included in the MACS2 analysis. It is introduced to avoid errors in the peak calling step and should only be changed if MACS2 fails.
+* **fragmentCountThreshold**: refers to the minimum number of counts a chromosome must have to be included in the MACS2 analysis. It is introduced to avoid errors in the peak calling step and should only be changed if MACS2 fails.
 
 * **Qval**: a value provided to MACS2 that affects the number and width of the resulting peaks.
 

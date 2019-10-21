@@ -11,7 +11,7 @@ workflow_rscripts=os.path.join(maindir, "shared", "rscripts")
 globals().update(cf.set_env_yamls())
 
 # load config file
-globals().update(cf.load_configfile(workflow.overwrite_configfile, config["verbose"]))
+globals().update(cf.load_configfile(workflow.overwrite_configfiles[0], config["verbose"]))
 # load organism-specific data, i.e. genome indices, annotation, etc.
 globals().update(cf.load_organism_data(genome, maindir, config["verbose"]))
 
@@ -27,7 +27,7 @@ include: os.path.join(workflow.basedir, "internals.snakefile")
 # Import deeptools cmds
 include: os.path.join(maindir, "shared", "tools", "deeptools_cmds.snakefile")
 
-if fromBam:
+if fromBAM:
     include: os.path.join(maindir, "shared", "rules", "LinkBam.snakefile")
     include: os.path.join(maindir, "shared", "rules", "deepTools_qc.snakefile")
 
@@ -51,12 +51,16 @@ else:
 # CSAW for differential binding (if sampleinfo specified)
 # needs a "ChIP-sample" variable, here all samples are ChIP-Samples
 chip_samples = samples
-paired = True
-#fragment_length = cf.get_fragment_length("deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv", chip_samples[0])
+pairedEnd = True
 if sampleSheet:
     include: os.path.join(maindir, "shared", "rules", "CSAW.snakefile")
     include: os.path.join(maindir, "shared", "rules", "nearestGene.snakefile")
-    include: os.path.join(maindir, "shared", "rules", "filter_annotation.snakefile")
+    include: os.path.join(maindir, "shared", "rules", "filterGTF.snakefile")
+    if not fromBAM:
+        # These are needed for the snakefile to be imported
+        aligner = "Bowtie2"
+        downsample = False
+        include: os.path.join(maindir, "shared", "rules", "deepTools_qc.snakefile")
 
 ## add outputs as asked
 def run_deepTools_allelic():
@@ -76,9 +80,9 @@ def run_CSAW():
     else:
         return([])
 
-def run_deepTools_qc(fromBam):
+def run_deepTools_qc(fromBAM):
     file_list = []
-    if fromBam:
+    if fromBAM:
         file_list = ["deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv"]
         file_list.append([expand("bamCoverage/{sample}.filtered.seq_depth_norm.bw", sample = samples)])
         if len(samples) <= 20:
@@ -116,19 +120,11 @@ onstart:
         print("Gene annotation BED:", genes_bed)
         print("Gene annotation GTF:", genes_gtf)
         print("Blacklist regions BED:", blacklist_bed)
-        print("Ignore for normalization (bigwigs):", ignore_forNorm)
+        print("Ignore for normalization (bigwigs):", ignoreForNormalization)
         print("-" * 80, "\n")
 
 ### main rule ##################################################################
 ################################################################################
-#print(expand(os.path.join(outdir_MACS2, "{sample}"), sample = samples))
-if sampleSheet:
-    localrules:
-        CSAW_report,
-        filterMetricsToHtml
-else:
-    localrules:
-        filterMetricsToHtml
 rule all:
     input:
         #expand(os.path.join(outdir_MACS2, "{sample}.short.bam"), sample = samples),
@@ -140,7 +136,7 @@ rule all:
         ## run csaw if asked for
         run_CSAW(),
         expand("deepTools_ATAC/bamCompare/{sample}.filtered.bw",sample=samples),
-        run_deepTools_qc(fromBam),
+        run_deepTools_qc(fromBAM),
         expand(os.path.join(outdir_MACS2, "{sample}.short.cleaned.bam"),sample=samples),
         expand(os.path.join(outdir_MACS2, "{sample}.short.cleaned.bam.bai"),sample=samples),
         "Filtering_metrics/Filtering_report.html"
@@ -150,8 +146,8 @@ rule all:
 onsuccess:
     cf.cleanLogs(workingdir, cluster_config)
     if "verbose" in config and config["verbose"]:
-        print("\n--- ATAC OpenChrom workflow finished successfully! --------------------------------\n")
+        print("\n--- The ATAC-seq open chromatin workflow finished successfully! --------------------------------\n")
         
 onerror:
-    print("\n !!! ERROR in ATAC OpenChrom workflow! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
+    print("\n !!! ERROR in the ATAC-seq open chromatin workflow! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
 

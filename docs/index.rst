@@ -1,7 +1,7 @@
 snakePipes
 ==========
 
-.. image:: content/images/snakePipes.png
+.. image:: content/images/snakePipes_small.png
    :scale: 20 %
    :height: 200px
    :width: 200 px
@@ -23,6 +23,7 @@ Pipeline                            Description
 :ref:`RNA-Seq`                  RNA-Seq workflow : From mapping to differential expression using DEseq2
 :ref:`scRNA-Seq`                Single-cell RNA-Seq (CEL-Seq2) workflow : From mapping to differential expression
 :ref:`WGBS`                     Whole-genome Bisulfite-Seq analysis workflow, from mapping to DMR calling and differential methylation analysis
+:ref:`preprocessing`            Merging technical replicates (e.g., across lanes), removing optical duplicates, running FastQC
 =============================== ===============================================================================================================
 
 Quick start
@@ -66,7 +67,9 @@ Citation
 If you adopt/run snakePipes for your analysis, cite it as follows :
 
 Bhardwaj V, Heyne S, Sikora K, Rabbani L, Rauer M, Kilpert F, Richter AS, Ryan DP, Manke T. **snakePipes: facilitating flexible, scalable and integrative epigenomic analysis.** Bioinformatics. 2019 May 27. pii: btz436. doi:
+
 10.1093/bioinformatics/btz436. [Epub ahead of print] PubMed PMID: 31134269. https://www.ncbi.nlm.nih.gov/pubmed/31134269
+
 
 .. image:: content/images/logo_mpi-ie.jpg
 
@@ -96,6 +99,7 @@ Contents:
    content/workflows/ChIP-seq.rst
    content/workflows/ATAC-seq.rst
    content/workflows/HiC.rst
+   content/workflows/preprocessing.rst
    content/workflows/RNA-seq.rst
    content/workflows/scRNA-seq.rst
    content/workflows/WGBS.rst

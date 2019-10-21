@@ -113,26 +113,26 @@ Configuration file
 There is a configuration file in ``snakePipes/workflows/ChIP-seq/defaults.yaml``::
 
     pipeline: chip-seq
-    configfile:
-    cluster_configfile:
+    configFile:
+    clusterConfigFile:
     local: false
-    max_jobs: 5
+    maxJobs: 5
     ## workingdir need to be required DNA-mapping output dir, 'outdir' is set to workingdir internally
     workingdir:
     ## preconfigured target genomes (mm9,mm10,dm3,...) , see /path/to/snakemake_workflows/shared/organisms/
     ## Value can be also path to your own genome config file!
     genome:
     ## paired end data?
-    paired: true
+    pairedEnd: true
     ## Bin size of output files in bigWig format
-    bw_binsize: 25
+    bwBinSize: 25
     ## Median/mean fragment length, only relevant for single-end data (default: 200)
-    fragment_length: 200
+    fragmentLength: 200
     verbose: false
     # sampleInfo_DB
     sample_info:
-    # window_size
-    window_size: 150
+    # windowSize
+    windowSize: 150
     plot_format: png
     ##dummy string to skip filtering annotation
     filter_annotation:
@@ -140,7 +140,7 @@ There is a configuration file in ``snakePipes/workflows/ChIP-seq/defaults.yaml``
     fdr: 0.05
     absBestLFC: 1
 
-The only parameters that are useful to change are ``bw_binsize``, ``fragment_length``, and ``window_size``. Note however that those can be more conveniently changed on the command line.
+The only parameters that are useful to change are ``bwBinSize``, ``fragmentLength``, and ``windowSize``. Note however that those can be more conveniently changed on the command line.
 
 Understanding the outputs
 ---------------------------

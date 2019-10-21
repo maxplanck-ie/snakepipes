@@ -1,4 +1,4 @@
-snakemake >= 5.2.3
+snakemake >= 5.7.0
 psutil
 pandas
 fuzzywuzzy
