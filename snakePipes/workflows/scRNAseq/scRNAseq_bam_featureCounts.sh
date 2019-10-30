@@ -22,12 +22,13 @@ gtf_path=$(realpath $gtf)
 bam_path=$(realpath $bam)
 tmp_path=$(realpath $tmp)
 
-mkdir -p $tmp_path 1>&2 
-tmp_dir=$(mktemp -d --tmpdir=$tmp_path)
+#mkdir -p $tmp_path 1>&2 
+#tmp_dir=$(mktemp -d --tmpdir=$tmp_path)
+tmp_dir=$tmp_path
 
 ## call featureCounts
-(>&2 echo "featureCounts -a $gtf_path -T $threads -s $lib_type -R CORE -F "GTF" --tmpDir ${tmp_dir} -o ${tmp_dir}/_tmp_$sample_name $bam_path 1>&2")
-featureCounts -a $gtf_path -T $threads -s $lib_type -R CORE -F "GTF" --tmpDir ${tmp_dir} -o ${tmp_dir}/_tmp_$sample_name $bam_path 1>&2
+(>&2 echo "featureCounts -a $gtf_path -T $threads -s $lib_type -R CORE -F "GTF" --tmpDir ${tmp_dir} -o ${tmp_dir}/$sample_name $bam_path 1>&2")
+featureCounts -a $gtf_path -T $threads -s $lib_type -R CORE -F "GTF" --tmpDir ${tmp_dir} -o ${tmp_dir}/$sample_name $bam_path 1>&2
 
 ## add gene_id (gtf col 10), gene_name (gtf col 18) to featureCounts output, last col is gene_name + chromosome
 ## <(cat $gtf_path | tr " " "\t" | tr -d "\";" | awk '{print $10,$18,$18"__chr"$1}') \
