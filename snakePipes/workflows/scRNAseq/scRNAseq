@@ -27,7 +27,8 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          "cellBarcodeFile": None, "splitLib": False,
                          "cellBarcodePattern": "NNNNNNXXXXXX", "bwBinSize": 10,
                          "plotFormat": "png", "skipRaceID": False,
-                         "cellFilterMetric": "gene_universe"}):
+                         "cellFilterMetric": "gene_universe",
+			 "mode": "STARsolo"}):
     """
     Parse arguments from the command line.
     """
@@ -43,6 +44,14 @@ def parse_args(defaults={"verbose": False, "configFile": None,
 
     # Workflow options
     optional = parser.add_argument_group('Options')
+
+    optional.add_argument("--mode",
+                          dest="mode",
+                          metavar="STR",
+                          help="Analysis mode.",
+			  choices=['Gruen', 'STARsolo'],
+                          type=str,
+                          default=defaults["mode"])
 
     optional.add_argument("--downsample",
                           dest="downsample",
