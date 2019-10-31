@@ -143,7 +143,7 @@ if mode=="Gruen":
 elif mode=="STARsolo":
     rule all:
         input:
-            placeholder
+            expand("STARsolo/{sample}.sorted.bam",sample = samples)
 
 ### execute after workflow finished ############################################
 ################################################################################

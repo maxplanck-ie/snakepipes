@@ -4,6 +4,7 @@ channels:
  - bioconda
 dependencies:
  - umi_tools = 0.5.5
+ - samtools = 1.9
  - star = 2.7.3a
  - r-stringr = 1.4.0
  - bioconductor-monocle = 2.10.0
