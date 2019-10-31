@@ -34,13 +34,7 @@ if not fromBAM:
 else:
     bamFiles = sorted(glob.glob(os.path.join(str(fromBAM or ''), '*' + bamExt)))
     bamSamples = cf.get_sample_names_bam(bamFiles, bamExt)
-    
-    
     bamDict = dict.fromkeys(bamSamples)
-    
-    print(bamFiles)
-    print(bamSamples)
-    
     aligner = "EXTERNAL_BAM"
     indir = fromBAM
     samples = bamSamples

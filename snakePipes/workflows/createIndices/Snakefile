@@ -8,7 +8,7 @@ maindir = os.path.dirname(os.path.dirname(workflow.basedir))
 globals().update(cf.set_env_yamls())
 
 # load config file
-globals().update(cf.load_configfile(workflow.overwrite_configfile, config["verbose"]))
+globals().update(cf.load_configfile(workflow.overwrite_configfiles[0], config["verbose"]))
 
 ### include modules of other snakefiles ########################################
 ################################################################################
@@ -127,10 +127,10 @@ onsuccess:
     organismDictionary['genome_size'] = int(f.read().strip())
     f.close()
     if not userYAML:
-        yamlPath = os.path.join(maindir, "shared", "organisms", "{}.yaml".format(genome))
-        cf.write_configfile(os.path.join(maindir, "shared", "organisms", "{}.yaml".format(genome)), organismDictionary)
+        yamlPath = os.path.join(maindir, organismsDir, "{}.yaml".format(genome))
     else:
         yamlPath = os.path.join(outdir, "{}.yaml".format(genome))
+    print("Storing the organism YAML file in {}".format(yamlPath))
     cf.write_configfile(yamlPath, organismDictionary)
     if "verbose" in config and config["verbose"]:
         print("\n--- index creation workflow finished successfully! --------------------------------\n")

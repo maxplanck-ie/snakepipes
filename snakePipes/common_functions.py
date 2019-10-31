@@ -27,6 +27,7 @@ def set_env_yamls():
             'CONDA_HIC_ENV': 'envs/hic.yaml',
             'CONDA_WGBS_ENV': 'envs/wgbs.yaml',
             'CONDA_RMD_ENV': 'envs/rmarkdown.yaml',
+            'CONDA_PREPROCESSING_ENV': 'envs/preprocessing.yaml',
             'CONDA_SAMBAMBA_ENV': 'envs/sambamba.yaml'}
 
 
@@ -48,15 +49,15 @@ def sanity_dict_clean(myDict):
     return myDict
 
 
-def load_configfile(configFile, verbose, info='Config'):
-    with open(configFile, "r") as f:
+def load_configfile(configFiles, verbose, info='Config'):
+    with open(configFiles, "r") as f:
         config = yaml.load(f, Loader=yaml.FullLoader)
 
     config = sanity_dict_clean(config)
 
     if verbose:
         print("\n--- " + info + " ---------------------------------------------------------------------")
-        print("config file: {}".format(configFile))
+        print("config file: {}".format(configFiles))
         for k, v in sorted(config.items()):
             print("{}: {}".format(k, v))
         print("-" * 80, "\n")
@@ -81,8 +82,13 @@ def config_diff(dict1, dict2):
 
 
 def load_organism_data(genome, maindir, verbose):
-    if os.path.isfile(os.path.join(maindir, "shared", "organisms", genome + ".yaml")):
-        organism = load_configfile(os.path.join(maindir, "shared", "organisms", genome + ".yaml"), verbose, "Genome")
+    # Load the global config file, which dictates where the organisms should be found
+    cfg = load_configfile(os.path.join(maindir, "shared", "defaults.yaml"), False, "defaults")
+
+    if os.path.isfile(os.path.join(maindir, cfg['organismsDir'], genome + ".yaml")):
+        organism = load_configfile(os.path.join(maindir, cfg['organismsDir'], genome + ".yaml"), verbose, "Genome")
+    elif os.path.isfile(os.path.join(cfg['organismsDir'], genome + ".yaml")):
+        organism = load_configfile(os.path.join(cfg['organismsDir'], genome + ".yaml"), verbose, "Genome")
     elif os.path.isfile(genome):
         organism = load_configfile(genome, verbose, "Genome (user)")
     else:
@@ -321,7 +327,7 @@ def sendEmail(args, returnCode):
         pass
 
 
-def checkCommonArguments(args, baseDir, outDir=False, createIndices=False):
+def checkCommonArguments(args, baseDir, outDir=False, createIndices=False, preprocessing=False):
     """
     Check the wrapper arguments
 
@@ -356,10 +362,10 @@ def checkCommonArguments(args, baseDir, outDir=False, createIndices=False):
                     sys.exit("\nError! Working-dir (-d) dir not found! ({})\n".format(args.workingdir))
             args.outdir = args.workingdir
     # 2. Sample info file
-    if 'sampleSheet' in args and args.sampleSheet:
+    if 'sampleSheet' in args and args.sampleSheet and not preprocessing:
         args.sampleSheet = check_sample_info_header(args.sampleSheet)
     # 3. get abspath from user provided genome/organism file
-    if not createIndices:
+    if not createIndices and not preprocessing:
         if not os.path.isfile(os.path.join(baseDir, "shared/organisms/{}.yaml".format(args.genome))) and os.path.isfile(args.genome):
             args.genome = os.path.abspath(args.genome)
 
@@ -390,7 +396,11 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
     write_configfile(os.path.join(args.outdir, '{}.config.yaml'.format(workflowName)), config)
 
     # merge cluster config files: 1) global one, 2) workflow specific one, 3) user provided one
-    cluster_config = load_configfile(os.path.join(baseDir, "shared/cluster.yaml"), False)
+    cfg = load_configfile(os.path.join(baseDir, "shared", "defaults.yaml"), False, "defaults")
+    if os.path.isfile(os.path.join(baseDir, cfg['clusterConfig'])):
+        cluster_config = load_configfile(os.path.join(baseDir, cfg['clusterConfig']), False)
+    else:
+        cluster_config = load_configfile(os.path.join(cfg['clusterConfig']), False)
     cluster_config = merge_dicts(cluster_config, load_configfile(os.path.join(workflowDir, "cluster.yaml"), False), )
 
     if args.clusterConfigFile:
@@ -409,24 +419,29 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
     write_configfile(os.path.join(args.outdir, '{}.cluster_config.yaml'.format(workflowName)), cluster_config)
 
     # Save the organism YAML file as {PIPELINE}_organism.yaml
-    orgyaml = os.path.join(baseDir, "shared/organisms/{}.yaml".format(args.genome))
-    if not os.path.isfile(orgyaml):
-        orgyaml = args.genome
-    organismYAMLname = os.path.join(args.outdir, "{}_organism.yaml".format(workflowName))
-    if workflowName != "createIndices" and os.path.abspath(organismYAMLname) != os.path.abspath(orgyaml):
-        shutil.copyfile(orgyaml, organismYAMLname)
+    if workflowName != "preprocessing":
+        orgyaml = os.path.join(baseDir, cfg['organismsDir'], "{}.yaml".format(args.genome))
+        if not os.path.isfile(orgyaml):
+            if os.path.isfile(os.path.join(cfg['organismsDir'], "{}.yaml".format(args.genome))):
+                orgyaml = os.path.join(cfg['organismsDir'], "{}.yaml".format(args.genome))
+            else:
+                orgyaml = args.genome
+        organismYAMLname = os.path.join(args.outdir, "{}_organism.yaml".format(workflowName))
+        if workflowName != "createIndices" and os.path.abspath(organismYAMLname) != os.path.abspath(orgyaml):
+            shutil.copyfile(orgyaml, organismYAMLname)
 
     if args.keepTemp:
         args.snakemakeOptions += " --notemp"
 
     snakemake_cmd = """
-                    PYTHONNOUSERSITE=True {snakemake} {snakemakeOptions} --latency-wait {latency_wait} --snakefile {snakefile} --jobs {maxJobs} --directory {workingdir} --configfile {configFile} --keep-going
+                    TMPDIR={tempDir} PYTHONNOUSERSITE=True {snakemake} {snakemakeOptions} --latency-wait {latency_wait} --snakefile {snakefile} --jobs {maxJobs} --directory {workingdir} --configfile {configFile} --keep-going
                     """.format(snakemake=os.path.join(snakemake_path, "snakemake"),
                                latency_wait=cluster_config["snakemake_latency_wait"],
                                snakefile=os.path.join(workflowDir, "Snakefile"),
                                maxJobs=args.maxJobs,
                                workingdir=args.workingdir,
                                snakemakeOptions=str(args.snakemakeOptions or ''),
+                               tempDir=cfg["tempDir"],
                                configFile=os.path.join(args.outdir, '{}.config.yaml'.format(workflowName))).split()
 
     # Produce the DAG if desired
@@ -434,10 +449,8 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
         oldVerbose = config['verbose']
         config['verbose'] = False
         write_configfile(os.path.join(args.outdir, '{}.config.yaml'.format(workflowName)), config)
-        DAGproc = subprocess.Popen(snakemake_cmd + ['--rulegraph'], stdout=subprocess.PIPE, shell=True)
-        _ = open("{}/{}_pipeline.pdf".format(args.outdir, workflowName), "wb")
-        subprocess.check_call(["dot", "-Tpdf"], stdin=DAGproc.stdout, stdout=_)
-        _.close()
+        DAGproc = subprocess.Popen(" ".join(snakemake_cmd + ["--rulegraph"]), stdout=subprocess.PIPE, shell=True)
+        subprocess.check_call("dot -Tpdf -o{}/{}_pipeline.pdf".format(args.outdir, workflowName), stdin=DAGproc.stdout, shell=True)
         config['verbose'] = oldVerbose
         write_configfile(os.path.join(args.outdir, '{}.config.yaml'.format(workflowName)), config)
 
@@ -506,6 +519,10 @@ def runAndCleanup(args, cmd, logfile_name):
         if args.emailAddress:
             sendEmail(args, p.returncode)
         sys.exit(p.returncode)
+    else:
+        if os.path.exists(os.path.join(args.outdir, ".snakemake")):
+            import shutil
+            shutil.rmtree(os.path.join(args.outdir, ".snakemake"), ignore_errors=True)
 
     # Send email if desired
     if args.emailAddress:

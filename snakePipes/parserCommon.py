@@ -13,7 +13,7 @@ def ListGenomes():
     return genomes
 
 
-def mainArguments(defaults, workingDir=False, createIndices=False):
+def mainArguments(defaults, workingDir=False, createIndices=False, preprocessing=False):
     """
     Return a parser with the general and required args. This will include EITHER
     a -d option OR -i and -o, depending on the workingDir setting
@@ -35,7 +35,7 @@ def mainArguments(defaults, workingDir=False, createIndices=False):
 
     parser = argparse.ArgumentParser(add_help=False)
 
-    if not createIndices:
+    if not createIndices and not preprocessing:
         genomes = ListGenomes()
         parser.add_argument("genome", metavar="GENOME", help="Genome acronym of the target organism. Either a yaml file or one of: {}".format(", ".join(genomes)))
 
@@ -73,6 +73,7 @@ def mainArguments(defaults, workingDir=False, createIndices=False):
                              default=defaults["ext"])
 
         general.add_argument("--reads",
+                             nargs=2,
                              help="Suffix used to denote reads 1 and 2 for paired-end data. This should typically be either '_1' '_2' or '_R1' '_R2' (default: '%(default)s). "
                              "Note that you should NOT separate the values by a comma (use a space) or enclose them in brackets.",
                              default=defaults["reads"])
@@ -83,7 +84,7 @@ def mainArguments(defaults, workingDir=False, createIndices=False):
 
     general.add_argument("--clusterConfigFile",
                          help="configuration file for cluster usage. In absence, the default options "
-                         "from shared/cluster.yaml and workflows/[workflow]/cluster.yaml would be selected (default: '%(default)s')",
+                         "specified in defaults.yaml and workflows/[workflow]/cluster.yaml would be selected (default: '%(default)s')",
                          default=defaults["clusterConfigFile"])
 
     general.add_argument("-j", "--jobs",
@@ -173,36 +174,38 @@ def snpArguments(defaults):
 
 
 # DNA-mapping options added
-def commonOptions(grp, defaults, bw=True, plots=True):
+def commonOptions(grp, defaults, bw=True, plots=True, preprocessing=False):
     """
     Common options found in many workflows
     grp is an argument group that's simply appended to
     """
-    grp.add_argument("--downsample",
-                     dest="downsample",
-                     metavar="INT",
-                     help="Downsample the given number of reads randomly from of each FASTQ file (default: '%(default)s')",
-                     type=int,
-                     default=defaults["downsample"])
 
-    grp.add_argument("--trim",
-                     dest="trim",
-                     action="store_true",
-                     help="Activate fastq read trimming. If activated, Illumina adaptors are trimmed by default. "
-                     "Additional parameters can be specified under --trimmerOptions. (default: '%(default)s')",
-                     default=defaults["trim"])
+    if not preprocessing:
+        grp.add_argument("--downsample",
+                         dest="downsample",
+                         metavar="INT",
+                         help="Downsample the given number of reads randomly from of each FASTQ file (default: '%(default)s')",
+                         type=int,
+                         default=defaults["downsample"])
 
-    grp.add_argument("--trimmer",
-                     dest="trimmer",
-                     choices=['cutadapt', 'trimgalore', 'fastp'],
-                     help="Trimming program to use: Cutadapt, TrimGalore, or fastp. Note that if you change this you may "
-                     "need to change --trimmerOptions to match! (default: '%(default)s')",
-                     default=defaults["trimmer"])
+        grp.add_argument("--trim",
+                         dest="trim",
+                         action="store_true",
+                         help="Activate fastq read trimming. If activated, Illumina adaptors are trimmed by default. "
+                         "Additional parameters can be specified under --trimmerOptions. (default: '%(default)s')",
+                         default=defaults["trim"])
 
-    grp.add_argument("--trimmerOptions",
-                     dest="trimmerOptions",
-                     help="Additional option string for trimming program of choice. (default: '%(default)s')",
-                     default=defaults["trimmerOptions"])
+        grp.add_argument("--trimmer",
+                         dest="trimmer",
+                         choices=['cutadapt', 'trimgalore', 'fastp'],
+                         help="Trimming program to use: Cutadapt, TrimGalore, or fastp. Note that if you change this you may "
+                         "need to change --trimmerOptions to match! (default: '%(default)s')",
+                         default=defaults["trimmer"])
+
+        grp.add_argument("--trimmerOptions",
+                         dest="trimmerOptions",
+                         help="Additional option string for trimming program of choice. (default: '%(default)s')",
+                         default=defaults["trimmerOptions"])
 
     grp.add_argument("--fastqc",
                      dest="fastqc",
@@ -222,31 +225,32 @@ def commonOptions(grp, defaults, bw=True, plots=True):
                      "(default: '%(default)s')",
                      default=defaults["bcPattern"])
 
-    grp.add_argument("--UMIDedup",
-                     action="store_true",
-                     help="Deduplicate bam file based on UMIs via `umi_tools dedup` that are present in the read name. "
-                     "(default: '%(default)s')",
-                     default=defaults["UMIDedup"])
+    if not preprocessing:
+        grp.add_argument("--UMIDedup",
+                         action="store_true",
+                         help="Deduplicate bam file based on UMIs via `umi_tools dedup` that are present in the read name. "
+                         "(default: '%(default)s')",
+                         default=defaults["UMIDedup"])
 
-    grp.add_argument("--UMIDedupSep",
-                     help="umi separation character "
-                     "that will be passed to umi_tools."
-                     "(default: '%(default)s')",
-                     default=defaults["UMIDedupSep"])
+        grp.add_argument("--UMIDedupSep",
+                         help="umi separation character "
+                         "that will be passed to umi_tools."
+                         "(default: '%(default)s')",
+                         default=defaults["UMIDedupSep"])
 
-    grp.add_argument("--UMIDedupOpts",
-                     help="Additional options that will be passed to umi_tools."
-                     "(default: '%(default)s')",
-                     default=defaults["UMIDedupOpts"])
+        grp.add_argument("--UMIDedupOpts",
+                         help="Additional options that will be passed to umi_tools."
+                         "(default: '%(default)s')",
+                         default=defaults["UMIDedupOpts"])
 
-    if bw:
+    if bw and not preprocessing:
         grp.add_argument("--bwBinSize",
                          dest="bwBinSize",
                          help="Bin size of output files in bigWig format (default: '%(default)s')",
                          type=int,
                          default=defaults["bwBinSize"])
 
-    if plots:
+    if plots and not preprocessing:
         grp.add_argument("--plotFormat",
                          choices=['png', 'pdf', 'None'],
                          metavar="STR",

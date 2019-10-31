@@ -37,6 +37,7 @@ All files needed to be modified in order to extend/modify a workflow, are availa
         ├── createIndices
         ├── DNA-mapping
         ├── HiC
+        ├── preprocessing
         ├── RNA-seq
         ├── scRNAseq
         └──WGBS

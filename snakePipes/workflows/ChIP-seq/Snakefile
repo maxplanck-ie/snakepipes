@@ -11,7 +11,7 @@ workflow_rscripts=os.path.join(maindir, "shared", "rscripts")
 globals().update(cf.set_env_yamls())
 
 # load config file
-globals().update(cf.load_configfile(workflow.overwrite_configfile, config["verbose"]))
+globals().update(cf.load_configfile(workflow.overwrite_configfiles[0], config["verbose"]))
 # load organism-specific data, i.e. genome indices, annotation, etc.
 globals().update(cf.load_organism_data(genome, maindir, config["verbose"]))
 
@@ -55,6 +55,11 @@ if sampleSheet:
     include: os.path.join(maindir, "shared", "rules", "CSAW.snakefile")
     include: os.path.join(maindir, "shared", "rules", "nearestGene.snakefile")
     include: os.path.join(maindir, "shared", "rules", "filterGTF.snakefile")
+    if not fromBAM:
+        # These are needed for the snakefile to be imported
+        aligner = "Bowtie2"
+        downsample = False
+        include: os.path.join(maindir, "shared", "rules", "deepTools_qc.snakefile")
 
 def run_histoneHMM(allele_info):
     if allele_info == 'FALSE':
@@ -149,10 +154,6 @@ onstart:
 
 ### main rule ##################################################################
 ################################################################################
-if sampleSheet:
-    localrules:
-        CSAW_report
-
 rule all:
     input:
     	run_deepTools_qc(fromBAM),

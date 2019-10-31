@@ -4,13 +4,6 @@ date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: 
     html_document:
         fig_caption: yes
-params:
-    outdir: "Stats_reports"
-    output_file: "Stats_reports/Stats_report.html"
-    sample_sheet: "dummy_sample_sheet"
-    fdr: 0.05
-    lfc: 1
-    pipeline: ChIP-seq
 title: "`r paste0('CSAW differential binding stats report')`"
 ---
 
@@ -18,20 +11,19 @@ title: "`r paste0('CSAW differential binding stats report')`"
 .libPaths(R.home("library"))
 
 knitr::opts_chunk$set(echo = FALSE)
-
 ```
 
 
 ### Overview
 
-This report summarizes statistical analysis of binding events using group information provided in sample sheet `r params$sample_sheet`. 
+This report summarizes statistical analysis of binding events using group information provided in sample sheet `r snakemake@params[["sample_sheet"]]`. 
 
 ### Analysis input
 
 ```{r data_load}
-DBdata<-file.path(params$outdir,"DiffBinding_analysis.Rdata")
-library(GenomicRanges,quietly=TRUE)
-library(csaw,quietly=TRUE)
+DBdata<-file.path(snakemake@params[["outdir"]], "DiffBinding_analysis.Rdata")
+suppressMessages(require(GenomicRanges))
+suppressMessages(require(csaw))
 load(DBdata)
 ```
 
@@ -52,20 +44,20 @@ The absolute log fold change of the window with the smallest p value belonging t
 ### Filtering of results
 
 ```{r filter_results}
-merged<-chip_results$mergedRegions
-tabcom<-chip_results$combinedPvalues
-merged$region$score <- -10*log10(tabcom$FDR)
+merged <- chip_results$mergedRegions
+tabcom <- chip_results$combinedPvalues
+merged$region$score <- -10 * log10(tabcom$FDR)
 names(merged$region) <- paste0("region", 1:length(merged$region))
 tabcom$name <- names(merged$region)
-tabx<-as.data.frame(merged$region,stringsAsFactors=FALSE)
-tabx$name<-rownames(tabx)
-full_res<-as.data.frame(merge(x=tabx,y=tabcom,by.x="name",by.y="name"),stringsAsFactors=FALSE)
-fdrcutoff<-as.numeric(params$fdr)
-lfccutoff<-as.numeric(params$lfc)
-full_res.filt<-subset(full_res,(FDR<=fdrcutoff)&(abs(best.logFC)>=lfccutoff))
+tabx <- as.data.frame(merged$region, stringsAsFactors=FALSE)
+tabx$name <- rownames(tabx)
+full_res <- as.data.frame(merge(x=tabx, y=tabcom, by.x="name", by.y="name"), stringsAsFactors=FALSE)
+fdrcutoff <- as.numeric(snakemake@params[["fdr"]])
+lfccutoff <- as.numeric(snakemake@params[["lfc"]])
+full_res.filt <- subset(full_res, (FDR<=fdrcutoff) & (abs(best.logFC) >= lfccutoff))
 ```
 
-Applying FDR threshold of `r params$fdr` and absolute (best) log fold change threshold of `r params$lfc` resulted in a final list of `r nrow(full_res.filt)` merged regions.   
+Applying FDR threshold of `r snakemake@params[["fdr"]]` and absolute (best) log fold change threshold of `r snakemake@params[["lfc"]]` resulted in a final list of `r nrow(full_res.filt)` merged regions.   
 Numbers of regions showing different direction change were as follows:
 
 ```{r direction_list}
@@ -79,20 +71,19 @@ Deeptools matrices were computed for the filtered lists of merged regions showin
 Heatmaps obtained using log2 ratio of ChIP signal over input were as follows:
 
 ```{r plot_l2r,fig.show='hold',fig.align='center', out.width ='40%',out.height='30%',fig.cap="UP and DOWN regions using log2 ratio."}
-if(!params$pipeline %in% "chip-seq"){message("ChIP signal enrichment over input is only available for ChIP-seq workflow!")}else{
-    knitr::include_graphics(c(file.path(params$outdir,"CSAW.UP.log2r.heatmap.png"),file.path(params$outdir,"CSAW.DOWN.log2r.heatmap.png")))
-    }
-
+if(!snakemake@params[["pipeline"]] %in% "chip-seq"){
+    message("ChIP signal enrichment over input is only available for ChIP-seq workflow!")
+}else{
+    knitr::include_graphics(c(file.path(snakemake@params[["outdir"]], "CSAW.UP.log2r.heatmap.png"),
+                              file.path(snakemake@params[["outdir"]], "CSAW.DOWN.log2r.heatmap.png")))
+}
 ```
 
 Heatmaps obtained using depth-normalized coverage were as follows:
 
-
 ```{r plot_cov, fig.show='hold',fig.align='center', out.width ='40%',out.height='30%',fig.cap="UP and DOWN regions using coverage."}
-knitr::include_graphics(c(file.path(params$outdir,"CSAW.UP.cov.heatmap.png"),file.path(params$outdir,"CSAW.DOWN.cov.heatmap.png")))
+knitr::include_graphics(c(file.path(snakemake@params[["outdir"]], "CSAW.UP.cov.heatmap.png"),
+                          file.path(snakemake@params[["outdir"]], "CSAW.DOWN.cov.heatmap.png")))
 ```
 
-Tables with differentially bound regions annotated with distance to nearest gene can be found in folder `r paste0("AnnotatedResults_",gsub("\\.[a-z]{3}$","",basename(params$sample_sheet)))`.   
-
-
-  
+Tables with differentially bound regions annotated with distance to nearest gene can be found in folder `r paste0("AnnotatedResults_", gsub("\\.[a-zA-Z]{3}$", "", basename(snakemake@params[["sampleSheet"]])))`.

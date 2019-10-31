@@ -154,20 +154,34 @@ rule compute_thresholds:
 
 
 ## Correct matrices
-rule correct_matrix:
-    input:
-        matrix= "HiC_matrices/{sample}_"+matrixFile_suffix+matrix_format,
-        correct = "HiC_matrices_corrected/logs/thresholds_{sample}_"+matrixFile_suffix+".out"
-    output:
-        "HiC_matrices_corrected/{sample}_"+matrixFile_suffix+".corrected"+matrix_format
-    params:
-        chr = lambda wildcards: " --chromosomes " + chromosomes if chromosomes else ""
-    conda: CONDA_HIC_ENV
-    shell:
-        "thresholds=$(cat \"{input.correct}\");"
-        "hicCorrectMatrix correct --filterThreshold $thresholds"
-        " {params.chr} -m {input.matrix} -o {output} >> {input.correct}"
-
+if correctionMethod == 'ICE':
+    rule correct_matrix:
+        input:
+            matrix= "HiC_matrices/{sample}_"+matrixFile_suffix+matrix_format,
+            correct = "HiC_matrices_corrected/logs/thresholds_{sample}_"+matrixFile_suffix+".out"
+        output:
+            "HiC_matrices_corrected/{sample}_"+matrixFile_suffix+".corrected"+matrix_format
+        params:
+            chr = lambda wildcards: " --chromosomes " + chromosomes if chromosomes else ""
+        conda: CONDA_HIC_ENV
+        shell:
+            "thresholds=$(cat \"{input.correct}\");"
+            "hicCorrectMatrix correct --correctionMethod ICE --filterThreshold $thresholds"
+            " {params.chr} -m {input.matrix} -o {output} >> {input.correct}"
+else:
+     rule correct_matrix:
+         input:
+             matrix = "HiC_matrices/{sample}_"+matrixFile_suffix+matrix_format
+         output:
+             "HiC_matrices_corrected/{sample}_"+matrixFile_suffix+".corrected"+matrix_format
+         params:
+             chr = lambda wildcards: " --chromosomes " + chromosomes if chromosomes else ""
+         log:
+             out = "HiC_matrices_corrected/logs/{sample}_correctoMatrix.out"
+         conda: CONDA_HIC_ENV
+         shell:
+             "hicCorrectMatrix correct --correctionMethod KR "
+             " {params.chr} -m {input.matrix} -o {output} > {log.out}"
 
 ## Call TADs
 rule call_tads:
