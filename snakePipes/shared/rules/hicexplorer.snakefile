@@ -154,7 +154,7 @@ rule compute_thresholds:
 
 
 ## Correct matrices
-if correctionMethod is 'ICE':
+if correctionMethod == 'ICE':
     rule correct_matrix:
         input:
             matrix= "HiC_matrices/{sample}_"+matrixFile_suffix+matrix_format,
@@ -170,19 +170,19 @@ if correctionMethod is 'ICE':
             " {params.chr} -m {input.matrix} -o {output} >> {input.correct}"
 
 else:
-    rule correct_matrix:
-        input:
-            matrix = "HiC_matrices/{sample}_"+matrixFile_suffix+matrix_format
-        output:
-            "HiC_matrices_corrected/{sample}_"+matrixFile_suffix+".corrected"+matrix_format
-        params:
-            chr = lambda wildcards: " --chromosomes " + chromosomes if chromosomes else ""
-        log:
-            out = "HiC_matrices_corrected/logs/{sample}_correctoMatrix.out"
-        conda: CONDA_HIC_ENV
-        shell:
-            "hicCorrectMatrix correct --correctionMethod KR "
-            " {params.chr} -m {input.matrix} -o {output} > {log.out}"
+     rule correct_matrix:
+         input:
+             matrix = "HiC_matrices/{sample}_"+matrixFile_suffix+matrix_format
+         output:
+             "HiC_matrices_corrected/{sample}_"+matrixFile_suffix+".corrected"+matrix_format
+         params:
+             chr = lambda wildcards: " --chromosomes " + chromosomes if chromosomes else ""
+         log:
+             out = "HiC_matrices_corrected/logs/{sample}_correctoMatrix.out"
+         conda: CONDA_HIC_ENV
+         shell:
+             "hicCorrectMatrix correct --correctionMethod KR "
+             " {params.chr} -m {input.matrix} -o {output} > {log.out}"
 
 ## Call TADs
 rule call_tads:
