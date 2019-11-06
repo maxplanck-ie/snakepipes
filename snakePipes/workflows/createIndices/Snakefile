@@ -9,6 +9,8 @@ globals().update(cf.set_env_yamls())
 
 # load config file
 globals().update(cf.load_configfile(workflow.overwrite_configfiles[0], config["verbose"]))
+# return the pipeline version in the log
+cf.get_version()
 
 ### include modules of other snakefiles ########################################
 ################################################################################
@@ -137,4 +139,3 @@ onsuccess:
 
 onerror:
     print("\n !!! ERROR in index creation workflow! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
-

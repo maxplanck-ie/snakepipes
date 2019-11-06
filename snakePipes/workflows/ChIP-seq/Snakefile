@@ -14,6 +14,8 @@ globals().update(cf.set_env_yamls())
 globals().update(cf.load_configfile(workflow.overwrite_configfiles[0], config["verbose"]))
 # load organism-specific data, i.e. genome indices, annotation, etc.
 globals().update(cf.load_organism_data(genome, maindir, config["verbose"]))
+# return the pipeline version in the log
+cf.get_version()
 
 # do workflow specific stuff now
 include: os.path.join(workflow.basedir, "internals.snakefile")
