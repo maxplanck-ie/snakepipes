@@ -10,6 +10,7 @@ import glob
 import sys
 import shutil
 from fuzzywuzzy import fuzz
+from snakePipes import __version__
 
 
 def set_env_yamls():
@@ -79,6 +80,10 @@ def config_diff(dict1, dict2):
         else:
             diff[k] = dict1[k]
     return diff
+
+
+def get_version():
+    print("This analysis has been done using snakePipes version {}".format(__version__))
 
 
 def load_organism_data(genome, maindir, verbose):
