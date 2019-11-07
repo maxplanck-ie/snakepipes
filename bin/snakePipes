@@ -9,6 +9,8 @@ import glob
 import hashlib
 import shutil
 import snakePipes.common_functions as cof
+from snakePipes import __version__
+
 
 
 def parse_arguments():
@@ -65,6 +67,9 @@ def parse_arguments():
 
     subparsers.add_parser('flushOrganisms',
                           help='Flush all installed organism YAML files. This is only advisable when performing a clean installation.')
+
+    subparsers.add_parser('version',
+                          help='Print the snakePipes version')
 
     baseDir = os.path.dirname(snakePipes.__file__)
     defaults = cof.load_configfile(os.path.join(baseDir, "shared", "defaults.yaml"), False, "defaults")
@@ -298,6 +303,10 @@ def updateConfig(args):
     cof.write_configfile(os.path.join(baseDir, "shared", "defaults.yaml"), d)
 
 
+def version():
+    print("version {}".format(__version__))
+
+
 def main(args):
     args = parse_arguments().parse_args(args)
     if args.command == 'info':
@@ -308,6 +317,8 @@ def main(args):
         flushOrganisms()
     elif args.command == 'config':
         updateConfig(args)
+    elif args.command == 'version':
+        version()
     else:
         createCondaEnvs(args)
 
