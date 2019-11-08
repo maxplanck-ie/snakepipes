@@ -1,5 +1,5 @@
 ##STARsolo
-
+##remember that reads are swapped in internals.snakefile!!
 rule STARsolo:
     input:
         r1="originalFASTQ/{sample}"+reads[0]+".fastq.gz",
@@ -29,7 +29,7 @@ rule STARsolo:
             --outStd BAM_Unsorted \
             --sjdbGTFfile {params.gtf} \
             --genomeDir {params.index} \
-            --readFilesIn {input.r2} {input.r1} \
+            --readFilesIn {input.r1} {input.r2} \
             --outFileNamePrefix {params.prefix} \
 	    --soloType CB_UMI_Simple \
 	    --soloUMIstart 1 \
@@ -39,7 +39,7 @@ rule STARsolo:
 	    --soloCBwhitelist /data/processing/bioinfo-core/celseq_barcodes.384.1col.txt \
 	    --soloBarcodeReadLength 0 \
 	    --soloCBmatchWLtype Exact \
-	    --soloStrand Reverse\
+	    --soloStrand Forward\
 	    --soloUMIdedup Exact \
         | samtools sort -m {params.samsort_memory} -T $MYTEMP/{wildcards.sample} -@ {threads} -O bam -o {output.bam} -;
         rm -rf $MYTEMP

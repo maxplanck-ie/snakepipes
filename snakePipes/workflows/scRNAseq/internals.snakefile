@@ -15,8 +15,6 @@ import subprocess
 ## we trim only R2 with transfered barcode info under "FASTQ_barcoded"
 ## only cutadapt is supported right now due to poly-A trimming 
 
-
-
 if mode == "Gruen":
     fastq_dir = "FASTQ_barcoded"
     if trim:

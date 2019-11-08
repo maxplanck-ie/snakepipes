@@ -54,7 +54,9 @@ rule sc_bam_featureCounts_genomic:
         gtf = "Annotation/genes.filtered.gtf"
     output:
         counts = "Counts/{sample}.raw_counts.txt",
-        counts_summary = "Counts/{sample}.featureCounts_summary.txt"
+        counts_summary = "Counts/{sample}.featureCounts_summary.txt",
+        counts_summary_orig = "Counts/{sample}.summary",
+        table = "Counts/{sample}.txt",
     params:
         count_script = workflow.basedir+"/scRNAseq_bam_featureCounts.sh",
         bc_file = cellBarcodeFile,
@@ -66,6 +68,8 @@ rule sc_bam_featureCounts_genomic:
         """
         MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX);
         {params.count_script} {input.bam} {input.gtf} {params.bc_file} {wildcards.sample} {params.lib_type} $MYTEMP {threads} 1>{output.counts} 2>{output.counts_summary};
+        mv $MYTEMP/{wildcards.sample}.summary {output.counts_summary_orig};
+        mv $MYTEMP/{wildcards.sample} {output.table};
         rm -rf $MYTEMP
         """
 
