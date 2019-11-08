@@ -64,7 +64,8 @@ def multiqc_input_check(return_value):
         else:
             infiles.append( expand("FastQC/{sample}{read}_fastqc.html", sample = samples, read = reads) )
             indir +=" FastQC "
-
+            infiles.append( expand("FastQC/{sample}{read}_fastqc.html", sample = samples, read = reads) )
+            indir +=" FastQC "
         infiles.append( expand(fastq_dir+"/{sample}"+reads[0]+".fastq.gz", sample = samples) )
         indir += fastq_dir + " "
         infiles.append( expand(aligner+"/{sample}.bam", sample = samples) +

@@ -15,20 +15,25 @@ import subprocess
 ## we trim only R2 with transfered barcode info under "FASTQ_barcoded"
 ## only cutadapt is supported right now due to poly-A trimming 
 
-fastq_dir = "FASTQ_barcoded"
 
-if trim:
-    fastq_indir_trim = "FASTQ_barcoded"
-    if trimmer == "trimgalore":
-        fastq_dir = "FASTQ_TrimGalore"
-    elif trimmer == "cutadapt":
-        fastq_dir = "FASTQ_Cutadapt"
-    elif trimmer == "fastp":
-        fastq_dir = "FASTQ_fastp"
-else:
+
+if mode == "Gruen":
+    fastq_dir = "FASTQ_barcoded"
+    if trim:
+        fastq_indir_trim = "FASTQ_barcoded"
+        if trimmer == "trimgalore":
+            fastq_dir = "FASTQ_TrimGalore"
+        elif trimmer == "cutadapt":
+            fastq_dir = "FASTQ_Cutadapt"
+        elif trimmer == "fastp":
+            fastq_dir = "FASTQ_fastp"
+    else:
+        fastq_indir_trim = None	
+    aligner = "STAR_genomic"
+elif mode == "STARsolo":
     fastq_indir_trim = None
-	
-aligner = "STAR_genomic"
+    fastq_dir = "originalFASTQ"
+    aligner = "STARsolo"
 
 ### Initialization #############################################################
 

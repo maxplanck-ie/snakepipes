@@ -45,6 +45,19 @@ rule STARsolo:
         rm -rf $MYTEMP
         """
 
+rule filter_reads:
+    input:
+        bamfile = aligner+"/{sample}.sorted.bam",
+        bami = aligner+"/{sample}.sorted.bam.bai"
+    output:
+        bamfile = "filtered_bam/{sample}.filtered.bam",
+        bami = "filtered_bam/{sample}.filtered.bam.bai"
+    shell: """
+           pwd
+           ln -s -r {input.bamfile} {output.bamfile} ;
+           ln -s -r {input.bami} {output.bami}
+           """
+
 #rule velocyto:
 #    input:
 #    output:
