@@ -64,9 +64,12 @@ def multiqc_input_check(return_value):
         else:
             infiles.append( expand("FastQC/{sample}{read}_fastqc.html", sample = samples, read = reads) )
             indir +=" FastQC "
-        infiles.append( expand(fastq_dir+"/{sample}"+reads[0]+".fastq.gz", sample = samples) +
-                        expand("Counts/{sample}.summary", sample = samples) )
-        indir += fastq_dir + " Counts "
+        if mode == "Gruen":
+            infiles.append( expand(fastq_dir+"/{sample}"+reads[0]+".fastq.gz", sample = samples) +
+                            expand("Counts/{sample}.summary", sample = samples) )
+            indir += fastq_dir + " Counts "
+        elif mode == "STARsolo":
+            infiles.append( expand(fastq_dir+"/{sample}"+reads[0]+".fastq.gz", sample = samples) )
         infiles.append( expand(aligner+"/{sample}.bam", sample = samples) +
         expand("Sambamba/{sample}.markdup.txt", sample = samples) +
         expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt", sample=samples))
