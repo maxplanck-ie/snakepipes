@@ -8,7 +8,7 @@ rule STARsolo:
         bam = "STARsolo/{sample}.sorted.bam"
     params:
         alignerOptions = str(alignerOptions or ''),
-        gtf = genes_gtf,
+        gtf = Annotation/genes.filtered.gtf,
         index = star_index,
         prefix = "STARsolo/{sample}/{sample}.",
         samsort_memory = '2G',
