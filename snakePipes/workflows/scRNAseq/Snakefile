@@ -22,6 +22,7 @@ include: os.path.join(workflow.basedir, "internals.snakefile")
 ### include modules of other snakefiles ########################################
 ################################################################################
 include: os.path.join(maindir, "shared", "rules", "FASTQ.snakefile")
+include: os.path.join(maindir, "shared", "rules", "filterGTF.snakefile")
 #umi_tools
 if mode=="Gruen":
     include: os.path.join(maindir, "shared", "rules", "umi_tools.snakefile")
@@ -39,7 +40,6 @@ include: os.path.join(maindir, "shared", "rules", "FastQC.snakefile")
 pairedEnd = False
 include: os.path.join(maindir, "shared", "rules", "sambamba.snakefile")
 include: os.path.join(maindir, "shared", "rules", "RNA-seq_qc_report.snakefile")
-include: os.path.join(maindir, "shared", "rules", "filterGTF.snakefile")
 include: os.path.join(maindir, "shared", "tools" , "deeptools_cmds.snakefile")
 include: os.path.join(maindir, "shared", "rules", "deepTools_RNA.snakefile")
 include: os.path.join(maindir, "shared", "rules", "multiQC.snakefile")
