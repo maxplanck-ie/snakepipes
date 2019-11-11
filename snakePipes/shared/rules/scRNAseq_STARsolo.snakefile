@@ -5,12 +5,12 @@ rule STARsolo:
         r1="originalFASTQ/{sample}"+reads[0]+".fastq.gz",
         r2="originalFASTQ/{sample}"+reads[1]+".fastq.gz"
     output:
-        bam = "STARsolo/{sample}.sorted.bam"
+        bam = "STARsolo/{sample}.star.bam"
     params:
         alignerOptions = str(alignerOptions or ''),
         gtf = outdir+"/Annotation/genes.filtered.gtf",
         index = star_index,
-        prefix = "STARsolo/{sample}/{sample}.",
+        prefix = "STARsolo/{sample}/{sample}.star",
         samsort_memory = '2G',
         sample_dir = "STARsolo/{sample}"
     benchmark:
@@ -40,12 +40,29 @@ rule STARsolo:
 	    --soloBarcodeReadLength 0 \
 	    --soloCBmatchWLtype Exact \
 	    --soloStrand Forward\
-	    --soloUMIdedup Exact \
-        | samtools sort -m {params.samsort_memory} -T $MYTEMP/{wildcards.sample} -@ {threads} -O bam -o {output.bam} -;
+	    --soloUMIdedup Exact
+ 
+            rm -rf $MYTEMP
+         """
+        #| samtools sort -m {params.samsort_memory} -T $MYTEMP/{wildcards.sample} -@ {threads} -O bam -o {output.bam} -;
+        #rm -rf $MYTEMP
+        #"""
+rule sort_bam:
+    input:
+        bamfile="STARsolo/{sample}/{sample}.star.bam"
+    output:
+        bamfile = aligner+"/{sample}.sorted.bam",
+        bami = aligner+"/{sample}.sorted.bam.bai"
+    conda: CONDA_scRNASEQ_ENV
+    shell: """
+        MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX)
+        samtools sort -m 2g -T $MYTEMP/{wildcards.sample} -@ 4 -O bam -o {output.bamfile} {input.bamfile}
+        samtools index {output.bamfile}
         rm -rf $MYTEMP
-        """
+    """
 
-rule filter_reads:
+
+rule filter_bam:
     input:
         bamfile = aligner+"/{sample}.sorted.bam",
         bami = aligner+"/{sample}.sorted.bam.bai"

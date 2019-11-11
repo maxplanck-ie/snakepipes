@@ -162,7 +162,7 @@ if mode=="Gruen":
 elif mode=="STARsolo":
     rule all:
         input:
-            expand("STARsolo/{sample}.sorted.bam",sample = samples),
+            expand("STARsolo/{sample}.filtered.bam",sample = samples),
             "VelocytoCounts/all.out",
             "Sambamba/flagstat_report_all.tsv",
             run_deeptools_qc(),
