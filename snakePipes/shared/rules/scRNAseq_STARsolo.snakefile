@@ -70,8 +70,10 @@ rule velocyto:
         out = "VelocytoCounts/all.out"
     params:
         outf = "VelocytoCounts"
-    threads: 2
+#    threads: 2
 #    conda:
     shell: """
-            velocyto run --help > {output.out}
+            export LC_ALL=en_US.utf-8
+            export LANG=en_US.utf-8
+            velocyto run --bcfile {input.bc} --outputfolder {params.outf} {input.bam} {input.gtf} > {output.out}
     """
