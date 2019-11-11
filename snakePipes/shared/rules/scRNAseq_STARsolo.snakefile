@@ -58,10 +58,20 @@ rule filter_reads:
            ln -s -r {input.bami} {output.bami}
            """
 
-#rule velocyto:
-#    input:
-#    output:
-#    params:
-#    threads:
+#the barcode whitelist is currently passed in although it's not tested if it's actually necessery as it was already provided to STARsolo
+#gtf mask is not used as a filtered gtf is passed in
+#no metadata table is provided
+rule velocyto:
+    input:
+        bc = "/data/processing/bioinfo-core/celseq_barcodes.384.1col.txt",
+        gtf = outdir+"/Annotation/genes.filtered.gtf",
+        bam = expand("STARsolo/{sample}.sorted.bam",sample=samples)
+    output:
+        out = "VelocytoCounts/all.out"
+    params:
+        outf = "VelocytoCounts"
+    threads: 2
 #    conda:
-#    shell:
+    shell: """
+            velocyto run --help > {output.out}
+    """

@@ -1,5 +1,22 @@
 import os
 import snakePipes.common_functions as cf
+import subprocess
+import sys
+
+def install(package):
+    subprocess.call([sys.executable, "-m", "pip", "install", package])
+
+###install velocyto if not present
+install("numpy")
+install("scipy")
+install("cython")
+install("numba")
+install("matplotlib")
+install("scikit-learn")
+install("h5py")
+install("click")
+install("pysam")
+install("velocyto")
 
 ### snakemake_workflows initialization ########################################
 maindir = os.path.dirname(os.path.dirname(workflow.basedir))
@@ -146,6 +163,7 @@ elif mode=="STARsolo":
     rule all:
         input:
             expand("STARsolo/{sample}.sorted.bam",sample = samples),
+            "VelocytoCounts/all.out",
             "Sambamba/flagstat_report_all.tsv",
             run_deeptools_qc(),
             "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv",
