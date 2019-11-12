@@ -1,19 +1,21 @@
 ##STARsolo
 ##remember that reads are swapped in internals.snakefile!!
+###currently having CB and UB tags output in the bam requires --outSAMtype SortedByCoordinate !!
 rule STARsolo:
     input:
         r1="originalFASTQ/{sample}"+reads[0]+".fastq.gz",
         r2="originalFASTQ/{sample}"+reads[1]+".fastq.gz",
         annot="Annotation/genes.filtered.gtf"
     output:
-        bam = "STARsolo/{sample}/{sample}.star.bam"
+        bam = "STARsolo/{sample}.sorted.bam"
     params:
         alignerOptions = str(alignerOptions or ''),
         gtf = outdir+"/Annotation/genes.filtered.gtf",
         index = star_index,
-        prefix = "STARsolo/{sample}/{sample}.star",
+        prefix = "STARsolo/{sample}/{sample}.",
         samsort_memory = '2G',
-        sample_dir = "STARsolo/{sample}"
+        sample_dir = "STARsolo/{sample}",
+        bam = "STARsolo/{sample}/{sample}.Aligned.sortedByCoord.out.bam"
     benchmark:
         aligner+"/.benchmark/STARsolo.{sample}.benchmark"
     threads: 20  # 3.2G per core
@@ -26,8 +28,8 @@ rule STARsolo:
             --sjdbOverhang 100 \
             --readFilesCommand zcat \
             --outSAMunmapped Within \
-            --outSAMtype BAM Unsorted \
-            --outStd BAM_Unsorted \
+            --outSAMtype BAM SortedByCoordinate \
+            --outSAMattributes CB UB \
             --sjdbGTFfile {params.gtf} \
             --genomeDir {params.index} \
             --readFilesIn {input.r1} {input.r2} \
@@ -41,25 +43,12 @@ rule STARsolo:
 	    --soloBarcodeReadLength 0 \
 	    --soloCBmatchWLtype Exact \
 	    --soloStrand Forward\
-	    --soloUMIdedup Exact
+	    --soloUMIdedup Exact ;
+
+        ln -s {params.bam} {output.bam};
  
-            rm -rf $MYTEMP
+        rm -rf $MYTEMP
          """
-
-
-#rule sort_bam:
-#    input:
-#        bamfile="STARsolo/{sample}/{sample}.star.bam"
-#    output:
-#        bamfile = aligner+"/{sample}.sorted.bam",
-#        bami = aligner+"/{sample}.sorted.bam.bai"
-#    conda: CONDA_scRNASEQ_ENV
-#    shell: """
-#        MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX)
-#        samtools sort -m 2g -T $MYTEMP/{wildcards.sample} -@ 4 -O bam -o {output.bamfile} {input.bamfile}
-#        samtools index {output.bamfile}
-#        rm -rf $MYTEMP
-#    """
 
 
 #rule filter_bam:
