@@ -51,18 +51,18 @@ rule STARsolo:
          """
 
 
-#rule filter_bam:
-#    input:
-#        bamfile = aligner+"/{sample}.sorted.bam",
-#        bami = aligner+"/{sample}.sorted.bam.bai"
-#    output:
-#        bamfile = "filtered_bam/{sample}.filtered.bam",
-#        bami = "filtered_bam/{sample}.filtered.bam.bai"
-#    shell: """
-#           pwd
-#           ln -s -r {input.bamfile} {output.bamfile} ;
-#           ln -s -r {input.bami} {output.bami}
-#           """
+rule filter_bam:
+    input:
+        bamfile = aligner+"/{sample}.sorted.bam",
+        bami = aligner+"/{sample}.sorted.bam.bai"
+    output:
+        bamfile = "filtered_bam/{sample}.filtered.bam",
+        bami = "filtered_bam/{sample}.filtered.bam.bai"
+    shell: """
+           pwd
+           ln -s -r {input.bamfile} {output.bamfile} ;
+           ln -s -r {input.bami} {output.bami}
+           """
 
 #the barcode whitelist is currently passed in although it's not tested if it's actually necessery as it was already provided to STARsolo
 #gtf mask is not used as a filtered gtf is passed in
