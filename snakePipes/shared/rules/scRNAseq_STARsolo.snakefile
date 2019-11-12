@@ -15,7 +15,7 @@ rule STARsolo:
         prefix = "STARsolo/{sample}/{sample}.",
         samsort_memory = '2G',
         sample_dir = "STARsolo/{sample}",
-        bam = "STARsolo/{sample}/{sample}.Aligned.sortedByCoord.out.bam"
+        bam = "{sample}/{sample}.Aligned.sortedByCoord.out.bam"
     benchmark:
         aligner+"/.benchmark/STARsolo.{sample}.benchmark"
     threads: 20  # 3.2G per core
