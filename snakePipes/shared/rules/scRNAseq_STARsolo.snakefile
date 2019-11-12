@@ -3,9 +3,10 @@
 rule STARsolo:
     input:
         r1="originalFASTQ/{sample}"+reads[0]+".fastq.gz",
-        r2="originalFASTQ/{sample}"+reads[1]+".fastq.gz"
+        r2="originalFASTQ/{sample}"+reads[1]+".fastq.gz",
+        annot="Annotation/genes.filtered.gtf"
     output:
-        bam = "STARsolo/{sample}.star.bam"
+        bam = "STARsolo/{sample}/{sample}.star.bam"
     params:
         alignerOptions = str(alignerOptions or ''),
         gtf = outdir+"/Annotation/genes.filtered.gtf",
@@ -44,53 +45,51 @@ rule STARsolo:
  
             rm -rf $MYTEMP
          """
-        #| samtools sort -m {params.samsort_memory} -T $MYTEMP/{wildcards.sample} -@ {threads} -O bam -o {output.bam} -;
-        #rm -rf $MYTEMP
-        #"""
-rule sort_bam:
-    input:
-        bamfile="STARsolo/{sample}/{sample}.star.bam"
-    output:
-        bamfile = aligner+"/{sample}.sorted.bam",
-        bami = aligner+"/{sample}.sorted.bam.bai"
-    conda: CONDA_scRNASEQ_ENV
-    shell: """
-        MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX)
-        samtools sort -m 2g -T $MYTEMP/{wildcards.sample} -@ 4 -O bam -o {output.bamfile} {input.bamfile}
-        samtools index {output.bamfile}
-        rm -rf $MYTEMP
-    """
 
 
-rule filter_bam:
-    input:
-        bamfile = aligner+"/{sample}.sorted.bam",
-        bami = aligner+"/{sample}.sorted.bam.bai"
-    output:
-        bamfile = "filtered_bam/{sample}.filtered.bam",
-        bami = "filtered_bam/{sample}.filtered.bam.bai"
-    shell: """
-           pwd
-           ln -s -r {input.bamfile} {output.bamfile} ;
-           ln -s -r {input.bami} {output.bami}
-           """
+#rule sort_bam:
+#    input:
+#        bamfile="STARsolo/{sample}/{sample}.star.bam"
+#    output:
+#        bamfile = aligner+"/{sample}.sorted.bam",
+#        bami = aligner+"/{sample}.sorted.bam.bai"
+#    conda: CONDA_scRNASEQ_ENV
+#    shell: """
+#        MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX)
+#        samtools sort -m 2g -T $MYTEMP/{wildcards.sample} -@ 4 -O bam -o {output.bamfile} {input.bamfile}
+#        samtools index {output.bamfile}
+#        rm -rf $MYTEMP
+#    """
+
+
+#rule filter_bam:
+#    input:
+#        bamfile = aligner+"/{sample}.sorted.bam",
+#        bami = aligner+"/{sample}.sorted.bam.bai"
+#    output:
+#        bamfile = "filtered_bam/{sample}.filtered.bam",
+#        bami = "filtered_bam/{sample}.filtered.bam.bai"
+#    shell: """
+#           pwd
+#           ln -s -r {input.bamfile} {output.bamfile} ;
+#           ln -s -r {input.bami} {output.bami}
+#           """
 
 #the barcode whitelist is currently passed in although it's not tested if it's actually necessery as it was already provided to STARsolo
 #gtf mask is not used as a filtered gtf is passed in
 #no metadata table is provided
-rule velocyto:
-    input:
-        bc = "/data/processing/bioinfo-core/celseq_barcodes.384.1col.txt",
-        gtf = outdir+"/Annotation/genes.filtered.gtf",
-        bam = expand("STARsolo/{sample}.sorted.bam",sample=samples)
-    output:
-        out = "VelocytoCounts/all.out"
-    params:
-        outf = "VelocytoCounts"
-#    threads: 2
-#    conda:
-    shell: """
-            export LC_ALL=en_US.utf-8
-            export LANG=en_US.utf-8
-            velocyto run --bcfile {input.bc} --outputfolder {params.outf} {input.bam} {input.gtf} > {output.out}
-    """
+
+#rule velocyto:
+#    input:
+#        bc = "/data/processing/bioinfo-core/celseq_barcodes.384.1col.txt",
+#        gtf = outdir+"/Annotation/genes.filtered.gtf",
+#        bam = expand("STARsolo/{sample}.sorted.bam",sample=samples)
+#    output:
+#        out = "VelocytoCounts/all.out"
+#    params:
+#        outf = "VelocytoCounts"
+#    shell: """
+#            export LC_ALL=en_US.utf-8
+#            export LANG=en_US.utf-8
+#            velocyto run --bcfile {input.bc} --outputfolder {params.outf} {input.bam} {input.gtf} > {output.out}
+#    """

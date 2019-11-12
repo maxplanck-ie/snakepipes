@@ -162,13 +162,13 @@ if mode=="Gruen":
 elif mode=="STARsolo":
     rule all:
         input:
-            expand("STARsolo/{sample}.filtered.bam",sample = samples),
-            "VelocytoCounts/all.out",
-            "Sambamba/flagstat_report_all.tsv",
-            run_deeptools_qc(),
-            "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv",
-            expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample = samples),
-            "multiQC/multiqc_report.html"
+            expand("STARsolo/{sample}/{sample}.star.bam",sample = samples),
+#            "VelocytoCounts/all.out",
+#            "Sambamba/flagstat_report_all.tsv",
+#            run_deeptools_qc(),
+#            "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv",
+#            expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample = samples),
+#            "multiQC/multiqc_report.html"
 
 ### execute after workflow finished ############################################
 ################################################################################
