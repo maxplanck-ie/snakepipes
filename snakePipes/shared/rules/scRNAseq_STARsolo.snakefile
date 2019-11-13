@@ -64,6 +64,23 @@ rule filter_bam:
            ln -s -r {input.bami} {output.bami}
            """
 
+rule cellsort_bam:
+    input:
+        bam = aligner+"/{sample}.sorted.bam"
+    output:
+        bam = aligner+"/cellsorted_{sample}.bam",
+        bami = aligner+"/cellsorted_{sample}.bam.bai"
+    params:
+        samsort_memory="3G"
+    threads: 4
+    conda: CONDA_scRNASEQ_ENV
+    shell: """
+            MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX);
+            samtools sort -m {params.samsort_memory} -T $MYTEMP/{wildcards.sample} -t CB -@ {threads} -O bam -o {output.bam} {input.bam};
+            samtools index {output.bam};
+            rm -rf $MYTEMP
+           """
+
 #the barcode whitelist is currently passed in although it's not tested if it's actually necessery as it was already provided to STARsolo
 #gtf mask is not used as a filtered gtf is passed in
 #no metadata table is provided
@@ -72,13 +89,13 @@ rule velocyto:
     input:
         bc = "/data/processing/bioinfo-core/celseq_barcodes.384.1col.txt",
         gtf = "Annotation/genes.filtered.gtf",
-        bam = expand("STARsolo/{sample}.sorted.bam",sample=samples)
+        bam = aligner+"/cellsorted_{sample}.bam"
     output:
-        out = "VelocytoCounts/all.out"
+        out = "VelocytoCounts/{sample}.loom"
     params:
         outf = "VelocytoCounts"
     shell: """
             export LC_ALL=en_US.utf-8
             export LANG=en_US.utf-8
-            velocyto run --bcfile {input.bc} --outputfolder {params.outf} {input.bam} {input.gtf} > {output.out}
+            velocyto run --bcfile {input.bc} --outputfolder {params.outf} {input.bam} {input.gtf} 
     """
