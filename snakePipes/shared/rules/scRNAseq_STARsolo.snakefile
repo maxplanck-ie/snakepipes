@@ -58,26 +58,28 @@ rule filter_bam:
     output:
         bamfile = "filtered_bam/{sample}.filtered.bam",
         bami = "filtered_bam/{sample}.filtered.bam.bai"
+    threads: 8
+    conda: CONDA_SAMBAMBA_ENV
     shell: """
-           pwd
-           ln -s -r {input.bamfile} {output.bamfile} ;
-           ln -s -r {input.bami} {output.bami}
+           MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX);
+           sambamba view -F "not unmapped and [CB] !=null" -t {threads} -f bam {input.bamfile} > {output.bamfile};
+           samtools index {output.bamfile};
+           rm -rf $MYTEMP
            """
 
 rule cellsort_bam:
     input:
-        bam = aligner+"/{sample}.sorted.bam"
+        bam = "filtered_bam/{sample}.filtered.bam"
     output:
-        bam = aligner+"/cellsorted_{sample}.bam",
-        bami = aligner+"/cellsorted_{sample}.bam.bai"
+        bam = "filtered_bam/cellsorted_{sample}.bam"
+#        bami = "filtered_bam/cellsorted_{sample}.bam.bai"
     params:
         samsort_memory="3G"
     threads: 4
     conda: CONDA_scRNASEQ_ENV
     shell: """
             MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX);
-            samtools sort -m {params.samsort_memory} -T $MYTEMP/{wildcards.sample} -t CB -@ {threads} -O bam -o {output.bam} {input.bam};
-            samtools index {output.bam};
+            samtools sort -m {params.samsort_memory} -@ {threads} -T $MYTEMP/{wildcards.sample} -t CB -O bam -o {output.bam} {input.bam};
             rm -rf $MYTEMP
            """
 
@@ -89,7 +91,7 @@ rule velocyto:
     input:
         bc = "/data/processing/bioinfo-core/celseq_barcodes.384.1col.txt",
         gtf = "Annotation/genes.filtered.gtf",
-        bam = aligner+"/cellsorted_{sample}.bam"
+        bam = "filtered_bam/cellsorted_{sample}.bam"
     output:
         out = "VelocytoCounts/{sample}.loom"
     params:
