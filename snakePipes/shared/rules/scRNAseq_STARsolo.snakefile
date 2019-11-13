@@ -29,7 +29,7 @@ rule STARsolo:
             --readFilesCommand zcat \
             --outSAMunmapped Within \
             --outSAMtype BAM SortedByCoordinate \
-            --outSAMattributes CB UB \
+            --outSAMattributes NH HI AS nM CB UB \
             --sjdbGTFfile {params.gtf} \
             --genomeDir {params.index} \
             --readFilesIn {input.r1} {input.r2} \
@@ -68,17 +68,17 @@ rule filter_bam:
 #gtf mask is not used as a filtered gtf is passed in
 #no metadata table is provided
 
-#rule velocyto:
-#    input:
-#        bc = "/data/processing/bioinfo-core/celseq_barcodes.384.1col.txt",
-#        gtf = outdir+"/Annotation/genes.filtered.gtf",
-#        bam = expand("STARsolo/{sample}.sorted.bam",sample=samples)
-#    output:
-#        out = "VelocytoCounts/all.out"
-#    params:
-#        outf = "VelocytoCounts"
-#    shell: """
-#            export LC_ALL=en_US.utf-8
-#            export LANG=en_US.utf-8
-#            velocyto run --bcfile {input.bc} --outputfolder {params.outf} {input.bam} {input.gtf} > {output.out}
-#    """
+rule velocyto:
+    input:
+        bc = "/data/processing/bioinfo-core/celseq_barcodes.384.1col.txt",
+        gtf = "Annotation/genes.filtered.gtf",
+        bam = expand("STARsolo/{sample}.sorted.bam",sample=samples)
+    output:
+        out = "VelocytoCounts/all.out"
+    params:
+        outf = "VelocytoCounts"
+    shell: """
+            export LC_ALL=en_US.utf-8
+            export LANG=en_US.utf-8
+            velocyto run --bcfile {input.bc} --outputfolder {params.outf} {input.bam} {input.gtf} > {output.out}
+    """
