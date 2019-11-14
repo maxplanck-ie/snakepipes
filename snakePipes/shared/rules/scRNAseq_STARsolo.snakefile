@@ -71,8 +71,7 @@ rule cellsort_bam:
     input:
         bam = "filtered_bam/{sample}.filtered.bam"
     output:
-        bam = "filtered_bam/cellsorted_{sample}.bam"
-#        bami = "filtered_bam/cellsorted_{sample}.bam.bai"
+        bam = "filtered_bam/cellsorted_{sample}.filtered.bam"
     params:
         samsort_memory="3G"
     threads: 4
@@ -90,8 +89,9 @@ rule cellsort_bam:
 rule velocyto:
     input:
         bc = "/data/processing/bioinfo-core/celseq_barcodes.384.1col.txt",
-        gtf = "Annotation/genes.filtered.gtf",
-        bam = "filtered_bam/cellsorted_{sample}.bam"
+        gtf = genes_gtf,
+        bam = "filtered_bam/{sample}.filtered.bam",
+        csbam="filtered_bam/cellsorted_{sample}.filtered.bam"
     output:
         out = "VelocytoCounts/{sample}.loom"
     params:
