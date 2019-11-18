@@ -1,6 +1,9 @@
 ##STARsolo
 ##remember that reads are swapped in internals.snakefile!!
 ###currently having CB and UB tags output in the bam requires --outSAMtype SortedByCoordinate !!
+import loompy
+import os
+
 rule STARsolo:
     input:
         r1="originalFASTQ/{sample}"+reads[0]+".fastq.gz",
@@ -83,7 +86,7 @@ rule cellsort_bam:
            """
 
 #the barcode whitelist is currently passed in although it's not tested if it's actually necessery as it was already provided to STARsolo
-#gtf mask is not used as a filtered gtf is passed in
+#velocyto doesn't accept our filtered gtf; will have to use the mask, after all
 #no metadata table is provided
 
 rule velocyto:
@@ -95,9 +98,20 @@ rule velocyto:
     output:
         out = "VelocytoCounts/{sample}.loom"
     params:
-        outf = "VelocytoCounts"
+        outf = "VelocytoCounts",
+        outinit = "VelocytoCounts/{sample}.{random}.loom"
     shell: """
             export LC_ALL=en_US.utf-8
             export LANG=en_US.utf-8
-            velocyto run --bcfile {input.bc} --outputfolder {params.outf} {input.bam} {input.gtf} 
+            velocyto run --bcfile {input.bc} --outputfolder {params.outf} {input.bam} {input.gtf} ;
+            touch {output.out}
     """
+
+rule combine_loom:
+    input:
+        velo=expand("VelocytoCounts/{sample}.done.out",sample=samples)
+    output:
+        out="VelocytoCounts/all.samples.loom"
+    params:
+        velo=lambda wildcards: filter(lambda x:'.loom' in x, os.listdir("VelocytoCounts"))
+    run: loompy.combine({params.velo}, {output.out}, key="Accession")
