@@ -41,6 +41,8 @@ There is a configuration file in ``snakePipes/workflows/RNA-seq/defaults.yaml``:
     ext: '.fastq.gz'
     ## paired-end read name extension (default: ["_R1", "_R2"])
     reads: ["_R1","_R2"]
+    ## assume paired end reads
+    pairedEnd: True
     ## Number of reads to downsample from each FASTQ file
     downsample:
     ## Options for trimming
@@ -48,7 +50,7 @@ There is a configuration file in ``snakePipes/workflows/RNA-seq/defaults.yaml``:
     trimmer: cutadapt
     trimmerOptions:
     ## further options
-    mode: alignment-free,deepTools_qc
+    mode: alignment,deepTools_qc
     sampleSheet:
     bwBinSize: 25
     fastqc: False
@@ -60,13 +62,21 @@ There is a configuration file in ``snakePipes/workflows/RNA-seq/defaults.yaml``:
     dnaContam: False
     ## supported mappers: STAR HISAT2
     aligner: STAR
-    ## N.B., setting --outBAMsortingBinsN too high can result in cryptic errors
     alignerOptions:
     verbose: False
     plotFormat: png
     # for allele-spcific mapping
     SNPFile:
     NMaskedIndex:
+    #### Flag to control the pipeline entry point
+    fromBAM: False
+    bamExt: '.bam'
+    #umi_tools
+    UMIBarcode: False
+    bcPattern: NNNNCCCCCCCCC #default: 4 base umi barcode, 9 base cell barcode (eg. RELACS barcode)
+    UMIDedup: False
+    UMIDedupSep: "_"
+    UMIDedupOpts: --paired
 
 
 Apart from the common workflow options (see :ref:`running_snakePipes`), the following parameters are useful to consider:
@@ -107,12 +117,12 @@ Like the other workflows, differential expression can be performed using the ``-
     SRR7013049      OreR
     SRR7013050      OreR
 
-.. note:: The first entry defines which group of samples are control. This way, the order of comparison and likewise the sign of values can be changed. The DE analysis might fail if your sample names begin with a number. So watch out for that! 
+.. note:: The first entry defines which group of samples are control. This way, the order of comparison and likewise the sign of values can be changed. The DE analysis might fail if your sample names begin with a number. So watch out for that!
 
 Complex designs with blocking factors
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If the user provides additional columns between 'name' and 'condition' in the sample sheet, the variables stored there will be used as blocking factors in the order they appear in the sample sheet. Eg. if the first line of your sample sheet looks like 'name	batch	condition', this will translate into a formula ``batch + condition``. 'condition' has to be the final column and it will be used for any statistical inference. 
+If the user provides additional columns between 'name' and 'condition' in the sample sheet, the variables stored there will be used as blocking factors in the order they appear in the sample sheet. Eg. if the first line of your sample sheet looks like 'name	batch	condition', this will translate into a formula ``batch + condition``. 'condition' has to be the final column and it will be used for any statistical inference.
 
 Analysis modes
 --------------
