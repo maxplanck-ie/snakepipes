@@ -89,29 +89,39 @@ rule cellsort_bam:
 #velocyto doesn't accept our filtered gtf; will have to use the mask, after all
 #no metadata table is provided
 
-rule velocyto:
+checkpoint velocyto:
     input:
         bc = "/data/processing/bioinfo-core/celseq_barcodes.384.1col.txt",
         gtf = genes_gtf,
         bam = "filtered_bam/{sample}.filtered.bam",
         csbam="filtered_bam/cellsorted_{sample}.filtered.bam"
     output:
-        out = "VelocytoCounts/{sample}.loom"
-    params:
-        outf = "VelocytoCounts",
-        outinit = "VelocytoCounts/{sample}.{random}.loom"
+        outdir = directory("VelocytoCounts/{sample}")
     shell: """
             export LC_ALL=en_US.utf-8
             export LANG=en_US.utf-8
-            velocyto run --bcfile {input.bc} --outputfolder {params.outf} {input.bam} {input.gtf} ;
-            touch {output.out}
+            velocyto run --bcfile {input.bc} --outputfolder {output.outdir} {input.bam} {input.gtf}
     """
 
+#def aggregate_input(wildcards):
+#    #checkpoint_output = checkpoints.velocyto.get(sample=samples).output[0]
+#    SAMPLES,ii = glob_wildcards("VelocytoCounts/{sample}/{sample}.{i}.loom")
+#    return expand("VelocytoCounts/{sample1}/{sample2}.{i}.loom",sample1=SAMPLES,sample2=SAMPLES,i=ii)
+
 rule combine_loom:
-    input:
-        velo=expand("VelocytoCounts/{sample}.done.out",sample=samples)
-    output:
-        out="VelocytoCounts/all.samples.loom"
-    params:
-        velo=lambda wildcards: filter(lambda x:'.loom' in x, os.listdir("VelocytoCounts"))
-    run: loompy.combine({params.velo}, {output.out}, key="Accession")
+    input: expand("VelocytoCounts/{sample}",sample=samples)
+    output: "VelocytoCounts_merged/merged.txt"
+    run: 
+        filelist=[]
+        for p in input:
+            z=os.listdir(p)
+            f=list(filter(lambda x: '.loom' in x,z))
+            ifi=os.path.join(outdir,p,f[0])
+            filelist.append(ifi)
+        print(filelist)
+        outf=outdir+"/VelocytoCounts_merged/merged.loom"
+        print(outf)
+        try:
+            loompy.combine(files=filelist,output_file=outf, key="Accession")
+        except RuntimeError:
+            print('RunTimeError occured')

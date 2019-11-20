@@ -163,8 +163,7 @@ elif mode=="STARsolo":
     rule all:
         input:
             expand("STARsolo/{sample}.sorted.bam",sample = samples),
-            expand("VelocytoCounts/{sample}.loom",sample=samples),
-            "VelocytoCounts/all.samples.loom",
+            "VelocytoCounts_merged/merged.txt",
             "Sambamba/flagstat_report_all.tsv",
             run_deeptools_qc(),
             "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv",
