@@ -64,6 +64,11 @@ There is a configuration file in ``snakePipes/workflows/DNA-mapping/defaults.yam
     insertSizeMax: 1000
     alignerOpts:
     plotFormat: png
+    UMIBarcode: False
+    bcPattern: NNNNCCCCCCCC #default: 4 base umi barcode, 8 base cell barcode (eg. RELACS barcode)
+    UMIDedup: False
+    UMIDedupSep: "_"
+    UMIDedupOpts:
     ## Median/mean fragment length, only relevant for single-end data (default: 200)
     fragmentLength: 200
     qualimap: false

@@ -30,9 +30,6 @@ include: os.path.join(maindir, "shared", "rules", "filterGTF.snakefile")
 ## bamCoverage_RPKM
 include: os.path.join(maindir, "shared", "rules", "deepTools_RNA.snakefile")
 
-#umi_tools
-include: os.path.join(maindir, "shared", "rules", "umi_tools.snakefile")
-
 
 if not fromBAM:
     ## FASTQ: either downsample FASTQ files or create symlinks to input files
@@ -48,6 +45,9 @@ if not fromBAM:
 
     ## sambamba
     include:os.path.join(maindir, "shared", "rules", "sambamba.snakefile")
+
+    #umi_tools
+    include: os.path.join(maindir, "shared", "rules", "umi_tools.snakefile")
 
     ## Allele-specific JOBS
     if "allelic-mapping" in mode:
