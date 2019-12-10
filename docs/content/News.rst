@@ -1,6 +1,11 @@
 snakePipes News
 ===============
 
+snakePipes 1.3.2
+----------------
+
+ * Fixed missing multiQC input in allelic RNAseq
+
 snakePipes 1.3.1
 ----------------
 
