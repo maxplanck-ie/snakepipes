@@ -143,6 +143,10 @@ else:
     samples = all_samples
     downsample = None
 
+if not samples:
+    print("\n  Error! NO samples found in dir "+str(indir or '')+"!!!\n\n")
+    exit(1)
+
 
 ##filter sample dictionary by the subset of samples listed in the 'name' column of the sample sheet
 def filter_dict(sampleSheet,input_dict):
