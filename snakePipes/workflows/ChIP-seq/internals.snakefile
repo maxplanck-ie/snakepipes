@@ -140,8 +140,12 @@ else:
             sys.exit("No bam file found for chip sample {}!".format(sample))
     aligner = "EXTERNAL_BAM"
     indir = fromBAM
-    samples = all_samples
     downsample = None
+
+samples = all_samples
+if not samples:
+    print("\n  Error! NO samples found in dir "+str(indir or '')+"!!!\n\n")
+    exit(1)
 
 
 ##filter sample dictionary by the subset of samples listed in the 'name' column of the sample sheet
