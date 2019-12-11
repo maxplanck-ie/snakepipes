@@ -50,6 +50,7 @@ def multiqc_input_check(return_value):
             indir += " deepTools_qc "   
         if "allelic-mapping" in mode:
             infiles.append( expand("featureCounts/{sample}.allelic_counts.txt", sample = samples) )
+            indir += aligner + " featureCounts "
         if "alignment-free" in mode:
             infiles.append( expand("Salmon/{sample}/quant.sf", sample = samples) )
             indir += " Salmon "

@@ -34,15 +34,17 @@ if trim:
 if not fromBAM:
     infiles = sorted(glob.glob(os.path.join(indir, '*' + ext)))
     samples = cf.get_sample_names(infiles, ext, reads)
-
     pairedEnd = cf.is_paired(infiles, ext, reads)
 else:
     infiles = sorted(glob.glob(os.path.join(str(indir or ''), '*' + bamExt)))
     samples = cf.get_sample_names_bam(infiles, bamExt)
-
 
 if sampleSheet:
     cf.check_sample_info_header(sampleSheet)
 
 if sampleSheet and not cf.check_replicates(sampleSheet):
     sys.stderr.write("\nWarning! Sleuth cannot be invoked without replicates! Only DESeq2 is used...\n")
+
+if not samples:
+    print("\n  Error! NO samples found in dir "+str(indir or '')+"!!!\n\n")
+    exit(1)
