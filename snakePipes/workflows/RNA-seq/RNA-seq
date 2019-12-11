@@ -30,7 +30,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          "bwBinSize": 25, "dnaContam": False, "plotFormat": "png",
                          "fromBAM": False, "pairedEnd": True,
                          "UMIDedup": False,
-                         "UMIDedupOpts": "", "bcPattern": "",
+                         "UMIDedupOpts": "", "bcPattern": "NNNNCCCCCCCCC",
                          "UMIDedupSep": "_", "UMIBarcode": False}):
     """
     Parse arguments from the command line.

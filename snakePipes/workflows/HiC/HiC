@@ -29,7 +29,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          "reads": ["_R1", "_R2"], "ext": ".fastq.gz",
                          "noCorrect": False, "distVsCount": False,
                          "distVsCountParams": None, "UMIDedup": False,
-                         "UMIDedupOpts": "", "bcPattern": "",
+                         "UMIDedupOpts": "", "bcPattern": "NNNNCCCCCCCCC",
                          "UMIDedupSep": "_", "UMIBarcode": False}):
     """
     Parse arguments from the command line.
