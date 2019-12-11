@@ -5,6 +5,7 @@ snakePipes 1.3.2
 ----------------
 
  * Fixed missing multiQC input in allelic RNAseq
+ * Added sample check to those workflows that were missing it.
 
 snakePipes 1.3.1
 ----------------
