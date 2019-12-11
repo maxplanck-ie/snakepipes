@@ -3,35 +3,29 @@
 ## example call:
 ## scRNAseq_bam_featureCounts.sh test.sorted.bam genes.filtered.gtf celseq_barcodes.192.txt test.txt /package/subread-1.5.0-p1/bin/ tmp_fc 5 1>MySample.cout.csv 2>MySample.cout_summary.txt
 
-bam=$1		## mapping for 96 cells
+bam=$1		## read mapping for all cells in one library 
 gtf=$2		## gene annotation
 bc_file=$3		## celSeq cell barcode file
 sample_name=$4	## sample name, used for featureCounts as ouput name, NOT a directory or path
-lib_type=$5
-tmp=$6	## will be created by this script, used as working dir for featureCounts due to -R issue
-threads=$7	## for featureCOunts only
-
+lib_type=$5 ## 1 for CelSeq2 
+tmp=$6	    ## used as output dir for featureCounts due to -R, should be "thread" safe, best created before with mktemp 
+threads=$7	## used threads for for featureCounts
 
 ## gtf is expected in this format, we use only gene_id and gene_name
 # 3	stdin	exon	108107280	108109316	.	-	.	gene_id "ENSMUSG00000000001.4"; transcript_id "ENSMUST00000000001.4"; exon_number "1"; exon_id "ENSMUST00000000001.4.1"; gene_name "Gnai3";
 # 3	stdin	exon	108109403	108109612	.	-	.	gene_id "ENSMUSG00000000001.4"; transcript_id "ENSMUST00000000001.4"; exon_number "2"; exon_id "ENSMUST00000000001.4.2"; gene_name "Gnai3";
 
-curr=$(pwd)
-
 gtf_path=$(realpath $gtf)
 bam_path=$(realpath $bam)
 tmp_path=$(realpath $tmp)
 
-mkdir -p $tmp_path 1>&2 
-tmp_dir=$(mktemp -d --tmpdir=$tmp_path)
-
 ## call featureCounts
-(>&2 echo "featureCounts -a $gtf_path -T $threads -s $lib_type -R CORE -F "GTF" --tmpDir ${tmp_dir} -o ${tmp_dir}/_tmp_$sample_name $bam_path 1>&2")
-featureCounts -a $gtf_path -T $threads -s $lib_type -R CORE -F "GTF" --tmpDir ${tmp_dir} -o ${tmp_dir}/_tmp_$sample_name $bam_path 1>&2
+(>&2 echo "featureCounts -a $gtf_path -T $threads -s $lib_type -R CORE -F "GTF" --tmpDir ${tmp_path} -o ${tmp_path}/$sample_name $bam_path 1>&2")
+featureCounts -a $gtf_path -T $threads -s $lib_type -R CORE -F "GTF" --tmpDir ${tmp_path} -o ${tmp_path}/$sample_name $bam_path 1>&2
 
 ## add gene_id (gtf col 10), gene_name (gtf col 18) to featureCounts output, last col is gene_name + chromosome
 ## <(cat $gtf_path | tr " " "\t" | tr -d "\";" | awk '{print $10,$18,$18"__chr"$1}') \
-cat ${tmp_dir}/${sample_name}.bam.featureCounts | awk -v map_f=$gtf_path \
+cat ${tmp_path}/${sample_name}.bam.featureCounts | awk -v map_f=$gtf_path \
 'BEGIN{
 	while (getline < map_f) {
 		match($0,"gene_id[[:space:]\";]+([^[:space:]\";]+)",gid)

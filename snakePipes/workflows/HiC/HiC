@@ -19,18 +19,18 @@ import snakePipes.parserCommon as parserCommon
 def parse_args(defaults={"verbose": False, "configFile": None,
                          "clusterConfigFile": None, "maxJobs": 5,
                          "snakemakeOptions": "--use-conda", "tempDir": None,
-                         "downsample": False, "trim": False, "trimmer": "cutadapt",
-                         "trimmerOptions": "", "fastqc": False,
-                         "binSize": 10000, "RFResolution": False,
+                         "downsample": False, "trim": False,
+                         "trimmer": "cutadapt", "trimmerOptions": "",
+                         "fastqc": False, "binSize": 10000, "noTAD": False,
+                         "RFResolution": False, "correctionMethod": "KR",
                          "enzyme": "HindIII", "restrictRegion": None,
                          "mergeSamples": False, "nBinsToMerge": 0,
                          "findTADParams": '--thresholdComparisons 0.01',
                          "reads": ["_R1", "_R2"], "ext": ".fastq.gz",
-                         "noTAD": False, "noCorrect": False,
-                         "distVsCount": False, "distVsCountParams": None,
-                         "UMIDedup": False, "UMIDedupOpts": "",
-                         "bcPattern": "", "UMIDedupSep": "_",
-                         "UMIBarcode": False}):
+                         "noCorrect": False, "distVsCount": False,
+                         "distVsCountParams": None, "UMIDedup": False,
+                         "UMIDedupOpts": "", "bcPattern": "NNNNCCCCCCCCC",
+                         "UMIDedupSep": "_", "UMIBarcode": False}):
     """
     Parse arguments from the command line.
     """
@@ -127,7 +127,8 @@ def parse_args(defaults={"verbose": False, "configFile": None,
     optional.add_argument("--distVsCountParams",
                           type=str,
                           metavar="STR",
-                          help="parameters to run hicDistVsCount. (default: '%(default)s')",
+                          help="parameters to run hicDistVsCount. "
+                          "(default: '%(default)s')",
                           default=defaults["distVsCountParams"])
 
     optional.add_argument("--sampleSheet",
@@ -135,12 +136,20 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                           type=str,
                           metavar="STR",
                           help="A .tsv file containing sample names and "
-                               "associated groups. If provided, the file would be "
-                               "used to identify groups to merge the samples. "
-                               "An example can be found at "
+                               "associated groups. If provided, the file "
+                               "would be used to identify groups to merge "
+                               "the samples. An example can be found at "
                                "'docs/content/sampleSheet.example.tsv'"
                                "(default: None)")
 
+    optional.add_argument("--correctionMethod",
+                          dest="correctionMethod",
+                          type=str,
+                          metavar="STR",
+                          help="Method to be used to balance the hic matrix."
+                               " Available options are KR and ICE. "
+                               "(default: '%(default)s')",
+                               default=defaults["correctionMethod"])
 
     return parser
 
