@@ -29,6 +29,7 @@ def set_env_yamls():
             'CONDA_WGBS_ENV': 'envs/wgbs.yaml',
             'CONDA_RMD_ENV': 'envs/rmarkdown.yaml',
             'CONDA_PREPROCESSING_ENV': 'envs/preprocessing.yaml',
+            'CONDA_NONCODING_RNASEQ_ENV': 'envs/noncoding.yaml',
             'CONDA_SAMBAMBA_ENV': 'envs/sambamba.yaml'}
 
 
