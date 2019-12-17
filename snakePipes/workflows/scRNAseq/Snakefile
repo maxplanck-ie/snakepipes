@@ -7,15 +7,16 @@ def install(package):
     subprocess.call([sys.executable, "-m", "pip", "install", package])
 
 ###install velocyto if not present
-install("numpy")
-install("scipy")
-install("cython")
-install("numba")
-install("matplotlib")
-install("scikit-learn")
-install("h5py")
-install("click")
-install("pysam")
+##velocyto install is working via pip
+#install("numpy")
+#install("scipy")
+#install("cython")
+#install("numba")
+#install("matplotlib")
+#install("scikit-learn")
+#install("h5py")
+#install("click")
+#install("pysam")
 install("velocyto")
 
 ### snakemake_workflows initialization ########################################
@@ -163,12 +164,14 @@ elif mode=="STARsolo":
     rule all:
         input:
             expand("STARsolo/{sample}.sorted.bam",sample = samples),
-            "VelocytoCounts_merged/merged.txt",
             "Sambamba/flagstat_report_all.tsv",
             run_deeptools_qc(),
             "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv",
             expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample = samples),
-            "multiQC/multiqc_report.html"
+            "multiQC/multiqc_report.html",
+            expand("VelocytoCounts/{sample}.done.txt",sample=samples)
+
+#            "VelocytoCounts_merged/merged.txt",
 
 ### execute after workflow finished ############################################
 ################################################################################

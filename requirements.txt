@@ -1,6 +1,15 @@
-snakemake >= 5.7.0
+snakemake >= 5.8.0
 psutil
 pandas
 fuzzywuzzy
 pyyaml >= 5.1
 loompy == 3.0.6
+numpy
+scipy
+cython
+numba
+matplotlib
+scikit-learn
+h5py
+click
+pysam

@@ -97,32 +97,26 @@ checkpoint velocyto:
         bam = "filtered_bam/{sample}.filtered.bam",
         csbam="filtered_bam/cellsorted_{sample}.filtered.bam"
     output:
-        outdir = directory("VelocytoCounts/{sample}")
+        outdir = directory("VelocytoCounts/{sample}"),
+        outdum = "VelocytoCounts/{sample}.done.txt"
     shell: """
             export LC_ALL=en_US.utf-8
             export LANG=en_US.utf-8
-            velocyto run --bcfile {input.bc} --outputfolder {output.outdir} {input.bam} {input.gtf}
+            velocyto run --bcfile {input.bc} --outputfolder {output.outdir} {input.bam} {input.gtf};
+            touch VelocytoCounts/done.txt
     """
 
-#def aggregate_input(wildcards):
-#    #checkpoint_output = checkpoints.velocyto.get(sample=samples).output[0]
-#    SAMPLES,ii = glob_wildcards("VelocytoCounts/{sample}/{sample}.{i}.loom")
-#    return expand("VelocytoCounts/{sample1}/{sample2}.{i}.loom",sample1=SAMPLES,sample2=SAMPLES,i=ii)
-
-rule combine_loom:
-    input: expand("VelocytoCounts/{sample}",sample=samples)
-    output: "VelocytoCounts_merged/merged.txt"
-    run: 
-        filelist=[]
-        for p in input:
-            z=os.listdir(p)
-            f=list(filter(lambda x: '.loom' in x,z))
-            ifi=os.path.join(outdir,p,f[0])
-            filelist.append(ifi)
-        print(filelist)
-        outf=outdir+"/VelocytoCounts_merged/merged.loom"
-        print(outf)
-        try:
-            loompy.combine(files=filelist,output_file=outf, key="Accession")
-        except RuntimeError:
-            print('RunTimeError occured')
+#rule combine_loom:
+#    input: expand("VelocytoCounts/{sample}",sample=samples)
+#    output: "VelocytoCounts_merged/merged.txt"
+#    run: 
+#        filelist=[]
+#        for p in input:
+#            z=os.listdir(p)
+#            f=list(filter(lambda x: '.loom' in x,z))
+#            ifi=os.path.join(outdir,p,f[0])
+#            filelist.append(ifi)
+#        print(filelist)
+#        outf=outdir+"/VelocytoCounts_merged/merged.loom"
+#        print(outf)
+#        loompy.combine(files=filelist,output_file=outf, key="Accession")
