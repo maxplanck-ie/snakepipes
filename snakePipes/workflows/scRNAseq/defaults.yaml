@@ -42,6 +42,7 @@ cellBarcodeFile:
 cellBarcodePattern: "NNNNNNXXXXXX"
 splitLib: False
 cellNames:
+BCwhiteList:
 libraryType: 1
 bwBinSize: 10
 verbose: False

@@ -47,6 +47,10 @@ if not cf.is_paired(infiles,ext,reads):
     print("This workflow requires paired-end read data!")
     exit(1)
 
+if mode == "STARsolo" and not BCwhiteList:
+    print("\n  Error! No barcode white list was provided !! This is curretly required for the STARsolo mode. \n\n")
+    exit(1)
+
 ## After barcode transfer to R2 we have only single end data / R2
 ## but we need to keep "reads" for rule fastq_barcode
 pairedEnd = False

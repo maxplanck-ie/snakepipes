@@ -28,7 +28,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          "cellBarcodePattern": "NNNNNNXXXXXX", "bwBinSize": 10,
                          "plotFormat": "png", "skipRaceID": False,
                          "cellFilterMetric": "gene_universe",
-			 "mode": "Gruen"}):
+			 "mode": "Gruen", "BCwhiteList": None}):
     """
     Parse arguments from the command line.
     """
@@ -110,6 +110,11 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                           help="either tab-sep. file with cell name ranges or directory with *.csv files that contain "
                           "cell names and plate/library information for all fastq files! (default: '%(default)s')",
                           default=defaults["cellNames"])
+
+    optional.add_argument("--BCwhiteList",
+                          metavar="STR",
+                          help="Path to a one-column txt file with barcode whitelist. Required for the STARsolo mode (default: '%(default)s')",
+                          default=defaults["BCwhiteList"])
 
     optional.add_argument("--bwBinSize",
                           dest="bwBinSize",

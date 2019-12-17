@@ -19,7 +19,8 @@ rule STARsolo:
         prefix = "STARsolo/{sample}/{sample}.",
         samsort_memory = '2G',
         sample_dir = "STARsolo/{sample}",
-        bam = "{sample}/{sample}.Aligned.sortedByCoord.out.bam"
+        bam = "{sample}/{sample}.Aligned.sortedByCoord.out.bam",
+        bclist = BCwhiteList
     benchmark:
         aligner+"/.benchmark/STARsolo.{sample}.benchmark"
     threads: 20  # 3.2G per core
@@ -43,7 +44,7 @@ rule STARsolo:
 	    --soloUMIlen 7 \
 	    --soloCBstart 8 \
 	    --soloCBlen 7 \
-	    --soloCBwhitelist /data/processing/bioinfo-core/celseq_barcodes.384.1col.txt \
+	    --soloCBwhitelist {params.bclist} \
 	    --soloBarcodeReadLength 0 \
 	    --soloCBmatchWLtype Exact \
 	    --soloStrand Forward\
