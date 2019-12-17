@@ -28,7 +28,8 @@ Workflows available
 
 - DNA-mapping*
 - ChIP-seq*
-- RNA-seq*
+- mRNA-seq*
+- noncoding-RNA-seq*
 - ATAC-seq*
 - scRNA-seq
 - Hi-C

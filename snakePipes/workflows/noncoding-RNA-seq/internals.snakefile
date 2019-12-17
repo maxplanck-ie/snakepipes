@@ -15,9 +15,6 @@ import sys
 
 mode = list(map(str.strip, re.split(',|;', config["mode"])))
 
-## genome names for allele-sp mapping
-strains = list(map(str.strip, re.split(',|;', config["strains"])))
-
 ## trim
 fastq_dir = "FASTQ"
 if trim:

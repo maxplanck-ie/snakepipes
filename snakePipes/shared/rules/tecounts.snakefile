@@ -26,8 +26,8 @@ if pairedEnd:
                 --sjdbGTFfile {params.gtf} \
                 --genomeDir {params.index} \
                 --readFilesIn {input.r1} {input.r2} \
-                --outFileNamePrefix {params.prefix} \
-            mv {params.prefix}/{wildcards.sample}.bam {output.bam}
+                --outFileNamePrefix {params.prefix}
+            mv {params.prefix}Aligned.out.bam {output.bam}
             """
 else:
     rule STAR:
@@ -56,13 +56,13 @@ else:
                 --sjdbGTFfile {params.gtf} \
                 --genomeDir {params.index} \
                 --readFilesIn {input} \
-                --outFileNamePrefix {params.prefix} \
-            mv {params.prefix}/{wildcards.sample}.bam {output.bam}
+                --outFileNamePrefix {params.prefix}
+            mv {params.prefix}Aligned.out.bam {output.bam}
             """
 
 
 rule makeRMSKGTF:
-    input: TEGTF
+    input: te_gtf
     output: temp("rmsk.gtf")
     run:
         f = open(input[0])
@@ -89,7 +89,7 @@ rule makeRMSKGTF:
                     "repFamily": repFamily,
                     "tid": tid}
 
-            of.write("{genoName}\trmsk\texon\t{genoStart}\t{genoEnd}\t.\{strand}\t.\tgene_id \"{repName}\"; transcript_id \"{tid}\"; family_id \"{repFamily}\"; class_id \"{repClass}\";\".format(**meta))
+            of.write("{genoName}\trmsk\texon\t{genoStart}\t{genoEnd}\t.\t{strand}\t.\tgene_id \"{repName}\"; transcript_id \"{tid}\"; family_id \"{repFamily}\"; class_id \"{repClass}\";\n".format(**meta))
         f.close()
         of.close()
 
@@ -100,7 +100,7 @@ rule TEcounts:
         bam = aligner + "/{sample}.unsorted.bam",
         repeatGTF = "rmsk.gtf"
     output:
-        "TEcount/{sample}/counts.txt"
+        "TEcount/{sample}.cntTable"
     params:
         gtf = genes_gtf
     log:
@@ -109,7 +109,26 @@ rule TEcounts:
     benchmark:
         "TEcount/.benchmark/{sample}.benchmark"
     threads: 1
-    conda: CONDA_RIBOMINUS_RNASEQ_ENV
+    conda: CONDA_NONCODING_RNASEQ_ENV
     shell: """
         TEcount --format BAM --mode multi -b {input.bam} --GTF {params.gtf} --TE {input.repeatGTF} --project TEcount/{wildcards.sample} 2> {log.err} > {log.out}
         """
+
+
+rule sortBams:
+    input:
+        aligner + "/{sample}.unsorted.bam"
+    output:
+        "filtered_bam/{sample}.filtered.bam"
+    threads: 5
+    conda: CONDA_SHARED_ENV
+    shell: """
+        MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX);
+        samtools view -u -F 2304 {input} | samtools sort -@ 4 -m 2G -T $MYTEMP/{wildcards.sample} -o {output}
+        """
+
+
+rule cpGTF:
+    input: genes_gtf
+    output: temp("Annotation/genes.filtered.gtf")
+    shell: "ln -s {input} {output}"

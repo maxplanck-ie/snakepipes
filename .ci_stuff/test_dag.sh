@@ -6,7 +6,7 @@ if [[ ${CI:-"false"} == "true" ]]; then
     python -m pip install --no-deps --ignore-installed .
 fi
 
-# Needed by DNA, HiC, RNA-seq, WGBS and scRNA-seq workflows
+# Needed by DNA, HiC, mRNA-seq, WGBS and scRNA-seq workflows
 mkdir -p PE_input
 touch PE_input/sample1_R1.fastq.gz PE_input/sample1_R2.fastq.gz \
       PE_input/sample2_R1.fastq.gz PE_input/sample2_R2.fastq.gz \
@@ -81,28 +81,28 @@ if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 338 ]; then exit 1 ; fi
 WC=`ATAC-seq -d BAM_input --snakemakeOptions " --dryrun --conda-prefix /tmp" --maxFragmentSize 120 --qval 0.1 .ci_stuff/organism.yaml | tee >(cat 1>&2) | grep -v "Conda environment" | wc -l`
 if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 338 ]; then exit 1 ; fi
 
-# RNA-seq
-WC=`RNA-seq -i PE_input -o output --snakemakeOptions " --dryrun --conda-prefix /tmp" .ci_stuff/organism.yaml | tee >(cat 1>&2) | grep -v "Conda environment" | wc -l`
+# mRNA-seq
+WC=`mRNA-seq -i PE_input -o output --snakemakeOptions " --dryrun --conda-prefix /tmp" .ci_stuff/organism.yaml | tee >(cat 1>&2) | grep -v "Conda environment" | wc -l`
 if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 1007 ]; then exit 1 ; fi
-WC=`RNA-seq -i PE_input -o output --snakemakeOptions " --dryrun --conda-prefix /tmp" -m "alignment" .ci_stuff/organism.yaml | tee >(cat 1>&2) | grep -v "Conda environment" | wc -l`
+WC=`mRNA-seq -i PE_input -o output --snakemakeOptions " --dryrun --conda-prefix /tmp" -m "alignment" .ci_stuff/organism.yaml | tee >(cat 1>&2) | grep -v "Conda environment" | wc -l`
 if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 735 ]; then exit 1 ; fi
-WC=`RNA-seq -i PE_input -o output --snakemakeOptions " --dryrun --conda-prefix /tmp" -m "alignment,deepTools_qc" --trim .ci_stuff/organism.yaml | tee >(cat 1>&2) | grep -v "Conda environment" | wc -l`
+WC=`mRNA-seq -i PE_input -o output --snakemakeOptions " --dryrun --conda-prefix /tmp" -m "alignment,deepTools_qc" --trim .ci_stuff/organism.yaml | tee >(cat 1>&2) | grep -v "Conda environment" | wc -l`
 if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 1075 ]; then exit 1 ; fi
-WC=`RNA-seq -i PE_input -o output --snakemakeOptions " --dryrun --conda-prefix /tmp" -m "alignment-free,deepTools_qc" .ci_stuff/organism.yaml | tee >(cat 1>&2) | grep -v "Conda environment" | wc -l`
+WC=`mRNA-seq -i PE_input -o output --snakemakeOptions " --dryrun --conda-prefix /tmp" -m "alignment-free,deepTools_qc" .ci_stuff/organism.yaml | tee >(cat 1>&2) | grep -v "Conda environment" | wc -l`
 if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 1157 ]; then exit 1 ; fi
-WC=`RNA-seq -i PE_input -o output --snakemakeOptions " --dryrun --conda-prefix /tmp" -m "alignment,deepTools_qc" --bcExtract --trim .ci_stuff/organism.yaml | tee >(cat 1>&2) | grep -v "Conda environment" | wc -l`
+WC=`mRNA-seq -i PE_input -o output --snakemakeOptions " --dryrun --conda-prefix /tmp" -m "alignment,deepTools_qc" --bcExtract --trim .ci_stuff/organism.yaml | tee >(cat 1>&2) | grep -v "Conda environment" | wc -l`
 if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 1033 ]; then exit 1 ; fi
-WC=`RNA-seq -i PE_input -o output --snakemakeOptions " --dryrun --conda-prefix /tmp" -m "alignment,deepTools_qc" --bcExtract --UMIDedup --trim .ci_stuff/organism.yaml | tee >(cat 1>&2) | grep -v "Conda environment" | wc -l`
+WC=`mRNA-seq -i PE_input -o output --snakemakeOptions " --dryrun --conda-prefix /tmp" -m "alignment,deepTools_qc" --bcExtract --UMIDedup --trim .ci_stuff/organism.yaml | tee >(cat 1>&2) | grep -v "Conda environment" | wc -l`
 if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 1089 ]; then exit 1 ; fi
-WC=`RNA-seq -i SE_input -o output --snakemakeOptions " --dryrun --conda-prefix /tmp" .ci_stuff/organism.yaml | tee >(cat 1>&2) | grep -v "Conda environment" | wc -l`
+WC=`mRNA-seq -i SE_input -o output --snakemakeOptions " --dryrun --conda-prefix /tmp" .ci_stuff/organism.yaml | tee >(cat 1>&2) | grep -v "Conda environment" | wc -l`
 if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 896 ]; then exit 1 ; fi
-WC=`RNA-seq -i SE_input -o output --snakemakeOptions " --dryrun --conda-prefix /tmp" -m "alignment" .ci_stuff/organism.yaml | tee >(cat 1>&2) | grep -v "Conda environment" | wc -l`
+WC=`mRNA-seq -i SE_input -o output --snakemakeOptions " --dryrun --conda-prefix /tmp" -m "alignment" .ci_stuff/organism.yaml | tee >(cat 1>&2) | grep -v "Conda environment" | wc -l`
 if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 635 ]; then exit 1 ; fi
-WC=`RNA-seq -i SE_input -o output --snakemakeOptions " --dryrun --conda-prefix /tmp" -m "alignment,deepTools_qc" --trim .ci_stuff/organism.yaml | tee >(cat 1>&2) | grep -v "Conda environment" | wc -l`
+WC=`mRNA-seq -i SE_input -o output --snakemakeOptions " --dryrun --conda-prefix /tmp" -m "alignment,deepTools_qc" --trim .ci_stuff/organism.yaml | tee >(cat 1>&2) | grep -v "Conda environment" | wc -l`
 if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 964 ]; then exit 1 ; fi
-WC=`RNA-seq -i SE_input -o output --snakemakeOptions " --dryrun --conda-prefix /tmp" -m "alignment-free,deepTools_qc" .ci_stuff/organism.yaml | tee >(cat 1>&2) | grep -v "Conda environment" | wc -l`
+WC=`mRNA-seq -i SE_input -o output --snakemakeOptions " --dryrun --conda-prefix /tmp" -m "alignment-free,deepTools_qc" .ci_stuff/organism.yaml | tee >(cat 1>&2) | grep -v "Conda environment" | wc -l`
 if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 1046 ]; then exit 1 ; fi
-WC=`RNA-seq -i SE_input -o output --snakemakeOptions " --dryrun --conda-prefix /tmp" --trim --fastqc .ci_stuff/organism.yaml | tee >(cat 1>&2) | grep -v "Conda environment" | wc -l`
+WC=`mRNA-seq -i SE_input -o output --snakemakeOptions " --dryrun --conda-prefix /tmp" --trim --fastqc .ci_stuff/organism.yaml | tee >(cat 1>&2) | grep -v "Conda environment" | wc -l`
 if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 1100 ]; then exit 1 ; fi
 
 # HiC

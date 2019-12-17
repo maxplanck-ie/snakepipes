@@ -57,7 +57,7 @@ The sample sheet
 ----------------
 
 Most of the workflows allow users to perform grouped operations as an option, for example
-differential expression analysis in RNA-seq workflow, differential binding analysis in
+differential expression analysis in mRNA-seq workflow, differential binding analysis in
 ChIP-Seq workflow, differential open-chromatin analysis in ATAC-seq workflow or merging of
 groups in Hi-C workflow. For all this analysis, snakePipes needs a ``sampleSheet.tsv`` file (file name is not important, but it has to be tab-separated) that contains sample grouping information. In most cases users would want to groups samples by replicates. The format of the file is as follows:
 

@@ -1,6 +1,11 @@
 snakePipes News
 ===============
 
+snakePipes 2.0.0
+----------------
+
+ * Added a noncoding-RNA-seq workflow and renamed RNA-seq to mRNA-seq for clarity. The noncoding workflow will also quantify protein coding genes, but its primary use is analyzing repeat expression.
+
 snakePipes 1.3.2
 ----------------
 

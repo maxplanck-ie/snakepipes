@@ -31,6 +31,7 @@ include: os.path.join(maindir, "shared", "rules", "deepTools_RNA.snakefile")
 if not fromBAM:
     ## FASTQ: either downsample FASTQ files or create symlinks to input files
     include: os.path.join(maindir, "shared", "rules", "FASTQ.snakefile")
+    include: os.path.join(maindir, "shared", "rules", "umi_tools.snakefile")
 
     ## FastQC
     if fastqc:
@@ -84,19 +85,19 @@ def run_Trimming(trim, fastqc):
         return([])
 
 
-def run_alignment():
-    if "alignment" in mode:
-        file_list = [
-        expand("filtered_bam/{sample}.filtered.bam", sample = samples),
-        expand("filtered_bam/{sample}.filtered.bam.bai", sample = samples),
-        "QC_report/QC_report_all.tsv"
-        ]
-        if sampleSheet:
-            sample_name = os.path.splitext(os.path.basename(sampleSheet))[0]
-            file_list.append( ["DESeq2_{}/DESeq2.session_info.txt".format(sample_name)] )
-        return(file_list)
-    else:
-        return([])
+#def run_alignment():
+#    if "alignment" in mode:
+#        file_list = [
+#        expand("filtered_bam/{sample}.filtered.bam", sample = samples),
+#        expand("filtered_bam/{sample}.filtered.bam.bai", sample = samples),
+#        "QC_report/QC_report_all.tsv"
+#        ]
+#        if sampleSheet:
+#            sample_name = os.path.splitext(os.path.basename(sampleSheet))[0]
+#            file_list.append( ["DESeq2_{}/DESeq2.session_info.txt".format(sample_name)] )
+#        return(file_list)
+#    else:
+#        return([])
 
 
 def run_deepTools_qc():
@@ -115,6 +116,7 @@ def run_deepTools_qc():
                               "deepTools_qc/plotCorrelation/correlation.pearson.bed_coverage.tsv",
                               "deepTools_qc/plotCorrelation/correlation.spearman.bed_coverage.tsv",
                               "deepTools_qc/plotPCA/PCA.bed_coverage.tsv"] )
+        return(file_list)
     else:
         return([])
 
@@ -158,21 +160,19 @@ if not fromBAM:
 
     rule all:
         input:
-           # expand("FASTQ/{sample}{read}.fastq.gz", sample = samples, read = reads),
-            expand("TEcount/{sample}/counts.txt", sample = samples),
+            expand("FASTQ/{sample}{read}.fastq.gz", sample = samples, read = reads),
+            expand("TEcount/{sample}.cntTable", sample = samples),
             run_FastQC(fastqc),
             run_Trimming(trim, fastqc),
-            run_alignment(),                 # classical mapping + counting
-            run_deepTools_qc(),
-            "multiQC/multiqc_report.html"
+            run_deepTools_qc()
+            #"multiQC/multiqc_report.html"
 
 else:
     rule all:
         input:
-            expand("TEcount/{sample}/counts.txt", sample = samples),
-            run_alignment(),
-            run_deepTools_qc(),
-            "multiQC/multiqc_report.html"
+            expand("TEcount/{sample}.cntTable", sample = samples),
+            run_deepTools_qc()
+            #"multiQC/multiqc_report.html"
 
 ### execute after  finished ####################################################
 ################################################################################

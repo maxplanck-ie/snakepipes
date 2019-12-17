@@ -84,7 +84,8 @@ def config_diff(dict1, dict2):
 
 
 def get_version():
-    print("\n---- This analysis has been done using snakePipes version {} ----\n".format(__version__))
+    # If this is sent to stdout it breaks making a DAG pdf
+    sys.stderr.write("\n---- This analysis has been done using snakePipes version {} ----\n".format(__version__))
 
 
 def load_organism_data(genome, maindir, verbose):
