@@ -25,7 +25,7 @@ UMIs in the read headers are used to avoid counting PCR duplicates. A number of 
 Input requirements
 ------------------
 
-The primary input requirement is a directory of paired-end fastq files. In addition, if you do not wish to use the default list of cell-barcodes you must then supply your own. For the STAR solo mode, a barcode whitelist is required.
+The primary input requirement is a directory of paired-end fastq files. In addition, if you do not wish to use the default list of cell-barcodes you must then supply your own. For the STAR solo mode, a barcode whitelist is required, as well as specification of UMI and CB positions and length, if different from default.
 
 Cell barcodes
 ~~~~~~~~~~~~~
