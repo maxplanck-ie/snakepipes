@@ -6,7 +6,13 @@ scRNA-seq
 What it does
 ------------
 
-The scRNA-seq pipeline is intended to process CEL-Seq2 data, though it may be able to process some similar Drop-seq protocols. The general procedure involves
+The scRNA-seq pipeline is intended to process UMI-based data, expecting the cell barcode and umi in Read1, and the cDNA sequence in Read2. 
+
+There are currently two analysis modes available:
+- "Gruen" to reproduce CellSeq2 data analysis by Gruen et al.
+- "STARsolo" which uses STAR solo for mapping and quantitation.
+
+The general procedure involves
 
 1. moving cell barcodes and UMIs from read 1 into the read headers of read 2,
 2. mapping read 2,
@@ -19,7 +25,7 @@ UMIs in the read headers are used to avoid counting PCR duplicates. A number of 
 Input requirements
 ------------------
 
-The primary input requirement is a directory of paired-end fastq files. In addition, if you do not wish to use the default list of cell-barcodes you must then supply your own.
+The primary input requirement is a directory of paired-end fastq files. In addition, if you do not wish to use the default list of cell-barcodes you must then supply your own. For the STAR solo mode, a barcode whitelist is required.
 
 Cell barcodes
 ~~~~~~~~~~~~~
@@ -42,6 +48,12 @@ The default cell barcodes are 192 hexamers listed in a file with the first colum
 
 Predefined cell barcodes are required right now. However it is planned to make this more generic in future workflow versions.
 
+Barcode whitelist
+~~~~~~~~~~~~~~~~~
+
+Required for the STARsolo mode. The expected format is a one-column txt file with barcodes the user wishes to retain.
+
+
 Configuration file
 ~~~~~~~~~~~~~~~~~~
 
@@ -62,18 +74,25 @@ The default configuration file is listed below and can be found in ``snakePipes/
     ext: '.fastq.gz'
     ## paired-end read name extension (default: ["_R1", "_R2"])
     reads: ["_R1","_R2"]
+    ##Analysis mode
+    mode: Gruen
     ## Number of reads to downsample from each FASTQ file
     downsample:
     ## Options for trimming
     trim: False
     trimmer: cutadapt
     trimmerOptions: -a A{'30'}
+    ## N.B., setting --outBAMsortingBinsN too high can result in cryptic errors
+    alignerOptions: "--outBAMsortingBinsN 30 --twopassMode Basic"
     ## further options
     filterGTF: "-v -P 'decay|pseudogene' "
     cellBarcodeFile:
     cellBarcodePattern: "NNNNNNXXXXXX"
     splitLib: False
     cellNames:
+    ##STARsolo options
+    BCwhiteList:
+    #generic options
     libraryType: 1
     bwBinSize: 10
     verbose: False
@@ -83,6 +102,12 @@ The default configuration file is listed below and can be found in ``snakePipes/
     cellFilterMetric: gene_universe
     #Option to skip RaceID to save time
     skipRaceID: False
+    #umi_tools options:
+    UMIBarcode: False
+    bcPattern: NNNNCCCCCCCCC #default: 4 base umi barcode, 9 base cell barcode (eg. RELACS barcode)
+    UMIDedup: False
+    UMIDedupSep: "_"
+    UMIDedupOpts: --paired
 
 
 While some of these can be changed on the command line, you may find it useful to change ``cellBarcodePattern`` and ``cellBarcodeFile`` if you find that you need to change them frequently.
