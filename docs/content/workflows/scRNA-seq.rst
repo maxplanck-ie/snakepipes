@@ -92,6 +92,7 @@ The default configuration file is listed below and can be found in ``snakePipes/
     cellNames:
     ##STARsolo options
     BCwhiteList:
+    STARsoloCoords: ["1","7","8","7"]
     #generic options
     libraryType: 1
     bwBinSize: 10
