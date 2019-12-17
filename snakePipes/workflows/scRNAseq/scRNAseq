@@ -28,7 +28,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          "cellBarcodePattern": "NNNNNNXXXXXX", "bwBinSize": 10,
                          "plotFormat": "png", "skipRaceID": False,
                          "cellFilterMetric": "gene_universe",
-			 "mode": "Gruen", "BCwhiteList": None}):
+			 "mode": "Gruen", "BCwhiteList": None, "STARsoloCoords": ["1","7","8","7"]}):
     """
     Parse arguments from the command line.
     """
@@ -115,6 +115,11 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                           metavar="STR",
                           help="Path to a one-column txt file with barcode whitelist. Required for the STARsolo mode (default: '%(default)s')",
                           default=defaults["BCwhiteList"])
+
+    optional.add_argument("--STARsoloCoords",
+                          type=list,
+                          help="Comma-separated list of values: UMI start position, UMI length, CB start position, CB length. Required for the STARsolo mode (default: '%(default)s')",
+                          default=defaults["STARsoloCoords"])
 
     optional.add_argument("--bwBinSize",
                           dest="bwBinSize",

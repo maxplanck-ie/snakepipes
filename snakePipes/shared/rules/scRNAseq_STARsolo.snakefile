@@ -20,7 +20,11 @@ rule STARsolo:
         samsort_memory = '2G',
         sample_dir = "STARsolo/{sample}",
         bam = "{sample}/{sample}.Aligned.sortedByCoord.out.bam",
-        bclist = BCwhiteList
+        bclist = BCwhiteList,
+        UMIstart = STARsoloCoords[0],
+        UMIlen = STARsoloCoords[1],
+        CBstart = STARsoloCoords[2],
+        CBlen = STARsoloCoords[3]
     benchmark:
         aligner+"/.benchmark/STARsolo.{sample}.benchmark"
     threads: 20  # 3.2G per core
@@ -40,10 +44,10 @@ rule STARsolo:
             --readFilesIn {input.r1} {input.r2} \
             --outFileNamePrefix {params.prefix} \
 	    --soloType CB_UMI_Simple \
-	    --soloUMIstart 1 \
-	    --soloUMIlen 7 \
-	    --soloCBstart 8 \
-	    --soloCBlen 7 \
+	    --soloUMIstart {params.UMIstart} \
+	    --soloUMIlen {params.UMIlen} \
+	    --soloCBstart {params.CBstart} \
+	    --soloCBlen {params.CBlen} \
 	    --soloCBwhitelist {params.bclist} \
 	    --soloBarcodeReadLength 0 \
 	    --soloCBmatchWLtype Exact \
