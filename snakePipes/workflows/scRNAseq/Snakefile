@@ -8,16 +8,17 @@ def install(package):
 
 ###install velocyto if not present
 ##velocyto install is working via pip
-#install("numpy")
-#install("scipy")
-#install("cython")
-#install("numba")
-#install("matplotlib")
-#install("scikit-learn")
-#install("h5py")
-#install("click")
-#install("pysam")
+install("numpy")
+install("scipy")
+install("cython")
+install("numba")
+install("matplotlib")
+install("scikit-learn")
+install("h5py")
+install("click")
+install("pysam")
 install("velocyto")
+#install("loompy")
 
 ### snakemake_workflows initialization ########################################
 maindir = os.path.dirname(os.path.dirname(workflow.basedir))
