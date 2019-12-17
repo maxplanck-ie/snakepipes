@@ -48,7 +48,7 @@ if not cf.is_paired(infiles,ext,reads):
     exit(1)
 
 if mode == "STARsolo" and not BCwhiteList:
-    BCwhiteList = os.path.join(maindir,"celseq_barcodes.384.1col.txt")
+    BCwhiteList = os.path.join(maindir,"workflows","scRNAseq","celseq_barcodes.384.1col.txt")
     print("\n  WARNING! No barcode white list was provided !! Default 384 CellSeq2 barcodes will be used. \n\n")
     
 ## After barcode transfer to R2 we have only single end data / R2
