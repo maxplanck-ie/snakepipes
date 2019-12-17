@@ -121,7 +121,7 @@ If your read/barcode layout requires additional **'Don't care'** positions eg. b
 Barcode file
 ~~~~~~~~~~~~~~~
 
-Only specify a file if you use other than the default CEL-seq2 barcodes.
+Only specify a file if you use other than the default CEL-seq2 barcodes (mode Gruen).
 
 
 Trimming
@@ -144,14 +144,14 @@ The CEL-seq2 protocol produces reads where read 2 maps in sense direction (:code
 Split lib
 ~~~~~~~~~
 
-This option you need in case a library contains only 96 instead of 192 cells.
+This option you need in case a library contains only 96 instead of 192 cells (mode Gruen).
 
 
 
 Output structure
 ----------------
 
-The following will be produced in the output directory::
+The following will be produced in the output directory when the workflow is run in mode Gruen::
 
     |-- cluster_logs
     |-- Filtered_cells_RaceID
@@ -189,6 +189,37 @@ The following will be produced in the output directory::
  - The **Counts** directory contains 4 sets of counts: UMIs/feature/cell (.umis.txt), reads/feature/cell (.reads.txt), corrected number of UMIs/feature/cell (corrected.txt) and raw counts per cell per UMI per feature (raw_counts.txt). Of these, the values in corrected.txt should be used for further analysis and the others for quality control.
  - The **deeptools_qc** directory contains additional QC reports and plots. The ``FASTQC`` directory can be used to verify eg. the barcode layout of read 1.
  - The **QC_report** directory contains additional QC stats as tables and plots.
+
+The following will be produced in the output directory when the workflow is run in mode STARsolo::
+
+    |-- VelocytoCounts
+    |-- cluster_logs
+    |-- filtered_bam
+    |-- multiQC
+    |   `-- multiqc_data
+    |-- deepTools_qc
+    |   |-- logs
+    |   |-- plotCorrelation
+    |   |-- plotPCA
+    |   |-- multiBigwigSummary
+    |   |-- estimateReadFiltering
+    |   |-- plotEnrichment
+    |   `-- bamPEFragmentSize
+    |-- Sambamba
+    |-- bamCoverage
+    |   `-- logs
+    |-- STARsolo
+    |   |-- logs
+    |-- FastQC
+    |   `-- logs
+    |-- Annotation
+    `-- originalFASTQ
+
+ - The **VelocytoCounts** directory contains loom files in sample subdirectories.
+ - The **STARsolo* directory contains bam files and 10X-format cell count matrices produced by STARsolo.
+
+The remaining folders are described in the Gruen mode above.
+
 
 Understanding the outputs
 -------------------------

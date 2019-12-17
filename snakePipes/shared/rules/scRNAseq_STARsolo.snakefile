@@ -104,7 +104,7 @@ checkpoint velocyto:
             export LC_ALL=en_US.utf-8
             export LANG=en_US.utf-8
             velocyto run --bcfile {input.bc} --outputfolder {output.outdir} {input.bam} {input.gtf};
-            touch VelocytoCounts/done.txt
+            touch {output.outdum}
     """
 
 #rule combine_loom:
