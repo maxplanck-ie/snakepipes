@@ -97,7 +97,7 @@ rule cellsort_bam:
 
 checkpoint velocyto:
     input:
-        bc = "/data/processing/bioinfo-core/celseq_barcodes.384.1col.txt",
+        bc = BCwhiteList,
         gtf = genes_gtf,
         bam = "filtered_bam/{sample}.filtered.bam",
         csbam="filtered_bam/cellsorted_{sample}.filtered.bam"
