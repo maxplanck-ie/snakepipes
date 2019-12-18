@@ -79,7 +79,7 @@ checktable <- function(countdata = NA, sampleSheet = NA, alleleSpecific = FALSE,
 #'
 #'
 
-DESeq_basic <- function(countdata, coldata, fdr, alleleSpecific = FALSE, from_salmon = FALSE) {
+DESeq_basic <- function(countdata, coldata, fdr, alleleSpecific = FALSE, from_salmon = FALSE, size_factors=NA) {
     cnames.sub<-unique(colnames(coldata)[2:which(colnames(coldata) %in% "condition")])
     d<-as.formula(noquote(paste0("~",paste(cnames.sub,collapse="+"))))
     
@@ -102,8 +102,13 @@ DESeq_basic <- function(countdata, coldata, fdr, alleleSpecific = FALSE, from_sa
                                     colData = coldata, design =d)
       }
     }
+    if(length(size_factors) > 1) {
+        print("applying size factors")
+        print(size_factors)
+        sizeFactors(dds) = size_factors
+    }
     dds <- DESeq2::DESeq(dds)
-    ddr <- DESeq2::results(dds,alpha = fdr)
+    ddr <- DESeq2::results(dds, alpha = fdr)
     output <- list(dds = dds, ddr = ddr)
     return(output)
 

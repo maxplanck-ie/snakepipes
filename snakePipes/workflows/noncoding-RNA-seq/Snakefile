@@ -50,15 +50,8 @@ else:
 ## Align and run TEcounts
 include: os.path.join(maindir, "shared", "rules", "tecounts.snakefile")
 
-### QC report
-#include:os.path.join(maindir, "shared", "rules", "RNA-seq_qc_report.snakefile")
-
-### DESeq2
-#if sampleSheet:
-#    include: os.path.join(maindir, "shared", "rules", "DESeq2.snakefile")
-
-### MultiQC
-#include: os.path.join(maindir, "shared", "rules", "multiQC.snakefile")
+## MultiQC
+include: os.path.join(maindir, "shared", "rules", "multiQC.snakefile")
 
 ### conditional/optional rules #################################################
 ################################################################################
@@ -85,21 +78,6 @@ def run_Trimming(trim, fastqc):
         return([])
 
 
-#def run_alignment():
-#    if "alignment" in mode:
-#        file_list = [
-#        expand("filtered_bam/{sample}.filtered.bam", sample = samples),
-#        expand("filtered_bam/{sample}.filtered.bam.bai", sample = samples),
-#        "QC_report/QC_report_all.tsv"
-#        ]
-#        if sampleSheet:
-#            sample_name = os.path.splitext(os.path.basename(sampleSheet))[0]
-#            file_list.append( ["DESeq2_{}/DESeq2.session_info.txt".format(sample_name)] )
-#        return(file_list)
-#    else:
-#        return([])
-
-
 def run_deepTools_qc():
     if "deepTools_qc" in mode:
         file_list = [
@@ -119,6 +97,14 @@ def run_deepTools_qc():
         return(file_list)
     else:
         return([])
+
+
+def run_deseq2():
+    if sampleSheet:
+        sample_name = os.path.splitext(os.path.basename(sampleSheet))[0]
+        file_list = ["DESeq2_{}/DESeq2.session_info.txt".format(sample_name)]
+        return(file_list)
+    return([])
 
 
 ### execute before  starts #####################################################
@@ -164,22 +150,24 @@ if not fromBAM:
             expand("TEcount/{sample}.cntTable", sample = samples),
             run_FastQC(fastqc),
             run_Trimming(trim, fastqc),
-            run_deepTools_qc()
-            #"multiQC/multiqc_report.html"
+            run_deepTools_qc(),
+            run_deseq2(),
+            "multiQC/multiqc_report.html"
 
 else:
     rule all:
         input:
             expand("TEcount/{sample}.cntTable", sample = samples),
-            run_deepTools_qc()
-            #"multiQC/multiqc_report.html"
+            run_deepTools_qc(),
+            run_deseq2(),
+            "multiQC/multiqc_report.html"
 
 ### execute after  finished ####################################################
 ################################################################################
 onsuccess:
     cf.cleanLogs(outdir, cluster_config)
     if "verbose" in config and config["verbose"]:
-        print("\n--- ribo-minus-RNA-seq workflow finished successfully! ------------------------------------\n")
+        print("\n--- noncoding-RNA-seq workflow finished successfully! ------------------------------------\n")
 
 onerror:
-    print("\n !!! ERROR in ribo-minus-RNA-seq workflow! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
+    print("\n !!! ERROR in noncoding-RNA-seq workflow! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")

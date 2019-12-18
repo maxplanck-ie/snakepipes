@@ -129,6 +129,59 @@ rule sortBams:
 
 
 rule cpGTF:
+    input:
+        genes_gtf,
+        genes_bed
+    output:
+        temp("Annotation/genes.filtered.gtf"),
+        temp("Annotation/genes.filtered.bed")
+    shell: """
+        ln -s {input[0]} {output[0]}
+        ln -s {input[1]} {output[1]}
+        """
+
+
+rule symbolFile:
     input: genes_gtf
-    output: temp("Annotation/genes.filtered.gtf")
-    shell: "ln -s {input} {output}"
+    output: temp("Annotation/genes.filtered.symbol")
+    run:
+        of = open(output[0], "w")
+        for line in open(input[0]):
+            if line.startswith("#"):
+                continue
+            cols = line.strip().split("\t")
+            geneID = None
+            geneSymbol = None
+            if cols[2] == "gene":
+                meta = cols[8].split(";")
+                meta = [x.strip() for x in meta]  # remove random spaces
+                for x in meta:
+                    if x.startswith("gene_id "):
+                        geneID = x[8:].strip('"')
+                    elif x.startswith("gene_name "):
+                        geneSymbol = x[10:].strip('"')
+                if geneID is not None and geneSymbol is not None:
+                    of.write("{}\t{}\n".format(geneID, geneSymbol))
+        of.close()
+
+
+def get_outdir(folder_name,sampleSheet):
+    sample_name = os.path.splitext(os.path.basename(str(sampleSheet)))[0]
+    return("{}_{}".format(folder_name, sample_name))
+
+
+# TODO: topN, FDR
+rule DESeq2:
+    input:
+        cnts=["TEcount/{}.cntTable".format(x) for x in samples],
+        sampleSheet=sampleSheet,
+        symbol_file = "Annotation/genes.filtered.symbol"
+    output:
+        "{}/DESeq2.session_info.txt".format(get_outdir("DESeq2",sampleSheet))
+    benchmark:
+        "{}/.benchmark/DESeq2.featureCounts.benchmark".format(get_outdir("DESeq2",sampleSheet))
+    params:
+        outdir = get_outdir("DESeq2", sampleSheet),
+        fdr = 0.05,
+    conda: CONDA_RNASEQ_ENV
+    script: "../rscripts/noncoding-DESeq2.R"

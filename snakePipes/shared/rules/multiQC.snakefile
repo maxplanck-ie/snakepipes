@@ -54,6 +54,9 @@ def multiqc_input_check(return_value):
         if "alignment-free" in mode:
             infiles.append( expand("Salmon/{sample}/quant.sf", sample = samples) )
             indir += " Salmon "
+    elif pipeline == "noncoding-rna-seq":
+        infiles.append(expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample=samples))
+        indir += " STAR deepTools_qc "
     elif pipeline == "hic":
         infiles.append(expand("HiC_matrices/QCplots/{sample}_QC/QC.log", sample = samples))
         indir += " BWA "
