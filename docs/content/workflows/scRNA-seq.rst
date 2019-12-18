@@ -22,6 +22,23 @@ UMIs in the read headers are used to avoid counting PCR duplicates. A number of 
 
 .. image:: ../images/scRNAseq_pipeline.png
 
+
+Mode STARsolo
+-------------
+
+With current settings, this mode should work with any UMI-based protocol that stores UMI and CB in read 1, each in one chunk. For 10x, reversing of read mates may be necessary.
+
+In this mode, STARsolo is used to map, UMI-deduplicate and count reads. A whitelist of expected barcodes is currently required. Also, read 1 is expected to carry the UMI and the cell barcode, while read 2 is expected to carry the cDNA sequence. Default positions of UMI and CB in read 1 are specified, as well as their respective lengths. If your setup is different from the default, change it via the --STARsoloCoords commandline argument or in the defaults.yaml dictionary.
+
+In the STARsolo folder, bam files are stored, along with 10x-format count matrices and log files summarizing barcode detection and UMI-deduplication.
+Bam files have the UB and CB tags set.
+
+Deeptools QC is run on these bam files.
+
+Before running velocyto, bam files from STARsolo are filtered to remove unmapped reads as well as reads with an empty CB tag and then cell-sorted by the CB tag.
+In the VelocytoCounts folder, loom files with counts of spliced, unspliced and ambiguous reads are stored. These can be further processed by the user e.g. using Seurat.
+
+
 Input requirements
 ------------------
 
