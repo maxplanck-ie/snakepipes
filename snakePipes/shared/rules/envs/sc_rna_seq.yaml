@@ -13,13 +13,4 @@ dependencies:
  - r-gtools = 3.8.1
  - r-dplyr = 0.8.0.1
  - r-raceid = 0.1.3
- - numpy 
- - scipy
- - cython 
- - numba
- - matplotlib
- - scikit-learn
- - h5py
- - click
- - pip:
-   - velocyto
+ - velocyto.py
