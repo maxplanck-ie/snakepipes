@@ -104,6 +104,7 @@ checkpoint velocyto:
     output:
         outdir = directory("VelocytoCounts/{sample}"),
         outdum = "VelocytoCounts/{sample}.done.txt"
+    conda: CONDA_scRNASEQ_ENV
     shell: """
             export LC_ALL=en_US.utf-8
             export LANG=en_US.utf-8
