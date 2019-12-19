@@ -5,6 +5,7 @@ snakePipes 2.0.0
 ----------------
 
  * Added a noncoding-RNA-seq workflow and renamed RNA-seq to mRNA-seq for clarity. The noncoding workflow will also quantify protein coding genes, but its primary use is analyzing repeat expression.
+ * In order to use the noncoding-RNA-seq workflow organism YAML files must now include a `rmsk_file` entry.
 
 snakePipes 1.3.2
 ----------------

@@ -62,7 +62,7 @@ else:
 
 
 rule makeRMSKGTF:
-    input: te_gtf
+    input: rmsk_file
     output: temp("rmsk.gtf")
     run:
         f = open(input[0])

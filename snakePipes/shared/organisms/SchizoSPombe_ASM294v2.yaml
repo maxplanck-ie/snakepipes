@@ -12,4 +12,4 @@ genes_gtf: "/data/repository/organisms/SchizoSPombe_ASM294v2_ensembl/Ensembl/rel
 extended_coding_regions_gtf: "/data/repository/organisms/SchizoSPombe_ASM294v2_ensembl/Ensembl/release-35/genes.slop.gtf"
 blacklist_bed:
 ignoreForNormalization:
-te_gtf: '/data/repository/organisms/SchizoSPombe_ASM294v2_ensembl/UCSC/mm9/rmsk.txt'
+rmsk_file: '/data/repository/organisms/SchizoSPombe_ASM294v2_ensembl/UCSC/mm9/rmsk.txt'
