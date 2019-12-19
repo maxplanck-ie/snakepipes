@@ -10,6 +10,8 @@ The snakePipes noncoding-RNA-seq workflow allows users to process their single o
 ribosomal-depleted RNA-seq fastq files upto the point of gene/transcript/repeat-element counts and differential expression.
 Repeat elements are quantified and tested for differential expression at the name, family and class level. Since changes in repeat element expression tend to be unidirectional, size factors from gene expression are used when normalizing repeat element expression.
 
+Note that in addition to the normal GTF file, this pipeline requires a repeat masker output file, which can be downloaded from UCSC or other sites. The chromosome names here must match that used in the other files.
+
 .. image:: ../images/noncoding_RNAseq_pipeline.png
 
 Input requirements
