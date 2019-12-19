@@ -11,7 +11,7 @@ dependencies:
  - samtools = 1.9
  - subread = 1.6.4
  - hisat2 = 2.1.0
- - star = 2.6.1d
+ - star = 2.7.3a
  - salmon = 0.13.1
  - r-base = 3.5.1
  - r-wasabi = 1.0.0

@@ -62,6 +62,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
 
     optional.add_argument("--aligner",
                           help="Program used for mapping: STAR or HISAT2 (default: '%(default)s'). If you change this, please change --alignerOptions to match.",
+                          choices=["STAR","HISAT2"],
                           default=defaults["aligner"])
 
     optional.add_argument("--alignerOptions",

@@ -16,3 +16,5 @@ filter_cells_monocle:
     memory: 16G
 filter_cells_raceid:
     memory: 12G
+STARsolo:
+    memory: 6G
