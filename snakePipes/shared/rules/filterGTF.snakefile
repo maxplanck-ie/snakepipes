@@ -55,7 +55,7 @@ rule filter_annotation_bed:
     shell:
         """
         cat {input.bed_annot} | grep {params.pattern} > {output.bed_filtered};
-        echo 'cat {input.bed_annot} | grep \'{params.pattern}\' > {output.bed_filtered}' > {params.cmd}
+        echo "cat {input.bed_annot} | grep {params.pattern} > {output.bed_filtered}" > {params.cmd}
         """
 
 ## t2g files is used in alignment-free mode for sleuth/DESeq2
