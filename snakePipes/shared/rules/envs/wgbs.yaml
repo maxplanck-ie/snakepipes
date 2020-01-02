@@ -11,7 +11,7 @@ dependencies:
   - r-car = 3.0_2
   - r-factominer = 1.41
   - r-ggplot2 = 3.1.0
-  - r-rmarkdown
+  - r-rmarkdown >= 2.0
   - r-dplyr = 0.8.0.1
   - r-tidyr
   - r-pander
