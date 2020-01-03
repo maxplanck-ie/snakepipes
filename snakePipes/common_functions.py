@@ -132,6 +132,20 @@ def get_sample_names_bam(infiles, bamExt):
     return sorted(list(set(s)))
 
 
+def check_gz_reads(readdir):
+    gz_check=subprocess.run(args="gzip -rl "+readdir,shell=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+    gl=gz_check.stderr.decode().split("\n")
+    print(gl)
+    gl2=[re.sub('gzip:.+: ','',x ) for x in gl]
+    #print(gl2)
+    s=gl2.count("not in gzip format")
+    print(s)
+    if s>0:
+        print("\n  Error! "+str(s)+" of the input files are not gzipped !!!\n\n")
+        exit(1)
+    return
+
+
 def is_paired(infiles, ext, reads):
     """
     Check for paired-end input files
