@@ -138,7 +138,6 @@ def check_gz_reads(readdir):
     print(gl)
     gl2=[re.sub('gzip:.+: ', '', x) for x in gl]
     s=gl2.count("not in gzip format")
-    print(s)
     if s > 0:
         print("\n  Error! " + str(s) + " of the input files are not gzipped !!!\n\n")
         exit(1)
