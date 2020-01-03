@@ -37,6 +37,7 @@ elif mode == "STARsolo":
 
 infiles = sorted(glob.glob(os.path.join(indir, '*'+ext)))
 samples = cf.get_sample_names(infiles,ext,reads)
+fromBAM = None
 
 if not samples:
     print("\n  Error! NO samples found in dir "+str(indir or '')+"!!!\n\n")
