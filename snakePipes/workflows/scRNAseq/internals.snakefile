@@ -37,6 +37,7 @@ elif mode == "STARsolo":
 
 infiles = sorted(glob.glob(os.path.join(indir, '*'+ext)))
 samples = cf.get_sample_names(infiles,ext,reads)
+fromBAM = None
 
 if not samples:
     print("\n  Error! NO samples found in dir "+str(indir or '')+"!!!\n\n")
@@ -46,6 +47,9 @@ if not samples:
 if not cf.is_paired(infiles,ext,reads):
     print("This workflow requires paired-end read data!")
     exit(1)
+
+if not fromBAM:
+    cf.check_gz_reads(indir)
 
 if mode == "STARsolo" and not BCwhiteList:
     BCwhiteList = os.path.join(maindir,"workflows","scRNAseq","celseq_barcodes.384.1col.txt")
