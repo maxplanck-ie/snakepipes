@@ -51,6 +51,14 @@ rule fastaDict:
         samtools dict -o {output} {input}
         """
 
+if rmsk_file:
+    rule fetchRMSK:
+        output: rmsk_file
+        params:
+            url = rmskURL
+        run:
+            downloadFile(params.url, output)
+
 # Default memory allocation: 8G
 rule make2bit:
     input: genome_fasta
