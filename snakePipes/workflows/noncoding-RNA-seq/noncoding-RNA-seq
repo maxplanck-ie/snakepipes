@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 
 __description__ = """
-MPI-IE workflow for RNA mapping and analysis
+MPI-IE workflow for noncoding RNA mapping and analysis
 
 usage example:
-    RNA-seq -i input-dir -o output-dir mm10
+    noncoding-RNA-seq -i input-dir -o output-dir mm10
 """
 
 
@@ -20,67 +20,46 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          "clusterConfigFile": None, "maxJobs": 5,
                          "snakemakeOptions": "--use-conda", "tempDir": None,
                          "mode": "alignment,deepTools_qc", "downsample": False,
-                         "trim": False, "trimmer": "cutadapt",
+                         "trim": False, "trimmer": "fastp",
                          "trimmerOptions": None, "fastqc": False,
                          "libraryType": 2, "aligner": "STAR",
-                         "alignerOptions": None, "salmonIndexOptions": "--type quasi -k 31",
-                         "featureCountsOptions": "-C -Q 10 --primary",
-                         "filterGTF": None, "sampleSheet": None,
+                         "alignerOptions": "--sjdbOverhang 100 --outSAMstrandField intronMotif --outFilterMultimapNmax 1000 --outFilterMismatchNoverLmax 0.1 --outSAMattributes Standard --outSAMunmapped Within --outSAMtype BAM Unsorted",
+                         "sampleSheet": None,
                          "reads": ["_R1", "_R2"], "ext": ".fastq.gz",
-                         "bwBinSize": 25, "dnaContam": False, "plotFormat": "png",
+                         "bwBinSize": 25, "plotFormat": "png",
                          "fromBAM": False, "pairedEnd": True,
                          "UMIDedup": False,
-                         "UMIDedupOpts": "", "bcPattern": "",
+                         "UMIDedupOpts": "", "bcPattern": "NNNNCCCCCCCCC",
                          "UMIDedupSep": "_", "UMIBarcode": False}):
     """
     Parse arguments from the command line.
     """
     mainArgs = parserCommon.mainArguments(defaults, workingDir=False)
-    snpArgs = parserCommon.snpArguments(defaults)
 
     parser = argparse.ArgumentParser(
         prog=sys.argv[0],
         formatter_class=argparse.RawDescriptionHelpFormatter,
         description=textwrap.dedent(__description__),
-        parents=[mainArgs, snpArgs],
+        parents=[mainArgs],
         add_help=False
     )
 
     # Workflow options
     optional = parser.add_argument_group('Options')
     optional.add_argument("-m", "--mode",
-                          help="workflow running modes (available: 'alignment-free, alignment, allelic-mapping, deepTools_qc')"
+                          help="workflow running modes (available: 'alignment, deepTools_qc')"
                           " (default: '%(default)s')",
                           default=defaults["mode"])
 
     parserCommon.commonOptions(optional, defaults, bw=True)
 
-    optional.add_argument("--libraryType",
-                          help="user provided library type strand specificity. featurCounts style: 0, 1, 2 (Illumina TruSeq); default: '%(default)s')",
-                          type=int,
-                          default=defaults["libraryType"])
-
     optional.add_argument("--aligner",
-                          help="Program used for mapping: STAR or HISAT2 (default: '%(default)s'). If you change this, please change --alignerOptions to match.",
+                          help="Program used for mapping: STAR (default: '%(default)s'). If you change this, please change --alignerOptions to match.",
                           default=defaults["aligner"])
 
     optional.add_argument("--alignerOptions",
-                          help="STAR or hisat2 option string, e.g.: '--twopassMode Basic' (default: '%(default)s')",
+                          help="STAR option string, e.g.: '--twopassMode Basic' (default: '%(default)s')",
                           default=defaults["alignerOptions"])
-
-    optional.add_argument("--salmonIndexOptions",
-                          help="Salmon index options, e.g. '--type fmd' (default: '%(default)s')",
-                          default=defaults["salmonIndexOptions"])
-
-    optional.add_argument("--featureCountsOptions",
-                          help="featureCounts option string. The options '-p -B'"
-                               " are always used for paired-end data (default: '%(default)s')",
-                          default=defaults["featureCountsOptions"])
-
-    optional.add_argument("--filterGTF",
-                          help="filter annotation GTF by grep for use with Salmon, e.g."
-                               " use --filterGTF='-v pseudogene'; default: '%(default)s')",
-                          default=defaults["filterGTF"])
 
     optional.add_argument("--sampleSheet",
                           help="Information on samples (required for DE analysis); see "
@@ -91,11 +70,6 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                                " The DE analysis might fail if your sample names begin with a number. So watch out"
                                " for that! (default: '%(default)s')",
                           default=defaults["sampleSheet"])
-
-    optional.add_argument("--dnaContam",
-                          action="store_true",
-                          help="Returns a plot which presents the proportion of the intergenic reads (default: '%(default)s')",
-                          default=defaults["dnaContam"])
 
     optional.add_argument("--fromBAM",
                          action="store_true",
@@ -125,26 +99,15 @@ def main():
     cf.checkCommonArguments(args, baseDir, outDir=True)
 
     ## Begin workflow-specific checks
-    # check for Allele-specific mapping mode
-    args.allele_mode = cf.checkAlleleParams(args)
-    # convert file path to abspath
-    if args.allele_mode == "create_and_map":
-        args.VCFfile = os.path.abspath(args.VCFfile)
-    elif args.allele_mode == "map_only":
-        args.SNPfile = os.path.abspath(args.SNPfile)
-        args.NMaskedIndex = os.path.abspath(args.NMaskedIndex)
     modeTemp = args.mode.split(",")
-    validModes = set(["alignment", "alignment-free", "deepTools_qc", "allelic-mapping"])
+    validModes = set(["alignment", "deepTools_qc"])
     for mode in modeTemp:
         if mode not in validModes:
             sys.exit("{} is not a valid mode!\n".format(mode))
     if "alignment" not in modeTemp and args.UMIDedup:
         sys.exit("UMIDedup is only valid for \"alignment\" mode!\n")
-    if args.fromBAM and ("alignment-free" in modeTemp or "allelic-mapping" in modeTemp):
-        sys.exit("\n--fromBAM can only be used with modes \'alignment\' or \'deepTools_qc\' - use one of these modes or provide fastq files!\n")
     if args.fromBAM:
         args.aligner = "EXTERNAL_BAM"
-
     ## End workflow-specific checks
 
     # Handle YAML and log files

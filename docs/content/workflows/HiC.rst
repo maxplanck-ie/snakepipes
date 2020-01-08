@@ -89,10 +89,20 @@ the config file description for the HiC workflow :
       noTAD: false
       #Terminate the pipeline before correting the matrices with a certain cutoff value
       noCorrect: false
+      # Method to balance a matrix
+      correctionMethod: KR
       #Chromosomes of interest to build matrix on them
       chromosomes:
       # a .tsv file contains names and replicates of samples. It is needed if mergeSamples
       sampleSheet:
+      #print tools versions
+      toolsVersion: True
+      #umi_tools
+      UMIBarcode: False
+      bcPattern: NNNNCCCCCCCCC #default: 4 base umi barcode, 9 base cell barcode (eg. RELACS barcode)
+      UMIDedup: False
+      UMIDedupSep: "_"
+      UMIDedupOpts: --paired
       ################################################################################
       # Call snakemake directly, i.e. without using the wrapper script:
       #

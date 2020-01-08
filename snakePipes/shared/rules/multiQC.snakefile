@@ -50,9 +50,13 @@ def multiqc_input_check(return_value):
             indir += " deepTools_qc "   
         if "allelic-mapping" in mode:
             infiles.append( expand("featureCounts/{sample}.allelic_counts.txt", sample = samples) )
+            indir += aligner + " featureCounts "
         if "alignment-free" in mode:
             infiles.append( expand("Salmon/{sample}/quant.sf", sample = samples) )
             indir += " Salmon "
+    elif pipeline == "noncoding-rna-seq":
+        infiles.append(expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample=samples))
+        indir += " STAR deepTools_qc "
     elif pipeline == "hic":
         infiles.append(expand("HiC_matrices/QCplots/{sample}_QC/QC.log", sample = samples))
         indir += " BWA "
@@ -64,9 +68,12 @@ def multiqc_input_check(return_value):
         else:
             infiles.append( expand("FastQC/{sample}{read}_fastqc.html", sample = samples, read = reads) )
             indir +=" FastQC "
-
-        infiles.append( expand(fastq_dir+"/{sample}"+reads[0]+".fastq.gz", sample = samples) )
-        indir += fastq_dir + " "
+        if mode == "Gruen":
+            infiles.append( expand(fastq_dir+"/{sample}"+reads[0]+".fastq.gz", sample = samples) +
+                            expand("Counts/{sample}.summary", sample = samples) )
+            indir += fastq_dir + " Counts "
+        elif mode == "STARsolo":
+            infiles.append( expand(fastq_dir+"/{sample}"+reads[0]+".fastq.gz", sample = samples) )
         infiles.append( expand(aligner+"/{sample}.bam", sample = samples) +
         expand("Sambamba/{sample}.markdup.txt", sample = samples) +
         expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt", sample=samples))

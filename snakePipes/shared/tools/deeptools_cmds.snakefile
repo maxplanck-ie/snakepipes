@@ -41,21 +41,20 @@ bamcov_raw_cmd = """
 # bamCoverage RPKM
 bamcov_RPKM_cmd = """
     bamCoverage -b {input.bam} \
-    -o {output} --binSize {params.bwBinSize} \
-    -p {threads} --normalizeUsing RPKM > {log.out} 2> {log.err}
+        -o {output} --binSize {params.bwBinSize} \
+        -p {threads} --normalizeUsing RPKM > {log.out} 2> {log.err}
     """
 
 # bamCoverage RNA-seq unique mappings 
 bamcov_unique_cmd = """
     bamCoverage -b {input.bam} \
-    -o {output.bw_fwd} --binSize {params.bwBinSize} \
-    --minMappingQuality 10 --samFlagExclude 2304 --filterRNAstrand forward \
-    -p {threads} > {log.out} 2> {log.err}; \
+        -o {output.bw_fwd} --binSize {params.bwBinSize} \
+        --minMappingQuality 10 --samFlagExclude 2304 --filterRNAstrand forward \
+        -p {threads} > {log.out} 2> {log.err}
     bamCoverage -b {input.bam} \
-    -o {output.bw_rev} --binSize {params.bwBinSize} \
-    --minMappingQuality 10 --samFlagExclude 2304 --filterRNAstrand reverse \
-    -p {threads} >> {log.out} 2>> {log.err}; \
-    
+        -o {output.bw_rev} --binSize {params.bwBinSize} \
+        --minMappingQuality 10 --samFlagExclude 2304 --filterRNAstrand reverse \
+        -p {threads} >> {log.out} 2>> {log.err}
     """
     
 
@@ -205,14 +204,14 @@ plotCoverage_cmd = """
 #EstimateReadFiltering
 estimateReadFiltering_cmd = """
     estimateReadFiltering -b {input.bam} \
-    -o {output} > {log.out} 2> {log.err}
+        -o {output} > {log.out} 2> {log.err}
     """
 
 #bamPEFragmentSize
 bamPEFragmentSize_cmd = """
     bamPEFragmentSize \
-    --bamfiles {input.bams} \
-    --binSize 1000000 \
-    {params.plotcmd} \
-    --table {output} -p {threads} > {log.out} 2> {log.err}
+        --bamfiles {input.bams} \
+        --binSize 1000000 \
+        {params.plotcmd} \
+        --table {output} -p {threads} > {log.out} 2> {log.err}
     """

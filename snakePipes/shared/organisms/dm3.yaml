@@ -12,3 +12,4 @@ genes_gtf: "/data/repository/organisms/dm3_ensembl/Ensembl/release-78/genes.gtf"
 extended_coding_regions_gtf: "/data/repository/organisms/dm3_ensembl/Ensembl/release-78/genes.slop.gtf"
 blacklist_bed:
 ignoreForNormalization: "U Uextra X XHet YHet dmel_mitochondrion_genome"
+rmsk_file: "/data/repository/organisms/dm3_ensembl/UCSC/dm3/rmsk.txt"

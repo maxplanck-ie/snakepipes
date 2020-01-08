@@ -168,6 +168,7 @@ if correctionMethod == 'ICE':
             "thresholds=$(cat \"{input.correct}\");"
             "hicCorrectMatrix correct --correctionMethod ICE --filterThreshold $thresholds"
             " {params.chr} -m {input.matrix} -o {output} >> {input.correct}"
+
 else:
      rule correct_matrix:
          input:

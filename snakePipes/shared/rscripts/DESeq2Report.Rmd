@@ -378,14 +378,17 @@ if(outputIsHTML) {
 
 ```{r 'heatmap', eval = TRUE, fig.show=TRUE}
 # 7. Heatmap topN genes rld
-pheatmap(heatmap_data,
-                 cluster_rows = TRUE,
-                 clustering_method = "average",
-                 show_rownames = TRUE,
-                 cluster_cols = FALSE,
-                 color = colorRampPalette(RColorBrewer::brewer.pal(9,"YlGnBu"))(255),
-                 main = sprintf("Heatmap : Top %d DE genes (by p-value) color: norm. expression (rld) ", heatmap_topN)
-)
+if (nrow(df.filt) > 0) {
+    pheatmap(heatmap_data,
+             cluster_rows = TRUE,
+             clustering_method = "average",
+             show_rownames = TRUE,
+             cluster_cols = FALSE,
+             color = colorRampPalette(RColorBrewer::brewer.pal(9,"YlGnBu"))(255),
+             main = sprintf("Heatmap : Top %d DE genes (by p-value) color: norm. expression (rld) ", heatmap_topN))
+} else {
+  message("No DE genes detected")
+}
 ```
 
 This plot shows a heatmap of DESeq2-normlized counts for the **top 20** differentially expressed genes.
@@ -394,16 +397,18 @@ This plot shows a heatmap of DESeq2-normlized counts for the **top 20** differen
 
 ```{r 'heatmap2', fig.show=TRUE}
 # 7.1 Heatmap topN genes z-score
-pheatmap(heatmap_data,
-            cluster_rows = TRUE,
-            clustering_method = "average",
-            show_rownames = TRUE,
-            cluster_cols = FALSE,
-            scale = "row",
-            color = colorRampPalette(rev(RColorBrewer::brewer.pal(9,"RdBu")))(255),
-            main = sprintf("Heatmap : Top %d DE genes (by p-value) color: z-score  ", heatmap_topN)
-)
-
+if (nrow(df.filt) > 0) {
+    pheatmap(heatmap_data,
+             cluster_rows = TRUE,
+             clustering_method = "average",
+             show_rownames = TRUE,
+             cluster_cols = FALSE,
+             scale = "row",
+             color = colorRampPalette(rev(RColorBrewer::brewer.pal(9,"RdBu")))(255),
+             main = sprintf("Heatmap : Top %d DE genes (by p-value) color: z-score  ", heatmap_topN))
+} else {
+  message("No DE genes detected")
+}
 ```
 
 This plot shows the same heatmap as the one above, however instead of actual counts, it shows the rwo-wise z-scores of counts, for the **top 20** differentially expressed genes.

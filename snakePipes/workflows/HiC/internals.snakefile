@@ -109,6 +109,7 @@ infiles = sorted(glob.glob(os.path.join(str(indir or ''), '*'+ext)))
 samples = cf.get_sample_names(infiles,ext,reads)
 pairedEnd = cf.is_paired(infiles,ext,reads)
 del infiles
+fromBAM = None
 
 if not samples:
     print("\n  Error! NO samples found in dir "+str(indir or '')+"!!!\n\n")

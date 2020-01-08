@@ -30,6 +30,8 @@ effectiveGenomeSize: 0
 blacklist:
 ## Regions to ignore during normalization (e.g., with bamCompare)
 ignoreForNormalization:
+## Repeat masker file. It's assumed that the columns are tab separated!
+rmsk_file:
 ################################################################################
 # Call snakemake directly, i.e. without using the wrapper script:
 #

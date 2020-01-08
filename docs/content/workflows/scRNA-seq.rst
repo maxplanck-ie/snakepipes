@@ -6,7 +6,13 @@ scRNA-seq
 What it does
 ------------
 
-The scRNA-seq pipeline is intended to process CEL-Seq2 data, though it may be able to process some similar Drop-seq protocols. The general procedure involves
+The scRNA-seq pipeline is intended to process UMI-based data, expecting the cell barcode and umi in Read1, and the cDNA sequence in Read2. 
+
+There are currently two analysis modes available:
+- "Gruen" to reproduce CellSeq2 data analysis by Gruen et al.
+- "STARsolo" which uses STAR solo for mapping and quantitation.
+
+The general procedure involves
 
 1. moving cell barcodes and UMIs from read 1 into the read headers of read 2,
 2. mapping read 2,
@@ -16,10 +22,27 @@ UMIs in the read headers are used to avoid counting PCR duplicates. A number of 
 
 .. image:: ../images/scRNAseq_pipeline.png
 
+
+Mode STARsolo
+-------------
+
+With current settings, this mode should work with any UMI-based protocol that stores UMI and CB in read 1, each in one chunk. For 10x, reversing of read mates may be necessary.
+
+In this mode, STARsolo is used to map, UMI-deduplicate and count reads. A whitelist of expected barcodes is currently required. Also, read 1 is expected to carry the UMI and the cell barcode, while read 2 is expected to carry the cDNA sequence. Default positions of UMI and CB in read 1 are specified, as well as their respective lengths. If your setup is different from the default, change it via the --STARsoloCoords commandline argument or in the defaults.yaml dictionary.
+
+In the STARsolo folder, bam files are stored, along with 10x-format count matrices and log files summarizing barcode detection and UMI-deduplication.
+Bam files have the UB and CB tags set.
+
+Deeptools QC is run on these bam files.
+
+Before running velocyto, bam files from STARsolo are filtered to remove unmapped reads as well as reads with an empty CB tag and then cell-sorted by the CB tag.
+In the VelocytoCounts folder, loom files with counts of spliced, unspliced and ambiguous reads are stored. These can be further processed by the user e.g. using Seurat.
+
+
 Input requirements
 ------------------
 
-The primary input requirement is a directory of paired-end fastq files. In addition, if you do not wish to use the default list of cell-barcodes you must then supply your own.
+The primary input requirement is a directory of paired-end fastq files. In addition, if you do not wish to use the default list of cell-barcodes you must then supply your own. For the STAR solo mode, a barcode whitelist is required, as well as specification of UMI and CB positions and length, if different from default.
 
 Cell barcodes
 ~~~~~~~~~~~~~
@@ -42,6 +65,12 @@ The default cell barcodes are 192 hexamers listed in a file with the first colum
 
 Predefined cell barcodes are required right now. However it is planned to make this more generic in future workflow versions.
 
+Barcode whitelist
+~~~~~~~~~~~~~~~~~
+
+Required for the STARsolo mode. The expected format is a one-column txt file with barcodes the user wishes to retain.
+
+
 Configuration file
 ~~~~~~~~~~~~~~~~~~
 
@@ -62,18 +91,26 @@ The default configuration file is listed below and can be found in ``snakePipes/
     ext: '.fastq.gz'
     ## paired-end read name extension (default: ["_R1", "_R2"])
     reads: ["_R1","_R2"]
+    ##Analysis mode
+    mode: Gruen
     ## Number of reads to downsample from each FASTQ file
     downsample:
     ## Options for trimming
     trim: False
     trimmer: cutadapt
     trimmerOptions: -a A{'30'}
+    ## N.B., setting --outBAMsortingBinsN too high can result in cryptic errors
+    alignerOptions: "--outBAMsortingBinsN 30 --twopassMode Basic"
     ## further options
     filterGTF: "-v -P 'decay|pseudogene' "
     cellBarcodeFile:
     cellBarcodePattern: "NNNNNNXXXXXX"
     splitLib: False
     cellNames:
+    ##STARsolo options
+    BCwhiteList:
+    STARsoloCoords: ["1","7","8","7"]
+    #generic options
     libraryType: 1
     bwBinSize: 10
     verbose: False
@@ -83,6 +120,12 @@ The default configuration file is listed below and can be found in ``snakePipes/
     cellFilterMetric: gene_universe
     #Option to skip RaceID to save time
     skipRaceID: False
+    #umi_tools options:
+    UMIBarcode: False
+    bcPattern: NNNNCCCCCCCCC #default: 4 base umi barcode, 9 base cell barcode (eg. RELACS barcode)
+    UMIDedup: False
+    UMIDedupSep: "_"
+    UMIDedupOpts: --paired
 
 
 While some of these can be changed on the command line, you may find it useful to change ``cellBarcodePattern`` and ``cellBarcodeFile`` if you find that you need to change them frequently.
@@ -96,7 +139,7 @@ If your read/barcode layout requires additional **'Don't care'** positions eg. b
 Barcode file
 ~~~~~~~~~~~~~~~
 
-Only specify a file if you use other than the default CEL-seq2 barcodes.
+Only specify a file if you use other than the default CEL-seq2 barcodes (mode Gruen).
 
 
 Trimming
@@ -119,14 +162,14 @@ The CEL-seq2 protocol produces reads where read 2 maps in sense direction (:code
 Split lib
 ~~~~~~~~~
 
-This option you need in case a library contains only 96 instead of 192 cells.
+This option you need in case a library contains only 96 instead of 192 cells (mode Gruen).
 
 
 
 Output structure
 ----------------
 
-The following will be produced in the output directory::
+The following will be produced in the output directory when the workflow is run in mode Gruen::
 
     |-- cluster_logs
     |-- Filtered_cells_RaceID
@@ -164,6 +207,37 @@ The following will be produced in the output directory::
  - The **Counts** directory contains 4 sets of counts: UMIs/feature/cell (.umis.txt), reads/feature/cell (.reads.txt), corrected number of UMIs/feature/cell (corrected.txt) and raw counts per cell per UMI per feature (raw_counts.txt). Of these, the values in corrected.txt should be used for further analysis and the others for quality control.
  - The **deeptools_qc** directory contains additional QC reports and plots. The ``FASTQC`` directory can be used to verify eg. the barcode layout of read 1.
  - The **QC_report** directory contains additional QC stats as tables and plots.
+
+The following will be produced in the output directory when the workflow is run in mode STARsolo::
+
+    |-- VelocytoCounts
+    |-- cluster_logs
+    |-- filtered_bam
+    |-- multiQC
+    |   `-- multiqc_data
+    |-- deepTools_qc
+    |   |-- logs
+    |   |-- plotCorrelation
+    |   |-- plotPCA
+    |   |-- multiBigwigSummary
+    |   |-- estimateReadFiltering
+    |   |-- plotEnrichment
+    |   `-- bamPEFragmentSize
+    |-- Sambamba
+    |-- bamCoverage
+    |   `-- logs
+    |-- STARsolo
+    |   |-- logs
+    |-- FastQC
+    |   `-- logs
+    |-- Annotation
+    `-- originalFASTQ
+
+ - The **VelocytoCounts** directory contains loom files in sample subdirectories.
+ - The **STARsolo* directory contains bam files and 10X-format cell count matrices produced by STARsolo.
+
+The remaining folders are described in the Gruen mode above.
+
 
 Understanding the outputs
 -------------------------

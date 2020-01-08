@@ -1,8 +1,8 @@
 ################################################################################
-# This file is the default configuration of the scRNA-seq workflow!
+# This file is the default configuration of the RNA-seq workflow!
 #
 # In order to adjust some parameters, please either use the wrapper script
-# (eg. /path/to/snakemake_workflows/workflows/scRNAseq/scRNAseq-mapcount)
+# (eg. /path/to/snakemake_workflows/workflows/RNA-seq/RNA-seq)
 # or save a copy of this file, modify necessary parameters and then provide
 # this file to the wrapper or snakmake via '--configFile' option
 # (see below how to call the snakefile directly)
@@ -11,7 +11,7 @@
 # can be used in new/extended snakemake rules!
 ################################################################################
 ## General/Snakemake parameters, only used/set by wrapper or in Snakemake cmdl, but not in Snakefile
-pipeline: scrna-seq
+pipeline: noncoding-rna-seq
 outdir:
 configFile:
 clusterConfigFile:
@@ -26,36 +26,30 @@ genome:
 ext: '.fastq.gz'
 ## paired-end read name extension (default: ["_R1", "_R2"])
 reads: ["_R1","_R2"]
-##Analysis mode
-mode: Gruen
+## assume paired end reads
+pairedEnd: True
 ## Number of reads to downsample from each FASTQ file
 downsample:
 ## Options for trimming
 trim: False
-trimmer: cutadapt
-trimmerOptions: -a A{'30'}
-## N.B., setting --outBAMsortingBinsN too high can result in cryptic errors
-alignerOptions: "--outBAMsortingBinsN 30 --twopassMode Basic"
+trimmer: fastp
+trimmerOptions:
 ## further options
-filterGTF: "-v -P 'decay|pseudogene' "
-cellBarcodeFile:
-cellBarcodePattern: "NNNNNNXXXXXX"
-splitLib: False
-cellNames:
-##STARsolo options
-BCwhiteList:
-STARsoloCoords: ["1","7","8","7"]
-#generic options
-libraryType: 1
-bwBinSize: 10
+mode: alignment,deepTools_qc
+sampleSheet:
+bwBinSize: 25
+fastqc: False
+fragmentLength: 200
+libraryType: 2
+## supported mappers: STAR
+aligner: STAR
+alignerOptions: "--outSAMstrandField intronMotif --outFilterMultimapNmax 1000 --outFilterMismatchNoverLmax 0.1 --outSAMattributes Standard"
 verbose: False
-plotFormat: pdf
-dnaContam: False
-## Parameters for th statistical analysis
-cellFilterMetric: gene_universe
-#Option to skip RaceID to save time
-skipRaceID: False
-#umi_tools options:
+plotFormat: png
+#### Flag to control the pipeline entry point
+fromBAM: False
+bamExt: '.bam'
+#umi_tools
 UMIBarcode: False
 bcPattern: NNNNCCCCCCCCC #default: 4 base umi barcode, 9 base cell barcode (eg. RELACS barcode)
 UMIDedup: False
@@ -68,8 +62,8 @@ UMIDedupOpts: --paired
 # via '--configFile' parameter!
 # example call:
 #
-# snakemake --snakefile /path/to/snakemake_workflows/workflows/scRNAseq/Snakefile
-#           --configFile /path/to/snakemake_workflows/workflows/scRNAseq/defaults.yaml
+# snakemake --snakefile /path/to/snakemake_workflows/workflows/RNA-seq/Snakefile
+#           --configFile /path/to/snakemake_workflows/workflows/RNA-seq/defaults.yaml
 #           --directory /path/to/outputdir
 #           --cores 32
 ################################################################################

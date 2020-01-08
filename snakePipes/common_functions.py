@@ -10,6 +10,7 @@ import glob
 import sys
 import shutil
 from fuzzywuzzy import fuzz
+from snakePipes import __version__
 
 
 def set_env_yamls():
@@ -28,6 +29,7 @@ def set_env_yamls():
             'CONDA_WGBS_ENV': 'envs/wgbs.yaml',
             'CONDA_RMD_ENV': 'envs/rmarkdown.yaml',
             'CONDA_PREPROCESSING_ENV': 'envs/preprocessing.yaml',
+            'CONDA_NONCODING_RNASEQ_ENV': 'envs/noncoding.yaml',
             'CONDA_SAMBAMBA_ENV': 'envs/sambamba.yaml'}
 
 
@@ -79,6 +81,11 @@ def config_diff(dict1, dict2):
         else:
             diff[k] = dict1[k]
     return diff
+
+
+def get_version():
+    # If this is sent to stdout it breaks making a DAG pdf
+    sys.stderr.write("\n---- This analysis has been done using snakePipes version {} ----\n".format(__version__))
 
 
 def load_organism_data(genome, maindir, verbose):

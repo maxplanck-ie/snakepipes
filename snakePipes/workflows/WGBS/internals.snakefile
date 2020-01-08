@@ -49,7 +49,6 @@ else:
 if not samples:
     sys.exit("\n  Error! NO samples found in dir {}!!!\n".format(str(indir or '')))
 
-
 def getGroups(sampleSheet):
     """
     Given a sample sheet, return a tuple of (group1, group2) for use with metilene
