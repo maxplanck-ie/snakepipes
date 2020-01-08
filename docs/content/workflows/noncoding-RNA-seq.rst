@@ -127,64 +127,62 @@ Understanding the outputs
 
 Assuming the pipline was run with ``--mode 'alignment,deepTools_qc'`` on a set of FASTQ files, the structure of the output directory would look like this (files are shown only for one sample) ::
 
-├── bamCoverage
-│   ├── sample1.coverage.bw
-│   ├── sample1.RPKM.bw
-│   ├── sample1.uniqueMappings.fwd.bw
-│   ├── sample1.uniqueMappings.rev.bw
-├── cluster_logs
-├── deepTools_qc
-│   ├── bamPEFragmentSize
-│   │   ├── fragmentSize.metric.tsv
-│   │   └── fragmentSizes.png
-│   ├── estimateReadFiltering
-│   │   └── sample1_filtering_estimation.txt
-│   ├── logs
-│   │   ├── bamPEFragmentSize.err
-│   │   ├── bamPEFragmentSize.out
-│   │   ├── multiBigwigSummary.err
-│   │   └── plotCorrelation_pearson.err
-│   ├── multiBigwigSummary
-│   │   └── coverage.bed.npz
-│   ├── plotCorrelation
-│   │   ├── correlation.pearson.bed_coverage.heatmap.png
-│   │   ├── correlation.pearson.bed_coverage.tsv
-│   │   ├── correlation.spearman.bed_coverage.heatmap.png
-│   │   └── correlation.spearman.bed_coverage.tsv
-│   ├── plotEnrichment
-│   │   ├── plotEnrichment.png
-│   │   └── plotEnrichment.tsv
-│   └── plotPCA
-│       ├── PCA.bed_coverage.png
-│       └── PCA.bed_coverage.tsv
-├── DESeq2_sampleSheet
-│   ├── DESeq2_report_genes.html
-│   ├── DESeq2_report_repeat_class.html
-│   ├── DESeq2_report_repeat_family.html
-│   ├── DESeq2_report_repeat_name.html
-│   ├── DESeq2.session_info.txt
-│   ├── genes_counts_DESeq2.normalized.tsv
-│   ├── genes_DEresults.tsv
-│   ├── genes_DESeq.Rdata
-│   ├── repeat_class_counts_DESeq2.normalized.tsv
-│   ├── repeat_class_DEresults.tsv
-│   ├── repeat_class_DESeq.Rdata
-│   ├── repeat_family_counts_DESeq2.normalized.tsv
-│   ├── repeat_family_DEresults.tsv
-│   ├── repeat_family_DESeq.Rdata
-│   ├── repeat_name_counts_DESeq2.normalized.tsv
-│   ├── repeat_name_DEresults.tsv
-│   └── repeat_name_DESeq.Rdata
-├── FASTQ
-├── filtered_bam
-│   ├── sample1.filtered.bam
-│   ├── sample1.filtered.bam.bai
-├── multiQC
-├── STAR
-└── TEcount
-    └── sample1.cntTable
-
-
+    ├── bamCoverage
+    │   ├── sample1.coverage.bw
+    │   ├── sample1.RPKM.bw
+    │   ├── sample1.uniqueMappings.fwd.bw
+    │   ├── sample1.uniqueMappings.rev.bw
+    ├── cluster_logs
+    ├── deepTools_qc
+    │   ├── bamPEFragmentSize
+    │   │   ├── fragmentSize.metric.tsv
+    │   │   └── fragmentSizes.png
+    │   ├── estimateReadFiltering
+    │   │   └── sample1_filtering_estimation.txt
+    │   ├── logs
+    │   │   ├── bamPEFragmentSize.err
+    │   │   ├── bamPEFragmentSize.out
+    │   │   ├── multiBigwigSummary.err
+    │   │   └── plotCorrelation_pearson.err
+    │   ├── multiBigwigSummary
+    │   │   └── coverage.bed.npz
+    │   ├── plotCorrelation
+    │   │   ├── correlation.pearson.bed_coverage.heatmap.png
+    │   │   ├── correlation.pearson.bed_coverage.tsv
+    │   │   ├── correlation.spearman.bed_coverage.heatmap.png
+    │   │   └── correlation.spearman.bed_coverage.tsv
+    │   ├── plotEnrichment
+    │   │   ├── plotEnrichment.png
+    │   │   └── plotEnrichment.tsv
+    │   └── plotPCA
+    │       ├── PCA.bed_coverage.png
+    │       └── PCA.bed_coverage.tsv
+    ├── DESeq2_sampleSheet
+    │   ├── DESeq2_report_genes.html
+    │   ├── DESeq2_report_repeat_class.html
+    │   ├── DESeq2_report_repeat_family.html
+    │   ├── DESeq2_report_repeat_name.html
+    │   ├── DESeq2.session_info.txt
+    │   ├── genes_counts_DESeq2.normalized.tsv
+    │   ├── genes_DEresults.tsv
+    │   ├── genes_DESeq.Rdata
+    │   ├── repeat_class_counts_DESeq2.normalized.tsv
+    │   ├── repeat_class_DEresults.tsv
+    │   ├── repeat_class_DESeq.Rdata
+    │   ├── repeat_family_counts_DESeq2.normalized.tsv
+    │   ├── repeat_family_DEresults.tsv
+    │   ├── repeat_family_DESeq.Rdata
+    │   ├── repeat_name_counts_DESeq2.normalized.tsv
+    │   ├── repeat_name_DEresults.tsv
+    │   └── repeat_name_DESeq.Rdata
+    ├── FASTQ
+    ├── filtered_bam
+    │   ├── sample1.filtered.bam
+    │   ├── sample1.filtered.bam.bai
+    ├── multiQC
+    ├── STAR
+    └── TEcount
+        └── sample1.cntTable
 
 
 .. note:: The ``_sampleSheet`` suffix for the ``DESeq2_sampleSheet`` is drawn from the name of the sample sheet you use. So if you instead named the sample sheet ``mySampleSheet.txt`` then the folder would be named ``DESeq2_mySampleSheet``. This facilitates using multiple sample sheets.
