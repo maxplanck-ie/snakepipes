@@ -134,17 +134,6 @@ def get_sample_names_bam(infiles, bamExt):
     return sorted(list(set(s)))
 
 
-# Ensure input fastq files are gzipped, since otherwise there are random failures/hanging jobs
-def check_gz_reads(readdir):
-    for fname in glob.glob(os.path.join(readdir, "*.{}".format(ext))):
-        f = open(fname, "rb")
-        first3 = bytes(f.read(3))
-        f.close()
-        if len(first3) == 3 and first3 != b"\x1f\x8b\x08":
-            exit("{} is NOT gzipped!\n".format(fname))
-    return
-
-
 def is_paired(infiles, ext, reads):
     """
     Check for paired-end input files
