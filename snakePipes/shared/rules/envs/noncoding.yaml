@@ -1,0 +1,6 @@
+name: snakepipes_noncoding_RNAseq_environment
+channels:
+ - conda-forge
+ - bioconda
+dependencies:
+ - tetranscripts==2.1.3

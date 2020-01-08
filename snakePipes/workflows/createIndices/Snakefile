@@ -31,7 +31,8 @@ organismDictionary = {'genome_size': 0,
                       'genes_gtf': '',
                       'extended_coding_regions_gtf': '',
                       'blacklist_bed': '',
-                      'ignoreForNormalization': ''}
+                      'ignoreForNormalization': '',
+                      'rmsk_file': ''}
 
 targets = [os.path.join(outdir, x) for x in ["genome_fasta/genome.fa",
                                              "genome_fasta/genome.fa.fai",
@@ -50,6 +51,10 @@ if gtfURL:
     organismDictionary['genes_gtf'] = os.path.join(outdir, "annotation/genes.gtf")
     organismDictionary['genes_bed'] = os.path.join(outdir, "annotation/genes.bed")
     organismDictionary['extended_coding_regions_gtf'] = os.path.join(outdir, "annotation/genes.slop.gtf")
+
+if rmskURL:
+    targets.extend([os.path.join(outdir, x) for x in ["annotation/rmsk.txt"]])
+    organismDictionary['rmsk_file'] = os.path.join(outdir, "annotation/rmsk.txt")
 
 if 'all' in tools or 'bowtie2' in tools:
     targets.append(os.path.join(outdir, "BowtieIndex/genome.rev.2.bt2"))

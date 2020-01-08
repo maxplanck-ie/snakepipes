@@ -29,6 +29,7 @@ def set_env_yamls():
             'CONDA_WGBS_ENV': 'envs/wgbs.yaml',
             'CONDA_RMD_ENV': 'envs/rmarkdown.yaml',
             'CONDA_PREPROCESSING_ENV': 'envs/preprocessing.yaml',
+            'CONDA_NONCODING_RNASEQ_ENV': 'envs/noncoding.yaml',
             'CONDA_SAMBAMBA_ENV': 'envs/sambamba.yaml'}
 
 
@@ -83,7 +84,8 @@ def config_diff(dict1, dict2):
 
 
 def get_version():
-    print("\n---- This analysis has been done using snakePipes version {} ----\n".format(__version__))
+    # If this is sent to stdout it breaks making a DAG pdf
+    sys.stderr.write("\n---- This analysis has been done using snakePipes version {} ----\n".format(__version__))
 
 
 def load_organism_data(genome, maindir, verbose):
@@ -130,18 +132,6 @@ def get_sample_names_bam(infiles, bamExt):
         x = os.path.basename(x).replace(bamExt, "")
         s.append(x)
     return sorted(list(set(s)))
-
-
-def check_gz_reads(readdir):
-    gz_check = subprocess.run(args="gzip -rl " + readdir, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    gl = gz_check.stderr.decode().split("\n")
-    print(gl)
-    gl2 = [re.sub('gzip:.+: ', '', x) for x in gl]
-    s = gl2.count("not in gzip format")
-    if s > 0:
-        print("\n  Error! " + str(s) + " of the input files are not gzipped !!!\n\n")
-        exit(1)
-    return
 
 
 def is_paired(infiles, ext, reads):

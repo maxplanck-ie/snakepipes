@@ -41,9 +41,6 @@ if not samples:
 
 fromBAM = None
 
-if not fromBAM:
-    cf.check_gz_reads(indir)
-
 idxRange = 1
 if pairedEnd:
     idxRange = 2

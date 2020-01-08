@@ -49,9 +49,6 @@ else:
 if not samples:
     sys.exit("\n  Error! NO samples found in dir {}!!!\n".format(str(indir or '')))
 
-if not fromBAM:
-    cf.check_gz_reads(indir)
-
 def getGroups(sampleSheet):
     """
     Given a sample sheet, return a tuple of (group1, group2) for use with metilene

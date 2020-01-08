@@ -1,14 +1,14 @@
-.. _RNA-seq:
+.. _mRNA-seq:
 
-RNA-seq
-=======
+mRNA-seq
+========
 
 What it does
 ------------
 
-The snakePipes RNA-seq workflow allows users to process their single or paired-end
-RNA-Seq fastq files upto the point of gene/transcript-counts and differential expression.
-It also allows full allele-specific RNA-Seq analysis (up to allele-specific
+The snakePipes mRNA-seq workflow allows users to process their single or paired-end
+mRNA-seq fastq files upto the point of gene/transcript-counts and differential expression.
+It also allows full allele-specific mRNA-seq analysis (up to allele-specific
 differential expression) using the *allelic-mapping* mode.
 
 .. image:: ../images/RNAseq_pipeline.png
@@ -23,7 +23,7 @@ The only requirement is a directory of gzipped fastq files. Files could be singl
 Configuration file
 ~~~~~~~~~~~~~~~~~~
 
-There is a configuration file in ``snakePipes/workflows/RNA-seq/defaults.yaml``::
+There is a configuration file in ``snakePipes/workflows/mRNA-seq/defaults.yaml``::
 
     ## General/Snakemake parameters, only used/set by wrapper or in Snakemake cmdl, but not in Snakefile
     pipeline: rna-seq
@@ -93,7 +93,7 @@ Apart from the common workflow options (see :ref:`running_snakePipes`), the foll
 
 * **salmonIndexOptions**: In the ``alignment-free`` mode (see below), this option allows you to change the type of index created by salmon. New users can leave it to default.
 
-* **dnaContam**: Enable this to test for possible DNA contamination in your RNA-seq samples. DNA contamination is quantified as the fraction of reads falling into intronic and intergenic regions, compared to those falling into exons. Enabling this option would produce a directory called ``GenomicContamination`` with ``.tsv`` files containing this information.
+* **dnaContam**: Enable this to test for possible DNA contamination in your mRNA-seq samples. DNA contamination is quantified as the fraction of reads falling into intronic and intergenic regions, compared to those falling into exons. Enabling this option would produce a directory called ``GenomicContamination`` with ``.tsv`` files containing this information.
 
 * **plotFormat**: You can switch the type of plot produced by all deeptools modules using this option. Possible choices : png, pdf, svg, eps, plotly
 
@@ -127,7 +127,7 @@ If the user provides additional columns between 'name' and 'condition' in the sa
 Analysis modes
 --------------
 
-Following analysis (**modes**) are possible using the RNA-seq workflow:
+Following analysis (**modes**) are possible using the mRNA-seq workflow:
 
 "alignment"
 ~~~~~~~~~~~
@@ -242,11 +242,11 @@ Assuming the pipline was run with ``--mode 'alignment-free,alignment,deepTools_q
     │   └── multiqc_report.html
     ├── QC_report
     │   └── QC_report_all.tsv
-    ├── RNA-seq.cluster_config.yaml
-    ├── RNA-seq.config.yaml
-    ├── RNA-seq_organism.yaml
-    ├── RNA-seq_pipeline.pdf
-    ├── RNA-seq_run-1.log
+    ├── mRNA-seq.cluster_config.yaml
+    ├── mRNA-seq.config.yaml
+    ├── mRNA-seq_organism.yaml
+    ├── mRNA-seq_pipeline.pdf
+    ├── mRNA-seq_run-1.log
     ├── Salmon
     │   ├── counts.genes.tsv
     │   ├── counts.tsv
@@ -284,7 +284,7 @@ Apart from the common module outputs (see :ref:`running_snakePipes`), the workfl
 
 * **bamCoverage**: (not produced in mode *alignment-free*) This would contain the bigWigs produced by deepTools `bamCoverage <https://deeptools.readthedocs.io/en/develop/content/tools/bamCoverage.html>`__ . Files with suffix ``.coverage.bw`` are raw coverage files, while the files with suffix ``RPKM.bw`` are `RPKM-normalized <https://www.biostars.org/p/273537/>`__ coverage files.
 
-* **deepTools_QC**: (produced in the mode *deepTools_QC*) This contains the quality checks specific for RNA-seq, performed via deepTools. The output folders are names after various deepTools functions and the outputs are explained under `deepTools documentation <deeptools.readthedocs.io>`__. In short, they show the insert size distribution(**bamPEFragmentSize**), mapping statistics (**estimateReadFiltering**), sample-to-sample correlations and PCA (**multiBigwigSummary, plotCorrelation, plotPCA**), and read enrichment on various genic features (**plotEnrichment**)
+* **deepTools_QC**: (produced in the mode *deepTools_QC*) This contains the quality checks specific for mRNA-seq, performed via deepTools. The output folders are names after various deepTools functions and the outputs are explained under `deepTools documentation <deeptools.readthedocs.io>`__. In short, they show the insert size distribution(**bamPEFragmentSize**), mapping statistics (**estimateReadFiltering**), sample-to-sample correlations and PCA (**multiBigwigSummary, plotCorrelation, plotPCA**), and read enrichment on various genic features (**plotEnrichment**)
 
 * **DESeq2_[sampleSheet]/DESeq2_Salmon_[sampleSheet]**: (produced in the modes *alignment* or *alignment-free*, only if a sample-sheet is provided.) The folder contains the HTML result report **DESeq2_report.html**, the annotated output file from DESeq2 (**DEseq_basic_DEresults.tsv**) and normalized counts for all samples, produced via DEseq2 (**DEseq_basic_counts_DESeq2.normalized.tsv**) as well as an Rdata file (**DEseq_basic_DESeq.Rdata**) with the R objects ``dds <- DESeq2::DESeq(dds)`` and ``ddr <- DDESeq2::results(dds,alpha = fdr)``. **DESeq2_[sampleSheet]** uses gene counts from ``featureCounts/counts.tsv``, whereas **DESeq2_Salmon_[sampleSheet]** uses transcript counts from ``Salmon/counts.tsv`` that are merged via tximport in R.
 
@@ -298,6 +298,6 @@ Command line options
 
 .. argparse::
     :func: parse_args
-    :filename: ../snakePipes/workflows/RNA-seq/RNA-seq
-    :prog: RNA-seq
+    :filename: ../snakePipes/workflows/mRNA-seq/mRNA-seq
+    :prog: mRNA-seq
     :nodefault:
