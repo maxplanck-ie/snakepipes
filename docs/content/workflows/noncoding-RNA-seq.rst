@@ -19,7 +19,7 @@ Input requirements
 
 The only requirement is a directory of gzipped fastq files. Files could be single or paired end, and the read extensions could be modified using the keys in the ``defaults.yaml`` file below.
 
-.. _RNAconfig:
+.. _noncodingRNAconfig:
 
 Configuration file
 ~~~~~~~~~~~~~~~~~~
