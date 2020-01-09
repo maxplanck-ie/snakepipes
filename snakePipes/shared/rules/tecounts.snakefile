@@ -20,12 +20,11 @@ if pairedEnd:
             STAR --runThreadN {threads} \
                 {params.alignerOptions} \
                 --sjdbOverhang 100 \
-                --readFilesCommand zcat \
                 --outSAMunmapped Within \
                 --outSAMtype BAM Unsorted \
                 --sjdbGTFfile {params.gtf} \
                 --genomeDir {params.index} \
-                --readFilesIn {input.r1} {input.r2} \
+                --readFilesIn <(gunzip -c {input.r1}) <(gunzip -c {input.r2}) \
                 --outFileNamePrefix {params.prefix}
             mv {params.prefix}Aligned.out.bam {output.bam}
             """
@@ -50,12 +49,11 @@ else:
             STAR --runThreadN {threads} \
                 {params.alignerOptions} \
                 --sjdbOverhang 100 \
-                --readFilesCommand zcat \
                 --outSAMunmapped Within \
                 --outSAMtype BAM Unsorted \
                 --sjdbGTFfile {params.gtf} \
                 --genomeDir {params.index} \
-                --readFilesIn {input} \
+                --readFilesIn <(gunzip -c {input}) \
                 --outFileNamePrefix {params.prefix}
             mv {params.prefix}Aligned.out.bam {output.bam}
             """
