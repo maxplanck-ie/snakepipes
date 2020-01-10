@@ -7,7 +7,7 @@ rule filter_gtf:
     output:
         gtf = "Annotation/genes.filtered.gtf"
     params:
-        pattern = filterGTF
+        pattern = "" if not filterGTF else filterGTF
     shell: """
         if [ -z '{params.pattern}' ] ; then
             ln -s {input.gtf} {output.gtf}
@@ -54,6 +54,8 @@ rule gtf_to_files:
                 gene_name = None
                 for anno in annos:
                     anno = shlex.split(anno.strip(), " ")
+                    if len(anno) == 0:
+                        continue
                     if anno[0] == "gene_id":
                         gene_id = anno[1]
                     elif anno[0] == "gene_name":
@@ -67,6 +69,8 @@ rule gtf_to_files:
                 transcript_id = None
                 for anno in annos:
                     anno = shlex.split(anno.strip(), " ")
+                    if len(anno) == 0:
+                        continue
                     if anno[0] == "gene_id":
                         gene_id = anno[1]
                     elif anno[0] == "transcript_id":
@@ -81,11 +85,14 @@ rule gtf_to_files:
                 transcript_id = None
                 for anno in annos:
                     anno = shlex.split(anno.strip(), " ")
+                    if len(anno) == 0:
+                        continue
                     if anno[0] == "transcript_id":
                         transcript_id = anno[1]
                 if transcript_id:
+                    print(GTFdict[transcript_id])
                     exonWidth = int(cols[4]) - int(cols[3])
-                    exonOffset = int(cols[3]) - GTFdict[transcript_id][1]
+                    exonOffset = int(cols[3]) - int(GTFdict[transcript_id][1])
                     GTFdict[transcript_id][4].append(str(exonWidth))
                     GTFdict[transcript_id][5].append(str(exonOffset))
 
