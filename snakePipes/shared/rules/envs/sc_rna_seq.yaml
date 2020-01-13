@@ -6,6 +6,8 @@ dependencies:
  - umi_tools = 0.5.5
  - samtools = 1.9
  - star = 2.7.3a
+ - r-base = 3.5.1
+ - readline <8  # Skip broken r-base builds 1008 and 1009
  - r-stringr = 1.4.0
  - bioconductor-monocle = 2.10.0
  - r-data.table = 1.12.0
