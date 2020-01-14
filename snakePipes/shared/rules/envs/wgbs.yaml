@@ -9,7 +9,7 @@ dependencies:
   - metilene = 0.2.6
   - bedtools = 2.28.0
   - r-base = 3.5.1
-  - readline <8  # skip r-base builds 1008 and 1009
+  - readline = 7.0  # ensure broken build 1008 and 1009 are NOT installed
   - r-car = 3.0_2
   - r-factominer = 1.41
   - r-ggplot2 = 3.1.0
