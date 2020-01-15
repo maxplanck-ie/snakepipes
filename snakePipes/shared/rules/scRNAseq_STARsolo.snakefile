@@ -35,13 +35,12 @@ rule STARsolo:
         STAR --runThreadN {threads} \
             {params.alignerOptions} \
             --sjdbOverhang 100 \
-            --readFilesCommand zcat \
             --outSAMunmapped Within \
             --outSAMtype BAM SortedByCoordinate \
             --outSAMattributes NH HI AS nM CB UB \
             --sjdbGTFfile {params.gtf} \
             --genomeDir {params.index} \
-            --readFilesIn {input.r1} {input.r2} \
+            --readFilesIn <(gunzip -c {input.r1}) <(gunzip -c {input.r2}) \
             --outFileNamePrefix {params.prefix} \
 	    --soloType CB_UMI_Simple \
 	    --soloUMIstart {params.UMIstart} \
