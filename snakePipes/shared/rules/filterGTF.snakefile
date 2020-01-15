@@ -12,7 +12,7 @@ rule filter_gtf:
         if [ -z '{params.pattern}' ] ; then
             ln -s {input.gtf} {output.gtf}
         else
-            grep '{params.pattern}' {input.gtf} > {output.gtf}
+            grep {params.pattern} {input.gtf} > {output.gtf}
         fi
         """
 
