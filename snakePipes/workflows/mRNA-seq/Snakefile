@@ -137,7 +137,6 @@ def run_Trimming(trim, fastqc):
 def run_alignment_free():
     if "alignment-free" in mode:
         file_list = [
-        "Annotation/genes.filtered.fa",
         "Salmon/SalmonIndex/sa.bin",
         expand("Salmon/{sample}.quant.sf", sample=samples),
         expand("Salmon/{sample}.quant.genes.sf", sample=samples),
@@ -286,9 +285,6 @@ if not fromBAM:
            # expand("FASTQ/{sample}{read}.fastq.gz", sample = samples, read = reads),
             run_FastQC(fastqc),
             run_Trimming(trim, fastqc),
-            "Annotation/genes.annotated.bed",
-            "Annotation/genes.filtered.bed",
-            "Annotation/genes.filtered.gtf",
             run_alignment_free(),            # Salmon
             run_alignment(),                 # classical mapping + counting
             run_allelesp_mapping(),        # allelic-mapping
@@ -302,9 +298,6 @@ else:
 
     rule all:
         input:
-            "Annotation/genes.annotated.bed",
-            "Annotation/genes.filtered.bed",
-            "Annotation/genes.filtered.gtf",
             run_alignment(),
             run_deepTools_qc(),
             run_GenomicContamination(),

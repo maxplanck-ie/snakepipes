@@ -33,10 +33,10 @@ if(file.exists(tx2gene_file)) {
 rmdTemplate <- args[8]
 topN <- 50
 ## include functions
-library(ggplot2)
-library(rmarkdown)
-library(knitcitations)
-source(importfunc)
+suppressPackageStartupMessages(library(ggplot2))
+suppressPackageStartupMessages(library(rmarkdown))
+suppressPackageStartupMessages(library(knitcitations))
+suppressPackageStartupMessages(source(importfunc))
 
 ## fix default FDR significance threshold
 if ( is.na(fdr) ) fdr <- 0.05

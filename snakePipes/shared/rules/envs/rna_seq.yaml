@@ -14,6 +14,7 @@ dependencies:
  - star = 2.7.3a
  - salmon = 0.13.1
  - r-base = 3.5.1
+ - readline = 7.0  # ensure broken build 1008 and 1009 are NOT installed
  - r-wasabi = 1.0.0
  - r-sleuth = 0.30.0
  - r-dplyr = 0.8.0.1

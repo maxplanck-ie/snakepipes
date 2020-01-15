@@ -11,6 +11,8 @@ dependencies:
  - bioconductor-genomeinfodbdata = 1.2.1
  - macs2 = 2.2.4
  - gawk = 4.2.1
+ - r-base = 3.5.1
+ - readline = 7.0  # ensure broken build 1008 and 1009 are NOT installed
  - r-kernsmooth = 2.23_15
  - r-statmod = 1.4.30
  - r-yaml

@@ -29,14 +29,14 @@ params:
 .libPaths(R.home('library'))
 
 ## Bioconductor
-library('DESeq2')
+suppressPackageStartupMessages(library('DESeq2'))
 
 ## CRAN
-library('ggplot2')
-library('knitr')
-library('RColorBrewer')
-library('pheatmap')
-library('DT')
+suppressPackageStartupMessages(library('ggplot2'))
+suppressPackageStartupMessages(library('knitr'))
+suppressPackageStartupMessages(library('RColorBrewer'))
+suppressPackageStartupMessages(library('pheatmap'))
+suppressPackageStartupMessages(library('DT'))
 
 ## Preset variables
 software = 'DESeq2'
