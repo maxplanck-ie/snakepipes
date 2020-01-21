@@ -104,7 +104,7 @@ onstart:
     if "verbose" in config and config["verbose"]:
         print("--- Workflow parameters --------------------------------------------------------")
         print("samples:", samples)
-        print("ATAC fragment cutoff: ", fragmentSize_cutoff)
+        print("ATAC fragment cutoff: {}-{}".format(minFragmentSize, maxFragmentSize))
         print("-" * 80, "\n")
 
         print("--- Environment ----------------------------------------------------------------")
