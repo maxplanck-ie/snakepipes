@@ -96,14 +96,6 @@ if trim:
     elif trimmer == "fastp":
         fastq_dir = "FASTQ_fastp"
 
-def printToolsVersion(usedEnvs):
-    with open(outdir+"/toolsVersion.txt", 'w') as f:
-        for item in usedEnvs:
-              for line in open(os.path.join(maindir, "shared", "rules", item), 'r'):
-                 if len(line.split('='))==2:
-                     f.write(line)
-    f.close()
-
 ### Initialization #############################################################
 infiles = sorted(glob.glob(os.path.join(str(indir or ''), '*'+ext)))
 samples = cf.get_sample_names(infiles,ext,reads)

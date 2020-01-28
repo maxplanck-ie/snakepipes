@@ -609,3 +609,11 @@ def predict_chip_dict(wdir, input_pattern_str, bamExt, fromBAM=None):
     print("Chip-seq sample configuration is written to file ", outfile)
     print("Please check and modify this file - this is just a guess! Then run the workflow with it.")
     print("---------------------------------------------------------------------------------------")
+
+def writeTools(usedEnvs, workflowName, maindir):
+    with open(outdir+workflowName+"/tools.txt", 'w') as f:
+        for item in usedEnvs:
+              for line in open(os.path.join(maindir, "shared", "rules", item), 'r'):
+                 if len(line.split('='))==2:
+                     f.write(line)
+    f.close()
