@@ -611,7 +611,7 @@ def predict_chip_dict(wdir, input_pattern_str, bamExt, fromBAM=None):
     print("---------------------------------------------------------------------------------------")
 
 def writeTools(usedEnvs, workflowName, maindir):
-    with open(outdir+workflowName+"/tools.txt", 'w') as f:
+    with open(outdir+workflowName+"/_tools.txt", 'w') as f:
         for item in usedEnvs:
               for line in open(os.path.join(maindir, "shared", "rules", item), 'r'):
                  if len(line.split('='))==2:
