@@ -122,7 +122,7 @@ onstart:
 
     if toolsVersion:
         usedEnvs = [CONDA_SHARED_ENV, CONDA_scRNASEQ_ENV]
-        cf.writeTools(usedEnvs, "scRNAseq", maindir)
+        cf.writeTools(usedEnvs, outdir, "scRNAseq", maindir)
 
 ### main rule ##################################################################
 ################################################################################

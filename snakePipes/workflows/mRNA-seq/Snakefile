@@ -275,7 +275,7 @@ onstart:
 
     if toolsVersion:
         usedEnvs = [CONDA_SHARED_ENV, CONDA_RNASEQ_ENV]
-        cf.writeTools(usedEnvs, "mRNA-seq", maindir)
+        cf.writeTools(usedEnvs, outdir, "mRNA-seq", maindir)
 
 ### main rule ##################################################################
 ################################################################################
