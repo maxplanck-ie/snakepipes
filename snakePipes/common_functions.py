@@ -612,7 +612,7 @@ def predict_chip_dict(wdir, input_pattern_str, bamExt, fromBAM=None):
 
 
 def writeTools(usedEnvs, wdir, workflowName, maindir):
-    outfile = os.path.join(wdir, workflowName+"_tools.txt")
+    outfile = os.path.join(wdir, workflowName + "_tools.txt")
     with open(outfile, 'w') as f:
         for item in usedEnvs:
             dependencies = False
