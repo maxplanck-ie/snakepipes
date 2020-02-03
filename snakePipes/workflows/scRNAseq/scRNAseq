@@ -149,7 +149,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                           help="Skip RaceID analysis.")
 
     optional.add_argument("--myKit",
-                          choices=['10Xv2', '10Xv3', 'CellSeq192', 'CellSeq384'],
+                          choices=['10Xv2', '10Xv3', 'CellSeq192', 'CellSeq384', 'Custom'],
                           metavar="STR",
                           type=str,
                           help="Library preparation kit and version to use preset barcode whitelist and CB/UMI positions for (default: '%(default)s')",
