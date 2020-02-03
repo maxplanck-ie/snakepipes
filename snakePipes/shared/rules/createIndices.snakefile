@@ -93,13 +93,13 @@ rule gtf2BED:
 
 # Default memory allocation: 1G
 # As a side effect, this checks the GTF and fasta file for chromosome name consistency (it will pass if at least 1 chromosome name is shared)
-rule extendCodingRegions:
+rule extendGenicRegions:
     input: genes_gtf, genome_index
     output: extended_coding_regions_gtf
-    shell: """
-        grep -v "^#" {input} | awk 'BEGIN{{FS="\t"; OFS="\t"}}{{if($3 == "gene" || $3 == "transcript") {{$4 -= 500; $5 += 500; if($4 < 1) {{$4 = 1}}; print}}}}' > {output}
-        """
     run:
+        import sys
+        import os
+
         faiChroms = set()
         for line in open(input[1]):
             cols = line.strip().split()
@@ -113,14 +113,18 @@ rule extendCodingRegions:
             cols = line.strip().split("\t")
             gtfChroms.add(cols[0])
             if cols[2] == "gene" or cols[2] == "transcript":
-                cols[3] = str(max(1, int(cols[3] - 500)))
+                cols[3] = str(max(1, int(cols[3]) - 500))
                 cols[4] = str(int(cols[4]) + 500)
             o.write("\t".join(cols))
             o.write("\n")
         o.close()
 
         # Ensure there is at least one shared chromosome name between the annotation and fasta file
-        assert faiChroms.intersection(gtfChroms) >= 1
+        try:
+            assert len(faiChroms.intersection(gtfChroms)) >= 1
+        except:
+            os.remove(output[0])
+            sys.exit("There are no chromosomes/contigs shared between the fasta and GTF file you have selected!\n")
 
 
 # Default memory allocation: 20G
