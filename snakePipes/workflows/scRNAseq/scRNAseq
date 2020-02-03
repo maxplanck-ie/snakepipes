@@ -28,7 +28,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          "cellBarcodePattern": "NNNNNNXXXXXX", "bwBinSize": 10,
                          "plotFormat": "png", "skipRaceID": False,
                          "cellFilterMetric": "gene_universe",
-			 "mode": "Gruen", "BCwhiteList": None, "STARsoloCoords": ["1","7","8","7"]}):
+			 "mode": "Gruen", "BCwhiteList": None, "STARsoloCoords": ["1","7","8","7"]}, "myKit": "CellSeq384"):
     """
     Parse arguments from the command line.
     """
@@ -147,6 +147,13 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                           action="store_true",
                           default=defaults["skipRaceID"],
                           help="Skip RaceID analysis.")
+
+    optional.add_argument("--myKit",
+                          choices=['10Xv2', '10Xv3', 'CellSeq192', 'CellSeq384'],
+                          metavar="STR",
+                          type=str,
+                          help="Library preparation kit and version to use preset barcode whitelist and CB/UMI positions for (default: '%(default)s')",
+                          default=defaults["myKit"])
 
     return parser
 
