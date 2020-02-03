@@ -87,14 +87,13 @@ else:
             shell: """
                    mv {input.bamfile} {output.bamfile}
                    """
-    else:
+    elif not fromBAM:
         rule filter_reads:
             input:
                 bamfile = aligner+"/{sample}.bam"
             output:
                 bamfile = "filtered_bam/{sample}.filtered.bam"
             shell: """
-                   pwd
                    ln -s -r {input.bamfile} {output.bamfile}
                    """
 
