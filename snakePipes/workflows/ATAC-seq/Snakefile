@@ -98,6 +98,19 @@ def run_deepTools_qc(fromBAM):
     return (file_list)
 
 
+# This needs to be optional
+def run_HMMRATAC():
+    file_list = expand("HMMRATAC/{sample}_peaks.gappedPeak", sample=samples)
+    return (file_list)
+
+
+def run_genrich():
+    file_list = ["genrich/all_samples.narrowPeak"]
+    if sampleSheet:
+        file_list = ["genrich/{}.narrowPeak".format(x) for x in genrichDict.keys()]
+    return (file_list)
+
+
 ### execute before workflow starts #############################################
 ################################################################################
 onstart:
@@ -127,7 +140,7 @@ onstart:
 
     if toolsVersion:
         usedEnvs = [CONDA_SHARED_ENV, CONDA_ATAC_ENV]
-        cf.writeTools(usedEnvs, "ATAC-seq", maindir)
+        cf.writeTools(usedEnvs, workingdir, "ATAC-seq", maindir)
 
 ### main rule ##################################################################
 ################################################################################
@@ -139,6 +152,10 @@ rule all:
         os.path.join(deeptools_ATAC, "plotFingerprint/plotFingerprint.metrics.txt"),
         ## run deeptools-allelic only if dir "allelic_bams" present and non empty
         run_deepTools_allelic(),
+        ## run HMMRATAC
+        run_HMMRATAC(),
+        ## run Genrich, this sets genrich_groups
+        run_genrich(),
         ## run csaw if asked for
         run_CSAW(),
         expand("deepTools_ATAC/bamCompare/{sample}.filtered.bw",sample=samples),

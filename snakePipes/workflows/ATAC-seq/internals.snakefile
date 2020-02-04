@@ -67,3 +67,6 @@ def filter_dict(sampleSheet):
 
 if sampleSheet:
     filtered_dict = filter_dict(sampleSheet)
+    genrichDict = cf.sampleSheetGroups(sampleSheet)
+else:
+    genrichDict = {"all_samples": samples}
