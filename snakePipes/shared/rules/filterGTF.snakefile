@@ -9,7 +9,7 @@ rule filter_gtf:
     params:
         pattern = "" if not filterGTF else filterGTF
     shell: """
-        if [ -z '{params.pattern}' ] ; then
+        if [ -z {params.pattern} ] ; then
             ln -s {input.gtf} {output.gtf}
         else
             grep {params.pattern} {input.gtf} > {output.gtf}
