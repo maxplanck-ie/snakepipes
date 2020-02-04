@@ -119,11 +119,11 @@ rule HMMRATAC_peaks:
 # Should be run once per-group!
 rule Genrich_peaks:
     input:
-        bams=lambda wildcards: expand(os.path.join(outdir_MACS2 + "/{sample}.short.cleaned.bam"), sample=genrichDict[wildcards.group])
+        bams=lambda wildcards: expand(os.path.join(outdir_MACS2, "{sample}.short.cleaned.bam"), sample=genrichDict[wildcards.group])
     output:
         "genrich/{group}.narrowPeak"
     params:
-        bams = lambda wildcards: ",".join(expand(os.path.join(outdir_MACS2 + "/{sample}.short.cleaned.bam"), sample=genrichDict[wildcards.group])),
+        bams = lambda wildcards: ",".join(expand(os.path.join(outdir_MACS2, "{sample}.short.cleaned.bam"), sample=genrichDict[wildcards.group])),
         blacklist = "-E {}".format(blacklist_bed) if blacklist_bed else ""
     conda: CONDA_ATAC_ENV
     shell: """
