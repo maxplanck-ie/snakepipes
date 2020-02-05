@@ -124,6 +124,16 @@ def run_CSAW():
     else:
         return([])
 
+
+def run_genrich():
+    if peakCaller == "Genrich":
+        file_list = ["genrich/all_samples.narrowPeak"]
+        if sampleSheet:
+            file_list = ["genrich/{}.narrowPeak".format(x) for x in genrichDict.keys()]
+        return (file_list)
+    return ([])
+
+
 ### execute before workflow starts #############################################
 ################################################################################
 onstart:
@@ -166,6 +176,7 @@ rule all:
         run_deepTools_ChIP(),
         expand("MACS2/{chip_sample}.filtered.BAM_peaks.xls", chip_sample = chip_samples),
         expand("MACS2/{chip_sample}.filtered.BAM_peaks.qc.txt", chip_sample = chip_samples),
+        run_genrich(),
         # run histoneHMM if allelic_bams are absent (since it gives index error without allele_specific index)
         run_histoneHMM(allele_info),
         ## run deeptools-allelic only if dir "allelic_bams" present and non empty
