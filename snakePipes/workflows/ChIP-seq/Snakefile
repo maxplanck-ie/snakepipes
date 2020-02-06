@@ -32,8 +32,8 @@ if fromBAM:
 # deepTools ChIP
 include: os.path.join(maindir, "shared", "rules", "deepTools_ChIP.snakefile")
 
-# MACS2 and MACS2 peak QC
-include: os.path.join(maindir, "shared", "rules", "MACS2.snakefile")
+# MACS2, MACS2 peak QC, and Genrich
+include: os.path.join(maindir, "shared", "rules", "ChIP_peak_calling.snakefile")
 
 # QC report for all samples
 include: os.path.join(maindir, "shared", "rules", "ChiP-seq_qc_report.snakefile")
@@ -127,9 +127,15 @@ def run_CSAW():
 
 def run_genrich():
     if peakCaller == "Genrich":
-        file_list = ["genrich/all_samples.narrowPeak"]
-        if sampleSheet:
-            file_list = ["genrich/{}.narrowPeak".format(x) for x in genrichDict.keys()]
+        file_list = expand("Genrich/{sample}.narrowPeak", sample=chip_samples)
+        return (file_list)
+    return ([])
+
+
+def run_macs2():
+    if peakCaller == "MACS2":
+        file_list = expand("MACS2/{chip_sample}.filtered.BAM_peaks.xls", chip_sample = chip_samples)
+        file_list.extend(expand("MACS2/{chip_sample}.filtered.BAM_peaks.qc.txt", chip_sample = chip_samples))
         return (file_list)
     return ([])
 
@@ -165,7 +171,7 @@ onstart:
         print("-" * 80, "\n")
 
     if toolsVersion:
-        usedEnvs = [CONDA_SHARED_ENV, CONDA_CHIPSEQ_ENV]
+        usedEnvs = [CONDA_SHARED_ENV, CONDA_CHIPSEQ_ENV, CONDA_ATAC_ENV]
         cf.writeTools(usedEnvs, workingdir, "ChIP-seq", maindir)
 
 ### main rule ##################################################################
@@ -174,8 +180,7 @@ rule all:
     input:
     	run_deepTools_qc(fromBAM),
         run_deepTools_ChIP(),
-        expand("MACS2/{chip_sample}.filtered.BAM_peaks.xls", chip_sample = chip_samples),
-        expand("MACS2/{chip_sample}.filtered.BAM_peaks.qc.txt", chip_sample = chip_samples),
+        run_macs2(),
         run_genrich(),
         # run histoneHMM if allelic_bams are absent (since it gives index error without allele_specific index)
         run_histoneHMM(allele_info),
