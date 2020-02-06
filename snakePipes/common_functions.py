@@ -198,14 +198,14 @@ def sampleSheetGroups(sampleSheet):
     """
     f = open(sampleSheet)
     conditionCol = None
-    nameCole = None
+    nameCol = None
     nCols = None
     d = dict()
     for idx, line in enumerate(f):
         cols = line.strip().split("\t")
         if idx == 0:
             if "condition" not in cols or "name" not in cols:
-                sys.exit("ERROR: Please use 'name' and 'condition' as column headers in the sample info file ({})!\n".format(sample_info_file))
+                sys.exit("ERROR: Please use 'name' and 'condition' as column headers in the sample info file ({})!\n".format(sampleSheet))
             conditionCol = cols.index("condition")
             nameCol = cols.index("name")
             nCols = len(cols)
@@ -213,7 +213,7 @@ def sampleSheetGroups(sampleSheet):
         elif idx == 1:
             # Sometimes there's a column of row names, which lack a header
             if len(cols) != nCols and len(cols) - 1 != nCols:
-                sys.exit("ERROR: there's a mismatch between the number of columns in the header and body of {}!\n".format(sample_info_file))
+                sys.exit("ERROR: there's a mismatch between the number of columns in the header and body of {}!\n".format(sampleSheet))
             if len(cols) - 1 == nCols:
                 conditionCol += 1
                 nameCol += 1
