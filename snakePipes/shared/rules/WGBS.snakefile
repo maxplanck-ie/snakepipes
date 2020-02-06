@@ -9,7 +9,7 @@ if fromBAM:
         input:
             indir + "/{sample}" + bamExt
         output:
-            "bwameth/{sample}"+bam_ext
+            "bwameth/{sample}.sorted" + bamExt
         shell:
             "( [ -f {output} ] || ln -s -r {input} {output} ) "
 
@@ -26,7 +26,7 @@ rule conversionRate:
 
 
 ### bwameth ##########################################
-if pairedEnd:
+if pairedEnd and not fromBAM:
     rule bwameth:
         input:
             r1=fastq_dir + "/{sample}" + reads[0] + ".fastq.gz",
@@ -46,7 +46,7 @@ if pairedEnd:
 	        samtools sort -T "$MYTEMP"/{wildcards.sample} -m 3G -@ 4 -o "{output.sbam}"
             rm -rf "$MYTEMP"
             """
-else:
+elif not fromBAM:
     rule bwameth:
         input:
             r1=fastq_dir + "/{sample}" + reads[0] + ".fastq.gz",

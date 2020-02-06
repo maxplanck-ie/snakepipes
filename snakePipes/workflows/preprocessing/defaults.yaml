@@ -19,6 +19,7 @@ maxJobs: 5
 tempDir:
 # This is just for compatibility with other pipelines, it's otherwise ignored
 aligner: "bowtie2"
+fromBAM: False
 ## directory with fastq files
 indir:
 ## FASTQ file extension (default: ".fastq.gz")
