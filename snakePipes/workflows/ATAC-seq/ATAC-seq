@@ -24,6 +24,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          "bamExt": "filtered.bam", "fdr": 0.05,
                          "absBestLFC": 1, "UMIDedup": False,
                          "UMIDedupOpts": "", "UMIDedupSep": "_",
+                         "peakCaller": "MACS2",
                          "UMIBarcode": False, "bcPattern": ""}):
 
     """
@@ -41,6 +42,11 @@ def parse_args(defaults={"verbose": False, "configFile": None,
 
     # Workflow options
     optional = parser.add_argument_group('Options')
+    optional.add_argument("--peakCaller",
+                          help="The peak caller to use. The default is %(default)s",
+                          choices=["MACS2", "HMMRATAC", "Genrich"],
+                          default=defaults['peakCaller'])
+
     optional.add_argument("--maxFragmentSize",
                           help="Maximum size of (typically nucleosomal) fragments for inclusion in the analysis (default: '%(default)s')",
                           type=int,

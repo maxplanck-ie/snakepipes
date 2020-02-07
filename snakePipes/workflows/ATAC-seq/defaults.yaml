@@ -30,6 +30,8 @@ sampleSheet:
 # windowSize
 windowSize: 20
 fragmentCountThreshold: 1
+## The peak caller to use
+peakCaller: "MACS2"
 #### Flag to control the pipeline entry point
 ## Bin size of output files in bigWig format
 bwBinSize: 25
