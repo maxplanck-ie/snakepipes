@@ -60,7 +60,7 @@ def multiqc_input_check(return_value):
     elif pipeline == "hic":
         infiles.append(expand("HiC_matrices/QCplots/{sample}_QC/QC.log", sample = samples))
         indir += " BWA "
-        #indir += " ".join(expand("HiC_matrices/QCplots/{sample}_QC ", sample = samples))
+        indir += " ".join(expand("HiC_matrices/QCplots/{sample}_QC ", sample = samples))
     elif pipeline == "scrna-seq":
         if trim:
             infiles.append( expand("FastQC_trimmed/{sample}"+reads[0]+"_fastqc.html", sample = samples) )
