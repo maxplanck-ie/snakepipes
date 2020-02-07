@@ -132,3 +132,21 @@ rule MACS2_peak_qc:
 
 # TODO
 # add joined deepTools plotEnrichment call for all peaks and samples in one plot
+
+# Requires PE data
+# Should be run once per-group!
+rule Genrich_peaks:
+    input:
+        IP=lambda wildcards: expand("filtered_bam/{sample}.filtered.bam", sample=wildcards.sample),
+        control =
+                lambda wildcards: "filtered_bam/"+get_control(wildcards.sample)+".filtered.bam" if get_control(wildcards.sample)
+                else []
+    output:
+        "Genrich/{sample}.narrowPeak"
+    params:
+        control=lambda wildcards: "-c" if get_control(wildcards.sample) else "",
+        blacklist = "-E {}".format(blacklist_bed) if blacklist_bed else ""
+    conda: CONDA_ATAC_ENV
+    shell: """
+        Genrich -S -t {input.IP} {params.control} {input.control} -o {output} -r {params.blacklist} -y
+        """

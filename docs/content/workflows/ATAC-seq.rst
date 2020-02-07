@@ -47,7 +47,7 @@ If the user provides additional columns between 'name' and 'condition' in the sa
 
 The differential binding module utilizes the R package `CSAW <https://bioconductor.org/packages/release/bioc/html/csaw.html>`__ to detect significantly different peaks between two conditions.
 The analysis is performed on a union of peaks from all samples mentioned in the sample sheet. 
-This merged set of regions are provided as an output inside the **CSAW_sampleSheet** folder as the file 'DiffBinding_allregions.bed'. 
+This merged set of regions are provided as an output inside the **CSAW_MACS2_sampleSheet** folder as the file 'DiffBinding_allregions.bed'. 
 All differentially bound regions are available in 'CSAW/DiffBinding_significant.bed' . 
 Two thresholds are applied to produce ``Filtered.results.bed`` : FDR (default ``0.05`` ) as well as absolute log fold change (``1``). These can be specified either in the defaults.yaml dictionary or via commandline parameters '--FDR' and '--LFC'. Additionally, filtered results are split into up to 3 bed files, representing direction change (UP, DOWN, or MIXED).
 
@@ -82,6 +82,8 @@ There is a configuration file in ``snakePipes/workflows/ATACseq/defaults.yaml``:
     maxFragmentSize: 150
     minFragmentSize: 0
     verbose: false
+    ## which peak caller to use
+    peakCaller: 'MACS2'
     # sampleSheet_DB
     sampleSheet:
     # windowSize
@@ -119,7 +121,7 @@ Understanding the outputs
 Assuming a sample sheet is used, the following will be **added** to the working directory::
 
     .
-    ├── CSAW_sampleSheet
+    ├── CSAW_MACS2_sampleSheet
     │   ├── CSAW.log
     │   ├── CSAW.session_info.txt
     │   ├── DiffBinding_allregions.bed
@@ -134,6 +136,14 @@ Assuming a sample sheet is used, the following will be **added** to the working 
     │   └── plotFingerprint
     │       ├── plotFingerprint.metrics.txt
     │       └── plotFingerprint.png
+    ├── Genrich
+    │   └── group1.narrowPeak
+    ├── HMMRATAC
+    │   ├── sample1.log
+    │   ├── sample1.model
+    │   ├── sample1_peaks.gappedPeak
+    │   ├── sample1_summits.bed
+    │   └── sample1_training.bed
     ├── MACS2
     │   ├── sample1.filtered.BAM_control_lambda.bdg
     │   ├── sample1.filtered.BAM_peaks.narrowPeak
@@ -151,8 +161,10 @@ Assuming a sample sheet is used, the following will be **added** to the working 
         ├── sample1.filtered.BAM_peaks.qc.txt
         └── sample2.filtered.BAM_peaks.qc.txt
 
-Currently the ATAC-seq workflow performs detection of open chromatin regions via `MACS2 <https://github.com/taoliu/MACS>`__, and if a sample sheet is provided, the detection of differential open chromatin sites via `CSAW <https://bioconductor.org/packages/release/bioc/html/csaw.html>`__. There are additionally log files in most of the directories. The various outputs are documented in the CSAW and MACS2 documentation.
-For more information on the contents of the **CSAW_sampleSheet** folder, see section :ref:`diffOpenChrom` .
+Currently the ATAC-seq workflow performs detection of open chromatin regions via `MACS2 <https://github.com/taoliu/MACS>`__ (or `HMMRATAC <https://academic.oup.com/nar/article/47/16/e91/5519166>`__ or `Genrich <https://github.com/jsh58/Genrich>`__, if specified with ``--peakCaller``), and if a sample sheet is provided, the detection of differential open chromatin sites via `CSAW <https://bioconductor.org/packages/release/bioc/html/csaw.html>`__. There are additionally log files in most of the directories. The various outputs are documented in the CSAW and MACS2 documentation.
+For more information on the contents of the **CSAW_MACS2_sampleSheet** folder, see section :ref:`diffOpenChrom` .
+
+* **MACS2** / **HMMRATAC** / **Genrich**: Contains peaks found by the peak caller. The most useful files end in ``.narrowPeak`` or ``.gappedPeak`` and are appropriate for visualization in IGV.
 
 * **MACS2_QC**: contains a number of QC metrics that we find useful, namely :
     * the number of peaks
@@ -161,7 +173,9 @@ For more information on the contents of the **CSAW_sampleSheet** folder, see sec
 
 * **deepTools_ATAC**: contains the output of `plotFingerPrint <https://deeptools.readthedocs.io/en/develop/content/tools/plotFingerprint.html>`__, which is a useful QC plot to assess signal enrichment between the ATAC-seq samples.
 
-.. note:: The ``_sampleSheet`` suffix for the ``CSAW_sampleSheet`` is drawn from the name of the sample sheet you use. So if you instead named the sample sheet ``mySampleSheet.txt`` then the folder would be named ``CSAW_mySampleSheet``. This facilitates using multiple sample sheets.
+.. note:: The ``_sampleSheet`` suffix for the ``CSAW_MACS2_sampleSheet`` is drawn from the name of the sample sheet you use. So if you instead named the sample sheet ``mySampleSheet.txt`` then the folder would be named ``CSAW_mySampleSheet``. This facilitates using multiple sample sheets. Similarly, ``_MACS2`` portion will be different if you use HMMRATAC or Genrich for peak calling.
+
+.. note:: The output from Genrich will be peaks called per-group if you specify a sample sheet. This is because Genrich is capable of directly using replicates during peak calling.
 
 
 Where to find final bam files and biwgwigs
