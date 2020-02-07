@@ -70,10 +70,8 @@ rule filter_bam:
     threads: 8
     conda: CONDA_SAMBAMBA_ENV
     shell: """
-           MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX);
            sambamba view -F "not unmapped and [CB] !=null" -t {threads} -f bam {input.bamfile} > {output.bamfile};
-           samtools index {output.bamfile};
-           rm -rf $MYTEMP
+           sambamba index -t {threads} {output.bamfile}
            """
 
 rule cellsort_bam:
@@ -82,7 +80,7 @@ rule cellsort_bam:
     output:
         bam = "filtered_bam/cellsorted_{sample}.filtered.bam"
     params:
-        samsort_memory="3G"
+        samsort_memory="20G"
     threads: 4
     conda: CONDA_scRNASEQ_ENV
     shell: """
