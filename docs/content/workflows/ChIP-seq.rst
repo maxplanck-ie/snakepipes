@@ -122,6 +122,8 @@ There is a configuration file in ``snakePipes/workflows/ChIP-seq/defaults.yaml``
     ## preconfigured target genomes (mm9,mm10,dm3,...) , see /path/to/snakemake_workflows/shared/organisms/
     ## Value can be also path to your own genome config file!
     genome:
+    ## Which peak caller should be used?
+    peakCaller: 'MACS2'
     ## paired end data?
     pairedEnd: true
     ## Bin size of output files in bigWig format
@@ -165,6 +167,8 @@ The ChIP-seq pipeline will generate additional output as follows::
     │   ├── sample2.filtered.histoneHMM-zinba-emfit.pdf
     │   ├── sample2.filtered.histoneHMM-zinba-params-em.RData
     │   └── sample2.filtered.histoneHMM-zinba-params-em.txt
+    ├── Genrich
+    │   └── sample2.narrowPeak
     └── MACS2
         ├── sample1.filtered.BAM_peaks.narrowPeak
         ├── sample1.filtered.BAM_peaks.qc.txt
@@ -187,7 +191,9 @@ Following up on the DNA-mapping module results (see :doc:`DNA-mapping`), the wor
 
 * **deepTools_ChIP**: Contains output from two of the deepTools modules. The `bamCompare <https://deeptools.readthedocs.io/en/develop/content/tools/bamCompare.html>`__ output contains the input-normalized coverage files for the samples, which is very useful for downstream analysis, such as visualization in IGV and plotting the heatmaps. The `plotFingerPrint <https://deeptools.readthedocs.io/en/develop/content/tools/plotFingerprint.html>`__ output is a useful QC plot to assess signal enrichment in the ChIP samples.
 
-* **MACS2**: This folder contains the output of `MACS2 <https://github.com/taoliu/MACS>`__ on the ChIP samples, MACS2 would perform either a **narrow** or **broad** peak calling on the samples, as indicated by the ChIP sample configuration file (see :ref:`ChIPconfig`). The outputs files would contain the respective tags (**narrowPeak** or **broadPeak**).
+* **Genrich**: This folder contains the output of `Genrich <https://github.com/jsh58/Genrich>`__. This will only exist IF you specified ``--peakCaller Genrich`` and you have samples with non-broad peaks. The output is in narrowPeak format, like that from MACS2.
+
+* **MACS2**: This folder contains the output of `MACS2 <https://github.com/taoliu/MACS>`__ on the ChIP samples, MACS2 would perform either a **narrow** or **broad** peak calling on the samples, as indicated by the ChIP sample configuration file (see :ref:`ChIPconfig`). The outputs files would contain the respective tags (**narrowPeak** or **broadPeak**). This folder will only exist if you have non-broad marks and use MACS2 for peak calling
 
 * **histoneHMM**: This folder contains the output of `histoneHMM <https://github.com/matthiasheinig/histoneHMM>`__. This folder will only exist if you have broad marks.
 
@@ -197,6 +203,8 @@ Following up on the DNA-mapping module results (see :doc:`DNA-mapping`), the wor
 .. note:: Although in case of broad marks, we also perform the MACS2 `broadpeak` analysis (output available as ``MACS2/<sample>.filtered.BAM_peaks.broadPeak``), we would recommend using the histoneHMM outputs in these cases, since histoneHMM produces better results than MACS2 for broad peaks.
 
 .. note:: The ``_sampleSheet`` suffix for the ``CSAW_sampleSheet`` is drawn from the name of the sample sheet you use. So if you instead named the sample sheet ``mySampleSheet.txt`` then the folder would be named ``CSAW_mySampleSheet``. This facilitates using multiple sample sheets.
+
+.. node:: At the moment Genrich is NOT jointly calling peaks within a group since it's not aware of which samples contain which antibody. It is utilizing the input control if one exists.
 
 
 Command line options
