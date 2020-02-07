@@ -204,7 +204,7 @@ Following up on the DNA-mapping module results (see :doc:`DNA-mapping`), the wor
 
 .. note:: The ``_sampleSheet`` suffix for the ``CSAW_sampleSheet`` is drawn from the name of the sample sheet you use. So if you instead named the sample sheet ``mySampleSheet.txt`` then the folder would be named ``CSAW_mySampleSheet``. This facilitates using multiple sample sheets.
 
-.. node:: At the moment Genrich is NOT jointly calling peaks within a group since it's not aware of which samples contain which antibody. It is utilizing the input control if one exists.
+.. note:: At the moment Genrich is NOT jointly calling peaks within a group since it's not aware of which samples contain which antibody. It is utilizing the input control if one exists.
 
 
 Command line options
