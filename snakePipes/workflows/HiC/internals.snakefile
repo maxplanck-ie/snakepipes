@@ -70,14 +70,7 @@ def get_mad_score(madfile):
 ## get sample grouping information
 def get_sampleSheet(sample_sheet):
     sample_dict = dict()
-    if sample_sheet:     #Read the sample info and make a dictionary
-        # sample_conditions =  pd.read_csv(os.path.join(os.path.abspath(sample_sheet)), sep = '\t')
-        # for id, row in sample_conditions.iterrows():
-        #     v, k = row
-        #     if k in sample_dict:
-        #         sample_dict[k].append(v)
-        #     else:
-        #         sample_dict[k]=[v]
+    if sample_sheet:  # Read the sample info and fill in a dictionary
         sample_dict = cf.sampleSheetGroups(sample_sheet)
     else:
         sample_dict['merged'] = []
