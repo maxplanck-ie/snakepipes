@@ -43,11 +43,11 @@ def multiqc_input_check(return_value):
         if "alignment" in mode or "deepTools_qc" in mode:
             infiles.append( expand(aligner+"/{sample}.bam", sample = samples) +
                     expand("Sambamba/{sample}.markdup.txt", sample = samples) +
-                    expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample=samples)+ 
+                    expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample=samples)+
                     expand("featureCounts/{sample}.counts.txt", sample = samples))
             indir += aligner + " featureCounts "
             indir += " Sambamba "
-            indir += " deepTools_qc "   
+            indir += " deepTools_qc "
         if "allelic-mapping" in mode:
             infiles.append( expand("featureCounts/{sample}.allelic_counts.txt", sample = samples) )
             indir += aligner + " featureCounts "
@@ -60,7 +60,7 @@ def multiqc_input_check(return_value):
     elif pipeline == "hic":
         infiles.append(expand("HiC_matrices/QCplots/{sample}_QC/QC.log", sample = samples))
         indir += " BWA "
-        indir += " ".join(expand("HiC_matrices/QCplots/{sample}_QC ", sample = samples))
+        #indir += " ".join(expand("HiC_matrices/QCplots/{sample}_QC ", sample = samples))
     elif pipeline == "scrna-seq":
         if trim:
             infiles.append( expand("FastQC_trimmed/{sample}"+reads[0]+"_fastqc.html", sample = samples) )
