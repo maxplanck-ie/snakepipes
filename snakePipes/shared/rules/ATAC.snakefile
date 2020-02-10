@@ -17,6 +17,7 @@ rule filterFragments:
         --minFragmentLength {params.minFragmentSize}
         """
 
+
 rule filterMetricsToHtml:
     input: 
         expand(os.path.join(outdir_MACS2, "{sample}.short.metrics"), sample=samples)
@@ -50,6 +51,7 @@ rule filterCoveragePerScaffolds:
         samtools index -@ {threads} {output.bam}
         """
 
+
 # MACS2 BAMPE filter: samtools view -b -f 2 -F 4 -F 8 -F 256 -F 512 -F 2048
 rule callOpenChromatin:
     input:
@@ -79,4 +81,51 @@ rule callOpenChromatin:
             --qvalue {params.qval_cutoff} \
             {params.nomodel} \
             {params.write_bdg} > {log.out} 2> {log.err}
+        """
+
+
+rule tempChromSizes:
+    input: genome_index
+    output: temp("HMMRATAC/chrom_sizes")
+    shell: """
+        cut -f 1,2 {input} > {output}
+        """
+
+
+# TODO: -q MINMAPQ -Xmx value is currently hard-coded
+# Actually uses 2-4 cores, even though there's no option for it!
+# Requires PE data
+rule HMMRATAC_peaks:
+    input:
+        "filtered_bam/{sample}.filtered.bam",
+        "filtered_bam/{sample}.filtered.bam.bai",
+        "HMMRATAC/chrom_sizes"
+    output:
+        "HMMRATAC/{sample}.log",
+        "HMMRATAC/{sample}.model",
+        "HMMRATAC/{sample}_peaks.gappedPeak",
+        "HMMRATAC/{sample}_summits.bed",
+        "HMMRATAC/{sample}_training.bed"
+    params:
+        blacklist = "-e {}".format(blacklist_bed) if blacklist_bed else ""
+    conda: CONDA_ATAC_ENV
+    threads: 4
+    shell: """
+        HMMRATAC -Xmx10G -b {input[0]} -i {input[1]} -g {input[2]} {params.blacklist} -o HMMRATAC/{wildcards.sample}
+        """
+
+
+# Requires PE data
+# Should be run once per-group!
+rule Genrich_peaks:
+    input:
+        bams=lambda wildcards: expand(os.path.join(outdir_MACS2, "{sample}.short.cleaned.bam"), sample=genrichDict[wildcards.group])
+    output:
+        "Genrich/{group}.narrowPeak"
+    params:
+        bams = lambda wildcards: ",".join(expand(os.path.join(outdir_MACS2, "{sample}.short.cleaned.bam"), sample=genrichDict[wildcards.group])),
+        blacklist = "-E {}".format(blacklist_bed) if blacklist_bed else ""
+    conda: CONDA_ATAC_ENV
+    shell: """
+        Genrich -S -t {params.bams} -o {output} -r {params.blacklist} -j -y
         """

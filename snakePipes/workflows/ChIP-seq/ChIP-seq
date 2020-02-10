@@ -21,7 +21,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          "snakemakeOptions": "--use-conda", "tempDir": None,
                          "pairedEnd": True, "fragmentLength":200, "bwBinSize": 25, "qval": 0.001, "sampleSheet": "",
                          "windowSize": 150, "predictChIPDict": None,
-                         "bigWigType": "both", "mfold": "0 50",
+                         "bigWigType": "both", "mfold": "0 50", "peakCaller": "MACS2",
                          "plotFormat": "png","fromBAM": False, "bamExt": ".filtered.bam",
                          "fdr": 0.05, "absBestLFC": 1}):
 
@@ -43,6 +43,11 @@ def parse_args(defaults={"verbose": False, "configFile": None,
 
     # Workflow options
     optional = parser.add_argument_group('Options')
+    optional.add_argument("--peakCaller",
+                          help="The peak caller to use. The default is %(default)s and this is only applicable for sharper peaks (broad peaks will always use histoneHMM).",
+                          choices=["MACS2", "Genrich"],
+                          default=defaults['peakCaller'])
+
     optional.add_argument("--singleEnd",
                           dest="pairedEnd",
                           action="store_false",
