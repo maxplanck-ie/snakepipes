@@ -21,7 +21,7 @@ include: os.path.join(workflow.basedir, "internals.snakefile")
 ### include modules of other snakefiles ########################################
 ################################################################################
 
-cv.namesOKinR(samples)
+cf.namesOKinR(samples)
 
 # deeptools cmds
 include: os.path.join(maindir, "shared", "tools" , "deeptools_cmds.snakefile")
