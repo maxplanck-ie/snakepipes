@@ -4,5 +4,5 @@ channels:
  - conda-forge
  - bioconda
 dependencies:
- - bbmap 38.61b
+ - bbmap = 38.76
  - splitfastq

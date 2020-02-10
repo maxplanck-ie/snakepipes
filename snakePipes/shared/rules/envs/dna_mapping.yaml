@@ -4,5 +4,5 @@ channels:
  - bioconda
 dependencies:
  - bowtie2 = 2.3.5
- - qualimap = 2.2.2b
- - samtools = 1.9
+ - qualimap = 2.2.2d
+ - samtools = 1.10

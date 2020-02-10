@@ -3,4 +3,4 @@ channels:
  - conda-forge
  - bioconda
 dependencies:
- - tetranscripts==2.1.3
+ - tetranscripts = 2.1.4
