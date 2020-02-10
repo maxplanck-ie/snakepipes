@@ -67,7 +67,7 @@ def namesOKinR(sampleNames):
         if sampleName in reservedWords:
             sys.stderr.write("{} is a reserved keyword in R, so if there are steps using R they will fail!\n".format(sampleName))
         # invalid characters, which is everything except alpha numeric, . and _
-        if not all([(x.isalnum() or x in ["_", "."] for x in sampleName]):
+        if not all([(x.isalnum() or x in ["_", "."]) for x in sampleName]):
             sys.stderr.write("R requires that all samples names contain ONLY letters, number, '_' or '.', so {} is invalid and may cause failure in steps using R!\n".format(sampleName))
 
 
