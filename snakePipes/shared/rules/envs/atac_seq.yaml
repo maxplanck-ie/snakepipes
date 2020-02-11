@@ -17,3 +17,5 @@ dependencies:
  - r-statmod = 1.4.30
  - r-yaml
  - r-rmarkdown
+ - hmmratac = 1.2.9
+ - genrich = 0.6

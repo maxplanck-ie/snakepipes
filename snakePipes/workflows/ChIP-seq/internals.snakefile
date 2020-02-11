@@ -171,3 +171,6 @@ def filter_dict(sampleSheet,input_dict):
 
 if sampleSheet:
     filtered_dict = filter_dict(sampleSheet,dict(zip(chip_samples_w_ctrl, [ get_control_name(x) for x in chip_samples_w_ctrl ])))
+    genrichDict = cf.sampleSheetGroups(sampleSheet)
+else:
+    genrichDict = {"all_samples": samples}
