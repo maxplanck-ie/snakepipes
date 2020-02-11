@@ -12,7 +12,7 @@ dependencies:
   - r-car = 3.0_6
   - r-factominer = 2.2
   - r-ggplot2 = 3.1.1
-  - r-rmarkdown >= 2.0
+  - r-rmarkdown
   - r-dplyr = 0.8.4
   - r-tidyr
   - r-pander
@@ -20,7 +20,7 @@ dependencies:
   - bioconductor-genomicranges = 1.38.0
   - bioconductor-genomicfeatures = 1.38.0
   - bioconductor-biomart = 2.42.0
-  - bioconductor-dss >= 2.34.0
+  - bioconductor-dss = 2.34.0
   - bioconductor-dmrseq = 1.6.0
   - bioconductor-rtracklayer = 1.46.0
   - bioconductor-biocparallel = 1.20.0
