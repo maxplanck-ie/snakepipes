@@ -90,7 +90,7 @@ rule gtf_to_files:
                     if anno[0] == "transcript_id":
                         transcript_id = anno[1]
                 if transcript_id:
-                    exonWidth = int(cols[4]) - int(cols[3])
+                    exonWidth = int(cols[4]) - int(cols[3]) + 1
                     exonOffset = int(cols[3]) - int(GTFdict[transcript_id][1])
                     GTFdict[transcript_id][4].append(str(exonWidth))
                     GTFdict[transcript_id][5].append(str(exonOffset))
