@@ -75,41 +75,42 @@ rule filter_bam:
            sambamba index -t {threads} {output.bamfile}
            """
 
-#rule cellsort_bam:
-#    input:
-#        bam = "filtered_bam/{sample}.filtered.bam"
-#    output:
-#        bam = "filtered_bam/cellsorted_{sample}.filtered.bam"
-#    params:
-#        samsort_memory="20G"
-#    threads: 4
-#    conda: CONDA_scRNASEQ_ENV
-#    shell: """
-#            MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX);
-#            samtools sort -m {params.samsort_memory} -@ {threads} -T $MYTEMP/{wildcards.sample} -t CB -O bam -o {output.bam} {input.bam};
-#            rm -rf $MYTEMP
-#           """
+rule cellsort_bam:
+    input:
+        bam = "filtered_bam/{sample}.filtered.bam"
+    output:
+        bam = "filtered_bam/cellsorted_{sample}.filtered.bam"
+    params:
+        samsort_memory="20G"
+    threads: 4
+    conda: CONDA_scRNASEQ_ENV
+    shell: """
+            MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX);
+            samtools sort -m {params.samsort_memory} -@ {threads} -T $MYTEMP/{wildcards.sample} -t CB -O bam -o {output.bam} {input.bam};
+            rm -rf $MYTEMP
+           """
 
 #the barcode whitelist is currently passed in although it's not tested if it's actually necessery as it was already provided to STARsolo
 #velocyto doesn't accept our filtered gtf; will have to use the mask, after all
 #no metadata table is provided
 
-#checkpoint velocyto:
-#    input:
-#        bc = BCwhiteList,
-#        gtf = genes_gtf,
-#        bam = "filtered_bam/{sample}.filtered.bam",
-#        csbam="filtered_bam/cellsorted_{sample}.filtered.bam"
-#    output:
-#        outdir = directory("VelocytoCounts/{sample}"),
-#        outdum = "VelocytoCounts/{sample}.done.txt"
-#    conda: CONDA_scRNASEQ_ENV
-#    shell: """
-#            export LC_ALL=en_US.utf-8
-#            export LANG=en_US.utf-8
-#            velocyto run --bcfile {input.bc} --outputfolder {output.outdir} {input.bam} {input.gtf};
-#            touch {output.outdum}
-#    """
+checkpoint velocyto:
+    input:
+        gtf = genes_gtf,
+        bam = "filtered_bam/{sample}.filtered.bam",
+        csbam="filtered_bam/cellsorted_{sample}.filtered.bam"
+    output:
+        outdir = directory("VelocytoCounts/{sample}"),
+        outdum = "VelocytoCounts/{sample}.done.txt"
+    params:
+        bc = BCwhiteList_gz
+    conda: CONDA_scRNASEQ_ENV
+    shell: """
+            export LC_ALL=en_US.utf-8
+            export LANG=en_US.utf-8
+            velocyto run --bcfile {params.bc} --outputfolder {output.outdir} {input.bam} {input.gtf};
+            touch {output.outdum}
+    """
 
 #rule combine_loom:
 #    input: expand("VelocytoCounts/{sample}",sample=samples)

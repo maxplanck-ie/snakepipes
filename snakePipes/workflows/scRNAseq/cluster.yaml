@@ -19,4 +19,6 @@ filter_cells_raceid:
 STARsolo:
     memory: 6G
 cellsort_bam:
-    memory: 20G
+    memory: 10G
+velocyto:
+    memory: 10G

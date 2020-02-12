@@ -160,8 +160,8 @@ elif mode=="STARsolo":
             run_deeptools_qc(),
             "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv",
             expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample = samples),
-            "multiQC/multiqc_report.html"#,
-            #expand("VelocytoCounts/{sample}.done.txt",sample=samples)
+            "multiQC/multiqc_report.html",
+            expand("VelocytoCounts/{sample}.done.txt",sample=samples)
 
 #            "VelocytoCounts_merged/merged.txt",
 
