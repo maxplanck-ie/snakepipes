@@ -100,6 +100,12 @@ rule gtf_to_files:
 
         BED = open(output[2], "w")
         for k, v in GTFdict.items():
+            # sort the starts and sizes together
+            v[5] = [int(x) for x in v[5]]
+            v[4] = [int(x) for x in v[4]]
+            blockSizes = [str(x) for _,x in sorted(zip(v[5], v[4]))]
+            blockStarts = sorted(v[5])
+            blockStarts = [str(x) for x in blockStarts]
             BED.write("{}\t{}\t{}\t{}\t.\t{}\t{}\t{}\t255,0,0\t{}\t{}\t{}\n".format(v[0],  # chrom
                                                                                v[1],  # start
                                                                                v[2],  # end
@@ -108,8 +114,8 @@ rule gtf_to_files:
                                                                                v[1],  # start
                                                                                v[2],  # end
                                                                                len(v[4]),  # blockCount
-                                                                               ",".join(v[4]),  # blockSizes
-                                                                               ",".join(v[5])))  # blockStarts
+                                                                               ",".join(blockSizes),  # blockSizes
+                                                                               ",".join(blockStarts)))  # blockStarts
         BED.close()
 
 
@@ -128,4 +134,4 @@ rule annotation_bed2fasta:
     threads: 1
     conda: CONDA_RNASEQ_ENV
     shell:
-        "bedtools getfasta -name -s -split -fi {input.genome_fasta} -bed <(cat {input.bed} | cut -f1-12) | sed 's/(.*)//g' > {output}"
+        "bedtools getfasta -name -s -split -fi {input.genome_fasta} -bed <(cat {input.bed} | cut -f1-12) | sed 's/(.*)//g' | sed 's/:.*//g' > {output}"
