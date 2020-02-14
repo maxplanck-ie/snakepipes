@@ -81,7 +81,7 @@ rule cellsort_bam:
     output:
         bam = "filtered_bam/cellsorted_{sample}.filtered.bam"
     params:
-        samsort_memory="20G"
+        samsort_memory="10G"
     threads: 4
     conda: CONDA_scRNASEQ_ENV
     shell: """
@@ -103,13 +103,17 @@ checkpoint velocyto:
         outdir = directory("VelocytoCounts/{sample}"),
         outdum = "VelocytoCounts/{sample}.done.txt"
     params:
-        bc = BCwhiteList_gz
+        bc = BCwhiteList_gz,
+        tempdir = tempDir
     conda: CONDA_scRNASEQ_ENV
     shell: """
             export LC_ALL=en_US.utf-8
             export LANG=en_US.utf-8
+            export TMPDIR={params.tempdir}
+            MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX);
             velocyto run --bcfile {params.bc} --outputfolder {output.outdir} {input.bam} {input.gtf};
-            touch {output.outdum}
+            touch {output.outdum};
+            rm -rf $MYTEMP
     """
 
 #rule combine_loom:
