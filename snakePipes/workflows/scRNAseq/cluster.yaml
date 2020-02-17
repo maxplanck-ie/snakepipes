@@ -21,4 +21,4 @@ STARsolo:
 cellsort_bam:
     memory: 10G
 velocyto:
-    memory: 20G
+    memory: 30G
