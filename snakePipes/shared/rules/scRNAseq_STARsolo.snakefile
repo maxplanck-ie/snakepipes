@@ -111,7 +111,7 @@ checkpoint velocyto:
             export LANG=en_US.utf-8
             export TMPDIR={params.tempdir}
             MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX);
-            velocyto run --bcfile {params.bc} --outputfolder {output.outdir} {input.bam} {input.gtf};
+            velocyto run --bcfile {params.bc} --outputfolder {output.outdir} --dtype uint64 {input.bam} {input.gtf};
             touch {output.outdum};
             rm -rf $MYTEMP
     """
