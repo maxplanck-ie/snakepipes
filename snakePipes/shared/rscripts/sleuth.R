@@ -47,7 +47,7 @@ print(s2c)
 tryCatch( { t2g = read.table(t2g_file, header=F) },error = function(e) { print('No t2g file available!') },finally = {})
 
 if (exists('t2g')) {
-  colnames(t2g) <- c("target_id","ens_gene")
+  colnames(t2g) <- c("target_id","ens_gene","ext_gene")
 
   ## add gene names
   so <- sleuth_prep(s2c, full_model=d, target_mapping = t2g)

@@ -166,7 +166,7 @@ Most of the exploration below is based on the annotated DESeq2 output file gener
         d_topx_padj <- d[order(d$padj, decreasing = F),][1:heatmap_topN,]
         heatmap_data <- SummarizedExperiment::assay(rld)[as.character(d_topx_padj$id),]
         ## create another df to get the gene names
-        if (file.exists(geneNamesFile)) {
+        if (file.exists(geneNamesFile) && "external_gene_name" %in% colnames(ddr.df)) {
             mdf <- data.frame(row.names = rownames(ddr.df), external_gene_name = ddr.df$external_gene_name)
             htdat <- merge(mdf, heatmap_data, by = 0, all.y = TRUE, order = FALSE)
             napos <- which(is.na(htdat$external_gene_name))

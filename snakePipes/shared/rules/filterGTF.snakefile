@@ -67,6 +67,7 @@ rule gtf_to_files:
                 annos = cols[8].split(";")
                 gene_id = None
                 transcript_id = None
+                gene_name = ""
                 for anno in annos:
                     anno = shlex.split(anno.strip(), " ")
                     if len(anno) == 0:
@@ -75,8 +76,10 @@ rule gtf_to_files:
                         gene_id = anno[1]
                     elif anno[0] == "transcript_id":
                         transcript_id = anno[1]
+                    elif anno[0] == "gene_name":
+                        gene_name = anno[1]
                 if transcript_id:
-                    t2g.write("{}\t{}\n".format(transcript_id, "" if not gene_id else gene_id))
+                    t2g.write("{}\t{}\t{}\n".format(transcript_id, "" if not gene_id else gene_id, gene_name))
                     # chrom, start, end, strand, exon width and exon start offset
                     GTFdict[transcript_id] = [cols[0], cols[3], cols[4], cols[6], [], []]
             elif cols[2] == "exon":
