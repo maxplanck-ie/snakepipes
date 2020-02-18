@@ -103,7 +103,7 @@ checkpoint velocyto:
         outdir = directory("VelocytoCounts/{sample}"),
         outdum = "VelocytoCounts/{sample}.done.txt"
     params:
-        bc = BCwhiteList_gz,
+        bc = "STARsolo/{sample}/{sample}.Solo.out/Gene/filtered/barcodes.tsv",
         tempdir = tempDir
     conda: CONDA_scRNASEQ_ENV
     shell: """
