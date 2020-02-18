@@ -2,7 +2,7 @@
 ##remember that reads are swapped in internals.snakefile!!
 ###currently having CB and UB tags output in the bam requires --outSAMtype SortedByCoordinate !!
 import numpy
-#import loompy
+import loompy
 import os
 
 rule STARsolo:
@@ -116,17 +116,17 @@ checkpoint velocyto:
             rm -rf $MYTEMP
     """
 
-#rule combine_loom:
-#    input: expand("VelocytoCounts/{sample}",sample=samples)
-#    output: "VelocytoCounts_merged/merged.txt"
-#    run: 
-#        filelist=[]
-#        for p in input:
-#            z=os.listdir(p)
-#            f=list(filter(lambda x: '.loom' in x,z))
-#            ifi=os.path.join(outdir,p,f[0])
-#            filelist.append(ifi)
-#        print(filelist)
-#        outf=outdir+"/VelocytoCounts_merged/merged.loom"
-#        print(outf)
-#        loompy.combine(files=filelist,output_file=outf, key="Accession")
+rule combine_loom:
+    input: expand("VelocytoCounts/{sample}",sample=samples)
+    output: "VelocytoCounts_merged/merged.txt"
+    run: 
+        filelist=[]
+        for p in input:
+            z=os.listdir(p)
+            f=list(filter(lambda x: '.loom' in x,z))
+            ifi=os.path.join(outdir,p,f[0])
+            filelist.append(ifi)
+        print(filelist)
+        outf=outdir+"/VelocytoCounts_merged/merged.loom"
+        print(outf)
+        loompy.combine(files=filelist,output_file=outf, key="Accession")
