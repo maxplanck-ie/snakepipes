@@ -116,6 +116,14 @@ checkpoint velocyto:
             rm -rf $MYTEMP
     """
 
+rule STARsolo_raw_to_seurat:
+    input:
+        indirs = directory(expand("STARsolo/{sample}/{sample}.Solo.out/Gene/raw"))
+    output:
+        seu_raw = "Seurat/raw/merged_samples.RDS"
+    params:
+    shell:
+
 #rule combine_loom:
 #    input: expand("VelocytoCounts/{sample}",sample=samples)
 #    output: "VelocytoCounts_merged/merged.txt"
