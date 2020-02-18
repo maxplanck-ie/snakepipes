@@ -118,11 +118,11 @@ checkpoint velocyto:
 
 rule STARsolo_raw_to_seurat:
     input:
-        infiles = expand("STARsolo/{sample}/{sample}.Solo.out/Gene/raw/matrix.mtx")
+        infiles = expand("STARsolo/{sample}/{sample}.Solo.out/Gene/raw/matrix.mtx",sample=samples)
     output:
         seurat = "Seurat/STARsolo_raw/merged_samples.RDS"
     params:
-        indirs = expand("STARsolo/{sample}/{sample}.Solo.out/Gene/raw"),
+        indirs = expand("STARsolo/{sample}/{sample}.Solo.out/Gene/raw",sample=samples),
         wdir = "Seurat/STARsolo_raw",
         samples = samples
     conda: CONDA_scRNASEQ_ENV
@@ -130,11 +130,11 @@ rule STARsolo_raw_to_seurat:
 
 rule STARsolo_filtered_to_seurat:
     input:
-        infiles = expand("STARsolo/{sample}/{sample}.Solo.out/Gene/filtered/matrix.mtx")
+        infiles = expand("STARsolo/{sample}/{sample}.Solo.out/Gene/filtered/matrix.mtx",sample=samples)
     output:
         seurat = "Seurat/STARsolo_filtered/merged_samples.RDS"
     params:
-        indirs = expand("STARsolo/{sample}/{sample}.Solo.out/Gene/filtered"),
+        indirs = expand("STARsolo/{sample}/{sample}.Solo.out/Gene/filtered",sample=samples),
         wdir = "Seurat/STARsolo_filtered",
         samples = samples
     conda: CONDA_scRNASEQ_ENV
