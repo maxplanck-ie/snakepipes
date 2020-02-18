@@ -1,26 +1,25 @@
 .libPaths(R.home("library"))
 
 #set working directory
-wdir<-commandArgs(trailingOnly=TRUE)[1]
+in_dirs<-snakemake@params[["indirs"]]
+message(sprintf("analyzing folders %s",unlist(in_dirs)))
+samples<-snakemake@params[["samples"]]
+message(sprintf("analyzing samples %s",samples))
+
 #system(paste0('mkdir -p ',wdir)) #for debugging
+wdir<-snakemake@params[["wdir"]]
 setwd(wdir)
 message(sprintf("working directory is %s",getwd()))
 
-
 options(stringsAsFactors=FALSE,na.rm=TRUE,rgl.useNULL = TRUE)
 
-#library(Rcpp)
 library(dplyr)
 library(Seurat)
-library(clustree)
 
 #####read-in data
-##access samples dict and STARsolo output dir
-samples<-commandArgs(trailingOnly=TRUE)[2]
-/data/processing/sikora/scRNA-seq.STARsolo/analysis/STARsolo/195-1/195-1.Solo.out/Gene/filtered
-l<-lapply(folder_list,function(X)Read10X(X))
-names(l)<-samples_dict
+l<-lapply(in_dirs,function(X)Read10X(X))
+names(l)<-samples
 s<-MergeSeurat(x=l[[1]],y=unlist(l[[2:length(l)]]),add.cell.ids=names(l))
-saveRDS(s,file="s.RDS")
+saveRDS(s,file=snakemake@output[["seurat"]])
 
-##QC plots and filter data
+message('done all')

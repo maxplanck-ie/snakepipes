@@ -10,7 +10,7 @@ dependencies:
  - r-stringr = 1.4.0
  - bioconductor-monocle = 2.10.0
  - r-data.table = 1.12.0
- - r-seurat = 2.3.4
+ - r-seurat = 3.0.2
  - r-gtools = 3.8.1
  - r-dplyr = 0.8.0.1
  - r-raceid = 0.1.3

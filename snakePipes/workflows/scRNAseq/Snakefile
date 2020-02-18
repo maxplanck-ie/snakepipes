@@ -161,7 +161,9 @@ elif mode=="STARsolo":
             "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv",
             expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample = samples),
             "multiQC/multiqc_report.html",
-            expand("VelocytoCounts/{sample}.done.txt",sample=samples)
+            expand("VelocytoCounts/{sample}.done.txt",sample=samples),
+            "Seurat/STARsolo_filtered/merged_samples.RDS",
+            "Seurat/STARsolo_raw/merged_samples.RDS"
 
 #            "VelocytoCounts_merged/merged.txt",
 

@@ -118,11 +118,27 @@ checkpoint velocyto:
 
 rule STARsolo_raw_to_seurat:
     input:
-        indirs = directory(expand("STARsolo/{sample}/{sample}.Solo.out/Gene/raw"))
+        infiles = expand("STARsolo/{sample}/{sample}.Solo.out/Gene/raw/matrix.mtx")
     output:
-        seu_raw = "Seurat/raw/merged_samples.RDS"
+        seurat = "Seurat/STARsolo_raw/merged_samples.RDS"
     params:
-    shell:
+        indirs = expand("STARsolo/{sample}/{sample}.Solo.out/Gene/raw"),
+        wdir = "Seurat/STARsolo_raw",
+        samples = samples
+    conda: CONDA_scRNASEQ_ENV
+    script: "../rscripts/scRNAseq_Seurat3.R"
+
+rule STARsolo_filtered_to_seurat:
+    input:
+        infiles = expand("STARsolo/{sample}/{sample}.Solo.out/Gene/filtered/matrix.mtx")
+    output:
+        seurat = "Seurat/STARsolo_filtered/merged_samples.RDS"
+    params:
+        indirs = expand("STARsolo/{sample}/{sample}.Solo.out/Gene/filtered"),
+        wdir = "Seurat/STARsolo_filtered",
+        samples = samples
+    conda: CONDA_scRNASEQ_ENV
+    script: "../rscripts/scRNAseq_Seurat3.R"
 
 #rule combine_loom:
 #    input: expand("VelocytoCounts/{sample}",sample=samples)
