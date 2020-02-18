@@ -16,3 +16,5 @@ dependencies:
  - r-raceid = 0.1.3
  - h5py = 2.10.0
  - velocyto.py = 0.17.17
+ - r-velocyto.r
+ - r-seurat-scripts 

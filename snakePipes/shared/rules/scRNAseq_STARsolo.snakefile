@@ -140,6 +140,17 @@ rule STARsolo_filtered_to_seurat:
     conda: CONDA_scRNASEQ_ENV
     script: "../rscripts/scRNAseq_Seurat3.R"
 
+rule velocity_to_seurat:
+    input:
+        infiles = expand("VelocytoCounts/{sample}/{sample}",sample=samples)
+    output:
+        seurat = "Seurat/Velocyto/merged_samples.RDS"
+    params:
+        wdir = "Seurat/Velocyto",
+        samples = samples
+    conda: CONDA_scRNASEQ_ENV
+    script: "../rscripts/scRNAseq_merge_loom.R"
+
 #rule combine_loom:
 #    input: expand("VelocytoCounts/{sample}",sample=samples)
 #    output: "VelocytoCounts_merged/merged.txt"
