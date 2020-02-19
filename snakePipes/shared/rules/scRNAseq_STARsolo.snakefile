@@ -2,7 +2,6 @@
 ##remember that reads are swapped in internals.snakefile!!
 ###currently having CB and UB tags output in the bam requires --outSAMtype SortedByCoordinate !!
 import numpy
-import loompy
 import os
 
 rule STARsolo:
