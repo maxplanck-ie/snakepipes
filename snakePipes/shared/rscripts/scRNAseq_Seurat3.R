@@ -26,7 +26,8 @@ names(datav)<-samples
 print(datav)
 expression_matrix <- Read10X(data.dir = datav)
 s = CreateSeuratObject(counts = expression_matrix)
-saveRDS(s,file=snakemake@output[["seurat"]])
+outfile<-filepath(wdir,basename(snakemake@output[["seurat"]]))
+saveRDS(s,file=outfile)
 
 message('done all')
 sink()
