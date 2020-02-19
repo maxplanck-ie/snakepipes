@@ -257,7 +257,7 @@ Understanding the outputs: mode Gruen
 
 
 Understanding the outputs: mode STARsolo
---------------------------------------
+----------------------------------------
 
 - **Main result:** output folders with 10x-format count matrices can be found in sample subfolders under ``STARsolo``. The ouput consists of three files: barcodes.tsv, features.tsv, matrix.mtx. Their gzipped versions are stored in the same folder.
 

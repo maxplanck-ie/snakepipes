@@ -92,7 +92,7 @@ rule cellsort_bam:
             rm -rf $MYTEMP
            """
 
-#the barcode whitelist is currently passed in although it's not tested if it's actually necessery as it was already provided to STARsolo
+#the barcode whitelist is currently taken from STARsolo filtered output, this is required to reduce runtime!
 #velocyto doesn't accept our filtered gtf; will have to use the mask, after all
 #no metadata table is provided
 
