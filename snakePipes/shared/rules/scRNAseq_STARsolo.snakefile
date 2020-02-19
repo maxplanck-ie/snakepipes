@@ -11,7 +11,9 @@ rule STARsolo:
         r2="originalFASTQ/{sample}"+reads[1]+".fastq.gz",
         annot="Annotation/genes.filtered.gtf"
     output:
-        bam = "STARsolo/{sample}.sorted.bam"
+        bam = "STARsolo/{sample}.sorted.bam",
+        raw_counts = "STARsolo/{sample}/{sample}.Solo.out/Gene/raw/matrix.mtx",
+        filtered_counts = "STARsolo/{sample}/{sample}.Solo.out/Gene/filtered/matrix.mtx"
     params:
         alignerOptions = str(alignerOptions or ''),
         gtf = outdir+"/Annotation/genes.filtered.gtf",
