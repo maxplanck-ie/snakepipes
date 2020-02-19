@@ -152,7 +152,7 @@ rule STARsolo_raw_to_seurat:
         seurat = "Seurat/STARsolo_raw/merged_samples.RDS"
     params:
         indirs = expand(outdir + "/STARsolo/{sample}/{sample}.Solo.out/Gene/raw",sample=samples),
-        wdir = "Seurat/STARsolo_raw",
+        wdir = outdir + "Seurat/STARsolo_raw",
         samples = samples
     log:
         err = "Seurat/STARsolo_raw/logs/seurat.err",
@@ -167,7 +167,7 @@ rule STARsolo_filtered_to_seurat:
         seurat = "Seurat/STARsolo_filtered/merged_samples.RDS"
     params:
         indirs = expand(outdir +"/STARsolo/{sample}/{sample}.Solo.out/Gene/filtered",sample=samples),
-        wdir = "Seurat/STARsolo_filtered",
+        wdir = outdir +"/Seurat/STARsolo_filtered",
         samples = samples
     log:
         err = "Seurat/STARsolo_filtered/logs/seurat.err",
