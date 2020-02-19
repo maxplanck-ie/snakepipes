@@ -18,9 +18,14 @@ library(dplyr)
 library(Seurat)
 
 #####read-in data
-l<-lapply(in_dirs,function(X)Read10X(X))
-names(l)<-samples
-s<-MergeSeurat(x=l[[1]],y=unlist(l[[2:length(l)]]),add.cell.ids=names(l))
+#l<-lapply(in_dirs,function(X)Read10X(X))
+#names(l)<-samples
+#s<-MergeSeurat(x=l[[1]],y=unlist(l[[2:length(l)]]),add.cell.ids=names(l))
+datav<-unlist(in_dirs)
+names(datav)<-samples
+print(datav)
+expression_matrix <- Read10X(data.dir = datav)
+s = CreateSeuratObject(counts = expression_matrix)
 saveRDS(s,file=snakemake@output[["seurat"]])
 
 message('done all')
