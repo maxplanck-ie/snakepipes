@@ -1,0 +1,9 @@
+name: snakepipes_scRNAseq_environment_v1.0
+channels:
+ - conda-forge
+ - bioconda
+dependencies:
+ - r-base = 3.6.1
+ - r-seurat = 3.0.2
+ - r-velocyto.r
+ - r-seurat-scripts 

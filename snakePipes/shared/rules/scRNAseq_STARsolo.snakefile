@@ -127,7 +127,7 @@ rule STARsolo_raw_to_seurat:
         indirs = expand("STARsolo/{sample}/{sample}.Solo.out/Gene/raw",sample=samples),
         wdir = "Seurat/STARsolo_raw",
         samples = samples
-    conda: CONDA_scRNASEQ_ENV
+    conda: CONDA_seurat3_ENV
     script: "../rscripts/scRNAseq_Seurat3.R"
 
 rule STARsolo_filtered_to_seurat:
@@ -139,7 +139,7 @@ rule STARsolo_filtered_to_seurat:
         indirs = expand("STARsolo/{sample}/{sample}.Solo.out/Gene/filtered",sample=samples),
         wdir = "Seurat/STARsolo_filtered",
         samples = samples
-    conda: CONDA_scRNASEQ_ENV
+    conda: CONDA_seurat3_ENV
     script: "../rscripts/scRNAseq_Seurat3.R"
 
 rule velocity_to_seurat:
@@ -150,7 +150,7 @@ rule velocity_to_seurat:
     params:
         wdir = "Seurat/Velocyto",
         samples = samples
-    conda: CONDA_scRNASEQ_ENV
+    conda: CONDA_seurat3_ENV
     script: "../rscripts/scRNAseq_merge_loom.R"
 
 #rule combine_loom:
