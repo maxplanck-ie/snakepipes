@@ -2,7 +2,7 @@
 ##remember that reads are swapped in internals.snakefile!!
 ###currently having CB and UB tags output in the bam requires --outSAMtype SortedByCoordinate !!
 import numpy
-#import loompy
+import loompy
 import os
 
 rule STARsolo:
@@ -175,26 +175,26 @@ rule STARsolo_filtered_to_seurat:
 
 #rule velocity_to_seurat:
 #    input:
-#        infiles = expand("VelocytoCounts/{sample}/{sample}",sample=samples)
+#        indirs = expand("VelocytoCounts/{sample}",sample=samples)
 #    output:
 #        seurat = "Seurat/Velocyto/merged_samples.RDS"
 #    params:
-#        wdir = "Seurat/Velocyto",
+#        wdir = outdir + "/Seurat/Velocyto",
 #        samples = samples
+#    log:
+#        out = "Seurat/Velocyto/logs/seurat.out"
 #    conda: CONDA_seurat3_ENV
 #    script: "../rscripts/scRNAseq_merge_loom.R"
 
-#rule combine_loom:
-#    input: expand("VelocytoCounts/{sample}",sample=samples)
-#    output: "VelocytoCounts_merged/merged.txt"
-#    run: 
-#        filelist=[]
-#        for p in input:
-#            z=os.listdir(p)
-#            f=list(filter(lambda x: '.loom' in x,z))
-#            ifi=os.path.join(outdir,p,f[0])
-#            filelist.append(ifi)
-#        print(filelist)
-#        outf=outdir+"/VelocytoCounts_merged/merged.loom"
-#        print(outf)
-#        loompy.combine(files=filelist,output_file=outf, key="Accession")
+rule combine_loom:
+    input: expand("VelocytoCounts/{sample}",sample=samples)
+    output: "VelocytoCounts_merged/merged.loom"
+    conda: CONDA_loompy_ENV
+    params:
+        outfile = outdir+"/VelocytoCounts_merged/merged.loom",
+        script = maindir+"/shared/tools/loompy_merge.py",
+        input_fp = lambda wildcards,input: [ os.path.join(outdir,f) for f in input ]
+    shell: """
+        python {params.script} -outf {params.outfile} {params.input_fp}
+          """
+       
