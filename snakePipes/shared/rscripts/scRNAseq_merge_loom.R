@@ -1,10 +1,11 @@
+sink(snakemake@log[["out"]])
 .libPaths(R.home("library"))
 
 #set working directory
 in_files<-snakemake@input[["ifiles"]]
-message(sprintf("analyzing files %s",unlist(in_files)))
+message(sprintf("analyzing files %s ",unlist(in_files)))
 samples<-snakemake@params[["samples"]]
-message(sprintf("analyzing samples %s",samples))
+message(sprintf("analyzing samples %s ",samples))
 
 #system(paste0('mkdir -p ',wdir)) #for debugging
 wdir<-snakemake@params[["wdir"]]
@@ -25,3 +26,4 @@ s<-MergeSeurat(x=l[[1]],y=unlist(l[[2:length(l)]]),add.cell.ids=names(l))
 saveRDS(s,file=snakemake@output[["seurat"]])
 
 message('done all')
+sink()

@@ -13,7 +13,8 @@ rule STARsolo:
     output:
         bam = "STARsolo/{sample}.sorted.bam",
         raw_counts = "STARsolo/{sample}/{sample}.Solo.out/Gene/raw/matrix.mtx",
-        filtered_counts = "STARsolo/{sample}/{sample}.Solo.out/Gene/filtered/matrix.mtx"
+        filtered_counts = "STARsolo/{sample}/{sample}.Solo.out/Gene/filtered/matrix.mtx",
+        filtered_bc = "STARsolo/{sample}/{sample}.Solo.out/Gene/filtered/barcodes.tsv"
     params:
         alignerOptions = str(alignerOptions or ''),
         gtf = outdir+"/Annotation/genes.filtered.gtf",
@@ -100,12 +101,12 @@ checkpoint velocyto:
     input:
         gtf = genes_gtf,
         bam = "filtered_bam/{sample}.filtered.bam",
-        csbam="filtered_bam/cellsorted_{sample}.filtered.bam"
+        csbam="filtered_bam/cellsorted_{sample}.filtered.bam",
+        bc = "STARsolo/{sample}/{sample}.Solo.out/Gene/filtered/barcodes.tsv"
     output:
         outdir = directory("VelocytoCounts/{sample}"),
         outdum = "VelocytoCounts/{sample}.done.txt"
     params:
-        bc = "STARsolo/{sample}/{sample}.Solo.out/Gene/filtered/barcodes.tsv",
         tempdir = tempDir
     conda: CONDA_scRNASEQ_ENV
     shell: """
@@ -113,32 +114,64 @@ checkpoint velocyto:
             export LANG=en_US.utf-8
             export TMPDIR={params.tempdir}
             MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX);
-            velocyto run --bcfile {params.bc} --outputfolder {output.outdir} --dtype uint64 {input.bam} {input.gtf};
+            velocyto run --bcfile {input.bc} --outputfolder {output.outdir} --dtype uint64 {input.bam} {input.gtf};
             touch {output.outdum};
             rm -rf $MYTEMP
     """
 
+rule gzip_STARsolo_for_seurat:
+    input:
+        raw_counts = "STARsolo/{sample}/{sample}.Solo.out/Gene/raw/matrix.mtx",
+        filtered_counts = "STARsolo/{sample}/{sample}.Solo.out/Gene/filtered/matrix.mtx"
+    output:
+        raw_counts_gz = "STARsolo/{sample}/{sample}.Solo.out/Gene/raw/matrix.mtx.gz",
+        filtered_counts_gz = "STARsolo/{sample}/{sample}.Solo.out/Gene/filtered/matrix.mtx.gz"
+    params:
+        raw_bc = "STARsolo/{sample}/{sample}.Solo.out/Gene/raw/barcodes.tsv",
+        filtered_bc = "STARsolo/{sample}/{sample}.Solo.out/Gene/filtered/barcodes.tsv",
+        raw_features = "STARsolo/{sample}/{sample}.Solo.out/Gene/raw/features.tsv",
+        filtered_features = "STARsolo/{sample}/{sample}.Solo.out/Gene/filtered/features.tsv",
+        raw_bc_gz = "STARsolo/{sample}/{sample}.Solo.out/Gene/raw/barcodes.tsv.gz",
+        filtered_bc_gz = "STARsolo/{sample}/{sample}.Solo.out/Gene/filtered/barcodes.tsv.gz",
+        raw_features_gz = "STARsolo/{sample}/{sample}.Solo.out/Gene/raw/features.tsv.gz",
+        filtered_features_gz = "STARsolo/{sample}/{sample}.Solo.out/Gene/filtered/features.tsv.gz"
+    shell: """
+         gzip -c {params.raw_bc} > {params.raw_bc_gz};
+         gzip -c {params.raw_features} > {params.raw_features_gz};
+         gzip -c {params.filtered_bc} > {params.filtered_bc_gz};
+         gzip -c {params.filtered_features} > {params.filtered_features_gz};
+         gzip -c {input.raw_counts} > {output.raw_counts_gz};
+         gzip -c {input.filtered_counts} > {output.filtered_counts_gz}
+    """
+
+
 rule STARsolo_raw_to_seurat:
     input:
-        infiles = expand("STARsolo/{sample}/{sample}.Solo.out/Gene/raw/matrix.mtx",sample=samples)
+        infiles = expand("STARsolo/{sample}/{sample}.Solo.out/Gene/raw/matrix.mtx.gz",sample=samples)
     output:
         seurat = "Seurat/STARsolo_raw/merged_samples.RDS"
     params:
-        indirs = expand("STARsolo/{sample}/{sample}.Solo.out/Gene/raw",sample=samples),
+        indirs = expand(outdir + "/STARsolo/{sample}/{sample}.Solo.out/Gene/raw",sample=samples),
         wdir = "Seurat/STARsolo_raw",
         samples = samples
+    log:
+        err = "Seurat/STARsolo_raw/logs/seurat.err",
+        out = "Seurat/STARsolo_raw/logs/seurat.out"
     conda: CONDA_seurat3_ENV
     script: "../rscripts/scRNAseq_Seurat3.R"
 
 rule STARsolo_filtered_to_seurat:
     input:
-        infiles = expand("STARsolo/{sample}/{sample}.Solo.out/Gene/filtered/matrix.mtx",sample=samples)
+        infiles = expand("STARsolo/{sample}/{sample}.Solo.out/Gene/filtered/matrix.mtx.gz",sample=samples)
     output:
         seurat = "Seurat/STARsolo_filtered/merged_samples.RDS"
     params:
-        indirs = expand("STARsolo/{sample}/{sample}.Solo.out/Gene/filtered",sample=samples),
+        indirs = expand(outdir +"/STARsolo/{sample}/{sample}.Solo.out/Gene/filtered",sample=samples),
         wdir = "Seurat/STARsolo_filtered",
         samples = samples
+    log:
+        err = "Seurat/STARsolo_filtered/logs/seurat.err",
+        out = "Seurat/STARsolo_filtered/logs/seurat.out"
     conda: CONDA_seurat3_ENV
     script: "../rscripts/scRNAseq_Seurat3.R"
 
