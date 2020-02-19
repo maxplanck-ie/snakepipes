@@ -10,7 +10,7 @@ build:
   noarch: python
 
 requirements:
-  build:
+  host:
     - python >=3
   run:
     - python >=3
