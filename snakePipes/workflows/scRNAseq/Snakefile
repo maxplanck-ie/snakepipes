@@ -128,7 +128,7 @@ onstart:
 ################################################################################
 
 if mode=="Gruen":
-    localrules: FASTQ1, FASTQ2
+    localrules: origFASTQ1, origFASTQ2
     rule all:
         input:
             expand("FASTQ_barcoded/{sample}{read}.fastq.gz", sample = samples, read=reads[0]),
@@ -153,7 +153,7 @@ if mode=="Gruen":
             "multiQC/multiqc_report.html",
             'Filtered_cells_monocle/Stats_report.html'
 elif mode=="STARsolo":
-    localrules: FASTQ1, FASTQ2, gzip_STARsolo_for_seurat
+    localrules: origFASTQ1, origFASTQ2, gzip_STARsolo_for_seurat
     rule all:
         input:
             expand("STARsolo/{sample}.sorted.bam",sample = samples),
