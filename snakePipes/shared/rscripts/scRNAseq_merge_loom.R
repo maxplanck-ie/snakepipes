@@ -1,16 +1,17 @@
+#system(paste0('mkdir -p ',wdir)) #for debugging
+wdir<-snakemake@params[["wdir"]]
+if (!dir.exists(wdir)) dir.create(wdir)
+setwd(wdir)
 sink(snakemake@log[["out"]])
 .libPaths(R.home("library"))
+
+message(sprintf("working directory is %s",getwd()))
 
 #set working directory
 in_files<-snakemake@input[["ifiles"]]
 message(sprintf("analyzing files %s ",unlist(in_files)))
 samples<-snakemake@params[["samples"]]
 message(sprintf("analyzing samples %s ",samples))
-
-#system(paste0('mkdir -p ',wdir)) #for debugging
-wdir<-snakemake@params[["wdir"]]
-setwd(wdir)
-message(sprintf("working directory is %s",getwd()))
 
 options(stringsAsFactors=FALSE,na.rm=TRUE,rgl.useNULL = TRUE)
 

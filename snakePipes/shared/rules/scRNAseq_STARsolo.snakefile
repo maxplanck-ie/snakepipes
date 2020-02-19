@@ -152,10 +152,9 @@ rule STARsolo_raw_to_seurat:
         seurat = "Seurat/STARsolo_raw/merged_samples.RDS"
     params:
         indirs = expand(outdir + "/STARsolo/{sample}/{sample}.Solo.out/Gene/raw",sample=samples),
-        wdir = outdir + "Seurat/STARsolo_raw",
+        wdir = outdir + "/Seurat/STARsolo_raw",
         samples = samples
     log:
-        err = "Seurat/STARsolo_raw/logs/seurat.err",
         out = "Seurat/STARsolo_raw/logs/seurat.out"
     conda: CONDA_seurat3_ENV
     script: "../rscripts/scRNAseq_Seurat3.R"
@@ -170,7 +169,6 @@ rule STARsolo_filtered_to_seurat:
         wdir = outdir +"/Seurat/STARsolo_filtered",
         samples = samples
     log:
-        err = "Seurat/STARsolo_filtered/logs/seurat.err",
         out = "Seurat/STARsolo_filtered/logs/seurat.out"
     conda: CONDA_seurat3_ENV
     script: "../rscripts/scRNAseq_Seurat3.R"
