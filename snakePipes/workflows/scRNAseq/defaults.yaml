@@ -43,6 +43,7 @@ cellBarcodePattern: "NNNNNNXXXXXX"
 splitLib: False
 cellNames:
 ##STARsolo options
+myKit: CellSeq384
 BCwhiteList:
 STARsoloCoords: ["1","7","8","7"]
 #generic options
