@@ -163,8 +163,8 @@ elif mode=="STARsolo":
             "multiQC/multiqc_report.html",
             expand("VelocytoCounts/{sample}.done.txt",sample=samples),
             "Seurat/STARsolo_filtered/merged_samples.RDS",
-            "Seurat/STARsolo_raw/merged_samples.RDS",
-            "Seurat/Velocyto/merged_samples.RDS"
+            "Seurat/STARsolo_raw/merged_samples.RDS"#,
+#            "Seurat/Velocyto/merged_samples.RDS"
 
 #            "VelocytoCounts_merged/merged.txt",
 

@@ -5,5 +5,5 @@ channels:
 dependencies:
  - r-base = 3.6.1
  - r-seurat = 3.0.2
- - r-velocyto.r
- - r-seurat-scripts 
+# - r-velocyto.r
+# - r-seurat-scripts 
