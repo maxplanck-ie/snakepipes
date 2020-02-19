@@ -73,14 +73,14 @@ if aligner.upper().find("HISAT2") >=0:
             threads: 10
             conda: CONDA_RNASEQ_ENV
             shell: """
-                MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX);
+                MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX)
                 hisat2 -p {threads} {params.alignerOptions} \
                     {params.lib_type} -x {params.idx} \
                     --known-splicesite-infile {params.input_splice} \
                     -U {input[0]} \
                     --novel-splicesite-outfile {output.splice} \
                     --met-file {output.met} 2> {output.align_summary} \
-                | samtools sort -m {params.samsort_memory} -T $MYTEMP/{wildcards.sample} -@ {threads} -O bam -o {output.bam} -;
+                | samtools sort -m {params.samsort_memory} -T $MYTEMP/{wildcards.sample} -@ {threads} -O bam -o {output.bam} -
                 rm -rf $MYTEMP
                 """
 elif aligner.upper().find("STAR") >=0:
@@ -97,13 +97,14 @@ elif aligner.upper().find("STAR") >=0:
                 index = star_index,
                 prefix = aligner+"/{sample}/{sample}.",
                 samsort_memory = '2G',
-                sample_dir = aligner+"/{sample}"
+                sample_dir = aligner+"/{sample}",
+                samtools_threads = 5
             benchmark:
                 aligner+"/.benchmark/STAR.{sample}.benchmark"
             threads: 20  # 3.2G per core
             conda: CONDA_RNASEQ_ENV
             shell: """
-                MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX);
+                MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX)
                 ( [ -d {params.sample_dir} ] || mkdir -p {params.sample_dir} )
                 STAR --runThreadN {threads} \
                     {params.alignerOptions} \
@@ -115,7 +116,7 @@ elif aligner.upper().find("STAR") >=0:
                     --genomeDir {params.index} \
                     --readFilesIn <(gunzip -c {input.r1}) <(gunzip -c {input.r2}) \
                     --outFileNamePrefix {params.prefix} \
-                | samtools sort -m {params.samsort_memory} -T $MYTEMP/{wildcards.sample} -@ {threads} -O bam -o {output.bam} -;
+                | samtools sort -m {params.samsort_memory} -T $MYTEMP/{wildcards.sample} -@ {params.samtools_threads} -O bam -o {output.bam} -
                 rm -rf $MYTEMP
                 """
     else:
@@ -130,13 +131,14 @@ elif aligner.upper().find("STAR") >=0:
                 index = star_index,
                 prefix = aligner+"/{sample}/{sample}.",
                 samsort_memory = '2G',
-                sample_dir = aligner+"/{sample}"
+                sample_dir = aligner+"/{sample}",
+                samtools_threads = 5
             benchmark:
                 aligner+"/.benchmark/STAR.{sample}.benchmark"
             threads: 20  # 3.2G per core
             conda: CONDA_RNASEQ_ENV
             shell: """
-                MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX);
+                MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX)
                 ( [ -d {params.sample_dir} ] || mkdir -p {params.sample_dir} )
                 STAR --runThreadN {threads} \
                     {params.alignerOptions} \
@@ -148,6 +150,6 @@ elif aligner.upper().find("STAR") >=0:
                     --genomeDir {params.index} \
                     --readFilesIn <(gunzip -c {input}) \
                     --outFileNamePrefix {params.prefix} \
-                | samtools sort -m {params.samsort_memory} -T $MYTEMP/{wildcards.sample} -@ {threads} -O bam -o {output.bam} -;
+                | samtools sort -m {params.samsort_memory} -T $MYTEMP/{wildcards.sample} -@ {params.samtools_threads} -O bam -o {output.bam} -
                 rm -rf $MYTEMP
                 """
