@@ -3,6 +3,7 @@ import os
 import subprocess
 import re
 import yaml
+import sys
 
 
 ### Functions ##################################################################
@@ -131,9 +132,6 @@ else:
     bamSamples = cf.get_sample_names_bam(bamFiles, bamExt)
     
     bamDict = dict.fromkeys(bamSamples)
-    
-    print(bamFiles)
-    print(bamSamples)
     
     for sample in all_samples:
         if sample not in bamDict:

@@ -21,7 +21,6 @@ rule STARsolo:
         prefix = "STARsolo/{sample}/{sample}.",
         samsort_memory = '2G',
         sample_dir = "STARsolo/{sample}",
-        bam = "{sample}/{sample}.Aligned.sortedByCoord.out.bam",
         bclist = BCwhiteList,
         UMIstart = STARsoloCoords[0],
         UMIlen = STARsoloCoords[1],
@@ -55,9 +54,9 @@ rule STARsolo:
 	    --soloBarcodeReadLength 0 \
 	    --soloCBmatchWLtype Exact \
 	    --soloStrand Forward\
-	    --soloUMIdedup Exact ;
+	    --soloUMIdedup Exact
 
-        ln -s {params.bam} {output.bam};
+        ln -rs {params.prefix}Aligned.sortedByCoord.out.bam {output.bam}
  
         rm -rf $MYTEMP
          """
@@ -87,8 +86,8 @@ rule cellsort_bam:
     threads: 4
     conda: CONDA_scRNASEQ_ENV
     shell: """
-            MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX);
-            samtools sort -m {params.samsort_memory} -@ {threads} -T $MYTEMP/{wildcards.sample} -t CB -O bam -o {output.bam} {input.bam};
+            MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX)
+            samtools sort -m {params.samsort_memory} -@ {threads} -T $MYTEMP/{wildcards.sample} -t CB -O bam -o {output.bam} {input.bam}
             rm -rf $MYTEMP
            """
 

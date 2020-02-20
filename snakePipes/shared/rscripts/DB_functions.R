@@ -191,7 +191,7 @@ tmmNormalize_chip <- function(chipCountObject, binsize, plotfile){
     bam.files <- SummarizedExperiment::colData(chipCountObject$windowCounts)$bam.files
     # Get norm factors
     wider <- csaw::windowCounts(bam.files, bin = TRUE, width = binsize, param = chipCountObject$pe.param)
-    normfacs <- csaw::normOffsets(wider, se.out=FALSE)
+    normfacs <- csaw::normFactors(wider, se.out=FALSE)
     chipCountObject$normFactors <- normfacs
 
     # get norm counts

@@ -1,9 +1,12 @@
 ## Salmon Index
 rule SalmonIndex:
     input:
-        "Annotation/genes.filtered.fa"  ## transcripts
+        "Annotation/genes.filtered.fa",
+        genome_fasta
     output:
-        "Salmon/SalmonIndex/sa.bin"
+        "Salmon/SalmonIndex/decoys.txt",
+        temp("Salmon/SalmonIndex/seq.fa"),
+        "Salmon/SalmonIndex/seq.bin"
     benchmark:
         "Salmon/.benchmark/Salmon.index.benchmark"
     params:
@@ -14,7 +17,9 @@ rule SalmonIndex:
     threads: 16
     conda: CONDA_RNASEQ_ENV
     shell: """
-        salmon index -p {threads} -t {input} -i Salmon/SalmonIndex {params.salmonIndexOptions} > {log.out} 2> {log.err}
+        grep "^>" {input[1]} | cut -d " " -f 1 | tr -d ">" > {output[0]}
+        cat {input[0]} {input[1]} > {output[1]}
+        salmon index -p {threads} -t {output[1]} -d {output[0]} -i Salmon/SalmonIndex {params.salmonIndexOptions} > {log.out} 2> {log.err}
         """
 
 
@@ -38,16 +43,15 @@ def getSalmon_libtype(pairedEnd, libraryType):
             return "U"
 
 
-## Salmon quant
+## Salmon quant, the bootstraps are needed in Sleuth
 if pairedEnd:
     rule SalmonQuant:
         input:
             r1 = fastq_dir+"/{sample}"+reads[0]+".fastq.gz",
             r2 = fastq_dir+"/{sample}"+reads[1]+".fastq.gz",
-            bin = "Salmon/SalmonIndex/sa.bin",
+            bin = "Salmon/SalmonIndex/seq.bin"
         output:
-            quant = "Salmon/{sample}/quant.sf",
-            quant_genes = "Salmon/{sample}/quant.genes.sf"
+            quant = "Salmon/{sample}/quant.sf"
         benchmark:
             "Salmon/.benchmark/SalmonQuant.{sample}.benchmark"
         params:
@@ -57,16 +61,15 @@ if pairedEnd:
         threads: 8
         conda: CONDA_RNASEQ_ENV
         shell: """
-            salmon quant -p {threads} --numBootstraps 50 -g {params.gtf} -i Salmon/SalmonIndex -l {params.lib_type} -1 {input.r1} -2 {input.r2} -o {params.outdir}
+            salmon quant -p {threads} --softclipOverhangs --validateMappings --numBootstraps 50 -i Salmon/SalmonIndex -l {params.lib_type} -1 {input.r1} -2 {input.r2} -o {params.outdir}
             """
 else:
     rule SalmonQuant:
         input:
             fastq = fastq_dir+"/{sample}"+reads[0]+".fastq.gz",
-            bin = "Salmon/SalmonIndex/sa.bin",
+            bin = "Salmon/SalmonIndex/seq.bin",
         output:
-            quant = "Salmon/{sample}/quant.sf",
-            quant_genes = "Salmon/{sample}/quant.genes.sf"
+            quant = "Salmon/{sample}/quant.sf"
         benchmark:
             "Salmon/.benchmark/SalmonQuant.{sample}.benchmark"
         params:
@@ -76,23 +79,19 @@ else:
         threads: 8
         conda: CONDA_RNASEQ_ENV
         shell: """
-            salmon quant -p {threads} --numBootstraps 50 -g {params.gtf} -i Salmon/SalmonIndex -l {params.lib_type} -r {input.fastq} -o {params.outdir}
+            salmon quant -p {threads} --softclipOverhangs --validateMappings --numBootstraps 50 -i Salmon/SalmonIndex -l {params.lib_type} -r {input.fastq} -o {params.outdir}
             """
 
 
 rule Salmon_symlinks:
     input:
-        quant = "Salmon/{sample}/quant.sf",
-        quant_genes = "Salmon/{sample}/quant.genes.sf"
+        quant = "Salmon/{sample}/quant.sf"
     output:
-        quant = "Salmon/{sample}.quant.sf",
-        quant_genes = "Salmon/{sample}.quant.genes.sf"
+        quant = "Salmon/{sample}.quant.sf"
     params:
-        quant = "{sample}/quant.sf",
-        quant_genes = "{sample}/quant.genes.sf"
+        quant = "{sample}/quant.sf"
     shell: """
         ln -s -f {params.quant} {output.quant}
-        ln -s -f {params.quant_genes} {output.quant_genes}
         """
 
 
@@ -110,20 +109,6 @@ rule Salmon_TPM:
         "Rscript "+os.path.join(maindir, "shared", "rscripts", "merge_count_tables.R")+" Name TPM {output} {input} "
 
 
-rule Salmon_genes_TPM:
-    input:
-        expand("Salmon/{sample}.quant.genes.sf", sample=samples)
-    output:
-        "Salmon/TPM.genes.tsv"
-    benchmark:
-        "Salmon/.benchmark/Salmon_genes_TPM.benchmark"
-    log:
-        "Salmon/Salmon_genes_TPM.log"
-    conda: CONDA_RNASEQ_ENV
-    shell:
-        "Rscript "+os.path.join(maindir, "shared", "rscripts", "merge_count_tables.R")+" Name TPM {output} {input} "
-
-
 rule Salmon_counts:
     input:
         expand("Salmon/{sample}.quant.sf", sample=samples)
@@ -133,20 +118,6 @@ rule Salmon_counts:
         "Salmon/.benchmark/Salmon_counts.benchmark"
     log:
         "Salmon/Salmon_counts.log"
-    conda: CONDA_RNASEQ_ENV
-    shell:
-        "Rscript "+os.path.join(maindir, "shared", "rscripts", "merge_count_tables.R")+" Name NumReads {output} {input} "
-
-
-rule Salmon_genes_counts:
-    input:
-        expand("Salmon/{sample}.quant.genes.sf", sample=samples)
-    output:
-        "Salmon/counts.genes.tsv"
-    benchmark:
-        "Salmon/.benchmark/Salmon_genes_counts.benchmark"
-    log:
-        "Salmon/Salmon_genes_counts.log"
     conda: CONDA_RNASEQ_ENV
     shell:
         "Rscript "+os.path.join(maindir, "shared", "rscripts", "merge_count_tables.R")+" Name NumReads {output} {input} "

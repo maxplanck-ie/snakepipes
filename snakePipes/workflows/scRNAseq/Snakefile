@@ -3,9 +3,6 @@ import snakePipes.common_functions as cf
 import subprocess
 import sys
 
-#def install(package):
-#    subprocess.call([sys.executable, "-m", "pip", "install", package])
-
 ### snakemake_workflows initialization ########################################
 maindir = os.path.dirname(os.path.dirname(workflow.basedir))
 workflow_rscripts=os.path.join(maindir, "shared", "rscripts")
@@ -49,7 +46,7 @@ include: os.path.join(maindir, "shared", "tools" , "deeptools_cmds.snakefile")
 include: os.path.join(maindir, "shared", "rules", "deepTools_RNA.snakefile")
 include: os.path.join(maindir, "shared", "rules", "multiQC.snakefile")
 
-
+cf.namesOKinR(samples)
 
 
 ### conditional/optional rules #################################################

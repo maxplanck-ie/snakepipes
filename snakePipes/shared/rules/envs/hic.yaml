@@ -3,7 +3,6 @@ channels:
  - conda-forge
  - bioconda
 dependencies:
- - hicexplorer = 3.4
+ - hicexplorer = 3.4.1
  - bwa = 0.7.17
- - samtools = 1.9
- - python-dateutil = 2.8.0
+ - samtools = 1.10
