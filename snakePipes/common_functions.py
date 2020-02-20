@@ -21,6 +21,8 @@ def set_env_yamls():
             'CONDA_CREATE_INDEX_ENV': 'envs/createIndices.yaml',
             'CONDA_RNASEQ_ENV': 'envs/rna_seq.yaml',
             'CONDA_scRNASEQ_ENV': 'envs/sc_rna_seq.yaml',
+            'CONDA_seurat3_ENV': 'envs/sc_rna_seq_seurat3.yaml',
+            'CONDA_loompy_ENV': 'envs/sc_rna_seq_loompy.yaml',
             'CONDA_DNA_MAPPING_ENV': 'envs/dna_mapping.yaml',
             'CONDA_CHIPSEQ_ENV': 'envs/chip_seq.yaml',
             'CONDA_HISTONE_HMM_ENV': 'envs/histone_hmm.yaml',

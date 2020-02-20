@@ -12,6 +12,7 @@ dependencies:
  - r-data.table = 1.12.8
  - r-seurat = 3.1.2
  - r-gtools = 3.8.1
- - r-dplyr = 0.8.4
+ - r-dplyr = 0.8.0.1
  - r-raceid = 0.1.7
- - velocyto.py
+ - h5py = 2.10.0
+ - velocyto.py = 0.17.17 
