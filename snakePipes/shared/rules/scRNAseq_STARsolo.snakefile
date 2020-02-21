@@ -97,7 +97,7 @@ rule cellsort_bam:
 
 checkpoint velocyto:
     input:
-        gtf = genes_gtf,
+        gtf = "/Annotation/genes.filtered.gtf" #genes_gtf
         bam = "filtered_bam/{sample}.filtered.bam",
         csbam="filtered_bam/cellsorted_{sample}.filtered.bam",
         bc = "STARsolo/{sample}/{sample}.Solo.out/Gene/filtered/barcodes.tsv"
