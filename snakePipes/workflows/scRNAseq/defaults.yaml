@@ -42,10 +42,11 @@ cellBarcodeFile:
 cellBarcodePattern: "NNNNNNXXXXXX"
 splitLib: False
 cellNames:
-##STARsolo options
+##mode STARsolo options
 myKit: CellSeq384
 BCwhiteList:
 STARsoloCoords: ["1","7","8","7"]
+skipVelocyto: False
 #generic options
 libraryType: 1
 bwBinSize: 10

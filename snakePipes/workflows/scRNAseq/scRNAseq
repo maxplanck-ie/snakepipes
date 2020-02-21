@@ -28,7 +28,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          "cellBarcodePattern": "NNNNNNXXXXXX", "bwBinSize": 10,
                          "plotFormat": "png", "skipRaceID": False,
                          "cellFilterMetric": "gene_universe",
-			 "mode": "Gruen", "BCwhiteList": None, "STARsoloCoords": ["1","7","8","7"], "myKit": "CellSeq384"}):
+			 "mode": "Gruen", "BCwhiteList": None, "STARsoloCoords": ["1","7","8","7"], "myKit": "CellSeq384", "skipVelocyto": False}):
     """
     Parse arguments from the command line.
     """
@@ -154,6 +154,13 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                           type=str,
                           help="Library preparation kit and version to use preset barcode whitelist and CB/UMI positions for (default: '%(default)s')",
                           default=defaults["myKit"])
+
+    optional.add_argument("--skipVelocyto",
+                          dest="skipVelocyto",
+                          action="store_true",
+                          default=defaults["skipVelocyto"],
+                          help="Skip bam filtering and generating RNA velocity counts by velocyto to save time and memory usage. (default: '%(default)s')")
+
 
     return parser
 
