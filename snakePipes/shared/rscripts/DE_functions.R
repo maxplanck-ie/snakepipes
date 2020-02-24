@@ -195,7 +195,6 @@ DESeq_writeOutput <- function(DEseqout,
                     ifelse(ddr_shrunk.df$padj < fdr,
                          ifelse(ddr_shrunk.df$log2FoldChange > 0, "UP", "DOWN"),
                          "None")
-
     }
 
     # If gene names given, then add this info to ddr.df
