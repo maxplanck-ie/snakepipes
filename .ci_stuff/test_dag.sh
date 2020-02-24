@@ -50,6 +50,9 @@ touch BAM_input/sample1.bam \
       BAM_input/deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv
 mkdir -p output
 touch /tmp/genes.gtf /tmp/genome.fa /tmp/genome.fa.fai
+mkdir -p allelic_input
+mkdir -p allelic_input/Ngenome
+touch allelic_input/file.vcf.gz allelic_input/snpfile.txt
 
 # DNA mapping
 WC=`DNA-mapping -i PE_input -o output .ci_stuff/organism.yaml --snakemakeOptions " --dryrun --conda-prefix /tmp" | tee >(cat 1>&2) | grep -v "Conda environment" | wc -l`
@@ -66,6 +69,13 @@ WC=`DNA-mapping -i SE_input -o output .ci_stuff/organism.yaml --snakemakeOptions
 if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 786 ]; then exit 1 ; fi
 WC=`DNA-mapping -i SE_input -o output .ci_stuff/organism.yaml --snakemakeOptions " --dryrun --conda-prefix /tmp" --trim --mapq 20 --dedup --properPairs | tee >(cat 1>&2) | grep -v "Conda environment" | wc -l`
 if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 854 ]; then exit 1 ; fi
+#allelic
+WC=`DNA-mapping -m allelic-mapping -i PE_input -o output --snakemakeOptions " --dryrun --conda-prefix /tmp" --VCFfile allelic_input/file.vcf.gz --strains strain1,strain2 .ci_stuff/organism.yaml | tee >(cat 1>&2) | grep -v "Conda environment" | wc -l`
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 1742 ]; then exit 1 ; fi
+WC=`DNA-mapping -m allelic-mapping -i PE_input -o output --snakemakeOptions " --dryrun --conda-prefix /tmp" --SNPfile allelic_input/snpfile.txt --NMaskedIndex allelic_input/Ngenome .ci_stuff/organism.yaml | tee >(cat 1>&2) | grep -v "Conda environment" | wc -l`
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 1721 ]; then exit 1 ; fi
+WC=`DNA-mapping -m allelic-mapping -i PE_input -o output --snakemakeOptions " --dryrun --conda-prefix /tmp" --VCFfile allelic_input/file.vcf.gz --strains strain1 .ci_stuff/organism.yaml | tee >(cat 1>&2) | grep -v "Conda environment" | wc -l`
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 1742 ]; then exit 1 ; fi
 
 # ChIP-seq
 WC=`ChIP-seq -d BAM_input --snakemakeOptions " --dryrun --conda-prefix /tmp" .ci_stuff/organism.yaml .ci_stuff/ChIP.sample_config.yaml | tee >(cat 1>&2) | grep -v "Conda environment" | wc -l`
@@ -117,6 +127,13 @@ WC=`mRNA-seq -i SE_input -o output --snakemakeOptions " --dryrun --conda-prefix 
 if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 1089 ]; then exit 1 ; fi
 WC=`mRNA-seq -i BAM_input/filtered_bam -o output --snakemakeOptions " --dryrun --conda-prefix /tmp" --fromBAM .ci_stuff/organism.yaml | tee >(cat 1>&2) | grep -v "Conda environment" | wc -l`
 if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 715 ]; then exit 1 ; fi
+#allelic
+WC=`mRNA-seq -m allelic-mapping -i PE_input -o output --snakemakeOptions " --dryrun --conda-prefix /tmp" --VCFfile allelic_input/file.vcf.gz --strains strain1,strain2 .ci_stuff/organism.yaml | tee >(cat 1>&2) | grep -v "Conda environment" | wc -l`
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 1253 ]; then exit 1 ; fi
+WC=`mRNA-seq -m allelic-mapping -i PE_input -o output --snakemakeOptions " --dryrun --conda-prefix /tmp" --SNPfile allelic_input/snpfile.txt --NMaskedIndex allelic_input/Ngenome .ci_stuff/organism.yaml | tee >(cat 1>&2) | grep -v "Conda environment" | wc -l`
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 1232 ]; then exit 1 ; fi
+WC=`mRNA-seq -m allelic-mapping -i PE_input -o output --snakemakeOptions " --dryrun --conda-prefix /tmp" --VCFfile allelic_input/file.vcf.gz --strains strain1 .ci_stuff/organism.yaml | tee >(cat 1>&2) | grep -v "Conda environment" | wc -l`
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 1253 ]; then exit 1 ; fi
 
 # HiC
 WC=`HiC -i PE_input -o output --snakemakeOptions " --dryrun --conda-prefix /tmp" --correctionMethod ICE .ci_stuff/organism.yaml | tee >(cat 1>&2) | grep -v "Conda environment" | wc -l`
@@ -156,4 +173,4 @@ if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 143 ]; then exit 1 ; fi
 WC=`createIndices -o output --snakemakeOptions " --dryrun --conda-prefix /tmp" --genome ftp://ftp.ensembl.org/pub/release-93/fasta/mus_musculus/dna/Mus_musculus.GRCm38.dna_sm.primary_assembly.fa.gz --gtf ftp://ftp.ensembl.org/pub/release-93/gtf/mus_musculus/Mus_musculus.GRCm38.93.gtf.gz --rmskURL http://hgdownload.soe.ucsc.edu/goldenPath/dm6/database/rmsk.txt.gz blah | tee >(cat 1>&2) | grep -v "Conda environment" | wc -l`
 if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 150 ]; then exit 1 ; fi
 
-rm -rf SE_input PE_input BAM_input output /tmp/genes.gtf /tmp/genome.fa /tmp/genome.fa.fai
+rm -rf SE_input PE_input BAM_input output allelic_input /tmp/genes.gtf /tmp/genome.fa /tmp/genome.fa.fai
