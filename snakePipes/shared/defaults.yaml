@@ -6,7 +6,7 @@
 # Note that due to limitations in yaml.dump, only very basic structures are
 # permitted here.
 ################################################################################
-snakemakeOptions: ' --use-conda --conda-prefix /data/processing3/leily/miniconda3/envs/snakepipes-atac '
+snakemakeOptions: ' --use-conda --conda-prefix /package/anaconda3/envs/ '
 organismsDir: 'shared/organisms'
 clusterConfig: 'shared/cluster.yaml'
 tempDir: /data/extended/
