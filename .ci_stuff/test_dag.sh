@@ -51,7 +51,8 @@ touch BAM_input/sample1.bam \
 mkdir -p output
 touch /tmp/genes.gtf /tmp/genome.fa /tmp/genome.fa.fai
 mkdir -p allelic_input
-touch allelic_input/file.vcf.gz
+mdkir -p allelilc_input/Ngenome
+touch allelic_input/file.vcf.gz allelic_input/snpfile.txt
 
 # DNA mapping
 WC=`DNA-mapping -i PE_input -o output .ci_stuff/organism.yaml --snakemakeOptions " --dryrun --conda-prefix /tmp" | tee >(cat 1>&2) | grep -v "Conda environment" | wc -l`
@@ -121,7 +122,11 @@ WC=`mRNA-seq -i BAM_input/filtered_bam -o output --snakemakeOptions " --dryrun -
 if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 715 ]; then exit 1 ; fi
 #allelic
 WC=`mRNA-seq -m allelic-mapping -i PE_input -o output --snakemakeOptions " --dryrun --conda-prefix /tmp" --VCFfile allelic_input/file.vcf.gz --strains strain1,strain2 .ci_stuff/organism.yaml | tee >(cat 1>&2) | grep -v "Conda environment" | wc -l`
-if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 715 ]; then exit 1 ; fi
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 1253 ]; then exit 1 ; fi
+WC=`mRNA-seq -m allelic-mapping -i PE_input -o output --snakemakeOptions " --dryrun --conda-prefix /tmp" --SNPfile allelic_input/snpfile.txt --Nmasked_index Ngenome .ci_stuff/organism.yaml | tee >(cat 1>&2) | grep -v "Conda environment" | wc -l`
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 1253 ]; then exit 1 ; fi
+WC=`mRNA-seq -m allelic-mapping -i PE_input -o output --snakemakeOptions " --dryrun --conda-prefix /tmp" --VCFfile allelic_input/file.vcf.gz --strains strain1 .ci_stuff/organism.yaml | tee >(cat 1>&2) | grep -v "Conda environment" | wc -l`
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 1253 ]; then exit 1 ; fi
 
 # HiC
 WC=`HiC -i PE_input -o output --snakemakeOptions " --dryrun --conda-prefix /tmp" --correctionMethod ICE .ci_stuff/organism.yaml | tee >(cat 1>&2) | grep -v "Conda environment" | wc -l`
