@@ -3,4 +3,4 @@ channels:
  - conda-forge
  - bioconda
 dependencies:
- - sambamba = 0.7.1
+ - sambamba = 0.6.6

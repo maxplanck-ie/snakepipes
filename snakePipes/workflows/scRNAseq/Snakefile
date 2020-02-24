@@ -85,6 +85,16 @@ def run_RaceID(skipRaceID):
     else:
         return([])
 
+def run_velocyto(skipVelocyto):
+    if not skipVelocyto:
+        file_list = [
+        expand("VelocytoCounts/{sample}.done.txt",sample=samples),
+        "VelocytoCounts_merged/merged.loom"
+        ]
+        return(file_list)
+    else:
+        return([])
+
 ### execute before workflow starts #############################################
 ################################################################################
 onstart:
@@ -158,10 +168,9 @@ elif mode=="STARsolo":
             "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv",
             expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample = samples),
             "multiQC/multiqc_report.html",
-            expand("VelocytoCounts/{sample}.done.txt",sample=samples),
             "Seurat/STARsolo_filtered/merged_samples.RDS",
             "Seurat/STARsolo_raw/merged_samples.RDS",
-            "VelocytoCounts_merged/merged.loom"
+            run_velocyto(skipVelocyto)
           
 
 ### execute after workflow finished ############################################

@@ -8,6 +8,7 @@ snakePipes 2.0.0
  * In order to use the noncoding-RNA-seq workflow organism YAML files must now include a `rmsk_file` entry.
  * Fixed STAR on CIFS mounted VFAT file systems (issue #537).
  * Added mode STARsolo to scRNAseq.
+ * Added log fold change shrinkage with "apeglm" to DESeq2 basic in the mRNAseq workflow.
 
 .. note::
    Please be aware that this version requires regeneration of STAR indices!
