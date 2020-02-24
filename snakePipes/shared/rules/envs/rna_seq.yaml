@@ -23,3 +23,4 @@ dependencies:
  - bioconductor-deseq2 = 1.26.0
  - bioconductor-tximport = 1.14.0
  - r-knitcitations
+ - bioconductor-apeglm
