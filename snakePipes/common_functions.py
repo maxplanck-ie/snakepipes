@@ -200,10 +200,11 @@ def check_replicates(sample_info_file):
                 sys.exit("ERROR: there's a mismatch between the number of columns in the header and body of {}!\n".format(sample_info_file))
             if len(cols) - 1 == nCols:
                 conditionCol += 1
-        if not len(line.strip()) == 0:
-            if cols[conditionCol] not in d:
-                d[cols[conditionCol]] = 0
-            d[cols[conditionCol]] += 1
+        if idx > 0:
+            if not len(line.strip()) == 0:
+                if cols[conditionCol] not in d:
+                    d[cols[conditionCol]] = 0
+                d[cols[conditionCol]] += 1
     f.close()
 
     for k, v in d.items():
