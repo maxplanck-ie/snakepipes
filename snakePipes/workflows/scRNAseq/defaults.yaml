@@ -34,8 +34,8 @@ downsample:
 trim: False
 trimmer: cutadapt
 trimmerOptions: -a A{'30'}
-## N.B., setting --outBAMsortingBinsN too high can result in cryptic errors
-alignerOptions: "--outBAMsortingBinsN 30 --twopassMode Basic"
+## --twopassMode Basic is not compatible with --outStd in all STAR versions
+alignerOptions: ""
 ## further options
 filterGTF: "-v -P 'decay|pseudogene' "
 cellBarcodeFile:
@@ -43,6 +43,7 @@ cellBarcodePattern: "NNNNNNXXXXXX"
 splitLib: False
 cellNames:
 ##STARsolo options
+myKit: CellSeq384
 BCwhiteList:
 STARsoloCoords: ["1","7","8","7"]
 #generic options

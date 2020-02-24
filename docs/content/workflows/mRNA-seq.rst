@@ -58,7 +58,7 @@ There is a configuration file in ``snakePipes/workflows/mRNA-seq/defaults.yaml``
     filterGTF:
     fragmentLength: 200
     libraryType: 2
-    salmonIndexOptions: --type quasi -k 31
+    salmonIndexOptions: --type puff -k 31
     dnaContam: False
     ## supported mappers: STAR HISAT2
     aligner: STAR

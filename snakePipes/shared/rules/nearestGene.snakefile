@@ -3,7 +3,7 @@ if pipeline in ['chip-seq','ATAC-seq']:
     change_direction = ["UP","DOWN","MIXED"]
 rule get_nearest_transcript:
     input:
-        bed="CSAW_{}".format(sample_name)+"/Filtered.results.{change_dir}.bed"  if pipeline in ['chip-seq','ATAC-seq'] else ""
+        bed="CSAW_{}_{}".format(peakCaller, sample_name)+"/Filtered.results.{change_dir}.bed"  if pipeline in ['chip-seq','ATAC-seq'] else ""
     output:
         annotated_bed=temp("AnnotatedResults_{}".format(sample_name)+"/Filtered.results.{change_dir}_withNearestTranscript.bed")
     params:
