@@ -51,7 +51,7 @@ touch BAM_input/sample1.bam \
 mkdir -p output
 touch /tmp/genes.gtf /tmp/genome.fa /tmp/genome.fa.fai
 mkdir -p allelic_input
-mdkir -p allelilc_input/Ngenome
+mkdir -p allelilc_input/Ngenome
 touch allelic_input/file.vcf.gz allelic_input/snpfile.txt
 
 # DNA mapping
