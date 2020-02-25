@@ -127,7 +127,7 @@ def run_CSAW():
 
 def run_genrich():
     if peakCaller == "Genrich":
-        expand("Genrich/{genrichGroup}.narrowPeak", genrichGroup = genrichDict.keys())
+        file_list = expand("Genrich/{genrichGroup}.narrowPeak", genrichGroup = genrichDict.keys())
         return (file_list)
     return ([])
 
