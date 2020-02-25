@@ -142,7 +142,7 @@ if sampleSheet:
             control = lambda wildcards: "filtered_bam/"+get_control(list(genrichDict.values())[0])+".filtered.bam" if get_control(list(genrichDict.values())[0])
                     else []
         output:
-            "Genrich/{group1}.narrowPeak"
+            "Genrich/" + list(genrichDict.keys())[0] + ".narrowPeak"
         params:
             control=lambda wildcards: "-c" if get_control(genrichDict[0]) else "",
             blacklist = "-E {}".format(blacklist_bed) if blacklist_bed else ""
@@ -157,7 +157,7 @@ if sampleSheet:
             control = lambda wildcards: "filtered_bam/"+get_control(list(genrichDict.values())[1])+".filtered.bam" if get_control(list(genrichDict.values())[1])
                 else []
         output:
-            "Genrich/{group2}.narrowPeak"
+            "Genrich/" + list(genrichDict.keys())[1] + ".narrowPeak"
         params:
             control=lambda wildcards: "-c" if get_control(list(genrichDict.values())[0]) else "",
             blacklist = "-E {}".format(blacklist_bed) if blacklist_bed else ""
