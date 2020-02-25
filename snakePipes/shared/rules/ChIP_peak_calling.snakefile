@@ -137,9 +137,9 @@ rule MACS2_peak_qc:
 # Should be run once per-group!
 rule Genrich_peaks:
     input:
-        IP=lambda wildcards: expand("filtered_bam/{sample}.filtered.bam", sample=wildcards.sample),
+        IP=lambda wildcards: expand("filtered_bam/{sample}.filtered.bam", sample=chip_samples_w_ctrl),
         control =
-                lambda wildcards: "filtered_bam/"+get_control(wildcards.sample)+".filtered.bam" if get_control(wildcards.sample)
+                lambda wildcards: "filtered_bam/"+get_control(chip_samples_w_ctrl)+".filtered.bam" if get_control(chip_samples_w_ctrl)
                 else []
     output:
         "Genrich/{sample}.narrowPeak"
