@@ -127,7 +127,9 @@ def run_CSAW():
 
 def run_genrich():
     if peakCaller == "Genrich":
-        file_list = expand("Genrich/{sample}.narrowPeak", sample=chip_samples)
+        if sampleSheet:
+            file_list = expand("Genrich/{group1}.narrowPeak", group1=genrichDict.keys[0])
+            file_list.append(expand("Genrich/{group2}.narrowPeak", group2=genrichDict.keys[1]))
         return (file_list)
     return ([])
 
