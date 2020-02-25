@@ -116,7 +116,7 @@ if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 1032 ]; then exit 1 ; fi
 WC=`mRNA-seq -i SE_input -o output --sampleSheet .ci_stuff/test_sampleSheet.tsv --snakemakeOptions " --dryrun --conda-prefix /tmp" --trim --fastqc .ci_stuff/organism.yaml | tee >(cat 1>&2) | grep -v "Conda environment" | wc -l`
 if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 1101 ]; then exit 1 ; fi
 WC=`mRNA-seq -i BAM_input/filtered_bam -o output --sampleSheet .ci_stuff/test_sampleSheet.tsv --snakemakeOptions " --dryrun --conda-prefix /tmp" --fromBAM .ci_stuff/organism.yaml | tee >(cat 1>&2) | grep -v "Conda environment" | wc -l`
-if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 715 ]; then exit 1 ; fi
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 727 ]; then exit 1 ; fi
 #allelic
 WC=`mRNA-seq -m allelic-mapping -i PE_input -o output --sampleSheet .ci_stuff/test_sampleSheet.tsv --snakemakeOptions " --dryrun --conda-prefix /tmp" --VCFfile allelic_input/file.vcf.gz --strains strain1,strain2 .ci_stuff/organism.yaml | tee >(cat 1>&2) | grep -v "Conda environment" | wc -l`
 if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 1253 ]; then exit 1 ; fi
