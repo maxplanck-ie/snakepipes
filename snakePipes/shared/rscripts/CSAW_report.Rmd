@@ -1,7 +1,7 @@
 ---
 author: "`r Sys.info()[length(Sys.info())-1]`"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
-output: 
+output:
     html_document:
         fig_caption: yes
 title: "`r paste0('CSAW differential binding stats report')`"
@@ -16,7 +16,7 @@ knitr::opts_chunk$set(echo = FALSE)
 
 ### Overview
 
-This report summarizes statistical analysis of binding events using group information provided in sample sheet `r snakemake@params[["sample_sheet"]]`. 
+This report summarizes statistical analysis of binding events using group information provided in sample sheet `r snakemake@params[["sample_sheet"]]`.
 
 ### Analysis input
 
@@ -38,7 +38,7 @@ Statistical model was fit according to the following design:
 chip_object$design
 ```
 
-The original windows were merged into `r length(chip_results$mergedRegions$region)` regions, for which p values were combined and FDR estimates were obtained after adjustment for multiple testing. 
+The original windows were merged into `r length(chip_results$mergedRegions$region)` regions, for which p values were combined and FDR estimates were obtained after adjustment for multiple testing.
 The absolute log fold change of the window with the smallest p value belonging to a merged region was reported as best log fold change for that region.
 
 ### Filtering of results
@@ -82,8 +82,21 @@ if(!snakemake@params[["pipeline"]] %in% "chip-seq"){
 Heatmaps obtained using depth-normalized coverage were as follows:
 
 ```{r plot_cov, fig.show='hold',fig.align='center', out.width ='40%',out.height='30%',fig.cap="UP and DOWN regions using coverage."}
-knitr::include_graphics(c(file.path(snakemake@params[["outdir"]], "CSAW.UP.cov.heatmap.png"),
-                          file.path(snakemake@params[["outdir"]], "CSAW.DOWN.cov.heatmap.png")))
+if(file.exists(file.path(snakemake@params[["outdir"]], "CSAW.UP.cov.heatmap.png"))){
+    knitr::include_graphics(c(file.path(snakemake@params[["outdir"]], "CSAW.UP.cov.heatmap.png")))
+}else{
+    print("No UP regulated regions has been detected!")
+}
+if(file.exists(file.path(snakemake@params[["outdir"]], "CSAW.DOWN.cov.heatmap.png"))){
+    knitr::include_graphics(c(file.path(snakemake@params[["outdir"]], "CSAW.DOWN.cov.heatmap.png")))
+}else{
+    print("No DOWN regulated regions has been detected!")
+}
+if(file.exists(file.path(snakemake@params[["outdir"]], "CSAW.MIXED.cov.heatmap.png"))){
+    knitr::include_graphics(c(file.path(snakemake@params[["outdir"]], "CSAW.MIXED.cov.heatmap.png")))
+}else{
+    print("No MIXED regions has been detected!")
+}
 ```
 
 Tables with differentially bound regions annotated with distance to nearest gene can be found in folder `r paste0("AnnotatedResults_", gsub("\\.[a-zA-Z]{3}$", "", basename(snakemake@params[["sampleSheet"]])))`.
