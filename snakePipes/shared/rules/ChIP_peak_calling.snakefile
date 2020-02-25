@@ -151,11 +151,11 @@ if sampleSheet:
             Genrich -S -t {input.IP} {params.control} {input.control} -o {output} -r {params.blacklist} -y
         """
 
-        rule Genrich_peaks_group2:
+    rule Genrich_peaks_group2:
         input:
             IP = expand("filtered_bam/{sample}.filtered.bam",sample=genrichDict[1]),
             control = lambda wildcards: "filtered_bam/"+get_control(genrichDict[1])+".filtered.bam" if get_control(genrichDict[1])
-                    else []
+                else []
         output:
             "Genrich/{group2}.narrowPeak"
         params:
