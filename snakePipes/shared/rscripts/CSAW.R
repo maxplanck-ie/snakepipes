@@ -15,7 +15,7 @@ outdir<-snakemake@params[["outdir"]]
 yaml_path<-snakemake@params[["yaml_path"]]
 
 ##set up a primitive log
-logfile <- file(snakemake@log[["err"]], open="wt")
+logfile <- file(snakemake@log[["err"]], open="w+")
 sink(logfile, type="message")
 
 

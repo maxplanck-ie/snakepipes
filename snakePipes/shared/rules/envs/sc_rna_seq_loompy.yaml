@@ -1,0 +1,8 @@
+name: snakepipes_loompy_environment_v1.0
+channels:
+ - conda-forge
+ - bioconda
+dependencies:
+ - python=3.8
+ - pip:
+   - loompy

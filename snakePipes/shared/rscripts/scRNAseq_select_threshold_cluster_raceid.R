@@ -28,7 +28,7 @@ minTi<-metrics.tab$minT[which.max(metrics.tab[,metric])]
 
 load(paste0("sc.minT",minTi,".RData"))
 
-sc<-compdist(sc,metric="logpearson",FSelect=TRUE)
+sc<-compdist(sc,metric="pearson",FSelect=TRUE)
 sc<-clustexp(sc,rseed=314,FUNcluster="kmedoids")
 
 png(paste0("sc.minT",minTi,".jaccard.png"))
