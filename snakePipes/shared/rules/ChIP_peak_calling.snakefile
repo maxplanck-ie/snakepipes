@@ -135,18 +135,18 @@ rule MACS2_peak_qc:
 
 # Requires PE data
 # Should be run once per-group!
-rule Genrich_peaks:
-    input:
-        IP=lambda wildcards: expand("filtered_bam/{sample}.filtered.bam", sample=chip_samples_w_ctrl),
-        control =
-                lambda wildcards: "filtered_bam/"+get_control(chip_samples_w_ctrl)+".filtered.bam" if get_control(chip_samples_w_ctrl)
-                else []
-    output:
-        "Genrich/{sample}.narrowPeak"
-    params:
-        control=lambda wildcards: "-c" if get_control(wildcards.sample) else "",
-        blacklist = "-E {}".format(blacklist_bed) if blacklist_bed else ""
-    conda: CONDA_ATAC_ENV
-    shell: """
-        Genrich -S -t {input.IP} {params.control} {input.control} -o {output} -r {params.blacklist} -y
+if sampleSheet:
+    rule Genrich_peaks_group1:
+        input:
+            IP = expand("filtered_bam/{sample}.filtered.bam",sample=genrichDict[0]),
+            control = lambda wildcards: "filtered_bam/"+get_control(genrichDict[0])+".filtered.bam" if get_control(genrichDict[0])
+                    else []
+        output:
+            "Genrich/{group}.narrowPeak"
+        params:
+            control=lambda wildcards: "-c" if get_control(genrichDict[0]) else "",
+            blacklist = "-E {}".format(blacklist_bed) if blacklist_bed else ""
+        conda: CONDA_ATAC_ENV
+        shell: """
+            Genrich -S -t {input.IP} {params.control} {input.control} -o {output} -r {params.blacklist} -y
         """
