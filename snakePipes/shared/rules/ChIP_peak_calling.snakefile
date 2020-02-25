@@ -163,3 +163,17 @@ if sampleSheet:
         shell: """
             Genrich -S -t {input.IP} {params.control} {input.control} -o {output} -r {params.blacklist} -y
         """
+else:
+    rule Genrich_peaks_allsamples:
+        input:
+            IP = expand("filtered_bam/{sample}.filtered.bam",sample=list(genrichDict.values())[0]),
+            control = ["filtered_bam/"+get_control(x)+".filtered.bam" for x in list(genrichDict.values())[0]][0] #the function returns the control sample repeated for multiple experimental samples
+        output:
+            "Genrich/" + list(genrichDict.keys())[0] + ".narrowPeak"
+        params:
+            control=lambda wildcards,input: "-c" if input.control else "",
+            blacklist = "-E {}".format(blacklist_bed) if blacklist_bed else ""
+        conda: CONDA_ATAC_ENV
+        shell: """
+            Genrich -S -t {input.IP} {params.control} {input.control} -o {output} -r {params.blacklist} -y
+        """
