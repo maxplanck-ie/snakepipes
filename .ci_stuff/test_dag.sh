@@ -94,7 +94,7 @@ if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 876 ]; then exit 1 ; fi
 
 # mRNA-seq
 WC=`mRNA-seq -i PE_input -o output --sampleSheet .ci_stuff/test_sampleSheet.tsv --snakemakeOptions " --dryrun --conda-prefix /tmp" .ci_stuff/organism.yaml | tee >(cat 1>&2) | grep -v "Conda environment" | wc -l`
-if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 996 ]; then exit 1 ; fi
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 1008 ]; then exit 1 ; fi
 WC=`mRNA-seq -i PE_input -o output --sampleSheet .ci_stuff/test_sampleSheet.tsv --snakemakeOptions " --dryrun --conda-prefix /tmp" -m "alignment" .ci_stuff/organism.yaml | tee >(cat 1>&2) | grep -v "Conda environment" | wc -l`
 if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 716 ]; then exit 1 ; fi
 WC=`mRNA-seq -i PE_input -o output --sampleSheet .ci_stuff/test_sampleSheet.tsv --snakemakeOptions " --dryrun --conda-prefix /tmp" -m "alignment,deepTools_qc" --trim .ci_stuff/organism.yaml | tee >(cat 1>&2) | grep -v "Conda environment" | wc -l`
