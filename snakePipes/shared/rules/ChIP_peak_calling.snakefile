@@ -139,8 +139,8 @@ if sampleSheet:
     rule Genrich_peaks_group1:
         input:
             IP = expand("filtered_bam/{sample}.filtered.bam",sample=list(genrichDict.values())[0]),
-            control = lambda wildcards: "filtered_bam/"+get_control(list(genrichDict.values())[0])+".filtered.bam" if get_control(list(genrichDict.values())[0])
-                    else []
+            control = lambda wildcards: "filtered_bam/"+get_control(x)+".filtered.bam" for x in list(genrichDict.values())[0]
+                    #else []
         output:
             "Genrich/" + list(genrichDict.keys())[0] + ".narrowPeak"
         params:
@@ -154,8 +154,8 @@ if sampleSheet:
     rule Genrich_peaks_group2:
         input:
             IP = expand("filtered_bam/{sample}.filtered.bam",sample=list(genrichDict.values())[1]),
-            control = lambda wildcards: "filtered_bam/"+get_control(list(genrichDict.values())[1])+".filtered.bam" if get_control(list(genrichDict.values())[1])
-                else []
+            control = lambda wildcards: "filtered_bam/"+get_control(x)+".filtered.bam" for x in list(genrichDict.values())[1]
+                #else []
         output:
             "Genrich/" + list(genrichDict.keys())[1] + ".narrowPeak"
         params:
