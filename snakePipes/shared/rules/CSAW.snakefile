@@ -151,7 +151,7 @@ if allele_info == 'FALSE':
         input:
             csaw_in = "CSAW_{}_{}/CSAW.session_info.txt".format(peakCaller, sample_name),
             heatmap_in=lambda wildcards: expand("CSAW_{}_{}".format(peakCaller, sample_name) +\
-             "/CSAW.{change_dir}.cov.heatmap.png", change_dir=['UP','DOWN', 'MIXED']) if pipeline in 'ATAC-seq' \
+             "/CSAW.{change_dir}.cov.heatmap.png", change_dir=['UP','DOWN']) if pipeline in 'ATAC-seq' \
              else expand("CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.cov.heatmap.png", change_dir=['UP','DOWN']) +\
               expand("CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.log2r.heatmap.png", change_dir=['UP', 'DOWN'])
         output:
