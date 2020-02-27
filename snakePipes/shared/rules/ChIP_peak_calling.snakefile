@@ -138,14 +138,15 @@ rule MACS2_peak_qc:
 rule Genrich_peaks:
     input:
         bams=lambda wildcards: expand(os.path.join("filtered_bam", "{sample}.filtered.bam"), sample=genrichDict[wildcards.group]),
-        control = lambda wildcards: ["filtered_bam/"+get_control(x)+".filtered.bam" for x in genrichDict[wildcards.group]][0] #the function returns the control sample repeated for multiple experimental samples in the group
+        control = lambda wildcards: ["filtered_bam/"+get_control(x)+".filtered.bam" for x in genrichDict[wildcards.group]]
     output:
         "Genrich/{group}.narrowPeak"
     params:
         bams = lambda wildcards: ",".join(expand(os.path.join("filtered_bam", "{sample}.filtered.bam"), sample=genrichDict[wildcards.group])),
         blacklist = "-E {}".format(blacklist_bed) if blacklist_bed else "",
-        control=lambda wildcards,input: "-c" if input.control else ""
+        control_pfx=lambda wildcards,input: "-c" if input.control else "",
+        control=lambda wildcards,input: ",".join(input.control) if input.control else ""
     conda: CONDA_ATAC_ENV
     shell: """
-        Genrich -S -t {params.bams} {params.control} {input.control} -o {output} -r {params.blacklist} -y
+        Genrich -S -t {params.bams} {params.control} {params.control} -o {output} -r {params.blacklist} -y
         """
