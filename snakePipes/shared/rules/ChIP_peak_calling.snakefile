@@ -148,7 +148,7 @@ if sampleSheet:
             IP = lambda wildcards,input: [" -t "+ x for x in input.IP]
         conda: CONDA_ATAC_ENV
         shell: """
-            Genrich -S -t {params.IP} {params.control} {input.control} -o {output} -r {params.blacklist} -y
+            Genrich -S {params.IP} {params.control} {input.control} -o {output} -r {params.blacklist} -y
         """
 
     rule Genrich_peaks_group2:
@@ -163,7 +163,7 @@ if sampleSheet:
             IP = lambda wildcards,input: [" -t "+ x for x in input.IP]
         conda: CONDA_ATAC_ENV
         shell: """
-            Genrich -S -t {params.IP} {params.control} {input.control} -o {output} -r {params.blacklist} -y
+            Genrich -S {params.IP} {params.control} {input.control} -o {output} -r {params.blacklist} -y
         """
 else:
     rule Genrich_peaks_allsamples:
