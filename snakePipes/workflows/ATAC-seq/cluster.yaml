@@ -6,3 +6,9 @@ CSAW:
     memory: 30G
 plot_heatmap_cov_CSAW:
     memory: 5G
+Genrich_peaks_group1:
+    memory: 20G
+Genrich_peaks_group2:
+    memory: 20G
+Genrich_peaks_allsamples:
+    memory: 20G
