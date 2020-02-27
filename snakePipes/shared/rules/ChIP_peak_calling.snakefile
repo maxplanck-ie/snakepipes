@@ -158,10 +158,11 @@ if sampleSheet:
             "Genrich/" + list(genrichDict.keys())[1] + ".narrowPeak"
         params:
             control=lambda wildcards,input: "-c" if input.control else "",
-            blacklist = "-E {}".format(blacklist_bed) if blacklist_bed else ""
+            blacklist = "-E {}".format(blacklist_bed) if blacklist_bed else "",
+            IP = lambda wildcards,input: [" -t "+ x for x in input.IP]
         conda: CONDA_ATAC_ENV
         shell: """
-            Genrich -S -t {input.IP} {params.control} {input.control} -o {output} -r {params.blacklist} -y
+            Genrich -S -t {params.IP} {params.control} {input.control} -o {output} -r {params.blacklist} -y
         """
 else:
     rule Genrich_peaks_allsamples:
