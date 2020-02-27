@@ -53,7 +53,7 @@ if allele_info == 'FALSE':
                 bigwigs = expand("deepTools_ChIP/bamCompare/{chip_sample}.filtered.log2ratio.over_{control_name}.bw", zip, chip_sample=filtered_dict.keys(), control_name=filtered_dict.values()),
                 sampleSheet = sampleSheet
             output:
-                matrix = "CSAW_{}_{}".format(peakCaller, sample_name)+"/CSAW.{change_dir}.log2r.matrix"
+                matrix = touch("CSAW_{}_{}".format(peakCaller, sample_name)+"/CSAW.{change_dir}.log2r.matrix")
             params:
                 bed_in = "CSAW_{}_{}".format(peakCaller, sample_name)+"/Filtered.results.{change_dir}.bed"
             log:
@@ -74,8 +74,8 @@ if allele_info == 'FALSE':
             input:
                 matrix = "CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.log2r.matrix"
             output:
-                image = "CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.log2r.heatmap.png",
-                sorted_regions = "CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.log2r.sortedRegions.bed"
+                image = touch("CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.log2r.heatmap.png"),
+                sorted_regions = touch("CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.log2r.sortedRegions.bed")
             params:
                 smpl_label=' '.join(filtered_dict.keys())
             log:
