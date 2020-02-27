@@ -148,5 +148,5 @@ rule Genrich_peaks:
         control=lambda wildcards,input: ",".join(input.control) if input.control else ""
     conda: CONDA_ATAC_ENV
     shell: """
-        Genrich -S -t {params.bams} {params.control} {params.control} -o {output} -r {params.blacklist} -y
+        Genrich -S -t {params.bams} {params.control_pfx} {params.control} -o {output} -r {params.blacklist} -y
         """
