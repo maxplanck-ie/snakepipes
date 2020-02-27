@@ -92,7 +92,7 @@ if allele_info == 'FALSE':
                                 --startLabel Start --endLabel End \
                                 --legendLocation lower-center \
                                 -x 'Scaled peak length' --labelRotation 90 \
-                                --samplesLabel {params.smpl_label} > {log.out} 2> {log.err}
+                                --samplesLabel {params.smpl_label} --colorMap "coolwarm" > {log.out} 2> {log.err}
                 fi
                 """
 
@@ -142,7 +142,7 @@ if allele_info == 'FALSE':
                             --outFileName {output.image} --startLabel Start \
                             --endLabel End --legendLocation lower-center \
                             -x 'Scaled peak length' --labelRotation 90 \
-                            --samplesLabel {params.smpl_label} >{log.out} 2>{log.err}
+                            --samplesLabel {params.smpl_label} --colorMap "coolwarm" >{log.out} 2>{log.err}
             fi
             """
 
