@@ -69,14 +69,14 @@ The format of the cell barcodes file is shown below. Note that the default file 
     8       ACAGAC
     9       ACGTTG
 
-The default cell barcodes are 192 hexamers listed in a file with the first column a cell number and the second the barcode sequence.
+The default cell barcodes in the Gruen mode are 192 hexamers listed in a file with the first column a cell number and the second the barcode sequence.
 
 Predefined cell barcodes are required right now. However it is planned to make this more generic in future workflow versions.
 
 Barcode whitelist
 ~~~~~~~~~~~~~~~~~
 
-Required for the STARsolo mode. The expected format is a one-column txt file with barcodes the user wishes to retain.
+Required for the STARsolo mode. The expected format is a one-column txt file with barcodes the user wishes to retain. Default is a whitelist file for CellSeq2 384 barcodes, provided with the pipeline. If 'myKit' is changed to another available preset, the corresponding barcode whitelist provided with the pipeline will be used.
 
 
 Configuration file
@@ -100,7 +100,7 @@ The default configuration file is listed below and can be found in ``snakePipes/
     ## paired-end read name extension (default: ["_R1", "_R2"])
     reads: ["_R1","_R2"]
     ##Analysis mode
-    mode: Gruen
+    mode: STARsolo
     ## Number of reads to downsample from each FASTQ file
     downsample:
     ## Options for trimming
