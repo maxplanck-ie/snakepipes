@@ -4,3 +4,5 @@ histoneHMM:
     memory: 4G
 CSAW:
     memory: 10G
+Genrich_peaks:
+    memory: 20G
