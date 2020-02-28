@@ -28,7 +28,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          "cellBarcodePattern": "NNNNNNXXXXXX", "bwBinSize": 10,
                          "plotFormat": "png", "skipRaceID": False,
                          "cellFilterMetric": "gene_universe",
-			 "mode": "Gruen", "BCwhiteList": None, "STARsoloCoords": ["1","7","8","7"], "myKit": "CellSeq384", "skipVelocyto": False}):
+			 "mode": "STARsolo", "BCwhiteList": None, "STARsoloCoords": ["1","7","8","7"], "myKit": "CellSeq384", "skipVelocyto": False}):
     """
     Parse arguments from the command line.
     """

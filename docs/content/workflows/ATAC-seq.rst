@@ -181,7 +181,7 @@ For more information on the contents of the **CSAW_MACS2_sampleSheet** folder, s
 Where to find final bam files and biwgwigs
 ------------------------------------------
 
-Bam files with the extention filtered.bam are only filtered for PCR duplicates. The final bam files filtered additionally for fragment size and used as direct input to MACS2 are found in the MACS2 folder with the exention ``.short.cleaned.bam``.
+Bam files with the extention filtered.bam are only filtered for PCR duplicates. The final bam files filtered additionally for fragment size and used as direct input to MACS2 are found in the short_bams folder with the exention ``.short.cleaned.bam``.
 Bigwig files calculated from these bam files are found under deepTools_ATAC/bamCompare with the extention ``.filtered.bw``.
 
 
