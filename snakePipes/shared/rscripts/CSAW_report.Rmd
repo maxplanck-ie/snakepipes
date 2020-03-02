@@ -82,12 +82,12 @@ if(!snakemake@params[["pipeline"]] %in% "chip-seq"){
 Heatmaps obtained using depth-normalized coverage were as follows:
 
 ```{r plot_cov, fig.show='hold',fig.align='center', out.width ='40%',out.height='30%',fig.cap="UP and DOWN regions using coverage."}
-if(file.exists(file.path(snakemake@params[["outdir"]], "CSAW.UP.cov.heatmap.png"))){
+if(file.info(file.path(snakemake@params[["outdir"]], "CSAW.UP.cov.heatmap.png"))$size != 0){
     knitr::include_graphics(c(file.path(snakemake@params[["outdir"]], "CSAW.UP.cov.heatmap.png")))
 }else{
     message("No UP regulated regions has been detected!")
 }
-if(file.exists(file.path(snakemake@params[["outdir"]], "CSAW.DOWN.cov.heatmap.png"))){
+if(file.info(file.path(snakemake@params[["outdir"]], "CSAW.DOWN.cov.heatmap.png"))$size != 0){
     knitr::include_graphics(c(file.path(snakemake@params[["outdir"]], "CSAW.DOWN.cov.heatmap.png")))
 }else{
     message("No DOWN regulated regions has been detected!")
