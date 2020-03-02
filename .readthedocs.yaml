@@ -1,5 +1,7 @@
-conda:
-  file: docs/environment.yaml
+#conda:
+#  file: docs/environment.yaml
 python:
   version: 3.7
   pip_install: true
+  install:
+      - requirements: docs/requirements.txt
