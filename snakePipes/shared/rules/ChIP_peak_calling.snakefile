@@ -135,45 +135,18 @@ rule MACS2_peak_qc:
 
 # Requires PE data
 # Should be run once per-group!
-if sampleSheet:
-    rule Genrich_peaks_group1:
-        input:
-            IP = expand("filtered_bam/{sample}.filtered.bam",sample=list(genrichDict.values())[0]),
-            control = ["filtered_bam/"+get_control(x)+".filtered.bam" for x in list(genrichDict.values())[0]][0] #the function returns the control sample repeated for multiple experimental samples
-        output:
-            "Genrich/" + list(genrichDict.keys())[0] + ".narrowPeak"
-        params:
-            control=lambda wildcards,input: "-c" if input.control else "",
-            blacklist = "-E {}".format(blacklist_bed) if blacklist_bed else ""
-        conda: CONDA_ATAC_ENV
-        shell: """
-            Genrich -S -t {input.IP} {params.control} {input.control} -o {output} -r {params.blacklist} -y
-        """
-
-    rule Genrich_peaks_group2:
-        input:
-            IP = expand("filtered_bam/{sample}.filtered.bam",sample=list(genrichDict.values())[1]),
-            control = ["filtered_bam/"+get_control(x)+".filtered.bam" for x in list(genrichDict.values())[1]][0] #the function returns the control sample repeated for multiple experimental samples
-        output:
-            "Genrich/" + list(genrichDict.keys())[1] + ".narrowPeak"
-        params:
-            control=lambda wildcards,input: "-c" if input.control else "",
-            blacklist = "-E {}".format(blacklist_bed) if blacklist_bed else ""
-        conda: CONDA_ATAC_ENV
-        shell: """
-            Genrich -S -t {input.IP} {params.control} {input.control} -o {output} -r {params.blacklist} -y
-        """
-else:
-    rule Genrich_peaks_allsamples:
-        input:
-            IP = expand("filtered_bam/{sample}.filtered.bam",sample=list(genrichDict.values())[0]),
-            control = ["filtered_bam/"+get_control(x)+".filtered.bam" for x in list(genrichDict.values())[0]][0] #the function returns the control sample repeated for multiple experimental samples
-        output:
-            "Genrich/" + list(genrichDict.keys())[0] + ".narrowPeak"
-        params:
-            control=lambda wildcards,input: "-c" if input.control else "",
-            blacklist = "-E {}".format(blacklist_bed) if blacklist_bed else ""
-        conda: CONDA_ATAC_ENV
-        shell: """
-            Genrich -S -t {input.IP} {params.control} {input.control} -o {output} -r {params.blacklist} -y
+rule Genrich_peaks:
+    input:
+        bams=lambda wildcards: expand(os.path.join("filtered_bam", "{sample}.filtered.bam"), sample=genrichDict[wildcards.group]),
+        control = lambda wildcards: ["filtered_bam/"+get_control(x)+".filtered.bam" for x in genrichDict[wildcards.group]]
+    output:
+        "Genrich/{group}.narrowPeak"
+    params:
+        bams = lambda wildcards: ",".join(expand(os.path.join("filtered_bam", "{sample}.filtered.bam"), sample=genrichDict[wildcards.group])),
+        blacklist = "-E {}".format(blacklist_bed) if blacklist_bed else "",
+        control_pfx=lambda wildcards,input: "-c" if input.control else "",
+        control=lambda wildcards,input: ",".join(input.control) if input.control else ""
+    conda: CONDA_ATAC_ENV
+    shell: """
+        Genrich -S -t {params.bams} {params.control_pfx} {params.control} -o {output} -r {params.blacklist} -y
         """
