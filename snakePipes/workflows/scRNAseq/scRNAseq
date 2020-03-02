@@ -27,7 +27,8 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          "cellBarcodeFile": None, "splitLib": False,
                          "cellBarcodePattern": "NNNNNNXXXXXX", "bwBinSize": 10,
                          "plotFormat": "png", "skipRaceID": False,
-                         "cellFilterMetric": "gene_universe"}):
+                         "cellFilterMetric": "gene_universe",
+			 "mode": "STARsolo", "BCwhiteList": None, "STARsoloCoords": ["1","7","8","7"], "myKit": "CellSeq384", "skipVelocyto": False}):
     """
     Parse arguments from the command line.
     """
@@ -43,6 +44,14 @@ def parse_args(defaults={"verbose": False, "configFile": None,
 
     # Workflow options
     optional = parser.add_argument_group('Options')
+
+    optional.add_argument("--mode",
+                          dest="mode",
+                          metavar="STR",
+                          help="Analysis mode. Default: %(default)s and possible settings 'Gruen' and 'STARsolo'.",
+			  choices=['Gruen', 'STARsolo'],
+                          type=str,
+                          default=defaults["mode"])
 
     optional.add_argument("--downsample",
                           dest="downsample",
@@ -102,6 +111,16 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                           "cell names and plate/library information for all fastq files! (default: '%(default)s')",
                           default=defaults["cellNames"])
 
+    optional.add_argument("--BCwhiteList",
+                          metavar="STR",
+                          help="Path to a one-column txt file with barcode whitelist. Required for the STARsolo mode (default: '%(default)s')",
+                          default=defaults["BCwhiteList"])
+
+    optional.add_argument("--STARsoloCoords",
+                          type=list,
+                          help="Comma-separated list of values: UMI start position, UMI length, CB start position, CB length. Required for the STARsolo mode (default: '%(default)s')",
+                          default=defaults["STARsoloCoords"])
+
     optional.add_argument("--bwBinSize",
                           dest="bwBinSize",
                           help="Bin size of output files in bigWig format (default: '%(default)s')",
@@ -128,6 +147,20 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                           action="store_true",
                           default=defaults["skipRaceID"],
                           help="Skip RaceID analysis.")
+
+    optional.add_argument("--myKit",
+                          choices=['10Xv2', '10Xv3', 'CellSeq192', 'CellSeq384', 'Custom'],
+                          metavar="STR",
+                          type=str,
+                          help="Library preparation kit and version to use preset barcode whitelist and CB/UMI positions for (default: '%(default)s')",
+                          default=defaults["myKit"])
+
+    optional.add_argument("--skipVelocyto",
+                          dest="skipVelocyto",
+                          action="store_true",
+                          default=defaults["skipVelocyto"],
+                          help="Skip bam filtering and generating RNA velocity counts by velocyto to save time and memory usage. (default: '%(default)s')")
+
 
     return parser
 

@@ -20,7 +20,8 @@ Pipeline                            Description
 :ref:`ChIP-Seq`                 Use the DNA mapping output and run ChIP/Input normalization and peak calling
 :ref:`ATAC-seq`                 Use the DNA mapping output and detect open chromatin regions for ATAC-seq data
 :ref:`HiC`                      Hi-C analysis workflow, from mapping to TAD calling
-:ref:`RNA-Seq`                  RNA-Seq workflow : From mapping to differential expression using DEseq2
+:ref:`noncoding-RNA-Seq`        noncoding-RNA-Seq workflow : From mapping to differential expression of genes and repeat elements using DESeq2
+:ref:`mRNA-Seq`                 RNA-Seq workflow : From mapping to differential expression using DESeq2
 :ref:`scRNA-Seq`                Single-cell RNA-Seq (CEL-Seq2) workflow : From mapping to differential expression
 :ref:`WGBS`                     Whole-genome Bisulfite-Seq analysis workflow, from mapping to DMR calling and differential methylation analysis
 :ref:`preprocessing`            Merging technical replicates (e.g., across lanes), removing optical duplicates, running FastQC
@@ -100,7 +101,8 @@ Contents:
    content/workflows/ATAC-seq.rst
    content/workflows/HiC.rst
    content/workflows/preprocessing.rst
-   content/workflows/RNA-seq.rst
+   content/workflows/mRNA-seq.rst
+   content/workflows/noncoding-RNA-seq.rst
    content/workflows/scRNA-seq.rst
    content/workflows/WGBS.rst
    content/News.rst

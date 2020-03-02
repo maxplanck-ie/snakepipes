@@ -9,6 +9,8 @@ globals().update(cf.set_env_yamls())
 
 # load config file
 globals().update(cf.load_configfile(workflow.overwrite_configfiles[0], config["verbose"]))
+# return the pipeline version in the log
+cf.get_version()
 
 ### include modules of other snakefiles ########################################
 ################################################################################
@@ -29,7 +31,8 @@ organismDictionary = {'genome_size': 0,
                       'genes_gtf': '',
                       'extended_coding_regions_gtf': '',
                       'blacklist_bed': '',
-                      'ignoreForNormalization': ''}
+                      'ignoreForNormalization': '',
+                      'rmsk_file': ''}
 
 targets = [os.path.join(outdir, x) for x in ["genome_fasta/genome.fa",
                                              "genome_fasta/genome.fa.fai",
@@ -48,6 +51,10 @@ if gtfURL:
     organismDictionary['genes_gtf'] = os.path.join(outdir, "annotation/genes.gtf")
     organismDictionary['genes_bed'] = os.path.join(outdir, "annotation/genes.bed")
     organismDictionary['extended_coding_regions_gtf'] = os.path.join(outdir, "annotation/genes.slop.gtf")
+
+if rmskURL:
+    targets.extend([os.path.join(outdir, x) for x in ["annotation/rmsk.txt"]])
+    organismDictionary['rmsk_file'] = os.path.join(outdir, "annotation/rmsk.txt")
 
 if 'all' in tools or 'bowtie2' in tools:
     targets.append(os.path.join(outdir, "BowtieIndex/genome.rev.2.bt2"))
@@ -114,6 +121,10 @@ onstart:
         print("$HOSTNAME: ",os.getenv('HOSTNAME', ""))
         print("-" * 80, "\n")
 
+    if toolsVersion:
+        usedEnvs = [CONDA_SHARED_ENV, CONDA_CREATE_INDEX_ENV]
+        cf.writeTools(usedEnvs, outdir, "createIndices", maindir)
+
 ### main rule ##################################################################
 ################################################################################
 rule all:
@@ -137,4 +148,3 @@ onsuccess:
 
 onerror:
     print("\n !!! ERROR in index creation workflow! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
-

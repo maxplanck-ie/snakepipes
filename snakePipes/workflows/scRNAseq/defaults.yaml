@@ -26,20 +26,28 @@ genome:
 ext: '.fastq.gz'
 ## paired-end read name extension (default: ["_R1", "_R2"])
 reads: ["_R1","_R2"]
+##Analysis mode
+mode: STARsolo
 ## Number of reads to downsample from each FASTQ file
 downsample:
 ## Options for trimming
 trim: False
 trimmer: cutadapt
 trimmerOptions: -a A{'30'}
-## N.B., setting --outBAMsortingBinsN too high can result in cryptic errors
-alignerOptions: "--outBAMsortingBinsN 30 --twopassMode Basic"
+## --twopassMode Basic is not compatible with --outStd in all STAR versions
+alignerOptions: ""
 ## further options
 filterGTF: "-v -P 'decay|pseudogene' "
 cellBarcodeFile:
 cellBarcodePattern: "NNNNNNXXXXXX"
 splitLib: False
 cellNames:
+##mode STARsolo options
+myKit: CellSeq384
+BCwhiteList:
+STARsoloCoords: ["1","7","8","7"]
+skipVelocyto: False
+#generic options
 libraryType: 1
 bwBinSize: 10
 verbose: False

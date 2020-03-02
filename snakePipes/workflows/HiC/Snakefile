@@ -12,6 +12,8 @@ globals().update(cf.set_env_yamls())
 globals().update(cf.load_configfile(workflow.overwrite_configfiles[0], config["verbose"]))
 # load organism-specific data, i.e. genome indices, annotation, etc.
 globals().update(cf.load_organism_data(genome, maindir, config["verbose"]))
+# return the pipeline version in the log
+cf.get_version()
 
 # do workflow specific stuff now
 include: os.path.join(workflow.basedir, "internals.snakefile")
@@ -128,6 +130,11 @@ onstart:
         print("$HOSTNAME: ",os.getenv('HOSTNAME', ""))
         print("-" * 80, "\n")
         print(sample_dict)
+
+    if toolsVersion:
+        usedEnvs = [CONDA_SHARED_ENV, CONDA_HIC_ENV]
+        cf.writeTools(usedEnvs, outdir, "HiC", maindir)
+
 ### main rule ##################################################################
 ################################################################################
 localrules: FASTQ1, FASTQ2
@@ -141,7 +148,7 @@ rule all:
         run_build_matrices(),
         expand("HiC_matrices/QCplots/{sample}_QC/QC.log", sample = samples),
         run_dist_vs_count(),
-        "multiQC/multiqc_report.html"
+        #"multiQC/multiqc_report.html"
 
 ### execute after workflow finished ############################################
 ################################################################################
@@ -149,9 +156,6 @@ onsuccess:
     cf.cleanLogs(outdir, cluster_config)
     if "verbose" in config and config["verbose"]:
         print("\n--- Hi-C workflow finished successfully! --------------------------------\n")
-    if toolsVersion:
-        usedEnvs = [CONDA_SHARED_ENV, CONDA_HIC_ENV]
-        printToolsVersion(usedEnvs)
 
 onerror:
     print("\n !!! ERROR in HI-C workflow! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")

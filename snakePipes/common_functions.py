@@ -10,6 +10,7 @@ import glob
 import sys
 import shutil
 from fuzzywuzzy import fuzz
+from snakePipes import __version__
 
 
 def set_env_yamls():
@@ -20,6 +21,8 @@ def set_env_yamls():
             'CONDA_CREATE_INDEX_ENV': 'envs/createIndices.yaml',
             'CONDA_RNASEQ_ENV': 'envs/rna_seq.yaml',
             'CONDA_scRNASEQ_ENV': 'envs/sc_rna_seq.yaml',
+            'CONDA_seurat3_ENV': 'envs/sc_rna_seq_seurat3.yaml',
+            'CONDA_loompy_ENV': 'envs/sc_rna_seq_loompy.yaml',
             'CONDA_DNA_MAPPING_ENV': 'envs/dna_mapping.yaml',
             'CONDA_CHIPSEQ_ENV': 'envs/chip_seq.yaml',
             'CONDA_HISTONE_HMM_ENV': 'envs/histone_hmm.yaml',
@@ -28,6 +31,7 @@ def set_env_yamls():
             'CONDA_WGBS_ENV': 'envs/wgbs.yaml',
             'CONDA_RMD_ENV': 'envs/rmarkdown.yaml',
             'CONDA_PREPROCESSING_ENV': 'envs/preprocessing.yaml',
+            'CONDA_NONCODING_RNASEQ_ENV': 'envs/noncoding.yaml',
             'CONDA_SAMBAMBA_ENV': 'envs/sambamba.yaml'}
 
 
@@ -47,6 +51,26 @@ def sanity_dict_clean(myDict):
         if myDict and k in myDict:
             del myDict[k]
     return myDict
+
+
+def namesOKinR(sampleNames):
+    """
+    Return nothing, but print warning to the screen
+    if any of the sample names will get munged by R.
+    """
+    reservedWords = set(["NULL", "NA", "TRUE", "FALSE", "Inf", "NaN", "NA_integer_", "NA_real_",
+                         "NA_character_", "NA_complex_", "function", "while", "repeat", "for",
+                         "if", "in", "else", "next", "break", "..."])
+    for sampleName in sampleNames:
+        # Starts with A-Za-z or .
+        if (not sampleName[0].isalpha()) and (not sampleName[0] == "."):
+            sys.stderr.write("Any steps involving R packages will fail if sample names do not start with a letter or '.'. {} is not compatible and will fail these!\n".format(sampleName))
+        # reserved word
+        if sampleName in reservedWords:
+            sys.stderr.write("{} is a reserved keyword in R, so if there are steps using R they will fail!\n".format(sampleName))
+        # invalid characters, which is everything except alpha numeric, . and _
+        if not all([(x.isalnum() or x in ["_", "."]) for x in sampleName]):
+            sys.stderr.write("R requires that all samples names contain ONLY letters, number, '_' or '.', so {} is invalid and may cause failure in steps using R!\n".format(sampleName))
 
 
 def load_configfile(configFiles, verbose, info='Config'):
@@ -79,6 +103,11 @@ def config_diff(dict1, dict2):
         else:
             diff[k] = dict1[k]
     return diff
+
+
+def get_version():
+    # If this is sent to stdout it breaks making a DAG pdf
+    sys.stderr.write("\n---- This analysis has been done using snakePipes version {} ----\n".format(__version__))
 
 
 def load_organism_data(genome, maindir, verbose):
@@ -183,6 +212,39 @@ def check_replicates(sample_info_file):
             return False
 
     return True
+
+
+def sampleSheetGroups(sampleSheet):
+    """
+    Parse a sampleSheet and return a dictionary with keys the group and values the sample names
+    """
+    f = open(sampleSheet)
+    conditionCol = None
+    nameCol = None
+    nCols = None
+    d = dict()
+    for idx, line in enumerate(f):
+        cols = line.strip().split("\t")
+        if idx == 0:
+            if "condition" not in cols or "name" not in cols:
+                sys.exit("ERROR: Please use 'name' and 'condition' as column headers in the sample info file ({})!\n".format(sampleSheet))
+            conditionCol = cols.index("condition")
+            nameCol = cols.index("name")
+            nCols = len(cols)
+            continue
+        elif idx == 1:
+            # Sometimes there's a column of row names, which lack a header
+            if len(cols) != nCols and len(cols) - 1 != nCols:
+                sys.exit("ERROR: there's a mismatch between the number of columns in the header and body of {}!\n".format(sampleSheet))
+            if len(cols) - 1 == nCols:
+                conditionCol += 1
+                nameCol += 1
+        if not len(line.strip()) == 0:
+            if cols[conditionCol] not in d:
+                d[cols[conditionCol]] = []
+            d[cols[conditionCol]].append(cols[nameCol])
+    f.close()
+    return d
 
 
 def make_temp_dir(tempDir, fallback_dir, verbose=False):
@@ -602,3 +664,16 @@ def predict_chip_dict(wdir, input_pattern_str, bamExt, fromBAM=None):
     print("Chip-seq sample configuration is written to file ", outfile)
     print("Please check and modify this file - this is just a guess! Then run the workflow with it.")
     print("---------------------------------------------------------------------------------------")
+
+
+def writeTools(usedEnvs, wdir, workflowName, maindir):
+    outfile = os.path.join(wdir, workflowName + "_tools.txt")
+    with open(outfile, 'w') as f:
+        for item in usedEnvs:
+            dependencies = False
+            for line in open(os.path.join(maindir, "shared", "rules", item), 'r'):
+                if line.split(":")[0] == "dependencies":
+                    dependencies = True
+                elif dependencies is True:
+                    f.write(line)
+    f.close()

@@ -27,8 +27,7 @@ if aligner == "STAR":
                     --genomeDir {params.idx} \
                     --sjdbGTFfile {params.gtf} \
                     --sjdbOverhang 100 \
-                    --readFilesCommand zcat \
-                    --readFilesIn {input.r1} {input.r2} \
+                    --readFilesIn <(gunzip -c {input.r1}) <(gunzip -c {input.r2}) \
                     --outFileNamePrefix {params.prefix} \
                     --outSAMunmapped Within \
                     --alignEndsType EndToEnd \
@@ -71,8 +70,7 @@ if aligner == "STAR":
                     --genomeDir {params.idx} \
                     --sjdbGTFfile {params.gtf} \
                     --sjdbOverhang 100 \
-                    --readFilesCommand zcat \
-                    --readFilesIn {input} \
+                    --readFilesIn <(gunzip -c {input}) \
                     --outFileNamePrefix {params.prefix} \
                     --outSAMunmapped Within \
                     --alignEndsType EndToEnd \

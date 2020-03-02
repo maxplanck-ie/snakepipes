@@ -15,7 +15,7 @@ outdir<-snakemake@params[["outdir"]]
 yaml_path<-snakemake@params[["yaml_path"]]
 
 ##set up a primitive log
-logfile <- file(snakemake@log[["err"]], open="wt")
+logfile <- file(snakemake@log[["err"]], open="w+")
 sink(logfile, type="message")
 
 
@@ -91,21 +91,32 @@ if (!is.null(sampleInfo$UseRegions)) {
     fnames<-sampleInfo$name
 }
 
-allpeaks <- lapply(fnames, function(x) {
-    narrow <- paste0("../MACS2/",x,".filtered.BAM_peaks.narrowPeak")
-    broad <- paste0("../MACS2/",x,".filtered.BAM_peaks.broadPeak")
-    # first look for narrowpeak then braod peak
-    if(file.exists(narrow)) {
-        bed <- read.delim(narrow, header = FALSE)
-    } else if (file.exists(broad)) {
-        bed <- read.delim(broad, header = FALSE)
-    } else {
-        stop("MACS2 output doesn't exist. Neither ", narrow, " , nor ", broad)
-    }
+if(snakemake@params[['peakCaller']] == "MACS2") {
+    allpeaks <- lapply(fnames, function(x) {
+        narrow <- paste0("../MACS2/",x,".filtered.BAM_peaks.narrowPeak")
+        if(snakemake@params[["pipeline"]] %in% "ATAC-seq"){
+            narrow <- paste0("../MACS2/",x,".filtered.short.BAM_peaks.narrowPeak")
+        }
+        broad <- paste0("../MACS2/",x,".filtered.BAM_peaks.broadPeak")
+        # first look for narrowpeak then braod peak
+        if(file.exists(narrow)) {
+            bed <- read.delim(narrow, header = FALSE)
+        } else if (file.exists(broad)) {
+            bed <- read.delim(broad, header = FALSE)
+        } else {
+            stop("MACS2 output doesn't exist. Neither ", narrow, " , nor ", broad)
+        }
 
-    bed.gr <- GRanges(seqnames = bed$V1, ranges = IRanges(start = bed$V2, end = bed$V3), name = bed$V4)
-    return(bed.gr)
+        bed.gr <- GRanges(seqnames = bed$V1, ranges = IRanges(start = bed$V2, end = bed$V3), name = bed$V4)
+        return(bed.gr)
     })
+} else {
+    allpeaks = lapply(snakemake@input[['peaks']], function(x) {
+        bed = read.delim(paste0("../", x), header=FALSE)
+        bed.gr = GRanges(seqnames = bed$V1, ranges = IRanges(start = bed$V2, end = bed$V3), name = bed$V4)
+        return(bed.gr)
+    })
+}
 
 # merge
 allpeaks <- Reduce(function(x,y) GenomicRanges::union(x,y), allpeaks)

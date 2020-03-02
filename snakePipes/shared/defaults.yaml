@@ -17,3 +17,5 @@ onlySSL: False
 emailSender:
 smtpUsername:
 smtpPassword:
+#print tools versions
+toolsVersion: True

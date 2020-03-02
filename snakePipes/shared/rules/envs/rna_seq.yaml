@@ -3,27 +3,24 @@ channels:
  - conda-forge
  - bioconda
 dependencies:
- - bedtools = 2.28.0
- - ucsc-genepredtogtf = 377
- - ucsc-bedtogenepred = 377
- - ucsc-genepredtobed = 377
- - ucsc-gtftoGenepred = 377
- - samtools = 1.9
- - subread = 1.6.4
+ - bedtools = 2.29.2
+ - samtools = 1.10
+ - subread = 2.0.0
  - hisat2 = 2.1.0
- - star = 2.6.1d
- - salmon = 0.13.1
- - r-base = 3.5.1
- - r-wasabi = 1.0.0
+ - star = 2.7.3a
+ - salmon = 1.1.0
+ - r-base = 3.6.2
+ - r-wasabi = 1.0.1
  - r-sleuth = 0.30.0
- - r-dplyr = 0.8.0.1
- - r-ggplot2 = 3.1.0
+ - r-dplyr = 0.8.4
+ - r-ggplot2 = 3.2.1
  - r-pheatmap
  - r-rmarkdown
- - r-knitr >= 1.6
- - pandoc = 2.7.1
+ - r-knitr >= 1.28
+ - pandoc
  - r-dt
  - r-rcolorbrewer
- - bioconductor-deseq2 = 1.22.1
- - bioconductor-tximport = 1.10.0
+ - bioconductor-deseq2 = 1.26.0
+ - bioconductor-tximport = 1.14.0
  - r-knitcitations
+ - bioconductor-apeglm

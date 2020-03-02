@@ -2,8 +2,8 @@ rule filterFragments:
     input:
         "filtered_bam/{sample}.filtered.bam"
     output:
-        shortBAM = temp(os.path.join(outdir_MACS2, "{sample}.short.bam")),
-        metrics = os.path.join(outdir_MACS2, "{sample}.short.metrics")
+        shortBAM = temp(os.path.join(short_bams, "{sample}.short.bam")),
+        metrics = os.path.join(short_bams, "{sample}.short.metrics")
     params:
         maxFragmentSize=maxFragmentSize,
         minFragmentSize=minFragmentSize
@@ -17,9 +17,10 @@ rule filterFragments:
         --minFragmentLength {params.minFragmentSize}
         """
 
+
 rule filterMetricsToHtml:
-    input: 
-        expand(os.path.join(outdir_MACS2, "{sample}.short.metrics"), sample=samples)
+    input:
+        expand(os.path.join(short_bams, "{sample}.short.metrics"), sample=samples)
     output:
         QCrep='Filtering_metrics/Filtering_report.html'
     log:
@@ -33,12 +34,12 @@ rule filterMetricsToHtml:
 # MACS2 BAMPE fails if there is just one fragment mapped
 rule filterCoveragePerScaffolds:
     input:
-        bam = os.path.join(outdir_MACS2, "{sample}.short.bam")
+        bam = os.path.join(short_bams, "{sample}.short.bam")
     output:
-        whitelist = os.path.join(outdir_MACS2, "{sample}.chrom.whitelist"),
-        shortbai = temp(os.path.join(outdir_MACS2, "{sample}.short.bam.bai")),
-        bam = os.path.join(outdir_MACS2, "{sample}.short.cleaned.bam"),
-        bai = os.path.join(outdir_MACS2, "{sample}.short.cleaned.bam.bai")
+        whitelist = os.path.join(short_bams, "{sample}.chrom.whitelist"),
+        shortbai = temp(os.path.join(short_bams, "{sample}.short.bam.bai")),
+        bam = os.path.join(short_bams, "{sample}.short.cleaned.bam"),
+        bai = os.path.join(short_bams, "{sample}.short.cleaned.bam.bai")
     params:
         count_cutoff = int(fragmentCountThreshold) * 2 # must contain more than 2 reads, i.e. 1 fragment
     threads: 6
@@ -50,13 +51,14 @@ rule filterCoveragePerScaffolds:
         samtools index -@ {threads} {output.bam}
         """
 
+
 # MACS2 BAMPE filter: samtools view -b -f 2 -F 4 -F 8 -F 256 -F 512 -F 2048
 rule callOpenChromatin:
     input:
-        os.path.join(outdir_MACS2, "{sample}.short.cleaned.bam")
+        os.path.join(short_bams, "{sample}.short.cleaned.bam")
     output:
-        peaks = os.path.join(outdir_MACS2, '{sample}.filtered.BAM_peaks.narrowPeak'),
-        xls = os.path.join(outdir_MACS2, '{sample}.filtered.BAM_peaks.xls')
+        peaks = os.path.join(outdir_MACS2, '{sample}.filtered.short.BAM_peaks.narrowPeak'),
+        xls = os.path.join(outdir_MACS2, '{sample}.filtered.short.BAM_peaks.xls')
     params:
         directory = outdir_MACS2,
         genome_size = int(genome_size),
@@ -73,10 +75,57 @@ rule callOpenChromatin:
     shell: """
         macs2 callpeak --treatment {input} \
             -g {params.genome_size} \
-            --name {params.name}.filtered.BAM \
+            --name {params.name}.filtered.short.BAM \
             --outdir {params.directory} \
             {params.fileformat} \
             --qvalue {params.qval_cutoff} \
             {params.nomodel} \
             {params.write_bdg} > {log.out} 2> {log.err}
+        """
+
+
+rule tempChromSizes:
+    input: genome_index
+    output: temp("HMMRATAC/chrom_sizes")
+    shell: """
+        cut -f 1,2 {input} > {output}
+        """
+
+
+# TODO: -q MINMAPQ -Xmx value is currently hard-coded
+# Actually uses 2-4 cores, even though there's no option for it!
+# Requires PE data
+rule HMMRATAC_peaks:
+    input:
+        "filtered_bam/{sample}.filtered.bam",
+        "filtered_bam/{sample}.filtered.bam.bai",
+        "HMMRATAC/chrom_sizes"
+    output:
+        "HMMRATAC/{sample}.log",
+        "HMMRATAC/{sample}.model",
+        "HMMRATAC/{sample}_peaks.gappedPeak",
+        "HMMRATAC/{sample}_summits.bed",
+        "HMMRATAC/{sample}_training.bed"
+    params:
+        blacklist = "-e {}".format(blacklist_bed) if blacklist_bed else ""
+    conda: CONDA_ATAC_ENV
+    threads: 4
+    shell: """
+        HMMRATAC -Xmx10G -b {input[0]} -i {input[1]} -g {input[2]} {params.blacklist} -o HMMRATAC/{wildcards.sample}
+        """
+
+
+# Requires PE data
+# Should be run once per-group!
+rule Genrich_peaks:
+    input:
+        bams=lambda wildcards: expand(os.path.join(short_bams, "{sample}.short.cleaned.bam"), sample=genrichDict[wildcards.group])
+    output:
+        "Genrich/{group}.narrowPeak"
+    params:
+        bams = lambda wildcards: ",".join(expand(os.path.join(short_bams, "{sample}.short.cleaned.bam"), sample=genrichDict[wildcards.group])),
+        blacklist = "-E {}".format(blacklist_bed) if blacklist_bed else ""
+    conda: CONDA_ATAC_ENV
+    shell: """
+        Genrich -S -t {params.bams} -o {output} -r {params.blacklist} -j -y
         """

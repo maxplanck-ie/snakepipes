@@ -1,5 +1,7 @@
 import os
 import snakePipes.common_functions as cf
+import subprocess
+import sys
 
 ### snakemake_workflows initialization ########################################
 maindir = os.path.dirname(os.path.dirname(workflow.basedir))
@@ -12,6 +14,8 @@ globals().update(cf.set_env_yamls())
 globals().update(cf.load_configfile(workflow.overwrite_configfiles[0], config["verbose"]))
 # load organism-specific data, i.e. genome indices, annotation, etc.
 globals().update(cf.load_organism_data(genome, maindir, config["verbose"]))
+# return the pipeline version in the log
+cf.get_version()
 
 # do workflow specific stuff now
 include: os.path.join(workflow.basedir, "internals.snakefile")
@@ -20,24 +24,30 @@ include: os.path.join(workflow.basedir, "internals.snakefile")
 ### include modules of other snakefiles ########################################
 ################################################################################
 include: os.path.join(maindir, "shared", "rules", "FASTQ.snakefile")
+include: os.path.join(maindir, "shared", "rules", "filterGTF.snakefile")
 #umi_tools
-include: os.path.join(maindir, "shared", "rules", "umi_tools.snakefile")
-
-include: os.path.join(maindir, "shared", "rules", "RNA_mapping.snakefile")
-include: os.path.join(maindir, "shared", "rules", "scRNAseq.snakefile")
+if mode=="Gruen":
+    include: os.path.join(maindir, "shared", "rules", "umi_tools.snakefile")
+    include: os.path.join(maindir, "shared", "rules", "RNA_mapping.snakefile")
+    include: os.path.join(maindir, "shared", "rules", "scRNAseq_Gruen.snakefile")
+    # TrimGalore
+    if trim:
+        include: os.path.join(maindir, "shared", "rules", "trimming.snakefile")
+elif mode=="STARsolo":
+    include: os.path.join(maindir, "shared", "rules", "scRNAseq_STARsolo.snakefile")
+    trim=False
+    skipRaceID=True
 pairedEnd = True
 include: os.path.join(maindir, "shared", "rules", "FastQC.snakefile")
 pairedEnd = False
-include: os.path.join(maindir, "shared", "rules", "filterGTF.snakefile")
+include: os.path.join(maindir, "shared", "rules", "sambamba.snakefile")
+include: os.path.join(maindir, "shared", "rules", "RNA-seq_qc_report.snakefile")
 include: os.path.join(maindir, "shared", "tools" , "deeptools_cmds.snakefile")
 include: os.path.join(maindir, "shared", "rules", "deepTools_RNA.snakefile")
 include: os.path.join(maindir, "shared", "rules", "multiQC.snakefile")
-include:os.path.join(maindir, "shared", "rules", "sambamba.snakefile")
-include:os.path.join(maindir, "shared", "rules", "RNA-seq_qc_report.snakefile")
 
-# TrimGalore
-if trim:
-    include: os.path.join(maindir, "shared", "rules", "trimming.snakefile")
+cf.namesOKinR(samples)
+
 
 ### conditional/optional rules #################################################
 ################################################################################
@@ -75,6 +85,16 @@ def run_RaceID(skipRaceID):
     else:
         return([])
 
+def run_velocyto(skipVelocyto):
+    if not skipVelocyto:
+        file_list = [
+        expand("VelocytoCounts/{sample}.done.txt",sample=samples),
+        "VelocytoCounts_merged/merged.loom"
+        ]
+        return(file_list)
+    else:
+        return([])
+
 ### execute before workflow starts #############################################
 ################################################################################
 onstart:
@@ -87,6 +107,7 @@ onstart:
         print("Read extension:", reads)
         print("Genome:", genome)
         print("Downsample:", downsample)
+	print("Mode:", mode)
         print("Trimming:", trim)
         print("Input directory for mapping:", fastq_dir)
         print("Input directory for trimming:", fastq_indir_trim)
@@ -105,34 +126,52 @@ onstart:
         print("$HOSTNAME: ",os.getenv('HOSTNAME', ""))
         print("-" * 80, "\n")
 
+    if toolsVersion:
+        usedEnvs = [CONDA_SHARED_ENV, CONDA_scRNASEQ_ENV]
+        cf.writeTools(usedEnvs, outdir, "scRNAseq", maindir)
+
 ### main rule ##################################################################
 ################################################################################
-localrules: FASTQ1, FASTQ2
-rule all:
-    input:
-        expand("FASTQ_barcoded/{sample}{read}.fastq.gz", sample = samples, read=reads[0]),
-        run_Trimming(trim),
-        expand("FastQC/{sample}{read}_fastqc.html", sample = samples, read=reads),
-        expand(aligner + "/{sample}.bam", sample = samples),
-        expand(aligner + "/{sample}.bam.bai", sample = samples),
-        "Sambamba/flagstat_report_all.tsv",
-        "Annotation/genes.annotated.bed",
-        "Annotation/genes.filtered.bed",
-        "Annotation/genes.filtered.gtf",
-        expand("Counts/{sample}.raw_counts.txt",sample = samples),
-        expand("Counts/{sample}.featureCounts_summary.txt",sample = samples),
-        expand("Counts/{sample}.corrected.txt",sample = samples),
-        "Results/all_samples.gencode_genomic.corrected_merged.csv",
-        "QC_report/QC_report.all_samples.libstats_reads.tsv",
-        "Filtered_cells_monocle/metrics.tab.RData",
-        "Filtered_cells_monocle/sessionInfo.txt",
-        run_RaceID(skipRaceID),
-        run_deeptools_qc(),
-        "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv",
-        expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample = samples),
-        "multiQC/multiqc_report.html",
-        'Filtered_cells_monocle/Stats_report.html'
 
+if mode=="Gruen":
+    localrules: origFASTQ1, origFASTQ2
+    rule all:
+        input:
+            expand("FASTQ_barcoded/{sample}{read}.fastq.gz", sample = samples, read=reads[0]),
+            run_Trimming(trim),
+            expand("FastQC/{sample}{read}_fastqc.html", sample = samples, read=reads),
+            expand(aligner + "/{sample}.bam", sample = samples),
+            expand(aligner + "/{sample}.bam.bai", sample = samples),
+            "Sambamba/flagstat_report_all.tsv",
+            "Annotation/genes.filtered.bed",
+            "Annotation/genes.filtered.gtf",
+            expand("Counts/{sample}.raw_counts.txt",sample = samples),
+            expand("Counts/{sample}.featureCounts_summary.txt",sample = samples),
+            expand("Counts/{sample}.corrected.txt",sample = samples),
+            "Results/all_samples.gencode_genomic.corrected_merged.csv",
+            "QC_report/QC_report.all_samples.libstats_reads.tsv",
+            "Filtered_cells_monocle/metrics.tab.RData",
+            "Filtered_cells_monocle/sessionInfo.txt",
+            run_RaceID(skipRaceID),
+            run_deeptools_qc(),
+            "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv",
+            expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample = samples),
+            "multiQC/multiqc_report.html",
+            'Filtered_cells_monocle/Stats_report.html'
+elif mode=="STARsolo":
+    localrules: origFASTQ1, origFASTQ2, gzip_STARsolo_for_seurat
+    rule all:
+        input:
+            expand("STARsolo/{sample}.sorted.bam",sample = samples),
+            "Sambamba/flagstat_report_all.tsv",
+            run_deeptools_qc(),
+            "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv",
+            expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample = samples),
+            "multiQC/multiqc_report.html",
+            "Seurat/STARsolo_filtered/merged_samples.RDS",
+            "Seurat/STARsolo_raw/merged_samples.RDS",
+            run_velocyto(skipVelocyto)
+          
 
 ### execute after workflow finished ############################################
 ################################################################################

@@ -10,6 +10,8 @@ globals().update(cf.set_env_yamls())
 
 # load config file
 globals().update(cf.load_configfile(workflow.overwrite_configfiles[0], config["verbose"]))
+# return the pipeline version in the log
+cf.get_version()
 
 # do workflow specific stuff now
 include: os.path.join(workflow.basedir, "internals.snakefile")
@@ -34,7 +36,7 @@ if sampleSheet and sampleSheet != "":
     samples = sampleDict.keys()
     if not pairedEnd:
         readsUse = [reads[0]]
- 
+
 include: os.path.join(maindir, "shared", "rules", "preprocessing.snakefile")
 infiles = expand("deduplicatedFASTQ/{sample}{RExt}{ext}", sample=samples, RExt=readsUse, ext=ext)
 
@@ -85,6 +87,10 @@ onstart:
         print("$HOSTNAME: ", os.getenv('HOSTNAME', ""))
         print("-" * 80, "\n")
 
+    if toolsVersion:
+        usedEnvs = [CONDA_SHARED_ENV, CONDA_PREPROCESSING_ENV]
+        cf.writeTools(usedEnvs, outdir, "preprocessing", maindir)
+
 ### main rule ##################################################################
 ################################################################################
 
@@ -98,7 +104,6 @@ onsuccess:
     cf.cleanLogs(outdir, cluster_config)
     if "verbose" in config and config["verbose"]:
         print("\n--- Preprocessing workflow finished successfully! ------------------------------------\n")
-        
+
 onerror:
     print("\n !!! ERROR in preprocessing workflow! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
-

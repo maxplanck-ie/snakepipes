@@ -37,8 +37,9 @@ All files needed to be modified in order to extend/modify a workflow, are availa
         ├── createIndices
         ├── DNA-mapping
         ├── HiC
+        ├── mRNA-seq
+        ├── noncoding-RNA-seq
         ├── preprocessing
-        ├── RNA-seq
         ├── scRNAseq
         └──WGBS
 
@@ -147,17 +148,17 @@ Therefore in order to change or upgrade a tool version, all you need to do is to
 Modifying or adding new rules to the workflows
 ------------------------------------------------
 
-Modifying or adding new rules to snakePipes workflows is relatively easy. Considering you want to add a new Rscript that performs a downstream analysis on the DESeq2 output in RNA-seq workflow. These would be the steps needed:
+Modifying or adding new rules to snakePipes workflows is relatively easy. Considering you want to add a new Rscript that performs a downstream analysis on the DESeq2 output in mRNA-seq workflow. These would be the steps needed:
 
     * Test the Rscript on command line first, then move it in the ``shared/rscripts`` folder.
 
     * Add a rule that called the Rscript and put it under ``shared/rules`` folder.
 
-    * Add the corresponding ``rule all``, that defines the expected output into ``workflows/RNA-seq/Snakefile``
+    * Add the corresponding ``rule all``, that defines the expected output into ``workflows/mRNA-seq/Snakefile``
 
     * Now, for easy and reproducible execution of the rule, add a ``conda`` directive and point it to the relevant conda env under ``shared/rules/envs``. Since your rule might need a new R package, `search whether it's available <https://anaconda.org/search?q=knitr>`__ in one of the conda channels and add the package name (as indicated in the conda channel) and version under the ``dependencies`` key.
 
-    * Finally, modify the command line wrapper (``workflows/RNA-seq/RNA-seq.py``) to make this new feature available to the users!
+    * Finally, modify the command line wrapper (``workflows/mRNA-seq/mRNA-seq``) to make this new feature available to the users!
 
 
 Using AWS or other cloud platforms
@@ -170,7 +171,7 @@ There is nothing particularly special about performing computations on AWS or ot
  3. Ensure that you install snakePipes on a separate EBS (or equivalent) storage block. We found that a 200GB ``/data`` partition was most convenient. This absolutely must not be the ``/`` partition, as mounting such a persistent image on other instances will result in paths being changed, which result in needing to modify large numbers of files.
  4. It's usually sufficient to use a single large (e.g., ``m5.24xlarge``) compute node, with 100+ cores and a few hundred GB RAM. This allows one to use the ``--local`` option and not have to deal with the hassle of setting up a proper cluster on AWS. Make sure the then set ``-j`` to the number of available cores on the node, so snakePipes can make the most efficient use of the resources (and minimize your bill).
 
-Below is an example of running the RNA-seq pipeline on AWS using the resources outlined above. Note that it's best to store your input/output data on a separate storage block, since its lifetime is likely to be shorter than that of the indices.
+Below is an example of running the mRNA-seq pipeline on AWS using the resources outlined above. Note that it's best to store your input/output data on a separate storage block, since its lifetime is likely to be shorter than that of the indices.
 
 .. code:: bash
 
@@ -213,7 +214,7 @@ Below is an example of running the RNA-seq pipeline on AWS using the resources o
 
     # Update defaults.yaml to use /data/tmp for temporary space
 
-Then a larger instance can be spun up and the `RNA-seq` pipeline run as normal.
+Then a larger instance can be spun up and the `mRNA-seq` pipeline run as normal.
 
 .. code:: bash
 
@@ -222,7 +223,7 @@ Then a larger instance can be spun up and the `RNA-seq` pipeline run as normal.
     chown ec2-user /data
     export PATH=/data/snakePipes/bin:$PATH
     conda activate snakePipes
-    RNA-seq -m alignment -i /data/data -o /data/output --local -j 192 /data/indices/GRCm28.yaml
+    mRNA-seq -m alignment -i /data/data -o /data/output --local -j 192 /data/indices/GRCm28.yaml
 
 Receiving emails upon pipeline completion
 -----------------------------------------

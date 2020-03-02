@@ -70,14 +70,8 @@ def get_mad_score(madfile):
 ## get sample grouping information
 def get_sampleSheet(sample_sheet):
     sample_dict = dict()
-    if sample_sheet:     #Read the sample info and make a dictionary
-        sample_conditions =  pd.read_csv(os.path.join(os.path.abspath(sample_sheet)), sep = '\t')
-        for id, row in sample_conditions.iterrows():
-            v, k = row
-            if k in sample_dict:
-                sample_dict[k].append(v)
-            else:
-                sample_dict[k]=[v]
+    if sample_sheet:  # Read the sample info and fill in a dictionary
+        sample_dict = cf.sampleSheetGroups(sample_sheet)
     else:
         sample_dict['merged'] = []
         for sample in samples:
@@ -96,19 +90,12 @@ if trim:
     elif trimmer == "fastp":
         fastq_dir = "FASTQ_fastp"
 
-def printToolsVersion(usedEnvs):
-    with open(outdir+"/toolsVersion.txt", 'w') as f:
-        for item in usedEnvs:
-              for line in open(os.path.join(maindir, "shared", "rules", item), 'r'):
-                 if len(line.split('='))==2:
-                     f.write(line)
-    f.close()
-
 ### Initialization #############################################################
 infiles = sorted(glob.glob(os.path.join(str(indir or ''), '*'+ext)))
 samples = cf.get_sample_names(infiles,ext,reads)
 pairedEnd = cf.is_paired(infiles,ext,reads)
 del infiles
+fromBAM = None
 
 if not samples:
     print("\n  Error! NO samples found in dir "+str(indir or '')+"!!!\n\n")

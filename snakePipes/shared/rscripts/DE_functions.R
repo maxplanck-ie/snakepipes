@@ -79,7 +79,7 @@ checktable <- function(countdata = NA, sampleSheet = NA, alleleSpecific = FALSE,
 #'
 #'
 
-DESeq_basic <- function(countdata, coldata, fdr, alleleSpecific = FALSE, from_salmon = FALSE) {
+DESeq_basic <- function(countdata, coldata, fdr, alleleSpecific = FALSE, from_salmon = FALSE, size_factors=NA) {
     cnames.sub<-unique(colnames(coldata)[2:which(colnames(coldata) %in% "condition")])
     d<-as.formula(noquote(paste0("~",paste(cnames.sub,collapse="+"))))
     
@@ -102,9 +102,17 @@ DESeq_basic <- function(countdata, coldata, fdr, alleleSpecific = FALSE, from_sa
                                     colData = coldata, design =d)
       }
     }
+    if(length(size_factors) > 1) {
+        print("applying size factors")
+        print(size_factors)
+        sizeFactors(dds) = size_factors
+    }
     dds <- DESeq2::DESeq(dds)
-    ddr <- DESeq2::results(dds,alpha = fdr)
-    output <- list(dds = dds, ddr = ddr)
+    ddr <- DESeq2::results(dds, alpha = fdr)
+    c1<-unique(coldata$condition)[1]
+    c2<-unique(coldata$condition)[2]
+    ddr_shrunk <- DESeq2::lfcShrink(dds,coef=paste0("condition_",c2,"_vs_",c1),type="apeglm",res=ddr)
+    output <- list(dds = dds, ddr = ddr, ddr_shrunk = ddr_shrunk)
     return(output)
 
 }
@@ -140,7 +148,7 @@ DESeq_allelic <- function(countdata, coldata, fdr) {
     rownames(dds) <- rownames(rnasamp)
     dds <- DESeq2::DESeq(dds,betaPrior = FALSE)
     ddr <- DESeq2::results(dds, name=paste0("allelegenome2.condition",unique(coldata$condition)[2]))
-    output <- list(dds = dds, ddr = ddr)
+    output <- list(dds = dds, ddr = ddr, ddr_shrunk=NULL)
     return(output)
 }
 
@@ -171,6 +179,7 @@ DESeq_writeOutput <- function(DEseqout,
     # get dds and ddr
     dds <- DEseqout$dds
     ddr <- DEseqout$ddr
+    ddr_shrunk <- DEseqout$ddr_shrunk
     # Now prep files for outputs
     ddr.df <- as.data.frame(ddr)
     print("Adding Status: UP/DOWN")
@@ -178,8 +187,14 @@ DESeq_writeOutput <- function(DEseqout,
     ddr.df$Status <- ifelse(is.na(ddr.df$padj), "None",
                     ifelse(ddr.df$padj < fdr,
                          ifelse(ddr.df$log2FoldChange > 0, "UP", "DOWN"),
-                         "None")
-    )
+                         "None"))
+    if (!is.null(ddr_shrunk)) {
+        ddr_shrunk.df <- as.data.frame(ddr_shrunk)
+        ddr_shrunk.df$Status <- ifelse(is.na(ddr_shrunk.df$padj), "None",
+                    ifelse(ddr_shrunk.df$padj < fdr,
+                         ifelse(ddr_shrunk.df$log2FoldChange > 0, "UP", "DOWN"),
+                         "None"))
+    }
 
     # If gene names given, then add this info to ddr.df
     if (file.exists(geneNamesFile)) {
@@ -190,17 +205,25 @@ DESeq_writeOutput <- function(DEseqout,
         ddr.df <- merge(ddr.df, geneNames, by.x = 0, by.y = "GeneID" , all.x = TRUE)
         rownames(ddr.df) <- ddr.df[,1]
         ddr.df[,1] <- NULL
+        if (!is.null(ddr_shrunk)) {
+            ddr_shrunk.df <- merge(ddr_shrunk.df, geneNames, by.x = 0, by.y = "GeneID" , all.x = TRUE)
+            rownames(ddr_shrunk.df) <- ddr_shrunk.df[,1]
+            ddr_shrunk.df[,1] <- NULL
+            }
     } else {
         print("Gene symbols file not found. Gene IDs used")
     }
     print("writing results")
     ## Write back diffExp output
     write.table(ddr.df,file = paste0(outprefix, "_DEresults.tsv"),sep = "\t",quote = FALSE)
+    if (!is.null(ddr_shrunk)){
+        write.table(ddr_shrunk.df,file = paste0(outprefix, "_DEresults_LFCshrunk.tsv"),sep = "\t",quote = FALSE)
+        }
     # write normalized counts
     write.table(DESeq2::counts(dds, normalized = T),
             file = paste0(outprefix, "_counts_DESeq2.normalized.tsv"),
                       sep = "\t", quote = FALSE, col.names = NA)
-    save(dds, ddr, file = paste0(outprefix,"_DESeq.Rdata"))
+    save(dds, ddr, ddr_shrunk, file = paste0(outprefix,"_DESeq.Rdata"))
 
 }
 

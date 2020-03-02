@@ -33,10 +33,10 @@ if(file.exists(tx2gene_file)) {
 rmdTemplate <- args[8]
 topN <- 50
 ## include functions
-library(ggplot2)
-library(rmarkdown)
-library(knitcitations)
-source(importfunc)
+suppressPackageStartupMessages(library(ggplot2))
+suppressPackageStartupMessages(library(rmarkdown))
+suppressPackageStartupMessages(library(knitcitations))
+suppressPackageStartupMessages(source(importfunc))
 
 ## fix default FDR significance threshold
 if ( is.na(fdr) ) fdr <- 0.05
@@ -64,11 +64,12 @@ sampleInfo$condition <- relevel(sampleInfo$condition, ref = as.character(sampleI
 #if ( any(grepl("^[0-9]", sampleInfo$name)) ) {
 #    sampleInfo[grepl("^[0-9]", sampleInfo$name),]$name <- paste0("X", sampleInfo[grepl("^[0-9]", sampleInfo$name),]$name)
 #}
-sampleInfo$name <- make.names(sampleInfo$name)
-rownames(sampleInfo)<-sampleInfo$name
+#sampleInfo$name <- make.names(sampleInfo$name)
+#rownames(sampleInfo)<-sampleInfo$name
 
 ## ~~~~~~ 2. Check if data is in proper order  ~~~~~
 if(isTRUE(tximport)) {
+  rownames(sampleInfo)<-sampleInfo$name
   ## Get data from salmon using TXIMPORT
   ## get gene annotation
   tx2gene <- read.delim(tx2gene_file, header = FALSE)
@@ -76,6 +77,8 @@ if(isTRUE(tximport)) {
   # check setup table and import
   countdata <- checktable(sampleSheet = sampleInfo, salmon_dir = dirname(countFilePath), tx2gene_annot = tx2gene)
 } else {
+  sampleInfo$name <- make.names(sampleInfo$name)
+  rownames(sampleInfo)<-sampleInfo$name
   ## Get data from featurecounts
   ## counts
   countdata <- read.table(countFilePath, header=TRUE, check.names = TRUE)
