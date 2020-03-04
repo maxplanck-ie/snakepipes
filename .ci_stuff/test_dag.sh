@@ -54,6 +54,9 @@ mkdir -p allelic_input
 mkdir -p allelic_input/Ngenome
 touch allelic_input/file.vcf.gz allelic_input/snpfile.txt
 
+# Ensure an empty snakePipes config doesn't muck anything up
+snakePipes config
+
 # DNA mapping
 WC=`DNA-mapping -i PE_input -o output .ci_stuff/organism.yaml --snakemakeOptions " --dryrun --conda-prefix /tmp" | tee >(cat 1>&2) | grep -v "Conda environment" | wc -l`
 if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 886 ]; then exit 1 ; fi
