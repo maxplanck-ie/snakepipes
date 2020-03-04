@@ -1,6 +1,11 @@
 snakePipes News
 ===============
 
+snakePipes 2.0.1
+----------------
+
+ * Fixed a bug in `snakePipes config` that caused the `toolsVersion` variable to be removed from `defaults.yaml`. This is likely related to issue #579.
+
 snakePipes 2.0.0
 ----------------
 
