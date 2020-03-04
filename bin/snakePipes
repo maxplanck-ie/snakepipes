@@ -100,6 +100,11 @@ def parse_arguments():
                                    "(Default: %(default)s)",
                               default=defaults['tempDir'])
 
+    configParser.add_argument('--noToolsversion',
+                              dest='toolsVersion',
+                              help="By default, tool versions are printed to a workflow-specific file. Specifying this disables that behavior.",
+                              action="store_false")
+
     email = configParser.add_argument_group(title="Email/SMTP options", description="These options are only used if/when --emailAddress is used.")
     email.add_argument('--smtpServer',
                        help="SMTP server address. (Default: %(default)s)",
@@ -302,7 +307,8 @@ def updateConfig(args):
          'onlySSL': args.onlySSL,
          'emailSender': args.emailSender,
          'smtpUsername': args.smtpUsername,
-         'smtpPassword': args.smtpPassword
+         'smtpPassword': args.smtpPassword,
+         'toolsVersion': args.toolsVersion
         }
     baseDir = os.path.dirname(snakePipes.__file__)
     cof.write_configfile(os.path.join(baseDir, "shared", "defaults.yaml"), d)
