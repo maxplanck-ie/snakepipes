@@ -100,7 +100,7 @@ def parse_arguments():
                                    "(Default: %(default)s)",
                               default=defaults['tempDir'])
 
-    configParser.add_argument('--noToolsversion',
+    configParser.add_argument('--noToolsVersion',
                               dest='toolsVersion',
                               help="By default, tool versions are printed to a workflow-specific file. Specifying this disables that behavior.",
                               action="store_false")
@@ -311,6 +311,9 @@ def updateConfig(args):
          'toolsVersion': args.toolsVersion
         }
     baseDir = os.path.dirname(snakePipes.__file__)
+    # Load, update and rewrite the default dictionary
+    currentDict = cof.load_configfile(os.path.join(baseDir, "shared", "defaults.yaml"), False)
+    cof.merge_dicts(currentDict, d)
     cof.write_configfile(os.path.join(baseDir, "shared", "defaults.yaml"), d)
 
 
