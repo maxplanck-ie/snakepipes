@@ -507,14 +507,14 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
                                configFile=os.path.join(args.outdir, '{}.config.yaml'.format(workflowName))).split()
 
     # Produce the DAG if desired
-    if args.createDAG:
-        oldVerbose = config['verbose']
-        config['verbose'] = False
-        write_configfile(os.path.join(args.outdir, '{}.config.yaml'.format(workflowName)), config)
-        DAGproc = subprocess.Popen(" ".join(snakemake_cmd + ["--rulegraph"]), stdout=subprocess.PIPE, shell=True)
-        subprocess.check_call("dot -Tpdf -o{}/{}_pipeline.pdf".format(args.outdir, workflowName), stdin=DAGproc.stdout, shell=True)
-        config['verbose'] = oldVerbose
-        write_configfile(os.path.join(args.outdir, '{}.config.yaml'.format(workflowName)), config)
+    #if args.createDAG:
+        #oldVerbose = config['verbose']
+        #config['verbose'] = False
+        #write_configfile(os.path.join(args.outdir, '{}.config.yaml'.format(workflowName)), config)
+        #DAGproc = subprocess.Popen(" ".join(snakemake_cmd + ["--rulegraph"]), stdout=subprocess.PIPE, shell=True)
+        #subprocess.check_call("dot -Tpdf -o{}/{}_pipeline.pdf".format(args.outdir, workflowName), stdin=DAGproc.stdout, shell=True)
+        #config['verbose'] = oldVerbose
+        #write_configfile(os.path.join(args.outdir, '{}.config.yaml'.format(workflowName)), config)
 
     if args.verbose:
         snakemake_cmd.append("--printshellcmds")
@@ -524,6 +524,20 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
                           os.path.join(args.outdir, '{}.cluster_config.yaml'.format(workflowName)),
                           "--cluster", "'" + cluster_config["snakemake_cluster_cmd"], "'"]
     return " ".join(snakemake_cmd)
+
+
+def print_DAG(args,snakemake_cmd,callingScript,defaults):
+    if args.createDAG:
+        config = defaults
+        config.update(vars(args))
+        workflowName = os.path.basename(callingScript)
+        oldVerbose = config['verbose']
+        config['verbose'] = False
+        write_configfile(os.path.join(args.outdir, '{}.config.yaml'.format(workflowName)), config)
+        DAGproc = subprocess.Popen(snakemake_cmd + " --rulegraph ", stdout=subprocess.PIPE, shell=True)
+        subprocess.check_call("dot -Tpdf -o{}/{}_pipeline.pdf".format(args.outdir, workflowName), stdin=DAGproc.stdout, shell=True)
+        config['verbose'] = oldVerbose
+        write_configfile(os.path.join(args.outdir, '{}.config.yaml'.format(workflowName)), config)
 
 
 def logAndExport(args, workflowName):
