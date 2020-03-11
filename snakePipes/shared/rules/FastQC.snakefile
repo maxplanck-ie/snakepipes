@@ -17,7 +17,7 @@ else:
     if pairedEnd:
         rule FastQC:
             input:
-                "FASTQ/{sample}{read}.fastq.gz"
+                "EXTERNAL_BAM/{sample}."+bamExt if fromBAM else "FASTQ/{sample}{read}.fastq.gz"
             output:
                 "FastQC/{sample}{read}_fastqc.html"
             log:
@@ -32,7 +32,7 @@ else:
     else:
         rule FastQC_singleEnd:
             input:
-                "FASTQ/{sample}"+reads[0]+".fastq.gz"
+                "EXTERNAL_BAM/{sample}."+bamExt if fromBAM else "FASTQ/{sample}"+reads[0]+".fastq.gz"
             output:
                 "FastQC/{sample}"+reads[0]+"_fastqc.html"
             params:
