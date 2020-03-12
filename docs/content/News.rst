@@ -1,6 +1,11 @@
 snakePipes News
 ===============
 
+snakePipes 2.0.2
+----------------
+
+ * Bugfixes
+
 snakePipes 2.0.1
 ----------------
 
