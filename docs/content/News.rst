@@ -4,7 +4,9 @@ snakePipes News
 snakePipes 2.0.2
 ----------------
 
- * Bugfixes
+ * DAG print is now moved to _after_ workflow run execution such that any error messages from e.g. input file evaluation do not interfere with the DAG and are visible to the user.
+ * Fixed fastqc for --forBAM .
+ * Fixed DESeq2 report failure with just 1 DEG.
 
 snakePipes 2.0.1
 ----------------
