@@ -506,16 +506,6 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
                                tempDir=cfg["tempDir"],
                                configFile=os.path.join(args.outdir, '{}.config.yaml'.format(workflowName))).split()
 
-    # Produce the DAG if desired
-    #if args.createDAG:
-        #oldVerbose = config['verbose']
-        #config['verbose'] = False
-        #write_configfile(os.path.join(args.outdir, '{}.config.yaml'.format(workflowName)), config)
-        #DAGproc = subprocess.Popen(" ".join(snakemake_cmd + ["--rulegraph"]), stdout=subprocess.PIPE, shell=True)
-        #subprocess.check_call("dot -Tpdf -o{}/{}_pipeline.pdf".format(args.outdir, workflowName), stdin=DAGproc.stdout, shell=True)
-        #config['verbose'] = oldVerbose
-        #write_configfile(os.path.join(args.outdir, '{}.config.yaml'.format(workflowName)), config)
-
     if args.verbose:
         snakemake_cmd.append("--printshellcmds")
 
@@ -526,7 +516,7 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
     return " ".join(snakemake_cmd)
 
 
-def print_DAG(args,snakemake_cmd,callingScript,defaults):
+def print_DAG(args, snakemake_cmd, callingScript, defaults):
     if args.createDAG:
         config = defaults
         config.update(vars(args))
