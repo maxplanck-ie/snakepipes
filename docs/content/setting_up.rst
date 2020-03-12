@@ -290,10 +290,10 @@ Test data
 
 Test data for the various workflows is available at the following locations:
 
- - `DNA mapping <https://zenodo.org/record/1346303>`__
+ - `DNA mapping <https://zenodo.org/record/3707259>`__
  - `ChIP-seq <https://zenodo.org/record/2624281>`__
- - `ATAC-seq <https://zenodo.org/record/2624323>`__
- - `RNA-seq <https://zenodo.org/record/2624408>`__
- - `HiC <https://zenodo.org/record/2624479>`__
- - `WGBS <https://zenodo.org/record/2624498>`__
- - `scRNA-seq <https://zenodo.org/record/2624518>`__
+ - `ATAC-seq <https://zenodo.org/record/3707666>`__
+ - `mRNA-seq <https://zenodo.org/record/3707602>`__
+ - `HiC <https://zenodo.org/record/3707714>`__
+ - `WGBS <https://zenodo.org/record/3707727>`__
+ - `scRNA-seq <https://zenodo.org/record/3707747>`__
