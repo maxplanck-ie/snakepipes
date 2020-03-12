@@ -8,6 +8,7 @@ snakePipes 2.0.2
  * Fixed fastqc for --forBAM .
  * Fixed DESeq2 report failure with just 1 DEG.
  * Updated links to test data and commands on zenodo in the docs.
+ * SampleSheet check now explicitly checks for tab-delimited header.
 
 snakePipes 2.0.1
 ----------------
