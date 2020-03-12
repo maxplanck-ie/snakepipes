@@ -320,11 +320,11 @@ def check_sample_info_header(sampleSheet_file):
     if not os.path.isfile(sampleSheet_file):
         sys.exit("ERROR: Cannot find sample info file! (--sampleSheet {})\n".format(sampleSheet_file))
     sampleSheet_file = os.path.abspath(sampleSheet_file)
-    ret = open(sampleSheet_file).read().split("\n")[0].split()
+    ret = open(sampleSheet_file).read().split("\n")[0].split("\t")
     if "name" in ret and "condition" in ret:
-        sys.stderr.write("Sample sheet found and format is ok!\n")
+        sys.stderr.write("Sample sheet found and header is ok!\n")
     else:
-        sys.exit("ERROR: Please use 'name' and 'condition' as column headers in sample info file! ({})\n".format(sampleSheet_file))
+        sys.exit("ERROR: Please use 'name' and 'condition' as column headers in sample info file! Please use a tab-delimited file! ({})\n".format(sampleSheet_file))
     return sampleSheet_file
 
 
