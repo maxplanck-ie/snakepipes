@@ -294,6 +294,7 @@ Test data for the various workflows is available at the following locations:
  - `ChIP-seq <https://zenodo.org/record/2624281>`__
  - `ATAC-seq <https://zenodo.org/record/3707666>`__
  - `mRNA-seq <https://zenodo.org/record/3707602>`__
+ - `noncoding-RNA-seq <https://zenodo.org/deposit/3707749>`__
  - `HiC <https://zenodo.org/record/3707714>`__
  - `WGBS <https://zenodo.org/record/3707727>`__
  - `scRNA-seq <https://zenodo.org/record/3707747>`__
