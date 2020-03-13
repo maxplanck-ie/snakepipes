@@ -35,6 +35,9 @@ infiles = sprintf("MethylDackel/%s_CpG.bedGraph", ss$name)
 
 g1 = which(ss$condition == groups[1])
 g2 = which(ss$condition == groups[2])
+
+message(sprintf("Samples belonging to group 1 (%s) are %s",groups[1],ss$name[g1]))
+message(sprintf("Samples belonging to group 2 (%s) are %s",groups[2],ss$name[g2]))
 ```
 
 # Overview
