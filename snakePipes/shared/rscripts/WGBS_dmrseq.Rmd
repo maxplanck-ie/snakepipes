@@ -35,6 +35,9 @@ infiles = sprintf("MethylDackel/%s_CpG.bedGraph", ss$name)
 
 g1 = which(ss$condition == groups[1])
 g2 = which(ss$condition == groups[2])
+
+message(sprintf("Samples belonging to group 1 (%s) are %s",groups[1],paste(ss$name[g1],collapse=" ")))
+message(sprintf("Samples belonging to group 2 (%s) are %s",groups[2],paste(ss$name[g2],collapse=" ")))
 ```
 
 # Overview
@@ -67,7 +70,7 @@ Using a minimum methylation difference of `r minMethDiff` and FDR of `r FDR` the
 
 ```{r warning=FALSE, message=FALSE}
 if (length(regions) > 0) {
-  g = ggplot(as.data.frame(regions), aes(x=beta)) + geom_histogram() + labs(x="Methylation Difference (per-DMR)")
+  g = ggplot(as.data.frame(regions,stringsAsFactors=FALSE), aes(x=beta)) + geom_histogram() + labs(x="Methylation Difference (per-DMR)")
   g = g + geom_vline(xintercept=minMethDiff) + geom_vline(xintercept=-1*minMethDiff)
   g
 } else {
@@ -79,7 +82,7 @@ Similarly, the test statistic, which is used to compute the p-value, is shown be
 
 ```{r warning=FALSE, message=FALSE}
 if (length(regions) > 0) {
-  g = ggplot(as.data.frame(regions), aes(x=stat)) + geom_histogram() + labs(x="Methylation Difference Statistic")
+  g = ggplot(as.data.frame(regions,stringsAsFactors=FALSE), aes(x=stat)) + geom_histogram() + labs(x="Methylation Difference Statistic")
   g
 } else { 
   message('No DMRs found.')
@@ -90,7 +93,7 @@ It can be useful to plot the unadjusted p-values for the DMRs to help in diagnos
 
 ```{r warning=FALSE, message=FALSE}
 if (length(regions) > 0) {
-  g = ggplot(as.data.frame(regions), aes(x=pval)) + geom_histogram(bins=100) + labs(x="Unadjusted p-value")
+  g = ggplot(as.data.frame(regions,stringsAsFactors=FALSE), aes(x=pval)) + geom_histogram() + labs(x="Unadjusted p-value")
   print(g)
 } else {
   message('No DMRs found.')
