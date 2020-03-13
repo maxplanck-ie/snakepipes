@@ -93,7 +93,7 @@ It can be useful to plot the unadjusted p-values for the DMRs to help in diagnos
 
 ```{r warning=FALSE, message=FALSE}
 if (length(regions) > 0) {
-  g = ggplot(as.data.frame(regions), aes(x=pval)) + geom_histogram(bins=100) + labs(x="Unadjusted p-value")
+  g = ggplot(as.data.frame(regions), aes(x=pval)) + geom_histogram(binwidth=0.01) + labs(x="Unadjusted p-value")
   print(g)
 } else {
   message('No DMRs found.')
