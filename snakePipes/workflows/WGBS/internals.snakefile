@@ -58,8 +58,6 @@ def getGroups(sampleSheet):
     groups = set()
     conditionIdx = None
     f = open(sampleSheet)
-    #line = f.readline()
-    #cols = line.strip().split("\t")
     for idx, line in enumerate(f):
         cols = line.strip().split("\t")
         if idx == 0:
