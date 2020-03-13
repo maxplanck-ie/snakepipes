@@ -1,6 +1,21 @@
 snakePipes News
 ===============
 
+snakePipes 2.0.2
+----------------
+
+ * DAG print is now moved to _after_ workflow run execution such that any error messages from e.g. input file evaluation do not interfere with the DAG and are visible to the user.
+ * Fixed fastqc for --forBAM .
+ * Fixed DESeq2 report failure with just 1 DEG.
+ * Updated links to test data and commands on zenodo in the docs.
+ * SampleSheet check now explicitly checks for tab-delimited header.
+ * Fixed metilene groups, as well methylation density plots in WGBS.
+
+snakePipes 2.0.1
+----------------
+
+ * Fixed a bug in `snakePipes config` that caused the `toolsVersion` variable to be removed from `defaults.yaml`. This is likely related to issue #579.
+
 snakePipes 2.0.0
 ----------------
 
