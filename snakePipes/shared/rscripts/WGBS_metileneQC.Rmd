@@ -18,7 +18,7 @@ gtfFile = snakemake@params[["genes_gtf"]]
 FDR = snakemake@params[["FDR"]]
 minMethDiff = snakemake@params[["minMethDiff"]]
 # Only a single output file is allows for Rmd files
-outputTxtFile = sprintf("%s/DMRs.FDR%s.annotated.txt", snakemake@params[["FDR"]], snakemake@params[["outdir"]])
+outputTxtFile = sprintf("%s/DMRs.FDR%s.annotated.txt", snakemake@params[["outdir"]], snakemake@params[["FDR"]])
 outputDiffMethyl = sprintf("%s/MethylationDensity.png", snakemake@params[["outdir"]])
 outputQValue = sprintf("%s/QValueDistribution.png", snakemake@params[["outdir"]])
 outputVolcano = sprintf("%s/Volcano.png", snakemake@params[["outdir"]])

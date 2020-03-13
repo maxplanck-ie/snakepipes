@@ -103,7 +103,7 @@ The p-value distribution for the DMLs should be relatively flat with a spike nea
 
 ```{r echo=FALSE, warning=FALSE, message=FALSE}
 if(!is.null(dmls) && !is.list(dmls) && nrow(dmls) > 0) {
-  ggplot(dmlT, aes(x=pval)) + geom_histogram(binwidth=0.01) + labs(x="Unadjusted p-value (per-CpG)")
+  ggplot(dmlT, aes(x=pval)) + geom_histogram(binwidth=0.005) + labs(x="Unadjusted p-value (per-CpG)")
 } else {
   message('No DMLs found.')
 }
