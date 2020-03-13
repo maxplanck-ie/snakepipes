@@ -100,6 +100,11 @@ def parse_arguments():
                                    "(Default: %(default)s)",
                               default=defaults['tempDir'])
 
+    configParser.add_argument('--noToolsVersion',
+                              dest='toolsVersion',
+                              help="By default, tool versions are printed to a workflow-specific file. Specifying this disables that behavior.",
+                              action="store_false")
+
     email = configParser.add_argument_group(title="Email/SMTP options", description="These options are only used if/when --emailAddress is used.")
     email.add_argument('--smtpServer',
                        help="SMTP server address. (Default: %(default)s)",
@@ -273,8 +278,13 @@ def createCondaEnvs(args):
         # Don't actually create the env if either --info is set or it already exists and --force is NOT set
         if not args.info:
             if not os.path.exists(os.path.join(condaDirUse, h)) or args.force:
-                os.makedirs(os.path.join(condaDirUse, h), exist_ok=True)
-                subprocess.check_call(cmd)
+                try:
+                    os.makedirs(os.path.join(condaDirUse, h), exist_ok=True)
+                    subprocess.check_call(cmd)
+                except:
+                    # Ensure an environment is fully removed on error
+                    shutil.rmtree(os.path.join(condaDirUse, h), ignore_errors=False)
+                    sys.exit("There was an error when creating the environments!\n")
 
         # Ignore site-packages
         if args.noSitePackages and not args.info:
@@ -297,9 +307,13 @@ def updateConfig(args):
          'onlySSL': args.onlySSL,
          'emailSender': args.emailSender,
          'smtpUsername': args.smtpUsername,
-         'smtpPassword': args.smtpPassword
+         'smtpPassword': args.smtpPassword,
+         'toolsVersion': args.toolsVersion
         }
     baseDir = os.path.dirname(snakePipes.__file__)
+    # Load, update and rewrite the default dictionary
+    currentDict = cof.load_configfile(os.path.join(baseDir, "shared", "defaults.yaml"), False)
+    cof.merge_dicts(currentDict, d)
     cof.write_configfile(os.path.join(baseDir, "shared", "defaults.yaml"), d)
 
 

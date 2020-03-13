@@ -107,7 +107,7 @@ if optDedupDist > 0:
                 clumpify.sh -Xmx{params.mem} \
                             {params.clumpifyOptions} \
                             in={input.r1} \
-                            out={input.tempOut} \
+                            out={output.tempOut} \
                             dupedist={params.optDedupDist} \
                             threads={threads} > {log.stdout} 2> {log.stderr}
 

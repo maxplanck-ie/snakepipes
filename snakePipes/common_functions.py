@@ -21,6 +21,8 @@ def set_env_yamls():
             'CONDA_CREATE_INDEX_ENV': 'envs/createIndices.yaml',
             'CONDA_RNASEQ_ENV': 'envs/rna_seq.yaml',
             'CONDA_scRNASEQ_ENV': 'envs/sc_rna_seq.yaml',
+            'CONDA_seurat3_ENV': 'envs/sc_rna_seq_seurat3.yaml',
+            'CONDA_loompy_ENV': 'envs/sc_rna_seq_loompy.yaml',
             'CONDA_DNA_MAPPING_ENV': 'envs/dna_mapping.yaml',
             'CONDA_CHIPSEQ_ENV': 'envs/chip_seq.yaml',
             'CONDA_HISTONE_HMM_ENV': 'envs/histone_hmm.yaml',
@@ -49,6 +51,26 @@ def sanity_dict_clean(myDict):
         if myDict and k in myDict:
             del myDict[k]
     return myDict
+
+
+def namesOKinR(sampleNames):
+    """
+    Return nothing, but print warning to the screen
+    if any of the sample names will get munged by R.
+    """
+    reservedWords = set(["NULL", "NA", "TRUE", "FALSE", "Inf", "NaN", "NA_integer_", "NA_real_",
+                         "NA_character_", "NA_complex_", "function", "while", "repeat", "for",
+                         "if", "in", "else", "next", "break", "..."])
+    for sampleName in sampleNames:
+        # Starts with A-Za-z or .
+        if (not sampleName[0].isalpha()) and (not sampleName[0] == "."):
+            sys.stderr.write("Any steps involving R packages will fail if sample names do not start with a letter or '.'. {} is not compatible and will fail these!\n".format(sampleName))
+        # reserved word
+        if sampleName in reservedWords:
+            sys.stderr.write("{} is a reserved keyword in R, so if there are steps using R they will fail!\n".format(sampleName))
+        # invalid characters, which is everything except alpha numeric, . and _
+        if not all([(x.isalnum() or x in ["_", "."]) for x in sampleName]):
+            sys.stderr.write("R requires that all samples names contain ONLY letters, number, '_' or '.', so {} is invalid and may cause failure in steps using R!\n".format(sampleName))
 
 
 def load_configfile(configFiles, verbose, info='Config'):
@@ -298,11 +320,11 @@ def check_sample_info_header(sampleSheet_file):
     if not os.path.isfile(sampleSheet_file):
         sys.exit("ERROR: Cannot find sample info file! (--sampleSheet {})\n".format(sampleSheet_file))
     sampleSheet_file = os.path.abspath(sampleSheet_file)
-    ret = open(sampleSheet_file).read().split("\n")[0].split()
+    ret = open(sampleSheet_file).read().split("\n")[0].split("\t")
     if "name" in ret and "condition" in ret:
-        sys.stderr.write("Sample sheet found and format is ok!\n")
+        sys.stderr.write("Sample sheet found and header is ok!\n")
     else:
-        sys.exit("ERROR: Please use 'name' and 'condition' as column headers in sample info file! ({})\n".format(sampleSheet_file))
+        sys.exit("ERROR: Please use 'name' and 'condition' as column headers in sample info file! Please use a tab-delimited file! ({})\n".format(sampleSheet_file))
     return sampleSheet_file
 
 
@@ -484,16 +506,6 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
                                tempDir=cfg["tempDir"],
                                configFile=os.path.join(args.outdir, '{}.config.yaml'.format(workflowName))).split()
 
-    # Produce the DAG if desired
-    if args.createDAG:
-        oldVerbose = config['verbose']
-        config['verbose'] = False
-        write_configfile(os.path.join(args.outdir, '{}.config.yaml'.format(workflowName)), config)
-        DAGproc = subprocess.Popen(" ".join(snakemake_cmd + ["--rulegraph"]), stdout=subprocess.PIPE, shell=True)
-        subprocess.check_call("dot -Tpdf -o{}/{}_pipeline.pdf".format(args.outdir, workflowName), stdin=DAGproc.stdout, shell=True)
-        config['verbose'] = oldVerbose
-        write_configfile(os.path.join(args.outdir, '{}.config.yaml'.format(workflowName)), config)
-
     if args.verbose:
         snakemake_cmd.append("--printshellcmds")
 
@@ -502,6 +514,20 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
                           os.path.join(args.outdir, '{}.cluster_config.yaml'.format(workflowName)),
                           "--cluster", "'" + cluster_config["snakemake_cluster_cmd"], "'"]
     return " ".join(snakemake_cmd)
+
+
+def print_DAG(args, snakemake_cmd, callingScript, defaults):
+    if args.createDAG:
+        config = defaults
+        config.update(vars(args))
+        workflowName = os.path.basename(callingScript)
+        oldVerbose = config['verbose']
+        config['verbose'] = False
+        write_configfile(os.path.join(args.outdir, '{}.config.yaml'.format(workflowName)), config)
+        DAGproc = subprocess.Popen(snakemake_cmd + " --rulegraph ", stdout=subprocess.PIPE, shell=True)
+        subprocess.check_call("dot -Tpdf -o{}/{}_pipeline.pdf".format(args.outdir, workflowName), stdin=DAGproc.stdout, shell=True)
+        config['verbose'] = oldVerbose
+        write_configfile(os.path.join(args.outdir, '{}.config.yaml'.format(workflowName)), config)
 
 
 def logAndExport(args, workflowName):

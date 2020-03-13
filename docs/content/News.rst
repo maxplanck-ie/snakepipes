@@ -1,12 +1,31 @@
 snakePipes News
 ===============
 
+snakePipes 2.0.2
+----------------
+
+ * DAG print is now moved to _after_ workflow run execution such that any error messages from e.g. input file evaluation do not interfere with the DAG and are visible to the user.
+ * Fixed fastqc for --forBAM .
+ * Fixed DESeq2 report failure with just 1 DEG.
+ * Updated links to test data and commands on zenodo in the docs.
+ * SampleSheet check now explicitly checks for tab-delimited header.
+
+snakePipes 2.0.1
+----------------
+
+ * Fixed a bug in `snakePipes config` that caused the `toolsVersion` variable to be removed from `defaults.yaml`. This is likely related to issue #579.
+
 snakePipes 2.0.0
 ----------------
 
  * Added a noncoding-RNA-seq workflow and renamed RNA-seq to mRNA-seq for clarity. The noncoding workflow will also quantify protein coding genes, but its primary use is analyzing repeat expression.
  * In order to use the noncoding-RNA-seq workflow organism YAML files must now include a `rmsk_file` entry.
  * Fixed STAR on CIFS mounted VFAT file systems (issue #537).
+ * Added mode STARsolo to scRNAseq. This mode is now default.
+ * Added log fold change shrinkage with "apeglm" to DESeq2 basic in the mRNAseq workflow. Two versions of results tables (with and without shrinkage) are now written to the DESeq2 output folder.
+ * Added Genrich as peakCaller option to ChIPseq and ATACseq.
+ * Added HMMRATAC as peakCaller option to ATACseq.
+ * ATAC-seq short bam (filtered for short fragments) is now stored in a separate folder.
 
 .. note::
    Please be aware that this version requires regeneration of STAR indices!

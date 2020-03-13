@@ -34,7 +34,7 @@ d = data.frame(chr=seqnames(bs),
                pos=start(bs))
 m = 100 * getMeth(bs, type="raw")
 d = cbind(d, m)
-colnames(d)[3:ncol(d)] = sprintf("%s_%s", ss$name, ss$condition)
+colnames(d)[3:ncol(d)] = sprintf("%s_%s", ss$condition, ss$name)
 
 write.table(d, file=snakemake@output[["MetileneIN"]], sep="\t", row.names=FALSE, quote=FALSE)
 

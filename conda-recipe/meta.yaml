@@ -1,6 +1,6 @@
 package:
   name: snakepipes
-  version: 2.0.0
+  version: 2.0.2
 
 source:
   path: ../
@@ -10,7 +10,7 @@ build:
   noarch: python
 
 requirements:
-  build:
+  host:
     - python >=3
   run:
     - python >=3

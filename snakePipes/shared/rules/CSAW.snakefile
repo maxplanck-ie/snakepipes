@@ -3,7 +3,10 @@ change_direction = ["UP", "DOWN", "MIXED"]
 
 def getInputPeaks(peakCaller, chip_samples, genrichDict):
     if peakCaller == "MACS2":
-        return expand("MACS2/{chip_sample}.filtered.BAM_peaks.xls", chip_sample = chip_samples)
+        if pipeline in 'ATAC-seq':
+            return expand("MACS2/{chip_sample}.filtered.short.BAM_peaks.xls", chip_sample = chip_samples)
+        else:
+            return expand("MACS2/{chip_sample}.filtered.BAM_peaks.xls", chip_sample = chip_samples)
     elif peakCaller == "HMMRATAC":
         return expand("HMMRATAC/{chip_sample}_peaks.gappedPeak", chip_sample = chip_samples)
     else:
@@ -33,8 +36,9 @@ rule CSAW:
         importfunc = os.path.join("shared", "rscripts", "DB_functions.R"),
         allele_info = allele_info,
         yaml_path=lambda wildcards: samples_config if pipeline in 'chip-seq' else "",
-        insert_size_metrics=os.path.join(outdir,"deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv") if pairedEnd else []
-    log: 
+        insert_size_metrics=os.path.join(outdir,"deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv") if pairedEnd else [],
+        pipeline = pipeline
+    log:
         out = os.path.join(outdir, "CSAW_{}_{}/logs/CSAW.out".format(peakCaller, sample_name)),
         err = os.path.join(outdir, "CSAW_{}_{}/logs/CSAW.err".format(peakCaller, sample_name))
     conda: CONDA_ATAC_ENV
@@ -49,7 +53,7 @@ if allele_info == 'FALSE':
                 bigwigs = expand("deepTools_ChIP/bamCompare/{chip_sample}.filtered.log2ratio.over_{control_name}.bw", zip, chip_sample=filtered_dict.keys(), control_name=filtered_dict.values()),
                 sampleSheet = sampleSheet
             output:
-                matrix = "CSAW_{}_{}".format(peakCaller, sample_name)+"/CSAW.{change_dir}.log2r.matrix"
+                matrix = touch("CSAW_{}_{}".format(peakCaller, sample_name)+"/CSAW.{change_dir}.log2r.matrix")
             params:
                 bed_in = "CSAW_{}_{}".format(peakCaller, sample_name)+"/Filtered.results.{change_dir}.bed"
             log:
@@ -60,7 +64,7 @@ if allele_info == 'FALSE':
             shell: """
                 touch {log.out}
                 touch {log.err}
-                if [ -s {params.bed_in} ]; then
+                if [[ -s {params.bed_in} ]]; then
                     computeMatrix scale-regions -S {input.bigwigs} -R {params.bed_in} -m 1000 -b 200 -a 200 -o {output.matrix} -p {threads} >{log.out} 2>{log.err}
                 fi
                 """
@@ -70,8 +74,8 @@ if allele_info == 'FALSE':
             input:
                 matrix = "CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.log2r.matrix"
             output:
-                image = "CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.log2r.heatmap.png",
-                sorted_regions = "CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.log2r.sortedRegions.bed"
+                image = touch("CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.log2r.heatmap.png"),
+                sorted_regions = touch("CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.log2r.sortedRegions.bed")
             params:
                 smpl_label=' '.join(filtered_dict.keys())
             log:
@@ -81,14 +85,14 @@ if allele_info == 'FALSE':
             shell: """
                 touch {log.out}
                 touch {log.err}
-                if [ -s {input.matrix} ]; then 
+                if [[ -s {input.matrix} ]]; then
                     plotHeatmap --matrixFile {input.matrix} \
                                 --outFileSortedRegions {output.sorted_regions} \
                                 --outFileName {output.image} \
                                 --startLabel Start --endLabel End \
                                 --legendLocation lower-center \
                                 -x 'Scaled peak length' --labelRotation 90 \
-                                --samplesLabel {params.smpl_label} > {log.out} 2> {log.err}
+                                --samplesLabel {params.smpl_label} --colorMap "coolwarm" > {log.out} 2> {log.err}
                 fi
                 """
 
@@ -99,7 +103,7 @@ if allele_info == 'FALSE':
             bigwigs = expand("bamCoverage/{chip_sample}.filtered.seq_depth_norm.bw", chip_sample=filtered_dict.keys()),
             sampleSheet = sampleSheet
         output:
-            matrix = "CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.cov.matrix"
+            matrix = touch("CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.cov.matrix")
         params:
             bed_in = "CSAW_{}_{}".format(peakCaller, sample_name) + "/Filtered.results.{change_dir}.bed"
         log:
@@ -110,8 +114,9 @@ if allele_info == 'FALSE':
         shell: """
             touch {log.out}
             touch {log.err}
-            if [ -s {params.bed_in} ]; then
-                computeMatrix scale-regions -S {input.bigwigs} -R {params.bed_in} -m 1000 -b 200 -a 200 -o {output.matrix} -p {threads} >{log.out} 2>{log.err}
+            if [[ -s {params.bed_in} ]]; then
+                computeMatrix scale-regions -S {input.bigwigs} -R {params.bed_in} \
+                -m 1000 -b 200 -a 200 -o {output.matrix} -p {threads} >{log.out} 2>{log.err}
             fi
             """
 
@@ -120,8 +125,8 @@ if allele_info == 'FALSE':
         input:
             matrix = "CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.cov.matrix"
         output:
-            image = "CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.cov.heatmap.png",
-            sorted_regions = "CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.cov.sortedRegions.bed"
+            image = touch("CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.cov.heatmap.png"),
+            sorted_regions = touch("CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.cov.sortedRegions.bed")
         params:
             smpl_label=' '.join(filtered_dict.keys())
         log:
@@ -131,13 +136,13 @@ if allele_info == 'FALSE':
         shell: """
             touch {log.out}
             touch {log.err}
-            if [ -s {input.matrix} ]; then
+            if [[ -s {input.matrix} ]]; then
                 plotHeatmap --matrixFile {input.matrix} \
                             --outFileSortedRegions {output.sorted_regions} \
                             --outFileName {output.image} --startLabel Start \
                             --endLabel End --legendLocation lower-center \
                             -x 'Scaled peak length' --labelRotation 90 \
-                            --samplesLabel {params.smpl_label} >{log.out} 2>{log.err}
+                            --samplesLabel {params.smpl_label} --colorMap "coolwarm" >{log.out} 2>{log.err}
             fi
             """
 
@@ -145,7 +150,10 @@ if allele_info == 'FALSE':
     rule CSAW_report:
         input:
             csaw_in = "CSAW_{}_{}/CSAW.session_info.txt".format(peakCaller, sample_name),
-            heatmap_in=lambda wildcards: expand("CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.cov.heatmap.png", change_dir=['UP','DOWN']) if pipeline in 'ATAC-seq' else expand("CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.cov.heatmap.png", change_dir=['UP','DOWN']) + expand("CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.log2r.heatmap.png", change_dir=['UP', 'DOWN'])
+            heatmap_in=lambda wildcards: expand("CSAW_{}_{}".format(peakCaller, sample_name) +\
+             "/CSAW.{change_dir}.cov.heatmap.png", change_dir=['UP','DOWN']) if pipeline in 'ATAC-seq' \
+             else expand("CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.cov.heatmap.png", change_dir=['UP','DOWN']) +\
+              expand("CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.log2r.heatmap.png", change_dir=['UP', 'DOWN'])
         output:
             outfile="CSAW_{}_{}/CSAW.Stats_report.html".format(peakCaller, sample_name)
         params:

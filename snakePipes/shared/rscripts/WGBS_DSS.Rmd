@@ -149,7 +149,8 @@ If there were DMRs, the first 10 (assuming there were that many) ordered by the 
 if(!is.null(dmrs) && nrow(dmrs) > 0) {
   foo = min(10, nrow(dmrs))
   for(i in 1:foo) {
-    print(showOneDMR(dmrs[i,], bs))
+    showOneDMR(dmrs[i,], bs)
+    cat(sprintf("%s:%i-%i\n", dmrs[i,1], dmrs[i,2], dmrs[i,3]))
   }
 } else {
   message("No DMRs found.")

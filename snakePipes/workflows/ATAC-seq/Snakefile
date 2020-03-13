@@ -18,6 +18,7 @@ globals().update(cf.load_organism_data(genome, maindir, config["verbose"]))
 cf.get_version()
 
 outdir_MACS2 = 'MACS2/'
+short_bams = 'short_bams/'
 outdir_ATACqc = 'MACS2_QC/'
 deeptools_ATAC='deepTools_ATAC/'
 
@@ -75,9 +76,15 @@ def run_deepTools_allelic():
 
 def run_CSAW():
     if sampleSheet:
-        file_list=["CSAW_{}_{}/CSAW.session_info.txt".format(peakCaller, sample_name),"Annotation/genes.filtered.symbol","Annotation/genes.filtered.t2g","CSAW_{}_{}/CSAW.Stats_report.html".format(peakCaller, sample_name)]
-        file_list.append([os.path.join("CSAW_{}_{}".format(peakCaller, sample_name), x) for x in list(itertools.chain.from_iterable([expand("CSAW.{change_dir}.cov.matrix",change_dir=change_direction),expand("CSAW.{change_dir}.cov.heatmap.png",change_dir=change_direction)]))])
-        file_list.append([os.path.join("AnnotatedResults_{}".format(sample_name), x) for x in list(itertools.chain.from_iterable([expand("Filtered.results.{change_dir}_withNearestGene.txt",change_dir=change_direction)]))])
+        file_list=["CSAW_{}_{}/CSAW.session_info.txt".format(peakCaller, sample_name),
+                   "Annotation/genes.filtered.symbol","Annotation/genes.filtered.t2g",
+                   "CSAW_{}_{}/CSAW.Stats_report.html".format(peakCaller, sample_name)]
+        file_list.append([os.path.join("CSAW_{}_{}".format(peakCaller, sample_name), x) \
+                         for x in list(itertools.chain.from_iterable([expand("CSAW.{change_dir}.cov.matrix",\
+                         change_dir=change_direction),expand("CSAW.{change_dir}.cov.heatmap.png",change_dir=change_direction)]))])
+        file_list.append([os.path.join("AnnotatedResults_{}_{}".format(peakCaller, sample_name), x) \
+                         for x in list(itertools.chain.from_iterable([expand("Filtered.results.{change_dir}_withNearestGene.txt",\
+                         change_dir=change_direction)]))])
         return( file_list )
     else:
         return([])
@@ -151,7 +158,7 @@ onstart:
 rule all:
     input:
         #expand(os.path.join(outdir_MACS2, "{sample}.short.bam"), sample = samples),
-        expand(os.path.join(outdir_MACS2, "{sample}.filtered.BAM_peaks.xls"), sample = samples),
+        expand(os.path.join(outdir_MACS2, "{sample}.filtered.short.BAM_peaks.xls"), sample = samples),
         expand(os.path.join(outdir_ATACqc,"{sample}.filtered.BAM_peaks.qc.txt"), sample = samples),
         os.path.join(deeptools_ATAC, "plotFingerprint/plotFingerprint.metrics.txt"),
         ## run deeptools-allelic only if dir "allelic_bams" present and non empty
@@ -164,8 +171,8 @@ rule all:
         run_CSAW(),
         expand("deepTools_ATAC/bamCompare/{sample}.filtered.bw",sample=samples),
         run_deepTools_qc(fromBAM),
-        expand(os.path.join(outdir_MACS2, "{sample}.short.cleaned.bam"),sample=samples),
-        expand(os.path.join(outdir_MACS2, "{sample}.short.cleaned.bam.bai"),sample=samples),
+        expand(os.path.join(short_bams, "{sample}.short.cleaned.bam"),sample=samples),
+        expand(os.path.join(short_bams, "{sample}.short.cleaned.bam.bai"),sample=samples),
         "Filtering_metrics/Filtering_report.html"
 
 ### execute after workflow finished ############################################

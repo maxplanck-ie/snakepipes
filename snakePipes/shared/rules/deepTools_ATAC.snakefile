@@ -2,8 +2,8 @@
 
 rule bamCompare_subtract:
     input:
-        bam = os.path.join(outdir_MACS2, "{sample}.short.cleaned.bam"),
-        bai = os.path.join(outdir_MACS2, "{sample}.short.cleaned.bam.bai")
+        bam = os.path.join(short_bams, "{sample}.short.cleaned.bam"),
+        bai = os.path.join(short_bams, "{sample}.short.cleaned.bam.bai")
     output:
         "deepTools_ATAC/bamCompare/{sample}.filtered.bw"
     params:
@@ -20,4 +20,3 @@ rule bamCompare_subtract:
     threads: 16
     conda: CONDA_SHARED_ENV
     shell: bamcov_cmd
-

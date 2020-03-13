@@ -38,7 +38,7 @@ Quick start
 
 * Download genome fasta and annotations for an your organism, and build indexes, Check in :ref:`createIndices`
 
-* Download example fastq files for the human genome `here <https://zenodo.org/record/1346303>`_
+* Download example fastq files for the human genome `here <https://zenodo.org/record/3707259>`_
 
 * Execute the DNA-mapping pipeline using the example **command.sh** in the test data directory.
 

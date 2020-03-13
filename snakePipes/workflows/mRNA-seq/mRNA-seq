@@ -23,7 +23,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          "trim": False, "trimmer": "cutadapt",
                          "trimmerOptions": None, "fastqc": False,
                          "libraryType": 2, "aligner": "STAR",
-                         "alignerOptions": None, "salmonIndexOptions": "--type quasi -k 31",
+                         "alignerOptions": None, "salmonIndexOptions": "--type puff -k 31",
                          "featureCountsOptions": "-C -Q 10 --primary",
                          "filterGTF": None, "sampleSheet": None,
                          "reads": ["_R1", "_R2"], "ext": ".fastq.gz",
@@ -70,7 +70,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                           default=defaults["alignerOptions"])
 
     optional.add_argument("--salmonIndexOptions",
-                          help="Salmon index options, e.g. '--type fmd' (default: '%(default)s')",
+                          help="Salmon index options, e.g. '--type puff' (default: '%(default)s')",
                           default=defaults["salmonIndexOptions"])
 
     optional.add_argument("--featureCountsOptions",
@@ -154,6 +154,9 @@ def main():
 
     # Run everything
     cf.runAndCleanup(args, snakemake_cmd, logfile_name)
+
+    #CreateDAG
+    cf.print_DAG(args,snakemake_cmd, __file__,defaults)
 
 
 if __name__ == "__main__":

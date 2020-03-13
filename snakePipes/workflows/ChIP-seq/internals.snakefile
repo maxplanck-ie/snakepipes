@@ -3,6 +3,7 @@ import os
 import subprocess
 import re
 import yaml
+import sys
 
 
 ### Functions ##################################################################
@@ -132,9 +133,6 @@ else:
     
     bamDict = dict.fromkeys(bamSamples)
     
-    print(bamFiles)
-    print(bamSamples)
-    
     for sample in all_samples:
         if sample not in bamDict:
             sys.exit("No bam file found for chip sample {}!".format(sample))
@@ -173,4 +171,4 @@ if sampleSheet:
     filtered_dict = filter_dict(sampleSheet,dict(zip(chip_samples_w_ctrl, [ get_control_name(x) for x in chip_samples_w_ctrl ])))
     genrichDict = cf.sampleSheetGroups(sampleSheet)
 else:
-    genrichDict = {"all_samples": samples}
+    genrichDict = {"all_samples": chip_samples}

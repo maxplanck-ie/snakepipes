@@ -21,6 +21,8 @@ include: os.path.join(workflow.basedir, "internals.snakefile")
 ### include modules of other snakefiles ########################################
 ################################################################################
 
+cf.namesOKinR(samples)
+
 # deeptools cmds
 include: os.path.join(maindir, "shared", "tools" , "deeptools_cmds.snakefile")
 
@@ -137,13 +139,9 @@ def run_Trimming(trim, fastqc):
 def run_alignment_free():
     if "alignment-free" in mode:
         file_list = [
-        "Salmon/SalmonIndex/sa.bin",
         expand("Salmon/{sample}.quant.sf", sample=samples),
-        expand("Salmon/{sample}.quant.genes.sf", sample=samples),
         "Salmon/TPM.transcripts.tsv",
-        "Salmon/TPM.genes.tsv",
         "Salmon/counts.transcripts.tsv",
-        "Salmon/counts.genes.tsv",
         expand("Salmon/{sample}/abundance.h5", sample=samples) ]
 
         if sampleSheet:

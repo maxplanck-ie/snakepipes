@@ -53,13 +53,13 @@ rule plotFingerprint_allelic:
 # bc from conda segfaults
 rule MACS2_peak_qc:
     input:
-        bam = os.path.join(outdir_MACS2, "{sample}.short.cleaned.bam"),
-        bai = os.path.join(outdir_MACS2, "{sample}.short.cleaned.bam.bai"),
-        xls = os.path.join(outdir_MACS2, '{sample}.filtered.BAM_peaks.xls')
+        bam = os.path.join(short_bams, "{sample}.short.cleaned.bam"),
+        bai = os.path.join(short_bams, "{sample}.short.cleaned.bam.bai"),
+        xls = os.path.join(outdir_MACS2, '{sample}.filtered.short.BAM_peaks.xls')
     output:
         qc = os.path.join(outdir_ATACqc, "{sample}.filtered.BAM_peaks.qc.txt")
     params:
-        peaks = os.path.join(outdir_MACS2, '{sample}.filtered.BAM_peaks.narrowPeak'),
+        peaks = os.path.join(outdir_MACS2, '{sample}.filtered.short.BAM_peaks.narrowPeak'),
         genome_index = genome_index
     benchmark:
         os.path.join(outdir_ATACqc, ".benchmark/ATAC_qc.{sample}.filtered.benchmark")

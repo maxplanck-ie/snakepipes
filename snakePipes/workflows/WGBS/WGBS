@@ -127,7 +127,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                           action="store_false")
 
     optional.add_argument("--DMRprograms",
-                          help="If a sample sheet is provided, use the specified DMR-calling programs. Multiple programs can be comma-separated with no spaces (e.g., 'metilene,dmrseq,dss'). The available programs are metilene, dmrseq, and DSS (note that this is very slow). Default: %(default)s.",
+                          help="If a sample sheet is provided, use the specified DMR-calling programs. Multiple programs can be comma-separated with no spaces (e.g., 'metilene,dmrseq,DSS'). The available programs are metilene, dmrseq, and DSS (note that this is very slow). Default: %(default)s.",
                           default=defaults["DMRprograms"])
 
     optional.add_argument("--skipDOC",
@@ -160,6 +160,9 @@ def main():
 
     # Run everything
     cf.runAndCleanup(args, snakemake_cmd, logfile_name)
+
+    #CreateDAG
+    cf.print_DAG(args,snakemake_cmd, __file__,defaults)
 
 
 if __name__ == "__main__":

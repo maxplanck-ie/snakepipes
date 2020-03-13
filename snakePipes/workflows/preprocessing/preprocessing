@@ -56,7 +56,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
     optional.add_argument("--clumpifyOptions",
                           help="Options passed to clumpify, which should generally "
                           "NOT be changed. The exception to this is with NextSeq runs, "
-                          "where 'spany=t adjacent=t' should be ADDED.",
+                          "where 'spany=t adjacent=t' should be ADDED. (default: '%(default)s)",
                           default=defaults["clumpifyOptions"])
 
     optional.add_argument("--clumpifyMemory",
@@ -135,6 +135,9 @@ def main():
 
     # Run everything
     cf.runAndCleanup(args, snakemake_cmd, logfile_name)
+
+    #CreateDAG
+    cf.print_DAG(args,snakemake_cmd, __file__,defaults)
 
 
 if __name__ == "__main__":
