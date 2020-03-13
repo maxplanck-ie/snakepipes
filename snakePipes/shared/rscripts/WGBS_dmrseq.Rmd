@@ -70,7 +70,7 @@ Using a minimum methylation difference of `r minMethDiff` and FDR of `r FDR` the
 
 ```{r warning=FALSE, message=FALSE}
 if (length(regions) > 0) {
-  g = ggplot(as.data.frame(regions), aes(x=beta)) + geom_histogram() + labs(x="Methylation Difference (per-DMR)")
+  g = ggplot(as.data.frame(regions,stringsAsFactors=FALSE), aes(x=beta)) + geom_histogram() + labs(x="Methylation Difference (per-DMR)")
   g = g + geom_vline(xintercept=minMethDiff) + geom_vline(xintercept=-1*minMethDiff)
   g
 } else {
@@ -82,7 +82,7 @@ Similarly, the test statistic, which is used to compute the p-value, is shown be
 
 ```{r warning=FALSE, message=FALSE}
 if (length(regions) > 0) {
-  g = ggplot(as.data.frame(regions), aes(x=stat)) + geom_histogram() + labs(x="Methylation Difference Statistic")
+  g = ggplot(as.data.frame(regions,stringsAsFactors=FALSE), aes(x=stat)) + geom_histogram() + labs(x="Methylation Difference Statistic")
   g
 } else { 
   message('No DMRs found.')
@@ -93,7 +93,7 @@ It can be useful to plot the unadjusted p-values for the DMRs to help in diagnos
 
 ```{r warning=FALSE, message=FALSE}
 if (length(regions) > 0) {
-  g = ggplot(as.data.frame(regions), aes(x=pval)) + geom_histogram(binwidth=0.005) + labs(x="Unadjusted p-value")
+  g = ggplot(as.data.frame(regions,stringsAsFactors=FALSE), aes(x=pval)) + geom_histogram(binwidth=0.005) + labs(x="Unadjusted p-value")
   print(g)
 } else {
   message('No DMRs found.')
