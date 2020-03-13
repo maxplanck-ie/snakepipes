@@ -110,7 +110,7 @@ rule merge_matrices:
          err = "HiC_matrices/logs/hicSumMatrices_{group}_"+matrixFile_suffix+".err"
       conda: CONDA_HIC_ENV
       shell:
-          "hicSumMatrices -m {input} -o {output.matrix} > {log.out} &> {log.err}"
+          "hicSumMatrices -m {input} -o {output.matrix} > {log.out} 2> {log.err}"
 
 ## Merge the bins if asked
 rule merge_bins:
@@ -138,7 +138,7 @@ rule diagnostic_plot:
         chr = lambda wildcards: " --chromosomes " + chromosomes if chromosomes else ""
     conda: CONDA_HIC_ENV
     shell:
-       "hicCorrectMatrix diagnostic_plot -m {input} -o {output.plot} {params.chr} &> {output.mad} "
+       "hicCorrectMatrix diagnostic_plot -m {input} -o {output.plot} {params.chr} > {output.mad} "
 
 
 # Compute MAD score thresholds
