@@ -406,9 +406,9 @@ rule run_metilene:
     benchmark: '{}/.benchmark/run_metilene.benchmark'.format(get_outdir("metilene", minCoverage))
     conda: CONDA_WGBS_ENV
     shell: """
-        echo -e "chrom\tstart\tend\tq-value\tmean methylation difference\tnCpGs\tp (MWU)\tp (2D KS)\tmean_{params.groups[0]}\tmean_{params.groups[1]}" > {output}
-        metilene --groupA {params.groups[0]} \
-                 --groupB {params.groups[1]} \
+        echo -e "chrom\tstart\tend\tq-value\tmean methylation difference\tnCpGs\tp (MWU)\tp (2D KS)\tmean_{params.groups[1]}\tmean_{params.groups[0]}" > {output}
+        metilene --groupA {params.groups[1]} \
+                 --groupB {params.groups[0]} \
                  --maxdist {params.maxDist} \
                  --mincpgs {params.minCpGs} \
                  --minMethDiff {params.minMethDiff} \
