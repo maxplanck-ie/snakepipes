@@ -138,7 +138,7 @@ rule diagnostic_plot:
         chr = lambda wildcards: " --chromosomes " + chromosomes if chromosomes else ""
     conda: CONDA_HIC_ENV
     shell:
-       "hicCorrectMatrix diagnostic_plot -m {input} -o {output.plot} {params.chr} > {output.mad} "
+       "hicCorrectMatrix diagnostic_plot -m {input} -o {output.plot} {params.chr} 2> {output.mad} "
 
 
 # Compute MAD score thresholds
@@ -182,7 +182,7 @@ else:
          conda: CONDA_HIC_ENV
          shell:
              "hicCorrectMatrix correct --correctionMethod KR "
-             " {params.chr} -m {input.matrix} -o {output} > {log.out}"
+             " {params.chr} -m {input.matrix} -o {output} 2> {log.out}"
 
 ## Call TADs
 rule call_tads:
