@@ -58,15 +58,22 @@ def getGroups(sampleSheet):
     groups = set()
     conditionIdx = None
     f = open(sampleSheet)
-    line = f.readline()
-    cols = line.strip().split()
-    if "condition" not in cols:
-        conditionIdx = 2
-    else:
-        conditionIdx = cols.index("condition")
-    for line in f:
-        cols = line.strip().split()
-        groups.add(cols[conditionIdx])
+    for idx, line in enumerate(f):
+        cols = line.strip().split("\t")
+        if idx == 0:
+            if "condition" not in cols or "name" not in cols:
+                sys.exit("ERROR: Please use 'name' and 'condition' as column headers in the sample info file ({})!\n".format(sample_info_file))
+            conditionIdx = cols.index("condition")
+            nCols = len(cols)
+            continue
+        elif idx == 1:
+            # Sometimes there's a column of row names, which lack a header
+            if len(cols) != nCols and len(cols) - 1 != nCols:
+                sys.exit("ERROR: there's a mismatch between the number of columns in the header and body of {}!\n".format(sample_info_file))
+            if len(cols) - 1 == nCols:
+                conditionIdx += 1
+        if idx > 0:        
+            groups.add(cols[conditionIdx])
     f.close()
 
     if "Mut" in groups:
