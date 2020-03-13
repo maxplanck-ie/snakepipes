@@ -11,7 +11,7 @@ rule get_restrictionSite:
         err = "log/get_restrictionSite.err"
     conda: CONDA_HIC_ENV
     shell:
-        "findRestSite -f {input} --searchPattern {params.res_seq} -o {output} > {log.out} 2> {log.err}"
+        "hicFindRestSite -f {input} --searchPattern {params.res_seq} -o {output} > {log.out} 2> {log.err}"
 
 
 # Map
@@ -68,7 +68,8 @@ else:
     rule build_matrix:
         input:
             R1 = "BWA/{sample}"+reads[0]+".bam",
-            R2 = "BWA/{sample}"+reads[1]+".bam"
+            R2 = "BWA/{sample}"+reads[1]+".bam",
+            bed = enzyme + ".bed"
         output:
             matrix = "HiC_matrices/{sample}_"+matrixFile_suffix+matrix_format,
             qc = "HiC_matrices/QCplots/{sample}_QC/QC.log"
