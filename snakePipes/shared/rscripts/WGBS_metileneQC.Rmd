@@ -18,7 +18,7 @@ gtfFile = snakemake@params[["genes_gtf"]]
 FDR = snakemake@params[["FDR"]]
 minMethDiff = snakemake@params[["minMethDiff"]]
 # Only a single output file is allows for Rmd files
-outputTxtFile = sprintf("%s/DMRs.annotated.txt", snakemake@params[["outdir"]])
+outputTxtFile = sprintf("%s/DMRs.FDR%s.annotated.txt", snakemake@params[["outdir"]], snakemake@params[["FDR"]])
 outputDiffMethyl = sprintf("%s/MethylationDensity.png", snakemake@params[["outdir"]])
 outputQValue = sprintf("%s/QValueDistribution.png", snakemake@params[["outdir"]])
 outputVolcano = sprintf("%s/Volcano.png", snakemake@params[["outdir"]])
@@ -34,7 +34,7 @@ This report summarizes the differentially methylated region (DMR) calling with m
 ```{r echo=FALSE, warning=FALSE, message=FALSE}
 # Read in the input data
 d = read.delim(inputFile)
-colnames(d) = c("CHROM", "START", "END", "qvalue", "MeanDiff", "NumCpGs", "pMWU", "p2DKS", "meanA", "meanB")
+colnames(d)[1:(length(colnames(d))-2)] = c("CHROM", "START", "END", "qvalue", "MeanDiff", "NumCpGs", "pMWU", "p2DKS")
 gr = GRanges(seqnames=d$CHROM,
              ranges=IRanges(start=d$START, end=d$END),
              mcols=d[,c(4:10)])
@@ -59,7 +59,7 @@ d = t(sapply(split(og, queryHits(og)), function(x) {
       distances = paste0(elementMetadata(x)$distance, collapse=",")
       return(as.character(c(idx, gnames, distances)))
 }))
-d = as.data.frame(d)
+d = as.data.frame(d,stringsAsFactors=FALSE)
 colnames(d) = c("idx", "NearestGene", "DistanceToNearestGene")
 d$idx = as.numeric(d$idx)
 gr$NearestGene = as.character("")
@@ -84,17 +84,15 @@ Averge methylation values for candidate DMRs in each of the groups are plotted b
 
 ```{r echo=FALSE, warning=FALSE, message=FALSE}
 # Select the mean* columns, strip "mean" and make long
-d = as.data.frame(elementMetadata(gr)) %>% select(starts_with("mean", ignore.case=FALSE)) %>% 
-  rename_all(funs(gsub("^mean", "", .))) %>% gather("Group", "MeanMethylation")
+d = as.data.frame(elementMetadata(gr,stringsAsFactor=FALSE)) %>% select(starts_with("mean", ignore.case=FALSE)) %>% 
+  rename_all(funs(gsub("^mean_", "", .))) %>% gather("Group", "MeanMethylation")
 
-g = ggplot(d, aes(x=MeanMethylation, fill=Group, color=Group)) + geom_density(alpha=0.3)
+g = ggplot(d, aes(x=MeanMethylation, fill=Group, color=Group, group=Group)) + geom_density(alpha=0.3)
 g = g + theme(text=element_text(size=16),
               axis.text = element_text(size=12),
               axis.title = element_text(size=14))
-g = g + xlab("Mean methylation ratio")
-g = g + scale_fill_manual(values=c("grey28", "red", "darkblue", "darkgreen"))
-g = g + scale_colour_manual(values=c("grey28", "red", "darkblue", "darkgreen"))
-g = g + xlim(0,1)
+g = g + xlab("Mean methylation ratio") + xlim(0,100)
+g = g + scale_fill_manual(values=c("grey28", "red", "darkblue", "darkgreen"),aesthetics = c("colour", "fill"))
 ggsave(outputDiffMethyl, plot=g)
 g
 ```
