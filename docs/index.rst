@@ -44,6 +44,12 @@ Quick start
 
 * Download genome fasta and annotations for an your organism, and build indexes, Check in :ref:`createIndices`
 
+* Configure snakePipes with paths to organism and cluster configs on your system using snakePipes config. For detailed information, run:
+
+.. code:: bash
+
+    snakePipes config --help
+
 * Download example fastq files for the human genome `here <https://zenodo.org/record/3707259>`_
 
 * Execute the DNA-mapping pipeline using the example **command.sh** in the test data directory.
