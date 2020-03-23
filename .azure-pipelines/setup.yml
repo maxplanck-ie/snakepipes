@@ -7,7 +7,7 @@ steps:
 #    installOptions: -c conda-forge -c bioconda --quiet
 #    createOptions: -c conda-forge -c bioconda --quiet --yes
 - bash: |
-    conda create -n foo -q --yes --quiet -c conda-forge -c bioconda snakemake fuzzywuzzy mock sphinx sphinx-argparse sphinx_rtd_theme flake8 coreutils
+    sudo chown 501:20 /usr/local/miniconda/envs/.conda_envs_dir_test; conda create -n foo -q --yes --quiet -c conda-forge -c bioconda snakemake fuzzywuzzy mock sphinx sphinx-argparse sphinx_rtd_theme flake8 coreutils
   displayName: Installing dependencies
 - bash: |
     source activate foo
