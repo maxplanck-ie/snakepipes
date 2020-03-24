@@ -125,7 +125,7 @@ rule sortBams:
         samtools view -u -F 2304 {input} | samtools sort -@ 4 -m 2G -T $MYTEMP/{wildcards.sample} -o {output}
         """
 
-rule samtools_index_filtered:
+rule samtools_index_filtered_bam:
         input:
             "filtered_bam/{sample}.filtered.bam"
         output:
