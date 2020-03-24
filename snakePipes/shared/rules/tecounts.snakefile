@@ -183,4 +183,4 @@ if sampleSheet:
             outdir = get_outdir("DESeq2", sampleSheet),
             fdr = 0.05,
         conda: CONDA_RNASEQ_ENV
-    script: "../rscripts/noncoding-DESeq2.R"
+        script: "../rscripts/noncoding-DESeq2.R"
