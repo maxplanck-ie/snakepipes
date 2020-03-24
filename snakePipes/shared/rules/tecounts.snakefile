@@ -124,14 +124,14 @@ rule sortBams:
         MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX);
         samtools view -u -F 2304 {input} | samtools sort -@ 4 -m 2G -T $MYTEMP/{wildcards.sample} -o {output}
         """
-
-rule samtools_index_filtered_bam:
-        input:
-            "filtered_bam/{sample}.filtered.bam"
-        output:
-            "filtered_bam/{sample}.filtered.bam.bai"
-        conda: CONDA_SHARED_ENV
-        shell: "samtools index {input}"
+if fromBAM:
+    rule samtools_index_filtered_bam:
+            input:
+                "filtered_bam/{sample}.filtered.bam"
+            output:
+                "filtered_bam/{sample}.filtered.bam.bai"
+            conda: CONDA_SHARED_ENV
+            shell: "samtools index {input}"
 
 
 rule cpGTF:
