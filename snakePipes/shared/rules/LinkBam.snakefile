@@ -2,11 +2,11 @@ rule link_bam:
     input:
         indir + "/{sample}" + bamExt
     output:
-        aligner + "/{sample}.unsorted.bam" if pipeline=="noncoding-RNA-seq" else aligner + "/{sample}.bam"
+        aligner + "/{sample}.unsorted.bam" if pipeline=="noncoding-rna-seq" else aligner + "/{sample}.bam"
     shell:
         "( [ -f {output} ] || ln -s -r {input} {output} )"
 
-if not pipeline=="noncoding-RNA-seq":
+if not pipeline=="noncoding-rna-seq":
     rule samtools_index_external:
         input:
             aligner + "/{sample}.bam"
