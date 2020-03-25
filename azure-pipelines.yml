@@ -88,6 +88,8 @@ jobs:
   - bash: echo "##vso[task.prependpath]$CONDA/bin"
     displayName: Add conda to PATH
   - bash: |
+      mkdir -p /usr/local/miniconda/envs
+      sudo chown 501:20 /usr/local/miniconda/envs/.conda_envs_dir_test
       if [ -f /Users/vsts/.conda/pkgs/urls.txt ]; then
         echo "chown"
         sudo chown 501:20 /Users/vsts/.conda/pkgs/urls.txt
