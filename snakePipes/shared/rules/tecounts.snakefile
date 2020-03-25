@@ -124,6 +124,14 @@ rule sortBams:
         MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX);
         samtools view -u -F 2304 {input} | samtools sort -@ 4 -m 2G -T $MYTEMP/{wildcards.sample} -o {output}
         """
+if fromBAM:
+    rule samtools_index_filtered_bam:
+            input:
+                "filtered_bam/{sample}.filtered.bam"
+            output:
+                "filtered_bam/{sample}.filtered.bam.bai"
+            conda: CONDA_SHARED_ENV
+            shell: "samtools index {input}"
 
 
 rule cpGTF:
@@ -169,17 +177,18 @@ def get_outdir(folder_name,sampleSheet):
 
 
 # TODO: topN, FDR
-rule DESeq2:
-    input:
-        cnts=["TEcount/{}.cntTable".format(x) for x in samples],
-        sampleSheet=sampleSheet,
-        symbol_file = "Annotation/genes.filtered.symbol"
-    output:
-        "{}/DESeq2.session_info.txt".format(get_outdir("DESeq2",sampleSheet))
-    benchmark:
-        "{}/.benchmark/DESeq2.featureCounts.benchmark".format(get_outdir("DESeq2",sampleSheet))
-    params:
-        outdir = get_outdir("DESeq2", sampleSheet),
-        fdr = 0.05,
-    conda: CONDA_RNASEQ_ENV
-    script: "../rscripts/noncoding-DESeq2.R"
+if sampleSheet:
+    rule DESeq2:
+        input:
+            cnts=["TEcount/{}.cntTable".format(x) for x in samples],
+            sampleSheet=sampleSheet,
+            symbol_file = "Annotation/genes.filtered.symbol"
+        output:
+            "{}/DESeq2.session_info.txt".format(get_outdir("DESeq2",sampleSheet))
+        benchmark:
+            "{}/.benchmark/DESeq2.featureCounts.benchmark".format(get_outdir("DESeq2",sampleSheet))
+        params:
+            outdir = get_outdir("DESeq2", sampleSheet),
+            fdr = 0.05,
+        conda: CONDA_RNASEQ_ENV
+        script: "../rscripts/noncoding-DESeq2.R"

@@ -20,7 +20,7 @@ source(paste0(snakemake@scriptdir, "/DE_functions.R"))
 
 ## ~~~~~ 1. SETUP ~~~~~
 ## sampleInfo (setup of the experiment)
-sampleInfo = read.table(sampleInfoFilePath, header = TRUE, stringsAsFactor = F)
+sampleInfo = read.table(sampleInfoFilePath, header = TRUE, stringsAsFactors = F)
 sampleInfo$condition = as.factor(sampleInfo$condition)
 sampleInfo$condition = relevel(sampleInfo$condition, ref = as.character(sampleInfo$condition[1])) # first sample defines base
 rownames(sampleInfo) = sampleInfo$name

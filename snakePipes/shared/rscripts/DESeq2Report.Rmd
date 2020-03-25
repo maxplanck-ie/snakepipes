@@ -217,6 +217,7 @@ This plot shows how samples are clustered based on their euclidean distance usin
 
 ```{r PCA, eval = TRUE}
     # 5. PCA plots
+    PCAdata$name<-make.names(PCAdata$name,unique=TRUE)
     print(ggplot(PCAdata, aes(PC1, PC2, color = condition, shape = name)) +
         geom_hline(aes(yintercept = 0), colour = "grey") +
         geom_vline(aes(xintercept = 0), colour = "grey") +
