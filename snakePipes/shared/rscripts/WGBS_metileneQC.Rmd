@@ -24,7 +24,7 @@ outputPCA = sprintf("%s/PCA.png", snakemake@params[["outdir"]])
 outputDiffMethyl = sprintf("%s/MethylationDensity.png", snakemake@params[["outdir"]])
 outputQValue = sprintf("%s/QValueDistribution.png", snakemake@params[["outdir"]])
 outputVolcano = sprintf("%s/Volcano.png", snakemake@params[["outdir"]])
-d = read.delim(inputFile)
+d = read.delim(DMRinput)
 ```
 
 # Overview
@@ -82,19 +82,16 @@ The genome annotation in **`r gtfFile`** was used to annotated DMRs according to
 
 # PCA plot
 
-PCA plot calculated on single CpGs used as input to metilene is stored in **`r outputPCA`**. Typically, the first principal component represents the auto-correlation in methylation values for single CpGs. If the biological effect of the experiment on DNA methylation is sufficiently large, the samples should split by biological condition on the second principal component.
+PCA plot calculated on single CpGs used as input to metilene is contained in and can copied directly from this html document. Typically, the first principal component represents the auto-correlation in methylation values for single CpGs. If the biological effect of the experiment on DNA methylation is sufficiently large, the samples should split by biological condition on the second principal component.
 
 ```{r echo=FALSE, warning=FALSE, message=FALSE}
-# Select the mean* columns, strip "mean" and make long
-d = read.table(PCAinput,header=TRUE,sep="\t",quote=FALSE,as.is=FALSE)
-d = subset(d,select=!colnames(d) %in% "chr","pos")
+d = read.table(PCAinput,header=TRUE,sep="\t",quote="",as.is=FALSE)
+d = subset(d,select=!(colnames(d) %in% c("chr","pos")))
 x1<-FactoMineR::PCA(d,graph=FALSE)
 if(nrow(x1$eig)>=2){
-png(paste0("PCA.png"),bg="white") 
 FactoMineR::plot.PCA(x1,choix="var")
-dev.off()
 }
-FactoMineR::plot.PCA(x1,choix="var")
+
 ```
 
 # Distribution of methylation values per group
