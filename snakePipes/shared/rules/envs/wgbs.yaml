@@ -16,6 +16,7 @@ dependencies:
   - r-dplyr = 0.8.4
   - r-tidyr
   - r-pander
+  - r-factominer
   - bioconductor-bsseq
   - bioconductor-genomicranges = 1.38.0
   - bioconductor-genomicfeatures = 1.38.0
