@@ -1,3 +1,4 @@
+import os
 if pairedEnd:
     rule STAR:
         input:
@@ -141,10 +142,11 @@ rule cpGTF:
     output:
         temp("Annotation/genes.filtered.gtf"),
         temp("Annotation/genes.filtered.bed")
-    shell: """
-        ln -s {input[0]} {output[0]}
-        ln -s {input[1]} {output[1]}
-        """
+    run:
+        if not os.path.exists(os.path.join(outdir,output[0])):
+            os.symlink(input[0],os.path.join(outdir,output[0]))
+        if not os.path.exists(os.path.join(outdir,output[1])):
+            os.symlink(input[1],os.path.join(outdir,output[1]))
 
 
 rule symbolFile:

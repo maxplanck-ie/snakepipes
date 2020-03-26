@@ -1,4 +1,5 @@
 # This requires sampleDict, which is a dictionary defined in the preprocessing Snakefile
+import os
 
 initialIndir = indir  # Due to the lambda functions, this ends up getting reset over time
 if sampleSheet:
@@ -124,20 +125,20 @@ else:
             output:
                 r1="deduplicatedFASTQ/{sample}" + reads[0] + ext,
                 r2="deduplicatedFASTQ/{sample}" + reads[1] + ext,
-            shell: """
-                ln -s -r {input.r1} {output.r1}
-                ln -s -r {input.r2} {output.r2}
-                """
+           run:
+                if not os.path.exists(os.path.join(outdir,output.r1)):
+                    os.symlink(os.path.join(outdir,input.r1),os.path.join(outdir,output.r1))
+                if not os.path.exists(os.path.join(outdir,output.r2)):
+                    os.symlink(os.path.join(outdir,input.r2),os.path.join(outdir,output.r2))
     else:
         rule clumpify:
             input:
                 r1="mergedFASTQ/{sample}" + reads[0] + ext
             output:
                 r1="deduplicatedFASTQ/{sample}" + reads[0] + ext
-            shell: """
-                ln -s -r {input.r1} {output.r1}
-                """
-
+            run:
+                if not os.path.exists(os.path.join(outdir,output.r1)):
+                    os.symlink(os.path.join(outdir,input.r1),os.path.join(outdir,output.r1))
 
 rule splitFastq2YAML:
     input:

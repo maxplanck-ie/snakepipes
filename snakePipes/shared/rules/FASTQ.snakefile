@@ -1,18 +1,21 @@
+import os
 rule origFASTQ1:
       input:
           indir+"/{sample}"+reads[0]+ext
       output:
           "originalFASTQ/{sample}"+reads[0]+".fastq.gz"
-      shell:
-          "( [ -f {output} ] || ln -s -r {input} {output} )"
+      run:
+        if not os.path.exists(os.path.join(outdir,output)):
+            os.symlink(os.path.join(outdir,input),os.path.join(outdir,output))
 
 rule origFASTQ2:
       input:
           indir+"/{sample}"+reads[1]+ext
       output:
           "originalFASTQ/{sample}"+reads[1]+".fastq.gz"
-      shell:
-          "( [ -f {output} ] || ln -s -r {input} {output} )"
+      run:
+        if not os.path.exists(os.path.join(outdir,output)):
+            os.symlink(os.path.join(outdir,input),os.path.join(outdir,output))
 
 if downsample:
     if pairedEnd:

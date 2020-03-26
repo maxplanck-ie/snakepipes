@@ -1,5 +1,5 @@
 ### samtools_filter ############################################################
-
+import os
 
 # When modifying the rule samtools_filter, double-check whether the function
 # update_filter() has to be modified too
@@ -13,7 +13,9 @@ rule samtools_filter:
     params:
         dedup = dedup,
         properPairs = properPairs,
-        mapq = mapq
+        mapq = mapq,
+        input = lambda wildcards,input: os.path.join(outdir,input[0]),
+        output = lambda wildcards: os.path.join(outdir,"filtered_bam/{sample}.filtered.tmp.bam")
     log:
         out = "filtered_bam/logs/samtools_filter.{sample}.out",
         err = "filtered_bam/logs/samtools_filter.{sample}.err"
@@ -26,7 +28,7 @@ rule samtools_filter:
         if [ "{params.dedup}" == "True" ] ; then filter="$filter -F 1024"; fi
         if [ "{params.properPairs}" == "True" ] ; then filter="$filter -f 2"; fi
         if [ "{params.mapq}" != "0" ] ; then filter="$filter -q {params.mapq}"; fi
-        if [[ -z $filter ]] ; then ln -s -r {input[0]} {output.bam} ;
+        if [[ -z $filter ]] ; then ln -s {params.input} {params.output} ;
         else
             samtools view -@ {threads} -b $filter -o {output.bam} {input[0]} 2> {log.err} ;
         fi

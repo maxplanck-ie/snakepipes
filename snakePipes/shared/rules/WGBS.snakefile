@@ -10,8 +10,9 @@ if fromBAM:
             indir + "/{sample}" + bamExt
         output:
             "bwameth/{sample}.sorted" + bamExt
-        shell:
-            "( [ -f {output} ] || ln -s -r {input} {output} ) "
+        run:
+            if not os.path.exists(os.path.join(outdir,output)):
+                os.symlink(os.path.join(outdir,input),os.path.join(outdir,output))
 
 # TODO: Make optional
 rule conversionRate:
