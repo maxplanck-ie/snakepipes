@@ -1,5 +1,6 @@
 ##umi_tools###############
 import os
+
 if UMIBarcode:
     if pairedEnd:
         rule umi_extract:
@@ -46,8 +47,8 @@ else:
           output:
               "FASTQ/{sample}"+reads[0]+".fastq.gz"
           run:
-            if not os.path.exists(os.path.join(outdir,output)):
-                os.symlink(os.path.join(outdir,input),os.path.join(outdir,output))
+            if not os.path.exists(os.path.join(outdir,output[0])):
+                os.symlink(os.path.join(outdir,input[0]),os.path.join(outdir,output[0]))
 
     rule FASTQ2:
           input:
@@ -55,8 +56,8 @@ else:
           output:
               "FASTQ/{sample}"+reads[1]+".fastq.gz"
           run:
-            if not os.path.exists(os.path.join(outdir,output)):
-                os.symlink(os.path.join(outdir,input),os.path.join(outdir,output))
+            if not os.path.exists(os.path.join(outdir,output[0])):
+                os.symlink(os.path.join(outdir,input[0]),os.path.join(outdir,output[0]))
 
 #If DNA-mapping:
 if UMIDedup:
@@ -97,8 +98,8 @@ else:
             output:
                 bamfile = "filtered_bam/{sample}.filtered.bam"
             run:
-                if not os.path.exists(os.path.join(outdir,output)):
-                    os.symlink(os.path.join(outdir,input),os.path.join(outdir,output))
+                if not os.path.exists(os.path.join(outdir,output[0])):
+                    os.symlink(os.path.join(outdir,input[0]),os.path.join(outdir,output[0]))
 
 rule samtools_index_filtered:
     input:

@@ -5,8 +5,8 @@ rule origFASTQ1:
       output:
           "originalFASTQ/{sample}"+reads[0]+".fastq.gz"
       run:
-        if not os.path.exists(os.path.join(outdir,output)):
-            os.symlink(os.path.join(outdir,input),os.path.join(outdir,output))
+        if not os.path.exists(os.path.join(outdir,output[0])):
+            os.symlink(os.path.join(outdir,input[0]),os.path.join(outdir,output[0]))
 
 rule origFASTQ2:
       input:
@@ -14,8 +14,8 @@ rule origFASTQ2:
       output:
           "originalFASTQ/{sample}"+reads[1]+".fastq.gz"
       run:
-        if not os.path.exists(os.path.join(outdir,output)):
-            os.symlink(os.path.join(outdir,input),os.path.join(outdir,output))
+        if not os.path.exists(os.path.join(outdir,output[0])):
+            os.symlink(os.path.join(outdir,input[0]),os.path.join(outdir,output[0]))
 
 if downsample:
     if pairedEnd:

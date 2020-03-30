@@ -15,7 +15,7 @@ rule samtools_filter:
         properPairs = properPairs,
         mapq = mapq,
         input = lambda wildcards,input: os.path.join(outdir,input[0]),
-        output = lambda wildcards: os.path.join(outdir,"filtered_bam/{sample}.filtered.tmp.bam")
+        output = lambda wildcards: os.path.join(outdir,"filtered_bam",wildcards.sample+".filtered.tmp.bam")
     log:
         out = "filtered_bam/logs/samtools_filter.{sample}.out",
         err = "filtered_bam/logs/samtools_filter.{sample}.err"
