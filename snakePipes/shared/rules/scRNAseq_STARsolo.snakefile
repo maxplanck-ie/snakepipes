@@ -25,7 +25,8 @@ rule STARsolo:
         UMIstart = STARsoloCoords[0],
         UMIlen = STARsoloCoords[1],
         CBstart = STARsoloCoords[2],
-        CBlen = STARsoloCoords[3]
+        CBlen = STARsoloCoords[3],
+        outdir = outdir
     benchmark:
         aligner+"/.benchmark/STARsolo.{sample}.benchmark"
     threads: 20  # 3.2G per core
@@ -56,7 +57,7 @@ rule STARsolo:
 	    --soloStrand Forward\
 	    --soloUMIdedup Exact
 
-        ln -rs {params.prefix}Aligned.sortedByCoord.out.bam {output.bam}
+        ln -s {params.outdir}/{params.prefix}Aligned.sortedByCoord.out.bam {params.outdir}/{output.bam}
  
         rm -rf $MYTEMP
          """

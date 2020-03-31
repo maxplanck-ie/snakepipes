@@ -1,4 +1,6 @@
 ## Salmon Index
+import os
+
 rule SalmonIndex:
     input:
         "Annotation/genes.filtered.fa",
@@ -90,9 +92,9 @@ rule Salmon_symlinks:
         quant = "Salmon/{sample}.quant.sf"
     params:
         quant = "{sample}/quant.sf"
-    shell: """
-        ln -s -f {params.quant} {output.quant}
-        """
+    run:
+        if not os.path.exists(os.path.join(outdir,output.quant)):
+            os.symlink(os.path.join(outdir,input.quant),os.path.join(outdir,output.quant))
 
 
 rule Salmon_TPM:

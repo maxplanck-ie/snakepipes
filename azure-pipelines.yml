@@ -87,15 +87,15 @@ jobs:
   steps:
   - bash: echo "##vso[task.prependpath]$CONDA/bin"
     displayName: Add conda to PATH
+  - bash: sudo chown -R $USER $CONDA
+    displayName: Take ownership of conda installation
   - bash: |
-      mkdir -p /usr/local/miniconda/envs
-      sudo chown 501:20 /usr/local/miniconda/envs/.conda_envs_dir_test
       if [ -f /Users/vsts/.conda/pkgs/urls.txt ]; then
         echo "chown"
         sudo chown 501:20 /Users/vsts/.conda/pkgs/urls.txt
       fi
     displayName: Fix OSX permissions
-  - template: .azure-pipelines/setup.yml
+  - template: .azure-pipelines/macosx_setup.yml
   - bash: |
       source activate foo
       sudo snakePipes createEnvs

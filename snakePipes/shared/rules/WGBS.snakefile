@@ -10,8 +10,9 @@ if fromBAM:
             indir + "/{sample}" + bamExt
         output:
             "bwameth/{sample}.sorted" + bamExt
-        shell:
-            "( [ -f {output} ] || ln -s -r {input} {output} ) "
+        run:
+            if not os.path.exists(os.path.join(outdir,output)):
+                os.symlink(os.path.join(outdir,input),os.path.join(outdir,output))
 
 # TODO: Make optional
 rule conversionRate:
@@ -421,7 +422,8 @@ rule run_metilene:
 # Annotates the metilene DMRs and produces QC plots
 rule metileneReport:
     input:
-        '{}/DMRs.txt'.format(get_outdir("metilene", minCoverage)),
+        DMRs='{}/DMRs.txt'.format(get_outdir("metilene", minCoverage)),
+        CpGs='{}/metilene.IN.txt'.format(get_outdir("metilene", minCoverage))
     output:
         HTML='{}/Stats_report.html'.format(get_outdir("metilene", minCoverage))
     params:
