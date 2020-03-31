@@ -1,6 +1,13 @@
 snakePipes News
 ===============
 
+snakePipes 2.1.0
+----------------
+
+ * Snamake version is bumped to 5.13.0, python to 3.7.
+ * Small fixes in DESeq2 report for noncoding-RNA-seq, WGBS reports
+ * Updated docs on running single snakefiles
+
 snakePipes 2.0.2
 ----------------
 
