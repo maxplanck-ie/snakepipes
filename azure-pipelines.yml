@@ -89,9 +89,9 @@ jobs:
     displayName: Add conda to PATH
 # On Hosted macOS, the agent user doesn't have ownership of Miniconda's installation directory/
 # We need to take ownership if we want to update conda or install packages globally
-- bash: sudo chown -R $USER $CONDA
-  displayName: Take ownership of conda installation
-- bash: |
+  - bash: sudo chown -R $USER $CONDA
+    displayName: Take ownership of conda installation
+  - bash: |
       if [ -f /Users/vsts/.conda/pkgs/urls.txt ]; then
         echo "chown"
         sudo chown 501:20 /Users/vsts/.conda/pkgs/urls.txt
@@ -99,6 +99,6 @@ jobs:
     displayName: Fix OSX permissions
   - template: .azure-pipelines/macosx_setup.yml
   - bash: |
-      source activate $(Agent.BuildDirectory)/snakePipes
-      sudo snakePipes createEnvs
-    displayName: "createEnvs"
+    source activate $(Agent.BuildDirectory)/snakePipes
+    sudo snakePipes createEnvs
+  displayName: "createEnvs"
