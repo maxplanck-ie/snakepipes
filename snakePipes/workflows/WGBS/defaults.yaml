@@ -23,6 +23,8 @@ indir:
 genome:
 ###SNP black list (bed file)
 blacklist:
+###target regions to analyze
+targetRegions:
 ###sample Sheet
 sampleSheet:
 ###inclusion bounds for methylation extraction
