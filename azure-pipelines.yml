@@ -99,6 +99,6 @@ jobs:
     displayName: Fix OSX permissions
   - template: .azure-pipelines/macosx_setup.yml
   - bash: |
-    source activate $(Agent.BuildDirectory)/snakePipes
-    sudo snakePipes createEnvs
+      source activate $(Agent.BuildDirectory)/snakePipes
+      sudo snakePipes createEnvs
   displayName: "createEnvs"
