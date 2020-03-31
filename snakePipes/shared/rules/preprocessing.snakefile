@@ -124,8 +124,8 @@ else:
                 r2="mergedFASTQ/{sample}" + reads[1] + ext
             output:
                 r1="deduplicatedFASTQ/{sample}" + reads[0] + ext,
-                r2="deduplicatedFASTQ/{sample}" + reads[1] + ext,
-           run:
+                r2="deduplicatedFASTQ/{sample}" + reads[1] + ext
+            run:
                 if not os.path.exists(os.path.join(outdir,output.r1)):
                     os.symlink(os.path.join(outdir,input.r1),os.path.join(outdir,output.r1))
                 if not os.path.exists(os.path.join(outdir,output.r2)):
