@@ -80,10 +80,17 @@ def get_outdir(folder_name, minCoverage):
             sample_name = sample_name[:idx]
     else:
         sample_name = ""
-    return("{}_{}_minCoverage{}".format(folder_name, sample_name, minCoverage))
+    if targetRegions:
+        region_name = os.path.basename(targetRegions)
+        if "." in region_name:
+            idx = region_name.rindex(".")
+            region_name = region_name[:idx]
+    else:
+        region_name = "genome"
+    return("{}_{}_{}_minCoverage{}".format(folder_name, sample_name, region_name, minCoverage))
 
 
-def run_DMRs(sampleSheet, minCoverage, DMRprograms):
+def run_DMRs(sampleSheet, targetRegions, minCoverage, DMRprograms):
     output = []
     if not sampleSheet:
         return output
