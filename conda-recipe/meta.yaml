@@ -13,8 +13,8 @@ requirements:
   host:
     - python >=3
   run:
-    - python >=3
-    - snakemake >=5.11
+    - python >=3.7
+    - snakemake >=5.13
     - pandas
     - graphviz
     - fuzzywuzzy
