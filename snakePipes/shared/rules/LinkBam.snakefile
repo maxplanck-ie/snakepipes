@@ -4,7 +4,12 @@ rule link_bam:
         indir + "/{sample}" + bamExt
     output:
         aligner + "/{sample}.unsorted.bam" if pipeline=="noncoding-rna-seq" else aligner + "/{sample}.bam"
+    params:
+        input_bai = indir + "/{sample}" + bamExt + '.bai'
+        output_bai = aligner + "/{sample}.unsorted.bam.bai" if pipeline=="noncoding-rna-seq" else aligner + "/{sample}.bam.bai"
     run:
+        if os.path.exists(params.input_bai) and not os.path.exists(os.path.join(outdir,params.output_bai)):
+            os.symlink(params.input_bai),os.path.join(outdir,params.output_bai))
         if not os.path.exists(os.path.join(outdir,output[0])):
             os.symlink(os.path.join(outdir,input[0]),os.path.join(outdir,output[0]))
 
@@ -15,7 +20,7 @@ if not pipeline=="noncoding-rna-seq":
         output:
             aligner + "/{sample}.bam.bai"
         conda: CONDA_SHARED_ENV
-        shell: "samtools index {input}"
+        shell: "if [[ -f {output} ]] samtools index {input}"
 
 
     rule link_bam_bai_external:
