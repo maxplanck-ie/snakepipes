@@ -5,8 +5,8 @@ rule link_bam:
     output:
         aligner + "/{sample}.unsorted.bam" if pipeline=="noncoding-rna-seq" else aligner + "/{sample}.bam"
     run:
-        if not os.path.exists(os.path.join(outdir,output)):
-            os.symlink(os.path.join(outdir,input),os.path.join(outdir,output))
+        if not os.path.exists(os.path.join(outdir,output[0])):
+            os.symlink(os.path.join(outdir,input[0]),os.path.join(outdir,output[0]))
 
 if not pipeline=="noncoding-rna-seq":
     rule samtools_index_external:
@@ -26,9 +26,9 @@ if not pipeline=="noncoding-rna-seq":
             bam_out = "filtered_bam/{sample}.filtered.bam",
             bai_out = "filtered_bam/{sample}.filtered.bam.bai",
         run:
-            if not os.path.exists(os.path.join(outdir,bam_out)):
-                os.symlink(os.path.join(outdir,bam),os.path.join(outdir,bam_out))
-                os.symlink(os.path.join(outdir,bai),os.path.join(outdir,bai_out))
+            if not os.path.exists(os.path.join(outdir,output.bam_out)):
+                os.symlink(os.path.join(outdir,input.bam),os.path.join(outdir,output.bam_out))
+                os.symlink(os.path.join(outdir,input.bai),os.path.join(outdir,output.bai_out))
 
 
     rule sambamba_flagstat:
