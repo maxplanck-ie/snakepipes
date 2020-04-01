@@ -164,7 +164,7 @@ rule all:
         expand("MethylDackel/{sample}_CpG.bedGraph", sample=samples),
         expand("MethylDackel/{sample}_CpG.methylation.bw", sample=samples),
         expand("MethylDackel/{sample}_CpG.coverage.bw", sample=samples),
-        run_DMRs(sampleSheet, minCoverage, DMRprograms),
+        run_DMRs(sampleSheet, targetRegions, minCoverage, DMRprograms),
         'multiQC/multiqc_report.html'
 
 
