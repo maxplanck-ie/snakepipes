@@ -135,7 +135,7 @@ rule MACS2_peak_qc:
 
 # Requires PE data
 # Should be run once per-group!
-if paired:
+if pairedEnd:
     rule Genrich_peaks:
         input:
             bams=lambda wildcards: expand(os.path.join("filtered_bam", "{sample}.filtered.bam"), sample=genrichDict[wildcards.group]),
