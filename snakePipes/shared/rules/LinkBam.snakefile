@@ -20,7 +20,7 @@ if not pipeline=="noncoding-rna-seq":
         output:
             aligner + "/{sample}.bam.bai"
         conda: CONDA_SHARED_ENV
-        shell: "if [[ -f {output} ]] samtools index {input}"
+        shell: "[[ ! -f {output} ]] samtools index {input}"
 
 
     rule link_bam_bai_external:
