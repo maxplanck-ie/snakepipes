@@ -10,7 +10,7 @@ rule link_bam:
         output_bai = aligner + "/{sample}.unsorted.bam.bai" if pipeline=="noncoding-rna-seq" else aligner + "/{sample}.bam.bai"
     run:
         if os.path.exists(params.input_bai) and not os.path.exists(os.path.join(outdir,params.output_bai)):
-            os.symlink(params.input_bai),os.path.join(outdir,params.output_bai))
+            os.symlink(params.input_bai,os.path.join(outdir,params.output_bai))
         if not os.path.exists(os.path.join(outdir,output[0])):
             os.symlink(os.path.join(outdir,input[0]),os.path.join(outdir,output[0]))
 
