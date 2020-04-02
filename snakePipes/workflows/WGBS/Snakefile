@@ -72,7 +72,7 @@ def run_FastQC(fastqc):
         return([])
 
 
-def get_outdir(folder_name, minCoverage):
+def get_outdir(folder_name, target_regions, minCoverage):
     if sampleSheet:
         sample_name = os.path.basename(sampleSheet)
         if "." in sample_name:
@@ -80,19 +80,26 @@ def get_outdir(folder_name, minCoverage):
             sample_name = sample_name[:idx]
     else:
         sample_name = ""
-    return("{}_{}_minCoverage{}".format(folder_name, sample_name, minCoverage))
+    if target_regions:
+        region_name = os.path.basename(target_regions)
+        if "." in region_name:
+            idx = region_name.rindex(".")
+            region_name = region_name[:idx]
+    else:
+        region_name = "genome"
+    return("{}_{}_{}_minCoverage{}".format(folder_name, sample_name, region_name, minCoverage))
 
 
-def run_DMRs(sampleSheet, minCoverage, DMRprograms):
+def run_DMRs(sampleSheet, targetRegions, minCoverage, DMRprograms):
     output = []
     if not sampleSheet:
         return output
     if "DSS" in DMRprograms:
-        output.append('{}/Stats_report.html'.format(get_outdir("DSS", minCoverage)))
+        output.append('{}/Stats_report.html'.format(get_outdir("DSS", None, minCoverage)))
     if "metilene" in DMRprograms:
-        output.append('{}/Stats_report.html'.format(get_outdir("metilene", minCoverage)))
+        output.append('{}/Stats_report.html'.format(get_outdir("metilene", targetRegions, minCoverage)))
     if "dmrseq" in DMRprograms:
-        output.append('{}/Stats_report.html'.format(get_outdir("dmrseq", minCoverage)))
+        output.append('{}/Stats_report.html'.format(get_outdir("dmrseq", None, minCoverage)))
     return output
 
 
@@ -157,7 +164,7 @@ rule all:
         expand("MethylDackel/{sample}_CpG.bedGraph", sample=samples),
         expand("MethylDackel/{sample}_CpG.methylation.bw", sample=samples),
         expand("MethylDackel/{sample}_CpG.coverage.bw", sample=samples),
-        run_DMRs(sampleSheet, minCoverage, DMRprograms),
+        run_DMRs(sampleSheet, targetRegions, minCoverage, DMRprograms),
         'multiQC/multiqc_report.html'
 
 

@@ -1,6 +1,16 @@
 snakePipes News
 ===============
 
+snakePipes 2.1.0
+----------------
+
+ * Snakemake version is bumped to 5.13.0, python to 3.7.
+ * Small fixes in DESeq2 report for noncoding-RNA-seq, WGBS reports
+ * Updated docs on running single snakefiles
+ * Added user-input target regions to differential methylation analysis with metilene
+ * Added Genrich support for SE data
+ * Fixed symlinking rules
+
 snakePipes 2.0.2
 ----------------
 

@@ -39,6 +39,7 @@ rule STARsolo:
             --sjdbOverhang 100 \
             --outSAMunmapped Within \
             --outSAMtype BAM SortedByCoordinate \
+            --outBAMsortingBinsN 20 \
             --outSAMattributes NH HI AS nM CB UB \
             --sjdbGTFfile {params.gtf} \
             --genomeDir {params.index} \

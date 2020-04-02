@@ -333,14 +333,14 @@ rule prepForMetilene:
     input:
         bedGraphs=expand("MethylDackel/{sample}_CpG.bedGraph", sample=samples)
     output:
-        MetileneIN='{}/metilene.IN.txt'.format(get_outdir("metilene", minCoverage))
+        MetileneIN='{}/metilene.IN.txt'.format(get_outdir("metilene", targetRegions, minCoverage))
     params:
         sampleSheet=sampleSheet,
         groups=metileneGroups,
         minCoverage=minCoverage,
         blacklist=blacklist
     log:
-        err='{}/logs/prep_for_stats.err'.format(get_outdir("metilene", minCoverage)),
+        err='{}/logs/prep_for_stats.err'.format(get_outdir("metilene", targetRegions, minCoverage)),
     threads: 10
     conda: CONDA_WGBS_ENV
     script: "../rscripts/WGBS_mergeStats.R"
@@ -350,10 +350,10 @@ rule DSS:
     input:
         bedGraphs=expand("MethylDackel/{sample}_CpG.bedGraph", sample=samples)
     output:
-        '{}/Stats_report.html'.format(get_outdir("DSS", minCoverage))
+        '{}/Stats_report.html'.format(get_outdir("DSS", None, minCoverage))
     params:
         blacklist=blacklist,
-        odir=get_outdir("DSS", minCoverage),
+        odir=get_outdir("DSS",None, minCoverage),
         sampleSheet=sampleSheet,
         groups=metileneGroups,
         maxDist=maxDist,
@@ -362,7 +362,7 @@ rule DSS:
         minCoverage=minCoverage,
         FDR=FDR
     threads: 10
-    benchmark: '{}/.benchmark/DSS.benchmark'.format(get_outdir("DSS", minCoverage))
+    benchmark: '{}/.benchmark/DSS.benchmark'.format(get_outdir("DSS", None, minCoverage))
     conda: CONDA_WGBS_ENV
     script: "../rscripts/WGBS_DSS.Rmd"
 
@@ -371,10 +371,10 @@ rule dmrseq:
     input:
         bedGraphs=expand("MethylDackel/{sample}_CpG.bedGraph", sample=samples)
     output:
-        '{}/Stats_report.html'.format(get_outdir("dmrseq", minCoverage))
+        '{}/Stats_report.html'.format(get_outdir("dmrseq", None, minCoverage))
     params:
         blacklist=blacklist,
-        odir=get_outdir("dmrseq", minCoverage),
+        odir=get_outdir("dmrseq", None, minCoverage),
         sampleSheet=sampleSheet,
         groups=metileneGroups,
         maxDist=maxDist,
@@ -383,7 +383,7 @@ rule dmrseq:
         minCoverage=minCoverage,
         FDR=FDR
     threads: 10
-    benchmark: '{}/.benchmark/dmrseq.benchmark'.format(get_outdir("dmrseq", minCoverage))
+    benchmark: '{}/.benchmark/dmrseq.benchmark'.format(get_outdir("dmrseq", None, minCoverage))
     conda: CONDA_WGBS_ENV
     script: "../rscripts/WGBS_dmrseq.Rmd"
 
@@ -392,19 +392,20 @@ rule dmrseq:
 # These are NOT filtered
 rule run_metilene:
     input:
-        MetIN='{}/metilene.IN.txt'.format(get_outdir("metilene", minCoverage))
+        MetIN='{}/metilene.IN.txt'.format(get_outdir("metilene", targetRegions, minCoverage))
     output:
-        MetBed='{}/DMRs.txt'.format(get_outdir("metilene", minCoverage))
+        MetBed='{}/DMRs.txt'.format(get_outdir("metilene", targetRegions, minCoverage))
     params:
         groups=metileneGroups,
         maxDist=maxDist,
         minCpGs=minCpGs,
         minMethDiff=minMethDiff,
-        FDR=FDR
+        FDR=FDR,
+        regionlist='-B ' + targetRegions if targetRegions else ''
     log:
-        err="{}/logs/run_metilene.err".format(get_outdir("metilene", minCoverage))
+        err="{}/logs/run_metilene.err".format(get_outdir("metilene", targetRegions, minCoverage))
     threads: 10
-    benchmark: '{}/.benchmark/run_metilene.benchmark'.format(get_outdir("metilene", minCoverage))
+    benchmark: '{}/.benchmark/run_metilene.benchmark'.format(get_outdir("metilene", targetRegions, minCoverage))
     conda: CONDA_WGBS_ENV
     shell: """
         echo -e "chrom\tstart\tend\tq-value\tmean methylation difference\tnCpGs\tp (MWU)\tp (2D KS)\tmean_{params.groups[1]}\tmean_{params.groups[0]}" > {output}
@@ -414,6 +415,7 @@ rule run_metilene:
                  --mincpgs {params.minCpGs} \
                  --minMethDiff {params.minMethDiff} \
                  --threads {threads} \
+                 {params.regionlist} \
                  {input.MetIN} 2>{log.err} \
             | sort -k 1,1 -k2,2n >> {output.MetBed}
         """
@@ -422,18 +424,18 @@ rule run_metilene:
 # Annotates the metilene DMRs and produces QC plots
 rule metileneReport:
     input:
-        DMRs='{}/DMRs.txt'.format(get_outdir("metilene", minCoverage)),
-        CpGs='{}/metilene.IN.txt'.format(get_outdir("metilene", minCoverage))
+        DMRs='{}/DMRs.txt'.format(get_outdir("metilene", targetRegions, minCoverage)),
+        CpGs='{}/metilene.IN.txt'.format(get_outdir("metilene", targetRegions, minCoverage))
     output:
-        HTML='{}/Stats_report.html'.format(get_outdir("metilene", minCoverage))
+        HTML='{}/Stats_report.html'.format(get_outdir("metilene", targetRegions, minCoverage))
     params:
         genes_gtf=genes_gtf,
-        outdir=get_outdir("metilene", minCoverage),
+        outdir=get_outdir("metilene", targetRegions, minCoverage),
         sampleSheet=sampleSheet,
         minMethDiff=minMethDiff,
         FDR=FDR
     threads: 1
-    benchmark: '{}/.benchmark/metileneReport.benchmark'.format(get_outdir("metilene", minCoverage))
+    benchmark: '{}/.benchmark/metileneReport.benchmark'.format(get_outdir("metilene", targetRegions, minCoverage))
     conda: CONDA_WGBS_ENV
     script: "../rscripts/WGBS_metileneQC.Rmd"
 

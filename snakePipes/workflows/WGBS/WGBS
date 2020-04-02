@@ -49,7 +49,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          "noAutoMethylationBias": False, "fromBAM": False, "skipDOC": False,
                          "UMIDedup": False,
                          "UMIDedupOpts": "", "bcPattern": "",
-                         "UMIDedupSep": "_", "UMIBarcode": False}):
+                         "UMIDedupSep": "_", "UMIBarcode": False, "targetRegions": None}):
 
     """
     Parse arguments from the command line.
@@ -73,6 +73,11 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                           dest="blacklist",
                           help="Bed file(s) with positions to mask for methylation calling. Useful for masking SNPs in your strain of interest. (default: '%(default)s')",
                           default=defaults["blacklist"])
+
+    optional.add_argument("--targetRegions",
+                          dest="targetRegions",
+                          help="Bed file(s) with regions of interest to evaluate methylation for. (default: '%(default)s')",
+                          default=defaults["targetRegions"])
 
     optional.add_argument("--sampleSheet",
                           dest="sampleSheet",
