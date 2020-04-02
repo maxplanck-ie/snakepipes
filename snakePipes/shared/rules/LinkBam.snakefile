@@ -1,11 +1,12 @@
 import os
+
 rule link_bam:
     input:
         indir + "/{sample}" + bamExt
     output:
         aligner + "/{sample}.unsorted.bam" if pipeline=="noncoding-rna-seq" else aligner + "/{sample}.bam"
     params:
-        input_bai = indir + "/{sample}" + bamExt + '.bai',
+        input_bai = indir + "/{sample}" + bamExt + ".bai",
         output_bai = aligner + "/{sample}.unsorted.bam.bai" if pipeline=="noncoding-rna-seq" else aligner + "/{sample}.bam.bai"
     run:
         if os.path.exists(params.input_bai) and not os.path.exists(os.path.join(outdir,params.output_bai)):
