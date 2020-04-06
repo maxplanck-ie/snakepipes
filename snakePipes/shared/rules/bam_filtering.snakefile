@@ -16,7 +16,7 @@ rule samtools_filter:
         mapq = mapq,
         input = lambda wildcards,input: os.path.join(outdir,input[0]),
         output = lambda wildcards: os.path.join(outdir,"filtered_bam",wildcards.sample+".filtered.tmp.bam"),
-        filter = lambda wildcards: "{} {} {}".format("-F 1024" if params.dedup else "", "-f 2" if params.properPairs else "", "-q "+params.mapq if params.mapq != "0" else "")
+        filter = lambda wildcards: "{} {} {}".format("-F 1024" if params.dedup else "", "-f 2" if params.properPairs else "", "-q "+params.mapq if params.mapq != "0" else ""),
         shell = lambda wildcards,input,output: "samtools view -@ {} -b {} -o {} {} ".format(threads, filter,output.bam,input[0]) if params.filter.strip() !="" else "ln -s {} {}".format(params.input,params.output) 
     log:
         out = "filtered_bam/logs/samtools_filter.{sample}.out",
