@@ -4,7 +4,7 @@ import os
 # When modifying the rule samtools_filter, double-check whether the function
 # update_filter() has to be modified too
 
-bam_filter_string = "{} {} {}".format("-F 1024" if dedup else "", "-f 2" if properPairs else "", "-q "+mapq if mapq != "0" else "")
+bam_filter_string = "{} {} {}".format("-F 1024" if dedup else "", "-f 2" if properPairs else "", "-q "+ str(mapq) if str(mapq) != "0" else "")
 
 rule samtools_filter:
     input:
