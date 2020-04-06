@@ -4,6 +4,7 @@ rule filterFragments:
     output:
         shortBAM = temp(os.path.join(short_bams, "{sample}.short.bam")),
         metrics = os.path.join(short_bams, "{sample}.short.metrics")
+    log: os.path.join(short_bams, "logs/{sample}.filterFragments.log")
     params:
         maxFragmentSize=maxFragmentSize,
         minFragmentSize=minFragmentSize
@@ -14,7 +15,8 @@ rule filterFragments:
         --outFile {output.shortBAM} -p {threads} \
         --filterMetrics {output.metrics} \
         --maxFragmentLength {params.maxFragmentSize} \
-        --minFragmentLength {params.minFragmentSize}
+        --minFragmentLength {params.minFragmentSize} \
+        2 > {log}
         """
 
 
@@ -40,6 +42,7 @@ rule filterCoveragePerScaffolds:
         shortbai = temp(os.path.join(short_bams, "{sample}.short.bam.bai")),
         bam = os.path.join(short_bams, "{sample}.short.cleaned.bam"),
         bai = os.path.join(short_bams, "{sample}.short.cleaned.bam.bai")
+    log: os.path.join(short_bams, "logs/{sample}.filterCoveragePerScaffolds.log")
     params:
         count_cutoff = int(fragmentCountThreshold) * 2 # must contain more than 2 reads, i.e. 1 fragment
     threads: 6
@@ -49,6 +52,7 @@ rule filterCoveragePerScaffolds:
         samtools idxstats {input.bam} | awk -v cutoff={params.count_cutoff} \'$3 > cutoff\' | cut -f 1 > {output.whitelist}
         samtools view -@ {threads} -bo {output.bam} {input.bam} $(cat {output.whitelist} | paste -sd\' \')
         samtools index -@ {threads} {output.bam}
+        2> {log}
         """
 
 
@@ -87,8 +91,9 @@ rule callOpenChromatin:
 rule tempChromSizes:
     input: genome_index
     output: temp("HMMRATAC/chrom_sizes")
+    log: "HMMRATAC/logs/{sample}.tempChromSizes.log"
     shell: """
-        cut -f 1,2 {input} > {output}
+        cut -f 1,2 {input} > {output} 2> {log}
         """
 
 
@@ -106,12 +111,13 @@ rule HMMRATAC_peaks:
         "HMMRATAC/{sample}_peaks.gappedPeak",
         "HMMRATAC/{sample}_summits.bed",
         "HMMRATAC/{sample}_training.bed"
+    log: "HMMRATAC/logs/{sample}.HMMRATAC_peaks.log"
     params:
         blacklist = "-e {}".format(blacklist_bed) if blacklist_bed else ""
     conda: CONDA_ATAC_ENV
     threads: 4
     shell: """
-        HMMRATAC -Xmx10G -b {input[0]} -i {input[1]} -g {input[2]} {params.blacklist} -o HMMRATAC/{wildcards.sample}
+        HMMRATAC -Xmx10G -b {input[0]} -i {input[1]} -g {input[2]} {params.blacklist} -o HMMRATAC/{wildcards.sample} 2> {log}
         """
 
 
@@ -122,10 +128,11 @@ rule Genrich_peaks:
         bams=lambda wildcards: expand(os.path.join(short_bams, "{sample}.short.cleaned.bam"), sample=genrichDict[wildcards.group])
     output:
         "Genrich/{group}.narrowPeak"
+    log: "Genrich/logs/{sample}.Genrich_peaks.log"
     params:
         bams = lambda wildcards: ",".join(expand(os.path.join(short_bams, "{sample}.short.cleaned.bam"), sample=genrichDict[wildcards.group])),
         blacklist = "-E {}".format(blacklist_bed) if blacklist_bed else ""
     conda: CONDA_ATAC_ENV
     shell: """
-        Genrich -S -t {params.bams} -o {output} -r {params.blacklist} -j -y
+        Genrich -S -t {params.bams} -o {output} -r {params.blacklist} -j -y 2> {log}
         """
