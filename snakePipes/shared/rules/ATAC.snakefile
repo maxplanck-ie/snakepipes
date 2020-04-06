@@ -128,7 +128,7 @@ rule Genrich_peaks:
         bams=lambda wildcards: expand(os.path.join(short_bams, "{sample}.short.cleaned.bam"), sample=genrichDict[wildcards.group])
     output:
         "Genrich/{group}.narrowPeak"
-    log: "Genrich/logs/{sample}.Genrich_peaks.log"
+    log: "Genrich/logs/{group}.Genrich_peaks.log"
     params:
         bams = lambda wildcards: ",".join(expand(os.path.join(short_bams, "{sample}.short.cleaned.bam"), sample=genrichDict[wildcards.group])),
         blacklist = "-E {}".format(blacklist_bed) if blacklist_bed else ""
