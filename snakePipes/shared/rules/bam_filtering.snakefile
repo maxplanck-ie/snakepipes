@@ -4,6 +4,8 @@ import os
 # When modifying the rule samtools_filter, double-check whether the function
 # update_filter() has to be modified too
 
+bam_filter_string = "{} {} {}".format("-F 1024" if dedup else "", "-f 2" if properPairs else "", "-q "+mapq if mapq != "0" else "")
+
 rule samtools_filter:
     input:
         aligner+"/{sample}.bam",
@@ -11,13 +13,12 @@ rule samtools_filter:
     output:
         bam = temp("filtered_bam/{sample}.filtered.tmp.bam")
     params:
-        dedup = dedup,
-        properPairs = properPairs,
-        mapq = mapq,
-        input = lambda wildcards,input: os.path.join(outdir,input[0]),
-        output = lambda wildcards: os.path.join(outdir,"filtered_bam",wildcards.sample+".filtered.tmp.bam"),
-        filter = lambda wildcards: "{} {} {}".format("-F 1024" if params.dedup else "", "-f 2" if params.properPairs else "", "-q "+params.mapq if params.mapq != "0" else ""),
-        shell = lambda wildcards,input,output: "samtools view -@ {} -b {} -o {} {} ".format(threads, filter,output.bam,input[0]) if params.filter.strip() !="" else "ln -s {} {}".format(params.input,params.output) 
+        #dedup = dedup,
+        #properPairs = properPairs,
+        #mapq = mapq,
+        #input = lambda wildcards,input: os.path.join(outdir,input[0]),
+        #output = lambda wildcards: os.path.join(outdir,"filtered_bam",wildcards.sample+".filtered.tmp.bam"),
+        shell = lambda wildcards,input,output: "samtools view -@ {} -b {} -o {} {} ".format(threads, bam_filter_string,output.bam,input[0]) if bam_filter_string.strip() !="" else "ln -s {} {}".format(os.path.join(outdir,input[0]),os.path.join(outdir,"filtered_bam",wildcards.sample+".filtered.tmp.bam")) 
     log:
         out = "filtered_bam/logs/samtools_filter.{sample}.out",
         err = "filtered_bam/logs/samtools_filter.{sample}.err"
