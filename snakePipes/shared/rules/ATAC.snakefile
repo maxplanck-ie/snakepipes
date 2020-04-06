@@ -91,7 +91,7 @@ rule callOpenChromatin:
 rule tempChromSizes:
     input: genome_index
     output: temp("HMMRATAC/chrom_sizes")
-    log: "HMMRATAC/logs/{sample}.tempChromSizes.log"
+    log: "HMMRATAC/logs/tempChromSizes.log"
     shell: """
         cut -f 1,2 {input} > {output} 2> {log}
         """
