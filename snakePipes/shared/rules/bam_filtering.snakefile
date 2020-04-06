@@ -46,5 +46,6 @@ rule samtools_index_tmp_filtered:
         "filtered_bam/{sample}.filtered.tmp.bam"
     output:
         temp("filtered_bam/{sample}.filtered.tmp.bam.bai")
+    log: "filtered_bam/logs/{sample}.samtools_index_tmp_filtered.log"
     conda: CONDA_SHARED_ENV
-    shell: "samtools index {input}"
+    shell: "samtools index {input} 2> {log}"
