@@ -58,7 +58,7 @@ rule MACS2_peak_qc:
         xls = os.path.join(outdir_MACS2, '{sample}.filtered.short.BAM_peaks.xls')
     output:
         qc = os.path.join(outdir_ATACqc, "{sample}.filtered.BAM_peaks.qc.txt")
-    log: os.path.join(outdir_ATACqc, "logs/{sample}.MACS2_peak_qc.log)
+    log: os.path.join(outdir_ATACqc, "logs/{sample}.MACS2_peak_qc.log")
     params:
         peaks = os.path.join(outdir_MACS2, '{sample}.filtered.short.BAM_peaks.narrowPeak'),
         genome_index = genome_index
