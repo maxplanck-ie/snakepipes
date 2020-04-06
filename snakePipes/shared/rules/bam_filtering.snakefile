@@ -13,11 +13,6 @@ rule samtools_filter:
     output:
         bam = temp("filtered_bam/{sample}.filtered.tmp.bam")
     params:
-        #dedup = dedup,
-        #properPairs = properPairs,
-        #mapq = mapq,
-        #input = lambda wildcards,input: os.path.join(outdir,input[0]),
-        #output = lambda wildcards: os.path.join(outdir,"filtered_bam",wildcards.sample+".filtered.tmp.bam"),
         shell = lambda wildcards,input,output: "samtools view -@ {} -b {} -o {} {} ".format(str(threads), bam_filter_string,output.bam,input[0]) if bam_filter_string.strip() !="" else "ln -s {} {}".format(os.path.join(outdir,input[0]),os.path.join(outdir,"filtered_bam",wildcards.sample+".filtered.tmp.bam")) 
     log:
         out = "filtered_bam/logs/samtools_filter.{sample}.out",
@@ -27,16 +22,6 @@ rule samtools_filter:
     threads: 8
     conda: CONDA_SHARED_ENV
     shell: """
-        #filter=""
-        #if [ "{params.dedup}" == "True" ] ; then filter="$filter -F 1024"; fi
-        #if [ "{params.properPairs}" == "True" ] ; then filter="$filter -f 2"; fi
-        #if [ "{params.mapq}" != "0" ] ; then filter="$filter -q {params.mapq}"; fi
-        #if [[ -z $filter ]] ; then ln -s {params.input} {params.output} ;
-        #else
-        #    samtools view -@ {threads} -b $filter -o {output.bam} {input[0]} 2> {log.err} ;
-        #fi
-        #echo "samtools view arguments: $filter" > {log.out}
-
         {params.shell} 2> {log.err}
         """
 
