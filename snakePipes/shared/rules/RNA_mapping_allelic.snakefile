@@ -8,6 +8,7 @@ if aligner == "STAR":
                 index = star_index_allelic
             output:
                 temp(aligner+"/{sample}.sorted.bam")
+            log: "aligner/logs/{sample}.sort.log"
             params:
                 alignerOptions = str(alignerOptions or ''),
                 gtf = genes_gtf,
@@ -41,7 +42,7 @@ if aligner == "STAR":
                     --alignIntronMin 1 \
                     --alignIntronMax 1000000 \
                     --alignMatesGapMax 1000000 \
-                | samtools sort -m {params.samsort_memory} -T $MYTEMP/{wildcards.sample} -@ {threads} -O bam -o {output} -;
+                | samtools sort -m {params.samsort_memory} -T $MYTEMP/{wildcards.sample} -@ {threads} -O bam -o {output} - 2> {log};
                 rm -rf $MYTEMP
                 """
     else:
@@ -51,6 +52,7 @@ if aligner == "STAR":
                 index = star_index_allelic
             output:
                 temp(aligner+"/{sample}.sorted.bam")
+            log: "aligner/logs/{sample}.sort.log"
             params:
                 alignerOptions = str(alignerOptions or ''),
                 gtf = genes_gtf,
@@ -84,7 +86,7 @@ if aligner == "STAR":
                     --alignIntronMin 1 \
                     --alignIntronMax 1000000 \
                     --alignMatesGapMax 1000000 \
-                | samtools sort -m {params.samsort_memory} -T $MYTEMP/{wildcards.sample} -@ {threads} -O bam -o {output} -;
+                | samtools sort -m {params.samsort_memory} -T $MYTEMP/{wildcards.sample} -@ {threads} -O bam -o {output} - 2> {log};
                 rm -rf $MYTEMP
                 """
 else:
