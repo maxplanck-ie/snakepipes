@@ -409,7 +409,8 @@ rule run_metilene:
         minCpGs=minCpGs,
         minMethDiff=minMethDiff,
         FDR=FDR,
-        regionlist='-B ' + targetRegions if targetRegions else ''
+        regionlist='-B ' + targetRegions if targetRegions else '',
+        opts = metileneOptions if metileneOptions else ''
     log:
         err="{}/logs/run_metilene.err".format(get_outdir("metilene", targetRegions, minCoverage))
     threads: 10
@@ -424,6 +425,7 @@ rule run_metilene:
                  --minMethDiff {params.minMethDiff} \
                  --threads {threads} \
                  {params.regionlist} \
+                 {params.opts} \
                  {input.MetIN} 2>{log.err} \
             | sort -k 1,1 -k2,2n >> {output.MetBed}
         """

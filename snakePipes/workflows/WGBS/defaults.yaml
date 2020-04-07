@@ -59,6 +59,7 @@ minCpGs: 10
 minCoverage: 5
 FDR: 0.1
 minMethDiff: 0.1
+metileneOptions:
 ###MethylDackel options
 MethylDackelOptions: '--mergeContext --maxVariantFrac 0.25 --minDepth 4'
 ##umi_tools
