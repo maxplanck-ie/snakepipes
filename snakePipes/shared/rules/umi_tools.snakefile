@@ -91,7 +91,7 @@ else:
             shell: """
                    mv {input.bamfile} {output.bamfile}
                    """
-    elif not fromBAM:
+    elif not aligner=="bwameth" :
         rule filter_reads:
             input:
                 bamfile = aligner+"/{sample}.bam"
@@ -101,11 +101,12 @@ else:
                 if not os.path.exists(os.path.join(outdir,output[0])):
                     os.symlink(os.path.join(outdir,input[0]),os.path.join(outdir,output[0]))
 
-rule samtools_index_filtered:
-    input:
-        "filtered_bam/{sample}.filtered.bam"
-    output:
-        "filtered_bam/{sample}.filtered.bam.bai"
-    log: "filtered_bam/logs/{sample}.index.log"
-    conda: CONDA_SHARED_ENV
-    shell: "samtools index {input} 2> {log}"
+if not aligner=="bwameth":
+    rule samtools_index_filtered:
+        input:
+            "filtered_bam/{sample}.filtered.bam"
+        output:
+            "filtered_bam/{sample}.filtered.bam.bai"
+        log: "filtered_bam/logs/{sample}.index.log"
+        conda: CONDA_SHARED_ENV
+        shell: "samtools index {input} 2> {log}"

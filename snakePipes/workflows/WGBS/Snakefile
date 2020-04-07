@@ -115,8 +115,7 @@ def run_deeptools(GCbias):
 
 def run_misc_QC(skipBamQC):
     if not skipBamQC:
-        return ( expand("bwameth/{sample}.markdup.bam", sample = samples), 
-                 expand("QC_metrics/{sample}.Mbias.txt", sample=samples),
+        return ( expand("filtered_bam/{sample}.filtered.bam", sample = samples), 
                  calc_doc(skipDOC),
                  'QC_metrics/QC_report.html',
                  run_deeptools(GCbias),
@@ -175,6 +174,7 @@ rule all:
     input:
         run_FastQC(fastqc),
         run_misc_QC(skipBamQC),
+        expand("QC_metrics/{sample}.Mbias.txt", sample=samples),
         expand("MethylDackel/{sample}_CpG.bedGraph", sample=samples),
         expand("MethylDackel/{sample}_CpG.methylation.bw", sample=samples),
         expand("MethylDackel/{sample}_CpG.coverage.bw", sample=samples),
