@@ -17,6 +17,7 @@ cf.get_version()
 # do workflow specific stuff now
 include: os.path.join(workflow.basedir, "internals.snakefile")
 
+
 ### include modules of other snakefiles ########################################
 ################################################################################
 

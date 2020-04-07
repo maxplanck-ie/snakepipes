@@ -1,5 +1,5 @@
 ##sambamba is used for marking up duplications
-
+import os
 
 ## see Bowtie2.snakefile or RNA_mapping.snakefile for input
 ## takes the input from RNA mapping or DNA mapping snakefile
@@ -14,9 +14,14 @@ rule sambamba_markdup:
            out=aligner + "/logs/{sample}.sambamba_markdup.out",
            err=aligner + "/logs/{sample}.sambamba_markdup.err"
        benchmark: aligner + "/.benchmark/sambamba_markdup.{sample}.benchmark"
+       params:
+           tempDir = tempDir
        conda: CONDA_SAMBAMBA_ENV
        shell: """
-           sambamba markdup -t {threads} --sort-buffer-size=6000 --overflow-list-size 600000 {input} {output} 2> {log.err} > {log.out}
+           TMPDIR = {params.tempDir}
+           MYTEMP=$(mktemp -d "${{TMPDIR:-/tmp}}"/snakepipes.XXXXXXXXXX)
+           sambamba markdup -t {threads} --sort-buffer-size=6000 --overflow-list-size 600000 --tmpdir $MYTEMP {input} {output} 2> {log.err} > {log.out}
+           rm -rf "$MYTEMP"
            """
 ## get statistics
 rule sambamba_flagstat_sorted:
