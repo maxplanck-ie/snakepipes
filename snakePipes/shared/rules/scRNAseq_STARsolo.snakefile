@@ -27,12 +27,14 @@ rule STARsolo:
         UMIlen = STARsoloCoords[1],
         CBstart = STARsoloCoords[2],
         CBlen = STARsoloCoords[3],
-        outdir = outdir
+        outdir = outdir,
+        tempDir = tempDir
     benchmark:
         aligner+"/.benchmark/STARsolo.{sample}.benchmark"
     threads: 20  # 3.2G per core
     conda: CONDA_scRNASEQ_ENV
     shell: """
+        TMPDIR = {params.tempDir}
         MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX);
         ( [ -d {params.sample_dir} ] || mkdir -p {params.sample_dir} )
         STAR --runThreadN {threads} \
@@ -143,10 +145,12 @@ if not skipVelocyto:
             bam = "filtered_bam/cellsorted_{sample}.filtered.bam"
         log: "filtered_bam/logs/{sample}.cellsort.log"
         params:
-            samsort_memory="10G"
+            samsort_memory="10G",
+            tempDir = tempDir
         threads: 4
         conda: CONDA_scRNASEQ_ENV
         shell: """
+                TMPDIR = {params.tempDir}
                 MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX)
                 samtools sort -m {params.samsort_memory} -@ {threads} -T $MYTEMP/{wildcards.sample} -t CB -O bam -o {output.bam} {input.bam} 2> {log}
                 rm -rf $MYTEMP

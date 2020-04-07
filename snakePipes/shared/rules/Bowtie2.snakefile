@@ -12,12 +12,14 @@ if pairedEnd:
             bowtie2_index=bowtie2_index,
             alignerOpts = str(alignerOpts or ''),
             mateOrientation = mateOrientation,
-            insertSizeMax = insertSizeMax
+            insertSizeMax = insertSizeMax,
+            tempDir = tempDir
         benchmark:
             "Bowtie2/.benchmark/Bowtie2.{sample}.benchmark"
         threads: 24  # 1G per core
         conda: CONDA_DNA_MAPPING_ENV
         shell: """
+            TMPDIR = {params.tempDir}
             MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX);
             bowtie2 \
             -X {params.insertSizeMax} \
@@ -41,12 +43,14 @@ else:
         log: "Bowtie2/logs/{sample}.sort.log"
         params:
             bowtie2_index=bowtie2_index,
-            alignerOpts = str(alignerOpts or '')
+            alignerOpts = str(alignerOpts or ''),
+            tempDir = tempDir
         benchmark:
             "Bowtie2/.benchmark/Bowtie2.{sample}.benchmark"
         threads: 24  # 1G per core
         conda: CONDA_DNA_MAPPING_ENV
         shell: """
+            TMPDIR = {params.tempDir}
             MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX);
             bowtie2 \
             -x {params.bowtie2_index} -U {input} \

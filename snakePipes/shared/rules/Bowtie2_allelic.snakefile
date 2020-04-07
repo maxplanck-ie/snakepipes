@@ -23,12 +23,14 @@ if aligner == "Bowtie2":
                 alignerOpts = str(alignerOpts or ''),
                 mateOrientation = mateOrientation,
                 insertSizeMax = insertSizeMax,
-                idxbase = getbw_idxbase(bowtie2_index_allelic)
+                idxbase = getbw_idxbase(bowtie2_index_allelic),
+                tempDir = tempDir
             benchmark:
                 aligner+"/.benchmark/Bowtie2.{sample}.benchmark"
             threads: 24  # 1G per core
             conda: CONDA_DNA_MAPPING_ENV
             shell: """
+                TMPDIR = {params.tempDir}
                 MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX);
                 bowtie2 \
                 -X {params.insertSizeMax} \
@@ -53,12 +55,14 @@ if aligner == "Bowtie2":
             log: "Bowtie2/logs/{sample}.sort.log"
             params:
                 alignerOpts = str(alignerOpts or ''),
-                idxbase = getbw_idxbase(bowtie2_index_allelic)
+                idxbase = getbw_idxbase(bowtie2_index_allelic),
+                tempDir = tempDir
             benchmark:
                 aligner+"/.benchmark/Bowtie2.{sample}.benchmark"
             threads: 24  # 1G per core
             conda: CONDA_DNA_MAPPING_ENV
             shell: """
+                TMPDIR = {params.tempDir}
                 MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX);
                 bowtie2 \
                 -x {params.idxbase} -U {input.r1} \

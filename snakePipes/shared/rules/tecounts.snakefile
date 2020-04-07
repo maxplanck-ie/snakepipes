@@ -121,10 +121,14 @@ rule sortBams:
         "filtered_bam/{sample}.filtered.bam"
     log: "filtered_bam/logs/{sample}.sort.log"
     threads: 5
+    params:
+        tempDir = tempDir
     conda: CONDA_SHARED_ENV
     shell: """
+        TMPDIR = {params.tempDir}
         MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX);
         samtools view -u -F 2304 {input} | samtools sort -@ 4 -m 2G -T $MYTEMP/{wildcards.sample} -o {output} 2> {log}
+        rm -rf $MYTEMP
         """
 if fromBAM:
     rule samtools_index_filtered_bam:
