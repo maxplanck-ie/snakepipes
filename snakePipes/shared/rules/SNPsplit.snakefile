@@ -56,7 +56,7 @@ rule BAMsort_allelic:
     input: "allelic_bams/{sample}.{suffix}.unsorted.bam"
     output:
         "allelic_bams/{sample}.{suffix}.sorted.bam"
-        log: "allelic_bams/logs/{sample}.sort.log"
+    log: "allelic_bams/logs/{sample}.{suffix}.sort.log"
     threads:
         12
     params:
@@ -75,6 +75,6 @@ rule BAMindex_allelic:
         "allelic_bams/{sample}.{suffix}.sorted.bam"
     output:
         "allelic_bams/{sample}.{suffix}.sorted.bam.bai"
-    log: "allelic_bams/logs/{sample}.index.log"
+    log: "allelic_bams/logs/{sample}.{suffix}.index.log"
     conda: CONDA_SHARED_ENV
     shell: "samtools index {input} 2> {log}"

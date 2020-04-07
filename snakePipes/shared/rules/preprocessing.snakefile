@@ -35,7 +35,7 @@ else:
             output:
                 r1="mergedFASTQ/{sample}" + reads[0] + ext,
                 r2="mergedFASTQ/{sample}" + reads[1] + ext
-             run:
+            run:
                 if not os.path.exists(os.path.join(outdir,output.r1)):
                     os.symlink(os.path.join(outdir,input.r1),os.path.join(outdir,output.r1))
                 if not os.path.exists(os.path.join(outdir,output.r2)):
