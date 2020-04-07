@@ -32,7 +32,7 @@ if aligner.upper().find("HISAT2") >=0:
                 bam = temp(aligner+"/{sample}.sorted.bam"),
                 splice = aligner+"/{sample}/splice_sites.txt",
                 met = aligner+"/{sample}/metrics.txt"
-            log: "aligner/logs/{sample}.sort.log"
+            log: aligner+"/logs/{sample}.sort.log"
             params:
                 lib_type = getHISAT_libtype(pairedEnd, libraryType),
                 input_splice = known_splicesites,
@@ -63,7 +63,7 @@ if aligner.upper().find("HISAT2") >=0:
                 bam = temp(aligner+"/{sample}.sorted.bam"),
                 splice = aligner+"/{sample}/splice_sites.txt",
                 met = aligner+"/{sample}/metrics.txt"
-            log: "aligner/logs/{sample}.sort.log"
+            log: aligner+"/logs/{sample}.sort.log"
             params:
                 lib_type = getHISAT_libtype(pairedEnd, libraryType),
                 input_splice = known_splicesites,
@@ -93,7 +93,7 @@ elif aligner.upper().find("STAR") >=0:
                 r2 = fastq_dir+"/{sample}"+reads[1]+".fastq.gz"
             output:
                 bam = temp(aligner+"/{sample}.sorted.bam")
-            log: "aligner/logs/{sample}.sort.log"
+            log: aligner+"/logs/{sample}.sort.log"
             params:
                 alignerOptions = str(alignerOptions or ''),
                 gtf = genes_gtf,
@@ -128,7 +128,7 @@ elif aligner.upper().find("STAR") >=0:
                 fastq_dir+"/{sample}"+reads[0]+".fastq.gz"
             output:
                 bam = temp(aligner+"/{sample}.sorted.bam")
-            log: "aligner/logs/{sample}.sort.log"
+            log: aligner+"/logs/{sample}.sort.log"
             params:
                 alignerOptions = str(alignerOptions or ''),
                 gtf = genes_gtf,

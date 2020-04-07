@@ -8,7 +8,7 @@ if aligner == "STAR":
                 index = star_index_allelic
             output:
                 temp(aligner+"/{sample}.sorted.bam")
-            log: "aligner/logs/{sample}.sort.log"
+            log: aligner+"/logs/{sample}.sort.log"
             params:
                 alignerOptions = str(alignerOptions or ''),
                 gtf = genes_gtf,
@@ -52,7 +52,7 @@ if aligner == "STAR":
                 index = star_index_allelic
             output:
                 temp(aligner+"/{sample}.sorted.bam")
-            log: "aligner/logs/{sample}.sort.log"
+            log: aligner+"/logs/{sample}.sort.log"
             params:
                 alignerOptions = str(alignerOptions or ''),
                 gtf = genes_gtf,

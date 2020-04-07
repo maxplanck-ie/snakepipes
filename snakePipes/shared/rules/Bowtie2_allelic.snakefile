@@ -18,6 +18,7 @@ if aligner == "Bowtie2":
             output:
                 align_summary = aligner+"/{sample}.Bowtie2_summary.txt",
                 bam = temp(aligner+"/{sample}.sorted.bam")
+            log: "Bowtie2/logs/{sample}.sort.log"
             params:
                 alignerOpts = str(alignerOpts or ''),
                 mateOrientation = mateOrientation,
@@ -38,7 +39,7 @@ if aligner == "Bowtie2":
                 -p {threads} \
                 2> {output.align_summary} | \
                 samtools view -Sb - | \
-                samtools sort -m 2G -T $MYTEMP/{wildcards.sample} -@ 2 -O bam - > {output.bam};
+                samtools sort -m 2G -T $MYTEMP/{wildcards.sample} -@ 2 -O bam - > {output.bam} 2> {log};
                 rm -rf $MYTEMP
                 """
     else:
@@ -49,6 +50,7 @@ if aligner == "Bowtie2":
             output:
                 align_summary = aligner+"/{sample}.Bowtie2_summary.txt",
                 bam = temp(aligner+"/{sample}.sorted.bam")
+            log: "Bowtie2/logs/{sample}.sort.log"
             params:
                 alignerOpts = str(alignerOpts or ''),
                 idxbase = getbw_idxbase(bowtie2_index_allelic)
@@ -67,7 +69,7 @@ if aligner == "Bowtie2":
                 -p {threads} \
                 2> {output.align_summary} | \
                 samtools view -Sbu - | \
-                samtools sort -m 2G -T $MYTEMP/{wildcards.sample} -@ 2 -O bam - > {output.bam};
+                samtools sort -m 2G -T $MYTEMP/{wildcards.sample} -@ 2 -O bam - > {output.bam} 2> {log};
                 rm -rf $MYTEMP
                 """
 else:

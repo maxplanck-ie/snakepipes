@@ -34,9 +34,9 @@ if downsample:
             threads: 10
             conda: CONDA_SHARED_ENV
             shell: """
-                seqtk sample -s 100 {input.r1} {params.num_reads} | pigz -p {threads} -9 > {output.r1}
-                seqtk sample -s 100 {input.r2} {params.num_reads} | pigz -p {threads} -9 > {output.r2}
-                2> {log}
+                seqtk sample -s 100 {input.r1} {params.num_reads} | pigz -p {threads} -9 > {output.r1} 2> {log}
+                seqtk sample -s 100 {input.r2} {params.num_reads} | pigz -p {threads} -9 > {output.r2} 2>> {log}
+                
                 """
     else:
         rule FASTQdownsample:

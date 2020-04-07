@@ -20,9 +20,10 @@ rule conversionRate:
         "QC_metrics/{sample}.CHH.Mbias.txt"
     output:
         "QC_metrics/{sample}.conv.rate.txt"
+    log: "QC_metrics/logs/{sample}.conversionRate.log"
     threads: 1
     shell: """
-        awk '{{if(NR>1) {{M+=$4; UM+=$5}}}}END{{printf("{wildcards.sample}\\t%f\\n", 100*(1.0-M/(M+UM)))}}' {input} > {output}
+        awk '{{if(NR>1) {{M+=$4; UM+=$5}}}}END{{printf("{wildcards.sample}\\t%f\\n", 100*(1.0-M/(M+UM)))}}' {input} > {output} 2> {log}
         """
 
 
@@ -44,7 +45,7 @@ if pairedEnd and not fromBAM:
         shell: """
             MYTEMP=$(mktemp -d "${{TMPDIR:-/tmp}}"/snakepipes.XXXXXXXXXX)
             bwameth.py --threads {threads} --reference "{params.bwameth_index}" "{input.r1}" "{input.r2}" 2> {log.err} | \
-	        samtools sort -T "$MYTEMP"/{wildcards.sample} -m 3G -@ 4 -o "{output.sbam}"
+	        samtools sort -T "$MYTEMP"/{wildcards.sample} -m 3G -@ 4 -o "{output.sbam}" 2>> {log.err}
             rm -rf "$MYTEMP"
             """
 elif not fromBAM:
@@ -63,7 +64,7 @@ elif not fromBAM:
         shell: """
             MYTEMP=$(mktemp -d "${{TMPDIR:-/tmp}}"/snakepipes.XXXXXXXXXX)
             bwameth.py --threads {threads} --reference "{params.bwameth_index}" "{input.r1}" 2> {log.err} | \
-	        samtools sort -T "$MYTEMP/{wildcards.sample}" -m 3G -@ 4 -o "{output.sbam}"
+	        samtools sort -T "$MYTEMP/{wildcards.sample}" -m 3G -@ 4 -o "{output.sbam}" 2>> {log.err}
             rm -rf "$MYTEMP"
             """
 
@@ -77,7 +78,7 @@ rule index_bam:
         out="bwameth/logs/{sample}.index_bam.out"
     conda: CONDA_SHARED_ENV
     shell: """
-        samtools index "{input}" >{log.out} 2>{log.err}
+        samtools index "{input}" > {log.out} 2> {log.err}
         """
 
 
@@ -94,7 +95,7 @@ rule markDupes:
     conda: CONDA_SAMBAMBA_ENV
     shell: """
         MYTEMP=$(mktemp -d "${{TMPDIR:-/tmp}}"/snakepipes.XXXXXXXXXX)
-        sambamba markdup -t {threads} --tmpdir "$MYTEMP/{wildcards.sample}" "{input[0]}" "{output}" >{log.out} 2>{log.err}
+        sambamba markdup -t {threads} --tmpdir "$MYTEMP/{wildcards.sample}" "{input[0]}" "{output}" > {log.out} 2> {log.err}
         rm -rf "$MYTEMP"
         """
 
@@ -111,7 +112,7 @@ rule indexMarkDupes:
     threads: 1
     conda: CONDA_SHARED_ENV
     shell: """
-        samtools index "{input}" 1>{log.out} 2>{log.err}
+        samtools index "{input}" 1> {log.out} 2> {log.err}
         """
 
 
@@ -270,7 +271,7 @@ rule get_flagstat:
         err="QC_metrics/logs/{sample}.get_flagstat.err"
     threads: 1
     conda: CONDA_SHARED_ENV
-    shell: "samtools flagstat {input} > {output} 2>{log.err}"
+    shell: "samtools flagstat {input} > {output} 2> {log.err}"
 
 
 rule produceReport:
@@ -307,7 +308,7 @@ if not noAutoMethylationBias:
         conda: CONDA_WGBS_ENV
         shell: """
             mi=$(cat {input[2]} | sed 's/Suggested inclusion options: //' )
-            MethylDackel extract -o MethylDackel/{wildcards.sample} {params.MethylDackelOptions} $mi -@ {threads} {params.genome} {input[0]} 1>{log.out} 2>{log.err}
+            MethylDackel extract -o MethylDackel/{wildcards.sample} {params.MethylDackelOptions} $mi -@ {threads} {params.genome} {input[0]} 1> {log.out} 2> {log.err}
             """
 else:
     rule methyl_extract:
@@ -325,7 +326,7 @@ else:
         threads: 10
         conda: CONDA_WGBS_ENV
         shell: """
-            MethylDackel extract -o MethylDackel/{wildcards.sample} {params.MethylDackelOptions} -@ {threads} {params.genome} {input[0]} 1>{log.out} 2>{log.err}
+            MethylDackel extract -o MethylDackel/{wildcards.sample} {params.MethylDackelOptions} -@ {threads} {params.genome} {input[0]} 1> {log.out} 2> {log.err}
             """
 
 

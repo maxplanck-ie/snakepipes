@@ -48,11 +48,11 @@ rule filterCoveragePerScaffolds:
     threads: 6
     conda: CONDA_SHARED_ENV
     shell: """
-        samtools index -@ {threads} {input.bam}
-        samtools idxstats {input.bam} | awk -v cutoff={params.count_cutoff} \'$3 > cutoff\' | cut -f 1 > {output.whitelist}
-        samtools view -@ {threads} -bo {output.bam} {input.bam} $(cat {output.whitelist} | paste -sd\' \')
-        samtools index -@ {threads} {output.bam}
-        2> {log}
+        samtools index -@ {threads} {input.bam} 2> {log}
+        samtools idxstats {input.bam} | awk -v cutoff={params.count_cutoff} \'$3 > cutoff\' | cut -f 1 > {output.whitelist} 2>> {log}
+        samtools view -@ {threads} -bo {output.bam} {input.bam} $(cat {output.whitelist} | paste -sd\' \') 2>> {log} 
+        samtools index -@ {threads} {output.bam} 2>> {log}
+        
         """
 
 

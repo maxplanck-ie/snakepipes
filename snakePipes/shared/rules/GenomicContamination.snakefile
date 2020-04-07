@@ -23,8 +23,9 @@ rule GContamination_featurecount_report:
         finaloutput = "GenomicContamination/{sample}.Gcontamination_report.tsv",
         temp = temp("GenomicContamination/{sample}.temp"),
         temp1 = temp("GenomicContamination/{sample}.temp1")
+    log: "GenomicContamination/logs/{sample}.report.log"
     shell:
-        "SUM=$(cut -f2 {input} | tr '\n' '\t'| cut -f2,4,5 | awk '{{num = $1 + $2 + $3}} END {{print num}}');NUM=$(cut -f2 {input} | tr '\n' '\t'| cut -f5 | awk '{{num = $1}} END {{print num}}'); bc -l <<< $NUM/$SUM > {output.temp}; cut -f2 {input} | tr '\n' '\t'|cut -f2 | sed 's/^/{wildcards.sample}\t/' > {output.temp1}; paste -d'\t' {output.temp1} {output.temp} > {output.finaloutput}"
+        "SUM=$(cut -f2 {input} | tr '\n' '\t'| cut -f2,4,5 | awk '{{num = $1 + $2 + $3}} END {{print num}}');NUM=$(cut -f2 {input} | tr '\n' '\t'| cut -f5 | awk '{{num = $1}} END {{print num}}'); bc -l <<< $NUM/$SUM > {output.temp}; cut -f2 {input} | tr '\n' '\t'|cut -f2 | sed 's/^/{wildcards.sample}\t/' > {output.temp1}; paste -d'\t' {output.temp1} {output.temp} > {output.finaloutput} 2> {log}"
 
 ##
 rule GContamination_featurecount_all_report:

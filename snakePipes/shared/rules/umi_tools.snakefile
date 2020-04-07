@@ -106,5 +106,6 @@ rule samtools_index_filtered:
         "filtered_bam/{sample}.filtered.bam"
     output:
         "filtered_bam/{sample}.filtered.bam.bai"
+    log: "filtered_bam/logs/{sample}.index.log"
     conda: CONDA_SHARED_ENV
-    shell: "samtools index {input}"
+    shell: "samtools index {input} 2> {log}"
