@@ -24,9 +24,10 @@ rule sambamba_flagstat_sorted:
            aligner+"/{sample}.sorted.bam"
        output:
            "Sambamba/{sample}.sorted.markdup.txt"
+       log: "Sambamba/logs/{sample}.flagstat_sorted.log"
        conda: CONDA_SAMBAMBA_ENV
        shell: """
-           sambamba flagstat -p {input} > {output}
+           sambamba flagstat -p {input} > {output} 2> {log}
            """
 
 rule sambamba_flagstat:
@@ -34,9 +35,10 @@ rule sambamba_flagstat:
            aligner+"/{sample}.bam"
        output:
            "Sambamba/{sample}.markdup.txt"
+       log: "Sambamba/logs/{sample}.flagstat.log"
        conda: CONDA_SAMBAMBA_ENV
        shell: """
-           sambamba flagstat -p {input} > {output}
+           sambamba flagstat -p {input} > {output} 2> {log}
            """
 
 ## index the duplicate marked folder
@@ -45,5 +47,6 @@ rule samtools_index:
         aligner+"/{sample}.bam"
     output:
         aligner+"/{sample}.bam.bai"
+    log: aligner + "/logs/{sample}.index.log"
     conda: CONDA_SHARED_ENV
-    shell: "samtools index {input}"
+    shell: "samtools index {input} 2> {log}"
