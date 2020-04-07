@@ -47,6 +47,7 @@ verbose: False
 plotFormat: 'png'
 #### Flag to control the pipeline entry point
 fromBAM: False
+skipBamQC: False
 bamExt: '.bam'
 pairedEnd: True
 ###Flags to control skipping of certain QC calculations

@@ -54,7 +54,7 @@ else:
 # TODO: Still needed?
 idxRange = 2 if pairedEnd else 1
 def calc_doc(skipDOC):
-    if not skipDOC:
+    if not skipDOC and not skipBamQC:
         return (["QC_metrics/genomeCoverage.txt",
                  "QC_metrics/genomeCoverage.png",
                  "QC_metrics/genomeCoverage.coverageMetrics.txt",
@@ -66,8 +66,10 @@ def calc_doc(skipDOC):
 
 
 def run_FastQC(fastqc):
-    if fastqc and fromBAM:
+    if fastqc and not fromBAM:
         return( expand("FastQC/{sample}{read}_fastqc.html", sample = samples, read = reads[:idxRange]) )
+    elif fastqc and fromBAM:
+        return( expand("FastQC/{sample}_fastqc.html", sample = samples) )
     else:
         return([])
 
@@ -104,8 +106,22 @@ def run_DMRs(sampleSheet, targetRegions, minCoverage, DMRprograms):
 
 
 def run_deeptools(GCbias):
+    if skipBamQC:
+        GCbias = False
     if GCbias:
         return (expand("QC_metrics/GCbias.freq.txt", sample = samples, read = reads) + expand("QC_metrics/GCbias.png", sample = samples, read = reads))
+    else:
+        return ([])
+
+def run_misc_QC(skipBamQC):
+    if not skipBamQC:
+        return ( expand("bwameth/{sample}.markdup.bam", sample = samples), 
+                 expand("QC_metrics/{sample}.Mbias.txt", sample=samples),
+                 calc_doc(skipDOC),
+                 'QC_metrics/QC_report.html',
+                 run_deeptools(GCbias),
+                 'multiQC/multiqc_report.html'
+                )
     else:
         return ([])
 
@@ -118,6 +134,8 @@ if not fromBAM:
     include: os.path.join(maindir, "shared", "rules", "umi_tools.snakefile")
     # FASTQ: either downsample FASTQ files or create symlinks to input files
     include: os.path.join(maindir, "shared", "rules", "FASTQ.snakefile")
+else:
+    include: os.path.join(maindir, "shared", "rules", "LinkBam.snakefile")
 
 # WGBS
 include: os.path.join(maindir, "shared", "rules", "WGBS.snakefile")
@@ -156,16 +174,11 @@ else:
 rule all:
     input:
         run_FastQC(fastqc),
-        expand("bwameth/{sample}.markdup.bam", sample = samples),
-        expand("QC_metrics/{sample}.Mbias.txt", sample=samples),
-        calc_doc(skipDOC),
-        'QC_metrics/QC_report.html',
-        run_deeptools(GCbias),
+        run_misc_QC(skipBamQC),
         expand("MethylDackel/{sample}_CpG.bedGraph", sample=samples),
         expand("MethylDackel/{sample}_CpG.methylation.bw", sample=samples),
         expand("MethylDackel/{sample}_CpG.coverage.bw", sample=samples),
-        run_DMRs(sampleSheet, targetRegions, minCoverage, DMRprograms),
-        'multiQC/multiqc_report.html'
+        run_DMRs(sampleSheet, targetRegions, minCoverage, DMRprograms)        
 
 
 ### execute after workflow finished ############################################

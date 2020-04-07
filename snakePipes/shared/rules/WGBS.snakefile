@@ -4,15 +4,15 @@ from operator import is_not
 import tempfile
 
 ###symlink bams if this is the starting point
-if fromBAM:
-    rule link_bam:
-        input:
-            indir + "/{sample}" + bamExt
-        output:
-            "bwameth/{sample}.sorted" + bamExt
-        run:
-            if not os.path.exists(os.path.join(outdir,output)):
-                os.symlink(os.path.join(outdir,input),os.path.join(outdir,output))
+#if fromBAM:
+#    rule link_bam:
+#        input:
+#            indir + "/{sample}" + bamExt
+#        output:
+#            "bwameth/{sample}.sorted" + bamExt
+#        run:
+#            if not os.path.exists(os.path.join(outdir,output)):
+#                os.symlink(os.path.join(outdir,input),os.path.join(outdir,output))
 
 # TODO: Make optional
 rule conversionRate:
@@ -34,7 +34,7 @@ if pairedEnd and not fromBAM:
             r1=fastq_dir + "/{sample}" + reads[0] + ".fastq.gz",
             r2=fastq_dir + "/{sample}" + reads[1] + ".fastq.gz"
         output:
-            sbam=temp("bwameth/{sample}.sorted.bam")
+            sbam=temp("bwameth/{sample}.bam")
         log:
             err="bwameth/logs/{sample}.map_reads.err",
             out="bwameth/logs/{sample}.map_reads.out"
@@ -55,7 +55,7 @@ elif not fromBAM:
         input:
             r1=fastq_dir + "/{sample}" + reads[0] + ".fastq.gz",
         output:
-            sbam=temp("bwameth/{sample}.sorted.bam")
+            sbam=temp("bwameth/{sample}.bam")
         log:
             err="bwameth/logs/{sample}.map_reads.err",
             out="bwameth/logs/{sample}.map_reads.out"
@@ -74,9 +74,9 @@ elif not fromBAM:
 
 rule index_bam:
     input:
-        "bwameth/{sample}.sorted.bam"
+        "bwameth/{sample}.bam"
     output:
-        temp("bwameth/{sample}.sorted.bam.bai")
+        temp("bwameth/{sample}.bam.bai")
     log:
         err="bwameth/logs/{sample}.index_bam.err",
         out="bwameth/logs/{sample}.index_bam.out"
@@ -85,16 +85,16 @@ rule index_bam:
         samtools index "{input}" > {log.out} 2> {log.err}
         """
 
-
-rule markDupes:
-    input:
-        "bwameth/{sample}.sorted.bam",
-        "bwameth/{sample}.sorted.bam.bai"
-    output:
-        "bwameth/{sample}.markdup.bam"
-    log:
-        err="bwameth/logs/{sample}.rm_dupes.err",
-        out="bwameth/logs/{sample}.rm_dupes.out"
+if not skipBamQC:
+    rule markDupes:
+        input:
+            "bwameth/{sample}.bam",
+            "bwameth/{sample}.bam.bai"
+        output:
+            temp("bwameth/{sample}.markdup.bam")
+        log:
+            err="bwameth/logs/{sample}.rm_dupes.err",
+            out="bwameth/logs/{sample}.rm_dupes.out"
     threads: 10
     params:
         tempDir = tempDir
@@ -107,20 +107,31 @@ rule markDupes:
         """
 
 
-rule indexMarkDupes:
-    input:
-        "bwameth/{sample}.markdup.bam"
-    output:
-        "bwameth/{sample}.markdup.bam.bai"
-    params:
-    log:
-        err="bwameth/logs/{sample}.indexMarkDupes.err",
-        out="bwameth/logs/{sample}.indexMarkDupes.out"
-    threads: 1
-    conda: CONDA_SHARED_ENV
-    shell: """
-        samtools index "{input}" 1> {log.out} 2> {log.err}
-        """
+    rule indexMarkDupes:
+        input:
+            "bwameth/{sample}.markdup.bam"
+        output:
+            temp("bwameth/{sample}.markdup.bam.bai")
+        params:
+        log:
+            err="bwameth/logs/{sample}.indexMarkDupes.err",
+            out="bwameth/logs/{sample}.indexMarkDupes.out"
+        threads: 1
+        conda: CONDA_SHARED_ENV
+        shell: """
+            samtools index "{input}" 1> {log.out} 2> {log.err}
+            """
+    rule link_deduped_bam:
+        input:
+            bam="bwameth/{sample}.markdup.bam",
+            bai="bwameth/{sample}.markdup.bam.bai"
+        output:
+            bam = "filtered_bam/{sample}.filtered.bam",
+            bai = "filtered_bam/{sample}.filtered.bam.bai"
+        run:
+            if not os.path.exists(os.path.join(outdir,output.bam_out)):
+                os.symlink(os.path.join(outdir,input.bam),os.path.join(outdir,output.bam))
+                os.symlink(os.path.join(outdir,input.bai),os.path.join(outdir,output.bai))
 
 
 rule getRandomCpGs:
@@ -176,8 +187,8 @@ rule getRandomCpGs:
 
 rule calc_Mbias:
     input:
-        "bwameth/{sample}.markdup.bam",
-        "bwameth/{sample}.markdup.bam.bai"
+        "filtered_bam/{sample}.filtered.bam",
+        "filtered_bam/{sample}.filtered.bam.bai"
     output:
         "QC_metrics/{sample}.Mbias.txt"
     params:
@@ -193,8 +204,8 @@ rule calc_Mbias:
 
 rule calcCHHbias:
     input:
-        "bwameth/{sample}.markdup.bam",
-        "bwameth/{sample}.markdup.bam.bai"
+        "filtered_bam/{sample}.filtered.bam",
+        "filtered_bam/{sample}.filtered.bam.bai"
     output:
         temp("QC_metrics/{sample}.CHH.Mbias.txt")
     params:
@@ -210,8 +221,8 @@ rule calcCHHbias:
 
 rule calc_GCbias:
     input:
-        BAMS=expand("bwameth/{sample}.markdup.bam", sample=samples),
-        BAIS=expand("bwameth/{sample}.markdup.bam.bai", sample=samples),
+        BAMS=expand("filtered_bam/{sample}.filtered.bam", sample=samples),
+        BAIS=expand("filtered_bam/{sample}.filtered.bam.bai", sample=samples),
     output:
         "QC_metrics/GCbias.freq.txt",
         "QC_metrics/GCbias." + plotFormat
@@ -229,8 +240,8 @@ rule calc_GCbias:
 
 rule DepthOfCov:
     input:
-        BAMS=expand("bwameth/{sample}.markdup.bam", sample=samples),
-        BAIS=expand("bwameth/{sample}.markdup.bam.bai", sample=samples),
+        BAMS=expand("filtered_bam/{sample}.filtered.bam", sample=samples),
+        BAIS=expand("filtered_bam/{sample}.filtered.bam.bai", sample=samples),
         BED="QC_metrics/randomCpG.bed"
     output:
         "QC_metrics/CpGCoverage.txt",
@@ -251,8 +262,8 @@ rule DepthOfCov:
 
 rule DepthOfCovGenome:
     input:
-        BAMS=expand("bwameth/{sample}.markdup.bam", sample=samples),
-        BAIS=expand("bwameth/{sample}.markdup.bam.bai", sample=samples)
+        BAMS=expand("filtered_bam/{sample}.filtered.bam", sample=samples),
+        BAIS=expand("filtered_bam/{sample}.filtered.bam.bai", sample=samples)
     output:
         "QC_metrics/genomeCoverage.txt",
         "QC_metrics/genomeCoverage.png",
@@ -271,7 +282,7 @@ rule DepthOfCovGenome:
 
 rule get_flagstat:
     input:
-        "bwameth/{sample}.markdup.bam"
+        "filtered_bam/{sample}.filtered.bam"
     output:
         "QC_metrics/{sample}.flagstat"
     log:
@@ -300,8 +311,8 @@ rule produceReport:
 if not noAutoMethylationBias:
     rule methyl_extract:
         input:
-            "bwameth/{sample}.markdup.bam",
-            "bwameth/{sample}.markdup.bam.bai",
+            "filtered_bam/{sample}.filtered.bam",
+            "filtered_bam/{sample}.filtered.bam.bai",
             "QC_metrics/{sample}.Mbias.txt"
         output:
             "MethylDackel/{sample}_CpG.bedGraph"
@@ -320,8 +331,8 @@ if not noAutoMethylationBias:
 else:
     rule methyl_extract:
         input:
-            "bwameth/{sample}.markdup.bam",
-            "bwameth/{sample}.markdup.bam.bai"
+            "filtered_bam/{sample}.filtered.bam",
+            "filtered_bam/{sample}.filtered.bam.bai"
         output:
             "MethylDackel/{sample}_CpG.bedGraph"
         params:

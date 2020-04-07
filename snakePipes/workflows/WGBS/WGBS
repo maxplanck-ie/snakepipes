@@ -49,7 +49,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          "noAutoMethylationBias": False, "fromBAM": False, "skipDOC": False,
                          "UMIDedup": False,
                          "UMIDedupOpts": "", "bcPattern": "",
-                         "UMIDedupSep": "_", "UMIBarcode": False, "targetRegions": None, "metileneOptions": None }):
+                         "UMIDedupSep": "_", "UMIBarcode": False, "targetRegions": None, "metileneOptions": None, "skipBamQC": False }):
 
     """
     Parse arguments from the command line.
@@ -120,6 +120,10 @@ def parse_args(defaults={"verbose": False, "configFile": None,
 
     optional.add_argument("--fromBAM",
                          help="If specified, the input is taking from BAM files containing alignments rather than fastq files. See also --bamExt.",
+                         action="store_true")
+
+    optional.add_argument("--skipBamQC",
+                         help="If specified, filtering of input bam files, as well as calculation of quality metrics, will be skipped. ",
                          action="store_true")
 
     optional.add_argument("--bamExt",

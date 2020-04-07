@@ -23,18 +23,18 @@ if not pipeline=="noncoding-rna-seq":
         conda: CONDA_SHARED_ENV
         shell: "[[ ! -f {output} ]] samtools index {input}"
 
-
-    rule link_bam_bai_external:
-        input:
-            bam = aligner + "/{sample}.bam",
-            bai = aligner + "/{sample}.bam.bai"
-        output:
-            bam_out = "filtered_bam/{sample}.filtered.bam",
-            bai_out = "filtered_bam/{sample}.filtered.bam.bai",
-        run:
-            if not os.path.exists(os.path.join(outdir,output.bam_out)):
-                os.symlink(os.path.join(outdir,input.bam),os.path.join(outdir,output.bam_out))
-                os.symlink(os.path.join(outdir,input.bai),os.path.join(outdir,output.bai_out))
+    if not pipeline=="WGBS" or pipeline=="WGBS" and skipBamQC:
+        rule link_bam_bai_external:
+            input:
+                bam = aligner + "/{sample}.bam",
+                bai = aligner + "/{sample}.bam.bai"
+            output:
+                bam_out = "filtered_bam/{sample}.filtered.bam",
+                bai_out = "filtered_bam/{sample}.filtered.bam.bai",
+            run:
+                if not os.path.exists(os.path.join(outdir,output.bam_out)):
+                    os.symlink(os.path.join(outdir,input.bam),os.path.join(outdir,output.bam_out))
+                    os.symlink(os.path.join(outdir,input.bai),os.path.join(outdir,output.bai_out))
 
 
     rule sambamba_flagstat:
