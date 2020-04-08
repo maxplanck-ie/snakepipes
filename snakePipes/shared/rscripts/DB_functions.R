@@ -36,11 +36,13 @@ readfiles_chip <- function(sampleSheet, fragmentLength, window_size, alleleSpeci
             # for 1 samples, use normal design
             message("1 sample used : comparing genome2 to genome1")
             designm <- model.matrix(~ allele, data = design)
+            rownames(designm)<-sampleSheet$name
             designType <- "allele"
         } else {
             # for 1 sample, use interaction design
             message(">1 samples used : comparing genome2 to genome1 blocking for different conditions")
             designm <- model.matrix(~ allele + condition,data = design)
+            rownames(designm)<-sampleSheet$name
             designType <- "blocking"
         }
 
@@ -56,11 +58,13 @@ readfiles_chip <- function(sampleSheet, fragmentLength, window_size, alleleSpeci
         sampleSheet$condition = factor(sampleSheet$condition )
         sampleSheet$condition <- relevel(sampleSheet$condition, ref = as.character(sampleSheet$condition[1]))# make the first entry the base level
         designm <- model.matrix(d, data = sampleSheet)
+        rownames(designm)<-sampleSheet$name
         designType <- "condition"
         # define bam files to read
         bam.files <- list.files("../filtered_bam",
                                 pattern = paste0(sampleSheet$name,".filtered.bam$", collapse = "|"),
                                 full.names = TRUE )
+        
     }
 
     message("bam files used: ")
@@ -69,10 +73,13 @@ readfiles_chip <- function(sampleSheet, fragmentLength, window_size, alleleSpeci
     mincount <- 20
     message(paste0("Counting reads in windows.. windows with total counts < ", mincount, " are discarded"))
     counts <- csaw::windowCounts(bam.files = bam.files, param = pe.param, ext = fragmentLength, spacing = window_size, filter = mincount)
+    colnames(counts)<-gsub(".filtered.bam","",basename(bam.files))
+    counts<-counts[,sampleSheet$name]
 
     # output
     chipCountObject <- list(windowCounts = counts, sampleSheet = sampleSheet,
                             design = designm, designType = designType, pe.param = pe.param)
+    print(head(windowCounts))
     return(chipCountObject)
 }
 
@@ -240,6 +247,7 @@ getDBregions_chip <- function(chipCountObject, plotfile = NULL){
 
     # Make DGElist
     y <- csaw::asDGEList(chipCountObject$windowCounts, norm.factors = chipCountObject$normFactors)
+    colnames(y)<-sampleInfo$name
     design <- chipCountObject$design
     # Estimate dispersions
     y <- edgeR::estimateDisp(y, design)
@@ -270,7 +278,7 @@ getDBregions_chip <- function(chipCountObject, plotfile = NULL){
     # get combined test p-value for merged windows
     tabcom <- csaw::combineTests(merged$id, results$table, pval.col = 4, fc.col = 1)
     # get fold change of the best window within each combined cluster
-    tab.best <- csaw::getBestTest(merged$id, results$table)
+    tab.best <- csaw::getBestTest(merged$id, results$table,pval.col=4,cpm.col=1)
     tabcom$best.logFC <- tab.best$logFC
     tabcom$best.start <- GenomicRanges::start(SummarizedExperiment::rowRanges(chipCountObject$windowCounts))[tab.best$best]
 
