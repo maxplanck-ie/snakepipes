@@ -146,15 +146,15 @@ include: os.path.join(maindir, "shared", "rules", "multiQC.snakefile")
 ################################################################################
 onstart:
     if "verbose" in config and config["verbose"]:
-        print("--- Workflow parameters --------------------------------------------------------",file=lo)
-        print("samples:"+ str(samples),file=lo)
-        print("input dir:"+ indir,file=lo)
-        print("-" * 80,file=lo)#, "\n"
+        print("--- Workflow parameters --------------------------------------------------------")
+        print("samples:"+ str(samples))
+        print("input dir:"+ indir)
+        print("-" * 80)#, "\n"
 
-        print("--- Environment ----------------------------------------------------------------",file=lo)
-        print("$TMPDIR: "+os.getenv('TMPDIR', ""),file=lo)
-        print("$HOSTNAME: "+os.getenv('HOSTNAME', ""),file=lo)
-        print("-" * 80,file=lo)#, "\n"
+        print("--- Environment ----------------------------------------------------------------")
+        print("$TMPDIR: "+os.getenv('TMPDIR', ""))
+        print("$HOSTNAME: "+os.getenv('HOSTNAME', ""))
+        print("-" * 80)#, "\n"
 
     if toolsVersion:
         usedEnvs = [CONDA_SHARED_ENV, CONDA_WGBS_ENV]
@@ -186,7 +186,7 @@ rule all:
 onsuccess:
     cf.cleanLogs(outdir, cluster_config)
     if "verbose" in config and config["verbose"]:
-        print("--- WGBS workflow finished successfully! --------------------------------",file=lo)#\n \n
+        print("--- WGBS workflow finished successfully! --------------------------------")#\n \n
 
 onerror:
     print("\n !!! ERROR in WGBS workflow! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
