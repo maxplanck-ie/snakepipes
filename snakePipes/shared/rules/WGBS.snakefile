@@ -415,7 +415,7 @@ rule run_metilene:
         minCpGs=minCpGs,
         minMethDiff=minMethDiff,
         FDR=FDR,
-        regionlist='-B ' + targetRegions if targetRegions else '',
+        regionlist='-f2 -B ' + targetRegions if targetRegions else '',
         opts = metileneOptions if metileneOptions else ''
     log:
         err="{}/logs/run_metilene.err".format(get_outdir("metilene", targetRegions, minCoverage))
