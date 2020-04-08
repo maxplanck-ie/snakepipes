@@ -14,6 +14,7 @@ snakePipes 2.1.0
  * TMPDIR is now passed at rule-level to the shell
  * Added logs in a couple of places
  * Added `--skipBamQC` to WGBS to be included with `--fromBAM` to suppress recalculation of QC metrics on the bam file
+ * Fixed `--verbose` in WGBS
 
 snakePipes 2.0.2
 ----------------
