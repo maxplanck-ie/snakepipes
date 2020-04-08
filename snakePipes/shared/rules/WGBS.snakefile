@@ -131,7 +131,7 @@ if not skipBamQC:
             bam = "filtered_bam/{sample}.filtered.bam",
             bai = "filtered_bam/{sample}.filtered.bam.bai"
         run:
-            if not os.path.exists(os.path.join(outdir,output.bam_out)):
+            if not os.path.exists(os.path.join(outdir,output.bam)):
                 os.symlink(os.path.join(outdir,input.bam),os.path.join(outdir,output.bam))
                 os.symlink(os.path.join(outdir,input.bai),os.path.join(outdir,output.bai))
 
