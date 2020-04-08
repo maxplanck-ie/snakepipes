@@ -22,7 +22,7 @@ if aligner == "STAR":
             threads: 12
             conda: CONDA_RNASEQ_ENV
             shell: """
-                TMPDIR = {params.tempDir}
+                TMPDIR={params.tempDir}
                 MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX);
                 ( [ -d {params.sample_dir} ] || mkdir -p {params.sample_dir} )
                 STAR {params.alignerOptions} \
@@ -68,7 +68,7 @@ if aligner == "STAR":
             threads: 12
             conda: CONDA_RNASEQ_ENV
             shell: """
-                TMPDIR = {params.tempDir}
+                TMPDIR={params.tempDir}
                 MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX);
                 ( [ -d {params.sample_dir} ] || mkdir -p {params.sample_dir} )
                 STAR {params.alignerOptions} \

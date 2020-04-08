@@ -44,7 +44,7 @@ if pairedEnd and not fromBAM:
         threads: 20
         conda: CONDA_WGBS_ENV
         shell: """
-            TMPDIR = {params.tempDir}
+            TMPDIR={params.tempDir}
             MYTEMP=$(mktemp -d "${{TMPDIR:-/tmp}}"/snakepipes.XXXXXXXXXX)
             bwameth.py --threads {threads} --reference "{params.bwameth_index}" "{input.r1}" "{input.r2}" 2> {log.err} | \
 	        samtools sort -T "$MYTEMP"/{wildcards.sample} -m 3G -@ 4 -o "{output.sbam}" 2>> {log.err}
@@ -65,7 +65,7 @@ elif not pairedEnd and not fromBAM:
         threads: 20
         conda: CONDA_WGBS_ENV
         shell: """
-            TMPDIR = {params.tempDir}
+            TMPDIR={params.tempDir}
             MYTEMP=$(mktemp -d "${{TMPDIR:-/tmp}}"/snakepipes.XXXXXXXXXX)
             bwameth.py --threads {threads} --reference "{params.bwameth_index}" "{input.r1}" 2> {log.err} | \
 	        samtools sort -T "$MYTEMP/{wildcards.sample}" -m 3G -@ 4 -o "{output.sbam}" 2>> {log.err}
@@ -101,7 +101,7 @@ if not skipBamQC:
             tempDir = tempDir
         conda: CONDA_SAMBAMBA_ENV
         shell: """
-            TMPDIR = {params.tempDir}
+            TMPDIR={params.tempDir}
             MYTEMP=$(mktemp -d "${{TMPDIR:-/tmp}}"/snakepipes.XXXXXXXXXX)
             sambamba markdup -t {threads} --tmpdir "$MYTEMP/{wildcards.sample}" "{input[0]}" "{output}" > {log.out} 2> {log.err}
             rm -rf "$MYTEMP"

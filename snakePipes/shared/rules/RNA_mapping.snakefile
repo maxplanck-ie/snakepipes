@@ -45,7 +45,7 @@ if aligner.upper().find("HISAT2") >=0:
             threads: 10
             conda: CONDA_RNASEQ_ENV
             shell: """
-                TMPDIR = {params.tempDir}
+                TMPDIR={params.tempDir}
                 MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX);
                 hisat2 -p {threads} {params.alignerOptions} \
                     {params.lib_type} -x {params.idx} \
@@ -78,7 +78,7 @@ if aligner.upper().find("HISAT2") >=0:
             threads: 10
             conda: CONDA_RNASEQ_ENV
             shell: """
-                TMPDIR = {params.tempDir}
+                TMPDIR={params.tempDir}
                 MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX)
                 hisat2 -p {threads} {params.alignerOptions} \
                     {params.lib_type} -x {params.idx} \
@@ -112,7 +112,7 @@ elif aligner.upper().find("STAR") >=0:
             threads: 20  # 3.2G per core
             conda: CONDA_RNASEQ_ENV
             shell: """
-                TMPDIR = {params.tempDir}
+                TMPDIR={params.tempDir}
                 MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX)
                 ( [ -d {params.sample_dir} ] || mkdir -p {params.sample_dir} )
                 STAR --runThreadN {threads} \
@@ -149,7 +149,7 @@ elif aligner.upper().find("STAR") >=0:
             threads: 20  # 3.2G per core
             conda: CONDA_RNASEQ_ENV
             shell: """
-                TMPDIR = {params.tempDir}
+                TMPDIR={params.tempDir}
                 MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX)
                 ( [ -d {params.sample_dir} ] || mkdir -p {params.sample_dir} )
                 STAR --runThreadN {threads} \

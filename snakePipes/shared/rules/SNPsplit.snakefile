@@ -63,7 +63,7 @@ rule BAMsort_allelic:
         tempDir = tempDir
     conda: CONDA_SHARED_ENV
     shell: """
-        TMPDIR = {params.tempDir}
+        TMPDIR={params.tempDir}
         MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX);
         samtools sort -@ {threads} -T $MYTEMP -O bam -o {output} {input} 2> {log};
         rm -rf $MYTEMP

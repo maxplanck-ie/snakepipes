@@ -19,7 +19,7 @@ if pairedEnd:
         threads: 24  # 1G per core
         conda: CONDA_DNA_MAPPING_ENV
         shell: """
-            TMPDIR = {params.tempDir}
+            TMPDIR={params.tempDir}
             MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX);
             bowtie2 \
             -X {params.insertSizeMax} \
@@ -50,7 +50,7 @@ else:
         threads: 24  # 1G per core
         conda: CONDA_DNA_MAPPING_ENV
         shell: """
-            TMPDIR = {params.tempDir}
+            TMPDIR={params.tempDir}
             MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX);
             bowtie2 \
             -x {params.bowtie2_index} -U {input} \

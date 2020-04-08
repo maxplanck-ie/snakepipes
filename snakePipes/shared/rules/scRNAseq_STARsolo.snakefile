@@ -34,7 +34,7 @@ rule STARsolo:
     threads: 20  # 3.2G per core
     conda: CONDA_scRNASEQ_ENV
     shell: """
-        TMPDIR = {params.tempDir}
+        TMPDIR={params.tempDir}
         MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX);
         ( [ -d {params.sample_dir} ] || mkdir -p {params.sample_dir} )
         STAR --runThreadN {threads} \
@@ -150,7 +150,7 @@ if not skipVelocyto:
         threads: 4
         conda: CONDA_scRNASEQ_ENV
         shell: """
-                TMPDIR = {params.tempDir}
+                TMPDIR={params.tempDir}
                 MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX)
                 samtools sort -m {params.samsort_memory} -@ {threads} -T $MYTEMP/{wildcards.sample} -t CB -O bam -o {output.bam} {input.bam} 2> {log}
                 rm -rf $MYTEMP
