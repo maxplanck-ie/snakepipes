@@ -172,12 +172,12 @@ def info():
 
     #tempDir
     tempDir = cfg['tempDir']
-    msg="\nTemp dir under {} ".format(tempDir)
+    msg=["\nTemp dir under {} ".format(tempDir)]
     if os.path.isdir(tempDir):
-        msg + "exists and will be used."
+        msg.append("exists and will be used.")
     else:
-        msg + "does not exist and /tmp will be used instead."
-    print(msg)
+        msg.append("does not exist and /tmp will be used instead.")
+    print(''.join(msg))
 
 
 def envInfo():
