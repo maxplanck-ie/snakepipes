@@ -92,7 +92,7 @@ if not skipBamQC:
             "bwameth/{sample}.bam",
             "bwameth/{sample}.bam.bai"
         output:
-            temp("Sambamba/{sample}.markdup.bam")
+            "Sambamba/{sample}.markdup.bam"
         log:
             err="Sambamba/logs/{sample}.rm_dupes.err",
             out="Sambamba/logs/{sample}.rm_dupes.out"
@@ -112,7 +112,7 @@ if not skipBamQC:
         input:
             "Sambamba/{sample}.markdup.bam"
         output:
-            temp("Sambamba/{sample}.markdup.bam.bai")
+            "Sambamba/{sample}.markdup.bam.bai"
         params:
         log:
             err="Sambamba/logs/{sample}.indexMarkDupes.err",
