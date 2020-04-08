@@ -15,6 +15,7 @@ snakePipes 2.1.0
  * Added logs in a couple of places
  * Added `--skipBamQC` to WGBS to be included with `--fromBAM` to suppress recalculation of QC metrics on the bam file
  * Fixed `--verbose` in WGBS
+ * Added tempDir check to snakePipes info
 
 snakePipes 2.0.2
 ----------------
