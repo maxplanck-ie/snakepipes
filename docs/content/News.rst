@@ -5,7 +5,6 @@ snakePipes 2.1.0
 ----------------
 
  * Snakemake version is bumped to 5.13.0
- * Small fixes in DESeq2 report for noncoding-RNA-seq, WGBS reports
  * Updated docs on running single snakefiles
  * Added user-input target regions and freetext parameters to differential methylation analysis with metilene
  * Added PCA to metilene report in WGBS
@@ -14,8 +13,10 @@ snakePipes 2.1.0
  * TMPDIR is now passed at rule-level to the shell
  * Added logs in a couple of places
  * Added `--skipBamQC` to WGBS to be included with `--fromBAM` to suppress recalculation of QC metrics on the bam file
- * Fixed `--verbose` in WGBS
  * Added tempDir check to snakePipes info
+ * Small fixes in DESeq2 report for noncoding-RNA-seq, WGBS reports
+ * Fixed `--verbose` in WGBS
+ * Fixed an important bug in differential binding analysis with CSAW (mismatch between sampleSheet rownames and countdata colnames).
 
 snakePipes 2.0.2
 ----------------
