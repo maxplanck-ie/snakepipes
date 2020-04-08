@@ -3,16 +3,7 @@ import re
 from operator import is_not
 import tempfile
 
-###symlink bams if this is the starting point
-#if fromBAM:
-#    rule link_bam:
-#        input:
-#            indir + "/{sample}" + bamExt
-#        output:
-#            "bwameth/{sample}.sorted" + bamExt
-#        run:
-#            if not os.path.exists(os.path.join(outdir,output)):
-#                os.symlink(os.path.join(outdir,input),os.path.join(outdir,output))
+###bam symlinking is taken care of by LinkBam
 
 # TODO: Make optional
 rule conversionRate:
@@ -75,7 +66,7 @@ elif not pairedEnd and not fromBAM:
 if not fromBAM:
     rule index_bam:
         input:
-            temp("bwameth/{sample}.bam")
+            "bwameth/{sample}.bam"
         output:
             temp("bwameth/{sample}.bam.bai")
         log:
@@ -89,8 +80,8 @@ if not fromBAM:
 if not skipBamQC:
     rule markDupes:
         input:
-            temp("bwameth/{sample}.bam"),
-            temp("bwameth/{sample}.bam.bai")
+            "bwameth/{sample}.bam",
+            "bwameth/{sample}.bam.bai"
         output:
             "Sambamba/{sample}.markdup.bam"
         log:
