@@ -70,19 +70,19 @@ chip_object <- readfiles_chip(sampleSheet = sampleInfo,
 first_bam <- head(SummarizedExperiment::colData(chip_object$windowCounts)$bam.files, n = 1)
 last_bam <- tail(SummarizedExperiment::colData(chip_object$windowCounts)$bam.files, n = 1)
 
-#if(isTRUE(pairedEnd)){
-#    message(paste0("Making QC plots for first sample : ", first_bam))
-#    makeQCplots_chip_PE(bam.file = first_bam, outplot = "QCplots_first_sample.pdf", pe.param = pe_param)
+if(isTRUE(pairedEnd)){
+    message(paste0("Making QC plots for first sample : ", first_bam))
+    makeQCplots_chip_PE(bam.file = first_bam, outplot = "QCplots_first_sample.pdf", pe.param = pe_param)
 
-#    message(paste0("Making QC plots for last sample : ", last_bam))
-#    makeQCplots_chip_PE(bam.file = last_bam, outplot = "QCplots_last_sample.pdf", pe.param = pe_param)
-#} else {
-#    message(paste0("Making QC plots for first sample : ", first_bam))
-#    makeQCplots_chip_SE(bam.file = first_bam, outplot = "QCplots_first_sample.pdf", pe.param = pe_param)
+    message(paste0("Making QC plots for last sample : ", last_bam))
+    makeQCplots_chip_PE(bam.file = last_bam, outplot = "QCplots_last_sample.pdf", pe.param = pe_param)
+} else {
+    message(paste0("Making QC plots for first sample : ", first_bam))
+    makeQCplots_chip_SE(bam.file = first_bam, outplot = "QCplots_first_sample.pdf", pe.param = pe_param)
 
-#    message(paste0("Making QC plots for last sample : ", last_bam))
-#    makeQCplots_chip_SE(bam.file = last_bam, outplot = "QCplots_last_sample.pdf", pe.param = pe_param)
-#}
+    message(paste0("Making QC plots for last sample : ", last_bam))
+    makeQCplots_chip_SE(bam.file = last_bam, outplot = "QCplots_last_sample.pdf", pe.param = pe_param)
+}
 
 ## merge all peaks from the samples mentioned in sampleinfo to test (exclude those with 'False' in the UseRegions column)
 # get files to read from MACS
