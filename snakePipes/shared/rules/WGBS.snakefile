@@ -58,7 +58,6 @@ elif not pairedEnd and not fromBAM:
         shell: """
             TMPDIR={params.tempDir}
             MYTEMP=$(mktemp -d "${{TMPDIR:-/tmp}}"/snakepipes.XXXXXXXXXX)
-            echo $MYTEMP > {log.out}
             bwameth.py --threads {threads} --reference "{params.bwameth_index}" "{input.r1}" 2> {log.err} | \
 	        samtools sort -T "$MYTEMP/{wildcards.sample}" -m 3G -@ 4 -o "{output.sbam}" 2>> {log.err}
             rm -rf "$MYTEMP"
@@ -95,7 +94,6 @@ if not skipBamQC:
         shell: """
             TMPDIR={params.tempDir}
             MYTEMP=$(mktemp -d "${{TMPDIR:-/tmp}}"/snakepipes.XXXXXXXXXX)
-            echo $MYTEMP > {log.out}
             sambamba markdup -t {threads} --tmpdir "$MYTEMP/{wildcards.sample}" "{input[0]}" "{output}" >> {log.out} 2> {log.err}
             rm -rf "$MYTEMP"
             """
