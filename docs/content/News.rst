@@ -10,10 +10,10 @@ snakePipes 2.1.0
  * Added user-input target regions and freetext parameters to differential methylation analysis with metilene
  * Added PCA to metilene report in WGBS
  * Added Genrich support for SE data
- * Fixed symlinking rules
+ * Edited symlinking rules to `ln -s` or python
  * TMPDIR is now passed at rule-level to the shell
  * Added logs in a couple of places
- * 
+ * Added `--skipBamQC` to WGBS to be included with `--fromBAM` to suppress recalculation of QC metrics on the bam file
 
 snakePipes 2.0.2
 ----------------
