@@ -75,11 +75,11 @@ readfiles_chip <- function(sampleSheet, fragmentLength, window_size, alleleSpeci
     counts <- csaw::windowCounts(bam.files = bam.files, param = pe.param, ext = fragmentLength, spacing = window_size, filter = mincount)
     colnames(counts)<-gsub(".filtered.bam","",basename(bam.files))
     counts<-counts[,sampleSheet$name]
+    print(head(counts))
 
     # output
     chipCountObject <- list(windowCounts = counts, sampleSheet = sampleSheet,
                             design = designm, designType = designType, pe.param = pe.param)
-    print(head(windowCounts))
     return(chipCountObject)
 }
 
