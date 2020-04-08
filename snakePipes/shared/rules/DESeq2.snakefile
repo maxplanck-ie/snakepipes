@@ -37,7 +37,7 @@ rule DESeq2:
         "{params.allele_info} " # 6
         "{params.tx2gene_file} " # 7
         "{params.rmdTemplate} " # 8
-        " > {log.out} 2> {log.err}"
+        " > ../{log.out} 2> ../{log.err}"
 
 
 ## DESeq2 (on Salmon)
@@ -74,4 +74,4 @@ rule DESeq2_Salmon:
         "{params.allele_info} " # 6
         "../{input.tx2gene_file} " # 7
         "{params.rmdTemplate} " # 8
-        " > {log.out} 2> {log.err}"
+        " > ../{log.out} 2> ../{log.err}"
