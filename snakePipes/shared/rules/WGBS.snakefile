@@ -75,7 +75,7 @@ elif not pairedEnd and not fromBAM:
 if not fromBAM:
     rule index_bam:
         input:
-            "bwameth/{sample}.bam"
+            temp("bwameth/{sample}.bam")
         output:
             temp("bwameth/{sample}.bam.bai")
         log:
@@ -89,8 +89,8 @@ if not fromBAM:
 if not skipBamQC:
     rule markDupes:
         input:
-            "bwameth/{sample}.bam",
-            "bwameth/{sample}.bam.bai"
+            temp("bwameth/{sample}.bam"),
+            temp("bwameth/{sample}.bam.bai")
         output:
             "Sambamba/{sample}.markdup.bam"
         log:
