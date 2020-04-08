@@ -145,7 +145,7 @@ def flushOrganisms():
 
 def info():
     """
-    Print the locations of EVERY yaml file. Break these up a bit so it's clear what they actually belong to.
+    Print the locations of EVERY yaml file. Break these up a bit so it's clear what they actually belong to. Print path to tempDir and check that it exists.
     """
     baseDir = os.path.dirname(snakePipes.__file__)
     cfg = cof.load_configfile(os.path.join(baseDir, "shared", "defaults.yaml"), False, "defaults")
@@ -169,6 +169,15 @@ def info():
     print("\nWorkflow-specific cluster.yaml and defaults.yaml files are in:")
     for f in glob.glob(os.path.join(baseDir, "workflows/*/cluster.yaml")):
         print("    {}".format(os.path.dirname(f)))
+
+    #tempDir
+    tempDir = cfg['tempDir']
+    msg="\nTemp dir under {} ".format(tempDir)
+    if os.path.isdir(tempDir):
+        msg + "exists and will be used."
+    else:
+        msg + "does not exist and /tmp will be used instead."
+    print(msg)
 
 
 def envInfo():
