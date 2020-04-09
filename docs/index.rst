@@ -27,7 +27,7 @@ Pipeline                            Description
 :ref:`preprocessing`            Merging technical replicates (e.g., across lanes), removing optical duplicates, running FastQC
 =============================== ===============================================================================================================
 
-Quick start
+Quick start 
 -----------
 
 * Assuming you have *python3* with *conda*, install snakePipes with:
@@ -49,6 +49,8 @@ Quick start
 .. code:: bash
 
     snakePipes config --help
+
+.. note:: If you have a copy of a `shared/defaults.yaml` with the necessary paths configured (i.e. from a previous installation), you can pass it to snakePipes config with `--oldConfig` and `--configMode recycle` instead of providing all the paths manually again. Config keys have to match for this to work.
 
 * Download example fastq files for the human genome `here <https://zenodo.org/record/3707259>`_
 
