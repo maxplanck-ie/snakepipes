@@ -54,7 +54,7 @@ rule format_HMM_output:
         txt = temp("histoneHMM/{sample}.filtered.histoneHMM_formatted.txt")
     run:
         format_HMM_output(input.post,output.post)
-        format_HMM_output(input.txt,output.txt
+        format_HMM_output(input.txt,output.txt)
 
 
 ### compress and index GFF result file from histoneHMM for usage with IGV ######
