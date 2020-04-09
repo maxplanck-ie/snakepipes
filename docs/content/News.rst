@@ -14,9 +14,11 @@ snakePipes 2.1.0
  * Added logs in a couple of places
  * Added `--skipBamQC` to WGBS to be included with `--fromBAM` to suppress recalculation of QC metrics on the bam file
  * Added tempDir check to snakePipes info
+ * Updated histoneHMM version to 1.8
  * Small fixes in DESeq2 report for noncoding-RNA-seq, WGBS reports
  * Fixed `--verbose` in WGBS
  * Fixed an important bug in differential binding analysis with CSAW (mismatch between sampleSheet rownames and countdata colnames).
+
 
 snakePipes 2.0.2
 ----------------
