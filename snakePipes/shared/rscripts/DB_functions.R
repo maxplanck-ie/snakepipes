@@ -77,7 +77,7 @@ readfiles_chip <- function(sampleSheet, fragmentLength, window_size, alleleSpeci
         colnames(counts)<-gsub(".filtered.bam","",basename(bam.files))
         counts<-counts[,sampleSheet$name]} else {
         colnames(counts)<-gsub(".sorted.bam","",basename(bam.files))
-        counts<-counts[,paste0(rep(sampleSheet$name,each=2),".genome",c(1,2))]}
+        counts<-counts[,paste0(rep(sampleSheet$name,each=2),".genome",c(1,2))]
     }
     print(head(counts))
 
