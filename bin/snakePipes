@@ -317,7 +317,7 @@ def updateConfig(args):
     """Update the global defaults"""
     baseDir = os.path.dirname(snakePipes.__file__)
     # Load, update and rewrite the default dictionary
-    currentDict = cof.load_configfile(os.path.join(baseDir, "shared", "defaults.yaml"), False)
+    currentDict = cof.load_configfile(os.path.join(baseDir, "shared", "defaults.yaml"), True)
 
     if args.configMode=="manual":
         d = {
@@ -338,13 +338,13 @@ def updateConfig(args):
     elif args.configMode=="recycle":
         oldConfig=args.oldConfig
         if os.path.isfile(oldConfig):
-            d = cof.load_configfile(oldConfig, False)
+            d = cof.load_configfile(oldConfig, True)
             if not currentDict.keys() & d.keys():
                 sys.exit("The old and the new config have no matching keys!!!\n")
         else:
             sys.exit("Config file not found\n")
-    cof.merge_dicts(currentDict, d)
-    cof.write_configfile(os.path.join(baseDir, "shared", "defaults.yaml"), d)
+    updatedDict=cof.merge_dicts(currentDict, d)
+    cof.write_configfile(os.path.join(baseDir, "shared", "defaults.yaml"), updatedDict)
 
 
 def version():
