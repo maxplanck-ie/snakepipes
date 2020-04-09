@@ -13,16 +13,18 @@ suppressMessages(require(dplyr))
 suppressMessages(require(tidyr))
 suppressMessages(require(ggplot2))
 
-inputFile = snakemake@input[[1]]
+DMRinput = snakemake@input[["DMRs"]]
+PCAinput = snakemake@input[["CpGs"]]
 gtfFile = snakemake@params[["genes_gtf"]]
 FDR = snakemake@params[["FDR"]]
 minMethDiff = snakemake@params[["minMethDiff"]]
 # Only a single output file is allows for Rmd files
 outputTxtFile = sprintf("%s/DMRs.FDR%s.annotated.txt", snakemake@params[["outdir"]], snakemake@params[["FDR"]])
+outputPCA = sprintf("%s/PCA.png", snakemake@params[["outdir"]])
 outputDiffMethyl = sprintf("%s/MethylationDensity.png", snakemake@params[["outdir"]])
 outputQValue = sprintf("%s/QValueDistribution.png", snakemake@params[["outdir"]])
 outputVolcano = sprintf("%s/Volcano.png", snakemake@params[["outdir"]])
-d = read.delim(inputFile)
+d = read.delim(DMRinput)
 ```
 
 # Overview
@@ -33,7 +35,7 @@ This report summarizes the differentially methylated region (DMR) calling with m
 
 ```{r echo=FALSE, warning=FALSE, message=FALSE}
 # Read in the input data
-d = read.delim(inputFile)
+d = read.delim(DMRinput)
 colnames(d)[1:(length(colnames(d))-2)] = c("CHROM", "START", "END", "qvalue", "MeanDiff", "NumCpGs", "pMWU", "p2DKS")
 gr = GRanges(seqnames=d$CHROM,
              ranges=IRanges(start=d$START, end=d$END),
@@ -77,6 +79,20 @@ write.table(d[IDX,c(1:3, 6:14)], file=outputTxtFile, sep="\t", col.names=T, row.
 ```
 
 The genome annotation in **`r gtfFile`** was used to annotated DMRs according to their proximity to genes. The results for the **`r length(IDX)`** candidate DMRs passing the FDR and methylation difference threshold are stored in **`r outputTxtFile`**.
+
+# PCA plot
+
+PCA plot calculated on single CpGs used as input to metilene is contained in and can copied directly from this html document. Typically, the first principal component represents the auto-correlation in methylation values for single CpGs. If the biological effect of the experiment on DNA methylation is sufficiently large, the samples should split by biological condition on the second principal component.
+
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+d = read.table(PCAinput,header=TRUE,sep="\t",quote="",as.is=FALSE)
+d = subset(d,select=!(colnames(d) %in% c("chr","pos")))
+x1<-FactoMineR::PCA(d,graph=FALSE)
+if(nrow(x1$eig)>=2){
+FactoMineR::plot.PCA(x1,choix="var")
+}
+
+```
 
 # Distribution of methylation values per group
 

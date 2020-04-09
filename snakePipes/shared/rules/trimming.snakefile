@@ -8,7 +8,7 @@ if pairedEnd:
             r1 = "FASTQ_Cutadapt/{sample}"+reads[0]+".fastq.gz",
             r2 = "FASTQ_Cutadapt/{sample}"+reads[1]+".fastq.gz"
         params:
-            opts = str(trimmerOptions or '')
+            opts = lambda wildcards: str(trimmerOptions or '')
         log:
             out = "FASTQ_Cutadapt/logs/Cutadapt.{sample}.out",
             err = "FASTQ_Cutadapt/logs/Cutadapt.{sample}.err"
@@ -27,7 +27,7 @@ else:
         output:
             "FASTQ_Cutadapt/{sample}"+reads[0]+".fastq.gz",
         params:
-            opts = str(trimmerOptions or '')
+            opts = lambda wildcards: str(trimmerOptions or '')
         log:
             out = "FASTQ_Cutadapt/logs/Cutadapt.{sample}.out",
             err = "FASTQ_Cutadapt/logs/Cutadapt.{sample}.err"
@@ -54,7 +54,7 @@ if pairedEnd:
             "FASTQ_fastp/{sample}fastp.json",
             "FASTQ_fastp/{sample}fastp.html"
         params:
-            opts = str(trimmerOptions or '')
+            opts = lambda wildcards: str(trimmerOptions or '')
         log:
             out = "FASTQ_fastp/logs/fastp.{sample}.out",
             err = "FASTQ_fastp/logs/fastp.{sample}.err"
@@ -74,7 +74,7 @@ else:
             "FASTQ_fastp/{sample}fastp.json",
             "FASTQ_fastp/{sample}fastp.html"
         params:
-            opts = str(trimmerOptions or '')
+            opts = lambda wildcards: str(trimmerOptions or '')
         log:
             out = "FASTQ_fastp/logs/fastp.{sample}.out",
             err = "FASTQ_fastp/logs/fastp.{sample}.err"
@@ -100,7 +100,7 @@ if pairedEnd:
         params:
             tmp1 = "FASTQ_TrimGalore/{sample}"+reads[0]+"_val_1.fq.gz",
             tmp2 = "FASTQ_TrimGalore/{sample}"+reads[1]+"_val_2.fq.gz",
-            opts = str(trimmerOptions or '')
+            opts = lambda wildcards: str(trimmerOptions or '')
         log:
             out = "FASTQ_TrimGalore/logs/TrimGalore.{sample}.out",
             err = "FASTQ_TrimGalore/logs/TrimGalore.{sample}.err"
@@ -120,7 +120,7 @@ else:
             "FASTQ_TrimGalore/{sample}"+reads[0]+".fastq.gz"
         params:
             tmp = "FASTQ_TrimGalore/{sample}_trimmed.fq.gz",
-            opts = str(trimmerOptions or '')
+            opts = lambda wildcards: str(trimmerOptions or '')
         log:
             out = "FASTQ_TrimGalore/logs/TrimGalore.{sample}.out",
             err = "FASTQ_TrimGalore/logs/TrimGalore.{sample}.err"

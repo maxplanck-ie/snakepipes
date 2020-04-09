@@ -19,3 +19,5 @@ smtpUsername:
 smtpPassword:
 #print tools versions
 toolsVersion: True
+oldConfig:
+configMode: manual

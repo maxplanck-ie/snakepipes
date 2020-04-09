@@ -1,4 +1,6 @@
 ##umi_tools###############
+import os
+
 if UMIBarcode:
     if pairedEnd:
         rule umi_extract:
@@ -44,16 +46,18 @@ else:
               "originalFASTQ/downsample_{sample}"+reads[0]+".fastq.gz" if downsample else "originalFASTQ/{sample}"+reads[0]+".fastq.gz"
           output:
               "FASTQ/{sample}"+reads[0]+".fastq.gz"
-          shell:
-              "( [ -f {output} ] || ln -s -r {input} {output} )"
+          run:
+            if not os.path.exists(os.path.join(outdir,output[0])):
+                os.symlink(os.path.join(outdir,input[0]),os.path.join(outdir,output[0]))
 
     rule FASTQ2:
           input:
               "originalFASTQ/downsample_{sample}"+reads[1]+".fastq.gz" if downsample else "originalFASTQ/{sample}"+reads[1]+".fastq.gz"
           output:
               "FASTQ/{sample}"+reads[1]+".fastq.gz"
-          shell:
-              "( [ -f {output} ] || ln -s -r {input} {output} )"
+          run:
+            if not os.path.exists(os.path.join(outdir,output[0])):
+                os.symlink(os.path.join(outdir,input[0]),os.path.join(outdir,output[0]))
 
 #If DNA-mapping:
 if UMIDedup:
@@ -87,20 +91,22 @@ else:
             shell: """
                    mv {input.bamfile} {output.bamfile}
                    """
-    elif not fromBAM:
+    elif not aligner=="bwameth" :
         rule filter_reads:
             input:
                 bamfile = aligner+"/{sample}.bam"
             output:
                 bamfile = "filtered_bam/{sample}.filtered.bam"
-            shell: """
-                   ln -s -r {input.bamfile} {output.bamfile}
-                   """
+            run:
+                if not os.path.exists(os.path.join(outdir,output[0])):
+                    os.symlink(os.path.join(outdir,input[0]),os.path.join(outdir,output[0]))
 
-rule samtools_index_filtered:
-    input:
-        "filtered_bam/{sample}.filtered.bam"
-    output:
-        "filtered_bam/{sample}.filtered.bam.bai"
-    conda: CONDA_SHARED_ENV
-    shell: "samtools index {input}"
+if not aligner=="bwameth":
+    rule samtools_index_filtered:
+        input:
+            "filtered_bam/{sample}.filtered.bam"
+        output:
+            "filtered_bam/{sample}.filtered.bam.bai"
+        log: "filtered_bam/logs/{sample}.index.log"
+        conda: CONDA_SHARED_ENV
+        shell: "samtools index {input} 2> {log}"

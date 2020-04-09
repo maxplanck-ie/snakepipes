@@ -60,12 +60,14 @@ rule sc_bam_featureCounts_genomic:
     params:
         count_script = workflow.basedir+"/scRNAseq_bam_featureCounts.sh",
         bc_file = cellBarcodeFile,
-        lib_type = libraryType
+        lib_type = libraryType,
+        tempDir = tempDir
     threads: 
         5
     conda: CONDA_RNASEQ_ENV
     shell:
         """
+        TMPDIR={params.tempDir}
         MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX);
         {params.count_script} {input.bam} {input.gtf} {params.bc_file} {wildcards.sample} {params.lib_type} $MYTEMP {threads} 1>{output.counts} 2>{output.counts_summary};
         mv $MYTEMP/{wildcards.sample}.summary {output.counts_summary_orig};

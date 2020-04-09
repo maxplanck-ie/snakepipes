@@ -1,3 +1,4 @@
+import os
 if pairedEnd:
     rule STAR:
         input:
@@ -118,12 +119,26 @@ rule sortBams:
         aligner + "/{sample}.unsorted.bam"
     output:
         "filtered_bam/{sample}.filtered.bam"
+    log: "filtered_bam/logs/{sample}.sort.log"
     threads: 5
+    params:
+        tempDir = tempDir
     conda: CONDA_SHARED_ENV
     shell: """
+        TMPDIR={params.tempDir}
         MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX);
-        samtools view -u -F 2304 {input} | samtools sort -@ 4 -m 2G -T $MYTEMP/{wildcards.sample} -o {output}
+        samtools view -u -F 2304 {input} | samtools sort -@ 4 -m 2G -T $MYTEMP/{wildcards.sample} -o {output} 2> {log}
+        rm -rf $MYTEMP
         """
+if fromBAM:
+    rule samtools_index_filtered_bam:
+            input:
+                "filtered_bam/{sample}.filtered.bam"
+            output:
+                "filtered_bam/{sample}.filtered.bam.bai"
+            log: "filtered_bam/logs/{sample}.index.log"
+            conda: CONDA_SHARED_ENV
+            shell: "samtools index {input} 2> {log}"
 
 
 rule cpGTF:
@@ -133,10 +148,11 @@ rule cpGTF:
     output:
         temp("Annotation/genes.filtered.gtf"),
         temp("Annotation/genes.filtered.bed")
-    shell: """
-        ln -s {input[0]} {output[0]}
-        ln -s {input[1]} {output[1]}
-        """
+    run:
+        if not os.path.exists(os.path.join(outdir,output[0])):
+            os.symlink(input[0],os.path.join(outdir,output[0]))
+        if not os.path.exists(os.path.join(outdir,output[1])):
+            os.symlink(input[1],os.path.join(outdir,output[1]))
 
 
 rule symbolFile:
@@ -169,17 +185,18 @@ def get_outdir(folder_name,sampleSheet):
 
 
 # TODO: topN, FDR
-rule DESeq2:
-    input:
-        cnts=["TEcount/{}.cntTable".format(x) for x in samples],
-        sampleSheet=sampleSheet,
-        symbol_file = "Annotation/genes.filtered.symbol"
-    output:
-        "{}/DESeq2.session_info.txt".format(get_outdir("DESeq2",sampleSheet))
-    benchmark:
-        "{}/.benchmark/DESeq2.featureCounts.benchmark".format(get_outdir("DESeq2",sampleSheet))
-    params:
-        outdir = get_outdir("DESeq2", sampleSheet),
-        fdr = 0.05,
-    conda: CONDA_RNASEQ_ENV
-    script: "../rscripts/noncoding-DESeq2.R"
+if sampleSheet:
+    rule DESeq2:
+        input:
+            cnts=["TEcount/{}.cntTable".format(x) for x in samples],
+            sampleSheet=sampleSheet,
+            symbol_file = "Annotation/genes.filtered.symbol"
+        output:
+            "{}/DESeq2.session_info.txt".format(get_outdir("DESeq2",sampleSheet))
+        benchmark:
+            "{}/.benchmark/DESeq2.featureCounts.benchmark".format(get_outdir("DESeq2",sampleSheet))
+        params:
+            outdir = get_outdir("DESeq2", sampleSheet),
+            fdr = 0.05,
+        conda: CONDA_RNASEQ_ENV
+        script: "../rscripts/noncoding-DESeq2.R"

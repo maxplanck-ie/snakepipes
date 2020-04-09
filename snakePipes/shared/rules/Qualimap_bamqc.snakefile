@@ -1,4 +1,5 @@
 ### Qualimap bamqc #############################################################
+import os
 
 rule Qualimap_bamqc:
     input:
@@ -33,9 +34,9 @@ rule Qualimap_bamqc_symlink_txt:
         "Qualimap_qc/{sample}.filtered/genome_results.txt"
     output:
         "Qualimap_qc/{sample}.filtered.bamqc_results.txt"
-    conda: CONDA_DNA_MAPPING_ENV
-    shell:
-        "( [ -f {output} ] || ln -s -r {input} {output} ) "
+    run:
+        if not os.path.exists(os.path.join(outdir,output)):
+            os.symlink(os.path.join(outdir,input),os.path.join(outdir,output))
 
 
 rule Qualimap_bamqc_symlink_html:
@@ -43,6 +44,6 @@ rule Qualimap_bamqc_symlink_html:
         "Qualimap_qc/{sample}.filtered/qualimapReport.html"
     output:
         "Qualimap_qc/{sample}.filtered.bamqc_report.html"
-    conda: CONDA_DNA_MAPPING_ENV
-    shell:
-        "( [ -f {output} ] || ln -s -r {input} {output} ) "
+    run:
+        if not os.path.exists(os.path.join(outdir,output)):
+            os.symlink(os.path.join(outdir,input),os.path.join(outdir,output))

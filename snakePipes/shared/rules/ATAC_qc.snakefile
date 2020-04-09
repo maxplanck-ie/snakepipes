@@ -58,6 +58,7 @@ rule MACS2_peak_qc:
         xls = os.path.join(outdir_MACS2, '{sample}.filtered.short.BAM_peaks.xls')
     output:
         qc = os.path.join(outdir_ATACqc, "{sample}.filtered.BAM_peaks.qc.txt")
+    log: os.path.join(outdir_ATACqc, "logs/{sample}.MACS2_peak_qc.log")
     params:
         peaks = os.path.join(outdir_MACS2, '{sample}.filtered.short.BAM_peaks.narrowPeak'),
         genome_index = genome_index
@@ -84,5 +85,5 @@ rule MACS2_peak_qc:
         genomecov=`bc -l <<< "$peak_len/$genome_size"`
 
         # write peak-based QC metrics to output file
-        printf "peak_count\tFRiP\tpeak_genome_coverage\n%d\t%5.3f\t%6.4f\n" $peak_count $frip $genomecov > {output.qc}
+        printf "peak_count\tFRiP\tpeak_genome_coverage\n%d\t%5.3f\t%6.4f\n" $peak_count $frip $genomecov > {output.qc} >2 {log}
         """

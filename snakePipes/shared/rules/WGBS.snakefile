@@ -3,15 +3,7 @@ import re
 from operator import is_not
 import tempfile
 
-###symlink bams if this is the starting point
-if fromBAM:
-    rule link_bam:
-        input:
-            indir + "/{sample}" + bamExt
-        output:
-            "bwameth/{sample}.sorted" + bamExt
-        shell:
-            "( [ -f {output} ] || ln -s -r {input} {output} ) "
+###bam symlinking is taken care of by LinkBam
 
 # TODO: Make optional
 rule conversionRate:
@@ -19,9 +11,10 @@ rule conversionRate:
         "QC_metrics/{sample}.CHH.Mbias.txt"
     output:
         "QC_metrics/{sample}.conv.rate.txt"
+    log: "QC_metrics/logs/{sample}.conversionRate.log"
     threads: 1
     shell: """
-        awk '{{if(NR>1) {{M+=$4; UM+=$5}}}}END{{printf("{wildcards.sample}\\t%f\\n", 100*(1.0-M/(M+UM)))}}' {input} > {output}
+        awk '{{if(NR>1) {{M+=$4; UM+=$5}}}}END{{printf("{wildcards.sample}\\t%f\\n", 100*(1.0-M/(M+UM)))}}' {input} > {output} 2> {log}
         """
 
 
@@ -32,86 +25,106 @@ if pairedEnd and not fromBAM:
             r1=fastq_dir + "/{sample}" + reads[0] + ".fastq.gz",
             r2=fastq_dir + "/{sample}" + reads[1] + ".fastq.gz"
         output:
-            sbam=temp("bwameth/{sample}.sorted.bam")
+            sbam=temp("bwameth/{sample}.bam")
         log:
             err="bwameth/logs/{sample}.map_reads.err",
             out="bwameth/logs/{sample}.map_reads.out"
         params:
-            bwameth_index=bwameth_index
+            bwameth_index=bwameth_index,
+            tempDir = tempDir
         threads: 20
         conda: CONDA_WGBS_ENV
         shell: """
+            TMPDIR={params.tempDir}
             MYTEMP=$(mktemp -d "${{TMPDIR:-/tmp}}"/snakepipes.XXXXXXXXXX)
             bwameth.py --threads {threads} --reference "{params.bwameth_index}" "{input.r1}" "{input.r2}" 2> {log.err} | \
-	        samtools sort -T "$MYTEMP"/{wildcards.sample} -m 3G -@ 4 -o "{output.sbam}"
+	        samtools sort -T "$MYTEMP"/{wildcards.sample} -m 3G -@ 4 -o "{output.sbam}" 2>> {log.err}
             rm -rf "$MYTEMP"
             """
-elif not fromBAM:
+elif not pairedEnd and not fromBAM:
     rule bwameth:
         input:
             r1=fastq_dir + "/{sample}" + reads[0] + ".fastq.gz",
         output:
-            sbam=temp("bwameth/{sample}.sorted.bam")
+            sbam=temp("bwameth/{sample}.bam")
         log:
             err="bwameth/logs/{sample}.map_reads.err",
             out="bwameth/logs/{sample}.map_reads.out"
         params:
-            bwameth_index=bwameth_index
+            bwameth_index=bwameth_index,
+            tempDir = tempDir
         threads: 20
         conda: CONDA_WGBS_ENV
         shell: """
+            TMPDIR={params.tempDir}
             MYTEMP=$(mktemp -d "${{TMPDIR:-/tmp}}"/snakepipes.XXXXXXXXXX)
             bwameth.py --threads {threads} --reference "{params.bwameth_index}" "{input.r1}" 2> {log.err} | \
-	        samtools sort -T "$MYTEMP/{wildcards.sample}" -m 3G -@ 4 -o "{output.sbam}"
+	        samtools sort -T "$MYTEMP/{wildcards.sample}" -m 3G -@ 4 -o "{output.sbam}" 2>> {log.err}
             rm -rf "$MYTEMP"
             """
 
-rule index_bam:
-    input:
-        "bwameth/{sample}.sorted.bam"
-    output:
-        temp("bwameth/{sample}.sorted.bam.bai")
-    log:
-        err="bwameth/logs/{sample}.index_bam.err",
-        out="bwameth/logs/{sample}.index_bam.out"
-    conda: CONDA_SHARED_ENV
-    shell: """
-        samtools index "{input}" >{log.out} 2>{log.err}
-        """
+if not fromBAM:
+    rule index_bam:
+        input:
+            "bwameth/{sample}.bam"
+        output:
+            temp("bwameth/{sample}.bam.bai")
+        log:
+            err="bwameth/logs/{sample}.index_bam.err",
+            out="bwameth/logs/{sample}.index_bam.out"
+        conda: CONDA_SHARED_ENV
+        shell: """
+            samtools index "{input}" > {log.out} 2> {log.err}
+            """
+
+if not skipBamQC:
+    rule markDupes:
+        input:
+            "bwameth/{sample}.bam",
+            "bwameth/{sample}.bam.bai"
+        output:
+            "Sambamba/{sample}.markdup.bam"
+        log:
+            err="Sambamba/logs/{sample}.rm_dupes.err",
+            out="Sambamba/logs/{sample}.rm_dupes.out"
+        threads: 10
+        params:
+            tempDir = tempDir
+        conda: CONDA_SAMBAMBA_ENV
+        shell: """
+            TMPDIR={params.tempDir}
+            MYTEMP=$(mktemp -d "${{TMPDIR:-/tmp}}"/snakepipes.XXXXXXXXXX)
+            sambamba markdup -t {threads} --tmpdir "$MYTEMP/{wildcards.sample}" "{input[0]}" "{output}" >> {log.out} 2> {log.err}
+            rm -rf "$MYTEMP"
+            """
 
 
-rule markDupes:
-    input:
-        "bwameth/{sample}.sorted.bam",
-        "bwameth/{sample}.sorted.bam.bai"
-    output:
-        "bwameth/{sample}.markdup.bam"
-    log:
-        err="bwameth/logs/{sample}.rm_dupes.err",
-        out="bwameth/logs/{sample}.rm_dupes.out"
-    threads: 10
-    conda: CONDA_SAMBAMBA_ENV
-    shell: """
-        MYTEMP=$(mktemp -d "${{TMPDIR:-/tmp}}"/snakepipes.XXXXXXXXXX)
-        sambamba markdup -t {threads} --tmpdir "$MYTEMP/{wildcards.sample}" "{input[0]}" "{output}" >{log.out} 2>{log.err}
-        rm -rf "$MYTEMP"
-        """
+    rule indexMarkDupes:
+        input:
+            "Sambamba/{sample}.markdup.bam"
+        output:
+            "Sambamba/{sample}.markdup.bam.bai"
+        params:
+        log:
+            err="Sambamba/logs/{sample}.indexMarkDupes.err",
+            out="Sambamba/logs/{sample}.indexMarkDupes.out"
+        threads: 1
+        conda: CONDA_SHARED_ENV
+        shell: """
+            samtools index "{input}" 1> {log.out} 2> {log.err}
+            """
 
-
-rule indexMarkDupes:
-    input:
-        "bwameth/{sample}.markdup.bam"
-    output:
-        "bwameth/{sample}.markdup.bam.bai"
-    params:
-    log:
-        err="bwameth/logs/{sample}.indexMarkDupes.err",
-        out="bwameth/logs/{sample}.indexMarkDupes.out"
-    threads: 1
-    conda: CONDA_SHARED_ENV
-    shell: """
-        samtools index "{input}" 1>{log.out} 2>{log.err}
-        """
+    rule link_deduped_bam:
+        input:
+            bam="Sambamba/{sample}.markdup.bam",
+            bai="Sambamba/{sample}.markdup.bam.bai"
+        output:
+            bam = "filtered_bam/{sample}.filtered.bam",
+            bai = "filtered_bam/{sample}.filtered.bam.bai"
+        run:
+            if not os.path.exists(os.path.join(outdir,output.bam)):
+                os.symlink(os.path.join(outdir,input.bam),os.path.join(outdir,output.bam))
+                os.symlink(os.path.join(outdir,input.bai),os.path.join(outdir,output.bai))
 
 
 rule getRandomCpGs:
@@ -167,8 +180,8 @@ rule getRandomCpGs:
 
 rule calc_Mbias:
     input:
-        "bwameth/{sample}.markdup.bam",
-        "bwameth/{sample}.markdup.bam.bai"
+        "filtered_bam/{sample}.filtered.bam",
+        "filtered_bam/{sample}.filtered.bam.bai"
     output:
         "QC_metrics/{sample}.Mbias.txt"
     params:
@@ -184,8 +197,8 @@ rule calc_Mbias:
 
 rule calcCHHbias:
     input:
-        "bwameth/{sample}.markdup.bam",
-        "bwameth/{sample}.markdup.bam.bai"
+        "filtered_bam/{sample}.filtered.bam",
+        "filtered_bam/{sample}.filtered.bam.bai"
     output:
         temp("QC_metrics/{sample}.CHH.Mbias.txt")
     params:
@@ -201,8 +214,8 @@ rule calcCHHbias:
 
 rule calc_GCbias:
     input:
-        BAMS=expand("bwameth/{sample}.markdup.bam", sample=samples),
-        BAIS=expand("bwameth/{sample}.markdup.bam.bai", sample=samples),
+        BAMS=expand("filtered_bam/{sample}.filtered.bam", sample=samples),
+        BAIS=expand("filtered_bam/{sample}.filtered.bam.bai", sample=samples),
     output:
         "QC_metrics/GCbias.freq.txt",
         "QC_metrics/GCbias." + plotFormat
@@ -220,8 +233,8 @@ rule calc_GCbias:
 
 rule DepthOfCov:
     input:
-        BAMS=expand("bwameth/{sample}.markdup.bam", sample=samples),
-        BAIS=expand("bwameth/{sample}.markdup.bam.bai", sample=samples),
+        BAMS=expand("filtered_bam/{sample}.filtered.bam", sample=samples),
+        BAIS=expand("filtered_bam/{sample}.filtered.bam.bai", sample=samples),
         BED="QC_metrics/randomCpG.bed"
     output:
         "QC_metrics/CpGCoverage.txt",
@@ -242,8 +255,8 @@ rule DepthOfCov:
 
 rule DepthOfCovGenome:
     input:
-        BAMS=expand("bwameth/{sample}.markdup.bam", sample=samples),
-        BAIS=expand("bwameth/{sample}.markdup.bam.bai", sample=samples)
+        BAMS=expand("filtered_bam/{sample}.filtered.bam", sample=samples),
+        BAIS=expand("filtered_bam/{sample}.filtered.bam.bai", sample=samples)
     output:
         "QC_metrics/genomeCoverage.txt",
         "QC_metrics/genomeCoverage.png",
@@ -262,14 +275,14 @@ rule DepthOfCovGenome:
 
 rule get_flagstat:
     input:
-        "bwameth/{sample}.markdup.bam"
+        "filtered_bam/{sample}.filtered.bam"
     output:
         "QC_metrics/{sample}.flagstat"
     log:
         err="QC_metrics/logs/{sample}.get_flagstat.err"
     threads: 1
     conda: CONDA_SHARED_ENV
-    shell: "samtools flagstat {input} > {output} 2>{log.err}"
+    shell: "samtools flagstat {input} > {output} 2> {log.err}"
 
 
 rule produceReport:
@@ -291,8 +304,8 @@ rule produceReport:
 if not noAutoMethylationBias:
     rule methyl_extract:
         input:
-            "bwameth/{sample}.markdup.bam",
-            "bwameth/{sample}.markdup.bam.bai",
+            "filtered_bam/{sample}.filtered.bam",
+            "filtered_bam/{sample}.filtered.bam.bai",
             "QC_metrics/{sample}.Mbias.txt"
         output:
             "MethylDackel/{sample}_CpG.bedGraph"
@@ -306,13 +319,13 @@ if not noAutoMethylationBias:
         conda: CONDA_WGBS_ENV
         shell: """
             mi=$(cat {input[2]} | sed 's/Suggested inclusion options: //' )
-            MethylDackel extract -o MethylDackel/{wildcards.sample} {params.MethylDackelOptions} $mi -@ {threads} {params.genome} {input[0]} 1>{log.out} 2>{log.err}
+            MethylDackel extract -o MethylDackel/{wildcards.sample} {params.MethylDackelOptions} $mi -@ {threads} {params.genome} {input[0]} 1> {log.out} 2> {log.err}
             """
 else:
     rule methyl_extract:
         input:
-            "bwameth/{sample}.markdup.bam",
-            "bwameth/{sample}.markdup.bam.bai"
+            "filtered_bam/{sample}.filtered.bam",
+            "filtered_bam/{sample}.filtered.bam.bai"
         output:
             "MethylDackel/{sample}_CpG.bedGraph"
         params:
@@ -324,7 +337,7 @@ else:
         threads: 10
         conda: CONDA_WGBS_ENV
         shell: """
-            MethylDackel extract -o MethylDackel/{wildcards.sample} {params.MethylDackelOptions} -@ {threads} {params.genome} {input[0]} 1>{log.out} 2>{log.err}
+            MethylDackel extract -o MethylDackel/{wildcards.sample} {params.MethylDackelOptions} -@ {threads} {params.genome} {input[0]} 1> {log.out} 2> {log.err}
             """
 
 
@@ -332,14 +345,14 @@ rule prepForMetilene:
     input:
         bedGraphs=expand("MethylDackel/{sample}_CpG.bedGraph", sample=samples)
     output:
-        MetileneIN='{}/metilene.IN.txt'.format(get_outdir("metilene", minCoverage))
+        MetileneIN='{}/metilene.IN.txt'.format(get_outdir("metilene", targetRegions, minCoverage))
     params:
         sampleSheet=sampleSheet,
         groups=metileneGroups,
         minCoverage=minCoverage,
         blacklist=blacklist
     log:
-        err='{}/logs/prep_for_stats.err'.format(get_outdir("metilene", minCoverage)),
+        err='{}/logs/prep_for_stats.err'.format(get_outdir("metilene", targetRegions, minCoverage)),
     threads: 10
     conda: CONDA_WGBS_ENV
     script: "../rscripts/WGBS_mergeStats.R"
@@ -349,10 +362,10 @@ rule DSS:
     input:
         bedGraphs=expand("MethylDackel/{sample}_CpG.bedGraph", sample=samples)
     output:
-        '{}/Stats_report.html'.format(get_outdir("DSS", minCoverage))
+        '{}/Stats_report.html'.format(get_outdir("DSS", None, minCoverage))
     params:
         blacklist=blacklist,
-        odir=get_outdir("DSS", minCoverage),
+        odir=get_outdir("DSS",None, minCoverage),
         sampleSheet=sampleSheet,
         groups=metileneGroups,
         maxDist=maxDist,
@@ -361,7 +374,7 @@ rule DSS:
         minCoverage=minCoverage,
         FDR=FDR
     threads: 10
-    benchmark: '{}/.benchmark/DSS.benchmark'.format(get_outdir("DSS", minCoverage))
+    benchmark: '{}/.benchmark/DSS.benchmark'.format(get_outdir("DSS", None, minCoverage))
     conda: CONDA_WGBS_ENV
     script: "../rscripts/WGBS_DSS.Rmd"
 
@@ -370,10 +383,10 @@ rule dmrseq:
     input:
         bedGraphs=expand("MethylDackel/{sample}_CpG.bedGraph", sample=samples)
     output:
-        '{}/Stats_report.html'.format(get_outdir("dmrseq", minCoverage))
+        '{}/Stats_report.html'.format(get_outdir("dmrseq", None, minCoverage))
     params:
         blacklist=blacklist,
-        odir=get_outdir("dmrseq", minCoverage),
+        odir=get_outdir("dmrseq", None, minCoverage),
         sampleSheet=sampleSheet,
         groups=metileneGroups,
         maxDist=maxDist,
@@ -382,7 +395,7 @@ rule dmrseq:
         minCoverage=minCoverage,
         FDR=FDR
     threads: 10
-    benchmark: '{}/.benchmark/dmrseq.benchmark'.format(get_outdir("dmrseq", minCoverage))
+    benchmark: '{}/.benchmark/dmrseq.benchmark'.format(get_outdir("dmrseq", None, minCoverage))
     conda: CONDA_WGBS_ENV
     script: "../rscripts/WGBS_dmrseq.Rmd"
 
@@ -391,19 +404,21 @@ rule dmrseq:
 # These are NOT filtered
 rule run_metilene:
     input:
-        MetIN='{}/metilene.IN.txt'.format(get_outdir("metilene", minCoverage))
+        MetIN='{}/metilene.IN.txt'.format(get_outdir("metilene", targetRegions, minCoverage))
     output:
-        MetBed='{}/DMRs.txt'.format(get_outdir("metilene", minCoverage))
+        MetBed='{}/DMRs.txt'.format(get_outdir("metilene", targetRegions, minCoverage))
     params:
         groups=metileneGroups,
         maxDist=maxDist,
         minCpGs=minCpGs,
         minMethDiff=minMethDiff,
-        FDR=FDR
+        FDR=FDR,
+        regionlist='-f 2 -B ' + targetRegions if targetRegions else '',
+        opts = metileneOptions if metileneOptions else ''
     log:
-        err="{}/logs/run_metilene.err".format(get_outdir("metilene", minCoverage))
+        err="{}/logs/run_metilene.err".format(get_outdir("metilene", targetRegions, minCoverage))
     threads: 10
-    benchmark: '{}/.benchmark/run_metilene.benchmark'.format(get_outdir("metilene", minCoverage))
+    benchmark: '{}/.benchmark/run_metilene.benchmark'.format(get_outdir("metilene", targetRegions, minCoverage))
     conda: CONDA_WGBS_ENV
     shell: """
         echo -e "chrom\tstart\tend\tq-value\tmean methylation difference\tnCpGs\tp (MWU)\tp (2D KS)\tmean_{params.groups[1]}\tmean_{params.groups[0]}" > {output}
@@ -413,6 +428,8 @@ rule run_metilene:
                  --mincpgs {params.minCpGs} \
                  --minMethDiff {params.minMethDiff} \
                  --threads {threads} \
+                 {params.regionlist} \
+                 {params.opts} \
                  {input.MetIN} 2>{log.err} \
             | sort -k 1,1 -k2,2n >> {output.MetBed}
         """
@@ -421,17 +438,18 @@ rule run_metilene:
 # Annotates the metilene DMRs and produces QC plots
 rule metileneReport:
     input:
-        '{}/DMRs.txt'.format(get_outdir("metilene", minCoverage)),
+        DMRs='{}/DMRs.txt'.format(get_outdir("metilene", targetRegions, minCoverage)),
+        CpGs='{}/metilene.IN.txt'.format(get_outdir("metilene", targetRegions, minCoverage))
     output:
-        HTML='{}/Stats_report.html'.format(get_outdir("metilene", minCoverage))
+        HTML='{}/Stats_report.html'.format(get_outdir("metilene", targetRegions, minCoverage))
     params:
         genes_gtf=genes_gtf,
-        outdir=get_outdir("metilene", minCoverage),
+        outdir=get_outdir("metilene", targetRegions, minCoverage),
         sampleSheet=sampleSheet,
         minMethDiff=minMethDiff,
         FDR=FDR
     threads: 1
-    benchmark: '{}/.benchmark/metileneReport.benchmark'.format(get_outdir("metilene", minCoverage))
+    benchmark: '{}/.benchmark/metileneReport.benchmark'.format(get_outdir("metilene", targetRegions, minCoverage))
     conda: CONDA_WGBS_ENV
     script: "../rscripts/WGBS_metileneQC.Rmd"
 

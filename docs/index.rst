@@ -27,7 +27,7 @@ Pipeline                            Description
 :ref:`preprocessing`            Merging technical replicates (e.g., across lanes), removing optical duplicates, running FastQC
 =============================== ===============================================================================================================
 
-Quick start
+Quick start 
 -----------
 
 * Assuming you have *python3* with *conda*, install snakePipes with:
@@ -43,6 +43,14 @@ Quick start
     conda update -n snakePipes -c mpi-ie -c bioconda -c conda-forge snakePipes
 
 * Download genome fasta and annotations for an your organism, and build indexes, Check in :ref:`createIndices`
+
+* Configure snakePipes with paths to organism and cluster configs on your system using snakePipes config. For detailed information, run:
+
+.. code:: bash
+
+    snakePipes config --help
+
+.. note:: If you have a copy of a `shared/defaults.yaml` with the necessary paths configured (i.e. from a previous installation), you can pass it to snakePipes config with `--oldConfig` and `--configMode recycle` instead of providing all the paths manually again. Config keys have to match for this to work.
 
 * Download example fastq files for the human genome `here <https://zenodo.org/record/3707259>`_
 

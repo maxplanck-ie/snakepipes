@@ -1,6 +1,26 @@
 snakePipes News
 ===============
 
+snakePipes 2.1.0
+----------------
+
+ * Snakemake version is bumped to 5.13.0
+ * Updated docs on running single snakefiles
+ * Added user-input target regions and freetext parameters to differential methylation analysis with metilene
+ * Added PCA to metilene report in WGBS
+ * Added Genrich support for SE data
+ * Edited symlinking rules to `ln -s` or python
+ * TMPDIR is now passed at rule-level to the shell
+ * Added logs in a couple of places
+ * Added `--skipBamQC` to WGBS to be included with `--fromBAM` to suppress recalculation of QC metrics on the bam file
+ * Added tempDir check to snakePipes info
+ * Added `--oldConfig` and `--configMode` options to snakePipes config that allow passing a copy of an existing pre-configured config file instead of passing the single paths. Previous mode can be used with `--configMode manual` (default), the new mode with `--configMode recycle`.
+ * Updated histoneHMM version to 1.8. Changed number formatting in histoneHMM output from scientific to general.
+ * Small fixes in DESeq2 report for noncoding-RNA-seq, WGBS reports
+ * Fixed `--verbose` in WGBS
+ * Fixed an important bug in differential binding analysis with CSAW (mismatch between sampleSheet rownames and countdata colnames).
+
+
 snakePipes 2.0.2
 ----------------
 

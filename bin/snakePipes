@@ -76,6 +76,15 @@ def parse_arguments():
     configParser = subparsers.add_parser('config',
                                          help="Update snakePipes-wide values in defaults.yaml")
 
+    configParser.add_argument('--configMode',
+                              help="Choose between manual argument setup and recycling a config file from previous installation (Default: %(default)s)",
+                              choices=['manual','recycle'],
+                              default=defaults['configMode'])
+
+    configParser.add_argument('--oldConfig',
+                              help="Provide an existing config file with the setup used in the previous installation. (Default: %(default)s)",
+                              default=defaults['oldConfig'])
+
     configParser.add_argument('--snakemakeOptions',
                               help="Update the options given to snakeMake. You MUST include --use-conda "
                                    "and an appropriate --conda-prefix if you change this! (Default: %(default)s)",
@@ -145,7 +154,7 @@ def flushOrganisms():
 
 def info():
     """
-    Print the locations of EVERY yaml file. Break these up a bit so it's clear what they actually belong to.
+    Print the locations of EVERY yaml file. Break these up a bit so it's clear what they actually belong to. Print path to tempDir and check that it exists.
     """
     baseDir = os.path.dirname(snakePipes.__file__)
     cfg = cof.load_configfile(os.path.join(baseDir, "shared", "defaults.yaml"), False, "defaults")
@@ -169,6 +178,15 @@ def info():
     print("\nWorkflow-specific cluster.yaml and defaults.yaml files are in:")
     for f in glob.glob(os.path.join(baseDir, "workflows/*/cluster.yaml")):
         print("    {}".format(os.path.dirname(f)))
+
+    #tempDir
+    tempDir = cfg['tempDir']
+    msg=["\nTemp dir under {} ".format(tempDir)]
+    if os.path.isdir(tempDir):
+        msg.append("exists and will be used.")
+    else:
+        msg.append("does not exist and /tmp will be used instead.")
+    print(''.join(msg))
 
 
 def envInfo():
@@ -297,24 +315,36 @@ def createCondaEnvs(args):
 
 def updateConfig(args):
     """Update the global defaults"""
-    d = {
-         'snakemakeOptions': args.snakemakeOptions,
-         'organismsDir': args.organismsDir,
-         'clusterConfig': args.clusterConfig,
-         'tempDir': args.tempDir,
-         'smtpServer': args.smtpServer,
-         'smtpPort': args.smtpPort,
-         'onlySSL': args.onlySSL,
-         'emailSender': args.emailSender,
-         'smtpUsername': args.smtpUsername,
-         'smtpPassword': args.smtpPassword,
-         'toolsVersion': args.toolsVersion
-        }
     baseDir = os.path.dirname(snakePipes.__file__)
     # Load, update and rewrite the default dictionary
-    currentDict = cof.load_configfile(os.path.join(baseDir, "shared", "defaults.yaml"), False)
-    cof.merge_dicts(currentDict, d)
-    cof.write_configfile(os.path.join(baseDir, "shared", "defaults.yaml"), d)
+    currentDict = cof.load_configfile(os.path.join(baseDir, "shared", "defaults.yaml"), True)
+
+    if args.configMode=="manual":
+        d = {
+             'snakemakeOptions': args.snakemakeOptions,
+             'organismsDir': args.organismsDir,
+             'clusterConfig': args.clusterConfig,
+             'tempDir': args.tempDir,
+             'smtpServer': args.smtpServer,
+             'smtpPort': args.smtpPort,
+             'onlySSL': args.onlySSL,
+             'emailSender': args.emailSender,
+             'smtpUsername': args.smtpUsername,
+             'smtpPassword': args.smtpPassword,
+             'toolsVersion': args.toolsVersion,
+             'oldConfig': None,
+             'configMode': "manual"
+            }
+    elif args.configMode=="recycle":
+        oldConfig=args.oldConfig
+        if os.path.isfile(oldConfig):
+            d = cof.load_configfile(oldConfig, True)
+            if not currentDict.keys() & d.keys():
+                sys.exit("The old and the new config have no matching keys!!!\n")
+        else:
+            sys.exit("Config file not found\n")
+    updatedDict=cof.merge_dicts(currentDict, d)
+    cof.write_configfile(os.path.join(baseDir, "shared", "defaults.yaml"), updatedDict)
 
 
 def version():

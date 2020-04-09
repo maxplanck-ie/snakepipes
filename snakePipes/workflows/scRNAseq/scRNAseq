@@ -107,7 +107,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
 
     optional.add_argument("--cellNames",
                           metavar="STR",
-                          help="either tab-sep. file with cell name ranges or directory with *.csv files that contain "
+                          help="either tab-sep. file with cell name ranges or directory with *.tsv files that contain "
                           "cell names and plate/library information for all fastq files! (default: '%(default)s')",
                           default=defaults["cellNames"])
 

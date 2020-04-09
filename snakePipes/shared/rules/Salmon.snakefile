@@ -1,4 +1,6 @@
 ## Salmon Index
+import os
+
 rule SalmonIndex:
     input:
         "Annotation/genes.filtered.fa",
@@ -52,6 +54,7 @@ if pairedEnd:
             bin = "Salmon/SalmonIndex/seq.bin"
         output:
             quant = "Salmon/{sample}/quant.sf"
+        log: "Salmon/logs/{sample}.quant.log"
         benchmark:
             "Salmon/.benchmark/SalmonQuant.{sample}.benchmark"
         params:
@@ -61,7 +64,7 @@ if pairedEnd:
         threads: 8
         conda: CONDA_RNASEQ_ENV
         shell: """
-            salmon quant -p {threads} --softclipOverhangs --validateMappings --numBootstraps 50 -i Salmon/SalmonIndex -l {params.lib_type} -1 {input.r1} -2 {input.r2} -o {params.outdir}
+            salmon quant -p {threads} --softclipOverhangs --validateMappings --numBootstraps 50 -i Salmon/SalmonIndex -l {params.lib_type} -1 {input.r1} -2 {input.r2} -o {params.outdir} 2> {log}
             """
 else:
     rule SalmonQuant:
@@ -70,6 +73,7 @@ else:
             bin = "Salmon/SalmonIndex/seq.bin",
         output:
             quant = "Salmon/{sample}/quant.sf"
+        log: "Salmon/logs/{sample}.quant.log"
         benchmark:
             "Salmon/.benchmark/SalmonQuant.{sample}.benchmark"
         params:
@@ -79,7 +83,7 @@ else:
         threads: 8
         conda: CONDA_RNASEQ_ENV
         shell: """
-            salmon quant -p {threads} --softclipOverhangs --validateMappings --numBootstraps 50 -i Salmon/SalmonIndex -l {params.lib_type} -r {input.fastq} -o {params.outdir}
+            salmon quant -p {threads} --softclipOverhangs --validateMappings --numBootstraps 50 -i Salmon/SalmonIndex -l {params.lib_type} -r {input.fastq} -o {params.outdir} 2> {log}
             """
 
 
@@ -90,9 +94,9 @@ rule Salmon_symlinks:
         quant = "Salmon/{sample}.quant.sf"
     params:
         quant = "{sample}/quant.sf"
-    shell: """
-        ln -s -f {params.quant} {output.quant}
-        """
+    run:
+        if not os.path.exists(os.path.join(outdir,output.quant)):
+            os.symlink(os.path.join(outdir,input.quant),os.path.join(outdir,output.quant))
 
 
 rule Salmon_TPM:
@@ -103,7 +107,7 @@ rule Salmon_TPM:
     benchmark:
         "Salmon/.benchmark/Salmon_TPM.benchmark"
     log:
-        "Salmon/Salmon_TPM.log"
+        "Salmon/logs/Salmon_TPM.log"
     conda: CONDA_RNASEQ_ENV
     shell:
         "Rscript "+os.path.join(maindir, "shared", "rscripts", "merge_count_tables.R")+" Name TPM {output} {input} "
@@ -117,7 +121,7 @@ rule Salmon_counts:
     benchmark:
         "Salmon/.benchmark/Salmon_counts.benchmark"
     log:
-        "Salmon/Salmon_counts.log"
+        "Salmon/logs/Salmon_counts.log"
     conda: CONDA_RNASEQ_ENV
     shell:
         "Rscript "+os.path.join(maindir, "shared", "rscripts", "merge_count_tables.R")+" Name NumReads {output} {input} "
@@ -129,8 +133,9 @@ rule Salmon_wasabi:
         "Salmon/{sample}.quant.sf"
     output:
         "Salmon/{sample}/abundance.h5"
+    log: "Salmon/logs/{sample}.wasabi.log"
     params:
         "Salmon/{sample}/"
     conda: CONDA_RNASEQ_ENV
     shell:
-        "Rscript "+os.path.join(maindir, "shared", "rscripts", "wasabi.R")+" {params}"
+        "Rscript "+os.path.join(maindir, "shared", "rscripts", "wasabi.R")+" {params} 2> {log}"
