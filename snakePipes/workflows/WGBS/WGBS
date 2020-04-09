@@ -49,7 +49,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          "noAutoMethylationBias": False, "fromBAM": False, "skipDOC": False,
                          "UMIDedup": False,
                          "UMIDedupOpts": "", "bcPattern": "",
-                         "UMIDedupSep": "_", "UMIBarcode": False, "targetRegions": None}):
+                         "UMIDedupSep": "_", "UMIBarcode": False, "targetRegions": None, "metileneOptions": None, "skipBamQC": False }):
 
     """
     Parse arguments from the command line.
@@ -122,6 +122,10 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          help="If specified, the input is taking from BAM files containing alignments rather than fastq files. See also --bamExt.",
                          action="store_true")
 
+    optional.add_argument("--skipBamQC",
+                         help="If specified, filtering of input bam files, as well as calculation of quality metrics, will be skipped. ",
+                         action="store_true")
+
     optional.add_argument("--bamExt",
                           help="If --fromBAM is specified, this is the expected file extension. Removing it yields sample names. Default: '%(default)s'",
                           default=defaults["bamExt"])
@@ -134,6 +138,10 @@ def parse_args(defaults={"verbose": False, "configFile": None,
     optional.add_argument("--DMRprograms",
                           help="If a sample sheet is provided, use the specified DMR-calling programs. Multiple programs can be comma-separated with no spaces (e.g., 'metilene,dmrseq,DSS'). The available programs are metilene, dmrseq, and DSS (note that this is very slow). Default: %(default)s.",
                           default=defaults["DMRprograms"])
+
+    optional.add_argument("--metileneOptions",
+                          help="Options to pass to metilene. Default: '%(default)s'",
+                          default=defaults["metileneOptions"])
 
     optional.add_argument("--skipDOC",
                          action="store_true",

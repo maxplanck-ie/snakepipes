@@ -11,12 +11,14 @@ rule featureCounts:
         libtype = libraryType,
         paired_opt = lambda wildcards: "-p -B " if pairedEnd else "",
         opts = config["featureCountsOptions"],
+        tempDir = tempDir
     log:
-        out = "featureCounts/{sample}.out",
-        err = "featureCounts/{sample}.err"
+        out = "featureCounts/logs/{sample}.out",
+        err = "featureCounts/logs/{sample}.err"
     threads: 8
     conda: CONDA_RNASEQ_ENV
     shell: """
+        TMPDIR={params.tempDir}
         MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX);
         featureCounts  \
         {params.paired_opt}{params.opts} \
@@ -34,6 +36,7 @@ rule merge_featureCounts:
         expand("featureCounts/{sample}.counts.txt", sample=samples)
     output:
         "featureCounts/counts.tsv"
+    log: "featureCounts/logs/merge_featureCounts.log"
     conda: CONDA_RNASEQ_ENV
     shell:
-        "Rscript "+os.path.join(maindir, "shared", "rscripts", "merge_featureCounts.R")+" {output} {input}"
+        "Rscript "+os.path.join(maindir, "shared", "rscripts", "merge_featureCounts.R")+" {output} {input} 2> {log}"

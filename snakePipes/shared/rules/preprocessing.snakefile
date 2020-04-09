@@ -11,9 +11,10 @@ if sampleSheet:
             output:
                 r1="mergedFASTQ/{sample}" + reads[0] + ext,
                 r2="mergedFASTQ/{sample}" + reads[1] + ext
+            log: "mergedFASTQ/logs/{sample}.mergeFastq.log"
             shell: """
-                cat {input.r1} > {output.r1}
-                cat {input.r2} > {output.r2}
+                cat {input.r1} > {output.r1} 2> {log}
+                cat {input.r2} > {output.r2} 2>> {log}
                 """
     else:
         rule mergeFastq:
@@ -21,8 +22,9 @@ if sampleSheet:
                 r1=lambda wildcards: expand(initialIndir + "/{sample}", sample=sampleDict[wildcards.sample][0])
             output:
                 r1="mergedFASTQ/{sample}" + reads[0] + ext
+            log: "mergedFASTQ/logs/{sample}.mergeFastq.log"
             shell: """
-                cat {input.r1} > {output.r1}
+                cat {input.r1} > {output.r1} 2> {log}
                 """
 else:
     if pairedEnd:
@@ -33,19 +35,20 @@ else:
             output:
                 r1="mergedFASTQ/{sample}" + reads[0] + ext,
                 r2="mergedFASTQ/{sample}" + reads[1] + ext
-            shell: """
-                ln -sr {input.r1} {output.r1}
-                ln -sr {input.r2} {output.r2}
-                """
+            run:
+                if not os.path.exists(os.path.join(outdir,output.r1)):
+                    os.symlink(os.path.join(outdir,input.r1),os.path.join(outdir,output.r1))
+                if not os.path.exists(os.path.join(outdir,output.r2)):
+                    os.symlink(os.path.join(outdir,input.r2),os.path.join(outdir,output.r2))
     else:
         rule mergeFastq:
             input:
                 r1=indir + "/{sample}" + reads[0] + ext
             output:
                 r1="mergedFASTQ/{sample}" + reads[0] + ext
-            shell: """
-                ln -sr {input.r1} {output.r1}
-                """
+            run:
+                if not os.path.exists(os.path.join(outdir,output.r1)):
+                    os.symlink(os.path.join(outdir,input.r1),os.path.join(outdir,output.r1))
 
 if optDedupDist > 0:
     if pairedEnd:

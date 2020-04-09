@@ -37,18 +37,20 @@ rule createGenomeFasta:
 rule fastaIndex:
     input: genome_fasta
     output: genome_index
+    log: "logs/fastaIndex.log"
     conda: CONDA_SHARED_ENV
     shell: """
-        samtools faidx {input}
+        samtools faidx {input} 2> {log}
         """
 
 # Default memory allocation: 4G
 rule fastaDict:
     input: genome_fasta
     output: genome_dict
+    log: "logs/fastaDict.log"
     conda: CONDA_SHARED_ENV
     shell: """
-        samtools dict -o {output} {input}
+        samtools dict -o {output} {input} 2> {log}
         """
 
 if rmsk_file:
@@ -63,9 +65,10 @@ if rmsk_file:
 rule make2bit:
     input: genome_fasta
     output: genome_2bit
+    log: "logs/make2bit.log"
     conda: CONDA_CREATE_INDEX_ENV
     shell: """
-        faToTwoBit {input} {output}
+        faToTwoBit {input} {output} 2> {log}
         """
 
 
@@ -83,12 +86,13 @@ rule downloadGTF:
 rule gtf2BED:
     input: genes_gtf
     output: genes_bed
+    log: "logs/gtf2BED.log"
     conda: CONDA_CREATE_INDEX_ENV
     shell: """
         awk '{{if ($3 != "gene") print $0;}}' {input} \
             | grep -v "^#" \
             | gtfToGenePred /dev/stdin /dev/stdout \
-            | genePredToBed stdin {output}
+            | genePredToBed stdin {output} 2> {log}
         """
 
 # Default memory allocation: 1G
@@ -131,6 +135,7 @@ rule extendGenicRegions:
 rule bowtie2Index:
     input: genome_fasta
     output: os.path.join(outdir, "BowtieIndex/genome.rev.2.bt2")
+    log: "logs/bowtie2Index.log"
     params:
       basedir = os.path.join(outdir, "BowtieIndex")
     conda: CONDA_DNA_MAPPING_ENV
@@ -138,12 +143,14 @@ rule bowtie2Index:
     shell: """
         ln -s {input} {params.basedir}/genome.fa
         bowtie2-build -t {threads} {params.basedir}/genome.fa {params.basedir}/genome
+        2> {log}
         """
 
 # Default memory allocation: 20G
 rule hisat2Index:
     input: genome_fasta
     output: os.path.join(outdir, "HISAT2Index/genome.6.ht2")
+    log: "logs/hisat2Index.log"
     params:
       basedir = os.path.join(outdir, "HISAT2Index")
     threads: 10
@@ -151,6 +158,7 @@ rule hisat2Index:
     shell: """
         ln -s {input} {params.basedir}/genome.fa
         hisat2-build -q -p {threads} {params.basedir}/genome.fa {params.basedir}/genome
+        2> {log}
         """
 
 
@@ -158,10 +166,11 @@ rule hisat2Index:
 rule makeKnownSpliceSites:
     input: genes_gtf
     output: known_splicesites
+    log: "logs/makeKnownSpliceSites.log"
     conda: CONDA_RNASEQ_ENV
     threads: 10
     shell: """
-        hisat2_extract_splice_sites.py {input} > {output}
+        hisat2_extract_splice_sites.py {input} > {output} 2> {log}
         """
 
 
@@ -169,12 +178,13 @@ rule makeKnownSpliceSites:
 rule starIndex:
     input: genome_fasta
     output: os.path.join(outdir, "STARIndex/SAindex")
+    log: "logs/starIndex.log"
     params:
       basedir = os.path.join(outdir, "STARIndex")
     conda: CONDA_RNASEQ_ENV
     threads: 10
     shell: """
-        STAR --runThreadN {threads} --runMode genomeGenerate --genomeDir {params.basedir} --genomeFastaFiles {input}
+        STAR --runThreadN {threads} --runMode genomeGenerate --genomeDir {params.basedir} --genomeFastaFiles {input} 2> {log}
         rm Log.out
         """
 
@@ -183,12 +193,13 @@ rule starIndex:
 rule bwaIndex:
     input: genome_fasta
     output: os.path.join(outdir, "BWAIndex/genome.fa.sa")
+    log: "logs/bwaIndex.log"
     params:
       genome = os.path.join(outdir, "BWAIndex", "genome.fa")
     conda: CONDA_HIC_ENV
     shell: """
         ln -s {input} {params.genome}
-        bwa index {params.genome}
+        bwa index {params.genome} 2> {log}
         """
 
 
@@ -196,12 +207,13 @@ rule bwaIndex:
 rule bwamethIndex:
     input: genome_fasta
     output: os.path.join(outdir, "BWAmethIndex/genome.fa.bwameth.c2t.sa")
+    log: "logs/bwamethIndex.log"
     params:
       genome = os.path.join(outdir, "BWAmethIndex", "genome.fa")
     conda: CONDA_WGBS_ENV
     shell: """
         ln -s {input[0]} {params.genome}
-        bwameth.py index {params.genome}
+        bwameth.py index {params.genome} 2> {log}
         """
 
 
@@ -218,7 +230,8 @@ rule copyBlacklist:
 rule computeEffectiveGenomeSize:
     input: genome_fasta
     output: os.path.join(outdir, "genome_fasta", "effectiveSize")
+    log: "logs/computeEffectiveGenomeSize.log"
     conda: CONDA_SHARED_ENV
     shell: """
-        seqtk comp {input} | awk '{{tot += $3 + $4 + $5 + $6}}END{{print tot}}' > {output}
+        seqtk comp {input} | awk '{{tot += $3 + $4 + $5 + $6}}END{{print tot}}' > {output} 2> {log}
         """

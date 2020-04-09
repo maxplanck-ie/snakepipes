@@ -8,18 +8,21 @@ if aligner == "STAR":
                 index = star_index_allelic
             output:
                 temp(aligner+"/{sample}.sorted.bam")
+            log: aligner+"/logs/{sample}.sort.log"
             params:
                 alignerOptions = str(alignerOptions or ''),
                 gtf = genes_gtf,
                 prefix = aligner+"/{sample}/{sample}.",
                 samsort_memory = '2G',
                 idx = os.path.dirname(star_index_allelic),
-                sample_dir = aligner+"/{sample}"
+                sample_dir = aligner+"/{sample}",
+                tempDir = tempDir
             benchmark:
                 aligner+"/.benchmark/STAR.{sample}.benchmark"
             threads: 12
             conda: CONDA_RNASEQ_ENV
             shell: """
+                TMPDIR={params.tempDir}
                 MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX);
                 ( [ -d {params.sample_dir} ] || mkdir -p {params.sample_dir} )
                 STAR {params.alignerOptions} \
@@ -41,7 +44,7 @@ if aligner == "STAR":
                     --alignIntronMin 1 \
                     --alignIntronMax 1000000 \
                     --alignMatesGapMax 1000000 \
-                | samtools sort -m {params.samsort_memory} -T $MYTEMP/{wildcards.sample} -@ {threads} -O bam -o {output} -;
+                | samtools sort -m {params.samsort_memory} -T $MYTEMP/{wildcards.sample} -@ {threads} -O bam -o {output} - 2> {log};
                 rm -rf $MYTEMP
                 """
     else:
@@ -51,18 +54,21 @@ if aligner == "STAR":
                 index = star_index_allelic
             output:
                 temp(aligner+"/{sample}.sorted.bam")
+            log: aligner+"/logs/{sample}.sort.log"
             params:
                 alignerOptions = str(alignerOptions or ''),
                 gtf = genes_gtf,
                 idx = os.path.dirname(star_index_allelic),
                 prefix = aligner+"/{sample}/{sample}.",
                 samsort_memory = '2G',
-                sample_dir = aligner+"/{sample}"
+                sample_dir = aligner+"/{sample}",
+                tempDir = tempDir
             benchmark:
                 aligner+"/.benchmark/STAR.{sample}.benchmark"
             threads: 12
             conda: CONDA_RNASEQ_ENV
             shell: """
+                TMPDIR={params.tempDir}
                 MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX);
                 ( [ -d {params.sample_dir} ] || mkdir -p {params.sample_dir} )
                 STAR {params.alignerOptions} \
@@ -84,7 +90,7 @@ if aligner == "STAR":
                     --alignIntronMin 1 \
                     --alignIntronMax 1000000 \
                     --alignMatesGapMax 1000000 \
-                | samtools sort -m {params.samsort_memory} -T $MYTEMP/{wildcards.sample} -@ {threads} -O bam -o {output} -;
+                | samtools sort -m {params.samsort_memory} -T $MYTEMP/{wildcards.sample} -@ {threads} -O bam -o {output} - 2> {log};
                 rm -rf $MYTEMP
                 """
 else:

@@ -39,7 +39,8 @@ message(paste("paired-end? :", pairedEnd, "\n"))
 message(paste("allele-specific? :", allelic_info, "\n"))
 
 ## sampleInfo (setup of the experiment)
-sampleInfo <- read.table(sampleInfoFilePath, header = TRUE, colClasses = c("character", "factor"))
+sampleInfo <- read.table(sampleInfoFilePath, header = TRUE, colClasses = c("character", "character"))
+rownames(sampleInfo)<-sampleInfo$name
 ## is paired end? : define read params
 pe = "none"
 if(isTRUE(pairedEnd)) {

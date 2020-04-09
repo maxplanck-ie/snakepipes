@@ -65,7 +65,7 @@ if allele_info == 'FALSE':
                 touch {log.out}
                 touch {log.err}
                 if [[ -s {params.bed_in} ]]; then
-                    computeMatrix scale-regions -S {input.bigwigs} -R {params.bed_in} -m 1000 -b 200 -a 200 -o {output.matrix} -p {threads} >{log.out} 2>{log.err}
+                    computeMatrix scale-regions -S {input.bigwigs} -R {params.bed_in} -m 1000 -b 200 -a 200 -o {output.matrix} -p {threads} > {log.out} 2> {log.err}
                 fi
                 """
 
@@ -116,7 +116,7 @@ if allele_info == 'FALSE':
             touch {log.err}
             if [[ -s {params.bed_in} ]]; then
                 computeMatrix scale-regions -S {input.bigwigs} -R {params.bed_in} \
-                -m 1000 -b 200 -a 200 -o {output.matrix} -p {threads} >{log.out} 2>{log.err}
+                -m 1000 -b 200 -a 200 -o {output.matrix} -p {threads} > {log.out} 2> {log.err}
             fi
             """
 

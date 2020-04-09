@@ -21,20 +21,20 @@ if not pipeline=="noncoding-rna-seq":
         output:
             aligner + "/{sample}.bam.bai"
         conda: CONDA_SHARED_ENV
-        shell: "[[ ! -f {output} ]] samtools index {input}"
+        shell: "if [[ ! -f {output[0]} ]]; then samtools index {input[0]}; fi"
 
-
-    rule link_bam_bai_external:
-        input:
-            bam = aligner + "/{sample}.bam",
-            bai = aligner + "/{sample}.bam.bai"
-        output:
-            bam_out = "filtered_bam/{sample}.filtered.bam",
-            bai_out = "filtered_bam/{sample}.filtered.bam.bai",
-        run:
-            if not os.path.exists(os.path.join(outdir,output.bam_out)):
-                os.symlink(os.path.join(outdir,input.bam),os.path.join(outdir,output.bam_out))
-                os.symlink(os.path.join(outdir,input.bai),os.path.join(outdir,output.bai_out))
+    if not pipeline=="WGBS" or pipeline=="WGBS" and skipBamQC:
+        rule link_bam_bai_external:
+            input:
+                bam = aligner + "/{sample}.bam",
+                bai = aligner + "/{sample}.bam.bai"
+            output:
+                bam_out = "filtered_bam/{sample}.filtered.bam",
+                bai_out = "filtered_bam/{sample}.filtered.bam.bai",
+            run:
+                if not os.path.exists(os.path.join(outdir,output.bam_out)):
+                    os.symlink(os.path.join(outdir,input.bam),os.path.join(outdir,output.bam_out))
+                    os.symlink(os.path.join(outdir,input.bai),os.path.join(outdir,output.bai_out))
 
 
     rule sambamba_flagstat:
@@ -42,7 +42,8 @@ if not pipeline=="noncoding-rna-seq":
            aligner + "/{sample}.bam"
        output:
            "Sambamba/{sample}.markdup.txt"
+       log: "Sambamba/logs/{sample}.flagstat.log"
        conda: CONDA_SAMBAMBA_ENV
        shell: """
-           sambamba flagstat -p {input} > {output}
+           sambamba flagstat -p {input} > {output} 2> {log}
            """

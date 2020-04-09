@@ -142,6 +142,7 @@ if pairedEnd:
             control = lambda wildcards: ["filtered_bam/"+get_control(x)+".filtered.bam" for x in genrichDict[wildcards.group]]
         output:
             "Genrich/{group}.narrowPeak"
+        log: "Genrich/logs/{group}.log"
         params:
             bams = lambda wildcards: ",".join(expand(os.path.join("filtered_bam", "{sample}.filtered.bam"), sample=genrichDict[wildcards.group])),
             blacklist = "-E {}".format(blacklist_bed) if blacklist_bed else "",
@@ -149,7 +150,7 @@ if pairedEnd:
             control=lambda wildcards,input: ",".join(input.control) if input.control else ""
         conda: CONDA_ATAC_ENV
         shell: """
-            Genrich -S -t {params.bams} {params.control_pfx} {params.control} -o {output} -r {params.blacklist} -y
+            Genrich -S -t {params.bams} {params.control_pfx} {params.control} -o {output} -r {params.blacklist} -y 2> {log}
             """
 else:
     rule Genrich_peaks:
@@ -158,6 +159,7 @@ else:
             control = lambda wildcards: ["filtered_bam/"+get_control(x)+".filtered.bam" for x in genrichDict[wildcards.group]]
         output:
             "Genrich/{group}.narrowPeak"
+        log: "Genrich/logs/{group}.log"
         params:
             bams = lambda wildcards: ",".join(expand(os.path.join("filtered_bam", "{sample}.filtered.bam"), sample=genrichDict[wildcards.group])),
             blacklist = "-E {}".format(blacklist_bed) if blacklist_bed else "",
@@ -166,5 +168,5 @@ else:
             frag_size=fragmentLength
         conda: CONDA_ATAC_ENV
         shell: """
-            Genrich -S -t {params.bams} {params.control_pfx} {params.control} -o {output} -r {params.blacklist} -w {params.frag_size}
+            Genrich -S -t {params.bams} {params.control_pfx} {params.control} -o {output} -r {params.blacklist} -w {params.frag_size} 2> {log}
             """

@@ -44,8 +44,8 @@ rule histoneHMM_out_gz:
     threads: 2
     conda: CONDA_CHIPSEQ_ENV
     shell: """
-        grep -v ^\"#\" {input.gff} | sort -k1,1 -k4,4n | bgzip > {output.gff}
-        tabix -p gff {output.gff} > {log.out} 2> {log.err}
+        grep -v ^\"#\" {input.gff} | sort -k1,1 -k4,4n | bgzip > {output.gff} 2> {log.err}
+        tabix -p gff {output.gff} > {log.out} 2>> {log.err}
         gzip {input.post}
         gzip {input.txt}
         """
