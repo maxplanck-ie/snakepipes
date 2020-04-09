@@ -319,7 +319,7 @@ def updateConfig(args):
     # Load, update and rewrite the default dictionary
     currentDict = cof.load_configfile(os.path.join(baseDir, "shared", "defaults.yaml"), False)
 
-    if args.mode=="manual":
+    if args.configMode=="manual":
         d = {
              'snakemakeOptions': args.snakemakeOptions,
              'organismsDir': args.organismsDir,
@@ -335,7 +335,7 @@ def updateConfig(args):
              'oldConfig': None,
              'configMode': "manual"
             }
-    elif args.mode=="recycle":
+    elif args.configMode=="recycle":
         if os.path.isfile(oldConfig):
             d = cof.load_configfile(oldConfig, False)
             if not currentDict.keys() & d.keys():
