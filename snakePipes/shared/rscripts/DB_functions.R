@@ -73,7 +73,7 @@ readfiles_chip <- function(sampleSheet, fragmentLength, window_size, alleleSpeci
     mincount <- 20
     message(paste0("Counting reads in windows.. windows with total counts < ", mincount, " are discarded"))
     counts <- csaw::windowCounts(bam.files = bam.files, param = pe.param, ext = fragmentLength, spacing = window_size, filter = mincount)
-    if designType==("condition"){
+    if (designType==("condition")){
         colnames(counts)<-gsub(".filtered.bam","",basename(bam.files))
         counts<-counts[,sampleSheet$name]} else {
         colnames(counts)<-gsub(".sorted.bam","",basename(bam.files))
