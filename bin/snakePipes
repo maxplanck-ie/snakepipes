@@ -336,6 +336,7 @@ def updateConfig(args):
              'configMode': "manual"
             }
     elif args.configMode=="recycle":
+        oldConfig=args.oldConfig
         if os.path.isfile(oldConfig):
             d = cof.load_configfile(oldConfig, False)
             if not currentDict.keys() & d.keys():
