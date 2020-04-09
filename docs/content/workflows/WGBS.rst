@@ -10,7 +10,7 @@ What it does
 Optionally trimmed reads are mapped to the reference genome using a bisulfite-specific aligner (`bwa-meth <https://github.com/brentp/bwa-meth>`__).
 Quality metrics are collected and synthesized in a QC report, including bisulfite conversion rate, mapping rate, coverage metrics, and methylation bias.
 
-There are two flags that allow skipping certain QC metric calculation, i.e. ``--skipDOC`` and ``--GCbias``. These deactivate or activate, respectively, the depth of coverage (DOC) calculations or GC bias calculation done by deepTools.
+There are two flags that allow skipping certain QC metric calculation, i.e. ``--skipDOC`` and ``--GCbias``. These deactivate or activate, respectively, the depth of coverage (DOC) calculations or GC bias calculation done by deepTools. If you run the workflow with ``--fromBAM``, you can also choose to skip the re-calculation of most QC metrics with ``--skipBamQC``.
 
 Methylation ratios are extracted (via `MethylDackel <https://github.com/dpryan79/MethylDackel>`__) for CpG positions in the reference genome with a minimum coverage specified by ``--minCoverage``  and low SNP allelic frequency (<0.25 illegitimate bases).
 If a sample sheet is provided, `Metilene <https://www.bioinf.uni-leipzig.de/Software/metilene/>`__ , `DMRseq <https://bioconductor.org/packages/release/bioc/html/dmrseq.html>`__ and/or `DSS <https://bioconductor.org/packages/release/bioc/html/DSS.html>`__ (as specified by ``--DMRprograms``) will be used to find differentially methylated regions (DMRs). Filtering criterion can be changed both for the CpGs used to find DMRs as well as what are considered as significant DMRs.
