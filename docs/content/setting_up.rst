@@ -244,11 +244,11 @@ If you want, you can also give an absolute log directory starting with /.
                            -e {snakePipes_cluster_logDir}/{rule}.\$PBS_JOBID.err
                         snakePipes_cluster_logDir: cluster_logs
 
- **SGE**              .. code::
- bash
+ **SGE**              .. code:: bash
+
                       snakemake_cluster_cmd: qsub -V -cwd -j y -pe threaded {threads} -l h_vmem={cluster.memory},h_rt=24:00:00 -l tmpspace=100G -N {rule}.snakemake -S /bin/bash
                       snakePipes_cluster_logDir: cluster_logs
-                    
+
 ==================== ======================================================================================
 
 
