@@ -1,5 +1,8 @@
 snakePipes News
 ===============
+snakePipes 2.1.1
+----------------
+* small bug fix: a typo in atac-seq pipeline
 
 snakePipes 2.1.0
 ----------------
@@ -90,14 +93,14 @@ snakePipes 1.2.3
  * Fixed CSAW QC plot error with single end reads
  * Updated histone HMM environment to a working conda version
  * Salmon_wasabi is now a localrule
- 
+
 
 snakePipes 1.2.2
 ----------------
 
  * Fixed a bug in the ATAC-seq environment where GenomeInfoDbData was missing.
  * Also an occasional issue with CSAW
- 
+
 
 snakePipes 1.2.1
 ----------------
@@ -106,7 +109,7 @@ snakePipes 1.2.1
  * Implemented complex experimental design in RNAseq (differential gene expression), ChIP/ATACseq (differential binding).
  * Fixed an issue with ggplot2 and log transformation in RNAseq report Rmd.
  * fastqc folder is created and its content will be added to multiqc only if fastqc flag is called.
- * fastqc-trimmed folder is created and its content will be added to multiqc only if both fastqc and trim flags are called. 
+ * fastqc-trimmed folder is created and its content will be added to multiqc only if both fastqc and trim flags are called.
 
 snakePipes 1.2.0
 ----------------
