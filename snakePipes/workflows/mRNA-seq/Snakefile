@@ -279,7 +279,7 @@ onstart:
 ################################################################################
 
 if not fromBAM:
-    localrules: FASTQ1, FASTQ2, Salmon_wasabi, sleuth_Salmon
+    localrules: Salmon_wasabi, sleuth_Salmon
 
 
     rule all:
