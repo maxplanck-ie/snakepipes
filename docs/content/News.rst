@@ -1,8 +1,17 @@
 snakePipes News
 ===============
+
+snakePipes 2.1.2
+----------------
+* FASTQ1 and FASTQ2 are not localrules anymore due to buggy logging
+* increased BBmap version
+* fixed issue with missing input for running the DNA-mapping Snakefile 
+
+
 snakePipes 2.1.1
 ----------------
 * small bug fix: a typo in atac-seq pipeline
+
 
 snakePipes 2.1.0
 ----------------
