@@ -148,8 +148,7 @@ onstart:
 ################################################################################
 
 if not fromBAM:
-    localrules: FASTQ1, FASTQ2
-
+    
     rule all:
         input:
             expand("FASTQ/{sample}{read}.fastq.gz", sample = samples, read = reads),

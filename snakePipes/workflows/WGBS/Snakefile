@@ -162,13 +162,6 @@ onstart:
 
 ### main rule ##################################################################
 ################################################################################
-if not fromBAM:
-    localrules:
-        FASTQ1,
-        FASTQ2
-else:
-    localrules:
-        link_bam
 
 rule all:
     input:
