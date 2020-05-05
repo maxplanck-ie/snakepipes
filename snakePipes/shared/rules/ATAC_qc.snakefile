@@ -64,7 +64,7 @@ rule MACS2_peak_qc:
         genome_index = genome_index
     benchmark:
         os.path.join(outdir_ATACqc, ".benchmark/ATAC_qc.{sample}.filtered.benchmark")
-    conda: CONDA_ATAC_ENV
+    conda: CONDA_SHARED_ENV
     shell: """
         # get the number of peaks
         peak_count=`cat {params.peaks} | wc -l`

@@ -106,7 +106,7 @@ rule MACS2_peak_qc:
         genome_index = genome_index
     benchmark:
         "MACS2/.benchmark/MACS2_peak_qc.{sample}.filtered.benchmark"
-    conda: CONDA_CHIPSEQ_ENV
+    conda: CONDA_SHARED_ENV
     shell: """
         # get the number of peaks
         peak_count=`wc -l < {params.peaks}`
