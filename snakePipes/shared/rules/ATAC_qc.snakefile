@@ -85,5 +85,5 @@ rule MACS2_peak_qc:
         genomecov=`bc -l <<< "$peak_len/$genome_size"`
 
         # write peak-based QC metrics to output file
-        printf "peak_count\tFRiP\tpeak_genome_coverage\n%d\t%5.3f\t%6.4f\n" $peak_count $frip $genomecov > {output.qc} >2 {log}
+        printf "peak_count\tFRiP\tpeak_genome_coverage\n%d\t%5.3f\t%6.4f\n" $peak_count $frip $genomecov > {output.qc} 2> {log}
         """
