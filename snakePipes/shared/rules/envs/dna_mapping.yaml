@@ -5,4 +5,3 @@ channels:
 dependencies:
  - bowtie2 = 2.3.5.1
  - qualimap = 2.2.2d
- - samtools = 1.10
