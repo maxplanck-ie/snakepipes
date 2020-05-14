@@ -173,7 +173,7 @@ onstart:
         print("-" * 80, "\n")
 
     if toolsVersion:
-        usedEnvs = [CONDA_SHARED_ENV, CONDA_CHIPSEQ_ENV, CONDA_ATAC_ENV]
+        usedEnvs = [CONDA_SHARED_ENV, CONDA_CHIPSEQ_ENV]
         cf.writeTools(usedEnvs, workingdir, "ChIP-seq", maindir)
 
 ### main rule ##################################################################

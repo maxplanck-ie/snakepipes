@@ -76,7 +76,7 @@ rule make2bit:
 # Default memory allocation: 20G
 rule downloadGTF:
     output: genes_gtf
-    params: 
+    params:
         url = gtfURL
     run:
         downloadFile(params.url, output)
@@ -138,7 +138,7 @@ rule bowtie2Index:
     log: "logs/bowtie2Index.log"
     params:
       basedir = os.path.join(outdir, "BowtieIndex")
-    conda: CONDA_DNA_MAPPING_ENV
+    conda: CONDA_CREATE_INDEX_ENV
     threads: 10
     shell: """
         ln -s {input} {params.basedir}/genome.fa
@@ -154,7 +154,7 @@ rule hisat2Index:
     params:
       basedir = os.path.join(outdir, "HISAT2Index")
     threads: 10
-    conda: CONDA_RNASEQ_ENV
+    conda: CONDA_CREATE_INDEX_ENV
     shell: """
         ln -s {input} {params.basedir}/genome.fa
         hisat2-build -q -p {threads} {params.basedir}/genome.fa {params.basedir}/genome
@@ -167,7 +167,7 @@ rule makeKnownSpliceSites:
     input: genes_gtf
     output: known_splicesites
     log: "logs/makeKnownSpliceSites.log"
-    conda: CONDA_RNASEQ_ENV
+    conda: CONDA_CREATE_INDEX_ENV
     threads: 10
     shell: """
         hisat2_extract_splice_sites.py {input} > {output} 2> {log}
@@ -181,7 +181,7 @@ rule starIndex:
     log: "logs/starIndex.log"
     params:
       basedir = os.path.join(outdir, "STARIndex")
-    conda: CONDA_RNASEQ_ENV
+    conda: CONDA_CREATE_INDEX_ENV
     threads: 10
     shell: """
         STAR --runThreadN {threads} --runMode genomeGenerate --genomeDir {params.basedir} --genomeFastaFiles {input} 2> {log}
@@ -196,7 +196,7 @@ rule bwaIndex:
     log: "logs/bwaIndex.log"
     params:
       genome = os.path.join(outdir, "BWAIndex", "genome.fa")
-    conda: CONDA_HIC_ENV
+    conda: CONDA_CREATE_INDEX_ENV
     shell: """
         ln -s {input} {params.genome}
         bwa index {params.genome} 2> {log}
@@ -210,7 +210,7 @@ rule bwamethIndex:
     log: "logs/bwamethIndex.log"
     params:
       genome = os.path.join(outdir, "BWAmethIndex", "genome.fa")
-    conda: CONDA_WGBS_ENV
+    conda: CONDA_CREATE_INDEX_ENV
     shell: """
         ln -s {input[0]} {params.genome}
         bwameth.py index {params.genome} 2> {log}
@@ -220,7 +220,7 @@ rule bwamethIndex:
 # Default memory allocation: 1G
 rule copyBlacklist:
     output: os.path.join(outdir, "annotation/blacklist.bed")
-    params: 
+    params:
         url = blacklist
     run:
         downloadFile(params.url, output)
