@@ -17,14 +17,15 @@ MAX_RS_DISTANCE = 1000
 
 ### Functions ##################################################################
 # define matrix format (filename suffix)
-matrix_format = ".h5"
+matrix_format = matrixFormat
 
 ## find out which resolution is it (RF or binsize)
 def get_matrixFile_suffix():
     if(RFResolution is True):
         return("rf")
     else:
-        return("bs")
+        bin_size = int(binSize/1000)
+        return("bs"+str(bins_size)+"kb")
 matrixFile_suffix = get_matrixFile_suffix()
 
 ## seq dict for restriction enzymes
