@@ -106,7 +106,7 @@ rule MACS2_peak_qc:
         genome_index = genome_index
     benchmark:
         "MACS2/.benchmark/MACS2_peak_qc.{sample}.filtered.benchmark"
-    conda: CONDA_CHIPSEQ_ENV
+    conda: CONDA_SHARED_ENV
     shell: """
         # get the number of peaks
         peak_count=`wc -l < {params.peaks}`
@@ -148,7 +148,7 @@ if pairedEnd:
             blacklist = "-E {}".format(blacklist_bed) if blacklist_bed else "",
             control_pfx=lambda wildcards,input: "-c" if input.control else "",
             control=lambda wildcards,input: ",".join(input.control) if input.control else ""
-        conda: CONDA_ATAC_ENV
+        conda: CONDA_CHIPSEQ_ENV
         shell: """
             Genrich -S -t {params.bams} {params.control_pfx} {params.control} -o {output} -r {params.blacklist} -y 2> {log}
             """
@@ -166,7 +166,7 @@ else:
             control_pfx=lambda wildcards,input: "-c" if input.control else "",
             control=lambda wildcards,input: ",".join(input.control) if input.control else "",
             frag_size=fragmentLength
-        conda: CONDA_ATAC_ENV
+        conda: CONDA_CHIPSEQ_ENV
         shell: """
             Genrich -S -t {params.bams} {params.control_pfx} {params.control} -o {output} -r {params.blacklist} -w {params.frag_size} 2> {log}
             """

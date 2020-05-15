@@ -3,5 +3,7 @@ channels:
  - conda-forge
  - bioconda
 dependencies:
- - samtools = 1.10  # This should pull in tabix via htslib as well
  - macs2 = 2.2.6
+ - genrich = 0.6
+ - bioconductor-csaw = 1.20.0
+ - r-histonehmm = 1.8
