@@ -25,7 +25,7 @@ def get_matrixFile_suffix():
         return("rf")
     else:
         bin_size = int(binSize/1000)
-        return("bs"+str(bins_size)+"kb")
+        return("bs"+str(bin_size)+"kb")
 matrixFile_suffix = get_matrixFile_suffix()
 
 ## seq dict for restriction enzymes
