@@ -63,6 +63,8 @@ noCorrect: false
 correctionMethod: KR
 #Chromosomes of interest to build matrix on them
 chromosomes:
+#Format of the built matrix. Choices are .h5 and .cool
+matrixFormat: ".h5"
 # a .tsv file contains names and replicates of samples. It is needed if mergeSamples
 sampleSheet:
 #umi_tools
