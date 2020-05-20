@@ -1,7 +1,7 @@
 snakePipes News
 ===============
 
-snakePipes 2.1.2
+snakePipes 2.x.y
 ----------------
 * FASTQ1 and FASTQ2 are not localrules anymore due to buggy logging
 * increased BBmap version

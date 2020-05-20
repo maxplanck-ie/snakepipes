@@ -40,7 +40,7 @@ Quick start
 
 .. code:: bash
 
-    conda update -n snakePipes -c mpi-ie -c bioconda -c conda-forge snakePipes
+    conda update -n snakePipes -c mpi-ie -c bioconda -c conda-forge --prune snakePipes
 
 * Download genome fasta and annotations for an your organism, and build indexes, Check in :ref:`createIndices`
 
