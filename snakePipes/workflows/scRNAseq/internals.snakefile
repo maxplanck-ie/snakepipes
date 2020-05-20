@@ -49,6 +49,11 @@ if not cf.is_paired(infiles,ext,reads):
     print("This workflow requires paired-end read data!")
     exit(1)
 
+## print deprecation message for modeGruen
+if mode=="Gruen":
+    print("Warning: mode Gruen is going to be deprecated by the end of 2020!")
+
+
 if mode == "STARsolo":
     if myKit == "10Xv2":
         BCwhiteList = os.path.join(maindir,"workflows","scRNAseq","10x_737K-august-2016.txt")
