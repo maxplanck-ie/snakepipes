@@ -189,7 +189,7 @@ elif mode=="Alevin":
             "Salmon/SalmonIndex/seq.bin",
             expand("Alevin/{sample}/alevin/quants_mat.gz",sample = samples),
             #expand("QC/Alevin_{sample}.html", sample=samples),
-            "multiQC/multiqc_report.html"
+            #"multiQC/multiqc_report.html"
 
 
 ### execute after workflow finished ############################################

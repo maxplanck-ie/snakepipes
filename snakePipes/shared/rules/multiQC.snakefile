@@ -72,23 +72,14 @@ def multiqc_input_check(return_value):
             infiles.append( expand(fastq_dir+"/{sample}"+reads[0]+".fastq.gz", sample = samples) +
                             expand("Counts/{sample}.summary", sample = samples) )
             indir += fastq_dir + " Counts "
-            infiles.append( expand(aligner+"/{sample}.bam", sample = samples) +
-            expand("Sambamba/{sample}.markdup.txt", sample = samples) +
-            expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt", sample=samples))
-            indir += aligner
-            indir += " Sambamba "
-            indir += " deepTools_qc "
         elif mode == "STARsolo":
             infiles.append( expand(fastq_dir+"/{sample}"+reads[0]+".fastq.gz", sample = samples) )
             infiles.append( expand(aligner+"/{sample}.bam", sample = samples) +
-            expand("Sambamba/{sample}.markdup.txt", sample = samples) +
-            expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt", sample=samples))
-            indir += aligner
-            indir += " Sambamba "
-            indir += " deepTools_qc "
-        elif mode == "Alevin":
-            infiles.append( expand("Alevin/{sample}/libParams/flenDist.txt", sample = samples) )
-            indir += " Alevin "
+        expand("Sambamba/{sample}.markdup.txt", sample = samples) +
+        expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt", sample=samples))
+        indir += aligner
+        indir += " Sambamba "
+        indir += " deepTools_qc "
     elif pipeline == "WGBS":
         infiles.append( expand("QC_metrics/{sample}.flagstat", sample = samples) )
         indir += " QC_metrics"
