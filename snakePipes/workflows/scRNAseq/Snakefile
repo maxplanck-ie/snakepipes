@@ -169,6 +169,7 @@ elif mode=="STARsolo":
             "multiQC/multiqc_report.html",
             "Seurat/STARsolo_filtered/merged_samples.RDS",
             "Seurat/STARsolo_raw/merged_samples.RDS",
+            "Seurat/STARsolo_raw_RmEmptyDrops/merged_samples.RDS",
             run_velocyto(skipVelocyto)
           
 

@@ -1,11 +1,12 @@
 snakePipes News
 ===============
 
-snakePipes 2.1.2
+snakePipes 2.x.y
 ----------------
 * FASTQ1 and FASTQ2 are not localrules anymore due to buggy logging
 * increased BBmap version
-* fixed issue with missing input for running the DNA-mapping Snakefile 
+* fixed issue with missing input for running the DNA-mapping Snakefile
+* added filtering of empty drops with Dropletutils to scRNAseq mode STARsolo 
 
 
 snakePipes 2.1.1
