@@ -37,6 +37,11 @@ elif mode=="STARsolo":
     include: os.path.join(maindir, "shared", "rules", "scRNAseq_STARsolo.snakefile")
     trim=False
     skipRaceID=True
+elif mode=="Alevin":
+    include: os.path.join(maindir, "shared", "rules", "Salmon.snakefile")
+    include: os.path.join(maindir, "shared", "rules", "scRNAseq_Alevin.snakefile")
+    trim=False
+    skipRaceID=True
 pairedEnd = True
 include: os.path.join(maindir, "shared", "rules", "FastQC.snakefile")
 pairedEnd = False
@@ -170,7 +175,22 @@ elif mode=="STARsolo":
             "Seurat/STARsolo_filtered/merged_samples.RDS",
             "Seurat/STARsolo_raw/merged_samples.RDS",
             run_velocyto(skipVelocyto)
-          
+elif mode=="Alevin":
+    localrules: origFASTQ1, origFASTQ2, filter_gtf, gtf_to_files, cut_t2g
+    rule all:
+        input:
+            expand("originalFASTQ/{sample}{read}.fastq.gz", sample = samples, read=reads),
+            expand("FastQC/{sample}{read}_fastqc.html", sample = samples, read=reads),
+            "Annotation/genes.filtered.gtf",
+            "Annotation/genes.filtered.t2g",
+            "Annotation/genes.filtered.slim.t2g",
+            "Annotation/genes.filtered.fa",
+            "Salmon/SalmonIndex/decoys.txt",
+            "Salmon/SalmonIndex/seq.bin",
+            expand("Alevin/{sample}/alevin/quants_mat.gz",sample = samples),
+            #expand("QC/Alevin_{sample}.html", sample=samples),
+            "multiQC/multiqc_report.html"
+
 
 ### execute after workflow finished ############################################
 ################################################################################

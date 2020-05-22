@@ -28,7 +28,8 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          "cellBarcodePattern": "NNNNNNXXXXXX", "bwBinSize": 10,
                          "plotFormat": "png", "skipRaceID": False,
                          "cellFilterMetric": "gene_universe",
-			 "mode": "STARsolo", "BCwhiteList": None, "STARsoloCoords": ["1","7","8","7"], "myKit": "CellSeq384", "skipVelocyto": False}):
+			 "mode": "STARsolo", "BCwhiteList": None, "STARsoloCoords": ["1","7","8","7"], "myKit": "CellSeq384", "skipVelocyto": False,
+                         "libType":"ISR", "prepprotocol":"celseq2", "salmonIndexOptions": "--type puff -k 31", "expectcells" : None}):
     """
     Parse arguments from the command line.
     """
@@ -48,8 +49,8 @@ def parse_args(defaults={"verbose": False, "configFile": None,
     optional.add_argument("--mode",
                           dest="mode",
                           metavar="STR",
-                          help="Analysis mode. Default: %(default)s and possible settings 'Gruen' and 'STARsolo'.",
-			  choices=['Gruen', 'STARsolo'],
+                          help="Analysis mode. Possible settings are 'Gruen, STARsolo and Alevin' Default: %(default)s",
+			  choices=['Gruen', 'STARsolo','Alevin'],
                           type=str,
                           default=defaults["mode"])
 
@@ -113,7 +114,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
 
     optional.add_argument("--BCwhiteList",
                           metavar="STR",
-                          help="Path to a one-column txt file with barcode whitelist. Required for the STARsolo mode (default: '%(default)s')",
+                          help="Path to a one-column txt file with barcode whitelist. Required for the STARsolo mode,optional for Alevin mode. (default: '%(default)s')",
                           default=defaults["BCwhiteList"])
 
     optional.add_argument("--STARsoloCoords",
@@ -161,6 +162,28 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                           default=defaults["skipVelocyto"],
                           help="Skip bam filtering and generating RNA velocity counts by velocyto to save time and memory usage. (default: '%(default)s')")
 
+    optional.add_argument("--prepprotocol",
+                          dest="prepprotocol",
+                          choices=["dropseq","chromiumV3", "chromium", "gemcode","citeseq","celseq","celseq2","quartzseq2"],
+                          default=defaults["prepprotocol"],
+                          help="Alevin mode. Specify the library prep method. (default: '%(default)s')")
+
+    optional.add_argument("--salmonIndexOptions",
+                          dest="salmonIndexOptions",
+                          default=defaults["salmonIndexOptions"],
+                          help="Alevin mode. Salmon index options e.g. '--type puff' (default: '%(default)s')")
+
+    optional.add_argument("--libType",
+                          dest="libType",
+                          choices=["ISR", "ISF", "MSF", "MSR", "OSR", "OSF"],
+                          default=defaults["libType"],
+                          help="Alevin mode. Library orientation type. (default: '%(default)s')")
+
+    optional.add_argument("--expectcells",
+                          type=int,
+                          dest="expectcells",
+                          default=defaults["expectcells"],
+                          help="Alevin mode. Optional to fill in if you know how many cells are expected. (default: '%(default)s')")
 
     return parser
 
