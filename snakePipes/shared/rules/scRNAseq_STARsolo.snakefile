@@ -66,7 +66,6 @@ rule STARsolo:
         rm -rf $MYTEMP
          """
 
-
 rule filter_bam:
     input:
         bamfile = aligner+"/{sample}.sorted.bam",
@@ -82,18 +81,33 @@ rule filter_bam:
            sambamba index -t {threads} {output.bamfile} 2>> {log}
            """
 
+##remove this rule as soon as STARsolo output has been fixed by Alex Dobin
+rule STARsolo_features_to_V3:
+    input: 
+        raw_features = "STARsolo/{sample}/{sample}.Solo.out/Gene/raw/features.tsv",
+        filtered_features = "STARsolo/{sample}/{sample}.Solo.out/Gene/filtered/features.tsv"
+    output:
+        raw_features = "STARsolo/{sample}/{sample}.Solo.out/Gene/raw/features.v3.tsv",
+        filtered_features = "STARsolo/{sample}/{sample}.Solo.out/Gene/filtered/features.v3.tsv"
+    log:"STARsolo/logs/{sample}.features_to_v3.log"
+    shell: """
+        awk '{{print $1, $2, "."}}' {input.raw_features} | tr " " "\t" > {output.raw_features} 2> {log};
+        awk '{{print $1, $2, "."}}' {input.filtered_features} | tr " " "\t" > {output.filtered_features} 2>> {log}
+    """       
+
+
 rule gzip_STARsolo_for_seurat:
     input:
         raw_counts = "STARsolo/{sample}/{sample}.Solo.out/Gene/raw/matrix.mtx",
-        filtered_counts = "STARsolo/{sample}/{sample}.Solo.out/Gene/filtered/matrix.mtx"
+        filtered_counts = "STARsolo/{sample}/{sample}.Solo.out/Gene/filtered/matrix.mtx",
+        raw_features = "STARsolo/{sample}/{sample}.Solo.out/Gene/raw/features.v3.tsv",
+        filtered_features = "STARsolo/{sample}/{sample}.Solo.out/Gene/filtered/features.v3.tsv"
     output:
         raw_counts_gz = "STARsolo/{sample}/{sample}.Solo.out/Gene/raw/matrix.mtx.gz",
         filtered_counts_gz = "STARsolo/{sample}/{sample}.Solo.out/Gene/filtered/matrix.mtx.gz"
     params:
         raw_bc = "STARsolo/{sample}/{sample}.Solo.out/Gene/raw/barcodes.tsv",
         filtered_bc = "STARsolo/{sample}/{sample}.Solo.out/Gene/filtered/barcodes.tsv",
-        raw_features = "STARsolo/{sample}/{sample}.Solo.out/Gene/raw/features.tsv",
-        filtered_features = "STARsolo/{sample}/{sample}.Solo.out/Gene/filtered/features.tsv",
         raw_bc_gz = "STARsolo/{sample}/{sample}.Solo.out/Gene/raw/barcodes.tsv.gz",
         filtered_bc_gz = "STARsolo/{sample}/{sample}.Solo.out/Gene/filtered/barcodes.tsv.gz",
         raw_features_gz = "STARsolo/{sample}/{sample}.Solo.out/Gene/raw/features.tsv.gz",
@@ -101,9 +115,9 @@ rule gzip_STARsolo_for_seurat:
     log: "STARsolo/logs/{sample}.gzip.log"
     shell: """
          gzip -c {params.raw_bc} > {params.raw_bc_gz} 2> {log};
-         gzip -c {params.raw_features} > {params.raw_features_gz} 2>> {log};
+         gzip -c {input.raw_features} > {params.raw_features_gz} 2>> {log};
          gzip -c {params.filtered_bc} > {params.filtered_bc_gz} 2>> {log};
-         gzip -c {params.filtered_features} > {params.filtered_features_gz} 2>> {log};
+         gzip -c {input.filtered_features} > {params.filtered_features_gz} 2>> {log};
          gzip -c {input.raw_counts} > {output.raw_counts_gz} 2>> {log};
          gzip -c {input.filtered_counts} > {output.filtered_counts_gz} 2>> {log}
     """
