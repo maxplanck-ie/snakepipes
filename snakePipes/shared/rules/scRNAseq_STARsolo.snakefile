@@ -138,6 +138,8 @@ rule STARsolo_filtered_to_seurat:
     script: "../rscripts/scRNAseq_Seurat3.R"
 
 
+
+
 rule remove_empty_drops:
     input:
         infiles = expand("STARsolo/{sample}/{sample}.Solo.out/Gene/raw/matrix.mtx.gz",sample=samples)
@@ -173,7 +175,6 @@ if not skipVelocyto:
                """
 
     #the barcode whitelist is currently taken from STARsolo filtered output, this is required to reduce runtime!
-    #velocyto doesn't accept our filtered gtf; will have to use the mask, after all
     #no metadata table is provided
 
     checkpoint velocyto:

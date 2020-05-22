@@ -8,17 +8,22 @@ setwd(wdir)
 message(sprintf("working directory is %s",getwd()))
 
 in_dirs<-snakemake@params[["indirs"]]
-message(sprintf("analyzing folders %s ",unlist(in_dir)))
-samples<-basename(in_dirs)
+message(sprintf("analyzing folders %s ",unlist(in_dirs)))
+
+get_samples<-function(folder){
+    z<-strsplit(folder, split="\\/")[[1]]
+    return(z[length(z)-3])
+}
+
+samples<-unlist(lapply(in_dirs,function(X)get_samples(X)))
 
 
 library(DropletUtils)
 library(dplyr)
 library(Seurat)
 
-filter_empty_cells<-function(folder){
+filter_empty_cells<-function(folder,sample){
 
-    sample<-basename(folder)
 
     sce <- read10xCounts(folder,version="3",type="sparse",col.names=TRUE)
     br.out <- barcodeRanks(counts(sce))
@@ -67,7 +72,7 @@ filter_empty_cells<-function(folder){
 
 }
 
-l<-lapply(in_dirs,function(X)filter_empty_cells(X))
+l<-mapply(SIMPLIFY=FALSE, function(X,Y) filter_empty_cells(X,Y),X=in_dirs,Y=samples)
 names(l)<-samples
 s<-MergeSeurat(x=l[[1]],y=unlist(l[[2:length(l)]]),add.cell.ids=names(l))
 
