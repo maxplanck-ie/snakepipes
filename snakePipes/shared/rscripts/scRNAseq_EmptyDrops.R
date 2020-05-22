@@ -21,6 +21,7 @@ samples<-unlist(lapply(in_dirs,function(X)get_samples(X)))
 library(DropletUtils)
 library(dplyr)
 library(Seurat)
+library(data.table)
 
 filter_empty_cells<-function(folder,sample){
 
@@ -61,7 +62,7 @@ filter_empty_cells<-function(folder,sample){
     ##fix rownames and make seurat object
     expdat <- assay(sce.filt, "counts")
     rownames(expdat)<-gsub("-PAR-Y","",rownames(expdat))
-    features<-fread(file.path(folder,features.tsv),header=FALSE,sep="\t",quote="")
+    features<-fread(file.path(folder,"features.tsv"),header=FALSE,sep="\t",quote="")
     rn<-features$V2[match(rownames(expdat),features$V1)]
     rn2<-make.unique(rn)
     rownames(expdat)<-rn2
@@ -74,7 +75,7 @@ filter_empty_cells<-function(folder,sample){
 
 l<-mapply(SIMPLIFY=FALSE, function(X,Y) filter_empty_cells(X,Y),X=in_dirs,Y=samples)
 names(l)<-samples
-s<-MergeSeurat(x=l[[1]],y=unlist(l[[2:length(l)]]),add.cell.ids=names(l))
+s<-merge(x=l[[1]],y=unlist(l[[2:length(l)]]),add.cell.ids=names(l))
 
 outfile<-file.path(wdir,basename(snakemake@output[["seurat"]]))
 saveRDS(s,file=outfile)

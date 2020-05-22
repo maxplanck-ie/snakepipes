@@ -13,7 +13,9 @@ rule STARsolo:
         bam = "STARsolo/{sample}.sorted.bam",
         raw_counts = "STARsolo/{sample}/{sample}.Solo.out/Gene/raw/matrix.mtx",
         filtered_counts = "STARsolo/{sample}/{sample}.Solo.out/Gene/filtered/matrix.mtx",
-        filtered_bc = "STARsolo/{sample}/{sample}.Solo.out/Gene/filtered/barcodes.tsv"
+        filtered_bc = "STARsolo/{sample}/{sample}.Solo.out/Gene/filtered/barcodes.tsv",
+        raw_features = "STARsolo/{sample}/{sample}.Solo.out/Gene/raw/features.tsv",
+        filtered_features = "STARsolo/{sample}/{sample}.Solo.out/Gene/filtered/features.tsv"
     log: "STARsolo/logs/{sample}.log"
     params:
         alignerOptions = str(alignerOptions or ''),
