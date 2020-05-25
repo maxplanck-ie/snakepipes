@@ -23,25 +23,28 @@ rule SalmonAlevin:
             libtype = libType,
             outdir = "Alevin/{sample}"
         output:
-            quantmat = "Alevin/{sample}/alevin/quants_mat.gz"
+            quantmat = "Alevin/{sample}/alevin/quants_mat.gz",
+        log: 
+            out =  "Alevin/logs/alevin.{sample}.out",
+            err = "Alevin/logs/alevin.{sample}.err"
+        #Use RNAseq env because Salmon already installed there (no need for duplication).
+        conda: CONDA_RNASEQ_ENV
         threads: 40
         shell:"""
-            salmon alevin -l {params.libtype} -1 {input.R1} -2 {input.R2} {params.protocol} -i Salmon/SalmonIndex -p {threads} -o {params.outdir} --tgMap {params.tgMap} --dumpFeatures --dumpMtx --numCellBootstraps 100
+            salmon alevin -l {params.libtype} -1 {input.R1} -2 {input.R2} {params.protocol} -i Salmon/SalmonIndex -p {threads} -o {params.outdir} --tgMap {params.tgMap} --dumpFeatures --dumpMtx --numCellBootstraps 100 > {log.out} 2> {log.err}
             """
 rule AlevinQC:
         input:
-            indir = expand("Alevin/{sample}/", sample=samples)
+            indum = "Alevin/{sample}/alevin/quants_mat.gz"
         output:
-            outfiles = expand("QC/Alevin_{sample}.html", sample=samples)
+            outfiles = "multiQC/Alevin_{sample}.html"
         params:
-            script=os.path.join(maindir, "shared", "rscripts", "scRNAseq_Alevinqc.R"),
-            outdir =  "QC/",
-            samid = expand("{sample}", sample=samples),
-            outfile = expand("Alevin_{sample}.html", sample=samples)
-        log:
-            out = expand("Alevin/{sample}/QC.out", sample=samples),
-        conda: CONDA_scRNASEQ_ENV
-        script: """
-            Rscript {params.script} {input.indir} {params.outdir} {params.samid} {params.outfile} >& {log.out}
-            echo "{params.script} {input.indir} {params.outdir} {params.samid} {params.outfile}"
+            indir = "Alevin/{sample}/",
+            script = os.path.join(maindir, "shared", "rscripts", "scRNAseq_Alevinqc.R"),
+            outdir =  "multiQC/",
+            samid = "{sample}",
+            outfile = "Alevin_{sample}.html"
+        conda: CONDA_alevinqc_ENV
+        shell: """
+            Rscript {params.script} {params.indir} {params.outdir} {params.samid} {params.outfile}
             """
