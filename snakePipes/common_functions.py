@@ -23,7 +23,7 @@ def set_env_yamls():
             'CONDA_scRNASEQ_ENV': 'envs/sc_rna_seq.yaml',
             'CONDA_seurat3_ENV': 'envs/sc_rna_seq_seurat3.yaml',
             'CONDA_loompy_ENV': 'envs/sc_rna_seq_loompy.yaml',
-            'CONDA_alevinqc_ENV' : 'envs/sc_rna_seq_alevinqc.yaml',
+            'CONDA_alevinqc_ENV': 'envs/sc_rna_seq_alevinqc.yaml',
             'CONDA_DNA_MAPPING_ENV': 'envs/dna_mapping.yaml',
             'CONDA_CHIPSEQ_ENV': 'envs/chip_seq.yaml',
             'CONDA_ATAC_ENV': 'envs/atac_seq.yaml',
