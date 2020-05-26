@@ -176,7 +176,7 @@ elif mode=="STARsolo":
             "Seurat/STARsolo_raw/merged_samples.RDS",
             run_velocyto(skipVelocyto)
 elif mode=="Alevin":
-    localrules: origFASTQ1, origFASTQ2, filter_gtf, gtf_to_files, cut_t2g
+    localrules: filter_gtf, gtf_to_files, cut_t2g
     rule all:
         input:
             expand("originalFASTQ/{sample}{read}.fastq.gz", sample = samples, read=reads),

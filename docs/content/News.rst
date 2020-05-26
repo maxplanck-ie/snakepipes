@@ -6,7 +6,9 @@ snakePipes 2.1.2
 * FASTQ1 and FASTQ2 are not localrules anymore due to buggy logging
 * increased BBmap version
 * fixed issue with missing input for running the DNA-mapping Snakefile 
-
+* added Alevin mode in scRNA workflow
+* included new conda environment using to call AlevinQC.
+* Minor changes to shared FastQC and multiQC rule with regards to scRNA workflow.
 
 snakePipes 2.1.1
 ----------------
