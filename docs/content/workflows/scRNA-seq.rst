@@ -18,6 +18,8 @@ The general procedure for mode "Gruen" involves:
 2. mapping read 2,
 3. quantification at the single cell level.
 
+Mode "Gruen" is going to be deprecated by the end of 2020.
+
 The general procedure for mode "STARsolo" involves:
 
 1. moving cell barcodes and UMIs from read 1 into the CB and UMI tags of read 2 during mapping (STARsolo),
@@ -259,7 +261,7 @@ Understanding the outputs: mode Gruen
 Understanding the outputs: mode STARsolo
 ----------------------------------------
 
-- **Main result:** output folders with 10x-format count matrices can be found in sample subfolders under ``STARsolo``. The ouput consists of three files: barcodes.tsv, features.tsv, matrix.mtx. Their gzipped versions are stored in the same folder.
+- **Main result:** output folders with 10x-format count matrices can be found in sample subfolders under ``STARsolo``. The ouput consists of three files: barcodes.tsv, features.tsv, matrix.mtx. Their gzipped versions are stored in the same folder. Seurat objects from merged samples are available in the ``Seurat`` folder.
 
 - Corresponding annotation files are: ``Annotation/genes.filtered.bed`` and ``Annotation/genes.filtered.gtf``, respectively.
 

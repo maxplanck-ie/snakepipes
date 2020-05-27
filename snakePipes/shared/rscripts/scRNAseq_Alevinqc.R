@@ -1,10 +1,10 @@
 .libPaths(R.home("library"))
 library(alevinQC)
-args <- commandArgs(trailingOnly=TRUE) 
-indir <- args[1]
-outdir <- args[2]
-samID <- args[3]
-outfile <- args[4]
+
+indir <- snakemake@params[["indir"]]
+outdir <- snakemake@params[["outdir"]]
+samID <- snakemake@params[["samid"]]
+outfile <- snakemake@params[["outfile"]]
 
 alevinQCReport(baseDir = indir,
                sampleId = samID, 

@@ -16,11 +16,11 @@ rule SalmonAlevin:
             R1 = "originalFASTQ/{sample}"+reads[1]+".fastq.gz",
             bin = "Salmon/SalmonIndex/seq.bin"
         params:
-            protocol = "--" + prepprotocol,
+            protocol = "--" + prepProtocol,
             whitelist = "--whitelist {}".format(BCwhiteList) if BCwhiteList else "",
-            expectcells = "--expectcells {}".format(expectcells) if expectcells else "",
+            expectcells = "--expectcells {}".format(expectCells) if expectCells else "",
             tgMap = "Annotation/genes.filtered.slim.t2g",
-            libtype = libType,
+            libtype = alevinLibraryType,
             outdir = "Alevin/{sample}"
         output:
             quantmat = "Alevin/{sample}/alevin/quants_mat.gz",
@@ -40,11 +40,8 @@ rule AlevinQC:
             outfiles = "multiQC/Alevin_{sample}.html"
         params:
             indir = "Alevin/{sample}/",
-            script = os.path.join(maindir, "shared", "rscripts", "scRNAseq_Alevinqc.R"),
             outdir =  "multiQC/",
             samid = "{sample}",
             outfile = "Alevin_{sample}.html"
         conda: CONDA_alevinqc_ENV
-        shell: """
-            Rscript {params.script} {params.indir} {params.outdir} {params.samid} {params.outfile}
-            """
+        script: "../rscripts/scRNAseq_Alevinqc.R"

@@ -48,10 +48,10 @@ BCwhiteList:
 STARsoloCoords: ["1","7","8","7"]
 skipVelocyto: False
 ##mode Alevin options
-libType: "ISR"
-prepprotocol: "celseq2"
+alevinLibraryType: "ISR"
+prepProtocol: "celseq2"
 salmonIndexOptions: --type puff -k 31
-expectcells: 
+expectCells: 
 #generic options
 libraryType: 1
 bwBinSize: 10
