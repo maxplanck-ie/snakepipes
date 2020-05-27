@@ -33,7 +33,9 @@ elif mode == "STARsolo":
     fastq_indir_trim = None
     fastq_dir = "originalFASTQ"
     aligner = "STARsolo"
-
+elif mode == "Alevin":
+    fastq_dir = "originalFASTQ"
+    aligner = "salmon"
 ### Initialization #############################################################
 
 infiles = sorted(glob.glob(os.path.join(indir, '*'+ext)))
