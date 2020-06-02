@@ -5,7 +5,7 @@ channels:
 dependencies:
  - umi_tools = 1.0.1
  - samtools = 1.10
- - star = 2.7.3a
+ - star = 2.7.4a
  - r-base = 3.5.1
  - r-stringr = 1.4.0
  - bioconductor-monocle = 2.10.0

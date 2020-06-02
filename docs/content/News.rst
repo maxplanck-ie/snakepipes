@@ -11,7 +11,7 @@ snakePipes 2.x.y
 * fixed issue with missing input for running the DNA-mapping Snakefile
 * added filtering of empty drops with Dropletutils to scRNAseq mode STARsolo
 * symlinks in the output path are relative 
-
+* 
 
 snakePipes 2.1.1
 ----------------
