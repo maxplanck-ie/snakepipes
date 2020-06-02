@@ -4,7 +4,7 @@ rule origFASTQ1:
       output:
           "originalFASTQ/{sample}"+reads[0]+".fastq.gz"
       shell: """
-                ln -s ../{input[0]} {output[0]}
+                ln -s {input} {output}
           """
 
 rule origFASTQ2:
@@ -13,7 +13,7 @@ rule origFASTQ2:
       output:
           "originalFASTQ/{sample}"+reads[1]+".fastq.gz"
       shell: """
-                ln -s ../{input[0]} {output[0]}
+                ln -s {input} {output}
           """
 
 if downsample:
