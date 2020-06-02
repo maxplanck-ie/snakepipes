@@ -1,5 +1,4 @@
 ##umi_tools###############
-#import os
 
 if UMIBarcode:
     if pairedEnd:
@@ -47,21 +46,17 @@ else:
           output:
               "FASTQ/{sample}"+reads[0]+".fastq.gz"
           shell: """
-                ln -s ../{input[0]} {output[0]}
+                ln -s ../{input} {output}
           """
-
-
-#            if not os.path.exists(os.path.join(outdir,output[0])):
-#                os.symlink(input[0],output[0])
 
     rule FASTQ2:
           input:
               "originalFASTQ/downsample_{sample}"+reads[1]+".fastq.gz" if downsample else "originalFASTQ/{sample}"+reads[1]+".fastq.gz"
           output:
               "FASTQ/{sample}"+reads[1]+".fastq.gz"
-          run:
-            if not os.path.exists(os.path.join(outdir,output[0])):
-                os.symlink(input[0],output[0])
+          shell: """
+                ln -s ../{input} {output}
+          """
 
 #If DNA-mapping:
 if UMIDedup:
@@ -102,9 +97,9 @@ else:
                 bamfile = aligner+"/{sample}.bam"
             output:
                 bamfile = "filtered_bam/{sample}.filtered.bam"
-            run:
-                if not os.path.exists(os.path.join(outdir,output[0])):
-                    os.symlink(input[0],output[0])
+            shell: """
+                ln -s ../{input} {output}
+          """
 
 if not aligner=="bwameth":
     rule samtools_index_filtered:

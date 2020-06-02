@@ -63,7 +63,7 @@ rule STARsolo:
 	    --soloStrand Forward\
 	    --soloUMIdedup Exact 2> {log}
 
-        ln -s {params.prefix}Aligned.sortedByCoord.out.bam {output.bam} 2>> {log}
+        ln -s ../{params.prefix}Aligned.sortedByCoord.out.bam {output.bam} 2>> {log}
  
         rm -rf $MYTEMP
          """

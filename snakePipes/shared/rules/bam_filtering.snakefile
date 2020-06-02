@@ -1,5 +1,4 @@
 ### samtools_filter ############################################################
-import os
 
 # When modifying the rule samtools_filter, double-check whether the function
 # update_filter() has to be modified too
@@ -12,7 +11,7 @@ rule samtools_filter:
     output:
         bam = temp("filtered_bam/{sample}.filtered.tmp.bam")
     params:
-        shell = lambda wildcards,input,output: "samtools view -@ {} -b {} -o {} {} ".format(str(8 if not local else 2), bam_filter_string,output.bam,input[0]) if bam_filter_string.strip() !="" else "ln -s {} {}".format(input[0],output.bam) 
+        shell = lambda wildcards,input,output: "samtools view -@ {} -b {} -o {} {} ".format(str(8 if not local else 2), bam_filter_string,output.bam,input[0]) if bam_filter_string.strip() !="" else "ln -s ../{} {}".format(input[0],output.bam) 
     log:
         out = "filtered_bam/logs/samtools_filter.{sample}.out",
         err = "filtered_bam/logs/samtools_filter.{sample}.err"

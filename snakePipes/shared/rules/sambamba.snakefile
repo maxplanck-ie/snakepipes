@@ -1,5 +1,4 @@
 ##sambamba is used for marking up duplications
-import os
 
 ## see Bowtie2.snakefile or RNA_mapping.snakefile for input
 ## takes the input from RNA mapping or DNA mapping snakefile
