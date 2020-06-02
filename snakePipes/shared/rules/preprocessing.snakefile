@@ -130,7 +130,7 @@ else:
                 r2="deduplicatedFASTQ/{sample}" + reads[1] + ext
             run:
                 if not os.path.exists(os.path.join(outdir,output.r1)):
-                    os.symlink(os.path.join(outdir,input.r1),os.path.join(outdir,output.r1))
+                    os.symlink(input.r1,output.r1)
                 if not os.path.exists(os.path.join(outdir,output.r2)):
                     os.symlink(os.path.join(outdir,input.r2),os.path.join(outdir,output.r2))
     else:
@@ -141,7 +141,7 @@ else:
                 r1="deduplicatedFASTQ/{sample}" + reads[0] + ext
             run:
                 if not os.path.exists(os.path.join(outdir,output.r1)):
-                    os.symlink(os.path.join(outdir,input.r1),os.path.join(outdir,output.r1))
+                    os.symlink(input.r1,output.r1)
 
 rule splitFastq2YAML:
     input:

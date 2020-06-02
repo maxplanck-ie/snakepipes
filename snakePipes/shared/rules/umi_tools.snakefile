@@ -48,7 +48,7 @@ else:
               "FASTQ/{sample}"+reads[0]+".fastq.gz"
           run:
             if not os.path.exists(os.path.join(outdir,output[0])):
-                os.symlink(os.path.join(outdir,input[0]),os.path.join(outdir,output[0]))
+                os.symlink(input[0],output[0])
 
     rule FASTQ2:
           input:
@@ -57,7 +57,7 @@ else:
               "FASTQ/{sample}"+reads[1]+".fastq.gz"
           run:
             if not os.path.exists(os.path.join(outdir,output[0])):
-                os.symlink(os.path.join(outdir,input[0]),os.path.join(outdir,output[0]))
+                os.symlink(input[0],output[0])
 
 #If DNA-mapping:
 if UMIDedup:
@@ -91,6 +91,7 @@ else:
             shell: """
                    mv {input.bamfile} {output.bamfile}
                    """
+
     elif not aligner=="bwameth" :
         rule filter_reads:
             input:
@@ -99,7 +100,7 @@ else:
                 bamfile = "filtered_bam/{sample}.filtered.bam"
             run:
                 if not os.path.exists(os.path.join(outdir,output[0])):
-                    os.symlink(os.path.join(outdir,input[0]),os.path.join(outdir,output[0]))
+                    os.symlink(input[0],output[0])
 
 if not aligner=="bwameth":
     rule samtools_index_filtered:

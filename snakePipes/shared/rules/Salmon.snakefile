@@ -96,7 +96,7 @@ rule Salmon_symlinks:
         quant = "{sample}/quant.sf"
     run:
         if not os.path.exists(os.path.join(outdir,output.quant)):
-            os.symlink(os.path.join(outdir,input.quant),os.path.join(outdir,output.quant))
+            os.symlink(input.quant,output.quant)
 
 
 rule Salmon_TPM:

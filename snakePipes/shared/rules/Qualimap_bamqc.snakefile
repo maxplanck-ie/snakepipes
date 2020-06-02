@@ -36,7 +36,7 @@ rule Qualimap_bamqc_symlink_txt:
         "Qualimap_qc/{sample}.filtered.bamqc_results.txt"
     run:
         if not os.path.exists(os.path.join(outdir,output)):
-            os.symlink(os.path.join(outdir,input),os.path.join(outdir,output))
+            os.symlink(input,output)
 
 
 rule Qualimap_bamqc_symlink_html:
@@ -46,4 +46,4 @@ rule Qualimap_bamqc_symlink_html:
         "Qualimap_qc/{sample}.filtered.bamqc_report.html"
     run:
         if not os.path.exists(os.path.join(outdir,output)):
-            os.symlink(os.path.join(outdir,input),os.path.join(outdir,output))
+            os.symlink(input,output)

@@ -41,6 +41,7 @@ if pairedEnd and not fromBAM:
 	        samtools sort -T "$MYTEMP"/{wildcards.sample} -m 3G -@ 4 -o "{output.sbam}" 2>> {log.err}
             rm -rf "$MYTEMP"
             """
+
 elif not pairedEnd and not fromBAM:
     rule bwameth:
         input:
@@ -123,8 +124,8 @@ if not skipBamQC:
             bai = "filtered_bam/{sample}.filtered.bam.bai"
         run:
             if not os.path.exists(os.path.join(outdir,output.bam)):
-                os.symlink(os.path.join(outdir,input.bam),os.path.join(outdir,output.bam))
-                os.symlink(os.path.join(outdir,input.bai),os.path.join(outdir,output.bai))
+                os.symlink(input.bam,output.bam)
+                os.symlink(input.bai,output.bai)
 
 
 rule getRandomCpGs:

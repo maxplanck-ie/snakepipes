@@ -33,6 +33,7 @@ rule SalmonAlevin:
         shell:"""
             salmon alevin -l {params.libtype} -1 {input.R1} -2 {input.R2} {params.protocol} -i Salmon/SalmonIndex -p {threads} -o {params.outdir} --tgMap {params.tgMap} --dumpFeatures --dumpMtx --numCellBootstraps 100 > {log.out} 2> {log.err}
             """
+
 rule AlevinQC:
         input:
             indum = "Alevin/{sample}/alevin/quants_mat.gz"

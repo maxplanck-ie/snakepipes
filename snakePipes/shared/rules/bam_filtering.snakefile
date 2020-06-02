@@ -12,7 +12,7 @@ rule samtools_filter:
     output:
         bam = temp("filtered_bam/{sample}.filtered.tmp.bam")
     params:
-        shell = lambda wildcards,input,output: "samtools view -@ {} -b {} -o {} {} ".format(str(8 if not local else 2), bam_filter_string,output.bam,input[0]) if bam_filter_string.strip() !="" else "ln -s {} {}".format(os.path.join(outdir,input[0]),os.path.join(outdir,"filtered_bam",wildcards.sample+".filtered.tmp.bam")) 
+        shell = lambda wildcards,input,output: "samtools view -@ {} -b {} -o {} {} ".format(str(8 if not local else 2), bam_filter_string,output.bam,input[0]) if bam_filter_string.strip() !="" else "ln -s {} {}".format(input[0],output.bam) 
     log:
         out = "filtered_bam/logs/samtools_filter.{sample}.out",
         err = "filtered_bam/logs/samtools_filter.{sample}.err"
