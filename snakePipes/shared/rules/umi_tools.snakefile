@@ -1,5 +1,5 @@
 ##umi_tools###############
-import os
+#import os
 
 if UMIBarcode:
     if pairedEnd:
@@ -46,9 +46,13 @@ else:
               "originalFASTQ/downsample_{sample}"+reads[0]+".fastq.gz" if downsample else "originalFASTQ/{sample}"+reads[0]+".fastq.gz"
           output:
               "FASTQ/{sample}"+reads[0]+".fastq.gz"
-          run:
-            if not os.path.exists(os.path.join(outdir,output[0])):
-                os.symlink(input[0],output[0])
+          shell: """
+                ln -s ../{input[0]} {output[0]}
+          """
+
+
+#            if not os.path.exists(os.path.join(outdir,output[0])):
+#                os.symlink(input[0],output[0])
 
     rule FASTQ2:
           input:
