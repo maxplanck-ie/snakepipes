@@ -124,7 +124,7 @@ if not skipBamQC:
             bai = "filtered_bam/{sample}.filtered.bam.bai"
         shell: """
             ln -s ../{input.bam} {output.bam}
-            ln -s ../{input.bai} {ouput.bai}
+            ln -s ../{input.bai} {output.bai}
         """
 
 
