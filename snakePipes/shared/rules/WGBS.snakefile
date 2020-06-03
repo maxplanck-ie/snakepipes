@@ -122,10 +122,10 @@ if not skipBamQC:
         output:
             bam = "filtered_bam/{sample}.filtered.bam",
             bai = "filtered_bam/{sample}.filtered.bam.bai"
-        run:
-            if not os.path.exists(os.path.join(outdir,output.bam)):
-                os.symlink(input.bam,output.bam)
-                os.symlink(input.bai,output.bai)
+        shell: """
+            ln -s ../{input.bam} {output.bam}
+            ln -s ../{input.bai} {ouput.bai}
+        """
 
 
 rule getRandomCpGs:

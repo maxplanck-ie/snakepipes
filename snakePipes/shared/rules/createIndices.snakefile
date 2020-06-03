@@ -185,7 +185,7 @@ rule starIndex:
     threads: 10
     shell: """
         STAR --runThreadN {threads} --runMode genomeGenerate --genomeDir {params.basedir} --genomeFastaFiles {input} 2> {log}
-        if [[ -w Log.out ]]; rm -v Log.out; elif [[ -w {params.basedir}/Log.out ]]; rm -v {params.basedir}/Log.out
+        if [[ -w Log.out ]]; then rm -v Log.out; elif [[ -w {params.basedir}/Log.out ]]; then rm -v {params.basedir}/Log.out; fi
         """
 
 
