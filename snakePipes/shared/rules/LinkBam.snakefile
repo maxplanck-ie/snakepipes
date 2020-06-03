@@ -31,10 +31,10 @@ if not pipeline=="noncoding-rna-seq":
             output:
                 bam_out = "filtered_bam/{sample}.filtered.bam",
                 bai_out = "filtered_bam/{sample}.filtered.bam.bai",
-            run:
-                if not os.path.exists(os.path.join(outdir,output.bam_out)):
-                    os.symlink(os.path.join(outdir,input.bam),os.path.join(outdir,output.bam_out))
-                    os.symlink(os.path.join(outdir,input.bai),os.path.join(outdir,output.bai_out))
+            shell: """
+                ln -s ../{input.bam} {output.bam_out};
+                ln -s ../{input.bai} {output.bai_out}
+            """
 
 
     rule sambamba_flagstat:
