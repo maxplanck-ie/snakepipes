@@ -34,13 +34,15 @@ Quick start
 
 .. code:: bash
 
-    conda create -n snakePipes -c mpi-ie -c bioconda -c conda-forge snakePipes
+    conda create -n snakePipes -c mpi-ie -c conda-forge -c bioconda snakePipes==2.1.1
 
 * You can update snakePipes to the latest version available on conda with:
 
 .. code:: bash
 
-    conda update -n snakePipes -c mpi-ie -c bioconda -c conda-forge --prune snakePipes
+    conda update -n snakePipes -c mpi-ie -c conda-forge -c bioconda --prune snakePipes
+
+snakePipes is going to move to mamba in the future.
 
 * Download genome fasta and annotations for an your organism, and build indexes, Check in :ref:`createIndices`
 
