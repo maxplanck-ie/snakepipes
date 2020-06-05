@@ -3,8 +3,10 @@ rule origFASTQ1:
           indir+"/{sample}"+reads[0]+ext
       output:
           "originalFASTQ/{sample}"+reads[0]+".fastq.gz"
+      params:
+            cmd = lambda wildcards, input,output: "ln -s ../{} {}".format(input[0],output[0]) if pipeline=="preprocessing" else "ln -s {} {}".format(input[0],output[0])
       shell: """
-                ln -s {input} {output}
+               {params.cmd}
           """
 
 rule origFASTQ2:
@@ -12,8 +14,10 @@ rule origFASTQ2:
           indir+"/{sample}"+reads[1]+ext
       output:
           "originalFASTQ/{sample}"+reads[1]+".fastq.gz"
+      params:
+            cmd = lambda wildcards, input,output: "ln -s ../{} {}".format(input[0],output[0]) if pipeline=="preprocessing" else "ln -s {} {}".format(input[0],output[0])
       shell: """
-                ln -s {input} {output}
+               {params.cmd}
           """
 
 if downsample:
