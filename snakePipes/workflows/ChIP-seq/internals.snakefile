@@ -173,6 +173,24 @@ if sampleSheet:
 else:
     genrichDict = {"all_samples": chip_samples}
 
-def check_if_hybrid_genome(genome_index,spikeInExt):
+
+#################### functions and checks for using a spiked-in genome for normalization ########################################
+def check_if_spikein_genome(genome_index,spikeInExt):
     if os.path.isfile(genome_index):
+        resl=[]
+        with open(genome_index) as ifile:
+            for line in ifile:
+                resl.append(re.search(spikeInExt, line))
+        if any(resl):
+            print("\n Hybrid genome detected - at least one spikeIn chromosome found with extention " + spikeInExt + " .\n\n")
+            return True
+        else:
+            print("\n Single genome detected - no spikeIn chromosomes found with extention " + spikeInExt + " .\n\n")
+            return False
+    else:
+        print("\n  Error! Genome index file "+ genome_index +" not found!!!\n\n")
+    exit(1)
+
+spikein=check_if_spikein_genome(genome_index,spikeInExt)
+
         

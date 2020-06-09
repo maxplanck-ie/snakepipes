@@ -23,7 +23,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          "windowSize": 150, "predictChIPDict": None,
                          "bigWigType": "both", "mfold": "0 50", "peakCaller": "MACS2",
                          "plotFormat": "png","fromBAM": False, "bamExt": ".filtered.bam",
-                         "fdr": 0.05, "absBestLFC": 1, "useSpikeinForNorm": False}):
+                         "fdr": 0.05, "absBestLFC": 1, "useSpikeinForNorm": False, "spikeInExt": "_spikeIn"}):
 
     """
     Parse arguments from the command line.
@@ -59,6 +59,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                           help="Use the spikeIn chromosomes of the hybrid genome for normalization.")
 
     optional.add_argument("--spikeInExt",
+                          dest="spikeInExt",
                           help="Extention of spikeIn chromosome names in the hybrid genome. Ignored if useSpikeInForNorm is False (default: '%(default)s') .",
                           default=defaults["spikeInExt"])
 

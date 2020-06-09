@@ -23,7 +23,7 @@ workingdir:
 genome:
 ## use spikein genome for normalization?
 useSpikeInForNorm: false
-spikeInExt: spikeIn
+spikeInExt: _spikeIn
 ## Which peak caller to use?
 peakCaller: 'MACS2'
 ## paired end data?
