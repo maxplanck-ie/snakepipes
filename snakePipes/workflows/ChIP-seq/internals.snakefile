@@ -172,3 +172,7 @@ if sampleSheet:
     genrichDict = cf.sampleSheetGroups(sampleSheet)
 else:
     genrichDict = {"all_samples": chip_samples}
+
+def check_if_hybrid_genome(genome_index,spikeInExt):
+    if os.path.isfile(genome_index):
+        
