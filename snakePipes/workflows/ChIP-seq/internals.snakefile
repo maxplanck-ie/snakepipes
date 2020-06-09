@@ -189,8 +189,17 @@ def check_if_spikein_genome(genome_index,spikeInExt):
             return False
     else:
         print("\n  Error! Genome index file "+ genome_index +" not found!!!\n\n")
-    exit(1)
+        exit(1)
 
-spikein=check_if_spikein_genome(genome_index,spikeInExt)
+spikein_detected=check_if_spikein_genome(genome_index,spikeInExt)
+
+if useSpikeInForNorm and spikein_detected:
+    blacklist_bed=blacklist_bed_spikein
+##ignore host for norm and spikein part
+elif useSpikeInForNorm and not spikein_detected:
+    print("\n  Error! Spikein genome not detected in the genome index file " + genome_index + "!!!\n\n")
+    exit(1)
+elif spikein_detected and not useSpikeInForNorm:
+##ignore spikein for norm and host part
 
         
