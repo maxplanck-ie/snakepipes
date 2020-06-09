@@ -191,15 +191,32 @@ def check_if_spikein_genome(genome_index,spikeInExt):
         print("\n  Error! Genome index file "+ genome_index +" not found!!!\n\n")
         exit(1)
 
+def get_host_and_spikein_chromosomes(genome_index,spikeInExt):
+    hostl=[]
+    spikeinl=[]
+    with open(genome_index) as ifile:
+        for line in ifile:
+            entry = line.split('\t')[0] 
+            if re.search(spikeInExt, entry):
+                spikeinl.append(entry)
+            else:
+                hostl.append(entry)
+    return([hostl,spikeinl])
+
+
 spikein_detected=check_if_spikein_genome(genome_index,spikeInExt)
 
 if useSpikeInForNorm and spikein_detected:
+    ##ignore host for norm and spikein lists
     blacklist_bed=blacklist_bed_spikein
-##ignore host for norm and spikein part
+    host_chr=get_host_and_spikein_chromosomes(genome_index,spikeInExt)[0]
+    ignoreForNormalization=ignoreForNormalization_spikein + " " + " ".join(host_chr) 
 elif useSpikeInForNorm and not spikein_detected:
     print("\n  Error! Spikein genome not detected in the genome index file " + genome_index + "!!!\n\n")
     exit(1)
 elif spikein_detected and not useSpikeInForNorm:
-##ignore spikein for norm and host part
+    ##ignore spikein for norm and host lists (default)
+    spikein_chr=get_host_and_spikein_chromosomes(genome_index,spikeInExt)[1]
+    ignoreForNormalization=ignoreForNormalization + " " + " ".join(spikein_chr) 
 
         
