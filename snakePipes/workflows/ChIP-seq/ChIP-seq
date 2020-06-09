@@ -23,7 +23,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          "windowSize": 150, "predictChIPDict": None,
                          "bigWigType": "both", "mfold": "0 50", "peakCaller": "MACS2",
                          "plotFormat": "png","fromBAM": False, "bamExt": ".filtered.bam",
-                         "fdr": 0.05, "absBestLFC": 1}):
+                         "fdr": 0.05, "absBestLFC": 1, "useSpikeinForNorm": False}):
 
     """
     Parse arguments from the command line.
@@ -52,6 +52,11 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                           dest="pairedEnd",
                           action="store_false",
                           help="Input data is single-end, not paired-end")
+
+    optional.add_argument("--useSpikeInForNorm",
+                          dest="useSpikeInForNorm",
+                          action="store_true",
+                          help="Use the spikeIn chromosomes of the hybrid genome for normalization.")
 
     optional.add_argument("--bigWigType",
                           help="Type of bigWig file to create. Options are: 'subtract' (control-subtracted ChIP coverage), 'log2ratio' (for log2 ratio of ChIP over control) or 'both' (create both set of bed files). Note that the allele-specific mode currently only produces 'log2ratio' bigwigs. (default: '%(default)s')",

@@ -21,6 +21,8 @@ workingdir:
 ## preconfigured target genomes (mm9,mm10,dm3,...) , see /path/to/snakemake_workflows/shared/organisms/
 ## Value can be also path to your own genome config file!
 genome:
+## use spikein genome for normalization?
+useSpikeInForNorm: false
 ## Which peak caller to use?
 peakCaller: 'MACS2'
 ## paired end data?
