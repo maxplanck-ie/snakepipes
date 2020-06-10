@@ -40,6 +40,7 @@ rule bamCoverage_filtered:
                          else "--extendReads {}".format(fragmentLength),
         blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed
                     else "",
+        scaling_factors =""
     log:
         out = "bamCoverage/logs/bamCoverage.{sample}.filtered.out",
         err = "bamCoverage/logs/bamCoverage.{sample}.filtered.err"
@@ -82,7 +83,7 @@ rule multiBamSummary:
         bams = expand("filtered_bam/{sample}.filtered.bam", sample=samples),
         bais = expand("filtered_bam/{sample}.filtered.bam.bai", sample=samples)
     output:
-        "deepTools_qc/multiBamSummary/read_coverage.bins.npz"
+        npz = "deepTools_qc/multiBamSummary/read_coverage.bins.npz"
     params:
         labels = " ".join(samples),
         blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed else "",

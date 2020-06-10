@@ -68,6 +68,7 @@ bamcov_cmd = """
                 --effectiveGenomeSize {params.genome_size} \
                 {params.ignoreForNorm} \
                 {params.blacklist} \
+                {params.scaling_factors} \
                 {params.read_extension} > {log.out} 2> {log.err}
     """
 
@@ -132,7 +133,7 @@ plotFingerprint_cmd = """
 multiBamSummary_cmd = """
     multiBamSummary bins \
                     -b {input.bams} \
-                    -o {output} \
+                    -o {output.npz} \
                     --labels {params.labels} \
                     --binSize 1000 \
                     {params.blacklist} \

@@ -90,6 +90,8 @@ def run_deepTools_qc(fromBAM,useSpikeInForNorm):
     elif useSpikeInForNorm and spikein_detected:
         file_list = expand("split_deepTools_qc/multiBamSummary/{part}.input_read_coverage.bins.npz",part=part)
         file_list.append(expand("split_deepTools_qc/multiBamSummary/{part}.ChIP_read_coverage.bins.npz",part=part))
+        file_list.append(expand("bamCoverage_NormedByHost/{sample}.host.seq_depth_norm.bw",sample=samples))
+        file_list.append(expand("bamCoverage_NormedBySpikeIn/{sample}.spikein.seq_depth_norm.bw",sample=samples))
     else:
         file_list = []
     return(file_list)
