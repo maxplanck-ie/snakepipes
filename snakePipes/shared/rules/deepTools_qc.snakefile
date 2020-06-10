@@ -87,7 +87,8 @@ rule multiBamSummary:
         labels = " ".join(samples),
         blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed else "",
         read_extension = "--extendReads" if pairedEnd
-                         else "--extendReads {}".format(fragmentLength)
+                         else "--extendReads {}".format(fragmentLength),
+        scaling_factors = "deepTools_qc/multiBamSummary/scaling_factors.txt"
     log:
         out = "deepTools_qc/logs/multiBamSummary.out",
         err = "deepTools_qc/logs/multiBamSummary.err"

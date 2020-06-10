@@ -136,7 +136,7 @@ multiBamSummary_cmd = """
                     --labels {params.labels} \
                     --binSize 1000 \
                     {params.blacklist} \
-                    --scalingFactors \
+                    {params.scaling_factors} \
                     -p {threads} \
                     {params.read_extension} > {log.out} 2> {log.err}
     """

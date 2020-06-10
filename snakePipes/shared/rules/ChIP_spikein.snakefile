@@ -13,9 +13,10 @@ rule split_bamfiles_by_genome:
         region = lambda wildcards: region_dict[wildcards.part]
     log: "split_bam/logs/{sample}_{part}.log"
     conda: CONDA_SAMBAMBA_ENV
+    threads: 4
     shell: """
-        sambamba slice -o {output.bam} {input.bam} {params.region} 2> {log}
-        sambamba index {output.bam} 2>> {log}
+        sambamba slice -o {output.bam} {input.bam} {params.region} 2> {log};
+        sambamba index -t {threads} {output.bam} 2>> {log}
         """
 
 rule multiBamSummary_input:
@@ -28,7 +29,8 @@ rule multiBamSummary_input:
         labels = " ".join(control_samples),
         blacklist = lambda wildcards: "--blackListFileName {}".format(blacklist_dict[wildcards.part]) if blacklist_dict[wildcards.part]  else "",
         read_extension = "--extendReads" if pairedEnd
-                         else "--extendReads {}".format(fragmentLength)
+                         else "--extendReads {}".format(fragmentLength),
+        scaling_factors = "split_deepTools_qc/multiBamSummary/{part}.input.scaling_factors.txt"
     log:
         out = "split_deepTools_qc/logs/{part}.input_multiBamSummary.out",
         err = "split_deepTools_qc/logs/{part}.input_multiBamSummary.err"
@@ -49,7 +51,8 @@ rule multiBamSummary_ChIP:
         labels = " ".join(chip_samples),
         blacklist = lambda wildcards: "--blackListFileName {}".format(blacklist_dict[wildcards.part]) if blacklist_dict[wildcards.part]  else "",
         read_extension = "--extendReads" if pairedEnd
-                         else "--extendReads {}".format(fragmentLength)
+                         else "--extendReads {}".format(fragmentLength),
+        scaling_factors = "split_deepTools_qc/multiBamSummary/{part}.ChIP.scaling_factors.txt"
     log:
         out = "split_deepTools_qc/logs/{part}.ChIP_multiBamSummary.out",
         err = "split_deepTools_qc/logs/{part}.ChIP_multiBamSummary.err"
