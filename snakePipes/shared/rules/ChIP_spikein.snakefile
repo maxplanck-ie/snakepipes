@@ -1,5 +1,6 @@
 part=['host','spikein']
 blacklist_dict={"host": blacklist_bed,"spikein": blacklist_bed_spikein}
+region_dict={"host": " ".join(host_chr),"spikein": " ".join(spikein_chr)}
 
 rule split_bamfiles_by_genome:
     input: 
@@ -9,13 +10,11 @@ rule split_bamfiles_by_genome:
         bam = "split_bam/{sample}_{part}.bam",
         bai = "split_bam/{sample}_{part}.bam.bai"
     params:
-        region_host = " ".join(host_chr),
-        region_spikein = " ".join(spikein_chr)
-    log:
-    conda:
+        region = lambda wildcards: region_dict[wildcards.part]
+    log: "split_bam/logs/{sample}_{part}.log"
+    conda: CONDA_SAMBAMBA_ENV
     shell: """
-        sambamba slice -o {output.bam} {input.bam} {params.region_host} 2> {log}
-        sambamba slice -o {output.bam} {input.bam} {params.region_spikein} 2>> {log}
+        sambamba slice -o {output.bam} {input.bam} {params.region} 2> {log}
         """
 
 rule multiBamSummary_input:

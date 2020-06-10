@@ -182,10 +182,10 @@ def check_if_spikein_genome(genome_index,spikeInExt):
             for line in ifile:
                 resl.append(re.search(spikeInExt, line))
         if any(resl):
-            print("\n Hybrid genome detected - at least one spikeIn chromosome found with extention " + spikeInExt + " .\n\n")
+            print("\n Spikein genome detected - at least one spikeIn chromosome found with extention " + spikeInExt + " .\n\n")
             return True
         else:
-            print("\n Single genome detected - no spikeIn chromosomes found with extention " + spikeInExt + " .\n\n")
+            print("\n No spikein genome detected - no spikeIn chromosomes found with extention " + spikeInExt + " .\n\n")
             return False
     else:
         print("\n  Error! Genome index file "+ genome_index +" not found!!!\n\n")
@@ -203,26 +203,11 @@ def get_host_and_spikein_chromosomes(genome_index,spikeInExt):
                 hostl.append(entry)
     return([hostl,spikeinl])
 
-
-spikein_detected=check_if_spikein_genome(genome_index,spikeInExt)
-
-if useSpikeInForNorm and spikein_detected:
-    host_chr=get_host_and_spikein_chromosomes(genome_index,spikeInExt)[0]
-    spikein_chr=get_host_and_spikein_chromosomes(genome_index,spikeInExt)[1]
+if useSpikeInForNorm:
     part=['host','spikein']
-
-############revisit!!
-#if useSpikeInForNorm and spikein_detected:
-#    ##ignore host for norm and spikein lists
-#    #blacklist_bed=blacklist_bed_spikein if blacklist_bed_spikein else ''
-#    host_chr=get_host_and_spikein_chromosomes(genome_index,spikeInExt)[0]
-#    ignoreForNormalization=ignoreForNormalization_spikein + " " + " ".join(host_chr) if ignoreForNormalization_spikein else " ".join(host_chr)
-#elif useSpikeInForNorm and not spikein_detected:
-#    print("\n  Error! Spikein genome not detected in the genome index file " + genome_index + "!!!\n\n")
-#    exit(1)
-#elif spikein_detected and not useSpikeInForNorm:
-#    ##ignore spikein for norm and host lists (default)
-#    spikein_chr=get_host_and_spikein_chromosomes(genome_index,spikeInExt)[1]
-#    ignoreForNormalization=ignoreForNormalization + " " + " ".join(spikein_chr)
-
+    spikein_detected=check_if_spikein_genome(genome_index,spikeInExt)
+    if spikein_detected:
+        host_chr=get_host_and_spikein_chromosomes(genome_index,spikeInExt)[0]
+        spikein_chr=get_host_and_spikein_chromosomes(genome_index,spikeInExt)[1]
         
+       
