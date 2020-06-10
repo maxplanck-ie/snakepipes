@@ -15,6 +15,7 @@ rule split_bamfiles_by_genome:
     conda: CONDA_SAMBAMBA_ENV
     shell: """
         sambamba slice -o {output.bam} {input.bam} {params.region} 2> {log}
+        sambamba index {output.bam} 2>> {log}
         """
 
 rule multiBamSummary_input:
