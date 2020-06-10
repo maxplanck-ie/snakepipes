@@ -27,10 +27,14 @@ include: os.path.join(maindir, "shared", "tools" , "deeptools_cmds.snakefile")
 # fromBAM
 if fromBAM:
     include: os.path.join(maindir, "shared", "rules", "LinkBam.snakefile")
-    include: os.path.join(maindir, "shared", "rules", "deepTools_qc.snakefile")
+    if not useSpikeInForNorm and not spikein_detected:
+        include: os.path.join(maindir, "shared", "rules", "deepTools_qc.snakefile")
 
-# deepTools ChIP
-include: os.path.join(maindir, "shared", "rules", "deepTools_ChIP.snakefile")
+if useSpikeInForNorm and spikein_detected:
+        include: os.path.join(maindir, "shared", "rules", "ChIP_spikein.snakefile")
+else:
+    # deepTools ChIP
+    include: os.path.join(maindir, "shared", "rules", "deepTools_ChIP.snakefile")
 
 # MACS2, MACS2 peak QC, and Genrich
 include: os.path.join(maindir, "shared", "rules", "ChIP_peak_calling.snakefile")
@@ -71,8 +75,8 @@ def run_histoneHMM(allele_info):
         file_list = []
     return(file_list)
 
-def run_deepTools_qc(fromBAM):
-    if fromBAM:
+def run_deepTools_qc(fromBAM,useSpikeInForNorm):
+    if fromBAM and not useSpikeInForNorm:
         file_list = ["deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv"]
         file_list.append([expand("bamCoverage/{sample}.filtered.seq_depth_norm.bw", sample = samples)])
         if len(samples) <= 20:
@@ -83,6 +87,9 @@ def run_deepTools_qc(fromBAM):
                 "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage.tsv",
                 "deepTools_qc/plotPCA/PCA.read_coverage.tsv" ])
         file_list.append(expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample = samples))
+    elif useSpikeInForNorm and spikein_detected:
+        file_list = expand("split_deepTools_qc/multiBamSummary/{part}.input_read_coverage.bins.npz",part=part)
+        file_list.append(expand("split_deepTools_qc/multiBamSummary/{part}.ChIP_read_coverage.bins.npz",part=part))
     else:
         file_list = []
     return(file_list)
@@ -180,7 +187,7 @@ onstart:
 ################################################################################
 rule all:
     input:
-    	run_deepTools_qc(fromBAM),
+    	run_deepTools_qc(fromBAM,useSpikeInForNorm),
         run_deepTools_ChIP(),
         run_macs2(),
         run_genrich(),
