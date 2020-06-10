@@ -5,8 +5,8 @@ region_dict={"host": " ".join(host_chr),"spikein": " ".join(spikein_chr)}
 def get_scaling_factor(sample,part):
     sample_names=[]
     scale_factors=[]
-    with open("split_deepTools_qc/multiBamSummary/"+ part +".concatenated.scaling_factors.txt") as file:
-        idx, line in enumerate(f):
+    with open(outdir +"/split_deepTools_qc/multiBamSummary/"+ part +".concatenated.scaling_factors.txt") as file:
+        for idx, line in enumerate(f):
             if idx > 0:
                 sample_names.append(line.split('\t')[0])
                 scale_factors.append(line.split('\t')[1])
@@ -81,8 +81,8 @@ rule concatenate_scaling_factors:
     input:
         scale_factors_input = "split_deepTools_qc/multiBamSummary/{part}.input.scaling_factors.txt",
         scale_factors_chip = "split_deepTools_qc/multiBamSummary/{part}.ChIP.scaling_factors.txt"
-    output = "split_deepTools_qc/multiBamSummary/{part}.concatenated.scaling_factors.txt"
-    log = "split_deepTools_qc/logs/{part}.cat.scaling_factors.log"
+    output: "split_deepTools_qc/multiBamSummary/{part}.concatenated.scaling_factors.txt"
+    log: "split_deepTools_qc/logs/{part}.cat.scaling_factors.log"
     shell: """
         cat {input.scale_factors_input} {input.scale_factors_chip} > {output} 2> {log}
     """
