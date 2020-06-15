@@ -206,7 +206,8 @@ else:
         input:
     	    run_deepTools_qc(fromBAM,useSpikeInForNorm),
             run_macs2(),
-            run_genrich()
+            run_genrich(),
+            run_histoneHMM(allele_info)
 
 ### execute after workflow finished ############################################
 ################################################################################
