@@ -40,7 +40,8 @@ rule bamCoverage_filtered:
                          else "--extendReads {}".format(fragmentLength),
         blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed
                     else "",
-        scaling_factors =""
+        scaling_factors ="",
+        binSize = ""
     log:
         out = "bamCoverage/logs/bamCoverage.{sample}.filtered.out",
         err = "bamCoverage/logs/bamCoverage.{sample}.filtered.err"

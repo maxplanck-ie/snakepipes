@@ -44,7 +44,8 @@ rule multiBamSummary_input:
         blacklist = lambda wildcards: "--blackListFileName {}".format(blacklist_dict[wildcards.part]) if blacklist_dict[wildcards.part]  else "",
         read_extension = "--extendReads" if pairedEnd
                          else "--extendReads {}".format(fragmentLength),
-        scaling_factors = "--scalingFactors split_deepTools_qc/multiBamSummary/{part}.input.scaling_factors.txt"
+        scaling_factors = "--scalingFactors split_deepTools_qc/multiBamSummary/{part}.input.scaling_factors.txt",
+        binsize = lambda wildcards: " --binSize 100000 " if wildcards.part=="spikein" else ""
     log:
         out = "split_deepTools_qc/logs/{part}.input_multiBamSummary.out",
         err = "split_deepTools_qc/logs/{part}.input_multiBamSummary.err"
@@ -67,7 +68,8 @@ rule multiBamSummary_ChIP:
         blacklist = lambda wildcards: "--blackListFileName {}".format(blacklist_dict[wildcards.part]) if blacklist_dict[wildcards.part]  else "",
         read_extension = "--extendReads" if pairedEnd
                          else "--extendReads {}".format(fragmentLength),
-        scaling_factors = "--scalingFactors split_deepTools_qc/multiBamSummary/{part}.ChIP.scaling_factors.txt"
+        scaling_factors = "--scalingFactors split_deepTools_qc/multiBamSummary/{part}.ChIP.scaling_factors.txt",
+        binsize = lambda wildcards: " --binSize 100000 " if wildcards.part=="spikein" else ""
     log:
         out = "split_deepTools_qc/logs/{part}.ChIP_multiBamSummary.out",
         err = "split_deepTools_qc/logs/{part}.ChIP_multiBamSummary.err"
