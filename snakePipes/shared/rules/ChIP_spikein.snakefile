@@ -2,17 +2,18 @@ part=['host','spikein']
 blacklist_dict={"host": blacklist_bed,"spikein": blacklist_bed_spikein}
 region_dict={"host": " ".join(host_chr),"spikein": " ".join(spikein_chr)}
 
-def get_scaling_factor(sample,part):
+
+def get_scaling_factor(sample,input):
     sample_names=[]
     scale_factors=[]
-    with open(outdir +"/split_deepTools_qc/multiBamSummary/"+ part +".concatenated.scaling_factors.txt") as file:
+    with open(os.path.join(outdir,input)) as f:
         for idx, line in enumerate(f):
             if idx > 0:
                 sample_names.append(line.split('\t')[0])
                 scale_factors.append(line.split('\t')[1])
     scale_factor = scale_factors[sample in sample_names]        
 
-    return 1/scale_factor
+    return 1/float(scale_factor)
 
 rule split_bamfiles_by_genome:
     input: 
@@ -103,7 +104,7 @@ rule bamCoverage_by_host:
                          else "--extendReads {}".format(fragmentLength),
         blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed
                     else "",
-        scaling_factors = "--scaleFactor {}".format(get_scaling_factor(sample,"host")) ## subset for the one factor needed
+        scaling_factors = lambda wildcards,input: "--scaleFactor {}".format(get_scaling_factor(sample,input.scale_factors)) ## subset for the one factor needed
     log:
         out = "bamCoverage_NormedByHost/logs/bamCoverage.{sample}.filtered.out",
         err = "bamCoverage_NormedByHost/logs/bamCoverage.{sample}.filtered.err"
@@ -128,7 +129,7 @@ rule bamCoverage_by_spikein:
                          else "--extendReads {}".format(fragmentLength),
         blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed
                     else "",
-        scaling_factors = "--scaleFactor {}".format(get_scaling_factor(sample,"spikein")) ## subset for the one factor needed
+        scaling_factors = lambda wildcards,input: "--scaleFactor {}".format(get_scaling_factor(sample,input.scale_factors)) ## subset for the one factor needed
     log:
         out = "bamCoverage_NormedBySpikeIn/logs/bamCoverage.{sample}.filtered.out",
         err = "bamCoverage_NormedBySpikeIn/logs/bamCoverage.{sample}.filtered.err"
