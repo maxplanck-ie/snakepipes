@@ -8,7 +8,7 @@ rule origFASTQ1:
         if not os.path.exists(os.path.join(outdir,output[0])):
             os.symlink(os.path.join(outdir,input[0]),os.path.join(outdir,output[0]))
 
-if pairedEnd:
+if pairedEnd or pipeline=="scRNA-seq":
     rule origFASTQ2:
         input:
             indir+"/{sample}"+reads[1]+ext
