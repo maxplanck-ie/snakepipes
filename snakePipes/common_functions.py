@@ -455,7 +455,6 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
     # save to configs.yaml in outdir
     config = defaults
     config.update(vars(args))  # This allows modifications of args after handling a user config file to still make it to the YAML given to snakemake!
-    #config.update({"pairedEnd": pairedEnd}) #this is evaluated at runtime
     write_configfile(os.path.join(args.outdir, '{}.config.yaml'.format(workflowName)), config)
 
     # merge cluster config files: 1) global one, 2) workflow specific one, 3) user provided one
