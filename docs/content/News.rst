@@ -13,10 +13,13 @@ snakePipes 2.x.y
 * symlinks in the output path are relative 
 * bumped STAR version to 2.7.4a in scRNAseq, noncoding-RNA-seq and mRNA-seq workflows
 
+snakePipes 2.1.2
+----------------
+* small bug fix: SE mode in noncoding-RNA-seq pipeline
+
 snakePipes 2.1.1
 ----------------
 * small bug fix: a typo in atac-seq pipeline
-
 
 snakePipes 2.1.0
 ----------------

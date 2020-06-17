@@ -9,16 +9,17 @@ rule origFASTQ1:
                {params.cmd}
           """
 
-rule origFASTQ2:
-      input:
-          indir+"/{sample}"+reads[1]+ext
-      output:
-          "originalFASTQ/{sample}"+reads[1]+".fastq.gz"
-      params:
+if pairedEnd or pipeline=="scrna-seq":
+    rule origFASTQ2:
+        input:
+            indir+"/{sample}"+reads[1]+ext
+        output:
+            "originalFASTQ/{sample}"+reads[1]+".fastq.gz"
+        params:
             cmd = lambda wildcards, input,output: "ln -s ../{} {}".format(input[0],output[0]) if pipeline=="preprocessing" else "ln -s {} {}".format(input[0],output[0])
-      shell: """
+        shell: """
                {params.cmd}
-          """
+            """
 
 if downsample:
     if pairedEnd:
