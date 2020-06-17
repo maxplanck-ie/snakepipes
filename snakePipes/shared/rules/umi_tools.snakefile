@@ -49,12 +49,13 @@ else:
                 ln -s ../{input} {output}
           """
 
-    rule FASTQ2:
-          input:
-              "originalFASTQ/downsample_{sample}"+reads[1]+".fastq.gz" if downsample else "originalFASTQ/{sample}"+reads[1]+".fastq.gz"
-          output:
-              "FASTQ/{sample}"+reads[1]+".fastq.gz"
-          shell: """
+    if pairedEnd or pipeline=="scrna-seq":
+        rule FASTQ2:
+            input:
+                "originalFASTQ/downsample_{sample}"+reads[1]+".fastq.gz" if downsample else "originalFASTQ/{sample}"+reads[1]+".fastq.gz"
+            output:
+                "FASTQ/{sample}"+reads[1]+".fastq.gz"
+            shell: """
                 ln -s ../{input} {output}
           """
 

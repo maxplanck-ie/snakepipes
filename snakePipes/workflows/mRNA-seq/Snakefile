@@ -284,7 +284,6 @@ if not fromBAM:
 
     rule all:
         input:
-           # expand("FASTQ/{sample}{read}.fastq.gz", sample = samples, read = reads),
             run_FastQC(fastqc),
             run_Trimming(trim, fastqc),
             run_alignment_free(),            # Salmon
