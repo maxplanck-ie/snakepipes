@@ -32,6 +32,7 @@ if fromBAM:
 
 if useSpikeInForNorm and spikein_detected:
         include: os.path.join(maindir, "shared", "rules", "ChIP_spikein.snakefile")
+        include: os.path.join(maindir, "shared", "rules", "deepTools_ChIP_spikein.snakefile")
 else:
     # deepTools ChIP
     include: os.path.join(maindir, "shared", "rules", "deepTools_ChIP.snakefile")
@@ -100,12 +101,20 @@ def run_deepTools_ChIP():
     file_list = []
     for chip_sample in chip_samples_w_ctrl:
         control_name = get_control_name(chip_sample)
-        file_list.append(["deepTools_ChIP/plotFingerprint/plotFingerprint.metrics.txt"])
-        # get bigwigtype
-        if bigWigType == "subtract" or bigWigType == "both":
-            file_list.append(["deepTools_ChIP/bamCompare/"+chip_sample+".filtered.subtract."+control_name+".bw"])
-        if bigWigType == "log2ratio" or bigWigType == "both":
-            file_list.append(["deepTools_ChIP/bamCompare/"+chip_sample+".filtered.log2ratio.over_"+control_name+".bw"])
+        if not useSpikeInForNorm:
+            file_list.append(["deepTools_ChIP/plotFingerprint/plotFingerprint.metrics.txt"])
+            # get bigwigtype
+            if bigWigType == "subtract" or bigWigType == "both":
+                file_list.append(["deepTools_ChIP/bamCompare/"+chip_sample+".filtered.subtract."+control_name+".bw"])
+            if bigWigType == "log2ratio" or bigWigType == "both":
+                file_list.append(["deepTools_ChIP/bamCompare/"+chip_sample+".filtered.log2ratio.over_"+control_name+".bw"])
+        else:
+            file_list.append(["split_deepTools_ChIP/plotFingerprint/plotFingerprint.metrics.txt"])
+            # get bigwigtype
+            if bigWigType == "subtract" or bigWigType == "both":
+                file_list.append(["split_deepTools_ChIP/bamCompare/"+chip_sample+".filtered.subtract."+control_name+".bw"])
+            if bigWigType == "log2ratio" or bigWigType == "both":
+                file_list.append(["split_deepTools_ChIP/bamCompare/"+chip_sample+".filtered.log2ratio.over_"+control_name+".bw"])
     return(file_list)
 
 def run_deepTools_allelic():
@@ -205,8 +214,10 @@ else:
     rule all:
         input:
     	    run_deepTools_qc(fromBAM,useSpikeInForNorm),
+            run_deepTools_ChIP(),
             run_macs2(),
             run_genrich()
+            
 
 ### execute after workflow finished ############################################
 ################################################################################
