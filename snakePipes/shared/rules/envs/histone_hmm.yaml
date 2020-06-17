@@ -1,6 +1,0 @@
-name: snakepipes_histoneHMM_1.0
-channels:
- - conda-forge
- - bioconda
-dependencies:
- - r-histonehmm = 1.8

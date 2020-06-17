@@ -33,7 +33,9 @@ elif mode == "STARsolo":
     fastq_indir_trim = None
     fastq_dir = "originalFASTQ"
     aligner = "STARsolo"
-
+elif mode == "Alevin":
+    fastq_dir = "originalFASTQ"
+    aligner = "salmon"
 ### Initialization #############################################################
 
 infiles = sorted(glob.glob(os.path.join(indir, '*'+ext)))
@@ -48,6 +50,11 @@ if not samples:
 if not cf.is_paired(infiles,ext,reads):
     print("This workflow requires paired-end read data!")
     exit(1)
+
+## print deprecation message for modeGruen
+if mode=="Gruen":
+    print("Warning: mode Gruen is going to be deprecated by the end of 2020!")
+
 
 if mode == "STARsolo":
     if myKit == "10Xv2":

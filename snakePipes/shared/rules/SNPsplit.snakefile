@@ -16,6 +16,7 @@ if aligner == "Bowtie2":
         shell:
             "SNPsplit {params.pairedEnd}"
             " -o {params.outdir} --snp_file {input.snp} {input.bam} 2> {log}"
+
 elif aligner == "STAR":
     rule snp_split:
         input:

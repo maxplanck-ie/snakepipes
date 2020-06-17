@@ -1,12 +1,13 @@
-import os
 rule origFASTQ1:
       input:
           indir+"/{sample}"+reads[0]+ext
       output:
           "originalFASTQ/{sample}"+reads[0]+".fastq.gz"
-      run:
-        if not os.path.exists(os.path.join(outdir,output[0])):
-            os.symlink(os.path.join(outdir,input[0]),os.path.join(outdir,output[0]))
+      params:
+            cmd = lambda wildcards, input,output: "ln -s ../{} {}".format(input[0],output[0]) if pipeline=="preprocessing" else "ln -s {} {}".format(input[0],output[0])
+      shell: """
+               {params.cmd}
+          """
 
 if pairedEnd or pipeline=="scrna-seq":
     rule origFASTQ2:
@@ -14,9 +15,11 @@ if pairedEnd or pipeline=="scrna-seq":
             indir+"/{sample}"+reads[1]+ext
         output:
             "originalFASTQ/{sample}"+reads[1]+".fastq.gz"
-        run:
-            if not os.path.exists(os.path.join(outdir,output[0])):
-                os.symlink(os.path.join(outdir,input[0]),os.path.join(outdir,output[0]))
+        params:
+            cmd = lambda wildcards, input,output: "ln -s ../{} {}".format(input[0],output[0]) if pipeline=="preprocessing" else "ln -s {} {}".format(input[0],output[0])
+        shell: """
+               {params.cmd}
+            """
 
 if downsample:
     if pairedEnd:

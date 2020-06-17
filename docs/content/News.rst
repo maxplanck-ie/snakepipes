@@ -1,6 +1,18 @@
 snakePipes News
 ===============
 
+snakePipes 2.x.y
+----------------
+* FASTQ1 and FASTQ2 are not localrules anymore due to buggy logging
+* increased BBmap version
+* added Alevin mode in scRNA workflow
+* included new conda environment using to call AlevinQC.
+* Minor changes to shared FastQC and multiQC rule with regards to scRNA workflow.
+* fixed issue with missing input for running the DNA-mapping Snakefile
+* added filtering of empty drops with Dropletutils to scRNAseq mode STARsolo
+* symlinks in the output path are relative 
+* bumped STAR version to 2.7.4a in scRNAseq, noncoding-RNA-seq and mRNA-seq workflows
+
 snakePipes 2.1.2
 ----------------
 * small bug fix: SE mode in noncoding-RNA-seq pipeline

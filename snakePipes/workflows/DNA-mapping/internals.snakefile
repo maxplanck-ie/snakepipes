@@ -43,3 +43,28 @@ fromBAM = None
 idxRange = 1
 if pairedEnd:
     idxRange = 2
+
+# clean up filtered_bam if needed appropriate
+os.makedirs(outdir, exist_ok=True)
+filt = ""
+if dedup:
+    filt += "-F 1024 "
+    assert UMIDedup is False, "\nPlease use either --UMIDedup (UMI-tools dedup) or --dedup (via sambamba and samtools)!\n"
+    "should be called!"
+if properPairs:
+    filt += "-f 2 "
+if mapq is not None and mapq > 0:
+    filt += "-q {} ".format(mapq)
+filter_rules = os.path.join(outdir, "filter_rules")
+if os.path.exists(filter_rules):
+    f = open(filter_rules)
+    cont = f.read()
+    f.close()
+    if cont != filt:
+        f = open(filter_rules, "w")
+        f.write(filt)
+        f.close()
+else:
+    f = open(filter_rules, "w")
+    f.write(filt)
+    f.close()
