@@ -50,14 +50,15 @@ else:
             if not os.path.exists(os.path.join(outdir,output[0])):
                 os.symlink(os.path.join(outdir,input[0]),os.path.join(outdir,output[0]))
 
-    rule FASTQ2:
-          input:
-              "originalFASTQ/downsample_{sample}"+reads[1]+".fastq.gz" if downsample else "originalFASTQ/{sample}"+reads[1]+".fastq.gz"
-          output:
-              "FASTQ/{sample}"+reads[1]+".fastq.gz"
-          run:
-            if not os.path.exists(os.path.join(outdir,output[0])):
-                os.symlink(os.path.join(outdir,input[0]),os.path.join(outdir,output[0]))
+    if pairedEnd or pipeline=="scrna-seq":
+        rule FASTQ2:
+            input:
+                "originalFASTQ/downsample_{sample}"+reads[1]+".fastq.gz" if downsample else "originalFASTQ/{sample}"+reads[1]+".fastq.gz"
+            output:
+                "FASTQ/{sample}"+reads[1]+".fastq.gz"
+            run:
+                if not os.path.exists(os.path.join(outdir,output[0])):
+                    os.symlink(os.path.join(outdir,input[0]),os.path.join(outdir,output[0]))
 
 #If DNA-mapping:
 if UMIDedup:

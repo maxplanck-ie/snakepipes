@@ -1,5 +1,10 @@
 snakePipes News
 ===============
+
+snakePipes 2.1.2
+----------------
+* small bug fix: SE mode in noncoding-RNA-seq pipeline
+
 snakePipes 2.1.1
 ----------------
 * small bug fix: a typo in atac-seq pipeline
