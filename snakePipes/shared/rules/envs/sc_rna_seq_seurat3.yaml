@@ -4,3 +4,4 @@ channels:
  - bioconda
 dependencies:
  - r-seurat = 3.1.3
+ - bioconductor-dropletutils

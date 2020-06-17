@@ -64,7 +64,7 @@ rule MACS2_peak_qc:
         genome_index = genome_index
     benchmark:
         os.path.join(outdir_ATACqc, ".benchmark/ATAC_qc.{sample}.filtered.benchmark")
-    conda: CONDA_ATAC_ENV
+    conda: CONDA_SHARED_ENV
     shell: """
         # get the number of peaks
         peak_count=`cat {params.peaks} | wc -l`
@@ -85,5 +85,5 @@ rule MACS2_peak_qc:
         genomecov=`bc -l <<< "$peak_len/$genome_size"`
 
         # write peak-based QC metrics to output file
-        printf "peak_count\tFRiP\tpeak_genome_coverage\n%d\t%5.3f\t%6.4f\n" $peak_count $frip $genomecov > {output.qc} >2 {log}
+        printf "peak_count\tFRiP\tpeak_genome_coverage\n%d\t%5.3f\t%6.4f\n" $peak_count $frip $genomecov > {output.qc} 2> {log}
         """

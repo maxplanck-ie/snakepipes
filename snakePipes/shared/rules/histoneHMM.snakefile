@@ -18,7 +18,7 @@ def format_HMM_output(infile,outfile):
     f.close()
     with open(outfile, 'w') as f:
         f.write("%s" % header)
-    with open(outfile, 'a') as f:    
+    with open(outfile, 'a') as f:
         for item in body:
             f.write("%s" % item)
 
@@ -39,7 +39,7 @@ rule histoneHMM:
         err = "histoneHMM/logs/histoneHMM.{sample}.filtered.err"
     benchmark:
         "histoneHMM/.benchmark/histoneHMM.{sample}.filtered.benchmark"
-    conda: CONDA_HISTONE_HMM_ENV
+    conda: CONDA_CHIPSEQ_ENV
     shell: """
         RHOME=`R RHOME`
         $RHOME/library/histoneHMM/bin/histoneHMM_call_regions.R -b 750 -c {params.genome_index} -o {params.prefix} -P 0.1 {input} > {log.out} 2> {log.err}
@@ -76,7 +76,7 @@ rule histoneHMM_out_gz:
     benchmark:
         "histoneHMM/.benchmark/histoneHMM_out_gz.{sample}.filtered.benchmark"
     threads: 2
-    conda: CONDA_CHIPSEQ_ENV
+    conda: CONDA_SHARED_ENV
     shell: """
         grep -v ^\"#\" {input.gff} | sort -k1,1 -k4,4n | bgzip > {output.gff} 2> {log.err}
         tabix -p gff {output.gff} > {log.out} 2>> {log.err}
