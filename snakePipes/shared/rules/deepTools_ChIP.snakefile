@@ -82,7 +82,7 @@ rule plotFingerprint:
     output:
         metrics = "deepTools_ChIP/plotFingerprint/plotFingerprint.metrics.txt"
     params:
-        labels = " ".join(all_samples),
+        labels = " --labels " + " ".join(all_samples),
         blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed else "",
         read_extension = "--extendReads" if pairedEnd else "--extendReads {}".format(fragmentLength),
         png = "--plotFile deepTools_ChIP/plotFingerprint/plotFingerprint.png" if (len(all_samples)<=20)
