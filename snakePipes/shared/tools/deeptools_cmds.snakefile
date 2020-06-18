@@ -8,7 +8,7 @@ bamcompare_log2_cmd = """
                -b2 {input.control_bam} \
                -o {output} \
                --operation log2 \
-               --scaleFactorsMethod readCount \
+               {params.scaleFactors} \
                {params.ignoreForNorm} \
                --binSize {params.bwBinSize} \
                -p {threads} \
@@ -22,7 +22,7 @@ bamcompare_subtract_cmd = """
                -b2 {input.control_bam} \
                -o {output} \
                --operation subtract \
-               --scaleFactorsMethod readCount \
+               {params.scaleFactors} \
                {params.ignoreForNorm} \
                --binSize {params.bwBinSize} \
                -p {threads} \

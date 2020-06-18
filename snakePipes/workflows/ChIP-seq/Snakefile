@@ -111,9 +111,9 @@ def run_deepTools_ChIP():
         else:
             # get bigwigtype
             if bigWigType == "subtract" or bigWigType == "both":
-                file_list.append(["split_deepTools_ChIP/bamCompare/"+chip_sample+".host.subtract."+control_name+".bw"])
+                file_list.append(expand("split_deepTools_ChIP/bamCompare/"+chip_sample+".host.subtract."+control_name+".scaledBY{part}.bw",part=part))
             if bigWigType == "log2ratio" or bigWigType == "both":
-                file_list.append(["split_deepTools_ChIP/bamCompare/"+chip_sample+".host.log2ratio.over_"+control_name+".bw"])
+                file_list.append(("split_deepTools_ChIP/bamCompare/"+chip_sample+".host.log2ratio.over_"+control_name+".scaledBY{part}.bw",part=part))
     return(file_list)
 
 def run_deepTools_allelic():

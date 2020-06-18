@@ -14,7 +14,8 @@ if bigWigType == "subtract" or bigWigType == "both":
             genome_size = genome_size,
             ignoreForNorm = "--ignoreForNormalization {}".format(ignoreForNormalization) if ignoreForNormalization else "",
             read_extension = "--extendReads" if pairedEnd else "--extendReads {}".format(fragmentLength),
-            blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed else ""
+            blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed else "",
+            scaleFactors = " --scaleFactorsMethod readCount "
         log:
             out = "deepTools_ChIP/logs/bamCompare.subtract.{chip_sample}.filtered.subtract.{control_name}.out",
             err = "deepTools_ChIP/logs/bamCompare.subtract.{chip_sample}.filtered.subtract.{control_name}.err"
@@ -38,7 +39,8 @@ if bigWigType == "log2ratio" or bigWigType == "both":
             bwBinSize = bwBinSize,
             ignoreForNorm = "--ignoreForNormalization {}".format(ignoreForNormalization) if ignoreForNormalization else "",
             read_extension = "--extendReads" if pairedEnd else "--extendReads {}".format(fragmentLength),
-            blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed else ""
+            blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed else "",
+            scaleFactors = " --scaleFactorsMethod readCount "
         log:
             out = "deepTools_ChIP/logs/bamCompare.log2ratio.{chip_sample}.{control_name}.filtered.out",
             err = "deepTools_ChIP/logs/bamCompare.log2ratio.{chip_sample}.{control_name}.filtered.err"
