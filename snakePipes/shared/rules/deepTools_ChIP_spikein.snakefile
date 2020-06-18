@@ -29,7 +29,7 @@ if bigWigType == "subtract" or bigWigType == "both":
             ignoreForNorm = "--ignoreForNormalization {}".format(ignoreForNormalization) if ignoreForNormalization else "",
             read_extension = "--extendReads" if pairedEnd else "--extendReads {}".format(fragmentLength),
             blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed else "",
-            scaleFactors = lambda wildcards,input: " --scaleFactors {}:{} ".format(get_scaling_factor(wildcards.chip_sample,input.scale_factors))
+            scaleFactors = lambda wildcards,input: " --scaleFactors {}:{} ".format(get_scaling_factor(wildcards.chip_sample,input.scale_factors),get_scaling_factor(wildcards.control_name,input.scale_factors))
         log:
             out = "split_deepTools_ChIP/logs/bamCompare.subtract.{chip_sample}.subtract.{control_name}.scaledBY{part}.out",
             err = "split_deepTools_ChIP/logs/bamCompare.subtract.{chip_sample}.subtract.{control_name}.scaledBY{part}.err"
@@ -49,13 +49,13 @@ if bigWigType == "log2ratio" or bigWigType == "both":
             control_bai = "split_bam/{control_name}_host.bam.bai",
             scale_factors = "split_deepTools_qc/multiBamSummary/{part}.concatenated.scaling_factors.txt"
         output:
-            "split_deepTools_ChIP/bamCompare/{chip_sample}.host.log2ratio.over_{control_name}.scaledBY{part}.bw"
+            "split_deepTools_ChIP/bamCompare/{chip_sample}.log2ratio.over_{control_name}.scaledBY{part}.bw"
         params:
             bwBinSize = bwBinSize,
             ignoreForNorm = "--ignoreForNormalization {}".format(ignoreForNormalization) if ignoreForNormalization else "",
             read_extension = "--extendReads" if pairedEnd else "--extendReads {}".format(fragmentLength),
             blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed else "",
-            scaleFactors = lambda wildcards,input: " --scaleFactors {}:{} ".format(get_scaling_factor(wildcards.chip_sample,input.scale_factors))
+            scaleFactors = lambda wildcards,input: " --scaleFactors {}:{} ".format(get_scaling_factor(wildcards.chip_sample,input.scale_factors),get_scaling_factor(wildcards.control_name,input.scale_factors))
         log:
             out = "split_deepTools_ChIP/logs/bamCompare.log2ratio.{chip_sample}.{control_name}.scaledBY{part}.out",
             err = "split_deepTools_ChIP/logs/bamCompare.log2ratio.{chip_sample}.{control_name}.scaledBY{part}.err"
