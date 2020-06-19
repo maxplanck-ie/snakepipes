@@ -99,7 +99,7 @@ def run_deepTools_qc(fromBAM,useSpikeInForNorm):
 
 def run_deepTools_ChIP():
     file_list = []
-    file_list.append(["deepTools_ChIP/plotFingerprint/plotFingerprint.metrics.txt","deepTools_ChIP/plotEnrichment/plotEnrichment.gene_features.png"]) if not useSpikeInForNorm else file_list.append(["split_deepTools_ChIP/plotFingerprint/plotFingerprint.metrics.txt","split_deepTools_ChIP/plotEnrichment/plotEnrichment.gene_features.png"])
+    file_list.append(["deepTools_ChIP/plotFingerprint/plotFingerprint.metrics.txt"]) if not useSpikeInForNorm else file_list.append(["split_deepTools_ChIP/plotFingerprint/plotFingerprint.metrics.txt"])
     for chip_sample in chip_samples_w_ctrl: 
         control_name = get_control_name(chip_sample)
         if not useSpikeInForNorm:

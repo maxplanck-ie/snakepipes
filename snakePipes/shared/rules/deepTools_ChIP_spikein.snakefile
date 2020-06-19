@@ -74,10 +74,10 @@ rule plotEnrichment:
         bais = expand("split_bam/{sample}_host.bam.bai", sample = all_samples)
     output:
         png = "split_deepTools_ChIP/plotEnrichment/plotEnrichment.gene_features.png",
-        tsv = "split_deepTools_ChIP/plotEnrichment/plotEnrichment.gene_features.tsv",
+        tsv = "split_deepTools_ChIP/plotEnrichment/plotEnrichment.gene_features.tsv"
     params:
         genes_gtf = genes_gtf,
-        labels = " ".join(all_samples),
+        labels = " --labels " + " ".join(all_samples),
         blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed else "",
         read_extension = "--extendReads" if pairedEnd else "--extendReads {}".format(fragmentLength)
     log:
@@ -104,7 +104,7 @@ rule plotFingerprint:
         read_extension = "--extendReads" if pairedEnd else "--extendReads {}".format(fragmentLength),
         png = "--plotFile deepTools_ChIP/plotFingerprint/plotFingerprint.png" if (len(samples)<=20)
               else "",
-        jsd = "--JSDsample split_bam/{}.host.bam".format(control_samples[0]) if (len(control_samples)>0)
+        jsd = "--JSDsample split_bam/{}_host.bam".format(control_samples[0]) if (len(control_samples)>0)
             else ""
     log:
         out = "split_deepTools_ChIP/logs/plotFingerprint.out",
