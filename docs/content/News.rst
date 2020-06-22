@@ -7,9 +7,9 @@ snakePipes 2.x.y
 * increased BBmap version
 * added Alevin mode in scRNA workflow
 * included new conda environment using to call AlevinQC.
-* Minor changes to shared FastQC and multiQC rule with regards to scRNA workflow.
+* Minor changes to shared FastQC and multiQC rule with regards to scRNA-seq workflow.
 * fixed issue with missing input for running the DNA-mapping Snakefile
-* added filtering of empty drops with Dropletutils to scRNAseq mode STARsolo
+* added filtering of empty drops with Dropletutils to scRNA-seq mode STARsolo
 * symlinks in the output path are relative 
 * bumped STAR version to 2.7.4a in scRNAseq, noncoding-RNA-seq and mRNA-seq workflows
 
