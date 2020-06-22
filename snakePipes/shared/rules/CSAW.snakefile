@@ -5,6 +5,8 @@ def getInputPeaks(peakCaller, chip_samples, genrichDict):
     if peakCaller == "MACS2":
         if pipeline in 'ATAC-seq':
             return expand("MACS2/{chip_sample}.filtered.short.BAM_peaks.xls", chip_sample = chip_samples)
+        elif pipeline == "chip-seq" and useSpikeInForNorm:
+            return expand("MACS2/{chip_sample}_host.BAM_peaks.xls", chip_sample = chip_samples)
         else:
             return expand("MACS2/{chip_sample}.filtered.BAM_peaks.xls", chip_sample = chip_samples)
     elif peakCaller == "HMMRATAC":
@@ -13,12 +15,23 @@ def getInputPeaks(peakCaller, chip_samples, genrichDict):
         return expand("Genrich/{genrichGroup}.narrowPeak", genrichGroup = genrichDict.keys())
 
 
+
+def getSizeMetrics():
+    if pairedEnd:
+        if not useSpikeInForNorm:
+            return "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv"
+        else:
+            return "split_deepTools_qc/bamPEFragmentSize/host.fragmentSize.metric.tsv"
+    else:
+        return []
+
+
 ## CSAW for differential binding / allele-specific binding analysis
 rule CSAW:
     input:
         peaks = getInputPeaks(peakCaller, chip_samples, genrichDict),
         sampleSheet = sampleSheet,
-        insert_size_metrics ="deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv" if pairedEnd else []
+        insert_size_metrics = getSizeMetrics()
     output:
         "CSAW_{}_{}/CSAW.session_info.txt".format(peakCaller, sample_name),
         "CSAW_{}_{}/DiffBinding_analysis.Rdata".format(peakCaller, sample_name),
@@ -36,8 +49,9 @@ rule CSAW:
         importfunc = os.path.join("shared", "rscripts", "DB_functions.R"),
         allele_info = allele_info,
         yaml_path=lambda wildcards: samples_config if pipeline in 'chip-seq' else "",
-        insert_size_metrics=os.path.join(outdir,"deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv") if pairedEnd else [],
-        pipeline = pipeline
+        insert_size_metrics = lambda wildcards,input: os.path.join(outdir, input.insert_size_metrics) if pairedEnd else [],
+        pipeline = pipeline,
+        useSpikeInForNorm = useSpikeInForNorm
     log:
         out = os.path.join(outdir, "CSAW_{}_{}/logs/CSAW.out".format(peakCaller, sample_name)),
         err = os.path.join(outdir, "CSAW_{}_{}/logs/CSAW.err".format(peakCaller, sample_name))
@@ -50,7 +64,7 @@ if allele_info == 'FALSE':
         rule calc_matrix_log2r_CSAW:
             input:
                 csaw_in = "CSAW_{}_{}/CSAW.session_info.txt".format(peakCaller, sample_name),
-                bigwigs = expand("deepTools_ChIP/bamCompare/{chip_sample}.filtered.log2ratio.over_{control_name}.bw", zip, chip_sample=filtered_dict.keys(), control_name=filtered_dict.values()),
+                bigwigs = expand("split_deepTools_ChIP/bamCompare/{chip_sample}.log2ratio.over_{control_name}.bw", zip, chip_sample=filtered_dict.keys(), control_name=filtered_dict.values()) if useSpikeInForNorm else expand("deepTools_ChIP/bamCompare/{chip_sample}.filtered.log2ratio.over_{control_name}.bw", zip, chip_sample=filtered_dict.keys(), control_name=filtered_dict.values()),
                 sampleSheet = sampleSheet
             output:
                 matrix = touch("CSAW_{}_{}".format(peakCaller, sample_name)+"/CSAW.{change_dir}.log2r.matrix")
@@ -100,7 +114,7 @@ if allele_info == 'FALSE':
     rule calc_matrix_cov_CSAW:
         input:
             csaw_in = "CSAW_{}_{}/CSAW.session_info.txt".format(peakCaller, sample_name),
-            bigwigs = expand("bamCoverage/{chip_sample}.filtered.seq_depth_norm.bw", chip_sample=filtered_dict.keys()),
+            bigwigs = expand("bamCoverage/{chip_sample}.host.seq_depth_norm.BYspikein.bw", chip_sample=filtered_dict.keys()) if useSpikeInForNorm else expand("bamCoverage/{chip_sample}.filtered.seq_depth_norm.bw", chip_sample=filtered_dict.keys()),
             sampleSheet = sampleSheet
         output:
             matrix = touch("CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.cov.matrix")

@@ -219,7 +219,8 @@ else:
     	    run_deepTools_qc(fromBAM,useSpikeInForNorm),
             run_deepTools_ChIP(),
             run_macs2(),
-            run_genrich()
+            run_genrich(),
+            run_CSAW()
             
 
 ### execute after workflow finished ############################################
