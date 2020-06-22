@@ -23,8 +23,8 @@ if pairedEnd:
                 else [],
             insert_size_metrics = "split_deepTools_qc/bamPEFragmentSize/host.fragmentSize.metric.tsv"
         output:
-            peaks = "MACS2/{chip_sample}_host.bam_peaks.xls",
-            peaksPE = "MACS2/{chip_sample}_host.bamPE_peaks.xls"
+            peaks = "MACS2/{chip_sample}_host.BAM_peaks.xls",
+            peaksPE = "MACS2/{chip_sample}_host.BAMPE_peaks.xls"
         params:
             genome_size = genome_size,
             broad_calling =
@@ -46,7 +46,7 @@ if pairedEnd:
                 -g {params.genome_size} --qvalue {params.qval_cutoff}\
                 --keep-dup all \
                 --outdir MACS2 \
-                --name {wildcards.chip_sample}_host.bam \
+                --name {wildcards.chip_sample}_host.BAM \
                 --nomodel \
                 --mfold {params.mfold}\
                 --extsize $(cat {input.insert_size_metrics} | grep split_bam/{wildcards.chip_sample}_host.bam | awk '{{printf("%i",$6)}}') \
@@ -56,7 +56,7 @@ if pairedEnd:
             macs2 callpeak -t {input.chip} \
                 {params.control_param} -f BAMPE --qvalue {params.qval_cutoff}\
                 -g {params.genome_size} --keep-dup all \
-                --outdir MACS2 --name {wildcards.chip_sample}_host.bamPE \
+                --outdir MACS2 --name {wildcards.chip_sample}_host.BAMPE \
                 {params.broad_calling} > {log.out}.BAMPE 2> {log.err}.BAMPE
             """
 else:
@@ -67,7 +67,7 @@ else:
                 lambda wildcards: "split_bam/"+get_control(wildcards.chip_sample)+"_host.bam" if get_control(wildcards.chip_sample)
                 else []
         output:
-            peaks = "MACS2/{chip_sample}_host.bam_peaks.xls",
+            peaks = "MACS2/{chip_sample}_host.BAM_peaks.xls",
         params:
             genome_size = int(genome_size),
             broad_calling =
@@ -87,7 +87,7 @@ else:
         conda: CONDA_CHIPSEQ_ENV
         shell: """
             macs2 callpeak -t {input.chip} {params.control_param} -f BAM -g {params.genome_size} --qvalue {params.qval_cutoff} --keep-dup all --outdir MACS2 \
-                --name {wildcards.chip_sample}_host.bam --mfold {params.mfold} --extsize {params.frag_size}\
+                --name {wildcards.chip_sample}_host.BAM --mfold {params.mfold} --extsize {params.frag_size}\
                 {params.broad_calling} > {log.out} 2> {log.err}
             """
 
