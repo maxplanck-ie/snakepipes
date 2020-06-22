@@ -116,3 +116,20 @@ rule bamCoverage_by_part:
     conda: CONDA_SHARED_ENV
     shell: bamcov_cmd
 
+
+rule bamPE_fragment_size:
+    input:
+        bams = expand("split_bam/{sample}_host.bam", sample=samples),
+        bais = expand("split_bam/{sample}_host.bam.bai", sample=samples)
+    output:
+        "split_deepTools_qc/bamPEFragmentSize/host.fragmentSize.metric.tsv"
+    params:
+        plotcmd = "" if plotFormat == 'None' else
+                "-o split_deepTools_qc/bamPEFragmentSize/host.fragmentSizes.{}".format(plotFormat)
+    log:
+        out = "split_deepTools_qc/logs/bamPEFragmentSize.out",
+        err = "split_deepTools_qc/logs/bamPEFragmentSize.err"
+    threads: 24
+    conda: CONDA_SHARED_ENV
+    shell: bamPEFragmentSize_cmd
+
