@@ -119,13 +119,13 @@ rule bamCoverage_by_part:
 
 rule bamPE_fragment_size:
     input:
-        bams = expand("split_bam/{sample}_host.bam", sample=samples),
-        bais = expand("split_bam/{sample}_host.bam.bai", sample=samples)
+        bams = lambda wildcards: expand("split_bam/{sample}_{part}.bam", sample=samples,part=wildcards.part),
+        bais = lambda wildcards: expand("split_bam/{sample}_{part}.bam.bai", sample=samples,part=wildcards.part)
     output:
         "split_deepTools_qc/bamPEFragmentSize/{part}.fragmentSize.metric.tsv"
     params:
-        plotcmd = "" if plotFormat == 'None' else
-                "-o split_deepTools_qc/bamPEFragmentSize/{part}.fragmentSizes.{}".format(plotFormat)
+        plotcmd = lambda wildcards: "" if plotFormat == 'None' else
+                "-o split_deepTools_qc/bamPEFragmentSize/" + wildcards.part + ".fragmentSizes.{}".format(plotFormat)
     log:
         out = "split_deepTools_qc/logs/{part}.bamPEFragmentSize.out",
         err = "split_deepTools_qc/logs/{part}.bamPEFragmentSize.err"
