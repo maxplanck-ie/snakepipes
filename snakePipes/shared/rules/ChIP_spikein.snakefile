@@ -122,13 +122,13 @@ rule bamPE_fragment_size:
         bams = expand("split_bam/{sample}_host.bam", sample=samples),
         bais = expand("split_bam/{sample}_host.bam.bai", sample=samples)
     output:
-        "split_deepTools_qc/bamPEFragmentSize/host.fragmentSize.metric.tsv"
+        "split_deepTools_qc/bamPEFragmentSize/{part}.fragmentSize.metric.tsv"
     params:
         plotcmd = "" if plotFormat == 'None' else
-                "-o split_deepTools_qc/bamPEFragmentSize/host.fragmentSizes.{}".format(plotFormat)
+                "-o split_deepTools_qc/bamPEFragmentSize/{part}.fragmentSizes.{}".format(plotFormat)
     log:
-        out = "split_deepTools_qc/logs/bamPEFragmentSize.out",
-        err = "split_deepTools_qc/logs/bamPEFragmentSize.err"
+        out = "split_deepTools_qc/logs/{part}.bamPEFragmentSize.out",
+        err = "split_deepTools_qc/logs/{part}.bamPEFragmentSize.err"
     threads: 24
     conda: CONDA_SHARED_ENV
     shell: bamPEFragmentSize_cmd

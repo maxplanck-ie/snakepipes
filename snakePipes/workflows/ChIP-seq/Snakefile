@@ -92,7 +92,7 @@ def run_deepTools_qc(fromBAM,useSpikeInForNorm):
         file_list = expand("split_deepTools_qc/multiBamSummary/{part}.input_read_coverage.bins.npz",part=part)
         file_list.append(expand("split_deepTools_qc/multiBamSummary/{part}.ChIP_read_coverage.bins.npz",part=part))
         file_list.append(expand("bamCoverage/{sample}.host.seq_depth_norm.BY{part}.bw",sample=samples,part=part))
-        file_list.append("split_deepTools_qc/bamPEFragmentSize/host.fragmentSize.metric.tsv")
+        file_list.append(expand("split_deepTools_qc/bamPEFragmentSize/{part}.fragmentSize.metric.tsv",part=part))
         
     else:
         file_list = []
