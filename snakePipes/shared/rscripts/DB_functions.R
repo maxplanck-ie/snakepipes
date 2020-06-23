@@ -204,9 +204,9 @@ tmmNormalize_chip <- function(chipCountObject, binsize, plotfile){
     wider <- csaw::windowCounts(bam.files, bin = TRUE, width = binsize, param = chipCountObject$pe.param)
     if(useSpikeInForNorm){
         tab<-read.table("../split_deepTools_qc/multiBamSummary/spikein.ChIP.scaling_factors.txt",sep="\t",header=TRUE,as.is=TRUE,quote="")
-        normfacs<-(tab$scalingFactor[match(colnames(chipCountObject$windowCounts),tab$sample)]) }else{
-        normfacs <- csaw::normFactors(wider, se.out=FALSE)
-    }
+        normfacs<-1/(tab$scalingFactor[match(colnames(chipCountObject$windowCounts),tab$sample)]) }else{
+        normfacs <- csaw::normFactors(wider, se.out=FALSE)}
+
     chipCountObject$normFactors <- normfacs
 
     # get norm counts
