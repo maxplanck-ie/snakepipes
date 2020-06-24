@@ -28,7 +28,7 @@ suppressMessages(require(csaw))
 load(DBdata)
 ```
 
-Input to the differential binding analysis were `r length(chip_object$windowCounts)` genomic bins of size `r width(chip_object$windowCounts)[1]` bp having any overlap to the union of MACS2 peaks from all samples listed in the sample sheet.   
+Input to the differential binding analysis were `r length(chip_object$windowCounts)` genomic bins of size `r width(chip_object$windowCounts)[1]` bp having any overlap to the union of `r unlist(strsplit(snakemake@output[["outfile"]],"_"))[2]` peaks from all samples listed in the sample sheet.   
 Size factors were calculated via `r ifelse(useSpikeInForNorm,"spikein normalization","TMM normalization of read counts obtained for 10kb genomic bins")` and amounted to `r chip_object$normFactors`.   
 
 ### Statistical analysis

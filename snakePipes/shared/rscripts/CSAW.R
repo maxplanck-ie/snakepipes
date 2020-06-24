@@ -132,9 +132,14 @@ message(paste0("Filtering windows using MACS2 output : ", length(allpeaks) , " r
 keep <- overlapsAny(SummarizedExperiment::rowRanges(chip_object$windowCounts), allpeaks)
 chip_object$windowCounts <- chip_object$windowCounts[keep,]
 
-## TMM normalize
-message("Normalizing using TMM (using 10kb background counts)")
-chip_object <- tmmNormalize_chip(chip_object, binsize = 10000, plotfile = "TMM_normalizedCounts.pdf")
+## normalize
+if(useSpikeInForNorm){
+    message("Normalizing using spikein (using 10kb background counts)")
+    chip_object <- tmmNormalize_chip(chip_object, binsize = 10000, plotfile = "spikein_normalizedCounts.pdf")
+}else{
+    message("Normalizing using TMM (using 10kb background counts)")
+    chip_object <- tmmNormalize_chip(chip_object, binsize = 10000, plotfile = "TMM_normalizedCounts.pdf")
+}
 
 ## get DB regions
 print("Performing differential binding")
