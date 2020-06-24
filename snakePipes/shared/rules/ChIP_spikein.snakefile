@@ -13,7 +13,7 @@ def get_scaling_factor(sample,input):
                 scale_factors.append(line.split('\t')[1])
     scale_factor = scale_factors[sample in sample_names]        
 
-    return 1/float(scale_factor)
+    return float(scale_factor)
 
 rule split_bamfiles_by_genome:
     input: 
