@@ -107,7 +107,7 @@ rule bamCoverage_by_part:
                          else "--extendReads {}".format(fragmentLength),
         blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed
                     else "",
-        scaling_factors = lambda wildcards,input: "--scaleFactor {}".format(get_scaling_factor(sample,input.scale_factors)) ## subset for the one factor needed
+        scaling_factors = lambda wildcards,input: "--scaleFactor {}".format(get_scaling_factor(wildcards.sample,input.scale_factors)) ## subset for the one factor needed
     log:
         out = "bamCoverage/logs/bamCoverage.{sample}.BY{part}.filtered.out",
         err = "bamCoverage/logs/bamCoverage.{sample}.BY{part}.filtered.err"
