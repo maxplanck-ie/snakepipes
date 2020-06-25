@@ -31,7 +31,8 @@ rule CSAW:
     input:
         peaks = getInputPeaks(peakCaller, chip_samples, genrichDict),
         sampleSheet = sampleSheet,
-        insert_size_metrics = getSizeMetrics()
+        insert_size_metrics = getSizeMetrics(),
+        scale_factors = "split_deepTools_qc/multiBamSummary/spikein.ChIP.scaling_factors.txt" if useSpikeInForNorm else []
     output:
         "CSAW_{}_{}/CSAW.session_info.txt".format(peakCaller, sample_name),
         "CSAW_{}_{}/DiffBinding_analysis.Rdata".format(peakCaller, sample_name),
