@@ -10,8 +10,9 @@ def get_scaling_factor(sample,input):
         for idx, line in enumerate(f):
             if idx > 0:
                 sample_names.append(line.split('\t')[0])
-                scale_factors.append(line.split('\t')[1])
-    scale_factor = scale_factors[sample in sample_names]        
+                scale_factors.append((line.split('\t')[1]).rstrip("\n"))
+    sf_dict = dict(zip(sample_names, scale_factors))
+    scale_factor = sf_dict[sample]
 
     return float(scale_factor)
 

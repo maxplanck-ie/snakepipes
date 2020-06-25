@@ -135,7 +135,6 @@ multiBamSummary_cmd = """
                     -b {input.bams} \
                     -o {output.npz} \
                     --labels {params.labels} \
-                    --binSize 1000 \
                     {params.blacklist} \
                     {params.scaling_factors} \
                     {params.binSize} \
