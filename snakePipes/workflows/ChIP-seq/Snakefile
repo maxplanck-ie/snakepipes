@@ -77,7 +77,7 @@ def run_histoneHMM(allele_info):
     return(file_list)
 
 def run_deepTools_qc(fromBAM,useSpikeInForNorm):
-    if fromBAM and not useSpikeInForNorm:
+    if fromBAM and not spikein_detected:
         file_list = ["deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv"]
         file_list.append([expand("bamCoverage/{sample}.filtered.seq_depth_norm.bw", sample = samples)])
         if len(samples) <= 20:
@@ -88,7 +88,7 @@ def run_deepTools_qc(fromBAM,useSpikeInForNorm):
                 "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage.tsv",
                 "deepTools_qc/plotPCA/PCA.read_coverage.tsv" ])
         file_list.append(expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample = samples))
-    elif useSpikeInForNorm and spikein_detected:
+    elif spikein_detected:
         file_list = expand("split_deepTools_qc/multiBamSummary/{part}.input_read_coverage.bins.npz",part=part)
         file_list.append(expand("split_deepTools_qc/multiBamSummary/{part}.ChIP_read_coverage.bins.npz",part=part))
         file_list.append(expand("bamCoverage/{sample}.host.seq_depth_norm.BY{part}.bw",sample=samples,part=part))
@@ -100,10 +100,10 @@ def run_deepTools_qc(fromBAM,useSpikeInForNorm):
 
 def run_deepTools_ChIP():
     file_list = []
-    file_list.append(["deepTools_ChIP/plotFingerprint/plotFingerprint.metrics.txt"]) if not useSpikeInForNorm else file_list.append(["split_deepTools_ChIP/plotFingerprint/plotFingerprint.metrics.txt"])
+    file_list.append(["deepTools_ChIP/plotFingerprint/plotFingerprint.metrics.txt"]) if not spikein_detected else file_list.append(["split_deepTools_ChIP/plotFingerprint/plotFingerprint.metrics.txt"])
     for chip_sample in chip_samples_w_ctrl: 
         control_name = get_control_name(chip_sample)
-        if not useSpikeInForNorm:
+        if not spikein_detected:
             # get bigwigtype
             if bigWigType == "subtract" or bigWigType == "both":
                 file_list.append(["deepTools_ChIP/bamCompare/"+chip_sample+".filtered.subtract."+control_name+".bw"])
@@ -154,7 +154,7 @@ def run_genrich():
 
 def run_macs2():
     if peakCaller == "MACS2":
-        if useSpikeInForNorm:
+        if spikein_detected:
             file_list = expand("MACS2/{chip_sample}_host.BAM_peaks.xls", chip_sample = chip_samples)
         else:
             file_list = expand("MACS2/{chip_sample}.filtered.BAM_peaks.xls", chip_sample = chip_samples)
