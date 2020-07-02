@@ -64,8 +64,22 @@ bamcov_cmd = """
                 -o {output} \
                 --binSize {params.bwBinSize} \
                 -p {threads} \
-                --normalizeUsing RPKM \  #RPGC
+                --normalizeUsing RPGC \
                 --effectiveGenomeSize {params.genome_size} \
+                {params.ignoreForNorm} \
+                {params.blacklist} \
+                {params.read_extension} > {log.out} 2> {log.err}
+"""
+
+bamcov_spikein_cmd = """
+    bamCoverage -b {input.bam} \
+                -o {output} \
+                --binSize {params.bwBinSize} \
+                -p {threads} \
+                --normalizeUsing None \
+                --effectiveGenomeSize {params.genome_size} \
+                --minMappingQuality 3 \
+                --ignoreDuplicates \
                 {params.ignoreForNorm} \
                 {params.blacklist} \
                 {params.scaling_factors} \
@@ -132,6 +146,20 @@ plotFingerprint_cmd = """
 # multiBAMsum ChIP
 multiBamSummary_cmd = """
     multiBamSummary bins \
+                    -b {input.bams} \
+                    -o {output.npz} \
+                    --labels {params.labels} \
+                    {params.blacklist} \
+                    {params.scaling_factors} \
+                    {params.binSize} \
+                    -p {threads} \
+                    {params.read_extension} > {log.out} 2> {log.err}
+    """
+
+# multiBAMsum ChIP with spikein
+multiBamSummary_spikein_cmd = """
+    multiBamSummary BED-file \
+                    --BED {input.bed} \
                     -b {input.bams} \
                     -o {output.npz} \
                     --labels {params.labels} \

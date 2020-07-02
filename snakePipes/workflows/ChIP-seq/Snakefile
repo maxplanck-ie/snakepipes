@@ -34,6 +34,7 @@ if useSpikeInForNorm:
         include: os.path.join(maindir, "shared", "rules", "ChIP_spikein.snakefile")
         include: os.path.join(maindir, "shared", "rules", "deepTools_ChIP_spikein.snakefile")
         include: os.path.join(maindir, "shared", "rules", "ChIP_peak_calling_spikein.snakefile")
+        include: os.path.join(maindir, "shared", "rules", "filterGTF.snakefile")
 else:
     # deepTools ChIP
     include: os.path.join(maindir, "shared", "rules", "deepTools_ChIP.snakefile")
@@ -93,6 +94,7 @@ def run_deepTools_qc(fromBAM,useSpikeInForNorm):
         file_list.append(expand("split_deepTools_qc/multiBamSummary/{part}.ChIP_read_coverage.bins.npz",part=part))
         file_list.append(expand("bamCoverage/{sample}.host.seq_depth_norm.BY{part}.bw",sample=samples,part=part))
         file_list.append(expand("split_deepTools_qc/bamPEFragmentSize/{part}.fragmentSize.metric.tsv",part=part))
+        file_list.append(expand("bamCoverage_TSS/{sample}.host.seq_depth_norm.BYspikein.bw",sample=chip_samples))
         
     else:
         file_list = []
@@ -154,7 +156,7 @@ def run_genrich():
 
 def run_macs2():
     if peakCaller == "MACS2":
-        if spikein_detected:
+        if useSpikeInForNorm:
             file_list = expand("MACS2/{chip_sample}_host.BAM_peaks.xls", chip_sample = chip_samples)
         else:
             file_list = expand("MACS2/{chip_sample}.filtered.BAM_peaks.xls", chip_sample = chip_samples)

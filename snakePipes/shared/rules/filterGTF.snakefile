@@ -139,3 +139,22 @@ rule annotation_bed2fasta:
     conda: CONDA_RNASEQ_ENV
     shell:
         "bedtools getfasta -name -s -split -fi {input.genome_fasta} -bed <(cat {input.bed} | cut -f1-12) | sed 's/(.*)//g' | sed 's/:.*//g' > {output} 2> {log}"
+
+
+rule TSS_to_windows:
+    input:
+        bed = "Annotation/genes.filtered.bed",
+        bam = expand("split_bam/{sample}_spikein.bam",sample=samples)[0]
+    output:
+        TSS_bed = "Annotation/TSS.filtered.bed"
+    params:
+        outfile = outdir+"/Annotation/TSS.filtered.bed",
+        script = maindir+"/shared/tools/TSS_to_windows.py",
+        size = 5000
+    log:
+        "Annotation/logs/TSS_to_windows.err"
+    conda: CONDA_pysam_ENV
+    shell: """
+            python {params.script} -inf {input.bed} -outf {output.TSS_bed} -size {params.size} -bam {input.bam} 2> {log}
+              """
+        

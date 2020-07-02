@@ -32,7 +32,8 @@ def set_env_yamls():
             'CONDA_RMD_ENV': 'envs/rmarkdown.yaml',
             'CONDA_PREPROCESSING_ENV': 'envs/preprocessing.yaml',
             'CONDA_NONCODING_RNASEQ_ENV': 'envs/noncoding.yaml',
-            'CONDA_SAMBAMBA_ENV': 'envs/sambamba.yaml'}
+            'CONDA_SAMBAMBA_ENV': 'envs/sambamba.yaml',
+            'CONDA_pysam_ENV': 'envs/pysam.yaml'}
 
 
 def merge_dicts(x, y):

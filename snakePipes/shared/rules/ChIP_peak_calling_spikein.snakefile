@@ -35,10 +35,10 @@ if pairedEnd:
             qval_cutoff=qval,
             mfold=mfold
         log:
-            out = "MACS2/logs/MACS2.{chip_sample}.filtered.out",
-            err = "MACS2/logs/MACS2.{chip_sample}.filtered.err"
+            out = "MACS2/logs/MACS2.{chip_sample}_host.filtered.out",
+            err = "MACS2/logs/MACS2.{chip_sample}_host.filtered.err"
         benchmark:
-            "MACS2/.benchmark/MACS2.{chip_sample}.filtered.benchmark"
+            "MACS2/.benchmark/MACS2.{chip_sample}_host.filtered.benchmark"
         conda: CONDA_CHIPSEQ_ENV
         shell: """
             macs2 callpeak -t {input.chip} {params.control_param} \
@@ -80,10 +80,10 @@ else:
             mfold=mfold,
             qval_cutoff=qval
         log:
-            out = "MACS2/logs/MACS2.{chip_sample}.filtered.out",
-            err = "MACS2/logs/MACS2.{chip_sample}.filtered.err"
+            out = "MACS2/logs/MACS2.{chip_sample}_host.filtered.out",
+            err = "MACS2/logs/MACS2.{chip_sample}_host.filtered.err"
         benchmark:
-            "MACS2/.benchmark/MACS2.{chip_sample}.filtered.benchmark"
+            "MACS2/.benchmark/MACS2.{chip_sample}_host.filtered.benchmark"
         conda: CONDA_CHIPSEQ_ENV
         shell: """
             macs2 callpeak -t {input.chip} {params.control_param} -f BAM -g {params.genome_size} --qvalue {params.qval_cutoff} --keep-dup all --outdir MACS2 \
@@ -103,11 +103,11 @@ rule MACS2_peak_qc:
         qc = "MACS2/{sample}_host.bam_peaks.qc.txt"
     params:
         peaks =
-            lambda wildcards: "MACS2/{}_host.bam_peaks.broadPeak".format(wildcards.sample) if is_broad(wildcards.sample)
-                              else "MACS2/{}_host.bam_peaks.narrowPeak".format(wildcards.sample),
+            lambda wildcards: "MACS2/{}_host.BAM_peaks.broadPeak".format(wildcards.sample) if is_broad(wildcards.sample)
+                              else "MACS2/{}_host.BAM_peaks.narrowPeak".format(wildcards.sample),
         genome_index = genome_index
     benchmark:
-        "MACS2/.benchmark/MACS2_peak_qc.{sample}.filtered.benchmark"
+        "MACS2/.benchmark/MACS2_peak_qc.{sample}_host.filtered.benchmark"
     conda: CONDA_SHARED_ENV
     shell: """
         # get the number of peaks
