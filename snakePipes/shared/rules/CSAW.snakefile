@@ -115,7 +115,7 @@ if allele_info == 'FALSE':
     rule calc_matrix_cov_CSAW:
         input:
             csaw_in = "CSAW_{}_{}/CSAW.session_info.txt".format(peakCaller, sample_name),
-            bigwigs = expand("bamCoverage/{chip_sample}.host.seq_depth_norm.BYspikein.bw", chip_sample=filtered_dict.keys()) if useSpikeInForNorm else expand("bamCoverage/{chip_sample}.filtered.seq_depth_norm.bw", chip_sample=filtered_dict.keys()),
+            bigwigs = expand("bamCoverage/{chip_sample}.filtered.seq_depth_norm.BYspikein.bw", chip_sample=filtered_dict.keys()) if useSpikeInForNorm else expand("bamCoverage/{chip_sample}.filtered.seq_depth_norm.bw", chip_sample=filtered_dict.keys()),
             sampleSheet = sampleSheet
         output:
             matrix = touch("CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.cov.matrix")

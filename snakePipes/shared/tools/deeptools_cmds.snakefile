@@ -78,8 +78,6 @@ bamcov_spikein_cmd = """
                 -p {threads} \
                 --normalizeUsing None \
                 --effectiveGenomeSize {params.genome_size} \
-                --minMappingQuality 3 \
-                --ignoreDuplicates \
                 {params.ignoreForNorm} \
                 {params.blacklist} \
                 {params.scaling_factors} \
