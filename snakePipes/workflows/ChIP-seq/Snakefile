@@ -96,6 +96,7 @@ def run_deepTools_qc(fromBAM,useSpikeInForNorm):
         file_list.append(expand("split_deepTools_qc/bamPEFragmentSize/{part}.fragmentSize.metric.tsv",part=part))
         file_list.append(expand("bamCoverage_TSS/{sample}.host.seq_depth_norm.BYspikein.bw",sample=chip_samples))
         file_list.append(expand("bamCoverage/{sample}.filtered.seq_depth_norm.BYspikein.bw",sample=chip_samples))
+        file_list.append(expand("bamCoverage_input/{sample}.host.seq_depth_norm.BYspikein.bw",sample=chip_samples))
         
     else:
         file_list = []

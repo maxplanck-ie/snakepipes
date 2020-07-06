@@ -195,6 +195,32 @@ rule bamCoverage_by_TSS:
     shell: bamcov_spikein_cmd
 
 
+rule bamCoverage_by_input:
+    input:
+        bam = "split_bam/{sample}_host.bam" ,
+        bai = "split_bam/{sample}_host.bam.bai",
+        scale_factors = "split_deepTools_qc/multiBamSummary/spikein.input.scaling_factors.txt" 
+    output:
+        "bamCoverage_input/{sample}.host.seq_depth_norm.BYspikein.bw"
+    params:
+        bwBinSize = bwBinSize,
+        genome_size = int(genome_size),
+        ignoreForNorm = "--ignoreForNormalization {}".format(ignoreForNormalization) if ignoreForNormalization else "",
+        read_extension = "--extendReads" if pairedEnd
+                         else "--extendReads {}".format(fragmentLength),
+        blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed
+                    else "",
+        scaling_factors = lambda wildcards,input: "--scaleFactor {}".format(get_scaling_factor(get_control(wildcards.sample),input.scale_factors)) ## subset for the one factor needed
+    log:
+        out = "bamCoverage_input/logs/bamCoverage.{sample}.BYspikein.filtered.out",
+        err = "bamCoverage_input/logs/bamCoverage.{sample}.BYspikein.filtered.err"
+    benchmark:
+        "bamCoverage_input/.benchmark/bamCoverage.{sample}.BYspikein.filtered.benchmark"
+    threads: 16  # 4GB per core
+    conda: CONDA_SHARED_ENV
+    shell: bamcov_spikein_cmd
+
+
 rule bamPE_fragment_size:
     input:
         bams = lambda wildcards: expand("split_bam/{sample}_{part}.bam", sample=samples,part=wildcards.part),
