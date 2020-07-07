@@ -15,10 +15,8 @@ outdir<-snakemake@params[["outdir"]]
 yaml_path<-snakemake@params[["yaml_path"]]
 useSpikeInForNorm<-snakemake@params[["useSpikeInForNorm"]]
 
-#bam_pfx<-ifelse(useSpikeInForNorm,"_host",".filtered")
-#bam_folder<-ifelse(useSpikeInForNorm,"split_bam","filtered_bam")
-bam_pfx<-ifelse(useSpikeInForNorm,".filtered",".filtered")
-bam_folder<-ifelse(useSpikeInForNorm,"filtered_bam","filtered_bam")
+bam_pfx<-ifelse(useSpikeInForNorm,"_host",".filtered")
+bam_folder<-ifelse(useSpikeInForNorm,"split_bam","filtered_bam")
 
 ##set up a primitive log
 logfile <- file(snakemake@log[["err"]], open="w+")
@@ -100,11 +98,11 @@ if (!is.null(sampleInfo$UseRegions)) {
 
 if(snakemake@params[['peakCaller']] == "MACS2") {
     allpeaks <- lapply(fnames, function(x) {
-        narrow <- paste0("../MACS2/",x,"_host",".BAM_peaks.narrowPeak") #bam_pfx
+        narrow <- paste0("../MACS2/",x,bam_pfx,".BAM_peaks.narrowPeak") #bam_pfx
         if(snakemake@params[["pipeline"]] %in% "ATAC-seq"){
             narrow <- paste0("../MACS2/",x,".filtered.short.BAM_peaks.narrowPeak")
         }
-        broad <- paste0("../MACS2/",x,"_host",".BAM_peaks.broadPeak") #bam_pfx
+        broad <- paste0("../MACS2/",x,bam_pfx,".BAM_peaks.broadPeak") #bam_pfx
         # first look for narrowpeak then braod peak
         if(file.exists(narrow)) {
             bed <- read.delim(narrow, header = FALSE)
