@@ -31,7 +31,7 @@ if fromBAM:
         include: os.path.join(maindir, "shared", "rules", "deepTools_qc.snakefile")
 
 if useSpikeInForNorm:
-        include: os.path.join(maindir, "shared", "rules", "ChIP_spikein.snakefile")
+        include: os.path.join(maindir, "shared", "rules", "split_bam_ops_ChIP_spikein.snakefile")
         include: os.path.join(maindir, "shared", "rules", "deepTools_ChIP_spikein.snakefile")
         include: os.path.join(maindir, "shared", "rules", "ChIP_peak_calling_spikein.snakefile")
         include: os.path.join(maindir, "shared", "rules", "filterGTF.snakefile")
