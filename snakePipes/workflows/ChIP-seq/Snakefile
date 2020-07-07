@@ -204,29 +204,20 @@ onstart:
 
 ### main rule ##################################################################
 ################################################################################
-if not useSpikeInForNorm:
-    rule all:
-        input:
-    	    run_deepTools_qc(fromBAM,useSpikeInForNorm),
-            run_deepTools_ChIP(),
-            run_macs2(),
-            run_genrich(),
-            # run histoneHMM if allelic_bams are absent (since it gives index error without allele_specific index)
-            run_histoneHMM(allele_info),
-            ## run deeptools-allelic only if dir "allelic_bams" present and non empty
-            run_deepTools_allelic(),
-            ## run csaw if asked for
-            run_CSAW(),
-            "QC_report/QC_report_all.tsv"
-else:
-    rule all:
-        input:
-    	    run_deepTools_qc(fromBAM,useSpikeInForNorm),
-            run_deepTools_ChIP(),
-            run_macs2(),
-            run_genrich(),
-            run_CSAW()
-            
+rule all:
+    input:
+        run_deepTools_qc(fromBAM,useSpikeInForNorm),
+        run_deepTools_ChIP(),
+        run_macs2(),
+        run_genrich(),
+        # run histoneHMM if allelic_bams are absent (since it gives index error without allele_specific index)
+        run_histoneHMM(allele_info),
+        ## run deeptools-allelic only if dir "allelic_bams" present and non empty
+        run_deepTools_allelic(),
+        ## run csaw if asked for
+        run_CSAW(),
+        "QC_report/QC_report_all.tsv"
+          
 
 ### execute after workflow finished ############################################
 ################################################################################

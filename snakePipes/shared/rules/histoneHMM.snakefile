@@ -26,7 +26,7 @@ def format_HMM_output(infile,outfile):
 # -b 750 -P 0.1
 rule histoneHMM:
     input:
-        "filtered_bam/{sample}.filtered.bam"
+        "filtered_bam/{sample}.filtered.bam" if not useSpikeInForNorm else "split_bam/{sample}_host.bam"
     output:
         temp("histoneHMM/{sample}.filtered.histoneHMM-regions.gff"),
         temp("histoneHMM/{sample}.filtered.histoneHMM-em-posterior.txt"),
