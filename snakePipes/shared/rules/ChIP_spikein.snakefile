@@ -121,7 +121,7 @@ rule bamCoverage_by_part:
     input:
         bam = "split_bam/{sample}_host.bam" ,
         bai = "split_bam/{sample}_host.bam.bai",
-        scale_factors = "split_deepTools_qc/multiBamSummary/{part}.concatenated.scaling_factors.txt" 
+        scale_factors = "split_deepTools_qc/multiBamSummary/{part}.ChIP.scaling_factors.txt" 
     output:
         "bamCoverage/{sample}.host.seq_depth_norm.BY{part}.bw"
     params:
@@ -147,7 +147,7 @@ rule bamCoverage_from_filtered:
     input:
         bam = "filtered_bam/{sample}.filtered.bam" ,
         bai = "filtered_bam/{sample}.filtered.bam.bai",
-        scale_factors = "split_deepTools_qc/multiBamSummary/spikein.concatenated.scaling_factors.txt" 
+        scale_factors = "split_deepTools_qc/multiBamSummary/spikein.ChIP.scaling_factors.txt" 
     output:
         "bamCoverage/{sample}.filtered.seq_depth_norm.BYspikein.bw"
     params:

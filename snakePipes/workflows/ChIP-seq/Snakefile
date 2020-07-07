@@ -90,13 +90,14 @@ def run_deepTools_qc(fromBAM,useSpikeInForNorm):
                 "deepTools_qc/plotPCA/PCA.read_coverage.tsv" ])
         file_list.append(expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample = samples))
     elif spikein_detected:
-        file_list = expand("split_deepTools_qc/multiBamSummary/{part}.input_read_coverage.bins.npz",part=part)
-        file_list.append(expand("split_deepTools_qc/multiBamSummary/{part}.ChIP_read_coverage.bins.npz",part=part))
-        file_list.append(expand("bamCoverage/{sample}.host.seq_depth_norm.BY{part}.bw",sample=samples,part=part))
+        file_list=(expand("split_deepTools_qc/multiBamSummary/{part}.ChIP_read_coverage.bins.npz",part=part))
+        file_list.append(expand("bamCoverage/{sample}.host.seq_depth_norm.BY{part}.bw",sample=chip_samples,part=part))
         file_list.append(expand("split_deepTools_qc/bamPEFragmentSize/{part}.fragmentSize.metric.tsv",part=part))
         file_list.append(expand("bamCoverage_TSS/{sample}.host.seq_depth_norm.BYspikein.bw",sample=chip_samples))
         file_list.append(expand("bamCoverage/{sample}.filtered.seq_depth_norm.BYspikein.bw",sample=chip_samples))
-        file_list.append(expand("bamCoverage_input/{sample}.host.seq_depth_norm.BYspikein.bw",sample=chip_samples))
+        if chip_samples_w_ctrl:
+            file_list.append(expand("bamCoverage_input/{sample}.host.seq_depth_norm.BYspikein.bw",sample=chip_samples_w_ctrl))
+            file_list.append(expand("split_deepTools_qc/multiBamSummary/{part}.input_read_coverage.bins.npz",part=part))
         
     else:
         file_list = []
