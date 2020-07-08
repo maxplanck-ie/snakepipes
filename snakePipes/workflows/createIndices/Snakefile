@@ -29,8 +29,10 @@ organismDictionary = {'genome_size': 0,
                       'star_index': '',
                       'genes_bed': '',
                       'genes_gtf': '',
+                      'spikein_genes_gtf': '',
                       'extended_coding_regions_gtf': '',
                       'blacklist_bed': '',
+                      'spikein_blacklist_bed': '',
                       'ignoreForNormalization': '',
                       'rmsk_file': ''}
 
@@ -51,6 +53,10 @@ if gtfURL:
     organismDictionary['genes_gtf'] = os.path.join(outdir, "annotation/genes.gtf")
     organismDictionary['genes_bed'] = os.path.join(outdir, "annotation/genes.bed")
     organismDictionary['extended_coding_regions_gtf'] = os.path.join(outdir, "annotation/genes.slop.gtf")
+
+if spikeinGtfURL:
+    targets.extend([os.path.join(outdir, x) for x in ["annotation/spikein.genes.gtf"]
+    organismDictionary['spikein_genes_gtf'] = os.path.join(outdir, "annotation/spikein_genes.gtf")
 
 if rmskURL:
     targets.extend([os.path.join(outdir, x) for x in ["annotation/rmsk.txt"]])

@@ -45,6 +45,18 @@ def parse_args(defaults={"configFile": None, "clusterConfigFile": None,
 
     # Workflow options
     optional = parser.add_argument_group('Options')
+
+    optional.add_argument("--spikeinGenomeURL",
+                          help="URL or local path to where the spikein genome fasta file is located. The file may optionally be gzipped.")
+
+    optional.add_argument("--spikeinGtfURL",
+                          help="URL or local path to where the spikein genome annotation in GTF format is located. GFF is NOT supported. The file may optionally be gzipped.")
+
+    optional.add_argument("--spikeinExt",
+                          dest="spikeinExt",
+                          help="Extention of spikein chromosome names in the hybrid genome. (default: '%(default)s') .",
+                          default=defaults["spikeinExt"])
+
     optional.add_argument("--tools",
                           help="Only produce indices for the following tools (by default, all indices will be created). The default is 'all'. 'none' will create everything except aligner indices.",
                           default="all",
@@ -54,6 +66,9 @@ def parse_args(defaults={"configFile": None, "clusterConfigFile": None,
     optional.add_argument("--effectiveGenomeSize",
                           type=int,
                           help="The effective genome size. If you don't specify a value then the number of non-N bases will be used.")
+
+    optional.add_argument("--spikeinBlacklist",
+                          help="An optional URL or local path to a file to use to blacklist spikein organism regions (such as that provided by the ENCODE consortium).")
 
     optional.add_argument("--blacklist",
                           help="An optional URL or local path to a file to use to blacklist regions (such as that provided by the ENCODE consortium).")

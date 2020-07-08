@@ -23,11 +23,15 @@ genome:
 tools: all
 ## URLs or paths for fasta and GTF files
 genomeURL:
+spikeinGenomeURL:
+spikeinExt: _spikein
 gtfURL:
+spikeinGtfURL:
 ## The effective genome size
 effectiveGenomeSize: 0
 ## Regions to blacklist in the ChIP-seq and related workflows
 blacklist:
+spikeinBlacklist
 ## Regions to ignore during normalization (e.g., with bamCompare)
 ignoreForNormalization:
 ## Repeat masker file. It's assumed that the columns are tab separated!

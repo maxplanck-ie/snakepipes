@@ -25,12 +25,47 @@ def downloadFile(url, output):
 
 
 # Default memory allocation: 20G
-rule createGenomeFasta:
-    output: genome_fasta
-    params:
-        url = genomeURL
-    run:
-        downloadFile(params.url, output)
+if not spikeinGenomeURL:
+    rule createGenomeFasta:
+        output: genome_fasta
+        params:
+            url = genomeURL
+        run:
+            downloadFile(params.url, output)
+
+else:
+
+    rule createHostGenomeFasta:
+        output: temp(os.path.join(outdir, "genome_fasta/host.genome.fa"))
+        params:
+            url = genomeURL
+        run:
+            downloadFile(params.url, output)
+
+    rule createSpikeinGenomeFasta:
+        output: temp(os.path.join(outdir, "genome_fasta/spikein.genome.fa"))
+        params:
+            url = spikeinGenomeURL
+        run:
+            downloadFile(params.url, output)
+
+    rule renameSpikeinChromsFasta:
+        input: os.path.join(outdir, "genome_fasta/spikein.genome.fa")
+        output: temp(os.path.join(outdir, "genome_fasta/spikein.genome_renamed.fa"))
+        params:
+            spikeinExt = spikeinExt
+        shell: """
+            sed '/^>/ s/$/{params.spikeinExt}/' {input} > {output}
+        """
+
+    rule createGenomeFasta:
+        input:
+            host_fasta = "genome_fasta/host.genome.fa",
+            spikein_fasta = "genome_fasta/spikein.genome_renamed.fa"
+        output: genome_fasta
+        shell: """
+            cat {input.host_fasta} {input.spikein_fasta} > {output}
+        """
 
 
 # Default memory allocation: 1G
@@ -80,6 +115,22 @@ rule downloadGTF:
         url = gtfURL
     run:
         downloadFile(params.url, output)
+
+rule downloadSpikeinGTF:
+    output: temp(os.path.join(outdir, "annotation/spikein_genes_ori.gtf"))
+    params:
+        url = gtfURL
+    run:
+        downloadFile(params.url, output)
+
+rule renameSpikeinChromsGTF:
+    input: "annotation/spikein_genes_ori.gtf"
+    output: spikein_genes_gtf
+    params:
+        spikeinExt = spikeinExt
+    shell: """
+        awk '{{ if($1 !~ /^#/){{print $0{params.spikeinExt}}} else{{print $0}} }}' {input} > {output}
+    """
 
 
 # Default memory allocation: 1G
@@ -225,10 +276,26 @@ rule copyBlacklist:
     run:
         downloadFile(params.url, output)
 
+rule copySpikeinBlacklist:
+    output: temp(os.path.join(outdir, "annotation/spikein.blacklist_ori.bed"))
+    params:
+        url = spikeinBlacklist
+    run:
+        downloadFile(params.url, output)
+
+rule renameSpikeinChromsGTF:
+    input: "annotation/spikein_genes_ori.gtf"
+    output: spikein_genes_gtf
+    params:
+        spikeinExt = spikeinExt
+    shell: """
+        awk '{{ if($1 !~ /^#/){{print $0{params.spikeinExt}}} else{{print $0}} }}' {input} > {output}
+    """
+
 
 # Default memory allocation: 1G
 rule computeEffectiveGenomeSize:
-    input: genome_fasta
+    input: genome_fasta if not spikeinGenomeURL else "genome_fasta/host.genome.fa"
     output: os.path.join(outdir, "genome_fasta", "effectiveSize")
     log: "logs/computeEffectiveGenomeSize.log"
     conda: CONDA_SHARED_ENV
