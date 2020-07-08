@@ -55,7 +55,7 @@ if gtfURL:
     organismDictionary['extended_coding_regions_gtf'] = os.path.join(outdir, "annotation/genes.slop.gtf")
 
 if spikeinGtfURL:
-    targets.extend([os.path.join(outdir, x) for x in ["annotation/spikein.genes.gtf"]
+    targets.extend([os.path.join(outdir, x) for x in ["annotation/spikein.genes.gtf"])
     organismDictionary['spikein_genes_gtf'] = os.path.join(outdir, "annotation/spikein_genes.gtf")
 
 if rmskURL:
