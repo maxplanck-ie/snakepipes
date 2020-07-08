@@ -54,13 +54,13 @@ else:
         params:
             spikeinExt = spikeinExt
         shell: """
-            sed '/^>/ s/$/{params.spikeinExt}/' {input} > {output}
+            sed -r 's/\s+/{spikeinExt} /' {input} > {output}
         """
 
     rule createGenomeFasta:
         input:
-            host_fasta = "genome_fasta/host.genome.fa",
-            spikein_fasta = "genome_fasta/spikein.genome_renamed.fa"
+            host_fasta = os.path.join(outdir,"genome_fasta/host.genome.fa"),
+            spikein_fasta = os.path.join(outdir,"genome_fasta/spikein.genome_renamed.fa")
         output: genome_fasta
         shell: """
             cat {input.host_fasta} {input.spikein_fasta} > {output}
@@ -118,17 +118,17 @@ rule downloadGTF:
 rule downloadSpikeinGTF:
     output: temp(os.path.join(outdir, "annotation/spikein_genes_ori.gtf"))
     params:
-        url = gtfURL
+        url = spikeinGtfURL
     run:
         downloadFile(params.url, output)
 
 rule renameSpikeinChromsGTF:
-    input: "annotation/spikein_genes_ori.gtf"
+    input: os.path.join(outdir,"annotation/spikein_genes_ori.gtf")
     output: spikein_genes_gtf
     params:
         spikeinExt = spikeinExt
     shell: """
-        awk '{{ if($1 !~ /^#/){{print $0{params.spikeinExt}}} else{{print $0}} }}' {input} > {output}
+        awk '{{ if($1 !~ /^#/){{$1=$1\"{params.spikeinExt}\"; print $0}} else{{print $0}} }}' {input} > {output}
     """
 
 
@@ -282,19 +282,19 @@ rule copySpikeinBlacklist:
     run:
         downloadFile(params.url, output)
 
-rule renameSpikeinChromsGTF:
-    input: "annotation/spikein_genes_ori.gtf"
-    output: spikein_genes_gtf
+rule renameSpikeinChromsBlacklist:
+    input:  os.path.join(outdir,"annotation/spikein.blacklist_ori.bed")
+    output: spikein_blacklist_bed
     params:
         spikeinExt = spikeinExt
     shell: """
-        awk '{{ if($1 !~ /^#/){{print $0{params.spikeinExt}}} else{{print $0}} }}' {input} > {output}
+        awk '{{ if($1 !~ /^#/){{$1=$1\"{params.spikeinExt}\"; print $0}} else{{print $0}} }}' {input} > {output}
     """
 
 
 # Default memory allocation: 1G
 rule computeEffectiveGenomeSize:
-    input: genome_fasta if not spikeinGenomeURL else "genome_fasta/host.genome.fa"
+    input: genome_fasta if not spikeinGenomeURL else os.path.join(outdir,"genome_fasta/host.genome.fa")
     output: os.path.join(outdir, "genome_fasta", "effectiveSize")
     log: "logs/computeEffectiveGenomeSize.log"
     conda: CONDA_SHARED_ENV
