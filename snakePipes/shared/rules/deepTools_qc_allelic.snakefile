@@ -58,7 +58,8 @@ rule multiBamSummary_allelic:
         blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed
                     else "",
         read_extension = "--extendReads" if pairedEnd
-                         else "--extendReads " + str(fragmentLength)
+                         else "--extendReads " + str(fragmentLength),
+        scaling_factors = ""
     log:
         out = "deepTools_qc/logs/multiBamSummary_allelic.out",
         err = "deepTools_qc/logs/multiBamSummary_allelic.err"
