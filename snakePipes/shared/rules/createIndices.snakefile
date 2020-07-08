@@ -34,7 +34,6 @@ if not spikeinGenomeURL:
             downloadFile(params.url, output)
 
 else:
-
     rule createHostGenomeFasta:
         output: temp(os.path.join(outdir, "genome_fasta/host.genome.fa"))
         params:
