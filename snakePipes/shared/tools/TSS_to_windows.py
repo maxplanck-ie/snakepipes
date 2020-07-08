@@ -1,4 +1,3 @@
-import os
 import pysam
 from argparse import ArgumentParser
 
@@ -19,11 +18,11 @@ size = args.size
 bam = pysam.AlignmentFile(bamf)
 chroms_sizes = dict(zip(bam.references, bam.lengths))
 
-with open(inf) as f, open(outf,'w') as of:
+with open(inf) as f, open(outf, 'w') as of:
     for idx, line in enumerate(f):
         linesplit = line.split('\t')
         chr = linesplit[0]
         if chr in chroms_sizes.keys():
-            start = max(1,int(linesplit[1])-size)
-            end = min(int(chroms_sizes[chr]),int(linesplit[1])+size)
-            of.write("{}\t{}\t{}\n".format(chr,str(start),str(end)))
+            start = max(1, int(linesplit[1]) - size)
+            end = min(int(chroms_sizes[chr]), int(linesplit[1]) + size)
+            of.write("{}\t{}\t{}\n".format(chr, str(start), str(end)))
