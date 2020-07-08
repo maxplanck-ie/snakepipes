@@ -123,14 +123,14 @@ rule downloadSpikeinGTF:
     run:
         downloadFile(params.url, output)
 
-rule renameSpikeinChromsGTF:
-    input: "annotation/spikein_genes_ori.gtf"
-    output: spikein_genes_gtf
-    params:
-        spikeinExt = spikeinExt
-    shell: """
-        awk '{{ if($1 !~ /^#/){{print $0{params.spikeinExt}}} else{{print $0}} }}' {input} > {output}
-    """
+#rule renameSpikeinChromsGTF:
+#    input: "annotation/spikein_genes_ori.gtf"
+#    output: spikein_genes_gtf
+#    params:
+#        spikeinExt = spikeinExt
+#    shell: """
+#        awk '{{ if($1 !~ /^#/){{print $0{params.spikeinExt}}} else{{print $0}} }}' {input} > {output}
+#    """
 
 
 # Default memory allocation: 1G
@@ -283,14 +283,14 @@ rule copySpikeinBlacklist:
     run:
         downloadFile(params.url, output)
 
-rule renameSpikeinChromsGTF:
-    input: "annotation/spikein_genes_ori.gtf"
-    output: spikein_genes_gtf
-    params:
-        spikeinExt = spikeinExt
-    shell: """
-        awk '{{ if($1 !~ /^#/){{print $0{params.spikeinExt}}} else{{print $0}} }}' {input} > {output}
-    """
+#rule renameSpikeinChromsGTF:
+#    input: "annotation/spikein_genes_ori.gtf"
+#    output: spikein_genes_gtf
+#    params:
+#        spikeinExt = spikeinExt
+#    shell: """
+#        awk '{{ if($1 !~ /^#/){{print $0{params.spikeinExt}}} else{{print $0}} }}' {input} > {output}
+#    """
 
 
 # Default memory allocation: 1G
