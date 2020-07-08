@@ -49,14 +49,14 @@ else:
         run:
             downloadFile(params.url, output)
 
-    rule renameSpikeinChromsFasta:
-        input: os.path.join(outdir, "genome_fasta/spikein.genome.fa")
-        output: temp(os.path.join(outdir, "genome_fasta/spikein.genome_renamed.fa"))
-        params:
-            spikeinExt = spikeinExt
-        shell: """
-            sed '/^>/ s/$/{params.spikeinExt}/' {input} > {output}
-        """
+    #rule renameSpikeinChromsFasta:
+    #    input: os.path.join(outdir, "genome_fasta/spikein.genome.fa")
+    #    output: temp(os.path.join(outdir, "genome_fasta/spikein.genome_renamed.fa"))
+    #    params:
+    #        spikeinExt = spikeinExt
+    #    shell: """
+    #        sed '/^>/ s/$/{params.spikeinExt}/' {input} > {output}
+    #    """
 
     rule createGenomeFasta:
         input:
