@@ -52,7 +52,7 @@ rule multiBamSummary_allelic:
         bams = expand("allelic_bams/{sample}.{suffix}.sorted.bam", sample=samples, suffix = ['genome1', 'genome2']),
         bais = expand("allelic_bams/{sample}.{suffix}.sorted.bam.bai", sample=samples, suffix = ['genome1', 'genome2'])
     output:
-        "deepTools_qc/multiBamSummary/read_coverage_allelic.bins.npz"
+        npz = "deepTools_qc/multiBamSummary/read_coverage_allelic.bins.npz"
     params:
         labels = " ".join(expand('{sample}.{suffix}', sample=samples, suffix = ['genome1', 'genome2'])),
         blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed
