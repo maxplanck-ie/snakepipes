@@ -48,14 +48,14 @@ else:
         run:
             downloadFile(params.url, output)
 
-    #rule renameSpikeinChromsFasta:
-    #    input: os.path.join(outdir, "genome_fasta/spikein.genome.fa")
-    #    output: temp(os.path.join(outdir, "genome_fasta/spikein.genome_renamed.fa"))
-    #    params:
-    #        spikeinExt = spikeinExt
-    #    shell: """
-    #        sed '/^>/ s/$/{params.spikeinExt}/' {input} > {output}
-    #    """
+    rule renameSpikeinChromsFasta:
+        input: os.path.join(outdir, "genome_fasta/spikein.genome.fa")
+        output: temp(os.path.join(outdir, "genome_fasta/spikein.genome_renamed.fa"))
+        params:
+            spikeinExt = spikeinExt
+        shell: """
+            sed '/^>/ s/$/{params.spikeinExt}/' {input} > {output}
+        """
 
     rule createGenomeFasta:
         input:
@@ -122,14 +122,14 @@ rule downloadSpikeinGTF:
     run:
         downloadFile(params.url, output)
 
-#rule renameSpikeinChromsGTF:
-#    input: "annotation/spikein_genes_ori.gtf"
-#    output: spikein_genes_gtf
-#    params:
-#        spikeinExt = spikeinExt
-#    shell: """
-#        awk '{{ if($1 !~ /^#/){{print $0{params.spikeinExt}}} else{{print $0}} }}' {input} > {output}
-#    """
+rule renameSpikeinChromsGTF:
+    input: "annotation/spikein_genes_ori.gtf"
+    output: spikein_genes_gtf
+    params:
+        spikeinExt = spikeinExt
+    shell: """
+        awk '{{ if($1 !~ /^#/){{print $0{params.spikeinExt}}} else{{print $0}} }}' {input} > {output}
+    """
 
 
 # Default memory allocation: 1G
@@ -282,14 +282,14 @@ rule copySpikeinBlacklist:
     run:
         downloadFile(params.url, output)
 
-#rule renameSpikeinChromsGTF:
-#    input: "annotation/spikein_genes_ori.gtf"
-#    output: spikein_genes_gtf
-#    params:
-#        spikeinExt = spikeinExt
-#    shell: """
-#        awk '{{ if($1 !~ /^#/){{print $0{params.spikeinExt}}} else{{print $0}} }}' {input} > {output}
-#    """
+rule renameSpikeinChromsGTF:
+    input: "annotation/spikein_genes_ori.gtf"
+    output: spikein_genes_gtf
+    params:
+        spikeinExt = spikeinExt
+    shell: """
+        awk '{{ if($1 !~ /^#/){{print $0{params.spikeinExt}}} else{{print $0}} }}' {input} > {output}
+    """
 
 
 # Default memory allocation: 1G
