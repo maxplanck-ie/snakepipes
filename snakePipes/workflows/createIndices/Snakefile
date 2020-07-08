@@ -89,6 +89,10 @@ if blacklist:
     targets.append(os.path.join(outdir, "annotation/blacklist.bed"))
     organismDictionary['blacklist_bed'] = os.path.join(outdir, "annotation/blacklist.bed")
 
+if spikeinBlacklist:
+    targets.append(os.path.join(outdir, "annotation/spikein_blacklist.bed"))
+    organismDictionary['spikein_blacklist_bed'] = os.path.join(outdir, "annotation/spikein_blacklist.bed")
+
 ignore = []
 if ignoreForNormalization:
     f = open(ignoreForNormalization)
