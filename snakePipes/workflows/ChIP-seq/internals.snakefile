@@ -175,29 +175,28 @@ else:
 
 
 #################### functions and checks for using a spiked-in genome for normalization ########################################
-def check_if_spikein_genome(genome_index,spikeInExt):
+def check_if_spikein_genome(genome_index,spikeinExt):
     if os.path.isfile(genome_index):
         resl=[]
         with open(genome_index) as ifile:
             for line in ifile:
-                resl.append(re.search(spikeInExt, line))
+                resl.append(re.search(spikeinExt, line))
         if any(resl):
-            print("\n Spikein genome detected - at least one spikeIn chromosome found with extention " + spikeInExt + " .\n\n")
+            print("\n Spikein genome detected - at least one spikeIn chromosome found with extention " + spikeinExt + " .\n\n")
             return True
         else:
-            print("\n No spikein genome detected - no spikeIn chromosomes found with extention " + spikeInExt + " .\n\n")
             return False
     else:
         print("\n  Error! Genome index file "+ genome_index +" not found!!!\n\n")
         exit(1)
 
-def get_host_and_spikein_chromosomes(genome_index,spikeInExt):
+def get_host_and_spikein_chromosomes(genome_index,spikeinExt):
     hostl=[]
     spikeinl=[]
     with open(genome_index) as ifile:
         for line in ifile:
             entry = line.split('\t')[0] 
-            if re.search(spikeInExt, entry):
+            if re.search(spikeinExt, entry):
                 spikeinl.append(entry)
             else:
                 hostl.append(entry)
@@ -205,9 +204,12 @@ def get_host_and_spikein_chromosomes(genome_index,spikeInExt):
 
 if useSpikeInForNorm:
     part=['host','spikein']
-    spikein_detected=check_if_spikein_genome(genome_index,spikeInExt)
+    spikein_detected=check_if_spikein_genome(genome_index,spikeinExt)
     if spikein_detected:
-        host_chr=get_host_and_spikein_chromosomes(genome_index,spikeInExt)[0]
-        spikein_chr=get_host_and_spikein_chromosomes(genome_index,spikeInExt)[1]
+        host_chr=get_host_and_spikein_chromosomes(genome_index,spikeinExt)[0]
+        spikein_chr=get_host_and_spikein_chromosomes(genome_index,spikeinExt)[1]
+    else:
+        print("\n No spikein genome detected - no spikeIn chromosomes found with extention " + spikeinExt + " .\n\n")
+        exit(1)
         
        

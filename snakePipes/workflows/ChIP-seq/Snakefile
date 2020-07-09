@@ -34,15 +34,15 @@ if useSpikeInForNorm:
         include: os.path.join(maindir, "shared", "rules", "split_bam_ops_ChIP_spikein.snakefile")
         include: os.path.join(maindir, "shared", "rules", "deepTools_ChIP_spikein.snakefile")
         include: os.path.join(maindir, "shared", "rules", "ChIP_peak_calling_spikein.snakefile")
-        include: os.path.join(maindir, "shared", "rules", "filterGTF.snakefile")
+        include: os.path.join(maindir, "shared", "rules", "filterGTF_spikein.snakefile")
 else:
     # deepTools ChIP
     include: os.path.join(maindir, "shared", "rules", "deepTools_ChIP.snakefile")
     # MACS2, MACS2 peak QC, and Genrich
     include: os.path.join(maindir, "shared", "rules", "ChIP_peak_calling.snakefile")
 
-    # QC report for all samples
-    include: os.path.join(maindir, "shared", "rules", "ChiP-seq_qc_report.snakefile")
+# QC report for all samples
+include: os.path.join(maindir, "shared", "rules", "ChiP-seq_qc_report.snakefile")
 
 # sambamba
 #include: os.path.join(maindir, "shared", "rules", "sambamba.snakefile")
@@ -63,7 +63,7 @@ if sampleSheet:
     include: os.path.join(maindir, "shared", "rules", "CSAW.snakefile")
     include: os.path.join(maindir, "shared", "rules", "nearestGene.snakefile")
     include: os.path.join(maindir, "shared", "rules", "filterGTF.snakefile")
-    if not fromBAM:
+    if not fromBAM and not useSpikeInForNorm:
         # These are needed for the snakefile to be imported
         aligner = "Bowtie2"
         downsample = False
@@ -90,15 +90,15 @@ def run_deepTools_qc(fromBAM,useSpikeInForNorm):
                 "deepTools_qc/plotPCA/PCA.read_coverage.tsv" ])
         file_list.append(expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample = samples))
     elif useSpikeInForNorm:
-        file_list=(expand("split_deepTools_qc/multiBamSummary/{part}.ChIP_read_coverage.bins.npz",part=part))
-        file_list.append(expand("bamCoverage/{sample}.host.seq_depth_norm.BY{part}.bw",sample=chip_samples,part=part))
-        file_list.append(expand("split_deepTools_qc/bamPEFragmentSize/{part}.fragmentSize.metric.tsv",part=part))
-        file_list.append(expand("bamCoverage_TSS/{sample}.host.seq_depth_norm.BYspikein.bw",sample=chip_samples))
-        file_list.append(expand("bamCoverage/{sample}.filtered.seq_depth_norm.BYspikein.bw",sample=chip_samples))
-        if chip_samples_w_ctrl:
+        file_list=expand("split_deepTools_qc/bamPEFragmentSize/{part}.fragmentSize.metric.tsv",part=part)
+        if getSizeFactorsFrom=="genome":
+            file_list=(expand("split_deepTools_qc/multiBamSummary/{part}.ChIP_read_coverage.bins.npz",part=part))
+            file_list.append(expand("bamCoverage/{sample}.host.seq_depth_norm.BY{part}.bw",sample=chip_samples,part=part))
+        elif getSizeFactorsFrom=="TSS":
+            file_list.append(expand("bamCoverage_TSS/{sample}.host.seq_depth_norm.BYspikein.bw",sample=chip_samples))
+        elif getSizeFactorsFrom=="input" and chip_samples_w_ctrl:
             file_list.append(expand("bamCoverage_input/{sample}.host.seq_depth_norm.BYspikein.bw",sample=chip_samples_w_ctrl))
             file_list.append(expand("split_deepTools_qc/multiBamSummary/{part}.input_read_coverage.bins.npz",part=part))
-        
     else:
         file_list = []
     return(file_list)

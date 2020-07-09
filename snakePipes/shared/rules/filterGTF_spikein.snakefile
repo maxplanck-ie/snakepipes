@@ -3,9 +3,9 @@
 
 rule filter_gtf:
     input:
-        gtf = genes_gtf
+        gtf = spikein_genes_gtf
     output:
-        gtf = "Annotation/genes.filtered.gtf"
+        gtf = "Annotation_spikein/genes.filtered.gtf"
     params:
         pattern = "" if not filterGTF else filterGTF
     shell: """
@@ -31,11 +31,11 @@ rule filter_gtf:
 
 rule gtf_to_files:
     input:
-        gtf = "Annotation/genes.filtered.gtf"
+        gtf = "Annotation_spkein/genes.filtered.gtf"
     output:
-        "Annotation/genes.filtered.t2g",
-        "Annotation/genes.filtered.symbol",
-        "Annotation/genes.filtered.bed"
+        "Annotation_spikein/genes.filtered.t2g",
+        "Annotation_spikein/genes.filtered.symbol",
+        "Annotation_spikein/genes.filtered.bed"
     run:
         import shlex
 
@@ -124,19 +124,21 @@ rule gtf_to_files:
 
 ## make standard annotation
 
-## creates fasta sequence file for the filtered transcripts
-## used to create the salmon index in alignment-free mode 
-rule annotation_bed2fasta:
+
+rule TSS_to_windows:
     input:
-        bed = "Annotation/genes.filtered.bed",
-        genome_fasta = genome_fasta
+        bed = "Annotation_spikein/genes.filtered.bed",
+        bam = expand("split_bam/{sample}_spikein.bam",sample=samples)[0]
     output:
-        "Annotation/genes.filtered.fa"
-    log: "Annotation/logs/bed2fasta.log"
-    benchmark:
-        "Annotation/.benchmark/annotation_bed2fasta.benchmark"
-    threads: 1
-    conda: CONDA_RNASEQ_ENV
-    shell:
-        "bedtools getfasta -name -s -split -fi {input.genome_fasta} -bed <(cat {input.bed} | cut -f1-12) | sed 's/(.*)//g' | sed 's/:.*//g' > {output} 2> {log}"
+        TSS_bed = "Annotation_spikein/TSS.filtered.bed"
+    params:
+        outfile = outdir+"/Annotation_spikein/TSS.filtered.bed",
+        script = maindir+"/shared/tools/TSS_to_windows.py",
+        size = 5000
+    log:
+        "Annotation_spikein/logs/TSS_to_windows.err"
+    conda: CONDA_pysam_ENV
+    shell: """
+            python {params.script} -inf {input.bed} -outf {output.TSS_bed} -size {params.size} -bam {input.bam} 2> {log}
+              """
         

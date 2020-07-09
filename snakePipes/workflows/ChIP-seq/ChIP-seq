@@ -23,7 +23,8 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          "windowSize": 150, "predictChIPDict": None,
                          "bigWigType": "both", "mfold": "0 50", "peakCaller": "MACS2",
                          "plotFormat": "png","fromBAM": False, "bamExt": ".filtered.bam",
-                         "fdr": 0.05, "absBestLFC": 1, "useSpikeinForNorm": False, "spikeInExt": "_spikeIn"}):
+                         "fdr": 0.05, "absBestLFC": 1, "useSpikeinForNorm": False, "spikeinExt": "_spikein",
+                         "getSizeFactorsFrom": "genome"}):
 
     """
     Parse arguments from the command line.
@@ -58,10 +59,17 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                           action="store_true",
                           help="Use the spikeIn chromosomes of the hybrid genome for normalization.")
 
-    optional.add_argument("--spikeInExt",
-                          dest="spikeInExt",
-                          help="Extention of spikeIn chromosome names in the hybrid genome. Ignored if useSpikeInForNorm is False (default: '%(default)s') .",
-                          default=defaults["spikeInExt"])
+    optional.add_argument("--getSizeFactorsFrom",
+                          dest="getSizeFactorsFrom",
+                          action="store",
+                          choices=["genome", "TSS", "input"],
+                          help="Which part of the spikein genome to use to calculate sizeFactors from.",
+                          default=defaults['getSizeFactorsFrom'])
+
+    optional.add_argument("--spikeinExt",
+                          dest="spikeinExt",
+                          help="Extention of spikein chromosome names in the hybrid genome. Ignored if useSpikeInForNorm is False (default: '%(default)s') .",
+                          default=defaults["spikeinExt"])
 
     optional.add_argument("--bigWigType",
                           help="Type of bigWig file to create. Options are: 'subtract' (control-subtracted ChIP coverage), 'log2ratio' (for log2 ratio of ChIP over control) or 'both' (create both set of bed files). Note that the allele-specific mode currently only produces 'log2ratio' bigwigs. (default: '%(default)s')",

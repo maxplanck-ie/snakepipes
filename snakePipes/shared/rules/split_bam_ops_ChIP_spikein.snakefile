@@ -1,5 +1,5 @@
 part=['host','spikein']
-blacklist_dict={"host": blacklist_bed,"spikein": blacklist_bed_spikein}
+blacklist_dict={"host": blacklist_bed,"spikein": spikein_blacklist_bed}
 region_dict={"host": " ".join(host_chr),"spikein": " ".join(spikein_chr)}
 
 
@@ -85,7 +85,7 @@ rule multiBamSummary_TSS:
     input:
         bams = lambda wildcards: expand("split_bam/{sample}_spikein.bam", sample=chip_samples),
         bais = lambda wildcards: expand("split_bam/{sample}_spikein.bam.bai", sample=chip_samples),
-        bed = "Annotation/TSS.filtered.bed"
+        bed = "Annotation_spikein/TSS.filtered.bed"
     output:
         npz = "split_deepTools_qc/multiBamSummary_BED/spikein.ChIP_read_coverage.bins.npz",
         scale_factors = "split_deepTools_qc/multiBamSummary_BED/spikein.ChIP.scaling_factors.txt"
