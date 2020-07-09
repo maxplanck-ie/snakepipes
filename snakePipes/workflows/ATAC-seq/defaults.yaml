@@ -21,6 +21,8 @@ workingdir:
 ## preconfigured target genomes (mm9,mm10,dm3,...) , see /path/to/snakemake_workflows/shared/organisms/
 ## Value can be also path to your own genome config file!
 genome:
+## use spike in for normalization?
+useSpikeInForNorm: false
 ## The maximum fragment size to retain. This should typically be the size of a nucleosome. A minimal size can also be specified, though a value of 1 should typically be used.
 maxFragmentSize: 150
 minFragmentSize: 0
