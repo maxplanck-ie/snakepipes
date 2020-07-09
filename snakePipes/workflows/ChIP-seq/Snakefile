@@ -105,10 +105,10 @@ def run_deepTools_qc(fromBAM,useSpikeInForNorm):
 
 def run_deepTools_ChIP():
     file_list = []
-    file_list.append(["deepTools_ChIP/plotFingerprint/plotFingerprint.metrics.txt"]) if not spikein_detected else file_list.append(["split_deepTools_ChIP/plotFingerprint/plotFingerprint.metrics.txt"])
+    file_list.append(["deepTools_ChIP/plotFingerprint/plotFingerprint.metrics.txt"]) if not useSpikeInForNorm else file_list.append(["split_deepTools_ChIP/plotFingerprint/plotFingerprint.metrics.txt"])
     for chip_sample in chip_samples_w_ctrl: 
         control_name = get_control_name(chip_sample)
-        if not spikein_detected:
+        if not useSpikeInForNorm:
             # get bigwigtype
             if bigWigType == "subtract" or bigWigType == "both":
                 file_list.append(["deepTools_ChIP/bamCompare/"+chip_sample+".filtered.subtract."+control_name+".bw"])
