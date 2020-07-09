@@ -78,7 +78,7 @@ def run_histoneHMM(allele_info):
     return(file_list)
 
 def run_deepTools_qc(fromBAM,useSpikeInForNorm):
-    if fromBAM and not spikein_detected:
+    if fromBAM and not useSpikeInForNorm:
         file_list = ["deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv"]
         file_list.append([expand("bamCoverage/{sample}.filtered.seq_depth_norm.bw", sample = samples)])
         if len(samples) <= 20:
@@ -89,7 +89,7 @@ def run_deepTools_qc(fromBAM,useSpikeInForNorm):
                 "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage.tsv",
                 "deepTools_qc/plotPCA/PCA.read_coverage.tsv" ])
         file_list.append(expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample = samples))
-    elif spikein_detected:
+    elif useSpikeInForNorm:
         file_list=(expand("split_deepTools_qc/multiBamSummary/{part}.ChIP_read_coverage.bins.npz",part=part))
         file_list.append(expand("bamCoverage/{sample}.host.seq_depth_norm.BY{part}.bw",sample=chip_samples,part=part))
         file_list.append(expand("split_deepTools_qc/bamPEFragmentSize/{part}.fragmentSize.metric.tsv",part=part))
