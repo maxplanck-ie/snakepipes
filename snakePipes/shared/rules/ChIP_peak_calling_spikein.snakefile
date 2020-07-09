@@ -149,10 +149,11 @@ if pairedEnd:
             bams = lambda wildcards: ",".join(expand(os.path.join("split_bam", "{sample}_host.bam"), sample=genrichDict[wildcards.group])),
             blacklist = "-E {}".format(blacklist_bed) if blacklist_bed else "",
             control_pfx=lambda wildcards,input: "-c" if input.control else "",
-            control=lambda wildcards,input: ",".join(input.control) if input.control else ""
+            control=lambda wildcards,input: ",".join(input.control) if input.control else "",
+            spikein_chroms=",".join(spikein_chr)
         conda: CONDA_CHIPSEQ_ENV
         shell: """
-            Genrich -S -t {params.bams} {params.control_pfx} {params.control} -o {output} -r {params.blacklist} -y 2> {log}
+            Genrich -S -t {params.bams} {params.control_pfx} {params.control} -o {output} -r {params.blacklist} -e {params.spikein_chroms} -y 2> {log}
             """
 else:
     rule Genrich_peaks:
@@ -167,8 +168,9 @@ else:
             blacklist = "-E {}".format(blacklist_bed) if blacklist_bed else "",
             control_pfx=lambda wildcards,input: "-c" if input.control else "",
             control=lambda wildcards,input: ",".join(input.control) if input.control else "",
-            frag_size=fragmentLength
+            frag_size=fragmentLength,
+            spikein_chroms=",".join(spikein_chr)
         conda: CONDA_CHIPSEQ_ENV
         shell: """
-            Genrich -S -t {params.bams} {params.control_pfx} {params.control} -o {output} -r {params.blacklist} -w {params.frag_size} 2> {log}
+            Genrich -S -t {params.bams} {params.control_pfx} {params.control} -o {output} -r {params.blacklist} -e {params.spikein_chroms} -w {params.frag_size} 2> {log}
             """
