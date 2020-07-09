@@ -1,6 +1,6 @@
 genome_size: 2652783500
 genome_fasta: ".ci_stuff/genome.fa"
-genome_index: "/tmp/genome.fa.fai"
+genome_index: ".ci_stuff/genome.fa.fai"
 genome_2bit: ".ci_stuff/genome_fasta/genome.2bit"
 bowtie2_index: ".ci_stuff/BowtieIndex/genome"
 hisat2_index: ".ci_stuff/HISAT2Index/genome"
