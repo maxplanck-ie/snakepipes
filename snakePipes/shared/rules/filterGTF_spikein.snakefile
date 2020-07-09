@@ -1,7 +1,7 @@
 # bed_annot is only used in this file
 # bed_filtered is used by deepTools
 
-rule filter_gtf:
+rule filter_gtf_spikein:
     input:
         gtf = spikein_genes_gtf
     output:
@@ -29,7 +29,7 @@ rule filter_gtf:
 # Annotation/genes.filtered.symbol
 #	Gene ID -> gene name mapping, used by R
 
-rule gtf_to_files:
+rule spikein_gtf_to_files:
     input:
         gtf = "Annotation_spkein/genes.filtered.gtf"
     output:
