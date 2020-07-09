@@ -25,6 +25,16 @@ def getSizeMetrics():
     else:
         return []
 
+def getScaleFactors():
+    if getSizeFactorsFrom=="genome":
+        return "split_deepTools_qc/multiBamSummary/spikein.ChIP.scaling_factors.txt
+    elif getSizeFactorsFrom=="TSS":
+        return "split_deepTools_qc/multiBamSummary_BED/spikein.ChIP.scaling_factors.txt"
+    elif getSizeFactorsFrom=="input":
+        return "split_deepTools_qc/multiBamSummary/spikein.input.scaling_factors.txt"
+    else:
+        return []
+
 
 ## CSAW for differential binding / allele-specific binding analysis
 rule CSAW:
@@ -32,7 +42,7 @@ rule CSAW:
         peaks = getInputPeaks(peakCaller, chip_samples, genrichDict),
         sampleSheet = sampleSheet,
         insert_size_metrics = getSizeMetrics(),
-        scale_factors = "split_deepTools_qc/multiBamSummary/spikein.ChIP.scaling_factors.txt" if useSpikeInForNorm else []
+        scale_factors = getScaleFactors() if useSpikeInForNorm else []
     output:
         "CSAW_{}_{}/CSAW.session_info.txt".format(peakCaller, sample_name),
         "CSAW_{}_{}/DiffBinding_analysis.Rdata".format(peakCaller, sample_name),

@@ -14,6 +14,7 @@ allelic_info <- as.logical(snakemake@params[["allele_info"]])
 outdir<-snakemake@params[["outdir"]]
 yaml_path<-snakemake@params[["yaml_path"]]
 useSpikeInForNorm<-snakemake@params[["useSpikeInForNorm"]]
+scale_factors<-snakemake@input[["scale_factors"]]
 
 bam_pfx<-ifelse(useSpikeInForNorm,"_host",".filtered")
 bam_folder<-ifelse(useSpikeInForNorm,"split_bam","filtered_bam")
