@@ -104,7 +104,7 @@ rule plotFingerprint:
         labels = " --smartLabels ",
         blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed else "",
         read_extension = "--extendReads" if pairedEnd else "--extendReads {}".format(fragmentLength),
-        png = "--plotFile deepTools_ChIP/plotFingerprint/plotFingerprint.png" if (len(samples)<=20)
+        png = "--plotFile split_deepTools_ChIP/plotFingerprint/plotFingerprint.png" if (len(samples)<=20)
               else "",
         jsd = "--JSDsample split_bam/{}_host.bam".format(control_samples[0]) if (len(control_samples)>0)
             else ""
