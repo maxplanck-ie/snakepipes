@@ -27,7 +27,7 @@ def getSizeMetrics():
 
 def getScaleFactors():
     if getSizeFactorsFrom=="genome":
-        return "split_deepTools_qc/multiBamSummary/spikein.ChIP.scaling_factors.txt
+        return "split_deepTools_qc/multiBamSummary/spikein.ChIP.scaling_factors.txt"
     elif getSizeFactorsFrom=="TSS":
         return "split_deepTools_qc/multiBamSummary_BED/spikein.ChIP.scaling_factors.txt"
     elif getSizeFactorsFrom=="input":
