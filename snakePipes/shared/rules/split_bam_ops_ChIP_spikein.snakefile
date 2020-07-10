@@ -33,7 +33,7 @@ rule split_bamfiles_by_genome:
         sambamba index -t {threads} {output.bam} 2>> {log}
         """
 
-checkpoint multiBamSummary_input:
+rule multiBamSummary_input:
     input:
         bams = lambda wildcards: expand("split_bam/{sample}_{part}.bam", sample=control_samples,part=wildcards.part),
         bais = lambda wildcards: expand("split_bam/{sample}_{part}.bam.bai", sample=control_samples,part=wildcards.part)
@@ -57,7 +57,7 @@ checkpoint multiBamSummary_input:
     shell: multiBamSummary_cmd
 
 
-checkpoint multiBamSummary_ChIP:
+rule multiBamSummary_ChIP:
     input:
         bams = lambda wildcards: expand("split_bam/{sample}_{part}.bam", sample=chip_samples,part=wildcards.part),
         bais = lambda wildcards: expand("split_bam/{sample}_{part}.bam.bai", sample=chip_samples,part=wildcards.part)
@@ -81,7 +81,7 @@ checkpoint multiBamSummary_ChIP:
     shell: multiBamSummary_cmd
 
 
-checkpoint multiBamSummary_TSS:
+rule multiBamSummary_TSS:
     input:
         bams = lambda wildcards: expand("split_bam/{sample}_spikein.bam", sample=chip_samples),
         bais = lambda wildcards: expand("split_bam/{sample}_spikein.bam.bai", sample=chip_samples),
