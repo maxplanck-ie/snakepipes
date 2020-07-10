@@ -1,5 +1,5 @@
 part=['host','spikein']
-blacklist_dict={"host": blacklist_bed,"spikein": spikein_blacklist_bed } if spikein_blacklist_bed else blacklist_dict={"host": blacklist_bed,"spikein": '' }
+blacklist_dict={"host": blacklist_bed,"spikein": spikein_blacklist_bed } if spikein_blacklist_bed else {"host": blacklist_bed,"spikein": '' }
 region_dict={"host": " ".join(host_chr),"spikein": " ".join(spikein_chr)}
 
 
