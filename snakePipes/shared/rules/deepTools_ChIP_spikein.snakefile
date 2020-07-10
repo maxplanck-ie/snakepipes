@@ -4,7 +4,7 @@ part=['host','spikein']
 def get_scaling_factor(sample,input):
     sample_names=[]
     scale_factors=[]
-    if os.file.exists(os.path.join(outdir,input)):
+    if os.is.file(os.path.join(outdir,input)):
         with open(os.path.join(outdir,input)) as f:
             for idx, line in enumerate(f):
                 if idx > 0:
