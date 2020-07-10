@@ -6,7 +6,7 @@ region_dict={"host": " ".join(host_chr),"spikein": " ".join(spikein_chr)}
 def get_scaling_factor(sample,input):
     sample_names=[]
     scale_factors=[]
-    if os.is.file(os.path.join(outdir,input)):
+    if os.path.isfile(os.path.join(outdir,input)):
         with open(os.path.join(outdir,input)) as f:
             for idx, line in enumerate(f):
                 if idx > 0:
