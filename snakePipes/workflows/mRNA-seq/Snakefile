@@ -107,6 +107,8 @@ include:os.path.join(maindir, "shared", "rules", "RNA-seq_qc_report.snakefile")
 ## DESeq2
 if sampleSheet:
     include: os.path.join(maindir, "shared", "rules", "DESeq2.snakefile")
+    if rMats:
+        include: os.path.join(maindir, "shared", "rules", "rMats.snakefile")
 
 ## MultiQC
 include: os.path.join(maindir, "shared", "rules", "multiQC.snakefile")
@@ -238,6 +240,14 @@ def run_GenomicContamination():
     else:
        return([])
 
+def run_rMats():
+    if sampleSheet:
+        file_list = []
+        sample_name = os.path.splitext(os.path.basename(sampleSheet))[0]
+        file_list.append( ["rMats_{}/RI.MATS.JCEC.txt".format(sample_name)] )
+        file_list.append( ["rMats_{}/b2.csv".format(sample_name)] )
+        return(file_list)
+
 ### execute before  starts #####################################################
 ################################################################################
 onstart:
@@ -292,6 +302,7 @@ if not fromBAM:
             make_nmasked_genome(),
             run_deepTools_qc(),
             run_GenomicContamination(),
+            run_rMats(),
             "multiQC/multiqc_report.html"
 
 else:
@@ -302,6 +313,7 @@ else:
             run_alignment(),
             run_deepTools_qc(),
             run_GenomicContamination(),
+            run_rMats(),
             "multiQC/multiqc_report.html"
 
 ### execute after  finished ####################################################

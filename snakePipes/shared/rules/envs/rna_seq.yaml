@@ -24,3 +24,4 @@ dependencies:
  - bioconductor-tximport = 1.14.0
  - r-knitcitations
  - bioconductor-apeglm
+ - rmats = 4.1.0
