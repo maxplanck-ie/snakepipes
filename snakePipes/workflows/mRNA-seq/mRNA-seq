@@ -31,7 +31,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          "fromBAM": False, "pairedEnd": True,
                          "UMIDedup": False,
                          "UMIDedupOpts": "", "bcPattern": "NNNNCCCCCCCCC",
-                         "UMIDedupSep": "_", "UMIBarcode": False, "rMats":False}):
+                         "UMIDedupSep": "_", "UMIBarcode": False, "rMats": False}):
     """
     Parse arguments from the command line.
     """
@@ -111,7 +111,8 @@ def parse_args(defaults={"verbose": False, "configFile": None,
     optional.add_argument("--rMats",
                           dest="rMats",
                           action="store_true",
-                          help="Run differential splicing analysis using rMats-turbo. Note that this flag requires --sampleSheet to be specified.")
+                          help="Run differential splicing analysis using rMats-turbo. Note that this flag requires --sampleSheet to be specified.",
+                          default=defaults["rMats"])
 
     return parser
 

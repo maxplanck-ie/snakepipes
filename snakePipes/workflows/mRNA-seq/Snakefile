@@ -151,6 +151,9 @@ def run_alignment_free():
             file_list.append( ["DESeq2_Salmon_{}/DESeq2.session_info.txt".format(sample_name)])
         if sampleSheet and cf.check_replicates(sampleSheet):
             file_list.append( ["sleuth_Salmon_{}/so.rds".format(sample_name)] )
+        if sampleSheet and rMats:
+            file_list.append( ["rMats_{}/RI.MATS.JCEC.txt".format(sample_name)] )
+            file_list.append( ["rMats_{}/b2.csv".format(sample_name)] )
 
         return(file_list)
     else:
@@ -170,6 +173,9 @@ def run_alignment():
         if sampleSheet:
             sample_name = os.path.splitext(os.path.basename(sampleSheet))[0]
             file_list.append( ["DESeq2_{}/DESeq2.session_info.txt".format(sample_name)] )
+        if sampleSheet and rMats:
+            file_list.append( ["rMats_{}/RI.MATS.JCEC.txt".format(sample_name)] )
+            file_list.append( ["rMats_{}/b2.csv".format(sample_name)] )
         return(file_list)
     else:
         return([])
@@ -202,6 +208,9 @@ def run_allelesp_mapping():
         if sampleSheet:
             sample_name = os.path.splitext(os.path.basename(sampleSheet))[0]
             file_list.append( ["DESeq2_{}/DESeq2.session_info.txt".format(sample_name)] )
+        if sampleSheet and rMats:
+            file_list.append( ["rMats_{}/RI.MATS.JCEC.txt".format(sample_name)] )
+            file_list.append( ["rMats_{}/b2.csv".format(sample_name)] )
         return(file_list)
     else:
         return([])
@@ -239,14 +248,6 @@ def run_GenomicContamination():
        return (file_list)
     else:
        return([])
-
-def run_rMats():
-    if sampleSheet:
-        file_list = []
-        sample_name = os.path.splitext(os.path.basename(sampleSheet))[0]
-        file_list.append( ["rMats_{}/RI.MATS.JCEC.txt".format(sample_name)] )
-        file_list.append( ["rMats_{}/b2.csv".format(sample_name)] )
-        return(file_list)
 
 ### execute before  starts #####################################################
 ################################################################################
@@ -302,7 +303,6 @@ if not fromBAM:
             make_nmasked_genome(),
             run_deepTools_qc(),
             run_GenomicContamination(),
-            run_rMats(),
             "multiQC/multiqc_report.html"
 
 else:
@@ -313,7 +313,6 @@ else:
             run_alignment(),
             run_deepTools_qc(),
             run_GenomicContamination(),
-            run_rMats(),
             "multiQC/multiqc_report.html"
 
 ### execute after  finished ####################################################

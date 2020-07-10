@@ -27,15 +27,14 @@ rule createInputcsv:
 rule rMats:
     input:
         b1 = "{}/b1.csv".format(get_outdir("rMats", sampleSheet)),
-        b2 = "{}/b2.csv".format(get_outdir("rMats", sampleSheet)),
-        expand("filtered_bam/{sample}.filtered.bam.bai", sample=samples)
+        b2 = "{}/b2.csv".format(get_outdir("rMats", sampleSheet))
     output:
         "{}/RI.MATS.JCEC.txt".format(get_outdir("rMats", sampleSheet))
     params:
         readLen = get_readLen(["filtered_bam/" + s for s in [s + ".filtered.bam" for s in rMatsConds[list(rMatsConds)[0]]]][0]),
         gtf = genes_gtf,
         od = "{}".format(get_outdir("rMats", sampleSheet)),
-        end = "paired" if pairedEnd else "single"
+        end = "paired" if pairedEnd else "single",
         libType = wrap_libType(libraryType),
         tempDir = tempDir,
     threads: 1
