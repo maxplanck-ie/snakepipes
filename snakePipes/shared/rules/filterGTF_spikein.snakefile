@@ -31,7 +31,7 @@ rule filter_gtf_spikein:
 
 rule spikein_gtf_to_files:
     input:
-        gtf = "Annotation_spkein/genes.filtered.gtf"
+        gtf = "Annotation_spikein/genes.filtered.gtf"
     output:
         "Annotation_spikein/genes.filtered.t2g",
         "Annotation_spikein/genes.filtered.symbol",
