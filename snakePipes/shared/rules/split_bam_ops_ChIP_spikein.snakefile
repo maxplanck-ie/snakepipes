@@ -6,15 +6,18 @@ region_dict={"host": " ".join(host_chr),"spikein": " ".join(spikein_chr)}
 def get_scaling_factor(sample,input):
     sample_names=[]
     scale_factors=[]
-    with open(os.path.join(outdir,input)) as f:
-        for idx, line in enumerate(f):
-            if idx > 0:
-                sample_names.append(line.split('\t')[0])
-                scale_factors.append((line.split('\t')[1]).rstrip("\n"))
-    sf_dict = dict(zip(sample_names, scale_factors))
-    scale_factor = sf_dict[sample]
+    if os.file.exists(os.path.join(outdir,input)):
+        with open(os.path.join(outdir,input)) as f:
+            for idx, line in enumerate(f):
+                if idx > 0:
+                    sample_names.append(line.split('\t')[0])
+                    scale_factors.append((line.split('\t')[1]).rstrip("\n"))
+        sf_dict = dict(zip(sample_names, scale_factors))
+        scale_factor = sf_dict[sample]
 
-    return float(scale_factor)
+        return float(scale_factor)
+    else:
+        return float(1)
 
 rule split_bamfiles_by_genome:
     input: 
