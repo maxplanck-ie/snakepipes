@@ -35,6 +35,16 @@ def getScaleFactors():
     else:
         return []
 
+def getBamCoverage():
+    if getSizeFactorsFrom=="genome":
+        return expand("bamCoverage/{chip_sample}.host.seq_depth_norm.BYspikein.bw", chip_sample=filtered_dict.keys())
+    elif getSizeFactorsFrom=="TSS":
+        return expand("bamCoverage_TSS/{chip_sample}.host.seq_depth_norm.BYspikein.bw", chip_sample=filtered_dict.keys())
+    elif getSizeFactorsFrom=="input":
+        return expand("bamCoverage_input/{chip_sample}.host.seq_depth_norm.BYspikein.bw", chip_sample=filtered_dict.keys())
+    else:
+        return []
+
 
 ## CSAW for differential binding / allele-specific binding analysis
 rule CSAW:
@@ -62,7 +72,8 @@ rule CSAW:
         yaml_path=lambda wildcards: samples_config if pipeline in 'chip-seq' else "",
         insert_size_metrics = lambda wildcards,input: os.path.join(outdir, input.insert_size_metrics) if pairedEnd else [],
         pipeline = pipeline,
-        useSpikeInForNorm = useSpikeInForNorm
+        useSpikeInForNorm = useSpikeInForNorm,
+        scale_factors = lambda wildcards, input: os.path.join(outdir, input.scale_factors)
     log:
         out = os.path.join(outdir, "CSAW_{}_{}/logs/CSAW.out".format(peakCaller, sample_name)),
         err = os.path.join(outdir, "CSAW_{}_{}/logs/CSAW.err".format(peakCaller, sample_name))
@@ -125,7 +136,7 @@ if allele_info == 'FALSE':
     rule calc_matrix_cov_CSAW:
         input:
             csaw_in = "CSAW_{}_{}/CSAW.session_info.txt".format(peakCaller, sample_name),
-            bigwigs = expand("bamCoverage/{chip_sample}.filtered.seq_depth_norm.BYspikein.bw", chip_sample=filtered_dict.keys()) if useSpikeInForNorm else expand("bamCoverage/{chip_sample}.filtered.seq_depth_norm.bw", chip_sample=filtered_dict.keys()),
+            bigwigs = getBamCoverage() if useSpikeInForNorm else expand("bamCoverage/{chip_sample}.filtered.seq_depth_norm.bw", chip_sample=filtered_dict.keys()),
             sampleSheet = sampleSheet
         output:
             matrix = touch("CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.cov.matrix")
