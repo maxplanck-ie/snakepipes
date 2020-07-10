@@ -186,15 +186,6 @@ def check_if_spikein_genome(genome_index,spikeinExt):
             return True
         else:
             return False
-    elif os.path.isfile("../" + genome_index):
-        with open("../" + genome_index) as ifile:
-            for line in ifile:
-                resl.append(re.search(spikeinExt, line))
-        if any(resl):
-            print("\n Spikein genome detected - at least one spikeIn chromosome found with extention " + spikeinExt + " .\n\n")
-            return True
-        else:
-            return False
     else:
         print("\n  Error! Genome index file "+ genome_index +" not found!!!\n\n")
         exit(1)
