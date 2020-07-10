@@ -82,7 +82,7 @@ rule CSAW:
 
 
 if allele_info == 'FALSE':
-    if pipeline in 'chip-seq':
+    if pipeline in 'chip-seq' and getSizeFactorsFrom == "genome":
         rule calc_matrix_log2r_CSAW:
             input:
                 csaw_in = "CSAW_{}_{}/CSAW.session_info.txt".format(peakCaller, sample_name),
