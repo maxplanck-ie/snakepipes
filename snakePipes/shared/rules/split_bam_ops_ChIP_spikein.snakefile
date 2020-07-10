@@ -33,7 +33,7 @@ rule split_bamfiles_by_genome:
         sambamba index -t {threads} {output.bam} 2>> {log}
         """
 
-rule multiBamSummary_input:
+checkpoint multiBamSummary_input:
     input:
         bams = lambda wildcards: expand("split_bam/{sample}_{part}.bam", sample=control_samples,part=wildcards.part),
         bais = lambda wildcards: expand("split_bam/{sample}_{part}.bam.bai", sample=control_samples,part=wildcards.part)
@@ -57,7 +57,7 @@ rule multiBamSummary_input:
     shell: multiBamSummary_cmd
 
 
-rule multiBamSummary_ChIP:
+checkpoint multiBamSummary_ChIP:
     input:
         bams = lambda wildcards: expand("split_bam/{sample}_{part}.bam", sample=chip_samples,part=wildcards.part),
         bais = lambda wildcards: expand("split_bam/{sample}_{part}.bam.bai", sample=chip_samples,part=wildcards.part)
@@ -81,7 +81,7 @@ rule multiBamSummary_ChIP:
     shell: multiBamSummary_cmd
 
 
-rule multiBamSummary_TSS:
+checkpoint multiBamSummary_TSS:
     input:
         bams = lambda wildcards: expand("split_bam/{sample}_spikein.bam", sample=chip_samples),
         bais = lambda wildcards: expand("split_bam/{sample}_spikein.bam.bai", sample=chip_samples),
@@ -138,32 +138,6 @@ rule bamCoverage_by_part:
         err = "bamCoverage/logs/bamCoverage.{sample}.BY{part}.filtered.err"
     benchmark:
         "bamCoverage/.benchmark/bamCoverage.{sample}.BY{part}.filtered.benchmark"
-    threads: 16  # 4GB per core
-    conda: CONDA_SHARED_ENV
-    shell: bamcov_spikein_cmd
-
-
-rule bamCoverage_from_filtered:
-    input:
-        bam = "filtered_bam/{sample}.filtered.bam" ,
-        bai = "filtered_bam/{sample}.filtered.bam.bai",
-        scale_factors = "split_deepTools_qc/multiBamSummary/spikein.ChIP.scaling_factors.txt" 
-    output:
-        "bamCoverage/{sample}.filtered.seq_depth_norm.BYspikein.bw"
-    params:
-        bwBinSize = bwBinSize,
-        genome_size = int(genome_size),
-        ignoreForNorm = "--ignoreForNormalization {}".format(ignoreForNormalization) if ignoreForNormalization else "",
-        read_extension = "--extendReads" if pairedEnd
-                         else "--extendReads {}".format(fragmentLength),
-        blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed
-                    else "",
-        scaling_factors = lambda wildcards,input: "--scaleFactor {}".format(get_scaling_factor(wildcards.sample,input.scale_factors)) ## subset for the one factor needed
-    log:
-        out = "bamCoverage/logs/bamCoverage.{sample}.filtered.BYspikein.filtered.out",
-        err = "bamCoverage/logs/bamCoverage.{sample}.filtered.BYspikein.filtered.err"
-    benchmark:
-        "bamCoverage/.benchmark/bamCoverage.{sample}.filtered.BYspikein.filtered.benchmark"
     threads: 16  # 4GB per core
     conda: CONDA_SHARED_ENV
     shell: bamcov_spikein_cmd
