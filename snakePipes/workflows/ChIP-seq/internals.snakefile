@@ -176,7 +176,7 @@ else:
 
 #################### functions and checks for using a spiked-in genome for normalization ########################################
 def check_if_spikein_genome(genome_index,spikeinExt):
-    if os.path.isfile(genome_index):
+    if os.path.isfile(genome_index) or os.path.isfile("../"+genome_index):
         resl=[]
         with open(genome_index) as ifile:
             for line in ifile:
