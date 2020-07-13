@@ -29,8 +29,10 @@ organismDictionary = {'genome_size': 0,
                       'star_index': '',
                       'genes_bed': '',
                       'genes_gtf': '',
+                      'spikein_genes_gtf': '',
                       'extended_coding_regions_gtf': '',
                       'blacklist_bed': '',
+                      'spikein_blacklist_bed': '',
                       'ignoreForNormalization': '',
                       'rmsk_file': ''}
 
@@ -51,6 +53,10 @@ if gtfURL:
     organismDictionary['genes_gtf'] = os.path.join(outdir, "annotation/genes.gtf")
     organismDictionary['genes_bed'] = os.path.join(outdir, "annotation/genes.bed")
     organismDictionary['extended_coding_regions_gtf'] = os.path.join(outdir, "annotation/genes.slop.gtf")
+
+if spikeinGtfURL:
+    targets.extend([os.path.join(outdir, x) for x in ["annotation/spikein_genes.gtf"]])
+    organismDictionary['spikein_genes_gtf'] = os.path.join(outdir, "annotation/spikein_genes.gtf")
 
 if rmskURL:
     targets.extend([os.path.join(outdir, x) for x in ["annotation/rmsk.txt"]])
@@ -82,6 +88,10 @@ if 'all' in tools or 'bwameth' in tools:
 if blacklist:
     targets.append(os.path.join(outdir, "annotation/blacklist.bed"))
     organismDictionary['blacklist_bed'] = os.path.join(outdir, "annotation/blacklist.bed")
+
+if spikeinBlacklist:
+    targets.append(os.path.join(outdir, "annotation/spikein_blacklist.bed"))
+    organismDictionary['spikein_blacklist_bed'] = os.path.join(outdir, "annotation/spikein_blacklist.bed")
 
 ignore = []
 if ignoreForNormalization:
