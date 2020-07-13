@@ -135,7 +135,7 @@ chip_object$windowCounts <- chip_object$windowCounts[keep,]
 
 ## normalize
 if(useSpikeInForNorm){
-    message("Normalizing using spikein (using 10kb background counts)")
+    message("Normalizing using spikein-derived scale factors")
     chip_object <- tmmNormalize_chip(chip_object, binsize = 10000, plotfile = "spikein_normalizedCounts.pdf")
 }else{
     message("Normalizing using TMM (using 10kb background counts)")

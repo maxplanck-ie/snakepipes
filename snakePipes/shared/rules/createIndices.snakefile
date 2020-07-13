@@ -193,7 +193,6 @@ rule bowtie2Index:
     shell: """
         ln -s {input} {params.basedir}/genome.fa
         bowtie2-build -t {threads} {params.basedir}/genome.fa {params.basedir}/genome
-        if [[ -f BowtieIndex/genome.rev.2.bt2l ]]; then ln -s BowtieIndex/genome.rev.2.bt2l {output}
         2> {log}
         """
 
