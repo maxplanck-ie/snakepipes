@@ -37,11 +37,11 @@ def getScaleFactors():
 
 def getBamCoverage():
     if getSizeFactorsFrom=="genome":
-        return expand("bamCoverage/{chip_sample}.host.seq_depth_norm.BYspikein.bw", chip_sample=filtered_dict.keys())
+        return expand("bamCoverage/{chip_sample}.host.seq_depth_norm.BYspikein.bw", chip_sample=reordered_dict.keys())
     elif getSizeFactorsFrom=="TSS":
-        return expand("bamCoverage_TSS/{chip_sample}.host.seq_depth_norm.BYspikein.bw", chip_sample=filtered_dict.keys())
+        return expand("bamCoverage_TSS/{chip_sample}.host.seq_depth_norm.BYspikein.bw", chip_sample=reordered_dict.keys())
     elif getSizeFactorsFrom=="input":
-        return expand("bamCoverage_input/{chip_sample}.host.seq_depth_norm.BYspikein.bw", chip_sample=filtered_dict.keys())
+        return expand("bamCoverage_input/{chip_sample}.host.seq_depth_norm.BYspikein.bw", chip_sample=reordered_dict.keys())
     else:
         return []
 
