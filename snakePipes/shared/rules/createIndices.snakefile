@@ -128,7 +128,7 @@ rule renameSpikeinChromsGTF:
     params:
         spikeinExt = spikeinExt
     shell: """
-        awk '{{ if($1 !~ /^#/){{$1=$1\"{params.spikeinExt}\"; print $0}} else{{print $0}} }}' {input} > {output}
+        awk -v FS='\\t' -v OFS='\\t' '{{ if($1 !~ /^#/){{$1=$1\"{params.spikeinExt}\"; print $1, $2, $3, $4, $5, $6, $7, $8, $9 }} else{{print $0}} }}' {input} > {output}
     """
 
 
