@@ -75,8 +75,11 @@ if "allelic-mapping" in mode:
     # deepTools QC
     include: os.path.join(maindir, "shared", "rules", "deepTools_qc_allelic.snakefile")
 else:
-    # Bowtie2 mapping, duplicate marking, BAM filtering and indexing
-    include: os.path.join(maindir, "shared", "rules", "Bowtie2.snakefile")
+    if aligner == "Bowtie2":
+        # Bowtie2 mapping, duplicate marking, BAM filtering and indexing
+        include: os.path.join(maindir, "shared", "rules", "Bowtie2.snakefile")
+    elif aligner == "bwa":
+        include: os.path.join(maindir, "shared", "rules", "bwa.snakefile")
 
 ### conditional/optional rules #################################################
 ################################################################################
