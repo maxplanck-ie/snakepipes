@@ -135,18 +135,36 @@ rule MACS2_peak_qc:
 # TODO
 # add joined deepTools plotEnrichment call for all peaks and samples in one plot
 
+rule namesort_bams:
+    input:
+        bam = "split_bam/{sample}.host.bam"
+    output:
+        bam = temp("split_bam/{sample}.namesorted.bam")
+    log:
+        "split_bam/logs/namesort.err"
+    params:
+        tempDir = tempDir
+    threads: 4
+    conda: CONDA_SAMBAMBA_ENV
+    shell: """
+        TMPDIR={params.tempDir}
+        MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX)
+        sambamba sort -t {threads} -o {output.bam} --tmpdir=$MYTEMP -n {input.bam} 2> {log}
+        rm -rf $MYTEMP
+         """
+
 # Requires PE data
 # Should be run once per-group!
 if pairedEnd:
     rule Genrich_peaks:
         input:
-            bams=lambda wildcards: expand(os.path.join("split_bam", "{sample}_host.bam"), sample=genrichDict[wildcards.group]),
-            control = lambda wildcards: ["split_bam/"+get_control(x)+"_host.bam" for x in genrichDict[wildcards.group]]
+            bams=lambda wildcards: expand(os.path.join("split_bam", "{sample}_namesorted.bam"), sample=genrichDict[wildcards.group]),
+            control = lambda wildcards: ["split_bam/"+get_control(x)+"_namesorted.bam" for x in genrichDict[wildcards.group]]
         output:
             "Genrich/{group}.narrowPeak"
         log: "Genrich/logs/{group}.log"
         params:
-            bams = lambda wildcards: ",".join(expand(os.path.join("split_bam", "{sample}_host.bam"), sample=genrichDict[wildcards.group])),
+            bams = lambda wildcards: ",".join(expand(os.path.join("split_bam", "{sample}_namesorted.bam"), sample=genrichDict[wildcards.group])),
             blacklist = "-E {}".format(blacklist_bed) if blacklist_bed else "",
             control_pfx=lambda wildcards,input: "-c" if input.control else "",
             control=lambda wildcards,input: ",".join(input.control) if input.control else "",
@@ -158,13 +176,13 @@ if pairedEnd:
 else:
     rule Genrich_peaks:
         input:
-            bams=lambda wildcards: expand(os.path.join("split_bam", "{sample}_host.bam"), sample=genrichDict[wildcards.group]),
-            control = lambda wildcards: ["split_bam/"+get_control(x)+"_host.bam" for x in genrichDict[wildcards.group]]
+            bams=lambda wildcards: expand(os.path.join("split_bam", "{sample}_namesorted.bam"), sample=genrichDict[wildcards.group]),
+            control = lambda wildcards: ["split_bam/"+get_control(x)+"_namesorted.bam" for x in genrichDict[wildcards.group]]
         output:
             "Genrich/{group}.narrowPeak"
         log: "Genrich/logs/{group}.log"
         params:
-            bams = lambda wildcards: ",".join(expand(os.path.join("split_bam", "{sample}_host.bam"), sample=genrichDict[wildcards.group])),
+            bams = lambda wildcards: ",".join(expand(os.path.join("split_bam", "{sample}_namesorted.bam"), sample=genrichDict[wildcards.group])),
             blacklist = "-E {}".format(blacklist_bed) if blacklist_bed else "",
             control_pfx=lambda wildcards,input: "-c" if input.control else "",
             control=lambda wildcards,input: ",".join(input.control) if input.control else "",
