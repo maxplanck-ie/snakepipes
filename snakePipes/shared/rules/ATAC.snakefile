@@ -120,6 +120,24 @@ rule HMMRATAC_peaks:
         HMMRATAC -Xmx10G -b {input[0]} -i {input[1]} -g {input[2]} {params.blacklist} -o HMMRATAC/{wildcards.sample} 2> {log}
         """
 
+rule namesort_bams:
+    input:
+        bam = short_bams + "/{sample}.short.cleaned.bam"
+    output:
+        bam = temp(short_bams + "/{sample}.short.namesorted.bam")
+    log:
+        short_bams + "/logs/namesort.err"
+    params:
+        tempDir = tempDir
+    threads: 4
+    conda: CONDA_SAMBAMBA_ENV
+    shell: """
+        TMPDIR={params.tempDir}
+        MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX)
+        sambamba sort -t {threads} -o {output.bam} --tmpdir=$MYTEMP -n {input.bam} 2> {log}
+        rm -rf $MYTEMP
+         """
+
 
 # Requires PE data
 # Should be run once per-group!
