@@ -168,7 +168,7 @@ if pairedEnd:
             control=lambda wildcards,input: ",".join(input.control) if input.control else ""
         conda: CONDA_CHIPSEQ_ENV
         shell: """
-            Genrich -S -t {params.bams} {params.control_pfx} {params.control} -o {output} -r {params.blacklist} -y 2> {log}
+            Genrich -t {params.bams} {params.control_pfx} {params.control} -o {output} -r {params.blacklist} -y 2> {log}
             """
 else:
     rule Genrich_peaks:
@@ -186,5 +186,5 @@ else:
             frag_size=fragmentLength
         conda: CONDA_CHIPSEQ_ENV
         shell: """
-            Genrich -S -t {params.bams} {params.control_pfx} {params.control} -o {output} -r {params.blacklist} -w {params.frag_size} 2> {log}
+            Genrich -t {params.bams} {params.control_pfx} {params.control} -o {output} -r {params.blacklist} -w {params.frag_size} 2> {log}
             """
