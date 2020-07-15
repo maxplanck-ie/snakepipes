@@ -171,7 +171,7 @@ if pairedEnd:
             spikein_chroms=",".join(spikein_chr)
         conda: CONDA_CHIPSEQ_ENV
         shell: """
-            Genrich -S -t {params.bams} {params.control_pfx} {params.control} -o {output} -r {params.blacklist} -e {params.spikein_chroms} -y 2> {log}
+            Genrich  -t {params.bams} {params.control_pfx} {params.control} -o {output} -r {params.blacklist} -e {params.spikein_chroms} -y 2> {log}
             """
 else:
     rule Genrich_peaks:
@@ -190,5 +190,5 @@ else:
             spikein_chroms=",".join(spikein_chr)
         conda: CONDA_CHIPSEQ_ENV
         shell: """
-            Genrich -S -t {params.bams} {params.control_pfx} {params.control} -o {output} -r {params.blacklist} -e {params.spikein_chroms} -w {params.frag_size} 2> {log}
+            Genrich  -t {params.bams} {params.control_pfx} {params.control} -o {output} -r {params.blacklist} -e {params.spikein_chroms} -w {params.frag_size} 2> {log}
             """
