@@ -128,7 +128,7 @@ rule renameSpikeinChromsGTF:
     params:
         spikeinExt = spikeinExt
     shell: """
-        awk '{{ if($1 !~ /^#/){{$1=$1\"{params.spikeinExt}\"; print $0}} else{{print $0}} }}' {input} > {output}
+        awk -v FS='\\t' -v OFS='\\t' '{{ if($1 !~ /^#/){{$1=$1\"{params.spikeinExt}\"; print $0 }} else{{print $0}} }}' {input} > {output}
     """
 
 
@@ -181,7 +181,7 @@ rule extendGenicRegions:
             sys.exit("There are no chromosomes/contigs shared between the fasta and GTF file you have selected!\n")
 
 
-# Default memory allocation: 8G
+# Default memory allocation: 10G
 rule bowtie2Index:
     input: genome_fasta
     output: os.path.join(outdir, "BowtieIndex/genome.rev.2.bt2")
@@ -193,6 +193,7 @@ rule bowtie2Index:
     shell: """
         ln -s {input} {params.basedir}/genome.fa
         bowtie2-build -t {threads} {params.basedir}/genome.fa {params.basedir}/genome
+        if [[ -f BowtieIndex/genome.rev.2.bt2l ]]; then ln -s genome.rev.2.bt2l {output} ; fi
         2> {log}
         """
 
@@ -288,7 +289,7 @@ rule renameSpikeinChromsBlacklist:
     params:
         spikeinExt = spikeinExt
     shell: """
-        awk '{{ if($1 !~ /^#/){{$1=$1\"{params.spikeinExt}\"; print $0}} else{{print $0}} }}' {input} > {output}
+        awk -v FS='\\t' -v OFS='\\t' '{{ if($1 !~ /^#/){{$1=$1\"{params.spikeinExt}\"; print $0}} else{{print $0}} }}' {input} > {output}
     """
 
 
