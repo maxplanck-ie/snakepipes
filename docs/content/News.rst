@@ -12,6 +12,7 @@ snakePipes 2.x.y
 * added filtering of empty drops with Dropletutils to scRNAseq mode STARsolo
 * symlinks in the output path are relative 
 * bumped STAR version to 2.7.4a in scRNAseq, noncoding-RNA-seq and mRNA-seq workflows
+* Included optional differential splicing analysis using rmats within mRNA-seq workflow
 
 snakePipes 2.1.2
 ----------------
