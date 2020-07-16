@@ -139,7 +139,7 @@ rule namesort_bams:
     output:
         bam = temp("filtered_bam/{sample}.namesorted.bam")
     log:
-        "filtered_bam/logs/namesort.err"
+        "filtered_bam/logs/{sample}.namesort.err"
     params:
         tempDir = tempDir
     threads: 4
