@@ -4,7 +4,7 @@ if pairedEnd:
             r1 = fastq_dir+"/{sample}"+reads[0]+".fastq.gz",
             r2 = fastq_dir+"/{sample}"+reads[1]+".fastq.gz"
         output:
-            #align_summary = "bwa/{sample}.bwa_summary.txt" would be could to have here as well.
+            align_summary = "bwa/{sample}.bwa_summary.txt", #samtools flagstat
             bam = temp("bwa/{sample}.sorted.bam")
         log: "bwa/logs/{sample}.sort.log"
         params:
@@ -23,13 +23,14 @@ if pairedEnd:
             samtools view -Sb - | \
             samtools sort -m 2G -@ 2 -O bam - > {output.bam} 2> {log};
             rm -rf $MYTEMP
+            samtools flagstat {output.bam} > {output.align_summary}
         """
 else:
     rule bwa:
         input:
             fastq_dir+"/{sample}"+reads[0]+".fastq.gz"
         output:
-            #align_summary = "bwa/{sample}.bwa_summary.txt" would be could to have here as well.
+            align_summary = "bwa/{sample}.bwa_summary.txt", #samtools flagstat
             bam = temp("bwa/{sample}.sorted.bam")
         log: "bwa/logs/{sample}.sort.log"
         params:
@@ -48,4 +49,5 @@ else:
             samtools view -Sbu - | \
             samtools sort -m 2G -T $MYTEMP/{wildcards.sample} -@ 2 -O bam - > {output.bam} 2> {log};
             rm -rf $MYTEMP
+            samtools flagstat {output.bam} > {output.align_summary}
         """

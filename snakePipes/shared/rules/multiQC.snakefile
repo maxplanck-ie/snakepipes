@@ -40,9 +40,9 @@ def multiqc_input_check(return_value):
                 infiles.append( expand("Qualimap_qc/{sample}.filtered.bamqc_results.txt", sample = samples) )
                 indir += " Qualimap_qc "
         elif aligner=="bwa":
-            #infiles.append( expand("bwa/{sample}.bwa_summary.txt", sample = samples) +
-            infiles.append( expand("Sambamba/{sample}.markdup.txt", sample = samples) +
-                    expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample=samples))
+            infiles.append( expand("bwa/{sample}.bwa_summary.txt", sample = samples) +
+                            expand("Sambamba/{sample}.markdup.txt", sample = samples) +
+                            expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample=samples))
             indir += " Sambamba "
             indir += " bwa "
             indir += " deepTools_qc "
