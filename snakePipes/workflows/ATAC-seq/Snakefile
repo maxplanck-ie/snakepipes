@@ -118,7 +118,7 @@ def run_genrich():
         file_list = ["Genrich/all_samples.narrowPeak"]
         if sampleSheet:
             file_list = ["Genrich/{}.narrowPeak".format(x) for x in genrichDict.keys()]
-        file_list.append(expand(short_bams + "/{sample}.short.namesorted.bam",sample=samples))
+        file_list.append(expand(short_bams + "{sample}.short.namesorted.bam",sample=samples))
         return (file_list)
     return ([])
 

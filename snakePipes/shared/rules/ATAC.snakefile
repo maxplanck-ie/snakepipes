@@ -123,11 +123,11 @@ rule HMMRATAC_peaks:
 #Genrich requires namesorted bams
 rule namesort_bams:
     input:
-        bam = short_bams + "/{sample}.short.cleaned.bam"
+        bam = short_bams + "{sample}.short.cleaned.bam"
     output:
-        bam = temp(short_bams + "/{sample}.short.namesorted.bam")
+        bam = temp(short_bams + "{sample}.short.namesorted.bam")
     log:
-        short_bams + "/logs/{sample}.namesort.err"
+        short_bams + "logs/{sample}.namesort.err"
     params:
         tempDir = tempDir
     threads: 4
@@ -144,12 +144,12 @@ rule namesort_bams:
 # Should be run once per-group!
 rule Genrich_peaks:
     input:
-        bams=lambda wildcards: expand(os.path.join(short_bams, "{sample}.short.namesorted.bam"), sample=genrichDict[wildcards.group])
+        bams=lambda wildcards: expand(short_bams + "{sample}.short.namesorted.bam", sample=genrichDict[wildcards.group])
     output:
         "Genrich/{group}.narrowPeak"
     log: "Genrich/logs/{group}.Genrich_peaks.log"
     params:
-        bams = lambda wildcards: ",".join(expand(os.path.join(short_bams, "{sample}.short.namesorted.bam"), sample=genrichDict[wildcards.group])),
+        bams = lambda wildcards: ",".join(expand(short_bams + "{sample}.short.namesorted.bam", sample=genrichDict[wildcards.group])),
         blacklist = "-E {}".format(blacklist_bed) if blacklist_bed else ""
     conda: CONDA_ATAC_ENV
     shell: """
