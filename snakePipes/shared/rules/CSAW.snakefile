@@ -15,7 +15,6 @@ def getInputPeaks(peakCaller, chip_samples, genrichDict):
         return expand("Genrich/{genrichGroup}.narrowPeak", genrichGroup = genrichDict.keys())
 
 
-
 def getSizeMetrics():
     if pairedEnd:
         if not useSpikeInForNorm:
@@ -44,6 +43,12 @@ def getBamCoverage():
         return expand("bamCoverage_input/{chip_sample}.host.seq_depth_norm.BYspikein.bw", chip_sample=reordered_dict.keys())
     else:
         return []
+
+def getHeatmapInput():
+    if pipeline in 'ATAC-seq' or pipeline in 'chip-seq' and not getSizeFactorsFrom == "genome":
+        return(expand("CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.cov.heatmap.png", change_dir=['UP','DOWN']))
+    else:
+        return(expand("CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.cov.heatmap.png", change_dir=['UP','DOWN']) + expand("CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.log2r.heatmap.png", change_dir=['UP', 'DOWN']))
 
 
 ## CSAW for differential binding / allele-specific binding analysis
@@ -186,10 +191,7 @@ if allele_info == 'FALSE':
     rule CSAW_report:
         input:
             csaw_in = "CSAW_{}_{}/CSAW.session_info.txt".format(peakCaller, sample_name),
-            heatmap_in=lambda wildcards: expand("CSAW_{}_{}".format(peakCaller, sample_name) +\
-             "/CSAW.{change_dir}.cov.heatmap.png", change_dir=['UP','DOWN']) if pipeline in 'ATAC-seq' or pipeline in 'chip-seq' and not getSizeFactorsFrom == "genome" \
-             else expand("CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.cov.heatmap.png", change_dir=['UP','DOWN']) +\
-              expand("CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.log2r.heatmap.png", change_dir=['UP', 'DOWN'])
+            heatmap_in = lambda wildcards: getHeatmapInput()
         output:
             outfile="CSAW_{}_{}/CSAW.Stats_report.html".format(peakCaller, sample_name)
         params:

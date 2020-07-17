@@ -7,7 +7,7 @@ rule plotFingerprint:
     output:
         metrics = os.path.join(deeptools_ATAC, "plotFingerprint/plotFingerprint.metrics.txt")
     params:
-        labels = " ".join(samples),
+        labels = " --labels " + " ".join(samples),
         blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed
                     else "",
         read_extension = "--extendReads",
@@ -32,7 +32,7 @@ rule plotFingerprint_allelic:
     output:
         metrics = os.path.join(deeptools_ATAC, "plotFingerprint", "plotFingerprint.metrics_allelic.txt")
     params:
-        labels = " ".join(expand("{sample}_{suffix}", sample = samples, suffix = ['genome1', 'genome2'])),
+        labels = " --labels " + " ".join(expand("{sample}_{suffix}", sample = samples, suffix = ['genome1', 'genome2'])),
         blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed
                     else "",
         read_extension = "--extendReads",
