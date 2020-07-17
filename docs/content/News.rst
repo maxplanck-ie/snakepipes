@@ -16,6 +16,7 @@ snakePipes 2.x.y
 * Minor changes to shared FastQC and multiQC rule with regards to scRNA-seq workflow.
 * Fixed issue with missing input for running the DNA-mapping Snakefile
 * deepTools heatmaps for differentially bound regions are now ordered by sample sheet condition
+* Genrich is now run on namesorted bams
 
 snakePipes 2.1.2
 ----------------
