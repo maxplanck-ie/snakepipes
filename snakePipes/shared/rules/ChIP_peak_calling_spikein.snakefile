@@ -135,36 +135,54 @@ rule MACS2_peak_qc:
 # TODO
 # add joined deepTools plotEnrichment call for all peaks and samples in one plot
 
+rule namesort_bams:
+    input:
+        bam = "split_bam/{sample}_host.bam"
+    output:
+        bam = temp("namesorted_bam/{sample}_host_namesorted.bam")
+    log:
+        "namesorted_bam/logs/{sample}_host_namesort.err"
+    params:
+        tempDir = tempDir
+    threads: 4
+    conda: CONDA_SAMBAMBA_ENV
+    shell: """
+        TMPDIR={params.tempDir}
+        MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX)
+        sambamba sort -t {threads} -o {output.bam} --tmpdir=$MYTEMP -n {input.bam} 2> {log}
+        rm -rf $MYTEMP
+         """
+
 # Requires PE data
 # Should be run once per-group!
 if pairedEnd:
     rule Genrich_peaks:
         input:
-            bams=lambda wildcards: expand(os.path.join("split_bam", "{sample}_host.bam"), sample=genrichDict[wildcards.group]),
-            control = lambda wildcards: ["split_bam/"+get_control(x)+"_host.bam" for x in genrichDict[wildcards.group]]
+            bams=lambda wildcards: expand(os.path.join("namesorted_bam", "{sample}_host_namesorted.bam"), sample=genrichDict[wildcards.group]),
+            control = lambda wildcards: ["namesorted_bam/"+get_control(x)+"_host_namesorted.bam" for x in genrichDict[wildcards.group]]
         output:
             "Genrich/{group}.narrowPeak"
         log: "Genrich/logs/{group}.log"
         params:
-            bams = lambda wildcards: ",".join(expand(os.path.join("split_bam", "{sample}_host.bam"), sample=genrichDict[wildcards.group])),
+            bams = lambda wildcards: ",".join(expand(os.path.join("namesorted_bam", "{sample}_host_namesorted.bam"), sample=genrichDict[wildcards.group])),
             blacklist = "-E {}".format(blacklist_bed) if blacklist_bed else "",
             control_pfx=lambda wildcards,input: "-c" if input.control else "",
             control=lambda wildcards,input: ",".join(input.control) if input.control else "",
             spikein_chroms=",".join(spikein_chr)
         conda: CONDA_CHIPSEQ_ENV
         shell: """
-            Genrich -S -t {params.bams} {params.control_pfx} {params.control} -o {output} -r {params.blacklist} -e {params.spikein_chroms} -y 2> {log}
+            Genrich  -t {params.bams} {params.control_pfx} {params.control} -o {output} -r {params.blacklist} -e {params.spikein_chroms} -y 2> {log}
             """
 else:
     rule Genrich_peaks:
         input:
-            bams=lambda wildcards: expand(os.path.join("split_bam", "{sample}_host.bam"), sample=genrichDict[wildcards.group]),
-            control = lambda wildcards: ["split_bam/"+get_control(x)+"_host.bam" for x in genrichDict[wildcards.group]]
+            bams=lambda wildcards: expand(os.path.join("namesorted_bam", "{sample}_host_namesorted.bam"), sample=genrichDict[wildcards.group]),
+            control = lambda wildcards: ["namesorted_bam/"+get_control(x)+"_host_namesorted.bam" for x in genrichDict[wildcards.group]]
         output:
             "Genrich/{group}.narrowPeak"
         log: "Genrich/logs/{group}.log"
         params:
-            bams = lambda wildcards: ",".join(expand(os.path.join("split_bam", "{sample}_host.bam"), sample=genrichDict[wildcards.group])),
+            bams = lambda wildcards: ",".join(expand(os.path.join("namesorted_bam", "{sample}_host_namesorted.bam"), sample=genrichDict[wildcards.group])),
             blacklist = "-E {}".format(blacklist_bed) if blacklist_bed else "",
             control_pfx=lambda wildcards,input: "-c" if input.control else "",
             control=lambda wildcards,input: ",".join(input.control) if input.control else "",
@@ -172,5 +190,5 @@ else:
             spikein_chroms=",".join(spikein_chr)
         conda: CONDA_CHIPSEQ_ENV
         shell: """
-            Genrich -S -t {params.bams} {params.control_pfx} {params.control} -o {output} -r {params.blacklist} -e {params.spikein_chroms} -w {params.frag_size} 2> {log}
+            Genrich  -t {params.bams} {params.control_pfx} {params.control} -o {output} -r {params.blacklist} -e {params.spikein_chroms} -w {params.frag_size} 2> {log}
             """

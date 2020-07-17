@@ -15,7 +15,9 @@ snakePipes 2.x.y
 * Increased STAR version to 2.7.4a in scRNAseq, noncoding-RNA-seq and mRNA-seq workflows
 * Minor changes to shared FastQC and multiQC rule with regards to scRNA-seq workflow.
 * Fixed issue with missing input for running the DNA-mapping Snakefile
+* Fixed rule TrimGalore for single end reads
 * deepTools heatmaps for differentially bound regions are now ordered by sample sheet condition
+* Genrich is now run on namesorted bams
 
 snakePipes 2.1.2
 ----------------
