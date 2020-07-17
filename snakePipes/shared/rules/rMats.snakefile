@@ -6,9 +6,6 @@ def get_outdir(folder_name,sampleSheet):
 def wrap_libType(libType):
     dic_libType = {0:"fr-unstranded",1:"fr-firststrand",2:"fr-secondstrand"}
     return dic_libType[libType]
-# return readlength as an average of first 10,000 reads in first bamfile.
-def get_readLen(inBam):
-    return subprocess.getoutput('samtools view ' + inBam + ' | awk \'{print length($10)}\' | head -10000 | awk \'{ sum += $1 } END { if (NR > 0) print sum / NR }\'')
 
 rule createInputcsv:
     input:
@@ -23,7 +20,6 @@ rule createInputcsv:
         echo '{params.b1}' > {output.b1out}
         echo '{params.b2}' > {output.b2out}
 """
-
 rule rMats:
     input:
         b1 = "{}/b1.csv".format(get_outdir("rMats", sampleSheet)),
@@ -31,14 +27,18 @@ rule rMats:
     output:
         "{}/RI.MATS.JCEC.txt".format(get_outdir("rMats", sampleSheet))
     params:
-        readLen = get_readLen(["filtered_bam/" + s for s in [s + ".filtered.bam" for s in rMatsConds[list(rMatsConds)[0]]]][0]),
+        s1 = ["filtered_bam/" + s for s in [s + ".filtered.bam" for s in rMatsConds[list(rMatsConds)[0]]]][0],
+        readLen = "{}/readlength.txt".format(get_outdir("rMats", sampleSheet)),
         gtf = genes_gtf,
         od = "{}".format(get_outdir("rMats", sampleSheet)),
         end = "paired" if pairedEnd else "single",
         libType = wrap_libType(libraryType),
         tempDir = tempDir,
+    log: "{}/rMats.log".format(get_outdir("rMats", sampleSheet))
     threads: 1
     conda: CONDA_RNASEQ_ENV
     shell:"""
-        rmats.py --gtf {params.gtf} --b1 {input.b1} --b2 {input.b2} --od {params.od} --tmp {params.tempDir} -t {params.end} --libType {params.libType} --readLength {params.readLen} --variable-read-length --nthread {threads} --tstat {threads}
+        set +o pipefail;
+        readLen=$(samtools view {params.s1} | awk \'{{print length($10)}}\' | head -10000 | awk \'{{ sum += $1 }} END {{ if (NR > 0) print sum / NR }}\')
+        rmats.py --gtf {params.gtf} --b1 {input.b1} --b2 {input.b2} --od {params.od} --tmp {params.tempDir} -t {params.end} --libType {params.libType} --readLength $readLen --variable-read-length --nthread {threads} --tstat {threads} 2> {log}
 """

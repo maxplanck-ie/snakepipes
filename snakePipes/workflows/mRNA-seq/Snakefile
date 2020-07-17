@@ -154,7 +154,6 @@ def run_alignment_free():
         if sampleSheet and rMats:
             file_list.append( ["rMats_{}/RI.MATS.JCEC.txt".format(sample_name)] )
             file_list.append( ["rMats_{}/b2.csv".format(sample_name)] )
-
         return(file_list)
     else:
         return([])
