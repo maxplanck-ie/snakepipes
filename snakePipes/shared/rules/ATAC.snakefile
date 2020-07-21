@@ -120,19 +120,38 @@ rule HMMRATAC_peaks:
         HMMRATAC -Xmx10G -b {input[0]} -i {input[1]} -g {input[2]} {params.blacklist} -o HMMRATAC/{wildcards.sample} 2> {log}
         """
 
+#Genrich requires namesorted bams
+rule namesort_bams:
+    input:
+        bam = short_bams + "{sample}.short.cleaned.bam"
+    output:
+        bam = temp(short_bams + "{sample}.short.namesorted.bam")
+    log:
+        short_bams + "logs/{sample}.namesort.err"
+    params:
+        tempDir = tempDir
+    threads: 4
+    conda: CONDA_SAMBAMBA_ENV
+    shell: """
+        TMPDIR={params.tempDir}
+        MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX)
+        sambamba sort -t {threads} -o {output.bam} --tmpdir=$MYTEMP -n {input.bam} 2> {log}
+        rm -rf $MYTEMP
+         """
+
 
 # Requires PE data
 # Should be run once per-group!
 rule Genrich_peaks:
     input:
-        bams=lambda wildcards: expand(os.path.join(short_bams, "{sample}.short.cleaned.bam"), sample=genrichDict[wildcards.group])
+        bams=lambda wildcards: expand(short_bams + "{sample}.short.namesorted.bam", sample=genrichDict[wildcards.group])
     output:
         "Genrich/{group}.narrowPeak"
     log: "Genrich/logs/{group}.Genrich_peaks.log"
     params:
-        bams = lambda wildcards: ",".join(expand(os.path.join(short_bams, "{sample}.short.cleaned.bam"), sample=genrichDict[wildcards.group])),
+        bams = lambda wildcards: ",".join(expand(short_bams + "{sample}.short.namesorted.bam", sample=genrichDict[wildcards.group])),
         blacklist = "-E {}".format(blacklist_bed) if blacklist_bed else ""
     conda: CONDA_ATAC_ENV
     shell: """
-        Genrich -S -t {params.bams} -o {output} -r {params.blacklist} -j -y 2> {log}
+        Genrich  -t {params.bams} -o {output} -r {params.blacklist} -j -y 2> {log}
         """

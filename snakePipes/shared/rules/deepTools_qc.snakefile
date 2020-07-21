@@ -14,6 +14,7 @@ rule bamCoverage:
         read_extension = "--extendReads" if pairedEnd
                          else "--extendReads {}".format(fragmentLength),
         blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed else "",
+        scaling_factors = ""
     log:
         out = "bamCoverage/logs/bamCoverage.{sample}.out",
         err = "bamCoverage/logs/bamCoverage.{sample}.err"
@@ -40,6 +41,8 @@ rule bamCoverage_filtered:
                          else "--extendReads {}".format(fragmentLength),
         blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed
                     else "",
+        scaling_factors ="",
+        binSize = ""
     log:
         out = "bamCoverage/logs/bamCoverage.{sample}.filtered.out",
         err = "bamCoverage/logs/bamCoverage.{sample}.filtered.err"
@@ -82,12 +85,14 @@ rule multiBamSummary:
         bams = expand("filtered_bam/{sample}.filtered.bam", sample=samples),
         bais = expand("filtered_bam/{sample}.filtered.bam.bai", sample=samples)
     output:
-        "deepTools_qc/multiBamSummary/read_coverage.bins.npz"
+        npz = "deepTools_qc/multiBamSummary/read_coverage.bins.npz"
     params:
         labels = " ".join(samples),
         blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed else "",
         read_extension = "--extendReads" if pairedEnd
-                         else "--extendReads {}".format(fragmentLength)
+                         else "--extendReads {}".format(fragmentLength),
+        scaling_factors = "--scalingFactors deepTools_qc/multiBamSummary/scaling_factors.txt",
+        binSize = ""
     log:
         out = "deepTools_qc/logs/multiBamSummary.out",
         err = "deepTools_qc/logs/multiBamSummary.err"
