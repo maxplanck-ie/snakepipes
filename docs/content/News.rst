@@ -8,8 +8,8 @@ snakePipes 2.x.y
 * Added filtering of empty drops with Dropletutils to scRNA-seq mode STARsolo
 * Added spikein normalization to ChIPseq workflow
 * Added hybrid genome creation to createIndices
-
 * FASTQ1 and FASTQ2 are not localrules anymore due to buggy logging
+* Included optional differential splicing analysis using rmats within mRNA-seq workflow
 * Symlinks in the output path are relative 
 * Increased BBmap version
 * Increased STAR version to 2.7.4a in scRNAseq, noncoding-RNA-seq and mRNA-seq workflows

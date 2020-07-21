@@ -107,6 +107,8 @@ include:os.path.join(maindir, "shared", "rules", "RNA-seq_qc_report.snakefile")
 ## DESeq2
 if sampleSheet:
     include: os.path.join(maindir, "shared", "rules", "DESeq2.snakefile")
+    if rMats:
+        include: os.path.join(maindir, "shared", "rules", "rMats.snakefile")
 
 ## MultiQC
 include: os.path.join(maindir, "shared", "rules", "multiQC.snakefile")
@@ -149,7 +151,9 @@ def run_alignment_free():
             file_list.append( ["DESeq2_Salmon_{}/DESeq2.session_info.txt".format(sample_name)])
         if sampleSheet and cf.check_replicates(sampleSheet):
             file_list.append( ["sleuth_Salmon_{}/so.rds".format(sample_name)] )
-
+        if sampleSheet and rMats:
+            file_list.append( ["rMats_{}/RI.MATS.JCEC.txt".format(sample_name)] )
+            file_list.append( ["rMats_{}/b2.csv".format(sample_name)] )
         return(file_list)
     else:
         return([])
@@ -168,6 +172,9 @@ def run_alignment():
         if sampleSheet:
             sample_name = os.path.splitext(os.path.basename(sampleSheet))[0]
             file_list.append( ["DESeq2_{}/DESeq2.session_info.txt".format(sample_name)] )
+        if sampleSheet and rMats:
+            file_list.append( ["rMats_{}/RI.MATS.JCEC.txt".format(sample_name)] )
+            file_list.append( ["rMats_{}/b2.csv".format(sample_name)] )
         return(file_list)
     else:
         return([])
@@ -200,6 +207,9 @@ def run_allelesp_mapping():
         if sampleSheet:
             sample_name = os.path.splitext(os.path.basename(sampleSheet))[0]
             file_list.append( ["DESeq2_{}/DESeq2.session_info.txt".format(sample_name)] )
+        if sampleSheet and rMats:
+            file_list.append( ["rMats_{}/RI.MATS.JCEC.txt".format(sample_name)] )
+            file_list.append( ["rMats_{}/b2.csv".format(sample_name)] )
         return(file_list)
     else:
         return([])
