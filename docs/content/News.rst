@@ -18,6 +18,7 @@ snakePipes 2.x.y
 * Fixed rule TrimGalore for single end reads
 * deepTools heatmaps for differentially bound regions are now ordered by sample sheet condition
 * Genrich is now run on namesorted bams
+* Workflow help message now points to example sampleSheet on GitHub
 
 snakePipes 2.1.2
 ----------------

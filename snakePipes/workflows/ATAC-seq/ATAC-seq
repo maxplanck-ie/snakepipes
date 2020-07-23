@@ -14,7 +14,6 @@ import textwrap
 import snakePipes.common_functions as cf
 import snakePipes.parserCommon as parserCommon
 
-
 def parse_args(defaults={"verbose": False, "configFile": None,
                          "clusterConfigFile": None, "maxJobs": 5,
                          "snakemakeOptions": "--use-conda", "tempDir": None,
@@ -39,6 +38,8 @@ def parse_args(defaults={"verbose": False, "configFile": None,
         parents=[mainArgs],
         add_help=False
     )
+
+
 
     # Workflow options
     optional = parser.add_argument_group('Options')
@@ -67,7 +68,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
 
     optional.add_argument("--sampleSheet",
                           dest="sampleSheet",
-                          help="Invoke differential accessibility analysis by providing information on samples; see 'docs/content/sampleSheet.example.tsv' for example. IMPORTANT: The first entry defines which group of samples are control. With this, the order of comparison and likewise the sign of values can be changed! Also, the condition `control` should not be used (reserved to mark input samples in the ChIP-Seq workflow (default: '%(default)s').",
+                          help="Invoke differential accessibility analysis by providing information on samples; see 'https://github.com/maxplanck-ie/snakepipes/tree/master/docs/content/sampleSheet.example.tsv' for example. IMPORTANT: The first entry defines which group of samples are control. With this, the order of comparison and likewise the sign of values can be changed! Also, the condition `control` should not be used (reserved to mark input samples in the ChIP-Seq workflow (default: '%(default)s').",
                           default=defaults["sampleSheet"])
 
     optional.add_argument("--fromBAM",

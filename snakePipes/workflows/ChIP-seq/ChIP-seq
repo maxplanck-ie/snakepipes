@@ -97,7 +97,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
 
     optional.add_argument("--sampleSheet",
                           help="Information on samples (If differential binding analysis required); see "
-                               "'docs/content/sampleSheet.example.tsv' for example. "
+                               "'https://github.com/maxplanck-ie/snakepipes/tree/master/docs/content/sampleSheet.example.tsv' for example. "
                                "IMPORTANT: The first entry defines which group of samples are control. "
                                "By this, the order of comparison and likewise the sign of values can be changed! "
                                "Also, the condition `control` should only be used for input samples (control peaks "
