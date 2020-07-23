@@ -31,7 +31,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          "fromBAM": False, "pairedEnd": True,
                          "UMIDedup": False,
                          "UMIDedupOpts": "", "bcPattern": "NNNNCCCCCCCCC",
-                         "UMIDedupSep": "_", "UMIBarcode": False}):
+                         "UMIDedupSep": "_", "UMIBarcode": False, "rMats": False}):
     """
     Parse arguments from the command line.
     """
@@ -56,7 +56,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
     parserCommon.commonOptions(optional, defaults, bw=True)
 
     optional.add_argument("--libraryType",
-                          help="user provided library type strand specificity. featurCounts style: 0, 1, 2 (Illumina TruSeq); default: '%(default)s')",
+                          help="user provided library type strand specificity. featureCounts style: 0, 1, 2 (Illumina TruSeq); default: '%(default)s')",
                           type=int,
                           default=defaults["libraryType"])
 
@@ -108,6 +108,12 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                           action="store_false",
                           help="input data is single-end, not paired-end. This is only used if --fromBAM is specified.")
 
+    optional.add_argument("--rMats",
+                          dest="rMats",
+                          action="store_true",
+                          help="Run differential splicing analysis using rMats-turbo. Note that this flag requires --sampleSheet to be specified.",
+                          default=defaults["rMats"])
+
     return parser
 
 
@@ -145,6 +151,8 @@ def main():
         sys.exit("\n--fromBAM can only be used with modes \'alignment\' or \'deepTools_qc\' - use one of these modes or provide fastq files!\n")
     if args.fromBAM:
         args.aligner = "EXTERNAL_BAM"
+    if args.rMats and not args.sampleSheet:
+        sys.exit("--rMats flag requires a sampleSheet (specified with --sampleSheet).\n")
 
     ## End workflow-specific checks
 

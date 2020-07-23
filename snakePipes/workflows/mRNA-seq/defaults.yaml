@@ -37,6 +37,7 @@ trimmerOptions:
 ## further options
 mode: alignment,deepTools_qc
 sampleSheet:
+rMats: False
 bwBinSize: 25
 fastqc: False
 featureCountsOptions: -C -Q 10 --primary
