@@ -182,10 +182,13 @@ def is_paired(infiles, ext, reads):
                 infiles_dic[bname] = [infile]
             else:
                 infiles_dic[bname].append(infile)
-    if infiles_dic and min([len(x) for x in infiles_dic.values()]) == 2:
+    if not infiles_dic:
+        sys.exit("Error: No find has been found to be checked.")
+    values_length = [len(x) for x in infiles_dic.values()]
+    if min(values_length) == 2:
         pairedEnd = True
-    else:
-        sys.exit("Error: The directory contains a mixture of paired end and single end data!")
+    elif min(values_length) == 1 and max(values_length) == 2:
+        sys.exit("Error: The directory contains a mixture of paired-end and single-end data!")
     return pairedEnd
 
 
