@@ -145,10 +145,9 @@ def get_sample_names(infiles, ext, reads):
             x = x[:-l1]
             s.add(x)
         else:
-            sys.stderr.write("Warning! {} does not have "
-                     "{} as its name suffix. Either change it or modify the "
-                     "'reads' in the config.yaml to your deired ones.\n"
-                     .format(x,reads))
+            sys.stderr.write("Warning! {} does not have {} as its name suffix. "
+                             "Either change it or modify the 'reads' in the "
+                             "config.yaml to your deired ones.\n".format(x,reads))
 
     if sorted(list(s)) == []:
         sys.exit("Error! No sample has the right read suffix ({}). "
