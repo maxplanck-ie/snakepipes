@@ -183,7 +183,7 @@ def is_paired(infiles, ext, reads):
             else:
                 infiles_dic[bname].append(infile)
     if not infiles_dic:
-        sys.exit("Error: No find has been found to be checked.")
+        sys.exit("Error: No fastq file has been found to be checked.")
     values_length = [len(x) for x in infiles_dic.values()]
     if min(values_length) == 2:
         pairedEnd = True
