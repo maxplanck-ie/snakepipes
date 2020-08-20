@@ -18,7 +18,7 @@ for(i in seq_along(rdir)){
 
 rdf <- Reduce(function(x, y, ...) merge(x, y, all = TRUE, by="Metric", sort=FALSE, ...),rl)
 
-outf<-file.path(wdir,basename(snakemake@output))
+outf<-file.path(wdir,basename(snakemake@output[["report"]]))
 write.table(rdf,outf,row.names=FALSE,quote=FALSE,sep="\t")
 
 message('done all')
