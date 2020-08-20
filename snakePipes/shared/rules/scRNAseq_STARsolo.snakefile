@@ -68,6 +68,19 @@ rule STARsolo:
         rm -rf $MYTEMP
          """
 
+rule STARsolo_report:
+    input: expand("STARsolo/{sample}/{sample}.Solo.out/Gene/Summary.csv",sample=samples)
+    output: "STARsolo/Report.tsv"
+    params:
+        wdir = outdir + "/STARsolo",
+        input = lambda wildcards,input: [ os.path.join(outdir,x) for x in input ],
+        samples = samples
+    log: 
+        out = "STARsolo/logs/Report.out"
+    conda: CONDA_seurat3_ENV
+    script: "../rscripts/scRNAseq_report.R"
+
+
 rule filter_bam:
     input:
         bamfile = aligner+"/{sample}.sorted.bam",
