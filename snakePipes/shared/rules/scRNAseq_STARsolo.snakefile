@@ -15,7 +15,8 @@ rule STARsolo:
         filtered_counts = "STARsolo/{sample}/{sample}.Solo.out/Gene/filtered/matrix.mtx",
         filtered_bc = "STARsolo/{sample}/{sample}.Solo.out/Gene/filtered/barcodes.tsv",
         raw_features = "STARsolo/{sample}/{sample}.Solo.out/Gene/raw/features.tsv",
-        filtered_features = "STARsolo/{sample}/{sample}.Solo.out/Gene/filtered/features.tsv"
+        filtered_features = "STARsolo/{sample}/{sample}.Solo.out/Gene/filtered/features.tsv",
+        summary = "STARsolo/{sample}/{sample}.Solo.out/Gene/Summary.csv"
     log: "STARsolo/logs/{sample}.log"
     params:
         alignerOptions = str(alignerOptions or ''),
@@ -67,6 +68,20 @@ rule STARsolo:
  
         rm -rf $MYTEMP
          """
+
+rule STARsolo_report:
+    input:  expand("STARsolo/{sample}/{sample}.Solo.out/Gene/Summary.csv",sample=samples)
+    output:
+        report = "STARsolo/Report.tsv"
+    params:
+        wdir = outdir + "/STARsolo",
+        input = lambda wildcards,input: [ os.path.join(outdir,x) for x in input ],
+        samples = samples
+    log: 
+        out = "STARsolo/logs/Report.out"
+    conda: CONDA_seurat3_ENV
+    script: "../rscripts/scRNAseq_report.R"
+
 
 rule filter_bam:
     input:

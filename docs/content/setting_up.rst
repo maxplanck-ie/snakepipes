@@ -96,6 +96,9 @@ This would show the locations of:
  * **organisms/<organism>.yaml** : Defines genome indices and annotations for various organisms. See :ref:`organisms`
  * Workflow-specific defaults : Defines default options for our command line wrappers. See :ref:`workflowOpts`
 
+It is a good idea to keep a copy of your defaults.yaml, cluster.yaml and the whole organism folder in a dedicated location e.g. some folder *outside the snakePipes installation folder* named "snakePipes_configs" .
+You can configure snakePipes to use these files after a fresh installation or update with ``snakePipes config --organismsDir my_organisms_dir --clusterConfig my_cluster_config`` . This will also work if you add ``--configMode recycle``.  
+
 
 .. _conda:
 
