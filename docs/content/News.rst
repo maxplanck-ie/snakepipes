@@ -14,6 +14,7 @@ snakePipes 2.2.0
 * Symlinks in the output path are relative 
 * Increased BBmap version
 * Increased STAR version to 2.7.4a in scRNAseq, noncoding-RNA-seq and mRNA-seq workflows
+* Fixed snakemake version at 5.18.0 due to a bug in DAG handling
 * Minor changes to shared FastQC and multiQC rule with regards to scRNA-seq workflow.
 * Fixed issue with missing input for running the DNA-mapping Snakefile
 * Fixed rule TrimGalore for single end reads
