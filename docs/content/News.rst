@@ -20,6 +20,7 @@ snakePipes 2.x.y
 * deepTools heatmaps for differentially bound regions are now ordered by sample sheet condition
 * Genrich is now run on namesorted bams
 * Workflow help message now points to example sampleSheet on GitHub
+* organismsDir can now be updated with snakePipes config mode "recycle"
 
 snakePipes 2.1.2
 ----------------
