@@ -1,7 +1,7 @@
 snakePipes News
 ===============
 
-snakePipes 2.x.y
+snakePipes 2.2.0
 ----------------
 * Added Alevin mode in scRNA workflow
 * Added a new conda environment using to call AlevinQC.
@@ -21,6 +21,9 @@ snakePipes 2.x.y
 * Genrich is now run on namesorted bams
 * Workflow help message now points to example sampleSheet on GitHub
 * organismsDir can now be updated with snakePipes config mode "recycle"
+
+.. note::
+   Please be aware that this version requires regeneration of STAR indices!
 
 snakePipes 2.1.2
 ----------------
