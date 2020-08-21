@@ -52,7 +52,7 @@ snakePipes is going to move to mamba in the future.
 
     snakePipes config --help
 
-.. note:: If you have a copy of a `shared/defaults.yaml` with the necessary paths configured (i.e. from a previous installation), you can pass it to snakePipes config with `--oldConfig` and `--configMode recycle` instead of providing all the paths manually again. Config keys have to match for this to work.
+.. note:: If you have a copy of a `shared/defaults.yaml` with the necessary paths configured (i.e. from a previous installation), you can pass it to snakePipes config with `--oldConfig` and `--configMode recycle` instead of providing all the paths manually again. Config keys have to match for this to work. In the same way, you can pass your external organism yaml folder with ``--organismsDir`` or cluster config with ``--clusterConfig``.
 
 * Download example fastq files for the human genome `here <https://zenodo.org/record/3707259>`_
 
