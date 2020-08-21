@@ -28,15 +28,18 @@ if trim:
 ### Initialization #############################################################
 
 infiles = sorted(glob.glob(os.path.join(str(indir or ''), '*'+ext)))
+if infiles == []:
+    sys.exit("Error! Samples extnesion in {} are not {}. "
+             "Please change the extensions to it or update the config.yaml file "
+             "with your desired extension.".format(indir,ext))
+samples = cf.get_sample_names(infiles,ext,reads)
 
 pairedEnd = cf.is_paired(infiles,ext,reads)
 
-samples = cf.get_sample_names(infiles,ext,reads)
 del infiles
 
 if not samples:
-    print("\n  Error! NO samples found in dir "+str(indir or '')+"!!!\n\n")
-    exit(1)
+    sys.exit("\n  Error! NO samples found in dir "+str(indir or '')+"!!!\n\n")
 
 fromBAM = None
 

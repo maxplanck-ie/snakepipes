@@ -10,6 +10,8 @@ import glob
 import sys
 import shutil
 from fuzzywuzzy import fuzz
+import smtplib
+from email.message import EmailMessage
 from snakePipes import __version__
 
 
@@ -138,11 +140,19 @@ def get_sample_names(infiles, ext, reads):
         x = os.path.basename(x)[:-lext]
         if x.endswith(reads[0]):
             x = x[:-l0]
+            s.add(x)
         elif x.endswith(reads[1]):
             x = x[:-l1]
+            s.add(x)
         else:
-            continue
-        s.add(x)
+            sys.stderr.write("Warning! {} does not have {} as its name suffix. "
+                             "Either change it or modify the 'reads' in the "
+                             "config.yaml to your deired ones.\n".format(x, reads))
+
+    if sorted(list(s)) == []:
+        sys.exit("Error! No sample has the right read suffix ({}). "
+                 "Please modify them or update the config.yaml with "
+                 "your desired suffix.".format(reads))
     return sorted(list(s))
 
 
@@ -172,9 +182,13 @@ def is_paired(infiles, ext, reads):
                 infiles_dic[bname] = [infile]
             else:
                 infiles_dic[bname].append(infile)
-    if infiles_dic and max([len(x) for x in infiles_dic.values()]) == 2:
+    if not infiles_dic:
+        sys.exit("Error: No fastq file has been found to be checked.")
+    values_length = [len(x) for x in infiles_dic.values()]
+    if min(values_length) == 2:
         pairedEnd = True
-    # TODO: raise exception if single-end and paired-end files are mixed
+    elif min(values_length) == 1 and max(values_length) == 2:
+        sys.exit("Error: The directory contains a mixture of paired-end and single-end data!")
     return pairedEnd
 
 
@@ -366,8 +380,6 @@ def sendEmail(args, returnCode):
     Try to send an email to the user. Errors must be non-fatal.
     """
     try:
-        import smtplib
-        from email.message import EmailMessage
         msg = EmailMessage()
         msg['Subject'] = "Snakepipes completed"
         msg['From'] = args.emailSender
