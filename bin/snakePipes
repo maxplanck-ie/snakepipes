@@ -342,6 +342,9 @@ def updateConfig(args):
             if args.organismsDir:
                 od = {'organismsDir': args.organismsDir}
                 d.update(od)
+            if args.clusterConfig:
+                od = {'clusterConfig': args.clusterConfig}
+                d.update(od)
             if not currentDict.keys() & d.keys():
                 sys.exit("The old and the new config have no matching keys!!!\n")
         else:
