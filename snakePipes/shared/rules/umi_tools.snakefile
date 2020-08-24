@@ -1,5 +1,4 @@
 ##umi_tools###############
-import os
 
 if UMIBarcode:
     if pairedEnd:
@@ -46,9 +45,9 @@ else:
               "originalFASTQ/downsample_{sample}"+reads[0]+".fastq.gz" if downsample else "originalFASTQ/{sample}"+reads[0]+".fastq.gz"
           output:
               "FASTQ/{sample}"+reads[0]+".fastq.gz"
-          run:
-            if not os.path.exists(os.path.join(outdir,output[0])):
-                os.symlink(os.path.join(outdir,input[0]),os.path.join(outdir,output[0]))
+          shell: """
+                ln -s ../{input} {output}
+          """
 
     if pairedEnd or pipeline=="scrna-seq":
         rule FASTQ2:
@@ -56,9 +55,9 @@ else:
                 "originalFASTQ/downsample_{sample}"+reads[1]+".fastq.gz" if downsample else "originalFASTQ/{sample}"+reads[1]+".fastq.gz"
             output:
                 "FASTQ/{sample}"+reads[1]+".fastq.gz"
-            run:
-                if not os.path.exists(os.path.join(outdir,output[0])):
-                    os.symlink(os.path.join(outdir,input[0]),os.path.join(outdir,output[0]))
+            shell: """
+                ln -s ../{input} {output}
+          """
 
 #If DNA-mapping:
 if UMIDedup:
@@ -92,15 +91,16 @@ else:
             shell: """
                    mv {input.bamfile} {output.bamfile}
                    """
+
     elif not aligner=="bwameth" :
         rule filter_reads:
             input:
                 bamfile = aligner+"/{sample}.bam"
             output:
                 bamfile = "filtered_bam/{sample}.filtered.bam"
-            run:
-                if not os.path.exists(os.path.join(outdir,output[0])):
-                    os.symlink(os.path.join(outdir,input[0]),os.path.join(outdir,output[0]))
+            shell: """
+                ln -s ../{input} {output}
+          """
 
 if not aligner=="bwameth":
     rule samtools_index_filtered:

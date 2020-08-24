@@ -1,6 +1,31 @@
 snakePipes News
 ===============
 
+snakePipes 2.2.0
+----------------
+* Added Alevin mode in scRNA workflow
+* Added a new conda environment using to call AlevinQC.
+* Added filtering of empty drops with Dropletutils to scRNA-seq mode STARsolo
+* Added spikein normalization to ChIPseq workflow
+* Added hybrid genome creation to createIndices
+* Added STARsolo report for all samples to STARsolo output folder
+* FASTQ1 and FASTQ2 are not localrules anymore due to buggy logging
+* Included optional differential splicing analysis using rmats within mRNA-seq workflow
+* Symlinks in the output path are relative 
+* Increased BBmap version
+* Increased STAR version to 2.7.4a in scRNAseq, noncoding-RNA-seq and mRNA-seq workflows
+* Fixed snakemake version at 5.18.0 due to a bug in DAG handling
+* Minor changes to shared FastQC and multiQC rule with regards to scRNA-seq workflow.
+* Fixed issue with missing input for running the DNA-mapping Snakefile
+* Fixed rule TrimGalore for single end reads
+* deepTools heatmaps for differentially bound regions are now ordered by sample sheet condition
+* Genrich is now run on namesorted bams
+* Workflow help message now points to example sampleSheet on GitHub
+* organismsDir can now be updated with snakePipes config mode "recycle"
+
+.. note::
+   Please be aware that this version requires regeneration of STAR indices!
+
 snakePipes 2.1.2
 ----------------
 * small bug fix: SE mode in noncoding-RNA-seq pipeline

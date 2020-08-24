@@ -96,7 +96,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                                "of bins. (default: '%(default)s')",
                           default=defaults["nBinsToMerge"])
 
-    optional.add_argument("--findTADsParams",
+    optional.add_argument("--findTADParams",
                           type=str,
                           metavar="STR",
                           help="parameters for HiCFindTADs. (default: '%(default)s')",

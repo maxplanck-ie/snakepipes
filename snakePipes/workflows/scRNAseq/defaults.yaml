@@ -47,6 +47,11 @@ myKit: CellSeq384
 BCwhiteList:
 STARsoloCoords: ["1","7","8","7"]
 skipVelocyto: False
+##mode Alevin options
+alevinLibraryType: "ISR"
+prepProtocol: "celseq2"
+salmonIndexOptions: --type puff -k 31
+expectCells: 
 #generic options
 libraryType: 1
 bwBinSize: 10

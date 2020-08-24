@@ -68,6 +68,19 @@ As you can see above, the same control can be used for multiple samples.
 
 .. note:: Set the flag broad to `True` for broad marks, such as H3K27me and H3K9me3
 
+
+.. _spikein:
+
+Spikein Normalization
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If chromatin from an external organism was spikein in, it is possible to obtain spikein-derived scaling factors for the ChIP (and input) samples with the flag ``--useSpikeInForNorm``. This requires providing a hybrid bam file, with reads aligned to a hybrid genome of host and spikein chromosomes. Spikein chromosome extention can be specified with `--spikeinExt`. Scale factors can be obtained either from whole spikein genome in the ChIP samples, from windows centered on TSS in the spikein genome in the ChIP samples, or from whole spikein genome in the input samples . The default scale factors from whole spikein genome in the ChIP samples can be changed to something else with ``--getSizeFactorsFrom``.
+
+DESeq2-style scaling factors produced with deepTools multiBamSummary will then be used to create bam coverage tracks and passed to CSAW as size Factors if sample sheet is provided.
+
+A hybrid genome can be obtained with createIndices workflow and can be passed to the DNA-mapping workflow without any particular arguments.
+
+
 .. _diffBinding:
 
 Differential Binding analysis

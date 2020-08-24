@@ -6,3 +6,8 @@ dependencies:
  - ucsc-fatotwobit
  - ucsc-gtftogenepred
  - ucsc-genepredtobed
+ - bowtie2 = 2.3.5.1
+ - hisat2 = 2.1.0
+ - star = 2.7.4a
+ - bwa = 0.7.17
+ - bwameth = 0.2.2

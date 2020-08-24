@@ -119,7 +119,7 @@ else:
         output:
             "FASTQ_TrimGalore/{sample}"+reads[0]+".fastq.gz"
         params:
-            tmp = "FASTQ_TrimGalore/{sample}_trimmed.fq.gz",
+            tmp = "FASTQ_TrimGalore/{sample}" + reads[0] + "_trimmed.fq.gz",
             opts = lambda wildcards: str(trimmerOptions or '')
         log:
             out = "FASTQ_TrimGalore/logs/TrimGalore.{sample}.out",

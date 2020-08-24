@@ -1,0 +1,6 @@
+name: snakepipes_pysam_1.0
+channels:
+ - conda-forge
+ - bioconda
+dependencies:
+ - pysam=0.16.0.1 

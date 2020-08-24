@@ -139,3 +139,4 @@ rule annotation_bed2fasta:
     conda: CONDA_RNASEQ_ENV
     shell:
         "bedtools getfasta -name -s -split -fi {input.genome_fasta} -bed <(cat {input.bed} | cut -f1-12) | sed 's/(.*)//g' | sed 's/:.*//g' > {output} 2> {log}"
+        

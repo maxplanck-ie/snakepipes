@@ -26,7 +26,7 @@ rule report_flagstat_all_data:
 rule qc_report_all:
     input:
         flagstat = "Sambamba/flagstat_report_all.tsv",
-        metrics = "deepTools_ChIP/plotFingerprint/plotFingerprint.metrics.txt"
+        metrics = "deepTools_ChIP/plotFingerprint/plotFingerprint.metrics.txt" if not useSpikeInForNorm else "split_deepTools_ChIP/plotFingerprint/plotFingerprint.metrics.txt"
     output:
         "QC_report/QC_report_all.tsv"
     log: "QC_report/logs/qc_report_all.log"

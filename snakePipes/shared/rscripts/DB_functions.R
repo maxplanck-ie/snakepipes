@@ -61,8 +61,8 @@ readfiles_chip <- function(sampleSheet, fragmentLength, window_size, alleleSpeci
         rownames(designm)<-sampleSheet$name
         designType <- "condition"
         # define bam files to read
-        bam.files <- list.files("../filtered_bam",
-                                pattern = paste0(sampleSheet$name,".filtered.bam$", collapse = "|"),
+        bam.files <- list.files(paste0("../",bam_folder),
+                                pattern = paste0(sampleSheet$name,bam_pfx,".bam$", collapse = "|"),
                                 full.names = TRUE )
         
     }
@@ -74,7 +74,7 @@ readfiles_chip <- function(sampleSheet, fragmentLength, window_size, alleleSpeci
     message(paste0("Counting reads in windows.. windows with total counts < ", mincount, " are discarded"))
     counts <- csaw::windowCounts(bam.files = bam.files, param = pe.param, ext = fragmentLength, spacing = window_size, filter = mincount)
     if (designType==("condition")){
-        colnames(counts)<-gsub(".filtered.bam","",basename(bam.files))
+        colnames(counts)<-gsub(paste0(bam_pfx,".bam"),"",basename(bam.files))
         counts<-counts[,sampleSheet$name]} else {
         colnames(counts)<-gsub(".sorted.bam","",basename(bam.files))
         counts<-counts[,paste0(rep(sampleSheet$name,each=2),".genome",c(1,2))]
@@ -202,7 +202,11 @@ tmmNormalize_chip <- function(chipCountObject, binsize, plotfile){
     bam.files <- SummarizedExperiment::colData(chipCountObject$windowCounts)$bam.files
     # Get norm factors
     wider <- csaw::windowCounts(bam.files, bin = TRUE, width = binsize, param = chipCountObject$pe.param)
-    normfacs <- csaw::normFactors(wider, se.out=FALSE)
+    if(useSpikeInForNorm){
+        tab<-read.table(scale_factors,sep="\t",header=TRUE,as.is=TRUE,quote="")
+        normfacs<-1/(tab$scalingFactor[match(colnames(chipCountObject$windowCounts),tab$sample)]) }else{
+        normfacs <- csaw::normFactors(wider, se.out=FALSE)}
+
     chipCountObject$normFactors <- normfacs
 
     # get norm counts

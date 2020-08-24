@@ -107,7 +107,7 @@ chip_samples_wo_ctrl = list(sorted(chip_samples_wo_ctrl))
 chip_samples = sorted(chip_samples_w_ctrl + chip_samples_wo_ctrl)
 all_samples = sorted(control_samples + chip_samples)
 
-if not fromBAM:
+if not fromBAM and not useSpikeInForNorm:
     if pairedEnd:
         if not os.path.isfile(os.path.join(workingdir, "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv")):
             sys.exit('ERROR: {} is required but not present\n'.format(os.path.join(workingdir, "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv")))
@@ -170,5 +170,47 @@ def filter_dict(sampleSheet,input_dict):
 if sampleSheet:
     filtered_dict = filter_dict(sampleSheet,dict(zip(chip_samples_w_ctrl, [ get_control_name(x) for x in chip_samples_w_ctrl ])))
     genrichDict = cf.sampleSheetGroups(sampleSheet)
+    reordered_dict = {k: filtered_dict[k] for k in [item for sublist in genrichDict.values() for item in sublist]}
 else:
     genrichDict = {"all_samples": chip_samples}
+
+
+#################### functions and checks for using a spiked-in genome for normalization ########################################
+def check_if_spikein_genome(genome_index,spikeinExt):
+    resl=[]
+    if os.path.isfile(genome_index):
+        with open(genome_index) as ifile:
+            for line in ifile:
+                resl.append(re.search(spikeinExt, line))
+        if any(resl):
+            print("\n Spikein genome detected - at least one spikeIn chromosome found with extention " + spikeinExt + " .\n\n")
+            return True
+        else:
+            return False
+    else:
+        print("\n  Error! Genome index file "+ genome_index +" not found!!!\n\n")
+        exit(1)
+
+def get_host_and_spikein_chromosomes(genome_index,spikeinExt):
+    hostl=[]
+    spikeinl=[]
+    with open(genome_index) as ifile:
+        for line in ifile:
+            entry = line.split('\t')[0] 
+            if re.search(spikeinExt, entry):
+                spikeinl.append(entry)
+            else:
+                hostl.append(entry)
+    return([hostl,spikeinl])
+
+if useSpikeInForNorm:
+    part=['host','spikein']
+    spikein_detected=check_if_spikein_genome(genome_index,spikeinExt)
+    if spikein_detected:
+        host_chr=get_host_and_spikein_chromosomes(genome_index,spikeinExt)[0]
+        spikein_chr=get_host_and_spikein_chromosomes(genome_index,spikeinExt)[1]
+    else:
+        print("\n No spikein genome detected - no spikeIn chromosomes found with extention " + spikeinExt + " .\n\n")
+        exit(1)
+        
+       

@@ -30,15 +30,17 @@ Next, install snakePipes.
 Installing snakePipes
 ---------------------
 
-The easiest way to install snakePipes is via our conda channel. The following command install snakePipes and also creates a conda virtual environment named ``snakePipes``, which you can then activate via ``conda activate snakePipes``.
+The easiest way to install snakePipes is via our conda channel. The following command install snakePipes and also creates a conda virtual environment named ``snakePipes``, which you can then activate via ``conda activate snakePipes``. Specifying snakePipes version avoids issues with conda's environment solver.
 
 .. code:: bash
 
-    conda create -n snakePipes -c mpi-ie -c bioconda -c conda-forge snakePipes
+    conda create -n snakePipes -c mpi-ie -c conda-forge -c bioconda snakePipes==2.1.1
 
 This way, the software used within snakePipes do not conflict with the software pre-installed on your terminal or in your python environment.
 
 .. note:: This might take a few minutes depending on the access to conda channels.
+
+snakePipes is going to move to mamba in the future.
 
 Development installation
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -93,6 +95,9 @@ This would show the locations of:
  * **cluster.yaml** Defines execution command for the cluster. See :ref:`cluster`
  * **organisms/<organism>.yaml** : Defines genome indices and annotations for various organisms. See :ref:`organisms`
  * Workflow-specific defaults : Defines default options for our command line wrappers. See :ref:`workflowOpts`
+
+It is a good idea to keep a copy of your defaults.yaml, cluster.yaml and the whole organism folder in a dedicated location e.g. some folder *outside the snakePipes installation folder* named "snakePipes_configs" .
+You can configure snakePipes to use these files after a fresh installation or update with ``snakePipes config --organismsDir my_organisms_dir --clusterConfig my_cluster_config`` . This will also work if you add ``--configMode recycle``.  
 
 
 .. _conda:
