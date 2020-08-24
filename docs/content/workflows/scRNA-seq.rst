@@ -8,9 +8,10 @@ What it does
 
 The scRNA-seq pipeline is intended to process UMI-based data, expecting the cell barcode and umi in Read1, and the cDNA sequence in Read2. 
 
-There are currently two analysis modes available:
+There are currently three analysis modes available:
 - "Gruen" to reproduce CellSeq2 data analysis by Gruen et al.
 - "STARsolo" which uses STAR solo for mapping and quantitation.
+- "Alevin" based on Salmon for generating the count matrix.
 
 The general procedure for mode "Gruen" involves:
 
@@ -28,6 +29,13 @@ The general procedure for mode "STARsolo" involves:
 4. generation of seurat objects for genic counts.
 
 UMIs in the read headers are used to avoid counting PCR duplicates. A number of bigWig and QC plots (e.g., from ``plotEnrichment``) are generated as well.
+
+Mode "Alevin" involves:
+
+1. Generation of a salmon index used for mapping.
+2. Mapping and generation of a readcount matrix.
+3. Estimation of uncertainty of gene counts using bootstrap method implemented in Salmon Alevin.
+4. General QC of the Alevin run using the AlevinQC R package.
 
 .. image:: ../images/scRNAseq_pipeline.png
 
@@ -121,6 +129,11 @@ The default configuration file is listed below and can be found in ``snakePipes/
     myKit: CellSeq384
     BCwhiteList:
     STARsoloCoords: ["1","7","8","7"]
+    ##mode Alevin options
+    alevinLibraryType: "ISR"
+    prepProtocol: "celseq2"
+    salmonIndexOptions: --type puff -k 31
+    expectCells: 
     #generic options
     libraryType: 1
     bwBinSize: 10
@@ -241,10 +254,29 @@ The following will be produced in the output directory when the workflow is run 
 
  - The **VelocytoCounts** directory contains loom files in sample subdirectories.
  - The **VelocytoCounts_merged** directory containes one loom file with all samples merged.
- - The **STARsolo* directory contains bam files and 10X-format cell count matrices produced by STARsolo.
+ - The **STARsolo** directory contains bam files and 10X-format cell count matrices produced by STARsolo.
 
 The remaining folders are described in the Gruen mode above.
 
+The following output structure will be produced when running in Alevin mode::
+
+    ├── Alevin
+    ├── Annotation
+    ├── cluster_logs
+    ├── FastQC
+    ├── multiQC
+    ├── originalFASTQ
+    ├── Salmon
+    ├── scRNAseq.cluster_config.yaml
+    ├── scRNAseq.config.yaml
+    ├── scRNAseq_organism.yaml
+    ├── scRNAseq_pipeline.pdf
+    ├── scRNAseq_run-1.log
+    └── scRNAseq_tools.txt
+
+ - The **Salmon** directory contains the generated genome index.
+ - The **Alevin** directory contains the matrix failes (both bootstrapped and raw) per sample in subdirectories.
+ - The **multiQC** directory contains an additional alevinQC html file generated per sample.
 
 Understanding the outputs: mode Gruen
 --------------------------------------
@@ -286,6 +318,15 @@ Cell filtering, metrics collection and threshold selection are done as above onl
 
 Clustering is done with RaceID default settings. The fully processed RaceID object is written to sc.minT\*.RData, the tsne plot with the clustering information to sc.minT\*.tsne.clu.png.
 Top 10 and top 2 markers are calculated, and the resulting plots and tables written out as above. Violin and feature plots are generated for the top2 marker list and saved to files as in the description above. Session info is written to sessionInfo.txt. Statistical procedures and results are summarized in Stats_report.html.
+
+Understanding the outputs: mode Alevin
+--------------------------------------
+
+- **Main result:** output folders containing the raw and boostrapped count matrices are found under the sample subfolders under ``Alevin``. The sample specific Alevin folders contain the matrices, as well as column data (barcodes) and row data (genes).
+
+- Corresponding annotation files are: ``Annotation/genes.filtered.bed`` and ``Annotation/genes.filtered.gtf``, respectively.
+
+- The QC plots (both from multiQC and AlevinQC) are available in the ``multiQC`` folder.
 
 
 Example images

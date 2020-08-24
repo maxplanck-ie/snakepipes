@@ -119,6 +119,11 @@ Like the other workflows, differential expression can be performed using the ``-
 
 .. note:: The first entry defines which group of samples are control. This way, the order of comparison and likewise the sign of values can be changed. The DE analysis might fail if your sample names begin with a number. So watch out for that!
 
+Differential Splicing
+---------------------
+
+In addition to differential expression, differential splicing analysis can be performed by using ``--rMats`` option in addition to supplying a sample sheet. This will invoke the rMats turbo on the samples.
+
 Complex designs with blocking factors
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
