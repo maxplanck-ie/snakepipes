@@ -1,6 +1,9 @@
 snakePipes News
 ===============
 
+snakePipes 2.x.y
+----------------
+
 snakePipes 2.2.0
 ----------------
 * Added Alevin mode in scRNA workflow
