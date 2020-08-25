@@ -65,8 +65,9 @@ if not os.path.isfile(samples_config):
 if sampleSheet:
     cf.check_sample_info_header(sampleSheet)
     if not cf.check_replicates(sampleSheet):
-        print("\nWarning! CSAW cannot be invoked without replicates!\n")
-        sys.exit()
+        print("\nWarning! CSAW cannot be invoked without replicates and will not be run!\n")
+        if not peakCaller=="Genrich":
+            sys.exit()
 
 chip_dict = {}
 with open(samples_config, "r") as f:
