@@ -223,7 +223,7 @@ def check_replicates(sample_info_file):
 
     for k, v in d.items():
         if v < 2:
-            sys.stderr.write("ERROR: The {} group has no replicates!\n".format(k))
+            sys.stderr.write("WARNING: The {} group has no replicates!\n".format(k))
             return False
 
     return True
