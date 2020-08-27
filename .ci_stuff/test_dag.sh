@@ -48,7 +48,7 @@ touch BAM_input/sample1.bam \
       BAM_input/Sambamba/sample5.markdup.txt \
       BAM_input/Sambamba/sample6.markdup.txt \
       BAM_input/deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv
-mkdir -p allelic_BAM_input/allelic_bams allelic_BAM_input/filtered_bam  allelic_BAM_input/deepTools_qc/bamPEFragmentSize
+mkdir -p allelic_BAM_input/allelic_bams allelic_BAM_input/filtered_bam  allelic_BAM_input/deepTools_qc/bamPEFragmentSize allelic_BAM_input/Sambamba
 touch allelic_BAM_input/allelic_bams/sample1.genome1.sorted.bam \
       allelic_BAM_input/allelic_bams/sample1.genome2.sorted.bam \
       allelic_BAM_input/allelic_bams/sample2.genome1.sorted.bam \
@@ -85,7 +85,13 @@ touch allelic_BAM_input/allelic_bams/sample1.genome1.sorted.bam \
       allelic_BAM_input/filtered_bam/sample3.filtered.bam.bai \
       allelic_BAM_input/filtered_bam/sample4.filtered.bam.bai \
       allelic_BAM_input/filtered_bam/sample5.filtered.bam.bai \
-      allelic_BAM_input/filtered_bam/sample6.filtered.bam.bai 
+      allelic_BAM_input/filtered_bam/sample6.filtered.bam.bai \
+      allelic_BAM_input/Sambamba/sample1.markdup.txt \
+      allelic_BAM_input/Sambamba/sample2.markdup.txt \
+      allelic_BAM_input/Sambamba/sample3.markdup.txt \ 
+      allelic_BAM_input/Sambamba/sample4.markdup.txt \
+      allelic_BAM_input/Sambamba/sample5.markdup.txt \
+      allelic_BAM_input/Sambamba/sample6.markdup.txt
 mkdir -p output
 touch /tmp/genes.gtf /tmp/genome.fa /tmp/genome.fa.fai /tmp/rmsk.txt /tmp/genes.bed /tmp/spikein_genes.gtf
 mkdir -p allelic_input
