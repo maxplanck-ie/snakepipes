@@ -67,7 +67,13 @@ touch allelic_BAM_input/allelic_bams/sample1.genome1.sorted.bam \
       allelic_BAM_input/filtered_bam/sample3.filtered.bam \
       allelic_BAM_input/filtered_bam/sample4.filtered.bam \
       allelic_BAM_input/filtered_bam/sample5.filtered.bam \
-      allelic_BAM_input/filtered_bam/sample6.filtered.bam 
+      allelic_BAM_input/filtered_bam/sample6.filtered.bam \
+      allelic_BAM_input/filtered_bam/sample1.filtered.bam.bai \
+      allelic_BAM_input/filtered_bam/sample2.filtered.bam.bai \
+      allelic_BAM_input/filtered_bam/sample3.filtered.bam.bai \
+      allelic_BAM_input/filtered_bam/sample4.filtered.bam.bai \
+      allelic_BAM_input/filtered_bam/sample5.filtered.bam.bai \
+      allelic_BAM_input/filtered_bam/sample6.filtered.bam.bai 
 mkdir -p output
 touch /tmp/genes.gtf /tmp/genome.fa /tmp/genome.fa.fai /tmp/rmsk.txt /tmp/genes.bed /tmp/spikein_genes.gtf
 mkdir -p allelic_input
