@@ -48,6 +48,15 @@ touch BAM_input/sample1.bam \
       BAM_input/Sambamba/sample5.markdup.txt \
       BAM_input/Sambamba/sample6.markdup.txt \
       BAM_input/deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv
+mkdir -p allelic_BAM_input/allelic_bams
+touch allelic_BAM_input/allelic_bams/sample1.genome1.sorted.bam
+      allelic_BAM_input/allelic_bams/sample1.genome2.sorted.bam
+      allelic_BAM_input/allelic_bams/sample2.genome1.sorted.bam
+      allelic_BAM_input/allelic_bams/sample2.genome2.sorted.bam
+      allelic_BAM_input/allelic_bams/sample3.genome1.sorted.bam
+      allelic_BAM_input/allelic_bams/sample3.genome2.sorted.bam
+      allelic_BAM_input/allelic_bams/sample4.genome1.sorted.bam
+      allelic_BAM_input/allelic_bams/sample4.genome2.sorted.bam
 mkdir -p output
 touch /tmp/genes.gtf /tmp/genome.fa /tmp/genome.fa.fai /tmp/rmsk.txt /tmp/genes.bed /tmp/spikein_genes.gtf
 mkdir -p allelic_input
@@ -116,7 +125,9 @@ WC=`ChIP-seq -d outdir --useSpikeInForNorm --getSizeFactorsFrom TSS --sampleShee
 if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 591 ]; then exit 1 ; fi
 WC=`ChIP-seq -d outdir --useSpikeInForNorm --getSizeFactorsFrom input --sampleSheet .ci_stuff/test_sampleSheet.tsv --snakemakeOptions " --dryrun --conda-prefix /tmp" --fromBAM BAM_input/filtered_bam/ .ci_stuff/spikein_organism.yaml .ci_stuff/ChIP.sample_config.yaml | tee >(cat 1>&2) | grep -v "Conda environment" | sed '/^\s*$/d' | wc -l`
 if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 579 ]; then exit 1 ; fi
-
+# allelic fromBAM
+WC=`ChIP-seq -d outdir --sampleSheet .ci_stuff/test_sampleSheet.tsv --snakemakeOptions " --dryrun --conda-prefix /tmp" --fromBAM allelic_BAM_input/ .ci_stuff/organism.yaml .ci_stuff/ChIP.sample_config.yaml | tee >(cat 1>&2) | grep -v "Conda environment" | sed '/^\s*$/d' | wc -l`
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 715 ]; then exit 1 ; fi
 
 # mRNA-seq
 WC=`mRNA-seq -i PE_input -o output --sampleSheet .ci_stuff/test_sampleSheet.tsv --snakemakeOptions " --dryrun --conda-prefix /tmp" .ci_stuff/organism.yaml | tee >(cat 1>&2) | grep -v "Conda environment" | sed '/^\s*$/d' | wc -l`
