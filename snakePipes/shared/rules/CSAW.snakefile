@@ -45,10 +45,11 @@ def getBamCoverage():
         return []
 
 def getHeatmapInput():
-    if pipeline in 'ATAC-seq' or pipeline in 'chip-seq' and not useSpikeInForNorm:
+    if pipeline in 'ATAC-seq' or pipeline in 'chip-seq':
         return(expand("CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.cov.heatmap.png", change_dir=['UP','DOWN']))
     else:
-        return(expand("CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.cov.heatmap.png", change_dir=['UP','DOWN']) + expand("CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.log2r.heatmap.png", change_dir=['UP', 'DOWN']))
+        if not useSpikeInForNorm:
+            return(expand("CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.cov.heatmap.png", change_dir=['UP','DOWN']) + expand("CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.log2r.heatmap.png", change_dir=['UP', 'DOWN']))
 
 
 ## CSAW for differential binding / allele-specific binding analysis
