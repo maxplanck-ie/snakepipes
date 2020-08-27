@@ -1,6 +1,11 @@
 snakePipes News
 ===============
 
+snakePipes 2.2.1
+----------------
+
+* Fix a bug in DAG for ChIPseq allelic with CSAW.
+
 snakePipes 2.2.0
 ----------------
 * Added Alevin mode in scRNA workflow
