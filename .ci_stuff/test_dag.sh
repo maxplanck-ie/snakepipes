@@ -48,7 +48,7 @@ touch BAM_input/sample1.bam \
       BAM_input/Sambamba/sample5.markdup.txt \
       BAM_input/Sambamba/sample6.markdup.txt \
       BAM_input/deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv
-mkdir -p allelic_BAM_input/allelic_bams
+mkdir -p allelic_BAM_input/allelic_bams allelic_BAM_input/deepTools_qc/bamPEFragmentSize
 touch allelic_BAM_input/allelic_bams/sample1.genome1.sorted.bam \
       allelic_BAM_input/allelic_bams/sample1.genome2.sorted.bam \
       allelic_BAM_input/allelic_bams/sample2.genome1.sorted.bam \
