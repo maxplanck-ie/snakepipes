@@ -49,13 +49,13 @@ touch BAM_input/sample1.bam \
       BAM_input/Sambamba/sample6.markdup.txt \
       BAM_input/deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv
 mkdir -p allelic_BAM_input/allelic_bams
-touch allelic_BAM_input/allelic_bams/sample1.genome1.sorted.bam
-      allelic_BAM_input/allelic_bams/sample1.genome2.sorted.bam
-      allelic_BAM_input/allelic_bams/sample2.genome1.sorted.bam
-      allelic_BAM_input/allelic_bams/sample2.genome2.sorted.bam
-      allelic_BAM_input/allelic_bams/sample3.genome1.sorted.bam
-      allelic_BAM_input/allelic_bams/sample3.genome2.sorted.bam
-      allelic_BAM_input/allelic_bams/sample4.genome1.sorted.bam
+touch allelic_BAM_input/allelic_bams/sample1.genome1.sorted.bam \
+      allelic_BAM_input/allelic_bams/sample1.genome2.sorted.bam \
+      allelic_BAM_input/allelic_bams/sample2.genome1.sorted.bam \
+      allelic_BAM_input/allelic_bams/sample2.genome2.sorted.bam \
+      allelic_BAM_input/allelic_bams/sample3.genome1.sorted.bam \
+      allelic_BAM_input/allelic_bams/sample3.genome2.sorted.bam \
+      allelic_BAM_input/allelic_bams/sample4.genome1.sorted.bam \
       allelic_BAM_input/allelic_bams/sample4.genome2.sorted.bam
 mkdir -p output
 touch /tmp/genes.gtf /tmp/genome.fa /tmp/genome.fa.fai /tmp/rmsk.txt /tmp/genes.bed /tmp/spikein_genes.gtf
