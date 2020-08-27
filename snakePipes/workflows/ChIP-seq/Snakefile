@@ -144,7 +144,7 @@ def run_CSAW():
         if allele_info == 'FALSE':
             file_list.append([os.path.join("CSAW_{}_{}".format(peakCaller, sample_name), x) for x in list(itertools.chain.from_iterable([expand("CSAW.{change_dir}.cov.matrix",change_dir=change_direction),expand("CSAW.{change_dir}.cov.heatmap.png",change_dir=change_direction)]))])
             file_list.append([os.path.join("AnnotatedResults_{}_{}".format(peakCaller,sample_name), x) for x in list(itertools.chain.from_iterable([expand("Filtered.results.{change_dir}_withNearestGene.txt",change_dir=change_direction)]))])
-            if getSizeFactorsFrom == "genome" and not useSpikeInForNorm:
+            if getSizeFactorsFrom == "genome" and useSpikeInForNorm:
                 file_list.append([os.path.join("CSAW_{}_{}".format(peakCaller, sample_name), x) for x in list(itertools.chain.from_iterable([expand("CSAW.{change_dir}.log2r.matrix",change_dir=change_direction),expand("CSAW.{change_dir}.log2r.heatmap.png",change_dir=change_direction)]))])
         return( file_list )
     else:
