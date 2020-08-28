@@ -88,9 +88,9 @@ touch allelic_BAM_input/allelic_bams/sample1.genome1.sorted.bam \
       allelic_BAM_input/filtered_bam/sample6.filtered.bam.bai \
       allelic_BAM_input/Sambamba/sample1.markdup.txt \
       allelic_BAM_input/Sambamba/sample2.markdup.txt \
-      allelic_BAM_input/Sambamba/sample3.markdup.txt \ 
-      allelic_BAM_input/Sambamba/sample4.markdup.txt 
-touch allelic_BAM_input/Sambamba/sample5.markdup.txt \
+      allelic_BAM_input/Sambamba/sample3.markdup.txt \
+      allelic_BAM_input/Sambamba/sample4.markdup.txt \
+      allelic_BAM_input/Sambamba/sample5.markdup.txt \
       allelic_BAM_input/Sambamba/sample6.markdup.txt
 mkdir -p output
 touch /tmp/genes.gtf /tmp/genome.fa /tmp/genome.fa.fai /tmp/rmsk.txt /tmp/genes.bed /tmp/spikein_genes.gtf
