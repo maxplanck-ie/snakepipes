@@ -5,6 +5,7 @@ snakePipes 2.2.1
 ----------------
 
 * Fix a bug in DAG for ChIPseq allelic with CSAW.
+* Fixed deepTools qc DAG for ChIPseq with spikein.
 * Added DAG test for allelic ChIPseq.
 * Fixed a bug with deepTools QC for allelic mRNAseq.
 
