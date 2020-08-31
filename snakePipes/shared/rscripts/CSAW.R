@@ -143,7 +143,7 @@ if(useSpikeInForNorm){
 }
 
 ## get DB regions
-print("Performing differential binding")
+message("Performing differential binding")
 chip_results <- getDBregions_chip(chip_object, plotfile = "DiffBinding_modelfit.pdf")
 
 ## write output

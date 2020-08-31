@@ -42,7 +42,7 @@ readfiles_chip <- function(sampleSheet, fragmentLength, window_size, alleleSpeci
             # for 1 sample, use interaction design
             message(">1 samples used : comparing genome2 to genome1 blocking for different conditions")
             designm <- model.matrix(~ allele + condition,data = design)
-            rownames(designm)<-paste0(design$name,"_",design$allele)
+            rownames(designm)<-paste0(design$name,".",design$allele)
             designType <- "blocking"
         }
 
@@ -255,7 +255,9 @@ getDBregions_chip <- function(chipCountObject, plotfile = NULL){
 
     # Make DGElist
     y <- csaw::asDGEList(chipCountObject$windowCounts, norm.factors = chipCountObject$normFactors)
-    colnames(y)<-sampleInfo$name
+    if(designType=="condition"){
+    colnames(y)<-sampleInfo$name}else{
+    colnames(y)<-paste0(rep(sampleSheet$name,each=2),".genome",c(1,2))}
     design <- chipCountObject$design
     # Estimate dispersions
     y <- edgeR::estimateDisp(y, design)
