@@ -255,7 +255,7 @@ getDBregions_chip <- function(chipCountObject, plotfile = NULL){
 
     # Make DGElist
     y <- csaw::asDGEList(chipCountObject$windowCounts, norm.factors = chipCountObject$normFactors)
-    if(designType=="condition"){
+    if(chipCountObject$designType=="condition"){
     colnames(y)<-sampleInfo$name}else{
     colnames(y)<-paste0(rep(sampleSheet$name,each=2),".genome",c(1,2))}
     design <- chipCountObject$design
