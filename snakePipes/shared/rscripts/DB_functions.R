@@ -36,7 +36,7 @@ readfiles_chip <- function(sampleSheet, fragmentLength, window_size, alleleSpeci
             # for 1 samples, use normal design
             message("1 sample used : comparing genome2 to genome1")
             designm <- model.matrix(~ allele, data = design)
-            rownames(designm)<-sampleSheet$name
+            rownames(designm)<-paste0(design$name,".",design$allele)
             designType <- "allele"
         } else {
             # for 1 sample, use interaction design
