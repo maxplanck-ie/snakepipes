@@ -42,7 +42,7 @@ readfiles_chip <- function(sampleSheet, fragmentLength, window_size, alleleSpeci
             # for 1 sample, use interaction design
             message(">1 samples used : comparing genome2 to genome1 blocking for different conditions")
             designm <- model.matrix(~ allele + condition,data = design)
-            rownames(designm)<-sampleSheet$name
+            rownames(designm)<-paste0(design$name,"_",design$allele)
             designType <- "blocking"
         }
 
