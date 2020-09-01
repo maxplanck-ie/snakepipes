@@ -45,10 +45,11 @@ def getBamCoverage():
         return []
 
 def getHeatmapInput():
-    if pipeline in 'ATAC-seq' or pipeline in 'chip-seq' and not getSizeFactorsFrom == "genome":
+    if pipeline in 'ATAC-seq' or pipeline in 'chip-seq':
         return(expand("CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.cov.heatmap.png", change_dir=['UP','DOWN']))
     else:
-        return(expand("CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.cov.heatmap.png", change_dir=['UP','DOWN']) + expand("CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.log2r.heatmap.png", change_dir=['UP', 'DOWN']))
+        if not useSpikeInForNorm:
+            return(expand("CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.cov.heatmap.png", change_dir=['UP','DOWN']) + expand("CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.log2r.heatmap.png", change_dir=['UP', 'DOWN']))
 
 
 ## CSAW for differential binding / allele-specific binding analysis
@@ -87,7 +88,7 @@ rule CSAW:
 
 
 if allele_info == 'FALSE':
-    if pipeline in 'chip-seq' and getSizeFactorsFrom == "genome":
+    if pipeline in 'chip-seq' and not useSpikeInForNorm:
         rule calc_matrix_log2r_CSAW:
             input:
                 csaw_in = "CSAW_{}_{}/CSAW.session_info.txt".format(peakCaller, sample_name),

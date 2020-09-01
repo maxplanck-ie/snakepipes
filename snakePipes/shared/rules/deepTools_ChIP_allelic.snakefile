@@ -17,6 +17,7 @@ rule bamCompare_log2_genome1:
                          else "--extendReads " + str(fragmentLength),
         blacklist = "--blackListFileName " + blacklist_bed if blacklist_bed
                     else "",
+        scaleFactors = " --scaleFactorsMethod readCount "
     log:
         out = "deepTools_ChIP/logs/bamCompare.log2ratio.{chip_sample}.{control_name}.genome1.out",
         err = "deepTools_ChIP/logs/bamCompare.log2ratio.{chip_sample}.{control_name}.genome1.err"
@@ -41,6 +42,7 @@ rule bamCompare_log2_genome2:
                          else "--extendReads " + str(fragmentLength),
         blacklist = "--blackListFileName " + blacklist_bed if blacklist_bed
                     else "",
+        scaleFactors = " --scaleFactorsMethod readCount "
     log:
         out = "deepTools_ChIP/logs/bamCompare.log2ratio.{chip_sample}.{control_name}.genome2.out",
         err = "deepTools_ChIP/logs/bamCompare.log2ratio.{chip_sample}.{control_name}.genome2.err"
