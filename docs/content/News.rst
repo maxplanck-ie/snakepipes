@@ -4,6 +4,8 @@ snakePipes News
 snakePipes 2.x.y
 ----------------
 
+* Genrich will now run if sampleSheet without replicates is provided.
+
 
 snakePipes 2.2.1
 ----------------
