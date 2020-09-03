@@ -116,7 +116,8 @@ if not fromBAM and not useSpikeInForNorm:
     for sample in all_samples:
         req_files = [
             os.path.join(workingdir, "filtered_bam/"+sample+".filtered.bam"),
-            os.path.join(workingdir, "filtered_bam/"+sample+".filtered.bam.bai")
+            os.path.join(workingdir, "filtered_bam/"+sample+".filtered.bam.bai"),
+            os.path.join(workingdir, "bamCoverage/"+sample+".filtered.seq_depth_norm.bw")
             ]
 
         # check for all samples whether all required files exist

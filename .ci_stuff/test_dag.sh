@@ -22,7 +22,7 @@ touch SE_input/sample1_R1.fastq.gz \
       SE_input/sample5_R1.fastq.gz \
       SE_input/sample6_R1.fastq.gz
 # Needed by ChIP and ATAC workflows
-mkdir -p BAM_input/deepTools_qc/bamPEFragmentSize BAM_input/filtered_bam BAM_input/Sambamba
+mkdir -p BAM_input/deepTools_qc/bamPEFragmentSize BAM_input/filtered_bam BAM_input/Sambamba BAM_input/bamCoverage/
 touch BAM_input/sample1.bam \
       BAM_input/sample2.bam \
       BAM_input/sample3.bam \
@@ -47,7 +47,14 @@ touch BAM_input/sample1.bam \
       BAM_input/Sambamba/sample4.markdup.txt \
       BAM_input/Sambamba/sample5.markdup.txt \
       BAM_input/Sambamba/sample6.markdup.txt \
-      BAM_input/deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv
+      BAM_input/deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv \
+      BAM_input/bamCoverage/sample1.filtered.seq_depth_norm.bw \
+      BAM_input/bamCoverage/sample2.filtered.seq_depth_norm.bw \
+      BAM_input/bamCoverage/sample3.filtered.seq_depth_norm.bw \
+      BAM_input/bamCoverage/sample4.filtered.seq_depth_norm.bw \
+      BAM_input/bamCoverage/sample5.filtered.seq_depth_norm.bw \
+      BAM_input/bamCoverage/sample6.filtered.seq_depth_norm.bw 
+
 mkdir -p allelic_BAM_input/allelic_bams allelic_BAM_input/filtered_bam  allelic_BAM_input/deepTools_qc/bamPEFragmentSize allelic_BAM_input/Sambamba
 touch allelic_BAM_input/allelic_bams/sample1.genome1.sorted.bam \
       allelic_BAM_input/allelic_bams/sample1.genome2.sorted.bam \
