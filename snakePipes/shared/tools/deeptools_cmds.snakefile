@@ -129,7 +129,7 @@ plotEnrich_chip_cmd = """
 plotFingerprint_cmd = """
     plotFingerprint \
             -b {input.bams} \
-            --labels {params.labels} \
+            {params.labels} \
             --plotTitle 'Cumulative read counts per bin without duplicates' \
             --ignoreDuplicates \
             --outQualityMetrics {output.metrics} \
