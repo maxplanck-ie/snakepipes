@@ -51,7 +51,7 @@ include: os.path.join(maindir, "shared", "rules", "ChiP-seq_qc_report.snakefile"
 
 
 # histoneHMM (if mode is not allele-specific)
-if allele_info == 'FALSE':
+if not allele_info:
     include: os.path.join(maindir, "shared", "rules", "histoneHMM.snakefile")
 else:
     include: os.path.join(maindir, "shared", "rules", "deepTools_ChIP_allelic.snakefile")
@@ -68,7 +68,7 @@ if sampleSheet:
         #include: os.path.join(maindir, "shared", "rules", "deepTools_qc.snakefile")
 
 def run_histoneHMM(allele_info):
-    if allele_info == 'FALSE':
+    if not allele_info:
         ## run histoneHMM broad enrichment calling only for samples annotated as *broad*
         file_list = expand("histoneHMM/{chip_sample}.filtered.histoneHMM-regions.gff.gz", chip_sample = [s for s in chip_samples if is_broad(s)])
     else:
@@ -139,7 +139,7 @@ def run_deepTools_allelic():
 def run_CSAW():
     if sampleSheet:
         file_list=["CSAW_{}_{}/CSAW.session_info.txt".format(peakCaller, sample_name)]
-        if allele_info == 'FALSE':
+        if not allele_info :
             file_list.append(["Annotation/genes.filtered.symbol","Annotation/genes.filtered.t2g","CSAW_{}_{}/CSAW.Stats_report.html".format(peakCaller, sample_name)])
             file_list.append([os.path.join("CSAW_{}_{}".format(peakCaller, sample_name), x) for x in list(itertools.chain.from_iterable([expand("CSAW.{change_dir}.cov.matrix",change_dir=change_direction),expand("CSAW.{change_dir}.cov.heatmap.png",change_dir=change_direction)]))])
             file_list.append([os.path.join("AnnotatedResults_{}_{}".format(peakCaller,sample_name), x) for x in list(itertools.chain.from_iterable([expand("Filtered.results.{change_dir}_withNearestGene.txt",change_dir=change_direction)]))])

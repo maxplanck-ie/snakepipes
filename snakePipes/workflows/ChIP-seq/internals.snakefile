@@ -49,14 +49,17 @@ def is_chip(sample):
     """
     return (sample in chip_samples)
 
+def is_allelic(workingdir):
+    if os.path.isdir(os.path.join(workingdir,'allelic_bams') ) and os.listdir(os.path.join(workingdir,'allelic_bams') ) != []:
+        return True
+else:
+    return False
+
 
 ### Variable defaults ##########################################################
 ### Initialization #############################################################
 
-if os.path.isdir(os.path.join(workingdir,'allelic_bams') ) and os.listdir(os.path.join(workingdir,'allelic_bams') ) != []:
-    allele_info = 'TRUE'
-else:
-    allele_info = 'FALSE'
+allele_info=is_allelic(workingdir)
 
 # TODO: catch exception if ChIP-seq samples are not unique
 # read ChIP-seq dictionary from config.yaml:
