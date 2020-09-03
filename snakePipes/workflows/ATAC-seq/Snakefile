@@ -48,9 +48,10 @@ include: os.path.join(maindir, "shared", "rules", "ATAC_qc.snakefile")
 
 # flags for allelic mode
 if os.path.isdir(os.path.join(workingdir, 'allelic_bams')) and os.listdir(os.path.join(workingdir, 'allelic_bams')) != []:
-    allele_info = 'TRUE'
+    allele_info = True
 else:
-    allele_info = 'FALSE'
+    allele_info = False
+
 # CSAW for differential binding (if sampleinfo specified)
 # needs a "ChIP-sample" variable, here all samples are ChIP-Samples
 chip_samples = samples
