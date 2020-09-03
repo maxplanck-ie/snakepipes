@@ -63,11 +63,11 @@ if sampleSheet:
     include: os.path.join(maindir, "shared", "rules", "CSAW.snakefile")
     include: os.path.join(maindir, "shared", "rules", "nearestGene.snakefile")
     include: os.path.join(maindir, "shared", "rules", "filterGTF.snakefile")
-    if not fromBAM and not useSpikeInForNorm:
+    #if not fromBAM and not useSpikeInForNorm:
         # These are needed for the snakefile to be imported
-        aligner = "Bowtie2"
-        downsample = False
-        include: os.path.join(maindir, "shared", "rules", "deepTools_qc.snakefile")
+        #aligner = "Bowtie2"
+        #downsample = False
+        #include: os.path.join(maindir, "shared", "rules", "deepTools_qc.snakefile")
 
 def run_histoneHMM(allele_info):
     if allele_info == 'FALSE':
