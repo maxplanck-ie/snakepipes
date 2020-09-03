@@ -52,8 +52,8 @@ def is_chip(sample):
 def is_allelic(workingdir):
     if os.path.isdir(os.path.join(workingdir,'allelic_bams') ) and os.listdir(os.path.join(workingdir,'allelic_bams') ) != []:
         return True
-else:
-    return False
+    else:
+        return False
 
 
 ### Variable defaults ##########################################################
