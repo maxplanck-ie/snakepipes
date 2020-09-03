@@ -87,7 +87,7 @@ rule CSAW:
     script: "../rscripts/CSAW.R"
 
 
-if allele_info == 'FALSE':
+if not allele_info:
     if pipeline in 'chip-seq' and not useSpikeInForNorm:
         rule calc_matrix_log2r_CSAW:
             input:
