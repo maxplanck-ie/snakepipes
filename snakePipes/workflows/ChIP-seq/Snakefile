@@ -17,6 +17,11 @@ globals().update(cf.load_organism_data(genome, maindir, config["verbose"]))
 # return the pipeline version in the log
 cf.get_version()
 
+if os.path.isdir(os.path.join(workingdir,'allelic_bams') ) and os.listdir(os.path.join(workingdir,'allelic_bams') ) != []:
+    allele_info = 'TRUE'
+else:
+    allele_info = 'FALSE'
+
 # do workflow specific stuff now
 include: os.path.join(workflow.basedir, "internals.snakefile")
 
@@ -48,15 +53,13 @@ include: os.path.join(maindir, "shared", "rules", "ChiP-seq_qc_report.snakefile"
 #include: os.path.join(maindir, "shared", "rules", "sambamba.snakefile")
 
 # deeptools for allelic bams (if present)
-if os.path.isdir(os.path.join(workingdir,'allelic_bams') ) and os.listdir(os.path.join(workingdir,'allelic_bams') ) != []:
-    allele_info = 'TRUE'
-    include: os.path.join(maindir, "shared", "rules", "deepTools_ChIP_allelic.snakefile")
-else:
-    allele_info = 'FALSE'
+
 
 # histoneHMM (if mode is not allele-specific)
 if allele_info == 'FALSE':
     include: os.path.join(maindir, "shared", "rules", "histoneHMM.snakefile")
+else:
+    include: os.path.join(maindir, "shared", "rules", "deepTools_ChIP_allelic.snakefile")
 
 # CSAW for differential binding (if sampleinfo specified)
 if sampleSheet:
