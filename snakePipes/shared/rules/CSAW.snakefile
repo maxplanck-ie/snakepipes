@@ -88,7 +88,7 @@ rule CSAW:
 
 
 if not allele_info:
-    if not useSpikeInForNorm:
+    if not useSpikeInForNorm or not pipeline=="ATAC-seq":
         rule calc_matrix_log2r_CSAW:
             input:
                 csaw_in = "CSAW_{}_{}/CSAW.session_info.txt".format(peakCaller, sample_name),
