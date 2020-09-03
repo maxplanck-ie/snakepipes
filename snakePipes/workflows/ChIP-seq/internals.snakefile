@@ -53,6 +53,11 @@ def is_chip(sample):
 ### Variable defaults ##########################################################
 ### Initialization #############################################################
 
+if os.path.isdir(os.path.join(workingdir,'allelic_bams') ) and os.listdir(os.path.join(workingdir,'allelic_bams') ) != []:
+    allele_info = 'TRUE'
+else:
+    allele_info = 'FALSE'
+
 # TODO: catch exception if ChIP-seq samples are not unique
 # read ChIP-seq dictionary from config.yaml:
 # { ChIP1: { control: Input1, broad: True }, ChIP2: { control: Input2, broad: false }

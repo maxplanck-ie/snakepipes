@@ -22,7 +22,7 @@ touch SE_input/sample1_R1.fastq.gz \
       SE_input/sample5_R1.fastq.gz \
       SE_input/sample6_R1.fastq.gz
 # Needed by ChIP and ATAC workflows
-mkdir -p BAM_input/deepTools_qc/bamPEFragmentSize BAM_input/filtered_bam BAM_input/Sambamba BAM_input/bamCoverage/
+mkdir -p BAM_input/deepTools_qc/bamPEFragmentSize BAM_input/filtered_bam BAM_input/Sambamba BAM_input/bamCoverage 
 touch BAM_input/sample1.bam \
       BAM_input/sample2.bam \
       BAM_input/sample3.bam \
@@ -55,7 +55,7 @@ touch BAM_input/sample1.bam \
       BAM_input/bamCoverage/sample5.filtered.seq_depth_norm.bw \
       BAM_input/bamCoverage/sample6.filtered.seq_depth_norm.bw 
 
-mkdir -p allelic_BAM_input/allelic_bams allelic_BAM_input/filtered_bam  allelic_BAM_input/deepTools_qc/bamPEFragmentSize allelic_BAM_input/Sambamba
+mkdir -p allelic_BAM_input/allelic_bams allelic_BAM_input/filtered_bam  allelic_BAM_input/deepTools_qc/bamPEFragmentSize allelic_BAM_input/Sambamba allelic_BAM_input/bamCoverage/allele_specific
 touch allelic_BAM_input/allelic_bams/sample1.genome1.sorted.bam \
       allelic_BAM_input/allelic_bams/sample1.genome2.sorted.bam \
       allelic_BAM_input/allelic_bams/sample2.genome1.sorted.bam \
@@ -98,7 +98,13 @@ touch allelic_BAM_input/allelic_bams/sample1.genome1.sorted.bam \
       allelic_BAM_input/Sambamba/sample3.markdup.txt \
       allelic_BAM_input/Sambamba/sample4.markdup.txt \
       allelic_BAM_input/Sambamba/sample5.markdup.txt \
-      allelic_BAM_input/Sambamba/sample6.markdup.txt
+      allelic_BAM_input/Sambamba/sample6.markdup.txt \
+      allelic_BAM_input/bamCoverage/allele_specific/sample1.genome1.seq_depth_norm.bw \
+      allelic_BAM_input/bamCoverage/allele_specific/sample2.genome1.seq_depth_norm.bw \
+      allelic_BAM_input/bamCoverage/allele_specific/sample3.genome1.seq_depth_norm.bw \
+      allelic_BAM_input/bamCoverage/allele_specific/sample4.genome1.seq_depth_norm.bw \
+      allelic_BAM_input/bamCoverage/allele_specific/sample5.genome1.seq_depth_norm.bw \
+      allelic_BAM_input/bamCoverage/allele_specific/sample6.genome1.seq_depth_norm.bw 
 mkdir -p output
 touch /tmp/genes.gtf /tmp/genome.fa /tmp/genome.fa.fai /tmp/rmsk.txt /tmp/genes.bed /tmp/spikein_genes.gtf
 mkdir -p allelic_input
