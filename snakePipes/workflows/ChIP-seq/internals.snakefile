@@ -125,8 +125,9 @@ if not fromBAM:
             ]
         if allele_info:
             req_files.append(os.path.join(workingdir, "bamCoverage/allele_specific/"+sample+".genome1.seq_depth_norm.bw"))
-        if not useSpikeInForNorm and not allele_info:
-            req_files.append(os.path.join(workingdir, "bamCoverage/"+sample+".filtered.seq_depth_norm.bw"))
+        else:
+            if not useSpikeInForNorm:
+                req_files.append(os.path.join(workingdir, "bamCoverage/"+sample+".filtered.seq_depth_norm.bw"))
 
         # check for all samples whether all required files exist
         for file in req_files:
