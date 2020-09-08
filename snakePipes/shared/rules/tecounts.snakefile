@@ -157,7 +157,7 @@ rule cpGTF:
 
 rule symbolFile:
     input: genes_gtf
-    output: temp("Annotation/genes.filtered.symbol")
+    output: "Annotation/genes.filtered.symbol"
     run:
         of = open(output[0], "w")
         for line in open(input[0]):

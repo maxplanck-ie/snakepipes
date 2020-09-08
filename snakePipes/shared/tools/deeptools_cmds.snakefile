@@ -115,7 +115,7 @@ plotEnrich_chip_cmd = """
         -b {input.bams} \
         --BED {params.genes_gtf} \
         --plotFile {output.png} \
-        --labels {params.labels} \
+        {params.labels} \
         --plotTitle 'Signal enrichment (fraction of reads) without duplicates' \
         --outRawCounts {output.tsv} \
         --variableScales \
@@ -129,7 +129,7 @@ plotEnrich_chip_cmd = """
 plotFingerprint_cmd = """
     plotFingerprint \
             -b {input.bams} \
-            --labels {params.labels} \
+            {params.labels} \
             --plotTitle 'Cumulative read counts per bin without duplicates' \
             --ignoreDuplicates \
             --outQualityMetrics {output.metrics} \
