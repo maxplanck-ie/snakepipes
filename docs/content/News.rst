@@ -1,6 +1,15 @@
 snakePipes News
 ===============
 
+snakePipes 2.2.2
+----------------
+
+* Fix DAG inconsistencies for ChIP-seq and ATAC-seq ran fromBAM and from -d.
+* DESeq2 Rmd file is not deleted anymore in noncoding-RNAseq.
+* Python version is fixed at 3.7.
+* Fixed labels in deepTools commands.
+* Allele_info is now boolean.
+
 snakePipes 2.2.1
 ----------------
 
