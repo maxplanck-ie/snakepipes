@@ -11,9 +11,9 @@ build:
 
 requirements:
   host:
-    - python >=3
+    - python ==3.7
   run:
-    - python >=3.7
+    - python ==3.7
     - snakemake ==5.18.0
     - pandas
     - graphviz

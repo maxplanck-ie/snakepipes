@@ -49,9 +49,17 @@ def is_chip(sample):
     """
     return (sample in chip_samples)
 
+def is_allelic(workingdir):
+    if os.path.isdir(os.path.join(workingdir,'allelic_bams') ) and os.listdir(os.path.join(workingdir,'allelic_bams') ) != []:
+        return True
+    else:
+        return False
+
 
 ### Variable defaults ##########################################################
 ### Initialization #############################################################
+
+allele_info=is_allelic(workingdir)
 
 # TODO: catch exception if ChIP-seq samples are not unique
 # read ChIP-seq dictionary from config.yaml:
@@ -107,8 +115,8 @@ chip_samples_wo_ctrl = list(sorted(chip_samples_wo_ctrl))
 chip_samples = sorted(chip_samples_w_ctrl + chip_samples_wo_ctrl)
 all_samples = sorted(control_samples + chip_samples)
 
-if not fromBAM and not useSpikeInForNorm:
-    if pairedEnd:
+if not fromBAM:
+    if pairedEnd and not useSpikeInForNorm:
         if not os.path.isfile(os.path.join(workingdir, "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv")):
             sys.exit('ERROR: {} is required but not present\n'.format(os.path.join(workingdir, "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv")))
 
@@ -116,8 +124,13 @@ if not fromBAM and not useSpikeInForNorm:
     for sample in all_samples:
         req_files = [
             os.path.join(workingdir, "filtered_bam/"+sample+".filtered.bam"),
-            os.path.join(workingdir, "filtered_bam/"+sample+".filtered.bam.bai")
+            os.path.join(workingdir, "filtered_bam/"+sample+".filtered.bam.bai"),
             ]
+        if allele_info:
+            req_files.append(os.path.join(workingdir, "bamCoverage/allele_specific/"+sample+".genome1.seq_depth_norm.bw"))
+        else:
+            if not useSpikeInForNorm:
+                req_files.append(os.path.join(workingdir, "bamCoverage/"+sample+".filtered.seq_depth_norm.bw"))
 
         # check for all samples whether all required files exist
         for file in req_files:
