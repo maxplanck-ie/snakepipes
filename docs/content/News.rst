@@ -1,11 +1,21 @@
 snakePipes News
 ===============
 
+
 snakePipes 2.x.y
 ----------------
 
 * Genrich will now run if sampleSheet without replicates is provided.
 
+
+snakePipes 2.2.2
+----------------
+
+* Fix DAG inconsistencies for ChIP-seq and ATAC-seq ran fromBAM and from -d.
+* DESeq2 Rmd file is not deleted anymore in noncoding-RNAseq.
+* Fixed labels in deepTools commands.
+* Allele_info is now boolean.
+>>>>>>> fe82f850134c819a783a69efa6d9a11a5e6c477d
 
 snakePipes 2.2.1
 ----------------

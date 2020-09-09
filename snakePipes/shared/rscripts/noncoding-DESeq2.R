@@ -139,5 +139,4 @@ sessionInfo()
 sink()
 
 ## ~~~~~~ 9. clean up ~~~~~
-file.remove('DESeq2_report_basic.Rmd')
 file.remove('citations.bib')

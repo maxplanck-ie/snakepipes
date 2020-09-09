@@ -48,30 +48,27 @@ include: os.path.join(maindir, "shared", "rules", "ChiP-seq_qc_report.snakefile"
 #include: os.path.join(maindir, "shared", "rules", "sambamba.snakefile")
 
 # deeptools for allelic bams (if present)
-if os.path.isdir(os.path.join(workingdir,'allelic_bams') ) and os.listdir(os.path.join(workingdir,'allelic_bams') ) != []:
-    allele_info = 'TRUE'
-    include: os.path.join(maindir, "shared", "rules", "deepTools_ChIP_allelic.snakefile")
-else:
-    allele_info = 'FALSE'
+
 
 # histoneHMM (if mode is not allele-specific)
-if allele_info == 'FALSE':
+if not allele_info:
     include: os.path.join(maindir, "shared", "rules", "histoneHMM.snakefile")
+else:
+    include: os.path.join(maindir, "shared", "rules", "deepTools_ChIP_allelic.snakefile")
 
 # CSAW for differential binding (if sampleinfo specified)
 if sampleSheet and cf.check_replicates(sampleSheet):
     include: os.path.join(maindir, "shared", "rules", "CSAW.snakefile")
     include: os.path.join(maindir, "shared", "rules", "nearestGene.snakefile")
     include: os.path.join(maindir, "shared", "rules", "filterGTF.snakefile")
-
-if not fromBAM and not useSpikeInForNorm:
-    # These are needed for the snakefile to be imported
-    aligner = "Bowtie2"
-    downsample = False
-    include: os.path.join(maindir, "shared", "rules", "deepTools_qc.snakefile")
+    #if not fromBAM and not useSpikeInForNorm:
+        # These are needed for the snakefile to be imported
+        #aligner = "Bowtie2"
+        #downsample = False
+        #include: os.path.join(maindir, "shared", "rules", "deepTools_qc.snakefile")
 
 def run_histoneHMM(allele_info):
-    if allele_info == 'FALSE':
+    if not allele_info:
         ## run histoneHMM broad enrichment calling only for samples annotated as *broad*
         file_list = expand("histoneHMM/{chip_sample}.filtered.histoneHMM-regions.gff.gz", chip_sample = [s for s in chip_samples if is_broad(s)])
     else:
@@ -142,7 +139,7 @@ def run_deepTools_allelic():
 def run_CSAW():
     if sampleSheet and cf.check_replicates(sampleSheet):
         file_list=["CSAW_{}_{}/CSAW.session_info.txt".format(peakCaller, sample_name)]
-        if allele_info == 'FALSE':
+        if not allele_info :
             file_list.append(["Annotation/genes.filtered.symbol","Annotation/genes.filtered.t2g","CSAW_{}_{}/CSAW.Stats_report.html".format(peakCaller, sample_name)])
             file_list.append([os.path.join("CSAW_{}_{}".format(peakCaller, sample_name), x) for x in list(itertools.chain.from_iterable([expand("CSAW.{change_dir}.cov.matrix",change_dir=change_direction),expand("CSAW.{change_dir}.cov.heatmap.png",change_dir=change_direction)]))])
             file_list.append([os.path.join("AnnotatedResults_{}_{}".format(peakCaller,sample_name), x) for x in list(itertools.chain.from_iterable([expand("Filtered.results.{change_dir}_withNearestGene.txt",change_dir=change_direction)]))])
