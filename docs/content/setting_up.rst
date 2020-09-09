@@ -193,7 +193,7 @@ Download premade indices
 For the sake of convenience, we provide premade indices for the following organisms:
 
  - `Human (GRCh38, Gencode release 29) <https://zenodo.org/record/2650763>`__
- - `Mouse (GRCm38/mm10, Gencode release m19) <https://zenodo.org/record/3629114>`__
+ - `Mouse (GRCm38/mm10, Gencode release m19) <https://zenodo.org/record/4020455>`__
  - `Mouse (GRCm37/mm9, Gencode release 1) <https://zenodo.org/record/2650849>`__
  - `Fruit fly (dm6, Ensembl release 94) <https://zenodo.org/record/2650762>`__
 
