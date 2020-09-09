@@ -15,7 +15,7 @@ snakePipes 2.2.2
 * DESeq2 Rmd file is not deleted anymore in noncoding-RNAseq.
 * Fixed labels in deepTools commands.
 * Allele_info is now boolean.
->>>>>>> fe82f850134c819a783a69efa6d9a11a5e6c477d
+
 
 snakePipes 2.2.1
 ----------------
