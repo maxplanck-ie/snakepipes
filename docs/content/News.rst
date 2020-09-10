@@ -6,6 +6,7 @@ snakePipes 2.x.y
 ----------------
 
 * Genrich will now run if sampleSheet without replicates is provided.
+* Updated zenodo link to mouse genome GRCm38/mm10 .
 
 
 snakePipes 2.2.2
