@@ -57,7 +57,7 @@ else:
     include: os.path.join(maindir, "shared", "rules", "deepTools_ChIP_allelic.snakefile")
 
 # CSAW for differential binding (if sampleinfo specified)
-if sampleSheet:
+if sampleSheet and cf.check_replicates(sampleSheet):
     include: os.path.join(maindir, "shared", "rules", "CSAW.snakefile")
     include: os.path.join(maindir, "shared", "rules", "nearestGene.snakefile")
     include: os.path.join(maindir, "shared", "rules", "filterGTF.snakefile")
@@ -137,7 +137,7 @@ def run_deepTools_allelic():
     return(file_list)
 
 def run_CSAW():
-    if sampleSheet:
+    if sampleSheet and cf.check_replicates(sampleSheet):
         file_list=["CSAW_{}_{}/CSAW.session_info.txt".format(peakCaller, sample_name)]
         if not allele_info :
             file_list.append(["Annotation/genes.filtered.symbol","Annotation/genes.filtered.t2g","CSAW_{}_{}/CSAW.Stats_report.html".format(peakCaller, sample_name)])
