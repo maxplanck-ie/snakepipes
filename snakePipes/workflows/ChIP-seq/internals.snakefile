@@ -186,7 +186,7 @@ if sampleSheet:
     if chip_samples_w_ctrl:
         filtered_dict = filter_dict(sampleSheet,dict(zip(chip_samples_w_ctrl, [ get_control_name(x) for x in chip_samples_w_ctrl ])))
     else:
-        filtered_dict = filter_dict(sampleSheet,dict(zip(chip_samples_wo_ctrl, [ get_control_name(x) for x in chip_samples_wo_ctrl ])))
+        filtered_dict = filter_dict(sampleSheet,dict(zip(chip_samples_wo_ctrl, [None]*len(chip_samples_wo_ctrl))))
     reordered_dict = {k: filtered_dict[k] for k in [item for sublist in genrichDict.values() for item in sublist]}
 else:
     genrichDict = {"all_samples": chip_samples}
