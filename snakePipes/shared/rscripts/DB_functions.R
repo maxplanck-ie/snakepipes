@@ -338,7 +338,7 @@ writeOutput_chip <- function(chipResultObject, outfile_prefix, fdrcutoff,lfccuto
     tabx$name<-rownames(tabx)
     full_res<-as.data.frame(merge(x=tabx,y=tabcom,by.x="name",by.y="name"),stringsAsFactors=FALSE) 
     full_res<-full_res[,c(2:ncol(full_res),1)]
-    full_res[,1]<-full_res[,1]-1
+    full_res[,2]<-as.numeric(full_res[,2])-1
     print(sprintf("Colnames of result file are %s",colnames(full_res)))
     ##filter full result for FDR and LFC and write to output
     full_res.filt<-subset(full_res,(FDR<=fdrcutoff)&(abs(best.logFC)>=lfccutoff))
