@@ -73,8 +73,9 @@ if not os.path.isfile(samples_config):
 if sampleSheet:
     cf.check_sample_info_header(sampleSheet)
     if not cf.check_replicates(sampleSheet):
-        print("\nWarning! CSAW cannot be invoked without replicates!\n")
-        sys.exit()
+        print("\nWarning! CSAW cannot be invoked without replicates and will not be run!\n")
+        if not peakCaller=="Genrich":
+            sys.exit()
 
 chip_dict = {}
 with open(samples_config, "r") as f:
@@ -181,8 +182,11 @@ def filter_dict(sampleSheet,input_dict):
     return(output_dict)
 
 if sampleSheet:
-    filtered_dict = filter_dict(sampleSheet,dict(zip(chip_samples_w_ctrl, [ get_control_name(x) for x in chip_samples_w_ctrl ])))
     genrichDict = cf.sampleSheetGroups(sampleSheet)
+    if chip_samples_w_ctrl:
+        filtered_dict = filter_dict(sampleSheet,dict(zip(chip_samples_w_ctrl, [ get_control_name(x) for x in chip_samples_w_ctrl ])))
+    else:
+        filtered_dict = filter_dict(sampleSheet,dict(zip(chip_samples_wo_ctrl, [None]*len(chip_samples_wo_ctrl))))
     reordered_dict = {k: filtered_dict[k] for k in [item for sublist in genrichDict.values() for item in sublist]}
 else:
     genrichDict = {"all_samples": chip_samples}

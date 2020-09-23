@@ -1,6 +1,15 @@
 snakePipes News
 ===============
 
+
+snakePipes 2.2.3
+----------------
+
+* Genrich will now run if sampleSheet without replicates is provided.
+* Updated zenodo link to mouse genome GRCm38/mm10 .
+* Fixed start coordinates in Filtered results bed from CSAW.
+
+
 snakePipes 2.2.2
 ----------------
 
@@ -9,6 +18,7 @@ snakePipes 2.2.2
 * Fixed labels in deepTools commands.
 * Allele_info is now boolean.
 
+
 snakePipes 2.2.1
 ----------------
 
@@ -16,6 +26,7 @@ snakePipes 2.2.1
 * Fixed deepTools qc DAG for ChIPseq with spikein.
 * Added DAG test for allelic ChIPseq.
 * Fixed a bug with deepTools QC for allelic mRNAseq.
+
 
 snakePipes 2.2.0
 ----------------
