@@ -53,7 +53,8 @@ if not cf.is_paired(infiles,ext,reads):
 
 ## print deprecation message for modeGruen
 if mode=="Gruen":
-    print("Warning: mode Gruen is going to be deprecated by the end of 2020!")
+    print("Mode Gruen has been deprecated! Please use mode STARsolo or Alevin for your analysis.")
+    exit(1)
 
 
 if mode == "STARsolo":

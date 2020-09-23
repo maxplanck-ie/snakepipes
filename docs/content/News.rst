@@ -1,6 +1,11 @@
 snakePipes News
 ===============
 
+snakePipes 2.x.y
+----------------
+
+* Deprecated mode Gruen in scRNAseq.
+
 
 snakePipes 2.2.3
 ----------------
