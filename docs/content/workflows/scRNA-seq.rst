@@ -12,7 +12,7 @@ There are currently two analysis modes available:
 - "STARsolo" which uses STAR solo for mapping and quantitation.
 - "Alevin" based on Salmon for generating the count matrix.
 
-Mode "Gruen" has been deprecated.
+.. note:: Mode "Gruen" has been deprecated.
 
 The general procedure for mode "STARsolo" involves:
 
