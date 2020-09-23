@@ -2,11 +2,12 @@ snakePipes News
 ===============
 
 
-snakePipes 2.x.y
+snakePipes 2.2.3
 ----------------
 
 * Genrich will now run if sampleSheet without replicates is provided.
 * Updated zenodo link to mouse genome GRCm38/mm10 .
+* Fixed start coordinates in Filtered results bed from CSAW.
 
 
 snakePipes 2.2.2
