@@ -17,8 +17,8 @@ suppressPackageStartupMessages({
   library(GenomicRanges)
 })
 
-gtf<-snakemake@input["gtf"]
-genome<-snakemake@input["fasta"]
+gtf<-snakemake@params["gtf"]
+genome_fasta<-snakemake@input["genome_fasta"]
 scriptdir<-snakemake@params["scriptdir"]
 isoform_action<-snakemake@params["isoform_action"]
 flanklength<-snakemake@params["flank_length"]
@@ -36,7 +36,7 @@ source(file.path(scriptdir, "extractTxSeqs.R"))
 
 ## Extract intronic sequences flanked by L-1 bases 
 ## of exonic sequences where L is the biological read length
-genome <- Biostrings::readDNAStringSet(genome)
+genome <- Biostrings::readDNAStringSet(genome_fasta)
 names(genome) <- sapply(strsplit(names(genome), " "), .subset, 1)
 gtfdf <- as.data.frame(rtracklayer::import(gtf))
 
@@ -55,6 +55,7 @@ if (isoform_action == "collapse") {
   t2gin <- data.frame(intr = names(intr),
                       gene = gsub("\\-I[0-9]*$", "", names(intr)),
                       stringsAsFactors = FALSE)
+   t2gin$gene_id<-paste0(t2gin$gene_id,"-I")
 } else if (isoform_action == "separate") {
   ## Intron names contain transcript name
   t2gin <- data.frame(intr = names(intr),
@@ -62,6 +63,7 @@ if (isoform_action == "collapse") {
                       stringsAsFactors = FALSE) %>%
     dplyr::left_join(t2gtx, by = "transcript_id") %>%
     dplyr::select(intr, gene_id)
+  t2gin$gene_id<-paste0(t2gin$gene_id,"-I")
 } else {
   stop("Unknown isoform_action")
 }

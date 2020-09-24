@@ -61,15 +61,17 @@ rule AlevinQC:
 rule run_eisaR:
     input:
         gtf = "Annotation/genes.filtered.gtf",
-        fasta = genome_fasta
+        genome_fasta = genome_fasta,
+        one_fastq = "originalFASTQ/"+samples[0]+reads[0]+ext
     output:
         joint_fasta = "Annotation/cDNA_introns.joint.fa",
         joint_t2g = "Annotation/cDNA_introns.joint.t2g"
     params:
-        wdir = os.path.join(wdir, "Annotation"),
+        wdir = os.path.join(outdir, "Annotation"),
         scriptdir = workflow_rscripts,
         isoform_action = "separate",
-        flank_length = get_flank_length(os.path.join(wdir,"originalFASTQ/"+samples[0]+reads[0]+ext),read_length_frx)
+        flank_length = lambda wildcards,input: get_flank_length(os.path.join(outdir,input.one_fastq),read_length_frx),
+        gtf = lambda wildcards,input: os.path.join(outdir, input.gtf)
     log:
         out = "Annotation/logs/eisaR.out"
     conda: CONDA_eisaR_ENV
@@ -85,10 +87,10 @@ rule Salmon_index_joint_fa:
         decoys = "Salmon/SalmonIndex/decoys.txt",
         genome_fasta = genome_fasta
     output:
-        seq_fa = temp("Salmon/SalmonIndex_RNAVelocity/seq.fa")
+        seq_fa = temp("Salmon/SalmonIndex_RNAVelocity/seq.fa"),
         salmon_index = "Salmon/SalmonIndex_RNAVelocity/seq.bin"
     log:
-        err = "Salmon/SalmonIndex_RNAVelocity/logs/SalmonIndex.err"
+        err = "Salmon/SalmonIndex_RNAVelocity/logs/SalmonIndex.err",
         out = "Salmon/SalmonIndex_RNAVelocity/logs/SalmonIndex.out"
     threads: 8
     conda: CONDA_RNASEQ_ENV
