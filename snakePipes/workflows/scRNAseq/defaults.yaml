@@ -52,6 +52,7 @@ alevinLibraryType: "ISR"
 prepProtocol: "celseq2"
 salmonIndexOptions: --type puff -k 31
 expectCells: 
+read_length_frx: 0.8
 #generic options
 libraryType: 1
 bwBinSize: 10
