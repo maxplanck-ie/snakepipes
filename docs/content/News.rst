@@ -5,6 +5,7 @@ snakePipes 2.x.y
 ----------------
 
 * Deprecated mode Gruen in scRNAseq.
+* Added RNA velocity to mode Alevin in scRNAseq.
 
 
 snakePipes 2.2.3
