@@ -17,28 +17,35 @@ suppressPackageStartupMessages({
   library(GenomicRanges)
 })
 
-gtf<-snakemake@params["gtf"]
-genome_fasta<-snakemake@input["genome_fasta"]
-scriptdir<-snakemake@params["scriptdir"]
-isoform_action<-snakemake@params["isoform_action"]
-flanklength<-snakemake@params["flank_length"]
-joint_fasta<-snakemake@output["joint_fasta"]
-joint_t2g<-snakemake@output["joint_t2g"]
+gtf<-snakemake@params[["gtf"]]
+genome_fasta<-snakemake@input[["genome_fasta"]]
+scriptdir<-snakemake@params[["scriptdir"]]
+isoform_action<-snakemake@params[["isoform_action"]]
+flanklength<-as.integer(snakemake@params[["flank_length"]])
+joint_fasta<-snakemake@params[["joint_fasta"]]
+joint_t2g<-snakemake@params[["joint_t2g"]]
 
 print(scriptdir)
 print(gtf)
-print(genome)
+print(genome_fasta)
 print(isoform_action)
 print(flanklength)
 
+print("sourcing extractIntronSeqs.R ..")
 source(file.path(scriptdir, "extractIntronSeqs.R"))
+print("sourcing extractTxSeqs.R ..")
 source(file.path(scriptdir, "extractTxSeqs.R"))
+print("..done")
 
 ## Extract intronic sequences flanked by L-1 bases 
 ## of exonic sequences where L is the biological read length
+print("loading genome ..")
 genome <- Biostrings::readDNAStringSet(genome_fasta)
 names(genome) <- sapply(strsplit(names(genome), " "), .subset, 1)
+print("..done")
+print("loading gtf ..")
 gtfdf <- as.data.frame(rtracklayer::import(gtf))
+print("..done")
 
 ## Extract transcript and intron sequences
 tx <- extractTxSeqs(gtf = gtf, genome = genome, type = "spliced")

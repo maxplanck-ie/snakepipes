@@ -60,7 +60,7 @@ rule AlevinQC:
 
 rule run_eisaR:
     input:
-        gtf = "Annotation/genes.filtered.gtf",
+        gtf = genes_gtf,
         genome_fasta = genome_fasta,
         one_fastq = "originalFASTQ/"+samples[0]+reads[0]+ext
     output:
@@ -71,7 +71,9 @@ rule run_eisaR:
         scriptdir = workflow_rscripts,
         isoform_action = "separate",
         flank_length = lambda wildcards,input: get_flank_length(os.path.join(outdir,input.one_fastq),read_length_frx),
-        gtf = lambda wildcards,input: os.path.join(outdir, input.gtf)
+        gtf = lambda wildcards,input: os.path.join(outdir, input.gtf),
+        joint_fasta = lambda wildcards,output: os.path.join(outdir,output.joint_fasta),
+        joint_t2g = lambda wildcards,output: os.path.join(outdir,output.joint_t2g)
     log:
         out = "Annotation/logs/eisaR.out"
     conda: CONDA_eisaR_ENV
@@ -89,6 +91,8 @@ rule Salmon_index_joint_fa:
     output:
         seq_fa = temp("Salmon/SalmonIndex_RNAVelocity/seq.fa"),
         salmon_index = "Salmon/SalmonIndex_RNAVelocity/seq.bin"
+    params:
+        salmonIndexOptions = salmonIndexOptions
     log:
         err = "Salmon/SalmonIndex_RNAVelocity/logs/SalmonIndex.err",
         out = "Salmon/SalmonIndex_RNAVelocity/logs/SalmonIndex.out"
