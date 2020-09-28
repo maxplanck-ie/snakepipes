@@ -194,7 +194,7 @@ elif mode=="Alevin":
             expand("multiQC/Alevin_{sample}.html", sample=samples),
             "multiQC/multiqc_report.html",
             expand("AlevinForVelocity/{sample}/alevin/quants_mat.gz",sample=samples),
-            SingleCellExperiment/AlevinForVelocity/merged_samples.RDS"
+            "SingleCellExperiment/AlevinForVelocity/merged_samples.RDS"
 
 
 ### execute after workflow finished ############################################

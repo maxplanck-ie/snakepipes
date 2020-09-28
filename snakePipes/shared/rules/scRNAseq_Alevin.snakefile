@@ -130,14 +130,14 @@ rule AlevinForVelocity:
 rule split_matrices:
     input:
         quantmat = expand("AlevinForVelocity/{sample}/alevin/quants_mat.gz",sample=samples),
-        t2g = Annotation/cDNA_introns.joint.t2g"
+        t2g = "Annotation/cDNA_introns.joint.t2g"
     output:
         merged = "SingleCellExperiment/AlevinForVelocity/merged_samples.RDS"
     params:
-        wdir = os.path.join(outdir,"SingleCellExperiment/AlevinForVelocity")
+        wdir = os.path.join(outdir,"SingleCellExperiment/AlevinForVelocity"),
         alevindir = os.path.join(outdir,"AlevinForVelocity"),
         samplenames = samples,
-        t2g = lambda wildcards,input: os.path.join(outdir, input.t2g)
+        t2g = lambda wildcards,input: os.path.join(outdir, input.t2g),
         outfile = lambda wildcards,output: os.path.join(outdir, output.merged)
     log:
         out = "SingleCellExperiment/AlevinForVelocity/logs/alevin2sce.out"
