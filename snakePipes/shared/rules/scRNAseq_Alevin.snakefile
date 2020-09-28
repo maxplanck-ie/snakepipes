@@ -96,7 +96,7 @@ rule Salmon_index_joint_fa:
     log:
         err = "Salmon/SalmonIndex_RNAVelocity/logs/SalmonIndex.err",
         out = "Salmon/SalmonIndex_RNAVelocity/logs/SalmonIndex.out"
-    threads: 8
+    threads: 16
     conda: CONDA_RNASEQ_ENV
     shell:"""
         cat {input.joint_fasta} {input.genome_fasta} > {output.seq_fa}

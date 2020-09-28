@@ -19,7 +19,7 @@ filter_cells_raceid:
 STARsolo:
     memory: 6G
 SalmonIndex:
-    memory: 2G
+    memory: 3G
 Salmon_index_joint_fa:
     memory: 3G
 SalmonAlevin:
