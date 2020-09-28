@@ -24,6 +24,8 @@ Salmon_index_joint_fa:
     memory: 3G
 SalmonAlevin:
     memory: 6G
+AlevinForVelocity:
+    memory: 6G
 cellsort_bam:
     memory: 10G
 velocyto:

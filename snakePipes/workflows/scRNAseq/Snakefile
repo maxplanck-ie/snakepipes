@@ -192,7 +192,8 @@ elif mode=="Alevin":
             "Salmon/SalmonIndex_RNAVelocity/seq.bin",
             expand("Alevin/{sample}/alevin/quants_mat.gz",sample = samples),
             expand("multiQC/Alevin_{sample}.html", sample=samples),
-            "multiQC/multiqc_report.html"
+            "multiQC/multiqc_report.html",
+            expand("AlevinForVelocity/{sample}/alevin/quants_mat.gz",sample=samples)
 
 
 ### execute after workflow finished ############################################

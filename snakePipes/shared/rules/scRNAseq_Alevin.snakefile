@@ -64,7 +64,7 @@ rule run_eisaR:
         genome_fasta = genome_fasta,
         one_fastq = "originalFASTQ/"+samples[0]+reads[0]+ext
     output:
-        joint_fasta = "Annotation/cDNA_introns.joint.fa",
+        joint_fasta = temp("Annotation/cDNA_introns.joint.fa"),
         joint_t2g = "Annotation/cDNA_introns.joint.t2g"
     params:
         wdir = os.path.join(outdir, "Annotation"),
@@ -108,7 +108,7 @@ rule AlevinForVelocity:
             R2 = "originalFASTQ/{sample}"+reads[0]+".fastq.gz",
             R1 = "originalFASTQ/{sample}"+reads[1]+".fastq.gz",
             bin = "Salmon/SalmonIndex_RNAVelocity/seq.bin",
-            tgMap = "Annotation/Annotation/cDNA_introns.joint.t2g"
+            tgMap = "Annotation/cDNA_introns.joint.t2g"
         params:
             protocol = "--" + prepProtocol,
             whitelist = "--whitelist {}".format(BCwhiteList) if BCwhiteList else "",
@@ -127,12 +127,21 @@ rule AlevinForVelocity:
             salmon alevin -l {params.libtype} -1 {input.R1} -2 {input.R2} {params.protocol} -i Salmon/SalmonIndex_RNAVelocity -p {threads} -o {params.outdir} --tgMap {input.tgMap} --dumpFeatures --dumpMtx --numCellBootstraps 100 > {log.out} 2> {log.err}
             """
 
-#rule split_matrices:
-#    input:
-#        quantmat = "AlevinForVelocity/{sample}/alevin/quants_mat.gz"
-#    output:
-#        spliced = ""
-#        unspliced = ""
-#    script: "../rscripts/scRNAseq_splitAlevinVelocityMatrices.R"
+rule split_matrices:
+    input:
+        quantmat = expand("AlevinForVelocity/{sample}/alevin/quants_mat.gz",sample=samples),
+        t2g = Annotation/cDNA_introns.joint.t2g"
+    output:
+        merged = "SingleCellExperiment/AlevinForVelocity/merged_samples.RDS"
+    params:
+        wdir = os.path.join(outdir,"SingleCellExperiment/AlevinForVelocity")
+        alevindir = os.path.join(outdir,"AlevinForVelocity"),
+        samplenames = samples,
+        t2g = lambda wildcards,input: os.path.join(outdir, input.t2g)
+        outfile = lambda wildcards,output: os.path.join(outdir, output.merged)
+    log:
+        out = "SingleCellExperiment/AlevinForVelocity/logs/alevin2sce.out"
+    conda: CONDA_eisaR_ENV
+    script: "../rscripts/scRNAseq_splitAlevinVelocityMatrices.R"
 
 

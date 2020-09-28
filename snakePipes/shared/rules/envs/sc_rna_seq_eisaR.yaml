@@ -10,3 +10,9 @@ dependencies:
  - bioconductor-biocgenerics
  - bioconductor-bsgenome
  - bioconductor-genomicranges
+ - bioconductor-tximeta
+ - bioconductor-summarizedexperiment
+ - bioconductor-singlecellexperiment
+ - bioconductor-scater
+ - bioconductor-biocparallel
+ - bioconductor-biocsingular
