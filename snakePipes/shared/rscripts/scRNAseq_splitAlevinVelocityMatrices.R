@@ -54,16 +54,14 @@ sce_from_scounts_ucounts <- function(scounts, ucounts) {
 
 
 read_alevin_cdna_introns <- function(alevindir, sampleid, tx2gene) {
-  cdna_introns <- tximeta(coldata = data.frame(
-    names = sampleid,
-    files = file.path(alevindir,s,"alevin", "quants_mat.gz"),
-    stringsAsFactors = FALSE
-  ), type = "alevin")
-  uidx <- grep("\\.*I\\.*$", cdna_introns[,2])
-  sidx <- grep("\\.*I\\.*$", cdna_introns[,2], invert = TRUE)
-  ucounts <- assay(cdna_introns, "counts")[uidx, ]
-  scounts <- assay(cdna_introns, "counts")[sidx, ]
-  rownames(ucounts) <- gsub("\\.*I\\.*$", "", rownames(ucounts))
+  cdna_introns <- tximport::tximport(
+    files = file.path(alevindir,sampleid,"alevin", "quants_mat.gz"),
+    type = "alevin",dropInfReps=TRUE,tx2gene=tx2gene)[["counts"]]
+  uidx <- grep("\\.*I\\.*$", rownames(cdna_introns))
+  sidx <- grep("\\.*I\\.*$", rownames(cdna_introns), invert = TRUE)
+  ucounts <- cdna_introns[uidx, ]
+  scounts <- cdna_introns[sidx, ]
+  rownames(ucounts) <- gsub("\\.*-I\\.*$", "", rownames(ucounts))
   rownames(scounts) <- gsub("\\.*$", "", rownames(scounts))
   cdna_introns <- sce_from_scounts_ucounts(scounts, ucounts)
   rownames(cdna_introns) <- scater::uniquifyFeatureNames(
@@ -76,18 +74,22 @@ read_alevin_cdna_introns <- function(alevindir, sampleid, tx2gene) {
 
 ###snakameke params here
 t2g<-snakemake@params[["t2g"]]
+g2s<-snakemake@params[["g2s"]]
 alevindir<-snakemake@params[["alevindir"]]
 samplenames<-snakemake@params[["samplenames"]]
 outfile<-snakemake@params[["outfile"]]
 
+print(alevindir)
+print(samplenames)
+
 ## cDNA/introns quantified jointly
 tx2gene <- read.table(t2g,header=FALSE,sep="\t",quote="",as.is=TRUE)
+colnames(tx2gene)<-c("transcript_id","gene_id")
+gene2symbol<- read.table(g2s,header=FALSE,sep="\t",quote="",as.is=TRUE)
+tx2gene$gene_name<-gene2symbol$V2[match(tx2gene$gene_id,gene2symbol$V1)]
 
-sce<- do.call(cbind, lapply(samplenames, function(s) {
-        tmp <- read_alevin_cdna_introns(
-          alevindir = file.path(alevindir),
-          sampleid = s, tx2gene = tx2gene
-        )
+sce<- do.call(cbind, lapply(samplenames, function(s) { 
+        tmp <- read_alevin_cdna_introns(alevindir = alevindir,sampleid = s, tx2gene = tx2gene)
         colnames(tmp) <- paste0(s, "__", colnames(tmp))
         tmp
       }))

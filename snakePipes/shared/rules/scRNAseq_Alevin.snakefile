@@ -127,10 +127,11 @@ rule AlevinForVelocity:
             salmon alevin -l {params.libtype} -1 {input.R1} -2 {input.R2} {params.protocol} -i Salmon/SalmonIndex_RNAVelocity -p {threads} -o {params.outdir} --tgMap {input.tgMap} --dumpFeatures --dumpMtx --numCellBootstraps 100 > {log.out} 2> {log.err}
             """
 
-rule split_matrices:
+rule velo_to_sce:
     input:
         quantmat = expand("AlevinForVelocity/{sample}/alevin/quants_mat.gz",sample=samples),
-        t2g = "Annotation/cDNA_introns.joint.t2g"
+        t2g = "Annotation/cDNA_introns.joint.t2g",
+        g2s = "Annotation/genes.filtered.symbol"
     output:
         merged = "SingleCellExperiment/AlevinForVelocity/merged_samples.RDS"
     params:
@@ -138,6 +139,7 @@ rule split_matrices:
         alevindir = os.path.join(outdir,"AlevinForVelocity"),
         samplenames = samples,
         t2g = lambda wildcards,input: os.path.join(outdir, input.t2g),
+        g2s = lambda wildcards,input: os.path.join(outdir, input.g2s),
         outfile = lambda wildcards,output: os.path.join(outdir, output.merged)
     log:
         out = "SingleCellExperiment/AlevinForVelocity/logs/alevin2sce.out"

@@ -16,3 +16,4 @@ dependencies:
  - bioconductor-scater
  - bioconductor-biocparallel
  - bioconductor-biocsingular
+ - bioconductor-fishpond

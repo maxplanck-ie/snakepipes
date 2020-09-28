@@ -34,3 +34,5 @@ STARsolo_raw_to_seurat:
     memory: 10G
 run_eisaR:
     memory: 30G
+velo_to_sce:
+    memeory: 30G
