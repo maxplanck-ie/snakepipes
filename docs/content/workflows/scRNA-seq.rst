@@ -145,6 +145,8 @@ Fraction of read length required to overlap the intron
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In mode Alevin, the fraction of read length required to overlap the intron in order to be counted as "unspliced" is set to 0.2 (i.e. 20%) by default. This corresponds to 10nt in a 50nt-long read, or to 20nt in a 100nt-long read. The user is encouraged to modify this value as deemed appropriate via the ``--readLengthFrx`` commandline argument.
+In practice, this variable affects the length of the exon sequence flank added to the intron sequence to generate reference sequences for Salmon Alevin. Exon sequence flank length is set to one minus 'readLengthFrx' of read length.
+
 
 
 Output structure
