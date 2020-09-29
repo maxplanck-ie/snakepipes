@@ -187,7 +187,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
 
     optional.add_argument("--readLengthFrx",
                           type=int,
-                          dest="readLengthFrx"
+                          dest="readLengthFrx",
                           help="Fraction of read length required to align to the intronic sequence (default: '%(default)s')",
                           default=defaults["readLengthFrx"])
 
