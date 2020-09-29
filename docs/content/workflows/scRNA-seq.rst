@@ -29,7 +29,7 @@ Mode "Alevin" involves:
 2. Mapping and generation of a readcount matrix.
 3. Estimation of uncertainty of gene counts using bootstrap method implemented in Salmon Alevin.
 4. General QC of the Alevin run using the AlevinQC R package.
-5. Quantification of reads supporting spliced and unspliced transcripts in each cell with Alevin - unless this has been disabled with --skipVelocyto .
+5. Quantification of "spliced" and "unspliced" read counts in each cell with Alevin - unless this has been disabled with --skipVelocyto .
 
 .. image:: ../images/scRNAseq_pipeline.png
 
@@ -90,23 +90,25 @@ The default configuration file is listed below and can be found in ``snakePipes/
     trim: False
     trimmer: cutadapt
     trimmerOptions: -a A{'30'}
-    ## N.B., setting --outBAMsortingBinsN too high can result in cryptic errors
-    alignerOptions: "--outBAMsortingBinsN 30 --twopassMode Basic"
+    ## --twopassMode Basic is not compatible with --outStd in all STAR versions
+    alignerOptions: ""
     ## further options
     filterGTF: "-v -P 'decay|pseudogene' "
     cellBarcodeFile:
     cellBarcodePattern: "NNNNNNXXXXXX"
     splitLib: False
     cellNames:
-    ##STARsolo options
+    ##mode STARsolo options
     myKit: CellSeq384
     BCwhiteList:
     STARsoloCoords: ["1","7","8","7"]
+    skipVelocyto: False
     ##mode Alevin options
     alevinLibraryType: "ISR"
     prepProtocol: "celseq2"
     salmonIndexOptions: --type puff -k 31
     expectCells: 
+    readLengthFrx: 0.2
     #generic options
     libraryType: 1
     bwBinSize: 10
@@ -173,6 +175,7 @@ The following will be produced in the output directory when the workflow is run 
 The following output structure will be produced when running in Alevin mode::
 
     ├── Alevin
+    ├── AlevinForVelocity
     ├── Annotation
     ├── cluster_logs
     ├── FastQC
@@ -184,12 +187,14 @@ The following output structure will be produced when running in Alevin mode::
     ├── scRNAseq_organism.yaml
     ├── scRNAseq_pipeline.pdf
     ├── scRNAseq_run-1.log
-    └── scRNAseq_tools.txt
+    ├── scRNAseq_tools.txt
+    └── SingleCellExperiment
 
  - The **Salmon** directory contains the generated genome index.
- - The **Alevin** directory contains the matrix failes (both bootstrapped and raw) per sample in subdirectories.
+ - The **Alevin** directory contains the matrix files (both bootstrapped and raw) per sample in subdirectories.
  - The **multiQC** directory contains an additional alevinQC html file generated per sample.
-
+ - The **AlevinForVelocity** directory contains the matrix files with "spliced" and "unspliced" reads per cell in subdirectories.
+ - The **SingleCellExperiment** directory contains the RDS files with "SingleCellExperiment" class R objects, storing spliced/unspliced counts per cell in corresponding assays.
 
 Understanding the outputs: mode STARsolo
 ----------------------------------------
@@ -206,7 +211,7 @@ Understanding the outputs: mode STARsolo
 Understanding the outputs: mode Alevin
 --------------------------------------
 
-- **Main result:** output folders containing the raw and boostrapped count matrices are found under the sample subfolders under ``Alevin``. The sample specific Alevin folders contain the matrices, as well as column data (barcodes) and row data (genes).
+- **Main result:** output folders containing the raw and boostrapped count matrices are found under the sample subfolders under ``Alevin``. The sample specific Alevin folders contain the matrices, as well as column data (barcodes) and row data (genes). Alevin spliced/unspliced counts for RNA velocity are stored as alevin matrices in the sample subfolders under ``AlevinForVelocity`` and as "SingleCellExperiment" class R objects under ``SingleCellExperiment``.
 
 - Corresponding annotation files are: ``Annotation/genes.filtered.bed`` and ``Annotation/genes.filtered.gtf``, respectively.
 
