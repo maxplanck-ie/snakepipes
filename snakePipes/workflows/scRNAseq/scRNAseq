@@ -29,7 +29,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          "plotFormat": "png", "skipRaceID": False,
                          "cellFilterMetric": "gene_universe",
 			 "mode": "STARsolo", "BCwhiteList": None, "STARsoloCoords": ["1","7","8","7"], "myKit": "CellSeq384", "skipVelocyto": False,
-                         "alevinLibraryType":"ISR", "prepProtocol":"celseq2", "salmonIndexOptions": "--type puff -k 31", "expectCells" : None}):
+                         "alevinLibraryType":"ISR", "prepProtocol":"celseq2", "salmonIndexOptions": "--type puff -k 31", "expectCells" : None, "readLengthFrx": 0.2}):
     """
     Parse arguments from the command line.
     """
@@ -184,6 +184,13 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                           dest="expectCells",
                           default=defaults["expectCells"],
                           help="Alevin mode. Optional to fill in if you know how many cells are expected. (default: '%(default)s')")
+
+    optional.add_argument("--readLengthFrx",
+                          type=int,
+                          dest="readLengthFrx"
+                          help="Fraction of read length required to align to the intronic sequence (default: '%(default)s')",
+                          default=defaults["readLengthFrx"])
+
 
     return parser
 

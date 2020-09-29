@@ -29,6 +29,7 @@ Mode "Alevin" involves:
 2. Mapping and generation of a readcount matrix.
 3. Estimation of uncertainty of gene counts using bootstrap method implemented in Salmon Alevin.
 4. General QC of the Alevin run using the AlevinQC R package.
+5. Quantification of reads supporting spliced and unspliced transcripts in each cell with Alevin - unless this has been disabled with --skipVelocyto .
 
 .. image:: ../images/scRNAseq_pipeline.png
 

@@ -5,7 +5,7 @@ def get_flank_length(file,read_length_frx):
     with gzip.open(file,"r") as rf:
         head = [next(rf) for x in range(4)]
     read_length = len(head[1])
-    flank_length = int( read_length_frx * read_length )
+    flank_length = int( (1 - read_length_frx) * read_length )
     return(flank_length)  
 
 rule cut_t2g:
@@ -70,7 +70,7 @@ rule run_eisaR:
         wdir = os.path.join(outdir, "Annotation"),
         scriptdir = workflow_rscripts,
         isoform_action = "separate",
-        flank_length = lambda wildcards,input: get_flank_length(os.path.join(outdir,input.one_fastq),read_length_frx),
+        flank_length = lambda wildcards,input: get_flank_length(os.path.join(outdir,input.one_fastq),readLengthFrx),
         gtf = lambda wildcards,input: os.path.join(outdir, input.gtf),
         joint_fasta = lambda wildcards,output: os.path.join(outdir,output.joint_fasta),
         joint_t2g = lambda wildcards,output: os.path.join(outdir,output.joint_t2g)
