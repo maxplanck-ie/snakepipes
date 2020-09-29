@@ -5,7 +5,7 @@ snakePipes 2.x.y
 ----------------
 
 * Deprecated mode Gruen in scRNAseq.
-* scRNAseq mode Alevin now outputs spliced/unspliced counts for RNA velocity estimation.
+* scRNAseq mode Alevin now outputs spliced/unspliced counts for RNA velocity estimation based on Soneson et al.  2020, bioRxiv https://doi.org/10.1101/2020.03.13.990069 .
 
 
 snakePipes 2.2.3

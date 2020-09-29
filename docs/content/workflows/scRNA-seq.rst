@@ -29,7 +29,7 @@ Mode "Alevin" involves:
 2. Mapping and generation of a readcount matrix.
 3. Estimation of uncertainty of gene counts using bootstrap method implemented in Salmon Alevin.
 4. General QC of the Alevin run using the AlevinQC R package.
-5. Quantification of "spliced" and "unspliced" read counts in each cell with Alevin - unless this has been disabled with --skipVelocyto .
+5. Quantification of "spliced" and "unspliced" read counts in each cell with Alevin - unless this has been disabled with --skipVelocyto . This analysis is derived from the code underlying Soneson et al.  2020, bioRxiv https://doi.org/10.1101/2020.03.13.990069. 
 
 .. image:: ../images/scRNAseq_pipeline.png
 
@@ -139,6 +139,12 @@ Library Type
 ~~~~~~~~~~~~
 
 The CEL-seq2 protocol produces reads where read 2 maps in sense direction (:code:`libraryType: 1`).
+
+
+Fraction of read length required to overlap the intron
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In mode Alevin, the fraction of read length required to overlap the intron in order to be counted as "unspliced" is set to 0.2 (i.e. 20%) by default. This corresponds to 10nt in a 50nt-long read, or to 20nt in a 100nt-long read. The user is encouraged to modify this value as deemed appropriate via the ``--readLengthFrx`` commandline argument.
 
 
 Output structure
