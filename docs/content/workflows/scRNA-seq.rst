@@ -6,7 +6,7 @@ scRNA-seq
 What it does
 ------------
 
-The scRNA-seq pipeline is intended to process UMI-based data, expecting the cell barcode and umi in Read1, and the cDNA sequence in Read2. 
+The scRNA-seq pipeline is intended to process UMI-based data, expecting the cell barcode and umi in Read1, and the cDNA sequence in Read2. The workflow has predefined settings for CelSeq2 and 10x data, but can be extended to custom protocols.
 
 There are currently two analysis modes available:
 - "STARsolo" which uses STAR solo for mapping and quantitation.
