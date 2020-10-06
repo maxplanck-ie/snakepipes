@@ -51,8 +51,6 @@ include: os.path.join(maindir, "shared", "tools" , "deeptools_cmds.snakefile")
 include: os.path.join(maindir, "shared", "rules", "deepTools_RNA.snakefile")
 include: os.path.join(maindir, "shared", "rules", "multiQC.snakefile")
 
-cf.namesOKinR(samples)
-
 
 ### conditional/optional rules #################################################
 ################################################################################

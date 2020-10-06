@@ -53,8 +53,6 @@ include: os.path.join(maindir, "shared", "rules", "tecounts.snakefile")
 ## MultiQC
 include: os.path.join(maindir, "shared", "rules", "multiQC.snakefile")
 
-cf.namesOKinR(samples)
-
 ### conditional/optional rules #################################################
 ################################################################################
 def run_FastQC(fastqc):
