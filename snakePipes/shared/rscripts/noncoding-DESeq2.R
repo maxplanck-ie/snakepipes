@@ -77,7 +77,7 @@ bib <- c(
     DESeq2 = citation('DESeq2'))
 
 write.bibtex(bib, file = 'citations.bib')
-file.copy(paste0(snakemake@scriptdir, "/DESeq2Report.Rmd"), to = 'DESeq2_report_basic.Rmd')
+file.copy(paste0(snakemake@scriptdir, "/DESeq2Report.Rmd"), to = file.path(snakemake@params["outdir"],'DESeq2_report_basic.Rmd'))
 
 ## TODO we need 4 of these...
 outprefix = "DEseq_basic"
