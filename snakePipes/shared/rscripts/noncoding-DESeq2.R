@@ -77,12 +77,12 @@ bib <- c(
     DESeq2 = citation('DESeq2'))
 
 write.bibtex(bib, file = 'citations.bib')
-file.copy(paste0(snakemake@scriptdir, "/DESeq2Report.Rmd"), to = 'DESeq2_report_basic.Rmd')
+file.copy(paste0(snakemake@scriptdir, "/DESeq2Report.Rmd"), to = file.path(snakemake@params["outdir"],'DESeq2_report_basic.Rmd'))
 
 ## TODO we need 4 of these...
 outprefix = "DEseq_basic"
 cite_options(citation_format="text", style="html", cite.style="numeric", hyperlink=TRUE)
-render('DESeq2_report_basic.Rmd',
+render(file.path(snakemake@params["outdir"],'DESeq2_report_basic.Rmd'),
        output_file = paste0(snakemake@params["outdir"], "/DESeq2_report_genes.html"),
        output_format = "html_document",
        clean = TRUE,
@@ -95,7 +95,7 @@ render('DESeq2_report_basic.Rmd',
            heatmap_topN = 20,
            geneNamesFile = geneNamesFilePath))
 
-render('DESeq2_report_basic.Rmd',
+render(file.path(snakemake@params["outdir"],'DESeq2_report_basic.Rmd'),
        output_file = paste0(snakemake@params["outdir"], "/DESeq2_report_repeat_name.html"),
        output_format = "html_document",
        clean = TRUE,
@@ -108,7 +108,7 @@ render('DESeq2_report_basic.Rmd',
            heatmap_topN = 20,
            geneNamesFile = geneNamesFilePath))
 
-render('DESeq2_report_basic.Rmd',
+render(file.path(snakemake@params["outdir"],'DESeq2_report_basic.Rmd'),
        output_file = paste0(snakemake@params["outdir"], "/DESeq2_report_repeat_class.html"),
        output_format = "html_document",
        clean = TRUE,
@@ -121,7 +121,7 @@ render('DESeq2_report_basic.Rmd',
            heatmap_topN = 20,
            geneNamesFile = geneNamesFilePath))
 
-render('DESeq2_report_basic.Rmd',
+render(file.path(snakemake@params["outdir"],'DESeq2_report_basic.Rmd'),
        output_file = paste0(snakemake@params["outdir"], "/DESeq2_report_repeat_family.html"),
        output_format = "html_document",
        clean = TRUE,

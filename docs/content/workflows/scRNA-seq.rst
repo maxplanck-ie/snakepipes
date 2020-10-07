@@ -6,7 +6,7 @@ scRNA-seq
 What it does
 ------------
 
-The scRNA-seq pipeline is intended to process UMI-based data, expecting the cell barcode and umi in Read1, and the cDNA sequence in Read2. 
+The scRNA-seq pipeline is intended to process UMI-based data, expecting the cell barcode and umi in Read1, and the cDNA sequence in Read2. The workflow has predefined settings for CelSeq2 and 10x data, but can be extended to custom protocols.
 
 There are currently two analysis modes available:
 - "STARsolo" which uses STAR solo for mapping and quantitation.
@@ -145,6 +145,8 @@ Fraction of read length required to overlap the intron
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In mode Alevin, the fraction of read length required to overlap the intron in order to be counted as "unspliced" is set to 0.2 (i.e. 20%) by default. This corresponds to 10nt in a 50nt-long read, or to 20nt in a 100nt-long read. The user is encouraged to modify this value as deemed appropriate via the ``--readLengthFrx`` commandline argument.
+In practice, this variable affects the length of the exon sequence flank added to the intron sequence to generate reference sequences for Salmon Alevin. Exon sequence flank length is set to one minus 'readLengthFrx' of read length.
+
 
 
 Output structure
