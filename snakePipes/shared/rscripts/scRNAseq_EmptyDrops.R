@@ -76,7 +76,12 @@ filter_empty_cells<-function(folder,sample){
 if(length(in_dirs)>1){
     l<-mapply(SIMPLIFY=FALSE, function(X,Y) filter_empty_cells(X,Y),X=in_dirs,Y=samples)
     names(l)<-samples
-    s<-merge(x=l[[1]],y=unlist(l[[2:length(l)]]),add.cell.ids=names(l))
+    l<-l[lapply(l,length)>0]
+    if(length(l)>1){
+        s<-merge(x=l[[1]],y=unlist(l[2:length(l)]),add.cell.ids=names(l))
+    }else{
+        s<-l[[1]]
+    }
 }else{
     s<-filter_empty_cells(in_dirs,samples)
 }
