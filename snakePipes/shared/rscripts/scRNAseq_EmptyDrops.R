@@ -67,7 +67,7 @@ filter_empty_cells<-function(folder,sample){
     rn2<-make.unique(rn)
     rownames(expdat)<-rn2
 
-    seuset<-CreateSeuratObject(counts = expdat)
+    seuset<-CreateSeuratObject(counts = expdat,project=sample)
 
     return(seuset)
 
