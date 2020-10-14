@@ -18,7 +18,7 @@ if pairedEnd:
             MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX);
             bwa mem \
             -t {threads} \
-            -R '@RG\\tID:{wildcards.sample}\\tDS:{wildcards.sample}\\tPL:ILLUMINA\\tSM:{wildcards.sample}' \
+            -R '@RG\\tID:{wildcards.sample}\\tDS:{wildcards.sample}\\tPL:ILLUMINA\\tSM:{wildcards.sample}' {params.alignerOpts} \
             {params.bwa_index} {input.r1} {input.r2} | \
             samtools view -Sb - | \
             samtools sort -m 2G -@ 2 -O bam - > {output.bam} 2> {log};
@@ -44,7 +44,7 @@ else:
             MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX);
             bwa mem \
             -t {threads} \
-            -R '@RG\\tID:{wildcards.sample}\\tDS:{wildcards.sample}\\tPL:ILLUMINA\\tSM:{wildcards.sample}' \
+            -R '@RG\\tID:{wildcards.sample}\\tDS:{wildcards.sample}\\tPL:ILLUMINA\\tSM:{wildcards.sample}' {params.alignerOpts}\
             {params.bwa_index} {input} | \
             samtools view -Sbu - | \
             samtools sort -m 2G -T $MYTEMP/{wildcards.sample} -@ 2 -O bam - > {output.bam} 2> {log};
