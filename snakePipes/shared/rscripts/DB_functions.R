@@ -36,13 +36,13 @@ readfiles_chip <- function(sampleSheet, fragmentLength, window_size, alleleSpeci
             # for 1 samples, use normal design
             message("1 sample used : comparing genome2 to genome1")
             designm <- model.matrix(~ allele, data = design)
-            rownames(designm)<-sampleSheet$name
+            rownames(designm)<-paste0(design$name,".",design$allele)
             designType <- "allele"
         } else {
             # for 1 sample, use interaction design
             message(">1 samples used : comparing genome2 to genome1 blocking for different conditions")
             designm <- model.matrix(~ allele + condition,data = design)
-            rownames(designm)<-sampleSheet$name
+            rownames(designm)<-paste0(design$name,".",design$allele)
             designType <- "blocking"
         }
 
@@ -255,7 +255,9 @@ getDBregions_chip <- function(chipCountObject, plotfile = NULL){
 
     # Make DGElist
     y <- csaw::asDGEList(chipCountObject$windowCounts, norm.factors = chipCountObject$normFactors)
-    colnames(y)<-sampleInfo$name
+    if(chipCountObject$designType=="condition"){
+    colnames(y)<-chipCountObject$sampleInfo$name}else{
+    colnames(y)<-paste0(rep(chipCountObject$sampleSheet$name,each=2),".genome",c(1,2))}
     design <- chipCountObject$design
     # Estimate dispersions
     y <- edgeR::estimateDisp(y, design)
@@ -337,6 +339,9 @@ writeOutput_chip <- function(chipResultObject, outfile_prefix, fdrcutoff,lfccuto
     full_res<-as.data.frame(merge(x=tabx,y=tabcom,by.x="name",by.y="name"),stringsAsFactors=FALSE) 
     full_res<-full_res[,c(2:ncol(full_res),1)]
     print(sprintf("Colnames of result file are %s",colnames(full_res)))
+    full_res[,2]<-full_res[,2]-1
+    full_res[,2]<-format(full_res[,2], scientific = FALSE)
+    full_res[,3]<-format(full_res[,3], scientific = FALSE)
     ##filter full result for FDR and LFC and write to output
     full_res.filt<-subset(full_res,(FDR<=fdrcutoff)&(abs(best.logFC)>=lfccutoff))
     if(nrow(full_res.filt)>0){

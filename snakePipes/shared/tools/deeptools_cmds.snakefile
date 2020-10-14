@@ -115,7 +115,7 @@ plotEnrich_chip_cmd = """
         -b {input.bams} \
         --BED {params.genes_gtf} \
         --plotFile {output.png} \
-        --labels {params.labels} \
+        {params.labels} \
         --plotTitle 'Signal enrichment (fraction of reads) without duplicates' \
         --outRawCounts {output.tsv} \
         --variableScales \

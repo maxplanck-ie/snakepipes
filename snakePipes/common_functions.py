@@ -26,6 +26,7 @@ def set_env_yamls():
             'CONDA_seurat3_ENV': 'envs/sc_rna_seq_seurat3.yaml',
             'CONDA_loompy_ENV': 'envs/sc_rna_seq_loompy.yaml',
             'CONDA_alevinqc_ENV': 'envs/sc_rna_seq_alevinqc.yaml',
+            'CONDA_eisaR_ENV': 'envs/sc_rna_seq_eisaR.yaml',
             'CONDA_DNA_MAPPING_ENV': 'envs/dna_mapping.yaml',
             'CONDA_CHIPSEQ_ENV': 'envs/chip_seq.yaml',
             'CONDA_ATAC_ENV': 'envs/atac_seq.yaml',
@@ -223,7 +224,7 @@ def check_replicates(sample_info_file):
 
     for k, v in d.items():
         if v < 2:
-            sys.stderr.write("ERROR: The {} group has no replicates!\n".format(k))
+            sys.stderr.write("WARNING: The {} group has no replicates!\n".format(k))
             return False
 
     return True

@@ -49,9 +49,17 @@ def is_chip(sample):
     """
     return (sample in chip_samples)
 
+def is_allelic(workingdir):
+    if os.path.isdir(os.path.join(workingdir,'allelic_bams') ) and os.listdir(os.path.join(workingdir,'allelic_bams') ) != []:
+        return True
+    else:
+        return False
+
 
 ### Variable defaults ##########################################################
 ### Initialization #############################################################
+
+allele_info=is_allelic(workingdir)
 
 # TODO: catch exception if ChIP-seq samples are not unique
 # read ChIP-seq dictionary from config.yaml:
@@ -65,8 +73,9 @@ if not os.path.isfile(samples_config):
 if sampleSheet:
     cf.check_sample_info_header(sampleSheet)
     if not cf.check_replicates(sampleSheet):
-        print("\nWarning! CSAW cannot be invoked without replicates!\n")
-        sys.exit()
+        print("\nWarning! CSAW cannot be invoked without replicates and will not be run!\n")
+        if not peakCaller=="Genrich":
+            sys.exit()
 
 chip_dict = {}
 with open(samples_config, "r") as f:
@@ -107,8 +116,8 @@ chip_samples_wo_ctrl = list(sorted(chip_samples_wo_ctrl))
 chip_samples = sorted(chip_samples_w_ctrl + chip_samples_wo_ctrl)
 all_samples = sorted(control_samples + chip_samples)
 
-if not fromBAM and not useSpikeInForNorm:
-    if pairedEnd:
+if not fromBAM:
+    if pairedEnd and not useSpikeInForNorm:
         if not os.path.isfile(os.path.join(workingdir, "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv")):
             sys.exit('ERROR: {} is required but not present\n'.format(os.path.join(workingdir, "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv")))
 
@@ -116,8 +125,13 @@ if not fromBAM and not useSpikeInForNorm:
     for sample in all_samples:
         req_files = [
             os.path.join(workingdir, "filtered_bam/"+sample+".filtered.bam"),
-            os.path.join(workingdir, "filtered_bam/"+sample+".filtered.bam.bai")
+            os.path.join(workingdir, "filtered_bam/"+sample+".filtered.bam.bai"),
             ]
+        if allele_info:
+            req_files.append(os.path.join(workingdir, "bamCoverage/allele_specific/"+sample+".genome1.seq_depth_norm.bw"))
+        else:
+            if not useSpikeInForNorm:
+                req_files.append(os.path.join(workingdir, "bamCoverage/"+sample+".filtered.seq_depth_norm.bw"))
 
         # check for all samples whether all required files exist
         for file in req_files:
@@ -168,8 +182,11 @@ def filter_dict(sampleSheet,input_dict):
     return(output_dict)
 
 if sampleSheet:
-    filtered_dict = filter_dict(sampleSheet,dict(zip(chip_samples_w_ctrl, [ get_control_name(x) for x in chip_samples_w_ctrl ])))
     genrichDict = cf.sampleSheetGroups(sampleSheet)
+    if chip_samples_w_ctrl:
+        filtered_dict = filter_dict(sampleSheet,dict(zip(chip_samples_w_ctrl, [ get_control_name(x) for x in chip_samples_w_ctrl ])))
+    else:
+        filtered_dict = filter_dict(sampleSheet,dict(zip(chip_samples_wo_ctrl, [None]*len(chip_samples_wo_ctrl))))
     reordered_dict = {k: filtered_dict[k] for k in [item for sublist in genrichDict.values() for item in sublist]}
 else:
     genrichDict = {"all_samples": chip_samples}

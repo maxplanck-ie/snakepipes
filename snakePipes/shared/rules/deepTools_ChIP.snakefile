@@ -62,7 +62,7 @@ rule plotEnrichment:
         tsv = "deepTools_ChIP/plotEnrichment/plotEnrichment.gene_features.tsv",
     params:
         genes_gtf = genes_gtf,
-        labels = " ".join(all_samples),
+        labels = " --labels " + " ".join(all_samples),
         blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed else "",
         read_extension = "--extendReads" if pairedEnd else "--extendReads {}".format(fragmentLength)
     log:

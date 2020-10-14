@@ -10,7 +10,7 @@ pairedEnd <- as.logical(snakemake@params[["pairedEnd"]])
 fraglength <- as.numeric(snakemake@params[["fragmentLength"]])  # used when the data is not paired end
 windowSize <- as.numeric(snakemake@params[["windowSize"]])
 importfunc <- snakemake@params[["importfunc"]]  #"DB_functions.R"
-allelic_info <- as.logical(snakemake@params[["allele_info"]])
+allelic_info <- as.logical(toupper(snakemake@params[["allele_info"]]))
 outdir<-snakemake@params[["outdir"]]
 yaml_path<-snakemake@params[["yaml_path"]]
 useSpikeInForNorm<-snakemake@params[["useSpikeInForNorm"]]
@@ -143,7 +143,7 @@ if(useSpikeInForNorm){
 }
 
 ## get DB regions
-print("Performing differential binding")
+message("Performing differential binding")
 chip_results <- getDBregions_chip(chip_object, plotfile = "DiffBinding_modelfit.pdf")
 
 ## write output

@@ -157,7 +157,7 @@ rule cpGTF:
 
 rule symbolFile:
     input: genes_gtf
-    output: temp("Annotation/genes.filtered.symbol")
+    output: "Annotation/genes.filtered.symbol"
     run:
         of = open(output[0], "w")
         for line in open(input[0]):
@@ -196,7 +196,7 @@ if sampleSheet:
         benchmark:
             "{}/.benchmark/DESeq2.featureCounts.benchmark".format(get_outdir("DESeq2",sampleSheet))
         params:
-            outdir = get_outdir("DESeq2", sampleSheet),
+            outdir = os.path.join(outdir, get_outdir("DESeq2", sampleSheet)),
             fdr = 0.05,
         conda: CONDA_RNASEQ_ENV
         script: "../rscripts/noncoding-DESeq2.R"

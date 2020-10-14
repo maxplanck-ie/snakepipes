@@ -51,8 +51,6 @@ include: os.path.join(maindir, "shared", "tools" , "deeptools_cmds.snakefile")
 include: os.path.join(maindir, "shared", "rules", "deepTools_RNA.snakefile")
 include: os.path.join(maindir, "shared", "rules", "multiQC.snakefile")
 
-cf.namesOKinR(samples)
-
 
 ### conditional/optional rules #################################################
 ################################################################################
@@ -91,12 +89,17 @@ def run_RaceID(skipRaceID):
         return([])
 
 def run_velocyto(skipVelocyto):
-    if not skipVelocyto:
-        file_list = [
-        expand("VelocytoCounts/{sample}.done.txt",sample=samples),
-        "VelocytoCounts_merged/merged.loom"
-        ]
+    if not skipVelocyto :
+        if mode == "STARsolo":
+            file_list = [
+            expand("VelocytoCounts/{sample}.done.txt",sample=samples),
+            "VelocytoCounts_merged/merged.loom"
+            ]
+        elif mode == "Alevin":
+            file_list = [expand("AlevinForVelocity/{sample}/alevin/quants_mat.gz",sample=samples),
+            "SingleCellExperiment/AlevinForVelocity/merged_samples.RDS"]
         return(file_list)
+
     else:
         return([])
 
@@ -189,9 +192,11 @@ elif mode=="Alevin":
             "Annotation/genes.filtered.fa",
             "Salmon/SalmonIndex/decoys.txt",
             "Salmon/SalmonIndex/seq.bin",
+            "Salmon/SalmonIndex_RNAVelocity/seq.bin",
             expand("Alevin/{sample}/alevin/quants_mat.gz",sample = samples),
             expand("multiQC/Alevin_{sample}.html", sample=samples),
-            "multiQC/multiqc_report.html"
+            "multiQC/multiqc_report.html",
+            run_velocyto(skipVelocyto)
 
 
 ### execute after workflow finished ############################################

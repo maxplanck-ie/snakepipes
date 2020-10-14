@@ -48,9 +48,10 @@ include: os.path.join(maindir, "shared", "rules", "ATAC_qc.snakefile")
 
 # flags for allelic mode
 if os.path.isdir(os.path.join(workingdir, 'allelic_bams')) and os.listdir(os.path.join(workingdir, 'allelic_bams')) != []:
-    allele_info = 'TRUE'
+    allele_info = True
 else:
-    allele_info = 'FALSE'
+    allele_info = False
+
 # CSAW for differential binding (if sampleinfo specified)
 # needs a "ChIP-sample" variable, here all samples are ChIP-Samples
 chip_samples = samples
@@ -59,11 +60,11 @@ if sampleSheet:
     include: os.path.join(maindir, "shared", "rules", "CSAW.snakefile")
     include: os.path.join(maindir, "shared", "rules", "nearestGene.snakefile")
     include: os.path.join(maindir, "shared", "rules", "filterGTF.snakefile")
-    if not fromBAM:
+#    if not fromBAM:
         # These are needed for the snakefile to be imported
-        aligner = "Bowtie2"
-        downsample = False
-        include: os.path.join(maindir, "shared", "rules", "deepTools_qc.snakefile")
+#        aligner = "Bowtie2"
+#        downsample = False
+#        include: os.path.join(maindir, "shared", "rules", "deepTools_qc.snakefile")
 
 ## add outputs as asked
 def run_deepTools_allelic():

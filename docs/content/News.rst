@@ -1,6 +1,41 @@
 snakePipes News
 ===============
 
+snakePipes 2.3.0
+----------------
+
+* Deprecated mode Gruen in scRNAseq.
+* scRNAseq mode Alevin now outputs spliced/unspliced counts for RNA velocity estimation based on Soneson et al.  2020, bioRxiv https://doi.org/10.1101/2020.03.13.990069 .
+* Fixed "external_gene_name" and "Status" columns in DESeq2 html report.
+* Removed warning when sample names start with a number.
+
+
+snakePipes 2.2.3
+----------------
+
+* Genrich will now run if sampleSheet without replicates is provided.
+* Updated zenodo link to mouse genome GRCm38/mm10 .
+* Fixed start coordinates in Filtered results bed from CSAW.
+
+
+snakePipes 2.2.2
+----------------
+
+* Fix DAG inconsistencies for ChIP-seq and ATAC-seq ran fromBAM and from -d.
+* DESeq2 Rmd file is not deleted anymore in noncoding-RNAseq.
+* Fixed labels in deepTools commands.
+* Allele_info is now boolean.
+
+
+snakePipes 2.2.1
+----------------
+
+* Fix a bug in DAG for ChIPseq allelic with CSAW.
+* Fixed deepTools qc DAG for ChIPseq with spikein.
+* Added DAG test for allelic ChIPseq.
+* Fixed a bug with deepTools QC for allelic mRNAseq.
+
+
 snakePipes 2.2.0
 ----------------
 * Added Alevin mode in scRNA workflow
