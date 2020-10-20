@@ -7,6 +7,7 @@ snakePipes 2.3.1
 * Fixed aligner options for bwa in DNA-mapping.
 * Fixed allelic mode for single end reads .
 * Bumped hiC explorer version in HiC.
+* Fixed python version at 3.8.5
 
 snakePipes 2.3.0
 ----------------
