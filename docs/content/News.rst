@@ -1,6 +1,11 @@
 snakePipes News
 ===============
 
+snakePipes x.y.z
+----------------
+
+* Loompy from conda is now used in mode STARsolo in scRNA-seq workflow.
+
 snakePipes 2.3.1
 ----------------
 
