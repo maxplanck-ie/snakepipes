@@ -8,6 +8,7 @@ snakePipes 2.3.1
 * Fixed allelic mode for single end reads .
 * Bumped hiC explorer version in HiC.
 
+
 snakePipes 2.3.0
 ----------------
 

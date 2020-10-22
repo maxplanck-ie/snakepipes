@@ -13,7 +13,7 @@ requirements:
   host:
     - python >=3
   run:
-    - python >=3.7
+    - python >=3.7.0
     - snakemake ==5.18.0
     - pandas
     - graphviz
