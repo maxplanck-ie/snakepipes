@@ -28,7 +28,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          "filterGTF": None, "sampleSheet": None,
                          "reads": ["_R1", "_R2"], "ext": ".fastq.gz",
                          "bwBinSize": 25, "dnaContam": False, "plotFormat": "png",
-                         "fromBAM": False, "pairedEnd": True,
+                         "fromBAM": False, "bamExt": ".bam", "pairedEnd": True,
                          "UMIDedup": False,
                          "UMIDedupOpts": "", "bcPattern": "NNNNCCCCCCCCC",
                          "UMIDedupSep": "_", "UMIBarcode": False, "rMats": False}):
@@ -102,6 +102,11 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          action="store_true",
                          help="Input folder with bam files. If provided, the analysis will start from this point. If bam files contain single ends, please specify --singleEnd additionally.",
                          default=defaults["fromBAM"])
+
+    optional.add_argument("--bamExt",
+                          help="Extention of provided bam files, will be substracted from basenames to obtain sample names. (default: '%(default)s')",
+                          default=defaults["bamExt"])
+
 
     optional.add_argument("--singleEnd",
                           dest="pairedEnd",
