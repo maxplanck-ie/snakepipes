@@ -6,6 +6,7 @@ snakePipes x.y.z
 
 * Loompy from conda is now used in mode STARsolo in scRNA-seq workflow.
 * Added bamExt to mRNA-seq and noncoding-RNA-seq commandline arguments.
+* Added support for multiple pairwise comparisons for DESeq2 and sleuth in the mRNA-seq workflow.
 
 snakePipes 2.3.1
 ----------------
