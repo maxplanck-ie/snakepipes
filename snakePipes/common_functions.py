@@ -294,7 +294,7 @@ def splitSampleSheet(sampleSheet, destination_pfx):
                 for item in d[k]:
                     of.write('\t'.join(item) + '\n')
 
-    return 
+    return
 
 
 def returnComparisonGroups(sampleSheet):
