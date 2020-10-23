@@ -80,7 +80,10 @@ if not fromBAM:
         include: os.path.join(maindir, "shared", "rules", "Salmon.snakefile")
         ## Sleuth (on Salmon)
         if sampleSheet:
-            include: os.path.join(maindir, "shared", "rules", "sleuth.snakefile")
+            if isMultipleComparison:
+                include: os.path.join(maindir, "shared", "rules", "sleuth.multiComp.snakefile")
+            else:
+                include: os.path.join(maindir, "shared", "rules", "sleuth.singleComp.snakefile")
 
 else:
     fastqc=False
@@ -148,13 +151,17 @@ def run_alignment_free():
         expand("Salmon/{sample}/abundance.h5", sample=samples) ]
 
         if sampleSheet:
-            sample_name = os.path.splitext(os.path.basename(sampleSheet))[0]
-            file_list.append( ["DESeq2_Salmon_{}/DESeq2.session_info.txt".format(sample_name)])
-        if sampleSheet and cf.check_replicates(sampleSheet):
-            file_list.append( ["sleuth_Salmon_{}/so.rds".format(sample_name)] )
-        if sampleSheet and rMats:
-            file_list.append( ["rMats_{}/RI.MATS.JCEC.txt".format(sample_name)] )
-            file_list.append( ["rMats_{}/b2.csv".format(sample_name)] )
+            if not isMultipleComparison:
+                sample_name = os.path.splitext(os.path.basename(sampleSheet))[0]
+                file_list.append( ["DESeq2_Salmon_{}/DESeq2.session_info.txt".format(sample_name)])
+                if cf.check_replicates(sampleSheet):
+                    file_list.append( ["sleuth_Salmon_{}/so.rds".format(sample_name)] )
+                if rMats:
+                    file_list.append( ["rMats_{}/RI.MATS.JCEC.txt".format(sample_name)] )
+                    file_list.append( ["rMats_{}/b2.csv".format(sample_name)] )
+            else:
+                file_list.append(expand("DESeq2_Salmon.done.{compGroup}.txt",compGroup=cf.returnComparisonGroups(sampleSheet)))
+                file_list.append(expand("sleuth.done.{compGroup}.txt",compGroup=cf.returnComparisonGroups(sampleSheet)))
         return(file_list)
     else:
         return([])

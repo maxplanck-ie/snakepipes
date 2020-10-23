@@ -59,19 +59,20 @@ rule DESeq2:
 rule DESeq2_Salmon:
     input:
         counts_table = "Salmon/counts.transcripts.tsv",
-        sampleSheet = sampleSheet,
+        sampleSheet = lambda wildcards: checkpoints.split_sampleSheet.get(compGroup=wildcards.compGroup).output,
         tx2gene_file = "Annotation/genes.filtered.t2g",
         symbol_file = "Annotation/genes.filtered.symbol" #get_symbol_file
     output:
-        "{}/DESeq2.session_info.txt".format(get_outdir("DESeq2_Salmon",sampleSheet))
+        "DESeq2_Salmon.done.{compGroup}.txt"
     log:
-        out = "{}/logs/DESeq2.out".format(get_outdir("DESeq2_Salmon",sampleSheet)),
-        err = "{}/logs/DESeq2.err".format(get_outdir("DESeq2_Salmon",sampleSheet))
+        out = "{}/logs/DESeq2.out".format(get_outdir("DESeq2_Salmon",os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv")),
+        err = "{}/logs/DESeq2.err".format(get_outdir("DESeq2_Salmon",os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv"))
     benchmark:
-        "{}/.benchmark/DESeq2.Salmon.benchmark".format(get_outdir("DESeq2_Salmon",sampleSheet))
+        "{}/.benchmark/DESeq2.Salmon.benchmark".format(get_outdir("DESeq2_Salmon",os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv"))
     params:
         script=os.path.join(maindir, "shared", "rscripts", "DESeq2.R"),
-        outdir = get_outdir("DESeq2_Salmon",sampleSheet),
+        outdir = lambda wildcards,input: get_outdir("DESeq2_Salmon",input.sampleSheet),
+        sampleSheet = lambda wildcards,input: os.path.join(outdir,str(input.sampleSheet)),
         fdr = 0.05,
         importfunc = os.path.join(maindir, "shared", "rscripts", "DE_functions.R"),
         allele_info = 'FALSE',
@@ -81,7 +82,7 @@ rule DESeq2_Salmon:
     shell:
         "cd {params.outdir} && "
         "Rscript {params.script} "
-        "{input.sampleSheet} " # 1
+        "{params.sampleSheet} " # 1
         "../{input.counts_table} " # 2
         "{params.fdr} " # 3
         "../{input.symbol_file} " # 4
@@ -89,4 +90,6 @@ rule DESeq2_Salmon:
         "{params.allele_info} " # 6
         "../{input.tx2gene_file} " # 7
         "{params.rmdTemplate} " # 8
-        " > ../{log.out} 2> ../{log.err}"
+        " > ../{log.out} 2> ../{log.err};"
+        "cd .. && "
+        "touch {output}"
