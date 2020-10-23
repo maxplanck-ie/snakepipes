@@ -256,7 +256,7 @@ def isMultipleComparison(sampleSheet):
         return True
 
 
-def splitSampleSheet(sampleSheet,destination_pfx):
+def splitSampleSheet(sampleSheet, destination_pfx):
     f = open(sampleSheet)
     conditionCol = None
     nameCol = None
@@ -282,24 +282,23 @@ def splitSampleSheet(sampleSheet,destination_pfx):
         if not len(line.strip()) == 0:
             if cols[comparisonGroupCol] not in d:
                 d[cols[comparisonGroupCol]] = []
-            d[cols[comparisonGroupCol]].append([cols[nameCol],cols[conditionCol]])
-               
+            d[cols[comparisonGroupCol]].append([cols[nameCol], cols[conditionCol]])
+
     f.close()
     for k in d.keys():
-        if k !="All" and "All" in d.keys():
+        if k != "All" and "All" in d.keys():
             d[k].extend(d['All'])
             outfile = os.path.join("splitSampleSheets", '.'.join([os.path.basename(destination_pfx), k, 'tsv']))
             with open(outfile, 'w') as of:
                 of.write('name\tcondition\n')
                 for item in d[k]:
                     of.write('\t'.join(item) + '\n')
-            
-   
+
     return 
+
 
 def returnComparisonGroups(sampleSheet):
     f = open(sampleSheet)
-    conditionCol = None
     nCols = None
     d = dict()
     for idx, line in enumerate(f):
