@@ -232,13 +232,12 @@ def check_replicates(sample_info_file):
 
 def isMultipleComparison(sampleSheet):
     f = open(sampleSheet)
-    conditionCol = None
     nCols = None
     d = dict()
     for idx, line in enumerate(f):
         cols = line.strip().split("\t")
         if idx == 0:
-            if "group" not in cols :
+            if "group" not in cols:
                 return False
             comparisonGroupCol = cols.index("group")
             nCols = len(cols)
@@ -289,12 +288,11 @@ def splitSampleSheet(sampleSheet,destination_pfx):
     for k in d.keys():
         if k !="All" and "All" in d.keys():
             d[k].extend(d['All'])
-            #print(d[k])
-            outfile = os.path.join("splitSampleSheets",'.'.join([os.path.basename(destination_pfx), k ,'tsv']))
-            with open(outfile,'w') as of:
+            outfile = os.path.join("splitSampleSheets", '.'.join([os.path.basename(destination_pfx), k, 'tsv']))
+            with open(outfile, 'w') as of:
                 of.write('name\tcondition\n')
                 for item in d[k]:
-                    of.write('\t'.join(item)+'\n')
+                    of.write('\t'.join(item) + '\n')
             
    
     return 
@@ -307,7 +305,7 @@ def returnComparisonGroups(sampleSheet):
     for idx, line in enumerate(f):
         cols = line.strip().split("\t")
         if idx == 0:
-            if "group" not in cols :
+            if "group" not in cols:
                 return False
             comparisonGroupCol = cols.index("group")
             nCols = len(cols)
