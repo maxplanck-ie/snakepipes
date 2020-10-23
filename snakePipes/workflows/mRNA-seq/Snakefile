@@ -104,9 +104,12 @@ include:os.path.join(maindir, "shared", "rules", "RNA-seq_qc_report.snakefile")
 
 ## DESeq2
 if sampleSheet:
-    include: os.path.join(maindir, "shared", "rules", "DESeq2.snakefile")
-    if rMats:
-        include: os.path.join(maindir, "shared", "rules", "rMats.snakefile")
+    if isMultipleComparison:
+        include: os.path.join(maindir, "shared", "rules", "DESeq2.multipleComp.snakefile")
+    else:
+        include: os.path.join(maindir, "shared", "rules", "DESeq2.singleComp.snakefile")
+        if rMats:
+            include: os.path.join(maindir, "shared", "rules", "rMats.snakefile")
 
 ## MultiQC
 include: os.path.join(maindir, "shared", "rules", "multiQC.snakefile")
@@ -168,8 +171,11 @@ def run_alignment():
         "QC_report/QC_report_all.tsv"
         ]
         if sampleSheet:
-            sample_name = os.path.splitext(os.path.basename(sampleSheet))[0]
-            file_list.append( ["DESeq2_{}/DESeq2.session_info.txt".format(sample_name)] )
+            if not isMultipleComparison:
+                sample_name = os.path.splitext(os.path.basename(sampleSheet))[0]
+                file_list.append( ["DESeq2_{}/DESeq2.session_info.txt".format(sample_name)] )
+            else:
+                file_list.append(expand("DESeq2done.{compGroup}.txt",compGroup=cf.returnComparisonGroups(sampleSheet)))
         if sampleSheet and rMats:
             file_list.append( ["rMats_{}/RI.MATS.JCEC.txt".format(sample_name)] )
             file_list.append( ["rMats_{}/b2.csv".format(sample_name)] )
