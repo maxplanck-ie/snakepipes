@@ -3,6 +3,7 @@ channels:
  - conda-forge
  - bioconda
 dependencies:
+ - python >= 3
  - bedtools = 2.29.2
  - samtools = 1.10
  - subread = 2.0.0
@@ -24,4 +25,4 @@ dependencies:
  - bioconductor-tximport = 1.14.0
  - r-knitcitations
  - bioconductor-apeglm
- - rmats
+ - rmats = 4.1.0

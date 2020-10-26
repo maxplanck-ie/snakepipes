@@ -109,10 +109,12 @@ include:os.path.join(maindir, "shared", "rules", "RNA-seq_qc_report.snakefile")
 if sampleSheet:
     if isMultipleComparison:
         include: os.path.join(maindir, "shared", "rules", "DESeq2.multipleComp.snakefile")
+        if rMats:
+            include: os.path.join(maindir, "shared", "rules", "rMats.multipleComp.snakefile")
     else:
         include: os.path.join(maindir, "shared", "rules", "DESeq2.singleComp.snakefile")
         if rMats:
-            include: os.path.join(maindir, "shared", "rules", "rMats.snakefile")
+            include: os.path.join(maindir, "shared", "rules", "rMats.singleComp.snakefile")
 
 ## MultiQC
 include: os.path.join(maindir, "shared", "rules", "multiQC.snakefile")
@@ -151,8 +153,8 @@ def run_alignment_free():
         expand("Salmon/{sample}/abundance.h5", sample=samples) ]
 
         if sampleSheet:
+            sample_name = os.path.splitext(os.path.basename(sampleSheet))[0]
             if not isMultipleComparison:
-                sample_name = os.path.splitext(os.path.basename(sampleSheet))[0]
                 file_list.append( ["DESeq2_Salmon_{}/DESeq2.session_info.txt".format(sample_name)])
                 if cf.check_replicates(sampleSheet):
                     file_list.append( ["sleuth_Salmon_{}/so.rds".format(sample_name)] )
@@ -162,6 +164,9 @@ def run_alignment_free():
             else:
                 file_list.append(expand("DESeq2_Salmon.done.{compGroup}.txt",compGroup=cf.returnComparisonGroups(sampleSheet)))
                 file_list.append(expand("sleuth.done.{compGroup}.txt",compGroup=cf.returnComparisonGroups(sampleSheet)))
+                if rMats:
+                    file_list.append(expand("rMats_{}".format(sample_name) + ".{compGroup}/RI.MATS.JCEC.txt",compGroup=cf.returnComparisonGroups(sampleSheet)))
+                    file_list.append(expand("rMats_{}".format(sample_name) + ".{compGroup}/b2.csv",compGroup=cf.returnComparisonGroups(sampleSheet)))
         return(file_list)
     else:
         return([])
@@ -178,14 +183,17 @@ def run_alignment():
         "QC_report/QC_report_all.tsv"
         ]
         if sampleSheet:
+            sample_name = os.path.splitext(os.path.basename(sampleSheet))[0]
             if not isMultipleComparison:
-                sample_name = os.path.splitext(os.path.basename(sampleSheet))[0]
                 file_list.append( ["DESeq2_{}/DESeq2.session_info.txt".format(sample_name)] )
+                if rMats:
+                    file_list.append( ["rMats_{}/RI.MATS.JCEC.txt".format(sample_name)] )
+                    file_list.append( ["rMats_{}/b2.csv".format(sample_name)] )
             else:
                 file_list.append(expand("DESeq2done.{compGroup}.txt",compGroup=cf.returnComparisonGroups(sampleSheet)))
-        if sampleSheet and rMats:
-            file_list.append( ["rMats_{}/RI.MATS.JCEC.txt".format(sample_name)] )
-            file_list.append( ["rMats_{}/b2.csv".format(sample_name)] )
+                if  rMats:
+                    file_list.append(expand("rMats_{}".format(sample_name) + ".{compGroup}/RI.MATS.JCEC.txt",compGroup=cf.returnComparisonGroups(sampleSheet)))
+                    file_list.append(expand("rMats_{}".format(sample_name) + ".{compGroup}/b2.csv",compGroup=cf.returnComparisonGroups(sampleSheet)))
         return(file_list)
     else:
         return([])

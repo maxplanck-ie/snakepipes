@@ -41,7 +41,6 @@ else:
 
 if sampleSheet:
     cf.check_sample_info_header(sampleSheet)
-    rMatsConds = cf.sampleSheetGroups(sampleSheet)
     isMultipleComparison = cf.isMultipleComparison(sampleSheet)
 
 if sampleSheet and not cf.check_replicates(sampleSheet):
