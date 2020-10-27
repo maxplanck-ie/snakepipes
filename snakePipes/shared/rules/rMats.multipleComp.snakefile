@@ -53,7 +53,7 @@ rule rMats:
         tempDir = tempDir,
     log: "rMats_{}/rMats.log".format(os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}")
     threads: 4
-    conda: CONDA_RNASEQ_ENV
+    conda: CONDA_RMATS_ENV
     shell:"""
         TMPDIR={params.tempDir}
         MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX);
