@@ -23,7 +23,7 @@ rule DESeq2:
         sampleSheet = lambda wildcards: checkpoints.split_sampleSheet.get(compGroup=wildcards.compGroup).output,
         symbol_file = "Annotation/genes.filtered.symbol" #get_symbol_file
     output:
-         lambda wildcards: "{}/DESeq2.session_info.txt".format(get_outdir("DESeq2",os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv"))
+         "{}/DESeq2.session_info.txt".format(get_outdir("DESeq2",os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv"))
     benchmark:
         "{}/.benchmark/DESeq2.featureCounts.benchmark".format(get_outdir("DESeq2",os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv"))
     params:
@@ -61,7 +61,7 @@ rule DESeq2_Salmon:
         tx2gene_file = "Annotation/genes.filtered.t2g",
         symbol_file = "Annotation/genes.filtered.symbol" #get_symbol_file
     output:
-        lambda wildcards: "{}/DESeq2.session_info.txt".format(get_outdir("DESeq2_Salmon",os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv"))
+        "{}/DESeq2.session_info.txt".format(get_outdir("DESeq2_Salmon",os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv"))
     log:
         out = "{}/logs/DESeq2.out".format(get_outdir("DESeq2_Salmon",os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv")),
         err = "{}/logs/DESeq2.err".format(get_outdir("DESeq2_Salmon",os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv"))

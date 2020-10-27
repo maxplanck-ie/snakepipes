@@ -9,7 +9,7 @@ rule sleuth_Salmon:
         t2g = "Annotation/genes.filtered.t2g",
         sampleSheet = lambda wildcards: checkpoints.split_sampleSheet.get(compGroup=wildcards.compGroup).output
     output:
-        lambda wildcards: "{}/so.rds".format(get_outdir("sleuth_Salmon",sleuth_salmon + ".{compGroup}.tsv"))
+         "{}/so.rds".format(get_outdir("sleuth_Salmon",sleuth_salmon + ".{compGroup}.tsv"))
     benchmark:
         "sleuth_Salmon_{}/.benchmark/sleuth.Salmon.benchmark".format(sample_name + ".{compGroup}")
     params:
