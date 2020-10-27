@@ -52,7 +52,7 @@ rule rMats:
         libType = wrap_libType(libraryType),
         tempDir = tempDir,
     log: "rMats_{}/rMats.log".format(os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}")
-    threads: 1
+    threads: 4
     conda: CONDA_RNASEQ_ENV
     shell:"""
         TMPDIR={params.tempDir}

@@ -22,6 +22,7 @@ rule createInputcsv:
         echo '{params.b1}' > {output.b1out}
         echo '{params.b2}' > {output.b2out}
 """
+
 rule rMats:
     input:
         b1 = "{}/b1.csv".format(get_outdir("rMats", sampleSheet)),
@@ -37,7 +38,7 @@ rule rMats:
         libType = wrap_libType(libraryType),
         tempDir = tempDir,
     log: "{}/rMats.log".format(get_outdir("rMats", sampleSheet))
-    threads: 1
+    threads: 4
     conda: CONDA_RNASEQ_ENV
     shell:"""
         TMPDIR={params.tempDir}
