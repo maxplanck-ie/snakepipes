@@ -1,7 +1,7 @@
 ## sleuth (on Salmon)
 ## requires the checkpoint rule defined in DESeq2.multipleComp.snakefile
 
-#sample_name = os.path.splitext(os.path.basename(sampleSheet))[0]
+sample_name = os.path.splitext(os.path.basename(sampleSheet))[0]
 
 rule sleuth_Salmon:
     input:
@@ -9,10 +9,9 @@ rule sleuth_Salmon:
         t2g = "Annotation/genes.filtered.t2g",
         sampleSheet = lambda wildcards: checkpoints.split_sampleSheet.get(compGroup=wildcards.compGroup).output
     output:
-        "sleuth.done.{compGroup}.txt"
-        #"sleuth_Salmon_{}/so.rds".format(sample_name)
+        lambda wildcards: "{}/so.rds".format(get_outdir("sleuth_Salmon",sleuth_salmon + ".{compGroup}.tsv"))
     benchmark:
-        "sleuth_Salmon_{}/.benchmark/sleuth.Salmon.benchmark".format(os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}")
+        "sleuth_Salmon_{}/.benchmark/sleuth.Salmon.benchmark".format(sample_name + ".{compGroup}")
     params:
         script=os.path.join(maindir, "shared", "rscripts", "sleuth.R"),
         indir = os.path.join(outdir,"Salmon"),
@@ -29,5 +28,4 @@ rule sleuth_Salmon:
         "{params.indir} "
         "{params.outdir} "
         "{params.fdr} " + os.path.join(outdir,"{input.t2g}") +
-        " >{log.out} 2>{log.err};"
-        "touch {output}"
+        " >{log.out} 2>{log.err}"

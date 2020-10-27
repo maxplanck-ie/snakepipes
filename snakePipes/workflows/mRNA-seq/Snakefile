@@ -162,8 +162,8 @@ def run_alignment_free():
                     file_list.append( ["rMats_{}/RI.MATS.JCEC.txt".format(sample_name)] )
                     file_list.append( ["rMats_{}/b2.csv".format(sample_name)] )
             else:
-                file_list.append(expand("DESeq2_Salmon.done.{compGroup}.txt",compGroup=cf.returnComparisonGroups(sampleSheet)))
-                file_list.append(expand("sleuth.done.{compGroup}.txt",compGroup=cf.returnComparisonGroups(sampleSheet)))
+                file_list.append(expand("DESeq2_Salmon_{}".format(sample_name) + ".{compGroup}/DESeq2.session_info.txt",compGroup=cf.returnComparisonGroups(sampleSheet)))
+                file_list.append(expand("sleuth_Salmon_{}".format(sample_name) + ".{compGroup}/so.rds",compGroup=cf.returnComparisonGroups(sampleSheet)))
                 if rMats:
                     file_list.append(expand("rMats_{}".format(sample_name) + ".{compGroup}/RI.MATS.JCEC.txt",compGroup=cf.returnComparisonGroups(sampleSheet)))
                     file_list.append(expand("rMats_{}".format(sample_name) + ".{compGroup}/b2.csv",compGroup=cf.returnComparisonGroups(sampleSheet)))
@@ -190,7 +190,7 @@ def run_alignment():
                     file_list.append( ["rMats_{}/RI.MATS.JCEC.txt".format(sample_name)] )
                     file_list.append( ["rMats_{}/b2.csv".format(sample_name)] )
             else:
-                file_list.append(expand("DESeq2done.{compGroup}.txt",compGroup=cf.returnComparisonGroups(sampleSheet)))
+                file_list.append(expand("DESeq2_{}".format(sample_name) + ".{compGroup}/DESeq2.session_info.txt",compGroup=cf.returnComparisonGroups(sampleSheet)))
                 if  rMats:
                     file_list.append(expand("rMats_{}".format(sample_name) + ".{compGroup}/RI.MATS.JCEC.txt",compGroup=cf.returnComparisonGroups(sampleSheet)))
                     file_list.append(expand("rMats_{}".format(sample_name) + ".{compGroup}/b2.csv",compGroup=cf.returnComparisonGroups(sampleSheet)))
