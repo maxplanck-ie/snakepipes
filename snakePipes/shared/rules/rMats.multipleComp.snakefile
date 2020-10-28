@@ -29,8 +29,8 @@ rule createInputcsv:
         b1out = "rMats_{}/b1.csv".format(os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}"),
         b2out = "rMats_{}/b2.csv".format(os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}")
     params:
-        b1 = lambda wildcards,input: generate_b1_b2(os.path.join(outdir,str(input.sampleSheet)),"b1"),
-        b2 = lambda wildcards,input: generate_b1_b2(os.path.join(outdir,str(input.sampleSheet)),"b2")
+        b1 = lambda wildcards: generate_b1_b2("splitSampleSheets/" + os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv","b1"),
+        b2 = lambda wildcards: generate_b1_b2("splitSampleSheets/" + os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv","b2")
     shell: """
         echo '{params.b1}' > {output.b1out}
         echo '{params.b2}' > {output.b2out}
