@@ -183,6 +183,17 @@ def get_outdir(folder_name,sampleSheet):
     sample_name = os.path.splitext(os.path.basename(str(sampleSheet)))[0]
     return("{}_{}".format(folder_name, sample_name))
 
+rule split_sampleSheet:
+    input:
+        sampleSheet = sampleSheet
+    output:
+        splitSheets = os.path.join("splitSampleSheets",os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv")
+    params:
+        splitSheetPfx = os.path.join("splitSampleSheets",os.path.splitext(os.path.basename(str(sampleSheet)))[0])
+    run:
+        if isMultipleComparison:
+            cf.splitSampleSheet(input.sampleSheet,params.splitSheetPfx)
+
 
 # TODO: topN, FDR
 if sampleSheet:
@@ -200,18 +211,8 @@ if sampleSheet:
                 outdir = os.path.join(outdir, get_outdir("DESeq2", sampleSheet)),
                 fdr = 0.05,
             conda: CONDA_RNASEQ_ENV
-        script: "../rscripts/noncoding-DESeq2.R"
+            script: "../rscripts/noncoding-DESeq2.R"
     else:
-        rule split_sampleSheet:
-            input:
-                sampleSheet = sampleSheet
-            output:
-                splitSheets = os.path.join("splitSampleSheets",os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv")
-            params:
-                splitSheetPfx = os.path.join("splitSampleSheets",os.path.splitext(os.path.basename(str(sampleSheet)))[0])
-            run:
-                if isMultipleComparison:
-                    cf.splitSampleSheet(input.sampleSheet,params.splitSheetPfx)
         rule DESeq2:
             input:
                 cnts=["TEcount/{}.cntTable".format(x) for x in samples],
@@ -225,4 +226,4 @@ if sampleSheet:
                 outdir = lambda wildcards,input: get_outdir("DESeq2",input.sampleSheet),
                 fdr = 0.05,
             conda: CONDA_RNASEQ_ENV
-        script: "../rscripts/noncoding-DESeq2.R"
+            script: "../rscripts/noncoding-DESeq2.R"
