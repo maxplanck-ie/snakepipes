@@ -7,7 +7,7 @@ rule sleuth_Salmon:
     input:
         quant_files = expand("Salmon/{sample}/abundance.h5", sample=samples),
         t2g = "Annotation/genes.filtered.t2g",
-        sampleSheet = lambda wildcards: checkpoints.split_sampleSheet.get(compGroup=wildcards.compGroup).output
+        sampleSheet = "splitSampleSheets/" + os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv"
     output:
          "sleuth_Salmon_{}/so.rds".format(sample_name + ".{compGroup}")
     benchmark:

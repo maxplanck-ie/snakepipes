@@ -4,7 +4,7 @@ def get_outdir(folder_name,sampleSheet):
 
     return("{}_{}".format(folder_name, sample_name))
 
-checkpoint split_sampleSheet:
+rule split_sampleSheet:
     input:
         sampleSheet = sampleSheet
     output:
@@ -20,7 +20,7 @@ checkpoint split_sampleSheet:
 rule DESeq2:
     input:
         counts_table = lambda wildcards : "featureCounts/counts_allelic.tsv" if 'allelic-mapping' in mode else "featureCounts/counts.tsv",
-        sampleSheet = lambda wildcards: checkpoints.split_sampleSheet.get(compGroup=wildcards.compGroup).output,
+        sampleSheet = "splitSampleSheets/" + os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv",
         symbol_file = "Annotation/genes.filtered.symbol" #get_symbol_file
     output:
          "{}/DESeq2.session_info.txt".format(get_outdir("DESeq2",os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv"))
@@ -57,7 +57,7 @@ rule DESeq2:
 rule DESeq2_Salmon:
     input:
         counts_table = "Salmon/counts.transcripts.tsv",
-        sampleSheet = lambda wildcards: checkpoints.split_sampleSheet.get(compGroup=wildcards.compGroup).output,
+        sampleSheet = "splitSampleSheets/" + os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv",
         tx2gene_file = "Annotation/genes.filtered.t2g",
         symbol_file = "Annotation/genes.filtered.symbol" #get_symbol_file
     output:

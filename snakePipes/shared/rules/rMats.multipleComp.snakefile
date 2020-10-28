@@ -24,7 +24,7 @@ def get_s1(sampleSheet):
 rule createInputcsv:
     input:
         bams = expand("filtered_bam/{sample}.filtered.bam.bai", sample=samples),
-        sampleSheet = lambda wildcards: checkpoints.split_sampleSheet.get(compGroup=wildcards.compGroup).output
+        sampleSheet = "splitSampleSheets/" + os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv"
     output:
         b1out = "rMats_{}/b1.csv".format(os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}"),
         b2out = "rMats_{}/b2.csv".format(os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}")
@@ -40,7 +40,7 @@ rule rMats:
     input:
         b1 = "rMats_{}/b1.csv".format(os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}"),
         b2 = "rMats_{}/b2.csv".format(os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}"),
-        sampleSheet = lambda wildcards: checkpoints.split_sampleSheet.get(compGroup=wildcards.compGroup).output
+        sampleSheet = "splitSampleSheets/" + os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv"
     output:
         "rMats_{}/RI.MATS.JCEC.txt".format(os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}")
     params:
