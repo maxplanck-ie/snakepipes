@@ -11,7 +11,7 @@ def wrap_libType(libType):
 #rMatsConds = cf.sampleSheetGroups(sampleSheet)
 
 def generate_b1_b2(sampleSheet,which_b):
-    if sampleSheet:
+    if os.path.isfile(sampleSheet):
         rMatsConds = cf.sampleSheetGroups(sampleSheet)
         if which_b == "b1":
             return ",".join(["filtered_bam/" + s for s in [s + ".filtered.bam" for s in rMatsConds[list(rMatsConds)[0]]]])
@@ -21,7 +21,7 @@ def generate_b1_b2(sampleSheet,which_b):
         return ""
 
 def get_s1(sampleSheet):
-    if sampleSheet:
+    if os.path.isfile(sampleSheet):
         rMatsConds = cf.sampleSheetGroups(sampleSheet)
         return ["filtered_bam/" + s for s in [s + ".filtered.bam" for s in rMatsConds[list(rMatsConds)[0]]]][0]
     else:
