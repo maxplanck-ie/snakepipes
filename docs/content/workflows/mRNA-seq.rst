@@ -137,13 +137,13 @@ Specifying a value of 'All' in the 'group' column will cause that sample group t
 
 An example sample sheet with the group information provided looks like this:
 
-	name	condition	group
-	sample1	Control	All
-	sample2	Control	All
-	sample3	Treatment	Group1
-	sample4	Treatment	Group1
-	sample5	Treatment	Group2
-	sample6	Treatment	Group2
+name	condition	group
+sample1	Control	All
+sample2	Control	All
+sample3	Treatment	Group1
+sample4	Treatment	Group1
+sample5	Treatment	Group2
+sample6	Treatment	Group2
 
 
 Analysis modes
