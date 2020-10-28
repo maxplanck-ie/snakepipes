@@ -5,3 +5,4 @@ channels:
 dependencies:
  - python >= 3
  - rmats = 4.1.0
+ - samtools = 1.10
