@@ -11,16 +11,21 @@ def wrap_libType(libType):
 #rMatsConds = cf.sampleSheetGroups(sampleSheet)
 
 def generate_b1_b2(sampleSheet,which_b):
-    rMatsConds = cf.sampleSheetGroups(sampleSheet)
-    if which_b == "b1":
-        return ",".join(["filtered_bam/" + s for s in [s + ".filtered.bam" for s in rMatsConds[list(rMatsConds)[0]]]])
+    if os.path.isfile(sampleSheet):
+        rMatsConds = cf.sampleSheetGroups(sampleSheet)
+        if which_b == "b1":
+            return ",".join(["filtered_bam/" + s for s in [s + ".filtered.bam" for s in rMatsConds[list(rMatsConds)[0]]]])
+        else:
+            return ",".join(["filtered_bam/" + s for s in [s + ".filtered.bam" for s in rMatsConds[list(rMatsConds)[1]]]])
     else:
-        return ",".join(["filtered_bam/" + s for s in [s + ".filtered.bam" for s in rMatsConds[list(rMatsConds)[1]]]])
+        return ""
 
 def get_s1(sampleSheet):
-    rMatsConds = cf.sampleSheetGroups(sampleSheet)
-    return ["filtered_bam/" + s for s in [s + ".filtered.bam" for s in rMatsConds[list(rMatsConds)[0]]]][0]
-
+    if os.path.isfile(sampleSheet):
+        rMatsConds = cf.sampleSheetGroups(sampleSheet)
+        return ["filtered_bam/" + s for s in [s + ".filtered.bam" for s in rMatsConds[list(rMatsConds)[0]]]][0]
+    else:
+        return ""
 
 rule createInputcsv:
     input:
