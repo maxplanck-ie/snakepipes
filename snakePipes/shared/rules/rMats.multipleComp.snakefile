@@ -11,32 +11,27 @@ def wrap_libType(libType):
 #rMatsConds = cf.sampleSheetGroups(sampleSheet)
 
 def generate_b1_b2(sampleSheet,which_b):
-    if os.path.isfile(sampleSheet):
-        rMatsConds = cf.sampleSheetGroups(sampleSheet)
-        if which_b == "b1":
-            return ",".join(["filtered_bam/" + s for s in [s + ".filtered.bam" for s in rMatsConds[list(rMatsConds)[0]]]])
-        else:
-            return ",".join(["filtered_bam/" + s for s in [s + ".filtered.bam" for s in rMatsConds[list(rMatsConds)[1]]]])
+    rMatsConds = cf.sampleSheetGroups(sampleSheet)
+    if which_b == "b1":
+        return ",".join(["filtered_bam/" + s for s in [s + ".filtered.bam" for s in rMatsConds[list(rMatsConds)[0]]]])
     else:
-        return ""
+        return ",".join(["filtered_bam/" + s for s in [s + ".filtered.bam" for s in rMatsConds[list(rMatsConds)[1]]]])
 
 def get_s1(sampleSheet):
-    if os.path.isfile(sampleSheet):
-        rMatsConds = cf.sampleSheetGroups(sampleSheet)
-        return ["filtered_bam/" + s for s in [s + ".filtered.bam" for s in rMatsConds[list(rMatsConds)[0]]]][0]
-    else:
-        return ""
+    rMatsConds = cf.sampleSheetGroups(sampleSheet)
+    return ["filtered_bam/" + s for s in [s + ".filtered.bam" for s in rMatsConds[list(rMatsConds)[0]]]][0]
+
 
 rule createInputcsv:
     input:
         bams = expand("filtered_bam/{sample}.filtered.bam.bai", sample=samples),
-        sampleSheet = "splitSampleSheets/" + os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv"
+        sampleSheet = lambda wildcards: checkpoints.split_sampleSheet.get(compGroup=wildcards.compGroup).output
     output:
         b1out = "rMats_{}/b1.csv".format(os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}"),
         b2out = "rMats_{}/b2.csv".format(os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}")
     params:
-        b1 = lambda wildcards: generate_b1_b2("splitSampleSheets/" + os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv","b1"),
-        b2 = lambda wildcards: generate_b1_b2("splitSampleSheets/" + os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv","b2")
+        b1 = lambda wildcards,input: generate_b1_b2(str(input.sampleSheet),"b1"),
+        b2 = lambda wildcards,input: generate_b1_b2(str(input.sampleSheet),"b2")
     shell: """
         echo '{params.b1}' > {output.b1out}
         echo '{params.b2}' > {output.b2out}
@@ -46,7 +41,7 @@ rule rMats:
     input:
         b1 = "rMats_{}/b1.csv".format(os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}"),
         b2 = "rMats_{}/b2.csv".format(os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}"),
-        sampleSheet = "splitSampleSheets/" + os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv"
+        sampleSheet = lambda wildcards: checkpoints.split_sampleSheet.get(compGroup=wildcards.compGroup).output
     output:
         "rMats_{}/RI.MATS.JCEC.txt".format(os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}")
     params:
