@@ -188,7 +188,7 @@ rule computeGCBias:
         genome_size = int(genome_size),
         genome_2bit = genome_2bit,
         blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed else "",
-        median_fragment_length = "" if pairedEnd else "-fragmentLength {}".format(fragmentLength),
+        median_fragment_length = "" if pairedEnd else "--fragmentLength {}".format(fragmentLength),
         sampleSize = downsample if downsample and downsample < 10000000 else 10000000
     log:
         out = "deepTools_qc/logs/computeGCBias.{sample}.filtered.out",
