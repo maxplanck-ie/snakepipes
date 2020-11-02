@@ -22,6 +22,7 @@ def set_env_yamls():
     return {'CONDA_SHARED_ENV': 'envs/shared.yaml',
             'CONDA_CREATE_INDEX_ENV': 'envs/createIndices.yaml',
             'CONDA_RNASEQ_ENV': 'envs/rna_seq.yaml',
+            'CONDA_RMATS_ENV': 'envs/rMats.yaml',
             'CONDA_scRNASEQ_ENV': 'envs/sc_rna_seq.yaml',
             'CONDA_seurat3_ENV': 'envs/sc_rna_seq_seurat3.yaml',
             'CONDA_loompy_ENV': 'envs/sc_rna_seq_loompy.yaml',
@@ -228,6 +229,101 @@ def check_replicates(sample_info_file):
             return False
 
     return True
+
+
+def isMultipleComparison(sampleSheet):
+    f = open(sampleSheet)
+    nCols = None
+    d = dict()
+    for idx, line in enumerate(f):
+        cols = line.strip().split("\t")
+        if idx == 0:
+            if "group" not in cols:
+                return False
+            comparisonGroupCol = cols.index("group")
+            nCols = len(cols)
+            continue
+        elif idx == 1:
+            # Sometimes there's a column of row names, which lack a header
+            if len(cols) - 1 == nCols:
+                comparisonGroupCol += 1
+        if not len(line.strip()) == 0:
+            if cols[comparisonGroupCol] not in d:
+                d[cols[comparisonGroupCol]] = 0
+            d[cols[comparisonGroupCol]] += 1
+    f.close()
+
+    if len(d) > 1:
+        return True
+
+
+def splitSampleSheet(sampleSheet, destination_pfx):
+    f = open(sampleSheet)
+    conditionCol = None
+    nameCol = None
+    comparisonGroupCol = None
+    nCols = None
+    d = dict()
+    for idx, line in enumerate(f):
+        cols = line.strip().split("\t")
+        if idx == 0:
+            conditionCol = cols.index("condition")
+            nameCol = cols.index("name")
+            comparisonGroupCol = cols.index("group")
+            nCols = len(cols)
+            continue
+        elif idx == 1:
+            # Sometimes there's a column of row names, which lack a header
+            if len(cols) != nCols and len(cols) - 1 != nCols:
+                sys.exit("ERROR: there's a mismatch between the number of columns in the header and body of {}!\n".format(sampleSheet))
+            if len(cols) - 1 == nCols:
+                conditionCol += 1
+                nameCol += 1
+                comparisonGroupCol += 1
+        if not len(line.strip()) == 0:
+            if cols[comparisonGroupCol] not in d:
+                d[cols[comparisonGroupCol]] = []
+            d[cols[comparisonGroupCol]].append([cols[nameCol], cols[conditionCol]])
+
+    f.close()
+    for k in d.keys():
+        if k != "All" and "All" in d.keys():
+            d[k].extend(d['All'])
+            outfile = os.path.join("splitSampleSheets", '.'.join([os.path.basename(destination_pfx), k, 'tsv']))
+            with open(outfile, 'w') as of:
+                of.write('name\tcondition\n')
+                for item in d[k]:
+                    of.write('\t'.join(item) + '\n')
+
+    return
+
+
+def returnComparisonGroups(sampleSheet):
+    f = open(sampleSheet)
+    nCols = None
+    d = dict()
+    for idx, line in enumerate(f):
+        cols = line.strip().split("\t")
+        if idx == 0:
+            if "group" not in cols:
+                return False
+            comparisonGroupCol = cols.index("group")
+            nCols = len(cols)
+            continue
+        elif idx == 1:
+            # Sometimes there's a column of row names, which lack a header
+            if len(cols) - 1 == nCols:
+                comparisonGroupCol += 1
+        if not len(line.strip()) == 0:
+            if cols[comparisonGroupCol] not in d:
+                d[cols[comparisonGroupCol]] = 0
+            d[cols[comparisonGroupCol]] += 1
+    f.close()
+
+    if "All" in d.keys():
+        del d['All']
+
+    return d.keys()
 
 
 def sampleSheetGroups(sampleSheet):

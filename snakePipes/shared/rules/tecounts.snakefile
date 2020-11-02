@@ -183,20 +183,47 @@ def get_outdir(folder_name,sampleSheet):
     sample_name = os.path.splitext(os.path.basename(str(sampleSheet)))[0]
     return("{}_{}".format(folder_name, sample_name))
 
+rule split_sampleSheet:
+    input:
+        sampleSheet = sampleSheet
+    output:
+        splitSheets = os.path.join("splitSampleSheets",os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv")
+    params:
+        splitSheetPfx = os.path.join("splitSampleSheets",os.path.splitext(os.path.basename(str(sampleSheet)))[0])
+    run:
+        if isMultipleComparison:
+            cf.splitSampleSheet(input.sampleSheet,params.splitSheetPfx)
+
 
 # TODO: topN, FDR
 if sampleSheet:
-    rule DESeq2:
-        input:
-            cnts=["TEcount/{}.cntTable".format(x) for x in samples],
-            sampleSheet=sampleSheet,
-            symbol_file = "Annotation/genes.filtered.symbol"
-        output:
-            "{}/DESeq2.session_info.txt".format(get_outdir("DESeq2",sampleSheet))
-        benchmark:
-            "{}/.benchmark/DESeq2.featureCounts.benchmark".format(get_outdir("DESeq2",sampleSheet))
-        params:
-            outdir = os.path.join(outdir, get_outdir("DESeq2", sampleSheet)),
-            fdr = 0.05,
-        conda: CONDA_RNASEQ_ENV
-        script: "../rscripts/noncoding-DESeq2.R"
+    if not isMultipleComparison:
+        rule DESeq2:
+            input:
+                cnts=["TEcount/{}.cntTable".format(x) for x in samples],
+                sampleSheet=sampleSheet,
+                symbol_file = "Annotation/genes.filtered.symbol"
+            output:
+                "{}/DESeq2.session_info.txt".format(get_outdir("DESeq2",sampleSheet))
+            benchmark:
+                "{}/.benchmark/DESeq2.featureCounts.benchmark".format(get_outdir("DESeq2",sampleSheet))
+            params:
+                outdir = os.path.join(outdir, get_outdir("DESeq2", sampleSheet)),
+                fdr = 0.05,
+            conda: CONDA_RNASEQ_ENV
+            script: "../rscripts/noncoding-DESeq2.R"
+    else:
+        rule DESeq2:
+            input:
+                cnts=["TEcount/{}.cntTable".format(x) for x in samples],
+                sampleSheet = "splitSampleSheets/" + os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv",
+                symbol_file = "Annotation/genes.filtered.symbol"
+            output:
+                "{}/DESeq2.session_info.txt".format(get_outdir("DESeq2",os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv"))
+            benchmark:
+                "{}/.benchmark/DESeq2.featureCounts.benchmark".format(get_outdir("DESeq2",os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv"))
+            params:
+                outdir = lambda wildcards,input: os.path.join(outdir,get_outdir("DESeq2",input.sampleSheet)),
+                fdr = 0.05,
+            conda: CONDA_RNASEQ_ENV
+            script: "../rscripts/noncoding-DESeq2.R"

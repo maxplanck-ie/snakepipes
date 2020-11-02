@@ -41,7 +41,7 @@ else:
 
 if sampleSheet:
     cf.check_sample_info_header(sampleSheet)
-    rMatsConds = cf.sampleSheetGroups(sampleSheet)
+    isMultipleComparison = cf.isMultipleComparison(sampleSheet)
 
 if sampleSheet and not cf.check_replicates(sampleSheet):
     sys.stderr.write("\nWarning! Sleuth cannot be invoked without replicates! Only DESeq2 is used...\n")
@@ -49,3 +49,5 @@ if sampleSheet and not cf.check_replicates(sampleSheet):
 if not samples:
     print("\n  Error! NO samples found in dir "+str(indir or '')+"!!!\n\n")
     exit(1)
+
+
