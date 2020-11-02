@@ -223,7 +223,7 @@ if sampleSheet:
             benchmark:
                 "{}/.benchmark/DESeq2.featureCounts.benchmark".format(get_outdir("DESeq2",os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv"))
             params:
-                outdir = lambda wildcards,input: get_outdir("DESeq2",input.sampleSheet),
+                outdir = lambda wildcards,input: os.path.join(outdir,get_outdir("DESeq2",input.sampleSheet)),
                 fdr = 0.05,
             conda: CONDA_RNASEQ_ENV
             script: "../rscripts/noncoding-DESeq2.R"
