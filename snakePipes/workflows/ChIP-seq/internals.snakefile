@@ -183,6 +183,8 @@ def filter_dict(sampleSheet,input_dict):
 
 if sampleSheet:
     genrichDict = cf.sampleSheetGroups(sampleSheet)
+    for k in genrichDict.keys():
+        genrichDict[k]=[item for item in genrichDict[k] if item in chip_samples]
     if chip_samples_w_ctrl:
         filtered_dict = filter_dict(sampleSheet,dict(zip(chip_samples_w_ctrl, [ get_control_name(x) for x in chip_samples_w_ctrl ])))
     else:
