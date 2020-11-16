@@ -118,7 +118,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                           default=defaults["BCwhiteList"])
 
     optional.add_argument("--STARsoloCoords",
-                          type=list,
+                          type=str,
                           help="Comma-separated list of values: UMI start position, UMI length, CB start position, CB length. Required for the STARsolo mode (default: '%(default)s')",
                           default=defaults["STARsoloCoords"])
 

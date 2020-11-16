@@ -74,6 +74,7 @@ if mode == "STARsolo":
         if not os.path.isfile(BCwhiteList):
             print("Provided barcode whitelist file doesn't exist! Exit...\n")
             exit(1)
+        STARsoloCoords = STARsoloCoords.split(',')
   
 ## After barcode transfer to R2 we have only single end data / R2
 ## but we need to keep "reads" for rule fastq_barcode
