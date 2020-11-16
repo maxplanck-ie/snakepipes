@@ -1,6 +1,18 @@
 snakePipes News
 ===============
 
+snakePipes 2.4.0
+----------------
+
+* Added support for multiple pairwise comparisons for DESeq2, sleuth, and rMats in the mRNA-seq workflow, as well as for DESeq2 in the noncoding-RNA-seq workflow.
+* Loompy from conda is now used in mode STARsolo in scRNA-seq workflow.
+* Added bamExt to mRNA-seq and noncoding-RNA-seq commandline arguments.
+* Added multi-thread support to rMats in mRNA-seq workflow.
+* Fixed deepTools GC bias command with SE reads.
+* Bumped HiC explorer version.
+* Fixed STARsoloCoords for Custom kit.
+
+
 snakePipes 2.3.1
 ----------------
 

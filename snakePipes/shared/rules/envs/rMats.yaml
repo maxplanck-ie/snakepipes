@@ -1,0 +1,8 @@
+name: snakepipes_rMats_environment_0.1
+channels:
+ - conda-forge
+ - bioconda
+dependencies:
+ - python >= 3
+ - rmats = 4.1.0
+ - samtools = 1.10
