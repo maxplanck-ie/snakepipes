@@ -289,11 +289,11 @@ def splitSampleSheet(sampleSheet, destination_pfx):
     for k in d.keys():
         if k != "All" and "All" in d.keys():
             d[k].extend(d['All'])
-            outfile = os.path.join("splitSampleSheets", '.'.join([os.path.basename(destination_pfx), k, 'tsv']))
-            with open(outfile, 'w') as of:
-                of.write('name\tcondition\n')
-                for item in d[k]:
-                    of.write('\t'.join(item) + '\n')
+        outfile = os.path.join("splitSampleSheets", '.'.join([os.path.basename(destination_pfx), k, 'tsv']))
+        with open(outfile, 'w') as of:
+            of.write('name\tcondition\n')
+            for item in d[k]:
+                of.write('\t'.join(item) + '\n')
 
     return
 
