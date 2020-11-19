@@ -34,7 +34,7 @@ Quick start
 
 .. code:: bash
 
-    conda create -n snakePipes -c mpi-ie -c conda-forge -c bioconda snakePipes==2.4.0
+    conda create -n snakePipes -c mpi-ie -c conda-forge -c bioconda snakePipes==2.4.1
 
 * You can update snakePipes to the latest version available on conda with:
 

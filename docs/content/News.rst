@@ -1,6 +1,11 @@
 snakePipes News
 ===============
 
+snakePipes 2.4.1
+----------------
+
+* Fixed sampleSheet splitting for multiple pairwise comparisons when group "All" is not listed.
+
 snakePipes 2.4.0
 ----------------
 
