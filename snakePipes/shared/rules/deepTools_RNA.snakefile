@@ -93,7 +93,8 @@ rule bamCoverage_scaleFactors:
         genome_size = int(genome_size),
         bwBinSize = bwBinSize,
         blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed else "",
-        ignoreForNorm = "--ignoreForNormalization {}".format(ignoreForNormalization) if ignoreForNormalization else ""
+        ignoreForNorm = "--ignoreForNormalization {}".format(ignoreForNormalization) if ignoreForNormalization else "",
+        read_extension = ""
     log:
         out="bamCoverage/logs/bamCoverage_scaleFactors.{sample}.out",
         err="bamCoverage/logs/bamCoverage_scaleFactors.{sample}.err"
