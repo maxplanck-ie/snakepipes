@@ -1,3 +1,20 @@
+def get_scaling_factor(sample,input):
+    sample_names=[]
+    scale_factors=[]
+    if os.path.isfile(os.path.join(outdir,input)):
+        with open(os.path.join(outdir,input)) as f:
+            for idx, line in enumerate(f):
+                if idx > 0:
+                    sample_names.append(line.split('\t')[0])
+                    scale_factors.append((line.split('\t')[1]).rstrip("\n"))
+        sf_dict = dict(zip(sample_names, scale_factors))
+        scale_factor = sf_dict[sample]
+
+        return float(scale_factor)
+    else:
+        return float(1)
+
+
 rule bamCoverage_unique_mappings:
     input:
         bam = "filtered_bam/{sample}.filtered.bam",
@@ -89,7 +106,7 @@ rule bamCoverage_scaleFactors:
     conda:
         CONDA_SHARED_ENV
     params:
-        scaling_factors = "--scalingFactors deepTools_qc/multiBamSummary/scalingFactors.tsv",
+        scaling_factors = lambda wildcards,input: "--scaleFactor {}".format(get_scaling_factor(wildcards.sample,input.scalingFactors)),
         genome_size = int(genome_size),
         bwBinSize = bwBinSize,
         blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed else "",
