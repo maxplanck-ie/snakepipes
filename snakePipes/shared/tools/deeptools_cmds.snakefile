@@ -180,6 +180,19 @@ multiBWsum_bed_cmd = """
                 -p {threads} > {log.out} 2> {log.err}
     """
 
+# multiBamSum RNA
+multiBamSum_bed_cmd = """
+    multiBamSummary BED-file \
+                --BED {input.bed} \
+                -b {input.bam} \
+                -o {output.npz} \
+                --labels {params.labels} \
+                --binSize 10 \
+                --scalingFactors {output.scalingFactors} \
+                {params.blacklist} \
+                -p {threads} > {log.out} 2> {log.err}
+    """
+
 ## plot Corr (both), requires params.label
 plotCorr_cmd = """
     plotCorrelation \

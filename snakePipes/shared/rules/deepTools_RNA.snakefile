@@ -58,6 +58,51 @@ rule bamCoverage_raw:
     shell: bamcov_raw_cmd
 
 
+rule multiBamSummary_bed:
+    input:
+        bam = "filtered_bam/{sample}.filtered.bam",
+        bai = "filtered_bam/{sample}.filtered.bam.bai",
+        bed = "Annotation/genes.filtered.bed",
+    output:
+        scalingFactors = "deepTools_qc/multiBamSummary/scalingFactors.tsv",
+        npz = "deepTools_qc/multiBamSummary/results.npz"
+    conda:
+        CONDA_SHARED_ENV
+    params:
+        labels = " ".join(samples),
+        blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed else ""
+    log:
+        out="deepTools_qc/logs/multiBamSummary.out",
+        err="deepTools_qc/logs/multiBamSummary.err"
+    benchmark:
+        "deepTools_qc/.benchmark/multiBamSummary.bed.benchmark"
+    threads: 8
+    shell: multiBamSum_bed_cmd
+
+rule bamCoverage_scaleFactors:
+    input:
+        bam = "filtered_bam/{sample}.filtered.bam",
+        bai = "filtered_bam/{sample}.filtered.bam.bai",
+        scalingFactors = "deepTools_qc/multiBamSummary/scalingFactors.tsv"
+    output:
+        "bamCoverage/{sample}.scaleFactors.bw"
+    conda:
+        CONDA_SHARED_ENV
+    params:
+        scalingFactors = "deepTools_qc/multiBamSummary/scalingFactors.tsv",
+        genome_size = int(genome_size),
+        bwBinSize = bwBinSize,
+        blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed else "",
+        ignoreForNorm = "--ignoreForNormalization {}".format(ignoreForNormalization) if ignoreForNormalization else ""
+    log:
+        out="bamCoverage/logs/bamCoverage_scaleFactors.{sample}.out",
+        err="bamCoverage/logs/bamCoverage_scaleFactors.{sample}.err"
+    benchmark:
+        "bamCoverage/.benchmark/bamCoverage_scaleFactors.{sample}.benchmark"
+    threads: 8
+    shell: bamcov_spikein_cmd
+
+
 rule plotEnrichment:
     input:
         bam = expand("filtered_bam/{sample}.filtered.bam", sample=samples),
