@@ -43,7 +43,7 @@ bamcov_RPKM_cmd = """
     bamCoverage -b {input.bam} \
         -o {output} --binSize {params.bwBinSize} \
         -p {threads} --normalizeUsing RPKM {params.ignoreForNorm} \
-        {params.blacklist} \ > {log.out} 2> {log.err}
+        {params.blacklist}  > {log.out} 2> {log.err}
     """
 
 # bamCoverage RNA-seq unique mappings 
