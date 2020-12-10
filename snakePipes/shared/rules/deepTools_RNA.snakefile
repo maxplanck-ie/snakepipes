@@ -89,7 +89,7 @@ rule bamCoverage_scaleFactors:
     conda:
         CONDA_SHARED_ENV
     params:
-        scaling_factors = "deepTools_qc/multiBamSummary/scalingFactors.tsv",
+        scaling_factors = "--scalingFactors deepTools_qc/multiBamSummary/scalingFactors.tsv",
         genome_size = int(genome_size),
         bwBinSize = bwBinSize,
         blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed else "",
