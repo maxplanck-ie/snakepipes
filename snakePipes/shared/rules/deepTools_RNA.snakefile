@@ -60,9 +60,9 @@ rule bamCoverage_raw:
 
 rule multiBamSummary_bed:
     input:
-        bam = "filtered_bam/{sample}.filtered.bam",
-        bai = "filtered_bam/{sample}.filtered.bam.bai",
-        bed = "Annotation/genes.filtered.bed",
+        bam = expand("filtered_bam/{sample}.filtered.bam",sample=samples),
+        bai = expand("filtered_bam/{sample}.filtered.bam.bai",sample=samples),
+        bed = "Annotation/genes.filtered.bed"
     output:
         scalingFactors = "deepTools_qc/multiBamSummary/scalingFactors.tsv",
         npz = "deepTools_qc/multiBamSummary/results.npz"
