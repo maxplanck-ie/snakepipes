@@ -187,7 +187,7 @@ multiBamSum_bed_cmd = """
                 -b {input.bam} \
                 -o {output.npz} \
                 --labels {params.labels} \
-                --binSize 10 \
+                --binSize 100 \
                 --scalingFactors {output.scalingFactors} \
                 {params.blacklist} \
                 -p {threads} > {log.out} 2> {log.err}
