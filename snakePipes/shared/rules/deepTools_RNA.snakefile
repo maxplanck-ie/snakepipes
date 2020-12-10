@@ -27,7 +27,9 @@ rule bamCoverage_RPKM:
     conda:
         CONDA_SHARED_ENV
     params:
-        bwBinSize = bwBinSize
+        bwBinSize = bwBinSize,
+        blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed else "",
+        ignoreForNorm = "--ignoreForNormalization {}".format(ignoreForNormalization) if ignoreForNormalization else ""
     log:
         out="bamCoverage/logs/bamCoverage_RPKM.{sample}.out",
         err="bamCoverage/logs/bamCoverage_RPKM.{sample}.err"
