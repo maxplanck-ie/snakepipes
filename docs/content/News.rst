@@ -4,8 +4,8 @@ snakePipes News
 snakePipes 2.4.2
 ----------------
 
-* Deeptools coverage RPKM in mRNA-seq worflow now respects blacklist and ingoreForNorm arguments.
-* In mRNA-seq workflow, deeptools qc will now also output DESeq2 size factor-normalized bigwig files.
+* Deeptools coverage RPKM in mRNA-seq and noncoding-RNA-seq worflows now respects blacklist and ingoreForNorm arguments.
+* In mRNA-seq and noncoding-RNA-seq workflow, deeptools qc will now also output DESeq2 size factor-normalized bigwig files.
 * Fixed conda env for WGBS.
 
 snakePipes 2.4.1
