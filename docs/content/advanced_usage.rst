@@ -167,8 +167,8 @@ Using AWS or other cloud platforms
 
 There is nothing particularly special about performing computations on AWS or other cloud platforms. Below are a few recommendations, using AWS as an example:
 
- 1. Use a small compute node for initial installation. On AWS a ``t2.small`` node is sufficient for general installation since conda will need 1-2GB RAM for dependency resolution during setup.
- 2. If you can need to create custom indices, then you will need a node with at least 80GB RAM and 10 cores.
+ 1. Use a large compute node for initial installation. On AWS a ``t2.large`` node is sufficient for general installation since conda will need a couple of GB RAM for dependency resolution during setup.
+ 2. If you need to create custom indices, then you will need a node with at least 80GB RAM and 10 cores.
  3. Ensure that you install snakePipes on a separate EBS (or equivalent) storage block. We found that a 200GB ``/data`` partition was most convenient. This absolutely must not be the ``/`` partition, as mounting such a persistent image on other instances will result in paths being changed, which result in needing to modify large numbers of files.
  4. It's usually sufficient to use a single large (e.g., ``m5.24xlarge``) compute node, with 100+ cores and a few hundred GB RAM. This allows one to use the ``--local`` option and not have to deal with the hassle of setting up a proper cluster on AWS. Make sure the then set ``-j`` to the number of available cores on the node, so snakePipes can make the most efficient use of the resources (and minimize your bill).
 
