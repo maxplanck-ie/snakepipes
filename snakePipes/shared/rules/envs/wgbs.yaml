@@ -9,12 +9,12 @@ dependencies:
   - methyldackel = 0.5.0
   - metilene = 0.2.8
   - bedtools = 2.29.2
-  - r-base = 3.6.2
+  - r-base = 3.6.3
   - r-car = 3.0_6
   - r-factominer = 2.2
   - r-ggplot2 = 3.1.1
   - r-rmarkdown
-  - r-dplyr = 0.8.4
+  - r-dplyr = 1.0.2
   - r-tidyr
   - r-pander
   - r-factominer
