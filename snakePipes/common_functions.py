@@ -294,15 +294,15 @@ def splitSampleSheet(sampleSheet, destination_pfx):
     f.close()
     for k in d.keys():
         if batchCol:
-                if d["All"][0][2] == firstCondition:
-                    d[k].insert(0,d["All"])
-                else:    
-                    d[k].extend(d['All'])
-            else:
-                if d["All"][0][1] == firstCondition:
-                    d[k].insert(0,d["All"])
-                else:    
-                    d[k].extend(d['All'])
+            if d["All"][0][2] == firstCondition:
+                d[k].insert(0,d["All"])
+            else:    
+                d[k].extend(d['All'])
+        else:
+            if d["All"][0][1] == firstCondition:
+                d[k].insert(0,d["All"])
+            else:    
+                d[k].extend(d['All'])
 
         outfile = os.path.join("splitSampleSheets", '.'.join([os.path.basename(destination_pfx), k, 'tsv']))
         with open(outfile, 'w') as of:
