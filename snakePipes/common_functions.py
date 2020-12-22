@@ -298,21 +298,21 @@ def splitSampleSheet(sampleSheet, destination_pfx):
 
     for k in d.keys():
         for k in d.keys():
-        if k != "All" and "All" in d.keys():
-            if batchCol:
-                if d["All"][0][2] == firstCondition:
-                    d["All"].reverse()
-                    for x in d["All"]:
-                        d[k].insert(0, x)
+            if k != "All" and "All" in d.keys():
+                if batchCol:
+                    if d["All"][0][2] == firstCondition:
+                        d["All"].reverse()
+                        for x in d["All"]:
+                            d[k].insert(0, x)
+                    else:
+                        d[k].extend(d['All'])
                 else:
-                    d[k].extend(d['All'])
-            else:
-                if d["All"][0][1] == firstCondition:
-                    d["All"].reverse()
-                    for x in d["All"]:
-                        d[k].insert(0, x)
-                else:
-                    d[k].extend(d['All'])
+                    if d["All"][0][1] == firstCondition:
+                        d["All"].reverse()
+                        for x in d["All"]:
+                            d[k].insert(0, x)
+                    else:
+                        d[k].extend(d['All'])
 
         outfile = os.path.join("splitSampleSheets", '.'.join([os.path.basename(destination_pfx), k, 'tsv']))
         with open(outfile, 'w') as of:
