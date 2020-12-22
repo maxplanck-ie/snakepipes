@@ -289,12 +289,13 @@ def splitSampleSheet(sampleSheet, destination_pfx):
         if not len(line.strip()) == 0:
             if cols[comparisonGroupCol] not in d:
                 d[cols[comparisonGroupCol]] = []
-            if batchCol:    
+            if batchCol:
                 d[cols[comparisonGroupCol]].append([cols[nameCol], cols[batchCol], cols[conditionCol]])
             else:
                 d[cols[comparisonGroupCol]].append([cols[nameCol], cols[conditionCol]])
 
     f.close()
+
     for k in d.keys():
         if batchCol:
             if d["All"][0][2] == firstCondition:
