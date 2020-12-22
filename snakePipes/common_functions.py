@@ -262,6 +262,7 @@ def splitSampleSheet(sampleSheet, destination_pfx):
     conditionCol = None
     nameCol = None
     comparisonGroupCol = None
+    batchCol = None
     nCols = None
     d = dict()
     for idx, line in enumerate(f):
@@ -270,6 +271,8 @@ def splitSampleSheet(sampleSheet, destination_pfx):
             conditionCol = cols.index("condition")
             nameCol = cols.index("name")
             comparisonGroupCol = cols.index("group")
+            if "batch" in cols:
+                batchCol = cols.index("batch")
             nCols = len(cols)
             continue
         elif idx == 1:
@@ -280,6 +283,9 @@ def splitSampleSheet(sampleSheet, destination_pfx):
                 conditionCol += 1
                 nameCol += 1
                 comparisonGroupCol += 1
+                if batchCol:
+                    batchCol += 1
+            firstCondition = cols[conditionCol]
         if not len(line.strip()) == 0:
             if cols[comparisonGroupCol] not in d:
                 d[cols[comparisonGroupCol]] = []
@@ -287,11 +293,23 @@ def splitSampleSheet(sampleSheet, destination_pfx):
 
     f.close()
     for k in d.keys():
-        if k != "All" and "All" in d.keys():
-            d[k].extend(d['All'])
+        if batchCol:
+                if d["All"][0][2] == firstCondition:
+                    d[k].insert(0,d["All"])
+                else:    
+                    d[k].extend(d['All'])
+            else:
+                if d["All"][0][1] == firstCondition:
+                    d[k].insert(0,d["All"])
+                else:    
+                    d[k].extend(d['All'])
+
         outfile = os.path.join("splitSampleSheets", '.'.join([os.path.basename(destination_pfx), k, 'tsv']))
         with open(outfile, 'w') as of:
-            of.write('name\tcondition\n')
+            if batchCol:
+                of.write('name\tbatch\tcondition\n')
+            else:    
+                of.write('name\tcondition\n')
             for item in d[k]:
                 of.write('\t'.join(item) + '\n')
 
