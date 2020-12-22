@@ -302,7 +302,7 @@ def splitSampleSheet(sampleSheet, destination_pfx):
         else:
             allCondition = d["All"][0][1]
         if allCondition == firstCondition:
-            d["All"].reverse()        
+            d["All"].reverse()
     for k in d.keys():
         if k != "All" and "All" in d.keys():
             if allCondition == firstCondition:
