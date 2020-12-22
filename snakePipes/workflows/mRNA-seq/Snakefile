@@ -237,6 +237,7 @@ def run_deepTools_qc():
     if "deepTools_qc" in mode:
         file_list = [
         expand("bamCoverage/{sample}.RPKM.bw", sample = samples),
+        expand("bamCoverage/{sample}.scaleFactors.bw",sample = samples),
         expand("bamCoverage/{sample}.coverage.bw", sample = samples),
         expand("bamCoverage/{sample}.uniqueMappings.fwd.bw", sample = samples),
         expand("bamCoverage/{sample}.uniqueMappings.rev.bw", sample = samples),

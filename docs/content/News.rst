@@ -1,6 +1,15 @@
 snakePipes News
 ===============
 
+snakePipes 2.4.2
+----------------
+
+* Deeptools coverage RPKM in mRNA-seq and noncoding-RNA-seq worflows now respects blacklist and ingoreForNorm arguments.
+* In mRNA-seq and noncoding-RNA-seq workflow, deeptools qc will now also output DESeq2 size factor-normalized bigwig files.
+* Fixed conda env for WGBS.
+* Fixed control group ordering in split sample sheets in mRNA-seq and other workflows.
+* Removed rule moving bams from allelic mRNA-seq and DNA-mapping workflows.
+
 snakePipes 2.4.1
 ----------------
 

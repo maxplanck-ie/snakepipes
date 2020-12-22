@@ -9,7 +9,9 @@ rule bamCoverage_RPKM_allelic:
     conda:
         CONDA_SHARED_ENV
     params:
-        bwBinSize = config["bwBinSize"]
+        bwBinSize = config["bwBinSize"],
+        blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed else "",
+        ignoreForNorm = "--ignoreForNormalization {}".format(ignoreForNormalization) if ignoreForNormalization else ""
     log:
         out="bamCoverage/allele_specific/logs/bamCoverage_RPKM.{sample}.{suffix}.out",
         err="bamCoverage/allele_specific/logs/bamCoverage_RPKM.{sample}.{suffix}.err",
