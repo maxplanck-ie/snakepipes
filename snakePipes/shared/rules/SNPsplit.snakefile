@@ -6,7 +6,8 @@ if aligner == "Bowtie2":
             snp = SNPFile,
             bam = "filtered_bam/{sample}.filtered.bam"
         output:
-            expand("allelic_bams/{{sample}}.filtered.{suffix}.bam", suffix = ['allele_flagged', 'genome1', 'genome2', 'unassigned'])
+            targetbam = expand("allelic_bams/{{sample}}.filtered.{suffix}.bam", suffix = ['allele_flagged', 'genome1', 'genome2', 'unassigned']),
+            tempbam = temp("filtered_bam/{sample}.filtered.sortedByName.bam")
         log: "allelic_bams/logs/{sample}.snp_split.log"
         params:
             pairedEnd = '--paired' if pairedEnd else '',
@@ -22,7 +23,8 @@ elif aligner == "STAR":
             snp = SNPFile,
             bam = aligner+"/{sample}.bam"
         output:
-            expand("allelic_bams/{{sample}}.{suffix}.bam", suffix = ['allele_flagged', 'genome1', 'genome2', 'unassigned'])
+            targetbam = expand("allelic_bams/{{sample}}.{suffix}.bam", suffix = ['allele_flagged', 'genome1', 'genome2', 'unassigned']),
+            tempbam = temp(aligner+"/{sample}.sortedByName.bam")
         log: "allelic_bams/logs/{sample}.snp_split.log"
         params:
             pairedEnd = '--paired' if pairedEnd else '',
@@ -33,32 +35,32 @@ elif aligner == "STAR":
             " -o {params.outdir} --snp_file {input.snp} {input.bam} 2> {log}"
 
 # move the allele-specific bams to another folder
-if aligner == "Bowtie2":
-    rule movebams:
-        input:
-            "allelic_bams/{sample}.filtered.{suffix}.bam"
-        params:
-            otherFile = "filtered_bam/{sample}.filtered.sortedByName.bam"
-        output:
-            temp("allelic_bams/{sample}.{suffix}.unsorted.bam")
-        shell:
-            "mv {input} {output} && \
-            if [ -e {params.otherFile} ]; then rm {params.otherFile}; fi"
-else:
-    rule movebams:
-        input:
-            "allelic_bams/{sample}.{suffix}.bam"
-        params:
-            otherFile = aligner+"/{sample}.sortedByName.bam"
-        output:
-            temp("allelic_bams/{sample}.{suffix}.unsorted.bam")
-        shell:
-            "mv {input} {output} && \
-            if [ -e {params.otherFile} ]; then rm {params.otherFile}; fi"
+#if aligner == "Bowtie2":
+#    rule movebams:
+#        input:
+#            "allelic_bams/{sample}.filtered.{suffix}.bam"
+#        params:
+#            otherFile = "filtered_bam/{sample}.filtered.sortedByName.bam"
+#        output:
+#            temp("allelic_bams/{sample}.{suffix}.unsorted.bam")
+#        shell:
+#            "mv {input} {output} && \
+#            if [ -e {params.otherFile} ]; then rm {params.otherFile}; fi"
+#else:
+#    rule movebams:
+#        input:
+#            "allelic_bams/{sample}.{suffix}.bam"
+#        params:
+#            otherFile = aligner+"/{sample}.sortedByName.bam"
+#        output:
+#            temp("allelic_bams/{sample}.{suffix}.unsorted.bam")
+#        shell:
+#            "mv {input} {output} && \
+#            if [ -e {params.otherFile} ]; then rm {params.otherFile}; fi"
 
 # sort them
 rule BAMsort_allelic:
-    input: "allelic_bams/{sample}.{suffix}.unsorted.bam"
+    input: "allelic_bams/{sample}.filtered.{suffix}.bam" if aligner == "Bowtie2" else "allelic_bams/{sample}.{suffix}.bam"
     output:
         "allelic_bams/{sample}.{suffix}.sorted.bam"
     log: "allelic_bams/logs/{sample}.{suffix}.sort.log"

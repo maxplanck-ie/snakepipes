@@ -42,7 +42,8 @@ bamcov_raw_cmd = """
 bamcov_RPKM_cmd = """
     bamCoverage -b {input.bam} \
         -o {output} --binSize {params.bwBinSize} \
-        -p {threads} --normalizeUsing RPKM > {log.out} 2> {log.err}
+        -p {threads} --normalizeUsing RPKM {params.ignoreForNorm} \
+        {params.blacklist}  > {log.out} 2> {log.err}
     """
 
 # bamCoverage RNA-seq unique mappings 
@@ -176,6 +177,19 @@ multiBWsum_bed_cmd = """
                 -o {output} \
                 --labels {params.labels} \
                 --binSize 1000 \
+                -p {threads} > {log.out} 2> {log.err}
+    """
+
+# multiBamSum RNA
+multiBamSum_bed_cmd = """
+    multiBamSummary BED-file \
+                --BED {input.bed} \
+                -b {input.bam} \
+                -o {output.npz} \
+                --labels {params.labels} \
+                --binSize 100 \
+                --scalingFactors {output.scalingFactors} \
+                {params.blacklist} \
                 -p {threads} > {log.out} 2> {log.err}
     """
 
