@@ -33,8 +33,7 @@ seq_dict = {
            'DpnII' : ['GATC', 'GATC'],
            'HindIII' : ['AAGCTT', 'AGCTT'],
            'HinfI' : ['GANTC', 'ANTC'],
-           'HinfI&DpnII' : ['GANTC GATC', 'ANTC GATC'],
-           'Arima' : ['GANTC GATC', 'ANTC GATC']
+           'Arima' : ['"GANTC GATC"', '"ANTC GATC"']
            }
 
 ## get sequences for restriction enzymes
