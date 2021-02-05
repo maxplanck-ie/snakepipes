@@ -183,16 +183,17 @@ def get_outdir(folder_name,sampleSheet):
     sample_name = os.path.splitext(os.path.basename(str(sampleSheet)))[0]
     return("{}_{}".format(folder_name, sample_name))
 
-rule split_sampleSheet:
-    input:
-        sampleSheet = sampleSheet
-    output:
-        splitSheets = os.path.join("splitSampleSheets",os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv")
-    params:
-        splitSheetPfx = os.path.join("splitSampleSheets",os.path.splitext(os.path.basename(str(sampleSheet)))[0])
-    run:
-        if isMultipleComparison:
-            cf.splitSampleSheet(input.sampleSheet,params.splitSheetPfx)
+if sampleSheet:
+    rule split_sampleSheet:
+        input:
+            sampleSheet = sampleSheet
+        output:
+            splitSheets = os.path.join("splitSampleSheets",os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv")
+        params:
+            splitSheetPfx = os.path.join("splitSampleSheets",os.path.splitext(os.path.basename(str(sampleSheet)))[0])
+        run:
+            if isMultipleComparison:
+                cf.splitSampleSheet(input.sampleSheet,params.splitSheetPfx)
 
 
 # TODO: topN, FDR
