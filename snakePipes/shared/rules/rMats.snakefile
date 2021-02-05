@@ -39,6 +39,6 @@ rule rMats:
     conda: CONDA_RNASEQ_ENV
     shell:"""
         set +o pipefail;
-        readLen=$(samtools view {params.s1} | awk \'{{print length($10)}}\' | head -10000 | awk \'{{ sum += $1 }} END {{ if (NR > 0) print sum / NR }}\')
+        readLen=$(samtools view {params.s1} | awk \'{{print length($10)}}\' | head -10000 | awk \'{{ sum += $1 }} END {{ if (NR > 0) print int(sum / NR) }}\')
         rmats.py --gtf {params.gtf} --b1 {input.b1} --b2 {input.b2} --od {params.od} --tmp {params.tempDir} -t {params.end} --libType {params.libType} --readLength $readLen --variable-read-length --nthread {threads} --tstat {threads} 2> {log}
 """
