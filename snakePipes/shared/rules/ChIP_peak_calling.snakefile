@@ -80,8 +80,8 @@ else:
                 lambda wildcards: "-c filtered_bam/"+get_control(wildcards.chip_sample)+".filtered.bam" if get_control(wildcards.chip_sample)
                 else "",
             frag_size=fragmentLength,
-            mfold=mfold,
-            qval_cutoff=qval
+            peakCaller_options = peakCallerOptions,
+            bam_options = BAMPeaks
         log:
             out = "MACS2/logs/MACS2.{chip_sample}.filtered.out",
             err = "MACS2/logs/MACS2.{chip_sample}.filtered.err"
@@ -89,9 +89,10 @@ else:
             "MACS2/.benchmark/MACS2.{chip_sample}.filtered.benchmark"
         conda: CONDA_CHIPSEQ_ENV
         shell: """
-            macs2 callpeak -t {input.chip} {params.control_param} -f BAM -g {params.genome_size} --qvalue {params.qval_cutoff} --keep-dup all --outdir MACS2 \
-                --name {wildcards.chip_sample}.filtered.BAM --mfold {params.mfold} --extsize {params.frag_size}\
-                {params.broad_calling} > {log.out} 2> {log.err}
+            macs2 callpeak -t {input.chip} {params.control_param} -f BAM -g {params.genome_size} \
+            {params.peakCaller_options} --keep-dup all --outdir MACS2 \
+            --name {wildcards.chip_sample}.filtered.BAM {params.bam_options} --extsize {params.frag_size} \
+            {params.broad_calling} > {log.out} 2> {log.err}
             """
 
 
