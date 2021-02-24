@@ -19,10 +19,10 @@ import snakePipes.parserCommon as parserCommon
 def parse_args(defaults={"verbose": False, "configFile": None,
                          "clusterConfigFile": None, "maxJobs": 5,
                          "snakemakeOptions": "--use-conda", "tempDir": None,
-                         "pairedEnd": True, "fragmentLength":200, "bwBinSize": 25, "qval": 0.001, "sampleSheet": "",
-                         "windowSize": 150, "predictChIPDict": None,
-                         "bigWigType": "both", "mfold": "0 50", "peakCaller": "MACS2",
-                         "peakCallerOptions": None, "plotFormat": "png","fromBAM": False,
+                         "pairedEnd": True, "fragmentLength":200, "bwBinSize": 25,
+                         "windowSize": 150, "predictChIPDict": None, "fromBAM": False,
+                         "bigWigType": "both", "peakCaller": "MACS2", "sampleSheet": "",
+                         "peakCallerOptions": "--qvalue 0.001", "plotFormat": "png",
                          "bamExt": ".filtered.bam", "fdr": 0.05, "absBestLFC": 1, "useSpikeinForNorm": False,
                          "spikeinExt": "_spikein", "getSizeFactorsFrom": "genome"}):
 
@@ -98,13 +98,6 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                           type=int,
                           default=defaults["bwBinSize"])
 
-    optional.add_argument("--qval",
-                          dest="qval",
-                          metavar="INT",
-                          help="qvalue threshold for MACS2(default: '%(default)s')",
-                          type=float,
-                          default=defaults['qval'])
-
     optional.add_argument("--sampleSheet",
                           help="Information on samples (If differential binding analysis required); see "
                                "'https://github.com/maxplanck-ie/snakepipes/tree/master/docs/content/sampleSheet.example.tsv' for example. "
@@ -144,15 +137,6 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          choices=['png', 'pdf', 'None'],
                          help="Format of the output plots from deepTools. Select 'none' for no plots (default: '%(default)s')",
                          default=defaults["plotFormat"])
-
-    optional.add_argument("--mfold",
-                         dest="mfold",
-                         metavar="INT INT",
-                         type=str,
-                         help="Select the regions within MFOLD range of high-confidence enrichment ratio against background to build model."
-                              "Fold-enrichment in regions must be lower than upper limit, and higher than the lower limit. Use as \"-m 10 30\"."
-                              "This setting is only used while building the shifting model. Tweaking it is not recommended. DEFAULT:5 50 (default: '%(default)s')",
-                         default=defaults["mfold"])
 
     optional.add_argument("--FDR",
                           dest="fdr",
