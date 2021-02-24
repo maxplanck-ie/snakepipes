@@ -63,9 +63,9 @@ def is_allelic(workingdir):
 def get_pe_frag_length(sample):
     df = pd.read_csv("deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv",
                      header = None, skiprows = 1, sep = "\t")
-    df = df.loc[df[0] == sample]
-    frag_len = str(df[5].values[0])
-    return frag_len
+    df = df.loc[df[0] == "filtered_bam/"+sample+".filtered.bam"]
+    frag_len = int(df[5].values[0])
+    return str(frag_len)
 ### Variable defaults ##########################################################
 ### Initialization #############################################################
 

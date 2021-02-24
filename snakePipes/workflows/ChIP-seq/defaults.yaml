@@ -30,7 +30,7 @@ spikeinExt: _spikein
 peakCaller: 'MACS2'
 peakCallerOptions: --qvalue 0.001
 ##MACS2 specific options:
-BAMPeaks: --mfold "0 50"
+BAMPeaks: --mfold 0 50
 BAMPEPeaks:
 ## paired end data?
 pairedEnd: True

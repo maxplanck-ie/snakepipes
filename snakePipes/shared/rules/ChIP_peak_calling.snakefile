@@ -16,10 +16,7 @@ if pairedEnd:
     rule MACS2:
         input:
             chip = "filtered_bam/{chip_sample}.filtered.bam",
-            control =
-                lambda wildcards: "filtered_bam/"+get_control(wildcards.chip_sample)+".filtered.bam" if get_control(wildcards.chip_sample)
-                else [],
-            insert_size_metrics = "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv"
+            frag_size = "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv"
         output:
             peaks = "MACS2/{chip_sample}.filtered.BAM_peaks.xls",
             peaksPE = "MACS2/{chip_sample}.filtered.BAMPE_peaks.xls"
@@ -29,12 +26,12 @@ if pairedEnd:
             control_param =
                 lambda wildcards: " -c filtered_bam/"+get_control(wildcards.chip_sample)+".filtered.bam" if get_control(wildcards.chip_sample)
                 else "",
-            genome_size = lambda wildcards: "-g "+genome_size if not cutntag else " ",
+            genome_size = lambda wildcards: "-g "+str(genome_size) if not cutntag else " ",
             ext_size =
                 lambda wildcards: " --nomodel --extsize "+get_pe_frag_length(wildcards.chip_sample) if not cutntag else " ",
-            peakCaller_options = lambda wildcards: peakCallerOptions if not cutntag else " -p 1e-5 ",
-            bampe_options = lambda wildcards: BAMPEPeaks if not cutntag else " ",
-            bam_options = lambda wildcards: BAMPeaks if not cutntag else " "
+            peakCaller_options = lambda wildcards: str(peakCallerOptions or '') if not cutntag else " -p 1e-5 ",
+            bampe_options = lambda wildcards: str(BAMPEPeaks or '')if not cutntag else " ",
+            bam_options = lambda wildcards: str(BAMPeaks or '') if not cutntag else " "
         log:
             out = "MACS2/logs/MACS2.{chip_sample}.filtered.out",
             err = "MACS2/logs/MACS2.{chip_sample}.filtered.err"
@@ -44,7 +41,7 @@ if pairedEnd:
         shell: """
             macs2 callpeak -t {input.chip} {params.control_param} \
                 -f BAM \
-                {params.bam_options}
+                {params.bam_options} \
                 {params.genome_size} \
                 {params.ext_size} \
                 --keep-dup all \
@@ -72,7 +69,7 @@ else:
         output:
             peaks = "MACS2/{chip_sample}.filtered.BAM_peaks.xls",
         params:
-            genome_size = int(genome_size),
+            genome_size = str(genome_size),
             broad_calling =
                 lambda wildcards: "--broad" if is_broad(wildcards.chip_sample)
                 else "",
@@ -80,8 +77,8 @@ else:
                 lambda wildcards: "-c filtered_bam/"+get_control(wildcards.chip_sample)+".filtered.bam" if get_control(wildcards.chip_sample)
                 else "",
             frag_size=fragmentLength,
-            peakCaller_options = peakCallerOptions,
-            bam_options = BAMPeaks
+            peakCaller_options = str(peakCallerOptions, ''),
+            bam_options = str(BAMPeaks or '')
         log:
             out = "MACS2/logs/MACS2.{chip_sample}.filtered.out",
             err = "MACS2/logs/MACS2.{chip_sample}.filtered.err"

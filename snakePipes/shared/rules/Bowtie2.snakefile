@@ -10,7 +10,8 @@ if pairedEnd:
         log: "Bowtie2/logs/{sample}.sort.log"
         params:
             bowtie2_index=bowtie2_index,
-            alignerOpts = str(alignerOpts or ''),
+            alignerOpts = str(alignerOpts or ' ') if not cutntag else " --local --very-sensitive-local "\
+            "--no-unal --no-mixed --no-discordant --phred33 -I 10 -X 700 ",
             mateOrientation = mateOrientation,
             insertSizeMax = insertSizeMax,
             tempDir = tempDir

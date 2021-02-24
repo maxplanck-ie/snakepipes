@@ -15,16 +15,16 @@ import snakePipes.common_functions as cf
 import snakePipes.parserCommon as parserCommon
 
 
-
 def parse_args(defaults={"verbose": False, "configFile": None,
                          "clusterConfigFile": None, "maxJobs": 5,
                          "snakemakeOptions": "--use-conda", "tempDir": None,
                          "pairedEnd": True, "fragmentLength":200, "bwBinSize": 25,
                          "windowSize": 150, "predictChIPDict": None, "fromBAM": False,
                          "bigWigType": "both", "peakCaller": "MACS2", "sampleSheet": "",
-                         "peakCallerOptions": "--qvalue 0.001", "plotFormat": "png",
-                         "bamExt": ".filtered.bam", "fdr": 0.05, "absBestLFC": 1, "useSpikeinForNorm": False,
-                         "spikeinExt": "_spikein", "getSizeFactorsFrom": "genome"}):
+                         "plotFormat": "png", "bamExt": ".filtered.bam", "fdr": 0.05,
+                         "absBestLFC": 1, "useSpikeinForNorm": False, "spikeinExt": "_spikein",
+                         "peakCallerOptions": "--qvalue 0.001","cutntag": False,
+                         "getSizeFactorsFrom": "genome"}):
 
     """
     Parse arguments from the command line.
@@ -50,14 +50,15 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                           default=defaults['peakCaller'])
 
     optional.add_argument("--peakCallerOptions",
-                              help="Custom options to set for the peak caller. The default is %(default).",
-                              default=defaults['peakCallerOptions'])
+                          help="Custom options to set for the peak caller. Default is '%(default)s'.",
+                          default=defaults['peakCallerOptions'])
 
     optional.add_argument("--cutntag",
-                              help="if set, MACS2 peakCaller is used with the parameters have been used "
-                              "in the method section of Meers et al. 2019, Kaya-Okur et al. 2019 and 2020. "
-                              "Setting this paramter overwrites the '--peakCallerOptions'",
-                              action="store_false")
+                          help="if set, MACS2 peakCaller is used with the parameters have been used "
+                          "in the method section of Meers et al. 2019, Kaya-Okur et al. 2019 and 2020. "
+                          "Setting this flag overwrites the '--peakCallerOptions'."
+                          " Default is '%(default)s'.",
+                          action="store_true")
 
     optional.add_argument("--singleEnd",
                           dest="pairedEnd",

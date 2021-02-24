@@ -27,7 +27,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          "bwBinSize": 25, "mapq": 0, "plotFormat": "png",
                          "alignerOpts": "", "mateOrientation": "--fr",
                          "UMIDedup": False, "UMIDedupOpts": "",
-                         "UMIDedupSep": "_", "UMIBarcode": False,
+                         "UMIDedupSep": "_", "UMIBarcode": False, "cutntag": False,
                          "bcPattern": "NNNNCCCCCCCC", "aligner":"Bowtie2"}):
     """
     Parse arguments from the command line.
@@ -60,6 +60,13 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                           "elsewhere. Read group information is set automatically. Note that you may need to escape "
                           "the first - (e.g., '\--very-fast'). Default: '%(default)s'.",
                           default=defaults["alignerOpts"])
+
+    optional.add_argument("--cutntag",
+                          help="if set, Bowti2 is used for mapping with parameters as has been used "
+                          "in the method section of Meers et al. 2019. "
+                          "Setting this flag overwrites the '--alignerOpts'."
+                          " Default is '%(default)s'.",
+                          action="store_true")
 
     optional.add_argument("--mateOrientation",
                           help="The --fr, --ff, or --rf option for bowtie2 (default: '%(default)s')",
