@@ -24,14 +24,17 @@ if pairedEnd:
             peaks = "MACS2/{chip_sample}.filtered.BAM_peaks.xls",
             peaksPE = "MACS2/{chip_sample}.filtered.BAMPE_peaks.xls"
         params:
-            genome_size = genome_size,
             broad_calling =
-                lambda wildcards: "--broad" if is_broad(wildcards.chip_sample) else "",
+                lambda wildcards: "--broad " if is_broad(wildcards.chip_sample) else "",
             control_param =
-                lambda wildcards: "-c filtered_bam/"+get_control(wildcards.chip_sample)+".filtered.bam" if get_control(wildcards.chip_sample)
+                lambda wildcards: " -c filtered_bam/"+get_control(wildcards.chip_sample)+".filtered.bam" if get_control(wildcards.chip_sample)
                 else "",
-            qval_cutoff=qval,
-            mfold=mfold
+            genome_size = lambda wildcards: "-g "+genome_size if not cutntag else " ",
+            ext_size =
+                lambda wildcards: " --nomodel --extsize "+get_pe_frag_length(wildcards.chip_sample) if not cutntag else " ",
+            peakCaller_options = lambda wildcards: peakCallerOptions if not cutntag else " -p 1e-5 ",
+            bampe_options = lambda wildcards: BAMPEPeaks if not cutntag else " ",
+            bam_options = lambda wildcards: BAMPeaks if not cutntag else " "
         log:
             out = "MACS2/logs/MACS2.{chip_sample}.filtered.out",
             err = "MACS2/logs/MACS2.{chip_sample}.filtered.err"
@@ -41,19 +44,21 @@ if pairedEnd:
         shell: """
             macs2 callpeak -t {input.chip} {params.control_param} \
                 -f BAM \
-                -g {params.genome_size} --qvalue {params.qval_cutoff}\
+                {params.bam_options}
+                {params.genome_size} \
+                {params.ext_size} \
                 --keep-dup all \
                 --outdir MACS2 \
                 --name {wildcards.chip_sample}.filtered.BAM \
-                --nomodel \
-                --mfold {params.mfold}\
-                --extsize $(cat {input.insert_size_metrics} | grep filtered_bam/{wildcards.chip_sample}.filtered.bam | awk '{{printf("%i",$6)}}') \
+                {params.peakCaller_options} \
                 {params.broad_calling} > {log.out} 2> {log.err}
 
             # also run MACS2 in paired-end mode BAMPE for comparison with single-end mode
             macs2 callpeak -t {input.chip} \
-                {params.control_param} -f BAMPE --qvalue {params.qval_cutoff}\
-                -g {params.genome_size} --keep-dup all \
+                {params.control_param} -f BAMPE \
+                {params.bampe_options} \
+                {params.peakCaller_options} \
+                {params.genome_size} --keep-dup all \
                 --outdir MACS2 --name {wildcards.chip_sample}.filtered.BAMPE \
                 {params.broad_calling} > {log.out}.BAMPE 2> {log.err}.BAMPE
             """

@@ -4,6 +4,7 @@ import subprocess
 import re
 import yaml
 import sys
+import pandas as pd
 
 
 ### Functions ##################################################################
@@ -18,6 +19,7 @@ def get_control(sample):
     else:
         return False
 
+
 def get_control_name(sample):
     """
     Return control sample alias for a given ChIP-seq sample
@@ -30,6 +32,7 @@ def get_control_name(sample):
             return False
     else:
         return False
+
 
 def is_broad(sample):
     """
@@ -49,6 +52,7 @@ def is_chip(sample):
     """
     return (sample in chip_samples)
 
+
 def is_allelic(workingdir):
     if os.path.isdir(os.path.join(workingdir,'allelic_bams') ) and os.listdir(os.path.join(workingdir,'allelic_bams') ) != []:
         return True
@@ -56,6 +60,12 @@ def is_allelic(workingdir):
         return False
 
 
+def get_pe_frag_length(sample):
+    df = pd.read_csv("deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv",
+                     header = None, skiprows = 1, sep = "\t")
+    df = df.loc[df[0] == sample]
+    frag_len = str(df[5].values[0])
+    return frag_len
 ### Variable defaults ##########################################################
 ### Initialization #############################################################
 
@@ -140,13 +150,13 @@ if not fromBAM:
                       'configuration file is NOT available.'.format(file, sample))
                 exit(1)
 
-        
+
 else:
     bamFiles = sorted(glob.glob(os.path.join(str(fromBAM or ''), '*' + bamExt)))
     bamSamples = cf.get_sample_names_bam(bamFiles, bamExt)
-    
+
     bamDict = dict.fromkeys(bamSamples)
-    
+
     for sample in all_samples:
         if sample not in bamDict:
             sys.exit("No bam file found for chip sample {}!".format(sample))
@@ -176,7 +186,7 @@ def filter_dict(sampleSheet,input_dict):
             if len(cols) - 1 == nCols:
                 nameCol += 1
         if not len(line.strip()) == 0:
-            names_sub.append(line.split('\t')[nameCol])      
+            names_sub.append(line.split('\t')[nameCol])
     f.close()
     output_dict = dict((k,v) for k,v in input_dict.items() if k in names_sub)
     return(output_dict)
@@ -215,7 +225,7 @@ def get_host_and_spikein_chromosomes(genome_index,spikeinExt):
     spikeinl=[]
     with open(genome_index) as ifile:
         for line in ifile:
-            entry = line.split('\t')[0] 
+            entry = line.split('\t')[0]
             if re.search(spikeinExt, entry):
                 spikeinl.append(entry)
             else:
@@ -231,5 +241,3 @@ if useSpikeInForNorm:
     else:
         print("\n No spikein genome detected - no spikeIn chromosomes found with extention " + spikeinExt + " .\n\n")
         exit(1)
-        
-       

@@ -22,9 +22,9 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          "pairedEnd": True, "fragmentLength":200, "bwBinSize": 25, "qval": 0.001, "sampleSheet": "",
                          "windowSize": 150, "predictChIPDict": None,
                          "bigWigType": "both", "mfold": "0 50", "peakCaller": "MACS2",
-                         "plotFormat": "png","fromBAM": False, "bamExt": ".filtered.bam",
-                         "fdr": 0.05, "absBestLFC": 1, "useSpikeinForNorm": False, "spikeinExt": "_spikein",
-                         "getSizeFactorsFrom": "genome"}):
+                         "peakCallerOptions": None, "plotFormat": "png","fromBAM": False,
+                         "bamExt": ".filtered.bam", "fdr": 0.05, "absBestLFC": 1, "useSpikeinForNorm": False,
+                         "spikeinExt": "_spikein", "getSizeFactorsFrom": "genome"}):
 
     """
     Parse arguments from the command line.
@@ -48,6 +48,16 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                           help="The peak caller to use. The default is %(default)s and this is only applicable for sharper peaks (broad peaks will always use histoneHMM).",
                           choices=["MACS2", "Genrich"],
                           default=defaults['peakCaller'])
+
+    optional.add_argument("--peakCallerOptions",
+                              help="Custom options to set for the peak caller. The default is %(default).",
+                              default=defaults['peakCallerOptions'])
+
+    optional.add_argument("--cutntag",
+                              help="if set, MACS2 peakCaller is used with the parameters have been used "
+                              "in the method section of Meers et al. 2019, Kaya-Okur et al. 2019 and 2020. "
+                              "Setting this paramter overwrites the '--peakCallerOptions'",
+                              action="store_false")
 
     optional.add_argument("--singleEnd",
                           dest="pairedEnd",
@@ -139,8 +149,8 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          dest="mfold",
                          metavar="INT INT",
                          type=str,
-                         help="Select the regions within MFOLD range of high-confidence enrichment ratio against background to build model." 
-                              "Fold-enrichment in regions must be lower than upper limit, and higher than the lower limit. Use as \"-m 10 30\"." 
+                         help="Select the regions within MFOLD range of high-confidence enrichment ratio against background to build model."
+                              "Fold-enrichment in regions must be lower than upper limit, and higher than the lower limit. Use as \"-m 10 30\"."
                               "This setting is only used while building the shifting model. Tweaking it is not recommended. DEFAULT:5 50 (default: '%(default)s')",
                          default=defaults["mfold"])
 
