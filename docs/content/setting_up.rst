@@ -34,7 +34,7 @@ The easiest way to install snakePipes is via our conda channel. The following co
 
 .. code:: bash
 
-    conda create -n snakePipes -c mpi-ie -c conda-forge -c bioconda snakePipes==2.4.2
+    conda create -n snakePipes -c mpi-ie -c conda-forge -c bioconda snakePipes==2.4.3
 
 This way, the software used within snakePipes do not conflict with the software pre-installed on your terminal or in your python environment.
 
@@ -192,10 +192,10 @@ Download premade indices
 
 For the sake of convenience, we provide premade indices for the following organisms:
 
- - `Human (GRCh38, Gencode release 29) <https://zenodo.org/record/2650763>`__
- - `Mouse (GRCm38/mm10, Gencode release m19) <https://zenodo.org/record/4020455>`__
- - `Mouse (GRCm37/mm9, Gencode release 1) <https://zenodo.org/record/2650849>`__
- - `Fruit fly (dm6, Ensembl release 94) <https://zenodo.org/record/2650762>`__
+ - `Human (GRCh38, Gencode release 29) <https://zenodo.org/record/4471116>`__
+ - `Mouse (GRCm38/mm10, Gencode release m19) <https://zenodo.org/record/4468065>`__
+ - `Mouse (GRCm37/mm9, Gencode release 1) <https://zenodo.org/record/4478284>`__
+ - `Fruit fly (dm6, Ensembl release 94) <https://zenodo.org/record/4478414>`__
 
 To use these, simply download and extract them. You will then need to modify the provided YAML file to indicate exactly where the indices are located (i.e., replace ``/data/processing/ryan`` with whatever is appropriate).
 
