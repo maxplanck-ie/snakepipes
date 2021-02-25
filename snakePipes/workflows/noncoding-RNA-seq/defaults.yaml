@@ -32,7 +32,7 @@ pairedEnd: True
 downsample:
 ## Options for trimming
 trim: False
-trimmer: fastp
+trimmer: cutadapt
 trimmerOptions:
 ## further options
 mode: alignment,deepTools_qc

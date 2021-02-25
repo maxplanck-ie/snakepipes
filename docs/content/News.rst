@@ -1,6 +1,15 @@
 snakePipes News
 ===============
 
+snakePipes 2.4.3
+----------------
+
+* Fixed noncoding-RNA-seq workflow without sample sheet.
+* Updated links to prebuilt indices on zenodo.
+* Fixed read length estimation for rMats.
+* Cutadapt is set as default read trimming program for both noncoding-RNA-seq and mRNA-seq workflows.
+
+
 snakePipes 2.4.2
 ----------------
 
