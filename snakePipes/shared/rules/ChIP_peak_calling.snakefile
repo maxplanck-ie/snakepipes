@@ -77,7 +77,7 @@ else:
                 lambda wildcards: "-c filtered_bam/"+get_control(wildcards.chip_sample)+".filtered.bam" if get_control(wildcards.chip_sample)
                 else "",
             frag_size=fragmentLength,
-            peakCaller_options = str(peakCallerOptions, ''),
+            peakCaller_options = str(peakCallerOptions or ''),
             bam_options = str(BAMPeaks or '')
         log:
             out = "MACS2/logs/MACS2.{chip_sample}.filtered.out",
