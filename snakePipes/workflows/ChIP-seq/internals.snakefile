@@ -5,6 +5,7 @@ import re
 import yaml
 import sys
 import pandas as pd
+import warnings
 
 
 ### Functions ##################################################################
@@ -61,11 +62,16 @@ def is_allelic(workingdir):
 
 
 def get_pe_frag_length(sample):
-    df = pd.read_csv("deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv",
+    try:
+        df = pd.read_csv("deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv",
                      header = None, skiprows = 1, sep = "\t")
-    df = df.loc[df[0] == "filtered_bam/"+sample+".filtered.bam"]
-    frag_len = int(df[5].values[0])
-    return str(frag_len)
+        df = df.loc[df[0] == "filtered_bam/"+sample+".filtered.bam"]
+        frag_len = int(df[5].values[0])
+        return str(frag_len)
+    except:
+        warnings.warn("fragmentSize.metric.tsv is empty, this sets "
+                      "--extsize of MACS2 to an empty string. Fix this and run MACS2 again!")
+        return " "
 ### Variable defaults ##########################################################
 ### Initialization #############################################################
 
