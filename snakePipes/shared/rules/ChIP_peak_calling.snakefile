@@ -76,7 +76,7 @@ else:
                 lambda wildcards: "--broad" if is_broad(wildcards.chip_sample)
                 else "",
             control_param =
-                lambda wildcards: "-c filtered_bam/"+get_control(wildcards.chip_sample)+".filtered.bam" if get_control(wildcards.chip_sample)
+                lambda wildcards: " -c filtered_bam/"+get_control(wildcards.chip_sample)+".filtered.bam" if get_control(wildcards.chip_sample)
                 else "",
             frag_size=fragmentLength,
             peakCaller_options = str(peakCallerOptions or ''),
