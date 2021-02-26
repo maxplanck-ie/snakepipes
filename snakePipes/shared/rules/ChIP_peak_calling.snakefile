@@ -26,7 +26,7 @@ if pairedEnd:
             control_param =
                 lambda wildcards: " -c filtered_bam/"+get_control(wildcards.chip_sample)+".filtered.bam" if get_control(wildcards.chip_sample)
                 else "",
-            genome_size = lambda wildcards: "-g "+str(genome_size) if not cutntag else " ",
+            genome_size = str(genome_size),
             ext_size =
                 lambda wildcards: " --nomodel --extsize "+get_pe_frag_length(wildcards.chip_sample,
                                                                             "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv") \
@@ -44,7 +44,7 @@ if pairedEnd:
             macs2 callpeak -t {input.chip} {params.control_param} \
                 -f BAM \
                 {params.bam_options} \
-                {params.genome_size} \
+                -g {params.genome_size} \
                 {params.ext_size} \
                 --keep-dup all \
                 --outdir MACS2 \
@@ -57,7 +57,7 @@ if pairedEnd:
                 {params.control_param} -f BAMPE \
                 {params.bampe_options} \
                 {params.peakCaller_options} \
-                {params.genome_size} --keep-dup all \
+                -g {params.genome_size} --keep-dup all \
                 --outdir MACS2 --name {wildcards.chip_sample}.filtered.BAMPE \
                 {params.broad_calling} > {log.out}.BAMPE 2> {log.err}.BAMPE
             """

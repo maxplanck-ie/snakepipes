@@ -23,7 +23,7 @@ if pairedEnd:
             peaks = "MACS2/{chip_sample}_host.BAM_peaks.xls",
             peaksPE = "MACS2/{chip_sample}_host.BAMPE_peaks.xls"
         params:
-            genome_size = lambda wildcards: "-g "+str(genome_size) if not cutntag else " ",
+            genome_size = str(genome_size),
             broad_calling =
                 lambda wildcards: "--broad" if is_broad(wildcards.chip_sample) else "",
             control_param =
@@ -46,7 +46,7 @@ if pairedEnd:
             macs2 callpeak -t {input.chip} {params.control_param} \
                 -f BAM \
                 {params.bam_options} \
-                {params.genome_size} \
+                -g {params.genome_size} \
                 {params.ext_size} \
                 --keep-dup all \
                 --outdir MACS2 \
@@ -59,7 +59,7 @@ if pairedEnd:
                 {params.control_param} -f BAMPE \
                 {params.bampe_options} \
                 {params.peakCaller_options} \
-                {params.genome_size} --keep-dup all \
+                -g {params.genome_size} --keep-dup all \
                 --outdir MACS2 --name {wildcards.chip_sample}_host.BAMPE \
                 {params.broad_calling} > {log.out}.BAMPE 2> {log.err}.BAMPE
             """
