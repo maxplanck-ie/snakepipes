@@ -11,3 +11,4 @@ dependencies:
  - star = 2.7.4a
  - bwa = 0.7.17
  - bwameth = 0.2.2
+ - tbb = 2020.2
