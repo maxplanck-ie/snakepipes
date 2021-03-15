@@ -70,6 +70,10 @@ jobs:
   - bash: echo "##vso[task.prependpath]/usr/share/miniconda/bin"
     displayName: Add conda to PATH
   - template: .azure-pipelines/setup.yml
+  - task: UsePythonVersion@0
+    displayName: 'Use Python 3.7'
+    inputs:
+      versionSpec: 3.7
   - bash: |
       source activate foo
       snakePipes createEnvs
