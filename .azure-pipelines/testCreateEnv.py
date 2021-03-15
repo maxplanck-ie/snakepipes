@@ -17,19 +17,20 @@ def parse_args():
                           required=True)
     return parser
 
+
 parser = parse_args()
 args = parser.parse_args()
 
 keys = []
 length = len(cf.set_env_yamls().items())
-index =  length / 3
+index = length / 3
 index = round(index)
 if args.envs_chunk == str(1):
-    envs = range(0,index)
+    envs = range(0, index)
 elif args.envs_chunk == str(2):
-    envs = range(index,2*index)
+    envs = range(index, 2 * index)
 elif args.envs_chunk == str(3):
-    envs = range(2*index, length)
+    envs = range(2 * index, length)
 
 for i in range(index):
     keys.append(list(cf.set_env_yamls())[i])
