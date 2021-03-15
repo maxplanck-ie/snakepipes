@@ -76,8 +76,17 @@ jobs:
       versionSpec: 3.7
   - bash: |
       source activate foo
-      python .azure-pipelines/testCreateEnv.py
-    displayName: "createEnvs"
+      python .azure-pipelines/testCreateEnv.py -d 1
+    displayName: "createEnvs1"
+  - bash: |
+      source activate foo
+      python .azure-pipelines/testCreateEnv.py -d 2
+    displayName: "createEnvs2"
+  - bash: |
+      source activate foo
+      python .azure-pipelines/testCreateEnv.py -d 3
+    displayName: "createEnvs3"
+
 
 - job: 'envs_OSX'
   pool:
