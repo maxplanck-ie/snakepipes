@@ -76,7 +76,7 @@ jobs:
       versionSpec: 3.7
   - bash: |
       source activate foo
-      snakePipes createEnvs
+      python .azure_piplines/testCreateEnv.py
     displayName: "createEnvs"
 
 - job: 'envs_OSX'
@@ -99,7 +99,7 @@ jobs:
         sudo chown 501:20 /Users/vsts/.conda/pkgs/urls.txt
       fi
     displayName: Fix OSX permissions
-  - template: .azure-pipelines/macosx_setup.yml
+  - template: .azure-pipelines/setup.yml
   - bash: |
       source activate foo
       sudo snakePipes createEnvs
