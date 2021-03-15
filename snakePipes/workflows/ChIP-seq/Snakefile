@@ -153,9 +153,9 @@ def run_CSAW():
 
 
 def run_genrich():
-    if (peakCaller == "Genrich"):
+    if peakCaller == "Genrich":
         if cutntag:
-            warnings.warn("--cutntag only works with macs2, your settign for using Genrich will be ignored. "
+            warnings.warn("--cutntag only works with macs2, your setting for using Genrich will be ignored. "
                           "Remove --cutntag if interested in Genrich.")
             return ([])
         file_list = ["Genrich/all_samples.narrowPeak"]
