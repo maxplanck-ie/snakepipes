@@ -7,3 +7,4 @@ dependencies:
  - qualimap = 2.2.2d
  - samtools = 1.10 ###DON'T TOUCH THIS!!!!
  - bwa = 0.7.17
+ - tbb = 2020.2
