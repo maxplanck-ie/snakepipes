@@ -17,7 +17,7 @@ jobs:
   - template: .azure-pipelines/setup.yml
   - bash: |
       source activate foo
-      flake8 --ignore=E501,E722 --exclude docs/conf.py .
+      flake8 --ignore=E501,E722,E402 --exclude docs/conf.py .
     displayName: flake8
 
 - job: 'CI_tests'
@@ -76,7 +76,7 @@ jobs:
       versionSpec: 3.7
   - bash: |
       source activate foo
-      python .azure_piplines/testCreateEnv.py
+      python .azure-pipelines/testCreateEnv.py
     displayName: "createEnvs"
 
 - job: 'envs_OSX'
