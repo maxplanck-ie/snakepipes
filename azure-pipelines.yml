@@ -17,7 +17,7 @@ jobs:
   - template: .azure-pipelines/setup.yml
   - bash: |
       source activate foo
-      flake8 --ignore=E501,E722 --exclude docs/conf.py .
+      flake8 --ignore=E501,E722,E402 --exclude docs/conf.py .
     displayName: flake8
 
 - job: 'CI_tests'
@@ -70,10 +70,23 @@ jobs:
   - bash: echo "##vso[task.prependpath]/usr/share/miniconda/bin"
     displayName: Add conda to PATH
   - template: .azure-pipelines/setup.yml
+  - task: UsePythonVersion@0
+    displayName: 'Use Python 3.7'
+    inputs:
+      versionSpec: 3.7
   - bash: |
       source activate foo
-      snakePipes createEnvs
-    displayName: "createEnvs"
+      python .azure-pipelines/testCreateEnv.py -d 1
+    displayName: "createEnvs1"
+  - bash: |
+      source activate foo
+      python .azure-pipelines/testCreateEnv.py -d 2
+    displayName: "createEnvs2"
+  - bash: |
+      source activate foo
+      python .azure-pipelines/testCreateEnv.py -d 3
+    displayName: "createEnvs3"
+
 
 - job: 'envs_OSX'
   pool:
@@ -95,7 +108,7 @@ jobs:
         sudo chown 501:20 /Users/vsts/.conda/pkgs/urls.txt
       fi
     displayName: Fix OSX permissions
-  - template: .azure-pipelines/macosx_setup.yml
+  - template: .azure-pipelines/setup.yml
   - bash: |
       source activate foo
       sudo snakePipes createEnvs
