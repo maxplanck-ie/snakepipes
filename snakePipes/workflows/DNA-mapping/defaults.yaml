@@ -53,6 +53,7 @@ mateOrientation: --fr
 ## other Bowtie2 stuff
 insertSizeMax: 1000
 alignerOpts:
+cutntag: False
 plotFormat: png
 UMIBarcode: False
 bcPattern: NNNNCCCCCCCC #default: 4 base umi barcode, 8 base cell barcode (eg. RELACS barcode)
