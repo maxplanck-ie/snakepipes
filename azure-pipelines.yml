@@ -111,5 +111,5 @@ jobs:
   - template: .azure-pipelines/setup.yml
   - bash: |
       source activate foo
-      sudo python .azure-pipelines/testCreateEnv.py -d 1
+      sudo -E python .azure-pipelines/testCreateEnv.py -d 1
     displayName: "createEnvs"
