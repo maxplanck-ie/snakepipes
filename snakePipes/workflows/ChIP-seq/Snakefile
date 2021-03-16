@@ -1,6 +1,7 @@
 import os
 import snakePipes.common_functions as cf
 import itertools
+import warnings
 
 
 ### snakemake_workflows initialization ########################################
@@ -67,7 +68,7 @@ if sampleSheet and cf.check_replicates(sampleSheet):
         #downsample = False
         #include: os.path.join(maindir, "shared", "rules", "deepTools_qc.snakefile")
 
-def run_histoneHMM(allele_info):
+def run_histoneHMM(allele_info): # TODO what is a good practice for broad peaks of cutntag?
     if not allele_info:
         ## run histoneHMM broad enrichment calling only for samples annotated as *broad*
         file_list = expand("histoneHMM/{chip_sample}.filtered.histoneHMM-regions.gff.gz", chip_sample = [s for s in chip_samples if is_broad(s)])
@@ -103,8 +104,9 @@ def run_deepTools_qc(fromBAM,useSpikeInForNorm):
 
 def run_deepTools_ChIP():
     file_list = []
-    file_list.append(["deepTools_ChIP/plotFingerprint/plotFingerprint.metrics.txt"]) if not useSpikeInForNorm else file_list.append(["split_deepTools_ChIP/plotFingerprint/plotFingerprint.metrics.txt"])
-    for chip_sample in chip_samples_w_ctrl: 
+    file_list.append(["deepTools_ChIP/plotFingerprint/plotFingerprint.metrics.txt"]) if not useSpikeInForNorm \
+                    else file_list.append(["split_deepTools_ChIP/plotFingerprint/plotFingerprint.metrics.txt"])
+    for chip_sample in chip_samples_w_ctrl:
         control_name = get_control_name(chip_sample)
         if not useSpikeInForNorm:
             # get bigwigtype
@@ -152,6 +154,10 @@ def run_CSAW():
 
 def run_genrich():
     if peakCaller == "Genrich":
+        if cutntag:
+            warnings.warn("--cutntag only works with macs2, your setting for using Genrich will be ignored. "
+                          "Remove --cutntag if interested in Genrich.")
+            return ([])
         file_list = ["Genrich/all_samples.narrowPeak"]
         if sampleSheet:
             file_list = ["Genrich/{}.narrowPeak".format(x) for x in genrichDict.keys()]
@@ -160,7 +166,7 @@ def run_genrich():
 
 
 def run_macs2():
-    if peakCaller == "MACS2":
+    if (peakCaller == "MACS2") or cutntag:
         if useSpikeInForNorm:
             file_list = expand("MACS2/{chip_sample}_host.BAM_peaks.xls", chip_sample = chip_samples)
         else:
@@ -219,7 +225,7 @@ rule all:
         ## run csaw if asked for
         run_CSAW(),
         "QC_report/QC_report_all.tsv"
-          
+
 
 ### execute after workflow finished ############################################
 ################################################################################

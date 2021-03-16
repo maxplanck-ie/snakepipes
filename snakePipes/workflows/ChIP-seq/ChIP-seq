@@ -15,15 +15,15 @@ import snakePipes.common_functions as cf
 import snakePipes.parserCommon as parserCommon
 
 
-
 def parse_args(defaults={"verbose": False, "configFile": None,
                          "clusterConfigFile": None, "maxJobs": 5,
                          "snakemakeOptions": "--use-conda", "tempDir": None,
-                         "pairedEnd": True, "fragmentLength":200, "bwBinSize": 25, "qval": 0.001, "sampleSheet": "",
-                         "windowSize": 150, "predictChIPDict": None,
-                         "bigWigType": "both", "mfold": "0 50", "peakCaller": "MACS2",
-                         "plotFormat": "png","fromBAM": False, "bamExt": ".filtered.bam",
-                         "fdr": 0.05, "absBestLFC": 1, "useSpikeinForNorm": False, "spikeinExt": "_spikein",
+                         "pairedEnd": True, "fragmentLength":200, "bwBinSize": 25,
+                         "windowSize": 150, "predictChIPDict": None, "fromBAM": False,
+                         "bigWigType": "both", "peakCaller": "MACS2", "sampleSheet": "",
+                         "plotFormat": "png", "bamExt": ".filtered.bam", "fdr": 0.05,
+                         "absBestLFC": 1, "useSpikeinForNorm": False, "spikeinExt": "_spikein",
+                         "peakCallerOptions": "--qvalue 0.001","cutntag": False,
                          "getSizeFactorsFrom": "genome"}):
 
     """
@@ -48,6 +48,17 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                           help="The peak caller to use. The default is %(default)s and this is only applicable for sharper peaks (broad peaks will always use histoneHMM).",
                           choices=["MACS2", "Genrich"],
                           default=defaults['peakCaller'])
+
+    optional.add_argument("--peakCallerOptions",
+                          help="Custom options to set for the peak caller. Default is '%(default)s'.",
+                          default=defaults['peakCallerOptions'])
+
+    optional.add_argument("--cutntag",
+                          help="if set, MACS2 peakCaller is used with the parameters have been used "
+                          "in the method section of Meers et al. 2019, Kaya-Okur et al. 2019 and 2020. "
+                          "Setting this flag overwrites the '--peakCallerOptions'."
+                          " Default is '%(default)s'.",
+                          action="store_true")
 
     optional.add_argument("--singleEnd",
                           dest="pairedEnd",
@@ -88,13 +99,6 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                           type=int,
                           default=defaults["bwBinSize"])
 
-    optional.add_argument("--qval",
-                          dest="qval",
-                          metavar="INT",
-                          help="qvalue threshold for MACS2(default: '%(default)s')",
-                          type=float,
-                          default=defaults['qval'])
-
     optional.add_argument("--sampleSheet",
                           help="Information on samples (If differential binding analysis required); see "
                                "'https://github.com/maxplanck-ie/snakepipes/tree/master/docs/content/sampleSheet.example.tsv' for example. "
@@ -134,15 +138,6 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          choices=['png', 'pdf', 'None'],
                          help="Format of the output plots from deepTools. Select 'none' for no plots (default: '%(default)s')",
                          default=defaults["plotFormat"])
-
-    optional.add_argument("--mfold",
-                         dest="mfold",
-                         metavar="INT INT",
-                         type=str,
-                         help="Select the regions within MFOLD range of high-confidence enrichment ratio against background to build model." 
-                              "Fold-enrichment in regions must be lower than upper limit, and higher than the lower limit. Use as \"-m 10 30\"." 
-                              "This setting is only used while building the shifting model. Tweaking it is not recommended. DEFAULT:5 50 (default: '%(default)s')",
-                         default=defaults["mfold"])
 
     optional.add_argument("--FDR",
                           dest="fdr",
