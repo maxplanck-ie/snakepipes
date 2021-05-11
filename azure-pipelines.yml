@@ -109,7 +109,22 @@ jobs:
       fi
     displayName: Fix OSX permissions
   - template: .azure-pipelines/setup.yml
+<<<<<<< HEAD
+=======
+  - task: UsePythonVersion@0
+    displayName: 'Use Python 3.7'
+    inputs:
+      versionSpec: 3.7
   - bash: |
       source activate foo
-      sudo snakePipes createEnvs
-    displayName: "createEnvs"
+      sudo -E python .azure-pipelines/testCreateEnv.py -d 1
+    displayName: "createEnvs1"
+  - bash: |
+      source activate foo
+      sudo -E python .azure-pipelines/testCreateEnv.py -d 2
+    displayName: "createEnvs2"
+>>>>>>> c5f47d93ecc3cc120aff55a10e4a6ab441a5b9d8
+  - bash: |
+      source activate foo
+      sudo -E python .azure-pipelines/testCreateEnv.py -d 3
+    displayName: "createEnvs3"

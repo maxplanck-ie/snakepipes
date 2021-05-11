@@ -225,24 +225,28 @@ def check_if_spikein_genome(genome_index,spikeinExt):
         print("\n  Error! Genome index file "+ genome_index +" not found!!!\n\n")
         exit(1)
 
-def get_host_and_spikein_chromosomes(genome_index,spikeinExt):
-    hostl=[]
-    spikeinl=[]
+def get_host_and_spikein_chromosomes(genome_index, spikeinEx):
+    hostl=dict()
+    spikeinl=dict()
     with open(genome_index) as ifile:
         for line in ifile:
             entry = line.split('\t')[0]
+            length = line.split('\t')[1]
             if re.search(spikeinExt, entry):
-                spikeinl.append(entry)
+                spikeinl[entry] = length
             else:
-                hostl.append(entry)
+                hostl[entry] = length
     return([hostl,spikeinl])
 
 if useSpikeInForNorm:
     part=['host','spikein']
     spikein_detected=check_if_spikein_genome(genome_index,spikeinExt)
     if spikein_detected:
-        host_chr=get_host_and_spikein_chromosomes(genome_index,spikeinExt)[0]
-        spikein_chr=get_host_and_spikein_chromosomes(genome_index,spikeinExt)[1]
+        host_chr, spikein_chr =get_host_and_spikein_chromosomes(genome_index,spikeinExt)
+        spikein_region = ""
+        if len(spikein_chr.items()) == 1:
+            k, v = next(iter(spikein_chr.items()))
+            spikein_region = ":0:".join([str(k),str(v)])
     else:
         print("\n No spikein genome detected - no spikeIn chromosomes found with extention " + spikeinExt + " .\n\n")
         exit(1)

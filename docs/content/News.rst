@@ -1,6 +1,14 @@
 snakePipes News
 ===============
 
+snakePipes 2.5.0
+----------------
+
+* Added tbb = 2020.2 to dna_mapping, creatIndices and rnae_seq yaml file
+* Added cut and tag parameters to macs2 and bowtei2. The parameters have been used in Kaya-Okur et al. 2019 and can be called by using --cut_n_tag.
+* Updated azure tests. python37 create envs constantly failing due its long run time. This test is now split into smaller chunks. set_macos is removed since it was completely redundant with the set.yaml
+
+
 snakePipes 2.4.3
 ----------------
 
@@ -89,7 +97,7 @@ snakePipes 2.2.0
 * Added STARsolo report for all samples to STARsolo output folder
 * FASTQ1 and FASTQ2 are not localrules anymore due to buggy logging
 * Included optional differential splicing analysis using rmats within mRNA-seq workflow
-* Symlinks in the output path are relative 
+* Symlinks in the output path are relative
 * Increased BBmap version
 * Increased STAR version to 2.7.4a in scRNAseq, noncoding-RNA-seq and mRNA-seq workflows
 * Fixed snakemake version at 5.18.0 due to a bug in DAG handling
