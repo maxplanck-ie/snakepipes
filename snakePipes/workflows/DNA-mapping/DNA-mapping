@@ -63,8 +63,9 @@ def parse_args(defaults={"verbose": False, "configFile": None,
 
     optional.add_argument("--cutntag",
                           help="if set, Bowti2 is used for mapping with parameters as has been used "
-                          "in the method section of Kaya-okur et al. 2019. "
-                          "Setting this flag overwrites the '--alignerOpts'."
+                          "in the method section of Kaya-okur et al. 2019. ('--local --very-sensitive-local "
+                          "--no-mixed --no-discordant --phred33 -I 10 -X 700')"
+                          "Setting this flag overwrites the '--alignerOpts' and '--insertSizeMax'."
                           " Default is '%(default)s'.",
                           action="store_true")
 
