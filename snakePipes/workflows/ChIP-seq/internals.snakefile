@@ -230,12 +230,16 @@ def get_host_and_spikein_chromosomes(genome_index, spikeinEx):
     spikeinl=dict()
     with open(genome_index) as ifile:
         for line in ifile:
-            entry = line.split('\t')[0]
-            length = line.split('\t')[1]
-            if re.search(spikeinExt, entry):
-                spikeinl[entry] = length
-            else:
-                hostl[entry] = length
+            try:
+                entry = line.split('\t')[0]
+                length = line.split('\t')[1]
+                if re.search(spikeinExt, entry):
+                    spikeinl[entry] = length
+                else:
+                    hostl[entry] = length
+            except:
+                warnings.warn("check for empty lines in the index file!")
+                continue
     return([hostl,spikeinl])
 
 if useSpikeInForNorm:
