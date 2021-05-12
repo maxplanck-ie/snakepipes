@@ -93,6 +93,7 @@ rule multiBamSummary:
                          else "--extendReads {}".format(fragmentLength),
         scaling_factors = "--scalingFactors deepTools_qc/multiBamSummary/scaling_factors.txt",
         binSize = ""
+        spikein_region = ""
     log:
         out = "deepTools_qc/logs/multiBamSummary.out",
         err = "deepTools_qc/logs/multiBamSummary.err"
