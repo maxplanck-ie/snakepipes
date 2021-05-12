@@ -14,7 +14,7 @@ rule Qualimap_bamqc:
         err = "Qualimap_qc/logs/Qualimap_bamqc.{sample}.filtered.err"
     benchmark:
         "Qualimap_qc/.benchmark/Qualimap_bamqc.{sample}.filtered.benchmark"
-    threads: 16
+    threads: lambda wildcards: 16 if 16<max_thread else max_thread
     conda: CONDA_DNA_MAPPING_ENV
     shell:
         "unset DISPLAY && "

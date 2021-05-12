@@ -20,7 +20,7 @@ def get_scaling_factor(sample,input):
         return float(1)
 
 rule split_bamfiles_by_genome:
-    input: 
+    input:
         bam = "filtered_bam/{sample}.filtered.bam",
         bai = "filtered_bam/{sample}.filtered.bam.bai"
     output:
@@ -55,7 +55,7 @@ rule multiBamSummary_input:
         err = "split_deepTools_qc/logs/{part}.input_multiBamSummary.err"
     benchmark:
         "split_deepTools_qc/.benchmark/{part}.input_multiBamSummary.benchmark"
-    threads: 24
+    threads: lambda wildcards: 24 if 24<max_thread else max_thread
     conda: CONDA_SHARED_ENV
     shell: multiBamSummary_cmd
 
@@ -79,7 +79,7 @@ rule multiBamSummary_ChIP:
         err = "split_deepTools_qc/logs/{part}.ChIP_multiBamSummary.err"
     benchmark:
         "split_deepTools_qc/.benchmark/{part}.ChIP_multiBamSummary.benchmark"
-    threads: 24
+    threads: lambda wildcards: 24 if 24<max_thread else max_thread
     conda: CONDA_SHARED_ENV
     shell: multiBamSummary_cmd
 
@@ -98,13 +98,13 @@ rule multiBamSummary_TSS:
         read_extension = "--extendReads" if pairedEnd
                          else "--extendReads {}".format(fragmentLength),
         scaling_factors = "--scalingFactors split_deepTools_qc/multiBamSummary_BED/spikein.ChIP.scaling_factors.txt",
-        binSize = " --binSize 100000 " 
+        binSize = " --binSize 100000 "
     log:
         out = "split_deepTools_qc/logs/spikein.ChIP_multiBamSummary.BED.out",
         err = "split_deepTools_qc/logs/spikein.ChIP_multiBamSummary.BED.err"
     benchmark:
         "split_deepTools_qc/.benchmark/spikein.ChIP_multiBamSummary.BED.benchmark"
-    threads: 24
+    threads: lambda wildcards: 24 if 24<max_thread else max_thread
     conda: CONDA_SHARED_ENV
     shell: multiBamSummary_spikein_cmd
 
@@ -124,7 +124,7 @@ rule bamCoverage_by_part:
     input:
         bam = "split_bam/{sample}_host.bam" ,
         bai = "split_bam/{sample}_host.bam.bai",
-        scale_factors = "split_deepTools_qc/multiBamSummary/{part}.ChIP.scaling_factors.txt" 
+        scale_factors = "split_deepTools_qc/multiBamSummary/{part}.ChIP.scaling_factors.txt"
     output:
         "bamCoverage/{sample}.host.seq_depth_norm.BY{part}.bw"
     params:
@@ -141,7 +141,7 @@ rule bamCoverage_by_part:
         err = "bamCoverage/logs/bamCoverage.{sample}.BY{part}.filtered.err"
     benchmark:
         "bamCoverage/.benchmark/bamCoverage.{sample}.BY{part}.filtered.benchmark"
-    threads: 16  # 4GB per core
+    threads: lambda wildcards: 16 if 16<max_thread else max_thread  # 4GB per core
     conda: CONDA_SHARED_ENV
     shell: bamcov_spikein_cmd
 
@@ -150,7 +150,7 @@ rule bamCoverage_by_TSS:
     input:
         bam = "split_bam/{sample}_host.bam" ,
         bai = "split_bam/{sample}_host.bam.bai",
-        scale_factors = "split_deepTools_qc/multiBamSummary_BED/spikein.ChIP.scaling_factors.txt" 
+        scale_factors = "split_deepTools_qc/multiBamSummary_BED/spikein.ChIP.scaling_factors.txt"
     output:
         "bamCoverage_TSS/{sample}.host.seq_depth_norm.BYspikein.bw"
     params:
@@ -167,7 +167,7 @@ rule bamCoverage_by_TSS:
         err = "bamCoverage_TSS/logs/bamCoverage.{sample}.BYspikein.filtered.err"
     benchmark:
         "bamCoverage_TSS/.benchmark/bamCoverage.{sample}.BYspikein.filtered.benchmark"
-    threads: 16  # 4GB per core
+    threads: lambda wildcards: 16 if 16<max_thread else max_thread  # 4GB per core
     conda: CONDA_SHARED_ENV
     shell: bamcov_spikein_cmd
 
@@ -176,7 +176,7 @@ rule bamCoverage_by_input:
     input:
         bam = "split_bam/{sample}_host.bam" ,
         bai = "split_bam/{sample}_host.bam.bai",
-        scale_factors = "split_deepTools_qc/multiBamSummary/spikein.input.scaling_factors.txt" 
+        scale_factors = "split_deepTools_qc/multiBamSummary/spikein.input.scaling_factors.txt"
     output:
         "bamCoverage_input/{sample}.host.seq_depth_norm.BYspikein.bw"
     params:
@@ -193,7 +193,7 @@ rule bamCoverage_by_input:
         err = "bamCoverage_input/logs/bamCoverage.{sample}.BYspikein.filtered.err"
     benchmark:
         "bamCoverage_input/.benchmark/bamCoverage.{sample}.BYspikein.filtered.benchmark"
-    threads: 16  # 4GB per core
+    threads: lambda wildcards: 16 if 16<max_thread else max_thread  # 4GB per core
     conda: CONDA_SHARED_ENV
     shell: bamcov_spikein_cmd
 
@@ -210,7 +210,6 @@ rule bamPE_fragment_size:
     log:
         out = "split_deepTools_qc/logs/{part}.bamPEFragmentSize.out",
         err = "split_deepTools_qc/logs/{part}.bamPEFragmentSize.err"
-    threads: 24
+    threads: lambda wildcards: 24 if 24<max_thread else max_thread
     conda: CONDA_SHARED_ENV
     shell: bamPEFragmentSize_cmd
-

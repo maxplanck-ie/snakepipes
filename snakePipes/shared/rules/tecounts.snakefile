@@ -14,7 +14,7 @@ if pairedEnd:
             sample_dir = aligner+"/{sample}"
         benchmark:
             aligner+"/.benchmark/STAR.{sample}.benchmark"
-        threads: 20  # 3.2G per core
+        threads: lambda wildcards: 20 if 20<max_thread else max_thread  # 3.2G per core
         conda: CONDA_RNASEQ_ENV
         shell: """
             ( [ -d {params.sample_dir} ] || mkdir -p {params.sample_dir} )
@@ -43,7 +43,7 @@ else:
             sample_dir = aligner+"/{sample}"
         benchmark:
             aligner+"/.benchmark/STAR.{sample}.benchmark"
-        threads: 20  # 3.2G per core
+        threads: lambda wildcards: 20 if 20<max_thread else max_thread  # 3.2G per core
         conda: CONDA_RNASEQ_ENV
         shell: """
             ( [ -d {params.sample_dir} ] || mkdir -p {params.sample_dir} )

@@ -109,7 +109,7 @@ elif aligner.upper().find("STAR") >=0:
                 tempDir = tempDir
             benchmark:
                 aligner+"/.benchmark/STAR.{sample}.benchmark"
-            threads: 20  # 3.2G per core
+            threads: lambda wildcards: 20 if 20<max_thread else max_thread  # 3.2G per core
             conda: CONDA_RNASEQ_ENV
             shell: """
                 TMPDIR={params.tempDir}
@@ -146,7 +146,7 @@ elif aligner.upper().find("STAR") >=0:
                 tempDir = tempDir
             benchmark:
                 aligner+"/.benchmark/STAR.{sample}.benchmark"
-            threads: 20  # 3.2G per core
+            threads: lambda wildcards: 20 if 20<max_thread else max_thread  # 3.2G per core
             conda: CONDA_RNASEQ_ENV
             shell: """
                 TMPDIR={params.tempDir}

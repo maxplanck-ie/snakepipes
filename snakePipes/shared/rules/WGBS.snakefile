@@ -32,7 +32,7 @@ if pairedEnd and not fromBAM:
         params:
             bwameth_index=bwameth_index,
             tempDir = tempDir
-        threads: 20
+        threads: lambda wildcards: 20 if 20<max_thread else max_thread
         conda: CONDA_WGBS_ENV
         shell: """
             TMPDIR={params.tempDir}
@@ -54,7 +54,7 @@ elif not pairedEnd and not fromBAM:
         params:
             bwameth_index=bwameth_index,
             tempDir = tempDir
-        threads: 20
+        threads: lambda wildcards: 20 if 20<max_thread else max_thread
         conda: CONDA_WGBS_ENV
         shell: """
             TMPDIR={params.tempDir}
@@ -225,7 +225,7 @@ rule calc_GCbias:
         twobitpath=genome_2bit
     log:
         out="QC_metrics/logs/calc_GCbias.out"
-    threads: 20
+    threads: lambda wildcards: 20 if 20<max_thread else max_thread
     conda: CONDA_SHARED_ENV
     shell: """
         computeGCBias -b {input.BAMS} --effectiveGenomeSize {params.genomeSize} -g {params.twobitpath} -l 300 --GCbiasFrequenciesFile {output[0]} -p {threads} --biasPlot {output[1]}
@@ -244,7 +244,7 @@ rule DepthOfCov:
     params:
         options="--minMappingQuality 10 --smartLabels --samFlagExclude 256",
         thresholds="-ct 0 -ct 1 -ct 2 -ct 5 -ct 10 -ct 15 -ct 20 -ct 30 -ct 50"
-    threads: 20
+    threads: lambda wildcards: 20 if 20<max_thread else max_thread
     log:
         err="QC_metrics/logs/DepthOfCov.err"
     conda: CONDA_SHARED_ENV
@@ -265,7 +265,7 @@ rule DepthOfCovGenome:
     params:
         options="--minMappingQuality 10 --smartLabels --samFlagExclude 256",
         thresholds="-ct 0 -ct 1 -ct 2 -ct 5 -ct 10 -ct 15 -ct 20 -ct 30 -ct 50"
-    threads: 20
+    threads: lambda wildcards: 20 if 20<max_thread else max_thread
     log:
         err="QC_metrics/logs/DepthOfCovGenome.err"
     conda: CONDA_SHARED_ENV
@@ -456,7 +456,7 @@ rule metileneReport:
 
 
 rule bedGraphToBigWig:
-    input: 
+    input:
         "MethylDackel/{sample}_CpG.bedGraph",
         genome_index
     output:

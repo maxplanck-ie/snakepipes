@@ -27,7 +27,7 @@ if aligner == "Bowtie2":
                 tempDir = tempDir
             benchmark:
                 aligner+"/.benchmark/Bowtie2.{sample}.benchmark"
-            threads: 24  # 1G per core
+            threads: lambda wildcards: 24 if 24<max_thread else max_thread  # 1G per core
             conda: CONDA_DNA_MAPPING_ENV
             shell: """
                 TMPDIR={params.tempDir}
@@ -59,7 +59,7 @@ if aligner == "Bowtie2":
                 tempDir = tempDir
             benchmark:
                 aligner+"/.benchmark/Bowtie2.{sample}.benchmark"
-            threads: 24  # 1G per core
+            threads: lambda wildcards: 24 if 24<max_thread else max_thread  # 1G per core
             conda: CONDA_DNA_MAPPING_ENV
             shell: """
                 TMPDIR={params.tempDir}

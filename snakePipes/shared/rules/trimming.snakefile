@@ -14,7 +14,7 @@ if pairedEnd:
             err = "FASTQ_Cutadapt/logs/Cutadapt.{sample}.err"
         benchmark:
             "FASTQ_Cutadapt/.benchmark/Cutadapt.{sample}.benchmark"
-        threads: 8
+        threads: lambda wildcards: 8 if 8<max_thread else max_thread
         conda: CONDA_SHARED_ENV
         shell: """
             cutadapt -j {threads} -e 0.1 -q 16 -O 3 --trim-n --minimum-length 25 -a AGATCGGAAGAGC -A AGATCGGAAGAGC {params.opts} \
@@ -33,7 +33,7 @@ else:
             err = "FASTQ_Cutadapt/logs/Cutadapt.{sample}.err"
         benchmark:
             "FASTQ_Cutadapt/.benchmark/Cutadapt.{sample}.benchmark"
-        threads: 8
+        threads: lambda wildcards: 8 if 8<max_thread else max_thread
         conda: CONDA_SHARED_ENV
         shell: """
             cutadapt -j {threads} -e 0.1 -q 16 -O 3 --trim-n --minimum-length 25 -a AGATCGGAAGAGC {params.opts} \
@@ -60,7 +60,7 @@ if pairedEnd:
             err = "FASTQ_fastp/logs/fastp.{sample}.err"
         benchmark:
             "FASTQ_fastp/.benchmark/fastp.{sample}.benchmark"
-        threads: 8
+        threads: lambda wildcards: 8 if 8<max_thread else max_thread
         conda: CONDA_SHARED_ENV
         shell: """
             fastp -w {threads} -i "{input[0]}" -I "{input[1]}" -o "{output[0]}" -O "{output[1]}" -j "{output[2]}" -h "{output[3]}" {params.opts} > {log.out} 2> {log.err}
@@ -80,7 +80,7 @@ else:
             err = "FASTQ_fastp/logs/fastp.{sample}.err"
         benchmark:
             "FASTQ_fastp/.benchmark/fastp.{sample}.benchmark"
-        threads: 8
+        threads: lambda wildcards: 8 if 8<max_thread else max_thread
         conda: CONDA_SHARED_ENV
         shell: """
             fastp -w {threads} -i "{input[0]}" -o "{output[0]}" -j "{output[1]}" -h "{output[2]}" {params.opts} > {log.out} 2> {log.err}
@@ -146,7 +146,7 @@ if pairedEnd:
             err = "FastQC_trimmed/logs/FastQC_trimmed.{sample}{read}.err"
         benchmark:
             "FastQC_trimmed/.benchmark/FastQC_trimmed.{sample}{read}.benchmark"
-        threads: 2
+        threads: lambda wildcards: 2 if 2<max_thread else max_thread
         conda: CONDA_SHARED_ENV
         shell: """
             fastqc -o FastQC_trimmed "{input}" > {log.out} 2> {log.err}
@@ -162,7 +162,7 @@ else:
             err = "FastQC_trimmed/logs/FastQC_trimmed.{sample}"+reads[0]+".err"
         benchmark:
             "FastQC_trimmed/.benchmark/FastQC_trimmed.{sample}"+reads[0]+".benchmark"
-        threads: 2
+        threads: lambda wildcards: 2 if 2<max_thread else max_thread
         conda: CONDA_SHARED_ENV
         shell: """
             fastqc -o FastQC_trimmed "{input}" > {log.out} 2> {log.err}

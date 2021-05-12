@@ -58,7 +58,7 @@ rule plotEnrichment_allelic:
         err="deepTools_qc/logs/plotEnrichment_allelic.err"
     benchmark:
         "deepTools_qc/.benchmark/plotEnrichment_allelic.benchmark"
-    threads: 24
+    threads: lambda wildcards: 24 if 24<max_thread else max_thread
     shell: plotEnrich_cmd
 
 
