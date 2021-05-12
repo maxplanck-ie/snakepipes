@@ -26,6 +26,7 @@ genome:
 useSpikeInForNorm: false
 getSizeFactorsFrom: genome
 spikeinExt: _spikein
+spikein_bin_size: 1000
 ## Which peak caller to use?
 peakCaller: 'MACS2'
 peakCallerOptions: --qvalue 0.001

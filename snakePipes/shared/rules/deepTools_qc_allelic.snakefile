@@ -60,7 +60,8 @@ rule multiBamSummary_allelic:
         read_extension = "--extendReads" if pairedEnd
                          else "--extendReads " + str(fragmentLength),
         scaling_factors = "",
-        binSize = ""
+        binSize = "",
+        spikein_region = ""
     log:
         out = "deepTools_qc/logs/multiBamSummary_allelic.out",
         err = "deepTools_qc/logs/multiBamSummary_allelic.err"
