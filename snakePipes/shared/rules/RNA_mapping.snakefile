@@ -165,4 +165,3 @@ elif aligner.upper().find("STAR") >=0:
                 | samtools sort -m {params.samsort_memory} -T $MYTEMP/{wildcards.sample} -@ {params.samtools_threads} -O bam -o {output.bam} - 2> {log}
                 rm -rf $MYTEMP
                 """
-threads: lambda wildcards: 10 if 10<max_thread else max_thread
