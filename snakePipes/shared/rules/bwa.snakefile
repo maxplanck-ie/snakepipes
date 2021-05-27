@@ -37,7 +37,7 @@ else:
             bwa_index = bwa_index,
             alignerOpts = str(alignerOpts or ''),
             tempDir = tempDir
-        threads : 24
+        threads : lambda wildcards: 24 if 24<max_thread else max_thread
         conda: CONDA_DNA_MAPPING_ENV
         shell: """
             TMPDIR={params.tempDir}

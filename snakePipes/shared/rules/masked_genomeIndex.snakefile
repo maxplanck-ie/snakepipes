@@ -1,4 +1,3 @@
-threads: lambda wildcards: 10 if 10<max_thread else max_thread
 from os.path import join, dirname
 import glob
 
