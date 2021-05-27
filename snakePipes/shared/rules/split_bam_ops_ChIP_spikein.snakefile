@@ -49,8 +49,8 @@ rule multiBamSummary_input:
         read_extension = "--extendReads" if pairedEnd
                          else "--extendReads {}".format(fragmentLength),
         scaling_factors = "--scalingFactors split_deepTools_qc/multiBamSummary/{part}.input.scaling_factors.txt",
-        binSize = lambda wildcards: " --binSize 100000 " if wildcards.part=="spikein" else "",
-        spikein_region = ""
+        binSize = lambda wildcards: " --binSize "+str(spikein_bin_size) if wildcards.part=="spikein" else "",
+        spikein_region = lambda wildcards: " --region "+spikein_region if ((wildcards.part=="spikein") and (spikein_region != "")) else ""
     log:
         out = "split_deepTools_qc/logs/{part}.input_multiBamSummary.out",
         err = "split_deepTools_qc/logs/{part}.input_multiBamSummary.err"
