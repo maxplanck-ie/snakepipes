@@ -46,7 +46,7 @@ bamcov_RPKM_cmd = """
         {params.blacklist}  > {log.out} 2> {log.err}
     """
 
-# bamCoverage RNA-seq unique mappings 
+# bamCoverage RNA-seq unique mappings
 bamcov_unique_cmd = """
     bamCoverage -b {input.bam} \
         -o {output.bw_fwd} --binSize {params.bwBinSize} \
@@ -57,7 +57,7 @@ bamcov_unique_cmd = """
         --minMappingQuality 10 --samFlagExclude 2304 --filterRNAstrand reverse \
         -p {threads} >> {log.out} 2>> {log.err}
     """
-    
+
 
 # bamCoverage CHIP
 bamcov_cmd = """
@@ -151,6 +151,7 @@ multiBamSummary_cmd = """
                     {params.blacklist} \
                     {params.scaling_factors} \
                     {params.binSize} \
+                    {params.spikein_region} \
                     -p {threads} \
                     {params.read_extension} > {log.out} 2> {log.err}
     """

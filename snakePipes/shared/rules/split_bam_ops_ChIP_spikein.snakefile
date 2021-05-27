@@ -1,6 +1,6 @@
 part=['host','spikein']
 blacklist_dict={"host": blacklist_bed,"spikein": spikein_blacklist_bed }
-region_dict={"host": " ".join(host_chr),"spikein": " ".join(spikein_chr)}
+region_dict={"host": " ".join(host_chr.keys()),"spikein": " ".join(spikein_chr.keys())}
 
 
 def get_scaling_factor(sample,input):
@@ -49,7 +49,8 @@ rule multiBamSummary_input:
         read_extension = "--extendReads" if pairedEnd
                          else "--extendReads {}".format(fragmentLength),
         scaling_factors = "--scalingFactors split_deepTools_qc/multiBamSummary/{part}.input.scaling_factors.txt",
-        binSize = lambda wildcards: " --binSize 100000 " if wildcards.part=="spikein" else ""
+        binSize = lambda wildcards: " --binSize 100000 " if wildcards.part=="spikein" else "",
+        spikein_region = ""
     log:
         out = "split_deepTools_qc/logs/{part}.input_multiBamSummary.out",
         err = "split_deepTools_qc/logs/{part}.input_multiBamSummary.err"
@@ -73,7 +74,9 @@ rule multiBamSummary_ChIP:
         read_extension = "--extendReads" if pairedEnd
                          else "--extendReads {}".format(fragmentLength),
         scaling_factors = "--scalingFactors split_deepTools_qc/multiBamSummary/{part}.ChIP.scaling_factors.txt",
-        binSize = lambda wildcards: " --binSize 100000 " if wildcards.part=="spikein" else ""
+        binSize = lambda wildcards: " --binSize "+str(spikein_bin_size) if wildcards.part=="spikein" else "",
+        spikein_region = lambda wildcards: " --region "+spikein_region if ((wildcards.part=="spikein") and (spikein_region != "")) else ""
+
     log:
         out = "split_deepTools_qc/logs/{part}.ChIP_multiBamSummary.out",
         err = "split_deepTools_qc/logs/{part}.ChIP_multiBamSummary.err"
