@@ -22,7 +22,7 @@ rule map_fastq_single_end:
     log:
         out = "BWA/logs/{sample}{read}.out",
         err = "BWA/logs/{sample}{read}.err"
-    threads: 15
+    threads: lambda wildcards: 15 if 15<max_thread else max_thread
     conda: CONDA_HIC_ENV
     shell:
         "echo 'mapping {input}' > {log.out} && "
@@ -50,7 +50,7 @@ if(RFResolution is True):
         log:
             out = "HiC_matrices/logs/{sample}_"+matrixFile_suffix+".out",
             err = "HiC_matrices/logs/{sample}_"+matrixFile_suffix+".err"
-        threads: 10
+        threads: lambda wildcards: 10 if 10<max_thread else max_thread
         conda: CONDA_HIC_ENV
         shell:
             "hicBuildMatrix -s {input.R1} {input.R2} "
@@ -85,7 +85,7 @@ else:
         log:
             out = "HiC_matrices/logs/{sample}_"+matrixFile_suffix+".out",
             err = "HiC_matrices/logs/{sample}_"+matrixFile_suffix+".err"
-        threads: 10
+        threads: lambda wildcards: 10 if 10<max_thread else max_thread
         conda: CONDA_HIC_ENV
         shell:
             "hicBuildMatrix -s {input.R1} {input.R2} "
@@ -195,7 +195,7 @@ rule call_tads:
     params:
         prefix="TADs/{sample}_"+matrixFile_suffix,
         parameters=lambda wildcards: findTADParams if findTADParams else ""
-    threads: 10
+    threads: lambda wildcards: 10 if 10<max_thread else max_thread
     log:
         out = "TADs/logs/{sample}_findTADs.out",
         err = "TADs/logs/{sample}_findTADs.err"

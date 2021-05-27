@@ -42,7 +42,7 @@ if aligner.upper().find("HISAT2") >=0:
                 tempDir = tempDir
             benchmark:
                 aligner+"/.benchmark/HISAT2.{sample}.benchmark"
-            threads: 10
+            threads: lambda wildcards: 10 if 10<max_thread else max_thread
             conda: CONDA_RNASEQ_ENV
             shell: """
                 TMPDIR={params.tempDir}
@@ -75,7 +75,7 @@ if aligner.upper().find("HISAT2") >=0:
                 tempDir = tempDir
             benchmark:
                 aligner+"/.benchmark/HISAT2.{sample}.benchmark"
-            threads: 10
+            threads: lambda wildcards: 10 if 10<max_thread else max_thread
             conda: CONDA_RNASEQ_ENV
             shell: """
                 TMPDIR={params.tempDir}
@@ -165,3 +165,4 @@ elif aligner.upper().find("STAR") >=0:
                 | samtools sort -m {params.samsort_memory} -T $MYTEMP/{wildcards.sample} -@ {params.samtools_threads} -O bam -o {output.bam} - 2> {log}
                 rm -rf $MYTEMP
                 """
+threads: lambda wildcards: 10 if 10<max_thread else max_thread

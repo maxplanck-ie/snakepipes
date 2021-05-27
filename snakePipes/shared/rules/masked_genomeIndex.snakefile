@@ -1,4 +1,4 @@
-
+threads: lambda wildcards: 10 if 10<max_thread else max_thread
 from os.path import join, dirname
 import glob
 
@@ -102,7 +102,7 @@ elif aligner == "Bowtie2":
         log:
             out = "snp_genome/bowtie2_Nmasked/bowtie2.index.out",
             err = "snp_genome/bowtie2_Nmasked/bowtie2.index.err"
-        threads: 10
+        threads: lambda wildcards: 10 if 10<max_thread else max_thread
         params:
             filelist = getref_fileList(SNPdir),
             idxbase = "snp_genome/bowtie2_Nmasked/Genome"

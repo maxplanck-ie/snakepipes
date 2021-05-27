@@ -20,7 +20,7 @@ rule bamCoverage_allelic:
         err = "bamCoverage/allele_specific/logs/bamCoverage.{sample}.{suffix}.err"
     benchmark:
         "bamCoverage/allele_specific/.benchmark/bamCoverage.{sample}.{suffix}.benchmark"
-    threads: 16
+    threads: lambda wildcards: 16 if 16<max_thread else max_thread
     conda: CONDA_SHARED_ENV
     shell: bamcov_cmd
 
