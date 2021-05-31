@@ -23,7 +23,7 @@ rule bamCompare_log2_genome1:
         err = "deepTools_ChIP/logs/bamCompare.log2ratio.{chip_sample}.{control_name}.genome1.err"
     benchmark:
         "deepTools_ChIP/.benchmark/bamCompare.log2ratio.{chip_sample}.{control_name}.genome1.benchmark"
-    threads: 16
+    threads: lambda wildcards: 16 if 16<max_thread else max_thread
     shell: bamcompare_log2_cmd
 
 rule bamCompare_log2_genome2:
@@ -48,7 +48,7 @@ rule bamCompare_log2_genome2:
         err = "deepTools_ChIP/logs/bamCompare.log2ratio.{chip_sample}.{control_name}.genome2.err"
     benchmark:
         "deepTools_ChIP/.benchmark/bamCompare.log2ratio.{chip_sample}.{control_name}.genome2.benchmark"
-    threads: 16
+    threads: lambda wildcards: 16 if 16<max_thread else max_thread
     shell: bamcompare_log2_cmd
 
 ### deepTools plotEnrichment ###################################################
@@ -73,7 +73,7 @@ rule plotEnrichment_allelic:
         err = "deepTools_ChIP/logs/plotEnrichment_allelic.err"
     benchmark:
         "deepTools_ChIP/.benchmark/plotEnrichment_allelic.benchmark"
-    threads: 24
+    threads: lambda wildcards: 24 if 24<max_thread else max_thread
     shell: plotEnrich_chip_cmd
 
 
@@ -100,5 +100,5 @@ rule plotFingerprint_allelic:
         err = "deepTools_ChIP/logs/plotFingerprint_allelic.err"
     benchmark:
         "deepTools_ChIP/.benchmark/plotFingerprint_allelic.benchmark"
-    threads: 24
+    threads: lambda wildcards: 24 if 24<max_thread else max_thread
     shell: plotFingerprint_cmd

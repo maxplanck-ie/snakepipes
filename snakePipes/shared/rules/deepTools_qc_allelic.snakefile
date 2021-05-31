@@ -20,7 +20,7 @@ rule bamCoverage_allelic:
         err = "bamCoverage/allele_specific/logs/bamCoverage.{sample}.{suffix}.err"
     benchmark:
         "bamCoverage/allele_specific/.benchmark/bamCoverage.{sample}.{suffix}.benchmark"
-    threads: 16
+    threads: lambda wildcards: 16 if 16<max_thread else max_thread
     conda: CONDA_SHARED_ENV
     shell: bamcov_cmd
 
@@ -41,7 +41,7 @@ rule plotCoverage_allelic:
         err = "deepTools_qc/logs/plotCoverage_allelic.err"
     benchmark:
         "deepTools_qc/.benchmark/plotCoverage_allelic.benchmark"
-    threads: 24
+    threads: lambda wildcards: 24 if 24<max_thread else max_thread
     conda: CONDA_SHARED_ENV
     shell: plotCoverage_cmd
 
@@ -67,7 +67,7 @@ rule multiBamSummary_allelic:
         err = "deepTools_qc/logs/multiBamSummary_allelic.err"
     benchmark:
         "deepTools_qc/.benchmark/multiBamSummary_allelic.benchmark"
-    threads: 24
+    threads: lambda wildcards: 24 if 24<max_thread else max_thread
     conda: CONDA_SHARED_ENV
     shell: multiBamSummary_cmd
 

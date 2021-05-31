@@ -15,7 +15,7 @@ rule featureCounts:
     log:
         out = "featureCounts/logs/{sample}.out",
         err = "featureCounts/logs/{sample}.err"
-    threads: 8
+    threads: lambda wildcards: 8 if 8<max_thread else max_thread
     conda: CONDA_RNASEQ_ENV
     shell: """
         TMPDIR={params.tempDir}

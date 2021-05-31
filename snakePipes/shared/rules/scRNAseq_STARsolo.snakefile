@@ -34,7 +34,7 @@ rule STARsolo:
         tempDir = tempDir
     benchmark:
         aligner+"/.benchmark/STARsolo.{sample}.benchmark"
-    threads: 20  # 3.2G per core
+    threads: lambda wildcards: 20 if 20<max_thread else max_thread  # 3.2G per core
     conda: CONDA_scRNASEQ_ENV
     shell: """
         TMPDIR={params.tempDir}
@@ -65,7 +65,7 @@ rule STARsolo:
 	    --soloUMIdedup Exact 2> {log}
 
         ln -s ../{params.prefix}Aligned.sortedByCoord.out.bam {output.bam} 2>> {log}
- 
+
         rm -rf $MYTEMP
          """
 
@@ -77,7 +77,7 @@ rule STARsolo_report:
         wdir = outdir + "/STARsolo",
         input = lambda wildcards,input: [ os.path.join(outdir,x) for x in input ],
         samples = samples
-    log: 
+    log:
         out = "STARsolo/logs/Report.out"
     conda: CONDA_seurat3_ENV
     script: "../rscripts/scRNAseq_report.R"
@@ -91,7 +91,7 @@ rule filter_bam:
         bamfile = "filtered_bam/{sample}.filtered.bam",
         bami = "filtered_bam/{sample}.filtered.bam.bai"
     log: "filtered_bam/logs/{sample}.log"
-    threads: 8
+    threads: lambda wildcards: 8 if 8<max_thread else max_thread
     conda: CONDA_SAMBAMBA_ENV
     shell: """
            sambamba view -F "not unmapped and [CB] !=null" -t {threads} -f bam {input.bamfile} > {output.bamfile} 2> {log};
@@ -100,7 +100,7 @@ rule filter_bam:
 
 ##remove this rule as soon as STARsolo output has been fixed by Alex Dobin
 rule STARsolo_features_to_V3:
-    input: 
+    input:
         raw_features = "STARsolo/{sample}/{sample}.Solo.out/Gene/raw/features.tsv",
         filtered_features = "STARsolo/{sample}/{sample}.Solo.out/Gene/filtered/features.tsv"
     output:
@@ -110,7 +110,7 @@ rule STARsolo_features_to_V3:
     shell: """
         awk '{{print $1, $2, "."}}' {input.raw_features} | tr " " "\t" > {output.raw_features} 2> {log};
         awk '{{print $1, $2, "."}}' {input.filtered_features} | tr " " "\t" > {output.filtered_features} 2>> {log}
-    """       
+    """
 
 
 rule gzip_STARsolo_for_seurat:
@@ -196,7 +196,7 @@ if not skipVelocyto:
         params:
             samsort_memory="10G",
             tempDir = tempDir
-        threads: 4
+        threads: lambda wildcards: 4 if 4<max_thread else max_thread
         conda: CONDA_scRNASEQ_ENV
         shell: """
                 TMPDIR={params.tempDir}
@@ -256,4 +256,3 @@ if not skipVelocyto:
     #        out = "Seurat/Velocyto/logs/seurat.out"
     #    conda: CONDA_seurat3_ENV
     #    script: "../rscripts/scRNAseq_merge_loom.R"
-    

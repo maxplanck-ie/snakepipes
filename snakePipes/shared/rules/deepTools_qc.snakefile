@@ -20,7 +20,7 @@ rule bamCoverage:
         err = "bamCoverage/logs/bamCoverage.{sample}.err"
     benchmark:
         "bamCoverage/.benchmark/bamCoverage.{sample}.benchmark"
-    threads: 16  # 4GB per core
+    threads: lambda wildcards: 16 if 16<max_thread else max_thread  # 4GB per core
     conda: CONDA_SHARED_ENV
     shell: bamcov_cmd
 
@@ -48,7 +48,7 @@ rule bamCoverage_filtered:
         err = "bamCoverage/logs/bamCoverage.{sample}.filtered.err"
     benchmark:
         "bamCoverage/.benchmark/bamCoverage.{sample}.filtered.benchmark"
-    threads: 16  # 4GB per core
+    threads: lambda wildcards: 16 if 16<max_thread else max_thread  # 4GB per core
     conda: CONDA_SHARED_ENV
     shell: bamcov_cmd
 
@@ -74,7 +74,7 @@ rule plotCoverage:
         err = "deepTools_qc/logs/plotCoverage.err"
     benchmark:
         "deepTools_qc/.benchmark/plotCoverage.benchmark"
-    threads: 24
+    threads: lambda wildcards: 24 if 24<max_thread else max_thread
     conda: CONDA_SHARED_ENV
     shell: plotCoverage_cmd
 
@@ -99,7 +99,7 @@ rule multiBamSummary:
         err = "deepTools_qc/logs/multiBamSummary.err"
     benchmark:
         "deepTools_qc/.benchmark/multiBamSummary.benchmark"
-    threads: 24
+    threads: lambda wildcards: 24 if 24<max_thread else max_thread
     conda: CONDA_SHARED_ENV
     shell: multiBamSummary_cmd
 
@@ -196,7 +196,7 @@ rule computeGCBias:
         err = "deepTools_qc/logs/computeGCBias.{sample}.filtered.err"
     benchmark:
         "deepTools_qc/.benchmark/computeGCBias.{sample}.filtered.benchmark"
-    threads: 16
+    threads: lambda wildcards: 16 if 16<max_thread else max_thread
     conda: CONDA_SHARED_ENV
     shell: gcbias_cmd
 
@@ -213,6 +213,6 @@ rule bamPE_fragment_size:
     log:
         out = "deepTools_qc/logs/bamPEFragmentSize.out",
         err = "deepTools_qc/logs/bamPEFragmentSize.err"
-    threads: 24
+    threads: lambda wildcards: 24 if 24<max_thread else max_thread
     conda: CONDA_SHARED_ENV
     shell: bamPEFragmentSize_cmd

@@ -18,6 +18,8 @@ onlySSL: False
 emailSender:
 smtpUsername:
 smtpPassword:
+# maximum number of threads to be used
+max_thread: 25
 #print tools versions
 toolsVersion: True
 oldConfig:

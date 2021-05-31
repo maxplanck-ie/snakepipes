@@ -20,7 +20,7 @@ rule plotFingerprint:
         err = os.path.join(deeptools_ATAC, "logs/plotFingerprint.err")
     benchmark:
         os.path.join(deeptools_ATAC, ".benchmark/plotFingerprint.benchmark")
-    threads: 24
+    threads: lambda wildcards: 24 if 24<max_thread else max_thread
     conda: CONDA_SHARED_ENV
     shell: plotFingerprint_cmd
 
@@ -44,7 +44,7 @@ rule plotFingerprint_allelic:
         err = os.path.join(deeptools_ATAC, "logs/plotFingerprint_allelic.err")
     benchmark:
         os.path.join(deeptools_ATAC, ".benchmark/plotFingerprint_allelic.benchmark")
-    threads: 24
+    threads: lambda wildcards: 24 if 24<max_thread else max_thread
     conda: CONDA_SHARED_ENV
     shell: plotFingerprint_cmd
 

@@ -139,7 +139,7 @@ rule plotEnrichment:
         err="deepTools_qc/logs/plotEnrichment.err"
     benchmark:
         "deepTools_qc/.benchmark/plotEnrichment.benchmark"
-    threads: 24
+    threads: lambda wildcards: 24 if 24<max_thread else max_thread
     shell: plotEnrich_cmd
 
 
@@ -175,7 +175,7 @@ rule plotCorr_bed_pearson:
         err="deepTools_qc/logs/plotCorrelation_pearson.err"
     benchmark:
         "deepTools_qc/.benchmark/plotCorrelation_pearson.benchmark"
-    params: 
+    params:
         plotcmd = "" if plotFormat == 'None' else
             "--plotFile " + "deepTools_qc/plotCorrelation/correlation.pearson.bed_coverage.heatmap." + plotFormat,
         title='genes'
@@ -195,7 +195,7 @@ rule plotCorr_bed_spearman:
         err="deepTools_qc/logs/plotCorrelation_spearman.err"
     benchmark:
         "deepTools_qc/.benchmark/plotCorrelation_spearman.benchmark"
-    params:        
+    params:
         plotcmd = "" if plotFormat == 'None' else
             "--plotFile " + "deepTools_qc/plotCorrelation/correlation.spearman.bed_coverage.heatmap." + plotFormat,
         title='genes'
@@ -215,7 +215,7 @@ rule plotPCA:
         err="deepTools_qc/logs/plotPCA.err",
     benchmark:
         "deepTools_qc/.benchmark/plotPCA.benchmark"
-    params: 
+    params:
         plotcmd = "" if plotFormat == 'None' else
                 "--plotFile " + "deepTools_qc/plotPCA/PCA.bed_coverage." + plotFormat,
         title='genes'
@@ -252,5 +252,5 @@ rule bamPE_fragment_size:
     log:
         out="deepTools_qc/logs/bamPEFragmentSize.out",
         err="deepTools_qc/logs/bamPEFragmentSize.err"
-    threads: 24
+    threads: lambda wildcards: 24 if 24<max_thread else max_thread
     shell: bamPEFragmentSize_cmd
