@@ -6,7 +6,7 @@ def get_flank_length(file,read_length_frx):
         head = [next(rf) for x in range(4)]
     read_length = len(head[1])
     flank_length = int( (1 - read_length_frx) * read_length )
-    return(flank_length)  
+    return(flank_length)
 
 rule cut_t2g:
         input:
@@ -32,7 +32,7 @@ rule SalmonAlevin:
             outdir = "Alevin/{sample}"
         output:
             quantmat = "Alevin/{sample}/alevin/quants_mat.gz",
-        log: 
+        log:
             out =  "Alevin/logs/alevin.{sample}.out",
             err = "Alevin/logs/alevin.{sample}.err"
         #Use RNAseq env because Salmon already installed there (no need for duplication).
@@ -96,7 +96,7 @@ rule Salmon_index_joint_fa:
     log:
         err = "Salmon/SalmonIndex_RNAVelocity/logs/SalmonIndex.err",
         out = "Salmon/SalmonIndex_RNAVelocity/logs/SalmonIndex.out"
-    threads: 16
+    threads: lambda wildcards: 16 if 16<max_thread else max_thread
     conda: CONDA_RNASEQ_ENV
     shell:"""
         cat {input.joint_fasta} {input.genome_fasta} > {output.seq_fa}
@@ -117,7 +117,7 @@ rule AlevinForVelocity:
             outdir = "AlevinForVelocity/{sample}"
         output:
             quantmat = "AlevinForVelocity/{sample}/alevin/quants_mat.gz"
-        log: 
+        log:
             out =  "AlevinForVelocity/logs/alevin.{sample}.out",
             err = "AlevinForVelocity/logs/alevin.{sample}.err"
         #Use RNAseq env because Salmon already installed there (no need for duplication).
@@ -145,5 +145,3 @@ rule velo_to_sce:
         out = "SingleCellExperiment/AlevinForVelocity/logs/alevin2sce.out"
     conda: CONDA_eisaR_ENV
     script: "../rscripts/scRNAseq_splitAlevinVelocityMatrices.R"
-
-

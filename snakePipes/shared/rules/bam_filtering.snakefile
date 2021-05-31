@@ -11,13 +11,13 @@ rule samtools_filter:
     output:
         bam = temp("filtered_bam/{sample}.filtered.tmp.bam")
     params:
-        shell = lambda wildcards,input,output: "samtools view -@ {} -b {} -o {} {} ".format(str(8 if not local else 2), bam_filter_string,output.bam,input[0]) if bam_filter_string.strip() !="" else "ln -s ../{} {}".format(input[0],output.bam) 
+        shell = lambda wildcards,input,output: "samtools view -@ {} -b {} -o {} {} ".format(str(8 if not local else 2), bam_filter_string,output.bam,input[0]) if bam_filter_string.strip() !="" else "ln -s ../{} {}".format(input[0],output.bam)
     log:
         out = "filtered_bam/logs/samtools_filter.{sample}.out",
         err = "filtered_bam/logs/samtools_filter.{sample}.err"
     benchmark:
         "filtered_bam/.benchmark/samtools_filter.{sample}.benchmark"
-    threads: 8
+    threads: lambda wildcards: 8 if 8<max_thread else max_thread
     conda: CONDA_SHARED_ENV
     shell: """
         {params.shell} 2> {log.err}

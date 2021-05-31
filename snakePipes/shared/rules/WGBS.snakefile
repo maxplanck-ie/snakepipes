@@ -32,7 +32,7 @@ if pairedEnd and not fromBAM:
         params:
             bwameth_index=bwameth_index,
             tempDir = tempDir
-        threads: 20
+        threads: lambda wildcards: 20 if 20<max_thread else max_thread
         conda: CONDA_WGBS_ENV
         shell: """
             TMPDIR={params.tempDir}
@@ -54,7 +54,7 @@ elif not pairedEnd and not fromBAM:
         params:
             bwameth_index=bwameth_index,
             tempDir = tempDir
-        threads: 20
+        threads: lambda wildcards: 20 if 20<max_thread else max_thread
         conda: CONDA_WGBS_ENV
         shell: """
             TMPDIR={params.tempDir}
@@ -88,7 +88,7 @@ if not skipBamQC:
         log:
             err="Sambamba/logs/{sample}.rm_dupes.err",
             out="Sambamba/logs/{sample}.rm_dupes.out"
-        threads: 10
+        threads: lambda wildcards: 10 if 10<max_thread else max_thread
         params:
             tempDir = tempDir
         conda: CONDA_SAMBAMBA_ENV
@@ -189,7 +189,7 @@ rule calc_Mbias:
         genome=genome_fasta
     log:
         out="QC_metrics/logs/{sample}.calc_Mbias.out"
-    threads: 10
+    threads: lambda wildcards: 10 if 10<max_thread else max_thread
     conda: CONDA_WGBS_ENV
     shell: """
         MethylDackel mbias -@ {threads} {params.genome} {input[0]} QC_metrics/{wildcards.sample} 2> {output} > {log.out}
@@ -206,7 +206,7 @@ rule calcCHHbias:
         genome=genome_fasta
     log:
         err="QC_metrics/logs/{sample}.calcCHHbias.err"
-    threads: 10
+    threads: lambda wildcards: 10 if 10<max_thread else max_thread
     conda: CONDA_WGBS_ENV
     shell: """
         MethylDackel mbias -@ {threads} --CHH --noCpG --noSVG {params.genome} {input[0]} QC_metrics/{wildcards.sample} > {output} 2> {log.err}
@@ -225,7 +225,7 @@ rule calc_GCbias:
         twobitpath=genome_2bit
     log:
         out="QC_metrics/logs/calc_GCbias.out"
-    threads: 20
+    threads: lambda wildcards: 20 if 20<max_thread else max_thread
     conda: CONDA_SHARED_ENV
     shell: """
         computeGCBias -b {input.BAMS} --effectiveGenomeSize {params.genomeSize} -g {params.twobitpath} -l 300 --GCbiasFrequenciesFile {output[0]} -p {threads} --biasPlot {output[1]}
@@ -244,7 +244,7 @@ rule DepthOfCov:
     params:
         options="--minMappingQuality 10 --smartLabels --samFlagExclude 256",
         thresholds="-ct 0 -ct 1 -ct 2 -ct 5 -ct 10 -ct 15 -ct 20 -ct 30 -ct 50"
-    threads: 20
+    threads: lambda wildcards: 20 if 20<max_thread else max_thread
     log:
         err="QC_metrics/logs/DepthOfCov.err"
     conda: CONDA_SHARED_ENV
@@ -265,7 +265,7 @@ rule DepthOfCovGenome:
     params:
         options="--minMappingQuality 10 --smartLabels --samFlagExclude 256",
         thresholds="-ct 0 -ct 1 -ct 2 -ct 5 -ct 10 -ct 15 -ct 20 -ct 30 -ct 50"
-    threads: 20
+    threads: lambda wildcards: 20 if 20<max_thread else max_thread
     log:
         err="QC_metrics/logs/DepthOfCovGenome.err"
     conda: CONDA_SHARED_ENV
@@ -316,7 +316,7 @@ if not noAutoMethylationBias:
         log:
             err="MethylDackel/logs/{sample}.methyl_extract.err",
             out="MethylDackel/logs/{sample}.methyl_extract.out"
-        threads: 10
+        threads: lambda wildcards: 10 if 10<max_thread else max_thread
         conda: CONDA_WGBS_ENV
         shell: """
             mi=$(cat {input[2]} | sed 's/Suggested inclusion options: //' )
@@ -335,7 +335,7 @@ else:
         log:
             err="MethylDackel/logs/{sample}.methyl_extract.err",
             out="MethylDackel/logs/{sample}.methyl_extract.out"
-        threads: 10
+        threads: lambda wildcards: 10 if 10<max_thread else max_thread
         conda: CONDA_WGBS_ENV
         shell: """
             MethylDackel extract -o MethylDackel/{wildcards.sample} {params.MethylDackelOptions} -@ {threads} {params.genome} {input[0]} 1> {log.out} 2> {log.err}
@@ -354,7 +354,7 @@ rule prepForMetilene:
         blacklist=blacklist
     log:
         err='{}/logs/prep_for_stats.err'.format(get_outdir("metilene", targetRegions, minCoverage)),
-    threads: 10
+    threads: lambda wildcards: 10 if 10<max_thread else max_thread
     conda: CONDA_WGBS_ENV
     script: "../rscripts/WGBS_mergeStats.R"
 
@@ -374,7 +374,7 @@ rule DSS:
         minMethDiff=minMethDiff,
         minCoverage=minCoverage,
         FDR=FDR
-    threads: 10
+    threads: lambda wildcards: 10 if 10<max_thread else max_thread
     benchmark: '{}/.benchmark/DSS.benchmark'.format(get_outdir("DSS", None, minCoverage))
     conda: CONDA_WGBS_ENV
     script: "../rscripts/WGBS_DSS.Rmd"
@@ -395,7 +395,7 @@ rule dmrseq:
         minMethDiff=minMethDiff,
         minCoverage=minCoverage,
         FDR=FDR
-    threads: 10
+    threads: lambda wildcards: 10 if 10<max_thread else max_thread
     benchmark: '{}/.benchmark/dmrseq.benchmark'.format(get_outdir("dmrseq", None, minCoverage))
     conda: CONDA_WGBS_ENV
     script: "../rscripts/WGBS_dmrseq.Rmd"
@@ -418,7 +418,7 @@ rule run_metilene:
         opts = metileneOptions if metileneOptions else ''
     log:
         err="{}/logs/run_metilene.err".format(get_outdir("metilene", targetRegions, minCoverage))
-    threads: 10
+    threads: lambda wildcards: 10 if 10<max_thread else max_thread
     benchmark: '{}/.benchmark/run_metilene.benchmark'.format(get_outdir("metilene", targetRegions, minCoverage))
     conda: CONDA_WGBS_ENV
     shell: """
@@ -456,7 +456,7 @@ rule metileneReport:
 
 
 rule bedGraphToBigWig:
-    input: 
+    input:
         "MethylDackel/{sample}_CpG.bedGraph",
         genome_index
     output:

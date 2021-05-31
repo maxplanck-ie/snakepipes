@@ -189,7 +189,7 @@ rule bowtie2Index:
     params:
       basedir = os.path.join(outdir, "BowtieIndex")
     conda: CONDA_CREATE_INDEX_ENV
-    threads: 10
+    threads: lambda wildcards: 10 if 10<max_thread else max_thread
     shell: """
         ln -s {input} {params.basedir}/genome.fa
         bowtie2-build -t {threads} {params.basedir}/genome.fa {params.basedir}/genome
@@ -204,7 +204,7 @@ rule hisat2Index:
     log: "logs/hisat2Index.log"
     params:
       basedir = os.path.join(outdir, "HISAT2Index")
-    threads: 10
+    threads: lambda wildcards: 10 if 10<max_thread else max_thread
     conda: CONDA_CREATE_INDEX_ENV
     shell: """
         ln -s {input} {params.basedir}/genome.fa
@@ -219,7 +219,7 @@ rule makeKnownSpliceSites:
     output: known_splicesites
     log: "logs/makeKnownSpliceSites.log"
     conda: CONDA_CREATE_INDEX_ENV
-    threads: 10
+    threads: lambda wildcards: 10 if 10<max_thread else max_thread
     shell: """
         hisat2_extract_splice_sites.py {input} > {output} 2> {log}
         """
@@ -233,7 +233,7 @@ rule starIndex:
     params:
       basedir = os.path.join(outdir, "STARIndex")
     conda: CONDA_CREATE_INDEX_ENV
-    threads: 10
+    threads: lambda wildcards: 10 if 10<max_thread else max_thread
     shell: """
         STAR --runThreadN {threads} --runMode genomeGenerate --genomeDir {params.basedir} --genomeFastaFiles {input} 2> {log}
         if [[ -w Log.out ]]; then rm -v Log.out; elif [[ -w {params.basedir}/Log.out ]]; then rm -v {params.basedir}/Log.out; fi

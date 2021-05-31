@@ -10,14 +10,14 @@ if pairedEnd:
         log: "Bowtie2/logs/{sample}.sort.log"
         params:
             bowtie2_index=bowtie2_index,
-            alignerOpts = str(alignerOpts or ' ') if not cutntag else " --end-to-end --very-sensitive "\
-            "--no-mixed --no-discordant --phred33 -I 10 -X 700 ",
+            alignerOpts = str(alignerOpts or ' ') if not cutntag else "  --local --very-sensitive-local "\
+            "--no-mixed --no-discordant --phred33 -I 10 ",
             mateOrientation = mateOrientation,
-            insertSizeMax = insertSizeMax,
+            insertSizeMax = str(insertSizeMax or ' ') if not cutntag else " 700 ",
             tempDir = tempDir
         benchmark:
             "Bowtie2/.benchmark/Bowtie2.{sample}.benchmark"
-        threads: 24  # 1G per core
+        threads: lambda wildcards: 24 if 24<max_thread else max_thread  # 1G per core
         conda: CONDA_DNA_MAPPING_ENV
         shell: """
             TMPDIR={params.tempDir}
@@ -48,7 +48,7 @@ else:
             tempDir = tempDir
         benchmark:
             "Bowtie2/.benchmark/Bowtie2.{sample}.benchmark"
-        threads: 24  # 1G per core
+        threads: lambda wildcards: 24 if 24<max_thread else max_thread  # 1G per core
         conda: CONDA_DNA_MAPPING_ENV
         shell: """
             TMPDIR={params.tempDir}

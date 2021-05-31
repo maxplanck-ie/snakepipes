@@ -19,7 +19,7 @@ if aligner == "STAR":
                 tempDir = tempDir
             benchmark:
                 aligner+"/.benchmark/STAR.{sample}.benchmark"
-            threads: 12
+            threads: lambda wildcards: 12 if 12<max_thread else max_thread
             conda: CONDA_RNASEQ_ENV
             shell: """
                 TMPDIR={params.tempDir}
@@ -65,7 +65,7 @@ if aligner == "STAR":
                 tempDir = tempDir
             benchmark:
                 aligner+"/.benchmark/STAR.{sample}.benchmark"
-            threads: 12
+            threads: lambda wildcards: 12 if 12<max_thread else max_thread
             conda: CONDA_RNASEQ_ENV
             shell: """
                 TMPDIR={params.tempDir}

@@ -72,7 +72,7 @@ if optDedupDist > 0:
                 stdout="deduplicatedFASTQ/logs/{sample}.stdout",
                 stderr="deduplicatedFASTQ/logs/{sample}.stderr"
             benchmark: "deduplicatedFASTQ/.benchmarks/{sample}"
-            threads: 20
+            threads: lambda wildcards: 20 if 20<max_thread else max_thread
             conda: CONDA_PREPROCESSING_ENV
             shell: """
                 clumpify.sh -Xmx{params.mem} \
@@ -105,7 +105,7 @@ if optDedupDist > 0:
                 stdout="deduplicatedFASTQ/logs/{sample}.stdout",
                 stderr="deduplicatedFASTQ/logs/{sample}.stderr"
             benchmark: "deduplicatedFASTQ/.benchmarks/{sample}"
-            threads: 20
+            threads: lambda wildcards: 20 if 20<max_thread else max_thread
             conda: CONDA_PREPROCESSING_ENV
             shell: """
                 clumpify.sh -Xmx{params.mem} \

@@ -21,7 +21,7 @@ if bigWigType == "subtract" or bigWigType == "both":
             err = "deepTools_ChIP/logs/bamCompare.subtract.{chip_sample}.filtered.subtract.{control_name}.err"
         benchmark:
             "deepTools_ChIP/.benchmark/bamCompare.subtract.{chip_sample}.filtered.subtract.{control_name}.benchmark"
-        threads: 16
+        threads: lambda wildcards: 16 if 16<max_thread else max_thread
         conda: CONDA_SHARED_ENV
         shell: bamcompare_subtract_cmd
 
@@ -46,7 +46,7 @@ if bigWigType == "log2ratio" or bigWigType == "both":
             err = "deepTools_ChIP/logs/bamCompare.log2ratio.{chip_sample}.{control_name}.filtered.err"
         benchmark:
             "deepTools_ChIP/.benchmark/bamCompare.log2ratio.{chip_sample}.{control_name}.filtered.benchmark"
-        threads: 16
+        threads: lambda wildcards: 16 if 16<max_thread else max_thread
         conda: CONDA_SHARED_ENV
         shell: bamcompare_log2_cmd
 
@@ -70,7 +70,7 @@ rule plotEnrichment:
         err = "deepTools_ChIP/logs/plotEnrichment.err"
     benchmark:
         "deepTools_ChIP/.benchmark/plotEnrichment.benchmark"
-    threads: 24
+    threads: lambda wildcards: 24 if 24<max_thread else max_thread
     conda: CONDA_SHARED_ENV
     shell: plotEnrich_chip_cmd
 
@@ -96,6 +96,6 @@ rule plotFingerprint:
         err = "deepTools_ChIP/logs/plotFingerprint.err"
     benchmark:
         "deepTools_ChIP/.benchmark/plotFingerprint.benchmark"
-    threads: 24
+    threads: lambda wildcards: 24 if 24<max_thread else max_thread
     conda: CONDA_SHARED_ENV
     shell: plotFingerprint_cmd

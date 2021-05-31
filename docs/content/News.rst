@@ -1,6 +1,15 @@
 snakePipes News
 ===============
 
+snakePipes 2.5.1
+----------------
+
+* Updated Bowtie2 parameters for the cut and tag data
+* Updated multibamSummary in ChIPSeq pipeline for data with spike-in
+* Uncommented the BamCompare for ChIPseq pipeline with spike-in
+* set a max thread for each rule 
+* External PR #764: always check for >0 when generating heatmap for the differential analysis done by deseq2 
+  
 snakePipes 2.5.0
 ----------------
 

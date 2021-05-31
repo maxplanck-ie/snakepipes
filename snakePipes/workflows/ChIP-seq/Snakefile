@@ -114,12 +114,12 @@ def run_deepTools_ChIP():
                 file_list.append(["deepTools_ChIP/bamCompare/"+chip_sample+".filtered.subtract."+control_name+".bw"])
             if bigWigType == "log2ratio" or bigWigType == "both":
                 file_list.append(["deepTools_ChIP/bamCompare/"+chip_sample+".filtered.log2ratio.over_"+control_name+".bw"])
-        #elif useSpikeInForNorm and getSizeFactorsFrom == "genome":
+        elif useSpikeInForNorm and getSizeFactorsFrom == "genome":
             # get bigwigtype
-            #if bigWigType == "subtract" or bigWigType == "both":
-            #    file_list.append(expand("split_deepTools_ChIP/bamCompare/"+chip_sample+".subtract."+control_name+".scaledBY{part}.bw",part=part))
-            #if bigWigType == "log2ratio" or bigWigType == "both":
-            #    file_list.append(expand("split_deepTools_ChIP/bamCompare/"+chip_sample+".log2ratio.over_"+control_name+".scaledBY{part}.bw",part=part))
+            if bigWigType == "subtract" or bigWigType == "both":
+                file_list.append(expand("split_deepTools_ChIP/bamCompare/"+chip_sample+".subtract."+control_name+".scaledBY{part}.bw",part=part))
+            if bigWigType == "log2ratio" or bigWigType == "both":
+                file_list.append(expand("split_deepTools_ChIP/bamCompare/"+chip_sample+".log2ratio.over_"+control_name+".scaledBY{part}.bw",part=part))
     return(file_list)
 
 def run_deepTools_allelic():
