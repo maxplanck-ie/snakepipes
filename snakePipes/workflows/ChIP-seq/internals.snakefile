@@ -64,7 +64,7 @@ def is_allelic(workingdir):
 def get_pe_frag_length(sample, frag_len_file):
     try:
         df = pd.read_csv(frag_len_file, header = None, skiprows = 1, sep = "\t")
-        df = df.loc[df[0] == "filtered_bam/"+sample+".filtered.bam"]
+        df = df.loc[df[0] == sample]
         frag_len = int(df[5].values[0])
         return str(frag_len)
     except:
