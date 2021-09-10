@@ -246,8 +246,10 @@ plotCoverage_cmd = """
 
 #EstimateReadFiltering
 estimateReadFiltering_cmd = """
-    estimateReadFiltering -b {input.bam} \
-        -o {output} > {log.out} 2> {log.err}
+    estimateReadFiltering -p {threads} -b {input.bam} \
+    --ignoreDuplicates --minMappingQuality {params.minQ} \
+    {params.blacklist} --smartLabels \
+    -o {output} > {log.out} 2> {log.err}
     """
 
 #bamPEFragmentSize

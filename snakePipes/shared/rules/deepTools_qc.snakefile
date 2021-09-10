@@ -168,6 +168,10 @@ rule estimate_read_filtering:
         bai = aligner+"/{sample}.bam.bai"
     output:
         "deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt"
+    params:
+        blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed else "",
+        minQ = mapq
+    threads: lambda wildcards: 16 if 16<max_thread else max_thread  # 4GB per core
     log:
         out = "deepTools_qc/logs/{sample}.estimateReadFiltering.out",
         err = "deepTools_qc/logs/{sample}.estimateReadFiltering.err"
