@@ -168,7 +168,7 @@ rule plot_heatmap_cov_CSAW:
         image = touch("CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.cov.heatmap.png"),
         sorted_regions = touch("CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.cov.sortedRegions.bed")
     params:
-        smpl_label=' '.join(filtered_dict.keys())
+        smpl_label=' '.join(reordered_dict.keys())
     log:
         out = os.path.join(outdir,"CSAW_{}_{}".format(peakCaller, sample_name) + "/logs/deeptools_heatmap.cov.{change_dir}.out"),
         err = os.path.join(outdir,"CSAW_{}_{}".format(peakCaller, sample_name) + "/logs/deeptools_heatmap.cov.{change_dir}.err")
