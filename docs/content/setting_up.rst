@@ -97,7 +97,7 @@ This would show the locations of:
  * Workflow-specific defaults : Defines default options for our command line wrappers. See :ref:`workflowOpts`
 
 It is a good idea to keep a copy of your defaults.yaml, cluster.yaml and the whole organism folder in a dedicated location e.g. some folder *outside the snakePipes installation folder* named "snakePipes_configs" .
-You can configure snakePipes to use these files after a fresh installation or update with ``snakePipes config --organismsDir my_organisms_dir --clusterConfig my_cluster_config`` . This will also work if you add ``--configMode recycle``.  
+You can configure snakePipes to use these files after a fresh installation or update with ``snakePipes config --organismsDir my_organisms_dir --clusterConfig my_cluster_config`` . This will also work if you add ``--configMode recycle``.
 
 
 .. _conda:
@@ -251,8 +251,8 @@ If you want, you can also give an absolute log directory starting with /.
 
  **SGE**              .. code:: bash
 
-                      snakemake_cluster_cmd: qsub -V -cwd -j y -pe threaded {threads} -l h_vmem={cluster.memory},h_rt=24:00:00 -l tmpspace=100G -N {rule}.snakemake -S /bin/bash
-                      snakePipes_cluster_logDir: cluster_logs
+                        snakemake_cluster_cmd: qsub -V -cwd -j y -pe threaded {threads} -l h_vmem={cluster.memory},h_rt=24:00:00 -l tmpspace=100G -N {rule}.snakemake -S /bin/bash
+                        snakePipes_cluster_logDir: cluster_logs
 
 ==================== ======================================================================================
 
