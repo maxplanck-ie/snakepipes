@@ -30,7 +30,7 @@ if pairedEnd:
                 lambda wildcards: "-c split_bam/"+get_control(wildcards.chip_sample)+"_host.bam" if get_control(wildcards.chip_sample)
                 else "",
             ext_size =
-                lambda wildcards: " --nomodel --extsize "+get_pe_frag_length(wildcards.chip_sample,
+                lambda wildcards: " --nomodel --extsize "+get_pe_frag_length("split_bam/"+wildcards.chip_sample+"_host.bam",
                                                                             "split_deepTools_qc/bamPEFragmentSize/host.fragmentSize.metric.tsv") \
                                                                             if not cutntag else " ",
             peakCaller_options = lambda wildcards: str(peakCallerOptions or '') if not cutntag else " -p 1e-5 ",

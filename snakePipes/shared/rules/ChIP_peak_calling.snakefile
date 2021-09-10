@@ -28,7 +28,7 @@ if pairedEnd:
                 else "",
             genome_size = str(genome_size),
             ext_size =
-                lambda wildcards: " --nomodel --extsize "+get_pe_frag_length(wildcards.chip_sample,
+                lambda wildcards: " --nomodel --extsize "+get_pe_frag_length("filtered_bam/"+wildcards.chip_sample+".filtered.bam",
                                                                             "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv") \
                                                                             if not cutntag else " ",
             peakCaller_options = lambda wildcards: str(peakCallerOptions or '') if not cutntag else " -p 1e-5 ",
