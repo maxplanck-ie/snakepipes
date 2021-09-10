@@ -23,7 +23,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          "bigWigType": "both", "peakCaller": "MACS2", "sampleSheet": "",
                          "plotFormat": "png", "bamExt": ".filtered.bam", "fdr": 0.05,
                          "absBestLFC": 1, "useSpikeinForNorm": False, "spikeinExt": "_spikein",
-                         "peakCallerOptions": "--qvalue 0.001","cutntag": False,
+                         "peakCallerOptions": "--qvalue 0.001","cutntag": False, "mapq": 0,
                          "getSizeFactorsFrom": "genome"}):
 
     """
@@ -149,7 +149,14 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                           help="Log fold change threshold to apply for filtering DB regions"
                                "(default: '%(default)s')",
                           default=defaults["absBestLFC"])
-
+    optional.add_argument("--mapq",
+                         dest="mapq",
+                         metavar="INT",
+                         help="retain only reads with at least the given "
+                         "mapping quality. It used for estimateReadFiltering. "
+                         "(default: '%(default)s')",
+                         type=int,
+                         default=defaults["mapq"])
 
     return parser
 

@@ -55,6 +55,8 @@ filterGTF:
 ##parameters to filter DB regions on
 fdr: 0.05
 absBestLFC: 1
+## Retain only reads with at least the given mapping quality
+mapq: 0
 ################################################################################
 # Call snakemake directly, i.e. without using the wrapper script:
 #
