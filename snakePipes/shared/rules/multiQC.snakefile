@@ -29,18 +29,29 @@ def multiqc_input_check(return_value):
                 indir +=" FastQC "
     if pipeline=="dna-mapping":
         # pipeline is DNA-mapping
-        infiles.append( expand("Bowtie2/{sample}.Bowtie2_summary.txt", sample = samples) +
-                expand("Sambamba/{sample}.markdup.txt", sample = samples) +
-                expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample=samples))
-        indir += " Sambamba "
-        indir += " Bowtie2 "
-        indir += " deepTools_qc "
-        if qualimap:
-            infiles.append( expand("Qualimap_qc/{sample}.filtered.bamqc_results.txt", sample = samples) )
-            indir += " Qualimap_qc "
+        if aligner=="Bowtie2":
+            infiles.append( expand("Bowtie2/{sample}.Bowtie2_summary.txt", sample = samples) +
+                    expand("Sambamba/{sample}.markdup.txt", sample = samples) +
+                    expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample=samples))
+            indir += " Sambamba "
+            indir += " Bowtie2 "
+            indir += " deepTools_qc "
+            if qualimap:
+                infiles.append( expand("Qualimap_qc/{sample}.filtered.bamqc_results.txt", sample = samples) )
+                indir += " Qualimap_qc "
+        elif aligner=="bwa":
+            infiles.append( expand("bwa/{sample}.bwa_summary.txt", sample = samples) +
+                            expand("Sambamba/{sample}.markdup.txt", sample = samples) +
+                            expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample=samples))
+            indir += " Sambamba "
+            indir += " bwa "
+            indir += " deepTools_qc "
+            if qualimap:
+                infiles.append( expand("Qualimap_qc/{sample}.filtered.bamqc_results.txt", sample = samples) )
+                indir += " Qualimap_qc "
     elif pipeline=="rna-seq":
         # must be RNA-mapping, add files as per the mode
-        if "alignment" in mode or "deepTools_qc" in mode:
+        if "alignment" in mode or "deepTools_qc" in mode and not "allelic-mapping" in mode:
             infiles.append( expand(aligner+"/{sample}.bam", sample = samples) +
                     expand("Sambamba/{sample}.markdup.txt", sample = samples) +
                     expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample=samples)+
@@ -72,14 +83,23 @@ def multiqc_input_check(return_value):
             infiles.append( expand(fastq_dir+"/{sample}"+reads[0]+".fastq.gz", sample = samples) +
                             expand("Counts/{sample}.summary", sample = samples) )
             indir += fastq_dir + " Counts "
+            infiles.append( expand(aligner+"/{sample}.bam", sample = samples) +
+            expand("Sambamba/{sample}.markdup.txt", sample = samples) +
+            expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt", sample=samples))
+            indir += aligner
+            indir += " Sambamba "
+            indir += " deepTools_qc "
         elif mode == "STARsolo":
             infiles.append( expand(fastq_dir+"/{sample}"+reads[0]+".fastq.gz", sample = samples) )
-        infiles.append( expand(aligner+"/{sample}.bam", sample = samples) +
-        expand("Sambamba/{sample}.markdup.txt", sample = samples) +
-        expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt", sample=samples))
-        indir += aligner
-        indir += " Sambamba "
-        indir += " deepTools_qc "
+            infiles.append( expand(aligner+"/{sample}.bam", sample = samples) +
+            expand("Sambamba/{sample}.markdup.txt", sample = samples) +
+            expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt", sample=samples))
+            indir += aligner
+            indir += " Sambamba "
+            indir += " deepTools_qc "
+        elif mode == "Alevin":
+            infiles.append( expand("multiQC/Alevin_{sample}.html", sample = samples))
+            indir += " Alevin "
     elif pipeline == "WGBS":
         infiles.append( expand("QC_metrics/{sample}.flagstat", sample = samples) )
         indir += " QC_metrics"

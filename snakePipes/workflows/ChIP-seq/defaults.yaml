@@ -12,6 +12,7 @@
 ################################################################################
 ## General/Snakemake parameters, only used/set by wrapper or in Snakemake cmdl, but not in Snakefile
 pipeline: chip-seq
+cutntag: False # if set to True, overwrites the peakCaller and peakCallerOptions.
 configFile:
 clusterConfigFile:
 local: false
@@ -21,8 +22,17 @@ workingdir:
 ## preconfigured target genomes (mm9,mm10,dm3,...) , see /path/to/snakemake_workflows/shared/organisms/
 ## Value can be also path to your own genome config file!
 genome:
+## use spikein genome for normalization?
+useSpikeInForNorm: false
+getSizeFactorsFrom: genome
+spikeinExt: _spikein
+spikein_bin_size: 1000
 ## Which peak caller to use?
 peakCaller: 'MACS2'
+peakCallerOptions: --qvalue 0.001
+##MACS2 specific options:
+BAMPeaks: --mfold 0 50
+BAMPEPeaks:
 ## paired end data?
 pairedEnd: True
 ## Bin size of output files in bigWig format
@@ -34,12 +44,8 @@ fragmentLength: 200
 verbose: false
 # sampleSheet_DB
 sampleSheet:
-# mfold
-mfold: "0 50"
 # windowSize
 windowSize: 150
-#MACS2 qvalue
-qval: 0.001
 #### Flag to control the pipeline entry point
 bamExt: '.filtered.bam'
 fromBAM:

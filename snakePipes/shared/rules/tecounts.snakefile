@@ -14,7 +14,7 @@ if pairedEnd:
             sample_dir = aligner+"/{sample}"
         benchmark:
             aligner+"/.benchmark/STAR.{sample}.benchmark"
-        threads: 20  # 3.2G per core
+        threads: lambda wildcards: 20 if 20<max_thread else max_thread  # 3.2G per core
         conda: CONDA_RNASEQ_ENV
         shell: """
             ( [ -d {params.sample_dir} ] || mkdir -p {params.sample_dir} )
@@ -43,7 +43,7 @@ else:
             sample_dir = aligner+"/{sample}"
         benchmark:
             aligner+"/.benchmark/STAR.{sample}.benchmark"
-        threads: 20  # 3.2G per core
+        threads: lambda wildcards: 20 if 20<max_thread else max_thread  # 3.2G per core
         conda: CONDA_RNASEQ_ENV
         shell: """
             ( [ -d {params.sample_dir} ] || mkdir -p {params.sample_dir} )
@@ -157,7 +157,7 @@ rule cpGTF:
 
 rule symbolFile:
     input: genes_gtf
-    output: temp("Annotation/genes.filtered.symbol")
+    output: "Annotation/genes.filtered.symbol"
     run:
         of = open(output[0], "w")
         for line in open(input[0]):
@@ -183,20 +183,48 @@ def get_outdir(folder_name,sampleSheet):
     sample_name = os.path.splitext(os.path.basename(str(sampleSheet)))[0]
     return("{}_{}".format(folder_name, sample_name))
 
+if sampleSheet:
+    rule split_sampleSheet:
+        input:
+            sampleSheet = sampleSheet
+        output:
+            splitSheets = os.path.join("splitSampleSheets",os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv")
+        params:
+            splitSheetPfx = os.path.join("splitSampleSheets",os.path.splitext(os.path.basename(str(sampleSheet)))[0])
+        run:
+            if isMultipleComparison:
+                cf.splitSampleSheet(input.sampleSheet,params.splitSheetPfx)
+
 
 # TODO: topN, FDR
 if sampleSheet:
-    rule DESeq2:
-        input:
-            cnts=["TEcount/{}.cntTable".format(x) for x in samples],
-            sampleSheet=sampleSheet,
-            symbol_file = "Annotation/genes.filtered.symbol"
-        output:
-            "{}/DESeq2.session_info.txt".format(get_outdir("DESeq2",sampleSheet))
-        benchmark:
-            "{}/.benchmark/DESeq2.featureCounts.benchmark".format(get_outdir("DESeq2",sampleSheet))
-        params:
-            outdir = get_outdir("DESeq2", sampleSheet),
-            fdr = 0.05,
-        conda: CONDA_RNASEQ_ENV
-        script: "../rscripts/noncoding-DESeq2.R"
+    if not isMultipleComparison:
+        rule DESeq2:
+            input:
+                cnts=["TEcount/{}.cntTable".format(x) for x in samples],
+                sampleSheet=sampleSheet,
+                symbol_file = "Annotation/genes.filtered.symbol"
+            output:
+                "{}/DESeq2.session_info.txt".format(get_outdir("DESeq2",sampleSheet))
+            benchmark:
+                "{}/.benchmark/DESeq2.featureCounts.benchmark".format(get_outdir("DESeq2",sampleSheet))
+            params:
+                outdir = os.path.join(outdir, get_outdir("DESeq2", sampleSheet)),
+                fdr = 0.05,
+            conda: CONDA_RNASEQ_ENV
+            script: "../rscripts/noncoding-DESeq2.R"
+    else:
+        rule DESeq2:
+            input:
+                cnts=["TEcount/{}.cntTable".format(x) for x in samples],
+                sampleSheet = "splitSampleSheets/" + os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv",
+                symbol_file = "Annotation/genes.filtered.symbol"
+            output:
+                "{}/DESeq2.session_info.txt".format(get_outdir("DESeq2",os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv"))
+            benchmark:
+                "{}/.benchmark/DESeq2.featureCounts.benchmark".format(get_outdir("DESeq2",os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv"))
+            params:
+                outdir = lambda wildcards,input: os.path.join(outdir,get_outdir("DESeq2",input.sampleSheet)),
+                fdr = 0.05,
+            conda: CONDA_RNASEQ_ENV
+            script: "../rscripts/noncoding-DESeq2.R"

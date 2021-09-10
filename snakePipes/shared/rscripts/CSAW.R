@@ -10,9 +10,14 @@ pairedEnd <- as.logical(snakemake@params[["pairedEnd"]])
 fraglength <- as.numeric(snakemake@params[["fragmentLength"]])  # used when the data is not paired end
 windowSize <- as.numeric(snakemake@params[["windowSize"]])
 importfunc <- snakemake@params[["importfunc"]]  #"DB_functions.R"
-allelic_info <- as.logical(snakemake@params[["allele_info"]])
+allelic_info <- as.logical(toupper(snakemake@params[["allele_info"]]))
 outdir<-snakemake@params[["outdir"]]
 yaml_path<-snakemake@params[["yaml_path"]]
+useSpikeInForNorm<-snakemake@params[["useSpikeInForNorm"]]
+scale_factors<-snakemake@params[["scale_factors"]]
+
+bam_pfx<-ifelse(useSpikeInForNorm,"_host",".filtered")
+bam_folder<-ifelse(useSpikeInForNorm,"split_bam","filtered_bam")
 
 ##set up a primitive log
 logfile <- file(snakemake@log[["err"]], open="w+")
@@ -94,11 +99,11 @@ if (!is.null(sampleInfo$UseRegions)) {
 
 if(snakemake@params[['peakCaller']] == "MACS2") {
     allpeaks <- lapply(fnames, function(x) {
-        narrow <- paste0("../MACS2/",x,".filtered.BAM_peaks.narrowPeak")
+        narrow <- paste0("../MACS2/",x,bam_pfx,".BAM_peaks.narrowPeak") #bam_pfx
         if(snakemake@params[["pipeline"]] %in% "ATAC-seq"){
             narrow <- paste0("../MACS2/",x,".filtered.short.BAM_peaks.narrowPeak")
         }
-        broad <- paste0("../MACS2/",x,".filtered.BAM_peaks.broadPeak")
+        broad <- paste0("../MACS2/",x,bam_pfx,".BAM_peaks.broadPeak") #bam_pfx
         # first look for narrowpeak then braod peak
         if(file.exists(narrow)) {
             bed <- read.delim(narrow, header = FALSE)
@@ -128,12 +133,17 @@ message(paste0("Filtering windows using MACS2 output : ", length(allpeaks) , " r
 keep <- overlapsAny(SummarizedExperiment::rowRanges(chip_object$windowCounts), allpeaks)
 chip_object$windowCounts <- chip_object$windowCounts[keep,]
 
-## TMM normalize
-message("Normalizing using TMM (using 10kb background counts)")
-chip_object <- tmmNormalize_chip(chip_object, binsize = 10000, plotfile = "TMM_normalizedCounts.pdf")
+## normalize
+if(useSpikeInForNorm){
+    message("Normalizing using spikein-derived scale factors")
+    chip_object <- tmmNormalize_chip(chip_object, binsize = 10000, plotfile = "spikein_normalizedCounts.pdf")
+}else{
+    message("Normalizing using TMM (using 10kb background counts)")
+    chip_object <- tmmNormalize_chip(chip_object, binsize = 10000, plotfile = "TMM_normalizedCounts.pdf")
+}
 
 ## get DB regions
-print("Performing differential binding")
+message("Performing differential binding")
 chip_results <- getDBregions_chip(chip_object, plotfile = "DiffBinding_modelfit.pdf")
 
 ## write output

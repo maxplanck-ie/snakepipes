@@ -119,10 +119,32 @@ Like the other workflows, differential expression can be performed using the ``-
 
 .. note:: The first entry defines which group of samples are control. This way, the order of comparison and likewise the sign of values can be changed. The DE analysis might fail if your sample names begin with a number. So watch out for that!
 
+Differential Splicing
+---------------------
+
+In addition to differential expression, differential splicing analysis can be performed by using ``--rMats`` option in addition to supplying a sample sheet. This will invoke the rMats turbo on the samples.
+
 Complex designs with blocking factors
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If the user provides additional columns between 'name' and 'condition' in the sample sheet, the variables stored there will be used as blocking factors in the order they appear in the sample sheet. Eg. if the first line of your sample sheet looks like 'name	batch	condition', this will translate into a formula ``batch + condition``. 'condition' has to be the final column and it will be used for any statistical inference.
+
+Multiple pairwise comparisons
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The user may specify multiple groups of independent comparisons by providing a 'group' column after the 'condition' column. This will cause the sample sheet to be split into the groups defined in this column, and a corresponding number of independent pairwise comparisons will be run, one for each split sheet, and placed in separate output folders named accordingly. This will be applied to DESeq2, sleuth, and rMats pairwise comparisons as requested by the user.
+Specifying a value of 'All' in the 'group' column will cause that sample group to be used in all pairwise comparisons, e.g. if the same set of controls should be used for several different treatment groups.
+
+An example sample sheet with the group information provided looks like this:
+
+name	condition	group
+sample1	Control		All
+sample2	Control		All
+sample3	Treatment	Group1
+sample4	Treatment	Group1
+sample5	Treatment	Group2
+sample6	Treatment	Group2
+
 
 Analysis modes
 --------------

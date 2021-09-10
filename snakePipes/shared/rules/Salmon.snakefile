@@ -1,5 +1,4 @@
 ## Salmon Index
-import os
 
 rule SalmonIndex:
     input:
@@ -16,7 +15,7 @@ rule SalmonIndex:
     log:
         out = "Salmon/SalmonIndex/SalmonIndex.out",
         err = "Salmon/SalmonIndex/SalmonIndex.err",
-    threads: 16
+    threads: lambda wildcards: 16 if 16<max_thread else max_thread
     conda: CONDA_RNASEQ_ENV
     shell: """
         grep "^>" {input[1]} | cut -d " " -f 1 | tr -d ">" > {output[0]}
@@ -92,11 +91,9 @@ rule Salmon_symlinks:
         quant = "Salmon/{sample}/quant.sf"
     output:
         quant = "Salmon/{sample}.quant.sf"
-    params:
-        quant = "{sample}/quant.sf"
-    run:
-        if not os.path.exists(os.path.join(outdir,output.quant)):
-            os.symlink(os.path.join(outdir,input.quant),os.path.join(outdir,output.quant))
+    shell: """
+         ln -s ../{input.quant} {output.quant}
+            """
 
 
 rule Salmon_TPM:

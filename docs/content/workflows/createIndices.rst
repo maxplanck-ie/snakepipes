@@ -45,6 +45,11 @@ There is a configuration file in ``snakePipes/workflows/createIndices/defaults.y
 
 These values are most conveniently set on the command line.
 
+Hybrid genome
+-------------
+
+To create a hybrid fasta, specify the host genome with ``--genomeURL`` and the spikein genome with ``--spikeinGenomeURL``. On top of ``--gtfURL`` and ``--blacklist``, you may optionally provide ``--spikeinGtfURL`` and `--spikeinBlacklist`. Default extention added to spikein chromosomes is '_spikein' and can be changes with ``--spikeinExt``.
+
 Output structure
 ----------------
 

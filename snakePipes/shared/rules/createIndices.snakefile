@@ -25,12 +25,46 @@ def downloadFile(url, output):
 
 
 # Default memory allocation: 20G
-rule createGenomeFasta:
-    output: genome_fasta
-    params:
-        url = genomeURL
-    run:
-        downloadFile(params.url, output)
+if not spikeinGenomeURL:
+    rule createGenomeFasta:
+        output: genome_fasta
+        params:
+            url = genomeURL
+        run:
+            downloadFile(params.url, output)
+
+else:
+    rule createHostGenomeFasta:
+        output: temp(os.path.join(outdir, "genome_fasta/host.genome.fa"))
+        params:
+            url = genomeURL
+        run:
+            downloadFile(params.url, output)
+
+    rule createSpikeinGenomeFasta:
+        output: temp(os.path.join(outdir, "genome_fasta/spikein.genome.fa"))
+        params:
+            url = spikeinGenomeURL
+        run:
+            downloadFile(params.url, output)
+
+    rule renameSpikeinChromsFasta:
+        input: os.path.join(outdir, "genome_fasta/spikein.genome.fa")
+        output: temp(os.path.join(outdir, "genome_fasta/spikein.genome_renamed.fa"))
+        params:
+            spikeinExt = spikeinExt
+        shell: """
+            sed -r 's/\s+/{spikeinExt} /' {input} > {output}
+        """
+
+    rule createGenomeFasta:
+        input:
+            host_fasta = os.path.join(outdir,"genome_fasta/host.genome.fa"),
+            spikein_fasta = os.path.join(outdir,"genome_fasta/spikein.genome_renamed.fa")
+        output: genome_fasta
+        shell: """
+            cat {input.host_fasta} {input.spikein_fasta} > {output}
+        """
 
 
 # Default memory allocation: 1G
@@ -76,10 +110,26 @@ rule make2bit:
 # Default memory allocation: 20G
 rule downloadGTF:
     output: genes_gtf
-    params: 
+    params:
         url = gtfURL
     run:
         downloadFile(params.url, output)
+
+rule downloadSpikeinGTF:
+    output: temp(os.path.join(outdir, "annotation/spikein_genes_ori.gtf"))
+    params:
+        url = spikeinGtfURL
+    run:
+        downloadFile(params.url, output)
+
+rule renameSpikeinChromsGTF:
+    input: os.path.join(outdir,"annotation/spikein_genes_ori.gtf")
+    output: spikein_genes_gtf
+    params:
+        spikeinExt = spikeinExt
+    shell: """
+        awk -v FS='\\t' -v OFS='\\t' '{{ if($1 !~ /^#/){{$1=$1\"{params.spikeinExt}\"; print $0 }} else{{print $0}} }}' {input} > {output}
+    """
 
 
 # Default memory allocation: 1G
@@ -131,18 +181,19 @@ rule extendGenicRegions:
             sys.exit("There are no chromosomes/contigs shared between the fasta and GTF file you have selected!\n")
 
 
-# Default memory allocation: 20G
+# Default memory allocation: 10G
 rule bowtie2Index:
     input: genome_fasta
     output: os.path.join(outdir, "BowtieIndex/genome.rev.2.bt2")
     log: "logs/bowtie2Index.log"
     params:
       basedir = os.path.join(outdir, "BowtieIndex")
-    conda: CONDA_DNA_MAPPING_ENV
-    threads: 10
+    conda: CONDA_CREATE_INDEX_ENV
+    threads: lambda wildcards: 10 if 10<max_thread else max_thread
     shell: """
         ln -s {input} {params.basedir}/genome.fa
         bowtie2-build -t {threads} {params.basedir}/genome.fa {params.basedir}/genome
+        if [[ -f BowtieIndex/genome.rev.2.bt2l ]]; then ln -s genome.rev.2.bt2l {output} ; fi
         2> {log}
         """
 
@@ -153,8 +204,8 @@ rule hisat2Index:
     log: "logs/hisat2Index.log"
     params:
       basedir = os.path.join(outdir, "HISAT2Index")
-    threads: 10
-    conda: CONDA_RNASEQ_ENV
+    threads: lambda wildcards: 10 if 10<max_thread else max_thread
+    conda: CONDA_CREATE_INDEX_ENV
     shell: """
         ln -s {input} {params.basedir}/genome.fa
         hisat2-build -q -p {threads} {params.basedir}/genome.fa {params.basedir}/genome
@@ -167,8 +218,8 @@ rule makeKnownSpliceSites:
     input: genes_gtf
     output: known_splicesites
     log: "logs/makeKnownSpliceSites.log"
-    conda: CONDA_RNASEQ_ENV
-    threads: 10
+    conda: CONDA_CREATE_INDEX_ENV
+    threads: lambda wildcards: 10 if 10<max_thread else max_thread
     shell: """
         hisat2_extract_splice_sites.py {input} > {output} 2> {log}
         """
@@ -181,11 +232,11 @@ rule starIndex:
     log: "logs/starIndex.log"
     params:
       basedir = os.path.join(outdir, "STARIndex")
-    conda: CONDA_RNASEQ_ENV
-    threads: 10
+    conda: CONDA_CREATE_INDEX_ENV
+    threads: lambda wildcards: 10 if 10<max_thread else max_thread
     shell: """
         STAR --runThreadN {threads} --runMode genomeGenerate --genomeDir {params.basedir} --genomeFastaFiles {input} 2> {log}
-        rm Log.out
+        if [[ -w Log.out ]]; then rm -v Log.out; elif [[ -w {params.basedir}/Log.out ]]; then rm -v {params.basedir}/Log.out; fi
         """
 
 
@@ -196,7 +247,7 @@ rule bwaIndex:
     log: "logs/bwaIndex.log"
     params:
       genome = os.path.join(outdir, "BWAIndex", "genome.fa")
-    conda: CONDA_HIC_ENV
+    conda: CONDA_CREATE_INDEX_ENV
     shell: """
         ln -s {input} {params.genome}
         bwa index {params.genome} 2> {log}
@@ -210,7 +261,7 @@ rule bwamethIndex:
     log: "logs/bwamethIndex.log"
     params:
       genome = os.path.join(outdir, "BWAmethIndex", "genome.fa")
-    conda: CONDA_WGBS_ENV
+    conda: CONDA_CREATE_INDEX_ENV
     shell: """
         ln -s {input[0]} {params.genome}
         bwameth.py index {params.genome} 2> {log}
@@ -220,15 +271,31 @@ rule bwamethIndex:
 # Default memory allocation: 1G
 rule copyBlacklist:
     output: os.path.join(outdir, "annotation/blacklist.bed")
-    params: 
+    params:
         url = blacklist
     run:
         downloadFile(params.url, output)
 
+rule copySpikeinBlacklist:
+    output: temp(os.path.join(outdir, "annotation/spikein.blacklist_ori.bed"))
+    params:
+        url = spikeinBlacklist
+    run:
+        downloadFile(params.url, output)
+
+rule renameSpikeinChromsBlacklist:
+    input:  os.path.join(outdir,"annotation/spikein.blacklist_ori.bed")
+    output: spikein_blacklist_bed
+    params:
+        spikeinExt = spikeinExt
+    shell: """
+        awk -v FS='\\t' -v OFS='\\t' '{{ if($1 !~ /^#/){{$1=$1\"{params.spikeinExt}\"; print $0}} else{{print $0}} }}' {input} > {output}
+    """
+
 
 # Default memory allocation: 1G
 rule computeEffectiveGenomeSize:
-    input: genome_fasta
+    input: genome_fasta if not spikeinGenomeURL else os.path.join(outdir,"genome_fasta/host.genome.fa")
     output: os.path.join(outdir, "genome_fasta", "effectiveSize")
     log: "logs/computeEffectiveGenomeSize.log"
     conda: CONDA_SHARED_ENV

@@ -1,5 +1,4 @@
 ### Qualimap bamqc #############################################################
-import os
 
 rule Qualimap_bamqc:
     input:
@@ -15,7 +14,7 @@ rule Qualimap_bamqc:
         err = "Qualimap_qc/logs/Qualimap_bamqc.{sample}.filtered.err"
     benchmark:
         "Qualimap_qc/.benchmark/Qualimap_bamqc.{sample}.filtered.benchmark"
-    threads: 16
+    threads: lambda wildcards: 16 if 16<max_thread else max_thread
     conda: CONDA_DNA_MAPPING_ENV
     shell:
         "unset DISPLAY && "
@@ -34,9 +33,9 @@ rule Qualimap_bamqc_symlink_txt:
         "Qualimap_qc/{sample}.filtered/genome_results.txt"
     output:
         "Qualimap_qc/{sample}.filtered.bamqc_results.txt"
-    run:
-        if not os.path.exists(os.path.join(outdir,output)):
-            os.symlink(os.path.join(outdir,input),os.path.join(outdir,output))
+    shell: """
+         ln -s ../{input} {output}
+            """
 
 
 rule Qualimap_bamqc_symlink_html:
@@ -44,6 +43,6 @@ rule Qualimap_bamqc_symlink_html:
         "Qualimap_qc/{sample}.filtered/qualimapReport.html"
     output:
         "Qualimap_qc/{sample}.filtered.bamqc_report.html"
-    run:
-        if not os.path.exists(os.path.join(outdir,output)):
-            os.symlink(os.path.join(outdir,input),os.path.join(outdir,output))
+    shell: """
+         ln -s ../{input} {output}
+            """

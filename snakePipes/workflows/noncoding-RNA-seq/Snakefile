@@ -53,8 +53,6 @@ include: os.path.join(maindir, "shared", "rules", "tecounts.snakefile")
 ## MultiQC
 include: os.path.join(maindir, "shared", "rules", "multiQC.snakefile")
 
-cf.namesOKinR(samples)
-
 ### conditional/optional rules #################################################
 ################################################################################
 def run_FastQC(fastqc):
@@ -84,6 +82,7 @@ def run_deepTools_qc():
     if "deepTools_qc" in mode:
         file_list = [
         expand("bamCoverage/{sample}.RPKM.bw", sample = samples),
+        expand("bamCoverage/{sample}.scaleFactors.bw",sample = samples),
         expand("bamCoverage/{sample}.coverage.bw", sample = samples),
         expand("bamCoverage/{sample}.uniqueMappings.fwd.bw", sample = samples),
         expand("bamCoverage/{sample}.uniqueMappings.rev.bw", sample = samples),
@@ -104,7 +103,10 @@ def run_deepTools_qc():
 def run_deseq2():
     if sampleSheet:
         sample_name = os.path.splitext(os.path.basename(sampleSheet))[0]
-        file_list = ["DESeq2_{}/DESeq2.session_info.txt".format(sample_name)]
+        if isMultipleComparison:
+            file_list = expand("DESeq2_{}".format(sample_name) + ".{compGroup}/DESeq2.session_info.txt",compGroup=cf.returnComparisonGroups(sampleSheet))
+        else:
+            file_list = ["DESeq2_{}/DESeq2.session_info.txt".format(sample_name)]
         return(file_list)
     return([])
 
@@ -148,11 +150,9 @@ onstart:
 ################################################################################
 
 if not fromBAM:
-    localrules: FASTQ1, FASTQ2
-
+    
     rule all:
         input:
-            expand("FASTQ/{sample}{read}.fastq.gz", sample = samples, read = reads),
             expand("TEcount/{sample}.cntTable", sample = samples),
             run_FastQC(fastqc),
             run_Trimming(trim, fastqc),

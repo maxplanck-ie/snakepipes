@@ -33,7 +33,9 @@ elif mode == "STARsolo":
     fastq_indir_trim = None
     fastq_dir = "originalFASTQ"
     aligner = "STARsolo"
-
+elif mode == "Alevin":
+    fastq_dir = "originalFASTQ"
+    aligner = "salmon"
 ### Initialization #############################################################
 
 infiles = sorted(glob.glob(os.path.join(indir, '*'+ext)))
@@ -48,6 +50,12 @@ if not samples:
 if not cf.is_paired(infiles,ext,reads):
     print("This workflow requires paired-end read data!")
     exit(1)
+
+## print deprecation message for modeGruen
+if mode=="Gruen":
+    print("Mode Gruen has been deprecated! Please use mode STARsolo or Alevin for your analysis.")
+    exit(1)
+
 
 if mode == "STARsolo":
     if myKit == "10Xv2":
@@ -66,6 +74,7 @@ if mode == "STARsolo":
         if not os.path.isfile(BCwhiteList):
             print("Provided barcode whitelist file doesn't exist! Exit...\n")
             exit(1)
+        STARsoloCoords = STARsoloCoords.split(',')
   
 ## After barcode transfer to R2 we have only single end data / R2
 ## but we need to keep "reads" for rule fastq_barcode

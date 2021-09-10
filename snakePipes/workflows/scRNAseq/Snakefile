@@ -37,6 +37,11 @@ elif mode=="STARsolo":
     include: os.path.join(maindir, "shared", "rules", "scRNAseq_STARsolo.snakefile")
     trim=False
     skipRaceID=True
+elif mode=="Alevin":
+    include: os.path.join(maindir, "shared", "rules", "Salmon.snakefile")
+    include: os.path.join(maindir, "shared", "rules", "scRNAseq_Alevin.snakefile")
+    trim=False
+    skipRaceID=True
 pairedEnd = True
 include: os.path.join(maindir, "shared", "rules", "FastQC.snakefile")
 pairedEnd = False
@@ -45,8 +50,6 @@ include: os.path.join(maindir, "shared", "rules", "RNA-seq_qc_report.snakefile")
 include: os.path.join(maindir, "shared", "tools" , "deeptools_cmds.snakefile")
 include: os.path.join(maindir, "shared", "rules", "deepTools_RNA.snakefile")
 include: os.path.join(maindir, "shared", "rules", "multiQC.snakefile")
-
-cf.namesOKinR(samples)
 
 
 ### conditional/optional rules #################################################
@@ -86,12 +89,17 @@ def run_RaceID(skipRaceID):
         return([])
 
 def run_velocyto(skipVelocyto):
-    if not skipVelocyto:
-        file_list = [
-        expand("VelocytoCounts/{sample}.done.txt",sample=samples),
-        "VelocytoCounts_merged/merged.loom"
-        ]
+    if not skipVelocyto :
+        if mode == "STARsolo":
+            file_list = [
+            expand("VelocytoCounts/{sample}.done.txt",sample=samples),
+            "VelocytoCounts_merged/merged.loom"
+            ]
+        elif mode == "Alevin":
+            file_list = [expand("AlevinForVelocity/{sample}/alevin/quants_mat.gz",sample=samples),
+            "SingleCellExperiment/AlevinForVelocity/merged_samples.RDS"]
         return(file_list)
+
     else:
         return([])
 
@@ -134,7 +142,6 @@ onstart:
 ################################################################################
 
 if mode=="Gruen":
-    localrules: origFASTQ1, origFASTQ2
     rule all:
         input:
             expand("FASTQ_barcoded/{sample}{read}.fastq.gz", sample = samples, read=reads[0]),
@@ -159,10 +166,11 @@ if mode=="Gruen":
             "multiQC/multiqc_report.html",
             'Filtered_cells_monocle/Stats_report.html'
 elif mode=="STARsolo":
-    localrules: origFASTQ1, origFASTQ2, gzip_STARsolo_for_seurat
+    localrules: gzip_STARsolo_for_seurat
     rule all:
         input:
             expand("STARsolo/{sample}.sorted.bam",sample = samples),
+            "STARsolo/Report.tsv",
             "Sambamba/flagstat_report_all.tsv",
             run_deeptools_qc(),
             "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv",
@@ -170,8 +178,26 @@ elif mode=="STARsolo":
             "multiQC/multiqc_report.html",
             "Seurat/STARsolo_filtered/merged_samples.RDS",
             "Seurat/STARsolo_raw/merged_samples.RDS",
+            "Seurat/STARsolo_raw_RmEmptyDrops/merged_samples.RDS",
             run_velocyto(skipVelocyto)
-          
+elif mode=="Alevin":
+    localrules: filter_gtf, gtf_to_files, cut_t2g
+    rule all:
+        input:
+            expand("originalFASTQ/{sample}{read}.fastq.gz", sample = samples, read=reads),
+            expand("FastQC/{sample}{read}_fastqc.html", sample = samples, read=reads),
+            "Annotation/genes.filtered.gtf",
+            "Annotation/genes.filtered.t2g",
+            "Annotation/genes.filtered.slim.t2g",
+            "Annotation/genes.filtered.fa",
+            "Salmon/SalmonIndex/decoys.txt",
+            "Salmon/SalmonIndex/seq.bin",
+            "Salmon/SalmonIndex_RNAVelocity/seq.bin",
+            expand("Alevin/{sample}/alevin/quants_mat.gz",sample = samples),
+            expand("multiQC/Alevin_{sample}.html", sample=samples),
+            "multiQC/multiqc_report.html",
+            run_velocyto(skipVelocyto)
+
 
 ### execute after workflow finished ############################################
 ################################################################################

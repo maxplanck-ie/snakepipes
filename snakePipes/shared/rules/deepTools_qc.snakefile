@@ -14,12 +14,13 @@ rule bamCoverage:
         read_extension = "--extendReads" if pairedEnd
                          else "--extendReads {}".format(fragmentLength),
         blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed else "",
+        scaling_factors = ""
     log:
         out = "bamCoverage/logs/bamCoverage.{sample}.out",
         err = "bamCoverage/logs/bamCoverage.{sample}.err"
     benchmark:
         "bamCoverage/.benchmark/bamCoverage.{sample}.benchmark"
-    threads: 16  # 4GB per core
+    threads: lambda wildcards: 16 if 16<max_thread else max_thread  # 4GB per core
     conda: CONDA_SHARED_ENV
     shell: bamcov_cmd
 
@@ -40,12 +41,14 @@ rule bamCoverage_filtered:
                          else "--extendReads {}".format(fragmentLength),
         blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed
                     else "",
+        scaling_factors ="",
+        binSize = ""
     log:
         out = "bamCoverage/logs/bamCoverage.{sample}.filtered.out",
         err = "bamCoverage/logs/bamCoverage.{sample}.filtered.err"
     benchmark:
         "bamCoverage/.benchmark/bamCoverage.{sample}.filtered.benchmark"
-    threads: 16  # 4GB per core
+    threads: lambda wildcards: 16 if 16<max_thread else max_thread  # 4GB per core
     conda: CONDA_SHARED_ENV
     shell: bamcov_cmd
 
@@ -71,7 +74,7 @@ rule plotCoverage:
         err = "deepTools_qc/logs/plotCoverage.err"
     benchmark:
         "deepTools_qc/.benchmark/plotCoverage.benchmark"
-    threads: 24
+    threads: lambda wildcards: 24 if 24<max_thread else max_thread
     conda: CONDA_SHARED_ENV
     shell: plotCoverage_cmd
 
@@ -82,18 +85,21 @@ rule multiBamSummary:
         bams = expand("filtered_bam/{sample}.filtered.bam", sample=samples),
         bais = expand("filtered_bam/{sample}.filtered.bam.bai", sample=samples)
     output:
-        "deepTools_qc/multiBamSummary/read_coverage.bins.npz"
+        npz = "deepTools_qc/multiBamSummary/read_coverage.bins.npz"
     params:
         labels = " ".join(samples),
         blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed else "",
         read_extension = "--extendReads" if pairedEnd
-                         else "--extendReads {}".format(fragmentLength)
+                         else "--extendReads {}".format(fragmentLength),
+        scaling_factors = "--scalingFactors deepTools_qc/multiBamSummary/scaling_factors.txt",
+        binSize = "",
+        spikein_region = ""
     log:
         out = "deepTools_qc/logs/multiBamSummary.out",
         err = "deepTools_qc/logs/multiBamSummary.err"
     benchmark:
         "deepTools_qc/.benchmark/multiBamSummary.benchmark"
-    threads: 24
+    threads: lambda wildcards: 24 if 24<max_thread else max_thread
     conda: CONDA_SHARED_ENV
     shell: multiBamSummary_cmd
 
@@ -183,14 +189,14 @@ rule computeGCBias:
         genome_size = int(genome_size),
         genome_2bit = genome_2bit,
         blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed else "",
-        median_fragment_length = "" if pairedEnd else "-fragmentLength {}".format(fragmentLength),
+        median_fragment_length = "" if pairedEnd else "--fragmentLength {}".format(fragmentLength),
         sampleSize = downsample if downsample and downsample < 10000000 else 10000000
     log:
         out = "deepTools_qc/logs/computeGCBias.{sample}.filtered.out",
         err = "deepTools_qc/logs/computeGCBias.{sample}.filtered.err"
     benchmark:
         "deepTools_qc/.benchmark/computeGCBias.{sample}.filtered.benchmark"
-    threads: 16
+    threads: lambda wildcards: 16 if 16<max_thread else max_thread
     conda: CONDA_SHARED_ENV
     shell: gcbias_cmd
 
@@ -207,6 +213,6 @@ rule bamPE_fragment_size:
     log:
         out = "deepTools_qc/logs/bamPEFragmentSize.out",
         err = "deepTools_qc/logs/bamPEFragmentSize.err"
-    threads: 24
+    threads: lambda wildcards: 24 if 24<max_thread else max_thread
     conda: CONDA_SHARED_ENV
     shell: bamPEFragmentSize_cmd

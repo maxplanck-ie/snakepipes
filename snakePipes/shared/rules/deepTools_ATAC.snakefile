@@ -17,6 +17,6 @@ rule bamCompare_subtract:
         err = "deepTools_ATAC/logs/bamCompare.{sample}.filtered.out"
     benchmark:
         "deepTools_ATAC/.benchmark/deepTools_ATAC/logs/bamCompare.{sample}.filtered.benchmark"
-    threads: 16
+    threads: lambda wildcards: 16 if 16<max_thread else max_thread
     conda: CONDA_SHARED_ENV
     shell: bamcov_cmd

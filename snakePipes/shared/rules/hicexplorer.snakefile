@@ -22,7 +22,7 @@ rule map_fastq_single_end:
     log:
         out = "BWA/logs/{sample}{read}.out",
         err = "BWA/logs/{sample}{read}.err"
-    threads: 15
+    threads: lambda wildcards: 15 if 15<max_thread else max_thread
     conda: CONDA_HIC_ENV
     shell:
         "echo 'mapping {input}' > {log.out} && "
@@ -50,7 +50,7 @@ if(RFResolution is True):
         log:
             out = "HiC_matrices/logs/{sample}_"+matrixFile_suffix+".out",
             err = "HiC_matrices/logs/{sample}_"+matrixFile_suffix+".err"
-        threads: 10
+        threads: lambda wildcards: 10 if 10<max_thread else max_thread
         conda: CONDA_HIC_ENV
         shell:
             "hicBuildMatrix -s {input.R1} {input.R2} "
@@ -68,7 +68,8 @@ else:
     rule build_matrix:
         input:
             R1 = "BWA/{sample}"+reads[0]+".bam",
-            R2 = "BWA/{sample}"+reads[1]+".bam"
+            R2 = "BWA/{sample}"+reads[1]+".bam",
+            bed = enzyme + ".bed"
         output:
             matrix = "HiC_matrices/{sample}_"+matrixFile_suffix+matrix_format,
             qc = "HiC_matrices/QCplots/{sample}_QC/QC.log"
@@ -84,11 +85,12 @@ else:
         log:
             out = "HiC_matrices/logs/{sample}_"+matrixFile_suffix+".out",
             err = "HiC_matrices/logs/{sample}_"+matrixFile_suffix+".err"
-        threads: 10
+        threads: lambda wildcards: 10 if 10<max_thread else max_thread
         conda: CONDA_HIC_ENV
         shell:
             "hicBuildMatrix -s {input.R1} {input.R2} "
             "-bs {params.bin_size} "
+            "-rs {input.bed} "
             "--restrictionSequence {params.res_seq} "
             "--danglingSequence {params.dang_seq} "
             "--minDistance {params.min_dist} "
@@ -193,7 +195,7 @@ rule call_tads:
     params:
         prefix="TADs/{sample}_"+matrixFile_suffix,
         parameters=lambda wildcards: findTADParams if findTADParams else ""
-    threads: 10
+    threads: lambda wildcards: 10 if 10<max_thread else max_thread
     log:
         out = "TADs/logs/{sample}_findTADs.out",
         err = "TADs/logs/{sample}_findTADs.err"

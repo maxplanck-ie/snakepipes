@@ -10,6 +10,8 @@ import glob
 import sys
 import shutil
 from fuzzywuzzy import fuzz
+import smtplib
+from email.message import EmailMessage
 from snakePipes import __version__
 
 
@@ -20,19 +22,22 @@ def set_env_yamls():
     return {'CONDA_SHARED_ENV': 'envs/shared.yaml',
             'CONDA_CREATE_INDEX_ENV': 'envs/createIndices.yaml',
             'CONDA_RNASEQ_ENV': 'envs/rna_seq.yaml',
+            'CONDA_RMATS_ENV': 'envs/rMats.yaml',
             'CONDA_scRNASEQ_ENV': 'envs/sc_rna_seq.yaml',
             'CONDA_seurat3_ENV': 'envs/sc_rna_seq_seurat3.yaml',
             'CONDA_loompy_ENV': 'envs/sc_rna_seq_loompy.yaml',
+            'CONDA_alevinqc_ENV': 'envs/sc_rna_seq_alevinqc.yaml',
+            'CONDA_eisaR_ENV': 'envs/sc_rna_seq_eisaR.yaml',
             'CONDA_DNA_MAPPING_ENV': 'envs/dna_mapping.yaml',
             'CONDA_CHIPSEQ_ENV': 'envs/chip_seq.yaml',
-            'CONDA_HISTONE_HMM_ENV': 'envs/histone_hmm.yaml',
             'CONDA_ATAC_ENV': 'envs/atac_seq.yaml',
             'CONDA_HIC_ENV': 'envs/hic.yaml',
             'CONDA_WGBS_ENV': 'envs/wgbs.yaml',
             'CONDA_RMD_ENV': 'envs/rmarkdown.yaml',
             'CONDA_PREPROCESSING_ENV': 'envs/preprocessing.yaml',
             'CONDA_NONCODING_RNASEQ_ENV': 'envs/noncoding.yaml',
-            'CONDA_SAMBAMBA_ENV': 'envs/sambamba.yaml'}
+            'CONDA_SAMBAMBA_ENV': 'envs/sambamba.yaml',
+            'CONDA_pysam_ENV': 'envs/pysam.yaml'}
 
 
 def merge_dicts(x, y):
@@ -137,11 +142,19 @@ def get_sample_names(infiles, ext, reads):
         x = os.path.basename(x)[:-lext]
         if x.endswith(reads[0]):
             x = x[:-l0]
+            s.add(x)
         elif x.endswith(reads[1]):
             x = x[:-l1]
+            s.add(x)
         else:
-            continue
-        s.add(x)
+            sys.stderr.write("Warning! {} does not have {} as its name suffix. "
+                             "Either change it or modify the 'reads' in the "
+                             "config.yaml to your deired ones.\n".format(x, reads))
+
+    if sorted(list(s)) == []:
+        sys.exit("Error! No sample has the right read suffix ({}). "
+                 "Please modify them or update the config.yaml with "
+                 "your desired suffix.".format(reads))
     return sorted(list(s))
 
 
@@ -171,9 +184,13 @@ def is_paired(infiles, ext, reads):
                 infiles_dic[bname] = [infile]
             else:
                 infiles_dic[bname].append(infile)
-    if infiles_dic and max([len(x) for x in infiles_dic.values()]) == 2:
+    if not infiles_dic:
+        sys.exit("Error: No fastq file has been found to be checked.")
+    values_length = [len(x) for x in infiles_dic.values()]
+    if min(values_length) == 2:
         pairedEnd = True
-    # TODO: raise exception if single-end and paired-end files are mixed
+    elif min(values_length) == 1 and max(values_length) == 2:
+        sys.exit("Error: The directory contains a mixture of paired-end and single-end data!")
     return pairedEnd
 
 
@@ -208,10 +225,130 @@ def check_replicates(sample_info_file):
 
     for k, v in d.items():
         if v < 2:
-            sys.stderr.write("ERROR: The {} group has no replicates!\n".format(k))
+            sys.stderr.write("WARNING: The {} group has no replicates!\n".format(k))
             return False
 
     return True
+
+
+def isMultipleComparison(sampleSheet):
+    f = open(sampleSheet)
+    nCols = None
+    d = dict()
+    for idx, line in enumerate(f):
+        cols = line.strip().split("\t")
+        if idx == 0:
+            if "group" not in cols:
+                return False
+            comparisonGroupCol = cols.index("group")
+            nCols = len(cols)
+            continue
+        elif idx == 1:
+            # Sometimes there's a column of row names, which lack a header
+            if len(cols) - 1 == nCols:
+                comparisonGroupCol += 1
+        if not len(line.strip()) == 0:
+            if cols[comparisonGroupCol] not in d:
+                d[cols[comparisonGroupCol]] = 0
+            d[cols[comparisonGroupCol]] += 1
+    f.close()
+
+    if len(d) > 1:
+        return True
+
+
+def splitSampleSheet(sampleSheet, destination_pfx):
+    f = open(sampleSheet)
+    conditionCol = None
+    nameCol = None
+    comparisonGroupCol = None
+    batchCol = None
+    nCols = None
+    d = dict()
+    for idx, line in enumerate(f):
+        cols = line.strip().split("\t")
+        if idx == 0:
+            conditionCol = cols.index("condition")
+            nameCol = cols.index("name")
+            comparisonGroupCol = cols.index("group")
+            if "batch" in cols:
+                batchCol = cols.index("batch")
+            nCols = len(cols)
+            continue
+        elif idx == 1:
+            # Sometimes there's a column of row names, which lack a header
+            if len(cols) != nCols and len(cols) - 1 != nCols:
+                sys.exit("ERROR: there's a mismatch between the number of columns in the header and body of {}!\n".format(sampleSheet))
+            if len(cols) - 1 == nCols:
+                conditionCol += 1
+                nameCol += 1
+                comparisonGroupCol += 1
+                if batchCol:
+                    batchCol += 1
+            firstCondition = cols[conditionCol]
+        if not len(line.strip()) == 0:
+            if cols[comparisonGroupCol] not in d:
+                d[cols[comparisonGroupCol]] = []
+            if batchCol:
+                d[cols[comparisonGroupCol]].append([cols[nameCol], cols[batchCol], cols[conditionCol]])
+            else:
+                d[cols[comparisonGroupCol]].append([cols[nameCol], cols[conditionCol]])
+
+    f.close()
+
+    if "All" in d.keys():
+        if batchCol:
+            allCondition = d["All"][0][2]
+        else:
+            allCondition = d["All"][0][1]
+        if allCondition == firstCondition:
+            d["All"].reverse()
+    for k in d.keys():
+        if k != "All" and "All" in d.keys():
+            if allCondition == firstCondition:
+                for x in d["All"]:
+                    d[k].insert(0, x)
+            else:
+                d[k].extend(d['All'])
+
+        outfile = os.path.join("splitSampleSheets", '.'.join([os.path.basename(destination_pfx), k, 'tsv']))
+        with open(outfile, 'w') as of:
+            if batchCol:
+                of.write('name\tbatch\tcondition\n')
+            else:
+                of.write('name\tcondition\n')
+            for item in d[k]:
+                of.write('\t'.join(item) + '\n')
+
+    return
+
+
+def returnComparisonGroups(sampleSheet):
+    f = open(sampleSheet)
+    nCols = None
+    d = dict()
+    for idx, line in enumerate(f):
+        cols = line.strip().split("\t")
+        if idx == 0:
+            if "group" not in cols:
+                return False
+            comparisonGroupCol = cols.index("group")
+            nCols = len(cols)
+            continue
+        elif idx == 1:
+            # Sometimes there's a column of row names, which lack a header
+            if len(cols) - 1 == nCols:
+                comparisonGroupCol += 1
+        if not len(line.strip()) == 0:
+            if cols[comparisonGroupCol] not in d:
+                d[cols[comparisonGroupCol]] = 0
+            d[cols[comparisonGroupCol]] += 1
+    f.close()
+
+    if "All" in d.keys():
+        del d['All']
+
+    return d.keys()
 
 
 def sampleSheetGroups(sampleSheet):
@@ -365,8 +502,6 @@ def sendEmail(args, returnCode):
     Try to send an email to the user. Errors must be non-fatal.
     """
     try:
-        import smtplib
-        from email.message import EmailMessage
         msg = EmailMessage()
         msg['Subject'] = "Snakepipes completed"
         msg['From'] = args.emailSender

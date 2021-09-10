@@ -1,6 +1,134 @@
 snakePipes News
 ===============
 
+snakePipes 2.5.1
+----------------
+
+* Updated Bowtie2 parameters for the cut and tag data
+* Updated multibamSummary in ChIPSeq pipeline for data with spike-in
+* Uncommented the BamCompare for ChIPseq pipeline with spike-in
+* set a max thread for each rule 
+* External PR #764: always check for >0 when generating heatmap for the differential analysis done by deseq2 
+  
+snakePipes 2.5.0
+----------------
+
+* Added tbb = 2020.2 to dna_mapping, creatIndices and rnae_seq yaml file
+* Added cut and tag parameters to macs2 and bowtei2. The parameters have been used in Kaya-Okur et al. 2019 and can be called by using --cut_n_tag.
+* Updated azure tests. python37 create envs constantly failing due its long run time. This test is now split into smaller chunks. set_macos is removed since it was completely redundant with the set.yaml
+
+
+snakePipes 2.4.3
+----------------
+
+* Fixed noncoding-RNA-seq workflow without sample sheet.
+* Updated links to prebuilt indices on zenodo.
+* Fixed read length estimation for rMats.
+* Cutadapt is set as default read trimming program for both noncoding-RNA-seq and mRNA-seq workflows.
+
+
+snakePipes 2.4.2
+----------------
+
+* Deeptools coverage RPKM in mRNA-seq and noncoding-RNA-seq worflows now respects blacklist and ingoreForNorm arguments.
+* In mRNA-seq and noncoding-RNA-seq workflow, deeptools qc will now also output DESeq2 size factor-normalized bigwig files.
+* Fixed conda env for WGBS.
+* Fixed control group ordering in split sample sheets in mRNA-seq and other workflows.
+* Removed rule moving bams from allelic mRNA-seq and DNA-mapping workflows.
+
+snakePipes 2.4.1
+----------------
+
+* Fixed sampleSheet splitting for multiple pairwise comparisons when group "All" is not listed.
+
+snakePipes 2.4.0
+----------------
+
+* Added support for multiple pairwise comparisons for DESeq2, sleuth, and rMats in the mRNA-seq workflow, as well as for DESeq2 in the noncoding-RNA-seq workflow.
+* Loompy from conda is now used in mode STARsolo in scRNA-seq workflow.
+* Added bamExt to mRNA-seq and noncoding-RNA-seq commandline arguments.
+* Added multi-thread support to rMats in mRNA-seq workflow.
+* Fixed deepTools GC bias command with SE reads.
+* Bumped HiC explorer version.
+* Fixed STARsoloCoords for Custom kit.
+
+
+snakePipes 2.3.1
+----------------
+
+* Fixed aligner options for bwa in DNA-mapping.
+* Fixed allelic mode for single end reads .
+* Bumped hiC explorer version in HiC.
+
+
+snakePipes 2.3.0
+----------------
+
+* Deprecated mode Gruen in scRNAseq.
+* scRNAseq mode Alevin now outputs spliced/unspliced counts for RNA velocity estimation based on Soneson et al.  2020, bioRxiv https://doi.org/10.1101/2020.03.13.990069 .
+* Fixed "external_gene_name" and "Status" columns in DESeq2 html report.
+* Removed warning when sample names start with a number.
+
+
+snakePipes 2.2.3
+----------------
+
+* Genrich will now run if sampleSheet without replicates is provided.
+* Updated zenodo link to mouse genome GRCm38/mm10 .
+* Fixed start coordinates in Filtered results bed from CSAW.
+
+
+snakePipes 2.2.2
+----------------
+
+* Fix DAG inconsistencies for ChIP-seq and ATAC-seq ran fromBAM and from -d.
+* DESeq2 Rmd file is not deleted anymore in noncoding-RNAseq.
+* Fixed labels in deepTools commands.
+* Allele_info is now boolean.
+
+
+snakePipes 2.2.1
+----------------
+
+* Fix a bug in DAG for ChIPseq allelic with CSAW.
+* Fixed deepTools qc DAG for ChIPseq with spikein.
+* Added DAG test for allelic ChIPseq.
+* Fixed a bug with deepTools QC for allelic mRNAseq.
+
+
+snakePipes 2.2.0
+----------------
+* Added Alevin mode in scRNA workflow
+* Added a new conda environment using to call AlevinQC.
+* Added filtering of empty drops with Dropletutils to scRNA-seq mode STARsolo
+* Added spikein normalization to ChIPseq workflow
+* Added hybrid genome creation to createIndices
+* Added STARsolo report for all samples to STARsolo output folder
+* FASTQ1 and FASTQ2 are not localrules anymore due to buggy logging
+* Included optional differential splicing analysis using rmats within mRNA-seq workflow
+* Symlinks in the output path are relative
+* Increased BBmap version
+* Increased STAR version to 2.7.4a in scRNAseq, noncoding-RNA-seq and mRNA-seq workflows
+* Fixed snakemake version at 5.18.0 due to a bug in DAG handling
+* Minor changes to shared FastQC and multiQC rule with regards to scRNA-seq workflow.
+* Fixed issue with missing input for running the DNA-mapping Snakefile
+* Fixed rule TrimGalore for single end reads
+* deepTools heatmaps for differentially bound regions are now ordered by sample sheet condition
+* Genrich is now run on namesorted bams
+* Workflow help message now points to example sampleSheet on GitHub
+* organismsDir can now be updated with snakePipes config mode "recycle"
+
+.. note::
+   Please be aware that this version requires regeneration of STAR indices!
+
+snakePipes 2.1.2
+----------------
+* small bug fix: SE mode in noncoding-RNA-seq pipeline
+
+snakePipes 2.1.1
+----------------
+* small bug fix: a typo in atac-seq pipeline
+
 snakePipes 2.1.0
 ----------------
 
@@ -90,14 +218,14 @@ snakePipes 1.2.3
  * Fixed CSAW QC plot error with single end reads
  * Updated histone HMM environment to a working conda version
  * Salmon_wasabi is now a localrule
- 
+
 
 snakePipes 1.2.2
 ----------------
 
  * Fixed a bug in the ATAC-seq environment where GenomeInfoDbData was missing.
  * Also an occasional issue with CSAW
- 
+
 
 snakePipes 1.2.1
 ----------------
@@ -106,7 +234,7 @@ snakePipes 1.2.1
  * Implemented complex experimental design in RNAseq (differential gene expression), ChIP/ATACseq (differential binding).
  * Fixed an issue with ggplot2 and log transformation in RNAseq report Rmd.
  * fastqc folder is created and its content will be added to multiqc only if fastqc flag is called.
- * fastqc-trimmed folder is created and its content will be added to multiqc only if both fastqc and trim flags are called. 
+ * fastqc-trimmed folder is created and its content will be added to multiqc only if both fastqc and trim flags are called.
 
 snakePipes 1.2.0
 ----------------

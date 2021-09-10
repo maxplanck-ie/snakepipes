@@ -72,7 +72,7 @@ if optDedupDist > 0:
                 stdout="deduplicatedFASTQ/logs/{sample}.stdout",
                 stderr="deduplicatedFASTQ/logs/{sample}.stderr"
             benchmark: "deduplicatedFASTQ/.benchmarks/{sample}"
-            threads: 20
+            threads: lambda wildcards: 20 if 20<max_thread else max_thread
             conda: CONDA_PREPROCESSING_ENV
             shell: """
                 clumpify.sh -Xmx{params.mem} \
@@ -105,7 +105,7 @@ if optDedupDist > 0:
                 stdout="deduplicatedFASTQ/logs/{sample}.stdout",
                 stderr="deduplicatedFASTQ/logs/{sample}.stderr"
             benchmark: "deduplicatedFASTQ/.benchmarks/{sample}"
-            threads: 20
+            threads: lambda wildcards: 20 if 20<max_thread else max_thread
             conda: CONDA_PREPROCESSING_ENV
             shell: """
                 clumpify.sh -Xmx{params.mem} \
@@ -128,20 +128,19 @@ else:
             output:
                 r1="deduplicatedFASTQ/{sample}" + reads[0] + ext,
                 r2="deduplicatedFASTQ/{sample}" + reads[1] + ext
-            run:
-                if not os.path.exists(os.path.join(outdir,output.r1)):
-                    os.symlink(os.path.join(outdir,input.r1),os.path.join(outdir,output.r1))
-                if not os.path.exists(os.path.join(outdir,output.r2)):
-                    os.symlink(os.path.join(outdir,input.r2),os.path.join(outdir,output.r2))
+            shell: """
+                ln -s ../{input.r1} {output.r1};
+                ln -s ../{input.r2} {output.r2}
+            """
     else:
         rule clumpify:
             input:
                 r1="mergedFASTQ/{sample}" + reads[0] + ext
             output:
                 r1="deduplicatedFASTQ/{sample}" + reads[0] + ext
-            run:
-                if not os.path.exists(os.path.join(outdir,output.r1)):
-                    os.symlink(os.path.join(outdir,input.r1),os.path.join(outdir,output.r1))
+            shell: """
+                ln -s ../{input.r1} {output.r1}
+            """
 
 rule splitFastq2YAML:
     input:

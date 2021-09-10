@@ -30,15 +30,17 @@ Next, install snakePipes.
 Installing snakePipes
 ---------------------
 
-The easiest way to install snakePipes is via our conda channel. The following command install snakePipes and also creates a conda virtual environment named ``snakePipes``, which you can then activate via ``conda activate snakePipes``.
+The easiest way to install snakePipes is via our conda channel. The following command install snakePipes and also creates a conda virtual environment named ``snakePipes``, which you can then activate via ``conda activate snakePipes``. Specifying snakePipes version avoids issues with conda's environment solver.
 
 .. code:: bash
 
-    conda create -n snakePipes -c mpi-ie -c bioconda -c conda-forge snakePipes
+    conda create -n snakePipes -c mpi-ie -c conda-forge -c bioconda snakePipes==2.4.3
 
 This way, the software used within snakePipes do not conflict with the software pre-installed on your terminal or in your python environment.
 
 .. note:: This might take a few minutes depending on the access to conda channels.
+
+snakePipes is going to move to mamba in the future.
 
 Development installation
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -93,6 +95,9 @@ This would show the locations of:
  * **cluster.yaml** Defines execution command for the cluster. See :ref:`cluster`
  * **organisms/<organism>.yaml** : Defines genome indices and annotations for various organisms. See :ref:`organisms`
  * Workflow-specific defaults : Defines default options for our command line wrappers. See :ref:`workflowOpts`
+
+It is a good idea to keep a copy of your defaults.yaml, cluster.yaml and the whole organism folder in a dedicated location e.g. some folder *outside the snakePipes installation folder* named "snakePipes_configs" .
+You can configure snakePipes to use these files after a fresh installation or update with ``snakePipes config --organismsDir my_organisms_dir --clusterConfig my_cluster_config`` . This will also work if you add ``--configMode recycle``.  
 
 
 .. _conda:
@@ -187,10 +192,10 @@ Download premade indices
 
 For the sake of convenience, we provide premade indices for the following organisms:
 
- - `Human (GRCh38, Gencode release 29) <https://zenodo.org/record/2650763>`__
- - `Mouse (GRCm38/mm10, Gencode release m19) <https://zenodo.org/record/3629114>`__
- - `Mouse (GRCm37/mm9, Gencode release 1) <https://zenodo.org/record/2650849>`__
- - `Fruit fly (dm6, Ensembl release 94) <https://zenodo.org/record/2650762>`__
+ - `Human (GRCh38, Gencode release 29) <https://zenodo.org/record/4471116>`__
+ - `Mouse (GRCm38/mm10, Gencode release m19) <https://zenodo.org/record/4468065>`__
+ - `Mouse (GRCm37/mm9, Gencode release 1) <https://zenodo.org/record/4478284>`__
+ - `Fruit fly (dm6, Ensembl release 94) <https://zenodo.org/record/4478414>`__
 
 To use these, simply download and extract them. You will then need to modify the provided YAML file to indicate exactly where the indices are located (i.e., replace ``/data/processing/ryan`` with whatever is appropriate).
 

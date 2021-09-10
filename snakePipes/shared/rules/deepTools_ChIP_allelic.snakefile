@@ -17,12 +17,13 @@ rule bamCompare_log2_genome1:
                          else "--extendReads " + str(fragmentLength),
         blacklist = "--blackListFileName " + blacklist_bed if blacklist_bed
                     else "",
+        scaleFactors = " --scaleFactorsMethod readCount "
     log:
         out = "deepTools_ChIP/logs/bamCompare.log2ratio.{chip_sample}.{control_name}.genome1.out",
         err = "deepTools_ChIP/logs/bamCompare.log2ratio.{chip_sample}.{control_name}.genome1.err"
     benchmark:
         "deepTools_ChIP/.benchmark/bamCompare.log2ratio.{chip_sample}.{control_name}.genome1.benchmark"
-    threads: 16
+    threads: lambda wildcards: 16 if 16<max_thread else max_thread
     shell: bamcompare_log2_cmd
 
 rule bamCompare_log2_genome2:
@@ -41,12 +42,13 @@ rule bamCompare_log2_genome2:
                          else "--extendReads " + str(fragmentLength),
         blacklist = "--blackListFileName " + blacklist_bed if blacklist_bed
                     else "",
+        scaleFactors = " --scaleFactorsMethod readCount "
     log:
         out = "deepTools_ChIP/logs/bamCompare.log2ratio.{chip_sample}.{control_name}.genome2.out",
         err = "deepTools_ChIP/logs/bamCompare.log2ratio.{chip_sample}.{control_name}.genome2.err"
     benchmark:
         "deepTools_ChIP/.benchmark/bamCompare.log2ratio.{chip_sample}.{control_name}.genome2.benchmark"
-    threads: 16
+    threads: lambda wildcards: 16 if 16<max_thread else max_thread
     shell: bamcompare_log2_cmd
 
 ### deepTools plotEnrichment ###################################################
@@ -61,7 +63,7 @@ rule plotEnrichment_allelic:
     conda: CONDA_SHARED_ENV
     params:
         genes_gtf = genes_gtf,
-        labels = " ".join(expand("{sample}_{suffix}", sample = all_samples, suffix = ['genome1', 'genome2'])),
+        labels = " --labels " + " ".join(expand("{sample}_{suffix}", sample = all_samples, suffix = ['genome1', 'genome2'])),
         blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed
                     else "",
         read_extension = "--extendReads" if pairedEnd
@@ -71,7 +73,7 @@ rule plotEnrichment_allelic:
         err = "deepTools_ChIP/logs/plotEnrichment_allelic.err"
     benchmark:
         "deepTools_ChIP/.benchmark/plotEnrichment_allelic.benchmark"
-    threads: 24
+    threads: lambda wildcards: 24 if 24<max_thread else max_thread
     shell: plotEnrich_chip_cmd
 
 
@@ -85,7 +87,7 @@ rule plotFingerprint_allelic:
         metrics = "deepTools_ChIP/plotFingerprint/plotFingerprint.metrics_allelic.txt"
     conda: CONDA_SHARED_ENV
     params:
-        labels = " ".join(expand("{sample}_{suffix}", sample = all_samples, suffix = ['genome1', 'genome2'])),
+        labels = " --labels " + " ".join(expand("{sample}_{suffix}", sample = all_samples, suffix = ['genome1', 'genome2'])),
         blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed
                     else "",
         read_extension = "--extendReads" if pairedEnd
@@ -98,5 +100,5 @@ rule plotFingerprint_allelic:
         err = "deepTools_ChIP/logs/plotFingerprint_allelic.err"
     benchmark:
         "deepTools_ChIP/.benchmark/plotFingerprint_allelic.benchmark"
-    threads: 24
+    threads: lambda wildcards: 24 if 24<max_thread else max_thread
     shell: plotFingerprint_cmd

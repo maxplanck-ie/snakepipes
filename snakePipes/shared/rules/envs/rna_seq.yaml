@@ -3,11 +3,12 @@ channels:
  - conda-forge
  - bioconda
 dependencies:
+# - python >= 3
  - bedtools = 2.29.2
  - samtools = 1.10
  - subread = 2.0.0
  - hisat2 = 2.1.0
- - star = 2.7.3a
+ - star = 2.7.4a
  - salmon = 1.1.0
  - r-base = 3.6.2
  - r-wasabi = 1.0.1
@@ -24,3 +25,5 @@ dependencies:
  - bioconductor-tximport = 1.14.0
  - r-knitcitations
  - bioconductor-apeglm
+ - tbb = 2020.2
+# - rmats = 4.1.0

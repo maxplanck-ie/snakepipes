@@ -1,21 +1,25 @@
-import os
 rule origFASTQ1:
       input:
           indir+"/{sample}"+reads[0]+ext
       output:
           "originalFASTQ/{sample}"+reads[0]+".fastq.gz"
-      run:
-        if not os.path.exists(os.path.join(outdir,output[0])):
-            os.symlink(os.path.join(outdir,input[0]),os.path.join(outdir,output[0]))
+      params:
+            cmd = lambda wildcards, input,output: "ln -s ../{} {}".format(input[0],output[0]) if pipeline=="preprocessing" else "ln -s {} {}".format(input[0],output[0])
+      shell: """
+               {params.cmd}
+          """
 
-rule origFASTQ2:
-      input:
-          indir+"/{sample}"+reads[1]+ext
-      output:
-          "originalFASTQ/{sample}"+reads[1]+".fastq.gz"
-      run:
-        if not os.path.exists(os.path.join(outdir,output[0])):
-            os.symlink(os.path.join(outdir,input[0]),os.path.join(outdir,output[0]))
+if pairedEnd or pipeline=="scrna-seq":
+    rule origFASTQ2:
+        input:
+            indir+"/{sample}"+reads[1]+ext
+        output:
+            "originalFASTQ/{sample}"+reads[1]+".fastq.gz"
+        params:
+            cmd = lambda wildcards, input,output: "ln -s ../{} {}".format(input[0],output[0]) if pipeline=="preprocessing" else "ln -s {} {}".format(input[0],output[0])
+        shell: """
+               {params.cmd}
+            """
 
 if downsample:
     if pairedEnd:
@@ -31,12 +35,12 @@ if downsample:
                 num_reads = downsample
             benchmark:
                 "FASTQ/.benchmark/FASTQ_downsample.{sample}.benchmark"
-            threads: 10
+            threads: lambda wildcards: 10 if 10<max_thread else max_thread
             conda: CONDA_SHARED_ENV
             shell: """
                 seqtk sample -s 100 {input.r1} {params.num_reads} | pigz -p {threads} -9 > {output.r1} 2> {log}
                 seqtk sample -s 100 {input.r2} {params.num_reads} | pigz -p {threads} -9 > {output.r2} 2>> {log}
-                
+
                 """
     else:
         rule FASTQdownsample:
@@ -45,7 +49,7 @@ if downsample:
             output:
                 fq = "originalFASTQ/downsample_{sample}.fastq.gz"
             log: "originalFASTQ/logs/{sample}.FASTQdownsample.log"
-            threads: 12
+            threads: lambda wildcards: 12 if 12<max_thread else max_thread
             params:
                 num_reads = downsample
             conda: CONDA_SHARED_ENV

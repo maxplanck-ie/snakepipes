@@ -44,7 +44,7 @@ gr = GRanges(seqnames=d$CHROM,
 colnames(elementMetadata(gr)) = gsub("mcols.", "", colnames(elementMetadata(gr)))
 
 # Get the genes
-gtf = makeTxDbFromGFF(gtfFile, format="gtf")
+gtf = GenomicFeatures::makeTxDbFromGFF(gtfFile, format="gtf")
 g = genes(gtf)
 
 # Subset g to only contain seqlevels in gr

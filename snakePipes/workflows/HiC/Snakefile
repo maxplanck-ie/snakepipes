@@ -137,7 +137,6 @@ onstart:
 
 ### main rule ##################################################################
 ################################################################################
-localrules: FASTQ1, FASTQ2
 
 rule all:
     input:
@@ -148,7 +147,7 @@ rule all:
         run_build_matrices(),
         expand("HiC_matrices/QCplots/{sample}_QC/QC.log", sample = samples),
         run_dist_vs_count(),
-        #"multiQC/multiqc_report.html"
+        "multiQC/multiqc_report.html"
 
 ### execute after workflow finished ############################################
 ################################################################################

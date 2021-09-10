@@ -8,7 +8,7 @@ bamcompare_log2_cmd = """
                -b2 {input.control_bam} \
                -o {output} \
                --operation log2 \
-               --scaleFactorsMethod readCount \
+               {params.scaleFactors} \
                {params.ignoreForNorm} \
                --binSize {params.bwBinSize} \
                -p {threads} \
@@ -22,7 +22,7 @@ bamcompare_subtract_cmd = """
                -b2 {input.control_bam} \
                -o {output} \
                --operation subtract \
-               --scaleFactorsMethod readCount \
+               {params.scaleFactors} \
                {params.ignoreForNorm} \
                --binSize {params.bwBinSize} \
                -p {threads} \
@@ -42,10 +42,11 @@ bamcov_raw_cmd = """
 bamcov_RPKM_cmd = """
     bamCoverage -b {input.bam} \
         -o {output} --binSize {params.bwBinSize} \
-        -p {threads} --normalizeUsing RPKM > {log.out} 2> {log.err}
+        -p {threads} --normalizeUsing RPKM {params.ignoreForNorm} \
+        {params.blacklist}  > {log.out} 2> {log.err}
     """
 
-# bamCoverage RNA-seq unique mappings 
+# bamCoverage RNA-seq unique mappings
 bamcov_unique_cmd = """
     bamCoverage -b {input.bam} \
         -o {output.bw_fwd} --binSize {params.bwBinSize} \
@@ -56,7 +57,7 @@ bamcov_unique_cmd = """
         --minMappingQuality 10 --samFlagExclude 2304 --filterRNAstrand reverse \
         -p {threads} >> {log.out} 2>> {log.err}
     """
-    
+
 
 # bamCoverage CHIP
 bamcov_cmd = """
@@ -68,6 +69,19 @@ bamcov_cmd = """
                 --effectiveGenomeSize {params.genome_size} \
                 {params.ignoreForNorm} \
                 {params.blacklist} \
+                {params.read_extension} > {log.out} 2> {log.err}
+"""
+
+bamcov_spikein_cmd = """
+    bamCoverage -b {input.bam} \
+                -o {output} \
+                --binSize {params.bwBinSize} \
+                -p {threads} \
+                --normalizeUsing None \
+                --effectiveGenomeSize {params.genome_size} \
+                {params.ignoreForNorm} \
+                {params.blacklist} \
+                {params.scaling_factors} \
                 {params.read_extension} > {log.out} 2> {log.err}
     """
 
@@ -102,7 +116,7 @@ plotEnrich_chip_cmd = """
         -b {input.bams} \
         --BED {params.genes_gtf} \
         --plotFile {output.png} \
-        --labels {params.labels} \
+        {params.labels} \
         --plotTitle 'Signal enrichment (fraction of reads) without duplicates' \
         --outRawCounts {output.tsv} \
         --variableScales \
@@ -116,7 +130,7 @@ plotEnrich_chip_cmd = """
 plotFingerprint_cmd = """
     plotFingerprint \
             -b {input.bams} \
-            --labels {params.labels} \
+            {params.labels} \
             --plotTitle 'Cumulative read counts per bin without duplicates' \
             --ignoreDuplicates \
             --outQualityMetrics {output.metrics} \
@@ -132,10 +146,26 @@ plotFingerprint_cmd = """
 multiBamSummary_cmd = """
     multiBamSummary bins \
                     -b {input.bams} \
-                    -o {output} \
+                    -o {output.npz} \
                     --labels {params.labels} \
-                    --binSize 1000 \
                     {params.blacklist} \
+                    {params.scaling_factors} \
+                    {params.binSize} \
+                    {params.spikein_region} \
+                    -p {threads} \
+                    {params.read_extension} > {log.out} 2> {log.err}
+    """
+
+# multiBAMsum ChIP with spikein
+multiBamSummary_spikein_cmd = """
+    multiBamSummary BED-file \
+                    --BED {input.bed} \
+                    -b {input.bams} \
+                    -o {output.npz} \
+                    --labels {params.labels} \
+                    {params.blacklist} \
+                    {params.scaling_factors} \
+                    {params.binSize} \
                     -p {threads} \
                     {params.read_extension} > {log.out} 2> {log.err}
     """
@@ -148,6 +178,19 @@ multiBWsum_bed_cmd = """
                 -o {output} \
                 --labels {params.labels} \
                 --binSize 1000 \
+                -p {threads} > {log.out} 2> {log.err}
+    """
+
+# multiBamSum RNA
+multiBamSum_bed_cmd = """
+    multiBamSummary BED-file \
+                --BED {input.bed} \
+                -b {input.bam} \
+                -o {output.npz} \
+                --labels {params.labels} \
+                --binSize 100 \
+                --scalingFactors {output.scalingFactors} \
+                {params.blacklist} \
                 -p {threads} > {log.out} 2> {log.err}
     """
 

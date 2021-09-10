@@ -11,6 +11,6 @@ dependencies:
  - fastqc = 0.11.9
  - cutadapt = 2.8
  - trim-galore = 0.6.5
- - multiqc = 1.8
+ - multiqc = 1.10.1
  - fastp = 0.20.0
  - umi_tools = 1.0.1

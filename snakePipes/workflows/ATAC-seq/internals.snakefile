@@ -21,7 +21,8 @@ if not fromBAM:
     for sample in samples:
         req_files = [
             os.path.join(workingdir, "filtered_bam/"+sample+".filtered.bam"),
-            os.path.join(workingdir, "filtered_bam/"+sample+".filtered.bam.bai")
+            os.path.join(workingdir, "filtered_bam/"+sample+".filtered.bam.bai"),
+            os.path.join(workingdir, "bamCoverage/"+sample+".filtered.seq_depth_norm.bw")
             ]
 
         # check for all samples whether all required files exist
@@ -68,5 +69,6 @@ def filter_dict(sampleSheet):
 if sampleSheet:
     filtered_dict = filter_dict(sampleSheet)
     genrichDict = cf.sampleSheetGroups(sampleSheet)
+    reordered_dict = {k: filtered_dict[k] for k in [item for sublist in genrichDict.values() for item in sublist]}
 else:
     genrichDict = {"all_samples": samples}

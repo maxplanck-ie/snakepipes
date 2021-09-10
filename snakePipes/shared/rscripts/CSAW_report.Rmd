@@ -22,13 +22,14 @@ This report summarizes statistical analysis of binding events using group inform
 
 ```{r data_load}
 DBdata<-file.path(snakemake@params[["outdir"]], "DiffBinding_analysis.Rdata")
+useSpikeInForNorm<-snakemake@params[["useSpikeInForNorm"]]
 suppressMessages(require(GenomicRanges))
 suppressMessages(require(csaw))
 load(DBdata)
 ```
 
-Input to the differential binding analysis were `r length(chip_object$windowCounts)` genomic bins of size `r width(chip_object$windowCounts)[1]` bp having any overlap to the union of MACS2 peaks from all samples listed in the sample sheet.   
-Size factors were calculated via TMM normalization of read counts obtained for 10kb genomic bins and amounted to `r chip_object$normFactors`.   
+Input to the differential binding analysis were `r length(chip_object$windowCounts)` genomic bins of size `r width(chip_object$windowCounts)[1]` bp having any overlap to the union of `r unlist(strsplit(snakemake@output[["outfile"]],"_"))[2]` peaks from all samples listed in the sample sheet.   
+Size factors were calculated via `r ifelse(useSpikeInForNorm,"spikein normalization","TMM normalization of read counts obtained for 10kb genomic bins")` and amounted to `r chip_object$normFactors`.   
 
 ### Statistical analysis
 
@@ -71,7 +72,7 @@ Deeptools matrices were computed for the filtered lists of merged regions showin
 Heatmaps obtained using log2 ratio of ChIP signal over input were as follows:
 
 ```{r plot_l2r,fig.show='hold',fig.align='center', out.width ='40%',out.height='30%',fig.cap="UP and DOWN regions using log2 ratio."}
-if(!snakemake@params[["pipeline"]] %in% "chip-seq"){
+if(sum(grepl("log2r.heatmap.png",snakemake@input[["csaw_in"]]))<1){
     message("ChIP signal enrichment over input is only available for ChIP-seq workflow!")
 }else{
     knitr::include_graphics(c(file.path(snakemake@params[["outdir"]], "CSAW.UP.log2r.heatmap.png"),

@@ -1,3 +1,20 @@
+def get_scaling_factor(sample,input):
+    sample_names=[]
+    scale_factors=[]
+    if os.path.isfile(os.path.join(outdir,input)):
+        with open(os.path.join(outdir,input)) as f:
+            for idx, line in enumerate(f):
+                if idx > 0:
+                    sample_names.append(line.split('\t')[0])
+                    scale_factors.append((line.split('\t')[1]).rstrip("\n"))
+        sf_dict = dict(zip(sample_names, scale_factors))
+        scale_factor = sf_dict[sample]
+
+        return float(scale_factor)
+    else:
+        return float(1)
+
+
 rule bamCoverage_unique_mappings:
     input:
         bam = "filtered_bam/{sample}.filtered.bam",
@@ -27,7 +44,9 @@ rule bamCoverage_RPKM:
     conda:
         CONDA_SHARED_ENV
     params:
-        bwBinSize = bwBinSize
+        bwBinSize = bwBinSize,
+        blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed else "",
+        ignoreForNorm = "--ignoreForNormalization {}".format(ignoreForNormalization) if ignoreForNormalization else ""
     log:
         out="bamCoverage/logs/bamCoverage_RPKM.{sample}.out",
         err="bamCoverage/logs/bamCoverage_RPKM.{sample}.err"
@@ -56,6 +75,52 @@ rule bamCoverage_raw:
     shell: bamcov_raw_cmd
 
 
+rule multiBamSummary_bed:
+    input:
+        bam = expand("filtered_bam/{sample}.filtered.bam",sample=samples),
+        bai = expand("filtered_bam/{sample}.filtered.bam.bai",sample=samples),
+        bed = "Annotation/genes.filtered.bed"
+    output:
+        scalingFactors = "deepTools_qc/multiBamSummary/scalingFactors.tsv",
+        npz = "deepTools_qc/multiBamSummary/results.npz"
+    conda:
+        CONDA_SHARED_ENV
+    params:
+        labels = " ".join(samples),
+        blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed else ""
+    log:
+        out="deepTools_qc/logs/multiBamSummary.out",
+        err="deepTools_qc/logs/multiBamSummary.err"
+    benchmark:
+        "deepTools_qc/.benchmark/multiBamSummary.bed.benchmark"
+    threads: 8
+    shell: multiBamSum_bed_cmd
+
+rule bamCoverage_scaleFactors:
+    input:
+        bam = "filtered_bam/{sample}.filtered.bam",
+        bai = "filtered_bam/{sample}.filtered.bam.bai",
+        scalingFactors = "deepTools_qc/multiBamSummary/scalingFactors.tsv"
+    output:
+        "bamCoverage/{sample}.scaleFactors.bw"
+    conda:
+        CONDA_SHARED_ENV
+    params:
+        scaling_factors = lambda wildcards,input: "--scaleFactor {}".format(get_scaling_factor(wildcards.sample,input.scalingFactors)),
+        genome_size = int(genome_size),
+        bwBinSize = bwBinSize,
+        blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed else "",
+        ignoreForNorm = "--ignoreForNormalization {}".format(ignoreForNormalization) if ignoreForNormalization else "",
+        read_extension = ""
+    log:
+        out="bamCoverage/logs/bamCoverage_scaleFactors.{sample}.out",
+        err="bamCoverage/logs/bamCoverage_scaleFactors.{sample}.err"
+    benchmark:
+        "bamCoverage/.benchmark/bamCoverage_scaleFactors.{sample}.benchmark"
+    threads: 8
+    shell: bamcov_spikein_cmd
+
+
 rule plotEnrichment:
     input:
         bam = expand("filtered_bam/{sample}.filtered.bam", sample=samples),
@@ -74,7 +139,7 @@ rule plotEnrichment:
         err="deepTools_qc/logs/plotEnrichment.err"
     benchmark:
         "deepTools_qc/.benchmark/plotEnrichment.benchmark"
-    threads: 24
+    threads: lambda wildcards: 24 if 24<max_thread else max_thread
     shell: plotEnrich_cmd
 
 
@@ -110,7 +175,7 @@ rule plotCorr_bed_pearson:
         err="deepTools_qc/logs/plotCorrelation_pearson.err"
     benchmark:
         "deepTools_qc/.benchmark/plotCorrelation_pearson.benchmark"
-    params: 
+    params:
         plotcmd = "" if plotFormat == 'None' else
             "--plotFile " + "deepTools_qc/plotCorrelation/correlation.pearson.bed_coverage.heatmap." + plotFormat,
         title='genes'
@@ -130,7 +195,7 @@ rule plotCorr_bed_spearman:
         err="deepTools_qc/logs/plotCorrelation_spearman.err"
     benchmark:
         "deepTools_qc/.benchmark/plotCorrelation_spearman.benchmark"
-    params:        
+    params:
         plotcmd = "" if plotFormat == 'None' else
             "--plotFile " + "deepTools_qc/plotCorrelation/correlation.spearman.bed_coverage.heatmap." + plotFormat,
         title='genes'
@@ -150,7 +215,7 @@ rule plotPCA:
         err="deepTools_qc/logs/plotPCA.err",
     benchmark:
         "deepTools_qc/.benchmark/plotPCA.benchmark"
-    params: 
+    params:
         plotcmd = "" if plotFormat == 'None' else
                 "--plotFile " + "deepTools_qc/plotPCA/PCA.bed_coverage." + plotFormat,
         title='genes'
@@ -187,5 +252,5 @@ rule bamPE_fragment_size:
     log:
         out="deepTools_qc/logs/bamPEFragmentSize.out",
         err="deepTools_qc/logs/bamPEFragmentSize.err"
-    threads: 24
+    threads: lambda wildcards: 24 if 24<max_thread else max_thread
     shell: bamPEFragmentSize_cmd

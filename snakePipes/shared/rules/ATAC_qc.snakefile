@@ -7,7 +7,7 @@ rule plotFingerprint:
     output:
         metrics = os.path.join(deeptools_ATAC, "plotFingerprint/plotFingerprint.metrics.txt")
     params:
-        labels = " ".join(samples),
+        labels = " --labels " + " ".join(samples),
         blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed
                     else "",
         read_extension = "--extendReads",
@@ -20,7 +20,7 @@ rule plotFingerprint:
         err = os.path.join(deeptools_ATAC, "logs/plotFingerprint.err")
     benchmark:
         os.path.join(deeptools_ATAC, ".benchmark/plotFingerprint.benchmark")
-    threads: 24
+    threads: lambda wildcards: 24 if 24<max_thread else max_thread
     conda: CONDA_SHARED_ENV
     shell: plotFingerprint_cmd
 
@@ -32,7 +32,7 @@ rule plotFingerprint_allelic:
     output:
         metrics = os.path.join(deeptools_ATAC, "plotFingerprint", "plotFingerprint.metrics_allelic.txt")
     params:
-        labels = " ".join(expand("{sample}_{suffix}", sample = samples, suffix = ['genome1', 'genome2'])),
+        labels = " --labels " + " ".join(expand("{sample}_{suffix}", sample = samples, suffix = ['genome1', 'genome2'])),
         blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed
                     else "",
         read_extension = "--extendReads",
@@ -44,7 +44,7 @@ rule plotFingerprint_allelic:
         err = os.path.join(deeptools_ATAC, "logs/plotFingerprint_allelic.err")
     benchmark:
         os.path.join(deeptools_ATAC, ".benchmark/plotFingerprint_allelic.benchmark")
-    threads: 24
+    threads: lambda wildcards: 24 if 24<max_thread else max_thread
     conda: CONDA_SHARED_ENV
     shell: plotFingerprint_cmd
 
@@ -64,7 +64,7 @@ rule MACS2_peak_qc:
         genome_index = genome_index
     benchmark:
         os.path.join(outdir_ATACqc, ".benchmark/ATAC_qc.{sample}.filtered.benchmark")
-    conda: CONDA_ATAC_ENV
+    conda: CONDA_SHARED_ENV
     shell: """
         # get the number of peaks
         peak_count=`cat {params.peaks} | wc -l`
@@ -85,5 +85,5 @@ rule MACS2_peak_qc:
         genomecov=`bc -l <<< "$peak_len/$genome_size"`
 
         # write peak-based QC metrics to output file
-        printf "peak_count\tFRiP\tpeak_genome_coverage\n%d\t%5.3f\t%6.4f\n" $peak_count $frip $genomecov > {output.qc} >2 {log}
+        printf "peak_count\tFRiP\tpeak_genome_coverage\n%d\t%5.3f\t%6.4f\n" $peak_count $frip $genomecov > {output.qc} 2> {log}
         """

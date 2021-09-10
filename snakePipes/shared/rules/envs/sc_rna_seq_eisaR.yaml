@@ -1,0 +1,19 @@
+name: snakepipes_eisaR_environment_v1.0
+channels:
+ - conda-forge
+ - bioconda
+dependencies:
+ - bioconductor-biostrings
+ - bioconductor-rtracklayer
+ - r-dplyr
+ - bioconductor-genomicfeatures
+ - bioconductor-biocgenerics
+ - bioconductor-bsgenome
+ - bioconductor-genomicranges
+ - bioconductor-tximeta
+ - bioconductor-summarizedexperiment
+ - bioconductor-singlecellexperiment
+ - bioconductor-scater
+ - bioconductor-biocparallel
+ - bioconductor-biocsingular
+ - bioconductor-fishpond

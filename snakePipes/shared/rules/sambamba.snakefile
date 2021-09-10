@@ -1,5 +1,4 @@
 ##sambamba is used for marking up duplications
-import os
 
 ## see Bowtie2.snakefile or RNA_mapping.snakefile for input
 ## takes the input from RNA mapping or DNA mapping snakefile
@@ -9,7 +8,7 @@ rule sambamba_markdup:
            aligner+"/{sample}.sorted.bam"
        output:
            aligner+"/{sample}.bam"# duplicate marked
-       threads: 10
+       threads: lambda wildcards: 10 if 10<max_thread else max_thread
        log:
            out=aligner + "/logs/{sample}.sambamba_markdup.out",
            err=aligner + "/logs/{sample}.sambamba_markdup.err"
@@ -23,6 +22,7 @@ rule sambamba_markdup:
            sambamba markdup -t {threads} --sort-buffer-size=6000 --overflow-list-size 600000 --tmpdir $MYTEMP {input} {output} 2> {log.err} > {log.out}
            rm -rf "$MYTEMP"
            """
+
 ## get statistics
 rule sambamba_flagstat_sorted:
        input:

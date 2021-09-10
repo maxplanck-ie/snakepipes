@@ -15,15 +15,16 @@ import snakePipes.common_functions as cf
 import snakePipes.parserCommon as parserCommon
 
 
-
 def parse_args(defaults={"verbose": False, "configFile": None,
                          "clusterConfigFile": None, "maxJobs": 5,
                          "snakemakeOptions": "--use-conda", "tempDir": None,
-                         "pairedEnd": True, "fragmentLength":200, "bwBinSize": 25, "qval": 0.001, "sampleSheet": "",
-                         "windowSize": 150, "predictChIPDict": None,
-                         "bigWigType": "both", "mfold": "0 50", "peakCaller": "MACS2",
-                         "plotFormat": "png","fromBAM": False, "bamExt": ".filtered.bam",
-                         "fdr": 0.05, "absBestLFC": 1}):
+                         "pairedEnd": True, "fragmentLength":200, "bwBinSize": 25,
+                         "windowSize": 150, "predictChIPDict": None, "fromBAM": False,
+                         "bigWigType": "both", "peakCaller": "MACS2", "sampleSheet": "",
+                         "plotFormat": "png", "bamExt": ".filtered.bam", "fdr": 0.05,
+                         "absBestLFC": 1, "useSpikeinForNorm": False, "spikeinExt": "_spikein",
+                         "peakCallerOptions": "--qvalue 0.001","cutntag": False,
+                         "getSizeFactorsFrom": "genome"}):
 
     """
     Parse arguments from the command line.
@@ -48,10 +49,38 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                           choices=["MACS2", "Genrich"],
                           default=defaults['peakCaller'])
 
+    optional.add_argument("--peakCallerOptions",
+                          help="Custom options to set for the peak caller. Default is '%(default)s'.",
+                          default=defaults['peakCallerOptions'])
+
+    optional.add_argument("--cutntag",
+                          help="if set, MACS2 peakCaller is used with the parameters have been used "
+                          "in the method section of Meers et al. 2019, Kaya-Okur et al. 2019 and 2020. "
+                          "Setting this flag overwrites the '--peakCallerOptions'."
+                          " Default is '%(default)s'.",
+                          action="store_true")
+
     optional.add_argument("--singleEnd",
                           dest="pairedEnd",
                           action="store_false",
                           help="Input data is single-end, not paired-end")
+
+    optional.add_argument("--useSpikeInForNorm",
+                          dest="useSpikeInForNorm",
+                          action="store_true",
+                          help="Use the spikeIn chromosomes of the hybrid genome for normalization.")
+
+    optional.add_argument("--getSizeFactorsFrom",
+                          dest="getSizeFactorsFrom",
+                          action="store",
+                          choices=["genome", "TSS", "input"],
+                          help="Which part of the spikein genome to use to calculate sizeFactors from.",
+                          default=defaults['getSizeFactorsFrom'])
+
+    optional.add_argument("--spikeinExt",
+                          dest="spikeinExt",
+                          help="Extention of spikein chromosome names in the hybrid genome. Ignored if useSpikeInForNorm is False (default: '%(default)s') .",
+                          default=defaults["spikeinExt"])
 
     optional.add_argument("--bigWigType",
                           help="Type of bigWig file to create. Options are: 'subtract' (control-subtracted ChIP coverage), 'log2ratio' (for log2 ratio of ChIP over control) or 'both' (create both set of bed files). Note that the allele-specific mode currently only produces 'log2ratio' bigwigs. (default: '%(default)s')",
@@ -70,16 +99,9 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                           type=int,
                           default=defaults["bwBinSize"])
 
-    optional.add_argument("--qval",
-                          dest="qval",
-                          metavar="INT",
-                          help="qvalue threshold for MACS2(default: '%(default)s')",
-                          type=float,
-                          default=defaults['qval'])
-
     optional.add_argument("--sampleSheet",
                           help="Information on samples (If differential binding analysis required); see "
-                               "'docs/content/sampleSheet.example.tsv' for example. "
+                               "'https://github.com/maxplanck-ie/snakepipes/tree/master/docs/content/sampleSheet.example.tsv' for example. "
                                "IMPORTANT: The first entry defines which group of samples are control. "
                                "By this, the order of comparison and likewise the sign of values can be changed! "
                                "Also, the condition `control` should only be used for input samples (control peaks "
@@ -116,15 +138,6 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          choices=['png', 'pdf', 'None'],
                          help="Format of the output plots from deepTools. Select 'none' for no plots (default: '%(default)s')",
                          default=defaults["plotFormat"])
-
-    optional.add_argument("--mfold",
-                         dest="mfold",
-                         metavar="INT INT",
-                         type=str,
-                         help="Select the regions within MFOLD range of high-confidence enrichment ratio against background to build model." 
-                              "Fold-enrichment in regions must be lower than upper limit, and higher than the lower limit. Use as \"-m 10 30\"." 
-                              "This setting is only used while building the shifting model. Tweaking it is not recommended. DEFAULT:5 50 (default: '%(default)s')",
-                         default=defaults["mfold"])
 
     optional.add_argument("--FDR",
                           dest="fdr",
