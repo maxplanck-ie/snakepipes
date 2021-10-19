@@ -40,7 +40,7 @@ Workflows available
 Installation
 -------------
 
-Snakepipes uses conda for installation and dependency resolution, so you will need to `install conda <https://conda.io/docs/user-guide/install/index.html>`__ first.
+Snakepipes is a set of Snakemake workflows which use conda for installation and dependency resolution, so you will need to `install conda <https://conda.io/docs/user-guide/install/index.html>`__ first.
 
 Afterward, simply run the following:
 
