@@ -18,7 +18,7 @@ setup(
     scripts=scripts,
     packages=find_packages(),
     include_package_data=True,
-    python_requires='>3.7',
+    python_requires='>=3.7',
     install_requires=requires,
     url='https://github.com/maxplanck-ie/snakepipes',
     license='MIT',
