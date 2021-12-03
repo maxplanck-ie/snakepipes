@@ -1,6 +1,17 @@
 snakePipes News
 ===============
 
+snakePipes 2.5.2
+----------------
+
+* snakemake version >= 6.2.1
+* python version >= 3.7
+* added snakeMake in readme
+* bug fix 777, 781
+* multiqc version = 1.10.1 to be able to report qc fir hic pipeline
+* added snakemake catalog yaml
+
+
 snakePipes 2.5.1
 ----------------
 

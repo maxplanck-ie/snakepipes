@@ -15,7 +15,7 @@ snakePipes
     :alt: Citation
 
 
-snakePipes are flexible and powerful workflows built using `snakemake <snakemake.readthedocs.io>`__ that simplify the analysis of NGS data.
+snakePipes are flexible and powerful workflows built using `Snakemake <https://snakemake.readthedocs.io>`__ that simplify the analysis of NGS data.
 
 .. image:: ./docs/content/images/snakePipes_small.png
    :scale: 20 %
@@ -40,7 +40,7 @@ Workflows available
 Installation
 -------------
 
-Snakepipes uses conda for installation and dependency resolution, so you will need to `install conda <https://conda.io/docs/user-guide/install/index.html>`__ first.
+Snakepipes is a set of Snakemake workflows which use conda for installation and dependency resolution, so you will need to `install conda <https://conda.io/docs/user-guide/install/index.html>`__ first.
 
 Afterward, simply run the following:
 

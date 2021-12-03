@@ -30,7 +30,8 @@ def multiqc_input_check(return_value):
     if pipeline=="dna-mapping":
         # pipeline is DNA-mapping
         if aligner=="Bowtie2":
-            infiles.append( expand("Bowtie2/{sample}.Bowtie2_summary.txt", sample = samples) +
+            infiles.append("deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv")
+            infiles.append(expand("Bowtie2/{sample}.Bowtie2_summary.txt", sample = samples) +
                     expand("Sambamba/{sample}.markdup.txt", sample = samples) +
                     expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample=samples))
             indir += " Sambamba "
