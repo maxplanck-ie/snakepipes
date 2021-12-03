@@ -15,7 +15,7 @@ snakePipes
     :alt: Citation
 
 
-snakePipes are flexible and powerful workflows built using `snakemake <snakemake.readthedocs.io>`__ that simplify the analysis of NGS data.
+snakePipes are flexible and powerful workflows built using `Snakemake <https://snakemake.readthedocs.io>`__ that simplify the analysis of NGS data.
 
 .. image:: ./docs/content/images/snakePipes_small.png
    :scale: 20 %
