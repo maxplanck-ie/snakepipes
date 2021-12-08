@@ -4,11 +4,11 @@ pr:
 jobs:
 - job: 'flake'
   pool:
-    vmImage: 'ubuntu-16.04'
+    vmImage: 'ubuntu-20.04'
   strategy:
     matrix:
       Python37:
-        python.version: '3.7'
+        python.version: '3.9'
     maxParallel: 1
 
   steps:
@@ -22,11 +22,11 @@ jobs:
 
 - job: 'CI_tests'
   pool:
-    vmImage: 'ubuntu-16.04'
+    vmImage: 'ubuntu-20.04'
   strategy:
     matrix:
       Python37:
-        python.version: '3.7'
+        python.version: '3.9'
     maxParallel: 1
 
   steps:
@@ -40,11 +40,11 @@ jobs:
 
 - job: 'docs'
   pool:
-    vmImage: 'ubuntu-16.04'
+    vmImage: 'ubuntu-20.04'
   strategy:
     matrix:
       Python37:
-        python.version: '3.7'
+        python.version: '3.9'
     maxParallel: 1
 
   steps:
@@ -59,11 +59,11 @@ jobs:
 
 - job: 'envs'
   pool:
-    vmImage: 'ubuntu-16.04'
+    vmImage: 'ubuntu-20.04'
   strategy:
     matrix:
       Python37:
-        python.version: '3.7'
+        python.version: '3.9'
     maxParallel: 1
 
   steps:
@@ -71,9 +71,9 @@ jobs:
     displayName: Add conda to PATH
   - template: .azure-pipelines/setup.yml
   - task: UsePythonVersion@0
-    displayName: 'Use Python 3.7'
+    displayName: 'Use Python 3.9'
     inputs:
-      versionSpec: 3.7
+      versionSpec: 3.9
   - bash: |
       source activate foo
       python .azure-pipelines/testCreateEnv.py -d 1
@@ -94,7 +94,7 @@ jobs:
   strategy:
     matrix:
       Python37:
-        python.version: '3.7'
+        python.version: '3.9'
     maxParallel: 1
 
   steps:
@@ -110,9 +110,9 @@ jobs:
     displayName: Fix OSX permissions
   - template: .azure-pipelines/setup.yml
   - task: UsePythonVersion@0
-    displayName: 'Use Python 3.7'
+    displayName: 'Use Python 3.9'
     inputs:
-      versionSpec: 3.7
+      versionSpec: 3.9
   - bash: |
       source activate foo
       sudo -E python .azure-pipelines/testCreateEnv.py -d 1

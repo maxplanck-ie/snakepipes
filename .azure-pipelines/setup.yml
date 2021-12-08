@@ -3,11 +3,11 @@ steps:
 #  inputs:
 #    createCustomEnvironment: true
 #    environmentName: foo
-#    packageSpecs: snakemake fuzzywuzzy mock sphinx sphinx-argparse sphinx_rtd_theme flake8 "python=3.7" pip
+#    packageSpecs: snakemake fuzzywuzzy mock sphinx sphinx-argparse sphinx_rtd_theme flake8 "python=3.9" pip
 #    installOptions: -c conda-forge -c bioconda --quiet
 #    createOptions: -c conda-forge -c bioconda --quiet --yes
 - bash: |
-    conda create -n foo -q --yes --quiet -c conda-forge -c bioconda snakemake=6.2.1 fuzzywuzzy mock sphinx sphinx-argparse sphinx_rtd_theme flake8 coreutils python=3.7
+    conda create -n foo -q --yes --quiet -c conda-forge -c bioconda snakemake=6.2.1 fuzzywuzzy mock sphinx sphinx-argparse sphinx_rtd_theme flake8 coreutils python=3.9
   displayName: Installing dependencies
 - bash: |
     source activate foo
