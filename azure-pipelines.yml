@@ -7,7 +7,7 @@ jobs:
     vmImage: 'ubuntu-20.04'
   strategy:
     matrix:
-      Python37:
+      Python39:
         python.version: '3.9'
     maxParallel: 1
 
@@ -25,7 +25,7 @@ jobs:
     vmImage: 'ubuntu-20.04'
   strategy:
     matrix:
-      Python37:
+      Python39:
         python.version: '3.9'
     maxParallel: 1
 
@@ -43,7 +43,7 @@ jobs:
     vmImage: 'ubuntu-20.04'
   strategy:
     matrix:
-      Python37:
+      Python39:
         python.version: '3.9'
     maxParallel: 1
 
@@ -62,7 +62,7 @@ jobs:
     vmImage: 'ubuntu-20.04'
   strategy:
     matrix:
-      Python37:
+      Python39:
         python.version: '3.9'
     maxParallel: 1
 
@@ -93,7 +93,7 @@ jobs:
     vmImage: 'macOS-latest'
   strategy:
     matrix:
-      Python37:
+      Python39:
         python.version: '3.9'
     maxParallel: 1
 
