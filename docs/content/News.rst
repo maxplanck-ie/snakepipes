@@ -1,6 +1,13 @@
 snakePipes News
 ===============
 
+
+snakePipes 2.5.3
+----------------
+
+* Switched to mamba by default at ``createEnvs`` function.
+
+
 snakePipes 2.5.2
 ----------------
 
@@ -8,7 +15,7 @@ snakePipes 2.5.2
 * python version >= 3.7
 * added snakeMake in readme
 * bug fix 777, 781
-* multiqc version = 1.10.1 to be able to report qc fir hic pipeline
+* multiqc version = 1.10.1 to be able to report QC for HiC pipeline
 * added snakemake catalog yaml
 
 

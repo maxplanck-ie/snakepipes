@@ -34,7 +34,7 @@ The easiest way to install snakePipes is via our conda channel. The following co
 
 .. code:: bash
 
-    conda create -n snakePipes -c mpi-ie -c conda-forge -c bioconda snakePipes==2.4.3
+    conda create -n snakePipes -c mpi-ie -c conda-forge -c bioconda snakePipes
 
 This way, the software used within snakePipes do not conflict with the software pre-installed on your terminal or in your python environment.
 
