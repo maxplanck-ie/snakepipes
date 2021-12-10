@@ -287,7 +287,7 @@ def createCondaEnvs(args):
         h = md5hash.hexdigest()
 
         sys.stderr.write("Creating environment from {} in {}\n".format(os.path.join(baseDir, "shared/rules", env), condaDirUse))
-        cmd = ["conda", "env", "create", "--force", "--file", os.path.join(baseDir, "shared/rules", env)]
+        cmd = ["mamba", "env", "create", "--force", "--file", os.path.join(baseDir, "shared/rules", env)]
         if '--conda-prefix' in cf['snakemakeOptions'] and (args.condaDir or args.keepCondaDir):
             cmd += ["--prefix", os.path.join(condaDirUse, h)]
         else:
