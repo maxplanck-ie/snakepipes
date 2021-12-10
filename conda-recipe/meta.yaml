@@ -1,6 +1,6 @@
 package:
   name: snakepipes
-  version: 2.5.2
+  version: 2.5.3
 
 source:
   path: ../
@@ -14,12 +14,13 @@ requirements:
     - python >=3
   run:
     - python >=3.7.0
-    - snakemake ==5.18.0
+    - snakemake >=6.2.1
     - pandas
     - graphviz
     - fuzzywuzzy
     - pyyaml >=5.1
     - coreutils
+    - mamba
 
 test:
   commands:
