@@ -30,11 +30,11 @@ Pipeline                            Description
 Quick start 
 -----------
 
-* Assuming you have *python3* with *conda*, install snakePipes with:
+* Assuming you have *python3* with *conda*, install the latest version of snakePipes with:
 
 .. code:: bash
 
-    conda create -n snakePipes -c mpi-ie -c conda-forge -c bioconda snakePipes==2.4.3
+    conda create -n snakePipes -c mpi-ie -c conda-forge -c bioconda snakePipes
 
 * You can update snakePipes to the latest version available on conda with:
 
