@@ -1,3 +1,4 @@
+# mamba = 0.19.1
 snakemake >= 6.2.1
 psutil
 pandas

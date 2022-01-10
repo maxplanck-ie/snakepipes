@@ -3,7 +3,7 @@
 
 rule GContamination_featureCounts:
     input:
-        bams = aligner + "/{sample}.bam",
+        bams = config['aligner'] + "/{sample}.bam",
         gtf = str(extended_coding_regions_gtf or '')
     output:
         txt = temp("GenomicContamination/{sample}.featurecounts.txt"),

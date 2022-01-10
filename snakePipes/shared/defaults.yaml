@@ -7,7 +7,7 @@
 # permitted here.
 ################################################################################
 #
-snakemakeOptions: ' --use-conda --conda-prefix /package/anaconda3/envs/ '
+snakemakeOptions: ' --use-conda --conda-prefix /localenv/rabbani/anaconda/miniconda3/envs/snakepipes2.5.3/ '
 organismsDir: 'shared/organisms'
 clusterConfig: 'shared/cluster.yaml'
 tempDir: /data/extended/

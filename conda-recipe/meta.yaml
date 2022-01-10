@@ -20,7 +20,7 @@ requirements:
     - fuzzywuzzy
     - pyyaml >=5.1
     - coreutils
-    - mamba
+    - mamba = 0.19.1
 
 test:
   commands:
