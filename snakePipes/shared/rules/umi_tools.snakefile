@@ -1,6 +1,6 @@
 ##umi_tools###############
 
-if UMIBarcode:
+if config['UMIBarcode']:
     if pairedEnd:
         rule umi_extract:
             input:
@@ -42,25 +42,25 @@ if UMIBarcode:
 else:
     rule FASTQ1:
           input:
-              "originalFASTQ/downsample_{sample}"+reads[0]+".fastq.gz" if downsample else "originalFASTQ/{sample}"+reads[0]+".fastq.gz"
+              "originalFASTQ/downsample_{sample}"+config['reads'][0]+".fastq.gz" if config['downsample'] else "originalFASTQ/{sample}"+config['reads'][0]+".fastq.gz"
           output:
-              "FASTQ/{sample}"+reads[0]+".fastq.gz"
+              "FASTQ/{sample}"+config['reads'][0]+".fastq.gz"
           shell: """
                 ln -s ../{input} {output}
           """
 
-    if pairedEnd or pipeline=="scrna-seq":
+    if config['pairedEnd'] or config['pipeline']=="scrna-seq":
         rule FASTQ2:
             input:
-                "originalFASTQ/downsample_{sample}"+reads[1]+".fastq.gz" if downsample else "originalFASTQ/{sample}"+reads[1]+".fastq.gz"
+                "originalFASTQ/downsample_{sample}"+config['reads'][1]+".fastq.gz" if config['downsample'] else "originalFASTQ/{sample}"+config['reads'][1]+".fastq.gz"
             output:
-                "FASTQ/{sample}"+reads[1]+".fastq.gz"
+                "FASTQ/{sample}"+config['reads'][1]+".fastq.gz"
             shell: """
                 ln -s ../{input} {output}
           """
 
 #If DNA-mapping:
-if UMIDedup:
+if config['UMIDedup']:
     rule filter_reads_umi:
         input:
             bamfile = "filtered_bam/{sample}.filtered.tmp.bam" if aligner == "Bowtie2" else aligner+"/{sample}.bam",
@@ -74,7 +74,7 @@ if UMIDedup:
         log:
             out = "filtered_bam/logs/umi_dedup.{sample}.out",
             err = "filtered_bam/logs/umi_dedup.{sample}.err"
-        conda: CONDA_SHARED_ENV
+        conda: config['CONDA_SHARED_ENV']
         shell: """
             umi_tools dedup -I {input.bamfile} \
             -S {output.bamfile} -L {log.out} -E {log.err} \
@@ -82,7 +82,7 @@ if UMIDedup:
             {params.umitools_paired} {params.umitools_options}
             """
 else:
-    if aligner == "Bowtie2":
+    if config['aligner'] == "Bowtie2":
         rule filter_reads:
             input:
                 bamfile = "filtered_bam/{sample}.filtered.tmp.bam"
@@ -92,22 +92,22 @@ else:
                    mv {input.bamfile} {output.bamfile}
                    """
 
-    elif not aligner=="bwameth" :
+    elif not config['aligner']=="bwameth" :
         rule filter_reads:
             input:
-                bamfile = aligner+"/{sample}.bam"
+                bamfile = config['aligner']+"/{sample}.bam"
             output:
                 bamfile = "filtered_bam/{sample}.filtered.bam"
             shell: """
                 ln -s ../{input} {output}
           """
 
-if not aligner=="bwameth":
+if not config['aligner']=="bwameth":
     rule samtools_index_filtered:
         input:
             "filtered_bam/{sample}.filtered.bam"
         output:
             "filtered_bam/{sample}.filtered.bam.bai"
         log: "filtered_bam/logs/{sample}.index.log"
-        conda: CONDA_SHARED_ENV
+        conda: config['CONDA_SHARED_ENV']
         shell: "samtools index {input} 2> {log}"
