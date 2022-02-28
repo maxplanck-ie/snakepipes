@@ -3,28 +3,27 @@
 Setting up snakePipes
 =====================
 
-Unlike many other pipelines, setting up snakePipes is easy! All you need is a *linux/OSX system* with *python3-conda* installation.
+Unlike many other pipelines, setting up snakePipes is easy! All you need is a *linux/OSX system* with *python3-mamba* installation. In past versions, snakePipes was using conda. We are now moving forward with mamba: a Python-based CLI conceived as a drop-in replacement for conda, offering higher speed and more reliable environment solutions to our snakePipes workflows thanks to the bindings over _libsolv_.
 
-Installing conda with python3
------------------------------
+Installing mamba
+----------------
 
-Follow the instructions `here <https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html>`__ to install either
-miniconda or anaconda. A minimal version (miniconda) is enough for snakePipes. Get the miniconda installer `here <https://conda.io/miniconda.html>`__.
+If you have already installed either miniconda or anaconda, you may simply `add mamba to your base environment <https://mamba.readthedocs.io/en/latest/installation.html#existing-conda-install>`__ . Otherwise, follow the instructions `here <https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html>`__ to install either miniconda or anaconda first.
+
+One third option would be to `go ahead installing mambaforge <https://mamba.readthedocs.io/en/latest/installation.html#fresh-install>`__ , to use the latest packages. Please bear in mind tha this last option wasn't tested. Please `report any issues <https://github.com/maxplanck-ie/snakepipes/issues>`__ if you decide to move forward with this (thanks!).
 
 After installation, check your python path and version :
 
 .. code-block:: bash
 
-    $ which python
-    $ /your_path/miniconda3/bin/python
+    $ command -v python
+    $ <your_chosen_installation_path>/bin/python
 
     $ python --version # anything above 3.5 is ok!
     $ Python 3.6.5 :: Anaconda, Inc.
 
-    $ conda --version # only for sanity check
-    $ conda 4.5.8
 
-Next, install snakePipes.
+Next, install snakePipes latest release using ``mamba``.
 
 
 Installing snakePipes
@@ -34,7 +33,7 @@ The easiest way to install snakePipes is via our conda channel. The following co
 
 .. code:: bash
 
-    conda create -n snakePipes -c mpi-ie -c conda-forge -c bioconda snakePipes
+    mamba create -n snakePipes -c mpi-ie -c conda-forge -c bioconda snakePipes
 
 This way, the software used within snakePipes do not conflict with the software pre-installed on your terminal or in your python environment.
 
@@ -49,11 +48,10 @@ If you wish to modify snakePipes you can install it via pip from within a conda 
 
 .. code:: bash
 
-    conda create -n snakepipes python=3.7 snakemake pandas graphviz fuzzywuzzy
-    conda activate snakepipes
-    pip install git+https://github.com/maxplanck-ie/snakepipes@develop
+    mamba create -n snakepipes python=3.7 snakemake pandas graphviz fuzzywuzzy
+    mamba activate snakepipes
 
-Instead of providing the URL to ``pip``, you can also `clone <https://help.github.com/articles/cloning-a-repository/>`__ our `GitHub repository <https://github.com/maxplanck-ie/snakepipes>`__ on your computer, and modify the code before running snakePipes. Please see :doc:`advanced_usage` for more information on how to modify and extend snakePipes workflows.
+Then, `clone <https://help.github.com/articles/cloning-a-repository/>`__ our `GitHub repository <https://github.com/maxplanck-ie/snakepipes>`__ on your computer, and modify the code before running snakePipes. You will want to create your own branch using as head our develop branch. Please see :doc:`advanced_usage` for more information on how to modify and extend snakePipes workflows.
 
 Testing whether the installation went fine
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
