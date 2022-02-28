@@ -10,7 +10,7 @@ Installing mamba
 
 If you have already installed either miniconda or anaconda, you may simply `add mamba to your base environment <https://mamba.readthedocs.io/en/latest/installation.html#existing-conda-install>`__ . Otherwise, follow the instructions `here <https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html>`__ to install either miniconda or anaconda first.
 
-One third option would be to `go ahead installing mambaforge <https://mamba.readthedocs.io/en/latest/installation.html#fresh-install>`__ , to use the latest packages. Please bear in mind tha this last option wasn't tested. Please `report any issues <https://github.com/maxplanck-ie/snakepipes/issues>`__ if you decide to move forward with this (thanks!).
+Another option would be to `go ahead installing mambaforge <https://mamba.readthedocs.io/en/latest/installation.html#fresh-install>`__ , to use the latest packages. This is only advisable if you were not using conda before. Please bear in mind: this last option wasn't tested thoroughly. Explicit this installation setup if you encounter, and `report any issues <https://github.com/maxplanck-ie/snakepipes/issues>`__ (thanks).
 
 After installation, check your python path and version :
 
