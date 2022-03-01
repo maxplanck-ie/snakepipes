@@ -34,13 +34,13 @@ Quick start
 
 .. code:: bash
 
-    conda create -n snakePipes -c mpi-ie -c conda-forge -c bioconda snakePipes
+    conda install mamba -c conda-forge && mamba create -n snakePipes -c mpi-ie -c conda-forge -c bioconda snakePipes
 
 * You can update snakePipes to the latest version available on conda with:
 
 .. code:: bash
 
-    conda update -n snakePipes -c mpi-ie -c conda-forge -c bioconda --prune snakePipes
+    mamba update -n snakePipes -c mpi-ie -c conda-forge -c bioconda --prune snakePipes
 
 snakePipes is going to move to mamba in the future.
 

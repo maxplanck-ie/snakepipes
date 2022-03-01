@@ -44,7 +44,7 @@ Snakepipes is a set of Snakemake workflows which use conda for installation and 
 
 Afterward, simply run the following:
 
-``conda create -n snakePipes -c mpi-ie -c bioconda -c conda-forge snakePipes``
+``conda install mamba -c conda-forge && mamba create -n snakePipes -c mpi-ie -c bioconda -c conda-forge snakePipes``
 
 This will create a new conda environment called "snakePipes" into which snakePipes is installed. You will then need to create the conda environments needed by the various workflows. To facilitate this we provide the `snakePipes` commands:
 

@@ -194,8 +194,7 @@ def envInfo():
     For each environment yaml file print where its conda env is actually located
     """
     baseDir = os.path.dirname(snakePipes.__file__)
-    condaDir = subprocess.check_output("which conda", shell=True).decode('utf-8').strip()
-    condaDir = os.path.dirname(os.path.dirname(condaDir))
+    condaDir = os.environ.get('CONDA_PREFIX')
     if "envs" in condaDir:
         condaDir = os.path.dirname(condaDir)
     else:
@@ -243,8 +242,7 @@ def createCondaEnvs(args):
     """
     baseDir = os.path.dirname(snakePipes.__file__)
 
-    condaDir = subprocess.check_output("which conda", shell=True).decode('utf-8').strip()
-    condaDir = os.path.dirname(os.path.dirname(condaDir))
+    condaDir = os.environ.get('CONDA_PREFIX')
     rootDir = condaDir
     if "envs" in condaDir:
         condaDir = os.path.dirname(condaDir)
