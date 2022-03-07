@@ -10,6 +10,7 @@ import hashlib
 import shutil
 import snakePipes.common_functions as cof
 from snakePipes import __version__
+from conda.base.context import context
 
 
 
@@ -194,7 +195,8 @@ def envInfo():
     For each environment yaml file print where its conda env is actually located
     """
     baseDir = os.path.dirname(snakePipes.__file__)
-    condaDir = os.environ.get('CONDA_PREFIX')
+    # condaDir = os.environ.get('CONDA_PREFIX')
+    condaDir = context.target_prefix 
     if "envs" in condaDir:
         condaDir = os.path.dirname(condaDir)
     else:
