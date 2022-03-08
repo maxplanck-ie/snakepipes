@@ -5,12 +5,14 @@ Setting up snakePipes
 
 Unlike many other pipelines, setting up snakePipes is easy! All you need is a *linux/OSX system* with *python3-mamba* installation. In past versions, snakePipes was using conda. We are now moving forward with mamba: a Python-based CLI conceived as a drop-in replacement for conda, offering higher speed and more reliable environment solutions to our snakePipes workflows thanks to the bindings over _libsolv_.
 
-Installing mamba
-----------------
+Installing conda & mamba
+------------------------
 
-If you have already installed either miniconda or anaconda, you may simply `add mamba to your base environment <https://mamba.readthedocs.io/en/latest/installation.html#existing-conda-install>`__ . Otherwise, follow the instructions `here <https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html>`__ to install either miniconda or anaconda first.
+Follow the instructions `here <https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html>`__ to install either miniconda or anaconda first. Once you have already installed either miniconda or anaconda, you may simply `add mamba to your base environment <https://mamba.readthedocs.io/en/latest/installation.html#existing-conda-install>`__
 
-Another option would be to `go ahead installing mambaforge <https://mamba.readthedocs.io/en/latest/installation.html#fresh-install>`__ , to use the latest packages. This is only advisable if you were not using conda before. Please bear in mind: this last option wasn't tested thoroughly. Explicit this installation setup if you encounter, and `report any issues <https://github.com/maxplanck-ie/snakepipes/issues>`__ (thanks).
+.. code-block:: bash
+
+    $ conda install mamba -c conda-forge
 
 After installation, check your python path and version :
 
@@ -37,9 +39,14 @@ The easiest way to install snakePipes is via our conda channel. The following co
 
 This way, the software used within snakePipes do not conflict with the software pre-installed on your terminal or in your python environment.
 
-.. note:: This might take a few minutes depending on the access to conda channels.
+Now, we should create the workflow environments:
 
-snakePipes is going to move to mamba in the future.
+.. code:: bash
+
+    conda activate snakePipes
+    snakePipes createEnvs
+
+
 
 Development installation
 ~~~~~~~~~~~~~~~~~~~~~~~~
