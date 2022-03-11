@@ -25,7 +25,7 @@ After installation, check your python path and version :
     $ Python 3.6.5 :: Anaconda, Inc.
 
 
-Next, install snakePipes latest release using ``mamba``.
+Now we are ready to install snakePipes latest release using ``mamba``.
 
 
 Installing snakePipes
@@ -45,42 +45,6 @@ Now, we should create the workflow environments:
 
     conda activate snakePipes
     snakePipes createEnvs
-
-
-
-Development installation
-~~~~~~~~~~~~~~~~~~~~~~~~
-
-If you wish to modify snakePipes you can install it via pip from within a conda environment, using our `GitHub repository <https://github.com/maxplanck-ie/snakepipes>`__ .
-
-.. code:: bash
-
-    mamba create -n snakepipes python=3.7 snakemake pandas graphviz fuzzywuzzy
-    mamba activate snakepipes
-
-Then, `clone <https://help.github.com/articles/cloning-a-repository/>`__ our `GitHub repository <https://github.com/maxplanck-ie/snakepipes>`__ on your computer, and modify the code before running snakePipes. You will want to create your own branch using as head our develop branch. Please see :doc:`advanced_usage` for more information on how to modify and extend snakePipes workflows.
-
-Testing whether the installation went fine
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-After installation, you can activate the snakePipes environment via
-
-.. code:: bash
-
-    conda activate snakePipes
-
-In case you installed conda using the latest version of conda installers (eg. minicoda `4.5.*` or later), the `conda` command might not be available inside an environment. To enable this, export the path to conda/bin in your $PATH (or append the path manually in your `bashrc`)
-
-.. code:: bash
-
-    export PATH="/path/to/miniconda3/bin:$PATH"
-
-Snakemake and pandas are installed along with snakePipes as requirements. Ensure you have them working by testing these commands:
-
-.. code-block:: bash
-
-    snakemake --help
-    snakePipes --help
 
 
 Modify global options
@@ -117,15 +81,10 @@ All the tools required for running various pipelines are installed via various c
 
     snakePipes createEnvs
 
-.. note:: Creating the environments might take 1 hour. But it only has to be done once.
-
 .. note::
 
     ``snakePipes createEnvs`` will also set the ``snakemakeOptions:`` line in the global snakePipes
     ``defaults.yaml`` files. If you have already modified this then use the ``--keepCondaDir`` option.
-
-.. warning::
-   If you installed with ``pip`` you must use the ``--develop`` option.
 
 The place where the conda envs are created (and therefore the tools are installed) is defined in ``snakePipes/defaults.yaml``
 file on our GitHub repository. You can modify it to suite your needs.
