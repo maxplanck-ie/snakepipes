@@ -33,7 +33,7 @@ if config['UMIBarcode']:
             log:
                 out = "FASTQ/logs/{sample}_log.out",
                 err = "FASTQ/logs/{sample}_log.err"
-            conda: ["CONDA_SHARED_ENV"]
+            conda: config["CONDA_SHARED_ENV"]
             shell: """
                 umi_tools extract -I {input.r1} --stdout={output.r1} \
                 --bc-pattern={params.bcpattern} -L {log.out} -E {log.err}
