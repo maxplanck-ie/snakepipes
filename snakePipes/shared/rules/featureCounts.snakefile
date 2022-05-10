@@ -8,15 +8,15 @@ rule featureCounts:
     output:
         "featureCounts/{sample}.counts.txt"
     params:
-        libtype = libraryType,
-        paired_opt = lambda wildcards: "-p -B " if pairedEnd else "",
+        libtype = config['libraryType'],
+        paired_opt = lambda wildcards: "-p -B " if config['pairedEnd'] else "",
         opts = config["featureCountsOptions"],
-        tempDir = tempDir
+        tempDir = config['tempDir']
     log:
         out = "featureCounts/logs/{sample}.out",
         err = "featureCounts/logs/{sample}.err"
-    threads: lambda wildcards: 8 if 8<max_thread else max_thread
-    conda: CONDA_RNASEQ_ENV
+    threads: lambda wildcards: 8 if 8<config['max_thread'] else config['max_thread']
+    conda: config['CONDA_RNASEQ_ENV']
     shell: """
         TMPDIR={params.tempDir}
         MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX);
@@ -33,10 +33,12 @@ rule featureCounts:
 
 rule merge_featureCounts:
     input:
-        expand("featureCounts/{sample}.counts.txt", sample=samples)
+        expand("featureCounts/{sample}.counts.txt", sample=config['samples'])
     output:
         "featureCounts/counts.tsv"
+    params:
+        scriptdir = os.path.join(config['maindir'], "shared", "rscripts", "merge_featureCounts.R")
     log: "featureCounts/logs/merge_featureCounts.log"
-    conda: CONDA_RNASEQ_ENV
+    conda: config['CONDA_RNASEQ_ENV']
     shell:
-        "Rscript "+os.path.join(maindir, "shared", "rscripts", "merge_featureCounts.R")+" {output} {input} 2> {log}"
+        "Rscript "+" {params.scriptdir}" +" {output} {input} 2> {log}"
