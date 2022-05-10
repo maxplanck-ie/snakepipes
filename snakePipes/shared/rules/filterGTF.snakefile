@@ -3,11 +3,11 @@
 
 rule filter_gtf:
     input:
-        gtf = genes_gtf
+        gtf = config['genes_gtf']
     output:
         gtf = "Annotation/genes.filtered.gtf"
     params:
-        pattern = "" if not filterGTF else filterGTF
+        pattern = "" if not config['filterGTF'] else config['filterGTF']
     shell: """
         if [ -z {params.pattern} ] ; then
             ln -s {input.gtf} {output.gtf}
@@ -129,14 +129,14 @@ rule gtf_to_files:
 rule annotation_bed2fasta:
     input:
         bed = "Annotation/genes.filtered.bed",
-        genome_fasta = genome_fasta
+        genome_fasta = config['genome_fasta']
     output:
         "Annotation/genes.filtered.fa"
     log: "Annotation/logs/bed2fasta.log"
     benchmark:
         "Annotation/.benchmark/annotation_bed2fasta.benchmark"
     threads: 1
-    conda: CONDA_RNASEQ_ENV
+    conda: config['CONDA_RNASEQ_ENV']
     shell:
         "bedtools getfasta -name -s -split -fi {input.genome_fasta} -bed <(cat {input.bed} | cut -f1-12) | sed 's/(.*)//g' | sed 's/:.*//g' > {output} 2> {log}"
         
