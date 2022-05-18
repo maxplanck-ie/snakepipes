@@ -7,25 +7,25 @@ def get_outdir(folder_name,sampleSheet):
 ## DESeq2 (on featureCounts)
 rule DESeq2:
     input:
-        counts_table = lambda wildcards : "featureCounts/counts_allelic.tsv" if 'allelic-mapping' in mode else "featureCounts/counts.tsv",
-        sampleSheet = sampleSheet,
+        counts_table = lambda wildcards : "featureCounts/counts_allelic.tsv" if allelic-mapping in config['mode'] else "featureCounts/counts.tsv",
+        sampleSheet = config['sampleSheet'],
         symbol_file = "Annotation/genes.filtered.symbol" #get_symbol_file
     output:
-        "{}/DESeq2.session_info.txt".format(get_outdir("DESeq2",sampleSheet))
+        "{}/DESeq2.session_info.txt".format(get_outdir("DESeq2",config['sampleSheet']))
     benchmark:
-        "{}/.benchmark/DESeq2.featureCounts.benchmark".format(get_outdir("DESeq2",sampleSheet))
+        "{}/.benchmark/DESeq2.featureCounts.benchmark".format(get_outdir("DESeq2",config['sampleSheet']))
     params:
-        script=os.path.join(maindir, "shared", "rscripts", "DESeq2.R"),
-        outdir = get_outdir("DESeq2",sampleSheet),
+        script=os.path.join(config['maindir'], "shared", "rscripts", "DESeq2.R"),
+        outdir = get_outdir("DESeq2",config['sampleSheet']),
         fdr = 0.05,
-        importfunc = os.path.join(maindir, "shared", "rscripts", "DE_functions.R"),
-        allele_info = lambda wildcards : 'TRUE' if 'allelic-mapping' in mode else 'FALSE',
+        importfunc = os.path.join(config['maindir'], "shared", "rscripts", "DE_functions.R"),
+        allele_info = lambda wildcards : 'TRUE' if 'allelic-mapping' in config['mode'] else 'FALSE',
         tx2gene_file = 'NA',
-        rmdTemplate = os.path.join(maindir, "shared", "rscripts", "DESeq2Report.Rmd")
+        rmdTemplate = os.path.join(config['maindir'], "shared", "rscripts", "DESeq2Report.Rmd")
     log:
-        out = "{}/logs/DESeq2.out".format(get_outdir("DESeq2",sampleSheet)),
-        err = "{}/logs/DESeq2.err".format(get_outdir("DESeq2",sampleSheet))
-    conda: CONDA_RNASEQ_ENV
+        out = "{}/logs/DESeq2.out".format(get_outdir("DESeq2",config['sampleSheet'])),
+        err = "{}/logs/DESeq2.err".format(get_outdir("DESeq2",config['sampleSheet']))
+    conda: config['CONDA_RNASEQ_ENV']
     shell:
         "cd {params.outdir} && "
         "Rscript {params.script} "
@@ -44,25 +44,25 @@ rule DESeq2:
 rule DESeq2_Salmon:
     input:
         counts_table = "Salmon/counts.transcripts.tsv",
-        sampleSheet = sampleSheet,
+        sampleSheet = config['sampleSheet'],
         tx2gene_file = "Annotation/genes.filtered.t2g",
         symbol_file = "Annotation/genes.filtered.symbol" #get_symbol_file
     output:
-        "{}/DESeq2.session_info.txt".format(get_outdir("DESeq2_Salmon",sampleSheet))
+        "{}/DESeq2.session_info.txt".format(get_outdir("DESeq2_Salmon",config['sampleSheet']))
     log:
-        out = "{}/logs/DESeq2.out".format(get_outdir("DESeq2_Salmon",sampleSheet)),
-        err = "{}/logs/DESeq2.err".format(get_outdir("DESeq2_Salmon",sampleSheet))
+        out = "{}/logs/DESeq2.out".format(get_outdir("DESeq2_Salmon",config['sampleSheet'])),
+        err = "{}/logs/DESeq2.err".format(get_outdir("DESeq2_Salmon",config['sampleSheet']))
     benchmark:
-        "{}/.benchmark/DESeq2.Salmon.benchmark".format(get_outdir("DESeq2_Salmon",sampleSheet))
+        "{}/.benchmark/DESeq2.Salmon.benchmark".format(get_outdir("DESeq2_Salmon",config['sampleSheet']))
     params:
-        script=os.path.join(maindir, "shared", "rscripts", "DESeq2.R"),
-        outdir = get_outdir("DESeq2_Salmon",sampleSheet),
+        script=os.path.join(config['maindir'], "shared", "rscripts", "DESeq2.R"),
+        outdir = get_outdir("DESeq2_Salmon",config['sampleSheet']),
         fdr = 0.05,
-        importfunc = os.path.join(maindir, "shared", "rscripts", "DE_functions.R"),
+        importfunc = os.path.join(config['maindir'], "shared", "rscripts", "DE_functions.R"),
         allele_info = 'FALSE',
         tx2gene_file = "Annotation/genes.filtered.t2g",
-        rmdTemplate = os.path.join(maindir, "shared", "rscripts", "DESeq2Report.Rmd")
-    conda: CONDA_RNASEQ_ENV
+        rmdTemplate = os.path.join(config['maindir'], "shared", "rscripts", "DESeq2Report.Rmd")
+    conda: config['CONDA_RNASEQ_ENV']
     shell:
         "cd {params.outdir} && "
         "Rscript {params.script} "
