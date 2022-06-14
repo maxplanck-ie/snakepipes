@@ -58,12 +58,13 @@ pe_param <- csaw::readParam(max.frag = 500, pe = pe)  # Some CSAW functions expl
 ## Read data
 ##filter out input using yaml
 library(yaml)
-y<-read_yaml(yaml_path)
-input_list<-unique(unlist(lapply(y[[1]],function(X)X[["control"]])))
-if(!is.null(input_list)&&!(input_list=="")){
-    sampleInfo<-subset(sampleInfo,!(name %in% input_list))
+if(file.exists(yaml_path)){
+  y<-read_yaml(yaml_path)
+  input_list<-unique(unlist(lapply(y[[1]],function(X)X[["control"]])))
+  if(!is.null(input_list)&&!(input_list=="")){
+      sampleInfo<-subset(sampleInfo,!(name %in% input_list))
+  }
 }
-
 
 chip_object <- readfiles_chip(sampleSheet = sampleInfo,
                               fragmentLength = fraglength,

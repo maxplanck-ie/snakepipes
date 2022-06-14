@@ -1,6 +1,6 @@
 ### deepTools bamCompare subtract #######################################################
 
-rule bamCompare_subtract:
+rule bamcoverage_short_cleaned:
     input:
         bam = os.path.join(short_bams, "{sample}.short.cleaned.bam"),
         bai = os.path.join(short_bams, "{sample}.short.cleaned.bam.bai")
