@@ -7,7 +7,7 @@ def get_outdir(folder_name,sampleSheet):
 ## DESeq2 (on featureCounts)
 rule DESeq2:
     input:
-        counts_table = lambda wildcards : "featureCounts/counts_allelic.tsv" if allelic-mapping in config['mode'] else "featureCounts/counts.tsv",
+        counts_table = lambda wildcards : "featureCounts/counts_allelic.tsv" if 'allelic-mapping' in config['mode'] else "featureCounts/counts.tsv",
         sampleSheet = config['sampleSheet'],
         symbol_file = "Annotation/genes.filtered.symbol" #get_symbol_file
     output:
