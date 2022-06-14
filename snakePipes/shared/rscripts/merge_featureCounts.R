@@ -15,7 +15,7 @@ isallelic <- function(x) {
 # get relevant cols
 get_df <- function(infile) {
   cat(infile, "\n")
-  bname = gsub(".filtered.bam" , "" , basename(infile) )
+  bname = gsub(".counts.txt" , "" , basename(infile) )
   df = read.table(infile, header=T)
 
   if(isallelic(df) == TRUE) {
