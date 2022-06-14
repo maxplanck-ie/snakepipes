@@ -218,16 +218,17 @@ This plot shows how samples are clustered based on their euclidean distance usin
 ```{r PCA, eval = TRUE}
     # 5. PCA plots
     PCAdata$name<-make.names(PCAdata$name,unique=TRUE)
-    print(ggplot(PCAdata, aes(PC1, PC2, color = condition, shape = name)) +
+    p<-ggplot(PCAdata, aes(PC1, PC2, color = condition)) +
         geom_hline(aes(yintercept = 0), colour = "grey") +
         geom_vline(aes(xintercept = 0), colour = "grey") +
         geom_point(size = 5) +
         xlab(paste0("PC1: ", percentVar[1], "% variance")) +
         ylab(paste0("PC2: ", percentVar[2], "% variance")) +
         #theme_bw(base_size = 14) +
-        ggtitle("PCA\n") +
-        scale_shape_manual(values = c(0:18,33:17))
-    )
+        ggtitle("PCA\n") 
+
+    if(nrow(PCAdata>36)){
+    print(p)}else{print(p+geom_point(aes(shape=name))+scale_shape_manual(values = c(0:18,33:17)))}
 ```
 
 
