@@ -7,7 +7,7 @@ steps:
 #    installOptions: -c conda-forge -c bioconda --quiet
 #    createOptions: -c conda-forge -c bioconda --quiet --yes
 - bash: |
-    conda install mamba -c conda-forge
+    conda install -c conda-forge --yes mamba
   displayName: Installing mamba in base env
 - bash: |
     conda create -n foo -q --yes --quiet -c conda-forge -c bioconda snakemake=6.2.1 fuzzywuzzy mock sphinx sphinx-argparse sphinx_rtd_theme flake8 coreutils python=3.9
