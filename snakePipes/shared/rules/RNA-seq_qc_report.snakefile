@@ -11,7 +11,7 @@ rule convert_flagstat_output:
 #######merge converted sambamba reports######
 rule report_flagstat_all_data:
       input:
-         expand("Sambamba/{sample}.dup.converted.tsv",sample=samples)
+         expand("Sambamba/{sample}.dup.converted.tsv",sample=config['samples'])
       output:
          "Sambamba/flagstat_report_all.tsv"
       log: "Sambamba/logs/report_flagstat_all_data.log"
@@ -19,7 +19,7 @@ rule report_flagstat_all_data:
          "sort -k1,1V {input} | cat <( echo -e 'sample\ttotal\tdup\tmapped') - > {output} 2> {log}"
 
 ##########QC report for all the samples#########
-if dnaContam:
+if config['dnaContam']:
   rule qc_report_all:
         input:
             flagstat = "Sambamba/flagstat_report_all.tsv",

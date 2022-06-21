@@ -49,10 +49,10 @@ if config['downsample']:
             output:
                 fq = "originalFASTQ/downsample_{sample}.fastq.gz"
             log: "originalFASTQ/logs/{sample}.FASTQdownsample.log"
-            threads: lambda wildcards: 12 if 12<max_thread else max_thread
+            threads: lambda wildcards: 12 if 12<config['max_thread'] else config['max_thread']
             params:
-                num_reads = downsample
-            conda: CONDA_SHARED_ENV
+                num_reads = config['downsample']
+            conda: config['CONDA_SHARED_ENV']
             shell: """
                 seqtk sample -s 100 {input} {params.num_reads} | pigz -p {threads} -9 > {output} 2> {log}
                 """
