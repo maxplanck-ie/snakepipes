@@ -1,6 +1,13 @@
 snakePipes News
 ===============
 
+snakePipes 2.5.4
+----------------
+
+* Fixed a number of minor GitHub issues: #791, #816, #807, #789, #783, #768.
+* Fixed misleading rule name for bamcoverage in atac-seq.
+* Fixed conda env building on microsoft azure.
+
 
 snakePipes 2.5.3
 ----------------
