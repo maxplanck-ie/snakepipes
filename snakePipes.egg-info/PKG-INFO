@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: snakePipes
-Version: 2.5.3
+Version: 2.5.4
 Summary: Snakemake workflows and wrappers for NGS data processing from the MPI-IE
 Home-page: https://github.com/maxplanck-ie/snakepipes
 License: MIT

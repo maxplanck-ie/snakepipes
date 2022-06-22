@@ -45,9 +45,9 @@ def getBamCoverage():
         return []
 
 def getHeatmapInput():
-    if pipeline in 'ATAC-seq' or pipeline in 'chip-seq':
+    if pipeline in 'ATAC-seq':
         return(expand("CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.cov.heatmap.png", change_dir=['UP','DOWN']))
-    else:
+    elif pipeline in 'chip-seq':
         if not useSpikeInForNorm:
             return(expand("CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.cov.heatmap.png", change_dir=['UP','DOWN']) + expand("CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.log2r.heatmap.png", change_dir=['UP', 'DOWN']))
 
@@ -117,7 +117,7 @@ rule plot_heatmap_log2r_CSAW:
         image = touch("CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.log2r.heatmap.png"),
         sorted_regions = touch("CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.log2r.sortedRegions.bed")
     params:
-        smpl_label=' '.join(filtered_dict.keys())
+        smpl_label=' '.join(reordered_dict.keys())
     log:
         out = os.path.join(outdir, "CSAW_{}_{}".format(peakCaller, sample_name) + "/logs/deeptools_heatmap.log2r.{change_dir}.out"),
         err = os.path.join(outdir, "CSAW_{}_{}".format(peakCaller, sample_name) + "/logs/deeptools_heatmap.log2r.{change_dir}.err")
