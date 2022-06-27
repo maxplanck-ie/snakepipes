@@ -32,7 +32,7 @@ elif args.envs_chunk == str(2):
 elif args.envs_chunk == str(3):
     envs = range(2 * index, length)
 
-for i in range(index):
+for i in envs:
     keys.append(list(cf.set_env_yamls())[i])
 envs_to_test = " ".join(keys)
 sp.check_output("snakePipes createEnvs --only {} --force".format(envs_to_test), shell=True)

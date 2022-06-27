@@ -129,7 +129,7 @@ rule bamCoverage_by_part:
         bai = "split_bam/{sample}_host.bam.bai",
         scale_factors = "split_deepTools_qc/multiBamSummary/{part}.ChIP.scaling_factors.txt"
     output:
-        "bamCoverage/{sample}.host.seq_depth_norm.BY{part}.bw"
+        "bamCoverage/{sample}.host_scaled.BY{part}.bw"
     params:
         bwBinSize = bwBinSize,
         genome_size = int(genome_size),
@@ -155,7 +155,7 @@ rule bamCoverage_by_TSS:
         bai = "split_bam/{sample}_host.bam.bai",
         scale_factors = "split_deepTools_qc/multiBamSummary_BED/spikein.ChIP.scaling_factors.txt"
     output:
-        "bamCoverage_TSS/{sample}.host.seq_depth_norm.BYspikein.bw"
+        "bamCoverage_TSS/{sample}.host_scaled.BYspikein.bw"
     params:
         bwBinSize = bwBinSize,
         genome_size = int(genome_size),
@@ -181,7 +181,7 @@ rule bamCoverage_by_input:
         bai = "split_bam/{sample}_host.bam.bai",
         scale_factors = "split_deepTools_qc/multiBamSummary/spikein.input.scaling_factors.txt"
     output:
-        "bamCoverage_input/{sample}.host.seq_depth_norm.BYspikein.bw"
+        "bamCoverage_input/{sample}.host_scaled.BYspikein.bw"
     params:
         bwBinSize = bwBinSize,
         genome_size = int(genome_size),

@@ -36,20 +36,22 @@ def getScaleFactors():
 
 def getBamCoverage():
     if getSizeFactorsFrom=="genome":
-        return expand("bamCoverage/{chip_sample}.host.seq_depth_norm.BYspikein.bw", chip_sample=reordered_dict.keys())
+        return expand("bamCoverage/{chip_sample}.host_scaled.BYspikein.bw", chip_sample=reordered_dict.keys())
     elif getSizeFactorsFrom=="TSS":
-        return expand("bamCoverage_TSS/{chip_sample}.host.seq_depth_norm.BYspikein.bw", chip_sample=reordered_dict.keys())
+        return expand("bamCoverage_TSS/{chip_sample}.host_scaled.BYspikein.bw", chip_sample=reordered_dict.keys())
     elif getSizeFactorsFrom=="input":
-        return expand("bamCoverage_input/{chip_sample}.host.seq_depth_norm.BYspikein.bw", chip_sample=reordered_dict.keys())
+        return expand("bamCoverage_input/{chip_sample}.host_scaled.BYspikein.bw", chip_sample=reordered_dict.keys())
     else:
         return []
 
 def getHeatmapInput():
-    if pipeline in 'ATAC-seq' or pipeline in 'chip-seq':
+    if pipeline in 'ATAC-seq':
         return(expand("CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.cov.heatmap.png", change_dir=['UP','DOWN']))
-    else:
+    elif pipeline in 'chip-seq':
         if not useSpikeInForNorm:
             return(expand("CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.cov.heatmap.png", change_dir=['UP','DOWN']) + expand("CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.log2r.heatmap.png", change_dir=['UP', 'DOWN']))
+        else:
+          return(expand("CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.cov.heatmap.png", change_dir=['UP','DOWN']))
 
 
 ## CSAW for differential binding / allele-specific binding analysis
@@ -117,7 +119,7 @@ rule plot_heatmap_log2r_CSAW:
         image = touch("CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.log2r.heatmap.png"),
         sorted_regions = touch("CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.log2r.sortedRegions.bed")
     params:
-        smpl_label=' '.join(filtered_dict.keys())
+        smpl_label=' '.join(reordered_dict.keys())
     log:
         out = os.path.join(outdir, "CSAW_{}_{}".format(peakCaller, sample_name) + "/logs/deeptools_heatmap.log2r.{change_dir}.out"),
         err = os.path.join(outdir, "CSAW_{}_{}".format(peakCaller, sample_name) + "/logs/deeptools_heatmap.log2r.{change_dir}.err")
@@ -168,7 +170,7 @@ rule plot_heatmap_cov_CSAW:
         image = touch("CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.cov.heatmap.png"),
         sorted_regions = touch("CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.cov.sortedRegions.bed")
     params:
-        smpl_label=' '.join(filtered_dict.keys())
+        smpl_label=' '.join(reordered_dict.keys())
     log:
         out = os.path.join(outdir,"CSAW_{}_{}".format(peakCaller, sample_name) + "/logs/deeptools_heatmap.cov.{change_dir}.out"),
         err = os.path.join(outdir,"CSAW_{}_{}".format(peakCaller, sample_name) + "/logs/deeptools_heatmap.cov.{change_dir}.err")
