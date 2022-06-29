@@ -10,15 +10,15 @@ rule featureCounts_allele:
     output:
         'featureCounts/{sample}.allelic_counts.txt'
     params:
-        libtype = libraryType,
-        paired_opt = lambda wildcards: "-p -B " if pairedEnd else "",
+        libtype = config['libraryType'],
+        paired_opt = lambda wildcards: "-p -B " if config['pairedEnd'] else "",
         opts = config["featureCountsOptions"],
-        tempDir = tempDir
+        tempDir = config['tempDir']
     log:
         out = "featureCounts/logs/{sample}.out",
         err = "featureCounts/logs/{sample}.err"
     threads: 8
-    conda: CONDA_RNASEQ_ENV
+    conda: config['CONDA_RNASEQ_ENV']
     shell: """
         TMPDIR={params.tempDir}
         MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX);
@@ -35,10 +35,12 @@ rule featureCounts_allele:
 
 rule merge_featureCounts:
     input:
-        expand("featureCounts/{sample}.allelic_counts.txt", sample=samples)
+        expand("featureCounts/{sample}.allelic_counts.txt", sample=config['samples'])
     output:
         "featureCounts/counts_allelic.tsv"
+    params:
+	scriptdir = os.path.join(config['maindir'], "shared", "rscripts", "merge_featureCounts.R")
     log: "featureCounts/logs/merge_featureCounts.log"
-    conda: CONDA_RNASEQ_ENV
+    conda: config['CONDA_RNASEQ_ENV']
     shell:
-        "Rscript "+os.path.join(maindir, "shared", "rscripts", "merge_featureCounts.R")+" {output} {input} 2> {log}"
+	"Rscript "+" {params.scriptdir}" +" {output} {input} 2> {log}"        

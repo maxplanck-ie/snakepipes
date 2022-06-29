@@ -4,13 +4,13 @@ if config['UMIBarcode']:
     if pairedEnd:
         rule umi_extract:
             input:
-                r1 = "originalFASTQ/downsample_{sample}"+reads[0]+".fastq.gz" if downsample else "originalFASTQ/{sample}"+reads[0]+".fastq.gz",
-                r2 = "originalFASTQ/downsample_{sample}"+reads[1]+".fastq.gz" if downsample else "originalFASTQ/{sample}"+reads[1]+".fastq.gz"
+                r1 = "originalFASTQ/downsample_{sample}"+config['reads'][0]+".fastq.gz" if downsample else "originalFASTQ/{sample}"+config['reads'][0]+".fastq.gz",
+                r2 = "originalFASTQ/downsample_{sample}"+config['reads'][1]+".fastq.gz" if downsample else "originalFASTQ/{sample}"+config['reads'][1]+".fastq.gz"
             output:
-                r1 = "FASTQ/{sample}"+reads[0]+".fastq.gz",
-                r2 = "FASTQ/{sample}"+reads[1]+".fastq.gz"
+                r1 = "FASTQ/{sample}"+config['reads'][0]+".fastq.gz",
+                r2 = "FASTQ/{sample}"+config['reads'][1]+".fastq.gz"
             params:
-                bcpattern = str(bcPattern)
+                bcpattern = str(config['bcpattern'])
             log:
                 out = "FASTQ/logs/{sample}_log.out",
                 err = "FASTQ/logs/{sample}_log.err"
@@ -25,11 +25,11 @@ if config['UMIBarcode']:
     else:
         rule umi_extract:
             input:
-                r1 = "originalFASTQ/downsample_{sample}"+reads[0]+".fastq.gz" if downsample else "originalFASTQ/{sample}"+reads[0]+".fastq.gz",
+                r1 = "originalFASTQ/downsample_{sample}"+config['reads'][0]+".fastq.gz" if downsample else "originalFASTQ/{sample}"+config['reads'][0]+".fastq.gz",
             output:
-                r1 = "FASTQ/{sample}"+reads[0]+".fastq.gz",
+                r1 = "FASTQ/{sample}"+config['reads'][0]+".fastq.gz",
             params:
-                bcpattern = str(bcPattern)
+                bcpattern = str(config['bcpattern'])
             log:
                 out = "FASTQ/logs/{sample}_log.out",
                 err = "FASTQ/logs/{sample}_log.err"
@@ -63,14 +63,14 @@ else:
 if config['UMIDedup']:
     rule filter_reads_umi:
         input:
-            bamfile = "filtered_bam/{sample}.filtered.tmp.bam" if aligner == "Bowtie2" else aligner+"/{sample}.bam",
-            indexfile = "filtered_bam/{sample}.filtered.tmp.bam.bai" if aligner == "Bowtie2" else aligner+"/{sample}.bam.bai"
+            bamfile = "filtered_bam/{sample}.filtered.tmp.bam" if config['aligner'] == "Bowtie2" else config['aligner']+"/{sample}.bam",
+            indexfile = "filtered_bam/{sample}.filtered.tmp.bam.bai" if config['aligner'] == "Bowtie2" else config['aligner']+"/{sample}.bam.bai"
         output:
             bamfile = "filtered_bam/{sample}.filtered.bam"
         params:
-            umitools_options = str(UMIDedupOpts or ''),
-            umitools_paired = "--paired " if pairedEnd else " ",
-            umi_sep = str(UMIDedupSep),
+            umitools_options = str(config['UMIDedupOpts'] or ''),
+            umitools_paired = "--paired " if config['pairedEnd'] else " ",
+            umi_sep = str(config['UMIDedupSep']),
         log:
             out = "filtered_bam/logs/umi_dedup.{sample}.out",
             err = "filtered_bam/logs/umi_dedup.{sample}.err"

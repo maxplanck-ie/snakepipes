@@ -131,23 +131,23 @@ if config['pairedEnd']:
 else:
     rule STAR:
         input:
-            fastq_dir+"/{sample}"+reads[0]+".fastq.gz"
+            config['fastq_dir']+"/{sample}"+config['reads'][0]+".fastq.gz"
         output:
-            bam = temp(aligner+"/{sample}.sorted.bam")
-        log: aligner+"/logs/{sample}.sort.log"
+            bam = temp(config['aligner']+"/{sample}.sorted.bam")
+        log: config['aligner']+"/logs/{sample}.sort.log"
         params:
-            alignerOptions = str(alignerOptions or ''),
-            gtf = genes_gtf,
-            index = star_index,
-            prefix = aligner+"/{sample}/{sample}.",
+            alignerOptions = str(config['alignerOptions'] or ''),
+            gtf = config['genes_gtf'],
+            index = config['star_index'],
+            prefix = config['aligner']+"/{sample}/{sample}.",
             samsort_memory = '2G',
-            sample_dir = aligner+"/{sample}",
+            sample_dir = config['aligner']+"/{sample}",
             samtools_threads = 5,
-            tempDir = tempDir
+            tempDir = config['tempDir']
         benchmark:
-            aligner+"/.benchmark/STAR.{sample}.benchmark"
-        threads: lambda wildcards: 20 if 20<max_thread else max_thread  # 3.2G per core
-        conda: CONDA_RNASEQ_ENV
+            config['aligner']+"/.benchmark/STAR.{sample}.benchmark"
+        threads: lambda wildcards: 20 if 20<config['max_thread'] else config['max_thread']  # 3.2G per core
+        conda: config['CONDA_RNASEQ_ENV']
         shell: """
             TMPDIR={params.tempDir}
             MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX)

@@ -5,17 +5,17 @@
 # mark dups
 rule sambamba_markdup:
        input:
-           aligner+"/{sample}.sorted.bam"
+           config['aligner']+"/{sample}.sorted.bam"
        output:
-           aligner+"/{sample}.bam"# duplicate marked
-       threads: lambda wildcards: 10 if 10<max_thread else max_thread
+           config['aligner']+"/{sample}.bam"# duplicate marked
+       threads: lambda wildcards: 10 if 10<config['max_thread'] else config['max_thread']
        log:
-           out=aligner + "/logs/{sample}.sambamba_markdup.out",
-           err=aligner + "/logs/{sample}.sambamba_markdup.err"
-       benchmark: aligner + "/.benchmark/sambamba_markdup.{sample}.benchmark"
+           out=config['aligner'] + "/logs/{sample}.sambamba_markdup.out",
+           err=config['aligner'] + "/logs/{sample}.sambamba_markdup.err"
+       benchmark: config['aligner'] + "/.benchmark/sambamba_markdup.{sample}.benchmark"
        params:
-           tempDir = tempDir
-       conda: CONDA_SAMBAMBA_ENV
+           tempDir = config['tempDir']
+       conda: config['CONDA_SAMBAMBA_ENV']
        shell: """
            TMPDIR={params.tempDir}
            MYTEMP=$(mktemp -d "${{TMPDIR:-/tmp}}"/snakepipes.XXXXXXXXXX)
@@ -26,22 +26,22 @@ rule sambamba_markdup:
 ## get statistics
 rule sambamba_flagstat_sorted:
        input:
-           aligner+"/{sample}.sorted.bam"
+           config['aligner']+"/{sample}.sorted.bam"
        output:
            "Sambamba/{sample}.sorted.markdup.txt"
        log: "Sambamba/logs/{sample}.flagstat_sorted.log"
-       conda: CONDA_SAMBAMBA_ENV
+       conda: config['CONDA_SAMBAMBA_ENV']
        shell: """
            sambamba flagstat -p {input} > {output} 2> {log}
            """
 
 rule sambamba_flagstat:
        input:
-           aligner+"/{sample}.bam"
+           config['aligner']+"/{sample}.bam"
        output:
            "Sambamba/{sample}.markdup.txt"
        log: "Sambamba/logs/{sample}.flagstat.log"
-       conda: CONDA_SAMBAMBA_ENV
+       conda: config['CONDA_SAMBAMBA_ENV']
        shell: """
            sambamba flagstat -p {input} > {output} 2> {log}
            """
@@ -49,9 +49,9 @@ rule sambamba_flagstat:
 ## index the duplicate marked folder
 rule samtools_index:
     input:
-        aligner+"/{sample}.bam"
+        config['aligner']+"/{sample}.bam"
     output:
-        aligner+"/{sample}.bam.bai"
-    log: aligner + "/logs/{sample}.index.log"
-    conda: CONDA_SHARED_ENV
+        config['aligner']+"/{sample}.bam.bai"
+    log: config['aligner'] + "/logs/{sample}.index.log"
+    conda: config['CONDA_SHARED_ENV']
     shell: "samtools index {input} 2> {log}"

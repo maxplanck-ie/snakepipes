@@ -4,7 +4,7 @@
 rule GContamination_featureCounts:
     input:
         bams = config['aligner'] + "/{sample}.bam",
-        gtf = str(extended_coding_regions_gtf or '')
+        gtf = str(config['extended_coding_regions_gtf'] or '')
     output:
         txt = temp("GenomicContamination/{sample}.featurecounts.txt"),
         summary = "GenomicContamination/{sample}.featurecounts.txt.summary"
@@ -12,7 +12,7 @@ rule GContamination_featureCounts:
         out = "GenomicContamination/{sample}.featurecounts.out",
         err = "GenomicContamination/{sample}.featurecounts.err"
     threads: 8
-    conda: CONDA_RNASEQ_ENV
+    conda: config['CONDA_RNASEQ_ENV']
     shell:
         "featureCounts -T {threads} -a {input.gtf} -t transcript -o {output.txt} {input.bams} > {log.out} 2> {log.err}"
 

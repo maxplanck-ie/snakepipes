@@ -1,26 +1,26 @@
 ## allelic mapping using STAR
-if aligner == "STAR":
-    if pairedEnd:
+if config['aligner'] == "STAR":
+    if config['pairedEnd']:
         rule STAR_allele:
             input:
-                r1 = fastq_dir+"/{sample}"+reads[0]+".fastq.gz",
-                r2 = fastq_dir+"/{sample}"+reads[1]+".fastq.gz",
-                index = star_index_allelic
+                r1 = config['fastq_dir']+"/{sample}"+config['reads'][0]+".fastq.gz",
+                r2 = config['fastq_dir']+"/{sample}"+config['reads'][1]+".fastq.gz",
+                index = config['star_index_allelic']
             output:
-                temp(aligner+"/{sample}.sorted.bam")
-            log: aligner+"/logs/{sample}.sort.log"
+                temp(config['aligner']+"/{sample}.sorted.bam")
+            log: config['aligner']+"/logs/{sample}.sort.log"
             params:
-                alignerOptions = str(alignerOptions or ''),
-                gtf = genes_gtf,
-                prefix = aligner+"/{sample}/{sample}.",
+                alignerOptions = str(config['alignerOptions'] or ''),
+                gtf = config['genes_gtf'],
+                prefix = config['aligner']+"/{sample}/{sample}.",
                 samsort_memory = '2G',
-                idx = os.path.dirname(star_index_allelic),
-                sample_dir = aligner+"/{sample}",
-                tempDir = tempDir
+                idx = os.path.dirname(config['star_index_allelic']),
+                sample_dir = config['aligner']+"/{sample}",
+                tempDir = config['tempDir']
             benchmark:
-                aligner+"/.benchmark/STAR.{sample}.benchmark"
-            threads: lambda wildcards: 12 if 12<max_thread else max_thread
-            conda: CONDA_RNASEQ_ENV
+                config['aligner']+"/.benchmark/STAR.{sample}.benchmark"
+            threads: lambda wildcards: 12 if 12<config['max_thread'] else config['max_thread']
+            conda: config['CONDA_RNASEQ_ENV']
             shell: """
                 TMPDIR={params.tempDir}
                 MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX);
@@ -50,23 +50,23 @@ if aligner == "STAR":
     else:
         rule STAR_allele:
             input:
-                r1 = fastq_dir+"/{sample}.fastq.gz",
-                index = star_index_allelic
+                r1 = config['fastq_dir']+"/{sample}.fastq.gz",
+                index = config['star_index_allelic']
             output:
-                temp(aligner+"/{sample}.sorted.bam")
-            log: aligner+"/logs/{sample}.sort.log"
+                temp(config['aligner']+"/{sample}.sorted.bam")
+            log: config['aligner']+"/logs/{sample}.sort.log"
             params:
-                alignerOptions = str(alignerOptions or ''),
-                gtf = genes_gtf,
-                idx = os.path.dirname(star_index_allelic),
-                prefix = aligner+"/{sample}/{sample}.",
+                alignerOptions = str(config['alignerOptions'] or ''),
+                gtf = config['genes_gtf'],
+                idx = os.path.dirname(config['star_index_allelic']),
+                prefix = config['aligner']+"/{sample}/{sample}.",
                 samsort_memory = '2G',
-                sample_dir = aligner+"/{sample}",
-                tempDir = tempDir
+                sample_dir = config['aligner']+"/{sample}",
+                tempDir = config['tempDir']
             benchmark:
-                aligner+"/.benchmark/STAR.{sample}.benchmark"
-            threads: lambda wildcards: 12 if 12<max_thread else max_thread
-            conda: CONDA_RNASEQ_ENV
+                config['aligner']+"/.benchmark/STAR.{sample}.benchmark"
+            threads: lambda wildcards: 12 if 12<config['max_thread'] else config['max_thread']
+            conda: config['CONDA_RNASEQ_ENV']
             shell: """
                 TMPDIR={params.tempDir}
                 MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX);
