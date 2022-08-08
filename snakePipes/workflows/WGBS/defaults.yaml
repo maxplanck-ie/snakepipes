@@ -37,8 +37,8 @@ reads: [_R1, _R2]
 downsample:
 ## Options for trimming
 trim: False
-trimmer: 'fastp'
-trimmerOptions: '-q 5 -l 30 -M 5'
+trimmer:
+trimmerOptions:
 ## Bin size of output files in bigWig format
 bwBinSize: 25
 ## Run FASTQC read quality control
