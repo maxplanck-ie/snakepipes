@@ -39,7 +39,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: mamba-org/provision-with-micromamba@main
-         with:
+        with:
           environment-file: .github/snakePipesEnvCI.yml
           cache-downloads: true
       - name: install snakePipes_OSX
