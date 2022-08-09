@@ -1,0 +1,27 @@
+name: osx
+
+on:
+  push:
+    branches: [master, develop, dev_wd_osxbuild]
+  pull_request:
+
+defaults:
+  run:
+      shell: bash -l {0}
+
+jobs:
+  createEnvs:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: mamba-org/provision-with-micromamba@main
+        with:
+          environment-file: .github/snakePipesEnvCI.yml
+          cache-downloads: true
+      - name: Install snakePipes
+        run: |
+          micromamba run -n snakePipes_CI python -m pip install . --no-deps --ignore-installed -vvv
+      - name: which snakePipes
+        run: |
+          micromamba activate snakePipes_CI
+          which snakePipes
