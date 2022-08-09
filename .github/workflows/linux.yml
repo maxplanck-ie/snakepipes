@@ -57,7 +57,9 @@ jobs:
         micromamba activate snakePipes_CI
         ./.ci_stuff/test_dag.sh
   createEnvs:
+    needs: CI
     strategy:
+      fail-fast: false
       matrix:
         envs: [
           'CONDA_SHARED_ENV',
