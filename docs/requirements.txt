@@ -1,3 +1,4 @@
 sphinx-argparse
 mock
 sphinx-rtd-theme
+jinja2 < 3.1.0
