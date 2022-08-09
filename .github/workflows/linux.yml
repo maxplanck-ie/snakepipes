@@ -49,7 +49,7 @@ jobs:
       with:
         environment-file: .github/snakePipesEnvCI.yml
         cache-downloads: true
-        channel-priority: 'disabled'
+        channel-priority: 'flexible'
     - name: Install snakePipes
       run: |
         micromamba run -n snakePipes_CI python -m pip install . --no-deps --ignore-installed -vvv
@@ -95,5 +95,7 @@ jobs:
         micromamba run -n snakePipes_CI python -m pip install . --no-deps --ignore-installed -vvv
     - name: createEnvs
       run: |
+        micromamba activate snakePipes_CI
+        conda config --set channel_priority flexible
         snakePipes createEnvs --force --only ${{matrix.envs}}
 
