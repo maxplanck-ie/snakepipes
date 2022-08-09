@@ -2,7 +2,7 @@ name: linux
 
 on: 
   push:
-    branches: [dev_wd, master, develop]
+    branches: [dev_wd]
   pull_request:
 
 defaults:
