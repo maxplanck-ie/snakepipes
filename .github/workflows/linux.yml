@@ -49,6 +49,7 @@ jobs:
       with:
         environment-file: .github/snakePipesEnvCI.yml
         cache-downloads: true
+        channel-priority: 'disabled'
     - name: Install snakePipes
       run: |
         micromamba run -n snakePipes_CI python -m pip install . --no-deps --ignore-installed -vvv
