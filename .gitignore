@@ -25,4 +25,4 @@ _sources
 output
 
 # pip stuff
-*egg-info
+snakePipes.egg-info
