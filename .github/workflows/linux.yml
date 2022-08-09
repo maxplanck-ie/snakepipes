@@ -60,7 +60,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - uses: mamba-org/provision-with-micromamba@main$
+    - uses: mamba-org/provision-with-micromamba@main
       with:
         environment-file: .github/snakePipesEnvCI.yml
         cache-downloads: true
