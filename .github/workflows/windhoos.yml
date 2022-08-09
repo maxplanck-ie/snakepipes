@@ -35,7 +35,7 @@ jobs:
           'CONDA_SAMBAMBA_ENV',
           'CONDA_pysam_ENV'
         ]
-    runs-on: macos-latest
+    runs-on: windows-latest
     steps:
       - uses: actions/checkout@v3
       - uses: mamba-org/provision-with-micromamba@main
@@ -50,4 +50,3 @@ jobs:
           micromamba activate snakePipes_CI
           conda config --set channel_priority flexible
           snakePipes createEnvs --force --only ${{matrix.envs}}
-     
