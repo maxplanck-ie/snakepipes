@@ -3,28 +3,29 @@
 Setting up snakePipes
 =====================
 
-Unlike many other pipelines, setting up snakePipes is easy! All you need is a *linux/OSX system* with *python3-conda* installation.
+Unlike many other pipelines, setting up snakePipes is easy! All you need is a *linux/OSX system* with *python3-mamba* installation. In past versions, snakePipes was using conda. We are now moving forward with mamba: a Python-based CLI conceived as a drop-in replacement for conda, offering higher speed and more reliable environment solutions to our snakePipes workflows thanks to the bindings over _libsolv_.
 
-Installing conda with python3
------------------------------
+Installing conda & mamba
+------------------------
 
-Follow the instructions `here <https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html>`__ to install either
-miniconda or anaconda. A minimal version (miniconda) is enough for snakePipes. Get the miniconda installer `here <https://conda.io/miniconda.html>`__.
+Follow the instructions `here <https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html>`__ to install either miniconda or anaconda first. Once you have already installed either miniconda or anaconda, you may simply `add mamba to your base environment <https://mamba.readthedocs.io/en/latest/installation.html#existing-conda-install>`__
+
+.. code-block:: bash
+
+    $ conda install mamba -c conda-forge
 
 After installation, check your python path and version :
 
 .. code-block:: bash
 
-    $ which python
-    $ /your_path/miniconda3/bin/python
+    $ command -v python
+    $ <your_chosen_installation_path>/bin/python
 
     $ python --version # anything above 3.5 is ok!
     $ Python 3.6.5 :: Anaconda, Inc.
 
-    $ conda --version # only for sanity check
-    $ conda 4.5.8
 
-Next, install snakePipes.
+Now we are ready to install snakePipes latest release using ``mamba``.
 
 
 Installing snakePipes
@@ -34,48 +35,16 @@ The easiest way to install snakePipes is via our conda channel. The following co
 
 .. code:: bash
 
-    conda create -n snakePipes -c mpi-ie -c conda-forge -c bioconda snakePipes
+    mamba create -n snakePipes -c mpi-ie -c conda-forge -c bioconda snakePipes
 
 This way, the software used within snakePipes do not conflict with the software pre-installed on your terminal or in your python environment.
 
-.. note:: This might take a few minutes depending on the access to conda channels.
-
-snakePipes is going to move to mamba in the future.
-
-Development installation
-~~~~~~~~~~~~~~~~~~~~~~~~
-
-If you wish to modify snakePipes you can install it via pip from within a conda environment, using our `GitHub repository <https://github.com/maxplanck-ie/snakepipes>`__ .
-
-.. code:: bash
-
-    conda create -n snakepipes python=3.7 snakemake pandas graphviz fuzzywuzzy
-    conda activate snakepipes
-    pip install git+https://github.com/maxplanck-ie/snakepipes@develop
-
-Instead of providing the URL to ``pip``, you can also `clone <https://help.github.com/articles/cloning-a-repository/>`__ our `GitHub repository <https://github.com/maxplanck-ie/snakepipes>`__ on your computer, and modify the code before running snakePipes. Please see :doc:`advanced_usage` for more information on how to modify and extend snakePipes workflows.
-
-Testing whether the installation went fine
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-After installation, you can activate the snakePipes environment via
+Now, we should create the workflow environments:
 
 .. code:: bash
 
     conda activate snakePipes
-
-In case you installed conda using the latest version of conda installers (eg. minicoda `4.5.*` or later), the `conda` command might not be available inside an environment. To enable this, export the path to conda/bin in your $PATH (or append the path manually in your `bashrc`)
-
-.. code:: bash
-
-    export PATH="/path/to/miniconda3/bin:$PATH"
-
-Snakemake and pandas are installed along with snakePipes as requirements. Ensure you have them working by testing these commands:
-
-.. code-block:: bash
-
-    snakemake --help
-    snakePipes --help
+    snakePipes createEnvs
 
 
 Modify global options
@@ -112,15 +81,10 @@ All the tools required for running various pipelines are installed via various c
 
     snakePipes createEnvs
 
-.. note:: Creating the environments might take 1 hour. But it only has to be done once.
-
 .. note::
 
     ``snakePipes createEnvs`` will also set the ``snakemakeOptions:`` line in the global snakePipes
     ``defaults.yaml`` files. If you have already modified this then use the ``--keepCondaDir`` option.
-
-.. warning::
-   If you installed with ``pip`` you must use the ``--develop`` option.
 
 The place where the conda envs are created (and therefore the tools are installed) is defined in ``snakePipes/defaults.yaml``
 file on our GitHub repository. You can modify it to suite your needs.

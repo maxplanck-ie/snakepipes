@@ -1,6 +1,6 @@
 package:
   name: snakepipes
-  version: 2.5.3
+  version: 2.5.4
 
 source:
   path: ../
@@ -20,7 +20,6 @@ requirements:
     - fuzzywuzzy
     - pyyaml >=5.1
     - coreutils
-    - mamba
 
 test:
   commands:
