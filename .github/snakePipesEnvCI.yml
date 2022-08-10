@@ -7,9 +7,9 @@ dependencies:
   - snakemake=6.2.1
   - fuzzywuzzy
   - mock
-  - sphinx
+  - sphinx=4.2.0
   - sphinx-argparse
-  - sphinx_rtd_theme
+  - sphinx_rtd_theme=1.0.0
   - flake8
   - coreutils
   - mamba
