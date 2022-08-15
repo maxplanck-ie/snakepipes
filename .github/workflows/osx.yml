@@ -1,0 +1,51 @@
+name: osx
+
+on:
+  pull_request:
+
+defaults:
+  run:
+      shell: bash -l {0}
+
+jobs:
+  createEnvs_OSX:
+    strategy:
+      fail-fast: false
+      matrix:
+        envs: [
+          'CONDA_SHARED_ENV',
+          'CONDA_CREATE_INDEX_ENV',
+          'CONDA_RNASEQ_ENV',
+          'CONDA_RMATS_ENV',
+          'CONDA_scRNASEQ_ENV',
+          'CONDA_seurat3_ENV',
+          'CONDA_loompy_ENV',
+          'CONDA_alevinqc_ENV',
+          'CONDA_eisaR_ENV',
+          'CONDA_DNA_MAPPING_ENV',
+          'CONDA_CHIPSEQ_ENV',
+          'CONDA_ATAC_ENV',
+          'CONDA_HIC_ENV',
+          'CONDA_WGBS_ENV',
+          'CONDA_RMD_ENV',
+          'CONDA_PREPROCESSING_ENV',
+          'CONDA_NONCODING_RNASEQ_ENV',
+          'CONDA_SAMBAMBA_ENV',
+          'CONDA_pysam_ENV'
+        ]
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: mamba-org/provision-with-micromamba@main
+        with:
+          environment-file: .github/snakePipesEnvCI.yml
+          cache-downloads: true
+      - name: install snakePipes_OSX
+        run: |
+          micromamba run -n snakePipes_CI python -m pip install . --no-deps --ignore-installed -vvv
+      - name: createEnvsOSX
+        run: |
+          micromamba activate snakePipes_CI
+          conda config --set channel_priority flexible
+          snakePipes createEnvs --force --only ${{matrix.envs}}
+     

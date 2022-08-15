@@ -12,7 +12,7 @@ dependencies:
   - r-base = 3.6.3
   - r-car = 3.0_6
   - r-factominer = 2.2
-  - r-ggplot2 = 3.1.1
+  - r-ggplot2
   - r-rmarkdown
   - r-dplyr = 1.0.2
   - r-tidyr
