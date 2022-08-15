@@ -10,3 +10,5 @@ Genrich_peaks:
     memory: 20G
 namesort_bams:
     memory: 6G
+filterCoveragePerScaffolds:
+    memory: 6G

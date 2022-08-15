@@ -1,7 +1,6 @@
 name: osx
 
-on:
-  pull_request:
+on: [pull_request, push]
 
 defaults:
   run:
