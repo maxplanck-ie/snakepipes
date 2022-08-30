@@ -1,17 +1,17 @@
-name: snakepipes_atac-seq_1.0
+name: snakepipes_atac-seq_2.0
 channels:
  - conda-forge
  - bioconda
 dependencies:
- - bioconductor-genomeinfodbdata = 1.2.2
- - bioconductor-csaw = 1.20.0
- - bioconductor-genomicranges = 1.38.0
- - macs2 = 2.2.6
- - gawk = 5.0.1
- - r-base = 3.6.2
+ - bioconductor-genomeinfodbdata
+ - bioconductor-csaw
+ - bioconductor-genomicranges
+ - macs2 = 2.2.7.1
+ - gawk = 5.1.0
+ - r-base = 4.1.3
  - r-kernsmooth
  - r-statmod
  - r-yaml
  - r-rmarkdown
- - hmmratac = 1.2.9
- - genrich = 0.6
+ - hmmratac = 1.2.10
+ - genrich = 0.6.1
