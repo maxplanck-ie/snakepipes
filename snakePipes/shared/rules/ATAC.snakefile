@@ -44,7 +44,7 @@ rule filterFragments:
     threads: 6
     conda: CONDA_SAMBAMBA_ENV
     shell: """
-        sambamba view -f bam -F "template_length >= {params.minFragmentSize} and template_length <= {params.maxFragmentsize}" -t {threads} -o {output.shortBAM} {input}
+        sambamba view -f bam -F "template_length >= {params.minFragmentSize} and template_length <= {params.maxFragmentSize}" -t {threads} -o {output.shortBAM} {input}
         2> {log}
         """
 
