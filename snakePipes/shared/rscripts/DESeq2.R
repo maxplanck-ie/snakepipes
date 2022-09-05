@@ -57,8 +57,12 @@ cat(paste("Salmon tx2gene file : ", tx2gene_file, "\n"))
 ## ~~~~~ 1. SETUP ~~~~~
 ## sampleInfo (setup of the experiment)
 sampleInfo <- read.table(sampleInfoFilePath, header = TRUE, stringsAsFactor = F)
+#in case of allelic mode with just one group - don't relevel?
+#in this case, comparison will be done between genome1 and genome2
+if( length(unique(sampleInfo$condition))>1){
 sampleInfo$condition <- as.factor(sampleInfo$condition)
 sampleInfo$condition <- relevel(sampleInfo$condition, ref = as.character(sampleInfo$condition[1])) # first sample defines base
+} else { message("Allelic workflow with one condition detected. Releveling skipped. Comparison will be done between genome1 and genome2.")}
 
 ## add X at the beginning of rows beginning with a number (makes it consistent to column names of of the count matrix!)
 #if ( any(grepl("^[0-9]", sampleInfo$name)) ) {
@@ -87,12 +91,14 @@ if(isTRUE(tximport)) {
 }
 
 ## ~~~~~~~ 3. run DESeq wrapper ~~~~~~~~
-seqout <- DESeq_basic(countdata, coldata = sampleInfo, fdr = fdr, alleleSpecific = allelic_info, from_salmon = tximport)
+#in case of the allelic-specific workflow, allow for 1 condition and skip deseq2 basic in this case 
+if(length(unique(sampleInfo$condition))>1){
+    seqout <- DESeq_basic(countdata, coldata = sampleInfo, fdr = fdr, alleleSpecific = allelic_info, from_salmon = tximport)
 
-DESeq_writeOutput(DEseqout = seqout,
+    DESeq_writeOutput(DEseqout = seqout,
                 fdr = fdr, outprefix = "DEseq_basic",
                 geneNamesFile = geneNamesFilePath)
-
+}
 #DESeq_downstream(DEseqout = seqout, countdata, sampleInfo,
 #             fdr = fdr, outprefix = "DEseq_basic", heatmap_topN = topN,
 #             geneNamesFile = geneNamesFilePath)
@@ -125,9 +131,10 @@ bib <- c(
 write.bibtex(bib, file = 'citations.bib')
 file.copy(rmdTemplate, to = 'DESeq2_report_basic.Rmd')
 
-outprefix = "DEseq_basic"
-cite_options(citation_format = "text",style = "html",cite.style = "numeric",hyperlink = TRUE)
-render('DESeq2_report_basic.Rmd',
+if(length(unique(sampleInfo$condition))>1){
+  outprefix = "DEseq_basic"
+  cite_options(citation_format = "text",style = "html",cite.style = "numeric",hyperlink = TRUE)
+  render('DESeq2_report_basic.Rmd',
               output_format = "html_document",
               clean = TRUE,
               params = list(
@@ -138,6 +145,7 @@ render('DESeq2_report_basic.Rmd',
                   fdr = 0.05,
                   heatmap_topN = 20,
                   geneNamesFile = geneNamesFilePath))
+}
 
 if (isTRUE(allelic_info)) {
     file.copy(rmdTemplate, to = 'DESeq2_report_allelic.Rmd')

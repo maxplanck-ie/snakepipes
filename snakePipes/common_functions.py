@@ -24,7 +24,7 @@ def set_env_yamls():
             'CONDA_RNASEQ_ENV': 'envs/rna_seq.yaml',
             'CONDA_RMATS_ENV': 'envs/rMats.yaml',
             'CONDA_scRNASEQ_ENV': 'envs/sc_rna_seq.yaml',
-            'CONDA_seurat3_ENV': 'envs/sc_rna_seq_seurat3.yaml',
+            'CONDA_seurat_ENV': 'envs/sc_rna_seq_seurat.yaml',
             'CONDA_loompy_ENV': 'envs/sc_rna_seq_loompy.yaml',
             'CONDA_alevinqc_ENV': 'envs/sc_rna_seq_alevinqc.yaml',
             'CONDA_eisaR_ENV': 'envs/sc_rna_seq_eisaR.yaml',

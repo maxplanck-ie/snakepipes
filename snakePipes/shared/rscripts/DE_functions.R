@@ -63,6 +63,11 @@ checktable <- function(countdata = NA, sampleSheet = NA, alleleSpecific = FALSE,
         }
     }
   }
+  if(all(is.integer(countdata))){
+        print("All countdata is integer.")
+    }else{
+        print("Non-integer counts detected. The data will be rounded, as this is well within the expected sampling variation of a technical replicate.")
+        countdata<-round(countdata) }
   return(countdata)
 }
 
@@ -143,11 +148,20 @@ DESeq_allelic <- function(countdata, coldata, fdr) {
     rownames(design)<-colnames(rnasamp)
 
     # Run DESeq
-    dds <- DESeq2::DESeqDataSetFromMatrix(rnasamp, colData = design,
+    if(length(unique(design$condition))>1){
+      dds <- DESeq2::DESeqDataSetFromMatrix(rnasamp, colData = design,
                               design = ~allele + condition + allele:condition)
-    rownames(dds) <- rownames(rnasamp)
-    dds <- DESeq2::DESeq(dds,betaPrior = FALSE)
-    ddr <- DESeq2::results(dds, name=paste0("allelegenome2.condition",unique(coldata$condition)[2]))
+      rownames(dds) <- rownames(rnasamp)
+      dds <- DESeq2::DESeq(dds,betaPrior = FALSE)
+      ddr <- DESeq2::results(dds, name=paste0("allelegenome2.condition",unique(coldata$condition)[2]))
+    } else {
+    dds <- DESeq2::DESeqDataSetFromMatrix(rnasamp, colData = design,
+                              design = ~allele)
+      rownames(dds) <- rownames(rnasamp)
+      dds <- DESeq2::DESeq(dds,betaPrior = FALSE)
+      ddr <- DESeq2::results(dds, name="allele_genome2_vs_genome1")
+
+   }
     output <- list(dds = dds, ddr = ddr, ddr_shrunk=NULL)
     return(output)
 }
