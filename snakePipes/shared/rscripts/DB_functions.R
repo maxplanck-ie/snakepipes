@@ -256,7 +256,7 @@ getDBregions_chip <- function(chipCountObject, plotfile = NULL){
     # Make DGElist
     y <- csaw::asDGEList(chipCountObject$windowCounts, norm.factors = chipCountObject$normFactors)
     if(chipCountObject$designType=="condition"){
-    colnames(y)<-chipCountObject$sampleInfo$name}else{
+    colnames(y)<-chipCountObject$sampleSheet$name}else{
     colnames(y)<-paste0(rep(chipCountObject$sampleSheet$name,each=2),".genome",c(1,2))}
     design <- chipCountObject$design
     # Estimate dispersions
@@ -289,8 +289,9 @@ getDBregions_chip <- function(chipCountObject, plotfile = NULL){
     tabcom <- csaw::combineTests(merged$id, results$table, pval.col = 4, fc.col = 1)
     # get fold change of the best window within each combined cluster
     tab.best <- csaw::getBestTest(merged$id, results$table,pval.col=4,cpm.col=1)
-    tabcom$best.logFC <- tab.best$logFC
-    tabcom$best.start <- GenomicRanges::start(SummarizedExperiment::rowRanges(chipCountObject$windowCounts))[tab.best$best]
+    tabcom$best.logFC <- tab.best$rep.logFC
+    tabcom$best.test <- tab.best$rep.test
+    tabcom$best.start <- GenomicRanges::start(SummarizedExperiment::rowRanges(chipCountObject$windowCounts))[tab.best$rep.test]
 
     # Return all results
     chipResultObject <- list(fit = fit, results = results, mergedRegions = merged, combinedPvalues = tabcom)
