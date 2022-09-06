@@ -6,6 +6,7 @@ dependencies:
  - bioconductor-genomeinfodbdata
  - bioconductor-csaw
  - bioconductor-genomicranges
+ - bioconductor-rtracklayer
  - macs2 = 2.2.7.1
  - gawk = 5.1.0
  - r-base = 4.1.3
