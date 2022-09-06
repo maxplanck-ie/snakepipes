@@ -13,7 +13,7 @@ rule get_nearest_transcript:
         err= "AnnotatedResults_{}_{}".format(peakCaller, sample_name)+"/logs/bedtools_closest.{change_dir}.err",
     conda: CONDA_RNASEQ_ENV
     shell: """
-            if [ -r {input.bed} ]; then bedtools closest -D b -a <( bedtools sort -i {input.bed} ) -b <( bedtools sort -i {params.genes_bed} ) | cut -f1-{params.field_offset},$(( {params.field_offset} + 1 ))-$(( {params.field_offset} + 4 )),$(( {params.field_offset} + 6 )),$(( {params.field_offset} + 13 )) > {output.annotated_bed};fi 2> {log.err}
+            if [ -r {input.bed} ]; then bedtools closest -D b -a <( bedtools sort -i {input.bed} | tr " " "\t" ) -b <( bedtools sort -i {params.genes_bed} | tr " " "\t" ) | cut -f1-{params.field_offset},$(( {params.field_offset} + 1 ))-$(( {params.field_offset} + 4 )),$(( {params.field_offset} + 6 )),$(( {params.field_offset} + 13 )) > {output.annotated_bed};fi 2> {log.err}
            """
 
 rule get_nearest_gene:
