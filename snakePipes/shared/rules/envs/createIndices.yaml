@@ -1,4 +1,4 @@
-name: snakepipes_createindices_environment_1.0
+name: snakepipes_createindices_environment_2.0
 channels:
  - conda-forge
  - bioconda
@@ -6,9 +6,9 @@ dependencies:
  - ucsc-fatotwobit
  - ucsc-gtftogenepred
  - ucsc-genepredtobed
- - bowtie2 = 2.3.5.1
- - hisat2 = 2.1.0
- - star = 2.7.4a
+ - bowtie2 = 2.4.5
+ - hisat2 = 2.2.1
+ - star = 2.7.10a
  - bwa = 0.7.17
- - bwameth = 0.2.2
- - tbb = 2020.2
+ - bwameth = 0.2.5
+ - tbb

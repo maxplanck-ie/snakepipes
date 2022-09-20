@@ -32,8 +32,8 @@ if(any(is.na(size_v),sum(size_v==0)>0)){message('Some of the input files are non
     if(pipeline %in% c("chip-seq","ATAC-seq")){
         ibed_tab$GeneID<-t2g_tab$V2[match(ibed_tab$V19,t2g_tab$V1)]
         ibed_tab$GeneSymbol<-gs_tab$V2[match(ibed_tab$GeneID,gs_tab$V1)]
-        obed_tab<-unique(subset(ibed_tab,select=c(paste0("V",c(1:15,20,21)),"GeneID","GeneSymbol")))
-        colnames(obed_tab)<-c("Chromosome","Start","End","Width","Strand","Score","nWindows","logFC.up","logFC.down","PValue","FDR","direction","best.logFC","best.start","Name","GeneStrand","Distance","GeneID","GeneSymbol")
+        obed_tab<-unique(subset(ibed_tab,select=c(paste0("V",c(1:18,20,21)),"GeneID","GeneSymbol")))
+        colnames(obed_tab)<-c("Chromosome","Start","End","Width","Strand","Score","nWindows","logFC.up","logFC.down","PValue","FDR","direction","rep.test","rep.logFC","best.logFC","best.test","best.start","Name","GeneStrand","Distance","GeneID","GeneSymbol")
     }
 
 
