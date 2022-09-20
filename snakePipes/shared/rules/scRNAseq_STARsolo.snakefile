@@ -79,7 +79,7 @@ rule STARsolo_report:
         samples = samples
     log:
         out = "STARsolo/logs/Report.out"
-    conda: CONDA_seurat3_ENV
+    conda: CONDA_seurat_ENV
     script: "../rscripts/scRNAseq_report.R"
 
 
@@ -151,7 +151,7 @@ rule STARsolo_raw_to_seurat:
         samples = samples
     log:
         out = "Seurat/STARsolo_raw/logs/seurat.out"
-    conda: CONDA_seurat3_ENV
+    conda: CONDA_seurat_ENV
     script: "../rscripts/scRNAseq_Seurat3.R"
 
 rule STARsolo_filtered_to_seurat:
@@ -165,7 +165,7 @@ rule STARsolo_filtered_to_seurat:
         samples = samples
     log:
         out = "Seurat/STARsolo_filtered/logs/seurat.out"
-    conda: CONDA_seurat3_ENV
+    conda: CONDA_seurat_ENV
     script: "../rscripts/scRNAseq_Seurat3.R"
 
 
@@ -182,7 +182,7 @@ rule remove_empty_drops:
         samples = samples
     log:
         out = "Seurat/STARsolo_raw_RmEmptyDrops/logs/seurat.out"
-    conda: CONDA_seurat3_ENV
+    conda: CONDA_seurat_ENV
     script: "../rscripts/scRNAseq_EmptyDrops.R"
 
 
