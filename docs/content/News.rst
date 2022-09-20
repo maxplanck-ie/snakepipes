@@ -1,6 +1,14 @@
 snakePipes News
 ===============
 
+snakePipes 2.x.x
+----------------
+
+* Bumped software versions in environment yamls.
+* Updated CSAW output.
+* Fixed a couple of issues in the ATAC-seq workflow after sofware versions update.
+
+
 snakePipes 2.5.4
 ----------------
 
