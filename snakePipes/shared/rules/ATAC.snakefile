@@ -1,36 +1,53 @@
+#rule filterFragments:
+#    input:
+#        "filtered_bam/{sample}.filtered.bam"
+#    output:
+#        shortBAM = temp(os.path.join(short_bams, "{sample}.short.bam")),
+#        metrics = os.path.join(short_bams, "{sample}.short.metrics")
+#    log: os.path.join(short_bams, "logs/{sample}.filterFragments.log")
+#    params:
+#        maxFragmentSize=maxFragmentSize,
+#        minFragmentSize=minFragmentSize
+#    threads: 6
+#    conda: CONDA_SHARED_ENV
+#    shell: """
+#        alignmentSieve --bam {input} \
+#        --outFile {output.shortBAM} -p {threads} \
+#        --filterMetrics {output.metrics} \
+#        --maxFragmentLength {params.maxFragmentSize} \
+#        --minFragmentLength {params.minFragmentSize} \
+#        2> {log}
+#        """
+
+
+#rule filterMetricsToHtml:
+#    input:
+#        expand(os.path.join(short_bams, "{sample}.short.metrics"), sample=samples)
+#    output:
+#        QCrep='Filtering_metrics/Filtering_report.html'
+#    log:
+#        err="Filtering_metrics/logs/produce_report.err",
+#        out="Filtering_metrics/logs/produce_report.out"
+#    conda: CONDA_RMD_ENV
+#    threads: 1
+#    script: "../rscripts/ATACseq_QC_report_template.Rmd"
+
 rule filterFragments:
     input:
         "filtered_bam/{sample}.filtered.bam"
     output:
-        shortBAM = temp(os.path.join(short_bams, "{sample}.short.bam")),
-        metrics = os.path.join(short_bams, "{sample}.short.metrics")
+        shortBAM = temp(os.path.join(short_bams, "{sample}.short.bam"))
     log: os.path.join(short_bams, "logs/{sample}.filterFragments.log")
     params:
         maxFragmentSize=maxFragmentSize,
         minFragmentSize=minFragmentSize
     threads: 6
-    conda: CONDA_SHARED_ENV
+    conda: CONDA_SAMBAMBA_ENV
     shell: """
-        alignmentSieve --bam {input} \
-        --outFile {output.shortBAM} -p {threads} \
-        --filterMetrics {output.metrics} \
-        --maxFragmentLength {params.maxFragmentSize} \
-        --minFragmentLength {params.minFragmentSize} \
+        sambamba view -f bam -F "template_length >= {params.minFragmentSize} and template_length <= {params.maxFragmentSize} or template_length >= -{params.maxFragmentSize} and template_length <= {params.minFragmentSize}" -t {threads} -o {output.shortBAM} {input}
         2> {log}
         """
 
-
-rule filterMetricsToHtml:
-    input:
-        expand(os.path.join(short_bams, "{sample}.short.metrics"), sample=samples)
-    output:
-        QCrep='Filtering_metrics/Filtering_report.html'
-    log:
-        err="Filtering_metrics/logs/produce_report.err",
-        out="Filtering_metrics/logs/produce_report.out"
-    conda: CONDA_RMD_ENV
-    threads: 1
-    script: "../rscripts/ATACseq_QC_report_template.Rmd"
 
 
 # MACS2 BAMPE fails if there is just one fragment mapped

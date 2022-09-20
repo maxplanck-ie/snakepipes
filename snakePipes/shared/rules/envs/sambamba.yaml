@@ -1,6 +1,6 @@
-name: sambamba_environment_1.0
+name: sambamba_environment_2.0
 channels:
  - conda-forge
  - bioconda
 dependencies:
- - sambamba = 0.7.1
+ - sambamba = 0.8.0

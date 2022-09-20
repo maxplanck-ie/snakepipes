@@ -8,7 +8,7 @@ rule get_nearest_transcript:
         annotated_bed=temp("AnnotatedResults_{}_{}".format(peakCaller, sample_name)+"/Filtered.results.{change_dir}_withNearestTranscript.bed")
     params:
         genes_bed=genes_bed,
-        field_offset=lambda wildcards: "15" if pipeline in ['chip-seq','ATAC-seq'] else ""
+        field_offset=lambda wildcards: "18" if pipeline in ['chip-seq','ATAC-seq'] else ""
     log:
         err= "AnnotatedResults_{}_{}".format(peakCaller, sample_name)+"/logs/bedtools_closest.{change_dir}.err",
     conda: CONDA_RNASEQ_ENV

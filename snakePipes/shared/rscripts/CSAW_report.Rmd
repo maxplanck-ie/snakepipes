@@ -11,6 +11,8 @@ title: "`r paste0('CSAW differential binding stats report')`"
 .libPaths(R.home("library"))
 
 knitr::opts_chunk$set(echo = FALSE)
+
+knitr::opts_knit$set(root.dir = snakemake@params[["outdir"]])
 ```
 
 
@@ -21,7 +23,7 @@ This report summarizes statistical analysis of binding events using group inform
 ### Analysis input
 
 ```{r data_load}
-DBdata<-file.path(snakemake@params[["outdir"]], "DiffBinding_analysis.Rdata")
+DBdata<-"DiffBinding_analysis.Rdata"
 useSpikeInForNorm<-snakemake@params[["useSpikeInForNorm"]]
 suppressMessages(require(GenomicRanges))
 suppressMessages(require(csaw))
@@ -75,21 +77,21 @@ Heatmaps obtained using log2 ratio of ChIP signal over input were as follows:
 if(sum(grepl("log2r.heatmap.png",snakemake@input[["heatmap_in"]]))<1){
     message("ChIP signal enrichment over input is only available for ChIP-seq workflow!")
 }else{
-    knitr::include_graphics(c(file.path(snakemake@params[["outdir"]], "CSAW.UP.log2r.heatmap.png"),
-                              file.path(snakemake@params[["outdir"]], "CSAW.DOWN.log2r.heatmap.png")))
+    knitr::include_graphics(c("CSAW.UP.log2r.heatmap.png",
+                              "CSAW.DOWN.log2r.heatmap.png"))
 }
 ```
 
 Heatmaps obtained using depth-normalized coverage were as follows:
 
 ```{r plot_cov, fig.show='hold',fig.align='center', out.width ='40%',out.height='30%',fig.cap="UP and DOWN regions using coverage."}
-if(file.info(file.path(snakemake@params[["outdir"]], "CSAW.UP.cov.heatmap.png"))$size != 0){
-    knitr::include_graphics(c(file.path(snakemake@params[["outdir"]], "CSAW.UP.cov.heatmap.png")))
+if(file.info("CSAW.UP.cov.heatmap.png")$size != 0){
+    knitr::include_graphics("CSAW.UP.cov.heatmap.png")
 }else{
     message("No UP regulated regions has been detected!")
 }
-if(file.info(file.path(snakemake@params[["outdir"]], "CSAW.DOWN.cov.heatmap.png"))$size != 0){
-    knitr::include_graphics(c(file.path(snakemake@params[["outdir"]], "CSAW.DOWN.cov.heatmap.png")))
+if(file.info("CSAW.DOWN.cov.heatmap.png")$size != 0){
+    knitr::include_graphics("CSAW.DOWN.cov.heatmap.png")
 }else{
     message("No DOWN regulated regions has been detected!")
 }
