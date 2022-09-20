@@ -1,10 +1,10 @@
-name: snakepipes_dna-mapping_1.0
+name: snakepipes_dna-mapping_2.0
 channels:
  - conda-forge
  - bioconda
 dependencies:
- - bowtie2 = 2.3.5.1
+ - bowtie2 = 2.4.5
  - qualimap = 2.2.2d
- - samtools = 1.10 ###DON'T TOUCH THIS!!!!
+ - samtools = 1.15.1 ###DON'T TOUCH THIS!!!!
  - bwa = 0.7.17
- - tbb = 2020.2
+ - tbb

@@ -1,18 +1,16 @@
-name: snakepipes_scRNAseq_environment_v1.0
+name: snakepipes_scRNAseq_environment_v2.0
 channels:
  - conda-forge
  - bioconda
 dependencies:
- - umi_tools = 1.0.1
- - samtools = 1.10
- - star = 2.7.4a
- - r-base = 3.5.1
- - r-stringr = 1.4.0
- - bioconductor-monocle = 2.10.0
- - r-data.table = 1.12.6
- - r-seurat = 2.3.4  # Newer versions aren't compatible with monocle2
- - r-gtools = 3.8.1
- - r-dplyr = 0.8.0.1
- - r-raceid = 0.1.7
- - h5py = 2.10.0
+ - umi_tools = 1.1.2
+ - samtools = 1.15.1
+ - star = 2.7.10a
+ - r-base = 4.1.3
+ - r-stringr
+ - r-data.table
+ - r-seurat = 4.1.1 
+ - r-gtools
+ - r-dplyr
+ - h5py = 3.6.0
  - velocyto.py = 0.17.17 

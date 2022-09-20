@@ -1,8 +1,8 @@
-name: snakepipes_preprocessing_environment_1.0
+name: snakepipes_preprocessing_environment_2.0
 channels:
  - mpi-ie
  - conda-forge
  - bioconda
 dependencies:
- - bbmap = 38.79
+ - bbmap = 38.96
  - splitfastq

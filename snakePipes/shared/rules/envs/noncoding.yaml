@@ -1,6 +1,6 @@
-name: snakepipes_noncoding_RNAseq_environment
+name: snakepipes_noncoding_RNAseq_environment_v2.0
 channels:
  - conda-forge
  - bioconda
 dependencies:
- - tetranscripts = 2.1.4
+ - tetranscripts = 2.2.1
