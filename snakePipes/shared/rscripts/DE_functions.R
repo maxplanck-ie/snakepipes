@@ -154,15 +154,16 @@ DESeq_allelic <- function(countdata, coldata, fdr) {
       rownames(dds) <- rownames(rnasamp)
       dds <- DESeq2::DESeq(dds,betaPrior = FALSE)
       ddr <- DESeq2::results(dds, name=paste0("allelegenome2.condition",unique(coldata$condition)[2]))
+      ddr_shrunk <- DESeq2::lfcShrink(dds,coef=paste0("allelegenome2.condition",unique(coldata$condition)[2]),type="apeglm",res=ddr)
     } else {
     dds <- DESeq2::DESeqDataSetFromMatrix(rnasamp, colData = design,
                               design = ~allele)
       rownames(dds) <- rownames(rnasamp)
       dds <- DESeq2::DESeq(dds,betaPrior = FALSE)
       ddr <- DESeq2::results(dds, name="allele_genome2_vs_genome1")
-
-   }
-    output <- list(dds = dds, ddr = ddr, ddr_shrunk=NULL)
+      ddr_shrunk <- DESeq2::lfcShrink(dds,coef="allele_genome2_vs_genome1",type="apeglm",res=ddr)
+    }
+    output <- list(dds = dds, ddr = ddr, ddr_shrunk=ddr_shrunk)
     return(output)
 }
 
