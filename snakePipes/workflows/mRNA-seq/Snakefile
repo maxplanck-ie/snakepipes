@@ -176,6 +176,10 @@ def run_alignment_free():
             "SalmonAllelic/TPM.transcripts.tsv",
             "SalmonAllelic/counts.transcripts.tsv",
             expand("SalmonAllelic/{sample}.{allelic_suffix}/abundance.h5", sample=samples,allelic_suffix=allelic_suffix) ]
+            if sampleSheet:
+                sample_name = os.path.splitext(os.path.basename(sampleSheet))[0]
+                if not isMultipleComparison:
+                    file_list.append( ["DESeq2_Salmon_{}/DESeq2.session_info.txt".format(sample_name)])
         return(file_list)
     else:
         return([])
