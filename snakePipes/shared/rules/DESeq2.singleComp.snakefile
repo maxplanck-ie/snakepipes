@@ -43,7 +43,7 @@ rule DESeq2:
 ## DESeq2 (on Salmon)
 rule DESeq2_Salmon:
     input:
-        counts_table = "Salmon/counts.transcripts.tsv",
+        counts_table = "Salmon/counts.transcripts.tsv" if not "allelic-mapping" in mode else "SalmonAllelic/counts.transcripts.tsv",
         sampleSheet = sampleSheet,
         tx2gene_file = "Annotation/genes.filtered.t2g",
         symbol_file = "Annotation/genes.filtered.symbol" #get_symbol_file
