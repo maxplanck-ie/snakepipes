@@ -9,6 +9,7 @@ snakePipes 2.x.x
 * Fixed a couple of issues in the ATAC-seq workflow after sofware versions update.
 * Updated organism yamls.
 * Added apeglm2 logFC shrinkage to allelic DESeq2 results.
+* Added the allelic version of Salmon-based transcript quantitation to mRNA-seq workflow. Will be run if *both* 'allelic-mapping' and 'alignment-free' modes are specified.
 
 
 snakePipes 2.5.4
