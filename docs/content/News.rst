@@ -8,6 +8,7 @@ snakePipes 2.x.x
 * Updated CSAW output.
 * Fixed a couple of issues in the ATAC-seq workflow after sofware versions update.
 * Updated organism yamls.
+* Added apeglm2 logFC shrinkage to allelic DESeq2 results.
 
 
 snakePipes 2.5.4
