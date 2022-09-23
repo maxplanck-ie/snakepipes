@@ -71,8 +71,12 @@ def multiqc_input_check(return_value):
             infiles.append( expand("allelic_bams/{sample}.SNPsplit_sort.yaml", sample = samples) )
             indir += "allelic_bams"
         if "alignment-free" in mode:
-            infiles.append( expand("Salmon/{sample}/quant.sf", sample = samples) )
-            indir += " Salmon "
+            if "allelic-mapping" in mode:
+                infiles.append( expand("SalmonAllelic/{sample}.{allelic_suffix}/quant.sf", sample = samples,allelic_suffix=allelic_suffix) )
+                indir += " SalmonAllelic "
+            else:
+                infiles.append( expand("Salmon/{sample}/quant.sf", sample = samples) )
+                indir += " Salmon "
     elif pipeline == "noncoding-rna-seq":
         infiles.append(expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample=samples))
         indir += " STAR deepTools_qc "
