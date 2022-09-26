@@ -24,6 +24,7 @@ organismDictionary = {'genome_size': 0,
                       'bowtie2_index': '',
                       'hisat2_index': '',
                       'bwa_index': '',
+                      'bwa-mem2_index': '',
                       'bwameth_index': '',
                       'known_splicesites': '',
                       'star_index': '',
@@ -80,6 +81,10 @@ if 'all' in tools or 'star' in tools:
 if 'all' in tools or 'bwa' in tools:
     targets.append(os.path.join(outdir, "BWAIndex/genome.fa.sa"))
     organismDictionary['bwa_index'] = os.path.join(outdir, "BWAIndex/genome.fa")
+
+if 'all' in tools or 'bwa-mem2' in tools:
+    targets.append(os.path.join(outdir, "BWA-MEM2Index/genome.fa.sa"))
+    organismDictionary['bwa-mem2_index'] = os.path.join(outdir, "BWA-MEM2Index/genome.fa")
 
 if 'all' in tools or 'bwameth' in tools:
     targets.append(os.path.join(outdir, "BWAmethIndex/genome.fa.bwameth.c2t.sa"))
