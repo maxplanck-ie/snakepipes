@@ -117,7 +117,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
 
     optional.add_argument("--aligner",
                           help="Program used for mapping: Bowtie2 or bwa (default: '%(default)s').",
-                          choices=["Bowtie2","bwa"],
+                          choices=["Bowtie2","bwa","bwa-mem2"],
                           default=defaults["aligner"])
 
     return parser
