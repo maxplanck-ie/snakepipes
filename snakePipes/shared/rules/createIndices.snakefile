@@ -253,6 +253,19 @@ rule bwaIndex:
         bwa index {params.genome} 2> {log}
         """
 
+# Default memory allocation: 8G
+rule bwa-mem2Index:
+    input: genome_fasta
+    output: os.path.join(outdir, "BWA-MEM2Index/genome.fa.sa")
+    log: "logs/bwaIndex.log"
+    params:
+      genome = os.path.join(outdir, "BWA-MEM2Index", "genome.fa")
+    conda: CONDA_CREATE_INDEX_ENV
+    shell: """
+        ln -s {input} {params.genome}
+        bwa index {params.genome} 2> {log}
+        """
+
 
 # Default memory allocation: 8G
 rule bwamethIndex:
