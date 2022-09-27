@@ -1,3 +1,11 @@
+def getAlignerCmd(which_aligner):
+    cmd_str=""
+    if which_aligner="bwa":
+        cmd_str="bwa mem"
+    elif which_aligner="bwa-mem2":
+        cmd_str="bwa-mem2"
+    return(cmd_str)
+
 ## get restriction site bed files
 rule get_restrictionSite:
     input:
@@ -18,15 +26,17 @@ rule get_restrictionSite:
 rule map_fastq_single_end:
     input: fastq_dir+"/{sample}{read}.fastq.gz"
     output:
-        out =  "BWA/{sample}{read}.bam"
+        out =  aligner+"/{sample}{read}.bam"
+    params:
+        aligner_cmd = getAlignerCmd(aligner)
     log:
-        out = "BWA/logs/{sample}{read}.out",
-        err = "BWA/logs/{sample}{read}.err"
+        out = aligner+"/logs/{sample}{read}.out",
+        err = aligner+"/logs/{sample}{read}.err"
     threads: lambda wildcards: 15 if 15<max_thread else max_thread
     conda: CONDA_HIC_ENV
     shell:
         "echo 'mapping {input}' > {log.out} && "
-        "bwa mem -A1 -B4  -E50 -L0 "
+        "{params.aligner_cmd} -A1 -B4  -E50 -L0 "
         "-t {threads} " + bwa_index + " {input}  2> {log.err} | "
         "samtools view -Shb - > {output.out}  2>> {log.err}"
 
