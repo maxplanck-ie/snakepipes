@@ -12,7 +12,7 @@ snakePipes 2.x.x
 * Added bwa-mem2 as an optional aligner to DNA-mapping and HiC, as well as as an additional tool to createIndices.
 * Added bwameth2 as an optional tool to createIndices - this will create a bwameth index with bwa-mem2.
 * Added bwameth2 as an optional aligner to WGBS - this will run bwameth with bwa-mem2 underneath.
-
+* Fixed genome size conversion to string.
 
 snakePipes 2.5.4
 ----------------

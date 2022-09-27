@@ -25,12 +25,12 @@ if pairedEnd and not fromBAM:
             r1=fastq_dir + "/{sample}" + reads[0] + ".fastq.gz",
             r2=fastq_dir + "/{sample}" + reads[1] + ".fastq.gz"
         output:
-            sbam=temp("bwameth/{sample}.bam")
+            sbam=temp(aligner+"/{sample}.bam")
         log:
-            err="bwameth/logs/{sample}.map_reads.err",
-            out="bwameth/logs/{sample}.map_reads.out"
+            err=aligner+"/logs/{sample}.map_reads.err",
+            out=aligner+"/logs/{sample}.map_reads.out"
         params:
-            bwameth_index=bwameth_index,
+            bwameth_index=bwameth_index if aligner="bwameth" else bwameth2_index,
             tempDir = tempDir
         threads: lambda wildcards: 20 if 20<max_thread else max_thread
         conda: CONDA_WGBS_ENV
@@ -47,12 +47,12 @@ elif not pairedEnd and not fromBAM:
         input:
             r1=fastq_dir + "/{sample}" + reads[0] + ".fastq.gz",
         output:
-            sbam=temp("bwameth/{sample}.bam")
+            sbam=temp(aligner+"/{sample}.bam")
         log:
-            err="bwameth/logs/{sample}.map_reads.err",
-            out="bwameth/logs/{sample}.map_reads.out"
+            err=aligner+"/logs/{sample}.map_reads.err",
+            out=aligner+"/logs/{sample}.map_reads.out"
         params:
-            bwameth_index=bwameth2_index,
+            bwameth_index=bwameth_index if aligner="bwameth" else bwameth2_index,
             tempDir = tempDir
         threads: lambda wildcards: 20 if 20<max_thread else max_thread
         conda: CONDA_WGBS_ENV
@@ -67,12 +67,12 @@ elif not pairedEnd and not fromBAM:
 if not fromBAM:
     rule index_bam:
         input:
-            "bwameth/{sample}.bam"
+            aligner+"/{sample}.bam"
         output:
-            temp("bwameth/{sample}.bam.bai")
+            temp(aligner+"/{sample}.bam.bai")
         log:
-            err="bwameth/logs/{sample}.index_bam.err",
-            out="bwameth/logs/{sample}.index_bam.out"
+            err=aligner+"/logs/{sample}.index_bam.err",
+            out=aligner+"/logs/{sample}.index_bam.out"
         conda: CONDA_SHARED_ENV
         shell: """
             samtools index "{input}" > {log.out} 2> {log.err}
@@ -81,8 +81,8 @@ if not fromBAM:
 if not skipBamQC:
     rule markDupes:
         input:
-            "bwameth/{sample}.bam",
-            "bwameth/{sample}.bam.bai"
+            aligner+"/{sample}.bam",
+            aligner+"/{sample}.bam.bai"
         output:
             "Sambamba/{sample}.markdup.bam"
         log:
