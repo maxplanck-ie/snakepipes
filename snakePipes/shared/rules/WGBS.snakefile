@@ -52,7 +52,7 @@ elif not pairedEnd and not fromBAM:
             err="bwameth/logs/{sample}.map_reads.err",
             out="bwameth/logs/{sample}.map_reads.out"
         params:
-            bwameth_index=bwameth_index,
+            bwameth_index=bwameth2_index,
             tempDir = tempDir
         threads: lambda wildcards: 20 if 20<max_thread else max_thread
         conda: CONDA_WGBS_ENV

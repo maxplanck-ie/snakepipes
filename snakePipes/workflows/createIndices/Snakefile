@@ -26,6 +26,7 @@ organismDictionary = {'genome_size': 0,
                       'bwa_index': '',
                       'bwa-mem2_index': '',
                       'bwameth_index': '',
+                      'bwameth2_index': '',
                       'known_splicesites': '',
                       'star_index': '',
                       'genes_bed': '',
@@ -89,6 +90,10 @@ if 'all' in tools or 'bwa-mem2' in tools:
 if 'all' in tools or 'bwameth' in tools:
     targets.append(os.path.join(outdir, "BWAmethIndex/genome.fa.bwameth.c2t.sa"))
     organismDictionary['bwameth_index'] = os.path.join(outdir, "BWAmethIndex/genome.fa")
+
+if 'all' in tools or 'bwameth2' in tools:
+    targets.append(os.path.join(outdir, "BWAmeth2Index/genome.fa.bwameth.c2t.sa"))
+    organismDictionary['bwameth2_index'] = os.path.join(outdir, "BWAmeth2Index/genome.fa")
 
 if blacklist:
     targets.append(os.path.join(outdir, "annotation/blacklist.bed"))

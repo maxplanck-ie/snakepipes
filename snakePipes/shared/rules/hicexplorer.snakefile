@@ -6,6 +6,14 @@ def getAlignerCmd(which_aligner):
         cmd_str="bwa-mem2"
     return(cmd_str)
 
+def getAlignerIndex(which_aligner):
+    which_index=""
+    if which_aligner="bwa":
+        which_index=bwa_index
+    elif which_aligner="bwa-mem2":
+        which_index=bwa-mem2_index
+    return(which_index)
+
 ## get restriction site bed files
 rule get_restrictionSite:
     input:
@@ -28,7 +36,8 @@ rule map_fastq_single_end:
     output:
         out =  aligner+"/{sample}{read}.bam"
     params:
-        aligner_cmd = getAlignerCmd(aligner)
+        aligner_cmd = getAlignerCmd(aligner),
+        aligner_index = getAlignerIndex(aligner)
     log:
         out = aligner+"/logs/{sample}{read}.out",
         err = aligner+"/logs/{sample}{read}.err"
@@ -37,7 +46,7 @@ rule map_fastq_single_end:
     shell:
         "echo 'mapping {input}' > {log.out} && "
         "{params.aligner_cmd} -A1 -B4  -E50 -L0 "
-        "-t {threads} " + bwa_index + " {input}  2> {log.err} | "
+        "-t {threads} {params.aligner_index} {input}  2> {log.err} | "
         "samtools view -Shb - > {output.out}  2>> {log.err}"
 
 ## Make HiC Matrix

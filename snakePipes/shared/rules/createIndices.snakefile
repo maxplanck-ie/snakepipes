@@ -263,7 +263,7 @@ rule bwa-mem2Index:
     conda: CONDA_CREATE_INDEX_ENV
     shell: """
         ln -s {input} {params.genome}
-        bwa index {params.genome} 2> {log}
+        bwa-mem2 index {params.genome} 2> {log}
         """
 
 
