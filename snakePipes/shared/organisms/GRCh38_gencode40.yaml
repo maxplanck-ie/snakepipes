@@ -1,7 +1,9 @@
 blacklist_bed: /data/repository/organisms/GRCh38_gencode_40/akundaje/blacklist.bed
 bowtie2_index: /data/repository/organisms/GRCh38_gencode_40/Indices/BowtieIndex/genome
 bwa_index: /data/repository/organisms/GRCh38_gencode_40/Indices/BWAIndex/genome
+bwa-mem2_index: /data/repository/organisms/GRCh38_gencode_40/Indices/BWAMEM2Index/genome
 bwameth_index: /data/repository/organisms/GRCh38_gencode_40/Indices/BWAmethIndex/genome.fa
+bwameth2_index:
 extended_coding_regions_gtf: /data/repository/organisms/GRCh38_gencode_40/gencode/release-40/genes.slop.gtf
 genes_bed: /data/repository/organisms/GRCh38_gencode_40/gencode/release-40/genes.bed
 genes_gtf: /data/repository/organisms/GRCh38_gencode_40/gencode/release-40/genes.gtf

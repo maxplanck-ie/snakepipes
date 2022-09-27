@@ -5,7 +5,9 @@ genome_2bit: "/data/repository/organisms/GRCz11_ensembl/genome_fasta/genome.2bit
 bowtie2_index: "/data/repository/organisms/GRCz11_ensembl/BowtieIndex/genome"
 hisat2_index: "/data/repository/organisms/GRCz11_ensembl/HISAT2Index/genome"
 bwa_index: "/data/repository/organisms/GRCz11_ensembl/BWAindex/genome.fa"
+bwa-mem2_index:  
 bwameth_index: "/data/repository/organisms/GRCz11_ensembl/BWAmethIndex/genome.fa"
+bwameth2_index: 
 known_splicesites: "/data/repository/organisms/GRCz11_ensembl/ensembl/release-100/HISAT2/splice_sites.txt"
 star_index: "/data/repository/organisms/GRCz11_ensembl/STARIndex/2.7.10a/"
 genes_bed: "/data/repository/organisms/GRCz11_ensembl/ensembl/release-100/genes.bed"
