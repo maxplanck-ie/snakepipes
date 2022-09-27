@@ -280,6 +280,18 @@ rule bwamethIndex:
         bwameth.py index {params.genome} 2> {log}
         """
 
+# Default memory allocation: 8G
+rule bwameth2Index:
+    input: genome_fasta
+    output: os.path.join(outdir, "BWAmeth2Index/genome.fa.bwameth.c2t.sa")
+    log: "logs/bwameth2Index.log"
+    params:
+      genome = os.path.join(outdir, "BWAmeth2Index", "genome.fa")
+    conda: CONDA_CREATE_INDEX_ENV
+    shell: """
+        ln -s {input[0]} {params.genome}
+        bwameth.py index-mem2 {params.genome} 2> {log}
+        """
 
 # Default memory allocation: 1G
 rule copyBlacklist:
