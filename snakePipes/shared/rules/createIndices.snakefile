@@ -254,7 +254,7 @@ rule bwaIndex:
         """
 
 # Default memory allocation: 8G
-rule bwa-mem2Index:
+rule bwamem2Index:
     input: genome_fasta
     output: os.path.join(outdir, "BWA-MEM2Index/genome.fa.sa")
     log: "logs/bwaIndex.log"
