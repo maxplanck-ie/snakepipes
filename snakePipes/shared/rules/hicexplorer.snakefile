@@ -11,7 +11,7 @@ def getAlignerIndex(which_aligner):
     if which_aligner="bwa":
         which_index=bwa_index
     elif which_aligner="bwa-mem2":
-        which_index=bwa-mem2_index
+        which_index=bwa_mem2_index
     return(which_index)
 
 ## get restriction site bed files

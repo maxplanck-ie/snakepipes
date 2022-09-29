@@ -1,5 +1,5 @@
 if pairedEnd:
-    rule bwa-mem2:
+    rule bwamem2:
         input:
             r1 = fastq_dir+"/{sample}"+reads[0]+".fastq.gz",
             r2 = fastq_dir+"/{sample}"+reads[1]+".fastq.gz"
@@ -8,7 +8,7 @@ if pairedEnd:
             bam = temp("bwa-mem2/{sample}.sorted.bam")
         log: "bwa-mem2/logs/{sample}.sort.log"
         params:
-            bwa_index = bwa-mem2_index,
+            bwa_index = bwa_mem2_index,
             alignerOpts = str(alignerOpts or ''),
             tempDir = tempDir
         threads: lambda wildcards: 24 if 24<max_thread else max_thread
@@ -26,7 +26,7 @@ if pairedEnd:
             samtools flagstat {output.bam} > {output.align_summary}
         """
 else:
-    rule bwa-mem2:
+    rule bwamem2:
         input:
             fastq_dir+"/{sample}"+reads[0]+".fastq.gz"
         output:
@@ -34,7 +34,7 @@ else:
             bam = temp("bwa-mem2/{sample}.sorted.bam")
         log: "bwa-mem2/logs/{sample}.sort.log"
         params:
-            bwa_index = bwa-mem2_index,
+            bwa_index = bwa_mem2_index,
             alignerOpts = str(alignerOpts or ''),
             tempDir = tempDir
         threads : lambda wildcards: 24 if 24<max_thread else max_thread

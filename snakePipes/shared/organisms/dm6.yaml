@@ -5,7 +5,7 @@ genome_2bit: "/data/repository/organisms/dm6_ensembl/genome_fasta/genome.2bit"
 bowtie2_index: "/data/repository/organisms/dm6_ensembl/BowtieIndex/genome"
 hisat2_index: "/data/repository/organisms/dm6_ensembl/HISAT2Index/genome"
 bwa_index: "/data/repository/organisms/dm6_ensembl/BWAindex/genome.fa"
-bwa-mem2_index: "/data/repository/organisms/dm6_ensembl/BWA2index/genome.fa"
+bwa_mem2_index: "/data/repository/organisms/dm6_ensembl/BWA2index/genome.fa"
 bwameth_index: "/data/repository/organisms/dm6_ensembl/BWAmethIndex/genome.fa"
 bwameth2_index:
 known_splicesites: "/data/repository/organisms/dm6_ensembl/ensembl/release-96/HISAT2/splice_sites.txt"
