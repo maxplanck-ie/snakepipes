@@ -3,7 +3,7 @@ def getAlignerCmd(which_aligner):
     if which_aligner="bwa":
         cmd_str="bwa mem"
     elif which_aligner="bwa-mem2":
-        cmd_str="bwa-mem2"
+        cmd_str="bwa-mem2 mem"
     return(cmd_str)
 
 def getAlignerIndex(which_aligner):

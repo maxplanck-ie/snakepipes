@@ -11,12 +11,12 @@ if pairedEnd:
             bwa_index = bwa_mem2_index,
             alignerOpts = str(alignerOpts or ''),
             tempDir = tempDir
-        threads: lambda wildcards: 24 if 24<max_thread else max_thread
+        threads: lambda wildcards: 12 if 12<max_thread else max_thread
         conda: CONDA_DNA_MAPPING_ENV
         shell:"""
             TMPDIR={params.tempDir}
             MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX);
-            bwa-mem2 \
+            bwa-mem2 mem \
             -t {threads} \
             -R '@RG\\tID:{wildcards.sample}\\tDS:{wildcards.sample}\\tPL:ILLUMINA\\tSM:{wildcards.sample}' {params.alignerOpts} \
             {params.bwa_index} {input.r1} {input.r2} | \
@@ -37,12 +37,12 @@ else:
             bwa_index = bwa_mem2_index,
             alignerOpts = str(alignerOpts or ''),
             tempDir = tempDir
-        threads : lambda wildcards: 24 if 24<max_thread else max_thread
+        threads : lambda wildcards: 12 if 12<max_thread else max_thread
         conda: CONDA_DNA_MAPPING_ENV
         shell: """
             TMPDIR={params.tempDir}
             MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX);
-            bwa-mem2 \
+            bwa-mem2 mem \
             -t {threads} \
             -R '@RG\\tID:{wildcards.sample}\\tDS:{wildcards.sample}\\tPL:ILLUMINA\\tSM:{wildcards.sample}' {params.alignerOpts}\
             {params.bwa_index} {input} | \
