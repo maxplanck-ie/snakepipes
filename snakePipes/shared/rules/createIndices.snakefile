@@ -256,7 +256,7 @@ rule bwaIndex:
 # Default memory allocation: 8G
 rule bwamem2Index:
     input: genome_fasta
-    output: os.path.join(outdir, "BWA-MEM2Index/genome.fa.sa")
+    output: os.path.join(outdir, "BWA-MEM2Index/genome.fa.bwt.2bit.64")
     log: "logs/bwaIndex.log"
     params:
       genome = os.path.join(outdir, "BWA-MEM2Index", "genome.fa")
@@ -283,7 +283,7 @@ rule bwamethIndex:
 # Default memory allocation: 8G
 rule bwameth2Index:
     input: genome_fasta
-    output: os.path.join(outdir, "BWAmeth2Index/genome.fa.bwameth.c2t.sa")
+    output: os.path.join(outdir, "BWAmeth2Index/genome.fa.bwameth.c2t.bwt.2bit.64")
     log: "logs/bwameth2Index.log"
     params:
       genome = os.path.join(outdir, "BWAmeth2Index", "genome.fa")
