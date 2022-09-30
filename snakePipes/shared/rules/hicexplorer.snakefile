@@ -1,16 +1,16 @@
 def getAlignerCmd(which_aligner):
     cmd_str=""
-    if which_aligner="bwa":
+    if which_aligner=="bwa":
         cmd_str="bwa mem"
-    elif which_aligner="bwa-mem2":
+    elif which_aligner=="bwa-mem2":
         cmd_str="bwa-mem2 mem"
     return(cmd_str)
 
 def getAlignerIndex(which_aligner):
     which_index=""
-    if which_aligner="bwa":
+    if which_aligner=="bwa":
         which_index=bwa_index
-    elif which_aligner="bwa-mem2":
+    elif which_aligner=="bwa-mem2":
         which_index=bwa_mem2_index
     return(which_index)
 
