@@ -9,7 +9,7 @@ bowtie2:
 bwa:
     memory: 4G
 bwamem2:
-    memory: 4G
+    memory: 6G
 CollectAlignmentSummaryMetrics:
     memory: 2G
 CollectInsertSizeMetrics:
