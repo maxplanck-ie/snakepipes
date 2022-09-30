@@ -15,7 +15,7 @@ starIndex:
 bwaIndex:
     memory: 8G
 bwamem2Index:
-    memory: 8G
+    memory: 90G
 bwamethIndex:
     memory: 20G
 fastaDict:
