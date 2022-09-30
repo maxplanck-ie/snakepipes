@@ -84,7 +84,7 @@ if 'all' in tools or 'bwa' in tools:
     organismDictionary['bwa_index'] = os.path.join(outdir, "BWAIndex/genome.fa")
 
 if 'all' in tools or 'bwa-mem2' in tools:
-    targets.append(os.path.join(outdir, "BWA-MEM2Index/genome.fa.sa"))
+    targets.append(os.path.join(outdir, "BWA-MEM2Index/genome.fa.bwt.2bit.64"))
     organismDictionary['bwa_mem2_index'] = os.path.join(outdir, "BWA-MEM2Index/genome.fa")
 
 if 'all' in tools or 'bwameth' in tools:
@@ -92,7 +92,7 @@ if 'all' in tools or 'bwameth' in tools:
     organismDictionary['bwameth_index'] = os.path.join(outdir, "BWAmethIndex/genome.fa")
 
 if 'all' in tools or 'bwameth2' in tools:
-    targets.append(os.path.join(outdir, "BWAmeth2Index/genome.fa.bwameth.c2t.sa"))
+    targets.append(os.path.join(outdir, "BWAmeth2Index/genome.fa.bwameth.c2t.bwt.2bit.64"))
     organismDictionary['bwameth2_index'] = os.path.join(outdir, "BWAmeth2Index/genome.fa")
 
 if blacklist:
