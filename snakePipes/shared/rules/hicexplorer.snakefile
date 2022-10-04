@@ -55,6 +55,8 @@ if(RFResolution is True):
         input:
             R1 = aligner+"/{sample}"+reads[0]+".bam",
             R2 = aligner+"/{sample}"+reads[1]+".bam",
+            R1i = aligner+"/{sample}"+reads[0]+".bam.bai",
+            R2i = aligner+"/{sample}"+reads[1]+".bam.bai", 
             bed = enzyme + ".bed"
         output:
              matrix ="HiC_matrices/{sample}_"+matrixFile_suffix+matrix_format,
