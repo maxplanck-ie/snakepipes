@@ -1,7 +1,7 @@
 snakePipes News
 ===============
 
-snakePipes 2.x.x
+snakePipes 2.6.0
 ----------------
 
 * Added apeglm2 logFC shrinkage to allelic DESeq2 results.
