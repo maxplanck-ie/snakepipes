@@ -88,7 +88,7 @@ def multiqc_input_check(return_value):
         indir += " STAR deepTools_qc "
     elif pipeline == "hic":
         infiles.append(expand("HiC_matrices/QCplots/{sample}_QC/QC.log", sample = samples))
-        indir += " BWA "
+        indir += " " + aligner + " " 
         indir += " ".join(expand("HiC_matrices/QCplots/{sample}_QC ", sample = samples))
     elif pipeline == "scrna-seq":
         if trim:
