@@ -24,4 +24,5 @@ _sources
 /snakePipes/shared/rscripts/*.html
 output
 
+# pip stuff
 snakePipes.egg-info

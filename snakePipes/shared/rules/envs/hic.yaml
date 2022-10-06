@@ -1,8 +1,9 @@
-name: hic_conda_env_1.0
+name: hic_conda_env_2.0
 channels:
  - conda-forge
  - bioconda
 dependencies:
- - hicexplorer = 3.6
+ - hicexplorer = 3.7.2
  - bwa = 0.7.17
- - samtools = 1.10
+ - bwa-mem2 = 2.2.1
+ - samtools = 1.15.1

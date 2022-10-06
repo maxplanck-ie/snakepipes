@@ -1,6 +1,19 @@
 snakePipes News
 ===============
 
+snakePipes 2.x.x
+----------------
+
+* Added apeglm2 logFC shrinkage to allelic DESeq2 results.
+* Added bwa-mem2 as an optional aligner to DNA-mapping and HiC, as well as as an additional tool to createIndices.
+* Added bwameth2 as an optional tool to createIndices - this will create a bwameth index with bwa-mem2.
+* Added bwameth2 as an optional aligner to WGBS - this will run bwameth with bwa-mem2 underneath.
+* Updated software versions in environment yamls.
+* Updated organism yamls.
+* Updated CSAW output.
+* Fixed a couple of issues in the ATAC-seq workflow after sofware versions update.
+* Fixed genome size conversion to string.
+
 snakePipes 2.5.4
 ----------------
 

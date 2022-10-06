@@ -92,7 +92,7 @@ else:
                    mv {input.bamfile} {output.bamfile}
                    """
 
-    elif not aligner=="bwameth" :
+    elif not (aligner=="bwameth" or aligner=="bwameth2") :
         rule filter_reads:
             input:
                 bamfile = aligner+"/{sample}.bam"
@@ -102,7 +102,7 @@ else:
                 ln -s ../{input} {output}
           """
 
-if not aligner=="bwameth":
+if not (aligner=="bwameth" or aligner=="bwameth2"):
     rule samtools_index_filtered:
         input:
             "filtered_bam/{sample}.filtered.bam"

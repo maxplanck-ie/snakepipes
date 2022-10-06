@@ -24,7 +24,9 @@ organismDictionary = {'genome_size': 0,
                       'bowtie2_index': '',
                       'hisat2_index': '',
                       'bwa_index': '',
+                      'bwa_mem2_index': '',
                       'bwameth_index': '',
+                      'bwameth2_index': '',
                       'known_splicesites': '',
                       'star_index': '',
                       'genes_bed': '',
@@ -81,9 +83,17 @@ if 'all' in tools or 'bwa' in tools:
     targets.append(os.path.join(outdir, "BWAIndex/genome.fa.sa"))
     organismDictionary['bwa_index'] = os.path.join(outdir, "BWAIndex/genome.fa")
 
+if 'all' in tools or 'bwa-mem2' in tools:
+    targets.append(os.path.join(outdir, "BWA-MEM2Index/genome.fa.bwt.2bit.64"))
+    organismDictionary['bwa_mem2_index'] = os.path.join(outdir, "BWA-MEM2Index/genome.fa")
+
 if 'all' in tools or 'bwameth' in tools:
     targets.append(os.path.join(outdir, "BWAmethIndex/genome.fa.bwameth.c2t.sa"))
     organismDictionary['bwameth_index'] = os.path.join(outdir, "BWAmethIndex/genome.fa")
+
+if 'all' in tools or 'bwameth2' in tools:
+    targets.append(os.path.join(outdir, "BWAmeth2Index/genome.fa.bwameth.c2t.bwt.2bit.64"))
+    organismDictionary['bwameth2_index'] = os.path.join(outdir, "BWAmeth2Index/genome.fa")
 
 if blacklist:
     targets.append(os.path.join(outdir, "annotation/blacklist.bed"))
@@ -145,7 +155,7 @@ rule all:
 onsuccess:
     cf.cleanLogs(outdir, cluster_config)
     f = open(os.path.join(outdir, "genome_fasta", "effectiveSize"))
-    organismDictionary['genome_size'] = int(f.read().strip())
+    organismDictionary['genome_size'] = int(float(f.read().strip()))
     f.close()
     if not userYAML:
         yamlPath = os.path.join(maindir, organismsDir, "{}.yaml".format(genome))

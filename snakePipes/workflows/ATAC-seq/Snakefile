@@ -174,8 +174,8 @@ rule all:
         expand("deepTools_ATAC/bamCompare/{sample}.filtered.bw",sample=samples),
         run_deepTools_qc(fromBAM),
         expand(os.path.join(short_bams, "{sample}.short.cleaned.bam"),sample=samples),
-        expand(os.path.join(short_bams, "{sample}.short.cleaned.bam.bai"),sample=samples),
-        "Filtering_metrics/Filtering_report.html"
+        expand(os.path.join(short_bams, "{sample}.short.cleaned.bam.bai"),sample=samples)
+        #"Filtering_metrics/Filtering_report.html"
 
 ### execute after workflow finished ############################################
 ################################################################################

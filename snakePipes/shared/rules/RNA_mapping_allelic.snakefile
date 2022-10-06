@@ -50,7 +50,7 @@ if aligner == "STAR":
     else:
         rule STAR_allele:
             input:
-                r1 = fastq_dir+"/{sample}.fastq.gz",
+                r1 = fastq_dir+"/{sample}"+reads[0]+".fastq.gz",
                 index = star_index_allelic
             output:
                 temp(aligner+"/{sample}.sorted.bam")
@@ -76,7 +76,7 @@ if aligner == "STAR":
                     --genomeDir {params.idx} \
                     --sjdbGTFfile {params.gtf} \
                     --sjdbOverhang 100 \
-                    --readFilesIn <(gunzip -c {input}) \
+                    --readFilesIn <(gunzip -c {input.r1}) \
                     --outFileNamePrefix {params.prefix} \
                     --outSAMunmapped Within \
                     --alignEndsType EndToEnd \

@@ -50,6 +50,20 @@ def multiqc_input_check(return_value):
             if qualimap:
                 infiles.append( expand("Qualimap_qc/{sample}.filtered.bamqc_results.txt", sample = samples) )
                 indir += " Qualimap_qc "
+        elif aligner=="bwa-mem2":
+            infiles.append( expand("bwa-mem2/{sample}.bwa-mem2_summary.txt", sample = samples) +
+                            expand("Sambamba/{sample}.markdup.txt", sample = samples) +
+                            expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample=samples))
+            indir += " Sambamba "
+            indir += " bwa-mem2 "
+            indir += " deepTools_qc "
+            if qualimap:
+                infiles.append( expand("Qualimap_qc/{sample}.filtered.bamqc_results.txt", sample = samples) )
+                indir += " Qualimap_qc "
+        if "allelic-mapping" in mode:
+            infiles.append( expand("allelic_bams/{sample}.SNPsplit_report.yaml", sample = samples) )
+            infiles.append( expand("allelic_bams/{sample}.SNPsplit_sort.yaml", sample = samples) )
+            indir += "allelic_bams"
     elif pipeline=="rna-seq":
         # must be RNA-mapping, add files as per the mode
         if "alignment" in mode or "deepTools_qc" in mode and not "allelic-mapping" in mode:
@@ -63,6 +77,9 @@ def multiqc_input_check(return_value):
         if "allelic-mapping" in mode:
             infiles.append( expand("featureCounts/{sample}.allelic_counts.txt", sample = samples) )
             indir += aligner + " featureCounts "
+            infiles.append( expand("allelic_bams/{sample}.SNPsplit_report.yaml", sample = samples) )
+            infiles.append( expand("allelic_bams/{sample}.SNPsplit_sort.yaml", sample = samples) )
+            indir += "allelic_bams"
         if "alignment-free" in mode:
             infiles.append( expand("Salmon/{sample}/quant.sf", sample = samples) )
             indir += " Salmon "
@@ -71,7 +88,7 @@ def multiqc_input_check(return_value):
         indir += " STAR deepTools_qc "
     elif pipeline == "hic":
         infiles.append(expand("HiC_matrices/QCplots/{sample}_QC/QC.log", sample = samples))
-        indir += " BWA "
+        indir += " " + aligner + " " 
         indir += " ".join(expand("HiC_matrices/QCplots/{sample}_QC ", sample = samples))
     elif pipeline == "scrna-seq":
         if trim:

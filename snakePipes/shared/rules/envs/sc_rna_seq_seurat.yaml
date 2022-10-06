@@ -1,0 +1,7 @@
+name: snakepipes_seurat_environment_v2.0
+channels:
+ - conda-forge
+ - bioconda
+dependencies:
+ - r-seurat = 4.1.1
+ - bioconductor-dropletutils
