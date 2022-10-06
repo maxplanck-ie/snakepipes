@@ -7,8 +7,12 @@ correct_matrix:
 diagnostic_plot:
     memory: 2G
 map_fastq_single_end:
-    memory: 3G
+    memory: 10G
 merge_bins:
     memory: 7G
 merge_matrices:
     memory: 3G
+sambamaba_sort_hic_r1:
+    memory: 4G
+sambamaba_sort_hic_r2:
+    memory: 4G

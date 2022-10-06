@@ -80,6 +80,8 @@ else:
         include: os.path.join(maindir, "shared", "rules", "Bowtie2.snakefile")
     elif aligner == "bwa":
         include: os.path.join(maindir, "shared", "rules", "bwa.snakefile")
+    elif aligner == "bwa-mem2":
+        include: os.path.join(maindir, "shared", "rules", "bwa-mem2.snakefile")
 
 ### conditional/optional rules #################################################
 ################################################################################
