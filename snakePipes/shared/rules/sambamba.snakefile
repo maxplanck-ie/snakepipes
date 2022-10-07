@@ -55,3 +55,5 @@ rule samtools_index:
     log: aligner + "/logs/{sample}.index.log"
     conda: CONDA_SHARED_ENV
     shell: "samtools index {input} 2> {log}"
+
+

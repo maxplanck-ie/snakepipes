@@ -21,7 +21,6 @@ if trim:
         fastq_dir = "FASTQ_fastp"
 
 ### Initialization #############################################################
-aligner="bwameth"
 
 # Disable trimming if BAM files are input
 if fromBAM:

@@ -6,6 +6,10 @@ bamPE_fragment_size:
     memory: 10G
 bowtie2:
     memory: 4G
+bwa:
+    memory: 4G
+bwamem2:
+    memory: 6G
 CollectAlignmentSummaryMetrics:
     memory: 2G
 CollectInsertSizeMetrics:

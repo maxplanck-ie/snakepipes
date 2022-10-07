@@ -5,4 +5,5 @@ channels:
 dependencies:
  - hicexplorer = 3.7.2
  - bwa = 0.7.17
+ - bwa-mem2 = 2.2.1
  - samtools = 1.15.1

@@ -38,7 +38,7 @@ def bounded01(x):
 def parse_args(defaults={"verbose": False, "configFile": None,
                          "clusterConfigFile":None, "maxJobs": 12,
                          "snakemakeOptions": "--use-conda", "tempDir": None,
-                         "downsample": None, "trim": True, "trimmer": "fastp",
+                         "downsample": None, "aligner": None, "trim": True, "trimmer": "fastp",
                          "trimmerOptions": "-q 5 -l 30 -M 5", "maxDist": 300,
                          "minCpGs": 10, "minMethDiff": 0.1, "FDR": 0.1,
                          "MethylDackelOptions": "--mergeContext --maxVariantFrac 0.25 --minDepth 4",
@@ -68,6 +68,11 @@ def parse_args(defaults={"verbose": False, "configFile": None,
     optional = parser.add_argument_group('Options')
 
     parserCommon.commonOptions(optional, defaults)
+
+    optional.add_argument("--aligner",
+                          help="Program used for mapping: bwameth or bwameth2 (default: '%(default)s'). Specifying bwameth2 will run bwameth with bwa-mem2 underneath.",
+                          choices=["bwameth","bwameth2"],
+                          default=defaults["aligner"])
 
     optional.add_argument("--blacklist",
                           dest="blacklist",

@@ -21,7 +21,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          "snakemakeOptions": "--use-conda", "tempDir": None,
                          "downsample": False, "trim": False,
                          "trimmer": "cutadapt", "trimmerOptions": "",
-                         "fastqc": False, "binSize": 10000, "noTAD": False,
+                         "fastqc": False, "aligner": None, "binSize": 10000, "noTAD": False,
                          "RFResolution": False, "correctionMethod": "KR",
                          "enzyme": "HindIII", "restrictRegion": None,
                          "mergeSamples": False, "nBinsToMerge": 0,
@@ -48,6 +48,12 @@ def parse_args(defaults={"verbose": False, "configFile": None,
     optional = parser.add_argument_group('Options')
 
     parserCommon.commonOptions(optional, defaults, bw=False, plots=False)
+    
+    optional.add_argument("--aligner",
+                          help="Program used for mapping: bwa or bwa-mem2 (default: '%(default)s').",
+                          choices=["bwa","bwa-mem2"],
+                          default=defaults["aligner"])
+
 
     optional.add_argument("--RFResolution",
                           action="store_true",

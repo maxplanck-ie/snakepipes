@@ -4,12 +4,21 @@ snakePipes News
 snakePipes 2.x.x
 ----------------
 
-* Bumped software versions in environment yamls.
+* Added the allelic version of Salmon-based transcript quantitation to mRNA-seq workflow. Will be run if *both* 'allelic-mapping' and 'alignment-free' modes are specified.
+
+
+snakePipes 2.6.0
+----------------
+
+* Added apeglm2 logFC shrinkage to allelic DESeq2 results.
+* Added bwa-mem2 as an optional aligner to DNA-mapping and HiC, as well as as an additional tool to createIndices.
+* Added bwameth2 as an optional tool to createIndices - this will create a bwameth index with bwa-mem2.
+* Added bwameth2 as an optional aligner to WGBS - this will run bwameth with bwa-mem2 underneath.
+* Updated software versions in environment yamls.
+* Updated organism yamls.
 * Updated CSAW output.
 * Fixed a couple of issues in the ATAC-seq workflow after sofware versions update.
-* Updated organism yamls.
-* Added apeglm2 logFC shrinkage to allelic DESeq2 results.
-* Added the allelic version of Salmon-based transcript quantitation to mRNA-seq workflow. Will be run if *both* 'allelic-mapping' and 'alignment-free' modes are specified.
+* Fixed genome size conversion to string.
 
 
 snakePipes 2.5.4
