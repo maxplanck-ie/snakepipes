@@ -1,6 +1,11 @@
 snakePipes News
 ===============
 
+snakePipes 2.6.1
+----------------
+
+* Capped tabulate version as 0.9.0 breaks snakemake
+
 snakePipes 2.6.0
 ----------------
 
