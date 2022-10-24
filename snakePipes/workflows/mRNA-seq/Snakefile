@@ -351,6 +351,7 @@ else:
     rule all:
         input:
             run_alignment(),
+            run_allelesp_mapping(),
             run_deepTools_qc(),
             run_GenomicContamination(),
             "multiQC/multiqc_report.html"
