@@ -91,6 +91,14 @@ else:
     fastqc=False
     trim=False
     downsample=None
+    if "allelic-mapping" in mode:
+        allele_mode = "from_bam"
+        star_index_allelic = NmaskedIndex
+        SNPFile = SNPfile
+        # SNPsplit
+        include: os.path.join(maindir, "shared", "rules", "SNPsplit.snakefile")
+        # deepTools QC
+        include: os.path.join(maindir, "shared", "rules", "deepTools_RNA_allelic.snakefile")
 
     include: os.path.join(maindir, "shared", "rules", "LinkBam.snakefile")
 
