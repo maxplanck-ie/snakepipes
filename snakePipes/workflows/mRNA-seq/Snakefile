@@ -93,7 +93,7 @@ else:
     downsample=None
     if "allelic-mapping" in mode:
         allele_mode = "from_bam"
-        star_index_allelic = NmaskedIndex
+        star_index_allelic = NMaskedIndex
         SNPFile = SNPfile
         # SNPsplit
         include: os.path.join(maindir, "shared", "rules", "SNPsplit.snakefile")
