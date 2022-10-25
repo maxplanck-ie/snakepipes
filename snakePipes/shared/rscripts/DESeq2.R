@@ -142,7 +142,7 @@ if(length(unique(sampleInfo$condition))>1){
                   ddr.df = paste0(outprefix, "_DEresults.tsv"),
                   countdata = countFilePath,
                   coldata = sampleInfo,
-                  fdr = 0.05,
+                  fdr = fdr,
                   heatmap_topN = 20,
                   geneNamesFile = geneNamesFilePath))
 }
@@ -158,7 +158,7 @@ if (isTRUE(allelic_info)) {
                       ddr.df = paste0(outprefix, "_DEresults.tsv"),
                       countdata = countFilePath,
                       coldata = sampleInfo,
-                      fdr = 0.05,
+                      fdr = fdr,
                       heatmap_topN = 20,
                       geneNamesFile = geneNamesFilePath))
 }

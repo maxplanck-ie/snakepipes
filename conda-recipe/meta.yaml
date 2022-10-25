@@ -1,6 +1,6 @@
 package:
   name: snakepipes
-  version: 2.6.0
+  version: 2.6.1
 
 source:
   path: ../
@@ -15,6 +15,7 @@ requirements:
   run:
     - python >=3.7.0
     - snakemake >=6.2.1
+    - tabulate <0.9
     - pandas
     - graphviz
     - fuzzywuzzy
