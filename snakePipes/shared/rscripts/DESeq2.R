@@ -79,7 +79,7 @@ if(isTRUE(tximport)) {
   tx2gene <- read.delim(tx2gene_file, header = FALSE)
   tx2gene <- tx2gene[c(1,2)]
   # check setup table and import
-  countdata <- checktable(sampleSheet = sampleInfo, salmon_dir = dirname(countFilePath), tx2gene_annot = tx2gene)
+  countdata <- checktable(sampleSheet = sampleInfo, salmon_dir = dirname(countFilePath), tx2gene_annot = tx2gene, alleleSpecific = allelic_info)
 } else {
   sampleInfo$name <- make.names(sampleInfo$name)
   rownames(sampleInfo)<-sampleInfo$name
@@ -105,7 +105,7 @@ if(length(unique(sampleInfo$condition))>1){
 
 ## Run allele-sepecific DESeq wrapper (if asked for)
 if (isTRUE(allelic_info)) {
-    seqout_allelic <- DESeq_allelic(countdata, coldata = sampleInfo, fdr = fdr)
+    seqout_allelic <- DESeq_allelic(countdata, coldata = sampleInfo, fdr = fdr, from_salmon=tximport)
 
     DESeq_writeOutput(DEseqout = seqout_allelic,
                  fdr = fdr, outprefix = "DEseq_allelic",

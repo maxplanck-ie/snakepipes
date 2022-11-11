@@ -31,8 +31,13 @@ checktable <- function(countdata = NA, sampleSheet = NA, alleleSpecific = FALSE,
   ## check files
   if(!is.na(salmon_dir)) {
 
-    # mode = Salmon : check whether salmon output files exist in Salmon dir
-    files <- paste0(salmon_dir,"/",sampleSheet$name,".quant.sf")
+    #mode = Salmon : check whether salmon output files exist in Salmon dir
+    if(alleleSpecific){
+        files <- c(paste0(salmon_dir,"/",sampleSheet$name,".genome1.quant.sf"),paste0(salmon_dir,"/",sampleSheet$name,".genome2.quant.sf"))
+    }else{
+        files <- paste0(salmon_dir,"/",sampleSheet$name,".quant.sf")
+    }
+    #files<-dir(salmon_dir,pattern=".quant.sf",full.names=TRUE)
     filecheck <- file.exists(files)
     if(!(all(filecheck == TRUE))) {
       cat("Error! The following File(s) don't exist : ")
@@ -63,7 +68,7 @@ checktable <- function(countdata = NA, sampleSheet = NA, alleleSpecific = FALSE,
         }
     }
   }
-  if(all(is.integer(countdata))){
+  if(all(is.integer(countdata)) | !is.na(salmon_dir)){
         print("All countdata is integer.")
     }else{
         print("Non-integer counts detected. The data will be rounded, as this is well within the expected sampling variation of a technical replicate.")
@@ -135,33 +140,51 @@ DESeq_basic <- function(countdata, coldata, fdr, alleleSpecific = FALSE, from_sa
 #'
 #'
 
-DESeq_allelic <- function(countdata, coldata, fdr) {
+DESeq_allelic <- function(countdata, coldata, fdr, from_salmon=FALSE) {
 
     # AlleleSpecific DEseq
     print("Performing Allele-specific DESeq using Interaction design : Genome2 vs Genome1")
+    if(isTRUE(from_salmon)) {
+        # create alleleSpecific design matrix
+        coldata_allelic <- data.frame(name = colnames(as.data.frame(countdata$counts)),
+                   allele = rep(c("genome1", "genome2"), nrow(coldata)),
+                   condition = rep(coldata$condition, each = 2) )
+        rownames(coldata_allelic)<-colnames(as.data.frame(countdata$counts))
+        coldata_allelic$allele<-factor(coldata_allelic$allele,levels=c("genome1","genome2"))
+        coldata_allelic$condition<-factor(coldata_allelic$condition,levels=unique(coldata_allelic$condition))
+        print("Using input from tximport")
+        dds <- DESeq2::DESeqDataSetFromTximport(countdata,
+                                  colData = coldata_allelic, design =~1)
+
+    } else {
+      print("Using input from count table")
     rnasamp <- dplyr::select(countdata, -dplyr::ends_with("_all"))
 
     # create alleleSpecific design matrix
-    design <- data.frame(name = colnames(rnasamp),
+    coldata_allelic <- data.frame(name = colnames(rnasamp),
                    allele = rep(c("genome1", "genome2"), nrow(coldata)),
                    condition = rep(coldata$condition, each = 2) )
-    rownames(design)<-colnames(rnasamp)
+    rownames(coldata_allelic)<-colnames(rnasamp)
+    coldata_allelic$allele<-factor(coldata_allelic$allele,levels=c("genome1","genome2"))
+    coldata_allelic$condition<-factor(coldata_allelic$condition,levels=unique(coldata_allelic$condition))
+    dds <- DESeq2::DESeqDataSetFromMatrix(rnasamp, colData = coldata_allelic,
+                              design = ~1)
+    rownames(dds) <- rownames(rnasamp)
 
+    }
+    coldata_allelic$allele<-factor(coldata_allelic$allele,levels=c("genome1","genome2"))
+    
     # Run DESeq
-    if(length(unique(design$condition))>1){
-      dds <- DESeq2::DESeqDataSetFromMatrix(rnasamp, colData = design,
-                              design = ~allele + condition + allele:condition)
-      rownames(dds) <- rownames(rnasamp)
+    if(length(unique(coldata_allelic$condition))>1){
+      DESeq2::design(dds) <- formula(~allele + condition + allele:condition)
       dds <- DESeq2::DESeq(dds,betaPrior = FALSE)
       ddr <- DESeq2::results(dds, name=paste0("allelegenome2.condition",unique(coldata$condition)[2]))
       ddr_shrunk <- DESeq2::lfcShrink(dds,coef=paste0("allelegenome2.condition",unique(coldata$condition)[2]),type="apeglm",res=ddr)
     } else {
-    dds <- DESeq2::DESeqDataSetFromMatrix(rnasamp, colData = design,
-                              design = ~allele)
-      rownames(dds) <- rownames(rnasamp)
-      dds <- DESeq2::DESeq(dds,betaPrior = FALSE)
-      ddr <- DESeq2::results(dds, name="allele_genome2_vs_genome1")
-      ddr_shrunk <- DESeq2::lfcShrink(dds,coef="allele_genome2_vs_genome1",type="apeglm",res=ddr)
+        DESeq2::design(dds) <- formula(~allele)
+        dds <- DESeq2::DESeq(dds,betaPrior = FALSE)
+        ddr <- DESeq2::results(dds, name="allele_genome2_vs_genome1")
+        ddr_shrunk <- DESeq2::lfcShrink(dds,coef="allele_genome2_vs_genome1",type="apeglm",res=ddr)
     }
     output <- list(dds = dds, ddr = ddr, ddr_shrunk=ddr_shrunk)
     return(output)
