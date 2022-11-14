@@ -59,7 +59,7 @@ rule DESeq2_Salmon:
         outdir = get_outdir("DESeq2_Salmon",sampleSheet),
         fdr = 0.05,
         importfunc = os.path.join(maindir, "shared", "rscripts", "DE_functions.R"),
-        allele_info = 'FALSE',
+        allele_info = lambda wildcards : 'TRUE' if 'allelic-mapping' in mode else 'FALSE',
         tx2gene_file = "Annotation/genes.filtered.t2g",
         rmdTemplate = os.path.join(maindir, "shared", "rscripts", "DESeq2Report.Rmd")
     conda: CONDA_RNASEQ_ENV

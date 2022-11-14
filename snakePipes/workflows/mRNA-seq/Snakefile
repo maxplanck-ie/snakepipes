@@ -188,6 +188,8 @@ def run_alignment_free():
                 sample_name = os.path.splitext(os.path.basename(sampleSheet))[0]
                 if not isMultipleComparison:
                     file_list.append( ["DESeq2_Salmon_{}/DESeq2.session_info.txt".format(sample_name)])
+                    if cf.check_replicates(sampleSheet):
+                        file_list.append( ["sleuth_SalmonAllelic_{}/so.rds".format(sample_name)] )
         return(file_list)
     else:
         return([])
