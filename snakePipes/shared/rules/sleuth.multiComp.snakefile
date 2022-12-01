@@ -21,7 +21,7 @@ rule sleuth_Salmon:
     log:
         out = "sleuth_Salmon_{}/logs/sleuth.out".format(os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}"),
         err = "sleuth_Salmon_{}/logs/sleuth.err".format(os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}")
-    conda: CONDA_RNASEQ_ENV
+    conda: CONDA_SLEUTH_ENV
     shell:
         "Rscript {params.script} "
         "{params.sampleSheet} "

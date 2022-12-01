@@ -73,6 +73,7 @@ if not fromBAM:
         include: os.path.join(maindir, "shared", "rules", "deepTools_RNA_allelic.snakefile")
         if "alignment-free" in mode:
             include: os.path.join(maindir, "shared", "rules", "Salmon_allelic.snakefile")
+            include: os.path.join(maindir, "shared", "rules", "sleuth.singleComp.snakefile")
     else:
         # HISAT2/STAR
         include: os.path.join(maindir, "shared", "rules", "RNA_mapping.snakefile")
@@ -188,8 +189,7 @@ def run_alignment_free():
                 sample_name = os.path.splitext(os.path.basename(sampleSheet))[0]
                 if not isMultipleComparison:
                     file_list.append( ["DESeq2_Salmon_{}/DESeq2.session_info.txt".format(sample_name)])
-                    if cf.check_replicates(sampleSheet):
-                        file_list.append( ["sleuth_SalmonAllelic_{}/so.rds".format(sample_name)] )
+                    file_list.append( ["sleuth_SalmonAllelic_{}/so.rds".format(sample_name)] )
         return(file_list)
     else:
         return([])

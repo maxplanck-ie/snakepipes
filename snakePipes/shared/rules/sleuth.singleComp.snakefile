@@ -19,7 +19,7 @@ rule sleuth_Salmon:
     log:
         out = "sleuth_Salmon_{}/logs/sleuth.out".format(sample_name),
         err = "sleuth_Salmon_{}/logs/sleuth.err".format(sample_name)
-    conda: CONDA_RNASEQ_ENV
+    conda: CONDA_SLEUTH_ENV
     shell:
         "Rscript {params.script} "
         "{input.sampleSheet} "
@@ -30,7 +30,7 @@ rule sleuth_Salmon:
 
 rule sleuth_SalmonAllelic:
     input:
-        quant_files = expand("SalmonAllelic/{sample}/abundance.h5", sample=samples),
+        quant_files = expand("SalmonAllelic/{sample}.{allele}/abundance.h5", sample=samples,allele=["genome1","genome2"]),
         t2g = "Annotation/genes.filtered.t2g",
         sampleSheet = sampleSheet
     output:
@@ -45,7 +45,7 @@ rule sleuth_SalmonAllelic:
     log:
         out = "sleuth_SalmonAllelic_{}/logs/sleuth.out".format(sample_name),
         err = "sleuth_SalmonAllelic_{}/logs/sleuth.err".format(sample_name)
-    conda: CONDA_RNASEQ_ENV
+    conda: CONDA_SLEUTH_ENV
     shell:
         "Rscript {params.script} "
         "{input.sampleSheet} "
