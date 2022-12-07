@@ -93,6 +93,7 @@ DESeq_basic <- function(countdata, coldata, fdr, alleleSpecific = FALSE, from_sa
     cnames.sub<-unique(colnames(coldata)[2:which(colnames(coldata) %in% "condition")])
     d<-as.formula(noquote(paste0("~",paste(cnames.sub,collapse="+"))))
     
+
     # Normal DESeq
     print("Performing basic DESeq: test vs control")
     if(isTRUE(from_salmon)) {
@@ -100,18 +101,18 @@ DESeq_basic <- function(countdata, coldata, fdr, alleleSpecific = FALSE, from_sa
         dds <- DESeq2::DESeqDataSetFromTximport(countdata,
                                   colData = coldata, design =d)
                 
-    } else {
-      print("Using input from count table")
-      if(isTRUE(alleleSpecific)) {
-          rnasamp <- dplyr::select(countdata, dplyr::ends_with("_all"))
-          rownames(coldata)<-colnames(rnasamp)
-          dds <- DESeq2::DESeqDataSetFromMatrix(countData = rnasamp,
-                                    colData = coldata, design =d)
       } else {
-          dds <- DESeq2::DESeqDataSetFromMatrix(countData = countdata,
+          if(isTRUE(alleleSpecific)) {
+            rnasamp <- dplyr::select(countdata, dplyr::ends_with("_all"))
+            rownames(coldata)<-colnames(rnasamp)
+            countdata<-rnasamp
+           }
+
+           dds <- DESeq2::DESeqDataSetFromMatrix(countData = countdata,
                                     colData = coldata, design =d)
+
       }
-    }
+
     if(length(size_factors) > 1) {
         print("applying size factors")
         print(size_factors)
@@ -172,7 +173,6 @@ DESeq_allelic <- function(countdata, coldata, fdr, from_salmon=FALSE) {
     rownames(dds) <- rownames(rnasamp)
 
     }
-    coldata_allelic$allele<-factor(coldata_allelic$allele,levels=c("genome1","genome2"))
     
     # Run DESeq
     if(length(unique(coldata_allelic$condition))>1){

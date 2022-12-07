@@ -50,10 +50,12 @@ if (exists('t2g')) {
   colnames(t2g) <- c("target_id","ens_gene","ext_gene")
 
   ## add gene names
-  so <- sleuth_prep(s2c, full_model=d, target_mapping = t2g)
+  so <- sleuth_prep(s2c, full_model=d, target_mapping = t2g, num_cores=6,
+        transformation_function=log2(x + 0.5))
 } else {
   ## construct sleuth object
-  so = sleuth_prep(s2c, full_model=d)
+  so = sleuth_prep(s2c, full_model=d, num_cores=6,
+        transformation_function=log2(x + 0.5))
 }
 
 ## model expression responding on condition

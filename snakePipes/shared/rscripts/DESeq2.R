@@ -93,11 +93,15 @@ if(isTRUE(tximport)) {
 ## ~~~~~~~ 3. run DESeq wrapper ~~~~~~~~
 #in case of the allelic-specific workflow, allow for 1 condition and skip deseq2 basic in this case 
 if(length(unique(sampleInfo$condition))>1){
-    seqout <- DESeq_basic(countdata, coldata = sampleInfo, fdr = fdr, alleleSpecific = allelic_info, from_salmon = tximport)
+    if(tximport & allelic_info){
+        message("Detected allelic Salmon counts. Skipping DESeq_basic.")
+    }else{
+        seqout <- DESeq_basic(countdata, coldata = sampleInfo, fdr = fdr, alleleSpecific = allelic_info, from_salmon = tximport)
 
-    DESeq_writeOutput(DEseqout = seqout,
+        DESeq_writeOutput(DEseqout = seqout,
                 fdr = fdr, outprefix = "DEseq_basic",
                 geneNamesFile = geneNamesFilePath)
+        }
 }
 #DESeq_downstream(DEseqout = seqout, countdata, sampleInfo,
 #             fdr = fdr, outprefix = "DEseq_basic", heatmap_topN = topN,
@@ -132,9 +136,10 @@ write.bibtex(bib, file = 'citations.bib')
 file.copy(rmdTemplate, to = 'DESeq2_report_basic.Rmd')
 
 if(length(unique(sampleInfo$condition))>1){
-  outprefix = "DEseq_basic"
-  cite_options(citation_format = "text",style = "html",cite.style = "numeric",hyperlink = TRUE)
-  render('DESeq2_report_basic.Rmd',
+  if(!tximport & !allelic_info){
+      outprefix = "DEseq_basic"
+      cite_options(citation_format = "text",style = "html",cite.style = "numeric",hyperlink = TRUE)
+      render('DESeq2_report_basic.Rmd',
               output_format = "html_document",
               clean = TRUE,
               params = list(
@@ -145,6 +150,7 @@ if(length(unique(sampleInfo$condition))>1){
                   fdr = fdr,
                   heatmap_topN = 20,
                   geneNamesFile = geneNamesFilePath))
+    }
 }
 
 if (isTRUE(allelic_info)) {
