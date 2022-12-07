@@ -91,7 +91,7 @@ so = sleuth_fit(so)
 
 ## Wald test (to get *fold change*)
 if(length(unique(sample_info$condition))>1){
-    wald_beta_name = paste0("allelegenome2.condition",unique(coldata_allelic$condition)[2])
+    wald_beta_name = paste0("allelegenome2:condition",unique(coldata_allelic$condition)[2])
 }else{
     wald_beta_name = "allelegenome2"
 }
