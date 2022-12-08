@@ -78,15 +78,6 @@ if not fromBAM:
         # HISAT2/STAR
         include: os.path.join(maindir, "shared", "rules", "RNA_mapping.snakefile")
 
-        ## Salmon
-        if "alignment-free" in mode:
-            include: os.path.join(maindir, "shared", "rules", "Salmon.snakefile")
-            ## Sleuth (on Salmon)
-            if sampleSheet:
-                if isMultipleComparison:
-                    include: os.path.join(maindir, "shared", "rules", "sleuth.multiComp.snakefile")
-                else:
-                    include: os.path.join(maindir, "shared", "rules", "sleuth.singleComp.snakefile")
 
 else:
     fastqc=False
@@ -102,6 +93,16 @@ else:
         include: os.path.join(maindir, "shared", "rules", "deepTools_RNA_allelic.snakefile")
 
     include: os.path.join(maindir, "shared", "rules", "LinkBam.snakefile")
+
+    ## Salmon
+    if "alignment-free" in mode:
+        include: os.path.join(maindir, "shared", "rules", "Salmon.snakefile")
+        ## Sleuth (on Salmon)
+        if sampleSheet:
+            if isMultipleComparison and not "allelic-mapping" in mode:
+                include: os.path.join(maindir, "shared", "rules", "sleuth.multiComp.snakefile")
+            else:
+                include: os.path.join(maindir, "shared", "rules", "sleuth.singleComp.snakefile")
 
 if "allelic-mapping" in mode:
     ## featureCounts_allelic

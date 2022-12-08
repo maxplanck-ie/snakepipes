@@ -15,7 +15,7 @@ annotation_bed2fasta:
 sleuth_Salmon:
     memory: 4G
 sleuth_SalmonAllelic:
-    memory: 4G
+    memory: 10G
 DESeq2:
     memory: 5G
 DESeq2_Salmon_basic:
