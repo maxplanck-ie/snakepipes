@@ -38,9 +38,7 @@ print(salmon_dirs)
 
 s2c = mutate(sample_info, path=salmon_dirs)
 ## reorder conditions (for Wald test later on: order of comparison important for fold change)
-if ( s2c$condition[1] != levels(s2c$condition)[1] ) {
-  s2c$condition =  relevel(s2c$condition, as.character(s2c$condition[1]) )
-}
+s2c$condition<-factor(s2c$condition,levels=unique(s2c$condition))
 print(s2c)
 
 ## get gene names / symbol names
@@ -51,11 +49,11 @@ if (exists('t2g')) {
 
   ## add gene names
   so <- sleuth_prep(s2c, full_model=d, target_mapping = t2g, num_cores=6,
-        transformation_function=log2(x + 0.5))
+        transformation_function=function(x) log2(x + 0.5))
 } else {
   ## construct sleuth object
   so = sleuth_prep(s2c, full_model=d, num_cores=6,
-        transformation_function=log2(x + 0.5))
+        transformation_function=function(x) log2(x + 0.5))
 }
 
 ## model expression responding on condition
