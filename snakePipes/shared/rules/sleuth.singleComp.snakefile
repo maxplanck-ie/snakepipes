@@ -15,7 +15,8 @@ rule sleuth_Salmon:
         script=os.path.join(maindir, "shared", "rscripts", "sleuth.R"),
         indir = os.path.join(outdir,"Salmon"),
         outdir = os.path.join(outdir,"sleuth_Salmon_{}".format(sample_name)),
-        fdr = 0.05,
+        fdr = 0.05
+    threads: 6
     log:
         out = "sleuth_Salmon_{}/logs/sleuth.out".format(sample_name),
         err = "sleuth_Salmon_{}/logs/sleuth.err".format(sample_name)
@@ -41,7 +42,8 @@ rule sleuth_SalmonAllelic:
         script=os.path.join(maindir, "shared", "rscripts", "sleuth_allelic.R"),
         indir = os.path.join(outdir,"SalmonAllelic"),
         outdir = os.path.join(outdir,"sleuth_SalmonAllelic_{}".format(sample_name)),
-        fdr = 0.05,
+        fdr = 0.05
+    threads: 6
     log:
         out = "sleuth_SalmonAllelic_{}/logs/sleuth.out".format(sample_name),
         err = "sleuth_SalmonAllelic_{}/logs/sleuth.err".format(sample_name)

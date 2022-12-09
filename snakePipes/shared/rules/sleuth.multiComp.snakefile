@@ -17,7 +17,8 @@ rule sleuth_Salmon:
         indir = os.path.join(outdir,"Salmon"),
         outdir = os.path.join(outdir,"sleuth_Salmon_{}".format(os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}")),
         sampleSheet = lambda wildcards,input: os.path.join(outdir,str(input.sampleSheet)),
-        fdr = 0.05,
+        fdr = 0.05
+    threads: 6
     log:
         out = "sleuth_Salmon_{}/logs/sleuth.out".format(os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}"),
         err = "sleuth_Salmon_{}/logs/sleuth.err".format(os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}")

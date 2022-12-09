@@ -41,9 +41,9 @@ rule DESeq2:
 
 
 ## DESeq2 (on Salmon)
-rule DESeq2_Salmon:
+rule DESeq2_Salmon_basic:
     input:
-        counts_table = "Salmon/counts.transcripts.tsv" if not "allelic-mapping" in mode else "SalmonAllelic/counts.transcripts.tsv",
+        counts_table = "Salmon/counts.transcripts.tsv",
         sampleSheet = sampleSheet,
         tx2gene_file = "Annotation/genes.filtered.t2g",
         symbol_file = "Annotation/genes.filtered.symbol" #get_symbol_file
@@ -59,7 +59,42 @@ rule DESeq2_Salmon:
         outdir = get_outdir("DESeq2_Salmon",sampleSheet),
         fdr = 0.05,
         importfunc = os.path.join(maindir, "shared", "rscripts", "DE_functions.R"),
-        allele_info = lambda wildcards : 'TRUE' if 'allelic-mapping' in mode else 'FALSE',
+        allele_info = 'FALSE',
+        tx2gene_file = "Annotation/genes.filtered.t2g",
+        rmdTemplate = os.path.join(maindir, "shared", "rscripts", "DESeq2Report.Rmd")
+    conda: CONDA_RNASEQ_ENV
+    shell:
+        "cd {params.outdir} && "
+        "Rscript {params.script} "
+        "{input.sampleSheet} " # 1
+        "../{input.counts_table} " # 2
+        "{params.fdr} " # 3
+        "../{input.symbol_file} " # 4
+        "{params.importfunc} " # 5
+        "{params.allele_info} " # 6
+        "../{input.tx2gene_file} " # 7
+        "{params.rmdTemplate} " # 8
+        " > ../{log.out} 2> ../{log.err}"
+
+rule DESeq2_Salmon_allelic:
+    input:
+        counts_table = "SalmonAllelic/counts.transcripts.tsv",
+        sampleSheet = sampleSheet,
+        tx2gene_file = "Annotation/genes.filtered.t2g",
+        symbol_file = "Annotation/genes.filtered.symbol" #get_symbol_file
+    output:
+        "{}/DESeq2.session_info.txt".format(get_outdir("DESeq2_SalmonAllelic",sampleSheet))
+    log:
+        out = "{}/logs/DESeq2.out".format(get_outdir("DESeq2_SalmonAllelic",sampleSheet)),
+        err = "{}/logs/DESeq2.err".format(get_outdir("DESeq2_SalmonAllelic",sampleSheet))
+    benchmark:
+        "{}/.benchmark/DESeq2.SalmonAllelic.benchmark".format(get_outdir("DESeq2_SalmonAllelic",sampleSheet))
+    params:
+        script=os.path.join(maindir, "shared", "rscripts", "DESeq2.R"),
+        outdir = get_outdir("DESeq2_SalmonAllelic",sampleSheet),
+        fdr = 0.05,
+        importfunc = os.path.join(maindir, "shared", "rscripts", "DE_functions.R"),
+        allele_info = 'TRUE',
         tx2gene_file = "Annotation/genes.filtered.t2g",
         rmdTemplate = os.path.join(maindir, "shared", "rscripts", "DESeq2Report.Rmd")
     conda: CONDA_RNASEQ_ENV
