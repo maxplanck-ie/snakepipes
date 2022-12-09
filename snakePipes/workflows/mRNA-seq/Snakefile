@@ -74,6 +74,7 @@ if not fromBAM:
         if "alignment-free" in mode:
             include: os.path.join(maindir, "shared", "rules", "Salmon_allelic.snakefile")
             include: os.path.join(maindir, "shared", "rules", "sleuth.singleComp.snakefile")
+#            include: os.path.join(maindir, "shared", "rules", "DESeq2.singleComp.snakefile")
     else:
         # HISAT2/STAR
         include: os.path.join(maindir, "shared", "rules", "RNA_mapping.snakefile")
@@ -118,7 +119,7 @@ include:os.path.join(maindir, "shared", "rules", "RNA-seq_qc_report.snakefile")
 
 ## DESeq2
 if sampleSheet:
-    if isMultipleComparison:
+    if isMultipleComparison and not "allelic-mapping" in mode:
         include: os.path.join(maindir, "shared", "rules", "DESeq2.multipleComp.snakefile")
         if rMats:
             include: os.path.join(maindir, "shared", "rules", "rMats.multipleComp.snakefile")

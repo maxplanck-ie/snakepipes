@@ -38,8 +38,8 @@ print(salmon_dirs)
 
 s2c = mutate(sample_info, path=salmon_dirs)
 ## reorder conditions (for Wald test later on: order of comparison important for fold change)
-if ( s2c$condition[[1]] != levels(s2c$condition)[[1]] ) {
-  s2c$condition =  relevel(s2c$condition, as.character(s2c$condition[[1]]) )
+if ( s2c$condition[1] != levels(s2c$condition)[1] ) {
+  s2c$condition =  relevel(s2c$condition, as.character(s2c$condition[1]) )
 }
 print(s2c)
 

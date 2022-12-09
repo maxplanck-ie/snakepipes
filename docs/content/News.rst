@@ -2,7 +2,7 @@ snakePipes News
 ===============
 
 
-snakePipes 2.x.x
+snakePipes 2.7.0
 ----------------
 
 * Added the allelic version of Salmon-based transcript quantitation to mRNA-seq workflow. Will be run if *both* 'allelic-mapping' and 'alignment-free' modes are specified.
