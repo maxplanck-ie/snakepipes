@@ -333,8 +333,6 @@ onstart:
 ################################################################################
 
 if not fromBAM:
-    localrules: Salmon_wasabi, sleuth_Salmon
-
 
     rule all:
         input:
@@ -349,7 +347,6 @@ if not fromBAM:
             "multiQC/multiqc_report.html"
 
 else:
-    localrules: Salmon_wasabi
 
     rule all:
         input:
