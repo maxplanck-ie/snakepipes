@@ -81,7 +81,7 @@ load(params$DEseqoutRdata) ## dds and ddr
 ddr.df <- params$ddr.df  #_DEresults.tsv file
 countdata <- params$countdata
 coldata <- params$coldata
-fdr <- params$fdr
+fdr <- as.numeric(params$fdr)
 heatmap_topN <- params$heatmap_topN
 geneNamesFile <- params$geneNamesFile
 
