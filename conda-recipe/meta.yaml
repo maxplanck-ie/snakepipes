@@ -14,7 +14,7 @@ requirements:
     - python >=3
   run:
     - python >=3.7.0
-    - snakemake >=6.2.1
+    - snakemake >=6.2.1, <7.19.0
     - tabulate <0.9
     - pandas
     - graphviz
