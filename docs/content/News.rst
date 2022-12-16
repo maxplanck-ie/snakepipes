@@ -1,6 +1,10 @@
 snakePipes News
 ===============
 
+snakePipes 2.7.1
+----------------
+* Capped snakemake version to < 7.19.0.
+
 
 snakePipes 2.7.0
 ----------------
