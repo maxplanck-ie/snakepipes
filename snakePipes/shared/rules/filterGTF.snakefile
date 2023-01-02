@@ -38,6 +38,7 @@ rule gtf_to_files:
         "Annotation/genes.filtered.bed"
     run:
         import shlex
+        import re
 
         t2g = open(output[0], "w")
         symbol = open(output[1], "w")
@@ -47,9 +48,9 @@ rule gtf_to_files:
             if line.startswith("#"):
                 continue
             cols = line.strip().split("\t")
+            annos = re.split(''';(?=(?:[^'"]|'[^']*'|"[^"]*")*$)''', cols[8]) 
             if cols[2] == "gene":
                 # get the gene_name and gene_id values
-                annos = cols[8].split(";")
                 gene_id = None
                 gene_name = None
                 for anno in annos:
@@ -64,7 +65,6 @@ rule gtf_to_files:
                     symbol.write("{}\t{}\n".format(gene_id, "" if not gene_name else gene_name))
             elif cols[2] == "transcript":
                 # get the gene_id and transcript_id values
-                annos = cols[8].split(";")
                 gene_id = None
                 transcript_id = None
                 gene_name = ""
@@ -84,7 +84,6 @@ rule gtf_to_files:
                     GTFdict[transcript_id] = [cols[0], cols[3], cols[4], cols[6], [], []]
             elif cols[2] == "exon":
                 # get the transcript_id
-                annos = cols[8].split(";")
                 transcript_id = None
                 for anno in annos:
                     anno = shlex.split(anno.strip(), " ")
