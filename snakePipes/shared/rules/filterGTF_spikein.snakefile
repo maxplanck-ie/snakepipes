@@ -63,7 +63,7 @@ rule spikein_gtf_to_files:
                         gene_name = anno[1]
                 if gene_id:
                     symbol.write("{}\t{}\n".format(gene_id, "" if not gene_name else gene_name))
-            elif cols[2] == "transcript":
+            elif cols[2] == "transcript" or 'RNA' in cols[2]:
                 # get the gene_id and transcript_id values
                 gene_id = None
                 transcript_id = None
@@ -91,7 +91,7 @@ rule spikein_gtf_to_files:
                         continue
                     if anno[0] == "transcript_id":
                         transcript_id = anno[1]
-                if transcript_id:
+                if transcript_id and transcript_id in GTFdict:
                     exonWidth = int(cols[4]) - int(cols[3]) + 1
                     exonOffset = int(cols[3]) - int(GTFdict[transcript_id][1])
                     GTFdict[transcript_id][4].append(str(exonWidth))
