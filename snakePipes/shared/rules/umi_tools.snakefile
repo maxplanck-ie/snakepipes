@@ -82,7 +82,7 @@ if UMIDedup:
             {params.umitools_paired} {params.umitools_options}
             """
 else:
-    if aligner == "Bowtie2":
+    if aligner == "Bowtie2" or aligner == "bwa":
         rule filter_reads:
             input:
                 bamfile = "filtered_bam/{sample}.filtered.tmp.bam"
