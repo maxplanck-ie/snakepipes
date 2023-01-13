@@ -123,7 +123,8 @@ elif aligner.upper().find("STAR") >=0:
                     --outStd BAM_Unsorted \
                     --sjdbGTFfile {params.gtf} \
                     --genomeDir {params.index} \
-                    --readFilesIn <(gunzip -c {input.r1}) <(gunzip -c {input.r2}) \
+                    --readFilesIn  {input.r1} {input.r2} \
+                    --readFilesCommand 'gunzip -c' \
                     --outFileNamePrefix {params.prefix} \
                 | samtools sort -m {params.samsort_memory} -T $MYTEMP/{wildcards.sample} -@ {params.samtools_threads} -O bam -o {output.bam} - 2> {log}
                 rm -rf $MYTEMP
@@ -160,7 +161,8 @@ elif aligner.upper().find("STAR") >=0:
                     --outStd BAM_Unsorted \
                     --sjdbGTFfile {params.gtf} \
                     --genomeDir {params.index} \
-                    --readFilesIn <(gunzip -c {input}) \
+                    --readFilesIn {input} \
+                    --readFilesCommand 'gunzip -c' \
                     --outFileNamePrefix {params.prefix} \
                 | samtools sort -m {params.samsort_memory} -T $MYTEMP/{wildcards.sample} -@ {params.samtools_threads} -O bam -o {output.bam} - 2> {log}
                 rm -rf $MYTEMP

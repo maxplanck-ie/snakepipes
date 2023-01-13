@@ -8,7 +8,7 @@ dependencies:
  - ucsc-genepredtobed
  - bowtie2 = 2.4.5
  - hisat2 = 2.2.1
- - star = 2.7.10a
+ - star = 2.7.10b
  - bwa = 0.7.17
  - bwa-mem2 = 2.2.1
  - bwameth = 0.2.5
