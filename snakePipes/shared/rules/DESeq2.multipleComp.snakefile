@@ -54,7 +54,7 @@ rule DESeq2:
 
 
 ## DESeq2 (on Salmon)
-rule DESeq2_Salmon:
+rule DESeq2_Salmon_basic:
     input:
         counts_table = "Salmon/counts.transcripts.tsv",
         sampleSheet = lambda wildcards: checkpoints.split_sampleSheet.get(compGroup=wildcards.compGroup).output,

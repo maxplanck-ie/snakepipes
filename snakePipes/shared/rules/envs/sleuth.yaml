@@ -1,0 +1,8 @@
+name: snakepipes_sleuth_environment_2.0
+channels:
+ - conda-forge
+ - bioconda
+dependencies:
+ - r-base = 4.2.0
+ - r-sleuth = 0.30.1
+ - r-dplyr

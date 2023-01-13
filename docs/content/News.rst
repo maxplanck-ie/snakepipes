@@ -1,10 +1,22 @@
 snakePipes News
 ===============
 
+snakePipes 2.7.1
+----------------
+* Capped snakemake version to < 7.19.0.
+
+
+snakePipes 2.7.0
+----------------
+
+* Added the allelic version of Salmon-based transcript quantitation to mRNA-seq workflow. Will be run if *both* 'allelic-mapping' and 'alignment-free' modes are specified. An allelic version of sleuth will be run, if sample sheet is provided, as well as DESeq2 on allelic Salmon counts.
+
+
 snakePipes 2.6.1
 ----------------
 
 * Capped tabulate version as 0.9.0 breaks snakemake
+
 
 snakePipes 2.6.0
 ----------------
@@ -18,6 +30,7 @@ snakePipes 2.6.0
 * Updated CSAW output.
 * Fixed a couple of issues in the ATAC-seq workflow after sofware versions update.
 * Fixed genome size conversion to string.
+
 
 snakePipes 2.5.4
 ----------------
