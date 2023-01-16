@@ -3,6 +3,7 @@ channels:
  - conda-forge
  - bioconda
 dependencies:
+ - python = 3.7.12 #This can be changed together with the update of deeptools to the next version
  - deeptools = 3.5.1
  - seqtk = 1.3
  - pigz = 2.6
