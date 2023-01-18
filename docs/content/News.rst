@@ -1,6 +1,12 @@
 snakePipes News
 ===============
 
+snakePipes 2.7.2
+----------------
+* STAR version has been updated to 2.7.10b. 2.7.10a was returning segmentation fault on MAC.
+* STAR command has been updated. Now, STAR itself offers a command line option for processing input files.
+* Put a cap on python version for the deeptools env. The current version of deeptools is not supporting the newer python versions and some tools fail.
+
 snakePipes 2.7.1
 ----------------
 * Capped snakemake version to < 7.19.0.
@@ -64,9 +70,9 @@ snakePipes 2.5.1
 * Updated Bowtie2 parameters for the cut and tag data
 * Updated multibamSummary in ChIPSeq pipeline for data with spike-in
 * Uncommented the BamCompare for ChIPseq pipeline with spike-in
-* set a max thread for each rule 
-* External PR #764: always check for >0 when generating heatmap for the differential analysis done by deseq2 
-  
+* set a max thread for each rule
+* External PR #764: always check for >0 when generating heatmap for the differential analysis done by deseq2
+
 snakePipes 2.5.0
 ----------------
 
