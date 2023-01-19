@@ -129,6 +129,8 @@ def run_misc_QC(skipBamQC):
 ##some rules depend on the definitions above
 ################################################################################
 if not fromBAM:
+    include: os.path.join(maindir, "shared", "rules", "sambamba.snakefile")
+    include: os.path.join(maindir, "shared", "rules", "bam_filtering.snakefile")
     #umi_tools
     include: os.path.join(maindir, "shared", "rules", "umi_tools.snakefile")
     # FASTQ: either downsample FASTQ files or create symlinks to input files
