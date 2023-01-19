@@ -25,7 +25,7 @@ if pairedEnd and not fromBAM:
             r1=fastq_dir + "/{sample}" + reads[0] + ".fastq.gz",
             r2=fastq_dir + "/{sample}" + reads[1] + ".fastq.gz"
         output:
-            sbam=temp(aligner+"/{sample}.bam")
+            sbam=temp(aligner+"/{sample}.sorted.bam")
         log:
             err=aligner+"/logs/{sample}.map_reads.err",
             out=aligner+"/logs/{sample}.map_reads.out"
@@ -47,7 +47,7 @@ elif not pairedEnd and not fromBAM:
         input:
             r1=fastq_dir + "/{sample}" + reads[0] + ".fastq.gz",
         output:
-            sbam=temp(aligner+"/{sample}.bam")
+            sbam=temp(aligner+"/{sample}.sorted.bam")
         log:
             err=aligner+"/logs/{sample}.map_reads.err",
             out=aligner+"/logs/{sample}.map_reads.out"
@@ -63,70 +63,6 @@ elif not pairedEnd and not fromBAM:
 	        samtools sort -T "$MYTEMP/{wildcards.sample}" -m 3G -@ 4 -o "{output.sbam}" 2>> {log.err}
             rm -rf "$MYTEMP"
             """
-
-if not fromBAM:
-    rule index_bam:
-        input:
-            aligner+"/{sample}.bam"
-        output:
-            temp(aligner+"/{sample}.bam.bai")
-        log:
-            err=aligner+"/logs/{sample}.index_bam.err",
-            out=aligner+"/logs/{sample}.index_bam.out"
-        conda: CONDA_SHARED_ENV
-        shell: """
-            samtools index "{input}" > {log.out} 2> {log.err}
-            """
-
-if not skipBamQC:
-    rule markDupes:
-        input:
-            aligner+"/{sample}.bam",
-            aligner+"/{sample}.bam.bai"
-        output:
-            "Sambamba/{sample}.markdup.bam"
-        log:
-            err="Sambamba/logs/{sample}.rm_dupes.err",
-            out="Sambamba/logs/{sample}.rm_dupes.out"
-        threads: lambda wildcards: 10 if 10<max_thread else max_thread
-        params:
-            tempDir = tempDir
-        conda: CONDA_SAMBAMBA_ENV
-        shell: """
-            TMPDIR={params.tempDir}
-            MYTEMP=$(mktemp -d "${{TMPDIR:-/tmp}}"/snakepipes.XXXXXXXXXX)
-            sambamba markdup -t {threads} --tmpdir "$MYTEMP/{wildcards.sample}" "{input[0]}" "{output}" >> {log.out} 2> {log.err}
-            rm -rf "$MYTEMP"
-            """
-
-
-    rule indexMarkDupes:
-        input:
-            "Sambamba/{sample}.markdup.bam"
-        output:
-            "Sambamba/{sample}.markdup.bam.bai"
-        params:
-        log:
-            err="Sambamba/logs/{sample}.indexMarkDupes.err",
-            out="Sambamba/logs/{sample}.indexMarkDupes.out"
-        threads: 1
-        conda: CONDA_SHARED_ENV
-        shell: """
-            samtools index "{input}" 1> {log.out} 2> {log.err}
-            """
-
-    rule link_deduped_bam:
-        input:
-            bam="Sambamba/{sample}.markdup.bam",
-            bai="Sambamba/{sample}.markdup.bam.bai"
-        output:
-            bam = "filtered_bam/{sample}.filtered.bam",
-            bai = "filtered_bam/{sample}.filtered.bam.bai"
-        shell: """
-            ln -s ../{input.bam} {output.bam}
-            ln -s ../{input.bai} {output.bai}
-        """
-
 
 rule getRandomCpGs:
     output:
