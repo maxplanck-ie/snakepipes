@@ -6,7 +6,9 @@ snakePipes 2.7.2
 * STAR version has been updated to 2.7.10b. 2.7.10a was returning segmentation fault on MAC.
 * STAR command has been updated. Now, STAR itself offers a command line option for processing input files.
 * Put a cap on python version for the deeptools env. The current version of deeptools is not supporting the newer python versions and some tools fail.
+* Update default condaDir.
 * Fully implement umi deduplication for WGBS. Use filtered bam as input to umi deduplication or relinking no umi deduplication is performed, same for all aligners.
+
 
 snakePipes 2.7.1
 ----------------
