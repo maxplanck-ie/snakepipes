@@ -46,8 +46,8 @@ if not fromBAM:
     ## sambamba
     include:os.path.join(maindir, "shared", "rules", "sambamba.snakefile")
 
-   ## bam filtering
-   include:os.path.join(maindir, "shared", "rules", "bam_filtering.snakefile")
+    ## bam filtering
+    include:os.path.join(maindir, "shared", "rules", "bam_filtering.snakefile")
 
     #umi_tools
     include: os.path.join(maindir, "shared", "rules", "umi_tools.snakefile")
