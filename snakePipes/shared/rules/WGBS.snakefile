@@ -129,7 +129,7 @@ rule calc_Mbias:
     threads: lambda wildcards: 10 if 10<max_thread else max_thread
     conda: CONDA_WGBS_ENV
     shell: """
-        MethylDackel mbias -q {q}-@ {threads} {params.genome} {input[0]} QC_metrics/{wildcards.sample} 2> {output} > {log.out}
+        MethylDackel mbias -q {params.q}-@ {threads} {params.genome} {input[0]} QC_metrics/{wildcards.sample} 2> {output} > {log.out}
         """
 
 
@@ -147,7 +147,7 @@ rule calcCHHbias:
     threads: lambda wildcards: 10 if 10<max_thread else max_thread
     conda: CONDA_WGBS_ENV
     shell: """
-        MethylDackel mbias -q {q} -@ {threads} --CHH --noCpG --noSVG {params.genome} {input[0]} QC_metrics/{wildcards.sample} > {output} 2> {log.err}
+        MethylDackel mbias -q {params.q} -@ {threads} --CHH --noCpG --noSVG {params.genome} {input[0]} QC_metrics/{wildcards.sample} > {output} 2> {log.err}
         """
 
 
@@ -259,7 +259,7 @@ if not noAutoMethylationBias:
         conda: CONDA_WGBS_ENV
         shell: """
             mi=$(cat {input[2]} | sed 's/Suggested inclusion options: //' )
-            MethylDackel extract -q {q} -o MethylDackel/{wildcards.sample} {params.MethylDackelOptions} $mi -@ {threads} {params.genome} {input[0]} 1> {log.out} 2> {log.err}
+            MethylDackel extract -q {params.q} -o MethylDackel/{wildcards.sample} {params.MethylDackelOptions} $mi -@ {threads} {params.genome} {input[0]} 1> {log.out} 2> {log.err}
             """
 else:
     rule methyl_extract:
@@ -278,7 +278,7 @@ else:
         threads: lambda wildcards: 10 if 10<max_thread else max_thread
         conda: CONDA_WGBS_ENV
         shell: """
-            MethylDackel extract -q {q} -o MethylDackel/{wildcards.sample} {params.MethylDackelOptions} -@ {threads} {params.genome} {input[0]} 1> {log.out} 2> {log.err}
+            MethylDackel extract -q {params.q} -o MethylDackel/{wildcards.sample} {params.MethylDackelOptions} -@ {threads} {params.genome} {input[0]} 1> {log.out} 2> {log.err}
             """
 
 
