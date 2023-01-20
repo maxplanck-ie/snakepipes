@@ -23,17 +23,16 @@ if not pipeline=="noncoding-rna-seq":
         conda: CONDA_SHARED_ENV
         shell: "if [[ ! -f {output[0]} ]]; then samtools index {input[0]}; fi"
 
-    if not pipeline=="WGBS" or pipeline=="WGBS" and skipBamQC:
-        rule link_bam_bai_external:
-            input:
-                bam = aligner + "/{sample}.bam",
-                bai = aligner + "/{sample}.bam.bai"
-            output:
-                bam_out = "filtered_bam/{sample}.filtered.bam",
-                bai_out = "filtered_bam/{sample}.filtered.bam.bai",
-            shell: """
-                ln -s ../{input.bam} {output.bam_out};
-                ln -s ../{input.bai} {output.bai_out}
+     rule link_bam_bai_external:
+        input:
+            bam = aligner + "/{sample}.bam",
+            bai = aligner + "/{sample}.bam.bai"
+        output:
+            bam_out = "filtered_bam/{sample}.filtered.bam",
+            bai_out = "filtered_bam/{sample}.filtered.bam.bai",
+        shell: """
+            ln -s ../{input.bam} {output.bam_out};
+            ln -s ../{input.bai} {output.bai_out}
             """
 
 
