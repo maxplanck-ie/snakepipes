@@ -47,6 +47,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          "DMRprograms": "metilene,dmrseq", "minCoverage": 5,
                          "blacklist": None, "sampleSheet": None,
                          "noAutoMethylationBias": False, "fromBAM": False, "skipDOC": False,
+                         "dedup": False, "properPairs": False, "mapq": 0,
                          "UMIDedup": False,
                          "UMIDedupOpts": "", "bcPattern": "",
                          "UMIDedupSep": "_", "UMIBarcode": False, "targetRegions": None, "metileneOptions": None, "skipBamQC": False }):
@@ -155,6 +156,26 @@ def parse_args(defaults={"verbose": False, "configFile": None,
     optional.add_argument("--GCbias",
                          action="store_true",
                          help="Perform GC bias calculation with deepTools.")
+
+    optional.add_argument("--dedup",
+                          dest="dedup",
+                          action="store_true",
+                          help="retain only de-duplicated reads/read pairs "
+                          "(given single-/paired-end data). (default: '%(default)s')",
+                          default=defaults["dedup"])
+
+    optional.add_argument("--properPairs",
+                          action="store_true",
+                          help="retain only reads mapping in proper pairs (default: '%(default)s')",
+                          default=defaults["properPairs"])
+
+    optional.add_argument("--mapq",
+                          dest="mapq",
+                          metavar="INT",
+                          help="retain only reads with at least the given "
+                          "mapping quality. (default: '%(default)s')",
+                          type=int,
+                          default=defaults["mapq"])
 
     return parser
 
