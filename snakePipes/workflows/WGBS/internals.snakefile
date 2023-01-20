@@ -25,7 +25,6 @@ if trim:
 # Disable trimming if BAM files are input
 if fromBAM:
     trim = False
-    fastqc = False
 
 ##check if genes_bed is available
 if not 'genes_bed' in globals():
