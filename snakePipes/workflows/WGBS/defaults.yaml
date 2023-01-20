@@ -42,7 +42,7 @@ trimmerOptions:
 ## Bin size of output files in bigWig format
 bwBinSize: 25
 ## Run FASTQC read quality control
-fastqc: false
+fastqc: False
 verbose: False
 plotFormat: 'png'
 #### Flag to control the pipeline entry point

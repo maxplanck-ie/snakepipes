@@ -66,10 +66,11 @@ def calc_doc(skipDOC):
 
 
 def run_FastQC(fastqc):
-    if fastqc and not fromBAM:
-        return( expand("FastQC/{sample}{read}_fastqc.html", sample = samples, read = reads[:idxRange]) )
-    elif fastqc and fromBAM:
-        return( expand("FastQC/{sample}_fastqc.html", sample = samples) )
+    if fastqc:
+        if fromBAM:
+            return( expand("FastQC/{sample}_fastqc.html", sample = samples) )
+        else:
+            return( expand("FastQC/{sample}{read}_fastqc.html", sample = samples, read = reads[:idxRange]) )
     else:
         return([])
 
