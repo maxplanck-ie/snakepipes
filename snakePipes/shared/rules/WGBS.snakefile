@@ -180,7 +180,7 @@ rule DepthOfCov:
         "QC_metrics/CpGCoverage.png",
         "QC_metrics/CpGCoverage.coverageMetrics.txt"
     params:
-        options="--minMappingQuality " + mapq + " --smartLabels --samFlagExclude 256",
+        options="--minMappingQuality " + str(mapq) + " --smartLabels --samFlagExclude 256",
         thresholds="-ct 0 -ct 1 -ct 2 -ct 5 -ct 10 -ct 15 -ct 20 -ct 30 -ct 50"
     threads: lambda wildcards: 20 if 20<max_thread else max_thread
     log:
@@ -201,7 +201,7 @@ rule DepthOfCovGenome:
         "QC_metrics/genomeCoverage.png",
         "QC_metrics/genomeCoverage.coverageMetrics.txt"
     params:
-        options="--minMappingQuality " + mapq + " --smartLabels --samFlagExclude 256",
+        options="--minMappingQuality " + str(mapq) + " --smartLabels --samFlagExclude 256",
         thresholds="-ct 0 -ct 1 -ct 2 -ct 5 -ct 10 -ct 15 -ct 20 -ct 30 -ct 50"
     threads: lambda wildcards: 20 if 20<max_thread else max_thread
     log:
