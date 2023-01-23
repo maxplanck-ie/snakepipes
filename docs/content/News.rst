@@ -7,6 +7,7 @@ snakePipes 2.7.2
 * STAR command has been updated. Now, STAR itself offers a command line option for processing input files.
 * Put a cap on python version for the deeptools env. The current version of deeptools is not supporting the newer python versions and some tools fail.
 * Update default condaDir.
+* The filter_gtf function has become a bit more versatile. GTF files that include delimiters (';') in e.g. a description field are now allowed. Gene names are also allowed to have symbols now. Lastly, GTF files that have xRNA instead of transcript as a feature in column 3 can also be parsed.
 
 snakePipes 2.7.1
 ----------------
