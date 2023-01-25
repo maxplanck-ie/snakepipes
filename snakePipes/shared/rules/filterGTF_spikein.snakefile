@@ -38,6 +38,7 @@ rule spikein_gtf_to_files:
         "Annotation_spikein/genes.filtered.bed"
     run:
         import shlex
+        import re
 
         t2g = open(output[0], "w")
         symbol = open(output[1], "w")
@@ -47,9 +48,9 @@ rule spikein_gtf_to_files:
             if line.startswith("#"):
                 continue
             cols = line.strip().split("\t")
+            annos = re.split(''';(?=(?:[^'"]|'[^']*'|"[^"]*")*$)''', cols[8]) 
             if cols[2] == "gene":
                 # get the gene_name and gene_id values
-                annos = cols[8].split(";")
                 gene_id = None
                 gene_name = None
                 for anno in annos:
@@ -62,9 +63,8 @@ rule spikein_gtf_to_files:
                         gene_name = anno[1]
                 if gene_id:
                     symbol.write("{}\t{}\n".format(gene_id, "" if not gene_name else gene_name))
-            elif cols[2] == "transcript":
+            elif cols[2] == "transcript" or 'RNA' in cols[2]:
                 # get the gene_id and transcript_id values
-                annos = cols[8].split(";")
                 gene_id = None
                 transcript_id = None
                 gene_name = ""
@@ -84,7 +84,6 @@ rule spikein_gtf_to_files:
                     GTFdict[transcript_id] = [cols[0], cols[3], cols[4], cols[6], [], []]
             elif cols[2] == "exon":
                 # get the transcript_id
-                annos = cols[8].split(";")
                 transcript_id = None
                 for anno in annos:
                     anno = shlex.split(anno.strip(), " ")
@@ -92,7 +91,7 @@ rule spikein_gtf_to_files:
                         continue
                     if anno[0] == "transcript_id":
                         transcript_id = anno[1]
-                if transcript_id:
+                if transcript_id and transcript_id in GTFdict:
                     exonWidth = int(cols[4]) - int(cols[3]) + 1
                     exonOffset = int(cols[3]) - int(GTFdict[transcript_id][1])
                     GTFdict[transcript_id][4].append(str(exonWidth))

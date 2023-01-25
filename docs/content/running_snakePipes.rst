@@ -35,7 +35,7 @@ All individual jobs of the workflow will be submitted to the Grid engine using t
 
 **To run the workflow locally**, use the parameter ``--local`` for local mode and the parameter ``-j 10`` to specify the maximal number of used CPU threads (here: 10).
 
-**For single-end FASTQ files**, the workflow automatically recognized single suffix (eg. "sample1.fastq" instead of "sample1_R1.fastq") as single-end reads. However, mixing of single and paired-end files in the same folder is not supported currently.
+**For single-end FASTQ files**, Note that single end data still needs a valid suffix (e.g. sample1_R1.fastq.gz). With a proper suffix, single end mode is detected by default. When executing some workflows with the ``--fromBAM`` flag, it is still necessary to set ``--singleEnd``.
 
 Once the DNA-mapping run is finished sucessfully. We can run the ChIP-seq analysis in the same directory.
 

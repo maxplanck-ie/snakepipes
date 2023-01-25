@@ -16,7 +16,7 @@ isallelic <- function(x) {
 get_df <- function(infile) {
   cat(infile, "\n")
   bname = gsub(".counts.txt" , "" , basename(infile) )
-  df = read.table(infile, header=T)
+  df = read.table(infile, header=T, sep='\t')
 
   if(isallelic(df) == TRUE) {
   print("Counts are allele-specific")
