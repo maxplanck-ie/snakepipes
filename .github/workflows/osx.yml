@@ -45,6 +45,6 @@ jobs:
       - name: createEnvsOSX
         run: |
           micromamba activate snakePipes_CI
-          conda config --set channel_priority flexible
+          conda config --set channel_priority strict
           snakePipes createEnvs --force --only ${{matrix.envs}}
      
