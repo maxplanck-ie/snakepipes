@@ -34,6 +34,7 @@ def set_env_yamls():
             'CONDA_ATAC_ENV': 'envs/atac_seq.yaml',
             'CONDA_HIC_ENV': 'envs/hic.yaml',
             'CONDA_WGBS_ENV': 'envs/wgbs.yaml',
+            'CONDA_DSS_ENV': 'envs/wgbs_dss.yaml',
             'CONDA_RMD_ENV': 'envs/rmarkdown.yaml',
             'CONDA_PREPROCESSING_ENV': 'envs/preprocessing.yaml',
             'CONDA_NONCODING_RNASEQ_ENV': 'envs/noncoding.yaml',
