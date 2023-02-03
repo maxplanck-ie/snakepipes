@@ -8,7 +8,7 @@
 ################################################################################
 #
 condaEnvDir: '/package/mamba/envs/'
-snakemakeOptions: ' --use-conda --conda-prefix /package/mamba/envs/ '
+snakemakeOptions: 
 organismsDir: 'shared/organisms'
 clusterConfig: 'shared/cluster.yaml'
 tempDir: /data/extended/

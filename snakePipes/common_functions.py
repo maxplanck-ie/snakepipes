@@ -632,7 +632,7 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
         args.snakemakeOptions += " --notemp"
 
     snakemake_cmd = """
-                    TMPDIR={tempDir} PYTHONNOUSERSITE=True {snakemake} {snakemakeOptions} --latency-wait {latency_wait} --snakefile {snakefile} --jobs {maxJobs} --directory {workingdir} --configfile {configFile} --keep-going
+                    TMPDIR={tempDir} PYTHONNOUSERSITE=True {snakemake} {snakemakeOptions} --latency-wait {latency_wait} --snakefile {snakefile} --jobs {maxJobs} --directory {workingdir} --configfile {configFile} --keep-going --use-conda --conda-prefix {condaEnvDir}
                     """.format(snakemake=os.path.join(snakemake_path, "snakemake"),
                                latency_wait=cluster_config["snakemake_latency_wait"],
                                snakefile=os.path.join(workflowDir, "Snakefile"),
