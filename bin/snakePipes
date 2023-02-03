@@ -358,7 +358,7 @@ def createCondaEnvs(args):
 #    cf["snakemakeOptions"] = " ".join(_)
 #    cf["condaEnvDir"] = condaDirUse
 
-   if args.autodetectCondaDir:
+    if args.autodetectCondaDir:
         condaDirUse=detectCondaDir()
     # rewrite defaults.yaml
         cof.write_configfile(os.path.join(baseDir, "shared/defaults.yaml"), cf)
