@@ -52,6 +52,15 @@ def parse_arguments():
 #    )
 
     createEnvsParser.add_argument(
+        "--autodetectCondaEnvDir",
+        action="store_true",
+        help="If specified, this will set condaEnvDir to system conda prefix,"
+       "and will overwrite the condaEnvDir entry in defaults.yaml ."
+       "Use with caution."
+    )
+
+    
+    createEnvsParser.add_argument(
         "--only",
         nargs="+",
         help="If specified, a space-separated list of environments to create. "
@@ -349,8 +358,10 @@ def createCondaEnvs(args):
 #    cf["snakemakeOptions"] = " ".join(_)
 #    cf["condaEnvDir"] = condaDirUse
 
+   if args.autodetectCondaDir:
+        condaDirUse=detectCondaDir()
     # rewrite defaults.yaml
-#    cof.write_configfile(os.path.join(baseDir, "shared/defaults.yaml"), cf)
+        cof.write_configfile(os.path.join(baseDir, "shared/defaults.yaml"), cf)
 
     for envName, env in cof.set_env_yamls().items():
         if args.only is not None and envName not in args.only:
@@ -399,6 +410,15 @@ def createCondaEnvs(args):
     # Ignore site-packages in this env
     if args.noSitePackages and not args.info:
         fixSitePy(rootDir)
+
+def detectCondaDir():
+    "Detect the default conda folder."
+    condaDir = os.environ.get("CONDA_PREFIX")
+    if "envs" in condaDir:
+        condaDir = os.path.dirname(condaDir)
+    else:
+        condaDir = os.path.join(condaDir, "envs")
+    return(condaDir)
 
 
 def updateConfig(args):

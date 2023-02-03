@@ -46,5 +46,5 @@ jobs:
         run: |
           micromamba activate snakePipes_CI
           conda config --set channel_priority flexible
-          snakePipes createEnvs --force --only ${{matrix.envs}}
+          snakePipes createEnvs --force --autodetectCondaEnvDir --only ${{matrix.envs}}
      
