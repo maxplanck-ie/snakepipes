@@ -45,7 +45,7 @@ def parse_arguments():
         "This is typically unwise and only expert users should specify this.",
     )
     mex.add_argument(
-        "--condaDir",
+        "--condaEnvDir",
         help="If specified, use this as the base directory for the "
         "created conda environments. This will ignore what is already "
         "in the workflow-specific yaml files and where conda is installed.",
@@ -115,6 +115,13 @@ def parse_arguments():
         help="Update the options given to snakeMake. You MUST include --use-conda "
         "and an appropriate --conda-prefix if you change this! (Default: %(default)s)",
         default=defaults["snakemakeOptions"],
+    )
+
+    configParser.add_argument(
+        "--condaEnvDir",
+        help="If specified, use this as the base directory for the "
+        "created conda environments. This will ignore what is already "
+        "in the workflow-specific yaml files and where conda is installed.",
     )
 
     configParser.add_argument(
@@ -254,19 +261,21 @@ def envInfo():
     For each environment yaml file print where its conda env is actually located
     """
     baseDir = os.path.dirname(snakePipes.__file__)
-    condaDir = os.environ.get("CONDA_PREFIX")
-    if "envs" in condaDir:
-        condaDir = os.path.dirname(condaDir)
-    else:
-        condaDir = os.path.join(condaDir, "envs")
+#    condaDir = os.environ.get("CONDA_PREFIX")
+#    if "envs" in condaDir:
+#        condaDir = os.path.dirname(condaDir)
+#    else:
+#        condaDir = os.path.join(condaDir, "envs")
 
     f = open(os.path.join(baseDir, "shared/defaults.yaml"))
     cf = yaml.load(f, Loader=yaml.FullLoader)
     f.close()
 
-    _ = cf["snakemakeOptions"].split(" ")
-    idx = _.index("--conda-prefix")
-    condaEnvDir = _[idx + 1]
+#condaEnvDir is now directly specified in defaults.yaml
+#    _ = cf["snakemakeOptions"].split(" ")
+#    idx = _.index("--conda-prefix")
+#    condaEnvDir = _[idx + 1]
+
 
     for env in cof.set_env_yamls().values():
         # Hash the file ala snakemake
@@ -322,11 +331,11 @@ def createCondaEnvs(args):
         idx = _.index("--conda-prefix")
     except:
         idx = len(_)
-        _.extend(["--conda-prefix", condaDir])
-
-    condaEnvDir = _[idx + 1]
-    if args.condaDir:
-        condaDirUse = args.condaDir
+        _.extend(["--conda-prefix", condaEnvDir])
+#
+#    condaEnvDir = _[idx + 1]
+    if args.condaEnvDir:
+        condaDirUse = args.condaEnvDir
         _[idx + 1] = condaDirUse
     elif args.keepCondaDir:
         condaDirUse = _[idx + 1]
@@ -334,6 +343,7 @@ def createCondaEnvs(args):
         condaDirUse = condaDir
         _[idx + 1] = condaDirUse
     cf["snakemakeOptions"] = " ".join(_)
+    cf["condaEnvDir"] = condaDirUse
 
     # rewrite defaults.yaml
     cof.write_configfile(os.path.join(baseDir, "shared/defaults.yaml"), cf)
@@ -363,7 +373,7 @@ def createCondaEnvs(args):
             os.path.join(baseDir, "shared/rules", env),
         ]
         if "--conda-prefix" in cf["snakemakeOptions"] and (
-            args.condaDir or args.keepCondaDir
+            args.condaEnvDir or args.keepCondaDir
         ):
             cmd += ["--prefix", os.path.join(condaDirUse, h)]
         else:
@@ -400,6 +410,7 @@ def updateConfig(args):
     if args.configMode == "manual":
         d = {
             "snakemakeOptions": args.snakemakeOptions,
+            "condaEnvDir": args.condaEnvDir,
             "organismsDir": args.organismsDir,
             "clusterConfig": args.clusterConfig,
             "tempDir": args.tempDir,
