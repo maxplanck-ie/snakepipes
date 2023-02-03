@@ -640,7 +640,8 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
                                workingdir=args.workingdir,
                                snakemakeOptions=str(args.snakemakeOptions or ''),
                                tempDir=cfg["tempDir"],
-                               configFile=os.path.join(args.outdir, '{}.config.yaml'.format(workflowName))).split()
+                               configFile=os.path.join(args.outdir, '{}.config.yaml'.format(workflowName)),
+                               condaEnvDir=cfg["condaEnvDir"]).split()
 
     if args.verbose:
         snakemake_cmd.append("--printshellcmds")
