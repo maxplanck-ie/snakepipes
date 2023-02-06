@@ -1,6 +1,12 @@
 snakePipes News
 ===============
 
+snakePipes 2.7.3
+----------------
+
+* Fixes #884 by creating an additional conda env for DSS. Build tests are now run with strict channel priority.
+
+
 snakePipes 2.7.2
 ----------------
 * STAR version has been updated to 2.7.10b. 2.7.10a was returning segmentation fault on MAC.
