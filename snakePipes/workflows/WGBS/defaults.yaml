@@ -42,7 +42,7 @@ trimmerOptions:
 ## Bin size of output files in bigWig format
 bwBinSize: 25
 ## Run FASTQC read quality control
-fastqc: false
+fastqc: False
 verbose: False
 plotFormat: 'png'
 #### Flag to control the pipeline entry point
@@ -63,6 +63,9 @@ minMethDiff: 0.1
 metileneOptions:
 ###MethylDackel options
 MethylDackelOptions: '--mergeContext --maxVariantFrac 0.25 --minDepth 4'
+dedup: False
+properPairs: False
+mapq: 10
 ##umi_tools
 UMIBarcode: False
 bcPattern: NNNNCCCCCCCCC #default: 4 base umi barcode, 9 base cell barcode (eg. RELACS barcode)

@@ -5,10 +5,9 @@ snakePipes x.x.x
 ----------------
 * Changed the behaviour of snakePipes createEnvs - it is no longer possible to set condaEnvDir with this function. It is required to set it with snakePipes config beforhand, instead. To ingore what's in the defaults.yaml and overwrite the condaEnvDir value with default system conda prefix, use '--autodetectCondaEnvDir'.
 * Snakemake options in the defaults.yaml are now an empty string. The required arguments '--use-conda --conda-prefix' have been directly added to the command string. condaEnvDir is parsed from defaults.yaml, requiring running snakePipes config first.
+* Revise and fully implement umi deduplication for WGBS, mRNAseq, DNAmapping. Use filtered bam as input to umi deduplication or relinking no umi deduplication is performed, same for all aligners.
 
 * Fixes #819
-
-
 
 
 snakePipes 2.7.2
@@ -18,6 +17,7 @@ snakePipes 2.7.2
 * Put a cap on python version for the deeptools env. The current version of deeptools is not supporting the newer python versions and some tools fail.
 * Update default condaDir.
 * The filter_gtf function has become a bit more versatile. GTF files that include delimiters (';') in e.g. a description field are now allowed. Gene names are also allowed to have symbols now. Lastly, GTF files that have xRNA instead of transcript as a feature in column 3 can also be parsed.
+
 
 snakePipes 2.7.1
 ----------------

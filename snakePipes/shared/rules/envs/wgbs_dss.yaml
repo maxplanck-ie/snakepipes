@@ -1,0 +1,16 @@
+name: WGBS_DSS-env-2.0
+channels:
+  - mpi-ie
+  - conda-forge
+  - bioconda
+dependencies:
+  - r-base
+  - r-car
+  - r-factominer
+  - r-ggplot2
+  - r-rmarkdown
+  - r-dplyr
+  - r-tidyr
+  - r-pander
+  - bioconductor-dss
+  - bioconductor-biocparallel
