@@ -36,21 +36,16 @@ def parse_arguments():
         help="Prints the location in which each conda environment is actually stored.",
     )
 
-    mex = createEnvsParser.add_mutually_exclusive_group()
-    mex.add_argument(
-        "--keepCondaDir",
+
+    createEnvsParser.add_argument(
+        "--autodetectCondaEnvDir",
         action="store_true",
-        help="If specified, the `snakemakeOptions:` setting in "
-        "the workflow `defaults.yaml` files will NOT be overwritten. "
-        "This is typically unwise and only expert users should specify this.",
-    )
-    mex.add_argument(
-        "--condaDir",
-        help="If specified, use this as the base directory for the "
-        "created conda environments. This will ignore what is already "
-        "in the workflow-specific yaml files and where conda is installed.",
+        help="If specified, this will set condaEnvDir to system conda prefix,"
+       "and will overwrite the condaEnvDir entry in defaults.yaml ."
+       "Use with caution."
     )
 
+    
     createEnvsParser.add_argument(
         "--only",
         nargs="+",
@@ -115,6 +110,13 @@ def parse_arguments():
         help="Update the options given to snakeMake. You MUST include --use-conda "
         "and an appropriate --conda-prefix if you change this! (Default: %(default)s)",
         default=defaults["snakemakeOptions"],
+    )
+
+    configParser.add_argument(
+        "--condaEnvDir",
+        help="If specified, use this as the base directory for the "
+        "created conda environments. This will ignore what is already "
+        "in the workflow-specific yaml files and where conda is installed.",
     )
 
     configParser.add_argument(
@@ -254,19 +256,13 @@ def envInfo():
     For each environment yaml file print where its conda env is actually located
     """
     baseDir = os.path.dirname(snakePipes.__file__)
-    condaDir = os.environ.get("CONDA_PREFIX")
-    if "envs" in condaDir:
-        condaDir = os.path.dirname(condaDir)
-    else:
-        condaDir = os.path.join(condaDir, "envs")
 
     f = open(os.path.join(baseDir, "shared/defaults.yaml"))
     cf = yaml.load(f, Loader=yaml.FullLoader)
     f.close()
 
-    _ = cf["snakemakeOptions"].split(" ")
-    idx = _.index("--conda-prefix")
-    condaEnvDir = _[idx + 1]
+    condaEnvDir=cf["condaEnvDir"]
+
 
     for env in cof.set_env_yamls().values():
         # Hash the file ala snakemake
@@ -307,36 +303,16 @@ def createCondaEnvs(args):
     """
     baseDir = os.path.dirname(snakePipes.__file__)
 
-    condaDir = os.environ.get("CONDA_PREFIX")
-    rootDir = condaDir
-    if "envs" in condaDir:
-        condaDir = os.path.dirname(condaDir)
-    else:
-        condaDir = os.path.join(condaDir, "envs")
-
     f = open(os.path.join(baseDir, "shared/defaults.yaml"))
     cf = yaml.load(f, Loader=yaml.FullLoader)
     f.close()
-    _ = cf["snakemakeOptions"].split(" ")
-    try:
-        idx = _.index("--conda-prefix")
-    except:
-        idx = len(_)
-        _.extend(["--conda-prefix", condaDir])
+    condaEnvDir=cf["condaEnvDir"]
+    condaDirUse=condaEnvDir
 
-    condaEnvDir = _[idx + 1]
-    if args.condaDir:
-        condaDirUse = args.condaDir
-        _[idx + 1] = condaDirUse
-    elif args.keepCondaDir:
-        condaDirUse = _[idx + 1]
-    else:
-        condaDirUse = condaDir
-        _[idx + 1] = condaDirUse
-    cf["snakemakeOptions"] = " ".join(_)
-
+    if args.autodetectCondaEnvDir:
+        condaDirUse=detectCondaDir()
     # rewrite defaults.yaml
-    cof.write_configfile(os.path.join(baseDir, "shared/defaults.yaml"), cf)
+        cof.write_configfile(os.path.join(baseDir, "shared/defaults.yaml"), cf)
 
     for envName, env in cof.set_env_yamls().items():
         if args.only is not None and envName not in args.only:
@@ -362,12 +338,7 @@ def createCondaEnvs(args):
             "--file",
             os.path.join(baseDir, "shared/rules", env),
         ]
-        if "--conda-prefix" in cf["snakemakeOptions"] and (
-            args.condaDir or args.keepCondaDir
-        ):
-            cmd += ["--prefix", os.path.join(condaDirUse, h)]
-        else:
-            cmd += ["--name", h]
+        cmd += ["--prefix", os.path.join(condaDirUse, h)]
 
         # Don't actually create the env if either --info is set or it already exists and --force is NOT set
         if not args.info:
@@ -388,6 +359,15 @@ def createCondaEnvs(args):
     if args.noSitePackages and not args.info:
         fixSitePy(rootDir)
 
+def detectCondaDir():
+    "Detect the default conda folder."
+    condaDir = os.environ.get("CONDA_PREFIX")
+    if "envs" in condaDir:
+        condaDir = os.path.dirname(condaDir)
+    else:
+        condaDir = os.path.join(condaDir, "envs")
+    return(condaDir)
+
 
 def updateConfig(args):
     """Update the global defaults"""
@@ -400,6 +380,7 @@ def updateConfig(args):
     if args.configMode == "manual":
         d = {
             "snakemakeOptions": args.snakemakeOptions,
+            "condaEnvDir": args.condaEnvDir,
             "organismsDir": args.organismsDir,
             "clusterConfig": args.clusterConfig,
             "tempDir": args.tempDir,

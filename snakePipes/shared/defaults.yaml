@@ -7,7 +7,8 @@
 # permitted here.
 ################################################################################
 #
-snakemakeOptions: ' --use-conda --conda-prefix /package/mamba/envs/ '
+condaEnvDir: '/package/mamba/envs/'
+snakemakeOptions: ''
 organismsDir: 'shared/organisms'
 clusterConfig: 'shared/cluster.yaml'
 tempDir: /data/extended/
