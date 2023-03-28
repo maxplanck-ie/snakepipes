@@ -31,8 +31,9 @@ rule sambamba_flagstat_sorted:
            "Sambamba/{sample}.sorted.markdup.txt"
        log: "Sambamba/logs/{sample}.flagstat_sorted.log"
        conda: CONDA_SAMBAMBA_ENV
+       threads: lambda wildcards: 10 if 10<max_thread else max_thread
        shell: """
-           sambamba flagstat -p {input} > {output} 2> {log}
+           sambamba flagstat -p {input} -t {threads} > {output} 2> {log}
            """
 
 rule sambamba_flagstat:
@@ -42,8 +43,9 @@ rule sambamba_flagstat:
            "Sambamba/{sample}.markdup.txt"
        log: "Sambamba/logs/{sample}.flagstat.log"
        conda: CONDA_SAMBAMBA_ENV
+       threads: lambda wildcards: 10 if 10<max_thread else max_thread
        shell: """
-           sambamba flagstat -p {input} > {output} 2> {log}
+           sambamba flagstat -p {input} -t {threads} > {output} 2> {log}
            """
 
 ## index the duplicate marked folder
