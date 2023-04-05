@@ -285,6 +285,15 @@ def run_deepTools_qc():
     else:
         return([])
 
+
+def run_threePrimeSeq():
+    if "threePrimeSeq" in mode: 
+        file_list = [
+            expand(),
+            expand(),
+        ]
+
+
 def run_GenomicContamination():
     if dnaContam:
        file_list = ["GenomicContamination/genomic_contamination_featurecount_report.tsv"]
@@ -333,7 +342,6 @@ onstart:
 ################################################################################
 
 if not fromBAM:
-
     rule all:
         input:
             run_FastQC(fastqc),
@@ -344,6 +352,7 @@ if not fromBAM:
             make_nmasked_genome(),
             run_deepTools_qc(),
             run_GenomicContamination(),
+            run_threePrimeSeq(),
             "multiQC/multiqc_report.html"
 
 else:

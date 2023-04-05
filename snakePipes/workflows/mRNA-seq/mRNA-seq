@@ -14,7 +14,18 @@ import sys
 import textwrap
 import snakePipes.common_functions as cf
 import snakePipes.parserCommon as parserCommon
+import yaml
+import pathlib as pl
 
+# load defaults.yaml from same directory as this script
+defaults_path = pl.Path(__file__).parent / "defaults.yaml"
+
+if defaults_path.exists():
+    with open(defaults_path, "r") as inh:
+        defaults_yaml = yaml.safe_load(inh)
+        print(defaults_yaml)
+else:
+    raise Exception("Error: {} does not exist".format(defaults_path))
 
 def parse_args(defaults={"verbose": False, "configFile": None,
                          "clusterConfigFile": None, "maxJobs": 5,
@@ -31,7 +42,8 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          "fromBAM": False, "bamExt": ".bam", "pairedEnd": True,
                          "UMIDedup": False,
                          "UMIDedupOpts": "", "bcPattern": "NNNNCCCCCCCCC",
-                         "UMIDedupSep": "_", "UMIBarcode": False, "rMats": False}):
+                         "UMIDedupSep": "_", "UMIBarcode": False, "rMats": False, 
+                         "threePrimeSeq": False}):
     """
     Parse arguments from the command line.
     """
@@ -119,6 +131,14 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                           help="Run differential splicing analysis using rMats-turbo. Note that this flag requires --sampleSheet to be specified.",
                           default=defaults["rMats"])
 
+    optional.add_argument("--three-prime-seq",
+                          dest="three_prime_seq",
+                          action="store_true",
+                          help="Assume library is from 3' sequencing data (e.g. Lexogen QuantSeq 3' mRNA-seq), using "
+                          "methods and scripts codeveloped by Valerie Hilgers, Devon Ryan, and Andrew Rezansoff. ",
+                          default=defaults_yaml["threePrimeSeq"])
+
+
     return parser
 
 
@@ -158,6 +178,12 @@ def main():
         args.aligner = "EXTERNAL_BAM"
     if args.rMats and not args.sampleSheet:
         sys.exit("--rMats flag requires a sampleSheet (specified with --sampleSheet).\n")
+    if args.three_prime_seq:
+        args.aligner = "STAR"
+        args.alignerOptions = defaults_yaml['threePrimeAlignerOptions']
+        args.trimmerOptions = defaults_yaml['threePrimeTrimmerOptions']
+        args.trimmer = "fastp"
+        args.trim = True
 
     ## End workflow-specific checks
 
