@@ -138,7 +138,6 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                           "methods and scripts codeveloped by Valerie Hilgers, Devon Ryan, and Andrew Rezansoff. ",
                           default=defaults_yaml["threePrimeSeq"])
 
-
     return parser
 
 
@@ -179,12 +178,16 @@ def main():
     if args.rMats and not args.sampleSheet:
         sys.exit("--rMats flag requires a sampleSheet (specified with --sampleSheet).\n")
     if args.three_prime_seq:
+        if not args.sampleSheet:
+            sys.exit("--three-prime-seq requires a sampleSheet "
+                     "(specified with --sampleSheet).\n")
         args.aligner = "STAR"
         args.alignerOptions = defaults_yaml['threePrimeAlignerOptions']
         args.trimmerOptions = defaults_yaml['threePrimeTrimmerOptions']
         args.trimmer = "fastp"
         args.trim = True
-
+        args.mode += ",threePrimeSeq"
+    
     ## End workflow-specific checks
 
     # Handle YAML and log files

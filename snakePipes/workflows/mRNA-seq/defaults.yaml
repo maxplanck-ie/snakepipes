@@ -51,10 +51,17 @@ polyAT:
   windowlength: 10
   percbase: 0.7
 
-# paramaters for geneAssociation rule in three_prime_seq workflow
+# parameters for geneAssociation rule in three_prime_seq workflow
 geneAssociation:
-  extend: 2000
+  extend: 500
 
+# parameters for cmatrix_raw in three_prime_seq workflow
+cmatrix_raw:
+  upstream: 500
+  downstream: 500
+
+clusterPAS:
+  window: 15
 
 ## further options
 mode: alignment,deepTools_qc

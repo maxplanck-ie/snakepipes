@@ -111,6 +111,10 @@ else:
     ## non-allelic featureCounts
     include: os.path.join(maindir, "shared", "rules", "featureCounts.snakefile")
 
+# Three Prime Sequencing mode
+if "threePrimeSeq" in mode:
+    include: os.path.join(maindir, "shared", "rules", "three_prime_seq.snakefile")
+
 ##Genomic_contamination
 include: os.path.join(maindir, "shared", "rules", "GenomicContamination.snakefile")
 
@@ -287,11 +291,13 @@ def run_deepTools_qc():
 
 
 def run_threePrimeSeq():
+    file_list = []
     if "threePrimeSeq" in mode: 
-        file_list = [
-            expand(),
-            expand(),
+        file_list += [
+            "three_prime_seq/combined_polyA.mat.gz",
+            expand("three_prime_seq/{sample}_uniqcounts.txt", sample=samples),
         ]
+    return file_list
 
 
 def run_GenomicContamination():
