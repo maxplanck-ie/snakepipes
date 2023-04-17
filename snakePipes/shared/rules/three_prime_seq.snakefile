@@ -150,7 +150,7 @@ rule preprocess_cluster_pas:
     input: 
         find_replicates_cluster_pas
     output: 
-        temp("three_prime_seq/tmp/condition-{condition}_preprocessed.txt")
+        "three_prime_seq/tmp/condition-{condition}_preprocessed.txt"
     shell:        
         "cat {input} | "
         "sed '/^[ ]*Chrom/ d' | " 
@@ -162,7 +162,7 @@ rule clusterPAS:
     input: 
         "three_prime_seq/tmp/condition-{condition}_preprocessed.txt"
     output: 
-        temp("three_prime_seq/tmp/condition-{condition}_clusterPAS_tmpdb.txt")
+        "three_prime_seq/tmp/condition-{condition}_clusterPAS_tmpdb.txt"
     conda:
         CONDA_SHARED_ENV
     params: 
@@ -175,6 +175,7 @@ rule clusterPAS:
 # awk command: remove entries with multiple genes in 4th column (must be unambiguous)
 # python script: add "_1", "_2", to each cluster label (4th column) to make each 
 # unique for each genomic position
+# also strip header of "bedlike" file
 rule postprocess_cluster_pas:
     input: 
         "three_prime_seq/tmp/condition-{condition}_clusterPAS_tmpdb.txt"

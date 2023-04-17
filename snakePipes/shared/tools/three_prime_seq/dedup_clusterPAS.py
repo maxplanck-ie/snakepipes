@@ -28,11 +28,9 @@ def dedup(sub_df):
     
 
 def main():
-    df = pd.read_table(sys.stdin, index_col=None, header=None)
-    df.columns = HEADERS
-    df = df.groupby("Gene").apply(dedup)
-    df.to_csv(sys.stdout, sep="\t", index=False)
-
+    df = pd.read_table(sys.stdin, index_col=None, header=0)
+    df = df.groupby("Gene", group_keys=False).apply(dedup).reset_index(drop=True)
+    df.to_csv(sys.stdout, sep="\t", index=False, header=False)
 
 if __name__ == "__main__":
     main()
