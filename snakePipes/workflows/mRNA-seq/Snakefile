@@ -294,7 +294,7 @@ def run_threePrimeSeq():
     file_list = []
     if "threePrimeSeq" in mode: 
         file_list += [
-            "three_prime_seq/combined_polyA.mat.gz",
+            "three_prime_seq/combined_polyA.png",
             expand("three_prime_seq/{sample}_uniqcounts.txt", sample=samples),
         ]
     return file_list
