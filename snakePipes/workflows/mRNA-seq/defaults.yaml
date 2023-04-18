@@ -46,8 +46,8 @@ threePrimeAlignerOptions: --limitBAMsortRAM 60000000000 --alignIntronMax 1
 # parameters for calling polyA/T stretches in three_prime_seq workflow
 polyAT:
   minlength: 6
-  mindistance: 200
-  extend: 5
+  mindistance: 25 # recommendation for Drosophila; for other genomes might be different
+  extend: 3 # recommendation from Andrew 
   windowlength: 10
   percbase: 0.7
 

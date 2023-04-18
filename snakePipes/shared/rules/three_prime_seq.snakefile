@@ -139,18 +139,18 @@ rule geneAssociation:
         "{input} {params.gtf} {output} "
 
 # return list of replicates for each condition output by geneAssociation
-def find_replicates_cluster_pas(wc):
-    _samples = samples_from_condition(str(wc.condition))
-    return expand("three_prime_seq/{sample}_polyA_annotation.txt", sample=_samples)
+# def find_replicates_cluster_pas(wc):
+#     _samples = samples_from_condition(str(wc.condition))
+#     return expand("three_prime_seq/{sample}_polyA_annotation.txt", sample=_samples)
 
-# here we need to merge replicates of geneAssociation -> see 
+# here we need to merge all replicates of geneAssociation -> see 
 # /data/hilgers/group2/rezansoff/sakshiProj/2507_3seq/polyA_annotation_polysome2K/combined_cluster_andGrep_commands
 # also sort by start position
 rule preprocess_cluster_pas:
     input: 
-        find_replicates_cluster_pas
+        expand("three_prime_seq/{sample}_polyA_annotation.txt", sample=samples)
     output: 
-        "three_prime_seq/tmp/condition-{condition}_preprocessed.txt"
+        temp("three_prime_seq/tmp/geneassociation_merged_preprocessed.txt")
     shell:        
         "cat {input} | "
         "sed '/^[ ]*Chrom/ d' | " 
@@ -160,9 +160,9 @@ rule preprocess_cluster_pas:
 rule clusterPAS: 
     # input is preprocessed output from geneAssoc
     input: 
-        "three_prime_seq/tmp/condition-{condition}_preprocessed.txt"
+        "three_prime_seq/tmp/geneassociation_merged_preprocessed.txt"
     output: 
-        "three_prime_seq/tmp/condition-{condition}_clusterPAS_tmpdb.txt"
+        temp("three_prime_seq/tmp/clusterPAS_tmpdb.txt")
     conda:
         CONDA_SHARED_ENV
     params: 
@@ -175,12 +175,13 @@ rule clusterPAS:
 # awk command: remove entries with multiple genes in 4th column (must be unambiguous)
 # python script: add "_1", "_2", to each cluster label (4th column) to make each 
 # unique for each genomic position
-# also strip header of "bedlike" file
+# TODO possibly make filtering of CDS/exons optional
+# TODO possibly keep only those that intersect an annotated 3' UTR
 rule postprocess_cluster_pas:
     input: 
-        "three_prime_seq/tmp/condition-{condition}_clusterPAS_tmpdb.txt"
+        "three_prime_seq/tmp/clusterPAS_tmpdb.txt"
     output: 
-        "three_prime_seq/db/condition-{condition}_clusterPAS_db.txt"
+        "three_prime_seq/db/clusterPAS_db.txt"
     conda:
         CONDA_SHARED_ENV
     params:
@@ -196,10 +197,10 @@ rule postprocess_cluster_pas:
 
 
 # return clusterPAS db for corresponding condition given sample
-def find_cluster_pas_db(wc):
-    condition = condition_from_sample(str(wc.sample))
-    return ("three_prime_seq/db/condition-{condition}_clusterPAS_db.txt"
-            .format(condition=condition))
+# def find_cluster_pas_db(wc):
+#     condition = condition_from_sample(str(wc.sample))
+#     return ("three_prime_seq/db/condition-{condition}_clusterPAS_db.txt"
+#             .format(condition=condition))
 
 
 # previously done by hand 
@@ -209,7 +210,7 @@ rule count_read_ends:
     input: 
         bws=expand("three_prime_seq/filtered/{{sample}}_direction-{direction}.bw", 
                    direction=["forward", "reverse"]),
-        bed=find_cluster_pas_db, # this is the "database" of PAS sites
+        bed="three_prime_seq/db/clusterPAS_db.txt", # this is the "database" of PAS sites
     output:
         counts="three_prime_seq/{sample}_uniqcounts.txt"
     wildcard_constraints:
@@ -220,6 +221,20 @@ rule count_read_ends:
         script=(tools_dir / "three_prime_seq" / "countReadEnds.py")
     shell:
         "python {params.script} {input} {output}"
+
+# create counts.tsv of all samples for each cluster
+rule merge_read_ends:
+    input:
+        expand("three_prime_seq/{sample}_uniqcounts.txt", sample=samples)
+    output: 
+        "three_prime_seq/counts.tsv"
+    conda:
+        CONDA_SHARED_ENV
+    params:
+        script=(tools_dir / "three_prime_seq" / "mergeReadEnds.py"),
+        samples=samples
+    shell:
+        "python {params.script} -i {input} -s {params.samples} -o {output}"
 
 
 rule cmatrix_raw:
