@@ -188,7 +188,7 @@ using the **deepTools_qc** mode. It's a very useful add-on with any of the other
 .. note:: Since most deeptools functions require an aligned (BAM) file, the deepTools_qc mode will additionally perform the alignment of the fastq files. However this would not interfere with operations of the other modes.
 
 "threePrimeSeq"
-~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~
 
 **threePrimeSeq** uses a pipeline developed by the Hilgers lab to annotate and 
 count clusters of reads mapping to three prime ends of genes using 
