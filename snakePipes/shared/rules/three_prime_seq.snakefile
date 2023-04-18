@@ -169,7 +169,7 @@ rule clusterPAS:
         script=(tools_dir / "three_prime_seq" / "clusterPAS.py"),
         windowsize=config["clusterPAS"]["window"], # 15
     shell:
-        "python {params.script} {input} {output}"
+        "python {params.script} --windowSize {params.windowsize} {input} {output}"
 
 
 # awk command: remove entries with multiple genes in 4th column (must be unambiguous)
