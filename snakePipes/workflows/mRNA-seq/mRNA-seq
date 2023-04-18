@@ -14,7 +14,6 @@ import sys
 import textwrap
 import snakePipes.common_functions as cf
 import snakePipes.parserCommon as parserCommon
-import yaml
 
 
 def parse_args(defaults={"verbose": False, "configFile": None,
@@ -106,7 +105,9 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          default=defaults["fromBAM"])
 
     optional.add_argument("--bamExt",
-                          help="Extention of provided bam files, will be substracted from basenames to obtain sample names. (default: '%(default)s')",
+                          help=("Extention of provided bam files, will be "
+                          "subtracted from basenames to obtain sample names. "
+                          "(default: '%(default)s')"),
                           default=defaults["bamExt"])
 
 
