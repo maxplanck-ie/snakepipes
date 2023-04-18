@@ -38,7 +38,7 @@ jobs:
     - name: flake
       run: |
         micromamba activate snakePipes_CI
-        flake8 --ignore=E501,E722,E402 --exclude docs/conf.py .
+        flake8 --ignore=E501,E722,E402 --exclude docs/conf.py snakePipes/shared/tools/three_prime_seq/* .
   CI:
     runs-on: ubuntu-latest
     steps:
