@@ -34,6 +34,35 @@ downsample:
 trim: False
 trimmer: cutadapt
 trimmerOptions:
+
+## three prime seq options
+## whether to conduct three prime sequencing at all
+threePrimeSeq: False
+# fastp options for three prime sequencing only
+threePrimeTrimmerOptions: -x --poly_x_min_len 6 -3 5 -q 5 -l 20 -y
+# STAR fastp options for three prime sequencing only
+threePrimeAlignerOptions: --limitBAMsortRAM 60000000000 --alignIntronMax 1
+
+# parameters for calling polyA/T stretches in three_prime_seq workflow
+polyAT:
+  minlength: 6
+  mindistance: 25 # recommendation for Drosophila; for other genomes might be different
+  extend: 3 # recommendation from Andrew 
+  windowlength: 10
+  percbase: 0.7
+
+# parameters for geneAssociation rule in three_prime_seq workflow
+geneAssociation:
+  extend: 500
+
+# parameters for cmatrix_raw in three_prime_seq workflow
+cmatrix_raw:
+  upstream: 500
+  downstream: 500
+
+clusterPAS:
+  window: 15
+
 ## further options
 mode: alignment,deepTools_qc
 sampleSheet:

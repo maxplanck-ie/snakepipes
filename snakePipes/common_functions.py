@@ -581,8 +581,6 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
     and create the DAG
     """
     workflowName = os.path.basename(callingScript)
-    snakemake_path = os.path.dirname(os.path.abspath(callingScript))
-
     os.makedirs(args.outdir, exist_ok=True)
 
     if isinstance(args.snakemakeOptions, list):
@@ -632,9 +630,8 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
         args.snakemakeOptions += " --notemp"
 
     snakemake_cmd = """
-                    TMPDIR={tempDir} PYTHONNOUSERSITE=True {snakemake} {snakemakeOptions} --latency-wait {latency_wait} --snakefile {snakefile} --jobs {maxJobs} --directory {workingdir} --configfile {configFile} --keep-going --use-conda --conda-prefix {condaEnvDir}
-                    """.format(snakemake=os.path.join(snakemake_path, "snakemake"),
-                               latency_wait=cluster_config["snakemake_latency_wait"],
+                    TMPDIR={tempDir} PYTHONNOUSERSITE=True snakemake {snakemakeOptions} --latency-wait {latency_wait} --snakefile {snakefile} --jobs {maxJobs} --directory {workingdir} --configfile {configFile} --keep-going --use-conda --conda-prefix {condaEnvDir}
+                    """.format(latency_wait=cluster_config["snakemake_latency_wait"],
                                snakefile=os.path.join(workflowDir, "Snakefile"),
                                maxJobs=args.maxJobs,
                                workingdir=args.workingdir,
