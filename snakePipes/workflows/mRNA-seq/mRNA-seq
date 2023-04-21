@@ -162,7 +162,7 @@ def main():
         sys.exit("--rMats flag requires a sampleSheet (specified with --sampleSheet).\n")
     if "three_prime_seq" in mode:
         if not args.sampleSheet:
-            sys.exit("--three-prime-seq requires a sampleSheet "
+            sys.exit("mode three-prime-seq requires a sampleSheet "
                      "(specified with --sampleSheet).\n")
         aligner = "STAR"
         alignerOptions = defaults['threePrimeAlignerOptions']
