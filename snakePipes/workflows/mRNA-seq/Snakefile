@@ -112,7 +112,7 @@ else:
     include: os.path.join(maindir, "shared", "rules", "featureCounts.snakefile")
 
 # Three Prime Sequencing mode
-if "threePrimeSeq" in mode:
+if "three-prime-seq" in mode:
     include: os.path.join(maindir, "shared", "rules", "three_prime_seq.snakefile")
 
 ##Genomic_contamination
@@ -292,7 +292,7 @@ def run_deepTools_qc():
 
 def run_threePrimeSeq():
     file_list = []
-    if "threePrimeSeq" in mode: 
+    if "three-prime-seq" in mode: 
         file_list += [
             "three_prime_seq/combined_polyA.png",
             "three_prime_seq/counts.tsv",
