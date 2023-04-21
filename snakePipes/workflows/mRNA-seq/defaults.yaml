@@ -36,8 +36,6 @@ trimmer: cutadapt
 trimmerOptions:
 
 ## three prime seq options
-## whether to conduct three prime sequencing at all
-threePrimeSeq: False
 # fastp options for three prime sequencing only
 threePrimeTrimmerOptions: -x --poly_x_min_len 6 -3 5 -q 5 -l 20 -y
 # STAR fastp options for three prime sequencing only

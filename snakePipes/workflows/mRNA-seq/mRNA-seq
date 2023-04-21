@@ -31,8 +31,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          "fromBAM": False, "bamExt": ".bam", "pairedEnd": True,
                          "UMIDedup": False,
                          "UMIDedupOpts": "", "bcPattern": "NNNNCCCCCCCCC",
-                         "UMIDedupSep": "_", "UMIBarcode": False, "rMats": False, 
-                         "threePrimeSeq": False}):
+                         "UMIDedupSep": "_", "UMIBarcode": False, "rMats": False}):
     """
     Parse arguments from the command line.
     """
@@ -50,7 +49,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
     # Workflow options
     optional = parser.add_argument_group('Options')
     optional.add_argument("-m", "--mode",
-                          help="workflow running modes (available: 'alignment-free, alignment, allelic-mapping, deepTools_qc')"
+                          help="workflow running modes (available: 'alignment-free, alignment, allelic-mapping, deepTools_qc, three-prime-seq')"
                           " (default: '%(default)s')",
                           default=defaults["mode"])
 
@@ -122,13 +121,6 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                           help="Run differential splicing analysis using rMats-turbo. Note that this flag requires --sampleSheet to be specified.",
                           default=defaults["rMats"])
 
-    optional.add_argument("--three-prime-seq",
-                          dest="three_prime_seq",
-                          action="store_true",
-                          help="Assume library is from 3' sequencing data (e.g. Lexogen QuantSeq 3' mRNA-seq), using "
-                          "methods and scripts codeveloped by Valerie Hilgers, Devon Ryan, and Andrew Rezansoff. ",
-                          default=defaults["threePrimeSeq"])
-
     return parser
 
 
@@ -156,7 +148,7 @@ def main():
         args.SNPfile = os.path.abspath(args.SNPfile)
         args.NMaskedIndex = os.path.abspath(args.NMaskedIndex)
     modeTemp = args.mode.split(",")
-    validModes = set(["alignment", "alignment-free", "deepTools_qc", "allelic-mapping"])
+    validModes = set(["alignment", "alignment-free", "deepTools_qc", "allelic-mapping","three-prime-seq"])
     for mode in modeTemp:
         if mode not in validModes:
             sys.exit("{} is not a valid mode!\n".format(mode))
@@ -168,16 +160,15 @@ def main():
         args.aligner = "EXTERNAL_BAM"
     if args.rMats and not args.sampleSheet:
         sys.exit("--rMats flag requires a sampleSheet (specified with --sampleSheet).\n")
-    if args.three_prime_seq:
+    if "three_prime_seq" in mode:
         if not args.sampleSheet:
-            sys.exit("--three-prime-seq requires a sampleSheet "
+            sys.exit("mode three-prime-seq requires a sampleSheet "
                      "(specified with --sampleSheet).\n")
-        args.aligner = "STAR"
-        args.alignerOptions = defaults['threePrimeAlignerOptions']
-        args.trimmerOptions = defaults['threePrimeTrimmerOptions']
-        args.trimmer = "fastp"
-        args.trim = True
-        args.mode += ",threePrimeSeq"
+        aligner = "STAR"
+        alignerOptions = defaults['threePrimeAlignerOptions']
+        trimmerOptions = defaults['threePrimeTrimmerOptions']
+        trimmer = "fastp"
+        trim = True
     
     ## End workflow-specific checks
 
