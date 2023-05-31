@@ -9,7 +9,7 @@ import yaml
 import glob
 import sys
 import shutil
-from fuzzywuzzy import fuzz
+from thefuzz import fuzz
 import smtplib
 from email.message import EmailMessage
 from snakePipes import __version__

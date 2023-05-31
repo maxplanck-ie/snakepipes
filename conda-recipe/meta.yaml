@@ -18,7 +18,7 @@ requirements:
     - tabulate <0.9
     - pandas
     - graphviz
-    - fuzzywuzzy
+    - thefuzz[speedup]
     - pyyaml >=5.1
     - coreutils
 
