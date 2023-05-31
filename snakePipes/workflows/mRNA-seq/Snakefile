@@ -111,6 +111,10 @@ else:
     ## non-allelic featureCounts
     include: os.path.join(maindir, "shared", "rules", "featureCounts.snakefile")
 
+# Three Prime Sequencing mode
+if "three-prime-seq" in mode:
+    include: os.path.join(maindir, "shared", "rules", "three_prime_seq.snakefile")
+
 ##Genomic_contamination
 include: os.path.join(maindir, "shared", "rules", "GenomicContamination.snakefile")
 
@@ -285,6 +289,17 @@ def run_deepTools_qc():
     else:
         return([])
 
+
+def run_threePrimeSeq():
+    file_list = []
+    if "three-prime-seq" in mode: 
+        file_list += [
+            "three_prime_seq/combined_polyA.png",
+            "three_prime_seq/counts.tsv",
+        ]
+    return file_list
+
+
 def run_GenomicContamination():
     if dnaContam:
        file_list = ["GenomicContamination/genomic_contamination_featurecount_report.tsv"]
@@ -333,7 +348,6 @@ onstart:
 ################################################################################
 
 if not fromBAM:
-
     rule all:
         input:
             run_FastQC(fastqc),
@@ -344,6 +358,7 @@ if not fromBAM:
             make_nmasked_genome(),
             run_deepTools_qc(),
             run_GenomicContamination(),
+            run_threePrimeSeq(),
             "multiQC/multiqc_report.html"
 
 else:

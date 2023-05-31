@@ -187,6 +187,28 @@ using the **deepTools_qc** mode. It's a very useful add-on with any of the other
 
 .. note:: Since most deeptools functions require an aligned (BAM) file, the deepTools_qc mode will additionally perform the alignment of the fastq files. However this would not interfere with operations of the other modes.
 
+"threePrimeSeq"
+~~~~~~~~~~~~~~~
+
+**threePrimeSeq** uses a pipeline developed by the Hilgers lab to annotate and 
+count clusters of reads mapping to three prime ends of genes using 
+poly(T)VN-primed 3' sequencing kits such as Lexogen's 3' mRNA-seq kit. 
+In this mode, **fastp** is used to pretrim with preset parameters, followed by 
+**STAR** mapping. 
+
+First, a blacklist of possible internal priming sites is generated for the 
+given organism. Next, the mapped regions are filtered according to this
+blacklist and associated with the nearest gene within a certain window. 
+For all samples within the run, a database of PAS sites is generated
+and read counts aggregated for each particular site. These are then 
+summarized on a metagene level and output to a counts.tsv file for 
+further downstream analysis. 
+
+The output for this mode will be stored in the ``three_prime_seq/`` subfolder. 
+
+.. note:: The ``--three-prime-seq`` option must be invoked (which will also set mode to threePrimeSeq) as this will set **fastp** and **STAR** with the appropriate parameters. 
+
+
 Understanding the outputs
 ---------------------------
 
