@@ -1,6 +1,20 @@
+rule validateFQ:
+    input:
+        r1 = indir+"/{sample}"+reads[0]+ext
+    output:
+        temp("originalFASTQ/{sample}.valid")
+    params:
+        sdir = lambda wildcards: "{}/{}*".format(indir, wildcards.sample)
+    conda: CONDA_SHARED_ENV
+    shell:"""
+        fq lint {params.sdir}*
+        touch {output}
+        """
+
 rule origFASTQ1:
       input:
-          indir+"/{sample}"+reads[0]+ext
+          r1 = indir+"/{sample}"+reads[0]+ext,
+          valid = 'originalFASTQ/{sample}.valid'
       output:
           "originalFASTQ/{sample}"+reads[0]+".fastq.gz"
       params:
@@ -12,7 +26,8 @@ rule origFASTQ1:
 if pairedEnd or pipeline=="scrna-seq":
     rule origFASTQ2:
         input:
-            indir+"/{sample}"+reads[1]+ext
+            r2 = indir+"/{sample}"+reads[1]+ext,
+            valid = 'originalFASTQ/{sample}.valid'
         output:
             "originalFASTQ/{sample}"+reads[1]+".fastq.gz"
         params:
@@ -20,6 +35,7 @@ if pairedEnd or pipeline=="scrna-seq":
         shell: """
                {params.cmd}
             """
+
 
 if downsample:
     if pairedEnd:
