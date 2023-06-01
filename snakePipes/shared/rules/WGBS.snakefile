@@ -376,7 +376,7 @@ rule DSS:
         FDR=FDR
     threads: lambda wildcards: 10 if 10<max_thread else max_thread
     benchmark: '{}/.benchmark/DSS.benchmark'.format(get_outdir("DSS", None, minCoverage))
-    conda: CONDA_WGBS_ENV
+    conda: CONDA_DSS_ENV
     script: "../rscripts/WGBS_DSS.Rmd"
 
 

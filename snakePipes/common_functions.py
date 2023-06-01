@@ -9,7 +9,8 @@ import yaml
 import glob
 import sys
 import shutil
-from fuzzywuzzy import fuzz
+from pathlib import Path
+from thefuzz import fuzz
 import smtplib
 from email.message import EmailMessage
 from snakePipes import __version__
@@ -34,6 +35,7 @@ def set_env_yamls():
             'CONDA_ATAC_ENV': 'envs/atac_seq.yaml',
             'CONDA_HIC_ENV': 'envs/hic.yaml',
             'CONDA_WGBS_ENV': 'envs/wgbs.yaml',
+            'CONDA_DSS_ENV': 'envs/wgbs_dss.yaml',
             'CONDA_RMD_ENV': 'envs/rmarkdown.yaml',
             'CONDA_PREPROCESSING_ENV': 'envs/preprocessing.yaml',
             'CONDA_NONCODING_RNASEQ_ENV': 'envs/noncoding.yaml',
@@ -720,8 +722,10 @@ def runAndCleanup(args, cmd, logfile_name):
             sendEmail(args, p.returncode)
         sys.exit(p.returncode)
     else:
+        Path(
+            os.path.join(args.outdir, "snakePipes.done")
+        ).touch()
         if os.path.exists(os.path.join(args.outdir, ".snakemake")):
-            import shutil
             shutil.rmtree(os.path.join(args.outdir, ".snakemake"), ignore_errors=True)
 
     # Send email if desired
