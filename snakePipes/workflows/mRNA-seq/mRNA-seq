@@ -49,7 +49,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
     # Workflow options
     optional = parser.add_argument_group('Options')
     optional.add_argument("-m", "--mode",
-                          help="workflow running modes (available: 'alignment-free, alignment, allelic-mapping, deepTools_qc')"
+                          help="workflow running modes (available: 'alignment-free, alignment, allelic-mapping, deepTools_qc, three-prime-seq')"
                           " (default: '%(default)s')",
                           default=defaults["mode"])
 
@@ -104,7 +104,9 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          default=defaults["fromBAM"])
 
     optional.add_argument("--bamExt",
-                          help="Extention of provided bam files, will be substracted from basenames to obtain sample names. (default: '%(default)s')",
+                          help=("Extention of provided bam files, will be "
+                          "subtracted from basenames to obtain sample names. "
+                          "(default: '%(default)s')"),
                           default=defaults["bamExt"])
 
 
@@ -146,7 +148,7 @@ def main():
         args.SNPfile = os.path.abspath(args.SNPfile)
         args.NMaskedIndex = os.path.abspath(args.NMaskedIndex)
     modeTemp = args.mode.split(",")
-    validModes = set(["alignment", "alignment-free", "deepTools_qc", "allelic-mapping"])
+    validModes = set(["alignment", "alignment-free", "deepTools_qc", "allelic-mapping","three-prime-seq"])
     for mode in modeTemp:
         if mode not in validModes:
             sys.exit("{} is not a valid mode!\n".format(mode))
@@ -158,7 +160,16 @@ def main():
         args.aligner = "EXTERNAL_BAM"
     if args.rMats and not args.sampleSheet:
         sys.exit("--rMats flag requires a sampleSheet (specified with --sampleSheet).\n")
-
+    if "three_prime_seq" in mode:
+        if not args.sampleSheet:
+            sys.exit("mode three-prime-seq requires a sampleSheet "
+                     "(specified with --sampleSheet).\n")
+        aligner = "STAR"
+        alignerOptions = defaults['threePrimeAlignerOptions']
+        trimmerOptions = defaults['threePrimeTrimmerOptions']
+        trimmer = "fastp"
+        trim = True
+    
     ## End workflow-specific checks
 
     # Handle YAML and log files

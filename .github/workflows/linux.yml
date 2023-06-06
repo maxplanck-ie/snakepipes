@@ -38,7 +38,7 @@ jobs:
     - name: flake
       run: |
         micromamba activate snakePipes_CI
-        flake8 --ignore=E501,E722,E402 --exclude docs/conf.py .
+        flake8 --ignore=E501,E722,E402 --exclude docs/conf.py,build/lib/snakePipes/shared/tools/three_prime_seq,snakePipes/shared/tools/three_prime_seq .
   CI:
     runs-on: ubuntu-latest
     steps:
@@ -95,6 +95,6 @@ jobs:
     - name: createEnvs
       run: |
         micromamba activate snakePipes_CI
-        conda config --set channel_priority strict
-        snakePipes createEnvs --force --only ${{matrix.envs}}
+        conda config --set channel_priority flexible
+        snakePipes createEnvs --autodetectCondaEnvDir --force --only ${{matrix.envs}}
 

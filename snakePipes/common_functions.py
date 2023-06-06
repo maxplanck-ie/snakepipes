@@ -9,7 +9,8 @@ import yaml
 import glob
 import sys
 import shutil
-from fuzzywuzzy import fuzz
+from pathlib import Path
+from thefuzz import fuzz
 import smtplib
 from email.message import EmailMessage
 from snakePipes import __version__
@@ -582,8 +583,6 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
     and create the DAG
     """
     workflowName = os.path.basename(callingScript)
-    snakemake_path = os.path.dirname(os.path.abspath(callingScript))
-
     os.makedirs(args.outdir, exist_ok=True)
 
     if isinstance(args.snakemakeOptions, list):
@@ -633,15 +632,15 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
         args.snakemakeOptions += " --notemp"
 
     snakemake_cmd = """
-                    TMPDIR={tempDir} PYTHONNOUSERSITE=True {snakemake} {snakemakeOptions} --latency-wait {latency_wait} --snakefile {snakefile} --jobs {maxJobs} --directory {workingdir} --configfile {configFile} --keep-going
-                    """.format(snakemake=os.path.join(snakemake_path, "snakemake"),
-                               latency_wait=cluster_config["snakemake_latency_wait"],
+                    TMPDIR={tempDir} PYTHONNOUSERSITE=True snakemake {snakemakeOptions} --latency-wait {latency_wait} --snakefile {snakefile} --jobs {maxJobs} --directory {workingdir} --configfile {configFile} --keep-going --use-conda --conda-prefix {condaEnvDir}
+                    """.format(latency_wait=cluster_config["snakemake_latency_wait"],
                                snakefile=os.path.join(workflowDir, "Snakefile"),
                                maxJobs=args.maxJobs,
                                workingdir=args.workingdir,
                                snakemakeOptions=str(args.snakemakeOptions or ''),
                                tempDir=cfg["tempDir"],
-                               configFile=os.path.join(args.outdir, '{}.config.yaml'.format(workflowName))).split()
+                               configFile=os.path.join(args.outdir, '{}.config.yaml'.format(workflowName)),
+                               condaEnvDir=cfg["condaEnvDir"]).split()
 
     if args.verbose:
         snakemake_cmd.append("--printshellcmds")
@@ -723,8 +722,10 @@ def runAndCleanup(args, cmd, logfile_name):
             sendEmail(args, p.returncode)
         sys.exit(p.returncode)
     else:
+        Path(
+            os.path.join(args.outdir, "snakePipes.done")
+        ).touch()
         if os.path.exists(os.path.join(args.outdir, ".snakemake")):
-            import shutil
             shutil.rmtree(os.path.join(args.outdir, ".snakemake"), ignore_errors=True)
 
     # Send email if desired

@@ -46,6 +46,17 @@ bamcov_RPKM_cmd = """
         {params.blacklist}  > {log.out} 2> {log.err}
     """
 
+# bamCoverage three-prime-seq non-unique, strand-specific mappings
+# samflagExclude 128 == exclude second read in pair
+# uses params.direction == forward or reverse
+bamcov_3pseq_cmd = """
+    bamCoverage -b {input.bam} \
+        -o {output.bw_fwd} --binSize {params.bwBinSize} \
+        --Offset 1 --samFlagExclude 128 --filterRNAstrand {params.direction} \
+        -p {threads} --skipNAs > {log.out} 2> {log.err}
+    """
+
+
 # bamCoverage RNA-seq unique mappings
 bamcov_unique_cmd = """
     bamCoverage -b {input.bam} \

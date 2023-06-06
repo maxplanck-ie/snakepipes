@@ -1,7 +1,10 @@
 ### cut columns 1 and 3 from t2g tsv #########
 import gzip
+import os
 
 def get_flank_length(file,read_length_frx):
+    if not os.path.exists(file):
+        return (0)
     with gzip.open(file,"r") as rf:
         head = [next(rf) for x in range(4)]
     read_length = len(head[1])

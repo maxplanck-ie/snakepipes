@@ -26,3 +26,6 @@ output
 
 # pip stuff
 snakePipes.egg-info
+
+# misc
+.vscode/
