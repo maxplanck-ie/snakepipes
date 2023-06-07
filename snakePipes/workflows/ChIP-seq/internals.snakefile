@@ -6,7 +6,6 @@ import yaml
 import sys
 import pandas as pd
 import warnings
-import logging
 
 ### Functions ##################################################################
 
@@ -217,7 +216,7 @@ def check_if_spikein_genome(genome_index,spikeinExt):
             for line in ifile:
                 resl.append(re.search(spikeinExt, line))
         if any(resl):
-            logging.info("\n Spikein genome detected - at least one spikeIn chromosome found with extention " + spikeinExt + " .\n\n")
+            warnings.warn("\n Spikein genome detected - at least one spikeIn chromosome found with extention " + spikeinExt + " .\n\n")
             return True
         else:
             return False
