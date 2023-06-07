@@ -169,6 +169,7 @@ def run_macs2():
     if (peakCaller == "MACS2") or cutntag:
         if useSpikeInForNorm:
             file_list = expand("MACS2/{chip_sample}_host.BAM_peaks.xls", chip_sample = chip_samples)
+            file_list.extend(expand("MACS2/{chip_sample}_host.BAM_peaks.qc.txt", chip_sample = chip_samples))
         else:
             file_list = expand("MACS2/{chip_sample}.filtered.BAM_peaks.xls", chip_sample = chip_samples)
             file_list.extend(expand("MACS2/{chip_sample}.filtered.BAM_peaks.qc.txt", chip_sample = chip_samples))
