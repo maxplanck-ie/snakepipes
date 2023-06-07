@@ -15,5 +15,6 @@ dependencies:
  - multiqc = 1.12
  - fastp = 0.23.2
  - umi_tools = 1.1.2
+ - fq = 0.10.0
  - pybigwig = 0.3.18
  

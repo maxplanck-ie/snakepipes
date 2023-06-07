@@ -75,6 +75,7 @@ jobs:
           'CONDA_ATAC_ENV',
           'CONDA_HIC_ENV',
           'CONDA_WGBS_ENV',
+          'CONDA_DSS_ENV',
           'CONDA_RMD_ENV',
           'CONDA_PREPROCESSING_ENV',
           'CONDA_NONCODING_RNASEQ_ENV',
