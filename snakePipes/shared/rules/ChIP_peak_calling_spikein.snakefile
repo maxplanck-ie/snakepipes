@@ -103,9 +103,9 @@ else:
 rule MACS2_peak_qc:
     input:
         bam = "split_bam/{sample}_host.bam",
-        xls = "MACS2/{sample}_host.bam_peaks.xls"
+        xls = "MACS2/{sample}_host.BAM_peaks.xls"
     output:
-        qc = "MACS2/{sample}_host.bam_peaks.qc.txt"
+        qc = "MACS2/{sample}_host.BAM_peaks.qc.txt"
     params:
         peaks =
             lambda wildcards: "MACS2/{}_host.BAM_peaks.broadPeak".format(wildcards.sample) if is_broad(wildcards.sample)
