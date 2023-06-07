@@ -16,3 +16,7 @@ CollectInsertSizeMetrics:
     memory: 1G
 filter_reads:
     memory: 3G
+sambamba_flagstat:
+    memory: 3G
+sambamba_flagstat_sorted:
+    memory: 3G

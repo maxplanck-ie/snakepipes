@@ -7,7 +7,6 @@ import sys
 import pandas as pd
 import warnings
 
-
 ### Functions ##################################################################
 
 def get_control(sample):
@@ -217,7 +216,7 @@ def check_if_spikein_genome(genome_index,spikeinExt):
             for line in ifile:
                 resl.append(re.search(spikeinExt, line))
         if any(resl):
-            print("\n Spikein genome detected - at least one spikeIn chromosome found with extention " + spikeinExt + " .\n\n")
+            warnings.warn("\n Spikein genome detected - at least one spikeIn chromosome found with extention " + spikeinExt + " .\n\n")
             return True
         else:
             return False
