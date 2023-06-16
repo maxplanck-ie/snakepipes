@@ -15,6 +15,12 @@ jobs:
     - uses: mamba-org/setup-micromamba@main
       with:
         environment-file: .github/snakePipesEnvCI.yml
+        condarc: |
+          channels:
+            - conda-forge
+            - bioconda
+            - defaults
+          channel_priority: 'strict'
         cache-downloads: true
     - name: Install snakePipes
       run: |
@@ -31,6 +37,12 @@ jobs:
     - uses: mamba-org/setup-micromamba@main
       with:
         environment-file: .github/snakePipesEnvCI.yml
+        condarc: |
+          channels:
+            - conda-forge
+            - bioconda
+            - defaults
+          channel_priority: 'strict'
         cache-downloads: true
     - name: Install snakePipes
       run: |
@@ -46,8 +58,13 @@ jobs:
     - uses: mamba-org/setup-micromamba@main
       with:
         environment-file: .github/snakePipesEnvCI.yml
+        condarc: |
+          channels:
+            - conda-forge
+            - bioconda
+            - defaults
+          channel_priority: 'flexible'
         cache-downloads: true
-        channel-priority: 'flexible'
     - name: Install snakePipes
       run: |
         micromamba run -n snakePipes_CI python -m pip install . --no-deps --ignore-installed -vvv
@@ -92,6 +109,12 @@ jobs:
     - uses: mamba-org/setup-micromamba@main
       with:
         environment-file: .github/snakePipesEnvCI.yml
+        condarc: |
+          channels:
+            - conda-forge
+            - bioconda
+            - defaults
+          channel_priority: 'strict'
         cache-downloads: true
     - name: install snakePipes
       run: |
@@ -99,6 +122,4 @@ jobs:
     - name: createEnvs
       run: |
         micromamba activate snakePipes_CI
-        conda config --set channel_priority flexible
-        snakePipes createEnvs --autodetectCondaEnvDir --force --only ${{matrix.envs}}
-
+        snakePipes createEnvs --force --only ${{matrix.envs}}
