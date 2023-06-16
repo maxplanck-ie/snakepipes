@@ -10,3 +10,4 @@ dependencies:
   - flake8
   - coreutils
   - mamba
+  - graphviz
