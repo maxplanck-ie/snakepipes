@@ -63,7 +63,7 @@ jobs:
             - conda-forge
             - bioconda
             - defaults
-          channel_priority: 'flexible'
+          channel_priority: 'strict'
         cache-downloads: true
     - name: Install snakePipes
       run: |
