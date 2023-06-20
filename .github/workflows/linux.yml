@@ -12,9 +12,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - uses: mamba-org/provision-with-micromamba@main
+    - uses: mamba-org/setup-micromamba@main
       with:
         environment-file: .github/snakePipesEnvCI.yml
+        condarc: |
+          channels:
+            - conda-forge
+            - bioconda
+            - defaults
+          channel_priority: 'strict'
         cache-downloads: true
     - name: Install snakePipes
       run: |
@@ -28,9 +34,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - uses: mamba-org/provision-with-micromamba@main
+    - uses: mamba-org/setup-micromamba@main
       with:
         environment-file: .github/snakePipesEnvCI.yml
+        condarc: |
+          channels:
+            - conda-forge
+            - bioconda
+            - defaults
+          channel_priority: 'strict'
         cache-downloads: true
     - name: Install snakePipes
       run: |
@@ -38,16 +50,21 @@ jobs:
     - name: flake
       run: |
         micromamba activate snakePipes_CI
-        flake8 --ignore=E501,E722,E402 --exclude docs/conf.py,build/lib/snakePipes/shared/tools/three_prime_seq,snakePipes/shared/tools/three_prime_seq .
+        flake8 --ignore=E501,E722,E402 --exclude tests,docs/conf.py,build/lib/snakePipes/shared/tools/three_prime_seq,snakePipes/shared/tools/three_prime_seq .
   CI:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - uses: mamba-org/provision-with-micromamba@main
+    - uses: mamba-org/setup-micromamba@main
       with:
         environment-file: .github/snakePipesEnvCI.yml
+        condarc: |
+          channels:
+            - conda-forge
+            - bioconda
+            - defaults
+          channel_priority: 'strict'
         cache-downloads: true
-        channel-priority: 'flexible'
     - name: Install snakePipes
       run: |
         micromamba run -n snakePipes_CI python -m pip install . --no-deps --ignore-installed -vvv
@@ -55,6 +72,10 @@ jobs:
       run: |
         micromamba activate snakePipes_CI
         ./.ci_stuff/test_dag.sh
+    - name: pytest
+      run: |
+        micromamba activate snakePipes_CI
+        pytest --verbosity=2
   createEnvs:
     needs: CI
     strategy:
@@ -85,9 +106,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - uses: mamba-org/provision-with-micromamba@main
+    - uses: mamba-org/setup-micromamba@main
       with:
         environment-file: .github/snakePipesEnvCI.yml
+        condarc: |
+          channels:
+            - conda-forge
+            - bioconda
+            - defaults
+          channel_priority: 'strict'
         cache-downloads: true
     - name: install snakePipes
       run: |
@@ -95,6 +122,4 @@ jobs:
     - name: createEnvs
       run: |
         micromamba activate snakePipes_CI
-        conda config --set channel_priority flexible
         snakePipes createEnvs --autodetectCondaEnvDir --force --only ${{matrix.envs}}
-

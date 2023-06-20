@@ -36,9 +36,15 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: mamba-org/provision-with-micromamba@main
+      - uses: mamba-org/setup-micromamba@main
         with:
           environment-file: .github/snakePipesEnvCI.yml
+          condarc: |
+            channels:
+              - conda-forge
+              - bioconda
+              - defaults
+            channel_priority: 'strict'
           cache-downloads: true
       - name: install snakePipes_OSX
         run: |
@@ -46,6 +52,5 @@ jobs:
       - name: createEnvsOSX
         run: |
           micromamba activate snakePipes_CI
-          conda config --set channel_priority flexible
           snakePipes createEnvs --force --autodetectCondaEnvDir --only ${{matrix.envs}}
      
