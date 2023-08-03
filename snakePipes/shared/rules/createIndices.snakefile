@@ -239,6 +239,44 @@ rule starIndex:
         if [[ -w Log.out ]]; then rm -v Log.out; elif [[ -w {params.basedir}/Log.out ]]; then rm -v {params.basedir}/Log.out; fi
         """
 
+rule genes_bed2fasta:
+    input:
+        bed = genes_bed,
+        genome_fasta = genome_fasta
+    output:
+        "annotation/genes.fa"
+    log: "annotation/logs/bed2fasta.log"
+    benchmark:
+        "annotation/.benchmark/annotation_bed2fasta.benchmark"
+    threads: 1
+    conda: CONDA_CREATE_INDEX_ENV
+    shell:
+        "bedtools getfasta -name -s -split -fi {input.genome_fasta} -bed <(cat {input.bed} | cut -f1-12) | sed 's/(.*)//g' | sed 's/:.*//g' > {output} 2> {log}"
+
+
+rule salmonIndex:
+    input:
+        "annotation/genes.fa",
+        genome_fasta
+    output:
+        "SalmonIndex/decoys.txt",
+        temp("SalmonIndex/seq.fa"),
+        "SalmonIndex/seq.bin"
+    benchmark:
+        "SalmonIndex/.benchmark/Salmon.index.benchmark"
+    params:
+        salmonIndexOptions = salmonIndexOptions
+    log:
+        out = "SalmonIndex/logs/SalmonIndex.out",
+        err = "SalmonIndex/logs/SalmonIndex.err",
+    threads: lambda wildcards: 16 if 16<max_thread else max_thread
+    conda: CONDA_CREATE_INDEX_ENV
+    shell: """
+        grep "^>" {input[1]} | cut -d " " -f 1 | tr -d ">" > {output[0]}
+        cat {input[0]} {input[1]} > {output[1]}
+        salmon index -p {threads} -t {output[1]} -d {output[0]} -i SalmonIndex {params.salmonIndexOptions} > {log.out} 2> {log.err}
+        """
+
 
 # Default memory allocation: 8G
 rule bwaIndex:

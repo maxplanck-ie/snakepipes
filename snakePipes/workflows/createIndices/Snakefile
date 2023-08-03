@@ -29,6 +29,7 @@ organismDictionary = {'genome_size': 0,
                       'bwameth2_index': '',
                       'known_splicesites': '',
                       'star_index': '',
+                      'salmon_index': '',
                       'genes_bed': '',
                       'genes_gtf': '',
                       'spikein_genes_gtf': '',
@@ -78,6 +79,10 @@ if 'all' in tools or 'hisat2' in tools:
 if 'all' in tools or 'star' in tools:
     targets.append(os.path.join(outdir, "STARIndex/SAindex"))
     organismDictionary['star_index'] = os.path.join(outdir, "STARIndex/")
+
+if 'all' in tools or 'salmon' in tools:
+    targets.append(os.path.join(outdir, "SalmonIndex/seq.bin"))
+    organismDictionary['salmon_index'] = os.path.join(outdir, "SalmonIndex/")
 
 if 'all' in tools or 'bwa' in tools:
     targets.append(os.path.join(outdir, "BWAIndex/genome.fa.sa"))
