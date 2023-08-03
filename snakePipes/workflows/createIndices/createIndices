@@ -61,7 +61,7 @@ def parse_args(defaults={"configFile": None, "clusterConfigFile": None,
                           help="Only produce indices for the following tools (by default, all indices will be created). The default is 'all'. 'none' will create everything except aligner indices.",
                           default="all",
                           nargs="+",
-                          choices=['all', 'bowtie2', 'hisat2', 'bwa', 'bwa-mem2', 'bwameth', 'bwameth2', 'star', 'none'])
+                          choices=['all', 'bowtie2', 'hisat2', 'bwa', 'bwa-mem2', 'bwameth', 'bwameth2', 'salmon', 'star', 'none'])
 
     optional.add_argument("--effectiveGenomeSize",
                           type=int,
