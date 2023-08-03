@@ -2,28 +2,28 @@ allelic_suffix = ['genome1', 'genome2']
 
 ## Salmon Index
 
-rule SalmonIndex:
-    input:
-        "Annotation/genes.filtered.fa",
-        genome_fasta
-    output:
-        "Salmon/SalmonIndex/decoys.txt",
-        temp("Salmon/SalmonIndex/seq.fa"),
-        "Salmon/SalmonIndex/seq.bin"
-    benchmark:
-        "Salmon/.benchmark/Salmon.index.benchmark"
-    params:
-        salmonIndexOptions = salmonIndexOptions
-    log:
-        out = "Salmon/SalmonIndex/SalmonIndex.out",
-        err = "Salmon/SalmonIndex/SalmonIndex.err",
-    threads: lambda wildcards: 16 if 16<max_thread else max_thread
-    conda: CONDA_RNASEQ_ENV
-    shell: """
-        grep "^>" {input[1]} | cut -d " " -f 1 | tr -d ">" > {output[0]}
-        cat {input[0]} {input[1]} > {output[1]}
-        salmon index -p {threads} -t {output[1]} -d {output[0]} -i Salmon/SalmonIndex {params.salmonIndexOptions} > {log.out} 2> {log.err}
-        """
+#rule SalmonIndex:
+#    input:
+#        "Annotation/genes.filtered.fa",
+#        genome_fasta
+#    output:
+#        "Salmon/SalmonIndex/decoys.txt",
+#        temp("Salmon/SalmonIndex/seq.fa"),
+#        "Salmon/SalmonIndex/seq.bin"
+#    benchmark:
+#        "Salmon/.benchmark/Salmon.index.benchmark"
+#    params:
+#        salmonIndexOptions = salmonIndexOptions
+#    log:
+#        out = "Salmon/SalmonIndex/SalmonIndex.out",
+#        err = "Salmon/SalmonIndex/SalmonIndex.err",
+#    threads: lambda wildcards: 16 if 16<max_thread else max_thread
+#    conda: CONDA_RNASEQ_ENV
+#    shell: """
+#        grep "^>" {input[1]} | cut -d " " -f 1 | tr -d ">" > {output[0]}
+#        cat {input[0]} {input[1]} > {output[1]}
+#        salmon index -p {threads} -t {output[1]} -d {output[0]} -i Salmon/SalmonIndex {params.salmonIndexOptions} > {log.out} 2> {log.err}
+#        """
 
 
 def getSalmon_libtype(pairedEnd, libraryType):
@@ -63,24 +63,25 @@ if pairedEnd:
 samtools fastq -1 {output.r1} -2 {output.r2} -0 /dev/null -s /dev/null -n  \\
                 2> {log}
                 """
+
     rule SalmonQuant:
         input:
             r1 = "allelicFASTQ/{sample}.{allelic_suffix}_R1.fastq.gz",
-            r2 = "allelicFASTQ/{sample}.{allelic_suffix}_R2.fastq.gz",
-            bin = "Salmon/SalmonIndex/seq.bin"
+            r2 = "allelicFASTQ/{sample}.{allelic_suffix}_R2.fastq.gz"
         output:
             quant = "SalmonAllelic/{sample}.{allelic_suffix}/quant.sf"
         log: "SalmonAllelic/logs/{sample}.{allelic_suffix}.quant.log"
         benchmark:
             "SalmonAllelic/.benchmark/SalmonQuant.{sample}.{allelic_suffix}.benchmark"
         params:
+            index = salmon_index,
             outdir = "SalmonAllelic/{sample}.{allelic_suffix}",
             gtf = genes_gtf,
             lib_type = getSalmon_libtype(pairedEnd, libraryType)
         threads: 8
         conda: CONDA_RNASEQ_ENV
         shell: """
-            salmon quant -p {threads} --softclipOverhangs --validateMappings --numBootstraps 50 -i Salmon/SalmonIndex -l {params.lib_type} -1 {input.r1} -2 {input.r2} -o {params.outdir} 2> {log}
+            salmon quant -p {threads} --softclipOverhangs --validateMappings --numBootstraps 50 -i {params.index} -l {params.lib_type} -1 {input.r1} -2 {input.r2} -o {params.outdir} 2> {log}
             """
 else:
     rule getAllelicFQ:
@@ -98,23 +99,24 @@ else:
 samtools fastq -1 /dev/null -2 /dev/null -0 /dev/null -s {output.r1} -n  \\
                 2> {log}
                 """
+
     rule SalmonQuant:
         input:
-            fastq = "allelicFASTQ/{sample}.{allelic_suffix}_R1.fastq.gz",
-            bin = "SalmonAllelic/SalmonIndex/seq.bin",
+            fastq = "allelicFASTQ/{sample}.{allelic_suffix}_R1.fastq.gz"
         output:
             quant = "SalmonAllelic/{sample}.{allelic_suffix}/quant.sf"
         log: "SalmonAllelic/logs/{sample}.{allelic_suffix}.quant.log"
         benchmark:
             "SalmonAllelic/.benchmark/SalmonQuant.{sample}.{allelic_suffix}.benchmark"
         params:
+            index = salmon_index,
             outdir = "SalmonAllelic/{sample}.{allelic_suffix}",
             gtf = genes_gtf,
             lib_type = getSalmon_libtype(pairedEnd, libraryType)
         threads: 8
         conda: CONDA_RNASEQ_ENV
         shell: """
-            salmon quant -p {threads} --softclipOverhangs --validateMappings --numBootstraps 50 -i Salmon/SalmonIndex -l {params.lib_type} -r {input.fastq} -o {params.outdir} 2> {log}
+            salmon quant -p {threads} --softclipOverhangs --validateMappings --numBootstraps 50 -i {params.index} -l {params.lib_type} -r {input.fastq} -o {params.outdir} 2> {log}
             """
 
 
