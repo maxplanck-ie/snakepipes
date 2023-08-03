@@ -259,16 +259,14 @@ rule salmonIndex:
         "annotation/genes.fa",
         genome_fasta
     output:
-        "SalmonIndex/decoys.txt",
-        temp("SalmonIndex/seq.fa"),
-        "SalmonIndex/seq.bin"
-    benchmark:
-        "SalmonIndex/.benchmark/Salmon.index.benchmark"
+        os.path.join(outdir, "SalmonIndex/decoys.txt"),
+        temp(os.path.join(outdir, "SalmonIndex/seq.fa")),
+        os.path.join(outdir, "SalmonIndex/seq.bin")
     params:
         salmonIndexOptions = salmonIndexOptions
     log:
-        out = "SalmonIndex/logs/SalmonIndex.out",
-        err = "SalmonIndex/logs/SalmonIndex.err",
+        out = "logs/SalmonIndex.out",
+        err = "logs/SalmonIndex.err",
     threads: lambda wildcards: 16 if 16<max_thread else max_thread
     conda: CONDA_CREATE_INDEX_ENV
     shell: """
