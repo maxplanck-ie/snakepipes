@@ -146,7 +146,7 @@ onstart:
         usedEnvs = [CONDA_SHARED_ENV, CONDA_NONCODING_RNASEQ_ENV]
         cf.writeTools(usedEnvs, outdir, "noncoding-RNA-seq", maindir)
     if sampleSheet:
-        cf.copySampleSheet(sampleSheet,wdir)
+        cf.copySampleSheet(sampleSheet, wdir)
 
 ### main rule ##################################################################
 ################################################################################
