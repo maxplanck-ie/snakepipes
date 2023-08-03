@@ -36,6 +36,8 @@ spikeinBlacklist:
 ignoreForNormalization:
 ## Repeat masker file. It's assumed that the columns are tab separated!
 rmsk_file:
+## Salmon Index Options
+salmonIndexOptions:
 ################################################################################
 # Call snakemake directly, i.e. without using the wrapper script:
 #
