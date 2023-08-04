@@ -89,7 +89,7 @@ rule run_eisaR:
 rule Salmon_index_joint_fa:
     input:
         joint_fasta = "Annotation/cDNA_introns.joint.fa",
-        decoys = os.path.join(os.path.dirname(salmon_index), "decoys.txt"),
+        decoys = os.path.join(salmon_index, "decoys.txt"),
         genome_fasta = genome_fasta
     output:
         seq_fa = temp("Salmon/SalmonIndex_RNAVelocity/seq.fa"),
