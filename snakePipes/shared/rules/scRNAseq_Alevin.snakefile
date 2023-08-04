@@ -24,9 +24,9 @@ rule cut_t2g:
 rule SalmonAlevin:
         input:
             R2 = "originalFASTQ/{sample}"+reads[0]+".fastq.gz",
-            R1 = "originalFASTQ/{sample}"+reads[1]+".fastq.gz",
-            bin = "Salmon/SalmonIndex/seq.bin"
+            R1 = "originalFASTQ/{sample}"+reads[1]+".fastq.gz"
         params:
+            index = salmon_index,
             protocol = "--" + prepProtocol,
             whitelist = "--whitelist {}".format(BCwhiteList) if BCwhiteList else "",
             expectcells = "--expectcells {}".format(expectCells) if expectCells else "",
@@ -42,7 +42,7 @@ rule SalmonAlevin:
         conda: CONDA_RNASEQ_ENV
         threads: 8
         shell:"""
-            salmon alevin -l {params.libtype} -1 {input.R1} -2 {input.R2} {params.protocol} -i Salmon/SalmonIndex -p {threads} -o {params.outdir} --tgMap {params.tgMap} --dumpFeatures --dumpMtx --numCellBootstraps 100 > {log.out} 2> {log.err}
+            salmon alevin -l {params.libtype} -1 {input.R1} -2 {input.R2} {params.protocol} -i {params.index} -p {threads} -o {params.outdir} --tgMap {params.tgMap} --dumpFeatures --dumpMtx --numCellBootstraps 100 > {log.out} 2> {log.err}
             """
 
 rule AlevinQC:
@@ -89,11 +89,11 @@ rule run_eisaR:
 rule Salmon_index_joint_fa:
     input:
         joint_fasta = "Annotation/cDNA_introns.joint.fa",
-        decoys = "Salmon/SalmonIndex/decoys.txt",
+        decoys = os.path.join(os.path.dirname(salmon_index, "decoys.txt")),
         genome_fasta = genome_fasta
     output:
         seq_fa = temp("Salmon/SalmonIndex_RNAVelocity/seq.fa"),
-        salmon_index = "Salmon/SalmonIndex_RNAVelocity/seq.bin"
+        velo_index = "Salmon/SalmonIndex_RNAVelocity/seq.bin"
     params:
         salmonIndexOptions = salmonIndexOptions
     log:

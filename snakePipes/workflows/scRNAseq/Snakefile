@@ -38,7 +38,7 @@ elif mode=="STARsolo":
     trim=False
     skipRaceID=True
 elif mode=="Alevin":
-    include: os.path.join(maindir, "shared", "rules", "Salmon.snakefile")
+#    include: os.path.join(maindir, "shared", "rules", "Salmon.snakefile")
     include: os.path.join(maindir, "shared", "rules", "scRNAseq_Alevin.snakefile")
     trim=False
     skipRaceID=True
