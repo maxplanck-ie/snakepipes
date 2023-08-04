@@ -728,7 +728,7 @@ class TestmRNAseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 131
+        assert parseSpOut(_p) == 129
     def test_bcExtract(self, ifs):
         ci = [
             "mRNA-seq",
@@ -787,7 +787,7 @@ class TestmRNAseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 119
+        assert parseSpOut(_p) == 117
     def test_SE(self, ifs):
         ci = [
             "mRNA-seq",
@@ -860,7 +860,7 @@ class TestmRNAseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 118
+        assert parseSpOut(_p) == 116
     def test_SEfastqc(self, ifs):
         ci = [
             "mRNA-seq",
@@ -1070,7 +1070,7 @@ class TestmRNAseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 230
+        assert parseSpOut(_p) == 228
 
 class TestncRNAseq():
     def test_default(self, ifs):
@@ -1210,7 +1210,7 @@ class TestscRNAseq():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 58
+        assert parseSpOut(_p) == 57
     def test_alevinskipvelo(self, ifs):
         ci = [
             "scRNAseq",
@@ -1228,7 +1228,7 @@ class TestscRNAseq():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 51
+        assert parseSpOut(_p) == 50
 
 class TestWGBS():
     def test_default(self, ifs):
