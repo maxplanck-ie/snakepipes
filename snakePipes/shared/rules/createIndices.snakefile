@@ -263,7 +263,7 @@ rule salmonIndex:
         temp(os.path.join(outdir, "SalmonIndex/seq.fa")),
         os.path.join(outdir, "SalmonIndex/seq.bin")
     params:
-        salmonIndexOptions = salmonIndexOptions
+        salmonIndexOptions = salmonIndexOptions if salmonIndexOptions else ""
     log:
         out = "logs/SalmonIndex.out",
         err = "logs/SalmonIndex.err",
