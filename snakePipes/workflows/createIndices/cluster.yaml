@@ -12,6 +12,8 @@ hisat2Index:
     memory: 2G
 starIndex:
     memory: 8G
+SalmonIndex:
+    memory: 3G
 bwaIndex:
     memory: 8G
 bwamem2Index:
