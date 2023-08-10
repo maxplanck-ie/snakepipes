@@ -21,6 +21,6 @@ bwamem2Index:
 bwamethIndex:
     memory: 20G
 bwameth2Index:
-    memory: 90G
+    memory: 120G
 fastaDict:
     memory: 4G
