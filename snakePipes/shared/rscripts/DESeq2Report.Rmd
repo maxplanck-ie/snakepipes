@@ -115,7 +115,7 @@ Most of the exploration below is based on the annotated DESeq2 output file gener
     rld <- DESeq2::rlog(dds)
 
     ## Expression density data (add mean and independent filtering threshold)
-    #print("Preparing data: expression density")
+    message("Preparing data: expression density")
     toplot <- data.frame(DESeq2::counts(dds, normalized = T))
     toplot <- stack(toplot, select = colnames(toplot))
     ind_filt_thres <- as.numeric(S4Vectors::metadata(ddr)$filterThreshold)
@@ -132,17 +132,18 @@ Most of the exploration below is based on the annotated DESeq2 output file gener
         ggtitle("Density plot\n")
 
     ## Sample distances
-    #print("Preparing data: sample distances")
+    message("Preparing data: sample distances")
     sampleDists <- dist(t(SummarizedExperiment::assay(rld)))
 
     ## Euclidean sample distance heatmap
     sampleDistMatrix <- as.matrix(sampleDists)
+    message(sprintf("Dimensions of sampleDistMatrix are %s",dim(sampleDistMatrix)))
     rownames(sampleDistMatrix) <- sprintf("%s\n(%s)", colnames(rld), rld$condition)
     colnames(sampleDistMatrix) <- sprintf("%s\n(%s)", colnames(rld), rld$condition)
     colours <- colorRampPalette(rev(RColorBrewer::brewer.pal(9, "GnBu")))(255)
 
     ## PCA data
-    #print("Preparing data: PCA")
+    message("Preparing data: PCA")
     PCAdata <- DESeq2::plotPCA(rld, intgroup = intgroup, returnData=TRUE)
     percentVar <- round(100 * attr(PCAdata, "percentVar"))
 
@@ -156,15 +157,16 @@ Most of the exploration below is based on the annotated DESeq2 output file gener
 
     ## Extract data for heatmap
     # order by fold change (by abs foldch if only few top genes requested)
-    #print("Preparing data: heatmap")
+    message("Preparing data: heatmap")
     if (nrow(df.filt) > 0) {
         d <- data.frame(id = rownames(df.filt), padj = df.filt$padj)
         if (length(rownames(d)) < heatmap_topN ) {
             heatmap_topN <- nrow(d)
         }
 
-        d_topx_padj <- d[order(d$padj, decreasing = F),][1:heatmap_topN,]
-        heatmap_data <- SummarizedExperiment::assay(rld)[as.character(d_topx_padj$id),]
+        d_topx_padj <- d[order(d$padj, decreasing = F),][1:heatmap_topN,,drop=FALSE]
+        heatmap_data <- SummarizedExperiment::assay(rld)[as.character(d_topx_padj$id),,drop=FALSE]
+        message(sprintf("Dimensions of heatmap_data are %s", dim(heatmap_data)))
         ## create another df to get the gene names
         if (file.exists(geneNamesFile) && "external_gene_name" %in% colnames(ddr.df)) {
             mdf <- data.frame(row.names = rownames(ddr.df), external_gene_name = ddr.df$external_gene_name)
@@ -384,8 +386,9 @@ if(outputIsHTML) {
 ```{r 'heatmap', eval = TRUE, fig.show=TRUE}
 # 7. Heatmap topN genes rld
 if (nrow(df.filt) > 0) {
+    clur <- ifelse (nrow(heatmap_data) > 1, TRUE, FALSE)
     pheatmap(heatmap_data,
-             cluster_rows = TRUE,
+             cluster_rows = clur,
              clustering_method = "average",
              show_rownames = TRUE,
              cluster_cols = FALSE,
@@ -403,8 +406,9 @@ This plot shows a heatmap of DESeq2-normlized counts for the **top 20** differen
 ```{r 'heatmap2', fig.show=TRUE}
 # 7.1 Heatmap topN genes z-score
 if (nrow(df.filt) > 0) {
+    clur <- ifelse (nrow(heatmap_data) > 1, TRUE, FALSE)
     pheatmap(heatmap_data,
-             cluster_rows = TRUE,
+             cluster_rows = clur,
              clustering_method = "average",
              show_rownames = TRUE,
              cluster_cols = FALSE,
@@ -483,7 +487,6 @@ for(i in head(features, nBestFeatures)) {
     print(plotCounts_gg(i, dds = dds, intgroup = intgroup[2:length(intgroup)]))
 }
 ```
-
 
 # Reproducibility
 

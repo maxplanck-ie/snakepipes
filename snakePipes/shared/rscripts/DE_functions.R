@@ -68,7 +68,8 @@ checktable <- function(countdata = NA, sampleSheet = NA, alleleSpecific = FALSE,
         }
     }
   }
-  if(all(is.integer(countdata)) | !is.na(salmon_dir)){
+  is.wholenumber <-function(x, tol = .Machine$double.eps^0.5)  abs(x - round(x)) < tol
+  if(all(is.wholenumber(countdata))){
         print("All countdata is integer.")
     }else{
         print("Non-integer counts detected. The data will be rounded, as this is well within the expected sampling variation of a technical replicate.")
