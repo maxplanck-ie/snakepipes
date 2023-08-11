@@ -23,7 +23,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          "trim": False, "trimmer": "cutadapt",
                          "trimmerOptions": None, "fastqc": False,
                          "libraryType": 2, "aligner": "STAR",
-                         "alignerOptions": None, "salmonIndexOptions": "--type puff -k 31",
+                         "alignerOptions": None,
                          "featureCountsOptions": "-C -Q 10 --primary",
                          "filterGTF": None, "sampleSheet": None,
                          "reads": ["_R1", "_R2"], "ext": ".fastq.gz",
@@ -69,9 +69,6 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                           help="STAR or hisat2 option string, e.g.: '--twopassMode Basic' (default: '%(default)s')",
                           default=defaults["alignerOptions"])
 
-    optional.add_argument("--salmonIndexOptions",
-                          help="Salmon index options, e.g. '--type puff' (default: '%(default)s')",
-                          default=defaults["salmonIndexOptions"])
 
     optional.add_argument("--featureCountsOptions",
                           help="featureCounts option string. The options '-p -B'"
