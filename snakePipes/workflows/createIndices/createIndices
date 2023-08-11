@@ -18,7 +18,7 @@ import snakePipes.parserCommon as parserCommon
 
 def parse_args(defaults={"configFile": None, "clusterConfigFile": None,
                          "maxJobs": 5, "snakemakeOptions": "--use-conda",
-                         "tempDir": None, "verbose": False, "spikeinExt": None, "salmonIndexOptions": None }):
+                         "tempDir": None, "verbose": False, "spikeinExt": None, "salmonIndexOptions": None, "eisaR_flank_length": None }):
     """
     Parse arguments from the command line.
     """
@@ -86,6 +86,10 @@ def parse_args(defaults={"configFile": None, "clusterConfigFile": None,
     optional.add_argument("--salmonIndexOptions",
                           help="Options to pass to salmon for index creation.",
                           default=defaults["salmonIndexOptions"])
+
+    optional.add_argument("--eisaR_flank_length",
+                          help="Length by which to extend intronic regions with eisaR.",
+                          default=defaults["eisaR_flank_length"])
 
     return parser
 

@@ -50,7 +50,6 @@ skipVelocyto: False
 ##mode Alevin options
 alevinLibraryType: "ISR"
 prepProtocol: "chromiumV3"
-salmonIndexOptions: --type puff -k 31
 expectCells: 
 readLengthFrx: 0.2
 #generic options
