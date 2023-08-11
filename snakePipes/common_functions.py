@@ -827,5 +827,5 @@ def copySampleSheet(sampleSheet, wdir):
         try:
             shutil.copy(sampleSheet, os.path.join(wdir, bname))
         except Exception as err:
-            print(f"Unexpected {err=}, {type(err)=}")
+            print("Unexpected error:\n{}".format(err))
             raise
