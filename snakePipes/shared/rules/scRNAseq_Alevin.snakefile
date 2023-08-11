@@ -18,7 +18,7 @@ rule cut_t2g:
             "Annotation/genes.filtered.slim.t2g"
         threads: 1
         shell:"""
-            cut -f1,3 {input[0]} > {output[0]}
+            cut -f1,2 {input[0]} > {output[0]}
             """
 
 rule SalmonAlevin:
