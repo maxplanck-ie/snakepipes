@@ -110,6 +110,8 @@ def createTestData(fp, samples=6) -> None:
         'known_splicesites': (fp / 'ref' / 'splicesites.txt').as_posix(),
         'star_index': (fp / 'ref').as_posix(),
         'salmon_index': (fp / 'ref').as_posix(),
+        'salmon_velocity_index': (fp /  'ref').as_posix(),
+        't2g_velocity': (fp / 'ref' / 'cDNA_introns.joint.t2g').as_posix(),
         'genes_bed': (fp / 'ref' / 'genes.bed').as_posix(),
         'genes_gtf': (fp / 'ref' / 'genes.gtf').as_posix(),
         'spikein_genes_gtf' : (fp / 'ref' / 'spikein_genes.gtf').as_posix(),
@@ -180,7 +182,7 @@ class TestCreateindices:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 19
+        assert parseSpOut(_p) == 21
     def test_rmsk(self):
         ci = [
             'createIndices',
@@ -199,7 +201,7 @@ class TestCreateindices:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 20 
+        assert parseSpOut(_p) == 22 
     def test_DAG(self):
         ci = [
             'createIndices',
@@ -219,7 +221,7 @@ class TestCreateindices:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 20
+        assert parseSpOut(_p) == 22
     def test_spikein(self):
         ci = [
             'createIndices',
@@ -243,7 +245,7 @@ class TestCreateindices:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 25
+        assert parseSpOut(_p) == 27
 
 class TestDNAmapping():
     def test_default(self, ifs):
