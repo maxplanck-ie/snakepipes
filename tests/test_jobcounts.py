@@ -1213,7 +1213,7 @@ class TestscRNAseq():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 57
+        assert parseSpOut(_p) == 55
     def test_alevinskipvelo(self, ifs):
         ci = [
             "scRNAseq",
