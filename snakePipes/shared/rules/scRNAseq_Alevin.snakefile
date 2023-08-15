@@ -133,7 +133,7 @@ rule AlevinForVelocity:
 rule velo_to_sce:
     input:
         quantmat = expand("AlevinForVelocity/{sample}/alevin/quants_mat.gz",sample=samples),
-        t2g = "Annotation/cDNA_introns.joint.t2g",
+        t2g = t2g_velocity,
         g2s = "Annotation/genes.filtered.symbol"
     output:
         merged = "SingleCellExperiment/AlevinForVelocity/merged_samples.RDS"
