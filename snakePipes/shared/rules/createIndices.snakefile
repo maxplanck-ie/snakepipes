@@ -283,16 +283,16 @@ rule run_eisaR:
         gtf = genes_gtf,
         genome_fasta = genome_fasta
     output:
-        joint_fasta = temp("annotation/cDNA_introns.joint.fa"),
-        joint_t2g = "annotation/cDNA_introns.joint.t2g"
+        joint_fasta = temp(os.path.join(outdir, "annotation/cDNA_introns.joint.fa")),
+        joint_t2g = os.path.join(outdir, "annotation/cDNA_introns.joint.t2g")
     params:
         wdir = os.path.join(outdir, "annotation"),
         scriptdir = workflow_rscripts,
         isoform_action = "separate",
         flank_length = eisaR_flank_length,
         gtf = lambda wildcards,input: os.path.join(outdir, input.gtf),
-        joint_fasta = lambda wildcards,output: os.path.join(outdir,output.joint_fasta),
-        joint_t2g = lambda wildcards,output: os.path.join(outdir,output.joint_t2g)
+        joint_fasta = lambda wildcards,output: output.joint_fasta,
+        joint_t2g = lambda wildcards,output: output.joint_t2g
     log:
         out = "logs/eisaR.out"
     conda: CONDA_eisaR_ENV
@@ -304,12 +304,12 @@ rule run_eisaR:
 
 rule Salmon_index_joint_fa:
     input:
-        joint_fasta = "annotation/cDNA_introns.joint.fa",
+        joint_fasta = os.path.join(outdir, "annotation/cDNA_introns.joint.fa"),
         decoys = os.path.join(salmon_index, "decoys.txt"),
         genome_fasta = genome_fasta
     output:
-        seq_fa = temp("SalmonIndex_RNAVelocity/seq.fa"),
-        velo_index = "SalmonIndex_RNAVelocity/seq.bin"
+        seq_fa = temp(os.path.join(outdir, "SalmonIndex_RNAVelocity/seq.fa")),
+        velo_index = os.path.join(outdir, "SalmonIndex_RNAVelocity/seq.bin")
     params:
         salmonIndexOptions = salmonIndexOptions
     log:
