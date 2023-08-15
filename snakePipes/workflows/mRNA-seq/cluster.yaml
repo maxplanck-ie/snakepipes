@@ -1,5 +1,3 @@
-SalmonIndex:
-    memory: 3G
 SalmonQuant:
     memory: 2G
 bamPE_fragment_size:

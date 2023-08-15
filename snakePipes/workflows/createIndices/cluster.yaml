@@ -14,6 +14,8 @@ starIndex:
     memory: 8G
 SalmonIndex:
     memory: 3G
+run_eisaR:
+    memory: 30G
 Salmon_index_joint_fa:
     memory: 6G
 bwaIndex:
