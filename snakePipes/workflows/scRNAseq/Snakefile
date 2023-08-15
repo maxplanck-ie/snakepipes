@@ -190,7 +190,6 @@ elif mode=="Alevin":
             "Annotation/genes.filtered.t2g",
             "Annotation/genes.filtered.slim.t2g",
             "Annotation/genes.filtered.fa",
-            "Salmon/SalmonIndex_RNAVelocity/seq.bin",
             expand("Alevin/{sample}/alevin/quants_mat.gz",sample = samples),
             expand("multiQC/Alevin_{sample}.html", sample=samples),
             "multiQC/multiqc_report.html",
