@@ -62,6 +62,7 @@ def createTestData(fp, samples=6) -> None:
     (fp / 'ref' / 'splicesites.txt').touch()
     (fp / 'ref' / 'rar.bed').touch()
     (fp / 'ref' / 'decoys.txt').touch()
+    (fp / 'ref' / 'cDNA_introns.joint.t2g').touch()
 
     (fp / 'allelic_input'/ 'Ngenome').mkdir(parents=True)
     (fp / 'allelic_input'/ 'file.vcf.gz').touch()
@@ -1230,7 +1231,7 @@ class TestscRNAseq():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 50
+        assert parseSpOut(_p) == 48
 
 class TestWGBS():
     def test_default(self, ifs):
