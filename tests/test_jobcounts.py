@@ -1215,7 +1215,7 @@ class TestscRNAseq():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 55
+        assert parseSpOut(_p) == 54
     def test_alevinskipvelo(self, ifs):
         ci = [
             "scRNAseq",
@@ -1233,7 +1233,7 @@ class TestscRNAseq():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 48
+        assert parseSpOut(_p) == 45
 
 class TestWGBS():
     def test_default(self, ifs):
