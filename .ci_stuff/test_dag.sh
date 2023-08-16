@@ -114,7 +114,7 @@ cp .ci_stuff/genome.fa .ci_stuff/genome.fa.fai /tmp/
 mkdir -p /tmp/SalmonIndex /tmp/annotation
 touch /tmp/SalmonIndex/decoys.txt
 touch /tmp/annotation/cDNA_introns.joint.t2g
-touch /tmp/annotation/genes.t2g
+touch /tmp/genes.t2g
 
 # Ensure an empty snakePipes config doesn't muck anything up
 snakePipes config
