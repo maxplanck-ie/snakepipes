@@ -13,9 +13,9 @@ def get_flank_length(file,read_length_frx):
 
 rule cut_t2g:
         input:
-            "Annotation/genes.filtered.t2g"
+            genes_t2g
         output:
-            "Annotation/genes.filtered.slim.t2g"
+            "Annotation/genes.slim.t2g"
         threads: 1
         shell:"""
             cut -f1,2 {input[0]} > {output[0]}
@@ -24,13 +24,13 @@ rule cut_t2g:
 rule SalmonAlevin:
         input:
             R2 = "originalFASTQ/{sample}"+reads[0]+".fastq.gz",
-            R1 = "originalFASTQ/{sample}"+reads[1]+".fastq.gz"
+            R1 = "originalFASTQ/{sample}"+reads[1]+".fastq.gz",
+            tgMap = "Annotation/genes.slim.t2g"
         params:
             index = salmon_index,
             protocol = "--" + prepProtocol,
             whitelist = "--whitelist {}".format(BCwhiteList) if BCwhiteList else "",
             expectcells = "--expectcells {}".format(expectCells) if expectCells else "",
-            tgMap = "Annotation/genes.filtered.slim.t2g",
             libtype = alevinLibraryType,
             outdir = "Alevin/{sample}"
         output:
@@ -42,7 +42,7 @@ rule SalmonAlevin:
         conda: CONDA_RNASEQ_ENV
         threads: 8
         shell:"""
-            salmon alevin -l {params.libtype} -1 {input.R1} -2 {input.R2} {params.protocol} -i {params.index} -p {threads} -o {params.outdir} --tgMap {params.tgMap} --dumpFeatures --dumpMtx --numCellBootstraps 100 > {log.out} 2> {log.err}
+            salmon alevin -l {params.libtype} -1 {input.R1} -2 {input.R2} {params.protocol} -i {params.index} -p {threads} -o {params.outdir} --tgMap {input.tgMap} --dumpFeatures --dumpMtx --numCellBootstraps 100 > {log.out} 2> {log.err}
             """
 
 rule AlevinQC:

@@ -133,17 +133,112 @@ rule renameSpikeinChromsGTF:
 
 
 # Default memory allocation: 1G
-rule gtf2BED:
-    input: genes_gtf
-    output: genes_bed
-    log: "logs/gtf2BED.log"
-    conda: CONDA_CREATE_INDEX_ENV
-    shell: """
-        awk '{{if ($3 != "gene") print $0;}}' {input} \
-            | grep -v "^#" \
-            | gtfToGenePred /dev/stdin /dev/stdout \
-            | genePredToBed stdin {output} 2> {log}
-        """
+#rule gtf2BED:
+#    input: genes_gtf
+#    output: genes_bed
+#    log: "logs/gtf2BED.log"
+#    conda: CONDA_CREATE_INDEX_ENV
+#    shell: """
+#        awk '{{if ($3 != "gene") print $0;}}' {input} \
+#            | grep -v "^#" \
+#            | gtfToGenePred /dev/stdin /dev/stdout \
+#            | genePredToBed stdin {output} 2> {log}
+#        """
+
+
+rule gtf_to_files:
+    input:
+        gtf = genes_gtf
+    output:
+        genes_t2g,
+        os.path.join(outdir, "annotation/genes.symbol"),
+        genes_bed
+    run:
+        import shlex
+        import re
+
+        t2g = open(output[0], "w")
+        symbol = open(output[1], "w")
+        GTFdict = dict()
+
+        for line in open(input.gtf):
+            if line.startswith("#"):
+                continue
+            cols = line.strip().split("\t")
+            annos = re.split(''';(?=(?:[^'"]|'[^']*'|"[^"]*")*$)''', cols[8])
+            if cols[2] == "gene":
+                # get the gene_name and gene_id values
+                gene_id = None
+                gene_name = None
+                for anno in annos:
+                    anno = shlex.split(anno.strip(), " ")
+                    if len(anno) == 0:
+                        continue
+                    if anno[0] == "gene_id":
+                        gene_id = anno[1]
+                    elif anno[0] == "gene_name":
+                        gene_name = anno[1]
+                if gene_id:
+                    symbol.write("{}\t{}\n".format(gene_id, "" if not gene_name else gene_name))
+            elif cols[2] == "transcript" or 'RNA' in cols[2]:
+                # get the gene_id and transcript_id values
+                gene_id = None
+                transcript_id = None
+                gene_name = ""
+                for anno in annos:
+                    anno = shlex.split(anno.strip(), " ")
+                    if len(anno) == 0:
+                        continue
+                    if anno[0] == "gene_id":
+                        gene_id = anno[1]
+                    elif anno[0] == "transcript_id":
+                        transcript_id = anno[1]
+                    elif anno[0] == "gene_name":
+                        gene_name = anno[1]
+                if transcript_id:
+                    t2g.write("{}\t{}\t{}\n".format(transcript_id, "" if not gene_id else gene_id, gene_name))
+                    # chrom, start, end, strand, exon width and exon start offset
+                    GTFdict[transcript_id] = [cols[0], cols[3], cols[4], cols[6], [], []]
+            elif cols[2] == "exon":
+                # get the transcript_id
+                transcript_id = None
+                for anno in annos:
+                    anno = shlex.split(anno.strip(), " ")
+                    if len(anno) == 0:
+                        continue
+                    if anno[0] == "transcript_id":
+                        transcript_id = anno[1]
+                if transcript_id and transcript_id in GTFdict:
+                    exonWidth = int(cols[4]) - int(cols[3]) + 1
+                    exonOffset = int(cols[3]) - int(GTFdict[transcript_id][1])
+                    GTFdict[transcript_id][4].append(str(exonWidth))
+                    GTFdict[transcript_id][5].append(str(exonOffset))
+
+        t2g.close()
+        symbol.close()
+
+        BED = open(output[2], "w")
+        for k, v in GTFdict.items():
+            # sort the starts and sizes together
+            v[5] = [int(x) for x in v[5]]
+            v[4] = [int(x) for x in v[4]]
+            blockSizes = [str(x) for _,x in sorted(zip(v[5], v[4]))]
+            blockStarts = sorted(v[5])
+            blockStarts = [str(x) for x in blockStarts]
+            BED.write("{}\t{}\t{}\t{}\t.\t{}\t{}\t{}\t255,0,0\t{}\t{}\t{}\n".format(v[0],  # chrom
+                                                                               v[1],  # start
+                                                                               v[2],  # end
+                                                                               k,
+                                                                               v[3],  # strand
+                                                                               v[1],  # start
+                                                                               v[2],  # end
+                                                                               len(v[4]),  # blockCount
+                                                                               ",".join(blockSizes),  # blockSizes
+                                                                               ",".join(blockStarts)))  # blockStarts
+        BED.close()
+
+
+
 
 # Default memory allocation: 1G
 # As a side effect, this checks the GTF and fasta file for chromosome name consistency (it will pass if at least 1 chromosome name is shared)

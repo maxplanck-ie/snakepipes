@@ -24,7 +24,7 @@ include: os.path.join(workflow.basedir, "internals.snakefile")
 ### include modules of other snakefiles ########################################
 ################################################################################
 include: os.path.join(maindir, "shared", "rules", "FASTQ.snakefile")
-include: os.path.join(maindir, "shared", "rules", "filterGTF.snakefile")
+#include: os.path.join(maindir, "shared", "rules", "filterGTF.snakefile")
 #umi_tools
 if mode=="Gruen":
     include: os.path.join(maindir, "shared", "rules", "umi_tools.snakefile")
@@ -186,10 +186,7 @@ elif mode=="Alevin":
         input:
             expand("originalFASTQ/{sample}{read}.fastq.gz", sample = samples, read=reads),
             expand("FastQC/{sample}{read}_fastqc.html", sample = samples, read=reads),
-            "Annotation/genes.filtered.gtf",
-            "Annotation/genes.filtered.t2g",
-            "Annotation/genes.filtered.slim.t2g",
-            "Annotation/genes.filtered.fa",
+            "Annotation/genes.slim.t2g",
             expand("Alevin/{sample}/alevin/quants_mat.gz",sample = samples),
             expand("multiQC/Alevin_{sample}.html", sample=samples),
             "multiQC/multiqc_report.html",

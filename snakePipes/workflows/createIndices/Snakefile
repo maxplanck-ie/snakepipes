@@ -35,6 +35,7 @@ organismDictionary = {'genome_size': 0,
                       't2g_velocity': '',
                       'genes_bed': '',
                       'genes_gtf': '',
+                      'genes_t2g': '',
                       'spikein_genes_gtf': '',
                       'extended_coding_regions_gtf': '',
                       'blacklist_bed': '',
@@ -55,9 +56,11 @@ organismDictionary['genome_dict'] = os.path.join(outdir, "genome_fasta/genome.di
 if gtfURL:
     targets.extend([os.path.join(outdir, x) for x in ["annotation/genes.gtf",
                                                       "annotation/genes.bed",
+                                                      "annotation/genes.t2g",
                                                       "annotation/genes.slop.gtf"]])
     organismDictionary['genes_gtf'] = os.path.join(outdir, "annotation/genes.gtf")
     organismDictionary['genes_bed'] = os.path.join(outdir, "annotation/genes.bed")
+    organismDictionary['genes_t2g'] = os.path.join(outdir, "annotation/genes.t2g")
     organismDictionary['extended_coding_regions_gtf'] = os.path.join(outdir, "annotation/genes.slop.gtf")
 
 if spikeinGtfURL:
