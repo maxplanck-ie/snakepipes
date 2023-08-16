@@ -63,6 +63,7 @@ def createTestData(fp, samples=6) -> None:
     (fp / 'ref' / 'rar.bed').touch()
     (fp / 'ref' / 'decoys.txt').touch()
     (fp / 'ref' / 'cDNA_introns.joint.t2g').touch()
+    (fp / 'ref' / 'genes.t2g').touch()
 
     (fp / 'allelic_input'/ 'Ngenome').mkdir(parents=True)
     (fp / 'allelic_input'/ 'file.vcf.gz').touch()
@@ -115,6 +116,7 @@ def createTestData(fp, samples=6) -> None:
         't2g_velocity': (fp / 'ref' / 'cDNA_introns.joint.t2g').as_posix(),
         'genes_bed': (fp / 'ref' / 'genes.bed').as_posix(),
         'genes_gtf': (fp / 'ref' / 'genes.gtf').as_posix(),
+        'genes_t2g': (fp / 'ref' / 'genes.t2g').as_posix(),
         'spikein_genes_gtf' : (fp / 'ref' / 'spikein_genes.gtf').as_posix(),
         'extended_coding_regions_gtf': (fp / 'ref' / 'genes.slop.gtf').as_posix(),
         'blacklist_bed': (fp / 'ref' / 'rar.bed').as_posix(),
