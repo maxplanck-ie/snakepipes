@@ -24,7 +24,8 @@ include: os.path.join(workflow.basedir, "internals.snakefile")
 ### include modules of other snakefiles ########################################
 ################################################################################
 include: os.path.join(maindir, "shared", "rules", "FASTQ.snakefile")
-#include: os.path.join(maindir, "shared", "rules", "filterGTF.snakefile")
+#STARsolo uses filtered GTF for counting
+include: os.path.join(maindir, "shared", "rules", "filterGTF.snakefile")
 #umi_tools
 if mode=="Gruen":
     include: os.path.join(maindir, "shared", "rules", "umi_tools.snakefile")
