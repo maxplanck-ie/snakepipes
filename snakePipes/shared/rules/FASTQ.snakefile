@@ -1,25 +1,36 @@
-rule validateFQ:
-    input:
-        r1 = indir+"/{sample}"+reads[0]+ext
-    output:
-        temp("originalFASTQ/{sample}.valid")
-    params:
-        sdir = lambda wildcards: "{}/{}*".format(indir, wildcards.sample)
-    conda: CONDA_SHARED_ENV
-    shell:"""
-        fq lint {params.sdir}*
-        touch {output}
-        """
+if pairedEnd or pipeline=="scrna-seq":
+    rule validateFQ:
+        input:
+            r1 = indir+"/{sample}"+reads[0]+ext,
+            r2 = indir+"/{sample}"+reads[1]+ext
+        output:
+            temp("originalFASTQ/{sample}.valid")
+        conda: CONDA_SHARED_ENV
+        shell:"""
+            fq lint {input.r1} {input.r2}
+            touch {output}
+            """
+else:
+    rule validateFQ:
+        input:
+            r1 = indir+"/{sample}"+reads[0]+ext
+        output:
+            temp("originalFASTQ/{sample}.valid")
+        conda: CONDA_SHARED_ENV
+        shell:"""
+            fq lint {input.r1}
+            touch {output}
+            """
 
 rule origFASTQ1:
-      input:
-          r1 = indir+"/{sample}"+reads[0]+ext,
-          valid = 'originalFASTQ/{sample}.valid'
-      output:
-          "originalFASTQ/{sample}"+reads[0]+".fastq.gz"
-      params:
-            cmd = lambda wildcards, input,output: "ln -s ../{} {}".format(input[0],output[0]) if pipeline=="preprocessing" else "ln -s {} {}".format(input[0],output[0])
-      shell: """
+    input:
+        r1 = indir+"/{sample}"+reads[0]+ext,
+        valid = 'originalFASTQ/{sample}.valid'
+    output:
+        "originalFASTQ/{sample}"+reads[0]+".fastq.gz"
+    params:
+          cmd = lambda wildcards, input,output: "ln -s ../{} {}".format(input[0],output[0]) if pipeline=="preprocessing" else "ln -s {} {}".format(input[0],output[0])
+    shell: """
                {params.cmd}
           """
 

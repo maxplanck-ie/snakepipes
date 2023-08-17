@@ -29,7 +29,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          "plotFormat": "png", "skipRaceID": False,
                          "cellFilterMetric": "gene_universe",
 			 "mode": "STARsolo", "BCwhiteList": None, "STARsoloCoords": ["1","7","8","7"], "myKit": "CellSeq384", "skipVelocyto": False,
-                         "alevinLibraryType":"ISR", "prepProtocol":"celseq2", "salmonIndexOptions": "--type puff -k 31", "expectCells" : None, "readLengthFrx": 0.2}):
+                         "alevinLibraryType":"ISR", "prepProtocol":None, "expectCells" : None }):
     """
     Parse arguments from the command line.
     """
@@ -168,10 +168,6 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                           default=defaults["prepProtocol"],
                           help="Alevin mode. Specify the library prep method. (default: '%(default)s')")
 
-    optional.add_argument("--salmonIndexOptions",
-                          dest="salmonIndexOptions",
-                          default=defaults["salmonIndexOptions"],
-                          help="Alevin mode. Salmon index options e.g. '--type puff' (default: '%(default)s')")
 
     optional.add_argument("--alevinLibraryType",
                           dest="alevinLibraryType",
@@ -184,12 +180,6 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                           dest="expectCells",
                           default=defaults["expectCells"],
                           help="Alevin mode. Optional to fill in if you know how many cells are expected. (default: '%(default)s')")
-
-    optional.add_argument("--readLengthFrx",
-                          type=int,
-                          dest="readLengthFrx",
-                          help="Fraction of read length required to align to the intronic sequence (default: '%(default)s')",
-                          default=defaults["readLengthFrx"])
 
 
     return parser

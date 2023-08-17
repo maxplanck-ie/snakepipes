@@ -24,6 +24,7 @@ include: os.path.join(workflow.basedir, "internals.snakefile")
 ### include modules of other snakefiles ########################################
 ################################################################################
 include: os.path.join(maindir, "shared", "rules", "FASTQ.snakefile")
+#STARsolo uses filtered GTF for counting
 include: os.path.join(maindir, "shared", "rules", "filterGTF.snakefile")
 #umi_tools
 if mode=="Gruen":
@@ -38,7 +39,7 @@ elif mode=="STARsolo":
     trim=False
     skipRaceID=True
 elif mode=="Alevin":
-    include: os.path.join(maindir, "shared", "rules", "Salmon.snakefile")
+#    include: os.path.join(maindir, "shared", "rules", "Salmon.snakefile")
     include: os.path.join(maindir, "shared", "rules", "scRNAseq_Alevin.snakefile")
     trim=False
     skipRaceID=True
@@ -186,13 +187,7 @@ elif mode=="Alevin":
         input:
             expand("originalFASTQ/{sample}{read}.fastq.gz", sample = samples, read=reads),
             expand("FastQC/{sample}{read}_fastqc.html", sample = samples, read=reads),
-            "Annotation/genes.filtered.gtf",
-            "Annotation/genes.filtered.t2g",
-            "Annotation/genes.filtered.slim.t2g",
-            "Annotation/genes.filtered.fa",
-            "Salmon/SalmonIndex/decoys.txt",
-            "Salmon/SalmonIndex/seq.bin",
-            "Salmon/SalmonIndex_RNAVelocity/seq.bin",
+            "Annotation/genes.slim.t2g",
             expand("Alevin/{sample}/alevin/quants_mat.gz",sample = samples),
             expand("multiQC/Alevin_{sample}.html", sample=samples),
             "multiQC/multiqc_report.html",

@@ -61,6 +61,9 @@ def createTestData(fp, samples=6) -> None:
     (fp / 'ref' / 'genome.2bit').touch()
     (fp / 'ref' / 'splicesites.txt').touch()
     (fp / 'ref' / 'rar.bed').touch()
+    (fp / 'ref' / 'decoys.txt').touch()
+    (fp / 'ref' / 'cDNA_introns.joint.t2g').touch()
+    (fp / 'ref' / 'genes.t2g').touch()
 
     (fp / 'allelic_input'/ 'Ngenome').mkdir(parents=True)
     (fp / 'allelic_input'/ 'file.vcf.gz').touch()
@@ -108,8 +111,12 @@ def createTestData(fp, samples=6) -> None:
         'bwameth2_index': (fp / 'ref' / 'genome.fa').as_posix(),
         'known_splicesites': (fp / 'ref' / 'splicesites.txt').as_posix(),
         'star_index': (fp / 'ref').as_posix(),
+        'salmon_index': (fp / 'ref').as_posix(),
+        'salmon_velocity_index': (fp /  'ref').as_posix(),
+        't2g_velocity': (fp / 'ref' / 'cDNA_introns.joint.t2g').as_posix(),
         'genes_bed': (fp / 'ref' / 'genes.bed').as_posix(),
         'genes_gtf': (fp / 'ref' / 'genes.gtf').as_posix(),
+        'genes_t2g': (fp / 'ref' / 'genes.t2g').as_posix(),
         'spikein_genes_gtf' : (fp / 'ref' / 'spikein_genes.gtf').as_posix(),
         'extended_coding_regions_gtf': (fp / 'ref' / 'genes.slop.gtf').as_posix(),
         'blacklist_bed': (fp / 'ref' / 'rar.bed').as_posix(),
@@ -178,7 +185,7 @@ class TestCreateindices:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 17
+        assert parseSpOut(_p) == 21
     def test_rmsk(self):
         ci = [
             'createIndices',
@@ -197,7 +204,7 @@ class TestCreateindices:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 18 
+        assert parseSpOut(_p) == 22 
     def test_DAG(self):
         ci = [
             'createIndices',
@@ -217,7 +224,7 @@ class TestCreateindices:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 18
+        assert parseSpOut(_p) == 22
     def test_spikein(self):
         ci = [
             'createIndices',
@@ -241,7 +248,7 @@ class TestCreateindices:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 23
+        assert parseSpOut(_p) == 27
 
 class TestDNAmapping():
     def test_default(self, ifs):
@@ -726,7 +733,7 @@ class TestmRNAseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 131
+        assert parseSpOut(_p) == 129
     def test_bcExtract(self, ifs):
         ci = [
             "mRNA-seq",
@@ -785,7 +792,7 @@ class TestmRNAseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 119
+        assert parseSpOut(_p) == 117
     def test_SE(self, ifs):
         ci = [
             "mRNA-seq",
@@ -858,7 +865,7 @@ class TestmRNAseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 118
+        assert parseSpOut(_p) == 116
     def test_SEfastqc(self, ifs):
         ci = [
             "mRNA-seq",
@@ -1068,7 +1075,7 @@ class TestmRNAseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 230
+        assert parseSpOut(_p) == 228
 
 class TestncRNAseq():
     def test_default(self, ifs):
@@ -1208,7 +1215,7 @@ class TestscRNAseq():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 58
+        assert parseSpOut(_p) == 54
     def test_alevinskipvelo(self, ifs):
         ci = [
             "scRNAseq",
@@ -1226,7 +1233,7 @@ class TestscRNAseq():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 51
+        assert parseSpOut(_p) == 45
 
 class TestWGBS():
     def test_default(self, ifs):

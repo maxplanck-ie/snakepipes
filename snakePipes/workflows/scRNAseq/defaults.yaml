@@ -49,8 +49,7 @@ STARsoloCoords: ["1","7","8","7"]
 skipVelocyto: False
 ##mode Alevin options
 alevinLibraryType: "ISR"
-prepProtocol: "celseq2"
-salmonIndexOptions: --type puff -k 31
+prepProtocol: "chromiumV3"
 expectCells: 
 readLengthFrx: 0.2
 #generic options

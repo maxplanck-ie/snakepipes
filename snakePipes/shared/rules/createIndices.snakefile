@@ -133,17 +133,112 @@ rule renameSpikeinChromsGTF:
 
 
 # Default memory allocation: 1G
-rule gtf2BED:
-    input: genes_gtf
-    output: genes_bed
-    log: "logs/gtf2BED.log"
-    conda: CONDA_CREATE_INDEX_ENV
-    shell: """
-        awk '{{if ($3 != "gene") print $0;}}' {input} \
-            | grep -v "^#" \
-            | gtfToGenePred /dev/stdin /dev/stdout \
-            | genePredToBed stdin {output} 2> {log}
-        """
+#rule gtf2BED:
+#    input: genes_gtf
+#    output: genes_bed
+#    log: "logs/gtf2BED.log"
+#    conda: CONDA_CREATE_INDEX_ENV
+#    shell: """
+#        awk '{{if ($3 != "gene") print $0;}}' {input} \
+#            | grep -v "^#" \
+#            | gtfToGenePred /dev/stdin /dev/stdout \
+#            | genePredToBed stdin {output} 2> {log}
+#        """
+
+
+rule gtf_to_files:
+    input:
+        gtf = genes_gtf
+    output:
+        genes_t2g,
+        os.path.join(outdir, "annotation/genes.symbol"),
+        genes_bed
+    run:
+        import shlex
+        import re
+
+        t2g = open(output[0], "w")
+        symbol = open(output[1], "w")
+        GTFdict = dict()
+
+        for line in open(input.gtf):
+            if line.startswith("#"):
+                continue
+            cols = line.strip().split("\t")
+            annos = re.split(''';(?=(?:[^'"]|'[^']*'|"[^"]*")*$)''', cols[8])
+            if cols[2] == "gene":
+                # get the gene_name and gene_id values
+                gene_id = None
+                gene_name = None
+                for anno in annos:
+                    anno = shlex.split(anno.strip(), " ")
+                    if len(anno) == 0:
+                        continue
+                    if anno[0] == "gene_id":
+                        gene_id = anno[1]
+                    elif anno[0] == "gene_name":
+                        gene_name = anno[1]
+                if gene_id:
+                    symbol.write("{}\t{}\n".format(gene_id, "" if not gene_name else gene_name))
+            elif cols[2] == "transcript" or 'RNA' in cols[2]:
+                # get the gene_id and transcript_id values
+                gene_id = None
+                transcript_id = None
+                gene_name = ""
+                for anno in annos:
+                    anno = shlex.split(anno.strip(), " ")
+                    if len(anno) == 0:
+                        continue
+                    if anno[0] == "gene_id":
+                        gene_id = anno[1]
+                    elif anno[0] == "transcript_id":
+                        transcript_id = anno[1]
+                    elif anno[0] == "gene_name":
+                        gene_name = anno[1]
+                if transcript_id:
+                    t2g.write("{}\t{}\t{}\n".format(transcript_id, "" if not gene_id else gene_id, gene_name))
+                    # chrom, start, end, strand, exon width and exon start offset
+                    GTFdict[transcript_id] = [cols[0], cols[3], cols[4], cols[6], [], []]
+            elif cols[2] == "exon":
+                # get the transcript_id
+                transcript_id = None
+                for anno in annos:
+                    anno = shlex.split(anno.strip(), " ")
+                    if len(anno) == 0:
+                        continue
+                    if anno[0] == "transcript_id":
+                        transcript_id = anno[1]
+                if transcript_id and transcript_id in GTFdict:
+                    exonWidth = int(cols[4]) - int(cols[3]) + 1
+                    exonOffset = int(cols[3]) - int(GTFdict[transcript_id][1])
+                    GTFdict[transcript_id][4].append(str(exonWidth))
+                    GTFdict[transcript_id][5].append(str(exonOffset))
+
+        t2g.close()
+        symbol.close()
+
+        BED = open(output[2], "w")
+        for k, v in GTFdict.items():
+            # sort the starts and sizes together
+            v[5] = [int(x) for x in v[5]]
+            v[4] = [int(x) for x in v[4]]
+            blockSizes = [str(x) for _,x in sorted(zip(v[5], v[4]))]
+            blockStarts = sorted(v[5])
+            blockStarts = [str(x) for x in blockStarts]
+            BED.write("{}\t{}\t{}\t{}\t.\t{}\t{}\t{}\t255,0,0\t{}\t{}\t{}\n".format(v[0],  # chrom
+                                                                               v[1],  # start
+                                                                               v[2],  # end
+                                                                               k,
+                                                                               v[3],  # strand
+                                                                               v[1],  # start
+                                                                               v[2],  # end
+                                                                               len(v[4]),  # blockCount
+                                                                               ",".join(blockSizes),  # blockSizes
+                                                                               ",".join(blockStarts)))  # blockStarts
+        BED.close()
+
+
+
 
 # Default memory allocation: 1G
 # As a side effect, this checks the GTF and fasta file for chromosome name consistency (it will pass if at least 1 chromosome name is shared)
@@ -238,6 +333,90 @@ rule starIndex:
         STAR --runThreadN {threads} --runMode genomeGenerate --genomeDir {params.basedir} --genomeFastaFiles {input} 2> {log}
         if [[ -w Log.out ]]; then rm -v Log.out; elif [[ -w {params.basedir}/Log.out ]]; then rm -v {params.basedir}/Log.out; fi
         """
+
+rule genes_bed2fasta:
+    input:
+        bed = genes_bed,
+        genome_fasta = genome_fasta
+    output:
+        "annotation/genes.fa"
+    log: "annotation/logs/bed2fasta.log"
+    benchmark:
+        "annotation/.benchmark/annotation_bed2fasta.benchmark"
+    threads: 1
+    conda: CONDA_CREATE_INDEX_ENV
+    shell:
+        "bedtools getfasta -name -s -split -fi {input.genome_fasta} -bed <(cat {input.bed} | cut -f1-12) | sed 's/(.*)//g' | sed 's/:.*//g' > {output} 2> {log}"
+
+
+rule salmonIndex:
+    input:
+        "annotation/genes.fa",
+        genome_fasta
+    output:
+        os.path.join(outdir, "SalmonIndex/decoys.txt"),
+        temp(os.path.join(outdir, "SalmonIndex/seq.fa")),
+        os.path.join(outdir, "SalmonIndex/seq.bin")
+    params:
+        salmonIndexOptions = salmonIndexOptions if salmonIndexOptions else ""
+    log:
+        out = "logs/SalmonIndex.out",
+        err = "logs/SalmonIndex.err",
+    threads: lambda wildcards: 16 if 16<max_thread else max_thread
+    conda: CONDA_CREATE_INDEX_ENV
+    shell: """
+        grep "^>" {input[1]} | cut -d " " -f 1 | tr -d ">" > {output[0]}
+        cat {input[0]} {input[1]} > {output[1]}
+        salmon index -p {threads} -t {output[1]} -d {output[0]} -i SalmonIndex {params.salmonIndexOptions} > {log.out} 2> {log.err}
+        """
+
+
+##### the code for obtaining spliced/unspliced counts from Alevin is based on Soneson et al.2020, bioRxiv, https://doi.org/10.1101/2020.03.13.990069
+
+rule run_eisaR:
+    input:
+        gtf = genes_gtf,
+        genome_fasta = genome_fasta
+    output:
+        joint_fasta = temp(os.path.join(outdir, "annotation/cDNA_introns.joint.fa")),
+        joint_t2g = os.path.join(outdir, "annotation/cDNA_introns.joint.t2g")
+    params:
+        wdir = os.path.join(outdir, "annotation"),
+        scriptdir = workflow_rscripts,
+        isoform_action = "separate",
+        flank_length = eisaR_flank_length,
+        gtf = lambda wildcards,input: os.path.join(outdir, input.gtf),
+        joint_fasta = lambda wildcards,output: output.joint_fasta,
+        joint_t2g = lambda wildcards,output: output.joint_t2g
+    log:
+        out = "logs/eisaR.out"
+    conda: CONDA_eisaR_ENV
+    script: "../rscripts/scRNAseq_eisaR.R"
+
+
+
+#uses decoys generated by rule SalmonIndex in Salmon.snakefile
+
+rule Salmon_index_joint_fa:
+    input:
+        joint_fasta = os.path.join(outdir, "annotation/cDNA_introns.joint.fa"),
+        decoys = os.path.join(salmon_index, "decoys.txt"),
+        genome_fasta = genome_fasta
+    output:
+        seq_fa = temp(os.path.join(outdir, "SalmonIndex_RNAVelocity/seq.fa")),
+        velo_index = os.path.join(outdir, "SalmonIndex_RNAVelocity/seq.bin")
+    params:
+        salmonIndexOptions = salmonIndexOptions
+    log:
+        err = "SalmonIndex_RNAVelocity/logs/SalmonIndex.err",
+        out = "SalmonIndex_RNAVelocity/logs/SalmonIndex.out"
+    threads: lambda wildcards: 16 if 16<max_thread else max_thread
+    conda: CONDA_RNASEQ_ENV
+    shell:"""
+        cat {input.joint_fasta} {input.genome_fasta} > {output.seq_fa}
+        salmon index -p {threads} -t {output.seq_fa} -d {input.decoys} -i SalmonIndex_RNAVelocity {params.salmonIndexOptions} > {log.out} 2> {log.err}
+        """
+
 
 
 # Default memory allocation: 8G
