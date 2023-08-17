@@ -297,6 +297,9 @@ def run_threePrimeSeq():
             "three_prime_seq/combined_polyA.png",
             "three_prime_seq/counts.tsv",
         ]
+    if sampleSheet:
+            sample_name = os.path.splitext(os.path.basename(sampleSheet))[0]
+            file_list.append( ["DESeq2_{}/DESeq2.session_info.txt".format(sample_name)] )
     return file_list
 
 
