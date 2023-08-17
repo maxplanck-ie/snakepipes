@@ -21,13 +21,10 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          "snakemakeOptions": "--use-conda", "tempdir": None,
                          "downsample": False, "trim": False,
                          "reads": ["_R1", "_R2"], "ext": ".fastq.gz", "ext": ".fastq.gz",
-                         "trimmerOptions": "-a A{'30'}", "cellNames": None,
                          "alignerOptions": "--outBAMsortingBinsN 30 --twopassMode Basic",
                          "filterGTF": "-v -P 'decay|pseudogene' ",
-                         "cellBarcodeFile": None, "splitLib": False,
-                         "cellBarcodePattern": "NNNNNNXXXXXX", "bwBinSize": 10,
-                         "plotFormat": "png", "skipRaceID": False,
-                         "cellFilterMetric": "gene_universe",
+                         "bwBinSize": 10,
+                         "plotFormat": "png",
 			 "mode": "STARsolo", "BCwhiteList": None, "STARsoloCoords": ["1","7","8","7"], "myKit": "CellSeq384", "skipVelocyto": False,
                          "alevinLibraryType":"ISR", "prepProtocol":None, "expectCells" : None }):
     """
@@ -50,7 +47,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                           dest="mode",
                           metavar="STR",
                           help="Analysis mode. Possible settings are 'Gruen, STARsolo and Alevin' Default: %(default)s",
-			  choices=['Gruen', 'STARsolo','Alevin'],
+			  choices=['STARsolo','Alevin'],
                           type=str,
                           default=defaults["mode"])
 
@@ -61,43 +58,6 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                           type=int,
                           default=defaults["downsample"])
 
-    optional.add_argument("--trim",
-                          dest="trim",
-                          action="store_true",
-                          default=defaults["trim"],
-                          help="Activate trimming with Cutadapt. Default: no Trimming!")
-
-    optional.add_argument("--trimmerOptions",
-                          dest="trimmerOptions",
-                          metavar="STR",
-                          type=str,
-                          help="Options passed to the selected trimmer, e.g. use --trimmerOptions='-a A{30}' "
-                          "for polyA trimming with Cutadapt (default: '%(default)s')",
-                          default=defaults["trimmerOptions"])
-
-    optional.add_argument("--alignerOptions",
-                          dest="alignerOptions",
-                          help="STAR option string, e.g.: '--twopassMode Basic' (default: '%(default)s')",
-                          default=defaults["alignerOptions"])
-
-    optional.add_argument("--cellBarcodeFile",
-                          metavar="STR",
-                          help="2-column file with cell-index (1st col) and barcode (2nd col). Default/None will use "
-                          "internal CelSeq2@MPI-IE file with 192 barcodes. (default: '%(default)s')",
-                          type=str,
-                          default= defaults["cellBarcodeFile"])
-
-    optional.add_argument("--cellBarcodePattern",
-                          metavar="STR",
-                          help="Defines the cell barcode and UMI order and length at the 5' end of R1 (Cel-seq protocol). "
-                          "'N' defines UMI/random positions, X defines fixed positions; (default '%(default)s')",
-                          type=str,
-                          default=defaults["cellBarcodePattern"])
-
-    optional.add_argument("--splitLib",
-                          action="store_true",
-                          help="Set this option if only 96 out of 192 barcodes were used per sample.",
-                          default=defaults["splitLib"])
 
     optional.add_argument("--filterGTF",
                           dest="filterGTF",
@@ -106,11 +66,6 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                           "(default: '%(default)s')",
                           default=defaults["filterGTF"])
 
-    optional.add_argument("--cellNames",
-                          metavar="STR",
-                          help="either tab-sep. file with cell name ranges or directory with *.tsv files that contain "
-                          "cell names and plate/library information for all fastq files! (default: '%(default)s')",
-                          default=defaults["cellNames"])
 
     optional.add_argument("--BCwhiteList",
                           metavar="STR",
@@ -136,18 +91,6 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                           help="Format of the output plots from deeptools. Select 'none' for no plot (default: '%(default)s')",
                           default=defaults["plotFormat"]),
 
-    optional.add_argument("--cellFilterMetric",
-                          choices=['gene_universe', 'medGPC'],
-                          metavar="STR",
-                          type=str,
-                          help="The metric to maximise when selecting a cell filtering threshold (default: '%(default)s')",
-                          default=defaults["cellFilterMetric"])
-
-    optional.add_argument("--skipRaceID",
-                          dest="skipRaceID",
-                          action="store_true",
-                          default=defaults["skipRaceID"],
-                          help="Skip RaceID analysis.")
 
     optional.add_argument("--myKit",
                           choices=['10Xv2', '10Xv3', 'CellSeq192', 'CellSeq384', 'Custom'],
@@ -198,19 +141,6 @@ def main():
 
     # Common arguments
     cf.checkCommonArguments(args, baseDir, outDir=True)
-    # 4. barcode file
-    if args.cellBarcodeFile == None:
-        args.cellBarcodeFile = os.path.join(workflowDir, "celseq_barcodes.192.txt")
-    elif args.cellBarcodeFile != None and os.path.exists(os.path.abspath(args.cellBarcodeFile)):
-        args.cellBarcodeFile = os.path.abspath(args.cellBarcodeFile)
-    else:
-        sys.exit("\nBarcode file (--cellBarcodeFile) not found! {}\n".format(args.cellBarcodeFile))
-    # 5. cell name tables
-    if args.cellNames:
-        if os.path.exists(os.path.abspath(args.cellNames)):
-            args.cellNames = os.path.abspath(args.cellNames)
-        else:
-            sys.exit("\nCell_names file not found! {}\n".format(args.cellNames))
 
     # Handle YAML and log files
     snakemake_cmd = cf.commonYAMLandLogs(baseDir, workflowDir, defaults, args, __file__)

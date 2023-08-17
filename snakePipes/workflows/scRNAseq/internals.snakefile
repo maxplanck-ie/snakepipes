@@ -16,20 +16,7 @@ import sys
 ## we trim only R2 with transfered barcode info under "FASTQ_barcoded"
 ## only cutadapt is supported right now due to poly-A trimming 
 
-if mode == "Gruen":
-    fastq_dir = "FASTQ_barcoded"
-    if trim:
-        fastq_indir_trim = "FASTQ_barcoded"
-        if trimmer == "trimgalore":
-            fastq_dir = "FASTQ_TrimGalore"
-        elif trimmer == "cutadapt":
-            fastq_dir = "FASTQ_Cutadapt"
-        elif trimmer == "fastp":
-            fastq_dir = "FASTQ_fastp"
-    else:
-        fastq_indir_trim = None	
-    aligner = "STAR_genomic"
-elif mode == "STARsolo":
+if mode == "STARsolo":
     fastq_indir_trim = None
     fastq_dir = "originalFASTQ"
     aligner = "STARsolo"
@@ -51,12 +38,6 @@ if not samples:
 if not cf.is_paired(infiles,ext,reads):
     print("This workflow requires paired-end read data!")
     exit(1)
-
-## print deprecation message for modeGruen
-if mode=="Gruen":
-    print("Mode Gruen has been deprecated! Please use mode STARsolo or Alevin for your analysis.")
-    exit(1)
-
 
 if mode == "STARsolo":
     if myKit == "10Xv2":
@@ -84,21 +65,3 @@ pairedEnd = False
 ##some rules use a hardcoded reads[0] for SE
 reads = reads[::-1]
 
-### barcode pattern extraction #################################################
-pattern = re.compile("[N]+")
-
-if pattern.search(cellBarcodePattern) is not None:
-    UMI_offset = pattern.search(cellBarcodePattern).start() + 1 
-    UMI_length = pattern.search(cellBarcodePattern).end() - UMI_offset + 1
-else:
-    print("Provided barcode pattern does not contain any 'N'! Exit...\n")
-    exit(1)
-
-pattern = re.compile("[X]+")
-
-if pattern.search(cellBarcodePattern) is not None:
-    CELLI_offset = pattern.search(cellBarcodePattern).start() + 1
-    CELLI_length = pattern.search(cellBarcodePattern).end() - CELLI_offset + 1 
-else:
-    print("Provided barcode pattern does not contain any 'X'! Exit...\n")
-    exit(1)
