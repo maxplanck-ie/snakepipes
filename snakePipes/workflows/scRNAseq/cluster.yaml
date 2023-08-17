@@ -7,9 +7,9 @@ annotation_bed2fasta:
 STARsolo:
     memory: 6G
 SalmonAlevin:
-    memory: 6G
+    memory: 10G
 AlevinForVelocity:
-    memory: 6G
+    memory: 10G
 cellsort_bam:
     memory: 10G
 velocyto:
