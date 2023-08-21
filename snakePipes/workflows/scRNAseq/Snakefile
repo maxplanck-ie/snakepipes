@@ -93,8 +93,6 @@ onstart:
 	print("Mode:", mode)
         print("Input directory for mapping:", fastq_dir)
         print("BigWig bin size:", bwBinSize)
-        print("UMI_LEN:",UMI_length)
-        print("UMI_offset:",UMI_offset)
 
         print("-" * 80, "\n")
 
