@@ -733,7 +733,7 @@ class TestmRNAseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 129
+        assert parseSpOut(_p) == 131
     def test_bcExtract(self, ifs):
         ci = [
             "mRNA-seq",
@@ -865,7 +865,7 @@ class TestmRNAseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 116
+        assert parseSpOut(_p) == 118
     def test_SEfastqc(self, ifs):
         ci = [
             "mRNA-seq",
@@ -921,7 +921,7 @@ class TestmRNAseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 92
+        assert parseSpOut(_p) == 114
     def test_threeprimeqc(self, ifs):
         ci = [
             "mRNA-seq",
@@ -940,7 +940,7 @@ class TestmRNAseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 161
+        assert parseSpOut(_p) == 163
     def test_allelic(self, ifs):
         ci = [
             "mRNA-seq",
