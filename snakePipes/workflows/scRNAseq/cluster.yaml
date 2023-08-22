@@ -17,4 +17,4 @@ velocyto:
 STARsolo_raw_to_seurat:
     memory: 10G
 velo_to_sce:
-    memeory: 30G
+    memory: 30G
