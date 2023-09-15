@@ -312,7 +312,7 @@ rule heatmap:
 if sampleSheet:
     rule DESeq2:
         input:
-            gene_counts="featureCounts/counts.txt",
+            gene_counts="featureCounts/counts.tsv",
             cluster_counts="three_prime_seq/counts.tsv",
             sampleSheet=sampleSheet,
             symbol_file = "Annotation/genes.filtered.symbol"
