@@ -304,3 +304,19 @@ rule heatmap:
     shell: 
         "plotProfile -m {input} -o {output}"
 
+if sampleSheet:
+    rule DESeq2:
+        input:
+            gene_counts="featureCounts/counts.txt",
+            cluster_counts="three_prime_seq/counts.tsv",
+            sampleSheet=sampleSheet,
+            symbol_file = "Annotation/genes.filtered.symbol"
+        output:
+            "{}/DESeq2.session_info.txt".format(get_outdir("DESeq2",sampleSheet))
+        benchmark:
+            "{}/.benchmark/DESeq2.featureCounts.benchmark".format(get_outdir("DESeq2",sampleSheet))
+        params:
+            outdir = os.path.join(outdir, get_outdir("DESeq2", sampleSheet)),
+            fdr = 0.05,
+        conda: CONDA_RNASEQ_ENV
+        script: "../rscripts/threeprimeseq-DESeq2.R"
