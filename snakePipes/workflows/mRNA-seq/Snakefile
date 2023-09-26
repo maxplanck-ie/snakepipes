@@ -296,6 +296,7 @@ def run_threePrimeSeq():
         file_list += [
             "three_prime_seq/combined_polyA.png",
             "three_prime_seq/counts.tsv",
+            "featureCounts/counts.tsv"
         ]
     if sampleSheet:
             sample_name = os.path.splitext(os.path.basename(sampleSheet))[0]
