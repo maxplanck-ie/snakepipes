@@ -75,7 +75,7 @@ render(file.path(snakemake@params["outdir"],'DESeq2_report_basic.Rmd'),
 render(file.path(snakemake@params["outdir"],'DESeq2_report_basic.Rmd'),
        output_file = paste0(snakemake@params["outdir"], "/DESeq2_report_clusters.html"),
        output_format = "html_document",
-       clean = TRUE,a
+       clean = TRUE,
        params = list(
            DEseqoutRdata = paste0(snakemake@params["outdir"], "/clusters_DESeq.Rdata"),
            ddr.df = paste0(snakemake@params["outdir"], "/clusters_DEresults.tsv"),
