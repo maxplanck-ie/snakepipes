@@ -22,6 +22,11 @@ def condition_from_sample(sample):
     sub_df = sample_metadata[sample_metadata['name'] == sample]
     return sub_df['condition'].iloc[0]
 
+def get_outdir(folder_name,sampleSheet):
+    sample_name = os.path.splitext(os.path.basename(str(sampleSheet)))[0]
+    return("{}_{}".format(folder_name, sample_name))
+
+
 # TODO: 
 # 3. check why cmatrix_filtered is commented out - OK
 # 5. re-implement clusterPAS?  
@@ -304,3 +309,19 @@ rule heatmap:
     shell: 
         "plotProfile -m {input} -o {output}"
 
+if sampleSheet:
+    rule DESeq2:
+        input:
+            gene_counts="featureCounts/counts.tsv",
+            cluster_counts="three_prime_seq/counts.tsv",
+            sampleSheet=sampleSheet,
+            symbol_file = "Annotation/genes.filtered.symbol"
+        output:
+            "{}/DESeq2.session_info.txt".format(get_outdir("DESeq2",sampleSheet))
+        benchmark:
+            "{}/.benchmark/DESeq2.featureCounts.benchmark".format(get_outdir("DESeq2",sampleSheet))
+        params:
+            outdir = os.path.join(outdir, get_outdir("DESeq2", sampleSheet)),
+            fdr = 0.05,
+        conda: CONDA_RNASEQ_ENV
+        script: "../rscripts/threeprimeseq-DESeq2.R"

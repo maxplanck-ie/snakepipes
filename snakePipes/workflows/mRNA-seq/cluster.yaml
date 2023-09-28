@@ -28,3 +28,5 @@ Salmon_TPM:
     memory: 5G
 Salmon_counts:
     memory: 5G
+filterBW:
+    memory: 6G
