@@ -296,7 +296,6 @@ def run_threePrimeSeq():
         file_list += [
             expand("filtered_bam/{sample}.filtered.bam",sample=samples),
             "three_prime_seq/combined_polyA.png",
-            expand("featureCounts/{sample}.counts.txt", sample=samples),
             "three_prime_seq/counts.tsv",
             "featureCounts/counts.tsv"
         ]
