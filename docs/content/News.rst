@@ -7,6 +7,7 @@ snakePipes x.x.x
 * Moved SalmonIndex creation from mRNAseq and scRNAseq to createIndices.
 * Changed the behaviour of snakePipes createEnvs - it is no longer possible to set condaEnvDir with this function. It is required to set it with snakePipes config beforhand, instead. To ingore what's in the defaults.yaml and overwrite the condaEnvDir value with default system conda prefix, use '--autodetectCondaEnvDir'.
 * Snakemake options in the defaults.yaml are now an empty string. The required arguments '--use-conda --conda-prefix' have been directly added to the command string. condaEnvDir is parsed from defaults.yaml, requiring running snakePipes config first.
+* Added a 'three-prime-seq' mode to mRNAseq (David Koppstein and Katarzyna Sikora).
 * Fixes #819
 * fastq files are checked for validity
 * an 'on success' file is touched in the output directory when a workflow is finished successfully
