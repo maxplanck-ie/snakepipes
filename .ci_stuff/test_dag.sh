@@ -117,7 +117,7 @@ touch /tmp/annotation/cDNA_introns.joint.t2g
 touch /tmp/genes.t2g
 
 # Ensure an empty snakePipes config doesn't muck anything up
-snakePipes config
+snakePipes config --tempDir /tmp
 
 # createIndices
 WC=`createIndices -o output --snakemakeOptions " --dryrun --conda-prefix /tmp" --genome ftp://ftp.ensembl.org/pub/release-93/fasta/mus_musculus/dna/Mus_musculus.GRCm38.dna_sm.primary_assembly.fa.gz --gtf ftp://ftp.ensembl.org/pub/release-93/gtf/mus_musculus/Mus_musculus.GRCm38.93.gtf.gz blah | tee >(cat 1>&2) | grep -v "conda installation\|Conda environment" | sed '/^\s*$/d' | wc -l`
