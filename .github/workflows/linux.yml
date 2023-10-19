@@ -28,6 +28,7 @@ jobs:
     - name: docs
       run: |
         micromamba activate snakePipes_CI
+        snakePipes config --tempDir /tmp
         cd docs
         make html
   flake:
@@ -50,6 +51,7 @@ jobs:
     - name: flake
       run: |
         micromamba activate snakePipes_CI
+        snakePipes config --tempDir /tmp
         flake8 --ignore=E501,E722,E402 --exclude tests,docs/conf.py,build/lib/snakePipes/shared/tools/three_prime_seq,snakePipes/shared/tools/three_prime_seq .
   CI:
     runs-on: ubuntu-latest
@@ -71,10 +73,12 @@ jobs:
     - name: CI
       run: |
         micromamba activate snakePipes_CI
+        snakePipes config --tempDir /tmp
         ./.ci_stuff/test_dag.sh
     - name: pytest
       run: |
         micromamba activate snakePipes_CI
+        snakePipes config --tempDir /tmp
         pytest --verbosity=2
   createEnvs:
     needs: CI
@@ -122,4 +126,5 @@ jobs:
     - name: createEnvs
       run: |
         micromamba activate snakePipes_CI
+        snakePipes config --tempDir /tmp
         snakePipes createEnvs --autodetectCondaEnvDir --force --only ${{matrix.envs}}
