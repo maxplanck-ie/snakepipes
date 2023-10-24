@@ -36,9 +36,9 @@ if (length(snakemake@input[["ConversionRate"]] > 0)) {
 }
 ```
 
-# Mapping rate
+# Mapping rate and PCR duplication rate
 
-A good mapping rate of 80-90% indicates successful library construction. Low mapping rates may reflect issues with sample contamination, damaged starting material, or that you aligned a non-directional library with directional settings. "Filtered" alignments are due to less than 44% of the the read sequence being aligned (i.e., the alignment is likely incorrect and is thus being ignored).
+A good mapping rate of 80-90% indicates successful library construction. Low mapping rates may reflect issues with sample contamination, damaged starting material, or that you aligned a non-directional library with directional settings. Observed PCR duplication rate on a PCR-free protocol should be low, not exceeding 10-15%. Higher duplication rates might reflect low-input samples and/or lower library complexity.
 
 ```{r message=FALSE, warning=FALSE}
 if (length(snakemake@input[["fstat"]] > 0)) {
@@ -48,47 +48,22 @@ if (length(snakemake@input[["fstat"]] > 0)) {
         as.numeric(v[1]) + as.numeric(v[3])
     })
     mapped = sapply(fl, function(x) {
-        v = strsplit(x$V1[5], " ")[[1]]
+        v = strsplit(x$V1[7], " ")[[1]]
         as.numeric(v[1]) + as.numeric(v[3])
     })
-    filtered = totals - sapply(fl, function(x) {
+    dupes = sapply(fl, function(x) {
         v = strsplit(x$V1[5], " ")[[1]]
-        v2 = strsplit(x$V1[5], " ")[[1]]
-        as.numeric(v[1])
+        as.numeric(v[1]) + as.numeric(v[3])
     })
     d = data.frame(Total=totals,
                    Mapped=mapped,
                    MappedPercent=100*mapped/totals,
-                   Filtered=filtered,
-                   FilteredPercent=100*filtered/totals)
+                   Duplicates=dupes,
+                   DuplicatesPercent=100*dupes/totals)
     rownames(d) = gsub(".flagstat", "", sapply(snakemake@input[["fstat"]], basename))
     pander(d, style='simple', split.table=Inf)
 } else {
     message('No flagstat files found!')
-}
-```
-
-# PCR duplication rate
-
-Observed PCR duplication rate on a PCR-free protocol should be low, not exceeding 10-15%. Higher duplication rates might reflect low-input samples and/or lower library complexity.
-
-```{r message=FALSE, warning=FALSE}
-if (length(snakemake@input[["fstat"]] > 0)) {
-    fl = lapply(snakemake@input[["fstat"]], function(x) read.table(x, header=FALSE, sep="\t", quote="", as.is=TRUE))
-    totals = sapply(fl, function(x) {
-        v = strsplit(x$V1[1], " ")[[1]]
-        as.numeric(v[1]) + as.numeric(v[3])
-    })
-    dupes = sapply(fl, function(x) {
-        v = strsplit(x$V1[4], " ")[[1]]
-        as.numeric(v[1]) + as.numeric(v[3])
-    })
-    d = data.frame(Duplicates=dupes,
-                   DuplicationRate=100 * dupes/totals)
-    rownames(d) = gsub(".flagstat", "", sapply(snakemake@input[["fstat"]], basename))
-    pander(d, style='simple')
-} else {
-    message('No information on PCR duplicate removal found. If you started the pipeline from bam files, this is expected outcome. Otherwise, an error might have occurred.')
 }
 ```
 
