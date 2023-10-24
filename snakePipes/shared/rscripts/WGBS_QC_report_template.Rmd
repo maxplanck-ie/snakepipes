@@ -158,20 +158,27 @@ sampleNames(bs) = gsub("MethylDackel/", "", sampleNames(bs))
 sampleNames(bs) = gsub("_CpG.bedGraph", "", sampleNames(bs))
 save.image(file="QC_metrics/Session.RData")
 
-methyl = logit(getBSseq(bs, type="M") / getBSseq(bs, type="Cov"), adjust=1e-3)
-rv = DelayedMatrixStats::rowVars(methyl)
-tot = min(1000, length(rv))
-IDX = order(rv, decreasing=TRUE)[1:tot]
-x = PCA(t(methyl[IDX,]), graph=FALSE)
-plot.PCA(x, choix="ind", title="PCA of methylation values")
+if(length(snakemake@input[["bedGraphs"]])>1){
+
+    methyl = logit(getBSseq(bs, type="M") / getBSseq(bs, type="Cov"), adjust=1e-3)
+    rv = DelayedMatrixStats::rowVars(methyl)
+    tot = min(1000, length(rv))
+    IDX = order(rv, decreasing=TRUE)[1:tot]
+    x = PCA(t(methyl[IDX,]), graph=FALSE)
+    plot.PCA(x, choix="ind", title="PCA of methylation values")} else {
+message("Cannot compute PCA for methylation on only 1 sample. Skipping.")
+}
 ```
 
 ```{r warning=FALSE, message=FALSE}
-coverage = getBSseq(bs, type="Cov")
-rv = DelayedMatrixStats::rowVars(coverage)
-IDX = order(rv, decreasing=TRUE)[1:tot]
-x = PCA(t(coverage), graph=FALSE)
-plot.PCA(x, choix="ind", title="PCA of coverage")
+if(length(snakemake@input[["bedGraphs"]])>1){
+    coverage = getBSseq(bs, type="Cov")
+    rv = DelayedMatrixStats::rowVars(coverage)
+    IDX = order(rv, decreasing=TRUE)[1:tot]
+    x = PCA(t(coverage), graph=FALSE)
+    plot.PCA(x, choix="ind", title="PCA of coverage")} else {
+message("Cannot compute PCA for coverage on only 1 sample. Skipping.")
+}
 ```
 
 # Methylation bias
