@@ -725,7 +725,7 @@ def runAndCleanup(args, cmd, logfile_name):
         sys.exit(p.returncode)
     else:
         Path(
-            os.path.join(args.outdir, "snakePipes.done")
+            os.path.join(args.outdir, "{}_snakePipes.done".format(logfile_name.split('_')[0]))
         ).touch()
         if os.path.exists(os.path.join(args.outdir, ".snakemake")):
             shutil.rmtree(os.path.join(args.outdir, ".snakemake"), ignore_errors=True)
