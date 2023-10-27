@@ -164,7 +164,7 @@ if pairedEnd:
     rule Genrich_peaks:
         input:
             bams=lambda wildcards: expand(os.path.join("namesorted_bam", "{sample}_host_namesorted.bam"), sample=genrichDict[wildcards.group]),
-            control = lambda wildcards: ["namesorted_bam/"+get_control(x)+"_host_namesorted.bam" for x in genrichDict[wildcards.group]]
+            control = lambda wildcards: ["namesorted_bam/"+get_control(x)+"_host_namesorted.bam" for x in genrichDict[wildcards.group]] if chip_samples_w_ctrl else []
         output:
             "Genrich/{group}.narrowPeak"
         log: "Genrich/logs/{group}.log"
@@ -182,7 +182,7 @@ else:
     rule Genrich_peaks:
         input:
             bams=lambda wildcards: expand(os.path.join("namesorted_bam", "{sample}_host_namesorted.bam"), sample=genrichDict[wildcards.group]),
-            control = lambda wildcards: ["namesorted_bam/"+get_control(x)+"_host_namesorted.bam" for x in genrichDict[wildcards.group]]
+            control = lambda wildcards: ["namesorted_bam/"+get_control(x)+"_host_namesorted.bam" for x in genrichDict[wildcards.group]] if chip_samples_w_ctrl else []
         output:
             "Genrich/{group}.narrowPeak"
         log: "Genrich/logs/{group}.log"
