@@ -90,6 +90,7 @@ if sampleSheet:
         print("\nWarning! CSAW cannot be invoked without replicates and will not be run!\n")
         if not peakCaller=="Genrich":
             sys.exit()
+    isMultipleComparison = cf.isMultipleComparison(sampleSheet)
 
 chip_dict = {}
 with open(samples_config, "r") as f:
