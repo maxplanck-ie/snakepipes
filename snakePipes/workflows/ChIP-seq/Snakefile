@@ -59,7 +59,10 @@ else:
 
 # CSAW for differential binding (if sampleinfo specified)
 if sampleSheet and cf.check_replicates(sampleSheet):
-    include: os.path.join(maindir, "shared", "rules", "CSAW.snakefile")
+    if not isMultipleComparison:
+        include: os.path.join(maindir, "shared", "rules", "CSAW.singleComp.snakefile")
+    else:
+        include: os.path.join(maindir, "shared", "rules", "CSAW.multipleComp.snakefile")
     include: os.path.join(maindir, "shared", "rules", "nearestGene.snakefile")
     include: os.path.join(maindir, "shared", "rules", "filterGTF.snakefile")
     #if not fromBAM and not useSpikeInForNorm:
