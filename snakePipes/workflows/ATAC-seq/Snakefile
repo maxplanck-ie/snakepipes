@@ -57,7 +57,10 @@ else:
 chip_samples = samples
 pairedEnd = True
 if sampleSheet:
-    include: os.path.join(maindir, "shared", "rules", "CSAW.snakefile")
+    if not isMultipleComparison:
+        include: os.path.join(maindir, "shared", "rules", "CSAW.singleComp.snakefile")
+    else:
+        include: os.path.join(maindir, "shared", "rules", "CSAW.multipleComp.snakefile")
     include: os.path.join(maindir, "shared", "rules", "nearestGene.snakefile")
     include: os.path.join(maindir, "shared", "rules", "filterGTF.snakefile")
 #    if not fromBAM:
