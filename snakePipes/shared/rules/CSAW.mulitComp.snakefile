@@ -1,5 +1,10 @@
-sample_name = os.path.splitext(os.path.basename(sampleSheet))[0]
+#sample_name = os.path.splitext(os.path.basename(sampleSheet))[0]
 change_direction = ["UP", "DOWN", "MIXED"]
+
+def get_outdir(peak_caller,sampleSheet):
+    sample_name = os.path.splitext(os.path.basename(str(sampleSheet)))[0]
+
+    return("CSAW_{}_{}".format(peak_caller, sample_name))
 
 def getInputPeaks(peakCaller, chip_samples, genrichDict):
     if peakCaller == "MACS2":
@@ -53,22 +58,32 @@ def getHeatmapInput():
         else:
           return(expand("CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.cov.heatmap.png", change_dir=['UP','DOWN']))
 
+checkpoint split_sampleSheet:
+    input:
+        sampleSheet = sampleSheet
+    output:
+        splitSheets = os.path.join("splitSampleSheets",os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv")
+    params:
+        splitSheetPfx = os.path.join("splitSampleSheets",os.path.splitext(os.path.basename(str(sampleSheet)))[0])
+    run:
+        if isMultipleComparison:
+            cf.splitSampleSheet(input.sampleSheet,params.splitSheetPfx)
 
 ## CSAW for differential binding / allele-specific binding analysis
 rule CSAW:
     input:
         peaks = getInputPeaks(peakCaller, chip_samples, genrichDict),
-        sampleSheet = sampleSheet,
+        sampleSheet = lambda wildcards: checkpoints.split_sampleSheet.get(compGroup=wildcards.compGroup).output,
         insert_size_metrics = getSizeMetrics(),
         scale_factors = getScaleFactors() if useSpikeInForNorm else []
     output:
-        "CSAW_{}_{}/CSAW.session_info.txt".format(peakCaller, sample_name),
-        "CSAW_{}_{}/DiffBinding_analysis.Rdata".format(peakCaller, sample_name),
-        expand("CSAW_{}_{}".format(peakCaller, sample_name) + "/Filtered.results.{change_dir}.bed", change_dir=change_direction)
+        "{}/CSAW.session_info.txt".format(get_outdir(peakCaller,os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv")),
+        "{}/DiffBinding_analysis.Rdata".format(get_outdir(peakCaller,os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv")),
+        expand("{}".format(get_outdir(peakCaller,os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv")) + "/Filtered.results.{change_dir}.bed", change_dir=change_direction)
     benchmark:
-        "CSAW_{}_{}/.benchmark/CSAW.benchmark".format(peakCaller, sample_name)
+        "{}/.benchmark/CSAW.benchmark".format(get_outdir(peakCaller,os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv"))
     params:
-        outdir=os.path.join(outdir, "CSAW_{}_{}".format(peakCaller, sample_name)),
+        outdir=lambda wildcards,input: get_outdir(peakCaller,input.sampleSheet),
         peakCaller=peakCaller,
         fdr = fdr,
         absBestLFC=absBestLFC,
@@ -83,24 +98,24 @@ rule CSAW:
         useSpikeInForNorm = useSpikeInForNorm,
         scale_factors = lambda wildcards, input: os.path.join(outdir, input.scale_factors) if input.scale_factors else ""
     log:
-        out = os.path.join(outdir, "CSAW_{}_{}/logs/CSAW.out".format(peakCaller, sample_name)),
-        err = os.path.join(outdir, "CSAW_{}_{}/logs/CSAW.err".format(peakCaller, sample_name))
+        out = os.path.join(outdir, "{}/logs/CSAW.out".format(get_outdir(peakCaller,os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv")),
+        err = os.path.join(outdir, "{}/logs/CSAW.err".format(get_outdir(peakCaller,os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv"))
     conda: CONDA_ATAC_ENV
     script: "../rscripts/CSAW.R"
 
 
 rule calc_matrix_log2r_CSAW:
     input:
-        csaw_in = "CSAW_{}_{}/CSAW.session_info.txt".format(peakCaller, sample_name),
+        csaw_in = "{}/CSAW.session_info.txt".format(get_outdir(peakCaller,os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv")),
         bigwigs = expand("split_deepTools_ChIP/bamCompare/{chip_sample}.log2ratio.over_{control_name}.scaledBYspikein.bw", zip, chip_sample=reordered_dict.keys(), control_name=reordered_dict.values()) if useSpikeInForNorm else expand("deepTools_ChIP/bamCompare/{chip_sample}.filtered.log2ratio.over_{control_name}.bw", zip, chip_sample=reordered_dict.keys(), control_name=reordered_dict.values()),
         sampleSheet = sampleSheet
     output:
-        matrix = touch("CSAW_{}_{}".format(peakCaller, sample_name)+"/CSAW.{change_dir}.log2r.matrix")
+        matrix = touch("{}".format(get_outdir(peakCaller,os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv"))+"/CSAW.{change_dir}.log2r.matrix")
     params:
-        bed_in = "CSAW_{}_{}".format(peakCaller, sample_name)+"/Filtered.results.{change_dir}.bed"
+        bed_in = "{}".format(get_outdir(peakCaller,os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv"))+"/Filtered.results.{change_dir}.bed"
     log:
-        out = os.path.join(outdir, "CSAW_{}_{}".format(peakCaller, sample_name) + "/logs/deeptools_matrix.log2r.{change_dir}.out"),
-        err = os.path.join(outdir, "CSAW_{}_{}".format(peakCaller, sample_name) + "/logs/deeptools_matrix.log2r.{change_dir}.err")
+        out = os.path.join(outdir, "{}".format(get_outdir(peakCaller,os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv")) + "/logs/deeptools_matrix.log2r.{change_dir}.out"),
+        err = os.path.join(outdir, "{}".format(get_outdir(peakCaller,os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv")) + "/logs/deeptools_matrix.log2r.{change_dir}.err")
     threads: 8
     conda: CONDA_SHARED_ENV
     shell: """
@@ -114,15 +129,15 @@ rule calc_matrix_log2r_CSAW:
 
 rule plot_heatmap_log2r_CSAW:
     input:
-        matrix = "CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.log2r.matrix"
+        matrix = "{}".format(get_outdir(peakCaller,os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv")) + "/CSAW.{change_dir}.log2r.matrix"
     output:
-        image = touch("CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.log2r.heatmap.png"),
-        sorted_regions = touch("CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.log2r.sortedRegions.bed")
+        image = touch("{}".format(get_outdir(peakCaller,os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv")) + "/CSAW.{change_dir}.log2r.heatmap.png"),
+        sorted_regions = touch("{}".format(get_outdir(peakCaller,os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv")) + "/CSAW.{change_dir}.log2r.sortedRegions.bed")
     params:
         smpl_label=' '.join(reordered_dict.keys())
     log:
-        out = os.path.join(outdir, "CSAW_{}_{}".format(peakCaller, sample_name) + "/logs/deeptools_heatmap.log2r.{change_dir}.out"),
-        err = os.path.join(outdir, "CSAW_{}_{}".format(peakCaller, sample_name) + "/logs/deeptools_heatmap.log2r.{change_dir}.err")
+        out = os.path.join(outdir, "{}".format(get_outdir(peakCaller,os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv")) + "/logs/deeptools_heatmap.log2r.{change_dir}.out"),
+        err = os.path.join(outdir, "{}".format(get_outdir(peakCaller,os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv")) + "/logs/deeptools_heatmap.log2r.{change_dir}.err")
     conda: CONDA_SHARED_ENV
     shell: """
         touch {log.out}
@@ -141,16 +156,16 @@ rule plot_heatmap_log2r_CSAW:
 
 rule calc_matrix_cov_CSAW:
     input:
-        csaw_in = "CSAW_{}_{}/CSAW.session_info.txt".format(peakCaller, sample_name),
+        csaw_in = "{}/CSAW.session_info.txt".format(get_outdir(peakCaller,os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv")),
         bigwigs = getBamCoverage() if useSpikeInForNorm else expand("bamCoverage/{chip_sample}.filtered.seq_depth_norm.bw", chip_sample=reordered_dict.keys()),
         sampleSheet = sampleSheet
     output:
-        matrix = touch("CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.cov.matrix")
+        matrix = touch("{}".format(get_outdir(peakCaller,os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv")) + "/CSAW.{change_dir}.cov.matrix")
     params:
-        bed_in = "CSAW_{}_{}".format(peakCaller, sample_name) + "/Filtered.results.{change_dir}.bed"
+        bed_in = "{}".format(get_outdir(peakCaller,os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv")) + "/Filtered.results.{change_dir}.bed"
     log:
-        out = os.path.join(outdir, "CSAW_{}_{}".format(peakCaller, sample_name) + "/logs/deeptools_matrix.cov.{change_dir}.out"),
-        err = os.path.join(outdir, "CSAW_{}_{}".format(peakCaller, sample_name) + "/logs/deeptools_matrix.cov.{change_dir}.err")
+        out = os.path.join(outdir, "{}".format(get_outdir(peakCaller,os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv")) + "/logs/deeptools_matrix.cov.{change_dir}.out"),
+        err = os.path.join(outdir, "{}".format(get_outdir(peakCaller,os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv")) + "/logs/deeptools_matrix.cov.{change_dir}.err")
     threads: 8
     conda: CONDA_SHARED_ENV
     shell: """
@@ -165,15 +180,15 @@ rule calc_matrix_cov_CSAW:
 
 rule plot_heatmap_cov_CSAW:
     input:
-        matrix = "CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.cov.matrix"
+        matrix = "{}".format(get_outdir(peakCaller,os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv")) + "/CSAW.{change_dir}.cov.matrix"
     output:
-        image = touch("CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.cov.heatmap.png"),
-        sorted_regions = touch("CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.cov.sortedRegions.bed")
+        image = touch("{}".format(get_outdir(peakCaller,os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv")) + "/CSAW.{change_dir}.cov.heatmap.png"),
+        sorted_regions = touch("{}".format(get_outdir(peakCaller,os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv")) + "/CSAW.{change_dir}.cov.sortedRegions.bed")
     params:
         smpl_label=' '.join(reordered_dict.keys())
     log:
-        out = os.path.join(outdir,"CSAW_{}_{}".format(peakCaller, sample_name) + "/logs/deeptools_heatmap.cov.{change_dir}.out"),
-        err = os.path.join(outdir,"CSAW_{}_{}".format(peakCaller, sample_name) + "/logs/deeptools_heatmap.cov.{change_dir}.err")
+        out = os.path.join(outdir,"{}".format(get_outdir(peakCaller,os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv")) + "/logs/deeptools_heatmap.cov.{change_dir}.out"),
+        err = os.path.join(outdir,"{}".format(get_outdir(peakCaller,os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv")) + "/logs/deeptools_heatmap.cov.{change_dir}.err")
     conda: CONDA_SHARED_ENV
     shell: """
         touch {log.out}
@@ -190,19 +205,19 @@ rule plot_heatmap_cov_CSAW:
 
 rule CSAW_report:
     input:
-        csaw_in = "CSAW_{}_{}/CSAW.session_info.txt".format(peakCaller, sample_name),
+        csaw_in = "{}/CSAW.session_info.txt".format(get_outdir(peakCaller,os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv")),
         heatmap_in = lambda wildcards: getHeatmapInput()
     output:
-        outfile="CSAW_{}_{}/CSAW.Stats_report.html".format(peakCaller, sample_name)
+        outfile="{}/CSAW.Stats_report.html".format(get_outdir(peakCaller,os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv"))
     params:
         pipeline=pipeline,
         fdr=fdr,
         lfc=absBestLFC,
-        outdir=os.path.join(outdir, "CSAW_{}_{}".format(peakCaller, sample_name)),
+        outdir=os.path.join(outdir, "{}".format(get_outdir(peakCaller,os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv")),
         sampleSheet=sampleSheet,
         useSpikeInForNorm = useSpikeInForNorm
     log:
-       out = os.path.join(outdir, "CSAW_{}_{}/logs/report.out".format(peakCaller, sample_name)),
-       err = os.path.join(outdir, "CSAW_{}_{}/logs/report.err".format(peakCaller, sample_name))
+       out = os.path.join(outdir, "{}/logs/report.out".format(get_outdir(peakCaller,os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv")),
+       err = os.path.join(outdir, "{}/logs/report.err".format(get_outdir(peakCaller,os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv"))
     conda: CONDA_ATAC_ENV
     script: "../rscripts/CSAW_report.Rmd"
