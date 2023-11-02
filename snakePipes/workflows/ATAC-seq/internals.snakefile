@@ -11,6 +11,7 @@ if sampleSheet:
     if not cf.check_replicates(sampleSheet):
         print("\nWarning! CSAW cannot be invoked without replicates!\n")
         sys.exit()
+    isMultipleComparison = cf.isMultipleComparison(sampleSheet)
 
 if not fromBAM:
     if pairedEnd:
