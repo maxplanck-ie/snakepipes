@@ -13,14 +13,20 @@ touch PE_input/sample1_R1.fastq.gz PE_input/sample1_R2.fastq.gz \
       PE_input/sample3_R1.fastq.gz PE_input/sample3_R2.fastq.gz \
       PE_input/sample4_R1.fastq.gz PE_input/sample4_R2.fastq.gz \
       PE_input/sample5_R1.fastq.gz PE_input/sample5_R2.fastq.gz \
-      PE_input/sample6_R1.fastq.gz PE_input/sample6_R2.fastq.gz
+      PE_input/sample6_R1.fastq.gz PE_input/sample6_R2.fastq.gz \
+      PE_input/sample7_R1.fastq.gz PE_input/sample7_R2.fastq.gz \
+      PE_input/sample8_R1.fastq.gz PE_input/sample8_R2.fastq.gz \
+      PE_input/sample9_R1.fastq.gz PE_input/sample9_R2.fastq.gz
 mkdir -p SE_input
 touch SE_input/sample1_R1.fastq.gz \
       SE_input/sample2_R1.fastq.gz \
       SE_input/sample3_R1.fastq.gz \
       SE_input/sample4_R1.fastq.gz \
       SE_input/sample5_R1.fastq.gz \
-      SE_input/sample6_R1.fastq.gz
+      SE_input/sample6_R1.fastq.gz \
+      SE_input/sample7_R1.fastq.gz \
+      SE_input/sample8_R1.fastq.gz \
+      SE_input/sample9_R1.fastq.gz
 # Needed by ChIP and ATAC workflows
 mkdir -p BAM_input/deepTools_qc/bamPEFragmentSize BAM_input/filtered_bam BAM_input/Sambamba BAM_input/bamCoverage
 touch BAM_input/sample1.bam \
@@ -29,31 +35,46 @@ touch BAM_input/sample1.bam \
       BAM_input/sample4.bam \
       BAM_input/sample5.bam \
       BAM_input/sample6.bam \
+      BAM_input/sample7.bam \
+      BAM_input/sample8.bam \
+      BAM_input/sample9.bam \
       BAM_input/filtered_bam/sample1.filtered.bam \
       BAM_input/filtered_bam/sample2.filtered.bam \
       BAM_input/filtered_bam/sample3.filtered.bam \
       BAM_input/filtered_bam/sample4.filtered.bam \
       BAM_input/filtered_bam/sample5.filtered.bam \
       BAM_input/filtered_bam/sample6.filtered.bam \
+      BAM_input/filtered_bam/sample7.filtered.bam \
+      BAM_input/filtered_bam/sample8.filtered.bam \
+      BAM_input/filtered_bam/sample9.filtered.bam \
       BAM_input/filtered_bam/sample1.filtered.bam.bai \
       BAM_input/filtered_bam/sample2.filtered.bam.bai \
       BAM_input/filtered_bam/sample3.filtered.bam.bai \
       BAM_input/filtered_bam/sample4.filtered.bam.bai \
       BAM_input/filtered_bam/sample5.filtered.bam.bai \
       BAM_input/filtered_bam/sample6.filtered.bam.bai \
+      BAM_input/filtered_bam/sample7.filtered.bam.bai \
+      BAM_input/filtered_bam/sample8.filtered.bam.bai \
+      BAM_input/filtered_bam/sample9.filtered.bam.bai \
       BAM_input/Sambamba/sample1.markdup.txt \
       BAM_input/Sambamba/sample2.markdup.txt \
       BAM_input/Sambamba/sample3.markdup.txt \
       BAM_input/Sambamba/sample4.markdup.txt \
       BAM_input/Sambamba/sample5.markdup.txt \
       BAM_input/Sambamba/sample6.markdup.txt \
+      BAM_input/Sambamba/sample7.markdup.txt \
+      BAM_input/Sambamba/sample8.markdup.txt \
+      BAM_input/Sambamba/sample9.markdup.txt \
       BAM_input/deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv \
       BAM_input/bamCoverage/sample1.filtered.seq_depth_norm.bw \
       BAM_input/bamCoverage/sample2.filtered.seq_depth_norm.bw \
       BAM_input/bamCoverage/sample3.filtered.seq_depth_norm.bw \
       BAM_input/bamCoverage/sample4.filtered.seq_depth_norm.bw \
       BAM_input/bamCoverage/sample5.filtered.seq_depth_norm.bw \
-      BAM_input/bamCoverage/sample6.filtered.seq_depth_norm.bw
+      BAM_input/bamCoverage/sample6.filtered.seq_depth_norm.bw \
+      BAM_input/bamCoverage/sample7.filtered.seq_depth_norm.bw \
+      BAM_input/bamCoverage/sample8.filtered.seq_depth_norm.bw \
+      BAM_input/bamCoverage/sample9.filtered.seq_depth_norm.bw 
 
 mkdir -p allelic_BAM_input/allelic_bams allelic_BAM_input/filtered_bam  allelic_BAM_input/deepTools_qc/bamPEFragmentSize allelic_BAM_input/Sambamba allelic_BAM_input/bamCoverage/allele_specific
 touch allelic_BAM_input/allelic_bams/sample1.genome1.sorted.bam \
@@ -169,11 +190,21 @@ WC=`ChIP-seq -d BAM_input --sampleSheet .ci_stuff/test_sampleSheet.tsv --snakema
 if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 514 ]; then exit 1 ; fi
 WC=`ChIP-seq -d BAM_input --sampleSheet .ci_stuff/test_sampleSheet.tsv --snakemakeOptions " --dryrun --conda-prefix /tmp" --bigWigType log2ratio .ci_stuff/organism.yaml .ci_stuff/ChIP.sample_config.yaml | tee >(cat 1>&2) | grep -v "conda installation\|Conda environment" | sed '/^\s*$/d' | wc -l`
 if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 470 ]; then exit 1 ; fi
+#noInput
+WC=`ChIP-seq -d BAM_input --sampleSheet .ci_stuff/test_sampleSheet.tsv --snakemakeOptions " --dryrun --conda-prefix /tmp" .ci_stuff/organism.yaml .ci_stuff/ChIP.sample_noControl_config.yaml | tee >(cat 1>&2) | grep -v "conda installation\|Conda environment" | sed '/^\s*$/d' | wc -l`
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 516 ]; then exit 1 ; fi
+WC=`ChIP-seq -d BAM_input --sampleSheet .ci_stuff/test_sampleSheet.tsv --snakemakeOptions " --dryrun --conda-prefix /tmp" --peakCaller Genrich .ci_stuff/organism.yaml .ci_stuff/ChIP.sample__noControl_config.yaml | tee >(cat 1>&2) | grep -v "conda installation\|Conda environment" | sed '/^\s*$/d' | wc -l`
 # fromBAM
 WC=`ChIP-seq -d outdir --sampleSheet .ci_stuff/test_sampleSheet.tsv --snakemakeOptions " --dryrun --conda-prefix /tmp" --fromBAM BAM_input/filtered_bam/ .ci_stuff/organism.yaml .ci_stuff/ChIP.sample_config.yaml | tee >(cat 1>&2) | grep -v "conda installation\|Conda environment" | sed '/^\s*$/d' | wc -l`
 if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 914 ]; then exit 1 ; fi
+# fromBam and noInput
+WC=`ChIP-seq -d outdir --sampleSheet .ci_stuff/test_sampleSheet.tsv --snakemakeOptions " --dryrun --conda-prefix /tmp" --fromBAM BAM_input/filtered_bam/ .ci_stuff/organism.yaml .ci_stuff/ChIP.sample_noControl_config.yaml | tee >(cat 1>&2) | grep -v "conda installation\|Conda environment" | sed '/^\s*$/d' | wc -l`
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 914 ]; then exit 1 ; fi
 # spikein
 WC=`ChIP-seq -d BAM_input --useSpikeInForNorm --sampleSheet .ci_stuff/test_sampleSheet.tsv --snakemakeOptions " --dryrun --conda-prefix /tmp"  .ci_stuff/spikein_organism.yaml .ci_stuff/ChIP.sample_config.yaml | tee >(cat 1>&2) | grep -v "conda installation\|Conda environment" | sed '/^\s*$/d' | wc -l`
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 838 ]; then exit 1 ; fi
+# spikein and noInput
+WC=`ChIP-seq -d BAM_input --useSpikeInForNorm --sampleSheet .ci_stuff/test_sampleSheet.tsv --snakemakeOptions " --dryrun --conda-prefix /tmp"  .ci_stuff/spikein_organism.yaml .ci_stuff/ChIP.sample_noControl_config.yaml | tee >(cat 1>&2) | grep -v "conda installation\|Conda environment" | sed '/^\s*$/d' | wc -l`
 if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 838 ]; then exit 1 ; fi
 # fromBAM and spikein
 WC=`ChIP-seq -d outdir --useSpikeInForNorm --sampleSheet .ci_stuff/test_sampleSheet.tsv --snakemakeOptions " --dryrun --conda-prefix /tmp" --fromBAM BAM_input/filtered_bam/ .ci_stuff/spikein_organism.yaml .ci_stuff/ChIP.sample_config.yaml | tee >(cat 1>&2) | grep -v "conda installation\|Conda environment" | sed '/^\s*$/d' | wc -l`
@@ -185,6 +216,36 @@ if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 786 ]; then exit 1 ; fi
 # allelic
 WC=`ChIP-seq -d allelic_BAM_input --sampleSheet .ci_stuff/test_sampleSheet.tsv --snakemakeOptions " --dryrun --conda-prefix /tmp"  .ci_stuff/organism.yaml .ci_stuff/ChIP.sample_config.yaml | tee >(cat 1>&2) | grep -v "conda installation\|Conda environment" | sed '/^\s*$/d' | wc -l`
 if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 421 ]; then exit 1 ; fi
+#multiComp
+WC=`ChIP-seq -d BAM_input --sampleSheet .ci_stuff/test_sampleSheet_multiComp.tsv --snakemakeOptions " --dryrun --conda-prefix /tmp" .ci_stuff/organism.yaml .ci_stuff/ChIP.sample_config.yaml | tee >(cat 1>&2) | grep -v "conda installation\|Conda environment" | sed '/^\s*$/d' | wc -l`
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 516 ]; then exit 1 ; fi
+WC=`ChIP-seq -d BAM_input --sampleSheet .ci_stuff/test_sampleSheet_multiComp.tsv --snakemakeOptions " --dryrun --conda-prefix /tmp" --peakCaller Genrich .ci_stuff/organism.yaml .ci_stuff/ChIP.sample_config.yaml | tee >(cat 1>&2) | grep -v "conda installation\|Conda environment" | sed '/^\s*$/d' | wc -l`
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 516 ]; then exit 1 ; fi
+#multiComp and fromBam
+WC=`ChIP-seq -d outdir --sampleSheet .ci_stuff/test_sampleSheet_multiComp.tsv --snakemakeOptions " --dryrun --conda-prefix /tmp" --fromBAM BAM_input/filtered_bam/ .ci_stuff/organism.yaml .ci_stuff/ChIP.sample_config.yaml | tee >(cat 1>&2) | grep -v "conda installation\|Conda environment" | sed '/^\s*$/d' | wc -l`
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 914 ]; then exit 1 ; fi
+WC=`ChIP-seq -d outdir --sampleSheet .ci_stuff/test_sampleSheet_multiComp.tsv --snakemakeOptions " --dryrun --conda-prefix /tmp" --peakCaller Genrich --fromBAM BAM_input/filtered_bam/ .ci_stuff/organism.yaml .ci_stuff/ChIP.sample_config.yaml | tee >(cat 1>&2) | grep -v "conda installation\|Conda environment" | sed '/^\s*$/d' | wc -l`
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 914 ]; then exit 1 ; fi
+#multiComp and spikein
+WC=`ChIP-seq -d BAM_input --useSpikeInForNorm --sampleSheet .ci_stuff/test_sampleSheet_multiComp.tsv --snakemakeOptions " --dryrun --conda-prefix /tmp"  .ci_stuff/spikein_organism.yaml .ci_stuff/ChIP.sample_config.yaml | tee >(cat 1>&2) | grep -v "conda installation\|Conda environment" | sed '/^\s*$/d' | wc -l`
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 838 ]; then exit 1 ; fi
+WC=`ChIP-seq -d BAM_input --useSpikeInForNorm --sampleSheet .ci_stuff/test_sampleSheet_multiComp.tsv --snakemakeOptions " --dryrun --conda-prefix /tmp" --peakCaller Genrich .ci_stuff/spikein_organism.yaml .ci_stuff/ChIP.sample_config.yaml | tee >(cat 1>&2) | grep -v "conda installation\|Conda environment" | sed '/^\s*$/d' | wc -l`
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 838 ]; then exit 1 ; fi
+#multiComp and spikein and noInput
+WC=`ChIP-seq -d BAM_input --useSpikeInForNorm --sampleSheet .ci_stuff/test_sampleSheet_multiComp.tsv --snakemakeOptions " --dryrun --conda-prefix /tmp"  .ci_stuff/spikein_organism.yaml .ci_stuff/ChIP.sample_noControl_config.yaml | tee >(cat 1>&2) | grep -v "conda installation\|Conda environment" | sed '/^\s*$/d' | wc -l`
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 838 ]; then exit 1 ; fi
+WC=`ChIP-seq -d BAM_input --useSpikeInForNorm --sampleSheet .ci_stuff/test_sampleSheet_multiComp.tsv --snakemakeOptions " --dryrun --conda-prefix /tmp" --peakCaller Genrich .ci_stuff/spikein_organism.yaml .ci_stuff/ChIP.sample_noControl_config.yaml | tee >(cat 1>&2) | grep -v "conda installation\|Conda environment" | sed '/^\s*$/d' | wc -l`
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 838 ]; then exit 1 ; fi
+#multiComp and spikein and fromBam
+WC=`ChIP-seq -d outdir --useSpikeInForNorm --sampleSheet .ci_stuff/test_sampleSheet_multiComp.tsv --snakemakeOptions " --dryrun --conda-prefix /tmp" --fromBAM BAM_input/filtered_bam/ .ci_stuff/spikein_organism.yaml .ci_stuff/ChIP.sample_config.yaml | tee >(cat 1>&2) | grep -v "conda installation\|Conda environment" | sed '/^\s*$/d' | wc -l`
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 1044 ]; then exit 1 ; fi
+WC=`ChIP-seq -d outdir --useSpikeInForNorm --sampleSheet .ci_stuff/test_sampleSheet_multiComp.tsv --snakemakeOptions " --dryrun --conda-prefix /tmp" --peakCaller Genrich --fromBAM BAM_input/filtered_bam/ .ci_stuff/spikein_organism.yaml .ci_stuff/ChIP.sample_noControl_config.yaml | tee >(cat 1>&2) | grep -v "conda installation\|Conda environment" | sed '/^\s*$/d' | wc -l`
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 1044 ]; then exit 1 ; fi
+#multiComp and spikein and fromBam and noInput
+WC=`ChIP-seq -d outdir --useSpikeInForNorm --sampleSheet .ci_stuff/test_sampleSheet_multiComp.tsv --snakemakeOptions " --dryrun --conda-prefix /tmp" --fromBAM BAM_input/filtered_bam/ .ci_stuff/spikein_organism.yaml .ci_stuff/ChIP.sample_noControl_config.yaml | tee >(cat 1>&2) | grep -v "conda installation\|Conda environment" | sed '/^\s*$/d' | wc -l`
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 1044 ]; then exit 1 ; fi
+WC=`ChIP-seq -d outdir --useSpikeInForNorm --sampleSheet .ci_stuff/test_sampleSheet_multiComp.tsv --snakemakeOptions " --dryrun --conda-prefix /tmp" --peakCaller Genrich --fromBAM BAM_input/filtered_bam/ .ci_stuff/spikein_organism.yaml .ci_stuff/ChIP.sample_noControl_config.yaml | tee >(cat 1>&2) | grep -v "conda installation\|Conda environment" | sed '/^\s*$/d' | wc -l`
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 1044 ]; then exit 1 ; fi
 
 # mRNA-seq
 WC=`mRNA-seq -i PE_input -o output --snakemakeOptions " --dryrun --conda-prefix /tmp" .ci_stuff/organism.yaml | tee >(cat 1>&2) | grep -v "conda installation\|Conda environment" | sed '/^\s*$/d' | wc -l`
