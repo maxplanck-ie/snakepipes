@@ -110,14 +110,14 @@ chip_samples_w_ctrl = set()
 chip_samples_wo_ctrl = set()
 for chip_sample, value in chip_dict.items():
     # set control to False if not specified or set to False
-    if 'control' not in chip_dict[chip_sample] or not chip_dict[chip_sample]['control']:
+    if 'control' not in chip_dict[chip_sample] or chip_dict[chip_sample]['control'] != None:
         chip_dict[chip_sample]['control'] = False
         chip_samples_wo_ctrl.add(chip_sample)
     else:
         control_samples.add(value['control'])
         chip_samples_w_ctrl.add(chip_sample)
     # set broad to False if not specified or set to False
-    if 'broad' not in chip_dict[chip_sample] or not chip_dict[chip_sample]['broad']:
+    if 'broad' not in chip_dict[chip_sample] or not value['broad']:
         chip_dict[chip_sample]['broad'] = False
 
 control_samples = list(sorted(control_samples))
