@@ -1,19 +1,19 @@
 chip_dict:
   sample1:
-    control:
+    control: False
     broad: False
   sample2:
-    control:
+    control: False
     broad: False
   sample3:
-    control:
+    control: False
     broad: False
   sample4:
-    control:
+    control: False
     broad: False
   sample5:
-    control:
+    control: False
     broad: False
   sample6:
-    control:
+    control: False
     broad: False
