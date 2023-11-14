@@ -89,6 +89,8 @@ bcPattern: NNNNCCCCCCCCC #default: 4 base umi barcode, 9 base cell barcode (eg. 
 UMIDedup: False
 UMIDedupSep: "_"
 UMIDedupOpts: --paired
+##DEG
+fdr: 0.05
 ################################################################################
 # Call snakemake directly, i.e. without using the wrapper script:
 #

@@ -31,7 +31,8 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          "fromBAM": False, "bamExt": ".bam", "pairedEnd": True,
                          "UMIDedup": False,
                          "UMIDedupOpts": "", "bcPattern": "NNNNCCCCCCCCC",
-                         "UMIDedupSep": "_", "UMIBarcode": False, "rMats": False}):
+                         "UMIDedupSep": "_", "UMIBarcode": False, "rMats": False,
+                         "fdr": 0.05}):
     """
     Parse arguments from the command line.
     """
@@ -117,6 +118,12 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                           action="store_true",
                           help="Run differential splicing analysis using rMats-turbo. Note that this flag requires --sampleSheet to be specified.",
                           default=defaults["rMats"])
+
+    optional.add_argument("--FDR",
+                          dest="fdr",
+                          help="FDR threshold to apply for filtering DE genes"
+                               "(default: '%(default)s')",
+                          default=defaults["fdr"])
 
     return parser
 
