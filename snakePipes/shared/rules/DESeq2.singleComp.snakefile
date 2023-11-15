@@ -17,7 +17,7 @@ rule DESeq2:
     params:
         script=os.path.join(maindir, "shared", "rscripts", "DESeq2.R"),
         outdir = get_outdir("DESeq2",sampleSheet),
-        fdr = 0.05,
+        fdr = fdr,
         importfunc = os.path.join(maindir, "shared", "rscripts", "DE_functions.R"),
         allele_info = lambda wildcards : 'TRUE' if 'allelic-mapping' in mode else 'FALSE',
         tx2gene_file = 'NA',
@@ -57,7 +57,7 @@ rule DESeq2_Salmon_basic:
     params:
         script=os.path.join(maindir, "shared", "rscripts", "DESeq2.R"),
         outdir = get_outdir("DESeq2_Salmon",sampleSheet),
-        fdr = 0.05,
+        fdr = fdr,
         importfunc = os.path.join(maindir, "shared", "rscripts", "DE_functions.R"),
         allele_info = 'FALSE',
         tx2gene_file = "Annotation/genes.filtered.t2g",
@@ -92,7 +92,7 @@ rule DESeq2_Salmon_allelic:
     params:
         script=os.path.join(maindir, "shared", "rscripts", "DESeq2.R"),
         outdir = get_outdir("DESeq2_SalmonAllelic",sampleSheet),
-        fdr = 0.05,
+        fdr = fdr,
         importfunc = os.path.join(maindir, "shared", "rscripts", "DE_functions.R"),
         allele_info = 'TRUE',
         tx2gene_file = "Annotation/genes.filtered.t2g",
