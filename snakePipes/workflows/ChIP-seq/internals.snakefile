@@ -110,7 +110,7 @@ chip_samples_w_ctrl = set()
 chip_samples_wo_ctrl = set()
 for chip_sample, value in chip_dict.items():
     # set control to False if not specified or set to False
-    if 'control' not in chip_dict[chip_sample] or chip_dict[chip_sample]['control'] == None:
+    if 'control' not in chip_dict[chip_sample] or chip_dict[chip_sample]['control'] is None:
         chip_dict[chip_sample]['control'] = False
         chip_samples_wo_ctrl.add(chip_sample)
     else:
