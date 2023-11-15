@@ -120,7 +120,6 @@ for chip_sample, value in chip_dict.items():
     if 'broad' not in chip_dict[chip_sample] or not value['broad']:
         chip_dict[chip_sample]['broad'] = False
 
-warnings.warn( str(len(chip_samples_wo_ctrl)) + " out of " + str(len(chip_samples)) + " have no matching control ")
 
 control_samples = list(sorted(control_samples))
 # get a list of corresp control_names for chip samples
@@ -132,6 +131,9 @@ chip_samples_w_ctrl = list(sorted(chip_samples_w_ctrl))
 chip_samples_wo_ctrl = list(sorted(chip_samples_wo_ctrl))
 chip_samples = sorted(chip_samples_w_ctrl + chip_samples_wo_ctrl)
 all_samples = sorted(control_samples + chip_samples)
+
+
+warnings.warn( str(len(chip_samples_wo_ctrl)) + " out of " + str(len(chip_samples)) + " have no matching control ")
 
 if not fromBAM:
     if pairedEnd and not useSpikeInForNorm:
