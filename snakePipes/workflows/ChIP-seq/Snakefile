@@ -109,20 +109,21 @@ def run_deepTools_ChIP():
     file_list = []
     file_list.append(["deepTools_ChIP/plotFingerprint/plotFingerprint.metrics.txt"]) if not useSpikeInForNorm \
                     else file_list.append(["split_deepTools_ChIP/plotFingerprint/plotFingerprint.metrics.txt"])
-    for chip_sample in chip_samples_w_ctrl:
-        control_name = get_control_name(chip_sample)
-        if not useSpikeInForNorm:
-            # get bigwigtype
-            if bigWigType == "subtract" or bigWigType == "both":
-                file_list.append(["deepTools_ChIP/bamCompare/"+chip_sample+".filtered.subtract."+control_name+".bw"])
-            if bigWigType == "log2ratio" or bigWigType == "both":
-                file_list.append(["deepTools_ChIP/bamCompare/"+chip_sample+".filtered.log2ratio.over_"+control_name+".bw"])
-        elif useSpikeInForNorm and getSizeFactorsFrom == "genome":
-            # get bigwigtype
-            if bigWigType == "subtract" or bigWigType == "both":
-                file_list.append(expand("split_deepTools_ChIP/bamCompare/"+chip_sample+".subtract."+control_name+".scaledBY{part}.bw",part=part))
-            if bigWigType == "log2ratio" or bigWigType == "both":
-                file_list.append(expand("split_deepTools_ChIP/bamCompare/"+chip_sample+".log2ratio.over_"+control_name+".scaledBY{part}.bw",part=part))
+    if chip_samples_w_ctrl:
+        for chip_sample in chip_samples_w_ctrl:
+            control_name = get_control_name(chip_sample)
+            if not useSpikeInForNorm:
+                # get bigwigtype
+                if bigWigType == "subtract" or bigWigType == "both":
+                    file_list.append(["deepTools_ChIP/bamCompare/"+chip_sample+".filtered.subtract."+control_name+".bw"])
+                if bigWigType == "log2ratio" or bigWigType == "both":
+                    file_list.append(["deepTools_ChIP/bamCompare/"+chip_sample+".filtered.log2ratio.over_"+control_name+".bw"])
+            elif useSpikeInForNorm and getSizeFactorsFrom == "genome":
+                # get bigwigtype
+                if bigWigType == "subtract" or bigWigType == "both":
+                    file_list.append(expand("split_deepTools_ChIP/bamCompare/"+chip_sample+".subtract."+control_name+".scaledBY{part}.bw",part=part))
+                if bigWigType == "log2ratio" or bigWigType == "both":
+                    file_list.append(expand("split_deepTools_ChIP/bamCompare/"+chip_sample+".log2ratio.over_"+control_name+".scaledBY{part}.bw",part=part))
     return(file_list)
 
 def run_deepTools_allelic():
