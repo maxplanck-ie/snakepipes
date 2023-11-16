@@ -38,7 +38,8 @@ if useSpikeInForNorm:
         include: os.path.join(maindir, "shared", "rules", "filterGTF_spikein.snakefile")
 else:
     # deepTools ChIP
-    include: os.path.join(maindir, "shared", "rules", "deepTools_ChIP.snakefile")
+    if chip_samples_w_ctrl:
+        include: os.path.join(maindir, "shared", "rules", "deepTools_ChIP.snakefile")
     # MACS2, MACS2 peak QC, and Genrich
     include: os.path.join(maindir, "shared", "rules", "ChIP_peak_calling.snakefile")
 
