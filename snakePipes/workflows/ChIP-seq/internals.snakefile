@@ -134,6 +134,7 @@ all_samples = sorted(control_samples + chip_samples)
 
 if(chip_samples_wo_ctrl):
     warnings.warn( str(len(chip_samples_wo_ctrl)) + " out of " + str(len(chip_samples)) + " have no matching control ")
+    warnings.warn(str(len(chip_samples_w_ctrl)) + " out of " + str(len(chip_samples)) + " have a matching control ")
 
 if not fromBAM:
     if pairedEnd and not useSpikeInForNorm:
