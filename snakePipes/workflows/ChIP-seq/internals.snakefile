@@ -130,7 +130,7 @@ for chip_sample in chip_samples_w_ctrl:
 chip_samples_w_ctrl = list(sorted(chip_samples_w_ctrl))
 chip_samples_wo_ctrl = list(sorted(chip_samples_wo_ctrl))
 chip_samples = sorted(chip_samples_w_ctrl + chip_samples_wo_ctrl)
-all_samples = sorted(control_samples + chip_samples)
+all_samples = sorted(control_samples + chip_samples) if control_samples else chip_samples
 
 if(chip_samples_wo_ctrl):
     warnings.warn( str(len(chip_samples_wo_ctrl)) + " out of " + str(len(chip_samples)) + " have no matching control ")
