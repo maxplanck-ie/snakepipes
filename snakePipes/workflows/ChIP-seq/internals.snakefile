@@ -128,12 +128,19 @@ for chip_sample in chip_samples_w_ctrl:
     control_names.append(get_control_name(chip_sample))
 
 chip_samples_w_ctrl = list(sorted(chip_samples_w_ctrl))
+chip_samples_w_ctrl = list(filter(None, chip_samples_w_ctrl))
 chip_samples_wo_ctrl = list(sorted(chip_samples_wo_ctrl))
+chip_samples_wo_ctrl = list(filter(None, chip_samples_wo_ctrl))
 chip_samples = sorted(chip_samples_w_ctrl + chip_samples_wo_ctrl)
+chip_samples = list(filter(None, chip_samples))
 all_samples = sorted(control_samples + chip_samples) if control_samples else chip_samples
+all_samples = list(filter(None, all_samples))
 
-if(chip_samples_wo_ctrl):
+#useful for debugging purposes; change the mode to info or debug
+if chip_samples_wo_ctrl:
     warnings.warn( str(len(chip_samples_wo_ctrl)) + " out of " + str(len(chip_samples)) + " have no matching control ")
+if chip_samples_w_ctrl:
+    warnings.warn( str(len(chip_samples_w_ctrl)) + " out of " + str(len(chip_samples)) + " have a matching control ")
 
 if not fromBAM:
     if pairedEnd and not useSpikeInForNorm:

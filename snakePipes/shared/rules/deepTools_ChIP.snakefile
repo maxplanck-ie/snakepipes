@@ -1,6 +1,6 @@
 ### deepTools bamCompare subtract #######################################################
 
-if bigWigType == "subtract" or bigWigType == "both":
+if bigWigType == "subtract" or bigWigType == "both" and chip_samples_w_ctrl:
     rule bamCompare_subtract:
         input:
             chip_bam = "filtered_bam/{chip_sample}.filtered.bam",
@@ -26,7 +26,7 @@ if bigWigType == "subtract" or bigWigType == "both":
         shell: bamcompare_subtract_cmd
 
 ### deepTools bamCompare log2ratio #######################################################
-if bigWigType == "log2ratio" or bigWigType == "both":
+if bigWigType == "log2ratio" or bigWigType == "both" and chip_samples_w_ctrl:
     rule bamCompare_log2:
         input:
             chip_bam = "filtered_bam/{chip_sample}.filtered.bam",
