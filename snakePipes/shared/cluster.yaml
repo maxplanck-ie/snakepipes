@@ -1,5 +1,5 @@
 snakemake_latency_wait: 300
-snakemake_cluster_cmd: module load slurm; sbatch --ntasks-per-node 1 -p bioinfo --mem-per-cpu {cluster.memory} -c {threads} -e {snakePipes_cluster_logDir}/{rule}.%j.err -o {snakePipes_cluster_logDir}/{rule}.%j.out -J {rule}.snakemake
+snakemake_cluster_cmd: module load slurm; sbatch --exclude deep9,deep17 --ntasks-per-node 1 -p bioinfo --mem-per-cpu {cluster.memory} -c {threads} -e {snakePipes_cluster_logDir}/{rule}.%j.err -o {snakePipes_cluster_logDir}/{rule}.%j.out -J {rule}.snakemake
 snakePipes_cluster_logDir: cluster_logs
 __default__:
     memory: 1G
@@ -40,4 +40,8 @@ plotPCA_allelic:
 plot_heatmap_CSAW_up:
     memory: 10G
 snp_split:
-    memory: 10G
+    memory: 25G
+sambamba_markdup:
+    memory: 2G
+BAMsort_allelic:
+    memory: 3G
