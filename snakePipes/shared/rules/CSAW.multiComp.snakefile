@@ -213,11 +213,11 @@ rule CSAW_report:
         pipeline=pipeline,
         fdr=fdr,
         lfc=absBestLFC,
-        outdir=os.path.join(outdir, "{}".format(get_outdir(peakCaller,os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv")),
+        outdir=os.path.join(outdir, "{}".format(get_outdir(peakCaller,os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv"))),
         sampleSheet=sampleSheet,
         useSpikeInForNorm = useSpikeInForNorm
     log:
-       out = os.path.join(outdir, "{}/logs/report.out".format(get_outdir(peakCaller,os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv")),
-       err = os.path.join(outdir, "{}/logs/report.err".format(get_outdir(peakCaller,os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv"))
+       out = os.path.join(outdir, "{}/logs/report.out".format(get_outdir(peakCaller,os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv"))),
+       err = os.path.join(outdir, "{}/logs/report.err".format(get_outdir(peakCaller,os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv")))
     conda: CONDA_ATAC_ENV
     script: "../rscripts/CSAW_report.Rmd"
