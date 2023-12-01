@@ -79,7 +79,7 @@ rule CSAW:
     output:
         "{}/CSAW.session_info.txt".format(get_outdir(peakCaller,os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv")),
         "{}/DiffBinding_analysis.Rdata".format(get_outdir(peakCaller,os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv")),
-        expand("{}".format(get_outdir(peakCaller,os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv")) + "/Filtered.results.{change_dir}.bed", change_dir=change_direction,compGroup=wildcards.compGroup)
+        lambda wildcards: expand("{}".format(get_outdir(peakCaller,os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv")) + "/Filtered.results.{change_dir}.bed", change_dir=change_direction,compGroup=wildcards.compGroup)
     benchmark:
         "{}/.benchmark/CSAW.benchmark".format(get_outdir(peakCaller,os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv"))
     params:
