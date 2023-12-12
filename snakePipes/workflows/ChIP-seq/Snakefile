@@ -145,7 +145,7 @@ def run_deepTools_allelic():
 
 def run_CSAW():
     if sampleSheet and cf.check_replicates(sampleSheet):
-        if not isMultipleComp:
+        if not isMultipleComparison:
             file_list=["CSAW_{}_{}/CSAW.session_info.txt".format(peakCaller, sample_name)]
             if not allele_info :
                 file_list.append(["Annotation/genes.filtered.symbol","Annotation/genes.filtered.t2g","CSAW_{}_{}/CSAW.Stats_report.html".format(peakCaller, sample_name)])
