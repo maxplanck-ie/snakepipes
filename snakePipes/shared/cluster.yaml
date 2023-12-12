@@ -40,4 +40,8 @@ plotPCA_allelic:
 plot_heatmap_CSAW_up:
     memory: 10G
 snp_split:
-    memory: 10G
+    memory: 25G
+sambamba_markdup:
+    memory: 2G
+BAMsort_allelic:
+    memory: 3G
