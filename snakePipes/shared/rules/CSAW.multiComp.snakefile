@@ -51,12 +51,12 @@ def getBamCoverage():
 
 def getHeatmapInput():
     if pipeline in 'ATAC-seq':
-        return(expand("CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.cov.heatmap.png", change_dir=['UP','DOWN']))
+        return(expand("CSAW_{}_{}".format(peakCaller, sample_name + ".{{compGroup}}") + "/CSAW.{change_dir}.cov.heatmap.png", change_dir=['UP','DOWN']))
     elif pipeline in 'chip-seq':
         if not useSpikeInForNorm:
-            return(expand("CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.cov.heatmap.png", change_dir=['UP','DOWN']) + expand("CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.log2r.heatmap.png", change_dir=['UP', 'DOWN']))
+            return(expand("CSAW_{}_{}".format(peakCaller, sample_name + ".{{compGroup}}") + "/CSAW.{change_dir}.cov.heatmap.png", change_dir=['UP','DOWN']) + expand("CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.log2r.heatmap.png", change_dir=['UP', 'DOWN']))
         else:
-          return(expand("CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.cov.heatmap.png", change_dir=['UP','DOWN']))
+          return(expand("CSAW_{}_{}".format(peakCaller, sample_name + ".{{compGroup}}") + "/CSAW.{change_dir}.cov.heatmap.png", change_dir=['UP','DOWN']))
 
 checkpoint split_sampleSheet:
     input:
