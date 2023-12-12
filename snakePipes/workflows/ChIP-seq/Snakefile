@@ -181,7 +181,7 @@ def run_genrich():
             if not isMultipleComparison:
                 file_list = ["Genrich/{}.narrowPeak".format(x) for x in genrichDict.keys()]
             else:
-                file_list = expand("Genrich/{group}.{compGroup}.narrowPeak",group=returnComparisonGroups(sampleSheet),compGroup=cf.returnComparisonGroups(sampleSheet))
+                file_list = expand("Genrich/{group}.{compGroup}.narrowPeak",group=cf.returnComparisonGroups(sampleSheet),compGroup=cf.returnComparisonGroups(sampleSheet))
         return (file_list)
     return ([])
 
