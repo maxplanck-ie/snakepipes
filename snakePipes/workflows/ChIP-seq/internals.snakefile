@@ -208,16 +208,23 @@ def filter_dict(sampleSheet,input_dict):
     return(output_dict)
 
 if sampleSheet:
-    genrichDict = cf.sampleSheetGroups(sampleSheet)
-    for k in genrichDict.keys():
-        genrichDict[k]=[item for item in genrichDict[k] if item in chip_samples]
     if chip_samples_w_ctrl:
         filtered_dict = filter_dict(sampleSheet,dict(zip(chip_samples_w_ctrl, [ get_control_name(x) for x in chip_samples_w_ctrl ])))
     else:
         filtered_dict = filter_dict(sampleSheet,dict(zip(chip_samples_wo_ctrl, [None]*len(chip_samples_wo_ctrl))))
-    reordered_dict = {k: filtered_dict[k] for k in [item for sublist in genrichDict.values() for item in sublist]}
+    genrichDict = cf.sampleSheetGroups(sampleSheet,isMultipleComparison)
+    if not isMultipleComparison:
+        for k in genrichDict.keys():
+            genrichDict[k]=[item for item in genrichDict[k] if item in chip_samples]
+        reordered_dict = {k: filtered_dict[k] for k in [item for sublist in genrichDict.values() for item in sublist]}
+    else:
+        for g in genrichDict.keys():
+            for k in g.keys():
+                genrichDict[g][k]=[item for item in genrichDict[g][k] if item in chip_samples]
+                reordered_dict[g][k] = filtered_dict[k] for k in [item for sublist in genrichDict[g].values() for item in sublist]}
 else:
     genrichDict = {"all_samples": chip_samples}
+
 
 
 #################### functions and checks for using a spiked-in genome for normalization ########################################

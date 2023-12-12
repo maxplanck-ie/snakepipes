@@ -1,12 +1,13 @@
 #sample_name = os.path.splitext(os.path.basename(sampleSheet))[0]
 change_direction = ["UP", "DOWN", "MIXED"]
+#compGroup = cf.returnComparisonGroups(sampleSheet)
 
 def get_outdir(peak_caller,sampleSheet):
     sample_name = os.path.splitext(os.path.basename(str(sampleSheet)))[0]
 
     return("CSAW_{}_{}".format(peak_caller, sample_name))
 
-def getInputPeaks(peakCaller, chip_samples, genrichDict):
+def getInputPeaks(peakCaller, chip_samples, genrichDict,comp_group):
     if peakCaller == "MACS2":
         if pipeline in 'ATAC-seq':
             return expand("MACS2/{chip_sample}.filtered.short.BAM_peaks.xls", chip_sample = chip_samples)
@@ -17,7 +18,7 @@ def getInputPeaks(peakCaller, chip_samples, genrichDict):
     elif peakCaller == "HMMRATAC":
         return expand("HMMRATAC/{chip_sample}_peaks.gappedPeak", chip_sample = chip_samples)
     else:
-        return expand("Genrich/{genrichGroup}.narrowPeak", genrichGroup = genrichDict.keys())
+        return expand("Genrich/{genrichGroup}.{{compGroup}}.narrowPeak", genrichGroup = genrichDict[comp_group].keys())
 
 
 def getSizeMetrics():
@@ -39,13 +40,13 @@ def getScaleFactors():
     else:
         return []
 
-def getBamCoverage():
+def getBamCoverage(comp_group):
     if getSizeFactorsFrom=="genome":
-        return expand("bamCoverage/{chip_sample}.host_scaled.BYspikein.bw", chip_sample=reordered_dict.keys())
+        return expand("bamCoverage/{chip_sample}.host_scaled.BYspikein.bw", chip_sample=reordered_dict[comp_group].keys())
     elif getSizeFactorsFrom=="TSS":
-        return expand("bamCoverage_TSS/{chip_sample}.host_scaled.BYspikein.bw", chip_sample=reordered_dict.keys())
+        return expand("bamCoverage_TSS/{chip_sample}.host_scaled.BYspikein.bw", chip_sample=reordered_dict[comp_group].keys())
     elif getSizeFactorsFrom=="input":
-        return expand("bamCoverage_input/{chip_sample}.host_scaled.BYspikein.bw", chip_sample=reordered_dict.keys())
+        return expand("bamCoverage_input/{chip_sample}.host_scaled.BYspikein.bw", chip_sample=reordered_dict[comp_group].keys())
     else:
         return []
 
@@ -72,7 +73,7 @@ checkpoint split_sampleSheet:
 ## CSAW for differential binding / allele-specific binding analysis
 rule CSAW:
     input:
-        peaks = getInputPeaks(peakCaller, chip_samples, genrichDict),
+        peaks = lambda wildcards: getInputPeaks(peakCaller, chip_samples, genrichDict,comp_group=wildcards.compGroup),
         sampleSheet = lambda wildcards: checkpoints.split_sampleSheet.get(compGroup=wildcards.compGroup).output,
         insert_size_metrics = getSizeMetrics(),
         scale_factors = getScaleFactors() if useSpikeInForNorm else []
@@ -107,7 +108,7 @@ rule CSAW:
 rule calc_matrix_log2r_CSAW:
     input:
         csaw_in = "{}/CSAW.session_info.txt".format(get_outdir(peakCaller,os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv")),
-        bigwigs = expand("split_deepTools_ChIP/bamCompare/{chip_sample}.log2ratio.over_{control_name}.scaledBYspikein.bw", zip, chip_sample=reordered_dict.keys(), control_name=reordered_dict.values()) if useSpikeInForNorm else expand("deepTools_ChIP/bamCompare/{chip_sample}.filtered.log2ratio.over_{control_name}.bw", zip, chip_sample=reordered_dict.keys(), control_name=reordered_dict.values()),
+        bigwigs = lambda wildcards: expand("split_deepTools_ChIP/bamCompare/{chip_sample}.log2ratio.over_{control_name}.scaledBYspikein.bw", zip, chip_sample=reordered_dict[wildcards.compGroup].keys(), control_name=reordered_dict[wildcards.compGroup].values()) if useSpikeInForNorm else expand("deepTools_ChIP/bamCompare/{chip_sample}.filtered.log2ratio.over_{control_name}.bw", zip, chip_sample=reordered_dict[wildcards.compGroup].keys(), control_name=reordered_dict[wildcards.compGroup].values()),
         sampleSheet = sampleSheet
     output:
         matrix = touch("{}".format(get_outdir(peakCaller,os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv"))+"/CSAW.{change_dir}.log2r.matrix")
@@ -134,7 +135,7 @@ rule plot_heatmap_log2r_CSAW:
         image = touch("{}".format(get_outdir(peakCaller,os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv")) + "/CSAW.{change_dir}.log2r.heatmap.png"),
         sorted_regions = touch("{}".format(get_outdir(peakCaller,os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv")) + "/CSAW.{change_dir}.log2r.sortedRegions.bed")
     params:
-        smpl_label=' '.join(reordered_dict.keys())
+        smpl_label = lambda wildcards: ' '.join(reordered_dict[wildcards.compGroup].keys())
     log:
         out = os.path.join(outdir, "{}".format(get_outdir(peakCaller,os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv")) + "/logs/deeptools_heatmap.log2r.{change_dir}.out"),
         err = os.path.join(outdir, "{}".format(get_outdir(peakCaller,os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv")) + "/logs/deeptools_heatmap.log2r.{change_dir}.err")
@@ -157,7 +158,7 @@ rule plot_heatmap_log2r_CSAW:
 rule calc_matrix_cov_CSAW:
     input:
         csaw_in = "{}/CSAW.session_info.txt".format(get_outdir(peakCaller,os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv")),
-        bigwigs = getBamCoverage() if useSpikeInForNorm else expand("bamCoverage/{chip_sample}.filtered.seq_depth_norm.bw", chip_sample=reordered_dict.keys()),
+        bigwigs = lambda wildcards: getBamCoverage(wildcards.compGroup) if useSpikeInForNorm else expand("bamCoverage/{chip_sample}.filtered.seq_depth_norm.bw", chip_sample=reordered_dict[wildcards.compGroup].keys()),
         sampleSheet = sampleSheet
     output:
         matrix = touch("{}".format(get_outdir(peakCaller,os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv")) + "/CSAW.{change_dir}.cov.matrix")
@@ -185,7 +186,7 @@ rule plot_heatmap_cov_CSAW:
         image = touch("{}".format(get_outdir(peakCaller,os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv")) + "/CSAW.{change_dir}.cov.heatmap.png"),
         sorted_regions = touch("{}".format(get_outdir(peakCaller,os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv")) + "/CSAW.{change_dir}.cov.sortedRegions.bed")
     params:
-        smpl_label=' '.join(reordered_dict.keys())
+        smpl_label = lambda wildcards: ' '.join(reordered_dict[wildcards.compGroup].keys())
     log:
         out = os.path.join(outdir,"{}".format(get_outdir(peakCaller,os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv")) + "/logs/deeptools_heatmap.cov.{change_dir}.out"),
         err = os.path.join(outdir,"{}".format(get_outdir(peakCaller,os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv")) + "/logs/deeptools_heatmap.cov.{change_dir}.err")

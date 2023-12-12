@@ -354,13 +354,14 @@ def returnComparisonGroups(sampleSheet):
     return d.keys()
 
 
-def sampleSheetGroups(sampleSheet):
+def sampleSheetGroups(sampleSheet,multipleComp):
     """
     Parse a sampleSheet and return a dictionary with keys the group and values the sample names
     """
     f = open(sampleSheet)
     conditionCol = None
     nameCol = None
+    groupCol = None
     nCols = None
     d = dict()
     for idx, line in enumerate(f):
@@ -380,9 +381,18 @@ def sampleSheetGroups(sampleSheet):
                 conditionCol += 1
                 nameCol += 1
         if not len(line.strip()) == 0:
-            if cols[conditionCol] not in d:
-                d[cols[conditionCol]] = []
-            d[cols[conditionCol]].append(cols[nameCol])
+            if not isMultipleComparison:
+                if cols[conditionCol] not in d:
+                    d[cols[conditionCol]] = []
+                d[cols[conditionCol]].append(cols[nameCol])
+            else:
+                compGroups = returnComparisonGroups(sampleSheet)
+                groupCol = cols.index("group")
+                for  g in compGroups:
+                    if cols[conditionCol] not in d[g]:
+                       d[g][cols[conditionCol]] = []
+                       d[g][cols[conditionCol]].append(cols[nameCol][cols[groupCol] in g])
+                    
     f.close()
     return d
 
