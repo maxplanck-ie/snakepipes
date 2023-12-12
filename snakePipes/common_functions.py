@@ -390,11 +390,11 @@ def sampleSheetGroups(sampleSheet,multipleComp):
                     d[cols[conditionCol]] = []
                 d[cols[conditionCol]].append(cols[nameCol])
             else:
-                compGroups = returnComparisonGroups(sampleSheet)
-                for  g in compGroups:
-                    if cols[conditionCol] not in d[g]:
-                       d[g][cols[conditionCol]] = []
-                       d[g][cols[conditionCol]].append(cols[nameCol][cols[groupCol] in g])
+                if cols[groupCol] not in d:
+                    d[cols[groupCol]]={}
+                if cols[conditionCol] not in d[cols[groupCol]]:
+                       d[cols[groupCol][cols[conditionCol]] = []
+                       d[cols[groupCol][cols[conditionCol]].append(cols[nameCol])
                     
     f.close()
     return d
