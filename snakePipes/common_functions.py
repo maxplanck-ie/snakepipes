@@ -380,7 +380,8 @@ def sampleSheetGroups(sampleSheet,multipleComp):
             if len(cols) - 1 == nCols:
                 conditionCol += 1
                 nameCol += 1
-                groupCol += 1 if groupCol
+                if groupCol:
+                    groupCol += 1
         if not len(line.strip()) == 0:
             if not multipleComp:
                 if cols[conditionCol] not in d:
