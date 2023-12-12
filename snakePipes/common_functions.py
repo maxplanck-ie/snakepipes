@@ -393,8 +393,8 @@ def sampleSheetGroups(sampleSheet,multipleComp):
                 if cols[groupCol] not in d:
                     d[cols[groupCol]]={}
                 if cols[conditionCol] not in d[cols[groupCol]]:
-                       d[cols[groupCol][cols[conditionCol]] = []
-                       d[cols[groupCol][cols[conditionCol]].append(cols[nameCol])
+                       d[cols[groupCol]][cols[conditionCol]] = []
+                       d[cols[groupCol]][cols[conditionCol]].append(cols[nameCol])
                     
     f.close()
     return d
