@@ -382,7 +382,7 @@ def sampleSheetGroups(sampleSheet,multipleComp):
                 nameCol += 1
                 groupCol += 1
         if not len(line.strip()) == 0:
-            if not isMultipleComparison:
+            if not multipleComp:
                 if cols[conditionCol] not in d:
                     d[cols[conditionCol]] = []
                 d[cols[conditionCol]].append(cols[nameCol])
