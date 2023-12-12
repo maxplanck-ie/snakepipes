@@ -73,7 +73,7 @@ checkpoint split_sampleSheet:
 ## CSAW for differential binding / allele-specific binding analysis
 rule CSAW:
     input:
-        peaks = lambda wildcards: getInputPeaks(peakCaller, chip_samples, genrichDict,comp_group=wildcards.compGroup),
+        peaks = lambda wildcards: getInputPeaks(peakCaller, chip_samples, genrichDict, comp_group=wildcards.compGroup),
         sampleSheet = lambda wildcards: checkpoints.split_sampleSheet.get(compGroup=wildcards.compGroup).output,
         insert_size_metrics = getSizeMetrics(),
         scale_factors = getScaleFactors() if useSpikeInForNorm else []
