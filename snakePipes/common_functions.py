@@ -371,6 +371,8 @@ def sampleSheetGroups(sampleSheet,multipleComp):
                 sys.exit("ERROR: Please use 'name' and 'condition' as column headers in the sample info file ({})!\n".format(sampleSheet))
             conditionCol = cols.index("condition")
             nameCol = cols.index("name")
+            if multipleComp:
+                groupCol = cols.index("group")
             nCols = len(cols)
             continue
         elif idx == 1:
@@ -380,6 +382,8 @@ def sampleSheetGroups(sampleSheet,multipleComp):
             if len(cols) - 1 == nCols:
                 conditionCol += 1
                 nameCol += 1
+                if multipleComp:
+                    groupCol += 1
         if not len(line.strip()) == 0:
             if not multipleComp:
                 if cols[conditionCol] not in d:
@@ -387,9 +391,6 @@ def sampleSheetGroups(sampleSheet,multipleComp):
                 d[cols[conditionCol]].append(cols[nameCol])
             else:
                 compGroups = returnComparisonGroups(sampleSheet)
-                groupCol = cols.index("group")
-                if len(cols) -1 ==nCols:
-                    groupCol += 1
                 for  g in compGroups:
                     if cols[conditionCol] not in d[g]:
                        d[g][cols[conditionCol]] = []
