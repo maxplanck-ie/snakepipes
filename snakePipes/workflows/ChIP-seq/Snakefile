@@ -181,7 +181,12 @@ def run_genrich():
             if not isMultipleComparison:
                 file_list = ["Genrich/{}.narrowPeak".format(x) for x in genrichDict.keys()]
             else:
-                file_list = ["Genrich/{}.{}.narrowPeak".format(y,x)  for x,y in genrichDict.items()]
+                unique_group=[]
+                for key,value in genrichDict.items():
+                    for x in value.keys():
+                        if (key,x) not in unique_group:
+                            unique_group.append(key,x)
+                file_list = ["Genrich/{}.{}.narrowPeak".format(x,y)  for x,y in [item for sublist in unique_group for item in sublist]]
         return (file_list)
     return ([])
 
