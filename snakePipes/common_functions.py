@@ -400,7 +400,6 @@ def sampleSheetGroups(sampleSheet,multipleComp):
             d[k][str(d["All"].keys())] = str(d["All"].values())
         del d['All']
     f.close()
-    print(d)
     return d
 
 
