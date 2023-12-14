@@ -188,7 +188,7 @@ def run_genrich():
                     for x in value.keys():
                         if zip(key,x) not in unique_group:
                             unique_group.append(zip(key,x))
-                            file_list.append("Genrich/{}.{}.narrowPeak".format(key,x))
+                            file_list.append("Genrich/{}.{}.narrowPeak".format(x,key))
         return (file_list)
     return ([])
 

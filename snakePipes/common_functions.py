@@ -394,11 +394,11 @@ def sampleSheetGroups(sampleSheet,multipleComp):
                     d[cols[groupCol]]={}
                 if cols[conditionCol] not in d[cols[groupCol]]:
                     d[cols[groupCol]][cols[conditionCol]] = []
-                    d[cols[groupCol]][cols[conditionCol]].append(cols[nameCol])
+                d[cols[groupCol]][cols[conditionCol]].append(cols[nameCol])
     if "All" in d.keys():
         for k in d.keys():
             if k not in "All":
-                d[k][list(d["All"].keys())[0]] = list(d["All"].values())[0]
+                d[k][list(d["All"].keys())[0]] = list(d["All"].values())
         del d['All']
     f.close()
     return d
