@@ -397,7 +397,7 @@ def sampleSheetGroups(sampleSheet,multipleComp):
                     d[cols[groupCol]][cols[conditionCol]].append(cols[nameCol])
     if "All" in d.keys():
         for k in d.keys():
-            d[k][d["All"].keys()[0]] = d["All"].values()[0]
+            d[k][str(d["All"].keys())] = str(d["All"].values())
         del d['All']
     f.close()
     return d
