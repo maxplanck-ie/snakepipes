@@ -395,6 +395,10 @@ def sampleSheetGroups(sampleSheet,multipleComp):
                 if cols[conditionCol] not in d[cols[groupCol]]:
                     d[cols[groupCol]][cols[conditionCol]] = []
                     d[cols[groupCol]][cols[conditionCol]].append(cols[nameCol])
+    if "All" in d.keys():
+        for k in d.keys():
+            d[k].append(d["All"])
+        del d['All']
     f.close()
     return d
 
