@@ -398,9 +398,9 @@ def sampleSheetGroups(sampleSheet,multipleComp):
     if "All" in d.keys():
         for k in d.keys():
             if k not in "All":
+                d[k][list(d["All"].keys())[0]]=[]
                 for x in d["All"].values():
-                    d[k].append(list(d["All"].keys())[0])
-                    #d[k][list(d["All"].keys())[0]].append(x)
+                    d[k][list(d["All"].keys())[0]].append(x)
         del d['All']
     f.close()
     return d
