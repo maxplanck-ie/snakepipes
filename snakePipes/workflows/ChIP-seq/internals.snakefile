@@ -218,7 +218,7 @@ if sampleSheet:
             genrichDict[k]=[item for item in genrichDict[k] if item in chip_samples]
         reordered_dict = {k: filtered_dict[k] for k in [item for sublist in genrichDict.values() for item in sublist]}
     else:
-        print(genrichDict)
+        #print(genrichDict)
         reordered_dict = {}
         for g in genrichDict.keys():
             for k in genrichDict[g].keys():
