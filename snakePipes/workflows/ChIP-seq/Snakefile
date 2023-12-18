@@ -181,7 +181,7 @@ def run_genrich():
             if not isMultipleComparison:
                 file_list = ["Genrich/{}.narrowPeak".format(x) for x in genrichDict.keys()]
             else:
-                print(genrichDict)
+                #print(genrichDict)
                 unique_group=[]
                 file_list=[]
                 for key,value in genrichDict.items():
