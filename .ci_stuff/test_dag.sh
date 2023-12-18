@@ -263,7 +263,7 @@ if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 1876 ]; then exit 1 ; fi
 WC=`mRNA-seq -i PE_input -o output --sampleSheet .ci_stuff/test_sampleSheet.tsv --snakemakeOptions " --dryrun --conda-prefix /tmp" -m "alignment,deepTools_qc" --bcExtract --trim .ci_stuff/organism.yaml | tee >(cat 1>&2) | grep -v "conda installation\|Conda environment" | sed '/^\s*$/d' | wc -l`
 if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 1721 ]; then exit 1 ; fi
 WC=`mRNA-seq -i PE_input -o output --sampleSheet .ci_stuff/test_sampleSheet.tsv --snakemakeOptions " --dryrun --conda-prefix /tmp" -m "alignment,deepTools_qc" --bcExtract --UMIDedup --trim .ci_stuff/organism.yaml | tee >(cat 1>&2) | grep -v "conda installation\|Conda environment" | sed '/^\s*$/d' | wc -l`
-if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 1279 ]; then exit 1 ; fi
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 1813 ]; then exit 1 ; fi
 WC=`mRNA-seq -i SE_input -o output --sampleSheet .ci_stuff/test_sampleSheet.tsv --snakemakeOptions " --dryrun --conda-prefix /tmp" .ci_stuff/organism.yaml | tee >(cat 1>&2) | grep -v "conda installation\|Conda environment" | sed '/^\s*$/d' | wc -l`
 if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 1082 ]; then exit 1 ; fi
 WC=`mRNA-seq -i SE_input -o output --sampleSheet .ci_stuff/test_sampleSheet.tsv --snakemakeOptions " --dryrun --conda-prefix /tmp" -m "alignment" .ci_stuff/organism.yaml | tee >(cat 1>&2) | grep -v "conda installation\|Conda environment" | sed '/^\s*$/d' | wc -l`
