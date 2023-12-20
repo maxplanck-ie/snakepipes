@@ -67,6 +67,8 @@ def filter_dict(sampleSheet):
     output_dict = dict(zip(names_sub, [""]*len(names_sub)))
     return(output_dict)
 
+chip_samples_w_ctrl = []
+
 if sampleSheet:
     filtered_dict = filter_dict(sampleSheet)
     genrichDict = cf.sampleSheetGroups(sampleSheet,isMultipleComparison)
