@@ -69,7 +69,7 @@ def filter_dict(sampleSheet):
 
 if sampleSheet:
     filtered_dict = filter_dict(sampleSheet)
-    genrichDict = cf.sampleSheetGroups(sampleSheet)
+    genrichDict = cf.sampleSheetGroups(sampleSheet,isMultipleComparison)
     reordered_dict = {k: filtered_dict[k] for k in [item for sublist in genrichDict.values() for item in sublist]}
 else:
     genrichDict = {"all_samples": samples}
