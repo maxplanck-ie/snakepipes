@@ -931,7 +931,8 @@ class TestChIPseq:
             '--useSpikeInForNorm',
             '--snakemakeOptions',
             SMKOPTS,
-            '--peakCaller Genrich',
+            '--peakCaller',
+            'Genrich',
             ifs / 'org.yaml',
             ifs / 'chipdict_noControl.yaml'
         ]
