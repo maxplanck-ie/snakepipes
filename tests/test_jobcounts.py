@@ -25,7 +25,7 @@ def parseSpOut(_s) -> int:
     except IndexError:
         return (0)
 
-def createTestData(fp, samples=6) -> None:
+def createTestData(fp, samples=9) -> None:
     # single end folder
     (fp / 'SE').mkdir()
     # paired end folder
@@ -153,13 +153,40 @@ def createTestData(fp, samples=6) -> None:
     # ChIP sample_config
     chip_dict ={
         'chip_dict': {
+            'sample1': {'control': 'sample7', 'broad': 'False'},
+            'sample2': {'control': 'sample7', 'broad': 'False'},
+            'sample3': {'control': 'sample8', 'broad': 'False'},
+            'sample4': {'control': 'sample8', 'broad': 'False'},
+            'sample5': {'control': 'sample9', 'broad': 'False'},
+            'sample6': {'control': 'sample9', 'broad': 'False'}
+        }
+    }
+    with open(fp / 'chipdict.yaml', 'w') as f:
+        yaml.dump(chip_dict, f, default_flow_style=False, default_style=None)
+
+    chip_dict ={
+        'chip_dict': {
+            'sample1': {'control': , 'broad': 'False'},
+            'sample2': {'control': , 'broad': 'False'},
+            'sample3': {'control': , 'broad': 'False'},
+            'sample4': {'control': , 'broad': 'False'},
+            'sample5': {'control': , 'broad': 'False'},
+            'sample6': {'control': , 'broad': 'False'}
+        }
+    }
+    with open(fp / 'chipdict_noControl.yaml', 'w') as f:
+        yaml.dump(chip_dict, f, default_flow_style=False, default_style=None)
+
+
+    chip_dict ={
+        'chip_dict': {
             'sample1': {'control': 'sample3', 'broad': 'False'},
             'sample2': {'control': 'sample3', 'broad': 'False'},
             'sample4': {'control': 'sample6', 'broad': 'False'},
             'sample5': {'control': 'sample6', 'broad': 'False'}
         }
     }
-    with open(fp / 'chipdict.yaml', 'w') as f:
+    with open(fp / 'chipdict_simple.yaml', 'w') as f:
         yaml.dump(chip_dict, f, default_flow_style=False, default_style=None)
 
 @pytest.fixture(scope="session")
