@@ -541,6 +541,39 @@ class TestChIPseq:
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
         assert parseSpOut(_p) == 56
+    def test_default_noInput(self, ifs):
+        ci = [
+            "ChIP-seq",
+            '-d',
+            ifs / 'bam_input',
+            '--sampleSheet',
+            ifs / 'sampleSheet.tsv',
+            '--snakemakeOptions',
+            SMKOPTS,
+            ifs / 'org.yaml',
+            ifs / 'chipdict_noControl.yaml'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 60
+    def test_genrich_noInput(self, ifs):
+        ci = [
+            "ChIP-seq",
+            '-d',
+            ifs / 'bam_input',
+            '--sampleSheet',
+            ifs / 'sampleSheet.tsv',
+            '--peakCaller Genrich'
+            '--snakemakeOptions',
+            SMKOPTS,
+            ifs / 'org.yaml',
+            ifs / 'chipdict_noControl.yaml'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 60
     def test_frombam(self, ifs):
         ci = [
             "ChIP-seq",
@@ -559,6 +592,24 @@ class TestChIPseq:
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
         assert parseSpOut(_p) == 102
+    def test_frombam_noInput(self, ifs):
+        ci = [
+            "ChIP-seq",
+            '-d',
+            'outdir',
+            '--fromBAM',
+            ifs / 'bam_input' / 'filtered_bam',
+            '--sampleSheet',
+            ifs / 'sampleSheet.tsv',
+            '--snakemakeOptions',
+            SMKOPTS,
+            ifs / 'org.yaml',
+            ifs / 'chipdict_noControl.yaml'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 102
     def test_spikein(self, ifs):
         ci = [
             "ChIP-seq",
@@ -571,6 +622,23 @@ class TestChIPseq:
             SMKOPTS,
             ifs / 'org.yaml',
             ifs / 'chipdict.yaml'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 89
+    def test_spikein_noInput(self, ifs):
+        ci = [
+            "ChIP-seq",
+            '--useSpikeInForNorm',
+            '-d',
+            ifs / 'bam_input',
+            '--sampleSheet',
+            ifs / 'sampleSheet.tsv',
+            '--snakemakeOptions',
+            SMKOPTS,
+            ifs / 'org.yaml',
+            ifs / 'chipdict_noControl.yaml'
         ]
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
@@ -647,12 +715,230 @@ class TestChIPseq:
             '--snakemakeOptions',
             SMKOPTS,
             ifs / 'org.yaml',
-            ifs / 'chipdict.yaml'
+            ifs / 'chipdict_simple.yaml'
         ]
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
         assert parseSpOut(_p) == 37
+    def test_multicomp(self, ifs):
+        ci = [
+            "ChIP-seq",
+            '-d',
+            ifs / 'bam_input',
+            '--sampleSheet',
+            ifs / 'sampleSheet_mc.tsv',
+            '--snakemakeOptions',
+            SMKOPTS,
+            ifs / 'org.yaml',
+            ifs / 'chipdict.yaml'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 89
+    def test_multicomp_genrich(self, ifs):
+        ci = [
+            "ChIP-seq",
+            '-d',
+            ifs / 'bam_input',
+            '--sampleSheet',
+            ifs / 'sampleSheet_mc.tsv',
+            '--peakCaller Genrich',
+            '--snakemakeOptions',
+            SMKOPTS,
+            ifs / 'org.yaml',
+            ifs / 'chipdict.yaml'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 89
+    def test_multicomp_fromBam(self, ifs):
+        ci = [
+            "ChIP-seq",
+            '-d',
+            'outdir',
+            '--fromBAM',
+            ifs / 'bam_input' / 'filtered_bam',
+            '--sampleSheet',
+            ifs / 'sampleSheet_mc.tsv',
+            '--snakemakeOptions',
+            SMKOPTS,
+            ifs / 'org.yaml',
+            ifs / 'chipdict.yaml'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 89
+    def test_multicomp_fromBam_Genrich(self, ifs):
+        ci = [
+            "ChIP-seq",
+            '-d',
+            'outdir',
+            '--fromBAM',
+            ifs / 'bam_input' / 'filtered_bam',
+            '--sampleSheet',
+            ifs / 'sampleSheet_mc.tsv',
+            '--peakCaller Genrich',
+            '--snakemakeOptions',
+            SMKOPTS,
+            ifs / 'org.yaml',
+            ifs / 'chipdict.yaml'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 89
+    def test_multicomp_spikein(self, ifs):
+        ci = [
+            "ChIP-seq",
+            '-d',
+            ifs / 'bam_input',
+            '--sampleSheet',
+            ifs / 'sampleSheet_mc.tsv',
+            '--useSpikeInForNorm',
+            '--snakemakeOptions',
+            SMKOPTS,
+            ifs / 'org.yaml',
+            ifs / 'chipdict.yaml'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 89
+    def test_multicomp_spikein_genrich(self, ifs):
+        ci = [
+            "ChIP-seq",
+            '-d',
+            ifs / 'bam_input',
+            '--sampleSheet',
+            ifs / 'sampleSheet_mc.tsv',
+            '--useSpikeInForNorm',
+            '--peakCaller Genrich',
+            '--snakemakeOptions',
+            SMKOPTS,
+            ifs / 'org.yaml',
+            ifs / 'chipdict.yaml'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 89
+    def test_multicomp_spikein_noInput(self, ifs):
+        ci = [
+            "ChIP-seq",
+            '-d',
+            ifs / 'bam_input',
+            '--sampleSheet',
+            ifs / 'sampleSheet_mc.tsv',
+            '--useSpikeInForNorm',
+            '--snakemakeOptions',
+            SMKOPTS,
+            ifs / 'org.yaml',
+            ifs / 'chipdict_noControl.yaml'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 89
+    def test_multicomp_spikein_noInput_Genrich(self, ifs):
+        ci = [
+            "ChIP-seq",
+            '-d',
+            ifs / 'bam_input',
+            '--sampleSheet',
+            ifs / 'sampleSheet_mc.tsv',
+            '--useSpikeInForNorm',
+            '--peakCaller Genrich',
+            '--snakemakeOptions',
+            SMKOPTS,
+            ifs / 'org.yaml',
+            ifs / 'chipdict_noControl.yaml'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 89
+    def test_multicomp_spikein_fromBam(self, ifs):
+        ci = [
+            "ChIP-seq",
+            '-d',
+            'outdir',
+            '--fromBAM',
+            ifs / 'bam_input' / 'filtered_bam',
+            '--sampleSheet',
+            ifs / 'sampleSheet_mc.tsv',
+            '--useSpikeInForNorm',
+            '--snakemakeOptions',
+            SMKOPTS,
+            ifs / 'org.yaml',
+            ifs / 'chipdict.yaml'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 89
+    def test_multicomp_spikein_fromBam_genrich(self, ifs):
+        ci = [
+            "ChIP-seq",
+            '-d',
+            'outdir',
+            '--fromBAM',
+            ifs / 'bam_input' / 'filtered_bam',
+            '--sampleSheet',
+            ifs / 'sampleSheet_mc.tsv',
+            '--peakCaller Genrich',
+            '--useSpikeInForNorm',
+            '--snakemakeOptions',
+            SMKOPTS,
+            ifs / 'org.yaml',
+            ifs / 'chipdict.yaml'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 89
+    def test_multicomp_spikein_fromBam_noInput(self, ifs):
+        ci = [
+            "ChIP-seq",
+            '-d',
+            'outdir',
+            '--fromBAM',
+            ifs / 'bam_input' / 'filtered_bam',
+            '--sampleSheet',
+            ifs / 'sampleSheet_mc.tsv',
+            '--useSpikeInForNorm',
+            '--snakemakeOptions',
+            SMKOPTS,
+            ifs / 'org.yaml',
+            ifs / 'chipdict_noControl.yaml'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 89
+    def test_multicomp_spikein_fromBam_noInput_genrich(self, ifs):
+        ci = [
+            "ChIP-seq",
+            '-d',
+            'outdir',
+            '--fromBAM',
+            ifs / 'bam_input' / 'filtered_bam',
+            '--sampleSheet',
+            ifs / 'sampleSheet_mc.tsv',
+            '--peakCaller Genrich',
+            '--useSpikeInForNorm',
+            '--snakemakeOptions',
+            SMKOPTS,
+            ifs / 'org.yaml',
+            ifs / 'chipdict_noControl.yaml'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 89
 
 class TestmRNAseq:
     def test_default(self, ifs):
