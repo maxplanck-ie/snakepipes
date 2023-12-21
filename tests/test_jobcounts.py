@@ -293,7 +293,7 @@ class TestDNAmapping():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 98
+        assert parseSpOut(_p) == 143
     def test_properPairs(self, ifs):
         ci = [
             "DNA-mapping",
@@ -313,7 +313,7 @@ class TestDNAmapping():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 104
+        assert parseSpOut(_p) == 152
     def test_bcExtract(self, ifs):
         ci = [
             "DNA-mapping",
@@ -334,7 +334,7 @@ class TestDNAmapping():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 98
+        assert parseSpOut(_p) == 143
     def test_UMIDedup(self, ifs):
         ci = [
             "DNA-mapping",
@@ -354,7 +354,7 @@ class TestDNAmapping():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 110
+        assert parseSpOut(_p) == 161
     def test_UMIDedupbcExtract(self, ifs):
         ci = [
             "DNA-mapping",
@@ -375,7 +375,7 @@ class TestDNAmapping():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 104
+        assert parseSpOut(_p) == 152
     def test_DAG(self, ifs):
         ci = [
             "DNA-mapping",
@@ -396,7 +396,7 @@ class TestDNAmapping():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 110
+        assert parseSpOut(_p) == 161
     def test_bwa(self, ifs):
         ci = [
             "DNA-mapping",
@@ -415,7 +415,7 @@ class TestDNAmapping():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 98
+        assert parseSpOut(_p) == 143
     def test_bwa2(self, ifs):
         ci = [
             "DNA-mapping",
@@ -434,7 +434,7 @@ class TestDNAmapping():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 98
+        assert parseSpOut(_p) == 143
     def test_se(self, ifs):
         ci = [
             "DNA-mapping",
@@ -449,7 +449,7 @@ class TestDNAmapping():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 86
+        assert parseSpOut(_p) == 125
     def test_seproperPairs(self, ifs):
         ci = [
             "DNA-mapping",
@@ -469,7 +469,7 @@ class TestDNAmapping():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 92
+        assert parseSpOut(_p) == 134
 
 class TestChIPseq:
     def test_default(self, ifs):
@@ -487,7 +487,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 60
+        assert parseSpOut(_p) == 77
     def test_genrich(self, ifs):
         ci = [
             "ChIP-seq",
@@ -505,7 +505,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 60
+        assert parseSpOut(_p) == 74
     def test_SE(self, ifs):
         ci = [
             "ChIP-seq",
@@ -522,7 +522,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 60
+        assert parseSpOut(_p) == 77
     def test_l2ratio(self, ifs):
         ci = [
             "ChIP-seq",
@@ -540,7 +540,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 56
+        assert parseSpOut(_p) == 71
     def test_default_noInput(self, ifs):
         ci = [
             "ChIP-seq",
