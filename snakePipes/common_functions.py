@@ -354,7 +354,7 @@ def returnComparisonGroups(sampleSheet):
     return d.keys()
 
 
-def sampleSheetGroups(sampleSheet,multipleComp):
+def sampleSheetGroups(sampleSheet, multipleComp):
     """
     Parse a sampleSheet and return a dictionary with keys the group and values the sample names
     """
@@ -391,16 +391,16 @@ def sampleSheetGroups(sampleSheet,multipleComp):
                 d[cols[conditionCol]].append(cols[nameCol])
             else:
                 if cols[groupCol] not in d:
-                    d[cols[groupCol]]={}
+                    d[cols[groupCol]] = {}
                 if cols[conditionCol] not in d[cols[groupCol]]:
                     d[cols[groupCol]][cols[conditionCol]] = []
                 d[cols[groupCol]][cols[conditionCol]].append(cols[nameCol])
     if "All" in d.keys():
         for k in d.keys():
             if k not in "All":
-                d[k][list(d["All"].keys())[0]]=[]
+                d[k][list(d["All"].keys())[0]] = []
                 for x in d["All"].values():
-                    #don't use append as this results in a list of lists and causes issues downstream
+#don't use append as this results in a list of lists and causes issues downstream
                     d[k][list(d["All"].keys())[0]] += x
         del d['All']
     f.close()
