@@ -166,12 +166,12 @@ def createTestData(fp, samples=9) -> None:
 
     chip_dict ={
         'chip_dict': {
-            'sample1': {'control':, 'broad': 'False'},
-            'sample2': {'control':, 'broad': 'False'},
-            'sample3': {'control':, 'broad': 'False'},
-            'sample4': {'control':, 'broad': 'False'},
-            'sample5': {'control':, 'broad': 'False'},
-            'sample6': {'control':, 'broad': 'False'}
+            'sample1': {'control': None, 'broad': 'False'},
+            'sample2': {'control': None, 'broad': 'False'},
+            'sample3': {'control': None, 'broad': 'False'},
+            'sample4': {'control': None, 'broad': 'False'},
+            'sample5': {'control': None, 'broad': 'False'},
+            'sample6': {'control': None, 'broad': 'False'}
         }
     }
     with open(fp / 'chipdict_noControl.yaml', 'w') as f:
