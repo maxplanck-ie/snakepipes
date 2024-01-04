@@ -1,0 +1,19 @@
+chip_dict:
+  sample1:
+    control: sample7
+    broad: True
+  sample2:
+    control: sample7
+    broad: True
+  sample3:
+    control: sample8
+    broad: True
+  sample4:
+    control: sample8
+    broad: True
+  sample5:
+    control: sample9
+    broad: True
+  sample6:
+    control: sample9
+    broad: True
