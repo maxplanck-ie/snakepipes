@@ -9,7 +9,7 @@ GTF = "ftp://ftp.ensembl.org/pub/release-93/gtf/mus_musculus/Mus_musculus.GRCm38
 RMSK = "http://hgdownload.soe.ucsc.edu/goldenPath/dm6/database/rmsk.txt.gz"
 SPIKEINGENOME = "ftp://ftp.ensembl.org/pub/release-79/fasta/drosophila_melanogaster/dna/Drosophila_melanogaster.BDGP6.dna_sm.toplevel.fa.gz"
 SPIKEINGTF = "ftp://ftp.ensembl.org/pub/release-96/gtf/drosophila_melanogaster/Drosophila_melanogaster.BDGP6.22.96.gtf.gz"
-SMKOPTS = "' --dryrun --conda-prefix /tmp -q '"
+SMKOPTS = '" --dryrun --conda-prefix /tmp -q "'
 
 
 def parseSpOut(_s) -> int:
