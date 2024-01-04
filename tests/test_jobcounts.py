@@ -564,9 +564,10 @@ class TestChIPseq:
             ifs / 'bam_input',
             '--sampleSheet',
             ifs / 'sampleSheet.tsv',
-            '--peakCaller Genrich',
             '--snakemakeOptions',
             SMKOPTS,
+            '--peakCaller',
+            'Genrich',
             ifs / 'org.yaml',
             ifs / 'chipdict_noControl.yaml'
         ]
