@@ -92,15 +92,12 @@ def run_CSAW():
                          for x in list(itertools.chain.from_iterable([expand("Filtered.results.{change_dir}_withNearestGene.txt",\
                          change_dir=change_direction)]))])
         else:
-            file_list=["CSAW_{}_{}/CSAW.session_info.txt".format(peakCaller, sample_name + "{compGroup}"),
-                   "Annotation/genes.filtered.symbol","Annotation/genes.filtered.t2g",
-                   "CSAW_{}_{}/CSAW.Stats_report.html".format(peakCaller, sample_name)]
-            file_list.append([os.path.join("CSAW_{}_{}".format(peakCaller, sample_name + "{compGroup}"), x) \
-                         for x in list(itertools.chain.from_iterable([expand("CSAW.{change_dir}.cov.matrix",\
-                         change_dir=change_direction),expand("CSAW.{change_dir}.cov.heatmap.png",change_dir=change_direction)]))])
-            file_list.append([os.path.join("AnnotatedResults_{}_{}".format(peakCaller, sample_name + "{compGroup}"), x) \
-                         for x in list(itertools.chain.from_iterable([expand("Filtered.results.{change_dir}_withNearestGene.txt",\
-                         change_dir=change_direction)]))])
+            file_list=expand("CSAW_{}_{}/CSAW.session_info.txt".format(peakCaller, sample_name + ".{compGroup}"),compGroup=cf.returnComparisonGroups(sampleSheet))
+            file_list.append(["Annotation/genes.filtered.symbol","Annotation/genes.filtered.t2g",expand("CSAW_{}_{}/CSAW.Stats_report.html".format(peakCaller, sample_name + ".{compGroup}"),compGroup=cf.returnComparisonGroups(sampleSheet))])
+            file_list.append([expand("CSAW_{}_{}".format(peakCaller, sample_name + ".{compGroup}") + "/CSAW.{change_dir}.cov.matrix",change_dir=change_direction,compGroup=cf.returnComparisonGroups(sampleSheet)),
+                  expand("CSAW_{}_{}".format(peakCaller, sample_name + ".{compGroup}") +"/CSAW.{change_dir}.cov.heatmap.png",change_dir=change_direction,compGroup=cf.returnComparisonGroups(sampleSheet)
+                  )])
+            file_list.append(expand("AnnotatedResults_{}_{}".format(peakCaller,sample_name + ".{compGroup}") + "/Filtered.results.{change_dir}_withNearestGene.txt",change_dir=change_direction, compGroup=cf.returnComparisonGroups(sampleSheet)))
         return( file_list )
     else:
         return([])
