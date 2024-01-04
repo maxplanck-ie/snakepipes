@@ -574,7 +574,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 60
+        assert parseSpOut(_p) == 50
     def test_frombam(self, ifs):
         ci = [
             "ChIP-seq",
@@ -745,10 +745,10 @@ class TestChIPseq:
             ifs / 'bam_input',
             '--sampleSheet',
             ifs / 'sampleSheet_mc.tsv',
-            '--peakCaller',
-            'Genrich',
             '--snakemakeOptions',
             SMKOPTS,
+            '--peakCaller',
+            'Genrich',
             ifs / 'org.yaml',
             ifs / 'chipdict.yaml'
         ]
@@ -783,9 +783,10 @@ class TestChIPseq:
             ifs / 'bam_input' / 'filtered_bam',
             '--sampleSheet',
             ifs / 'sampleSheet_mc.tsv',
-            '--peakCaller Genrich',
             '--snakemakeOptions',
             SMKOPTS,
+            '--peakCaller',
+            'Genrich',
             ifs / 'org.yaml',
             ifs / 'chipdict.yaml'
         ]
@@ -820,7 +821,8 @@ class TestChIPseq:
             '--useSpikeInForNorm',
             '--snakemakeOptions',
             SMKOPTS,
-            '--peakCaller Genrich',
+            '--peakCaller',
+            'Genrich',
             ifs / 'org.yaml',
             ifs / 'chipdict.yaml'
         ]
@@ -855,7 +857,8 @@ class TestChIPseq:
             '--useSpikeInForNorm',
             '--snakemakeOptions',
             SMKOPTS,
-            '--peakCaller Genrich',
+            '--peakCaller',
+            'Genrich',
             ifs / 'org.yaml',
             ifs / 'chipdict_noControl.yaml'
         ]
@@ -894,7 +897,8 @@ class TestChIPseq:
             '--useSpikeInForNorm',
             '--snakemakeOptions',
             SMKOPTS,
-            '--peakCaller Genrich',
+            '--peakCaller',
+            'Genrich',
             ifs / 'org.yaml',
             ifs / 'chipdict.yaml'
         ]
