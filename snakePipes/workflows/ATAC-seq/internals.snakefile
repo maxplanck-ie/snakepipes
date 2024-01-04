@@ -72,6 +72,13 @@ chip_samples_w_ctrl = []
 if sampleSheet:
     filtered_dict = filter_dict(sampleSheet)
     genrichDict = cf.sampleSheetGroups(sampleSheet,isMultipleComparison)
-    reordered_dict = {k: filtered_dict[k] for k in [item for sublist in genrichDict.values() for item in sublist]}
+    if not isMultipleComparison:
+        reordered_dict = {k: filtered_dict[k] for k in [item for sublist in genrichDict.values() for item in sublist]}
+    else:
+        reordered_dict = {}
+        for g in genrichDict.keys():
+            for k in genrichDict[g].keys():
+                genrichDict[g][k]=[item for item in genrichDict[g][k] if item in samples]
+                reordered_dict[g] = {k: filtered_dict[k] for k in [item for sublist in genrichDict[g].values() for item in sublist]}
 else:
     genrichDict = {"all_samples": samples}
