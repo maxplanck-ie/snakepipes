@@ -177,7 +177,7 @@ if not isMultipleComparison:
 else:
     rule Genrich_peaks:
         input:
-            bams=lambda wildcards: expand(short_bams, "{sample}.short.namesorted.bam", sample=genrichDict[wildcards.compGroup][wildcards.group]),
+            bams=lambda wildcards: expand(short_bams + "{sample}.short.namesorted.bam", sample=genrichDict[wildcards.compGroup][wildcards.group]),
         output:
             "Genrich/{group}.{compGroup}.narrowPeak"
         log: "Genrich/logs/{group}.{compGroup}.log"
