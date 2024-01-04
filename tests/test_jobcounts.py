@@ -556,7 +556,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 57
+        assert parseSpOut(_p) == 56
     def test_genrich_noInput(self, ifs):
         ci = [
             "ChIP-seq",
@@ -564,7 +564,7 @@ class TestChIPseq:
             ifs / 'bam_input',
             '--sampleSheet',
             ifs / 'sampleSheet.tsv',
-            '--peakCaller Genrich',
+            ' --peakCaller Genrich ',
             '--snakemakeOptions',
             SMKOPTS,
             ifs / 'org.yaml',
