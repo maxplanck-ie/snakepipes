@@ -800,7 +800,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 77
+        assert parseSpOut(_p) == 99
     def test_multicomp_fromBam(self, ifs):
         ci = [
             "ChIP-seq",
@@ -1807,8 +1807,8 @@ class TestATAC():
             "ATAC-seq",
             '-d', 
             ifs / 'bam_input',
-            '--sampleSheet_mc',
-            ifs / 'sampleSheet.tsv',
+            '--sampleSheet',
+            ifs / 'sampleSheet_mc.tsv',
             '--snakemakeOptions',
             SMKOPTS,
             ifs / 'org.yaml'
@@ -1833,7 +1833,7 @@ class TestATAC():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 74
+        assert parseSpOut(_p) == 92
     def test_multicomp_HMMRATAC(self, ifs):
         ci = [
             "ATAC-seq",
@@ -1850,7 +1850,7 @@ class TestATAC():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 73
+        assert parseSpOut(_p) == 89
     def test_multicomp_sieve(self, ifs):
         ci = [
             "ATAC-seq",
@@ -1869,7 +1869,7 @@ class TestATAC():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 63
+        assert parseSpOut(_p) == 79
     def test_multicomp_frombam(self, ifs):
         ci = [
             "ATAC-seq",
@@ -1886,7 +1886,7 @@ class TestATAC():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 114
+        assert parseSpOut(_p) == 130
 
 class TestHIC():
     def test_default(self, ifs):
