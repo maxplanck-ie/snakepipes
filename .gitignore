@@ -15,6 +15,7 @@ runRNAseq.sh
 *.pyc
 dist
 build
+*.swp
 
 # sphinx build folder
 _build

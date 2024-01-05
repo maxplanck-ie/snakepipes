@@ -22,7 +22,7 @@ def generate_b1_b2(sampleSheet,which_b):
 
 def get_s1(sampleSheet):
     if os.path.isfile(sampleSheet):
-        rMatsConds = cf.sampleSheetGroups(sampleSheet)
+        rMatsConds = cf.sampleSheetGroups(sampleSheet,isMultipleComparison)
         return ["filtered_bam/" + s for s in [s + ".filtered.bam" for s in rMatsConds[list(rMatsConds)[0]]]][0]
     else:
         return ""

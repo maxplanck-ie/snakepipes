@@ -354,13 +354,14 @@ def returnComparisonGroups(sampleSheet):
     return d.keys()
 
 
-def sampleSheetGroups(sampleSheet):
+def sampleSheetGroups(sampleSheet, multipleComp):
     """
     Parse a sampleSheet and return a dictionary with keys the group and values the sample names
     """
     f = open(sampleSheet)
     conditionCol = None
     nameCol = None
+    groupCol = None
     nCols = None
     d = dict()
     for idx, line in enumerate(f):
@@ -370,6 +371,8 @@ def sampleSheetGroups(sampleSheet):
                 sys.exit("ERROR: Please use 'name' and 'condition' as column headers in the sample info file ({})!\n".format(sampleSheet))
             conditionCol = cols.index("condition")
             nameCol = cols.index("name")
+            if multipleComp:
+                groupCol = cols.index("group")
             nCols = len(cols)
             continue
         elif idx == 1:
@@ -379,10 +382,27 @@ def sampleSheetGroups(sampleSheet):
             if len(cols) - 1 == nCols:
                 conditionCol += 1
                 nameCol += 1
+                if multipleComp:
+                    groupCol += 1
         if not len(line.strip()) == 0:
-            if cols[conditionCol] not in d:
-                d[cols[conditionCol]] = []
-            d[cols[conditionCol]].append(cols[nameCol])
+            if not multipleComp:
+                if cols[conditionCol] not in d:
+                    d[cols[conditionCol]] = []
+                d[cols[conditionCol]].append(cols[nameCol])
+            else:
+                if cols[groupCol] not in d:
+                    d[cols[groupCol]] = {}
+                if cols[conditionCol] not in d[cols[groupCol]]:
+                    d[cols[groupCol]][cols[conditionCol]] = []
+                d[cols[groupCol]][cols[conditionCol]].append(cols[nameCol])
+    if "All" in d.keys():
+        for k in d.keys():
+            if k not in "All":
+                d[k][list(d["All"].keys())[0]] = []
+                for x in d["All"].values():
+                    # don't use append as this results in a list of lists and causes issues downstream
+                    d[k][list(d["All"].keys())[0]] += x
+        del d['All']
     f.close()
     return d
 

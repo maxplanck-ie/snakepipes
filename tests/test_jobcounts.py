@@ -25,7 +25,7 @@ def parseSpOut(_s) -> int:
     except IndexError:
         return (0)
 
-def createTestData(fp, samples=6) -> None:
+def createTestData(fp, samples=9) -> None:
     # single end folder
     (fp / 'SE').mkdir()
     # paired end folder
@@ -153,13 +153,53 @@ def createTestData(fp, samples=6) -> None:
     # ChIP sample_config
     chip_dict ={
         'chip_dict': {
+            'sample1': {'control': 'sample7', 'broad': 'False'},
+            'sample2': {'control': 'sample7', 'broad': 'False'},
+            'sample3': {'control': 'sample8', 'broad': 'False'},
+            'sample4': {'control': 'sample8', 'broad': 'False'},
+            'sample5': {'control': 'sample9', 'broad': 'False'},
+            'sample6': {'control': 'sample9', 'broad': 'False'}
+        }
+    }
+    with open(fp / 'chipdict.yaml', 'w') as f:
+        yaml.dump(chip_dict, f, default_flow_style=False, default_style=None)
+
+    chip_dict ={
+        'chip_dict': {
+            'sample1': {'control': 'sample7', 'broad': 'True'},
+            'sample2': {'control': 'sample7', 'broad': 'True'},
+            'sample3': {'control': 'sample8', 'broad': 'True'},
+            'sample4': {'control': 'sample8', 'broad': 'True'},
+            'sample5': {'control': 'sample9', 'broad': 'True'},
+            'sample6': {'control': 'sample9', 'broad': 'True'}
+        }
+    }
+    with open(fp / 'chipdict_broad.yaml', 'w') as f:
+        yaml.dump(chip_dict, f, default_flow_style=False, default_style=None)
+
+    chip_dict ={
+        'chip_dict': {
+            'sample1': {'control': None, 'broad': 'False'},
+            'sample2': {'control': None, 'broad': 'False'},
+            'sample3': {'control': None, 'broad': 'False'},
+            'sample4': {'control': None, 'broad': 'False'},
+            'sample5': {'control': None, 'broad': 'False'},
+            'sample6': {'control': None, 'broad': 'False'}
+        }
+    }
+    with open(fp / 'chipdict_noControl.yaml', 'w') as f:
+        yaml.dump(chip_dict, f, default_flow_style=False, default_style=None)
+
+
+    chip_dict ={
+        'chip_dict': {
             'sample1': {'control': 'sample3', 'broad': 'False'},
             'sample2': {'control': 'sample3', 'broad': 'False'},
             'sample4': {'control': 'sample6', 'broad': 'False'},
             'sample5': {'control': 'sample6', 'broad': 'False'}
         }
     }
-    with open(fp / 'chipdict.yaml', 'w') as f:
+    with open(fp / 'chipdict_simple.yaml', 'w') as f:
         yaml.dump(chip_dict, f, default_flow_style=False, default_style=None)
 
 @pytest.fixture(scope="session")
@@ -266,7 +306,7 @@ class TestDNAmapping():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 98
+        assert parseSpOut(_p) == 143
     def test_properPairs(self, ifs):
         ci = [
             "DNA-mapping",
@@ -286,7 +326,7 @@ class TestDNAmapping():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 104
+        assert parseSpOut(_p) == 152
     def test_bcExtract(self, ifs):
         ci = [
             "DNA-mapping",
@@ -307,7 +347,7 @@ class TestDNAmapping():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 98
+        assert parseSpOut(_p) == 143
     def test_UMIDedup(self, ifs):
         ci = [
             "DNA-mapping",
@@ -327,7 +367,7 @@ class TestDNAmapping():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 110
+        assert parseSpOut(_p) == 161
     def test_UMIDedupbcExtract(self, ifs):
         ci = [
             "DNA-mapping",
@@ -348,7 +388,7 @@ class TestDNAmapping():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 104
+        assert parseSpOut(_p) == 152
     def test_DAG(self, ifs):
         ci = [
             "DNA-mapping",
@@ -369,7 +409,7 @@ class TestDNAmapping():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 110
+        assert parseSpOut(_p) == 161
     def test_bwa(self, ifs):
         ci = [
             "DNA-mapping",
@@ -388,7 +428,7 @@ class TestDNAmapping():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 98
+        assert parseSpOut(_p) == 143
     def test_bwa2(self, ifs):
         ci = [
             "DNA-mapping",
@@ -407,7 +447,7 @@ class TestDNAmapping():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 98
+        assert parseSpOut(_p) == 143
     def test_se(self, ifs):
         ci = [
             "DNA-mapping",
@@ -422,7 +462,7 @@ class TestDNAmapping():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 86
+        assert parseSpOut(_p) == 125
     def test_seproperPairs(self, ifs):
         ci = [
             "DNA-mapping",
@@ -442,7 +482,7 @@ class TestDNAmapping():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 92
+        assert parseSpOut(_p) == 134
 
 class TestChIPseq:
     def test_default(self, ifs):
@@ -460,7 +500,23 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 60
+        assert parseSpOut(_p) == 77
+    def test_broad(self, ifs):
+        ci = [
+            "ChIP-seq",
+            '-d',
+            ifs / 'bam_input',
+            '--sampleSheet',
+            ifs / 'sampleSheet.tsv',
+            '--snakemakeOptions',
+            SMKOPTS,
+            ifs / 'org.yaml',
+            ifs / 'chipdict_broad.yaml'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 77
     def test_genrich(self, ifs):
         ci = [
             "ChIP-seq",
@@ -478,7 +534,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 60
+        assert parseSpOut(_p) == 74
     def test_SE(self, ifs):
         ci = [
             "ChIP-seq",
@@ -495,7 +551,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 60
+        assert parseSpOut(_p) == 77
     def test_l2ratio(self, ifs):
         ci = [
             "ChIP-seq",
@@ -513,7 +569,41 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
+        assert parseSpOut(_p) == 71
+    def test_default_noInput(self, ifs):
+        ci = [
+            "ChIP-seq",
+            '-d',
+            ifs / 'bam_input',
+            '--sampleSheet',
+            ifs / 'sampleSheet.tsv',
+            '--snakemakeOptions',
+            SMKOPTS,
+            ifs / 'org.yaml',
+            ifs / 'chipdict_noControl.yaml'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
         assert parseSpOut(_p) == 56
+    def test_genrich_noInput(self, ifs):
+        ci = [
+            "ChIP-seq",
+            '-d',
+            ifs / 'bam_input',
+            '--sampleSheet',
+            ifs / 'sampleSheet.tsv',
+            '--snakemakeOptions',
+            SMKOPTS,
+            '--peakCaller',
+            'Genrich',
+            ifs / 'org.yaml',
+            ifs / 'chipdict_noControl.yaml'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 50
     def test_frombam(self, ifs):
         ci = [
             "ChIP-seq",
@@ -531,7 +621,25 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 102
+        assert parseSpOut(_p) == 137
+    def test_frombam_noInput(self, ifs):
+        ci = [
+            "ChIP-seq",
+            '-d',
+            'outdir',
+            '--fromBAM',
+            ifs / 'bam_input' / 'filtered_bam',
+            '--sampleSheet',
+            ifs / 'sampleSheet.tsv',
+            '--snakemakeOptions',
+            SMKOPTS,
+            ifs / 'org.yaml',
+            ifs / 'chipdict_noControl.yaml'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 98
     def test_spikein(self, ifs):
         ci = [
             "ChIP-seq",
@@ -548,7 +656,24 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 89
+        assert parseSpOut(_p) == 124
+    def test_spikein_noInput(self, ifs):
+        ci = [
+            "ChIP-seq",
+            '--useSpikeInForNorm',
+            '-d',
+            ifs / 'bam_input',
+            '--sampleSheet',
+            ifs / 'sampleSheet.tsv',
+            '--snakemakeOptions',
+            SMKOPTS,
+            ifs / 'org.yaml',
+            ifs / 'chipdict_noControl.yaml'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 83
     def test_spikeinfrombam(self, ifs):
         ci = [
             "ChIP-seq",
@@ -567,7 +692,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 113
+        assert parseSpOut(_p) == 160
     def test_spikeinfrombamTSSnorm(self, ifs):
         ci = [
             "ChIP-seq",
@@ -588,7 +713,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 92
+        assert parseSpOut(_p) == 136
     def test_spikeinfrombaminputnorm(self, ifs):
         ci = [
             "ChIP-seq",
@@ -609,7 +734,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 90
+        assert parseSpOut(_p) == 133
     def test_allelic(self, ifs):
         ci = [
             "ChIP-seq",
@@ -620,12 +745,252 @@ class TestChIPseq:
             '--snakemakeOptions',
             SMKOPTS,
             ifs / 'org.yaml',
-            ifs / 'chipdict.yaml'
+            ifs / 'chipdict_simple.yaml'
         ]
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
         assert parseSpOut(_p) == 37
+    def test_multicomp(self, ifs):
+        ci = [
+            "ChIP-seq",
+            '-d',
+            ifs / 'bam_input',
+            '--sampleSheet',
+            ifs / 'sampleSheet_mc.tsv',
+            '--snakemakeOptions',
+            SMKOPTS,
+            ifs / 'org.yaml',
+            ifs / 'chipdict.yaml'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 99
+    def test_multicomp_genrich(self, ifs):
+        ci = [
+            "ChIP-seq",
+            '-d',
+            ifs / 'bam_input',
+            '--sampleSheet',
+            ifs / 'sampleSheet_mc.tsv',
+            '--snakemakeOptions',
+            SMKOPTS,
+            '--peakCaller',
+            'Genrich',
+            ifs / 'org.yaml',
+            ifs / 'chipdict.yaml'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 100
+    def test_multicomp_broad(self, ifs):
+        ci = [
+            "ChIP-seq",
+            '-d',
+            ifs / 'bam_input',
+            '--sampleSheet',
+            ifs / 'sampleSheet_mc.tsv',
+            '--snakemakeOptions',
+            SMKOPTS,
+            ifs / 'org.yaml',
+            ifs / 'chipdict_broad.yaml'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 99
+    def test_multicomp_fromBam(self, ifs):
+        ci = [
+            "ChIP-seq",
+            '-d',
+            'outdir',
+            '--fromBAM',
+            ifs / 'bam_input' / 'filtered_bam',
+            '--sampleSheet',
+            ifs / 'sampleSheet_mc.tsv',
+            '--snakemakeOptions',
+            SMKOPTS,
+            ifs / 'org.yaml',
+            ifs / 'chipdict.yaml'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 159
+    def test_multicomp_fromBam_Genrich(self, ifs):
+        ci = [
+            "ChIP-seq",
+            '-d',
+            'outdir',
+            '--fromBAM',
+            ifs / 'bam_input' / 'filtered_bam',
+            '--sampleSheet',
+            ifs / 'sampleSheet_mc.tsv',
+            '--snakemakeOptions',
+            SMKOPTS,
+            '--peakCaller',
+            'Genrich',
+            ifs / 'org.yaml',
+            ifs / 'chipdict.yaml'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 160
+    def test_multicomp_spikein(self, ifs):
+        ci = [
+            "ChIP-seq",
+            '-d',
+            ifs / 'bam_input',
+            '--sampleSheet',
+            ifs / 'sampleSheet_mc.tsv',
+            '--useSpikeInForNorm',
+            '--snakemakeOptions',
+            SMKOPTS,
+            ifs / 'org.yaml',
+            ifs / 'chipdict.yaml'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 136
+    def test_multicomp_spikein_genrich(self, ifs):
+        ci = [
+            "ChIP-seq",
+            '-d',
+            ifs / 'bam_input',
+            '--sampleSheet',
+            ifs / 'sampleSheet_mc.tsv',
+            '--useSpikeInForNorm',
+            '--snakemakeOptions',
+            SMKOPTS,
+            '--peakCaller',
+            'Genrich',
+            ifs / 'org.yaml',
+            ifs / 'chipdict.yaml'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 137
+    def test_multicomp_spikein_noInput(self, ifs):
+        ci = [
+            "ChIP-seq",
+            '-d',
+            ifs / 'bam_input',
+            '--sampleSheet',
+            ifs / 'sampleSheet_mc.tsv',
+            '--useSpikeInForNorm',
+            '--snakemakeOptions',
+            SMKOPTS,
+            ifs / 'org.yaml',
+            ifs / 'chipdict_noControl.yaml'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 99
+    def test_multicomp_spikein_noInput_Genrich(self, ifs):
+        ci = [
+            "ChIP-seq",
+            '-d',
+            ifs / 'bam_input',
+            '--sampleSheet',
+            ifs / 'sampleSheet_mc.tsv',
+            '--useSpikeInForNorm',
+            '--snakemakeOptions',
+            SMKOPTS,
+            '--peakCaller',
+            'Genrich',
+            ifs / 'org.yaml',
+            ifs / 'chipdict_noControl.yaml'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 97
+    def test_multicomp_spikein_fromBam(self, ifs):
+        ci = [
+            "ChIP-seq",
+            '-d',
+            'outdir',
+            '--fromBAM',
+            ifs / 'bam_input' / 'filtered_bam',
+            '--sampleSheet',
+            ifs / 'sampleSheet_mc.tsv',
+            '--useSpikeInForNorm',
+            '--snakemakeOptions',
+            SMKOPTS,
+            ifs / 'org.yaml',
+            ifs / 'chipdict.yaml'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 172
+    def test_multicomp_spikein_fromBam_genrich(self, ifs):
+        ci = [
+            "ChIP-seq",
+            '-d',
+            'outdir',
+            '--fromBAM',
+            ifs / 'bam_input' / 'filtered_bam',
+            '--sampleSheet',
+            ifs / 'sampleSheet_mc.tsv',
+            '--useSpikeInForNorm',
+            '--snakemakeOptions',
+            SMKOPTS,
+            '--peakCaller',
+            'Genrich',
+            ifs / 'org.yaml',
+            ifs / 'chipdict.yaml'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 173
+    def test_multicomp_spikein_fromBam_noInput(self, ifs):
+        ci = [
+            "ChIP-seq",
+            '-d',
+            'outdir',
+            '--fromBAM',
+            ifs / 'bam_input' / 'filtered_bam',
+            '--sampleSheet',
+            ifs / 'sampleSheet_mc.tsv',
+            '--useSpikeInForNorm',
+            '--snakemakeOptions',
+            SMKOPTS,
+            ifs / 'org.yaml',
+            ifs / 'chipdict_noControl.yaml'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 123
+    def test_multicomp_spikein_fromBam_noInput_genrich(self, ifs):
+        ci = [
+            "ChIP-seq",
+            '-d',
+            'outdir',
+            '--fromBAM',
+            ifs / 'bam_input' / 'filtered_bam',
+            '--sampleSheet',
+            ifs / 'sampleSheet_mc.tsv',
+            '--useSpikeInForNorm',
+            '--snakemakeOptions',
+            SMKOPTS,
+            '--peakCaller',
+            'Genrich',
+            ifs / 'org.yaml',
+            ifs / 'chipdict_noControl.yaml'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 121
 
 class TestmRNAseq:
     def test_default(self, ifs):
@@ -642,7 +1007,7 @@ class TestmRNAseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 116
+        assert parseSpOut(_p) == 167
     def test_DE(self, ifs):
         ci = [
             "mRNA-seq",
@@ -659,7 +1024,7 @@ class TestmRNAseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 117
+        assert parseSpOut(_p) == 168
     def test_rMats(self, ifs):
         ci = [
             "mRNA-seq",
@@ -677,7 +1042,7 @@ class TestmRNAseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 119
+        assert parseSpOut(_p) == 170
     def test_almode(self, ifs):
         ci = [
             "mRNA-seq",
@@ -696,7 +1061,7 @@ class TestmRNAseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 86
+        assert parseSpOut(_p) == 125
     def test_trim(self, ifs):
         ci = [
             "mRNA-seq",
@@ -714,7 +1079,7 @@ class TestmRNAseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 123
+        assert parseSpOut(_p) == 177
     def test_alfreemode(self, ifs):
         ci = [
             "mRNA-seq",
@@ -733,7 +1098,7 @@ class TestmRNAseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 131
+        assert parseSpOut(_p) == 188
     def test_bcExtract(self, ifs):
         ci = [
             "mRNA-seq",
@@ -752,7 +1117,7 @@ class TestmRNAseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 117
+        assert parseSpOut(_p) == 168
     def test_bcExtractUMIdedup(self, ifs):
         ci = [
             "mRNA-seq",
@@ -772,7 +1137,7 @@ class TestmRNAseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 123
+        assert parseSpOut(_p) == 177
     def test_multicomp(self, ifs):
         ci = [
             "mRNA-seq",
@@ -792,7 +1157,7 @@ class TestmRNAseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 117
+        assert parseSpOut(_p) == 165
     def test_SE(self, ifs):
         ci = [
             "mRNA-seq",
@@ -809,7 +1174,7 @@ class TestmRNAseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 104
+        assert parseSpOut(_p) == 149
     def test_SEalmode(self, ifs):
         ci = [
             "mRNA-seq",
@@ -828,7 +1193,7 @@ class TestmRNAseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 74
+        assert parseSpOut(_p) == 107
     def test_SEtrim(self, ifs):
         ci = [
             "mRNA-seq",
@@ -846,7 +1211,7 @@ class TestmRNAseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 110
+        assert parseSpOut(_p) == 158
     def test_SEalfreemode(self, ifs):
         ci = [
             "mRNA-seq",
@@ -865,7 +1230,7 @@ class TestmRNAseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 118
+        assert parseSpOut(_p) == 169
     def test_SEfastqc(self, ifs):
         ci = [
             "mRNA-seq",
@@ -884,7 +1249,7 @@ class TestmRNAseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 122
+        assert parseSpOut(_p) == 176
     def test_SEfrombam(self, ifs):
         ci = [
             "mRNA-seq",
@@ -902,7 +1267,7 @@ class TestmRNAseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 81
+        assert parseSpOut(_p) == 114
     def test_threeprime(self, ifs):
         ci = [
             "mRNA-seq",
@@ -921,7 +1286,7 @@ class TestmRNAseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 132
+        assert parseSpOut(_p) == 189
     def test_threeprimeqc(self, ifs):
         ci = [
             "mRNA-seq",
@@ -940,7 +1305,7 @@ class TestmRNAseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 163
+        assert parseSpOut(_p) == 232
     def test_allelic(self, ifs):
         ci = [
             "mRNA-seq",
@@ -961,7 +1326,7 @@ class TestmRNAseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 175
+        assert parseSpOut(_p) == 253
     def test_allelicfrombam(self, ifs):
         ci = [
             "mRNA-seq",
@@ -983,7 +1348,7 @@ class TestmRNAseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 137
+        assert parseSpOut(_p) == 197
     def test_allelicDE(self, ifs):
         ci = [
             "mRNA-seq",
@@ -1006,7 +1371,7 @@ class TestmRNAseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 176
+        assert parseSpOut(_p) == 254
     def test_allelicDE_SNPfile(self, ifs):
         ci = [
             "mRNA-seq",
@@ -1029,7 +1394,7 @@ class TestmRNAseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 174
+        assert parseSpOut(_p) == 252
     def test_allelicDEsinglestrain(self, ifs):
         ci = [
             "mRNA-seq",
@@ -1052,7 +1417,7 @@ class TestmRNAseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 176
+        assert parseSpOut(_p) == 254
     def test_allelicDEalfree(self, ifs):
         ci = [
             "mRNA-seq",
@@ -1075,7 +1440,7 @@ class TestmRNAseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 228
+        assert parseSpOut(_p) == 330
 
 class TestncRNAseq():
     def test_default(self, ifs):
@@ -1092,7 +1457,7 @@ class TestncRNAseq():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 95
+        assert parseSpOut(_p) == 137
     def test_DE(self, ifs):
         ci = [
             "noncoding-RNA-seq",
@@ -1109,7 +1474,7 @@ class TestncRNAseq():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 97
+        assert parseSpOut(_p) == 139
     def test_SE(self, ifs):
         ci = [
             "noncoding-RNA-seq",
@@ -1126,7 +1491,7 @@ class TestncRNAseq():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 84
+        assert parseSpOut(_p) == 120
     def test_frombam(self, ifs):
         ci = [
             "noncoding-RNA-seq",
@@ -1144,7 +1509,7 @@ class TestncRNAseq():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 67
+        assert parseSpOut(_p) == 94
     def test_multicomp(self, ifs):
         ci = [
             "noncoding-RNA-seq",
@@ -1161,7 +1526,7 @@ class TestncRNAseq():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 100
+        assert parseSpOut(_p) == 142
 
 class TestscRNAseq():
     def test_default(self, ifs):
@@ -1180,7 +1545,7 @@ class TestscRNAseq():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 124
+        assert parseSpOut(_p) == 178
     def test_skipvelo(self, ifs):
         ci = [
             "scRNAseq",
@@ -1198,7 +1563,7 @@ class TestscRNAseq():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 111
+        assert parseSpOut(_p) == 159
     def test_alevin(self, ifs):
         ci = [
             "scRNAseq",
@@ -1215,7 +1580,7 @@ class TestscRNAseq():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 54
+        assert parseSpOut(_p) == 78
     def test_alevinskipvelo(self, ifs):
         ci = [
             "scRNAseq",
@@ -1233,7 +1598,7 @@ class TestscRNAseq():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 45
+        assert parseSpOut(_p) == 66
 
 class TestWGBS():
     def test_default(self, ifs):
@@ -1252,7 +1617,7 @@ class TestWGBS():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 106
+        assert parseSpOut(_p) == 154
     def test_bwameth2(self, ifs):
         ci = [
             "WGBS",
@@ -1271,7 +1636,7 @@ class TestWGBS():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 106
+        assert parseSpOut(_p) == 154
     def test_trimgcbias(self, ifs):
         ci = [
             "WGBS",
@@ -1290,7 +1655,7 @@ class TestWGBS():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 107
+        assert parseSpOut(_p) == 155
     def test_frombam(self, ifs):
         ci = [
             "WGBS",
@@ -1309,7 +1674,7 @@ class TestWGBS():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 77
+        assert parseSpOut(_p) == 110
     def test_frombamfqc(self, ifs):
         ci = [
             "WGBS",
@@ -1329,7 +1694,7 @@ class TestWGBS():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 77
+        assert parseSpOut(_p) == 110
     def test_frombamskipqc(self, ifs):
         ci = [
             "WGBS",
@@ -1349,7 +1714,7 @@ class TestWGBS():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 41
+        assert parseSpOut(_p) == 59
 
 class TestATAC():
     def test_default(self, ifs):
@@ -1366,7 +1731,7 @@ class TestATAC():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 48
+        assert parseSpOut(_p) == 63
     def test_genrich(self, ifs):
         ci = [
             "ATAC-seq",
@@ -1383,7 +1748,7 @@ class TestATAC():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 56
+        assert parseSpOut(_p) == 74
     def test_HMMRATAC(self, ifs):
         ci = [
             "ATAC-seq",
@@ -1400,7 +1765,7 @@ class TestATAC():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 55
+        assert parseSpOut(_p) == 73
     def test_sieve(self, ifs):
         ci = [
             "ATAC-seq",
@@ -1419,7 +1784,7 @@ class TestATAC():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 48
+        assert parseSpOut(_p) == 63
     def test_frombam(self, ifs):
         ci = [
             "ATAC-seq",
@@ -1436,7 +1801,92 @@ class TestATAC():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 84
+        assert parseSpOut(_p) == 114
+    def test_multicomp_default(self, ifs):
+        ci = [
+            "ATAC-seq",
+            '-d', 
+            ifs / 'bam_input',
+            '--sampleSheet',
+            ifs / 'sampleSheet_mc.tsv',
+            '--snakemakeOptions',
+            SMKOPTS,
+            ifs / 'org.yaml'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 79
+    def test_multicomp_genrich(self, ifs):
+        ci = [
+            "ATAC-seq",
+            '-d', 
+            ifs / 'bam_input',
+            '--sampleSheet',
+            ifs / 'sampleSheet_mc.tsv',
+            '--peakCaller',
+            'Genrich',
+            '--snakemakeOptions',
+            SMKOPTS,
+            ifs / 'org.yaml'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 92
+    def test_multicomp_HMMRATAC(self, ifs):
+        ci = [
+            "ATAC-seq",
+            '-d', 
+            ifs / 'bam_input',
+            '--sampleSheet',
+            ifs / 'sampleSheet_mc.tsv',
+            '--peakCaller',
+            'HMMRATAC',
+            '--snakemakeOptions',
+            SMKOPTS,
+            ifs / 'org.yaml'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 89
+    def test_multicomp_sieve(self, ifs):
+        ci = [
+            "ATAC-seq",
+            '-d',
+            ifs / 'bam_input',
+            '--sampleSheet',
+            ifs / 'sampleSheet_mc.tsv',
+            '--maxFragmentSize',
+            '120',
+            '--qval',
+            '0.1',
+            '--snakemakeOptions',
+            SMKOPTS,
+            ifs / 'org.yaml'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 79
+    def test_multicomp_frombam(self, ifs):
+        ci = [
+            "ATAC-seq",
+            '-d',
+            ifs / 'bam_input',
+            '--sampleSheet',
+            ifs / 'sampleSheet_mc.tsv',
+            '--snakemakeOptions',
+            SMKOPTS,
+            '--fromBAM',
+            ifs / 'bam_input' / 'filtered_bam',
+            ifs / 'org.yaml'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 130
 
 class TestHIC():
     def test_default(self, ifs):
@@ -1453,7 +1903,7 @@ class TestHIC():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 69
+        assert parseSpOut(_p) == 102
     def test_ice(self, ifs):
         ci = [
             "HiC",
@@ -1470,7 +1920,7 @@ class TestHIC():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 75
+        assert parseSpOut(_p) == 111
     def test_trim(self, ifs):
         ci = [
             "HiC",
@@ -1486,7 +1936,7 @@ class TestHIC():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 75
+        assert parseSpOut(_p) == 111
     def test_dpnii(self, ifs):
         ci = [
             "HiC",
@@ -1503,7 +1953,7 @@ class TestHIC():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 69
+        assert parseSpOut(_p) == 102
     def test_notad(self, ifs):
         ci = [
             "HiC",
@@ -1519,7 +1969,7 @@ class TestHIC():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 63
+        assert parseSpOut(_p) == 93
     def test_bwamem2(self, ifs):
         ci = [
             "HiC",
@@ -1536,7 +1986,7 @@ class TestHIC():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 69
+        assert parseSpOut(_p) == 102
 
 class Testpreprocessing():
     def test_default(self, ifs):
@@ -1555,7 +2005,7 @@ class Testpreprocessing():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 57
+        assert parseSpOut(_p) == 84
     def test_DAG(self, ifs):
         ci = [
             "preprocessing",
@@ -1573,4 +2023,4 @@ class Testpreprocessing():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 57
+        assert parseSpOut(_p) == 84

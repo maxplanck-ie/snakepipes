@@ -159,16 +159,32 @@ rule namesort_bams:
 
 # Requires PE data
 # Should be run once per-group!
-rule Genrich_peaks:
-    input:
-        bams=lambda wildcards: expand(short_bams + "{sample}.short.namesorted.bam", sample=genrichDict[wildcards.group])
-    output:
-        "Genrich/{group}.narrowPeak"
-    log: "Genrich/logs/{group}.Genrich_peaks.log"
-    params:
-        bams = lambda wildcards: ",".join(expand(short_bams + "{sample}.short.namesorted.bam", sample=genrichDict[wildcards.group])),
-        blacklist = "-E {}".format(blacklist_bed) if blacklist_bed else ""
-    conda: CONDA_ATAC_ENV
-    shell: """
-        Genrich  -t {params.bams} -o {output} -r {params.blacklist} -j -y 2> {log}
-        """
+if not isMultipleComparison:
+    rule Genrich_peaks:
+        input:
+            bams=lambda wildcards: expand(short_bams + "{sample}.short.namesorted.bam", sample=genrichDict[wildcards.group])
+        output:
+            "Genrich/{group}.narrowPeak"
+        log: "Genrich/logs/{group}.Genrich_peaks.log"
+        params:
+            bams = lambda wildcards: ",".join(expand(short_bams + "{sample}.short.namesorted.bam", sample=genrichDict[wildcards.group])),
+            blacklist = "-E {}".format(blacklist_bed) if blacklist_bed else ""
+        conda: CONDA_ATAC_ENV
+        shell: """
+            Genrich  -t {params.bams} -o {output} -r {params.blacklist} -j -y 2> {log}
+            """
+
+else:
+    rule Genrich_peaks:
+        input:
+            bams=lambda wildcards: expand(short_bams + "{sample}.short.namesorted.bam", sample=genrichDict[wildcards.compGroup][wildcards.group]),
+        output:
+            "Genrich/{group}.{compGroup}.narrowPeak"
+        log: "Genrich/logs/{group}.{compGroup}.log"
+        params:
+            bams = lambda wildcards: ",".join(expand(os.path.join(short_bams, "{sample}.short.namesorted.bam"), sample=genrichDict[wildcards.compGroup][wildcards.group])),
+            blacklist = "-E {}".format(blacklist_bed) if blacklist_bed else "",
+        conda: CONDA_ATAC_ENV
+        shell: """
+            Genrich -t {params.bams} -o {output} -r {params.blacklist} -j -y 2> {log}
+            """
