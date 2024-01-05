@@ -166,6 +166,19 @@ def createTestData(fp, samples=9) -> None:
 
     chip_dict ={
         'chip_dict': {
+            'sample1': {'control': 'sample7', 'broad': 'True'},
+            'sample2': {'control': 'sample7', 'broad': 'True'},
+            'sample3': {'control': 'sample8', 'broad': 'True'},
+            'sample4': {'control': 'sample8', 'broad': 'True'},
+            'sample5': {'control': 'sample9', 'broad': 'True'},
+            'sample6': {'control': 'sample9', 'broad': 'True'}
+        }
+    }
+    with open(fp / 'chipdict_broad.yaml', 'w') as f:
+        yaml.dump(chip_dict, f, default_flow_style=False, default_style=None)
+
+    chip_dict ={
+        'chip_dict': {
             'sample1': {'control': None, 'broad': 'False'},
             'sample2': {'control': None, 'broad': 'False'},
             'sample3': {'control': None, 'broad': 'False'},
@@ -488,6 +501,22 @@ class TestChIPseq:
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
         assert parseSpOut(_p) == 77
+    def test_broad(self, ifs):
+        ci = [
+            "ChIP-seq",
+            '-d',
+            ifs / 'bam_input',
+            '--sampleSheet',
+            ifs / 'sampleSheet.tsv',
+            '--snakemakeOptions',
+            SMKOPTS,
+            ifs / 'org.yaml',
+            ifs / 'chipdict_broad.yaml'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 77
     def test_genrich(self, ifs):
         ci = [
             "ChIP-seq",
@@ -756,6 +785,22 @@ class TestChIPseq:
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
         assert parseSpOut(_p) == 100
+    def test_multicomp_broad(self, ifs):
+        ci = [
+            "ChIP-seq",
+            '-d',
+            ifs / 'bam_input',
+            '--sampleSheet',
+            ifs / 'sampleSheet_mc.tsv',
+            '--snakemakeOptions',
+            SMKOPTS,
+            ifs / 'org.yaml',
+            ifs / 'chipdict_broad.yaml'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 77
     def test_multicomp_fromBam(self, ifs):
         ci = [
             "ChIP-seq",
@@ -1747,6 +1792,91 @@ class TestATAC():
             ifs / 'bam_input',
             '--sampleSheet',
             ifs / 'sampleSheet.tsv',
+            '--snakemakeOptions',
+            SMKOPTS,
+            '--fromBAM',
+            ifs / 'bam_input' / 'filtered_bam',
+            ifs / 'org.yaml'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 114
+    def test_multicomp_default(self, ifs):
+        ci = [
+            "ATAC-seq",
+            '-d', 
+            ifs / 'bam_input',
+            '--sampleSheet_mc',
+            ifs / 'sampleSheet.tsv',
+            '--snakemakeOptions',
+            SMKOPTS,
+            ifs / 'org.yaml'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 63
+    def test_multicomp_genrich(self, ifs):
+        ci = [
+            "ATAC-seq",
+            '-d', 
+            ifs / 'bam_input',
+            '--sampleSheet',
+            ifs / 'sampleSheet_mc.tsv',
+            '--peakCaller',
+            'Genrich',
+            '--snakemakeOptions',
+            SMKOPTS,
+            ifs / 'org.yaml'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 74
+    def test_multicomp_HMMRATAC(self, ifs):
+        ci = [
+            "ATAC-seq",
+            '-d', 
+            ifs / 'bam_input',
+            '--sampleSheet',
+            ifs / 'sampleSheet_mc.tsv',
+            '--peakCaller',
+            'HMMRATAC',
+            '--snakemakeOptions',
+            SMKOPTS,
+            ifs / 'org.yaml'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 73
+    def test_multicomp_sieve(self, ifs):
+        ci = [
+            "ATAC-seq",
+            '-d',
+            ifs / 'bam_input',
+            '--sampleSheet',
+            ifs / 'sampleSheet_mc.tsv',
+            '--maxFragmentSize',
+            '120',
+            '--qval',
+            '0.1',
+            '--snakemakeOptions',
+            SMKOPTS,
+            ifs / 'org.yaml'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 63
+    def test_multicomp_frombam(self, ifs):
+        ci = [
+            "ATAC-seq",
+            '-d',
+            ifs / 'bam_input',
+            '--sampleSheet',
+            ifs / 'sampleSheet_mc.tsv',
             '--snakemakeOptions',
             SMKOPTS,
             '--fromBAM',
