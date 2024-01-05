@@ -1816,7 +1816,7 @@ class TestATAC():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 63
+        assert parseSpOut(_p) == 79
     def test_multicomp_genrich(self, ifs):
         ci = [
             "ATAC-seq",
