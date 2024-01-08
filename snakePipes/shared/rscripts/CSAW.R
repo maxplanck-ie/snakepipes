@@ -2,7 +2,7 @@
 ## ChIPseq differential binding workflow
 .libPaths(R.home("library"))
 
-sampleInfoFilePath <- snakemake@input[["sampleSheet"]]  #"samplesheet.tab"
+sampleInfoFilePath <- snakemake@params[["sampleSheet"]]  #"samplesheet.tab"
 insert_size_metrics <- snakemake@params[["insert_size_metrics"]] # bamPEFragmentSize output
 fdr <- as.numeric(snakemake@params[["fdr"]])
 lfc <- as.numeric(snakemake@params[["absBestLFC"]])

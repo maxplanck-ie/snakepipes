@@ -68,6 +68,7 @@ rule CSAW:
     benchmark:
         "CSAW_{}_{}/.benchmark/CSAW.benchmark".format(peakCaller, sample_name)
     params:
+        sampleSheet = sampleSheet,
         outdir=os.path.join(outdir, "CSAW_{}_{}".format(peakCaller, sample_name)),
         peakCaller=peakCaller,
         fdr = fdr,
