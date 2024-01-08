@@ -84,6 +84,7 @@ rule CSAW:
     benchmark:
         "{}/.benchmark/CSAW.benchmark".format(get_outdir(peakCaller,os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv"))
     params:
+        sampleSheet = lambda wildcards,input: os.path.join(outdir, str(input.sampleSheet)),
         outdir=lambda wildcards,input: get_outdir(peakCaller,input.sampleSheet),
         peakCaller=peakCaller,
         fdr = fdr,
