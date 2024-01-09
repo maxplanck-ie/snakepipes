@@ -259,5 +259,5 @@ rule SEACR_peaks:
         prefix = os.path.join(outdir,"SEACR/{chip_sample}.filtered")
     conda: CONDA_SEACR_ENV
     script: """
-        bash ../tools/SEACR_1.3.sh {input.chip} {input.control} {params.fdr} {params.peakCaller_options} "norm" "stringend" {params.prefix}
+        bash ../tools/SEACR-1.3/SEACR_1.3.sh {input.chip} {input.control} {params.fdr} {params.peakCaller_options} "norm" "stringend" {params.prefix}
         """

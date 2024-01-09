@@ -1,0 +1,8 @@
+name: ChIP-SEACR-env-1.0
+channels:
+  - mpi-ie
+  - conda-forge
+  - bioconda
+dependencies:
+  - seacr
+  - ucsc-bigwigtobedgraph
