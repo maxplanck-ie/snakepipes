@@ -237,7 +237,7 @@ rule prep_bedgraph:
     output: temp("filtered_bedgraph/{sample}.fragments.bedgraph")
     log: "filtered_bedgraph/log/{sample}.log"
     params:
-        sample = lambda wildcards: wildcards.sample
+        sample = lambda wildcards: wildcards.sample,
         genome = genome_fasta
     conda: CONDA_RNASEQ_ENV
     shell: """
