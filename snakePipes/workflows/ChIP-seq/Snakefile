@@ -205,6 +205,16 @@ def run_macs2():
     return ([])
 
 
+def run_seacr():
+    if (peakCaller == "SEACR"):
+        if useSpikeInForNorm:
+            file_list = expand("SEACR/{chip_sample}_host.stringend_peaks.bed", chip_sample = chip_samples)
+        else:
+            file_list = expand("SEACR/{chip_sample}.filtered.stringend_peaks.bed", chip_sample = chip_samples)
+        return (file_list)
+    return ([])
+
+
 ### execute before workflow starts #############################################
 ################################################################################
 onstart:
@@ -250,6 +260,7 @@ rule all:
         run_deepTools_ChIP(),
         run_macs2(),
         run_genrich(),
+        run_seacr(),
         # run histoneHMM if allelic_bams are absent (since it gives index error without allele_specific index)
         run_histoneHMM(allele_info),
         ## run deeptools-allelic only if dir "allelic_bams" present and non empty
