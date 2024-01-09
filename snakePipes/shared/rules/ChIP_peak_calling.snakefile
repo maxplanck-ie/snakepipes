@@ -230,3 +230,34 @@ else:
             shell: """
                 Genrich -t {params.bams} {params.control_pfx} {params.control} -o {output} -r {params.blacklist} -w {params.frag_size} 2> {log}
                 """
+
+
+rule prep_bedgraph:
+    input: "filtered_bam/{sample}.filtered.bam"
+    output: temp("filtered_bedgraph/{sample}.fragments.bedgraph")
+    log: "filtered_bedgraph/log/{sample}.log"
+    params:
+        sample = lambda wildcards: wildcards.sample
+        genome = genome_fasta
+    conda: CONDA_RNASEQ_ENV
+    shell: """
+        bedtools bamtobed -bedpe -i {input} | awk '$1==$4 && $6-$2 < 1000 {print $0}' - | cut -f 1,2,6 - | sort -k1,1 -k2,2n -k3,3n > filtered_bedgraph/{params.sample}.fragments.bed
+        bedtools genomecov -bg -i filtered_bedgraph/{params.sample}.fragments.bed -g {params.genome} > {output}
+        """
+
+rule SEACR_peaks:
+    input:
+        chip = "filtered_bedgraph/{chip_sample}.fragments.bedgraph",
+        control = lambda wildcards: "filtered_bedgraph/"+get_control(wildcards.chip_sample)+".fragments.bedgraph" if get_control(wildcards.chip_sample)
+                 else []
+    output:
+        "SEACR/{chip_sample}.filtered.stringend.bed"
+    log: "SEACR/logs/{chip_sample}.log"
+    params:
+        fdr = fdr,
+        peakCaller_options = str(peakCallerOptions or ''),
+        prefix = os.path.join(outdir,"SEACR/{chip_sample}.filtered")
+    conda: CONDA_SEACR_ENV
+    script: """
+        bash ../tools/SEACR_1.3.sh {input.chip} {input.control} {params.fdr} {params.peakCaller_options} "norm" "stringend" {params.prefix}
+        """
