@@ -254,12 +254,12 @@ rule SEACR_peaks:
         control = lambda wildcards: "filtered_bedgraph/"+get_control(wildcards.chip_sample)+"_host.fragments.bedgraph" if get_control(wildcards.chip_sample)
                  else []
     output:
-        "SEACR/{chip_sample}.filtered.stringend.bed"
+        "SEACR/{chip_sample}_host.stringend.bed"
     log: "SEACR/logs/{chip_sample}.log"
     params:
         fdr = fdr,
         peakCaller_options = str(peakCallerOptions or ''),
-        prefix = os.path.join(outdir,"SEACR/{chip_sample}.filtered")
+        prefix = os.path.join(outdir,"SEACR/{chip_sample}_host")
     conda: CONDA_SEACR_ENV
     script: """
         bash ../tools/SEACR-1.3/SEACR_1.3.sh {input.chip} {input.control} {params.fdr} {params.peakCaller_options} "non" "stringend" {params.prefix}
