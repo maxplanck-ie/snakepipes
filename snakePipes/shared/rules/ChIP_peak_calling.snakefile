@@ -241,7 +241,7 @@ rule prep_bedgraph:
         genome = genome_fasta
     conda: CONDA_RNASEQ_ENV
     shell: """
-        bedtools bamtobed -bedpe -i {input} | awk '$1==$4 && $6-$2 < 1000 {print $0}' - | cut -f 1,2,6 - | sort -k1,1 -k2,2n -k3,3n > filtered_bedgraph/{params.sample}.fragments.bed
+        bedtools bamtobed -bedpe -i {input} | awk '$1==$4 && $6-$2 < 1000 {{print $0}}' - | cut -f 1,2,6 - | sort -k1,1 -k2,2n -k3,3n > filtered_bedgraph/{params.sample}.fragments.bed
         bedtools genomecov -bg -i filtered_bedgraph/{params.sample}.fragments.bed -g {params.genome} > {output}
         """
 
