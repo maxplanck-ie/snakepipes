@@ -535,6 +535,43 @@ class TestChIPseq:
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
         assert parseSpOut(_p) == 74
+    def test_seacr(self, ifs):
+        ci = [
+            "ChIP-seq",
+            '-d',
+            ifs / 'bam_input',
+            '--sampleSheet',
+            ifs / 'sampleSheet.tsv',
+            '--snakemakeOptions',
+            SMKOPTS,
+            '--peakCaller',
+            'SEACR',
+            ifs / 'org.yaml',
+            ifs / 'chipdict.yaml'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 74
+    def test_seacr_spikein(self, ifs):
+        ci = [
+            "ChIP-seq",
+            '-d',
+            ifs / 'bam_input',
+            '--sampleSheet',
+            ifs / 'sampleSheet.tsv',
+            '--snakemakeOptions',
+            SMKOPTS,
+            '--peakCaller',
+            'SEACR',
+            '--useSpikeInForNorm',
+            ifs / 'org.yaml',
+            ifs / 'chipdict.yaml'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 74
     def test_SE(self, ifs):
         ci = [
             "ChIP-seq",
@@ -604,6 +641,43 @@ class TestChIPseq:
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
         assert parseSpOut(_p) == 50
+    def test_seacr_noInput(self, ifs):
+        ci = [
+            "ChIP-seq",
+            '-d',
+            ifs / 'bam_input',
+            '--sampleSheet',
+            ifs / 'sampleSheet.tsv',
+            '--snakemakeOptions',
+            SMKOPTS,
+            '--peakCaller',
+            'SEACR',
+            ifs / 'org.yaml',
+            ifs / 'chipdict_noControl.yaml'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 74
+    def test_seacr_spikein_noInput(self, ifs):
+        ci = [
+            "ChIP-seq",
+            '-d',
+            ifs / 'bam_input',
+            '--sampleSheet',
+            ifs / 'sampleSheet.tsv',
+            '--snakemakeOptions',
+            SMKOPTS,
+            '--peakCaller',
+            'SEACR',
+            '--useSpikeInForNorm',
+            ifs / 'org.yaml',
+            ifs / 'chipdict_noControl.yaml'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 74
     def test_frombam(self, ifs):
         ci = [
             "ChIP-seq",
