@@ -137,24 +137,24 @@ rule MACS2_peak_qc:
 
 # TODO
 # add joined deepTools plotEnrichment call for all peaks and samples in one plot
-
-rule namesort_bams:
-    input:
-        bam = "filtered_bam/{sample}.filtered.bam"
-    output:
-        bam = temp("filtered_bam/{sample}.namesorted.bam")
-    log:
-        "filtered_bam/logs/{sample}.namesort.err"
-    params:
-        tempDir = tempDir
-    threads: 4
-    conda: CONDA_SAMBAMBA_ENV
-    shell: """
-        TMPDIR={params.tempDir}
-        MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX)
-        sambamba sort -t {threads} -o {output.bam} --tmpdir=$MYTEMP -n {input.bam} 2> {log}
-        rm -rf $MYTEMP
-         """
+if peakCaller=="Genrich":
+    rule namesort_bams:
+        input:
+            bam = "filtered_bam/{sample}.filtered.bam"
+        output:
+            bam = temp("filtered_bam/{sample}.namesorted.bam")
+        log:
+            "filtered_bam/logs/{sample}.namesort.err"
+        params:
+            tempDir = tempDir
+        threads: 4
+        conda: CONDA_SAMBAMBA_ENV
+        shell: """
+            TMPDIR={params.tempDir}
+            MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX)
+            sambamba sort -t {threads} -o {output.bam} --tmpdir=$MYTEMP -n {input.bam} 2> {log}
+            rm -rf $MYTEMP
+             """
 
 # Requires PE data
 # Should be run once per-group!
