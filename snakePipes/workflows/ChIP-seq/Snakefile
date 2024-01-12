@@ -172,10 +172,10 @@ def run_CSAW():
 
 def run_genrich():
     if (peakCaller == "Genrich"):
-        if cutntag:
-            warnings.warn("--cutntag only works with macs2, your setting for using Genrich will be ignored. "
-                          "Remove --cutntag if interested in Genrich.")
-            return ([])
+#        if cutntag:
+#            warnings.warn("--cutntag only works with macs2, your setting for using Genrich will be ignored. "
+#                          "Remove --cutntag if interested in Genrich.")
+#            return ([])
         file_list = ["Genrich/all_samples.narrowPeak"]
         if sampleSheet:
             if not isMultipleComparison:
@@ -190,7 +190,8 @@ def run_genrich():
                             unique_group.append(zip(key,x))
                             file_list.append("Genrich/{}.{}.narrowPeak".format(x,key))
         return (file_list)
-    return ([])
+    else:
+        return ([])
 
 
 def run_macs2():
