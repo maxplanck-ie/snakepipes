@@ -21,7 +21,7 @@ def getInputPeaks(peakCaller, chip_samples, genrichDict,comp_group):
         if pipeline == "chip-seq" and useSpikeInForNorm:
             return expand("SEACR/{chip_sample}_host.stringend.bed",chip_sample=chip_samples)
         elif pipeline == "chip-seq" and not useSpikeInForNorm:
-            return expand("SEACR/{chip_sample}.filtered.stringend.bed,chip_sample=chip_samples")
+            return expand("SEACR/{chip_sample}.filtered.stringend.bed",chip_sample=chip_samples)
     else:
         return expand("Genrich/{genrichGroup}.{{compGroup}}.narrowPeak", genrichGroup = genrichDict[comp_group].keys())
 
