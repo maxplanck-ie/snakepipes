@@ -46,7 +46,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
     optional = parser.add_argument_group('Options')
     optional.add_argument("--peakCaller",
                           help="The peak caller to use. The default is %(default)s and this is only applicable for sharper peaks (broad peaks will always use histoneHMM).",
-                          choices=["MACS2", "Genrich","SEACR"],
+                          choices=["MACS2", "Genrich", "SEACR"],
                           default=defaults['peakCaller'])
 
     optional.add_argument("--peakCallerOptions",
