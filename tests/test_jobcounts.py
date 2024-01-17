@@ -537,6 +537,7 @@ class TestChIPseq:
         assert parseSpOut(_p) == 74
     def test_seacr(self, ifs):
         ci = [
+            "cat", ifs / 'chipdict.yaml;',
             "ChIP-seq",
             '-d',
             ifs / 'bam_input',
