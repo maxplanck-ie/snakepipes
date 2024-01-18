@@ -261,6 +261,6 @@ rule SEACR_peaks:
         peakCaller_options = str(peakCallerOptions or ''),
         prefix = os.path.join(outdir,"SEACR/{chip_sample}_host")
     conda: CONDA_SEACR_ENV
-    script: """
+    shell: """
         bash ../tools/SEACR-1.3/SEACR_1.3.sh {input.chip} {input.control} {params.fdr} {params.peakCaller_options} "non" "stringend" {params.prefix}
         """
