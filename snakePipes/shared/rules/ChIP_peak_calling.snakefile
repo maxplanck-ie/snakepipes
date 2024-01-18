@@ -237,7 +237,7 @@ rule prep_bedgraph:
     log: "filtered_bedgraph/log/{sample}.log"
     params:
         sample = lambda wildcards: wildcards.sample,
-        genome = genome_fasta
+        genome = genome_index
     conda: CONDA_RNASEQ_ENV
     shell: """
         bedtools bamtobed -bedpe -i {input} | awk '$1==$4 && $6-$2 < 1000 {{print $0}}' - | cut -f 1,2,6 - | sort -k1,1 -k2,2n -k3,3n > filtered_bedgraph/{params.sample}.fragments.bed
