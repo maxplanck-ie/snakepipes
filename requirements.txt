@@ -1,4 +1,4 @@
-snakemake >= 6.2.1, <7.19.0
+snakemake >= 6.2.1, <8.0.0
 psutil
 pandas
 thefuzz[speedup]

@@ -232,7 +232,7 @@ else:
 
 
 rule prep_bedgraph:
-    input: "filtered_bam/{sample}.filtered.bam"
+    input: "filtered_bam/{sample}.namesorted.bam"
     output: temp("filtered_bedgraph/{sample}.fragments.bedgraph")
     log: "filtered_bedgraph/log/{sample}.log"
     params:
