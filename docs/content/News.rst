@@ -9,10 +9,12 @@ snakePipes x.x.x
 * Snakemake options in the defaults.yaml are now an empty string. The required arguments '--use-conda --conda-prefix' have been directly added to the command string. condaEnvDir is parsed from defaults.yaml, requiring running snakePipes config first.
 * Added a 'three-prime-seq' mode to mRNAseq (David Koppstein and Katarzyna Sikora).
 * Added support for multiple comparison groups to ChIPseq and ATAC-seq.
+* Added SEACR as an optional peak caller to ChIPseq.
 * Fixes #819
 * Fixes #947
 * Fixes #945
 * Fixes #941
+* Fixes #951
 * fastq files are checked for validity
 * an 'on success' file is touched in the output directory when a workflow is finished successfully
 * fuzzywuzzy deprecated in favor for thefuzz
