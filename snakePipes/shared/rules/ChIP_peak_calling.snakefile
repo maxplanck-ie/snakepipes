@@ -250,7 +250,7 @@ rule SEACR_peaks:
         control = lambda wildcards: "filtered_bedgraph/"+get_control(wildcards.chip_sample)+".fragments.bedgraph" if get_control(wildcards.chip_sample)
                  else []
     output:
-        "SEACR/{chip_sample}.filtered.stringend.bed"
+        "SEACR/{chip_sample}.filtered.stringent.bed"
     log: "SEACR/logs/{chip_sample}.log"
     params:
         fdr = fdr,

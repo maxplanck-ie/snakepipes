@@ -13,9 +13,9 @@ def getInputPeaks(peakCaller, chip_samples, genrichDict):
         return expand("HMMRATAC/{chip_sample}_peaks.gappedPeak", chip_sample = chip_samples)
     elif peakCaller == "SEACR":
         if pipeline == "chip-seq" and useSpikeInForNorm:
-            return expand("SEACR/{chip_sample}_host.stringend.bed",chip_sample=chip_samples)
+            return expand("SEACR/{chip_sample}_host.stringent.bed",chip_sample=chip_samples)
         elif pipeline == "chip-seq" and not useSpikeInForNorm:
-            return expand("SEACR/{chip_sample}.filtered.stringend.bed",chip_sample=chip_samples)
+            return expand("SEACR/{chip_sample}.filtered.stringent.bed",chip_sample=chip_samples)
     else:
         return expand("Genrich/{genrichGroup}.narrowPeak", genrichGroup = genrichDict.keys())
 
