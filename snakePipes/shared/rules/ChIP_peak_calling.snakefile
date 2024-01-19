@@ -258,5 +258,5 @@ rule SEACR_peaks:
         script=os.path.join(maindir, "shared","tools/SEACR-1.3/SEACR_1.3.sh")
     conda: CONDA_SEACR_ENV
     shell: """
-        bash {params.script} {input.chip} {input.control} {params.fdr} "norm" "stringend" {params.prefix} 2>{log}
+        bash {params.script} {input.chip} {input.control} {params.fdr} "norm" "stringent" {params.prefix} 2>{log}
         """
