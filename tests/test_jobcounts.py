@@ -518,6 +518,22 @@ class TestChIPseq:
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
         assert parseSpOut(_p) == 37
+    def test_nosamplesheet_genrich(self, ifs):
+        ci = [
+            "ChIP-seq",
+            '-d',
+            ifs / 'bam_input',
+            '--snakemakeOptions',
+            SMKOPTS,
+            '--peakCaller',
+            'Genrich',
+            ifs / 'org.yaml',
+            ifs / 'chipdict.yaml'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 37
     def test_broad(self, ifs):
         ci = [
             "ChIP-seq",
@@ -569,7 +585,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 70
+        assert parseSpOut(_p) == 71
     def test_seacr_spikein(self, ifs):
         ci = [
             "ChIP-seq",
@@ -1709,6 +1725,21 @@ class TestWGBS():
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
         assert parseSpOut(_p) == 154
+    def test_no_sampleSheet(self, ifs):
+        ci = [
+            "WGBS",
+            '-i',
+            ifs / 'PE',
+            '-o',
+            'outdir',
+            '--snakemakeOptions',
+            SMKOPTS,
+            ifs / 'org.yaml'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 154
     def test_bwameth2(self, ifs):
         ci = [
             "WGBS",
@@ -1815,6 +1846,19 @@ class TestATAC():
             ifs / 'bam_input',
             '--sampleSheet',
             ifs / 'sampleSheet.tsv',
+            '--snakemakeOptions',
+            SMKOPTS,
+            ifs / 'org.yaml'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 63
+    def test_no_sampleSheet(self, ifs):
+        ci = [
+            "ATAC-seq",
+            '-d',
+            ifs / 'bam_input',
             '--snakemakeOptions',
             SMKOPTS,
             ifs / 'org.yaml'
