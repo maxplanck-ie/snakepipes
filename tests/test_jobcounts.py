@@ -1,8 +1,7 @@
 import subprocess as sp
 import pytest
-import yaml
+from ruamel.yaml import YAML
 import pandas as pd
-
 
 GENOME = "ftp://ftp.ensembl.org/pub/release-93/fasta/mus_musculus/dna/Mus_musculus.GRCm38.dna_sm.primary_assembly.fa.gz"
 GTF = "ftp://ftp.ensembl.org/pub/release-93/gtf/mus_musculus/Mus_musculus.GRCm38.93.gtf.gz"
@@ -26,6 +25,10 @@ def parseSpOut(_s) -> int:
         return (0)
 
 def createTestData(fp, samples=9) -> None:
+    yaml = YAML()
+    yaml.boolean_representation = ['False', 'True']
+    #yaml.default_flow_style = False
+    #yaml.default_style = None
     # single end folder
     (fp / 'SE').mkdir()
     # paired end folder
@@ -125,7 +128,7 @@ def createTestData(fp, samples=9) -> None:
         'rmsk_file': (fp / 'ref' / 'rmsk.txt').as_posix()
     }
     with open(fp / 'org.yaml', 'w') as of:
-        yaml.dump(orgyaml, of, default_flow_style=False)
+        yaml.dump(orgyaml, of)
 
     # create test samplesheet
     pd.DataFrame(
@@ -153,54 +156,54 @@ def createTestData(fp, samples=9) -> None:
     # ChIP sample_config
     chip_dict ={
         'chip_dict': {
-            'sample1': {'control': 'sample7', 'broad': 'False'},
-            'sample2': {'control': 'sample7', 'broad': 'False'},
-            'sample3': {'control': 'sample8', 'broad': 'False'},
-            'sample4': {'control': 'sample8', 'broad': 'False'},
-            'sample5': {'control': 'sample9', 'broad': 'False'},
-            'sample6': {'control': 'sample9', 'broad': 'False'}
+            'sample1': {'control': 'sample7', 'broad': False},
+            'sample2': {'control': 'sample7', 'broad': False},
+            'sample3': {'control': 'sample8', 'broad': False},
+            'sample4': {'control': 'sample8', 'broad': False},
+            'sample5': {'control': 'sample9', 'broad': False},
+            'sample6': {'control': 'sample9', 'broad': False}
         }
     }
     with open(fp / 'chipdict.yaml', 'w') as f:
-        yaml.dump(chip_dict, f, default_flow_style=False, default_style=None)
+        yaml.dump(chip_dict, f)
 
-    chip_dict ={
+    chip_dict_broad ={
         'chip_dict': {
-            'sample1': {'control': 'sample7', 'broad': 'True'},
-            'sample2': {'control': 'sample7', 'broad': 'True'},
-            'sample3': {'control': 'sample8', 'broad': 'True'},
-            'sample4': {'control': 'sample8', 'broad': 'True'},
-            'sample5': {'control': 'sample9', 'broad': 'True'},
-            'sample6': {'control': 'sample9', 'broad': 'True'}
+            'sample1': {'control': 'sample7', 'broad': True},
+            'sample2': {'control': 'sample7', 'broad': True},
+            'sample3': {'control': 'sample8', 'broad': True},
+            'sample4': {'control': 'sample8', 'broad': True},
+            'sample5': {'control': 'sample9', 'broad': True},
+            'sample6': {'control': 'sample9', 'broad': True}
         }
     }
     with open(fp / 'chipdict_broad.yaml', 'w') as f:
-        yaml.dump(chip_dict, f, default_flow_style=False, default_style=None)
+        yaml.dump(chip_dict_broad, f)
 
-    chip_dict ={
+    chip_dict_no_control ={
         'chip_dict': {
-            'sample1': {'control': None, 'broad': 'False'},
-            'sample2': {'control': None, 'broad': 'False'},
-            'sample3': {'control': None, 'broad': 'False'},
-            'sample4': {'control': None, 'broad': 'False'},
-            'sample5': {'control': None, 'broad': 'False'},
-            'sample6': {'control': None, 'broad': 'False'}
+            'sample1': {'control': None, 'broad': False},
+            'sample2': {'control': None, 'broad': False},
+            'sample3': {'control': None, 'broad': False},
+            'sample4': {'control': None, 'broad': False},
+            'sample5': {'control': None, 'broad': False},
+            'sample6': {'control': None, 'broad': False}
         }
     }
     with open(fp / 'chipdict_noControl.yaml', 'w') as f:
-        yaml.dump(chip_dict, f, default_flow_style=False, default_style=None)
+        yaml.dump(chip_dict_no_control, f)
 
 
-    chip_dict ={
+    chip_dict_simple ={
         'chip_dict': {
-            'sample1': {'control': 'sample3', 'broad': 'False'},
-            'sample2': {'control': 'sample3', 'broad': 'False'},
-            'sample4': {'control': 'sample6', 'broad': 'False'},
-            'sample5': {'control': 'sample6', 'broad': 'False'}
+            'sample1': {'control': 'sample3', 'broad': False},
+            'sample2': {'control': 'sample3', 'broad': False},
+            'sample4': {'control': 'sample6', 'broad': False},
+            'sample5': {'control': 'sample6', 'broad': False}
         }
     }
     with open(fp / 'chipdict_simple.yaml', 'w') as f:
-        yaml.dump(chip_dict, f, default_flow_style=False, default_style=None)
+        yaml.dump(chip_dict_simple, f)
 
 @pytest.fixture(scope="session")
 def ifs(tmp_path_factory):
@@ -500,7 +503,37 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 77
+        assert parseSpOut(_p) == 59
+    def test_nosamplesheet(self, ifs):
+        ci = [
+            "ChIP-seq",
+            '-d',
+            ifs / 'bam_input',
+            '--snakemakeOptions',
+            SMKOPTS,
+            ifs / 'org.yaml',
+            ifs / 'chipdict.yaml'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 37
+    def test_nosamplesheet_genrich(self, ifs):
+        ci = [
+            "ChIP-seq",
+            '-d',
+            ifs / 'bam_input',
+            '--snakemakeOptions',
+            SMKOPTS,
+            '--peakCaller',
+            'Genrich',
+            ifs / 'org.yaml',
+            ifs / 'chipdict.yaml'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 35
     def test_broad(self, ifs):
         ci = [
             "ChIP-seq",
@@ -534,7 +567,44 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 74
+        assert parseSpOut(_p) == 56
+    def test_seacr(self, ifs):
+        ci = [
+            "ChIP-seq",
+            '-d',
+            ifs / 'bam_input',
+            '--sampleSheet',
+            ifs / 'sampleSheet.tsv',
+            '--snakemakeOptions',
+            SMKOPTS,
+            '--peakCaller',
+            'SEACR',
+            ifs / 'org.yaml',
+            ifs / 'chipdict.yaml'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 71
+    def test_seacr_spikein(self, ifs):
+        ci = [
+            "ChIP-seq",
+            '-d',
+            ifs / 'bam_input',
+            '--sampleSheet',
+            ifs / 'sampleSheet.tsv',
+            '--snakemakeOptions',
+            SMKOPTS,
+            '--peakCaller',
+            'SEACR',
+            '--useSpikeInForNorm',
+            ifs / 'org.yaml',
+            ifs / 'chipdict.yaml'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 112
     def test_SE(self, ifs):
         ci = [
             "ChIP-seq",
@@ -551,7 +621,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 77
+        assert parseSpOut(_p) == 59
     def test_l2ratio(self, ifs):
         ci = [
             "ChIP-seq",
@@ -569,7 +639,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 71
+        assert parseSpOut(_p) == 53
     def test_default_noInput(self, ifs):
         ci = [
             "ChIP-seq",
@@ -585,7 +655,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 56
+        assert parseSpOut(_p) == 38
     def test_genrich_noInput(self, ifs):
         ci = [
             "ChIP-seq",
@@ -603,7 +673,44 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 50
+        assert parseSpOut(_p) == 32
+    def test_seacr_noInput(self, ifs):
+        ci = [
+            "ChIP-seq",
+            '-d',
+            ifs / 'bam_input',
+            '--sampleSheet',
+            ifs / 'sampleSheet.tsv',
+            '--snakemakeOptions',
+            SMKOPTS,
+            '--peakCaller',
+            'SEACR',
+            ifs / 'org.yaml',
+            ifs / 'chipdict_noControl.yaml'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 44
+    def test_seacr_spikein_noInput(self, ifs):
+        ci = [
+            "ChIP-seq",
+            '-d',
+            ifs / 'bam_input',
+            '--sampleSheet',
+            ifs / 'sampleSheet.tsv',
+            '--snakemakeOptions',
+            SMKOPTS,
+            '--peakCaller',
+            'SEACR',
+            '--useSpikeInForNorm',
+            ifs / 'org.yaml',
+            ifs / 'chipdict_noControl.yaml'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 65
     def test_frombam(self, ifs):
         ci = [
             "ChIP-seq",
@@ -621,7 +728,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 137
+        assert parseSpOut(_p) == 119
     def test_frombam_noInput(self, ifs):
         ci = [
             "ChIP-seq",
@@ -639,7 +746,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 98
+        assert parseSpOut(_p) == 80
     def test_spikein(self, ifs):
         ci = [
             "ChIP-seq",
@@ -656,7 +763,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 124
+        assert parseSpOut(_p) == 106
     def test_spikein_noInput(self, ifs):
         ci = [
             "ChIP-seq",
@@ -673,7 +780,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 83
+        assert parseSpOut(_p) == 65
     def test_spikeinfrombam(self, ifs):
         ci = [
             "ChIP-seq",
@@ -692,7 +799,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 160
+        assert parseSpOut(_p) == 142
     def test_spikeinfrombamTSSnorm(self, ifs):
         ci = [
             "ChIP-seq",
@@ -713,7 +820,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 136
+        assert parseSpOut(_p) == 118
     def test_spikeinfrombaminputnorm(self, ifs):
         ci = [
             "ChIP-seq",
@@ -734,7 +841,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 133
+        assert parseSpOut(_p) == 115
     def test_allelic(self, ifs):
         ci = [
             "ChIP-seq",
@@ -766,7 +873,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 99
+        assert parseSpOut(_p) == 81
     def test_multicomp_genrich(self, ifs):
         ci = [
             "ChIP-seq",
@@ -784,7 +891,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 100
+        assert parseSpOut(_p) == 82
     def test_multicomp_broad(self, ifs):
         ci = [
             "ChIP-seq",
@@ -818,7 +925,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 159
+        assert parseSpOut(_p) == 141
     def test_multicomp_fromBam_Genrich(self, ifs):
         ci = [
             "ChIP-seq",
@@ -838,7 +945,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 160
+        assert parseSpOut(_p) == 142
     def test_multicomp_spikein(self, ifs):
         ci = [
             "ChIP-seq",
@@ -855,7 +962,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 136
+        assert parseSpOut(_p) == 118
     def test_multicomp_spikein_genrich(self, ifs):
         ci = [
             "ChIP-seq",
@@ -874,7 +981,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 137
+        assert parseSpOut(_p) == 119
     def test_multicomp_spikein_noInput(self, ifs):
         ci = [
             "ChIP-seq",
@@ -891,7 +998,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 99
+        assert parseSpOut(_p) == 81
     def test_multicomp_spikein_noInput_Genrich(self, ifs):
         ci = [
             "ChIP-seq",
@@ -910,7 +1017,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 97
+        assert parseSpOut(_p) == 79
     def test_multicomp_spikein_fromBam(self, ifs):
         ci = [
             "ChIP-seq",
@@ -929,7 +1036,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 172
+        assert parseSpOut(_p) == 154
     def test_multicomp_spikein_fromBam_genrich(self, ifs):
         ci = [
             "ChIP-seq",
@@ -950,7 +1057,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 173
+        assert parseSpOut(_p) == 155
     def test_multicomp_spikein_fromBam_noInput(self, ifs):
         ci = [
             "ChIP-seq",
@@ -969,7 +1076,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 123
+        assert parseSpOut(_p) == 105
     def test_multicomp_spikein_fromBam_noInput_genrich(self, ifs):
         ci = [
             "ChIP-seq",
@@ -990,7 +1097,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 121
+        assert parseSpOut(_p) == 103
 
 class TestmRNAseq:
     def test_default(self, ifs):
@@ -1618,6 +1725,21 @@ class TestWGBS():
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
         assert parseSpOut(_p) == 154
+    def test_no_sampleSheet(self, ifs):
+        ci = [
+            "WGBS",
+            '-i',
+            ifs / 'PE',
+            '-o',
+            'outdir',
+            '--snakemakeOptions',
+            SMKOPTS,
+            ifs / 'org.yaml'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 150
     def test_bwameth2(self, ifs):
         ci = [
             "WGBS",
@@ -1732,6 +1854,19 @@ class TestATAC():
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
         assert parseSpOut(_p) == 63
+    def test_no_sampleSheet(self, ifs):
+        ci = [
+            "ATAC-seq",
+            '-d',
+            ifs / 'bam_input',
+            '--snakemakeOptions',
+            SMKOPTS,
+            ifs / 'org.yaml'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 47
     def test_genrich(self, ifs):
         ci = [
             "ATAC-seq",

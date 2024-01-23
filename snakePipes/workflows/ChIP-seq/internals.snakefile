@@ -91,6 +91,8 @@ if sampleSheet:
         if not peakCaller=="Genrich":
             sys.exit()
     isMultipleComparison = cf.isMultipleComparison(sampleSheet)
+else:
+    isMultipleComparison = False
 
 chip_dict = {}
 with open(samples_config, "r") as f:

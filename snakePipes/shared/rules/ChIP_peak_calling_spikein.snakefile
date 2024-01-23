@@ -237,3 +237,30 @@ else:
             shell: """
                 Genrich -t {params.bams} {params.control_pfx} {params.control} -o {output} -r {params.blacklist} -e {params.spikein_chroms} -w {params.frag_size} 2> {log}
                 """
+
+
+rule prep_bedgraph:
+    input: "bamCoverage/{sample}.host_scaled.BYhost.bw"
+    output: temp("filtered_bedgraph/{sample}_host.fragments.bedgraph")
+    log: "filtered_bedgraph/log/{sample}.log"
+    conda: CONDA_SEACR_ENV
+    shell: """
+        bigWigToBedGraph {input} {output}
+        """
+
+rule SEACR_peaks:
+    input:
+        chip = "filtered_bedgraph/{chip_sample}_host.fragments.bedgraph",
+        control = lambda wildcards: "filtered_bedgraph/"+get_control(wildcards.chip_sample)+"_host.fragments.bedgraph" if get_control(wildcards.chip_sample)
+                 else []
+    output:
+        "SEACR/{chip_sample}_host.stringent.bed"
+    log: "SEACR/logs/{chip_sample}.log"
+    params:
+        fdr = fdr,
+        prefix = os.path.join(outdir,"SEACR/{chip_sample}_host"),
+        script=os.path.join(maindir, "shared","tools/SEACR-1.3/SEACR_1.3.sh")
+    conda: CONDA_SEACR_ENV
+    shell: """
+        bash {params.script} {input.chip} {input.control} {params.fdr} "non" "stringent" {params.prefix} 2>{log}
+        """

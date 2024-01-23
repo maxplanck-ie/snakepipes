@@ -171,11 +171,11 @@ def run_CSAW():
 
 
 def run_genrich():
-    if peakCaller == "Genrich":
-        if cutntag:
-            warnings.warn("--cutntag only works with macs2, your setting for using Genrich will be ignored. "
-                          "Remove --cutntag if interested in Genrich.")
-            return ([])
+    if (peakCaller == "Genrich"):
+#        if cutntag:
+#            warnings.warn("--cutntag only works with macs2, your setting for using Genrich will be ignored. "
+#                          "Remove --cutntag if interested in Genrich.")
+#            return ([])
         file_list = ["Genrich/all_samples.narrowPeak"]
         if sampleSheet:
             if not isMultipleComparison:
@@ -190,7 +190,8 @@ def run_genrich():
                             unique_group.append(zip(key,x))
                             file_list.append("Genrich/{}.{}.narrowPeak".format(x,key))
         return (file_list)
-    return ([])
+    else:
+        return ([])
 
 
 def run_macs2():
@@ -201,6 +202,16 @@ def run_macs2():
         else:
             file_list = expand("MACS2/{chip_sample}.filtered.BAM_peaks.xls", chip_sample = chip_samples)
             file_list.extend(expand("MACS2/{chip_sample}.filtered.BAM_peaks.qc.txt", chip_sample = chip_samples))
+        return (file_list)
+    return ([])
+
+
+def run_seacr():
+    if (peakCaller == "SEACR"):
+        if useSpikeInForNorm:
+            file_list = expand("SEACR/{chip_sample}_host.stringent.bed", chip_sample = chip_samples)
+        else:
+            file_list = expand("SEACR/{chip_sample}.filtered.stringent.bed", chip_sample = chip_samples)
         return (file_list)
     return ([])
 
@@ -250,6 +261,7 @@ rule all:
         run_deepTools_ChIP(),
         run_macs2(),
         run_genrich(),
+        run_seacr(),
         # run histoneHMM if allelic_bams are absent (since it gives index error without allele_specific index)
         run_histoneHMM(allele_info),
         ## run deeptools-allelic only if dir "allelic_bams" present and non empty
