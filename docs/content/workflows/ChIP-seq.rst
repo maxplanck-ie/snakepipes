@@ -210,14 +210,19 @@ Following up on the DNA-mapping module results (see :doc:`DNA-mapping`), the wor
 
 * **histoneHMM**: This folder contains the output of `histoneHMM <https://github.com/matthiasheinig/histoneHMM>`__. This folder will only exist if you have broad marks.
 
-* **CSAW_sampleSheet**: This folder is created optionally, if you provide a sample sheet for differential binding analysis. (see :ref:`diffBinding`)
+* **CSAW_sampleSheet**: This folder is created optionally, if you provide a sample sheet for differential binding analysis. (see :ref:`diffBinding`) CSAW will be run using peaks called by the chosen peak caller, and the output folder will be named accordingly.
 * **AnnotatedResults_sampleSheet**: This folder is created optionally, if you provide a sample sheet for differential binding analysis. (see :ref:`diffBinding`). Differentially bound regions annotated with distance to nearest gene are stored here.
 
 .. note:: Although in case of broad marks, we also perform the MACS2 `broadpeak` analysis (output available as ``MACS2/<sample>.filtered.BAM_peaks.broadPeak``), we would recommend using the histoneHMM outputs in these cases, since histoneHMM produces better results than MACS2 for broad peaks.
 
+.. note:: For narrow marks, the user may choose the peak caller from MACS2 (default), Genrich or `SEACR <https://github.com/FredHutch/SEACR>`__. By deafult, SEACR is run in the stringent mode, applying normalization to counts over bed files. If invoked together with ``--useSpikeInForNorm``, SEACR will be run in stringent mode, using spikein-normalized counts. FDR can be set by the user (default 0.05).
+
 .. note:: The ``_sampleSheet`` suffix for the ``CSAW_sampleSheet`` is drawn from the name of the sample sheet you use. So if you instead named the sample sheet ``mySampleSheet.txt`` then the folder would be named ``CSAW_mySampleSheet``. This facilitates using multiple sample sheets.
 
-.. note:: At the moment Genrich is NOT jointly calling peaks within a group since it's not aware of which samples contain which antibody. It is utilizing the input control if one exists.
+.. note:: If you provide a sampleSheet with name, condition and group columns, "multiple comparison mode" will be detected. The original sampleSheet will be split on the group column, and multiple pairwise comparisons will be run with CSAW, one per group.
+
+
+.. note:: If provided with sampleSheet, Genrich will be used to jointly call peaks within a condition group. It will utilize the input controls if they exist.
 
 
 Command line options
