@@ -103,9 +103,9 @@ else:
 rule MACS2_peak_qc:
     input:
         bam = "split_bam/{sample}_host.bam",
-        xls = "MACS2/{sample}_host.bam_peaks.xls"
+        xls = "MACS2/{sample}_host.BAM_peaks.xls"
     output:
-        qc = "MACS2/{sample}_host.bam_peaks.qc.txt"
+        qc = "MACS2/{sample}_host.BAM_peaks.qc.txt"
     params:
         peaks =
             lambda wildcards: "MACS2/{}_host.BAM_peaks.broadPeak".format(wildcards.sample) if is_broad(wildcards.sample)
@@ -160,40 +160,107 @@ rule namesort_bams:
 
 # Requires PE data
 # Should be run once per-group!
-if pairedEnd:
-    rule Genrich_peaks:
-        input:
-            bams=lambda wildcards: expand(os.path.join("namesorted_bam", "{sample}_host_namesorted.bam"), sample=genrichDict[wildcards.group]),
-            control = lambda wildcards: ["namesorted_bam/"+get_control(x)+"_host_namesorted.bam" for x in genrichDict[wildcards.group]]
-        output:
-            "Genrich/{group}.narrowPeak"
-        log: "Genrich/logs/{group}.log"
-        params:
-            bams = lambda wildcards: ",".join(expand(os.path.join("namesorted_bam", "{sample}_host_namesorted.bam"), sample=genrichDict[wildcards.group])),
-            blacklist = "-E {}".format(blacklist_bed) if blacklist_bed else "",
-            control_pfx=lambda wildcards,input: "-c" if input.control else "",
-            control=lambda wildcards,input: ",".join(input.control) if input.control else "",
-            spikein_chroms=",".join(spikein_chr)
-        conda: CONDA_CHIPSEQ_ENV
-        shell: """
-            Genrich  -t {params.bams} {params.control_pfx} {params.control} -o {output} -r {params.blacklist} -e {params.spikein_chroms} -y 2> {log}
-            """
+
+if not isMultipleComparison:
+    if pairedEnd:
+        rule Genrich_peaks:
+            input:
+                bams=lambda wildcards: expand(os.path.join("namesorted_bam", "{sample}_host_namesorted.bam"), sample=genrichDict[wildcards.group]),
+                control = lambda wildcards: ["namesorted_bam/"+get_control(x)+"_host_namesorted.bam" for x in genrichDict[wildcards.group]] if chip_samples_w_ctrl else []
+            output:
+                "Genrich/{group}.narrowPeak"
+            log: "Genrich/logs/{group}.log"
+            params:
+                bams = lambda wildcards: ",".join(expand(os.path.join("namesorted_bam", "{sample}_host_namesorted.bam"), sample=genrichDict[wildcards.group])),
+                blacklist = "-E {}".format(blacklist_bed) if blacklist_bed else "",
+                control_pfx=lambda wildcards,input: "-c" if input.control else "",
+                control=lambda wildcards,input: ",".join(input.control) if input.control else "",
+                spikein_chroms=",".join(spikein_chr)
+            conda: CONDA_CHIPSEQ_ENV
+            shell: """
+                Genrich  -t {params.bams} {params.control_pfx} {params.control} -o {output} -r {params.blacklist} -e {params.spikein_chroms} -y 2> {log}
+                """
+    else:
+        rule Genrich_peaks:
+            input:
+                bams=lambda wildcards: expand(os.path.join("namesorted_bam", "{sample}_host_namesorted.bam"), sample=genrichDict[wildcards.group]),
+                control = lambda wildcards: ["namesorted_bam/"+get_control(x)+"_host_namesorted.bam" for x in genrichDict[wildcards.group]] if chip_samples_w_ctrl else []
+            output:
+                "Genrich/{group}.narrowPeak"
+            log: "Genrich/logs/{group}.log"
+            params:
+                bams = lambda wildcards: ",".join(expand(os.path.join("namesorted_bam", "{sample}_host_namesorted.bam"), sample=genrichDict[wildcards.group])),
+                blacklist = "-E {}".format(blacklist_bed) if blacklist_bed else "",
+                control_pfx=lambda wildcards,input: "-c" if input.control else "",
+                control=lambda wildcards,input: ",".join(input.control) if input.control else "",
+                frag_size=fragmentLength,
+                spikein_chroms=",".join(spikein_chr)
+            conda: CONDA_CHIPSEQ_ENV
+            shell: """
+                Genrich  -t {params.bams} {params.control_pfx} {params.control} -o {output} -r {params.blacklist} -e {params.spikein_chroms} -w {params.frag_size} 2> {log}
+                """
 else:
-    rule Genrich_peaks:
-        input:
-            bams=lambda wildcards: expand(os.path.join("namesorted_bam", "{sample}_host_namesorted.bam"), sample=genrichDict[wildcards.group]),
-            control = lambda wildcards: ["namesorted_bam/"+get_control(x)+"_host_namesorted.bam" for x in genrichDict[wildcards.group]]
-        output:
-            "Genrich/{group}.narrowPeak"
-        log: "Genrich/logs/{group}.log"
-        params:
-            bams = lambda wildcards: ",".join(expand(os.path.join("namesorted_bam", "{sample}_host_namesorted.bam"), sample=genrichDict[wildcards.group])),
-            blacklist = "-E {}".format(blacklist_bed) if blacklist_bed else "",
-            control_pfx=lambda wildcards,input: "-c" if input.control else "",
-            control=lambda wildcards,input: ",".join(input.control) if input.control else "",
-            frag_size=fragmentLength,
-            spikein_chroms=",".join(spikein_chr)
-        conda: CONDA_CHIPSEQ_ENV
-        shell: """
-            Genrich  -t {params.bams} {params.control_pfx} {params.control} -o {output} -r {params.blacklist} -e {params.spikein_chroms} -w {params.frag_size} 2> {log}
-            """
+    if pairedEnd:
+        rule Genrich_peaks:
+            input:
+                bams=lambda wildcards: expand(os.path.join("namesorted_bam", "{sample}_host_namesorted.bam"), sample=genrichDict[wildcards.compGroup][wildcards.group]),
+                control = lambda wildcards: ["namesorted_bam/"+get_control(x)+"_host_namesorted.bam" for x in genrichDict[wildcards.compGroup][wildcards.group]] if chip_samples_w_ctrl else []
+            output:
+                "Genrich/{group}.{compGroup}.narrowPeak"
+            log: "Genrich/logs/{group}.{compGroup}.log"
+            params:
+                bams = lambda wildcards: ",".join(expand(os.path.join("namesorted_bam", "{sample}_host_namesorted.bam"), sample=genrichDict[wildcards.compGroup][wildcards.group])),
+                blacklist = "-E {}".format(blacklist_bed) if blacklist_bed else "",
+                control_pfx=lambda wildcards,input: "-c" if input.control else "",
+                control=lambda wildcards,input: ",".join(input.control) if input.control else "",
+                spikein_chroms=",".join(spikein_chr)
+            conda: CONDA_CHIPSEQ_ENV
+            shell: """
+                Genrich -t {params.bams} {params.control_pfx} {params.control} -o {output} -r {params.blacklist} -e {params.spikein_chroms} -y 2> {log}
+                """
+    else:
+        rule Genrich_peaks:
+            input:
+                bams=lambda wildcards: expand(os.path.join("namesorted_bam", "{sample}_host_namesorted.bam"), sample=genrichDict[wildcards.compGroup][wildcards.group]),
+                control = lambda wildcards: ["namesorted_bam/"+get_control(x)+"_host_namesorted.bam" for x in genrichDict[wildcards.compGroup][wildcards.group] ] if chip_samples_w_ctrl else []
+            output:
+                "Genrich/{group}.{compGroup}.narrowPeak"
+            log: "Genrich/logs/{group}.{compGroup}.log"
+            params:
+                bams = lambda wildcards: ",".join(expand(os.path.join("namesorted_bam", "{sample}_host_namesorted.bam"), sample=genrichDict[wildcards.compGroup][wildcards.group])),
+                blacklist = "-E {}".format(blacklist_bed) if blacklist_bed else "",
+                control_pfx=lambda wildcards,input: "-c" if input.control else "",
+                control=lambda wildcards,input: ",".join(input.control) if input.control else "",
+                frag_size=fragmentLength,
+                spikein_chroms=",".join(spikein_chr)
+            conda: CONDA_CHIPSEQ_ENV
+            shell: """
+                Genrich -t {params.bams} {params.control_pfx} {params.control} -o {output} -r {params.blacklist} -e {params.spikein_chroms} -w {params.frag_size} 2> {log}
+                """
+
+
+rule prep_bedgraph:
+    input: "bamCoverage/{sample}.host_scaled.BYhost.bw"
+    output: temp("filtered_bedgraph/{sample}_host.fragments.bedgraph")
+    log: "filtered_bedgraph/log/{sample}.log"
+    conda: CONDA_SEACR_ENV
+    shell: """
+        bigWigToBedGraph {input} {output}
+        """
+
+rule SEACR_peaks:
+    input:
+        chip = "filtered_bedgraph/{chip_sample}_host.fragments.bedgraph",
+        control = lambda wildcards: "filtered_bedgraph/"+get_control(wildcards.chip_sample)+"_host.fragments.bedgraph" if get_control(wildcards.chip_sample)
+                 else []
+    output:
+        "SEACR/{chip_sample}_host.stringent.bed"
+    log: "SEACR/logs/{chip_sample}.log"
+    params:
+        fdr = fdr,
+        prefix = os.path.join(outdir,"SEACR/{chip_sample}_host"),
+        script=os.path.join(maindir, "shared","tools/SEACR-1.3/SEACR_1.3.sh")
+    conda: CONDA_SEACR_ENV
+    shell: """
+        bash {params.script} {input.chip} {input.control} {params.fdr} "non" "stringent" {params.prefix} 2>{log}
+        """

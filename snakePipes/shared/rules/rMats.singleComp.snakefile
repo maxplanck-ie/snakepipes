@@ -7,7 +7,7 @@ def wrap_libType(libType):
     dic_libType = {0:"fr-unstranded",1:"fr-firststrand",2:"fr-secondstrand"}
     return dic_libType[libType]
 
-rMatsConds = cf.sampleSheetGroups(sampleSheet)
+rMatsConds = cf.sampleSheetGroups(sampleSheet,isMultipleComparison)
 
 rule createInputcsv:
     input:

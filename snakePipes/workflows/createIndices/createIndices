@@ -18,7 +18,7 @@ import snakePipes.parserCommon as parserCommon
 
 def parse_args(defaults={"configFile": None, "clusterConfigFile": None,
                          "maxJobs": 5, "snakemakeOptions": "--use-conda",
-                         "tempDir": None, "verbose": False, "spikeinExt": None}):
+                         "tempDir": None, "verbose": False, "spikeinExt": None, "salmonIndexOptions": None, "eisaR_flank_length": None }):
     """
     Parse arguments from the command line.
     """
@@ -61,7 +61,7 @@ def parse_args(defaults={"configFile": None, "clusterConfigFile": None,
                           help="Only produce indices for the following tools (by default, all indices will be created). The default is 'all'. 'none' will create everything except aligner indices.",
                           default="all",
                           nargs="+",
-                          choices=['all', 'bowtie2', 'hisat2', 'bwa', 'bwa-mem2', 'bwameth', 'bwameth2', 'star', 'none'])
+                          choices=['all', 'bowtie2', 'hisat2', 'bwa', 'bwa-mem2', 'bwameth', 'bwameth2', 'salmon', 'star', 'none'])
 
     optional.add_argument("--effectiveGenomeSize",
                           type=int,
@@ -82,6 +82,14 @@ def parse_args(defaults={"configFile": None, "clusterConfigFile": None,
     optional.add_argument("--userYAML",
                           action="store_true",
                           help="By default, this workflow creates an organism YAML file where snakePipes will look for it by default. If this isn't desired (e.g., you don't want the organism to be selectable by default or you don't have write permissions to the snakePipes installation) you can specify this option and the YAML file will instead be created in the location specified by the `-o` option.")
+
+    optional.add_argument("--salmonIndexOptions",
+                          help="Options to pass to salmon for index creation.",
+                          default=defaults["salmonIndexOptions"])
+
+    optional.add_argument("--eisaR_flank_length",
+                          help="Length by which to extend intronic regions with eisaR.",
+                          default=defaults["eisaR_flank_length"])
 
     return parser
 

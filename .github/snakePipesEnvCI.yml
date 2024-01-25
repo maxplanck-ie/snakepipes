@@ -1,11 +1,8 @@
 name: snakePipes_CI
-channels:
-  - conda-forge
-  - bioconda
 dependencies:
   - python=3.9
-  - snakemake=6.2.1
-  - fuzzywuzzy
+  - snakemake=7.18.2
+  - thefuzz[speedup]
   - mock
   - sphinx=4.2.0
   - sphinx-argparse
@@ -13,3 +10,4 @@ dependencies:
   - flake8
   - coreutils
   - mamba
+  - graphviz

@@ -105,8 +105,7 @@ The default configuration file is listed below and can be found in ``snakePipes/
     skipVelocyto: False
     ##mode Alevin options
     alevinLibraryType: "ISR"
-    prepProtocol: "celseq2"
-    salmonIndexOptions: --type puff -k 31
+    prepProtocol: "chromiumV3"
     expectCells: 
     readLengthFrx: 0.2
     #generic options
@@ -124,8 +123,7 @@ The default configuration file is listed below and can be found in ``snakePipes/
     bcPattern: NNNNCCCCCCCCC #default: 4 base umi barcode, 9 base cell barcode (eg. RELACS barcode)
     UMIDedup: False
     UMIDedupSep: "_"
-    UMIDedupOpts: --paired
-
+    UMIDedupOpts: --pairedUMIDedupOpts: --paired
 
 
 Pseudogene filter

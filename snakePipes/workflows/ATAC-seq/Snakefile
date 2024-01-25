@@ -57,8 +57,12 @@ else:
 chip_samples = samples
 pairedEnd = True
 if sampleSheet:
-    include: os.path.join(maindir, "shared", "rules", "CSAW.snakefile")
-    include: os.path.join(maindir, "shared", "rules", "nearestGene.snakefile")
+    if not isMultipleComparison:
+        include: os.path.join(maindir, "shared", "rules", "CSAW.singleComp.snakefile")
+        include: os.path.join(maindir, "shared", "rules", "nearestGene.singleComp.snakefile")
+    else:
+        include: os.path.join(maindir, "shared", "rules", "CSAW.multiComp.snakefile")
+        include: os.path.join(maindir, "shared", "rules", "nearestGene.multiComp.snakefile")
     include: os.path.join(maindir, "shared", "rules", "filterGTF.snakefile")
 #    if not fromBAM:
         # These are needed for the snakefile to be imported
@@ -77,15 +81,23 @@ def run_deepTools_allelic():
 
 def run_CSAW():
     if sampleSheet:
-        file_list=["CSAW_{}_{}/CSAW.session_info.txt".format(peakCaller, sample_name),
+        if not isMultipleComparison:
+            file_list=["CSAW_{}_{}/CSAW.session_info.txt".format(peakCaller, sample_name),
                    "Annotation/genes.filtered.symbol","Annotation/genes.filtered.t2g",
                    "CSAW_{}_{}/CSAW.Stats_report.html".format(peakCaller, sample_name)]
-        file_list.append([os.path.join("CSAW_{}_{}".format(peakCaller, sample_name), x) \
+            file_list.append([os.path.join("CSAW_{}_{}".format(peakCaller, sample_name), x) \
                          for x in list(itertools.chain.from_iterable([expand("CSAW.{change_dir}.cov.matrix",\
                          change_dir=change_direction),expand("CSAW.{change_dir}.cov.heatmap.png",change_dir=change_direction)]))])
-        file_list.append([os.path.join("AnnotatedResults_{}_{}".format(peakCaller, sample_name), x) \
+            file_list.append([os.path.join("AnnotatedResults_{}_{}".format(peakCaller, sample_name), x) \
                          for x in list(itertools.chain.from_iterable([expand("Filtered.results.{change_dir}_withNearestGene.txt",\
                          change_dir=change_direction)]))])
+        else:
+            file_list=expand("CSAW_{}_{}/CSAW.session_info.txt".format(peakCaller, sample_name + ".{compGroup}"),compGroup=cf.returnComparisonGroups(sampleSheet))
+            file_list.append(["Annotation/genes.filtered.symbol","Annotation/genes.filtered.t2g",expand("CSAW_{}_{}/CSAW.Stats_report.html".format(peakCaller, sample_name + ".{compGroup}"),compGroup=cf.returnComparisonGroups(sampleSheet))])
+            file_list.append([expand("CSAW_{}_{}".format(peakCaller, sample_name + ".{compGroup}") + "/CSAW.{change_dir}.cov.matrix",change_dir=change_direction,compGroup=cf.returnComparisonGroups(sampleSheet)),
+                  expand("CSAW_{}_{}".format(peakCaller, sample_name + ".{compGroup}") +"/CSAW.{change_dir}.cov.heatmap.png",change_dir=change_direction,compGroup=cf.returnComparisonGroups(sampleSheet)
+                  )])
+            file_list.append(expand("AnnotatedResults_{}_{}".format(peakCaller,sample_name + ".{compGroup}") + "/Filtered.results.{change_dir}_withNearestGene.txt",change_dir=change_direction, compGroup=cf.returnComparisonGroups(sampleSheet)))
         return( file_list )
     else:
         return([])
@@ -118,7 +130,17 @@ def run_genrich():
     if peakCaller == "Genrich":
         file_list = ["Genrich/all_samples.narrowPeak"]
         if sampleSheet:
-            file_list = ["Genrich/{}.narrowPeak".format(x) for x in genrichDict.keys()]
+            if not isMultipleComparison:
+                file_list = ["Genrich/{}.narrowPeak".format(x) for x in genrichDict.keys()]
+            else:
+                #print(genrichDict)
+                unique_group=[]
+                file_list=[]
+                for key,value in genrichDict.items():
+                    for x in value.keys():
+                        if zip(key,x) not in unique_group:
+                            unique_group.append(zip(key,x))
+                            file_list.append("Genrich/{}.{}.narrowPeak".format(x,key))
         file_list.append(expand(short_bams + "{sample}.short.namesorted.bam",sample=samples))
         return (file_list)
     return ([])
@@ -154,6 +176,8 @@ onstart:
     if toolsVersion:
         usedEnvs = [CONDA_SHARED_ENV, CONDA_ATAC_ENV, CONDA_RMD_ENV]
         cf.writeTools(usedEnvs, workingdir, "ATAC-seq", maindir)
+    if sampleSheet:
+        cf.copySampleSheet(sampleSheet, workingdir)
 
 ### main rule ##################################################################
 ################################################################################

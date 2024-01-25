@@ -15,6 +15,7 @@ runRNAseq.sh
 *.pyc
 dist
 build
+*.swp
 
 # sphinx build folder
 _build
@@ -26,3 +27,6 @@ output
 
 # pip stuff
 snakePipes.egg-info
+
+# misc
+.vscode/

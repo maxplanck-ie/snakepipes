@@ -3,6 +3,7 @@ import snakePipes.common_functions as cf
 
 ### snakemake_workflows initialization ########################################
 maindir = os.path.dirname(os.path.dirname(workflow.basedir))
+workflow_rscripts=os.path.join(maindir, "shared", "rscripts")
 
 # load conda ENVs (path is relative to "shared/rules" directory)
 globals().update(cf.set_env_yamls())
@@ -29,8 +30,12 @@ organismDictionary = {'genome_size': 0,
                       'bwameth2_index': '',
                       'known_splicesites': '',
                       'star_index': '',
+                      'salmon_index': '',
+                      'salmon_velocity_index': '',
+                      't2g_velocity': '',
                       'genes_bed': '',
                       'genes_gtf': '',
+                      'genes_t2g': '',
                       'spikein_genes_gtf': '',
                       'extended_coding_regions_gtf': '',
                       'blacklist_bed': '',
@@ -51,9 +56,11 @@ organismDictionary['genome_dict'] = os.path.join(outdir, "genome_fasta/genome.di
 if gtfURL:
     targets.extend([os.path.join(outdir, x) for x in ["annotation/genes.gtf",
                                                       "annotation/genes.bed",
+                                                      "annotation/genes.t2g",
                                                       "annotation/genes.slop.gtf"]])
     organismDictionary['genes_gtf'] = os.path.join(outdir, "annotation/genes.gtf")
     organismDictionary['genes_bed'] = os.path.join(outdir, "annotation/genes.bed")
+    organismDictionary['genes_t2g'] = os.path.join(outdir, "annotation/genes.t2g")
     organismDictionary['extended_coding_regions_gtf'] = os.path.join(outdir, "annotation/genes.slop.gtf")
 
 if spikeinGtfURL:
@@ -78,6 +85,14 @@ if 'all' in tools or 'hisat2' in tools:
 if 'all' in tools or 'star' in tools:
     targets.append(os.path.join(outdir, "STARIndex/SAindex"))
     organismDictionary['star_index'] = os.path.join(outdir, "STARIndex/")
+
+if 'all' in tools or 'salmon' in tools:
+    targets.append(os.path.join(outdir, "SalmonIndex/seq.bin"))
+    organismDictionary['salmon_index'] = os.path.join(outdir, "SalmonIndex/")
+    targets.append(os.path.join(outdir, "SalmonIndex_RNAVelocity/seq.bin"))
+    organismDictionary['salmon_velocity_index'] = os.path.join(outdir, "SalmonIndex_RNAVelocity/")
+    targets.append(os.path.join(outdir, "annotation/cDNA_introns.joint.t2g"))
+    organismDictionary['t2g_velocity'] = os.path.join(outdir, "annotation/cDNA_introns.joint.t2g")
 
 if 'all' in tools or 'bwa' in tools:
     targets.append(os.path.join(outdir, "BWAIndex/genome.fa.sa"))

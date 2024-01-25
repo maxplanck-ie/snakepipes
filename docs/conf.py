@@ -17,7 +17,7 @@ import os
 
 # to allow readthedocs to compile without installing some dependencies
 import mock
-MOCK_MODULES = ['yaml', 'fuzzywuzzy']
+MOCK_MODULES = ['yaml', 'thefuzz[speedup]']
 
 for mod_name in MOCK_MODULES:
     sys.modules[mod_name] = mock.Mock()

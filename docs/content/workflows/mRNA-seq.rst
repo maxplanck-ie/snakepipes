@@ -25,7 +25,7 @@ Configuration file
 
 There is a configuration file in ``snakePipes/workflows/mRNA-seq/defaults.yaml``::
 
-    ## General/Snakemake parameters, only used/set by wrapper or in Snakemake cmdl, but not in Snakefile
+
     pipeline: rna-seq
     outdir:
     configFile:
@@ -49,16 +49,42 @@ There is a configuration file in ``snakePipes/workflows/mRNA-seq/defaults.yaml``
     trim: False
     trimmer: cutadapt
     trimmerOptions:
+
+    ## three prime seq options
+    # fastp options for three prime sequencing only
+    threePrimeTrimmerOptions: -x --poly_x_min_len 6 -3 5 -q 5 -l 20 -y
+    # STAR fastp options for three prime sequencing only
+    threePrimeAlignerOptions: --limitBAMsortRAM 60000000000 --alignIntronMax 1UMIDedupOpts: --paired
+    # parameters for calling polyA/T stretches in three_prime_seq workflow
+    polyAT:
+      minlength: 6
+      mindistance: 25 # recommendation for Drosophila; for other genomes might be different
+      extend: 3 # recommendation from Andrew 
+      windowlength: 10
+      percbase: 0.7
+
+    # parameters for geneAssociation rule in three_prime_seq workflow
+    geneAssociation:
+      extend: 500
+
+    # parameters for cmatrix_raw in three_prime_seq workflow
+    cmatrix_raw:
+      upstream: 500
+      downstream: 500
+
+    clusterPAS:
+      window: 15
+
     ## further options
     mode: alignment,deepTools_qc
     sampleSheet:
+    rMats: False
     bwBinSize: 25
     fastqc: False
     featureCountsOptions: -C -Q 10 --primary
     filterGTF:
     fragmentLength: 200
     libraryType: 2
-    salmonIndexOptions: --type puff -k 31
     dnaContam: False
     ## supported mappers: STAR HISAT2
     aligner: STAR
@@ -77,7 +103,6 @@ There is a configuration file in ``snakePipes/workflows/mRNA-seq/defaults.yaml``
     UMIDedup: False
     UMIDedupSep: "_"
     UMIDedupOpts: --paired
-
 
 Apart from the common workflow options (see :ref:`running_snakePipes`), the following parameters are useful to consider:
 
@@ -187,112 +212,58 @@ using the **deepTools_qc** mode. It's a very useful add-on with any of the other
 
 .. note:: Since most deeptools functions require an aligned (BAM) file, the deepTools_qc mode will additionally perform the alignment of the fastq files. However this would not interfere with operations of the other modes.
 
+"threePrimeSeq"
+~~~~~~~~~~~~~~~
+
+**threePrimeSeq** uses a pipeline developed by the Hilgers lab to annotate and 
+count clusters of reads mapping to three prime ends of genes using 
+poly(T)VN-primed 3' sequencing kits such as Lexogen's 3' mRNA-seq kit. 
+In this mode, **fastp** is used to pretrim with preset parameters, followed by 
+**STAR** mapping. 
+
+First, a blacklist of possible internal priming sites is generated for the 
+given organism. Next, the mapped regions are filtered according to this
+blacklist and associated with the nearest gene within a certain window. 
+For all samples within the run, a database of PAS sites is generated
+and read counts aggregated for each particular site. These are then 
+summarized on a metagene level and output to a counts.tsv file for 
+further downstream analysis. 
+
+The output for this mode will be stored in the ``three_prime_seq/`` subfolder. 
+
+.. note:: The ``--three-prime-seq`` option must be invoked (which will also set mode to threePrimeSeq) as this will set **fastp** and **STAR** with the appropriate parameters. 
+
+
 Understanding the outputs
 ---------------------------
 
-Assuming the pipline was run with ``--mode 'alignment-free,alignment,deepTools_qc'`` on a set of FASTQ files, the structure of the output directory would look like this (files are shown only for one sample) ::
+Assuming the pipline was run with ``--mode alignment-free,alignment,deepTools_qc``::
 
     ├── Annotation
-    │   ├── filter_command.txt
-    │   ├── genes.annotated.bed
-    │   ├── genes.filtered.bed
-    │   ├── genes.filtered.fa
-    │   ├── genes.filtered.gtf
-    │   ├── genes.filtered.symbol
-    │   ├── genes.filtered.t2g
     ├── bamCoverage
-    │   ├── logs
-    │   ├── sample1.coverage.bw
-    │   ├── sample1.RPKM.bw
-    │   ├── sample1.uniqueMappings.fwd.bw
-    │   └── sample1.uniqueMappings.rev.bw
     ├── cluster_logs
     ├── deepTools_qc
     │   ├── bamPEFragmentSize
-    │   │   ├── fragmentSize.metric.tsv
-    │   │   └── fragmentSizes.png
     │   ├── estimateReadFiltering
-    │   │   └── sample1_filtering_estimation.txt
     │   ├── logs
     │   ├── multiBigwigSummary
     │   ├── plotCorrelation
-    │   │   ├── correlation.pearson.bed_coverage.heatmap.png
-    │   │   ├── correlation.pearson.bed_coverage.tsv
-    │   │   ├── correlation.spearman.bed_coverage.heatmap.png
-    │   │   └── correlation.spearman.bed_coverage.tsv
     │   ├── plotEnrichment
-    │   │   ├── plotEnrichment.png
-    │   │   └── plotEnrichment.tsv
     │   └── plotPCA
-    │       ├── PCA.bed_coverage.png
-    │       └── PCA.bed_coverage.tsv
     ├── DESeq2_Salmon_sampleSheet
-    │   ├── DESeq2_Salmon.err
-    │   ├── DESeq2_Salmon.out
-    │   ├── citations.bib
-    │   ├── DESeq2_report_files
-    │   ├── DESeq2_report.html
-    │   ├── DESeq2_report.Rmd
-    │   ├── DESeq2.session_info.txt
-    │   ├── DEseq_basic_counts_DESeq2.normalized.tsv
-    │   ├── DEseq_basic_DEresults.tsv
-    │   └── DEseq_basic_DESeq.Rdata
     ├── DESeq2_sampleSheet
-    │   ├── DESeq2.err
-    │   ├── DESeq2.out
-    │   ├── citations.bib
-    │   ├── DESeq2_report_files
-    │   ├── DESeq2_report.html
-    │   ├── DESeq2_report.Rmd
-    │   ├── DESeq2.session_info.txt
-    │   ├── DEseq_basic_counts_DESeq2.normalized.tsv
-    │   ├── DEseq_basic_DEresults.tsv
-    │   └── DEseq_basic_DESeq.Rdata
     ├── FASTQ
-    │   ├── sample1_R1.fastq.gz
-    │   └── sample1_R2.fastq.gz
     ├── featureCounts
-    │   ├── counts.tsv
-    │   ├── sample1.counts.txt
-    │   ├── sample1.counts.txt.summary
-    │   ├── sample1.err
-    │   ├── sample1.out
     ├── multiQC
-    │   ├── multiqc_data
-    │   ├── multiQC.err
-    │   ├── multiQC.out
-    │   └── multiqc_report.html
     ├── QC_report
-    │   └── QC_report_all.tsv
     ├── mRNA-seq.cluster_config.yaml
     ├── mRNA-seq.config.yaml
     ├── mRNA-seq_organism.yaml
     ├── mRNA-seq_pipeline.pdf
     ├── mRNA-seq_run-1.log
     ├── Salmon
-    │   ├── counts.genes.tsv
-    │   ├── counts.tsv
-    │   ├── Salmon_counts.log
-    │   ├── Salmon_genes_counts.log
-    │   ├── Salmon_genes_TPM.log
-    │   ├── SalmonIndex
-    │   ├── Salmon_TPM.log
-    │   ├── sample1
-    │   ├── sample1.quant.genes.sf
-    │   ├── sample1.quant.sf
-    │   ├── TPM.genes.tsv
-    │   └── TPM.tsv
     ├── sleuth_Salmon_sampleSheet
-    │   ├── logs
-    │   ├── MA-plot.pdf
-    │   ├── sleuth_live.R
-    │   ├── so.rds
-    │   └── Wald-test.results.tsv
     └── STAR
-  	    ├── logs
-        ├── sample1
-        ├── sample1.bam
-        └── sample1.bam.bai
 
 .. note:: The ``_sampleSheet`` suffix for the ``DESeq2_sampleSheet`` and ``sleuth_Salmon_sampleSheet`` is drawn from the name of the sample sheet you use. So if you instead named the sample sheet ``mySampleSheet.txt`` then the folders would be named ``DESeq2_mySampleSheet`` and ``sleuth_Salmon_mySampleSheet``. This facilitates using multiple sample sheets.
 

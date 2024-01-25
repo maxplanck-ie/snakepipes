@@ -7,7 +7,6 @@ import sys
 import pandas as pd
 import warnings
 
-
 ### Functions ##################################################################
 
 def get_control(sample):
@@ -91,6 +90,9 @@ if sampleSheet:
         print("\nWarning! CSAW cannot be invoked without replicates and will not be run!\n")
         if not peakCaller=="Genrich":
             sys.exit()
+    isMultipleComparison = cf.isMultipleComparison(sampleSheet)
+else:
+    isMultipleComparison = False
 
 chip_dict = {}
 with open(samples_config, "r") as f:
@@ -110,7 +112,7 @@ chip_samples_w_ctrl = set()
 chip_samples_wo_ctrl = set()
 for chip_sample, value in chip_dict.items():
     # set control to False if not specified or set to False
-    if 'control' not in chip_dict[chip_sample] or not value['control']:
+    if 'control' not in chip_dict[chip_sample] or value['control'] is None:
         chip_dict[chip_sample]['control'] = False
         chip_samples_wo_ctrl.add(chip_sample)
     else:
@@ -120,6 +122,7 @@ for chip_sample, value in chip_dict.items():
     if 'broad' not in chip_dict[chip_sample] or not value['broad']:
         chip_dict[chip_sample]['broad'] = False
 
+
 control_samples = list(sorted(control_samples))
 # get a list of corresp control_names for chip samples
 control_names = []
@@ -127,9 +130,19 @@ for chip_sample in chip_samples_w_ctrl:
     control_names.append(get_control_name(chip_sample))
 
 chip_samples_w_ctrl = list(sorted(chip_samples_w_ctrl))
+chip_samples_w_ctrl = list(filter(None, chip_samples_w_ctrl))
 chip_samples_wo_ctrl = list(sorted(chip_samples_wo_ctrl))
+chip_samples_wo_ctrl = list(filter(None, chip_samples_wo_ctrl))
 chip_samples = sorted(chip_samples_w_ctrl + chip_samples_wo_ctrl)
-all_samples = sorted(control_samples + chip_samples)
+chip_samples = list(filter(None, chip_samples))
+all_samples = sorted(control_samples + chip_samples) if control_samples else chip_samples
+all_samples = list(filter(None, all_samples))
+
+#useful for debugging purposes; change the mode to info or debug
+if chip_samples_wo_ctrl:
+    warnings.warn( str(len(chip_samples_wo_ctrl)) + " out of " + str(len(chip_samples)) + " have no matching control ")
+if chip_samples_w_ctrl:
+    warnings.warn( str(len(chip_samples_w_ctrl)) + " out of " + str(len(chip_samples)) + " have a matching control ")
 
 if not fromBAM:
     if pairedEnd and not useSpikeInForNorm:
@@ -197,16 +210,25 @@ def filter_dict(sampleSheet,input_dict):
     return(output_dict)
 
 if sampleSheet:
-    genrichDict = cf.sampleSheetGroups(sampleSheet)
-    for k in genrichDict.keys():
-        genrichDict[k]=[item for item in genrichDict[k] if item in chip_samples]
     if chip_samples_w_ctrl:
         filtered_dict = filter_dict(sampleSheet,dict(zip(chip_samples_w_ctrl, [ get_control_name(x) for x in chip_samples_w_ctrl ])))
     else:
         filtered_dict = filter_dict(sampleSheet,dict(zip(chip_samples_wo_ctrl, [None]*len(chip_samples_wo_ctrl))))
-    reordered_dict = {k: filtered_dict[k] for k in [item for sublist in genrichDict.values() for item in sublist]}
+    genrichDict = cf.sampleSheetGroups(sampleSheet,isMultipleComparison)
+    if not isMultipleComparison:
+        for k in genrichDict.keys():
+            genrichDict[k]=[item for item in genrichDict[k] if item in chip_samples]
+        reordered_dict = {k: filtered_dict[k] for k in [item for sublist in genrichDict.values() for item in sublist]}
+    else:
+        #print(genrichDict)
+        reordered_dict = {}
+        for g in genrichDict.keys():
+            for k in genrichDict[g].keys():
+                genrichDict[g][k]=[item for item in genrichDict[g][k] if item in chip_samples]
+                reordered_dict[g] = {k: filtered_dict[k] for k in [item for sublist in genrichDict[g].values() for item in sublist]}
 else:
     genrichDict = {"all_samples": chip_samples}
+
 
 
 #################### functions and checks for using a spiked-in genome for normalization ########################################
@@ -217,7 +239,7 @@ def check_if_spikein_genome(genome_index,spikeinExt):
             for line in ifile:
                 resl.append(re.search(spikeinExt, line))
         if any(resl):
-            print("\n Spikein genome detected - at least one spikeIn chromosome found with extention " + spikeinExt + " .\n\n")
+            warnings.warn("\n Spikein genome detected - at least one spikeIn chromosome found with extention " + spikeinExt + " .\n\n")
             return True
         else:
             return False

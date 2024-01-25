@@ -9,7 +9,9 @@ dependencies:
  - bowtie2 = 2.4.5
  - hisat2 = 2.2.1
  - star = 2.7.10b
+ - salmon = 1.10.1
  - bwa = 0.7.17
  - bwa-mem2 = 2.2.1
  - bwameth = 0.2.5
  - tbb
+ - bedtools

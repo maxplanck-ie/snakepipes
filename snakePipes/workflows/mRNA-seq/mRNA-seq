@@ -23,7 +23,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          "trim": False, "trimmer": "cutadapt",
                          "trimmerOptions": None, "fastqc": False,
                          "libraryType": 2, "aligner": "STAR",
-                         "alignerOptions": None, "salmonIndexOptions": "--type puff -k 31",
+                         "alignerOptions": None,
                          "featureCountsOptions": "-C -Q 10 --primary",
                          "filterGTF": None, "sampleSheet": None,
                          "reads": ["_R1", "_R2"], "ext": ".fastq.gz",
@@ -31,7 +31,8 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          "fromBAM": False, "bamExt": ".bam", "pairedEnd": True,
                          "UMIDedup": False,
                          "UMIDedupOpts": "", "bcPattern": "NNNNCCCCCCCCC",
-                         "UMIDedupSep": "_", "UMIBarcode": False, "rMats": False}):
+                         "UMIDedupSep": "_", "UMIBarcode": False, "rMats": False,
+                         "fdr": 0.05}):
     """
     Parse arguments from the command line.
     """
@@ -49,7 +50,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
     # Workflow options
     optional = parser.add_argument_group('Options')
     optional.add_argument("-m", "--mode",
-                          help="workflow running modes (available: 'alignment-free, alignment, allelic-mapping, deepTools_qc')"
+                          help="workflow running modes (available: 'alignment-free, alignment, allelic-mapping, deepTools_qc, three-prime-seq')"
                           " (default: '%(default)s')",
                           default=defaults["mode"])
 
@@ -69,9 +70,6 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                           help="STAR or hisat2 option string, e.g.: '--twopassMode Basic' (default: '%(default)s')",
                           default=defaults["alignerOptions"])
 
-    optional.add_argument("--salmonIndexOptions",
-                          help="Salmon index options, e.g. '--type puff' (default: '%(default)s')",
-                          default=defaults["salmonIndexOptions"])
 
     optional.add_argument("--featureCountsOptions",
                           help="featureCounts option string. The options '-p -B'"
@@ -104,7 +102,9 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          default=defaults["fromBAM"])
 
     optional.add_argument("--bamExt",
-                          help="Extention of provided bam files, will be substracted from basenames to obtain sample names. (default: '%(default)s')",
+                          help=("Extention of provided bam files, will be "
+                          "subtracted from basenames to obtain sample names. "
+                          "(default: '%(default)s')"),
                           default=defaults["bamExt"])
 
 
@@ -118,6 +118,12 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                           action="store_true",
                           help="Run differential splicing analysis using rMats-turbo. Note that this flag requires --sampleSheet to be specified.",
                           default=defaults["rMats"])
+
+    optional.add_argument("--FDR",
+                          dest="fdr",
+                          help="FDR threshold to apply for filtering DE genes"
+                               "(default: '%(default)s')",
+                          default=defaults["fdr"])
 
     return parser
 
@@ -146,7 +152,7 @@ def main():
         args.SNPfile = os.path.abspath(args.SNPfile)
         args.NMaskedIndex = os.path.abspath(args.NMaskedIndex)
     modeTemp = args.mode.split(",")
-    validModes = set(["alignment", "alignment-free", "deepTools_qc", "allelic-mapping"])
+    validModes = set(["alignment", "alignment-free", "deepTools_qc", "allelic-mapping","three-prime-seq"])
     for mode in modeTemp:
         if mode not in validModes:
             sys.exit("{} is not a valid mode!\n".format(mode))
@@ -158,7 +164,16 @@ def main():
         args.aligner = "EXTERNAL_BAM"
     if args.rMats and not args.sampleSheet:
         sys.exit("--rMats flag requires a sampleSheet (specified with --sampleSheet).\n")
-
+    if "three_prime_seq" in mode:
+        if not args.sampleSheet:
+            sys.exit("mode three-prime-seq requires a sampleSheet "
+                     "(specified with --sampleSheet).\n")
+        aligner = "STAR"
+        alignerOptions = defaults['threePrimeAlignerOptions']
+        trimmerOptions = defaults['threePrimeTrimmerOptions']
+        trimmer = "fastp"
+        trim = True
+    
     ## End workflow-specific checks
 
     # Handle YAML and log files

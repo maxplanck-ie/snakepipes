@@ -11,6 +11,9 @@ if sampleSheet:
     if not cf.check_replicates(sampleSheet):
         print("\nWarning! CSAW cannot be invoked without replicates!\n")
         sys.exit()
+    isMultipleComparison = cf.isMultipleComparison(sampleSheet)
+else:
+    isMultipleComparison = False
 
 if not fromBAM:
     if pairedEnd:
@@ -66,9 +69,18 @@ def filter_dict(sampleSheet):
     output_dict = dict(zip(names_sub, [""]*len(names_sub)))
     return(output_dict)
 
+chip_samples_w_ctrl = []
+
 if sampleSheet:
     filtered_dict = filter_dict(sampleSheet)
-    genrichDict = cf.sampleSheetGroups(sampleSheet)
-    reordered_dict = {k: filtered_dict[k] for k in [item for sublist in genrichDict.values() for item in sublist]}
+    genrichDict = cf.sampleSheetGroups(sampleSheet,isMultipleComparison)
+    if not isMultipleComparison:
+        reordered_dict = {k: filtered_dict[k] for k in [item for sublist in genrichDict.values() for item in sublist]}
+    else:
+        reordered_dict = {}
+        for g in genrichDict.keys():
+            for k in genrichDict[g].keys():
+                genrichDict[g][k]=[item for item in genrichDict[g][k] if item in samples]
+                reordered_dict[g] = {k: filtered_dict[k] for k in [item for sublist in genrichDict[g].values() for item in sublist]}
 else:
     genrichDict = {"all_samples": samples}

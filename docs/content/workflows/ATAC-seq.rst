@@ -175,6 +175,8 @@ For more information on the contents of the **CSAW_MACS2_sampleSheet** folder, s
 
 .. note:: The ``_sampleSheet`` suffix for the ``CSAW_MACS2_sampleSheet`` is drawn from the name of the sample sheet you use. So if you instead named the sample sheet ``mySampleSheet.txt`` then the folder would be named ``CSAW_mySampleSheet``. This facilitates using multiple sample sheets. Similarly, ``_MACS2`` portion will be different if you use HMMRATAC or Genrich for peak calling.
 
+.. note:: If you provide a sampleSheet with name, condition and group columns, "multiple comparison mode" will be detected. The original sampleSheet will be split on the group column, and multiple pairwise comparisons will be run with CSAW, one per group.
+
 .. note:: The output from Genrich will be peaks called per-group if you specify a sample sheet. This is because Genrich is capable of directly using replicates during peak calling.
 
 

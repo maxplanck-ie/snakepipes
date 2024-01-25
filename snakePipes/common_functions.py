@@ -9,7 +9,8 @@ import yaml
 import glob
 import sys
 import shutil
-from fuzzywuzzy import fuzz
+from pathlib import Path
+from thefuzz import fuzz
 import smtplib
 from email.message import EmailMessage
 from snakePipes import __version__
@@ -39,7 +40,8 @@ def set_env_yamls():
             'CONDA_PREPROCESSING_ENV': 'envs/preprocessing.yaml',
             'CONDA_NONCODING_RNASEQ_ENV': 'envs/noncoding.yaml',
             'CONDA_SAMBAMBA_ENV': 'envs/sambamba.yaml',
-            'CONDA_pysam_ENV': 'envs/pysam.yaml'}
+            'CONDA_pysam_ENV': 'envs/pysam.yaml',
+            'CONDA_SEACR_ENV': 'envs/chip_seacr.yaml'}
 
 
 def merge_dicts(x, y):
@@ -353,13 +355,14 @@ def returnComparisonGroups(sampleSheet):
     return d.keys()
 
 
-def sampleSheetGroups(sampleSheet):
+def sampleSheetGroups(sampleSheet, multipleComp):
     """
     Parse a sampleSheet and return a dictionary with keys the group and values the sample names
     """
     f = open(sampleSheet)
     conditionCol = None
     nameCol = None
+    groupCol = None
     nCols = None
     d = dict()
     for idx, line in enumerate(f):
@@ -369,6 +372,8 @@ def sampleSheetGroups(sampleSheet):
                 sys.exit("ERROR: Please use 'name' and 'condition' as column headers in the sample info file ({})!\n".format(sampleSheet))
             conditionCol = cols.index("condition")
             nameCol = cols.index("name")
+            if multipleComp:
+                groupCol = cols.index("group")
             nCols = len(cols)
             continue
         elif idx == 1:
@@ -378,10 +383,27 @@ def sampleSheetGroups(sampleSheet):
             if len(cols) - 1 == nCols:
                 conditionCol += 1
                 nameCol += 1
+                if multipleComp:
+                    groupCol += 1
         if not len(line.strip()) == 0:
-            if cols[conditionCol] not in d:
-                d[cols[conditionCol]] = []
-            d[cols[conditionCol]].append(cols[nameCol])
+            if not multipleComp:
+                if cols[conditionCol] not in d:
+                    d[cols[conditionCol]] = []
+                d[cols[conditionCol]].append(cols[nameCol])
+            else:
+                if cols[groupCol] not in d:
+                    d[cols[groupCol]] = {}
+                if cols[conditionCol] not in d[cols[groupCol]]:
+                    d[cols[groupCol]][cols[conditionCol]] = []
+                d[cols[groupCol]][cols[conditionCol]].append(cols[nameCol])
+    if "All" in d.keys():
+        for k in d.keys():
+            if k not in "All":
+                d[k][list(d["All"].keys())[0]] = []
+                for x in d["All"].values():
+                    # don't use append as this results in a list of lists and causes issues downstream
+                    d[k][list(d["All"].keys())[0]] += x
+        del d['All']
     f.close()
     return d
 
@@ -582,8 +604,6 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
     and create the DAG
     """
     workflowName = os.path.basename(callingScript)
-    snakemake_path = os.path.dirname(os.path.abspath(callingScript))
-
     os.makedirs(args.outdir, exist_ok=True)
 
     if isinstance(args.snakemakeOptions, list):
@@ -633,15 +653,17 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
         args.snakemakeOptions += " --notemp"
 
     snakemake_cmd = """
-                    TMPDIR={tempDir} PYTHONNOUSERSITE=True {snakemake} {snakemakeOptions} --latency-wait {latency_wait} --snakefile {snakefile} --jobs {maxJobs} --directory {workingdir} --configfile {configFile} --keep-going
-                    """.format(snakemake=os.path.join(snakemake_path, "snakemake"),
-                               latency_wait=cluster_config["snakemake_latency_wait"],
+                    TMPDIR={tempDir}
+                    UTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX);
+                    XDG_CACHE_HOME=$UTEMP TMPDIR={tempDir} PYTHONNOUSERSITE=True snakemake {snakemakeOptions} --latency-wait {latency_wait} --snakefile {snakefile} --jobs {maxJobs} --directory {workingdir} --configfile {configFile} --keep-going --use-conda --conda-prefix {condaEnvDir}
+                    """.format(latency_wait=cluster_config["snakemake_latency_wait"],
                                snakefile=os.path.join(workflowDir, "Snakefile"),
                                maxJobs=args.maxJobs,
                                workingdir=args.workingdir,
                                snakemakeOptions=str(args.snakemakeOptions or ''),
                                tempDir=cfg["tempDir"],
-                               configFile=os.path.join(args.outdir, '{}.config.yaml'.format(workflowName))).split()
+                               configFile=os.path.join(args.outdir, '{}.config.yaml'.format(workflowName)),
+                               condaEnvDir=cfg["condaEnvDir"]).split()
 
     if args.verbose:
         snakemake_cmd.append("--printshellcmds")
@@ -723,8 +745,10 @@ def runAndCleanup(args, cmd, logfile_name):
             sendEmail(args, p.returncode)
         sys.exit(p.returncode)
     else:
+        Path(
+            os.path.join(args.outdir, "{}_snakePipes.done".format(logfile_name.split('_')[0]))
+        ).touch()
         if os.path.exists(os.path.join(args.outdir, ".snakemake")):
-            import shutil
             shutil.rmtree(os.path.join(args.outdir, ".snakemake"), ignore_errors=True)
 
     # Send email if desired
@@ -818,3 +842,13 @@ def writeTools(usedEnvs, wdir, workflowName, maindir):
                 elif dependencies is True:
                     f.write(line)
     f.close()
+
+
+def copySampleSheet(sampleSheet, wdir):
+    if os.path.isfile(sampleSheet) and os.path.exists(wdir):
+        bname = os.path.basename(sampleSheet)
+        try:
+            shutil.copy(sampleSheet, os.path.join(wdir, bname))
+        except Exception as err:
+            print("Unexpected error:\n{}".format(err))
+            raise

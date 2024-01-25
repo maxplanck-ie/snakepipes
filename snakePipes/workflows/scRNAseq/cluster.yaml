@@ -1,38 +1,20 @@
 STAR:
     memory: 6G
-sc_bam_featureCounts_genomic:
-    memory: 4G
 bamPE_fragment_size:
     memory: 3G
-combine_sample_counts:
-    memory: 10G
-cluster_cells_raceid:
-    memory: 6G
-cluster_cells_monocle:
-    memory: 6G
 annotation_bed2fasta:
     memory: 4G
-filter_cells_monocle:
-    memory: 16G
-filter_cells_raceid:
-    memory: 12G
 STARsolo:
     memory: 6G
-SalmonIndex:
-    memory: 3G
-Salmon_index_joint_fa:
-    memory: 3G
 SalmonAlevin:
-    memory: 6G
+    memory: 10G
 AlevinForVelocity:
-    memory: 6G
+    memory: 10G
 cellsort_bam:
     memory: 10G
 velocyto:
     memory: 20G
 STARsolo_raw_to_seurat:
     memory: 10G
-run_eisaR:
-    memory: 30G
 velo_to_sce:
-    memeory: 30G
+    memory: 30G

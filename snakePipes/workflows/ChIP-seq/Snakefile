@@ -59,8 +59,12 @@ else:
 
 # CSAW for differential binding (if sampleinfo specified)
 if sampleSheet and cf.check_replicates(sampleSheet):
-    include: os.path.join(maindir, "shared", "rules", "CSAW.snakefile")
-    include: os.path.join(maindir, "shared", "rules", "nearestGene.snakefile")
+    if not isMultipleComparison:
+        include: os.path.join(maindir, "shared", "rules", "CSAW.singleComp.snakefile")
+        include: os.path.join(maindir, "shared", "rules", "nearestGene.singleComp.snakefile")
+    else:
+        include: os.path.join(maindir, "shared", "rules", "CSAW.multiComp.snakefile")
+        include: os.path.join(maindir, "shared", "rules", "nearestGene.multiComp.snakefile")
     include: os.path.join(maindir, "shared", "rules", "filterGTF.snakefile")
     #if not fromBAM and not useSpikeInForNorm:
         # These are needed for the snakefile to be imported
@@ -106,20 +110,21 @@ def run_deepTools_ChIP():
     file_list = []
     file_list.append(["deepTools_ChIP/plotFingerprint/plotFingerprint.metrics.txt"]) if not useSpikeInForNorm \
                     else file_list.append(["split_deepTools_ChIP/plotFingerprint/plotFingerprint.metrics.txt"])
-    for chip_sample in chip_samples_w_ctrl:
-        control_name = get_control_name(chip_sample)
-        if not useSpikeInForNorm:
-            # get bigwigtype
-            if bigWigType == "subtract" or bigWigType == "both":
-                file_list.append(["deepTools_ChIP/bamCompare/"+chip_sample+".filtered.subtract."+control_name+".bw"])
-            if bigWigType == "log2ratio" or bigWigType == "both":
-                file_list.append(["deepTools_ChIP/bamCompare/"+chip_sample+".filtered.log2ratio.over_"+control_name+".bw"])
-        elif useSpikeInForNorm and getSizeFactorsFrom == "genome":
-            # get bigwigtype
-            if bigWigType == "subtract" or bigWigType == "both":
-                file_list.append(expand("split_deepTools_ChIP/bamCompare/"+chip_sample+".subtract."+control_name+".scaledBY{part}.bw",part=part))
-            if bigWigType == "log2ratio" or bigWigType == "both":
-                file_list.append(expand("split_deepTools_ChIP/bamCompare/"+chip_sample+".log2ratio.over_"+control_name+".scaledBY{part}.bw",part=part))
+    if chip_samples_w_ctrl:
+        for chip_sample in chip_samples_w_ctrl:
+            control_name = get_control_name(chip_sample)
+            if not useSpikeInForNorm:
+                # get bigwigtype
+                if bigWigType == "subtract" or bigWigType == "both":
+                    file_list.append(["deepTools_ChIP/bamCompare/"+chip_sample+".filtered.subtract."+control_name+".bw"])
+                if bigWigType == "log2ratio" or bigWigType == "both":
+                    file_list.append(["deepTools_ChIP/bamCompare/"+chip_sample+".filtered.log2ratio.over_"+control_name+".bw"])
+            elif useSpikeInForNorm and getSizeFactorsFrom == "genome":
+                # get bigwigtype
+                if bigWigType == "subtract" or bigWigType == "both":
+                    file_list.append(expand("split_deepTools_ChIP/bamCompare/"+chip_sample+".subtract."+control_name+".scaledBY{part}.bw",part=part))
+                if bigWigType == "log2ratio" or bigWigType == "both":
+                    file_list.append(expand("split_deepTools_ChIP/bamCompare/"+chip_sample+".log2ratio.over_"+control_name+".scaledBY{part}.bw",part=part))
     return(file_list)
 
 def run_deepTools_allelic():
@@ -140,38 +145,73 @@ def run_deepTools_allelic():
 
 def run_CSAW():
     if sampleSheet and cf.check_replicates(sampleSheet):
-        file_list=["CSAW_{}_{}/CSAW.session_info.txt".format(peakCaller, sample_name)]
-        if not allele_info :
-            file_list.append(["Annotation/genes.filtered.symbol","Annotation/genes.filtered.t2g","CSAW_{}_{}/CSAW.Stats_report.html".format(peakCaller, sample_name)])
-            file_list.append([os.path.join("CSAW_{}_{}".format(peakCaller, sample_name), x) for x in list(itertools.chain.from_iterable([expand("CSAW.{change_dir}.cov.matrix",change_dir=change_direction),expand("CSAW.{change_dir}.cov.heatmap.png",change_dir=change_direction)]))])
-            file_list.append([os.path.join("AnnotatedResults_{}_{}".format(peakCaller,sample_name), x) for x in list(itertools.chain.from_iterable([expand("Filtered.results.{change_dir}_withNearestGene.txt",change_dir=change_direction)]))])
-            if not useSpikeInForNorm and chip_samples_w_ctrl:
-                file_list.append([os.path.join("CSAW_{}_{}".format(peakCaller, sample_name), x) for x in list(itertools.chain.from_iterable([expand("CSAW.{change_dir}.log2r.matrix",change_dir=change_direction),expand("CSAW.{change_dir}.log2r.heatmap.png",change_dir=change_direction)]))])
+        if not isMultipleComparison:
+            file_list=["CSAW_{}_{}/CSAW.session_info.txt".format(peakCaller, sample_name)]
+            if not allele_info :
+                file_list.append(["Annotation/genes.filtered.symbol","Annotation/genes.filtered.t2g","CSAW_{}_{}/CSAW.Stats_report.html".format(peakCaller, sample_name)])
+                file_list.append([os.path.join("CSAW_{}_{}".format(peakCaller, sample_name), x) for x in list(itertools.chain.from_iterable([expand("CSAW.{change_dir}.cov.matrix",change_dir=change_direction),expand("CSAW.{change_dir}.cov.heatmap.png",change_dir=change_direction)]))])
+                file_list.append([os.path.join("AnnotatedResults_{}_{}".format(peakCaller,sample_name), x) for x in list(itertools.chain.from_iterable([expand("Filtered.results.{change_dir}_withNearestGene.txt",change_dir=change_direction)]))])
+                if chip_samples_w_ctrl and not useSpikeInForNorm:
+                    file_list.append([os.path.join("CSAW_{}_{}".format(peakCaller, sample_name), x) for x in list(itertools.chain.from_iterable([expand("CSAW.{change_dir}.log2r.matrix",change_dir=change_direction),expand("CSAW.{change_dir}.log2r.heatmap.png",change_dir=change_direction)]))])
+        else:
+            file_list=expand("CSAW_{}_{}/CSAW.session_info.txt".format(peakCaller, sample_name + ".{compGroup}"),compGroup=cf.returnComparisonGroups(sampleSheet))
+            if not allele_info :
+                file_list.append(["Annotation/genes.filtered.symbol","Annotation/genes.filtered.t2g",expand("CSAW_{}_{}/CSAW.Stats_report.html".format(peakCaller, sample_name + ".{compGroup}"),compGroup=cf.returnComparisonGroups(sampleSheet))])
+                file_list.append([expand("CSAW_{}_{}".format(peakCaller, sample_name + ".{compGroup}") + "/CSAW.{change_dir}.cov.matrix",change_dir=change_direction,compGroup=cf.returnComparisonGroups(sampleSheet)),
+                  expand("CSAW_{}_{}".format(peakCaller, sample_name + ".{compGroup}") +"/CSAW.{change_dir}.cov.heatmap.png",change_dir=change_direction,compGroup=cf.returnComparisonGroups(sampleSheet)
+                  )])
+                file_list.append(expand("AnnotatedResults_{}_{}".format(peakCaller,sample_name + ".{compGroup}") + "/Filtered.results.{change_dir}_withNearestGene.txt",change_dir=change_direction, compGroup=cf.returnComparisonGroups(sampleSheet)))
+                if chip_samples_w_ctrl and not useSpikeInForNorm:
+                    file_list.append([expand("CSAW_{}_{}".format(peakCaller, sample_name + ".{compGroup}") + "/CSAW.{change_dir}.log2r.matrix",change_dir=change_direction,compGroup=cf.returnComparisonGroups(sampleSheet)),
+                      expand("CSAW_{}_{}".format(peakCaller, sample_name + ".{compGroup}") + "/CSAW.{change_dir}.log2r.heatmap.png",change_dir=change_direction,compGroup=cf.returnComparisonGroups(sampleSheet))
+                      ])
         return( file_list )
     else:
         return([])
 
 
 def run_genrich():
-    if peakCaller == "Genrich":
-        if cutntag:
-            warnings.warn("--cutntag only works with macs2, your setting for using Genrich will be ignored. "
-                          "Remove --cutntag if interested in Genrich.")
-            return ([])
+    if (peakCaller == "Genrich"):
+#        if cutntag:
+#            warnings.warn("--cutntag only works with macs2, your setting for using Genrich will be ignored. "
+#                          "Remove --cutntag if interested in Genrich.")
+#            return ([])
         file_list = ["Genrich/all_samples.narrowPeak"]
         if sampleSheet:
-            file_list = ["Genrich/{}.narrowPeak".format(x) for x in genrichDict.keys()]
+            if not isMultipleComparison:
+                file_list = ["Genrich/{}.narrowPeak".format(x) for x in genrichDict.keys()]
+            else:
+                #print(genrichDict)
+                unique_group=[]
+                file_list=[]
+                for key,value in genrichDict.items():
+                    for x in value.keys():
+                        if zip(key,x) not in unique_group:
+                            unique_group.append(zip(key,x))
+                            file_list.append("Genrich/{}.{}.narrowPeak".format(x,key))
         return (file_list)
-    return ([])
+    else:
+        return ([])
 
 
 def run_macs2():
     if (peakCaller == "MACS2") or cutntag:
         if useSpikeInForNorm:
             file_list = expand("MACS2/{chip_sample}_host.BAM_peaks.xls", chip_sample = chip_samples)
+            file_list.extend(expand("MACS2/{chip_sample}_host.BAM_peaks.qc.txt", chip_sample = chip_samples))
         else:
             file_list = expand("MACS2/{chip_sample}.filtered.BAM_peaks.xls", chip_sample = chip_samples)
             file_list.extend(expand("MACS2/{chip_sample}.filtered.BAM_peaks.qc.txt", chip_sample = chip_samples))
+        return (file_list)
+    return ([])
+
+
+def run_seacr():
+    if (peakCaller == "SEACR"):
+        if useSpikeInForNorm:
+            file_list = expand("SEACR/{chip_sample}_host.stringent.bed", chip_sample = chip_samples)
+        else:
+            file_list = expand("SEACR/{chip_sample}.filtered.stringent.bed", chip_sample = chip_samples)
         return (file_list)
     return ([])
 
@@ -209,6 +249,9 @@ onstart:
     if toolsVersion:
         usedEnvs = [CONDA_SHARED_ENV, CONDA_CHIPSEQ_ENV]
         cf.writeTools(usedEnvs, workingdir, "ChIP-seq", maindir)
+    if sampleSheet:
+        cf.copySampleSheet(sampleSheet, workingdir)
+
 
 ### main rule ##################################################################
 ################################################################################
@@ -218,6 +261,7 @@ rule all:
         run_deepTools_ChIP(),
         run_macs2(),
         run_genrich(),
+        run_seacr(),
         # run histoneHMM if allelic_bams are absent (since it gives index error without allele_specific index)
         run_histoneHMM(allele_info),
         ## run deeptools-allelic only if dir "allelic_bams" present and non empty
