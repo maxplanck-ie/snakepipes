@@ -1,7 +1,7 @@
 snakePipes News
 ===============
 
-snakePipes x.x.x
+snakePipes 2.8.0
 ----------------
 
 * Moved SalmonIndex creation from mRNAseq and scRNAseq to createIndices.
