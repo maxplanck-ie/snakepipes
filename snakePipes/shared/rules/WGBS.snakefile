@@ -95,7 +95,7 @@ if not skipBamQC:
         shell: """
             TMPDIR={params.tempDir}
             MYTEMP=$(mktemp -d "${{TMPDIR:-/tmp}}"/snakepipes.XXXXXXXXXX)
-            sambamba markdup -t {threads} --tmpdir "$MYTEMP/{wildcards.sample}" "{input[0]}" "{output}" >> {log.out} 2> {log.err}
+            sambamba markdup --overflow-list-size 600000 -t {threads} --tmpdir "$MYTEMP/{wildcards.sample}" "{input[0]}" "{output}" >> {log.out} 2> {log.err}
             rm -rf "$MYTEMP"
             """
 
