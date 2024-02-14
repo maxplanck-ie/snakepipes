@@ -3,7 +3,7 @@ channels:
  - conda-forge
  - bioconda
 dependencies:
- - hicexplorer = 3.7.2
+ - hicexplorer = 3.7.3
  - bwa = 0.7.17
  - bwa-mem2 = 2.2.1
  - samtools = 1.15.1
