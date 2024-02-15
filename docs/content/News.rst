@@ -1,5 +1,11 @@
 snakePipes News
 ===============
+snakePipes 2.8.1
+----------------
+* Boosted versions on shared_env, as python 3.7 and multiqc no longer work together.
+* WGBS doesn't draw a PCA on datasets with one or two samples.
+* HiCExplorer version boosted in HiC mode
+
 
 snakePipes 2.8.0
 ----------------
