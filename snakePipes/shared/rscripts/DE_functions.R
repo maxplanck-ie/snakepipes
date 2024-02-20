@@ -123,9 +123,8 @@ DESeq_basic <- function(countdata, coldata, fdr, alleleSpecific = FALSE, from_sa
     }
     dds <- DESeq2::DESeq(dds)
     ddr <- DESeq2::results(dds, alpha = fdr)
-    c1<-unique(coldata$condition)[1]
-    c2<-unique(coldata$condition)[2]
-    ddr_shrunk <- DESeq2::lfcShrink(dds,coef=paste0("condition_",c2,"_vs_",c1),type="apeglm",res=ddr)
+    auto_coef<-resultsNames(dds)[length(resultsNames(dds))]
+    ddr_shrunk <- DESeq2::lfcShrink(dds,coef=auto_coef,type="apeglm",res=ddr)
     output <- list(dds = dds, ddr = ddr, ddr_shrunk = ddr_shrunk)
     return(output)
 
