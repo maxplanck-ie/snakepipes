@@ -64,6 +64,8 @@ clusterPAS:
 ## further options
 mode: alignment,deepTools_qc
 sampleSheet:
+formula:
+contrast:
 rMats: False
 bwBinSize: 25
 fastqc: False
