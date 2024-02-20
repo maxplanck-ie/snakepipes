@@ -39,8 +39,8 @@ else:
     infiles = sorted(glob.glob(os.path.join(str(indir or ''), '*' + bamExt)))
     samples = cf.get_sample_names_bam(infiles, bamExt)
 
-if formula and not sampleSheet or contrast and not sampleSheet:
-    print("In order to apply custom formula or contrast, please provide a sample sheet!")
+if formula and not sampleSheet:
+    print("In order to apply custom formula, please provide a sample sheet!")
     exit(1)
 
 if sampleSheet:
