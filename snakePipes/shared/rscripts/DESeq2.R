@@ -100,7 +100,7 @@ if(length(unique(sampleInfo$condition))>1){
     if(tximport & allelic_info){
         message("Detected allelic Salmon counts. Skipping DESeq_basic.")
     }else{
-        seqout <- DESeq_basic(countdata, coldata = sampleInfo, fdr = fdr, alleleSpecific = allelic_info, from_salmon = tximport, custom_formula = formulaInput)
+        seqout <- DESeq_basic(countdata, coldata = sampleInfo, fdr = fdr, alleleSpecific = allelic_info, from_salmon = tximport, customFormula = formulaInput)
 
         DESeq_writeOutput(DEseqout = seqout,
                 fdr = fdr, outprefix = "DEseq_basic",
