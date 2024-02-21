@@ -63,7 +63,7 @@ rule DESeq2_Salmon_basic:
         importfunc = os.path.join(maindir, "shared", "rscripts", "DE_functions.R"),
         allele_info = 'FALSE',
         tx2gene_file = "Annotation/genes.filtered.t2g",
-        rmdTemplate = os.path.join(maindir, "shared", "rscripts", "DESeq2Report.Rmd")a,
+        rmdTemplate = os.path.join(maindir, "shared", "rscripts", "DESeq2Report.Rmd"),
         formula = formula
     conda: CONDA_RNASEQ_ENV
     shell:
