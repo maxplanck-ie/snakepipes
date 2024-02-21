@@ -94,7 +94,7 @@ checktable <- function(countdata = NA, sampleSheet = NA, alleleSpecific = FALSE,
 
 DESeq_basic <- function(countdata, coldata, fdr, alleleSpecific = FALSE, from_salmon = FALSE, size_factors=NA, customFormula=NA) {
     cnames.sub<-unique(colnames(coldata)[2:which(colnames(coldata) %in% "condition")])
-    d<-ifelse(is.na(customFormula),as.formula(noquote(paste0("~",paste(cnames.sub,collapse="+"))),d<-as.formula(customFormula))
+    d<-ifelse(is.na(customFormula),as.formula(noquote(paste0("~",paste(cnames.sub,collapse="+")))),as.formula(customFormula))
     
 
     # Normal DESeq
