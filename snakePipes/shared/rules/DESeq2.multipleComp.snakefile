@@ -51,7 +51,7 @@ rule DESeq2:
         "{params.allele_info} " # 6
         "{params.tx2gene_file} " # 7
         "{params.rmdTemplate} " # 8
-        "{params.formula}" # 9
+        "{params.formula} " # 9
         " > ../{log.out} 2> ../{log.err}"
 
 
@@ -91,5 +91,5 @@ rule DESeq2_Salmon_basic:
         "{params.allele_info} " # 6
         "../{input.tx2gene_file} " # 7
         "{params.rmdTemplate} " # 8
-        "{params.formula}"
+        "{params.formula} "
         " > ../{log.out} 2> ../{log.err}"
