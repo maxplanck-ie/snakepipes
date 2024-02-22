@@ -22,7 +22,7 @@ rule DESeq2:
         allele_info = lambda wildcards : 'TRUE' if 'allelic-mapping' in mode else 'FALSE',
         tx2gene_file = 'NA',
         rmdTemplate = os.path.join(maindir, "shared", "rscripts", "DESeq2Report.Rmd"),
-        formula = formula
+        formula = config["formula"]
     log:
         out = "{}/logs/DESeq2.out".format(get_outdir("DESeq2",sampleSheet)),
         err = "{}/logs/DESeq2.err".format(get_outdir("DESeq2",sampleSheet))
@@ -64,7 +64,7 @@ rule DESeq2_Salmon_basic:
         allele_info = 'FALSE',
         tx2gene_file = "Annotation/genes.filtered.t2g",
         rmdTemplate = os.path.join(maindir, "shared", "rscripts", "DESeq2Report.Rmd"),
-        formula = formula
+        formula = config["formula"]
     conda: CONDA_RNASEQ_ENV
     shell:
         "cd {params.outdir} && "
