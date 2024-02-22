@@ -27,7 +27,7 @@
 #tx2gene_file <- args[7]
 
 sampleInfoFilePath <- snakemake@params[["sampleSheet"]]
-countFilePath <- snakemake@input[["counts_table"]]
+countFilePath <- snakemake@params[["counts_table"]]
 fdr <- as.numeric(snakemake@params[["fdr"]])
 geneNamesFilePath <- snakemake@input[["symbol_file"]]
 importfunc <- snakemake@params[["importfunc"]]
@@ -35,6 +35,10 @@ allelic_info <- as.logical(snakemake@params[["allele_info"]])
 tx2gene_file <- snakemake@params[["tx2gene_file"]]
 rmdTemplate <- snakemake@params[["rmdTemplate"]]
 formulaInput <- snakemake@params[["formula"]]
+wdir <- snakemake@params[["outdir"]]
+
+setwd(wdir)
+
 
 if(file.exists(tx2gene_file)) {
   tximport <- TRUE

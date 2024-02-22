@@ -94,7 +94,13 @@ checktable <- function(countdata = NA, sampleSheet = NA, alleleSpecific = FALSE,
 
 DESeq_basic <- function(countdata, coldata, fdr, alleleSpecific = FALSE, from_salmon = FALSE, size_factors=NA, customFormula=NA) {
     cnames.sub<-unique(colnames(coldata)[2:which(colnames(coldata) %in% "condition")])
-    d<-ifelse(is.na(customFormula),as.formula(noquote(paste0("~",paste(cnames.sub,collapse="+")))),as.formula(paste0("~",customFormula)))
+    
+    if(is.na(customFormula)){
+      d<-as.formula(noquote(paste0("~",paste(cnames.sub,collapse="+"))))
+    } else {
+
+      d<-as.formula(paste0("~",customFormula))
+    }
     
 
     # Normal DESeq
@@ -123,7 +129,8 @@ DESeq_basic <- function(countdata, coldata, fdr, alleleSpecific = FALSE, from_sa
     }
     dds <- DESeq2::DESeq(dds)
     ddr <- DESeq2::results(dds, alpha = fdr)
-    auto_coef<-resultsNames(dds)[length(resultsNames(dds))]
+    a <- DESeq2::resultsNames(dds)
+    auto_coef <- a[length(a)]
     ddr_shrunk <- DESeq2::lfcShrink(dds,coef=auto_coef,type="apeglm",res=ddr)
     output <- list(dds = dds, ddr = ddr, ddr_shrunk = ddr_shrunk)
     return(output)
