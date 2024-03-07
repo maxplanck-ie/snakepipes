@@ -17,7 +17,7 @@ if aligner == "Bowtie2":
                 index = bowtie2_index_allelic
             output:
                 align_summary = aligner+"/{sample}.Bowtie2_summary.txt",
-                bam = temp(aligner+"/{sample}.sorted.bam")
+                bam = aligner+"/{sample}.sorted.bam"
             log: "Bowtie2/logs/{sample}.sort.log"
             params:
                 alignerOpts = str(alignerOpts or ''),
@@ -51,7 +51,7 @@ if aligner == "Bowtie2":
                 index = bowtie2_index_allelic
             output:
                 align_summary = aligner+"/{sample}.Bowtie2_summary.txt",
-                bam = temp(aligner+"/{sample}.sorted.bam")
+                bam = aligner+"/{sample}.sorted.bam"
             log: "Bowtie2/logs/{sample}.sort.log"
             params:
                 alignerOpts = str(alignerOpts or ''),
