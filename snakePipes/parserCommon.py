@@ -168,7 +168,8 @@ def snpArguments(defaults):
 
     snpargs.add_argument("--NMaskedIndex",
                          default='',
-                         help="N-masked index of the reference genome (default: 'None')")
+                         help="N-masked index of the reference genome (default: 'None'). "
+                         "Note that this should point to a file (i.e. 'Genome' for STAR indices, genome.1.bt2 for bowtie2 indices).")
 
     return parser
 
