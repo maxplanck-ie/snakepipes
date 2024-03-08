@@ -61,8 +61,8 @@ def multiqc_input_check(return_value):
                 infiles.append( expand("Qualimap_qc/{sample}.filtered.bamqc_results.txt", sample = samples) )
                 indir += " Qualimap_qc "
         if "allelic-mapping" in mode:
-            infiles.append( expand("allelic_bams/{sample}.SNPsplit_report.yaml", sample = samples) )
-            infiles.append( expand("allelic_bams/{sample}.SNPsplit_sort.yaml", sample = samples) )
+            infiles.append( expand("allelic_bams/{sample}.filtered.SNPsplit_report.yaml", sample = samples) )
+            infiles.append( expand("allelic_bams/{sample}.filtered.SNPsplit_sort.yaml", sample = samples) )
             indir += "allelic_bams"
     elif pipeline=="rna-seq":
         # must be RNA-mapping, add files as per the mode
