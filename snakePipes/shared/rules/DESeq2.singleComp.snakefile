@@ -21,7 +21,8 @@ rule DESeq2:
         importfunc = os.path.join(maindir, "shared", "rscripts", "DE_functions.R"),
         allele_info = lambda wildcards : 'TRUE' if 'allelic-mapping' in mode else 'FALSE',
         tx2gene_file = 'NA',
-        rmdTemplate = os.path.join(maindir, "shared", "rscripts", "DESeq2Report.Rmd")
+        rmdTemplate = os.path.join(maindir, "shared", "rscripts", "DESeq2Report.Rmd"),
+        formula = config["formula"]
     log:
         out = "{}/logs/DESeq2.out".format(get_outdir("DESeq2",sampleSheet)),
         err = "{}/logs/DESeq2.err".format(get_outdir("DESeq2",sampleSheet))
@@ -37,6 +38,7 @@ rule DESeq2:
         "{params.allele_info} " # 6
         "{params.tx2gene_file} " # 7
         "{params.rmdTemplate} " # 8
+        "{params.formula} " #9
         " > ../{log.out} 2> ../{log.err}"
 
 
@@ -61,7 +63,8 @@ rule DESeq2_Salmon_basic:
         importfunc = os.path.join(maindir, "shared", "rscripts", "DE_functions.R"),
         allele_info = 'FALSE',
         tx2gene_file = "Annotation/genes.filtered.t2g",
-        rmdTemplate = os.path.join(maindir, "shared", "rscripts", "DESeq2Report.Rmd")
+        rmdTemplate = os.path.join(maindir, "shared", "rscripts", "DESeq2Report.Rmd"),
+        formula = config["formula"]
     conda: CONDA_RNASEQ_ENV
     shell:
         "cd {params.outdir} && "
@@ -74,6 +77,7 @@ rule DESeq2_Salmon_basic:
         "{params.allele_info} " # 6
         "../{input.tx2gene_file} " # 7
         "{params.rmdTemplate} " # 8
+        "{params.formula} " # 9
         " > ../{log.out} 2> ../{log.err}"
 
 rule DESeq2_Salmon_allelic:

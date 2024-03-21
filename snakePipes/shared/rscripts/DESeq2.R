@@ -9,28 +9,47 @@
 # args 5 : path to DE_functions
 # args 6 : T/F whether or not the workflow is allele-sepecific
 # args 7 : tx2gene file for salmon --> DESeq mode
+# args 9:  model formula
 
 .libPaths(R.home("library"))
 
-args = commandArgs(TRUE)
+#args = commandArgs(TRUE)
 
 
 ## re invented RNaseq workflow
-sampleInfoFilePath <- args[1]
-countFilePath <- args[2]
-fdr <- as.numeric(args[3])
-geneNamesFilePath <- args[4]
-importfunc <- args[5]
-allelic_info <- as.logical(args[6])
+#sampleInfoFilePath <- args[1]
+#countFilePath <- args[2]
+#fdr <- as.numeric(args[3])
+#geneNamesFilePath <- args[4]
+#importfunc <- args[5]
+#allelic_info <- as.logical(args[6])
 ## if output is from salmon then tx2gene file should be present
-tx2gene_file <- args[7]
+#tx2gene_file <- args[7]
+
+sampleInfoFilePath <- snakemake@params[["sampleSheet"]]
+countFilePath <- snakemake@params[["counts_table"]]
+fdr <- as.numeric(snakemake@params[["fdr"]])
+geneNamesFilePath <- snakemake@input[["symbol_file"]]
+importfunc <- snakemake@params[["importfunc"]]
+allelic_info <- as.logical(snakemake@params[["allele_info"]])
+tx2gene_file <- snakemake@params[["tx2gene_file"]]
+rmdTemplate <- snakemake@params[["rmdTemplate"]]
+formulaInput <- snakemake@params[["formula"]]
+wdir <- snakemake@params[["outdir"]]
+
+setwd(wdir)
+
+
 if(file.exists(tx2gene_file)) {
   tximport <- TRUE
 } else {
   tximport <- FALSE
 }
 
-rmdTemplate <- args[8]
+#rmdTemplate <- args[8]
+
+#formulaInput <- args[9]
+
 topN <- 50
 ## include functions
 suppressPackageStartupMessages(library(ggplot2))
@@ -49,6 +68,7 @@ cat(paste("Working dir:", getwd(), "\n"))
 cat(paste("Sample info CSV:", sampleInfoFilePath, "\n"))
 cat(paste("Count file:", countFilePath, "\n"))
 cat(paste("FDR:", fdr, "\n"))
+cat(paste("Custom formula:",formulaInput,"\n"))
 cat(paste("Gene names:", geneNamesFilePath, "\n"))
 cat(paste("Number of top N genes:", topN, "\n"))
 cat(paste("Salmon --> DESeq2 : ", tximport, "\n"))
@@ -96,7 +116,7 @@ if(length(unique(sampleInfo$condition))>1){
     if(tximport & allelic_info){
         message("Detected allelic Salmon counts. Skipping DESeq_basic.")
     }else{
-        seqout <- DESeq_basic(countdata, coldata = sampleInfo, fdr = fdr, alleleSpecific = allelic_info, from_salmon = tximport)
+        seqout <- DESeq_basic(countdata, coldata = sampleInfo, fdr = fdr, alleleSpecific = allelic_info, from_salmon = tximport, customFormula = formulaInput)
 
         DESeq_writeOutput(DEseqout = seqout,
                 fdr = fdr, outprefix = "DEseq_basic",
