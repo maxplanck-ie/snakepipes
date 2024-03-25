@@ -276,3 +276,9 @@ if useSpikeInForNorm:
     else:
         print("\n No spikein genome detected - no spikeIn chromosomes found with extention " + spikeinExt + " .\n\n")
         exit(1)
+
+if externalBed:
+    if os.path.isfile(externalBed):
+        peakCaller = os.path.splitext(os.path.basename(sampleSheet))[0]
+    else:
+        warnings.warn("{} file not found.".format(externalBed))

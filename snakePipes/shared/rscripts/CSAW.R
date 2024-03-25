@@ -98,6 +98,7 @@ if (!is.null(sampleInfo$UseRegions)) {
     fnames<-sampleInfo$name
 }
 
+
 if(snakemake@params[['peakCaller']] == "MACS2") {
     allpeaks <- lapply(fnames, function(x) {
         narrow <- paste0("../MACS2/",x,bam_pfx,".BAM_peaks.narrowPeak") #bam_pfx

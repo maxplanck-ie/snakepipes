@@ -16,8 +16,10 @@ def getInputPeaks(peakCaller, chip_samples, genrichDict):
             return expand("SEACR/{chip_sample}_host.stringent.bed",chip_sample=chip_samples)
         elif pipeline == "chip-seq" and not useSpikeInForNorm:
             return expand("SEACR/{chip_sample}.filtered.stringent.bed",chip_sample=chip_samples)
-    else:
+    elif peakCaller == "Genrich":
         return expand("Genrich/{genrichGroup}.narrowPeak", genrichGroup = genrichDict.keys())
+    elif externalBed:
+        return externalBed
 
 
 def getSizeMetrics():
