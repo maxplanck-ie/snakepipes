@@ -210,8 +210,10 @@ def run_seacr():
     if (peakCaller == "SEACR"):
         if useSpikeInForNorm:
             file_list = expand("SEACR/{chip_sample}_host.stringent.bed", chip_sample = chip_samples)
+            file_list.append(expand("SEACR/{chip_sample}.host.stringent_peaks.qc.txt",chip_sample=chip_samples))
         else:
             file_list = expand("SEACR/{chip_sample}.filtered.stringent.bed", chip_sample = chip_samples)
+            file_list.append(expand("SEACR/{chip_sample}.filtered.stringent_peaks.qc.txt",chip_sample=chip_samples))
         return (file_list)
     return ([])
 
