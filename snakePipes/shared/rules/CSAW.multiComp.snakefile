@@ -105,7 +105,8 @@ rule CSAW:
         insert_size_metrics = lambda wildcards,input: os.path.join(outdir, input.insert_size_metrics) if pairedEnd else [],
         pipeline = pipeline,
         useSpikeInForNorm = useSpikeInForNorm,
-        scale_factors = lambda wildcards, input: os.path.join(outdir, input.scale_factors) if input.scale_factors else ""
+        scale_factors = lambda wildcards, input: os.path.join(outdir, input.scale_factors) if input.scale_factors else "",
+        externalBed = True if externalBed else False
     log:
         out = os.path.join(outdir, "{}/logs/CSAW.out".format(get_outdir(peakCaller,os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv"))),
         err = os.path.join(outdir, "{}/logs/CSAW.err".format(get_outdir(peakCaller,os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv")))

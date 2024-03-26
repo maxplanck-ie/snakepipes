@@ -15,6 +15,9 @@ outdir<-snakemake@params[["outdir"]]
 yaml_path<-snakemake@params[["yaml_path"]]
 useSpikeInForNorm<-snakemake@params[["useSpikeInForNorm"]]
 scale_factors<-snakemake@params[["scale_factors"]]
+external_bed<-as.logical(snakemake@params[["externalBed"]])
+
+
 
 bam_pfx<-ifelse(useSpikeInForNorm,"_host",".filtered")
 bam_folder<-ifelse(useSpikeInForNorm,"split_bam","filtered_bam")
@@ -42,6 +45,7 @@ message(paste("FDR:", fdr, "\n"))
 message(paste("LFC:", lfc, "\n"))
 message(paste("paired-end? :", pairedEnd, "\n"))
 message(paste("allele-specific? :", allelic_info, "\n"))
+message(paste("External bam? ;", external_bam, "\n"))
 
 ## sampleInfo (setup of the experiment)
 sampleInfo <- read.table(sampleInfoFilePath, header = TRUE, colClasses = c("character", "character"))
@@ -98,32 +102,36 @@ if (!is.null(sampleInfo$UseRegions)) {
     fnames<-sampleInfo$name
 }
 
+if !( external_bed) {
+    if(snakemake@params[['peakCaller']] == "MACS2") {
+        allpeaks <- lapply(fnames, function(x) {
+            narrow <- paste0("../MACS2/",x,bam_pfx,".BAM_peaks.narrowPeak") #bam_pfx
+            if(snakemake@params[["pipeline"]] %in% "ATAC-seq"){
+                narrow <- paste0("../MACS2/",x,".filtered.short.BAM_peaks.narrowPeak")
+            }
+            broad <- paste0("../MACS2/",x,bam_pfx,".BAM_peaks.broadPeak") #bam_pfx
+             #first look for narrowpeak then braod peak
+            if(file.exists(narrow)) {
+                bed <- read.delim(narrow, header = FALSE)
+            } else if (file.exists(broad)) {
+                bed <- read.delim(broad, header = FALSE)
+            } else {
+                stop("MACS2 output doesn't exist. Neither ", narrow, " , nor ", broad)
+            }
 
-if(snakemake@params[['peakCaller']] == "MACS2") {
-    allpeaks <- lapply(fnames, function(x) {
-        narrow <- paste0("../MACS2/",x,bam_pfx,".BAM_peaks.narrowPeak") #bam_pfx
-        if(snakemake@params[["pipeline"]] %in% "ATAC-seq"){
-            narrow <- paste0("../MACS2/",x,".filtered.short.BAM_peaks.narrowPeak")
-        }
-        broad <- paste0("../MACS2/",x,bam_pfx,".BAM_peaks.broadPeak") #bam_pfx
-        # first look for narrowpeak then braod peak
-        if(file.exists(narrow)) {
-            bed <- read.delim(narrow, header = FALSE)
-        } else if (file.exists(broad)) {
-            bed <- read.delim(broad, header = FALSE)
-        } else {
-            stop("MACS2 output doesn't exist. Neither ", narrow, " , nor ", broad)
-        }
-
-        bed.gr <- GRanges(seqnames = bed$V1, ranges = IRanges(start = bed$V2, end = bed$V3), name = bed$V4)
-        return(bed.gr)
-    })
-} else {
-    allpeaks = lapply(snakemake@input[['peaks']], function(x) {
-        bed = read.delim(paste0("../", x), header=FALSE)
+            bed.gr <- GRanges(seqnames = bed$V1, ranges = IRanges(start = bed$V2, end = bed$V3), name = bed$V4)
+            return(bed.gr)
+        })
+    } else {
+        allpeaks = lapply(snakemake@input[['peaks']], function(x) {
+            bed = read.delim(paste0("../", x), header=FALSE)
+            bed.gr = GRanges(seqnames = bed$V1, ranges = IRanges(start = bed$V2, end = bed$V3), name = bed$V4)
+            return(bed.gr)
+        })
+    }
+    } else {
+        bed = read.delim(snakemake@input[['pekas']],header=FALSE)
         bed.gr = GRanges(seqnames = bed$V1, ranges = IRanges(start = bed$V2, end = bed$V3), name = bed$V4)
-        return(bed.gr)
-    })
 }
 
 # merge
@@ -166,4 +174,3 @@ sink("CSAW.session_info.txt")
 sessionInfo()
 sink()
 
-print("DONE..!")
