@@ -128,6 +128,8 @@ if (! external_bed) {
             bed.gr = GRanges(seqnames = bed$V1, ranges = IRanges(start = bed$V2, end = bed$V3), name = bed$V4)
             return(bed.gr)
         })
+    # merge
+    allpeaks <- Reduce(function(x,y) GenomicRanges::union(x,y), allpeaks)
     }
     } else {
         bed = read.delim(snakemake@input[['peaks']],header=FALSE)
@@ -136,7 +138,7 @@ if (! external_bed) {
 }
 
 # merge
-allpeaks <- Reduce(function(x,y) GenomicRanges::union(x,y), allpeaks)
+#allpeaks <- Reduce(function(x,y) GenomicRanges::union(x,y), allpeaks)
 
 ## keep only these peaks for testing DB
 message(paste0("Filtering windows using MACS2 output : ", length(allpeaks) , " regions used (Union of peaks)"))
