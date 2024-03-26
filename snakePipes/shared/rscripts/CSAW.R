@@ -45,7 +45,7 @@ message(paste("FDR:", fdr, "\n"))
 message(paste("LFC:", lfc, "\n"))
 message(paste("paired-end? :", pairedEnd, "\n"))
 message(paste("allele-specific? :", allelic_info, "\n"))
-message(paste("External bam? ;", external_bam, "\n"))
+message(paste("External bed? ;", external_bed, "\n"))
 
 ## sampleInfo (setup of the experiment)
 sampleInfo <- read.table(sampleInfoFilePath, header = TRUE, colClasses = c("character", "character"))
