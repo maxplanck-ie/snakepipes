@@ -132,6 +132,7 @@ if (! external_bed) {
     } else {
         bed = read.delim(snakemake@input[['peaks']],header=FALSE)
         bed.gr = GRanges(seqnames = bed$V1, ranges = IRanges(start = bed$V2, end = bed$V3), name = bed$V4)
+        allpeaks <- bed.gr
 }
 
 # merge
