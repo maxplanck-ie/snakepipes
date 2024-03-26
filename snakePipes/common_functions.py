@@ -848,7 +848,7 @@ def copySampleSheet(sampleSheet, wdir):
     if os.path.isfile(sampleSheet) and os.path.exists(wdir):
         bname = os.path.basename(sampleSheet)
         try:
-            shutil.copy(sampleSheet, os.path.join(wdir, bname))
+            shutil.copyfile(sampleSheet, os.path.join(wdir, bname))
         except Exception as err:
             print("Unexpected error:\n{}".format(err))
             raise
