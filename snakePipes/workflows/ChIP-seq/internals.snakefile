@@ -279,6 +279,6 @@ if useSpikeInForNorm:
 
 if externalBed:
     if os.path.isfile(externalBed):
-        peakCaller = os.path.splitext(os.path.basename(sampleSheet))[0]
+        peakCaller = os.path.splitext(os.path.basename(externalBed))[0]
     else:
         warnings.warn("{} file not found.".format(externalBed))
