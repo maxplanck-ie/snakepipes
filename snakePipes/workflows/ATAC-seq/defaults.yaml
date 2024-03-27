@@ -29,6 +29,7 @@ minFragmentSize: 0
 verbose: false
 # sampleSheet_DB
 sampleSheet:
+externalBed:
 # windowSize
 windowSize: 20
 fragmentCountThreshold: 1

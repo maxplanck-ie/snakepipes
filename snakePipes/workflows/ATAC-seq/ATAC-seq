@@ -20,6 +20,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          "reads": ["_R1", "_R2"],
                          "maxFragmentSize": 150, "minFragmentSize": 0,
                          "fromBAM": False ,"qval": 0.001 ,"sampleSheet": None,
+                         "externalBed": None,
                          "bamExt": "filtered.bam", "fdr": 0.05,
                          "absBestLFC": 1, "UMIDedup": False,
                          "UMIDedupOpts": "", "UMIDedupSep": "_",
@@ -70,6 +71,10 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                           dest="sampleSheet",
                           help="Invoke differential accessibility analysis by providing information on samples; see 'https://github.com/maxplanck-ie/snakepipes/tree/master/docs/content/sampleSheet.example.tsv' for example. IMPORTANT: The first entry defines which group of samples are control. With this, the order of comparison and likewise the sign of values can be changed! Also, the condition `control` should not be used (reserved to mark input samples in the ChIP-Seq workflow (default: '%(default)s').",
                           default=defaults["sampleSheet"])
+
+    optional.add_argument("--externalBed",
+                          help="A bed file with intervals to be tested for differential binding. (default: '%(default)s')",
+                          default=defaults["externalBed"])
 
     optional.add_argument("--fromBAM",
                           dest="fromBAM",
