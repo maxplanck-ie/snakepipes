@@ -1,5 +1,19 @@
 snakePipes News
 ===============
+
+snakePipes x.y.z
+________________
+
+* added SEACR peaks qc
+* added external bed functionality for differential binding in ChIP-seq and ATAC-seq workflows
+* fixed copyfile command for sampleSheet
+* removed deprecated --force argument from mamba commands
+* fixes #998
+* fixes #997
+* fixes #996
+
+
+
 snakePipes 2.8.1
 ----------------
 * Boosted versions on shared_env, as python 3.7 and multiqc no longer work together.

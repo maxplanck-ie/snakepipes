@@ -127,4 +127,4 @@ jobs:
       run: |
         micromamba activate snakePipes_CI
         snakePipes config --tempDir /tmp
-        snakePipes createEnvs --autodetectCondaEnvDir --force --only ${{matrix.envs}}
+        snakePipes createEnvs --autodetectCondaEnvDir --only ${{matrix.envs}}
