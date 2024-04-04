@@ -52,5 +52,5 @@ jobs:
       - name: createEnvsOSX
         run: |
           micromamba activate snakePipes_CI
-          snakePipes createEnvs --force --autodetectCondaEnvDir --only ${{matrix.envs}}
+          snakePipes createEnvs --autodetectCondaEnvDir --only ${{matrix.envs}}
      
