@@ -257,7 +257,7 @@ rule SEACR_peaks:
         "SEACR/{chip_sample}_host.stringent.bed"
     log: "SEACR/logs/{chip_sample}.log"
     params:
-        fdr = fdr,
+        fdr = lambda wildcards,input: fdr if not input.control else "",
         prefix = os.path.join(outdir,"SEACR/{chip_sample}_host"),
         script=os.path.join(maindir, "shared","tools/SEACR-1.3/SEACR_1.3.sh")
     conda: CONDA_SEACR_ENV
