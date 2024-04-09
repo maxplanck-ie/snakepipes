@@ -17,9 +17,9 @@ if pipeline=="mRNAseq" and mode in "allelic-counting":
 
     rule samtools_index_external:
         input:
-            "allelic_bams/{sample}.{suffix} + bamExt
+            "allelic_bams/{sample}.{suffix}" + bamExt
         output:
-            "allelic_bams/{sample}.{suffix} + bamExt + ".bai"
+            "allelic_bams/{sample}.{suffix}" + bamExt + ".bai"
         conda: CONDA_SHARED_ENV
         shell: "if [[ ! -f {output[0]} ]]; then samtools index {input[0]}; fi"
 
