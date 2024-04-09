@@ -173,6 +173,7 @@ def main():
     if "allelic-counting" in modeTemp and not args.fromBAM:
         warnings.warn("--fromBAM is required with allelic-counting mode. Setting to True.")
         args.fromBAM = True
+        args.aligner = "EXTERNAL_BAM"
     if args.rMats and not args.sampleSheet:
         sys.exit("--rMats flag requires a sampleSheet (specified with --sampleSheet).\n")
     if "three_prime_seq" in mode:
