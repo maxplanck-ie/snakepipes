@@ -27,8 +27,9 @@ include: os.path.join(maindir, "shared", "tools" , "deeptools_cmds.snakefile")
 ## filtered annotation (GTF)
 include: os.path.join(maindir, "shared", "rules", "filterGTF.snakefile")
 
-## bamCoverage_RPKM
-include: os.path.join(maindir, "shared", "rules", "deepTools_RNA.snakefile")
+if not "allelic-counting" in mode:
+    ## bamCoverage_RPKM
+    include: os.path.join(maindir, "shared", "rules", "deepTools_RNA.snakefile")
 
 
 if not fromBAM:
