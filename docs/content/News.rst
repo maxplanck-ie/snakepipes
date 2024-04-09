@@ -6,6 +6,7 @@ ________________
 
 * added SEACR peaks qc
 * added external bed functionality for differential binding in ChIP-seq and ATAC-seq workflows
+* added "allelic-counting" mode to mRNA-seq, allowing to count reads and run DGE from allelic bam files split e.g. by whatshap
 * fixed copyfile command for sampleSheet
 * removed deprecated --force argument from mamba commands
 * fixes #998
