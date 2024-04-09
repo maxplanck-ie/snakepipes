@@ -176,7 +176,7 @@ def get_sample_names_suffix_bam(infiles, bamExt):
     """
     Get sample names without file extensions
     """
-    bamSuff = [x + bamExt for x in ["genome1","genome2","unassigned","allele_flagged"]]
+    bamSuff = [x + bamExt for x in [".genome1",".genome2",".unassigned",".allele_flagged"]]
     s = []
     for x in infiles:
         for y in bamSuff:
