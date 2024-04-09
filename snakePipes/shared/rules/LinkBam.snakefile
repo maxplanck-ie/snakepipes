@@ -1,6 +1,6 @@
 import os
 
-if pipeline=="mRNAseq" and mode in "allelic-counting":
+if pipeline=="mRNAseq" and "allelic-counting" in mode:
     rule link_bam:
         input:
             indir + "/{sample}.{suffix}" + bamExt
