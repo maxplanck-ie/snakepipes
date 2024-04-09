@@ -5,7 +5,7 @@ if pipeline=="mRNAseq" and mode in "allelic-counting":
         input:
             indir + "/{sample}.{suffix}" + bamExt
         output:
-            "allelic_bams/{sample}.{suffix} + bamExt
+            "allelic_bams/{sample}.{suffix}" + bamExt
         params:
             input_bai = indir + "/{sample}.{suffix}" + bamExt + ".bai",
             output_bai = "allelic_bams/{sample}.{suffix}" + bamExt + ".bai"
