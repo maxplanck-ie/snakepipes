@@ -101,6 +101,30 @@ touch allelic_BAM_input/allelic_bams/sample1.genome1.sorted.bam \
       allelic_BAM_input/allelic_bams/sample5.genome2.sorted.bam.bai \
       allelic_BAM_input/allelic_bams/sample6.genome1.sorted.bam.bai \
       allelic_BAM_input/allelic_bams/sample6.genome2.sorted.bam.bai \
+      allelic_BAM_input/allelic_bams/sample1.allele_flagged.sorted.bam \
+      allelic_BAM_input/allelic_bams/sample1.unassigned.sorted.bam \
+      allelic_BAM_input/allelic_bams/sample2.allele_flagged.sorted.bam \
+      allelic_BAM_input/allelic_bams/sample2.unassigned.sorted.bam \
+      allelic_BAM_input/allelic_bams/sample3.allele_flagged.sorted.bam \
+      allelic_BAM_input/allelic_bams/sample3.unassigned.sorted.bam \
+      allelic_BAM_input/allelic_bams/sample4.allele_flagged.sorted.bam \
+      allelic_BAM_input/allelic_bams/sample4.unassigned.sorted.bam \
+      allelic_BAM_input/allelic_bams/sample5.allele_flagged.sorted.bam \
+      allelic_BAM_input/allelic_bams/sample5.unassigned.sorted.bam \
+      allelic_BAM_input/allelic_bams/sample6.allele_flagged.sorted.bam \
+      allelic_BAM_input/allelic_bams/sample6.unassigned.sorted.bam \
+      allelic_BAM_input/allelic_bams/sample1.allele_flagged.sorted.bam.bai \
+      allelic_BAM_input/allelic_bams/sample1.unassigned.sorted.bam.bai \
+      allelic_BAM_input/allelic_bams/sample2.allele_flagged.sorted.bam.bai \
+      allelic_BAM_input/allelic_bams/sample2.unassigned.sorted.bam.bai \
+      allelic_BAM_input/allelic_bams/sample3.allele_flagged.sorted.bam.bai \
+      allelic_BAM_input/allelic_bams/sample3.unassigned.sorted.bam.bai \
+      allelic_BAM_input/allelic_bams/sample4.allele_flagged.sorted.bam.bai \
+      allelic_BAM_input/allelic_bams/sample4.unassigned.sorted.bam.bai \
+      allelic_BAM_input/allelic_bams/sample5.allele_flagged.sorted.bam.bai \
+      allelic_BAM_input/allelic_bams/sample5.unassigned.sorted.bam.bai \
+      allelic_BAM_input/allelic_bams/sample6.allele_flagged.sorted.bam.bai \
+      allelic_BAM_input/allelic_bams/sample6.unassigned.sorted.bam.bai \
       allelic_BAM_input/deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv \
       allelic_BAM_input/filtered_bam/sample1.filtered.bam \
       allelic_BAM_input/filtered_bam/sample2.filtered.bam \
