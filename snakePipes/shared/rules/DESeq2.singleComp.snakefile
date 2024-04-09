@@ -15,7 +15,8 @@ rule DESeq2:
     benchmark:
         "{}/.benchmark/DESeq2.featureCounts.benchmark".format(get_outdir("DESeq2",sampleSheet))
     params:
-        script=os.path.join(maindir, "shared", "rscripts", "DESeq2.R"),
+        script = os.path.join(maindir, "shared", "rscripts", "DESeq2.R"),
+        sampleSheet = lambda wildcards,input: input.sampleSheet,
         outdir = get_outdir("DESeq2",sampleSheet),
         fdr = fdr,
         importfunc = os.path.join(maindir, "shared", "rscripts", "DE_functions.R"),
