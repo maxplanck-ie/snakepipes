@@ -36,7 +36,8 @@ rule DESeq2:
         tx2gene_file = 'NA',
         rmdTemplate = os.path.join(maindir, "shared", "rscripts", "DESeq2Report.Rmd"),
         formula = config["formula"],
-        counts_table = lambda wildcards,input: os.path.join(outdir,input.counts_table)
+        counts_table = lambda wildcards,input: os.path.join(outdir,input.counts_table),
+        symbol_file = lambda wildcards,input: os.path.join(outdir,input.symbol_file)
     log:
         out = "{}/logs/DESeq2.out".format(get_outdir("DESeq2",os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv")),
         err = "{}/logs/DESeq2.err".format(get_outdir("DESeq2",os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv"))
