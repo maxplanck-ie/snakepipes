@@ -3,18 +3,18 @@ channels:
  - conda-forge
  - bioconda
 dependencies:
- - python = 3.7.12 #This can be changed together with the update of deeptools to the next version
- - deeptools = 3.5.1
- - seqtk = 1.3
- - pigz = 2.6
- - snpsplit = 0.5.0
- - samtools = 1.15.1
- - fastqc = 0.11.9
- - cutadapt = 4.1
- - trim-galore = 0.6.5
- - multiqc = 1.12
- - fastp = 0.23.2
- - umi_tools = 1.1.2
- - fq = 0.10.0
- - pybigwig = 0.3.18
+ - python = 3.10.13
+ - deeptools = 3.5.4
+ - seqtk = 1.4
+ - pigz = 2.8
+ - snpsplit = 0.6.0
+ - samtools = 1.19.2
+ - fastqc = 0.12.1
+ - cutadapt = 4.6
+ - trim-galore = 0.6.10
+ - multiqc = 1.19
+ - fastp = 0.23.4
+ - umi_tools = 1.1.4
+ - fq = 0.11.0
+ - pybigwig = 0.3.22
  

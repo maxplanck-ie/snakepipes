@@ -21,6 +21,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          "pairedEnd": True, "fragmentLength":200, "bwBinSize": 25,
                          "windowSize": 150, "predictChIPDict": None, "fromBAM": False,
                          "bigWigType": "both", "peakCaller": "MACS2", "sampleSheet": "",
+                         "externalBed": "",
                          "plotFormat": "png", "bamExt": ".filtered.bam", "fdr": 0.05,
                          "absBestLFC": 1, "useSpikeinForNorm": False, "spikeinExt": "_spikein",
                          "peakCallerOptions": "--qvalue 0.001","cutntag": False,
@@ -107,6 +108,10 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                                "Also, the condition `control` should only be used for input samples (control peaks "
                                "are not evaluated for differential binding) (default: '%(default)s')",
                           default=defaults["sampleSheet"])
+
+    optional.add_argument("--externalBed",
+                          help="A bed file with intervals to be tested for differential binding. (default: '%(default)s')",
+                          default=defaults["externalBed"])
 
     optional.add_argument("--windowSize",
                           help="Window size to counts reads in (If differential binding analysis required); "

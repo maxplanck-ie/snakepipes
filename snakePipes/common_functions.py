@@ -173,6 +173,20 @@ def get_sample_names_bam(infiles, bamExt):
     return sorted(list(set(s)))
 
 
+def get_sample_names_suffix_bam(infiles, bamExt):
+    """
+    Get sample names without file extensions
+    """
+    bamSuff = [x + bamExt for x in [".genome1", ".genome2", ".unassigned", ".allele_flagged"]]
+    s = []
+    for x in infiles:
+        for y in bamSuff:
+            if y in os.path.basename(x):
+                x = os.path.basename(x).replace(y, "")
+                s.append(x)
+    return sorted(list(set(s)))
+
+
 def is_paired(infiles, ext, reads):
     """
     Check for paired-end input files
@@ -848,7 +862,7 @@ def copySampleSheet(sampleSheet, wdir):
     if os.path.isfile(sampleSheet) and os.path.exists(wdir):
         bname = os.path.basename(sampleSheet)
         try:
-            shutil.copy(sampleSheet, os.path.join(wdir, bname))
+            shutil.copyfile(sampleSheet, os.path.join(wdir, bname))
         except Exception as err:
             print("Unexpected error:\n{}".format(err))
             raise

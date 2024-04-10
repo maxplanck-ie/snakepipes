@@ -101,6 +101,30 @@ touch allelic_BAM_input/allelic_bams/sample1.genome1.sorted.bam \
       allelic_BAM_input/allelic_bams/sample5.genome2.sorted.bam.bai \
       allelic_BAM_input/allelic_bams/sample6.genome1.sorted.bam.bai \
       allelic_BAM_input/allelic_bams/sample6.genome2.sorted.bam.bai \
+      allelic_BAM_input/allelic_bams/sample1.allele_flagged.sorted.bam \
+      allelic_BAM_input/allelic_bams/sample1.unassigned.sorted.bam \
+      allelic_BAM_input/allelic_bams/sample2.allele_flagged.sorted.bam \
+      allelic_BAM_input/allelic_bams/sample2.unassigned.sorted.bam \
+      allelic_BAM_input/allelic_bams/sample3.allele_flagged.sorted.bam \
+      allelic_BAM_input/allelic_bams/sample3.unassigned.sorted.bam \
+      allelic_BAM_input/allelic_bams/sample4.allele_flagged.sorted.bam \
+      allelic_BAM_input/allelic_bams/sample4.unassigned.sorted.bam \
+      allelic_BAM_input/allelic_bams/sample5.allele_flagged.sorted.bam \
+      allelic_BAM_input/allelic_bams/sample5.unassigned.sorted.bam \
+      allelic_BAM_input/allelic_bams/sample6.allele_flagged.sorted.bam \
+      allelic_BAM_input/allelic_bams/sample6.unassigned.sorted.bam \
+      allelic_BAM_input/allelic_bams/sample1.allele_flagged.sorted.bam.bai \
+      allelic_BAM_input/allelic_bams/sample1.unassigned.sorted.bam.bai \
+      allelic_BAM_input/allelic_bams/sample2.allele_flagged.sorted.bam.bai \
+      allelic_BAM_input/allelic_bams/sample2.unassigned.sorted.bam.bai \
+      allelic_BAM_input/allelic_bams/sample3.allele_flagged.sorted.bam.bai \
+      allelic_BAM_input/allelic_bams/sample3.unassigned.sorted.bam.bai \
+      allelic_BAM_input/allelic_bams/sample4.allele_flagged.sorted.bam.bai \
+      allelic_BAM_input/allelic_bams/sample4.unassigned.sorted.bam.bai \
+      allelic_BAM_input/allelic_bams/sample5.allele_flagged.sorted.bam.bai \
+      allelic_BAM_input/allelic_bams/sample5.unassigned.sorted.bam.bai \
+      allelic_BAM_input/allelic_bams/sample6.allele_flagged.sorted.bam.bai \
+      allelic_BAM_input/allelic_bams/sample6.unassigned.sorted.bam.bai \
       allelic_BAM_input/deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv \
       allelic_BAM_input/filtered_bam/sample1.filtered.bam \
       allelic_BAM_input/filtered_bam/sample2.filtered.bam \
@@ -197,18 +221,18 @@ if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 628 ]; then exit 1 ; fi
 WC=`ChIP-seq -d BAM_input --sampleSheet .ci_stuff/test_sampleSheet.tsv --snakemakeOptions " --dryrun --conda-prefix /tmp" --bigWigType log2ratio .ci_stuff/organism.yaml .ci_stuff/ChIP.sample_config.yaml | tee >(cat 1>&2) | grep -v "conda installation\|Conda environment" | sed '/^\s*$/d' | wc -l`
 if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 562 ]; then exit 1 ; fi
 WC=`ChIP-seq -d BAM_input --sampleSheet .ci_stuff/test_sampleSheet.tsv --snakemakeOptions " --dryrun --conda-prefix /tmp" --peakCaller SEACR .ci_stuff/organism.yaml .ci_stuff/ChIP.sample_config.yaml | tee >(cat 1>&2) | grep -v "conda installation\|Conda environment" | sed '/^\s*$/d' | wc -l`
-if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 759 ]; then exit 1 ; fi
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 815 ]; then exit 1 ; fi
 WC=`ChIP-seq -d BAM_input --sampleSheet .ci_stuff/test_sampleSheet.tsv --snakemakeOptions " --dryrun --conda-prefix /tmp" --peakCaller SEACR --useSpikeInForNorm .ci_stuff/spikein_organism.yaml .ci_stuff/ChIP.sample_config.yaml | tee >(cat 1>&2) | grep -v "conda installation\|Conda environment" | sed '/^\s*$/d' | wc -l`
-if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 1203 ]; then exit 1 ; fi
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 1259 ]; then exit 1 ; fi
 #noInput
 WC=`ChIP-seq -d BAM_input --sampleSheet .ci_stuff/test_sampleSheet.tsv --snakemakeOptions " --dryrun --conda-prefix /tmp" .ci_stuff/organism.yaml .ci_stuff/ChIP.sample_noControl_config.yaml | tee >(cat 1>&2) | grep -v "conda installation\|Conda environment" | sed '/^\s*$/d' | wc -l`
 if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 403 ]; then exit 1 ; fi
 WC=`ChIP-seq -d BAM_input --sampleSheet .ci_stuff/test_sampleSheet.tsv --snakemakeOptions " --dryrun --conda-prefix /tmp" --peakCaller Genrich .ci_stuff/organism.yaml .ci_stuff/ChIP.sample_noControl_config.yaml | tee >(cat 1>&2) | grep -v "conda installation\|Conda environment" | sed '/^\s*$/d' | wc -l`
 if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 349 ]; then exit 1 ; fi
 WC=`ChIP-seq -d BAM_input --sampleSheet .ci_stuff/test_sampleSheet.tsv --snakemakeOptions " --dryrun --conda-prefix /tmp" --peakCaller SEACR .ci_stuff/organism.yaml .ci_stuff/ChIP.sample_noControl_config.yaml | tee >(cat 1>&2) | grep -v "conda installation\|Conda environment" | sed '/^\s*$/d' | wc -l`
-if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 469 ]; then exit 1 ; fi
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 525 ]; then exit 1 ; fi
 WC=`ChIP-seq -d BAM_input --sampleSheet .ci_stuff/test_sampleSheet.tsv --snakemakeOptions " --dryrun --conda-prefix /tmp" --peakCaller SEACR --useSpikeInForNorm .ci_stuff/spikein_organism.yaml .ci_stuff/ChIP.sample_noControl_config.yaml | tee >(cat 1>&2) | grep -v "conda installation\|Conda environment" | sed '/^\s*$/d' | wc -l`
-if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 696 ]; then exit 1 ; fi
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 752 ]; then exit 1 ; fi
 # fromBAM
 WC=`ChIP-seq -d outdir --sampleSheet .ci_stuff/test_sampleSheet.tsv --snakemakeOptions " --dryrun --conda-prefix /tmp" --fromBAM BAM_input/filtered_bam/ .ci_stuff/organism.yaml .ci_stuff/ChIP.sample_config.yaml | tee >(cat 1>&2) | grep -v "conda installation\|Conda environment" | sed '/^\s*$/d' | wc -l`
 if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 1187 ]; then exit 1 ; fi
@@ -314,6 +338,10 @@ WC=`mRNA-seq -m allelic-mapping,deepTools_qc -i PE_input -o output --sampleSheet
 if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 2539 ]; then exit 1 ; fi
 WC=`mRNA-seq -m allelic-mapping,deepTools_qc,alignment-free -i PE_input -o output --sampleSheet .ci_stuff/test_sampleSheet.tsv --snakemakeOptions " --dryrun --conda-prefix /tmp" --VCFfile allelic_input/file.vcf.gz --strains strain1 .ci_stuff/organism.yaml | tee >(cat 1>&2) | grep -v "conda installation\|Conda environment" | sed '/^\s*$/d' | wc -l`
 if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 3294 ]; then exit 1 ; fi
+WC=`mRNA-seq -m allelic-counting -i allelic_BAM_input/allelic_bams --fromBAM --bamExt '.sorted.bam' -o output --sampleSheet .ci_stuff/test_sampleSheet.tsv --snakemakeOptions " --dryrun --conda-prefix /tmp"  .ci_stuff/organism.yaml | tee >(cat 1>&2) | grep -v "conda installation\|Conda environment" | sed '/^\s*$/d' | wc -l`
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 659 ]; then exit 1 ; fi
+
+
 
 WC=`noncoding-RNA-seq -i PE_input -o output --snakemakeOptions " --dryrun --conda-prefix /tmp" .ci_stuff/organism.yaml | tee >(cat 1>&2) | grep -v "conda installation\|Conda environment" | sed '/^\s*$/d' | wc -l`
 if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 1370 ]; then exit 1 ; fi

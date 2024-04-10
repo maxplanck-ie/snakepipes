@@ -84,3 +84,9 @@ if sampleSheet:
                 reordered_dict[g] = {k: filtered_dict[k] for k in [item for sublist in genrichDict[g].values() for item in sublist]}
 else:
     genrichDict = {"all_samples": samples}
+
+if externalBed:
+    if os.path.isfile(externalBed):
+        peakCaller = os.path.splitext(os.path.basename(externalBed))[0]
+    else:
+        warnings.warn("{} file not found.".format(externalBed))

@@ -8,8 +8,8 @@ if aligner == "Bowtie2":
         output:
             targetbam = expand("allelic_bams/{{sample}}.filtered.{suffix}.bam", suffix = ['allele_flagged', 'genome1', 'genome2', 'unassigned']),
             tempbam = temp("filtered_bam/{sample}.filtered.sortedByName.bam"),
-            rep1 = "allelic_bams/{sample}.SNPsplit_report.yaml",
-            rep2 = "allelic_bams/{sample}.SNPsplit_sort.yaml"
+            rep1 = "allelic_bams/{sample}.filtered.SNPsplit_report.yaml",
+            rep2 = "allelic_bams/{sample}.filtered.SNPsplit_sort.yaml"
         log: "allelic_bams/logs/{sample}.snp_split.log"
         params:
             pairedEnd = '--paired' if pairedEnd else '',

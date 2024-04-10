@@ -6,3 +6,4 @@ channels:
 dependencies:
   - seacr
   - ucsc-bigwigtobedgraph
+  - bedtools

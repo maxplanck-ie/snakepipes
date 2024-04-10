@@ -54,11 +54,11 @@ def parse_arguments():
         "possible environments are: {}".format(cof.set_env_yamls().keys()),
     )
 
-    createEnvsParser.add_argument(
-        "--force",
-        action="store_true",
-        help="Force creation of conda environments, even if they apparently exist.",
-    )
+#    createEnvsParser.add_argument(
+#        "--force",
+#        action="store_true",
+#        help="Force creation of conda environments, even if they apparently exist.",
+#    )
 
     createEnvsParser.add_argument(
         "--info",
@@ -334,7 +334,6 @@ def createCondaEnvs(args):
             "mamba",
             "env",
             "create",
-            "--force",
             "--file",
             os.path.join(baseDir, "shared/rules", env),
         ]
@@ -342,7 +341,7 @@ def createCondaEnvs(args):
 
         # Don't actually create the env if either --info is set or it already exists and --force is NOT set
         if not args.info:
-            if not os.path.exists(os.path.join(condaDirUse, h)) or args.force:
+            if not os.path.exists(os.path.join(condaDirUse, h)):
                 try:
                     os.makedirs(os.path.join(condaDirUse, h), exist_ok=True)
                     subprocess.check_call(cmd)
