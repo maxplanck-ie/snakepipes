@@ -170,10 +170,11 @@ if not isMultipleComparison:
                 bams = lambda wildcards: ",".join(expand(os.path.join("filtered_bam", "{sample}.namesorted.bam"), sample=genrichDict[wildcards.group])),
                 blacklist = "-E {}".format(blacklist_bed) if blacklist_bed else "",
                 control_pfx=lambda wildcards,input: "-c" if input.control else "",
-                control=lambda wildcards,input: ",".join(input.control) if input.control else ""
+                control=lambda wildcards,input: ",".join(input.control) if input.control else "",
+                ignoreForNorm = "-e " + ','.join(ignoreForNormalization) if ignoreForNormalization else ""
             conda: CONDA_CHIPSEQ_ENV
             shell: """
-                Genrich -t {params.bams} {params.control_pfx} {params.control} -o {output} -r {params.blacklist} -y 2> {log}
+                Genrich -t {params.bams} {params.control_pfx} {params.control} -o {output} -r {params.blacklist} {params.ignoreForNorm} -y 2> {log}
                 """
     else:
         rule Genrich_peaks:
@@ -188,10 +189,11 @@ if not isMultipleComparison:
                 blacklist = "-E {}".format(blacklist_bed) if blacklist_bed else "",
                 control_pfx=lambda wildcards,input: "-c" if input.control else "",
                 control=lambda wildcards,input: ",".join(input.control) if input.control else "",
-                frag_size=fragmentLength
+                frag_size=fragmentLength,
+                ignoreForNorm = "-e " + ','.join(ignoreForNormalization) if ignoreForNormalization else ""
             conda: CONDA_CHIPSEQ_ENV
             shell: """
-                Genrich -t {params.bams} {params.control_pfx} {params.control} -o {output} -r {params.blacklist} -w {params.frag_size} 2> {log}
+                Genrich -t {params.bams} {params.control_pfx} {params.control} -o {output} -r {params.blacklist} {params.ignoreForNorm} -w {params.frag_size} 2> {log}
                 """
 else:
     if pairedEnd:
@@ -206,10 +208,11 @@ else:
                 bams = lambda wildcards: ",".join(expand(os.path.join("filtered_bam", "{sample}.namesorted.bam"), sample=genrichDict[wildcards.compGroup][wildcards.group])),
                 blacklist = "-E {}".format(blacklist_bed) if blacklist_bed else "",
                 control_pfx=lambda wildcards,input: "-c" if input.control else "",
-                control=lambda wildcards,input: ",".join(input.control) if input.control else ""
+                control=lambda wildcards,input: ",".join(input.control) if input.control else "",
+                ignoreForNorm = "-e " + ','.join(ignoreForNormalization) if ignoreForNormalization else ""
             conda: CONDA_CHIPSEQ_ENV
             shell: """
-                Genrich -t {params.bams} {params.control_pfx} {params.control} -o {output} -r {params.blacklist} -y 2> {log}
+                Genrich -t {params.bams} {params.control_pfx} {params.control} -o {output} -r {params.blacklist} {params.ignoreForNorm} -y 2> {log}
                 """
     else:
         rule Genrich_peaks:
@@ -224,10 +227,11 @@ else:
                 blacklist = "-E {}".format(blacklist_bed) if blacklist_bed else "",
                 control_pfx=lambda wildcards,input: "-c" if input.control else "",
                 control=lambda wildcards,input: ",".join(input.control) if input.control else "",
-                frag_size=fragmentLength
+                frag_size=fragmentLength,
+                ignoreForNorm = "-e " + ','.join(ignoreForNormalization) if ignoreForNormalization else ""
             conda: CONDA_CHIPSEQ_ENV
             shell: """
-                Genrich -t {params.bams} {params.control_pfx} {params.control} -o {output} -r {params.blacklist} -w {params.frag_size} 2> {log}
+                Genrich -t {params.bams} {params.control_pfx} {params.control} -o {output} -r {params.blacklist} {params.ignoreForNorm} -w {params.frag_size} 2> {log}
                 """
 
 
@@ -253,10 +257,43 @@ rule SEACR_peaks:
         "SEACR/{chip_sample}.filtered.stringent.bed"
     log: "SEACR/logs/{chip_sample}.log"
     params:
-        fdr = fdr,
+        fdr = lambda wildcards,input: fdr if not input.control else "",
         prefix = os.path.join(outdir,"SEACR/{chip_sample}.filtered"),
         script=os.path.join(maindir, "shared","tools/SEACR-1.3/SEACR_1.3.sh")
     conda: CONDA_SEACR_ENV
     shell: """
         bash {params.script} {input.chip} {input.control} {params.fdr} "norm" "stringent" {params.prefix} 2>{log}
+        """
+
+rule SEACR_peak_qc:
+    input:
+        bam = "filtered_bam/{sample}.filtered.bam",
+        peaks = "SEACR/{sample}.filtered.stringent.bed"
+    output:
+        qc = "SEACR/{sample}.filtered.stringent_peaks.qc.txt"
+    params:
+        genome_index = genome_index
+    benchmark:
+        "SEACR/.benchmark/SEACR_peak_qc.{sample}.filtered.benchmark"
+    conda: CONDA_SHARED_ENV
+    shell: """
+        # get the number of peaks
+        peak_count=`wc -l < {input.peaks}`
+        
+        # get the number of mapped reads
+        mapped_reads=`samtools view -c -F 4 {input.bam}`
+        
+        #calculate the number of alignments overlapping the peaks
+        # exclude reads flagged as unmapped (unmapped reads will be reported when using -L)
+        reads_in_peaks=`samtools view -c -F 4 -L {input.peaks} {input.bam}`
+        
+        # calculate Fraction of Reads In Peaks
+        frip=`bc -l <<< "$reads_in_peaks/$mapped_reads"`
+        # compute peak genome coverage
+        peak_len=`awk '{{total+=$3-$2}}END{{print total}}' {input.peaks}`
+        genome_size=`awk '{{total+=$3-$2}}END{{print total}}' {params.genome_index}`
+        genomecov=`bc -l <<< "$peak_len/$genome_size"`
+        
+        # write peak-based QC metrics to output file
+        printf "peak_count\tFRiP\tpeak_genome_coverage\n%d\t%5.3f\t%6.4f\n" $peak_count $frip $genomecov > {output.qc}
         """

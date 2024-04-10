@@ -585,7 +585,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 71
+        assert parseSpOut(_p) == 77
     def test_seacr_spikein(self, ifs):
         ci = [
             "ChIP-seq",
@@ -604,7 +604,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 112
+        assert parseSpOut(_p) == 118
     def test_SE(self, ifs):
         ci = [
             "ChIP-seq",
@@ -691,7 +691,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 44
+        assert parseSpOut(_p) == 50
     def test_seacr_spikein_noInput(self, ifs):
         ci = [
             "ChIP-seq",
@@ -710,7 +710,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 65
+        assert parseSpOut(_p) == 71
     def test_frombam(self, ifs):
         ci = [
             "ChIP-seq",

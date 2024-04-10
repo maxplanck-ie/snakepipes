@@ -22,8 +22,10 @@ def getInputPeaks(peakCaller, chip_samples, genrichDict,comp_group):
             return expand("SEACR/{chip_sample}_host.stringent.bed",chip_sample=chip_samples)
         elif pipeline == "chip-seq" and not useSpikeInForNorm:
             return expand("SEACR/{chip_sample}.filtered.stringent.bed",chip_sample=chip_samples)
-    else:
+    elif peakCaller == "Genrich":
         return expand("Genrich/{genrichGroup}.{{compGroup}}.narrowPeak", genrichGroup = genrichDict[comp_group].keys())
+    elif externalBed:
+        return externalBed
 
 
 def getSizeMetrics():
@@ -103,7 +105,8 @@ rule CSAW:
         insert_size_metrics = lambda wildcards,input: os.path.join(outdir, input.insert_size_metrics) if pairedEnd else [],
         pipeline = pipeline,
         useSpikeInForNorm = useSpikeInForNorm,
-        scale_factors = lambda wildcards, input: os.path.join(outdir, input.scale_factors) if input.scale_factors else ""
+        scale_factors = lambda wildcards, input: os.path.join(outdir, input.scale_factors) if input.scale_factors else "",
+        externalBed = True if externalBed else False
     log:
         out = os.path.join(outdir, "{}/logs/CSAW.out".format(get_outdir(peakCaller,os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv"))),
         err = os.path.join(outdir, "{}/logs/CSAW.err".format(get_outdir(peakCaller,os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv")))

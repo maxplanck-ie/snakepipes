@@ -1,5 +1,22 @@
 snakePipes News
 ===============
+
+snakePipes 2.8.2
+________________
+
+* added SEACR peaks qc
+* added external bed functionality for differential binding in ChIP-seq and ATAC-seq workflows
+* added "allelic-counting" mode to mRNA-seq, allowing to count reads and run DGE from allelic bam files split e.g. by whatshap
+* added support for custom model formula to mRNA-seq workflow
+* fixed copyfile command for sampleSheet
+* removed deprecated --force argument from mamba commands
+* fixes #998
+* fixes #997
+* fixes #996
+* fixes #994
+* fixes #1000
+* fixes #1001
+
 snakePipes 2.8.1
 ----------------
 * Boosted versions on shared_env, as python 3.7 and multiqc no longer work together.
