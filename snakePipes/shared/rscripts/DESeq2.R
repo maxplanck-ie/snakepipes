@@ -29,7 +29,7 @@
 sampleInfoFilePath <- snakemake@params[["sampleSheet"]]
 countFilePath <- snakemake@params[["counts_table"]]
 fdr <- as.numeric(snakemake@params[["fdr"]])
-geneNamesFilePath <- snakemake@input[["symbol_file"]]
+geneNamesFilePath <- snakemake@params[["symbol_file"]]
 importfunc <- snakemake@params[["importfunc"]]
 allelic_info <- as.logical(snakemake@params[["allele_info"]])
 tx2gene_file <- snakemake@params[["tx2gene_file"]]

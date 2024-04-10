@@ -14,6 +14,7 @@ import sys
 import textwrap
 import snakePipes.common_functions as cf
 import snakePipes.parserCommon as parserCommon
+import warnings
 
 
 def parse_args(defaults={"verbose": False, "configFile": None,
@@ -51,7 +52,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
     # Workflow options
     optional = parser.add_argument_group('Options')
     optional.add_argument("-m", "--mode",
-                          help="workflow running modes (available: 'alignment-free, alignment, allelic-mapping, deepTools_qc, three-prime-seq')"
+                          help="workflow running modes (available: 'alignment-free, alignment, allelic-mapping, allelic-counting, deepTools_qc, three-prime-seq')"
                           " (default: '%(default)s')",
                           default=defaults["mode"])
 
@@ -159,16 +160,24 @@ def main():
         args.SNPfile = os.path.abspath(args.SNPfile)
         args.NMaskedIndex = os.path.abspath(args.NMaskedIndex)
     modeTemp = args.mode.split(",")
-    validModes = set(["alignment", "alignment-free", "deepTools_qc", "allelic-mapping","three-prime-seq"])
+    validModes = set(["alignment", "alignment-free", "deepTools_qc", "allelic-mapping", "allelic-counting", "three-prime-seq"])
     for mode in modeTemp:
         if mode not in validModes:
             sys.exit("{} is not a valid mode!\n".format(mode))
     if "alignment" not in modeTemp and args.UMIDedup:
         sys.exit("UMIDedup is only valid for \"alignment\" mode!\n")
+    if "allelic-counting" in modeTemp and "deepTools_qc" in modeTemp:
+        sys.exit("Mode deepTools_qc is not compatible with mode allelic-counting.")
     if args.fromBAM and ("alignment-free" in modeTemp ):
-        sys.exit("\n--fromBAM can only be used with modes \'alignment\' , \'allelic-mapping\'  or \'deepTools_qc\' - use one of these modes or provide fastq files!\n")
+        sys.exit("\n--fromBAM can only be used with modes \'alignment\' , \'allelic-mapping\' , \'allelic-counting\'  or \'deepTools_qc\' - use one of these modes or provide fastq files!\n")
     if args.fromBAM:
         args.aligner = "EXTERNAL_BAM"
+    if "allelic-counting" in modeTemp and not args.fromBAM:
+        warnings.warn("--fromBAM is required with allelic-counting mode. Setting to True.")
+        args.fromBAM = True
+    if "allelic-counting" in modeTemp:
+        args.bamExt = ".sorted.bam"
+        args.aligner = "allelic_bams"
     if args.rMats and not args.sampleSheet:
         sys.exit("--rMats flag requires a sampleSheet (specified with --sampleSheet).\n")
     if "three_prime_seq" in mode:

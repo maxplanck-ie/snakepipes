@@ -7,7 +7,7 @@ def get_outdir(folder_name,sampleSheet):
 ## DESeq2 (on featureCounts)
 rule DESeq2:
     input:
-        counts_table = lambda wildcards : "featureCounts/counts_allelic.tsv" if 'allelic-mapping' in mode else "featureCounts/counts.tsv",
+        counts_table = lambda wildcards : "featureCounts/counts_allelic.tsv" if 'allelic-mapping' in mode or "allelic-counting" in mode else "featureCounts/counts.tsv",
         sampleSheet = sampleSheet,
         symbol_file = "Annotation/genes.filtered.symbol" #get_symbol_file
     output:
@@ -15,32 +15,22 @@ rule DESeq2:
     benchmark:
         "{}/.benchmark/DESeq2.featureCounts.benchmark".format(get_outdir("DESeq2",sampleSheet))
     params:
-        script=os.path.join(maindir, "shared", "rscripts", "DESeq2.R"),
+        script = os.path.join(maindir, "shared", "rscripts", "DESeq2.R"),
+        sampleSheet = lambda wildcards,input: input.sampleSheet,
         outdir = get_outdir("DESeq2",sampleSheet),
         fdr = fdr,
         importfunc = os.path.join(maindir, "shared", "rscripts", "DE_functions.R"),
-        allele_info = lambda wildcards : 'TRUE' if 'allelic-mapping' in mode else 'FALSE',
+        allele_info = lambda wildcards : 'TRUE' if 'allelic-mapping' in mode or "allelic-counting" in mode else 'FALSE',
         tx2gene_file = 'NA',
         rmdTemplate = os.path.join(maindir, "shared", "rscripts", "DESeq2Report.Rmd"),
-        formula = config["formula"]
+        formula = config["formula"],
+        counts_table = lambda wildcards,input: os.path.join(outdir,input.counts_table),
+        symbol_file = lambda wildcards,input: os.path.join(outdir,input.symbol_file)
     log:
         out = "{}/logs/DESeq2.out".format(get_outdir("DESeq2",sampleSheet)),
         err = "{}/logs/DESeq2.err".format(get_outdir("DESeq2",sampleSheet))
     conda: CONDA_RNASEQ_ENV
-    shell:
-        "cd {params.outdir} && "
-        "Rscript {params.script} "
-        "{input.sampleSheet} " # 1
-        "../{input.counts_table} " # 2
-        "{params.fdr} " # 3
-        "../{input.symbol_file} " # 4
-        "{params.importfunc} " # 5
-        "{params.allele_info} " # 6
-        "{params.tx2gene_file} " # 7
-        "{params.rmdTemplate} " # 8
-        "{params.formula} " #9
-        " > ../{log.out} 2> ../{log.err}"
-
+    script: "{params.script}"
 
 ## DESeq2 (on Salmon)
 rule DESeq2_Salmon_basic:
@@ -62,23 +52,14 @@ rule DESeq2_Salmon_basic:
         fdr = fdr,
         importfunc = os.path.join(maindir, "shared", "rscripts", "DE_functions.R"),
         allele_info = 'FALSE',
-        tx2gene_file = "Annotation/genes.filtered.t2g",
+        tx2gene_file = os.path.join(outdir,"Annotation/genes.filtered.t2g"),
         rmdTemplate = os.path.join(maindir, "shared", "rscripts", "DESeq2Report.Rmd"),
-        formula = config["formula"]
+        formula = config["formula"],
+        counts_table = lambda wildcards,input: os.path.join(outdir,input.counts_table),
+        symbol_file = lambda wildcards,input: os.path.join(outdir,input.symbol_file)
     conda: CONDA_RNASEQ_ENV
-    shell:
-        "cd {params.outdir} && "
-        "Rscript {params.script} "
-        "{input.sampleSheet} " # 1
-        "../{input.counts_table} " # 2
-        "{params.fdr} " # 3
-        "../{input.symbol_file} " # 4
-        "{params.importfunc} " # 5
-        "{params.allele_info} " # 6
-        "../{input.tx2gene_file} " # 7
-        "{params.rmdTemplate} " # 8
-        "{params.formula} " # 9
-        " > ../{log.out} 2> ../{log.err}"
+    script: "{params.script}"
+
 
 rule DESeq2_Salmon_allelic:
     input:
@@ -99,18 +80,10 @@ rule DESeq2_Salmon_allelic:
         fdr = fdr,
         importfunc = os.path.join(maindir, "shared", "rscripts", "DE_functions.R"),
         allele_info = 'TRUE',
-        tx2gene_file = "Annotation/genes.filtered.t2g",
-        rmdTemplate = os.path.join(maindir, "shared", "rscripts", "DESeq2Report.Rmd")
+        tx2gene_file = os.path.join(outdir,"Annotation/genes.filtered.t2g"),
+        rmdTemplate = os.path.join(maindir, "shared", "rscripts", "DESeq2Report.Rmd"),
+        formula = config["formula"],
+        counts_table = lambda wildcards,input: os.path.join(outdir,input.counts_table),
+        symbol_file = lambda wildcards,input: os.path.join(outdir,input.symbol_file)
     conda: CONDA_RNASEQ_ENV
-    shell:
-        "cd {params.outdir} && "
-        "Rscript {params.script} "
-        "{input.sampleSheet} " # 1
-        "../{input.counts_table} " # 2
-        "{params.fdr} " # 3
-        "../{input.symbol_file} " # 4
-        "{params.importfunc} " # 5
-        "{params.allele_info} " # 6
-        "../{input.tx2gene_file} " # 7
-        "{params.rmdTemplate} " # 8
-        " > ../{log.out} 2> ../{log.err}"
+    script: "{params.script}"

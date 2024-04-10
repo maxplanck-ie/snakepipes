@@ -37,7 +37,10 @@ if not fromBAM:
     pairedEnd = cf.is_paired(infiles, ext, reads)
 else:
     infiles = sorted(glob.glob(os.path.join(str(indir or ''), '*' + bamExt)))
-    samples = cf.get_sample_names_bam(infiles, bamExt)
+    if "allelic-counting" in mode:
+        samples = cf.get_sample_names_suffix_bam(infiles, bamExt)
+    else:
+        samples = cf.get_sample_names_bam(infiles, bamExt)
 
 if formula and not sampleSheet:
     print("In order to apply custom formula, please provide a sample sheet!")
