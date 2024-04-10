@@ -144,6 +144,9 @@ Like the other workflows, differential expression can be performed using the ``-
 
 .. note:: The first entry defines which group of samples are control. This way, the order of comparison and likewise the sign of values can be changed. The DE analysis might fail if your sample names begin with a number. So watch out for that!
 
+
+Optionally, the user may submit their desired model formula (without the leading tilda ``~``)  with ``--formula``.
+
 Differential Splicing
 ---------------------
 
