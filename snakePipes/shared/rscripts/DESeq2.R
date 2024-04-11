@@ -129,7 +129,7 @@ if(length(unique(sampleInfo$condition))>1){
 
 ## Run allele-sepecific DESeq wrapper (if asked for)
 if (isTRUE(allelic_info)) {
-    seqout_allelic <- DESeq_allelic(countdata, coldata = sampleInfo, fdr = fdr, from_salmon=tximport)
+    seqout_allelic <- DESeq_allelic(countdata, coldata = sampleInfo, fdr = fdr, from_salmon=tximport, customFormula = NA)
 
     DESeq_writeOutput(DEseqout = seqout_allelic,
                  fdr = fdr, outprefix = "DEseq_allelic",
