@@ -256,11 +256,14 @@ def run_allelesp_mapping():
         "featureCounts/counts_allelic.tsv"
         ]
         if sampleSheet:
-            sample_name = os.path.splitext(os.path.basename(sampleSheet))[0]
-            file_list.append( ["DESeq2_{}/DESeq2.session_info.txt".format(sample_name)] )
-        if sampleSheet and rMats:
-            file_list.append( ["rMats_{}/RI.MATS.JCEC.txt".format(sample_name)] )
-            file_list.append( ["rMats_{}/b2.csv".format(sample_name)] )
+            if not isMultipleComparison:
+                sample_name = os.path.splitext(os.path.basename(sampleSheet))[0]
+                file_list.append( ["DESeq2_{}/DESeq2.session_info.txt".format(sample_name)] )
+                if rMats:
+                    file_list.append( ["rMats_{}/RI.MATS.JCEC.txt".format(sample_name)] )
+                file_list.append( ["rMats_{}/b2.csv".format(sample_name)] )
+            else:
+                file_list.append(expand("DESeq2_{}".format(sample_name) + ".{compGroup}/DESeq2.session_info.txt",compGroup=cf.returnComparisonGroups(sampleSheet)))
         return(file_list)
     else:
         return([])
