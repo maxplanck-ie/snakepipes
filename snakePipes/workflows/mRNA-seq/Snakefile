@@ -127,7 +127,7 @@ include:os.path.join(maindir, "shared", "rules", "RNA-seq_qc_report.snakefile")
 
 ## DESeq2
 if sampleSheet and not "three-prime-seq" in mode:
-    if isMultipleComparison and not "allelic-mapping" in mode and in mode:
+    if isMultipleComparison and not "allelic-mapping" in mode :
         include: os.path.join(maindir, "shared", "rules", "DESeq2.multipleComp.snakefile")
         if rMats:
             include: os.path.join(maindir, "shared", "rules", "rMats.multipleComp.snakefile")
