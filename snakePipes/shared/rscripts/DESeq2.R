@@ -34,7 +34,7 @@ importfunc <- snakemake@params[["importfunc"]]
 allelic_info <- as.logical(snakemake@params[["allele_info"]])
 tx2gene_file <- snakemake@params[["tx2gene_file"]]
 rmdTemplate <- snakemake@params[["rmdTemplate"]]
-formulaInput <- snakemake@params[["formula"]]
+formulaInput <- as.character(snakemake@params[["formula"]])
 wdir <- snakemake@params[["outdir"]]
 
 setwd(wdir)
