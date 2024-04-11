@@ -32,7 +32,7 @@ rule DESeq2:
         sampleSheet = lambda wildcards,input: os.path.join(outdir,str(input.sampleSheet)),
         fdr = fdr,
         importfunc = os.path.join(maindir, "shared", "rscripts", "DE_functions.R"),
-        allele_info = lambda wildcards : 'TRUE' if 'allelic-mapping' in mode else 'FALSE',
+        allele_info = lambda wildcards : 'TRUE' if 'allelic-mapping' in mode or "allelic-counting" in mode else 'FALSE',
         tx2gene_file = 'NA',
         rmdTemplate = os.path.join(maindir, "shared", "rscripts", "DESeq2Report.Rmd"),
         formula = config["formula"],
