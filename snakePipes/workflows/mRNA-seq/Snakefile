@@ -256,8 +256,8 @@ def run_allelesp_mapping():
         "featureCounts/counts_allelic.tsv"
         ]
         if sampleSheet:
+            sample_name = os.path.splitext(os.path.basename(sampleSheet))[0]
             if not isMultipleComparison:
-                sample_name = os.path.splitext(os.path.basename(sampleSheet))[0]
                 file_list.append( ["DESeq2_{}/DESeq2.session_info.txt".format(sample_name)] )
                 if rMats:
                     file_list.append( ["rMats_{}/RI.MATS.JCEC.txt".format(sample_name)] )
