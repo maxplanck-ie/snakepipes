@@ -1098,6 +1098,25 @@ class TestChIPseq:
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
         assert parseSpOut(_p) == 103
+    def test_multicomp_fromBam_noInput_SEACR(self, ifs):
+        ci = [
+            "ChIP-seq",
+            '-d',
+            'outdir',
+            '--fromBAM',
+            ifs / 'bam_input' / 'filtered_bam',
+            '--sampleSheet',
+            ifs / 'sampleSheet_mc.tsv',
+            '--peakCaller SEACR',
+            '--snakemakeOptions',
+            SMKOPTS,
+            ifs / 'org.yaml',
+            ifs / 'chipdict_noControl.yaml'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 105
 
 class TestmRNAseq:
     def test_default(self, ifs):
@@ -1542,6 +1561,84 @@ class TestmRNAseq:
             '--strains',
             'strain1',
             '-m',
+            'allelic-mapping,deepTools_qc,alignment-free'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 330
+    def test_allelic_count_fromBam_singlecomp(self, ifs):
+        ci = [
+            "mRNA-seq",
+            '-i', 
+            ifs / 'allelic_bam_input' / 'allelic_bams',
+            '-o',
+            'outdir',
+            '--bamExt .sorted.bam',
+            '--snakemakeOptions',
+            SMKOPTS,
+            ifs / 'org.yaml',
+            '--sampleSheet',
+            ifs / 'sampleSheet.tsv',
+            '-m',
+            'allelic-counting'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 330
+    def test_allelic_count_fromBam_multicomp(self, ifs):
+        ci = [
+            "mRNA-seq",
+            '-i',
+            ifs / 'allelic_bam_input' / 'allelic_bams',
+            '-o',
+            'outdir',
+            '--bamExt .sorted.bam',
+            '--snakemakeOptions',
+            SMKOPTS,
+            ifs / 'org.yaml',
+            '--sampleSheet',
+            ifs / 'sampleSheet_mc.tsv',
+            '-m',
+            'allelic-counting'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 330
+    def test_allelic_mapping_fromBam_multicomp(self, ifs):
+        ci = [
+            "mRNA-seq",
+            '-i',
+            ifs / 'allelic_bam_input' / 'filtered_bam',
+            '-o',
+            'outdir',
+            '--snakemakeOptions',
+            SMKOPTS,
+            ifs / 'org.yaml',
+            '--sampleSheet',
+            ifs / 'sampleSheet_mc.tsv',
+            '-m',
+            'allelic-mapping,deepTools_qc'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 330
+    def test_allelic_alfree_multicomp(self, ifs):
+        ci = [
+            "mRNA-seq",
+            '-i',
+            ifs / 'PE',
+            '-o',
+            'outdir',
+            '--snakemakeOptions',
+            SMKOPTS,
+            ifs / 'org.yaml',
+            '--sampleSheet',
+            ifs / 'sampleSheet_mc.tsv',
+            '-m', 
             'allelic-mapping,deepTools_qc,alignment-free'
         ]
         print(' '.join([str(i) for i in ci]))
