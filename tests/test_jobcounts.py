@@ -1593,7 +1593,7 @@ class TestmRNAseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 330
+        assert parseSpOut(_p) == 105
     def test_allelic_count_fromBam_multicomp(self, ifs):
         ci = [
             "mRNA-seq",
@@ -1615,7 +1615,7 @@ class TestmRNAseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 330
+        assert parseSpOut(_p) == 108
     def test_allelic_mapping_fromBam_multicomp(self, ifs):
         ci = [
             "mRNA-seq",
@@ -1631,6 +1631,10 @@ class TestmRNAseq:
             ifs / 'org.yaml',
             '--sampleSheet',
             ifs / 'sampleSheet_mc.tsv',
+            '--VCFfile',
+            ifs / 'allelic_input' / 'file.vcf.gz',
+            '--strains',
+            'strain1',
             '-m',
             'allelic-mapping,deepTools_qc'
         ]
