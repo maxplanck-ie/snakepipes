@@ -1117,7 +1117,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 105
+        assert parseSpOut(_p) == 108
 
 class TestmRNAseq:
     def test_default(self, ifs):
@@ -1578,7 +1578,8 @@ class TestmRNAseq:
             '--snakemakeOptions',
             SMKOPTS,
             '--fromBAM',
-            '--bamExt .sorted.bam',
+            '--bamExt',
+            '.sorted.bam',
             ifs / 'org.yaml',
             '--sampleSheet',
             ifs / 'sampleSheet.tsv',
@@ -1599,7 +1600,8 @@ class TestmRNAseq:
             '--snakemakeOptions',
             SMKOPTS,
             '--fromBAM',
-            '--bamExt .sorted.bam',
+            '--bamExt',
+            '.sorted.bam',
             ifs / 'org.yaml',
             '--sampleSheet',
             ifs / 'sampleSheet_mc.tsv',
@@ -1620,7 +1622,8 @@ class TestmRNAseq:
             '--snakemakeOptions',
             SMKOPTS,
             '--fromBAM',
-            '--bamExt .filtered.bam',
+            '--bamExt',
+            '.filtered.bam',
             ifs / 'org.yaml',
             '--sampleSheet',
             ifs / 'sampleSheet_mc.tsv',
