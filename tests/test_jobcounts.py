@@ -1631,10 +1631,10 @@ class TestmRNAseq:
             ifs / 'org.yaml',
             '--sampleSheet',
             ifs / 'sampleSheet_mc.tsv',
-            '--VCFfile',
-            ifs / 'allelic_input' / 'file.vcf.gz',
-            '--strains',
-            'strain1',
+            '--SNPfile',
+            ifs / 'allelic_input' / 'snpfile.txt',
+            '--NMaskedIndex',
+            ifs / 'allelic_input' / 'Ngenome'
             '-m',
             'allelic-mapping,deepTools_qc'
         ]
