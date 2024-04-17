@@ -1109,7 +1109,8 @@ class TestChIPseq:
             ifs / 'sampleSheet_mc.tsv',
             '--snakemakeOptions',
             SMKOPTS,
-            '--peakCaller SEACR',
+            '--peakCaller',
+            'SEACR',
             ifs / 'org.yaml',
             ifs / 'chipdict_noControl.yaml'
         ]
