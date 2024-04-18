@@ -1641,7 +1641,7 @@ class TestmRNAseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 330
+        assert parseSpOut(_p) == 201
     def test_allelic_alfree_multicomp(self, ifs):
         ci = [
             "mRNA-seq",
@@ -1664,7 +1664,7 @@ class TestmRNAseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 330
+        assert parseSpOut(_p) == 331
 
 class TestncRNAseq():
     def test_default(self, ifs):
