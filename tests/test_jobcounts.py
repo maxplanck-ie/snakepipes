@@ -1628,6 +1628,8 @@ class TestmRNAseq:
             '--fromBAM',
             '--bamExt',
             '.filtered.bam',
+            '-m',
+            'allelic-mapping,deepTools_qc',
             ifs / 'org.yaml',
             '--sampleSheet',
             ifs / 'sampleSheet_mc.tsv',
@@ -1635,8 +1637,6 @@ class TestmRNAseq:
             ifs / 'allelic_input' / 'snpfile.txt',
             '--NMaskedIndex',
             ifs / 'allelic_input' / 'Ngenome'
-            '-m',
-            'allelic-mapping,deepTools_qc'
         ]
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
@@ -1655,7 +1655,11 @@ class TestmRNAseq:
             '--sampleSheet',
             ifs / 'sampleSheet_mc.tsv',
             '-m', 
-            'allelic-mapping,deepTools_qc,alignment-free'
+            'allelic-mapping,deepTools_qc,alignment-free',
+            '--VCFfile',
+            ifs / 'allelic_input' / 'file.vcf.gz',
+            '--strains',
+            'strain1'
         ]
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
