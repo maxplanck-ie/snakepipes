@@ -213,7 +213,7 @@ def run_seacr():
             file_list.append(expand("SEACR/{chip_sample}_host.{mode}_peaks.qc.txt",chip_sample=chip_samples,mode=["stringent","lenient"]))
         else:
             file_list = expand("SEACR/{chip_sample}.filtered.{mode}.bed", chip_sample = chip_samples,mode=["stringent","lenient"])
-            file_list.append(expand("SEACR/{chip_sample}.{mode}.stringent_peaks.qc.txt",chip_sample=chip_samples,mode=["stringent","lenient"]))
+            file_list.append(expand("SEACR/{chip_sample}.{mode}_peaks.qc.txt",chip_sample=chip_samples,mode=["stringent","lenient"]))
         return (file_list)
     return ([])
 
