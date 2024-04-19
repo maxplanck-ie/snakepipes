@@ -223,7 +223,7 @@ if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 562 ]; then exit 1 ; fi
 WC=`ChIP-seq -d BAM_input --sampleSheet .ci_stuff/test_sampleSheet.tsv --snakemakeOptions " --dryrun --conda-prefix /tmp" --peakCaller SEACR .ci_stuff/organism.yaml .ci_stuff/ChIP.sample_config.yaml | tee >(cat 1>&2) | grep -v "conda installation\|Conda environment" | sed '/^\s*$/d' | wc -l`
 if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 927 ]; then exit 1 ; fi
 WC=`ChIP-seq -d BAM_input --sampleSheet .ci_stuff/test_sampleSheet.tsv --snakemakeOptions " --dryrun --conda-prefix /tmp" --peakCaller SEACR --useSpikeInForNorm .ci_stuff/spikein_organism.yaml .ci_stuff/ChIP.sample_config.yaml | tee >(cat 1>&2) | grep -v "conda installation\|Conda environment" | sed '/^\s*$/d' | wc -l`
-if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 1259 ]; then exit 1 ; fi
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 1371 ]; then exit 1 ; fi
 #noInput
 WC=`ChIP-seq -d BAM_input --sampleSheet .ci_stuff/test_sampleSheet.tsv --snakemakeOptions " --dryrun --conda-prefix /tmp" .ci_stuff/organism.yaml .ci_stuff/ChIP.sample_noControl_config.yaml | tee >(cat 1>&2) | grep -v "conda installation\|Conda environment" | sed '/^\s*$/d' | wc -l`
 if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 403 ]; then exit 1 ; fi
