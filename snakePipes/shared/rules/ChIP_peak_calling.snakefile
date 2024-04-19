@@ -248,7 +248,7 @@ rule prep_bedgraph:
         bedtools genomecov -bg -i filtered_bedgraph/{params.sample}.fragments.bed -g {params.genome} > {output}
         """
 
-rule SEACR_peaks:
+rule SEACR_peaks_stringent:
     input:
         chip = "filtered_bedgraph/{chip_sample}.fragments.bedgraph",
         control = lambda wildcards: "filtered_bedgraph/"+get_control(wildcards.chip_sample)+".fragments.bedgraph" if get_control(wildcards.chip_sample)
@@ -265,7 +265,24 @@ rule SEACR_peaks:
         bash {params.script} {input.chip} {input.control} {params.fdr} "norm" "stringent" {params.prefix} 2>{log}
         """
 
-rule SEACR_peak_qc:
+rule SEACR_peaks_lenient:
+    input:
+        chip = "filtered_bedgraph/{chip_sample}.fragments.bedgraph",
+        control = lambda wildcards: "filtered_bedgraph/"+get_control(wildcards.chip_sample)+".fragments.bedgraph" if get_control(wildcards.chip_sample)
+                 else []
+    output:
+        "SEACR/{chip_sample}.filtered.lenient.bed"
+    log: "SEACR/logs/{chip_sample}.log"
+    params:
+        fdr = lambda wildcards,input: fdr if not input.control else "",
+        prefix = os.path.join(outdir,"SEACR/{chip_sample}.filtered"),
+        script=os.path.join(maindir, "shared","tools/SEACR-1.3/SEACR_1.3.sh")
+    conda: CONDA_SEACR_ENV
+    shell: """
+        bash {params.script} {input.chip} {input.control} {params.fdr} "norm" "lenient" {params.prefix} 2>{log}
+        """
+
+rule SEACR_peak_stringent_qc:
     input:
         bam = "filtered_bam/{sample}.filtered.bam",
         peaks = "SEACR/{sample}.filtered.stringent.bed"
@@ -274,7 +291,41 @@ rule SEACR_peak_qc:
     params:
         genome_index = genome_index
     benchmark:
-        "SEACR/.benchmark/SEACR_peak_qc.{sample}.filtered.benchmark"
+        "SEACR/.benchmark/SEACR_peak_stringent_qc.{sample}.filtered.benchmark"
+    conda: CONDA_SHARED_ENV
+    shell: """
+        # get the number of peaks
+        peak_count=`wc -l < {input.peaks}`
+        
+        # get the number of mapped reads
+        mapped_reads=`samtools view -c -F 4 {input.bam}`
+        
+        #calculate the number of alignments overlapping the peaks
+        # exclude reads flagged as unmapped (unmapped reads will be reported when using -L)
+        reads_in_peaks=`samtools view -c -F 4 -L {input.peaks} {input.bam}`
+        
+        # calculate Fraction of Reads In Peaks
+        frip=`bc -l <<< "$reads_in_peaks/$mapped_reads"`
+        # compute peak genome coverage
+        peak_len=`awk '{{total+=$3-$2}}END{{print total}}' {input.peaks}`
+        genome_size=`awk '{{total+=$3-$2}}END{{print total}}' {params.genome_index}`
+        genomecov=`bc -l <<< "$peak_len/$genome_size"`
+        
+        # write peak-based QC metrics to output file
+        printf "peak_count\tFRiP\tpeak_genome_coverage\n%d\t%5.3f\t%6.4f\n" $peak_count $frip $genomecov > {output.qc}
+        """
+
+
+rule SEACR_peak_lenient_qc:
+    input:
+        bam = "filtered_bam/{sample}.filtered.bam",
+        peaks = "SEACR/{sample}.filtered.lenient.bed"
+    output:
+        qc = "SEACR/{sample}.filtered.lenient_peaks.qc.txt"
+    params:
+        genome_index = genome_index
+    benchmark:
+        "SEACR/.benchmark/SEACR_peak_lenient_qc.{sample}.filtered.benchmark"
     conda: CONDA_SHARED_ENV
     shell: """
         # get the number of peaks
