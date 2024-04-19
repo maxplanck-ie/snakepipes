@@ -95,6 +95,10 @@ def createTestData(fp, samples=9) -> None:
         (fp / "allelic_bam_input" / "allelic_bams" / "sample{}.genome1.sorted.bam.bai".format(sample)).touch()
         (fp / "allelic_bam_input" / "allelic_bams" / "sample{}.genome2.sorted.bam".format(sample)).touch()
         (fp / "allelic_bam_input" / "allelic_bams" / "sample{}.genome2.sorted.bam.bai".format(sample)).touch()
+        (fp / "allelic_bam_input" / "allelic_bams" / "sample{}.allele_flagged.sorted.bam".format(sample)).touch()
+        (fp / "allelic_bam_input" / "allelic_bams" / "sample{}.allele_flagged.sorted.bam.bai".format(sample)).touch()
+        (fp / "allelic_bam_input" / "allelic_bams" / "sample{}.unassigned.sorted.bam".format(sample)).touch()
+        (fp / "allelic_bam_input" / "allelic_bams" / "sample{}.unassigned.sorted.bam.bai".format(sample)).touch()
         (fp / "allelic_bam_input" / "filtered_bam" / "sample{}.filtered.bam".format(sample)).touch()
         (fp / "allelic_bam_input" / "filtered_bam" / "sample{}.filtered.bam.bai".format(sample)).touch()
         (fp / "allelic_bam_input" / "Sambamba" / "sample{}.markdup.txt".format(sample)).touch()
@@ -962,7 +966,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 118
+        assert parseSpOut(_p) == 126
     def test_multicomp_spikein_genrich(self, ifs):
         ci = [
             "ChIP-seq",
@@ -981,7 +985,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 119
+        assert parseSpOut(_p) == 127
     def test_multicomp_spikein_noInput(self, ifs):
         ci = [
             "ChIP-seq",
@@ -1036,7 +1040,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 154
+        assert parseSpOut(_p) == 162
     def test_multicomp_spikein_fromBam_genrich(self, ifs):
         ci = [
             "ChIP-seq",
@@ -1057,7 +1061,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 155
+        assert parseSpOut(_p) == 163
     def test_multicomp_spikein_fromBam_noInput(self, ifs):
         ci = [
             "ChIP-seq",
@@ -1098,6 +1102,26 @@ class TestChIPseq:
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
         assert parseSpOut(_p) == 103
+    def test_multicomp_fromBam_noInput_SEACR(self, ifs):
+        ci = [
+            "ChIP-seq",
+            '-d',
+            'outdir',
+            '--fromBAM',
+            ifs / 'bam_input' / 'filtered_bam',
+            '--sampleSheet',
+            ifs / 'sampleSheet_mc.tsv',
+            '--snakemakeOptions',
+            SMKOPTS,
+            '--peakCaller',
+            'SEACR',
+            ifs / 'org.yaml',
+            ifs / 'chipdict_noControl.yaml'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 108
 
 class TestmRNAseq:
     def test_default(self, ifs):
@@ -1548,6 +1572,99 @@ class TestmRNAseq:
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
         assert parseSpOut(_p) == 330
+    def test_allelic_count_fromBam_singlecomp(self, ifs):
+        ci = [
+            "mRNA-seq",
+            '-i', 
+            ifs / 'allelic_bam_input' / 'allelic_bams',
+            '-o',
+            'outdir',
+            '--snakemakeOptions',
+            SMKOPTS,
+            '--fromBAM',
+            '--bamExt',
+            '.sorted.bam',
+            ifs / 'org.yaml',
+            '--sampleSheet',
+            ifs / 'sampleSheet.tsv',
+            '-m',
+            'allelic-counting'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 105
+    def test_allelic_count_fromBam_multicomp(self, ifs):
+        ci = [
+            "mRNA-seq",
+            '-i',
+            ifs / 'allelic_bam_input' / 'allelic_bams',
+            '-o',
+            'outdir',
+            '--snakemakeOptions',
+            SMKOPTS,
+            '--fromBAM',
+            '--bamExt',
+            '.sorted.bam',
+            ifs / 'org.yaml',
+            '--sampleSheet',
+            ifs / 'sampleSheet_mc.tsv',
+            '-m',
+            'allelic-counting'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 108
+    def test_allelic_mapping_fromBam_multicomp(self, ifs):
+        ci = [
+            "mRNA-seq",
+            '-i',
+            ifs / 'allelic_bam_input' / 'filtered_bam',
+            '-o',
+            'outdir',
+            '--snakemakeOptions',
+            SMKOPTS,
+            '--fromBAM',
+            '--bamExt',
+            '.filtered.bam',
+            '-m',
+            'allelic-mapping,deepTools_qc',
+            ifs / 'org.yaml',
+            '--sampleSheet',
+            ifs / 'sampleSheet_mc.tsv',
+            '--SNPfile',
+            ifs / 'allelic_input' / 'snpfile.txt',
+            '--NMaskedIndex',
+            ifs / 'allelic_input' / 'Ngenome'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 201
+    def test_allelic_alfree_multicomp(self, ifs):
+        ci = [
+            "mRNA-seq",
+            '-i',
+            ifs / 'PE',
+            '-o',
+            'outdir',
+            '--snakemakeOptions',
+            SMKOPTS,
+            ifs / 'org.yaml',
+            '--sampleSheet',
+            ifs / 'sampleSheet_mc.tsv',
+            '-m', 
+            'allelic-mapping,deepTools_qc,alignment-free',
+            '--VCFfile',
+            ifs / 'allelic_input' / 'file.vcf.gz',
+            '--strains',
+            'strain1'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 331
 
 class TestncRNAseq():
     def test_default(self, ifs):

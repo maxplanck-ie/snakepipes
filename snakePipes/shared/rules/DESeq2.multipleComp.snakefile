@@ -19,7 +19,7 @@ checkpoint split_sampleSheet:
 ## DESeq2 (on featureCounts)
 rule DESeq2:
     input:
-        counts_table = lambda wildcards : "featureCounts/counts_allelic.tsv" if 'allelic-mapping' in mode else "featureCounts/counts.tsv",
+        counts_table = lambda wildcards : "featureCounts/counts_allelic.tsv" if 'allelic-mapping' in mode or "allelic-counting" in mode else "featureCounts/counts.tsv",
         sampleSheet = lambda wildcards: checkpoints.split_sampleSheet.get(compGroup=wildcards.compGroup).output,
         symbol_file = "Annotation/genes.filtered.symbol" #get_symbol_file
     output:
@@ -32,7 +32,7 @@ rule DESeq2:
         sampleSheet = lambda wildcards,input: os.path.join(outdir,str(input.sampleSheet)),
         fdr = fdr,
         importfunc = os.path.join(maindir, "shared", "rscripts", "DE_functions.R"),
-        allele_info = lambda wildcards : 'TRUE' if 'allelic-mapping' in mode else 'FALSE',
+        allele_info = lambda wildcards : 'TRUE' if 'allelic-mapping' in mode or "allelic-counting" in mode else 'FALSE',
         tx2gene_file = 'NA',
         rmdTemplate = os.path.join(maindir, "shared", "rscripts", "DESeq2Report.Rmd"),
         formula = config["formula"],

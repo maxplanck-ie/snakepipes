@@ -61,7 +61,7 @@ def getHeatmapInput():
     if pipeline in 'ATAC-seq':
         return(expand("CSAW_{}_{}".format(peakCaller, sample_name + ".{{compGroup}}") + "/CSAW.{change_dir}.cov.heatmap.png", change_dir=['UP','DOWN']))
     elif pipeline in 'chip-seq':
-        if not useSpikeInForNorm:
+        if chip_samples_w_ctrl:
             return(expand("CSAW_{}_{}".format(peakCaller, sample_name + ".{{compGroup}}") + "/CSAW.{change_dir}.cov.heatmap.png", change_dir=['UP','DOWN']) + expand("CSAW_{}_{}".format(peakCaller, sample_name + ".{{compGroup}}") + "/CSAW.{change_dir}.log2r.heatmap.png", change_dir=['UP', 'DOWN']))
         else:
           return(expand("CSAW_{}_{}".format(peakCaller, sample_name + ".{{compGroup}}") + "/CSAW.{change_dir}.cov.heatmap.png", change_dir=['UP','DOWN']))
