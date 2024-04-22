@@ -255,7 +255,7 @@ rule SEACR_peaks_stringent:
                  else []
     output:
         "SEACR/{chip_sample}_host.stringent.bed"
-    log: "SEACR/logs/{chip_sample}.log"
+    log: "SEACR/logs/{chip_sample}_stringent.log"
     params:
         fdr = lambda wildcards,input: fdr if not input.control else "",
         prefix = os.path.join(outdir,"SEACR/{chip_sample}_host"),
@@ -272,14 +272,14 @@ rule SEACR_peaks_lenient:
                  else []
     output:
         "SEACR/{chip_sample}_host.lenient.bed"
-    log: "SEACR/logs/{chip_sample}.log"
+    log: "SEACR/logs/{chip_sample}_lenient.log"
     params:
         fdr = lambda wildcards,input: fdr if not input.control else "",
         prefix = os.path.join(outdir,"SEACR/{chip_sample}_host"),
         script=os.path.join(maindir, "shared","tools/SEACR-1.3/SEACR_1.3.sh")
     conda: CONDA_SEACR_ENV
     shell: """
-        bash {params.script} {input.chip} {input.control} {params.fdr} "non" "lenient" {params.prefix} 2>{log}
+        bash {params.script} {input.chip} {input.control} {params.fdr} "non" "relaxed" {params.prefix} 2>{log}
         """
 
 
