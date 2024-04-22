@@ -265,14 +265,14 @@ rule SEACR_peaks_stringent:
         bash {params.script} {input.chip} {input.control} {params.fdr} "norm" "stringent" {params.prefix} 2>{log}
         """
 
-rule SEACR_peaks_lenient:
+rule SEACR_peaks_relaxed:
     input:
         chip = "filtered_bedgraph/{chip_sample}.fragments.bedgraph",
         control = lambda wildcards: "filtered_bedgraph/"+get_control(wildcards.chip_sample)+".fragments.bedgraph" if get_control(wildcards.chip_sample)
                  else []
     output:
-        "SEACR/{chip_sample}.filtered.lenient.bed"
-    log: "SEACR/logs/{chip_sample}_lenient.log"
+        "SEACR/{chip_sample}.filtered.relaxed.bed"
+    log: "SEACR/logs/{chip_sample}_relaxed.log"
     params:
         fdr = lambda wildcards,input: fdr if not input.control else "",
         prefix = os.path.join(outdir,"SEACR/{chip_sample}.filtered"),
@@ -316,16 +316,16 @@ rule SEACR_peak_stringent_qc:
         """
 
 
-rule SEACR_peak_lenient_qc:
+rule SEACR_peak_relaxed_qc:
     input:
         bam = "filtered_bam/{sample}.filtered.bam",
-        peaks = "SEACR/{sample}.filtered.lenient.bed"
+        peaks = "SEACR/{sample}.filtered.relaxed.bed"
     output:
-        qc = "SEACR/{sample}.filtered.lenient_peaks.qc.txt"
+        qc = "SEACR/{sample}.filtered.relaxed_peaks.qc.txt"
     params:
         genome_index = genome_index
     benchmark:
-        "SEACR/.benchmark/SEACR_peak_lenient_qc.{sample}.filtered.benchmark"
+        "SEACR/.benchmark/SEACR_peak_relaxed_qc.{sample}.filtered.benchmark"
     conda: CONDA_SHARED_ENV
     shell: """
         # get the number of peaks

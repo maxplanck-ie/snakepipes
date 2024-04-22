@@ -265,14 +265,14 @@ rule SEACR_peaks_stringent:
         bash {params.script} {input.chip} {input.control} {params.fdr} "non" "stringent" {params.prefix} 2>{log}
         """
 
-rule SEACR_peaks_lenient:
+rule SEACR_peaks_relaxed:
     input:
         chip = "filtered_bedgraph/{chip_sample}_host.fragments.bedgraph",
         control = lambda wildcards: "filtered_bedgraph/"+get_control(wildcards.chip_sample)+"_host.fragments.bedgraph" if get_control(wildcards.chip_sample)
                  else []
     output:
-        "SEACR/{chip_sample}_host.lenient.bed"
-    log: "SEACR/logs/{chip_sample}_lenient.log"
+        "SEACR/{chip_sample}_host.relaxed.bed"
+    log: "SEACR/logs/{chip_sample}_relaxed.log"
     params:
         fdr = lambda wildcards,input: fdr if not input.control else "",
         prefix = os.path.join(outdir,"SEACR/{chip_sample}_host"),
@@ -316,16 +316,16 @@ rule SEACR_peak_stringent_qc:
         printf "peak_count\tFRiP\tpeak_genome_coverage\n%d\t%5.3f\t%6.4f\n" $peak_count $frip $genomecov > {output.qc}
         """
 
-rule SEACR_peak_lenient_qc:
+rule SEACR_peak_relaxed_qc:
     input:
         bam = "split_bam/{sample}_host.bam",
-        peaks = "SEACR/{sample}_host.lenient.bed"
+        peaks = "SEACR/{sample}_host.relaxed.bed"
     output:
-        qc = "SEACR/{sample}_host.lenient_peaks.qc.txt"
+        qc = "SEACR/{sample}_host.relaxed_peaks.qc.txt"
     params:
         genome_index = genome_index
     benchmark:
-        "SEACR/.benchmark/SEACR_peak_qc.{sample}_host_lenient.benchmark"
+        "SEACR/.benchmark/SEACR_peak_qc.{sample}_host_relaxed.benchmark"
     conda: CONDA_SHARED_ENV
     shell: """
         # get the number of peaks
