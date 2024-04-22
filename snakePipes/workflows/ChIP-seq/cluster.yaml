@@ -9,6 +9,6 @@ Genrich_peaks:
 namesort_bams:
     memory: 6G
 SEACR_peaks_stringent:
-    memory: 3G
+    memory: 10G
 SEACR_peaks_lenient:
-    memory: 3G
+    memory: 20G
