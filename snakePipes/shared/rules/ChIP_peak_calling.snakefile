@@ -255,7 +255,7 @@ rule SEACR_peaks_stringent:
                  else []
     output:
         "SEACR/{chip_sample}.filtered.stringent.bed"
-    log: "SEACR/logs/{chip_sample}.log"
+    log: "SEACR/logs/{chip_sample}_stringent.log"
     params:
         fdr = lambda wildcards,input: fdr if not input.control else "",
         prefix = os.path.join(outdir,"SEACR/{chip_sample}.filtered"),
@@ -272,7 +272,7 @@ rule SEACR_peaks_lenient:
                  else []
     output:
         "SEACR/{chip_sample}.filtered.lenient.bed"
-    log: "SEACR/logs/{chip_sample}.log"
+    log: "SEACR/logs/{chip_sample}_lenient.log"
     params:
         fdr = lambda wildcards,input: fdr if not input.control else "",
         prefix = os.path.join(outdir,"SEACR/{chip_sample}.filtered"),
