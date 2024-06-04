@@ -128,9 +128,10 @@ if (! external_bed) {
             bed.gr = GRanges(seqnames = bed$V1, ranges = IRanges(start = bed$V2, end = bed$V3), name = bed$V4)
             return(bed.gr)
         })
+    }
     # merge
     allpeaks <- Reduce(function(x,y) GenomicRanges::union(x,y), allpeaks)
-    }
+    
     } else {
         bed = read.delim(snakemake@input[['peaks']],header=FALSE)
         bed.gr = GRanges(seqnames = bed$V1, ranges = IRanges(start = bed$V2, end = bed$V3), name = bed$V4)

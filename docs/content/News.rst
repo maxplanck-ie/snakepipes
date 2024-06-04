@@ -1,7 +1,7 @@
 snakePipes News
 ===============
 
-snakePipes 2.8.2
+snakePipes 2.9.0
 ________________
 
 * added SEACR peaks qc

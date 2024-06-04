@@ -127,13 +127,13 @@ include:os.path.join(maindir, "shared", "rules", "RNA-seq_qc_report.snakefile")
 
 ## DESeq2
 if sampleSheet and not "three-prime-seq" in mode:
-    if isMultipleComparison and not "allelic-mapping" in mode and not "allelic-counting" in mode:
+    if isMultipleComparison :
         include: os.path.join(maindir, "shared", "rules", "DESeq2.multipleComp.snakefile")
-        if rMats:
+        if rMats and not "allelic-mapping" in mode and not "allelic-counting" in mode:
             include: os.path.join(maindir, "shared", "rules", "rMats.multipleComp.snakefile")
     else:
         include: os.path.join(maindir, "shared", "rules", "DESeq2.singleComp.snakefile")
-        if rMats:
+        if rMats and not "allelic-mapping" in mode and not "allelic-counting" in mode:
             include: os.path.join(maindir, "shared", "rules", "rMats.singleComp.snakefile")
 
 ## MultiQC
@@ -257,10 +257,13 @@ def run_allelesp_mapping():
         ]
         if sampleSheet:
             sample_name = os.path.splitext(os.path.basename(sampleSheet))[0]
-            file_list.append( ["DESeq2_{}/DESeq2.session_info.txt".format(sample_name)] )
-        if sampleSheet and rMats:
-            file_list.append( ["rMats_{}/RI.MATS.JCEC.txt".format(sample_name)] )
-            file_list.append( ["rMats_{}/b2.csv".format(sample_name)] )
+            if not isMultipleComparison:
+                file_list.append( ["DESeq2_{}/DESeq2.session_info.txt".format(sample_name)] )
+                #if rMats:
+                    #file_list.append( ["rMats_{}/RI.MATS.JCEC.txt".format(sample_name)] )
+                    #file_list.append( ["rMats_{}/b2.csv".format(sample_name)] )
+            else:
+                file_list.append(expand("DESeq2_{}".format(sample_name) + ".{compGroup}/DESeq2.session_info.txt",compGroup=cf.returnComparisonGroups(sampleSheet)))
         return(file_list)
     else:
         return([])

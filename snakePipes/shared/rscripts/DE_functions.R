@@ -95,7 +95,7 @@ checktable <- function(countdata = NA, sampleSheet = NA, alleleSpecific = FALSE,
 DESeq_basic <- function(countdata, coldata, fdr, alleleSpecific = FALSE, from_salmon = FALSE, size_factors=NA, customFormula=NA) {
     cnames.sub<-unique(colnames(coldata)[2:which(colnames(coldata) %in% "condition")])
     
-    if(is.na(customFormula)){
+    if(is.na(customFormula)|customFormula==""){
       d<-as.formula(noquote(paste0("~",paste(cnames.sub,collapse="+"))))
     } else {
 
@@ -150,7 +150,7 @@ DESeq_basic <- function(countdata, coldata, fdr, alleleSpecific = FALSE, from_sa
 #'
 #'
 
-DESeq_allelic <- function(countdata, coldata, fdr, from_salmon=FALSE) {
+DESeq_allelic <- function(countdata, coldata, fdr, from_salmon=FALSE, customFormula=NA) {
 
     # AlleleSpecific DEseq
     print("Performing Allele-specific DESeq using Interaction design : Genome2 vs Genome1")

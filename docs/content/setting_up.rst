@@ -39,18 +39,16 @@ The easiest way to install snakePipes is via our conda channel. The following co
 
 This way, the software used within snakePipes do not conflict with the software pre-installed on your terminal or in your python environment.
 
-Now, we should create the workflow environments:
+Now, we should activate this environment:
 
 .. code:: bash
 
     conda activate snakePipes
-    snakePipes createEnvs
 
+Finally, in order to create the workflow environments, we'll need to adjust the path under ``defaults.yaml`` settings file. Please continue reading about all global options.
 
 Modify global options
 ---------------------
-
-It is often useful to store organism YAML files and the cluster configuration file outside of snakePipes, so that these can be used across snakePipes versions without needing to make copies. Since snakePipes 1.3.0, this can be done by modifying the **defaults.yaml** file, the location of which is given by ``snakePipes info``. Instead of manually modifying this file, you may also use ``snakePipes config``. 
 
 To see the location of the various YAML files so you can manually inspect them, you can use:
 
