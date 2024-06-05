@@ -1,4 +1,4 @@
-name: snakepipes_RNAseq_environment_2.0
+name: snakepipes_RNAseq_environment_3.0
 channels:
  - conda-forge
  - bioconda
@@ -9,8 +9,8 @@ dependencies:
  - subread = 2.0.1
  - hisat2 = 2.2.1
  - star = 2.7.10b
- - salmon = 1.10.1
- - r-base = 4.1.3
+# - salmon = 1.10.1
+ - r-base = 4.3.0
  - r-wasabi
  - r-dplyr
  - r-ggplot2
@@ -20,7 +20,7 @@ dependencies:
  - pandoc
  - r-dt
  - r-rcolorbrewer
- - bioconductor-deseq2
+ - bioconductor-deseq2 = 1.42.0
  - bioconductor-tximport
  - r-knitcitations
  - bioconductor-apeglm

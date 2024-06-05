@@ -39,7 +39,7 @@ rule SalmonAlevin:
             out =  "Alevin/logs/alevin.{sample}.out",
             err = "Alevin/logs/alevin.{sample}.err"
         #Use RNAseq env because Salmon already installed there (no need for duplication).
-        conda: CONDA_RNASEQ_ENV
+        conda: CONDA_SALMON_ENV
         threads: 8
         shell:"""
             salmon alevin -l {params.libtype} -1 {input.R1} -2 {input.R2} {params.protocol} -i {params.index} -p {threads} -o {params.outdir} --tgMap {input.tgMap} --dumpFeatures --dumpMtx --numCellBootstraps 100 > {log.out} 2> {log.err}
@@ -124,7 +124,7 @@ rule AlevinForVelocity:
             out =  "AlevinForVelocity/logs/alevin.{sample}.out",
             err = "AlevinForVelocity/logs/alevin.{sample}.err"
         #Use RNAseq env because Salmon already installed there (no need for duplication).
-        conda: CONDA_RNASEQ_ENV
+        conda: CONDA_SALMON_ENV
         threads: 8
         shell:"""
             salmon alevin -l {params.libtype} -1 {input.R1} -2 {input.R2} {params.protocol} -i {params.velo_index} -p {threads} -o {params.outdir} --tgMap {params.tgMap} --dumpFeatures --dumpMtx --numCellBootstraps 100 > {log.out} 2> {log.err}
