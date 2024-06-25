@@ -5,8 +5,6 @@ import shutil
 import gzip
 import pytest
 
-SMKOPTS = " --dryrun --conda-prefix /tmp -q "
-
 def extract_gz(i, o):
   '''
   extracts i into file o
@@ -29,6 +27,8 @@ def createTestData(fp):
     extract_gz(gtfgz, gtfout)
     # Path to STAR index (created in action)
     STARpath = Path('tests') / 'data' / 'mRNA_STAR'
+    STARpath = p.resolve()
+    
     orgyaml = {
       "genome_size": 94987271 , #we can also extract genome size from STARindex output
       "genome_fasta": faout.as_posix(),
