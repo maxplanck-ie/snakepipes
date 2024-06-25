@@ -10,7 +10,7 @@ jobs:
   create_STARix:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - uses: mamba-org/setup-micromamba@main
       with:
         environment-file: snakePipes/shared/rules/envs/rna_seq.yaml
@@ -32,7 +32,7 @@ jobs:
     needs: create_STARix
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - uses: mamba-org/setup-micromamba@main
       with:
         environment-file: .github/snakePipesEnvCI.yml
@@ -55,7 +55,7 @@ jobs:
   CI_jobcounts:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - uses: mamba-org/setup-micromamba@main
       with:
         environment-file: .github/snakePipesEnvCI.yml
