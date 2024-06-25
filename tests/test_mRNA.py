@@ -19,15 +19,17 @@ genomedir = Path(__file__).parents[0]/ 'data' / 'genomes'
 datadir = Path(__file__).parents[0] / 'data' / 'mRNA'
 gtf = genomedir/'genes_chr17.gtf'
 fa = genomedir/'genome_chr17.fa'
+STARdir = genomedir / 'STAR_index'
 
 def STAR_ix():
   assert gtf.exists(), f"GTF file does not exist at {gtf}"
   assert fa.exists(), f"FASTA file does not exist at {fa}"
 
   sp.run(['STAR' , '--runThreadN' , '8', '--runMode', 'genomeGenerate' , 
-          '--genomeDir' , 'STARdir' , '--genomeFastaFiles' , str(fa), 
+          '--genomeDir' , str(STARdir), '--genomeFastaFiles' , str(fa), 
           '--sjdbGTFfile',str(gtf), '--sjdbOverhang', '100', '--genomeSAindexNbases' , '12'], check=True)
-  return 
+  
+  return STARdir.as_posix()
       
 
 def createYaml(yaml_file):
@@ -36,9 +38,9 @@ def createYaml(yaml_file):
 
   data = {
      "genome_size": 94987271 , #we can also extract genome size from STARindex output
-     "genome_fasta": "data/manke/group/schmidth/tests/data/genome_chr17.fa",
+     "genome_fasta": "data/manke/group/schmidth/tests/data/genomes/genome_chr17.fa",
      "star_index": "STARdir",
-     "genes_gtf" : "data/manke/group/schmidth/tests/data/genomes/genes_chr17.gtf",
+     "genes_gtf" : "data/manke/group/schmidth/tests/data/genomes/genes_chr17.gtf", 'path(__file_) relative' as_posix
      "extended_coding_regions_gtf" : "",
      "blacklist_bed": "",
      "ignoreForNormalization": "" 
@@ -63,13 +65,13 @@ def config_conda(_config):
 
  
 
-def create_indices():
-  sp.run(['createIndices', '-o', str(genomedir), 
-          '--genomeURL', str(fa),  
-          '--gtfURL', str(gtf), 
-          '--userYAML',  
-          'mm10_M19_chr17'], 
-            check = True)
+# def create_indices():
+#   sp.run(['createIndices', '-o', str(genomedir), 
+#           '--genomeURL', str(fa),  
+#           '--gtfURL', str(gtf), 
+#           '--userYAML',  
+#           'mm10_M19_chr17'], 
+#             check = True)
 
 def test_mrna():
     yaml_file = 'mm10_chr17.yaml'
@@ -79,12 +81,11 @@ def test_mrna():
     config= config_conda(_config)
     indices = create_indices()  
 
-  # assert Path(STAR_index).exists(), "STAR index directory does not exist"
-  # assert Path(yaml_path).exists(), "Organism YAML file does not exist"
-  # assert Path(config).exists(), "Custom config file does not exist"
+    assert Path(STAR_index).exists(), "STAR index directory does not exist"
+    assert Path(yaml_path).exists(), "Organism YAML file does not exist"
+    assert Path(config).exists(), "Custom config file does not exist"
 
     return yaml_path, STAR_index, config, indices
-
 
 test_mrna()
 
