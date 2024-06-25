@@ -31,9 +31,6 @@ jobs:
   CI_RNA:
     needs: create_STARix
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        pytests: ['tests/test_mRNA.py']
     steps:
     - uses: actions/checkout@v3
     - uses: mamba-org/setup-micromamba@main
@@ -54,12 +51,9 @@ jobs:
         micromamba activate snakePipes_CI
         snakePipes config --tempDir /tmp --condaEnvDir ./
         snakePipes createEnvs --only CONDA_SHARED_ENV CONDA_RNASEQ_ENV
-        pytest --verbosity=2
+        pytest --verbosity=2 -rP tests/test_mRNA.py
   CI_jobcounts:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        pytests: ['tests/test_jobcounts.py']
     steps:
     - uses: actions/checkout@v3
     - uses: mamba-org/setup-micromamba@main
@@ -79,4 +73,4 @@ jobs:
       run: |
         micromamba activate snakePipes_CI
         snakePipes config --tempDir /tmp --condaEnvDir ./
-        pytest --verbosity=2
+        pytest --verbosity=2 -rP tests/test_jobcounts.py
