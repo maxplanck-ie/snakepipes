@@ -7,7 +7,7 @@ defaults:
       shell: bash -l {0}
 
 jobs:
-  create_STARix:
+  test_mRNA:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -28,11 +28,6 @@ jobs:
         gunzip -c tests/data/genomes/genome_chr17.fa.gz > genome_chr17.fa
         gunzip -c tests/data/genomes/genes_chr17.gtf.gz > genes_chr17.gtf
         STAR --runThreadN 4 --runMode genomeGenerate --genomeDir tests/data/mRNA_STAR --genomeFastaFiles genome_chr17.fa --sjdbGTFfile genes_chr17.gtf --sjdbOverhang 100 --genomeSAindexNbases 12
-  CI_RNA:
-    needs: create_STARix
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
     - uses: mamba-org/setup-micromamba@main
       with:
         environment-file: .github/snakePipesEnvCI.yml
