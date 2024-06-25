@@ -75,11 +75,6 @@ jobs:
         micromamba activate snakePipes_CI
         snakePipes config --tempDir /tmp
         ./.ci_stuff/test_dag.sh
-    - name: pytest
-      run: |
-        micromamba activate snakePipes_CI
-        snakePipes config --tempDir /tmp
-        pytest --verbosity=2
   createEnvs:
     needs: CI
     strategy:

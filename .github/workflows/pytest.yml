@@ -1,0 +1,82 @@
+name: linux
+
+on: [pull_request, push]
+
+defaults:
+  run:
+      shell: bash -l {0}
+
+jobs:
+  create_STARix:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: mamba-org/setup-micromamba@main
+      with:
+        environment-file: snakePipes/shared/rules/envs/rna_seq.yaml
+        environment-name: rnaseqenv
+        condarc: |
+          channels:
+            - conda-forge
+            - bioconda
+            - defaults
+          channel_priority: 'strict'
+        cache-downloads: true
+    - name: create_starix
+      run: |
+        micromamba activate rnaseqenv
+        gunzip -c tests/data/genomes/genome_chr17.fa.gz > genome_chr17.fa
+        gunzip -c tests/data/genomes/genes_chr17.gtf.gz > genes_chr17.gtf
+        STAR --runThreadN 4 --runMode genomeGenerate --genomeDir tests/data/mRNA_STAR --genomeFastaFiles genome_chr17.fa --sjdbGTFfile genes_chr17.gtf --sjdbOverhang 100 --genomeSAindexNbases 12
+  CI_RNA:
+    needs: create_STARix
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        pytests: ['tests/test_mRNA.py']
+    steps:
+    - uses: actions/checkout@v3
+    - uses: mamba-org/setup-micromamba@main
+      with:
+        environment-file: .github/snakePipesEnvCI.yml
+        condarc: |
+          channels:
+            - conda-forge
+            - bioconda
+            - defaults
+          channel_priority: 'strict'
+        cache-downloads: true
+    - name: Install snakePipes
+      run: |
+        micromamba run -n snakePipes_CI python -m pip install . --no-deps --ignore-installed -vvv
+    - name: pytest
+      run: |
+        micromamba activate snakePipes_CI
+        snakePipes config --tempDir /tmp --condaEnvDir ./
+        snakePipes createEnvs --only CONDA_SHARED_ENV CONDA_RNASEQ_ENV
+        pytest --verbosity=2
+  CI_jobcounts:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        pytests: ['tests/test_jobcounts.py']
+    steps:
+    - uses: actions/checkout@v3
+    - uses: mamba-org/setup-micromamba@main
+      with:
+        environment-file: .github/snakePipesEnvCI.yml
+        condarc: |
+          channels:
+            - conda-forge
+            - bioconda
+            - defaults
+          channel_priority: 'strict'
+        cache-downloads: true
+    - name: Install snakePipes
+      run: |
+        micromamba run -n snakePipes_CI python -m pip install . --no-deps --ignore-installed -vvv
+    - name: pytest
+      run: |
+        micromamba activate snakePipes_CI
+        snakePipes config --tempDir /tmp --condaEnvDir ./
+        pytest --verbosity=2
