@@ -22,6 +22,7 @@ jobs:
             - defaults
           channel_priority: 'strict'
         cache-downloads: true
+        post-cleanup: 'none'
     - name: create_starix
       run: |
         micromamba activate rnaseqenv
