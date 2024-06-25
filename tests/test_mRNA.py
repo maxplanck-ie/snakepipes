@@ -19,9 +19,6 @@ def createTestData(fp):
     '''
     Sets up fasta, gtf and organism yaml in a factory (fp)
     '''
-    # Provide cluster yaml
-    clsyml = Path('tests') / ' data' / 'cluster_config.yaml'
-    shutil.copyfile(clsyml, fp / 'cconf.yaml')
     # uncompress fna into tmp factory
     fnagz = Path('tests') / 'data' / 'genomes' / 'genome_chr17.fa.gz'
     faout = fp / 'genome.fa'
@@ -56,7 +53,7 @@ def ifs(tmp_path_factory):
 class TestmRNAseq:
     def test_mrna(self, ifs):
       org = ifs / 'org.yaml'
-      clusterconfig = ifs / 'cconf.yaml'
+      clusterconfig = Path('tests') / data / 'cluster_config.yaml'
       sp.run(
         [
           'mRNA-seq',
