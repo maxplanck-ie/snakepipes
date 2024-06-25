@@ -1,4 +1,4 @@
-import os
+import os.path
 from pathlib import Path
 import subprocess as sp
 import pytest
@@ -25,13 +25,10 @@ def STAR_ix():
   assert fa.exists(), f"FASTA file does not exist at {fa}"
 
   sp.run(['STAR' , '--runThreadN' , '8', '--runMode', 'genomeGenerate' , 
-          '--genomeDir' , 'STARdir2' , '--genomeFastaFiles' , str(fa), 
+          '--genomeDir' , 'STARdir' , '--genomeFastaFiles' , str(fa), 
           '--sjdbGTFfile',str(gtf), '--sjdbOverhang', '100', '--genomeSAindexNbases' , '12'], check=True)
-
   return 
-       
-STAR_ix()
-
+      
 
 def createYaml(yaml_file):
   yamlPath  = datadir / yaml_file
@@ -53,6 +50,7 @@ def createYaml(yaml_file):
   return yamlPath.as_posix()
 
 
+
 def config_conda(_config):
   config_path = Path(__file__).parents[0] / 'data' / 'env' / _config
   config_data = { "conda_path": "" }
@@ -63,37 +61,31 @@ def config_conda(_config):
   
   return config_path.as_posix()
 
+ 
 
-def setup_env():
+def create_indices():
   sp.run(['createIndices', '-o', str(genomedir), 
           '--genomeURL', str(fa),  
           '--gtfURL', str(gtf), 
           '--userYAML',  
           'mm10_M19_chr17'], 
             check = True)
-  
 
-
-def setup_files():
+def test_mrna():
     yaml_file = 'mm10_chr17.yaml'
-    STAR_index = STAR_ix()
     yaml_path = createYaml(yaml_file)
+    STAR_index = STAR_ix()
     _config = 'conda.yaml'
     config= config_conda(_config)
+    indices = create_indices()  
 
-    return STAR_index, yaml_path, config
+  # assert Path(STAR_index).exists(), "STAR index directory does not exist"
+  # assert Path(yaml_path).exists(), "Organism YAML file does not exist"
+  # assert Path(config).exists(), "Custom config file does not exist"
 
-def test_mrnaseq(setup_files):
-    STAR_index , yaml_path, config_path = setup_files
-
-    assert Path(STAR_index).exists(), "STAR index directory does not exist"
-    assert Path(yaml_path).exists(), "Organism YAML file does not exist"
-    assert Path(config_path).exists(), "Custom config file does not exist"
-
-    setup_env()
+    return yaml_path, STAR_index, config, indices
 
 
-# def test_mrna():
-#   sp.run(
-#     ['mRNA-seq', '-i', '/data/manke/group/schmidth/snakepipes/tests/data/mRNA', '-o', 'TEST', '/data/manke/group/schmidth/snakepipes/tests/mm10_chr17.yaml']
-#   )
+test_mrna()
+
+
