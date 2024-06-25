@@ -66,7 +66,5 @@ class TestmRNAseq:
           org
         ]
       )
-      print(list(Path('test_mrna').glob('*.*')))
-      assert Path('test_mrna/mRNA-seq_snakePipes.done').is_file == True
+      assert Path('test_mrna/mRNA-seq_snakePipes.done').is_file() == True
 
-      
