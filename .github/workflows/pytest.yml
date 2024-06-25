@@ -1,4 +1,4 @@
-name: linux
+name: pytest
 
 on: [pull_request, push]
 
