@@ -58,7 +58,7 @@ class TestmRNAseq:
         [
           'mRNA-seq',
           '-i',
-          Path('tests') / 'data' / 'mRNA'
+          Path('tests') / 'data' / 'mRNA',
           '-o',
           'test_mrna',
           '--clusterConfig',
