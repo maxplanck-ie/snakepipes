@@ -248,14 +248,14 @@ rule prep_bedgraph:
         bigWigToBedGraph {input} {output}
         """
 
-rule SEACR_peaks:
+rule SEACR_peaks_stringent:
     input:
         chip = "filtered_bedgraph/{chip_sample}_host.fragments.bedgraph",
         control = lambda wildcards: "filtered_bedgraph/"+get_control(wildcards.chip_sample)+"_host.fragments.bedgraph" if get_control(wildcards.chip_sample)
                  else []
     output:
         "SEACR/{chip_sample}_host.stringent.bed"
-    log: "SEACR/logs/{chip_sample}.log"
+    log: "SEACR/logs/{chip_sample}_stringent.log"
     params:
         fdr = lambda wildcards,input: fdr if not input.control else "",
         prefix = os.path.join(outdir,"SEACR/{chip_sample}_host"),
@@ -265,8 +265,25 @@ rule SEACR_peaks:
         bash {params.script} {input.chip} {input.control} {params.fdr} "non" "stringent" {params.prefix} 2>{log}
         """
 
+rule SEACR_peaks_relaxed:
+    input:
+        chip = "filtered_bedgraph/{chip_sample}_host.fragments.bedgraph",
+        control = lambda wildcards: "filtered_bedgraph/"+get_control(wildcards.chip_sample)+"_host.fragments.bedgraph" if get_control(wildcards.chip_sample)
+                 else []
+    output:
+        "SEACR/{chip_sample}_host.relaxed.bed"
+    log: "SEACR/logs/{chip_sample}_relaxed.log"
+    params:
+        fdr = lambda wildcards,input: fdr if not input.control else "",
+        prefix = os.path.join(outdir,"SEACR/{chip_sample}_host"),
+        script=os.path.join(maindir, "shared","tools/SEACR-1.3/SEACR_1.3.sh")
+    conda: CONDA_SEACR_ENV
+    shell: """
+        bash {params.script} {input.chip} {input.control} {params.fdr} "non" "relaxed" {params.prefix} 2>{log}
+        """
 
-rule SEACR_peak_qc:
+
+rule SEACR_peak_stringent_qc:
     input:
         bam = "split_bam/{sample}_host.bam",
         peaks = "SEACR/{sample}_host.stringent.bed"
@@ -275,7 +292,7 @@ rule SEACR_peak_qc:
     params:
         genome_index = genome_index
     benchmark:
-        "SEACR/.benchmark/SEACR_peak_qc.{sample}_host.benchmark"
+        "SEACR/.benchmark/SEACR_peak_qc.{sample}_host_stringend.benchmark"
     conda: CONDA_SHARED_ENV
     shell: """
         # get the number of peaks
@@ -299,4 +316,35 @@ rule SEACR_peak_qc:
         printf "peak_count\tFRiP\tpeak_genome_coverage\n%d\t%5.3f\t%6.4f\n" $peak_count $frip $genomecov > {output.qc}
         """
 
-
+rule SEACR_peak_relaxed_qc:
+    input:
+        bam = "split_bam/{sample}_host.bam",
+        peaks = "SEACR/{sample}_host.relaxed.bed"
+    output:
+        qc = "SEACR/{sample}_host.relaxed_peaks.qc.txt"
+    params:
+        genome_index = genome_index
+    benchmark:
+        "SEACR/.benchmark/SEACR_peak_qc.{sample}_host_relaxed.benchmark"
+    conda: CONDA_SHARED_ENV
+    shell: """
+        # get the number of peaks
+        peak_count=`wc -l < {input.peaks}`
+        
+        #get the number of mapped reads
+        mapped_reads=`samtools view -c -F 4 {input.bam}`
+        
+        #calculate the number of alignments overlapping the peaks
+        # exclude reads flagged as unmapped (unmapped reads will be reported when using -L)
+        reads_in_peaks=`samtools view -c -F 4 -L {input.peaks} {input.bam}`
+        
+        # calculate Fraction of Reads In Peaks
+        frip=`bc -l <<< "$reads_in_peaks/$mapped_reads"`
+        # compute peak genome coverage
+        peak_len=`awk '{{total+=$3-$2}}END{{print total}}' {input.peaks}`
+        genome_size=`awk '{{total+=$3-$2}}END{{print total}}' {params.genome_index}`
+        genomecov=`bc -l <<< "$peak_len/$genome_size"`
+        
+        # write peak-based QC metrics to output file
+        printf "peak_count\tFRiP\tpeak_genome_coverage\n%d\t%5.3f\t%6.4f\n" $peak_count $frip $genomecov > {output.qc}
+        """

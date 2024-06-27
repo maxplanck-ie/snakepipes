@@ -79,7 +79,7 @@ samtools fastq -1 {output.r1} -2 {output.r2} -0 /dev/null -s /dev/null -n  \\
             gtf = genes_gtf,
             lib_type = getSalmon_libtype(pairedEnd, libraryType)
         threads: 8
-        conda: CONDA_RNASEQ_ENV
+        conda: CONDA_SALMON_ENV
         shell: """
             salmon quant -p {threads} --softclipOverhangs --validateMappings --numBootstraps 50 -i {params.index} -l {params.lib_type} -1 {input.r1} -2 {input.r2} -o {params.outdir} 2> {log}
             """
@@ -114,7 +114,7 @@ samtools fastq -1 /dev/null -2 /dev/null -0 /dev/null -s {output.r1} -n  \\
             gtf = genes_gtf,
             lib_type = getSalmon_libtype(pairedEnd, libraryType)
         threads: 8
-        conda: CONDA_RNASEQ_ENV
+        conda: CONDA_SALMON_ENV
         shell: """
             salmon quant -p {threads} --softclipOverhangs --validateMappings --numBootstraps 50 -i {params.index} -l {params.lib_type} -r {input.fastq} -o {params.outdir} 2> {log}
             """

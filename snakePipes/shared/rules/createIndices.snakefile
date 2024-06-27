@@ -411,7 +411,7 @@ rule Salmon_index_joint_fa:
         err = "SalmonIndex_RNAVelocity/logs/SalmonIndex.err",
         out = "SalmonIndex_RNAVelocity/logs/SalmonIndex.out"
     threads: lambda wildcards: 16 if 16<max_thread else max_thread
-    conda: CONDA_RNASEQ_ENV
+    conda: CONDA_SALMON_ENV
     shell:"""
         cat {input.joint_fasta} {input.genome_fasta} > {output.seq_fa}
         salmon index -p {threads} -t {output.seq_fa} -d {input.decoys} -i SalmonIndex_RNAVelocity {params.salmonIndexOptions} > {log.out} 2> {log.err}
