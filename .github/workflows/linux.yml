@@ -11,7 +11,7 @@ jobs:
   docs:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - uses: mamba-org/setup-micromamba@main
       with:
         environment-file: .github/snakePipesEnvCI.yml
@@ -34,7 +34,7 @@ jobs:
   flake:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - uses: mamba-org/setup-micromamba@main
       with:
         environment-file: .github/snakePipesEnvCI.yml
@@ -56,7 +56,7 @@ jobs:
   CI:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - uses: mamba-org/setup-micromamba@main
       with:
         environment-file: .github/snakePipesEnvCI.yml
