@@ -4,6 +4,8 @@ import subprocess as sp
 import pytest
 from ruamel.yaml import YAML
 
+#from distutils.command.config import dump_file
+
 
 
 #  for the functionality of tests/test_mrnaseq.py
@@ -40,7 +42,7 @@ def createYaml(yaml_file):
      "genome_size": 94987271 , #we can also extract genome size from STARindex output
      "genome_fasta": "data/manke/group/schmidth/tests/data/genomes/genome_chr17.fa",
      "star_index": "STARdir",
-     "genes_gtf" : "data/manke/group/schmidth/tests/data/genomes/genes_chr17.gtf", 'path(__file_) relative' as_posix
+     "genes_gtf" : "data/manke/group/schmidth/tests/data/genomes/genes_chr17.gtf",
      "extended_coding_regions_gtf" : "",
      "blacklist_bed": "",
      "ignoreForNormalization": "" 
@@ -65,15 +67,15 @@ def config_conda(_config):
 
  
 
-# def create_indices():
-#   sp.run(['createIndices', '-o', str(genomedir), 
-#           '--genomeURL', str(fa),  
-#           '--gtfURL', str(gtf), 
-#           '--userYAML',  
-#           'mm10_M19_chr17'], 
-#             check = True)
+def create_indices():
+  sp.run(['createIndices', '-o', str(genomedir), 
+          '--genomeURL', str(fa),  
+          '--gtfURL', str(gtf), 
+          '--userYAML',  
+          'mm10_M19_chr17'], 
+            check = True)
 
-def test_mrna():
+def test_files():
     yaml_file = 'mm10_chr17.yaml'
     yaml_path = createYaml(yaml_file)
     STAR_index = STAR_ix()
@@ -87,6 +89,11 @@ def test_mrna():
 
     return yaml_path, STAR_index, config, indices
 
-test_mrna()
 
+def test_mrna():
+  setup_files = test_files()
+  analysis = sp.run(['mRNA-seq', '-i', str(datadir), '-o', 'TEST_1', str(genomedir/'mm10_M19_chr17.yaml')], check= True )
+  return setup_files, analysis
 
+if __name__ == "__main__":
+  test_mrna()
