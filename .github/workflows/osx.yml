@@ -35,7 +35,7 @@ jobs:
         ]
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: mamba-org/setup-micromamba@main
         with:
           environment-file: .github/snakePipesEnvCI.yml
@@ -52,5 +52,6 @@ jobs:
       - name: createEnvsOSX
         run: |
           micromamba activate snakePipes_CI
+          conda config --add subdirs osx-64
           snakePipes createEnvs --autodetectCondaEnvDir --only ${{matrix.envs}}
      
