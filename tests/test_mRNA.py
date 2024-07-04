@@ -58,7 +58,7 @@ class TestmRNAseq:
         [
           'mRNA-seq',
           '-i',
-          Path('tests') / 'data' / 'mRNA',
+          Path('tests') / 'data' / 'mRNA_mIFNB',
           '-o',
           'test_mrna',
           '--clusterConfig',
@@ -67,4 +67,21 @@ class TestmRNAseq:
         ]
       )
       assert Path('test_mrna/mRNA-seq_snakePipes.done').is_file() == True
+    
+    def test_mrna4(self, ifs):
+      org = ifs / 'org.yaml'
+      clusterconfig = Path('tests') / 'data' / 'cluster_config.yaml'
+      sp.run(
+        [
+          'mRNA-seq',
+          '-i',
+          Path('tests') / 'data' / 'mRNA_BcellPancreas',
+          '-o',
+          'test_mrna_4sample',
+          '--clusterConfig',
+          clusterconfig,
+          org
+        ]
+      )
+      assert Path('test_mrna_4sample/mRNA-seq_snakePipes.done').is_file() == True
 
