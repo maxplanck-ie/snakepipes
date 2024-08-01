@@ -126,6 +126,6 @@ Command line options
 
 .. argparse::
    :func: parse_args
-   :filename: ../snakePipes/workflows/DNAmapping/DNAmapping
+   :filename: ../snakePipes/workflows/DNAmapping/DNAmapping.py
    :prog: DNAmapping
    :nodefault:

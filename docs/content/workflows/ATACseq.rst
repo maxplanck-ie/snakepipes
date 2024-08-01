@@ -192,6 +192,6 @@ Command line options
 
 .. argparse::
     :func: parse_args
-    :filename: ../snakePipes/workflows/ATACseq/ATACseq
+    :filename: ../snakePipes/workflows/ATACseq/ATACseq.py
     :prog: ATACseq
     :nodefault:

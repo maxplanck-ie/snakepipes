@@ -88,6 +88,6 @@ Command line options
 
 .. argparse::
     :func: parse_args
-    :filename: ../snakePipes/workflows/createIndices/createIndices
+    :filename: ../snakePipes/workflows/createIndices/createIndices.py
     :prog: createIndices
     :nodefault:

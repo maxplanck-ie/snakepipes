@@ -230,6 +230,6 @@ Command line options
 
 .. argparse::
     :func: parse_args
-    :filename: ../snakePipes/workflows/ChIPseq/ChIPseq
+    :filename: ../snakePipes/workflows/ChIPseq/ChIPseq.py
     :prog: ChIPseq
     :nodefault:

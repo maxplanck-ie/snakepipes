@@ -229,6 +229,6 @@ Command line options
 
 .. argparse::
     :func: parse_args
-    :filename: ../snakePipes/workflows/scRNAseq/scRNAseq
+    :filename: ../snakePipes/workflows/scRNAseq/scRNAseq.py
     :prog: scRNAseq
     :nodefault:
