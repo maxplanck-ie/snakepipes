@@ -1,0 +1,14 @@
+name: pairtools_phased
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - bwa
+  - samtools
+  - tabix
+  - bcftools
+  - pairtools==1.1
+  - pip
+  - pip:
+      - git+https://github.com/open2c/MultiQC.git
