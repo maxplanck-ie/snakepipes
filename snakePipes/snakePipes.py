@@ -9,7 +9,7 @@ import glob
 import hashlib
 import shutil
 import snakePipes.common_functions as cof
-from snakePipes import __version__
+from importlib.metadata import version
 
 
 def parse_arguments():
@@ -413,13 +413,10 @@ def updateConfig(args):
         os.path.join(baseDir, "shared", "defaults.yaml"), True, "Final Updated Config"
     )
 
-
-def version():
-    print("version {}".format(__version__))
-
-
-def main(args):
-    args = parse_arguments().parse_args(args)
+def main():
+    if len(sys.argv) == 1:
+        sys.argv.append("--help")
+    args = parse_arguments().parse_args(sys.argv[1:])
     if args.command == "info":
         info()
     elif args.command == "envInfo":
@@ -429,12 +426,7 @@ def main(args):
     elif args.command == "config":
         updateConfig(args)
     elif args.command == "version":
-        version()
+        _v = version("snakePipes")
+        print(f"snakePipes version {_v}")
     else:
         createCondaEnvs(args)
-
-
-if __name__ == "__main__":
-    if len(sys.argv) == 1:
-        sys.argv.append("--help")
-    main(sys.argv[1:])
