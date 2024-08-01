@@ -24,7 +24,7 @@ requirements:
 
 test:
   commands:
-    - DNA-mapping --help
+    - DNAmapping --help
 
 about:
   home: 'https://snakepipes.readthedocs.org'

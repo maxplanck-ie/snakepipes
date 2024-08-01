@@ -7,7 +7,7 @@
 # permitted here.
 ################################################################################
 #
-condaEnvDir: '/package/mamba/envs/snakepipesenvs/2.9.0'
+condaEnvDir: '/localenv/deboutte/anaconda/snakepipes-envs'
 snakemakeOptions: ''
 organismsDir: 'shared/organisms'
 clusterConfig: 'shared/cluster.yaml'

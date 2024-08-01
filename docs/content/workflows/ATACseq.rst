@@ -1,12 +1,12 @@
-.. _ATAC-seq:
+.. _ATACseq:
 
-ATAC-seq
+ATACseq
 ========
 
 What it does
 ------------
 
-The ATAC-seq pipeline takes one or more BAM files and attempts to find accessible regions. If multiple samples and a sample sheet are provided, then CSAW is additionally used to find differentially accessible regions. Prior to finding open/accessible regions, the BAM files are filtered to include only properly paired reads with appropriate fragment sizes (<150 bases by default). These filtered fragments are then used for the remainder of the pipeline.
+The ATACseq pipeline takes one or more BAM files and attempts to find accessible regions. If multiple samples and a sample sheet are provided, then CSAW is additionally used to find differentially accessible regions. Prior to finding open/accessible regions, the BAM files are filtered to include only properly paired reads with appropriate fragment sizes (<150 bases by default). These filtered fragments are then used for the remainder of the pipeline.
 
 .. image:: ../images/ATACseq_pipeline.png
 
@@ -15,8 +15,8 @@ The ATAC-seq pipeline takes one or more BAM files and attempts to find accessibl
 Input requirements
 ------------------
 
-The DNA mapping pipeline generates output that is fully compatible with the ATAC-seq pipeline input requirements!
-When running the ATAC-seq pipeline, please specify the output directory of DNA-mapping pipeline as the working directory (``-d``).
+The DNA mapping pipeline generates output that is fully compatible with the ATACseq pipeline input requirements!
+When running the ATACseq pipeline, please specify the output directory of DNAmapping pipeline as the working directory (``-d``).
 
 * **filtered_bam** directory contains the input BAM files (either filtered or unfiltered, however you prefer).
 
@@ -27,7 +27,7 @@ When running the ATAC-seq pipeline, please specify the output directory of DNA-m
 Differential open chromatin analysis
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Similar to differential binding analysis with the ChIP-Seq data. We can perform the differential open chromatin analysis, using the ``--sampleSheet`` option of the ATAC-seq workflow. This requires a sample sheet, which is identical to that required by the ChIP-seq and RNA-seq workflows (see :doc:`ChIP-seq` for details).
+Similar to differential binding analysis with the ChIPseq data. We can perform the differential open chromatin analysis, using the ``--sampleSheet`` option of the ATACseq workflow. This requires a sample sheet, which is identical to that required by the ChIPseq and RNA-seq workflows (see :doc:`ChIPseq` for details).
 
 An example is below::
 
@@ -39,7 +39,7 @@ An example is below::
     SRR7013049      OreR
     SRR7013050      OreR
 
-.. note:: This sample sheet has the same requirements as the sample sheet in the ChIP-seq workflow, and also uses the same tool (CSAW) with a narrow default window size.
+.. note:: This sample sheet has the same requirements as the sample sheet in the ChIPseq workflow, and also uses the same tool (CSAW) with a narrow default window size.
 
 For comparison between two conditions, the name you assign to "condition" is not relevant, but rather the order is. The group mentioned first (in the above case "wild-type") would be used as a "control" and the group mentioned later would be used as "test".
 
@@ -68,12 +68,12 @@ Configuration file
 There is a configuration file in ``snakePipes/workflows/ATACseq/defaults.yaml``::
 
     ## General/Snakemake parameters, only used/set by wrapper or in Snakemake cmdl, but not in Snakefile
-    pipeline: ATAC-seq
+    pipeline: ATACseq
     configFile:
     clusterConfigFile:
     local: false
     maxJobs: 5
-    ## workingdir need to be required DNA-mapping output dir, 'outdir' is set to workingdir internally
+    ## workingdir need to be required DNAmapping output dir, 'outdir' is set to workingdir internally
     workingdir:
     ## preconfigured target genomes (mm9,mm10,dm3,...) , see /path/to/snakemake_workflows/shared/organisms/
     ## Value can be also path to your own genome config file!
@@ -109,7 +109,7 @@ There is a configuration file in ``snakePipes/workflows/ATACseq/defaults.yaml``:
 
 Useful parameters are ``maxFragmentSize``, ``minFragmentSize`` and ``windowSize``, also available from commandline.  
 
-* **windowSize**: is the size of windows to test differential binding using CSAW. The default small window size is sufficient for most analysis, since an ATAC-seq peak is sharp.
+* **windowSize**: is the size of windows to test differential binding using CSAW. The default small window size is sufficient for most analysis, since an ATACseq peak is sharp.
 
 * **fragmentCountThreshold**: refers to the minimum number of counts a chromosome must have to be included in the MACS2 analysis. It is introduced to avoid errors in the peak calling step and should only be changed if MACS2 fails.
 
@@ -161,7 +161,7 @@ Assuming a sample sheet is used, the following will be **added** to the working 
         ├── sample1.filtered.BAM_peaks.qc.txt
         └── sample2.filtered.BAM_peaks.qc.txt
 
-Currently the ATAC-seq workflow performs detection of open chromatin regions via `MACS2 <https://github.com/taoliu/MACS>`__ (or `HMMRATAC <https://academic.oup.com/nar/article/47/16/e91/5519166>`__ or `Genrich <https://github.com/jsh58/Genrich>`__, if specified with ``--peakCaller``), and if a sample sheet is provided, the detection of differential open chromatin sites via `CSAW <https://bioconductor.org/packages/release/bioc/html/csaw.html>`__. There are additionally log files in most of the directories. The various outputs are documented in the CSAW and MACS2 documentation.
+Currently the ATACseq workflow performs detection of open chromatin regions via `MACS2 <https://github.com/taoliu/MACS>`__ (or `HMMRATAC <https://academic.oup.com/nar/article/47/16/e91/5519166>`__ or `Genrich <https://github.com/jsh58/Genrich>`__, if specified with ``--peakCaller``), and if a sample sheet is provided, the detection of differential open chromatin sites via `CSAW <https://bioconductor.org/packages/release/bioc/html/csaw.html>`__. There are additionally log files in most of the directories. The various outputs are documented in the CSAW and MACS2 documentation.
 For more information on the contents of the **CSAW_MACS2_sampleSheet** folder, see section :ref:`diffOpenChrom` .
 
 * **MACS2** / **HMMRATAC** / **Genrich**: Contains peaks found by the peak caller. The most useful files end in ``.narrowPeak`` or ``.gappedPeak`` and are appropriate for visualization in IGV.
@@ -171,7 +171,7 @@ For more information on the contents of the **CSAW_MACS2_sampleSheet** folder, s
     * fraction of reads in peaks (FRiP)
     * percentage of the genome covered by peaks.
 
-* **deepTools_ATAC**: contains the output of `plotFingerPrint <https://deeptools.readthedocs.io/en/develop/content/tools/plotFingerprint.html>`__, which is a useful QC plot to assess signal enrichment between the ATAC-seq samples.
+* **deepTools_ATAC**: contains the output of `plotFingerPrint <https://deeptools.readthedocs.io/en/develop/content/tools/plotFingerprint.html>`__, which is a useful QC plot to assess signal enrichment between the ATACseq samples.
 
 .. note:: The ``_sampleSheet`` suffix for the ``CSAW_MACS2_sampleSheet`` is drawn from the name of the sample sheet you use. So if you instead named the sample sheet ``mySampleSheet.txt`` then the folder would be named ``CSAW_mySampleSheet``. This facilitates using multiple sample sheets. Similarly, ``_MACS2`` portion will be different if you use HMMRATAC or Genrich for peak calling.
 
@@ -192,6 +192,6 @@ Command line options
 
 .. argparse::
     :func: parse_args
-    :filename: ../snakePipes/workflows/ATAC-seq/ATAC-seq
-    :prog: ATAC-seq
+    :filename: ../snakePipes/workflows/ATACseq/ATACseq
+    :prog: ATACseq
     :nodefault:

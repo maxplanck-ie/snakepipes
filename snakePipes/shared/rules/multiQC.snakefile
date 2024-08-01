@@ -8,7 +8,7 @@ def multiqc_input_check(return_value):
     if pairedEnd:
         readsIdx = 2
 
-    if not pipeline=="scrna-seq" and ("fromBAM" not in globals() or not fromBAM):
+    if not pipeline=="scrnaseq" and ("fromBAM" not in globals() or not fromBAM):
         if pairedEnd:
             if trim and fastqc:
                 infiles.append( expand("FastQC_trimmed/{sample}{read}_fastqc.html", sample = samples, read = reads) )
@@ -27,8 +27,8 @@ def multiqc_input_check(return_value):
             elif fastqc:
                 infiles.append( expand("FastQC/{sample}"+reads[0]+"_fastqc.html", sample = samples) )
                 indir +=" FastQC "
-    if pipeline=="dna-mapping":
-        # pipeline is DNA-mapping
+    if pipeline=="dnamapping":
+        # pipeline is DNAmapping
         if aligner=="Bowtie2":
             infiles.append("deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv")
             infiles.append(expand("Bowtie2/{sample}.Bowtie2_summary.txt", sample = samples) +
@@ -88,14 +88,14 @@ def multiqc_input_check(return_value):
             else:
                 infiles.append( expand("Salmon/{sample}/quant.sf", sample = samples) )
                 indir += " Salmon "
-    elif pipeline == "noncoding-rna-seq":
+    elif pipeline == "ncRNAseq":
         infiles.append(expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample=samples))
         indir += " STAR deepTools_qc "
     elif pipeline == "hic":
         infiles.append(expand("HiC_matrices/QCplots/{sample}_QC/QC.log", sample = samples))
         indir += " " + aligner + " " 
         indir += " ".join(expand("HiC_matrices/QCplots/{sample}_QC ", sample = samples))
-    elif pipeline == "scrna-seq":
+    elif pipeline == "scrnaseq":
         if trim:
             infiles.append( expand("FastQC_trimmed/{sample}"+reads[0]+"_fastqc.html", sample = samples) )
             indir += " FastQC_trimmed "

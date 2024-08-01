@@ -49,7 +49,7 @@ else:
                 ln -s ../{input} {output}
           """
 
-    if pairedEnd or pipeline=="scrna-seq":
+    if pairedEnd or pipeline=="scrnaseq":
         rule FASTQ2:
             input:
                 "originalFASTQ/downsample_{sample}"+reads[1]+".fastq.gz" if downsample else "originalFASTQ/{sample}"+reads[1]+".fastq.gz"
@@ -59,7 +59,7 @@ else:
                 ln -s ../{input} {output}
           """
 
-#If DNA-mapping:
+#If DNAmapping:
 if UMIDedup:
     rule filter_reads_umi:
         input:

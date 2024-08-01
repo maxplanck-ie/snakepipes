@@ -29,7 +29,7 @@ if(any(is.na(size_v),sum(size_v==0)>0)){message('Some of the input files are non
     t2g_tab<-data.table::fread(t2g,header=FALSE)
     gs_tab<-data.table::fread(gene_symbol,header=FALSE)
 
-    if(pipeline %in% c("chip-seq","ATAC-seq")){
+    if(pipeline %in% c("chipseq","ATACseq")){
         ibed_tab$GeneID<-t2g_tab$V2[match(ibed_tab$V22,t2g_tab$V1)]
         ibed_tab$GeneSymbol<-gs_tab$V2[match(ibed_tab$GeneID,gs_tab$V1)]
         obed_tab<-unique(subset(ibed_tab,select=c(paste0("V",c(1:18,23,24)),"GeneID","GeneSymbol")))

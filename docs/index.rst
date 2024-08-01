@@ -16,13 +16,13 @@ Below is the list of pipelines available in snakePipes
 Pipeline                            Description
 =============================== ===============================================================================================================
 :ref:`createIndices`            Create indices for an organism for further use within snakePipes
-:ref:`DNA-mapping`              Basic DNA mapping using bowtie2, filter mapped files, QC and create coverage plots
-:ref:`ChIP-Seq`                 Use the DNA mapping output and run ChIP/Input normalization and peak calling
-:ref:`ATAC-seq`                 Use the DNA mapping output and detect open chromatin regions for ATAC-seq data
-:ref:`HiC`                      Hi-C analysis workflow, from mapping to TAD calling
-:ref:`noncoding-RNA-Seq`        noncoding-RNA-Seq workflow : From mapping to differential expression of genes and repeat elements using DESeq2
-:ref:`mRNA-Seq`                 RNA-Seq workflow : From mapping to differential expression using DESeq2
-:ref:`scRNA-Seq`                Single-cell RNA-Seq (CEL-Seq2) workflow : From mapping to differential expression
+:ref:`DNAmapping`               Basic DNA mapping using bowtie2, filter mapped files, QC and create coverage plots
+:ref:`ChIPSeq`                  Use the DNA mapping output and run ChIP/Input normalization and peak calling
+:ref:`ATACseq`                  Use the DNA mapping output and detect open chromatin regions for ATACseq data
+:ref:`HiC`                      HiC analysis workflow, from mapping to TAD calling
+:ref:`ncRNAseq`                 ncRNAseq workflow : From mapping to differential expression of genes and repeat elements using DESeq2
+:ref:`mRNASeq`                  RNASeq workflow : From mapping to differential expression using DESeq2
+:ref:`scRNASeq`                 Single-cell RNA-Seq (CEL-Seq2) workflow : From mapping to differential expression
 :ref:`WGBS`                     Whole-genome Bisulfite-Seq analysis workflow, from mapping to DMR calling and differential methylation analysis
 :ref:`preprocessing`            Merging technical replicates (e.g., across lanes), removing optical duplicates, running FastQC
 =============================== ===============================================================================================================
@@ -56,7 +56,7 @@ snakePipes is going to move to mamba in the future.
 
 * Download example fastq files for the human genome `here <https://zenodo.org/record/3707259>`_
 
-* Execute the DNA-mapping pipeline using the example **command.sh** in the test data directory.
+* Execute the DNAmapping pipeline using the example **command.sh** in the test data directory.
 
 
 Running your own analysis
@@ -112,14 +112,14 @@ Contents:
    content/running_snakePipes.rst
    content/advanced_usage.rst
    content/workflows/createIndices.rst
-   content/workflows/DNA-mapping.rst
-   content/workflows/ChIP-seq.rst
-   content/workflows/ATAC-seq.rst
+   content/workflows/DNAmapping.rst
+   content/workflows/ChIPseq.rst
+   content/workflows/ATACseq.rst
    content/workflows/HiC.rst
    content/workflows/preprocessing.rst
-   content/workflows/mRNA-seq.rst
-   content/workflows/noncoding-RNA-seq.rst
-   content/workflows/scRNA-seq.rst
+   content/workflows/mRNAseq.rst
+   content/workflows/ncRNAseq.rst
+   content/workflows/scRNAseq.rst
    content/workflows/WGBS.rst
    content/News.rst
 

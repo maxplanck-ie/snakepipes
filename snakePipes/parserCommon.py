@@ -43,7 +43,7 @@ def mainArguments(defaults, workingDir=False, createIndices=False, preprocessing
     if workingDir:
         required.add_argument("-d", "--working-dir",
                               dest="workingdir",
-                              help="working directory is output directory and must contain DNA-mapping pipeline output files",
+                              help="working directory is output directory and must contain DNAmapping pipeline output files",
                               required=True)
     else:
         if not createIndices:
@@ -174,7 +174,7 @@ def snpArguments(defaults):
     return parser
 
 
-# DNA-mapping options added
+# DNAmapping options added
 def commonOptions(grp, defaults, bw=True, plots=True, preprocessing=False):
     """
     Common options found in many workflows

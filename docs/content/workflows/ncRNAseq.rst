@@ -1,33 +1,33 @@
-.. _noncoding-RNA-seq:
+.. _ncRNAseq:
 
-noncoding-RNA-seq
+ncRNAseq
 =================
 
 What it does
 ------------
 
-The snakePipes noncoding-RNA-seq workflow allows users to process their single or paired-end
+The snakePipes ncRNAseq workflow allows users to process their single or paired-end
 ribosomal-depleted RNA-seq fastq files upto the point of gene/transcript/repeat-element counts and differential expression.
 Repeat elements are quantified and tested for differential expression at the name, family and class level. Since changes in repeat element expression tend to be unidirectional, size factors from gene expression are used when normalizing repeat element expression.
 
 Note that in addition to the normal GTF file, this pipeline requires a repeat masker output file, which can be downloaded from UCSC or other sites. The chromosome names here must match that used in the other files.
 
-.. image:: ../images/noncoding-RNA-seq_pipeline.png
+.. image:: ../images/ncRNAseq_pipeline.png
 
 Input requirements
 ------------------
 
 The only requirement is a directory of gzipped fastq files. Files could be single or paired end, and the read extensions could be modified using the keys in the ``defaults.yaml`` file below.
 
-.. _noncodingRNAconfig:
+.. _ncRNAconfig:
 
 Configuration file
 ~~~~~~~~~~~~~~~~~~
 
-There is a configuration file in ``snakePipes/workflows/noncoding-RNA-seq/defaults.yaml``::
+There is a configuration file in ``snakePipes/workflows/ncRNAseq/defaults.yaml``::
 
     ## General/Snakemake parameters, only used/set by wrapper or in Snakemake cmdl, but not in Snakefile
-    pipeline: noncoding-rna-seq
+    pipeline: ncRNAseq
     outdir:
     configFile:
     clusterConfigFile:
@@ -121,7 +121,7 @@ sample6	Treatment	Group2
 Analysis modes
 --------------
 
-Following analysis (**modes**) are possible using the noncoding-RNA-seq workflow:
+Following analysis (**modes**) are possible using the ncRNAseq workflow:
 
 "alignment"
 ~~~~~~~~~~~
@@ -207,7 +207,7 @@ Apart from the common module outputs (see :ref:`running_snakePipes`), the workfl
 
 * **bamCoverage**: This would contain the bigWigs produced by deepTools `bamCoverage <https://deeptools.readthedocs.io/en/develop/content/tools/bamCoverage.html>`__ . Files with suffix ``.coverage.bw`` are raw coverage files, while the files with suffix ``RPKM.bw`` are `RPKM-normalized <https://www.biostars.org/p/273537/>`__ coverage files.
 
-* **deepTools_QC**: (produced in the mode *deepTools_QC*) This contains the quality checks specific for mRNA-seq, performed via deepTools. The output folders are names after various deepTools functions and the outputs are explained under `deepTools documentation <deeptools.readthedocs.io>`__. In short, they show the insert size distribution(**bamPEFragmentSize**), mapping statistics (**estimateReadFiltering**), sample-to-sample correlations and PCA (**multiBigwigSummary, plotCorrelation, plotPCA**), and read enrichment on various genic features (**plotEnrichment**)
+* **deepTools_QC**: (produced in the mode *deepTools_QC*) This contains the quality checks specific for mRNAseq, performed via deepTools. The output folders are names after various deepTools functions and the outputs are explained under `deepTools documentation <deeptools.readthedocs.io>`__. In short, they show the insert size distribution(**bamPEFragmentSize**), mapping statistics (**estimateReadFiltering**), sample-to-sample correlations and PCA (**multiBigwigSummary, plotCorrelation, plotPCA**), and read enrichment on various genic features (**plotEnrichment**)
 
 * **DESeq2_[sampleSheet]**: (produced only if a sample-sheet is provided.) The folder contains the HTML result reports **DESeq2_report_genes.html**, **DESeq2_report_repeat_name.html**, **DESeq2_report_repeat_class.html** and **DESeq2_report_repeat_family.html** as we as the annotated output file from DESeq2 (**genes_DEresults.tsv**, etc.) and normalized counts for all samples, produced via DEseq2 (**genes_counts_DESeq2.normalized.tsv**, etc.) as well as an Rdata file (**genes_DESeq.Rdata**, etc.) with the R objects ``dds <- DESeq2::DESeq(dds)`` and ``ddr <- DDESeq2::results(dds,alpha = fdr)``. Sample name to plotting shape mapping on the PCA plot is limited to 36 samples and skipped otherwise.
 
@@ -225,6 +225,6 @@ Command line options
 
 .. argparse::
     :func: parse_args
-    :filename: ../snakePipes/workflows/noncoding-RNA-seq/noncoding-RNA-seq
-    :prog: noncoding-RNA-seq
+    :filename: ../snakePipes/workflows/ncRNAseq/ncRNAseq
+    :prog: ncRNAseq
     :nodefault:

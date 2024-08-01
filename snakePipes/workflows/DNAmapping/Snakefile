@@ -178,7 +178,7 @@ onstart:
 
     if toolsVersion:
         usedEnvs = [CONDA_SHARED_ENV, CONDA_DNA_MAPPING_ENV]
-        cf.writeTools(usedEnvs, outdir, "DNA-mapping", maindir)
+        cf.writeTools(usedEnvs, outdir, "DNAmapping", maindir)
 
 
 ### main rule ##################################################################

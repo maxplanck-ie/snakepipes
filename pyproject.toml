@@ -8,12 +8,12 @@ description = 'Snakemake workflows and wrappers for NGS data processing from the
 readme = "README.rst"
 version = "3.9.1"
 keywords = [
-    "DNA-mapping",
-    "ChIP-Seq",
-    "mRNA-seq",
-    "noncoding-RNA-seq",
-    "ATAC-seq",
-    "scRNA-seq",
+    "DNAmapping",
+    "ChIPSeq",
+    "mRNAseq",
+    "ncRNAseq",
+    "ATACseq",
+    "scRNAseq",
     "WGBS / Bisulfite seq",
     "epigenetics workflows",
     "Illumina"

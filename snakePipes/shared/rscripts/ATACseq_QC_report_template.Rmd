@@ -1,5 +1,5 @@
 ---
-title: "ATAC-seq filtering report"
+title: "ATACseq filtering report"
 author: "`r Sys.info()[length(Sys.info())-1]`"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: html_document

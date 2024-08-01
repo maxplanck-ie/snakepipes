@@ -1,12 +1,12 @@
-.. _scRNA-seq:
+.. _scRNAseq:
 
-scRNA-seq
+scRNAseq
 =========
 
 What it does
 ------------
 
-The scRNA-seq pipeline is intended to process UMI-based data, expecting the cell barcode and umi in Read1, and the cDNA sequence in Read2. The workflow has predefined settings for CelSeq2 and 10x data, but can be extended to custom protocols.
+The scRNAseq pipeline is intended to process UMI-based data, expecting the cell barcode and umi in Read1, and the cDNA sequence in Read2. The workflow has predefined settings for CelSeq2 and 10x data, but can be extended to custom protocols.
 
 There are currently two analysis modes available:
 - "STARsolo" which uses STAR solo for mapping and quantitation.
@@ -67,7 +67,7 @@ Configuration file
 
 The default configuration file is listed below and can be found in ``snakePipes/workflows/scRNAseq/defaults.yaml``::
 
-    pipeline: scrna-seq
+    pipeline: scrnaseq
     outdir:
     configFile:
     clusterConfigFile:

@@ -1,4 +1,4 @@
-if pairedEnd or pipeline=="scrna-seq":
+if pairedEnd or pipeline=="scrnaseq":
     rule validateFQ:
         input:
             r1 = indir+"/{sample}"+reads[0]+ext,
@@ -34,7 +34,7 @@ rule origFASTQ1:
                {params.cmd}
           """
 
-if pairedEnd or pipeline=="scrna-seq":
+if pairedEnd or pipeline=="scrnaseq":
     rule origFASTQ2:
         input:
             r2 = indir+"/{sample}"+reads[1]+ext,

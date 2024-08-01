@@ -794,7 +794,7 @@ def predict_chip_dict(wdir, input_pattern_str, bamExt, fromBAM=None):
     chip_dict_pred = {}
     chip_dict_pred["chip_dict"] = {}
     print("---------------------------------------------------------------------------------------")
-    print("Predict Chip-seq sample configuration")
+    print("Predict ChIPseq sample configuration")
     print("---------------------------------------------------------------------------------------")
     print("\nSearch for Input/control samples...")
 
@@ -842,7 +842,7 @@ def predict_chip_dict(wdir, input_pattern_str, bamExt, fromBAM=None):
     outfile = os.path.join(wdir, "chip_seq_sample_config.PREDICTED.yaml")
     write_configfile(outfile, chip_dict_pred)
     print("---------------------------------------------------------------------------------------")
-    print("Chip-seq sample configuration is written to file ", outfile)
+    print("ChIPseq sample configuration is written to file ", outfile)
     print("Please check and modify this file - this is just a guess! Then run the workflow with it.")
     print("---------------------------------------------------------------------------------------")
 

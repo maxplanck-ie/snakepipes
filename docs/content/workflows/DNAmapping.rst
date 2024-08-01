@@ -1,12 +1,12 @@
-.. _DNA-mapping:
+.. _DNAmapping:
 
-DNA-mapping
+DNAmapping
 ===========
 
 What it does
 ------------
 
-This is the primary DNA-mapping pipeline. It can be used both alone or upstream of the ATAC-seq and ChIP-seq pipelines. This has a wide array of options, including trimming and various QC steps (e.g., marking duplicates and plotting coverage and PCAs). In addition, basic coverage tracks are created to facilitate viewing the data in IGV.
+This is the primary DNAmapping pipeline. It can be used both alone or upstream of the ATACseq and ChIPseq pipelines. This has a wide array of options, including trimming and various QC steps (e.g., marking duplicates and plotting coverage and PCAs). In addition, basic coverage tracks are created to facilitate viewing the data in IGV.
 
 .. image:: ../images/DNAmapping_pipeline.png
 
@@ -18,10 +18,10 @@ The only requirement is a directory of gzipped fastq files. Files could be singl
 Configuration file
 ~~~~~~~~~~~~~~~~~~
 
-There is a configuration file in ``snakePipes/workflows/DNA-mapping/defaults.yaml``::
+There is a configuration file in ``snakePipes/workflows/DNAmapping/defaults.yaml``::
 
     ## General/Snakemake parameters, only used/set by wrapper or in Snakemake cmdl, but not in Snakefile
-    pipeline: dna-mapping
+    pipeline: dnamapping
     outdir:
     configFile:
     clusterConfigFile:
@@ -103,7 +103,7 @@ In addition to the FASTQ module results (see :ref:`running_snakePipes`), the wor
  * **Bowtie2** : Contains the BAM files after mapping with `Bowtie2 <http://bowtie-bio.sourceforge.net/bowtie2/index.shtml>`__ and indexed by `Samtools <http://www.htslib.org/>`__.
 
 
- * **filtered_bam** : Contains the BAM files filtered by the provided criteria, such as mapping quality (``--mapq``) or PCR duplicates (``--dedup``). This file is used for most downstream analysis in the DNA-mapping and ChIP-seq/ATAC-seq pipeline.
+ * **filtered_bam** : Contains the BAM files filtered by the provided criteria, such as mapping quality (``--mapq``) or PCR duplicates (``--dedup``). This file is used for most downstream analysis in the DNAmapping and ChIPseq/ATACseq pipeline.
 
 
  * **bamCoverage** : Contains the coverage files (`bigWig format <https://genome.ucsc.edu/goldenpath/help/bigWig.html>`__) produced from the BAM files by `deepTools bamCoverage <https://deeptools.readthedocs.io/en/develop/content/tools/bamCoverage.html>`__ . The files are either raw, or 1x normalized (by sequencing depth). They are useful for plotting and inspecting the data in IGV.
@@ -126,6 +126,6 @@ Command line options
 
 .. argparse::
    :func: parse_args
-   :filename: ../snakePipes/workflows/DNA-mapping/DNA-mapping
-   :prog: DNA-mapping
+   :filename: ../snakePipes/workflows/DNAmapping/DNAmapping
+   :prog: DNAmapping
    :nodefault:

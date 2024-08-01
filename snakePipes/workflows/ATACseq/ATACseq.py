@@ -1,8 +1,8 @@
 __description__ = """
-MPI-IE workflow for ATAC-seq Analysis
+MPI-IE workflow for ATACseq Analysis
 
 usage example:
-    ATAC-seq -d working-dir mm10
+    ATACseq -d working-dir mm10
 """
 
 import argparse
@@ -67,7 +67,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
 
     optional.add_argument("--sampleSheet",
                           dest="sampleSheet",
-                          help="Invoke differential accessibility analysis by providing information on samples; see 'https://github.com/maxplanck-ie/snakepipes/tree/master/docs/content/sampleSheet.example.tsv' for example. IMPORTANT: The first entry defines which group of samples are control. With this, the order of comparison and likewise the sign of values can be changed! Also, the condition `control` should not be used (reserved to mark input samples in the ChIP-Seq workflow (default: '%(default)s').",
+                          help="Invoke differential accessibility analysis by providing information on samples; see 'https://github.com/maxplanck-ie/snakepipes/tree/master/docs/content/sampleSheet.example.tsv' for example. IMPORTANT: The first entry defines which group of samples are control. With this, the order of comparison and likewise the sign of values can be changed! Also, the condition `control` should not be used (reserved to mark input samples in the ChIPSeq workflow (default: '%(default)s').",
                           default=defaults["sampleSheet"])
 
     optional.add_argument("--externalBed",

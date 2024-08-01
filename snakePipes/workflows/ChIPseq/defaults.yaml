@@ -1,8 +1,8 @@
 ################################################################################
-# This file is the default configuration of the ChIP-seq workflow!
+# This file is the default configuration of the ChIPseq workflow!
 #
 # In order to adjust some parameters, please either use the wrapper script
-# (eg. /path/to/snakemake_workflows/workflows/ChIP-seq/ChIP-seq)
+# (eg. /path/to/snakemake_workflows/workflows/ChIPseq/ChIPseq)
 # or save a copy of this file, modify necessary parameters and then provide
 # this file to the wrapper or snakmake via '--configFile' option
 # (see below how to call the snakefile directly)
@@ -11,13 +11,13 @@
 # can be used in new/extended snakemake rules!
 ################################################################################
 ## General/Snakemake parameters, only used/set by wrapper or in Snakemake cmdl, but not in Snakefile
-pipeline: chip-seq
+pipeline: chipseq
 cutntag: False # if set to True, overwrites the peakCaller and peakCallerOptions.
 configFile:
 clusterConfigFile:
 local: false
 maxJobs: 5
-## workingdir need to be required DNA-mapping output dir, 'outdir' is set to workingdir internally
+## workingdir need to be required DNAmapping output dir, 'outdir' is set to workingdir internally
 workingdir:
 ## preconfigured target genomes (mm9,mm10,dm3,...) , see /path/to/snakemake_workflows/shared/organisms/
 ## Value can be also path to your own genome config file!
@@ -64,8 +64,8 @@ absBestLFC: 1
 # via '--configFile' parameter!
 # example call:
 #
-# snakemake --snakefile /path/to/snakemake_workflows/workflows/ChIP-seq/Snakefile
-#           --configFile /path/to/snakemake_workflows/workflows/ChIP-seq/defaults.yaml
+# snakemake --snakefile /path/to/snakemake_workflows/workflows/ChIPseq/Snakefile
+#           --configFile /path/to/snakemake_workflows/workflows/ChIPseq/defaults.yaml
 #           --directory /path/to/outputdir
 #           --cores 32
 ################################################################################

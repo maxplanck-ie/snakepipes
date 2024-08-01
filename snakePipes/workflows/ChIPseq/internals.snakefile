@@ -11,8 +11,8 @@ import warnings
 
 def get_control(sample):
     """
-    Return control sample name for a given ChIP-seq sample
-    Return False if given ChIP-seq sample has no control
+    Return control sample name for a given ChIPseq sample
+    Return False if given ChIPseq sample has no control
     """
     if sample in chip_samples_w_ctrl:
         return chip_dict[sample]['control']
@@ -22,8 +22,8 @@ def get_control(sample):
 
 def get_control_name(sample):
     """
-    Return control sample alias for a given ChIP-seq sample
-    Return False if given ChIP-seq sample has no control
+    Return control sample alias for a given ChIPseq sample
+    Return False if given ChIPseq sample has no control
     """
     if sample in chip_samples_w_ctrl:
         if 'control' in chip_dict[sample] and chip_dict[sample]['control'] != None:
@@ -36,7 +36,7 @@ def get_control_name(sample):
 
 def is_broad(sample):
     """
-    Return True if given ChIP-seq sample is annotated as sample with
+    Return True if given ChIPseq sample is annotated as sample with
     broad enrichment, else return False
     """
     if sample in chip_dict:
@@ -47,7 +47,7 @@ def is_broad(sample):
 
 def is_chip(sample):
     """
-    Return True if a given sample is a ChIP-seq sample
+    Return True if a given sample is a ChIPseq sample
     Else return False
     """
     return (sample in chip_samples)
@@ -75,8 +75,8 @@ def get_pe_frag_length(sample, frag_len_file):
 
 allele_info=is_allelic(workingdir)
 
-# TODO: catch exception if ChIP-seq samples are not unique
-# read ChIP-seq dictionary from config.yaml:
+# TODO: catch exception if ChIPseq samples are not unique
+# read ChIPseq dictionary from config.yaml:
 # { ChIP1: { control: Input1, broad: True }, ChIP2: { control: Input2, broad: false }
 #config["chip_dict"] = {}
 

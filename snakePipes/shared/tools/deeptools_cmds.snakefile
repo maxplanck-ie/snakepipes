@@ -137,7 +137,7 @@ plotEnrich_chip_cmd = """
         --ignoreDuplicates > {log.out} 2> {log.err}
     """
 
-#plot fingerprint (ChIP-seq)
+#plot fingerprint (ChIPseq)
 plotFingerprint_cmd = """
     plotFingerprint \
             -b {input.bams} \

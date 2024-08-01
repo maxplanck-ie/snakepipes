@@ -144,7 +144,7 @@ onstart:
 
     if toolsVersion:
         usedEnvs = [CONDA_SHARED_ENV, CONDA_NONCODING_RNASEQ_ENV]
-        cf.writeTools(usedEnvs, outdir, "noncoding-RNA-seq", maindir)
+        cf.writeTools(usedEnvs, outdir, "ncRNAseq", maindir)
     if sampleSheet:
         cf.copySampleSheet(sampleSheet, outdir)
 
@@ -175,7 +175,7 @@ else:
 onsuccess:
     cf.cleanLogs(outdir, cluster_config)
     if "verbose" in config and config["verbose"]:
-        print("\n--- noncoding-RNA-seq workflow finished successfully! ------------------------------------\n")
+        print("\n--- ncRNAseq workflow finished successfully! ------------------------------------\n")
 
 onerror:
-    print("\n !!! ERROR in noncoding-RNA-seq workflow! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
+    print("\n !!! ERROR in ncRNAseq workflow! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")

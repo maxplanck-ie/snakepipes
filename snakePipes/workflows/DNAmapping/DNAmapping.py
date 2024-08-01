@@ -1,10 +1,8 @@
-#!/usr/bin/env python3
-
 __description__ = """
 MPI-IE workflow for DNA mapping
 
 usage example:
-    DNA-mapping -i input-dir -o output-dir mm10
+    DNAmapping -i input-dir -o output-dir mm10
 """
 
 
@@ -84,7 +82,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                           action="store_true",
                           help="retain only de-duplicated reads/read pairs "
                           "(given single-/paired-end data), recommended for "
-                          "ChIP-seq data (default: '%(default)s')",
+                          "ChIPseq data (default: '%(default)s')",
                           default=defaults["dedup"])
 
     optional.add_argument("--properPairs",
@@ -97,7 +95,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                           metavar="INT",
                           help="retain only reads with at least the given "
                           "mapping quality. We recommend using"
-                          "mapq of 3 or more for ChIP-seq to remove all true "
+                          "mapq of 3 or more for ChIPseq to remove all true "
                           "multimapping reads. (default: '%(default)s')",
                           type=int,
                           default=defaults["mapq"])

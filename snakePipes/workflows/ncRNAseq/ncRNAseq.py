@@ -1,10 +1,8 @@
-#!/usr/bin/env python3
-
 __description__ = """
-MPI-IE workflow for noncoding RNA mapping and analysis
+MPI-IE workflow for ncRNAseq mapping and analysis
 
 usage example:
-    noncoding-RNA-seq -i input-dir -o output-dir mm10
+    ncRNAseq -i input-dir -o output-dir mm10
 """
 
 

@@ -119,7 +119,7 @@ The yaml files look like this after the setup (an example from drosophila genome
     genome_index: "/data/repository/organisms/dm3_ensembl/genome_fasta/genome.fa.fai"
     # OPTIONAL. Needed for GC bias estimation by deepTools
     genome_2bit: "/data/repository/organisms/dm3_ensembl/genome_fasta/genome.2bit"
-    # Needed for DNA-mapping workflow
+    # Needed for DNAmapping workflow
     bowtie2_index: "/data/repository/organisms/dm3_ensembl/BowtieIndex/genome"
     # index of the genome.fasta using HISAT2, needed for RNA-seq workflow
     hisat2_index: "/data/repository/organisms/dm3_ensembl/HISAT2Index/genome"
@@ -128,9 +128,9 @@ The yaml files look like this after the setup (an example from drosophila genome
     bwa_index: "/data/repository/organisms/dm3_ensembl/BWAindex/genome.fa"
     # index of the genome.fasta using STAR, needed for RNA-seq workflow
     star_index: "/data/repository/organisms/dm3_ensembl/STARIndex/"
-    # Needed for QC and annotation in DNA-mapping/RNA-Seq workflows
+    # Needed for QC and annotation in DNAmapping/RNA-Seq workflows
     genes_bed: "/data/repository/organisms/dm3_ensembl/Ensembl/release-78/genes.bed"
-    # Needed for QC and annotation in DNA-mapping/RNA-Seq workflows
+    # Needed for QC and annotation in DNAmapping/RNA-Seq workflows
     genes_gtf: "/data/repository/organisms/dm3_ensembl/Ensembl/release-78/genes.gtf"
     # OPTIONAL. For QC and filtering of regions in multiple workflows.
     blacklist_bed:
@@ -223,7 +223,7 @@ Configure default options for workflows
 
 The default options for all command-line arguments as well as for the cluster (memory) are stored in the workflow-specific folders. If you have cloned the repository locally, these files are located under ``snakePipes/workflows/<workflow_name>`` folder. You can modify the values in these yamls to suite your needs. Most of the default values could also be replaced from the command line wrappers while executing a workflow.
 
-Below are some of the workflow defaults from the DNA-mapping pipeline. Empty sections means no default is set:
+Below are some of the workflow defaults from the DNAmapping pipeline. Empty sections means no default is set:
 
 .. parsed-literal::
     ## key for the genome name (eg. dm3)
@@ -257,11 +257,11 @@ Test data
 
 Test data for the various workflows is available at the following locations:
 
- - `DNA mapping <https://zenodo.org/record/3707259>`__
- - `ChIP-seq <https://zenodo.org/record/2624281>`__
- - `ATAC-seq <https://zenodo.org/record/3707666>`__
- - `mRNA-seq <https://zenodo.org/record/3707602>`__
- - `noncoding-RNA-seq <https://zenodo.org/deposit/3707749>`__
+ - `DNAmapping <https://zenodo.org/record/3707259>`__
+ - `ChIPseq <https://zenodo.org/record/2624281>`__
+ - `ATACseq <https://zenodo.org/record/3707666>`__
+ - `mRNAseq <https://zenodo.org/record/3707602>`__
+ - `ncRNAseq <https://zenodo.org/deposit/3707749>`__
  - `HiC <https://zenodo.org/record/3707714>`__
  - `WGBS <https://zenodo.org/record/3707727>`__
- - `scRNA-seq <https://zenodo.org/record/3707747>`__
+ - `scRNAseq <https://zenodo.org/record/3707747>`__

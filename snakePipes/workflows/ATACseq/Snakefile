@@ -40,7 +40,7 @@ include: os.path.join(maindir, "shared", "rules", "deepTools_ATAC.snakefile")
 #import multiQC
 include: os.path.join(maindir, "shared", "rules", "multiQC.snakefile")
 
-# ATAC-seq open chromatin
+# ATACseq open chromatin
 include: os.path.join(maindir, "shared", "rules", "ATAC.snakefile")
 
 # ATAC QC open chromatin
@@ -175,7 +175,7 @@ onstart:
 
     if toolsVersion:
         usedEnvs = [CONDA_SHARED_ENV, CONDA_ATAC_ENV, CONDA_RMD_ENV]
-        cf.writeTools(usedEnvs, workingdir, "ATAC-seq", maindir)
+        cf.writeTools(usedEnvs, workingdir, "ATACseq", maindir)
     if sampleSheet:
         cf.copySampleSheet(sampleSheet, workingdir)
 
@@ -206,7 +206,7 @@ rule all:
 onsuccess:
     cf.cleanLogs(workingdir, cluster_config)
     if "verbose" in config and config["verbose"]:
-        print("\n--- The ATAC-seq open chromatin workflow finished successfully! --------------------------------\n")
+        print("\n--- The ATACseq open chromatin workflow finished successfully! --------------------------------\n")
 
 onerror:
-    print("\n !!! ERROR in the ATAC-seq open chromatin workflow! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
+    print("\n !!! ERROR in the ATACseq open chromatin workflow! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")

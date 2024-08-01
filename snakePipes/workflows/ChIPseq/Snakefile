@@ -250,7 +250,7 @@ onstart:
 
     if toolsVersion:
         usedEnvs = [CONDA_SHARED_ENV, CONDA_CHIPSEQ_ENV]
-        cf.writeTools(usedEnvs, workingdir, "ChIP-seq", maindir)
+        cf.writeTools(usedEnvs, workingdir, "ChIPseq", maindir)
     if sampleSheet:
         cf.copySampleSheet(sampleSheet, workingdir)
 
@@ -278,10 +278,10 @@ rule all:
 onsuccess:
     cf.cleanLogs(workingdir, cluster_config)
     if "verbose" in config and config["verbose"]:
-        print("\n--- ChIP-seq workflow finished successfully! -----------------------------------\n")
+        print("\n--- ChIPseq workflow finished successfully! -----------------------------------\n")
 
 onerror:
-    print("\n !!! ERROR in ChIP-seq workflow! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
+    print("\n !!! ERROR in ChIPseq workflow! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
 
 
 ## benchmark ###################################################################

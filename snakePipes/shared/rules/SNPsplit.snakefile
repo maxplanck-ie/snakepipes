@@ -1,5 +1,5 @@
 
-## get input bam depending on the mapping prog (use filtered bam in case of chip-seq data)
+## get input bam depending on the mapping prog (use filtered bam in case of chipseq data)
 if aligner == "Bowtie2":
     rule snp_split:
         input:

@@ -1,8 +1,8 @@
 ################################################################################
-# This file is the default configuration of the DNA-mapping workflow!
+# This file is the default configuration of the DNAmapping workflow!
 #
 # In order to adjust some parameters, please either use the wrapper script
-# (eg. /path/to/snakemake_workflows/workflows/DNA-mapping/DNA-mapping)
+# (eg. /path/to/snakemake_workflows/workflows/DNAmapping/DNAmapping)
 # or save a copy of this file, modify necessary parameters and then provide
 # this file to the wrapper or snakmake via '--configFile' option
 # (see below how to call the snakefile directly)
@@ -11,7 +11,7 @@
 # can be used in new/extended snakemake rules!
 ################################################################################
 ## General/Snakemake parameters, only used/set by wrapper or in Snakemake cmdl, but not in Snakefile
-pipeline: dna-mapping
+pipeline: dnamapping
 outdir:
 configFile:
 clusterConfigFile:
@@ -71,8 +71,8 @@ verbose: false
 # via '--configFile' parameter!
 # example call:
 #
-# snakemake --snakefile /path/to/snakemake_workflows/workflows/DNA-mapping/Snakefile
-#           --configFile /path/to/snakemake_workflows/workflows/DNA-mapping/defaults.yaml
+# snakemake --snakefile /path/to/snakemake_workflows/workflows/DNAmapping/Snakefile
+#           --configFile /path/to/snakemake_workflows/workflows/DNAmapping/defaults.yaml
 #           --directory /path/to/outputdir
 #           --cores 32
 ################################################################################

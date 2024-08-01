@@ -75,7 +75,7 @@ Heatmaps obtained using log2 ratio of ChIP signal over input were as follows:
 
 ```{r plot_l2r,fig.show='hold',fig.align='center', out.width ='40%',out.height='30%',fig.cap="UP and DOWN regions using log2 ratio."}
 if(sum(grepl("log2r.heatmap.png",snakemake@input[["heatmap_in"]]))<1){
-    message("ChIP signal enrichment over input is only available for ChIP-seq workflow!")
+    message("ChIP signal enrichment over input is only available for ChIPseq workflow!")
 }else{
     knitr::include_graphics(c("CSAW.UP.log2r.heatmap.png",
                               "CSAW.DOWN.log2r.heatmap.png"))

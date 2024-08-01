@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 __description__ = """
-MPI-IE workflow for scRNA-seq (CEL-Seq2 and related protocols)
+MPI-IE workflow for scRNAseq (CEL-Seq2 and related protocols)
 
 usage example:
     scRNAseq -i input-dir -o output-dir mm10

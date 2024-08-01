@@ -1,14 +1,14 @@
 sample_name = os.path.splitext(os.path.basename(sampleSheet))[0]
-if pipeline in ['chip-seq','ATAC-seq']:
+if pipeline in ['chipseq','ATACseq']:
     change_direction = ["UP","DOWN","MIXED"]
 rule get_nearest_transcript:
     input:
-        bed="CSAW_{}_{}".format(peakCaller, sample_name)+"/Filtered.results.{change_dir}.bed"  if pipeline in ['chip-seq','ATAC-seq'] else ""
+        bed="CSAW_{}_{}".format(peakCaller, sample_name)+"/Filtered.results.{change_dir}.bed"  if pipeline in ['chipseq','ATACseq'] else ""
     output:
         annotated_bed=temp("AnnotatedResults_{}_{}".format(peakCaller, sample_name)+"/Filtered.results.{change_dir}_withNearestTranscript.bed")
     params:
         genes_bed=genes_bed,
-        field_offset=lambda wildcards: "18" if pipeline in ['chip-seq','ATAC-seq'] else ""
+        field_offset=lambda wildcards: "18" if pipeline in ['chipseq','ATACseq'] else ""
     log:
         err= "AnnotatedResults_{}_{}".format(peakCaller, sample_name)+"/logs/bedtools_closest.{change_dir}.err",
     conda: CONDA_RNASEQ_ENV

@@ -75,7 +75,7 @@ def parse_args(defaults={"configFile": None, "clusterConfigFile": None,
                           help="An optional file list, with one entry per line, the chromosomes to ignore during normalization. These are typically sex chromosomes, mitochondrial DNA, and unplaced contigs.")
 
     optional.add_argument("--rmskURL",
-                          help="URL or local path to where the repeat masker output file is located. This is only required if you plan to run the non-coding RNA-seq workflow.")
+                          help="URL or local path to where the repeat masker output file is located. This is only required if you plan to run the ncRNAseq workflow.")
 
     optional.add_argument("--userYAML",
                           action="store_true",

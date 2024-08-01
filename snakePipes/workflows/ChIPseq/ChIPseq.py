@@ -1,10 +1,8 @@
-#!/usr/bin/env python3
-
 __description__ = """
-MPI-IE workflow for ChIP-seq analysis
+MPI-IE workflow for ChIPseq analysis
 
 Usage example:
-    ChIP-seq -d working-dir mm10 samples.yaml
+    ChIPseq -d working-dir mm10 samples.yaml
 """
 
 import argparse
@@ -124,7 +122,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
     optional.add_argument("--predictChIPDict",
                           nargs='?',
                           action='store',
-                          help="Use existing bam files to predict a CHiP-seq sample configuration file. Write it to the workingdir. "
+                          help="Use existing bam files to predict a ChIPseq sample configuration file. Write it to the workingdir. "
                                "If no value is given, samples that contain 'input' are used as ChIP input/ctrl. Provide a custom pattern like 'input,H3$,H4$' to change that!",
                           default= None,
                           const="input")

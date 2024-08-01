@@ -301,7 +301,7 @@ class TestDNAmapping():
     def test_default(self, ifs):
         # PE
         ci = [
-            "DNA-mapping",
+            "DNAmapping",
             '-i',
             ifs / 'PE',
             '-o',
@@ -316,7 +316,7 @@ class TestDNAmapping():
         assert parseSpOut(_p) == 143
     def test_properPairs(self, ifs):
         ci = [
-            "DNA-mapping",
+            "DNAmapping",
             '-i',
             ifs / 'PE',
             '-o',
@@ -336,7 +336,7 @@ class TestDNAmapping():
         assert parseSpOut(_p) == 152
     def test_bcExtract(self, ifs):
         ci = [
-            "DNA-mapping",
+            "DNAmapping",
             '-i',
             ifs / 'PE',
             '-o',
@@ -357,7 +357,7 @@ class TestDNAmapping():
         assert parseSpOut(_p) == 143
     def test_UMIDedup(self, ifs):
         ci = [
-            "DNA-mapping",
+            "DNAmapping",
             '-i',
             ifs / 'PE',
             '-o',
@@ -377,7 +377,7 @@ class TestDNAmapping():
         assert parseSpOut(_p) == 161
     def test_UMIDedupbcExtract(self, ifs):
         ci = [
-            "DNA-mapping",
+            "DNAmapping",
             '-i',
             ifs / 'PE',
             '-o',
@@ -398,7 +398,7 @@ class TestDNAmapping():
         assert parseSpOut(_p) == 152
     def test_DAG(self, ifs):
         ci = [
-            "DNA-mapping",
+            "DNAmapping",
             '-i',
             ifs / 'PE',
             '-o',
@@ -419,7 +419,7 @@ class TestDNAmapping():
         assert parseSpOut(_p) == 161
     def test_bwa(self, ifs):
         ci = [
-            "DNA-mapping",
+            "DNAmapping",
             '-i',
             ifs / 'PE',
             '-o',
@@ -438,7 +438,7 @@ class TestDNAmapping():
         assert parseSpOut(_p) == 143
     def test_bwa2(self, ifs):
         ci = [
-            "DNA-mapping",
+            "DNAmapping",
             '-i',
             ifs / 'PE',
             '-o',
@@ -457,7 +457,7 @@ class TestDNAmapping():
         assert parseSpOut(_p) == 143
     def test_se(self, ifs):
         ci = [
-            "DNA-mapping",
+            "DNAmapping",
             '-i',
             ifs / 'SE',
             '-o',
@@ -472,7 +472,7 @@ class TestDNAmapping():
         assert parseSpOut(_p) == 125
     def test_seproperPairs(self, ifs):
         ci = [
-            "DNA-mapping",
+            "DNAmapping",
             '-i',
             ifs / 'SE',
             '-o',
@@ -494,7 +494,7 @@ class TestDNAmapping():
 class TestChIPseq:
     def test_default(self, ifs):
         ci = [
-            "ChIP-seq",
+            "ChIPseq",
             '-d',
             ifs / 'bam_input',
             '--sampleSheet',
@@ -510,7 +510,7 @@ class TestChIPseq:
         assert parseSpOut(_p) == 59
     def test_nosamplesheet(self, ifs):
         ci = [
-            "ChIP-seq",
+            "ChIPseq",
             '-d',
             ifs / 'bam_input',
             '--snakemakeOptions',
@@ -524,7 +524,7 @@ class TestChIPseq:
         assert parseSpOut(_p) == 37
     def test_nosamplesheet_genrich(self, ifs):
         ci = [
-            "ChIP-seq",
+            "ChIPseq",
             '-d',
             ifs / 'bam_input',
             '--snakemakeOptions',
@@ -540,7 +540,7 @@ class TestChIPseq:
         assert parseSpOut(_p) == 35
     def test_broad(self, ifs):
         ci = [
-            "ChIP-seq",
+            "ChIPseq",
             '-d',
             ifs / 'bam_input',
             '--sampleSheet',
@@ -556,7 +556,7 @@ class TestChIPseq:
         assert parseSpOut(_p) == 77
     def test_genrich(self, ifs):
         ci = [
-            "ChIP-seq",
+            "ChIPseq",
             '-d',
             ifs / 'bam_input',
             '--sampleSheet',
@@ -574,7 +574,7 @@ class TestChIPseq:
         assert parseSpOut(_p) == 56
     def test_seacr(self, ifs):
         ci = [
-            "ChIP-seq",
+            "ChIPseq",
             '-d',
             ifs / 'bam_input',
             '--sampleSheet',
@@ -592,7 +592,7 @@ class TestChIPseq:
         assert parseSpOut(_p) == 89
     def test_seacr_spikein(self, ifs):
         ci = [
-            "ChIP-seq",
+            "ChIPseq",
             '-d',
             ifs / 'bam_input',
             '--sampleSheet',
@@ -611,7 +611,7 @@ class TestChIPseq:
         assert parseSpOut(_p) == 130
     def test_SE(self, ifs):
         ci = [
-            "ChIP-seq",
+            "ChIPseq",
             '-d',
             ifs / 'bam_input',
             '--sampleSheet',
@@ -628,7 +628,7 @@ class TestChIPseq:
         assert parseSpOut(_p) == 59
     def test_l2ratio(self, ifs):
         ci = [
-            "ChIP-seq",
+            "ChIPseq",
             '-d',
             ifs / 'bam_input',
             '--sampleSheet',
@@ -646,7 +646,7 @@ class TestChIPseq:
         assert parseSpOut(_p) == 53
     def test_default_noInput(self, ifs):
         ci = [
-            "ChIP-seq",
+            "ChIPseq",
             '-d',
             ifs / 'bam_input',
             '--sampleSheet',
@@ -662,7 +662,7 @@ class TestChIPseq:
         assert parseSpOut(_p) == 38
     def test_genrich_noInput(self, ifs):
         ci = [
-            "ChIP-seq",
+            "ChIPseq",
             '-d',
             ifs / 'bam_input',
             '--sampleSheet',
@@ -680,7 +680,7 @@ class TestChIPseq:
         assert parseSpOut(_p) == 32
     def test_seacr_noInput(self, ifs):
         ci = [
-            "ChIP-seq",
+            "ChIPseq",
             '-d',
             ifs / 'bam_input',
             '--sampleSheet',
@@ -698,7 +698,7 @@ class TestChIPseq:
         assert parseSpOut(_p) == 62
     def test_seacr_spikein_noInput(self, ifs):
         ci = [
-            "ChIP-seq",
+            "ChIPseq",
             '-d',
             ifs / 'bam_input',
             '--sampleSheet',
@@ -717,7 +717,7 @@ class TestChIPseq:
         assert parseSpOut(_p) == 83
     def test_frombam(self, ifs):
         ci = [
-            "ChIP-seq",
+            "ChIPseq",
             '-d',
             'outdir',
             '--fromBAM',
@@ -735,7 +735,7 @@ class TestChIPseq:
         assert parseSpOut(_p) == 119
     def test_frombam_noInput(self, ifs):
         ci = [
-            "ChIP-seq",
+            "ChIPseq",
             '-d',
             'outdir',
             '--fromBAM',
@@ -753,7 +753,7 @@ class TestChIPseq:
         assert parseSpOut(_p) == 80
     def test_spikein(self, ifs):
         ci = [
-            "ChIP-seq",
+            "ChIPseq",
             '--useSpikeInForNorm',
             '-d',
             ifs / 'bam_input',
@@ -770,7 +770,7 @@ class TestChIPseq:
         assert parseSpOut(_p) == 106
     def test_spikein_noInput(self, ifs):
         ci = [
-            "ChIP-seq",
+            "ChIPseq",
             '--useSpikeInForNorm',
             '-d',
             ifs / 'bam_input',
@@ -787,7 +787,7 @@ class TestChIPseq:
         assert parseSpOut(_p) == 65
     def test_spikeinfrombam(self, ifs):
         ci = [
-            "ChIP-seq",
+            "ChIPseq",
             '--useSpikeInForNorm',
             '-d',
             'outdir',
@@ -806,7 +806,7 @@ class TestChIPseq:
         assert parseSpOut(_p) == 142
     def test_spikeinfrombamTSSnorm(self, ifs):
         ci = [
-            "ChIP-seq",
+            "ChIPseq",
             '--useSpikeInForNorm',
             '--getSizeFactorsFrom',
             'TSS',
@@ -827,7 +827,7 @@ class TestChIPseq:
         assert parseSpOut(_p) == 118
     def test_spikeinfrombaminputnorm(self, ifs):
         ci = [
-            "ChIP-seq",
+            "ChIPseq",
             '--useSpikeInForNorm',
             '--getSizeFactorsFrom',
             'input',
@@ -848,7 +848,7 @@ class TestChIPseq:
         assert parseSpOut(_p) == 115
     def test_allelic(self, ifs):
         ci = [
-            "ChIP-seq",
+            "ChIPseq",
             '-d',
             ifs / 'allelic_bam_input',
             '--sampleSheet',
@@ -864,7 +864,7 @@ class TestChIPseq:
         assert parseSpOut(_p) == 37
     def test_multicomp(self, ifs):
         ci = [
-            "ChIP-seq",
+            "ChIPseq",
             '-d',
             ifs / 'bam_input',
             '--sampleSheet',
@@ -880,7 +880,7 @@ class TestChIPseq:
         assert parseSpOut(_p) == 81
     def test_multicomp_genrich(self, ifs):
         ci = [
-            "ChIP-seq",
+            "ChIPseq",
             '-d',
             ifs / 'bam_input',
             '--sampleSheet',
@@ -898,7 +898,7 @@ class TestChIPseq:
         assert parseSpOut(_p) == 82
     def test_multicomp_broad(self, ifs):
         ci = [
-            "ChIP-seq",
+            "ChIPseq",
             '-d',
             ifs / 'bam_input',
             '--sampleSheet',
@@ -914,7 +914,7 @@ class TestChIPseq:
         assert parseSpOut(_p) == 99
     def test_multicomp_fromBam(self, ifs):
         ci = [
-            "ChIP-seq",
+            "ChIPseq",
             '-d',
             'outdir',
             '--fromBAM',
@@ -932,7 +932,7 @@ class TestChIPseq:
         assert parseSpOut(_p) == 141
     def test_multicomp_fromBam_Genrich(self, ifs):
         ci = [
-            "ChIP-seq",
+            "ChIPseq",
             '-d',
             'outdir',
             '--fromBAM',
@@ -952,7 +952,7 @@ class TestChIPseq:
         assert parseSpOut(_p) == 142
     def test_multicomp_spikein(self, ifs):
         ci = [
-            "ChIP-seq",
+            "ChIPseq",
             '-d',
             ifs / 'bam_input',
             '--sampleSheet',
@@ -969,7 +969,7 @@ class TestChIPseq:
         assert parseSpOut(_p) == 126
     def test_multicomp_spikein_genrich(self, ifs):
         ci = [
-            "ChIP-seq",
+            "ChIPseq",
             '-d',
             ifs / 'bam_input',
             '--sampleSheet',
@@ -988,7 +988,7 @@ class TestChIPseq:
         assert parseSpOut(_p) == 127
     def test_multicomp_spikein_noInput(self, ifs):
         ci = [
-            "ChIP-seq",
+            "ChIPseq",
             '-d',
             ifs / 'bam_input',
             '--sampleSheet',
@@ -1005,7 +1005,7 @@ class TestChIPseq:
         assert parseSpOut(_p) == 81
     def test_multicomp_spikein_noInput_Genrich(self, ifs):
         ci = [
-            "ChIP-seq",
+            "ChIPseq",
             '-d',
             ifs / 'bam_input',
             '--sampleSheet',
@@ -1024,7 +1024,7 @@ class TestChIPseq:
         assert parseSpOut(_p) == 79
     def test_multicomp_spikein_fromBam(self, ifs):
         ci = [
-            "ChIP-seq",
+            "ChIPseq",
             '-d',
             'outdir',
             '--fromBAM',
@@ -1043,7 +1043,7 @@ class TestChIPseq:
         assert parseSpOut(_p) == 162
     def test_multicomp_spikein_fromBam_genrich(self, ifs):
         ci = [
-            "ChIP-seq",
+            "ChIPseq",
             '-d',
             'outdir',
             '--fromBAM',
@@ -1064,7 +1064,7 @@ class TestChIPseq:
         assert parseSpOut(_p) == 163
     def test_multicomp_spikein_fromBam_noInput(self, ifs):
         ci = [
-            "ChIP-seq",
+            "ChIPseq",
             '-d',
             'outdir',
             '--fromBAM',
@@ -1083,7 +1083,7 @@ class TestChIPseq:
         assert parseSpOut(_p) == 105
     def test_multicomp_spikein_fromBam_noInput_genrich(self, ifs):
         ci = [
-            "ChIP-seq",
+            "ChIPseq",
             '-d',
             'outdir',
             '--fromBAM',
@@ -1104,7 +1104,7 @@ class TestChIPseq:
         assert parseSpOut(_p) == 103
     def test_multicomp_fromBam_noInput_SEACR(self, ifs):
         ci = [
-            "ChIP-seq",
+            "ChIPseq",
             '-d',
             'outdir',
             '--fromBAM',
@@ -1126,7 +1126,7 @@ class TestChIPseq:
 class TestmRNAseq:
     def test_default(self, ifs):
         ci = [
-            "mRNA-seq",
+            "mRNAseq",
             '-i',
             ifs / 'PE',
             '-o',
@@ -1141,7 +1141,7 @@ class TestmRNAseq:
         assert parseSpOut(_p) == 167
     def test_DE(self, ifs):
         ci = [
-            "mRNA-seq",
+            "mRNAseq",
             '-i',
             ifs / 'PE',
             '-o',
@@ -1158,7 +1158,7 @@ class TestmRNAseq:
         assert parseSpOut(_p) == 168
     def test_rMats(self, ifs):
         ci = [
-            "mRNA-seq",
+            "mRNAseq",
             '-i',
             ifs / 'PE',
             '-o',
@@ -1176,7 +1176,7 @@ class TestmRNAseq:
         assert parseSpOut(_p) == 170
     def test_almode(self, ifs):
         ci = [
-            "mRNA-seq",
+            "mRNAseq",
             '-i',
             ifs / 'PE',
             '-o',
@@ -1195,7 +1195,7 @@ class TestmRNAseq:
         assert parseSpOut(_p) == 125
     def test_trim(self, ifs):
         ci = [
-            "mRNA-seq",
+            "mRNAseq",
             '-i',
             ifs / 'PE',
             '-o',
@@ -1213,7 +1213,7 @@ class TestmRNAseq:
         assert parseSpOut(_p) == 177
     def test_alfreemode(self, ifs):
         ci = [
-            "mRNA-seq",
+            "mRNAseq",
             '-i',
             ifs / 'PE',
             '-o',
@@ -1232,7 +1232,7 @@ class TestmRNAseq:
         assert parseSpOut(_p) == 188
     def test_bcExtract(self, ifs):
         ci = [
-            "mRNA-seq",
+            "mRNAseq",
             '-i',
             ifs / 'PE',
             '-o',
@@ -1251,7 +1251,7 @@ class TestmRNAseq:
         assert parseSpOut(_p) == 168
     def test_bcExtractUMIdedup(self, ifs):
         ci = [
-            "mRNA-seq",
+            "mRNAseq",
             '-i',
             ifs / 'PE',
             '-o',
@@ -1271,7 +1271,7 @@ class TestmRNAseq:
         assert parseSpOut(_p) == 177
     def test_multicomp(self, ifs):
         ci = [
-            "mRNA-seq",
+            "mRNAseq",
             '-i',
             ifs / 'PE',
             '-o',
@@ -1291,7 +1291,7 @@ class TestmRNAseq:
         assert parseSpOut(_p) == 165
     def test_SE(self, ifs):
         ci = [
-            "mRNA-seq",
+            "mRNAseq",
             '-i',
             ifs / 'SE',
             '-o',
@@ -1308,7 +1308,7 @@ class TestmRNAseq:
         assert parseSpOut(_p) == 149
     def test_SEalmode(self, ifs):
         ci = [
-            "mRNA-seq",
+            "mRNAseq",
             '-i',
             ifs / 'SE',
             '-o',
@@ -1327,7 +1327,7 @@ class TestmRNAseq:
         assert parseSpOut(_p) == 107
     def test_SEtrim(self, ifs):
         ci = [
-            "mRNA-seq",
+            "mRNAseq",
             '-i',
             ifs / 'SE',
             '-o',
@@ -1345,7 +1345,7 @@ class TestmRNAseq:
         assert parseSpOut(_p) == 158
     def test_SEalfreemode(self, ifs):
         ci = [
-            "mRNA-seq",
+            "mRNAseq",
             '-i',
             ifs / 'SE',
             '-o',
@@ -1364,7 +1364,7 @@ class TestmRNAseq:
         assert parseSpOut(_p) == 169
     def test_SEfastqc(self, ifs):
         ci = [
-            "mRNA-seq",
+            "mRNAseq",
             '-i',
             ifs / 'SE',
             '-o',
@@ -1383,7 +1383,7 @@ class TestmRNAseq:
         assert parseSpOut(_p) == 176
     def test_SEfrombam(self, ifs):
         ci = [
-            "mRNA-seq",
+            "mRNAseq",
             '-i',
             ifs / 'bam_input' / 'filtered_bam',
             '-o',
@@ -1401,7 +1401,7 @@ class TestmRNAseq:
         assert parseSpOut(_p) == 114
     def test_threeprime(self, ifs):
         ci = [
-            "mRNA-seq",
+            "mRNAseq",
             '-i',
             ifs / 'PE',
             '-o',
@@ -1420,7 +1420,7 @@ class TestmRNAseq:
         assert parseSpOut(_p) == 189
     def test_threeprimeqc(self, ifs):
         ci = [
-            "mRNA-seq",
+            "mRNAseq",
             '-i',
             ifs / 'PE',
             '-o',
@@ -1439,7 +1439,7 @@ class TestmRNAseq:
         assert parseSpOut(_p) == 232
     def test_allelic(self, ifs):
         ci = [
-            "mRNA-seq",
+            "mRNAseq",
             '-i',
             ifs / 'PE',
             '-o',
@@ -1460,7 +1460,7 @@ class TestmRNAseq:
         assert parseSpOut(_p) == 253
     def test_allelicfrombam(self, ifs):
         ci = [
-            "mRNA-seq",
+            "mRNAseq",
             '-i',
             ifs / 'allelic_bam_input' / 'filtered_bam',
             '-o',
@@ -1482,7 +1482,7 @@ class TestmRNAseq:
         assert parseSpOut(_p) == 197
     def test_allelicDE(self, ifs):
         ci = [
-            "mRNA-seq",
+            "mRNAseq",
             '-i',
             ifs / 'PE',
             '-o',
@@ -1505,7 +1505,7 @@ class TestmRNAseq:
         assert parseSpOut(_p) == 254
     def test_allelicDE_SNPfile(self, ifs):
         ci = [
-            "mRNA-seq",
+            "mRNAseq",
             '-i',
             ifs / 'PE',
             '-o',
@@ -1528,7 +1528,7 @@ class TestmRNAseq:
         assert parseSpOut(_p) == 252
     def test_allelicDEsinglestrain(self, ifs):
         ci = [
-            "mRNA-seq",
+            "mRNAseq",
             '-i',
             ifs / 'PE',
             '-o',
@@ -1551,7 +1551,7 @@ class TestmRNAseq:
         assert parseSpOut(_p) == 254
     def test_allelicDEalfree(self, ifs):
         ci = [
-            "mRNA-seq",
+            "mRNAseq",
             '-i',
             ifs / 'PE',
             '-o',
@@ -1574,7 +1574,7 @@ class TestmRNAseq:
         assert parseSpOut(_p) == 330
     def test_allelic_count_fromBam_singlecomp(self, ifs):
         ci = [
-            "mRNA-seq",
+            "mRNAseq",
             '-i', 
             ifs / 'allelic_bam_input' / 'allelic_bams',
             '-o',
@@ -1596,7 +1596,7 @@ class TestmRNAseq:
         assert parseSpOut(_p) == 105
     def test_allelic_count_fromBam_multicomp(self, ifs):
         ci = [
-            "mRNA-seq",
+            "mRNAseq",
             '-i',
             ifs / 'allelic_bam_input' / 'allelic_bams',
             '-o',
@@ -1618,7 +1618,7 @@ class TestmRNAseq:
         assert parseSpOut(_p) == 108
     def test_allelic_mapping_fromBam_multicomp(self, ifs):
         ci = [
-            "mRNA-seq",
+            "mRNAseq",
             '-i',
             ifs / 'allelic_bam_input' / 'filtered_bam',
             '-o',
@@ -1644,7 +1644,7 @@ class TestmRNAseq:
         assert parseSpOut(_p) == 201
     def test_allelic_alfree_multicomp(self, ifs):
         ci = [
-            "mRNA-seq",
+            "mRNAseq",
             '-i',
             ifs / 'PE',
             '-o',
@@ -1669,7 +1669,7 @@ class TestmRNAseq:
 class TestncRNAseq():
     def test_default(self, ifs):
         ci = [
-            "noncoding-RNA-seq",
+            "ncRNAseq",
             '-i',
             ifs / 'PE',
             '-o',
@@ -1684,7 +1684,7 @@ class TestncRNAseq():
         assert parseSpOut(_p) == 137
     def test_DE(self, ifs):
         ci = [
-            "noncoding-RNA-seq",
+            "ncRNAseq",
             '-i',
             ifs / 'PE',
             '-o',
@@ -1701,7 +1701,7 @@ class TestncRNAseq():
         assert parseSpOut(_p) == 139
     def test_SE(self, ifs):
         ci = [
-            "noncoding-RNA-seq",
+            "ncRNAseq",
             '-i',
             ifs / 'SE',
             '-o',
@@ -1718,7 +1718,7 @@ class TestncRNAseq():
         assert parseSpOut(_p) == 120
     def test_frombam(self, ifs):
         ci = [
-            "noncoding-RNA-seq",
+            "ncRNAseq",
             '-i',
             ifs / 'bam_input' / 'filtered_bam',
             '--fromBAM',
@@ -1736,7 +1736,7 @@ class TestncRNAseq():
         assert parseSpOut(_p) == 94
     def test_multicomp(self, ifs):
         ci = [
-            "noncoding-RNA-seq",
+            "ncRNAseq",
             '-i',
             ifs / 'PE',
             '-o',
@@ -1958,7 +1958,7 @@ class TestWGBS():
 class TestATAC():
     def test_default(self, ifs):
         ci = [
-            "ATAC-seq",
+            "ATACseq",
             '-d',
             ifs / 'bam_input',
             '--sampleSheet',
@@ -1973,7 +1973,7 @@ class TestATAC():
         assert parseSpOut(_p) == 63
     def test_no_sampleSheet(self, ifs):
         ci = [
-            "ATAC-seq",
+            "ATACseq",
             '-d',
             ifs / 'bam_input',
             '--snakemakeOptions',
@@ -1986,7 +1986,7 @@ class TestATAC():
         assert parseSpOut(_p) == 47
     def test_genrich(self, ifs):
         ci = [
-            "ATAC-seq",
+            "ATACseq",
             '-d',
             ifs / 'bam_input',
             '--sampleSheet',
@@ -2003,7 +2003,7 @@ class TestATAC():
         assert parseSpOut(_p) == 74
     def test_HMMRATAC(self, ifs):
         ci = [
-            "ATAC-seq",
+            "ATACseq",
             '-d',
             ifs / 'bam_input',
             '--sampleSheet',
@@ -2020,7 +2020,7 @@ class TestATAC():
         assert parseSpOut(_p) == 73
     def test_sieve(self, ifs):
         ci = [
-            "ATAC-seq",
+            "ATACseq",
             '-d',
             ifs / 'bam_input',
             '--sampleSheet',
@@ -2039,7 +2039,7 @@ class TestATAC():
         assert parseSpOut(_p) == 63
     def test_frombam(self, ifs):
         ci = [
-            "ATAC-seq",
+            "ATACseq",
             '-d',
             ifs / 'bam_input',
             '--sampleSheet',
@@ -2056,7 +2056,7 @@ class TestATAC():
         assert parseSpOut(_p) == 114
     def test_multicomp_default(self, ifs):
         ci = [
-            "ATAC-seq",
+            "ATACseq",
             '-d', 
             ifs / 'bam_input',
             '--sampleSheet',
@@ -2071,7 +2071,7 @@ class TestATAC():
         assert parseSpOut(_p) == 79
     def test_multicomp_genrich(self, ifs):
         ci = [
-            "ATAC-seq",
+            "ATACseq",
             '-d', 
             ifs / 'bam_input',
             '--sampleSheet',
@@ -2088,7 +2088,7 @@ class TestATAC():
         assert parseSpOut(_p) == 92
     def test_multicomp_HMMRATAC(self, ifs):
         ci = [
-            "ATAC-seq",
+            "ATACseq",
             '-d', 
             ifs / 'bam_input',
             '--sampleSheet',
@@ -2105,7 +2105,7 @@ class TestATAC():
         assert parseSpOut(_p) == 89
     def test_multicomp_sieve(self, ifs):
         ci = [
-            "ATAC-seq",
+            "ATACseq",
             '-d',
             ifs / 'bam_input',
             '--sampleSheet',
@@ -2124,7 +2124,7 @@ class TestATAC():
         assert parseSpOut(_p) == 79
     def test_multicomp_frombam(self, ifs):
         ci = [
-            "ATAC-seq",
+            "ATACseq",
             '-d',
             ifs / 'bam_input',
             '--sampleSheet',

@@ -1,4 +1,4 @@
-if pipeline == "scrna-seq" and mode == "STARsolo" or pipeline=="scrna-seq" and mode == "Alevin":
+if pipeline == "scrnaseq" and mode == "STARsolo" or pipeline=="scrnaseq" and mode == "Alevin":
     rule FastQC:
         input:
             "originalFASTQ/{sample}{read}.fastq.gz"

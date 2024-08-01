@@ -355,7 +355,7 @@ onstart:
 
     if toolsVersion:
         usedEnvs = [CONDA_SHARED_ENV, CONDA_RNASEQ_ENV]
-        cf.writeTools(usedEnvs, outdir, "mRNA-seq", maindir)
+        cf.writeTools(usedEnvs, outdir, "mRNAseq", maindir)
     if sampleSheet:
         cf.copySampleSheet(sampleSheet, outdir)
 

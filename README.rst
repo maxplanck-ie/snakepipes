@@ -26,13 +26,13 @@ snakePipes are flexible and powerful workflows built using `Snakemake <https://s
 Workflows available
 --------------------
 
-- DNA-mapping*
-- ChIP-seq*
-- mRNA-seq*
-- noncoding-RNA-seq*
-- ATAC-seq*
-- scRNA-seq
-- Hi-C
+- DNAmapping*
+- ChIPseq*
+- mRNAseq*
+- ncRNAseq*
+- ATACseq*
+- scRNAseq
+- HiC
 - Whole Genome Bisulfite Seq/WGBS
 
 **(*Also available in "allele-specific" mode)**

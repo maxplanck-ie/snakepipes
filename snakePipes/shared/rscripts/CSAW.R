@@ -106,7 +106,7 @@ if (! external_bed) {
     if(snakemake@params[['peakCaller']] == "MACS2") {
         allpeaks <- lapply(fnames, function(x) {
             narrow <- paste0("../MACS2/",x,bam_pfx,".BAM_peaks.narrowPeak") #bam_pfx
-            if(snakemake@params[["pipeline"]] %in% "ATAC-seq"){
+            if(snakemake@params[["pipeline"]] %in% "ATACseq"){
                 narrow <- paste0("../MACS2/",x,".filtered.short.BAM_peaks.narrowPeak")
             }
             broad <- paste0("../MACS2/",x,bam_pfx,".BAM_peaks.broadPeak") #bam_pfx

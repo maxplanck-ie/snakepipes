@@ -9,18 +9,18 @@ def get_outdir(peak_caller,sampleSheet):
 
 def getInputPeaks(peakCaller, chip_samples, genrichDict,comp_group):
     if peakCaller == "MACS2":
-        if pipeline in 'ATAC-seq':
+        if pipeline in 'ATACseq':
             return expand("MACS2/{chip_sample}.filtered.short.BAM_peaks.xls", chip_sample = chip_samples)
-        elif pipeline == "chip-seq" and useSpikeInForNorm:
+        elif pipeline == "chipseq" and useSpikeInForNorm:
             return expand("MACS2/{chip_sample}_host.BAM_peaks.xls", chip_sample = chip_samples)
         else:
             return expand("MACS2/{chip_sample}.filtered.BAM_peaks.xls", chip_sample = chip_samples)
     elif peakCaller == "HMMRATAC":
         return expand("HMMRATAC/{chip_sample}_peaks.gappedPeak", chip_sample = chip_samples)
     elif peakCaller == "SEACR":
-        if pipeline == "chip-seq" and useSpikeInForNorm:
+        if pipeline == "chipseq" and useSpikeInForNorm:
             return expand("SEACR/{chip_sample}_host.stringent.bed",chip_sample=chip_samples)
-        elif pipeline == "chip-seq" and not useSpikeInForNorm:
+        elif pipeline == "chipseq" and not useSpikeInForNorm:
             return expand("SEACR/{chip_sample}.filtered.stringent.bed",chip_sample=chip_samples)
     elif peakCaller == "Genrich":
         return expand("Genrich/{genrichGroup}.{{compGroup}}.narrowPeak", genrichGroup = genrichDict[comp_group].keys())
@@ -58,9 +58,9 @@ def getBamCoverage(comp_group):
         return []
 
 def getHeatmapInput():
-    if pipeline in 'ATAC-seq':
+    if pipeline in 'ATACseq':
         return(expand("CSAW_{}_{}".format(peakCaller, sample_name + ".{{compGroup}}") + "/CSAW.{change_dir}.cov.heatmap.png", change_dir=['UP','DOWN']))
-    elif pipeline in 'chip-seq':
+    elif pipeline in 'chipseq':
         if chip_samples_w_ctrl:
             return(expand("CSAW_{}_{}".format(peakCaller, sample_name + ".{{compGroup}}") + "/CSAW.{change_dir}.cov.heatmap.png", change_dir=['UP','DOWN']) + expand("CSAW_{}_{}".format(peakCaller, sample_name + ".{{compGroup}}") + "/CSAW.{change_dir}.log2r.heatmap.png", change_dir=['UP', 'DOWN']))
         else:
@@ -101,7 +101,7 @@ rule CSAW:
         windowSize = windowSize,
         importfunc = os.path.join("shared", "rscripts", "DB_functions.R"),
         allele_info = allele_info,
-        yaml_path=lambda wildcards: samples_config if pipeline in 'chip-seq' else "",
+        yaml_path=lambda wildcards: samples_config if pipeline in 'chipseq' else "",
         insert_size_metrics = lambda wildcards,input: os.path.join(outdir, input.insert_size_metrics) if pairedEnd else [],
         pipeline = pipeline,
         useSpikeInForNorm = useSpikeInForNorm,
