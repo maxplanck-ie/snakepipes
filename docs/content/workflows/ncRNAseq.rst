@@ -12,7 +12,7 @@ Repeat elements are quantified and tested for differential expression at the nam
 
 Note that in addition to the normal GTF file, this pipeline requires a repeat masker output file, which can be downloaded from UCSC or other sites. The chromosome names here must match that used in the other files.
 
-.. image:: ../images/ncRNAseq_pipeline.png
+.. image:: ../images/noncoding-RNA-seq_pipeline.png
 
 Input requirements
 ------------------
