@@ -511,7 +511,7 @@ def setDefaults(fileName):
     """
     # Script-neutral paths
     baseDir = os.path.dirname(__file__)
-    workflowDir = os.path.join(baseDir, "workflows", fileName)
+    workflowDir = os.path.join(baseDir, "workflows", fileName.replace('.py', ''))
 
     # defaults
     defaults = load_configfile(os.path.join(workflowDir, "defaults.yaml"), False)

@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 __description__ = """
 Create indices for use by snakePipes. A YAML file will be created by default in the default location where snakePipes looks for organism YAML files.
 

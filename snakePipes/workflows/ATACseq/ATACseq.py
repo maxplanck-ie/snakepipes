@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 __description__ = """
 MPI-IE workflow for ATAC-seq Analysis
 

@@ -38,4 +38,14 @@ classifiers = [
 ]
 
 [project.scripts]
+ATACseq = "snakePipes.workflows.ATACseq.ATACseq:main"
+ChIPseq = "snakePipes.workflows.ChIPseq.ChIPseq:main"
+createIndices = "snakePipes.workflows.createIndices.createIndices:main"
+DNAmapping = "snakePipes.workflows.DNAmapping.DNAmapping:main"
+HiC = "snakePipes.workflows.HiC.HiC:main"
 makePairs = "snakePipes.workflows.makePairs.makePairs:main"
+mRNAseq = "snakePipes.workflows.mRNAseq.mRNAseq:main"
+ncRNAseq = "snakePipes.workflows.ncRNAseq.ncRNAseq:main"
+preprocessing = "snakePipes.workflows.preprocessing.preprocessing:main"
+scRNAseq = "snakePipes.workflows.scRNAseq.scRNAseq:main"
+WGBS = "snakePipes.workflows.WGBS.WGBS:main"
