@@ -2,7 +2,7 @@
 # This file should hold values that should be present in ALL workflows
 #
 # Note that tempDir MUST end with a "/"!
-# Note that the condaEnvDir cannot end with a "/"!
+#
 # Note that due to limitations in yaml.dump, only very basic structures are
 # permitted here.
 ################################################################################
