@@ -1,6 +1,0 @@
-snakemake >= 6.2.1, <7.19.0
-psutil
-pandas
-thefuzz
-pyyaml >= 5.1
-tabulate < 0.9
