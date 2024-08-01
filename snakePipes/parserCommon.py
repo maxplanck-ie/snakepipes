@@ -1,7 +1,7 @@
 import argparse
 import os.path
 import glob
-from snakePipes import __version__
+from importlib.metadata import version
 
 
 def ListGenomes():
@@ -115,7 +115,7 @@ def mainArguments(defaults, workingDir=False, createIndices=False, preprocessing
 
     general.add_argument("--version",
                          action="version",
-                         version="%(prog)s {}".format(__version__))
+                         version="%(prog)s {}".format(version("snakePipes")))
 
     emailArgs = parser.add_argument_group('Email Arguments')
     emailArgs.add_argument("--emailAddress",
