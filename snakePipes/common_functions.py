@@ -35,7 +35,7 @@ def set_env_yamls():
             'CONDA_CHIPSEQ_ENV': 'envs/chip_seq.yaml',
             'CONDA_ATAC_ENV': 'envs/atac_seq.yaml',
             'CONDA_HIC_ENV': 'envs/hic.yaml',
-            'CONDA_PAIRTOOLS_ENV': 'envs/pairtools.yaml',
+            'CONDA_MAKEPAIRS_ENV': 'envs/makePairs.yaml',
             'CONDA_WGBS_ENV': 'envs/wgbs.yaml',
             'CONDA_DSS_ENV': 'envs/wgbs_dss.yaml',
             'CONDA_RMD_ENV': 'envs/rmarkdown.yaml',
