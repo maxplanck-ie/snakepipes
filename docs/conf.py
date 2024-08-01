@@ -14,6 +14,7 @@
 
 import sys
 import os
+from importlib.metadata import version as importlibversion
 
 # to allow readthedocs to compile without installing some dependencies
 import mock
@@ -82,9 +83,9 @@ author = u'MPI-IE'
 exec(open('../snakePipes/__init__.py').read())
 
 # The short X.Y version.
-version = __version__
+version = importlibversion("snakePipes")
 # The full version, including alpha/beta/rc tags.
-release = __version__
+release = importlibversion("snakePipes")
 
 # An rst epilog to apper at the end of every page
 rst_epilog = """
