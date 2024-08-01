@@ -619,7 +619,7 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
     Merge dictionaries, write YAML files, construct the snakemake command
     and create the DAG
     """
-    workflowName = os.path.basename(callingScript)
+    workflowName = os.path.basename(callingScript).replace('.py', '')
     os.makedirs(args.outdir, exist_ok=True)
 
     if isinstance(args.snakemakeOptions, list):
