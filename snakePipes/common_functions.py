@@ -13,7 +13,8 @@ from pathlib import Path
 from thefuzz import fuzz
 import smtplib
 from email.message import EmailMessage
-from snakePipes import __version__
+#from snakePipes import __version__
+from importlib.metadata import version
 
 
 def set_env_yamls():
@@ -117,7 +118,7 @@ def config_diff(dict1, dict2):
 
 def get_version():
     # If this is sent to stdout it breaks making a DAG pdf
-    sys.stderr.write("\n---- This analysis has been done using snakePipes version {} ----\n".format(__version__))
+    sys.stderr.write("\n---- This analysis has been done using snakePipes version {} ----\n".format(version("snakePipes")))
 
 
 def load_organism_data(genome, maindir, verbose):
