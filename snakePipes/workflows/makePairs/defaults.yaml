@@ -1,4 +1,4 @@
-pipeline: rna-seq
+pipeline: makePairs
 outdir:
 configFile:
 clusterConfigFile:
@@ -18,6 +18,22 @@ pairedEnd: True
 ## Number of reads to downsample from each FASTQ file
 downsample:
 ## Options for trimming
-trim: False
-trimmer: cutadapt
+trim: True
+trimmer: fastp
 trimmerOptions:
+
+verbose: False
+fastqc: True
+UMIBarcode: False
+bcPattern: "NNNNCCCCCCCCC"
+UMIDedup: False
+UMIDedupSep: "_"
+UMIDedupOpts: "_"
+plotFormat: png
+bwBinSize: 1000
+aligner: 'bwa'
+alignerOptions: '-SPu -T0'
+alignerThreads: 30
+
+fromBAM: False
+sampleSheet:
