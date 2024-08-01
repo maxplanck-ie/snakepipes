@@ -13,7 +13,6 @@ from pathlib import Path
 from thefuzz import fuzz
 import smtplib
 from email.message import EmailMessage
-#from snakePipes import __version__
 from importlib.metadata import version
 
 
