@@ -64,7 +64,7 @@ def multiqc_input_check(return_value):
             infiles.append( expand("allelic_bams/{sample}.filtered.SNPsplit_report.yaml", sample = samples) )
             infiles.append( expand("allelic_bams/{sample}.filtered.SNPsplit_sort.yaml", sample = samples) )
             indir += "allelic_bams"
-    elif pipeline=="rna-seq":
+    elif pipeline=="rnaseq":
         # must be RNA-mapping, add files as per the mode
         if ( "alignment" in mode or "deepTools_qc" in mode or "three-prime-seq" in mode ) and not "allelic-mapping" in mode and not "allelic-counting" in mode:
             infiles.append( expand(aligner+"/{sample}.bam", sample = samples) +
