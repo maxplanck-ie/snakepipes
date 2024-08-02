@@ -39,7 +39,7 @@ def parse_args(defaults={"configFile": None, "clusterConfigFile": None,
                           help="URL or local path to where the genome fasta file is located. The file may optionally be gzipped.")
 
     required.add_argument("--gtfURL",
-                          help="URL or local path to where the genome annotation in GTF format is located. GFF is NOT supported. The file may optionally be gzipped. If this file is not specified, then RNA-seq related tools will NOT be usable.")
+                          help="URL or local path to where the genome annotation in GTF format is located. GFF is NOT supported. The file may optionally be gzipped. If this file is not specified, then RNAseq related tools will NOT be usable.")
 
     # Workflow options
     optional = parser.add_argument_group('Options')
