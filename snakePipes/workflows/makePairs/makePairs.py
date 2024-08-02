@@ -71,20 +71,17 @@ def main():
 
     # Common arguments
     cf.checkCommonArguments(args, baseDir, outDir=True)
-
     args.VCFfile = os.path.abspath(args.VCFfile)
-    print(args.VCFfile)
     
     if args.fromBAM:
          args.aligner = "EXTERNAL_BAM"
 
-    
 #     ## End workflow-specific checks
 
     # Handle YAML and log files
     snakemake_cmd = cf.commonYAMLandLogs(baseDir, workflowDir, defaults, args, __file__)
     logfile_name = cf.logAndExport(args, os.path.basename(__file__))
-    print(logfile_name)
+
     # Run everything
     cf.runAndCleanup(args, snakemake_cmd, logfile_name)
 
