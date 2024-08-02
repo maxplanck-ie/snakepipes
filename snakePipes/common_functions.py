@@ -709,6 +709,7 @@ def logAndExport(args, workflowName):
     """
     Set up logging
     """
+    workflowName = workflowName.replace('.py', '')
     # Write snakemake_cmd to log file
     fnames = glob.glob(os.path.join(args.outdir, '{}_run-[0-9]*.log'.format(workflowName)))
     if len(fnames) == 0:
