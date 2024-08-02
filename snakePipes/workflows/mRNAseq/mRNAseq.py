@@ -4,7 +4,7 @@ __description__ = """
 MPI-IE workflow for RNA mapping and analysis
 
 usage example:
-    RNA-seq -i input-dir -o output-dir mm10
+    RNAseq -i input-dir -o output-dir mm10
 """
 
 
