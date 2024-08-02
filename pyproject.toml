@@ -42,8 +42,7 @@ classifiers = [
 actions = [
     "pytest",
     "flake8",
-    "ruamel.yaml",
-    "graphviz"
+    "ruamel.yaml"
 ]
 
 [project.scripts]
