@@ -5,7 +5,6 @@
 import os
 import snakePipes.common_functions as cf
 
-
 ### snakemake_workflows initialization ########################################
 maindir = os.path.dirname(os.path.dirname(workflow.basedir))
 
@@ -33,11 +32,14 @@ if fastqc:
 if trim:
     include: os.path.join(maindir, "shared", "rules", "trimming.snakefile")
 
-#umi_tools: needed for FASTQC handling
+#umi_tools: needed for FASTQ handling
 include: os.path.join(maindir, "shared", "rules", "umi_tools.snakefile")
 
 #diploid_genome: concatenation and indexing
 include: os.path.join(maindir, "shared", "rules", "diploid_genome.snakefile")
+
+#pairtools: bwa mapping (without sorting),  pairtools rules & multiqc
+include: os.path.join(maindir, "shared", "rules", "pairtools.snakefile")
 
 def run_FastQC(fastqc):
     if fastqc:
@@ -53,7 +55,7 @@ def run_Trimming(trim, fastqc):
         return( expand(fastq_dir+"/{sample}{read}.fastq.gz", sample = samples, read = reads) )
     else:
         return([])
-    
+
 ### execute before workflow starts #############################################
 ################################################################################
 onstart:
@@ -68,11 +70,9 @@ onstart:
         print("$TMPDIR: ",os.getenv('TMPDIR', ""))
         print("$HOSTNAME: ",os.getenv('HOSTNAME', ""))
         print("-" * 80, "\n")
-        print(sample_dict)
 
     if toolsVersion:
         usedEnvs = [CONDA_SHARED_ENV, CONDA_MAKEPAIRS_ENV]
-        print("write tools {} {} {}".format(CONDA_MAKEPAIRS_ENV, CONDA_SHARED_ENV, maindir))
         cf.writeTools(usedEnvs, outdir, "makePairs", maindir)
         
     if sampleSheet:
@@ -86,12 +86,7 @@ rule all:
         expand("originalFASTQ/{sample}{read}.fastq.gz", sample = samples, read = reads),
         run_FastQC(fastqc),
         run_Trimming(trim, fastqc),
-        "02_bwa_index/diploid_genome.fa.gz.bwt",
-#        expand(aligner + "/{sample}{read}.bam", sample = samples, read = reads),
-#        run_build_matrices(),
-#        expand("HiC_matrices/QCplots/{sample}_QC/QC.log", sample = samples),
-#        run_dist_vs_count(),
-#        "multiQC/multiqc_report.html"
+        "multiqc/multiqc_report.html"
 
 ### execute after workflow finished ############################################
 ################################################################################

@@ -88,7 +88,7 @@ def main():
     # Run everything
     cf.runAndCleanup(args, snakemake_cmd, logfile_name)
 
-    #CreateDAG
+    #CreateDAG (with --DAG flag)
     cf.print_DAG(args,snakemake_cmd, __file__,defaults)
 
 
