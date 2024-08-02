@@ -1,4 +1,5 @@
 # Snakemake workflow for phased mapping with pairtools
+# based on https://github.com/caballero/snakemake-pairtools-phased/tree/df410ff
 # Juan Caballero
 # (C) 2024
 
@@ -56,7 +57,9 @@ def run_Trimming(trim, fastqc):
     else:
         return([])
 
+
 ### execute before workflow starts #############################################
+# does NOT seem to execute "onstart"
 ################################################################################
 onstart:
     if "verbose" in config and config["verbose"]:
@@ -83,9 +86,11 @@ onstart:
 
 rule all:
     input:
+        # set soft-links
         expand("originalFASTQ/{sample}{read}.fastq.gz", sample = samples, read = reads),
         run_FastQC(fastqc),
         run_Trimming(trim, fastqc),
+        "genome/diploid_genome.chromsizes",
         "multiqc/multiqc_report.html"
 
 ### execute after workflow finished ############################################
