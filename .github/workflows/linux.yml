@@ -24,7 +24,8 @@ jobs:
         cache-downloads: true
     - name: Install snakePipes
       run: |
-        micromamba run -n snakePipes_CI python -m pip install . --no-deps --ignore-installed -vvv
+        micromamba run -n snakePipes_CI python -m pip install .
+        micromamba run -n snakePipes_CI python -m pip install -r docs/requirements.txt
     - name: docs
       run: |
         micromamba activate snakePipes_CI
@@ -47,7 +48,7 @@ jobs:
         cache-downloads: true
     - name: Install snakePipes
       run: |
-        micromamba run -n snakePipes_CI python -m pip install . --no-deps --ignore-installed -vvv
+        micromamba run -n snakePipes_CI python -m pip install .[actions]
     - name: flake
       run: |
         micromamba activate snakePipes_CI
@@ -69,7 +70,7 @@ jobs:
         cache-downloads: true
     - name: Install snakePipes
       run: |
-        micromamba run -n snakePipes_CI python -m pip install . --no-deps --ignore-installed -vvv
+        micromamba run -n snakePipes_CI python -m pip install .
     - name: CI
       run: |
         micromamba activate snakePipes_CI
@@ -117,7 +118,7 @@ jobs:
         cache-downloads: true
     - name: install snakePipes
       run: |
-        micromamba run -n snakePipes_CI python -m pip install . --no-deps --ignore-installed -vvv
+        micromamba run -n snakePipes_CI python -m pip install .
     - name: createEnvs
       run: |
         micromamba activate snakePipes_CI

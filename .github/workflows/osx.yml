@@ -48,7 +48,7 @@ jobs:
           cache-downloads: true
       - name: install snakePipes_OSX
         run: |
-          micromamba run -n snakePipes_CI python -m pip install . --no-deps --ignore-installed -vvv
+          micromamba run -n snakePipes_CI python -m pip install .
       - name: createEnvsOSX
         run: |
           micromamba activate snakePipes_CI
