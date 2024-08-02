@@ -13,7 +13,7 @@ requirements:
   host:
     - python >=3
   run:
-    - python >=3.7.0
+    - python >=3.10
     - snakemake >=6.2.1, <7.19.0
     - tabulate <0.9
     - pandas
