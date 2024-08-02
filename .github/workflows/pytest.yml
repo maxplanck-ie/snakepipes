@@ -41,7 +41,7 @@ jobs:
         cache-downloads: true
     - name: Install snakePipes
       run: |
-        micromamba run -n snakePipes_CI python -m pip install .
+        micromamba run -n snakePipes_CI python -m pip install .[actions]
     - name: pytest
       run: |
         micromamba activate snakePipes_CI
@@ -64,7 +64,7 @@ jobs:
         cache-downloads: true
     - name: Install snakePipes
       run: |
-        micromamba run -n snakePipes_CI python -m pip install .
+        micromamba run -n snakePipes_CI python -m pip install .[actions]
     - name: pytest
       run: |
         micromamba activate snakePipes_CI
