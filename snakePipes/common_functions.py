@@ -695,14 +695,26 @@ def print_DAG(args, snakemake_cmd, callingScript, defaults):
     if args.createDAG:
         config = defaults
         config.update(vars(args))
-        workflowName = os.path.basename(callingScript)
+        workflowName = os.path.basename(callingScript).replace('.py', '')
         oldVerbose = config['verbose']
         config['verbose'] = False
-        write_configfile(os.path.join(args.outdir, '{}.config.yaml'.format(workflowName)), config)
-        DAGproc = subprocess.Popen(snakemake_cmd + " --rulegraph ", stdout=subprocess.PIPE, shell=True)
-        subprocess.check_call("dot -Tpdf -o{}/{}_pipeline.pdf".format(args.outdir, workflowName), stdin=DAGproc.stdout, shell=True)
+        write_configfile(
+            os.path.join(args.outdir,
+                         '{}.config.yaml'.format(workflowName)), config)
+
+        DAGproc = subprocess.Popen(
+            snakemake_cmd + " --rulegraph ", 
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            shell=True)
+
+        subprocess.check_call(
+            "dot -Tpdf -o{}/{}_pipeline.pdf".format(args.outdir, workflowName), 
+            stdin=DAGproc.stdout, shell=True)
         config['verbose'] = oldVerbose
-        write_configfile(os.path.join(args.outdir, '{}.config.yaml'.format(workflowName)), config)
+        write_configfile(
+            os.path.join(args.outdir, '{}.config.yaml'.format(workflowName)),
+            config)
 
 
 def logAndExport(args, workflowName):
