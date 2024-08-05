@@ -183,7 +183,7 @@ rule multiqc:
     params:
         odir="multiqc",
     benchmark:
-        "{params.odir}/.benchmark/multiqc.benchmark"
+        "multiqc/.benchmark/multiqc.benchmark"
     threads: 1
     conda:
         CONDA_MAKEPAIRS_ENV
