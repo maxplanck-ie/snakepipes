@@ -25,6 +25,8 @@ rule bwa_mapping:
       fna = lambda wildcards, input: Path(input.ix).with_suffix('')
     resources:
       mem_mb = 3000
+    benchmark:
+        "bam/.benchmark/bwa_mapping.{sample}.{ref}.benchmark"
     conda: CONDA_MAKEPAIRS_ENV
     shell:
         """
@@ -48,6 +50,8 @@ rule pairtools_parse:
         minmapq = 40,
         cols = lambda wildcards: '--add-columns XB,AS,XS' if 'diploid_genome' in wildcards.ref else ''
     threads: 12
+    benchmark:
+        "pairs/.benchmark/pairtools_parse.{sample}.{ref}.benchmark"
     conda: CONDA_MAKEPAIRS_ENV
     shell:
         """
@@ -70,6 +74,8 @@ rule pairtools_phase:
         hap1 = strains[0],
         hap2 = strains[1]
     threads: 12
+    benchmark:
+        "pairs/.benchmark/pairtools_phase.{sample}.benchmark"
     conda: CONDA_MAKEPAIRS_ENV
     shell:
         """
@@ -86,6 +92,8 @@ rule pairtools_sort:
     output:
         pairs = "pairs/{sample}.{ref}.pairs.sorted.gz"
     threads: 20
+    benchmark:
+        "pairs/.benchmark/pairtools_sort.{sample}.{ref}.benchmark"
     conda: CONDA_MAKEPAIRS_ENV
     shell:
         """
@@ -104,6 +112,8 @@ rule pairtools_dedup:
     params:
         extra_cols = lambda wildcards: '--extra-col-pair phase1 phase2'  if 'diploid' in wildcards.ref else ''
     threads: 12
+    benchmark:
+        "pairs/.benchmark/pairtools_dedup.{sample}.{ref}.benchmark"
     conda: CONDA_MAKEPAIRS_ENV
     shell:
         """
@@ -127,6 +137,8 @@ rule pairtools_filter_phased:
         filterparam = lambda wildcards: PHASEDIC[wildcards.phasetype]
     resources:
         mem_mb = 1000
+    benchmark:
+        "phase_stats/.benchmark/pairtools_filter_phased.{sample}.diploid_genome_{phasetype}.benchmark"
     threads: 12
     conda: CONDA_MAKEPAIRS_ENV
     shell:
@@ -154,6 +166,8 @@ rule multiqc:
         html = "multiqc/multiqc_report.html"
     params:
         odir = "multiqc"
+    benchmark:
+        "{params.odir}/.benchmark/multiqc.benchmark"
     threads: 1
     conda: CONDA_MAKEPAIRS_ENV
     shell:

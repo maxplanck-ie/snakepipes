@@ -11,6 +11,8 @@ rule diploid_genome:
     output:
         genome = "genome/diploid_genome.fa.gz"
     threads: 4
+    benchmark:
+        "genome/.benchmark/diploid_genome.benchmark"
     params:
         hap1 = strains[0],
         hap2 = strains[1]
