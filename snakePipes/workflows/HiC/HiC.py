@@ -21,7 +21,8 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          "snakemakeOptions": "--use-conda", "tempDir": None,
                          "downsample": False, "trim": False,
                          "trimmer": "cutadapt", "trimmerOptions": "",
-                         "fastqc": False, "aligner": None, "binSize": 10000, "noTAD": False,
+                         "fastqc": False, "aligner": None, "binSize": 10000,
+                         "noTAD": False,
                          "RFResolution": False, "correctionMethod": "KR",
                          "enzyme": "HindIII", "restrictRegion": None,
                          "mergeSamples": False, "nBinsToMerge": 0,
@@ -48,12 +49,12 @@ def parse_args(defaults={"verbose": False, "configFile": None,
     optional = parser.add_argument_group('Options')
 
     parserCommon.commonOptions(optional, defaults, bw=False, plots=False)
-    
-    optional.add_argument("--aligner",
-                          help="Program used for mapping: bwa or bwa-mem2 (default: '%(default)s').",
-                          choices=["bwa","bwa-mem2"],
-                          default=defaults["aligner"])
 
+    optional.add_argument("--aligner",
+                          help="Program used for mapping: bwa or bwa-mem2 \
+                               (default: '%(default)s').",
+                          choices=["bwa", "bwa-mem2"],
+                          default=defaults["aligner"])
 
     optional.add_argument("--RFResolution",
                           action="store_true",
@@ -74,7 +75,8 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                           metavar="INT",
                           help="Create Hi-C matrices at the given binSize. "
                                "This option is mutally exclusive with the "
-                               "`--RFResolution` option (default: '%(default)s')",
+                               "`--RFResolution` option \
+                               (default: '%(default)s')",
                           default=defaults["binSize"])
 
     optional.add_argument("--restrictRegion",
@@ -88,7 +90,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
 
     optional.add_argument("--mergeSamples",
                           action="store_true",
-                          help="Merge the HiC matrices and create a new matrix."
+                          help="Merge HiC matrices and create a new matrix."
                                " If this option is specified togather with "
                                "`--sampleInfo` (see below), the samples would "
                                "be merged based on the defined groups. "
@@ -105,12 +107,14 @@ def parse_args(defaults={"verbose": False, "configFile": None,
     optional.add_argument("--findTADParams",
                           type=str,
                           metavar="STR",
-                          help="parameters for HiCFindTADs. (default: '%(default)s')",
+                          help="parameters for HiCFindTADs. \
+                               (default: '%(default)s')",
                           default=defaults["findTADParams"])
 
     optional.add_argument("--noTAD",
                           action="store_true",
-                          help="Stop the pipeline before TAD calling. (default: '%(default)s')",
+                          help="Stop the pipeline before TAD calling. \
+                               (default: '%(default)s')",
                           default=defaults["noTAD"])
 
     optional.add_argument("--noCorrect",
@@ -168,21 +172,22 @@ def main():
     args = parser.parse_args()
     args, defaults = cf.handleUserArgs(args, defaults, parse_args)
 
-    # we also add these paths to config, although we don't use them in the Snakefile
+    # add these paths to config, although we don't use them in the Snakefile
     args.baseDir = baseDir
 
     # Common arguments
     cf.checkCommonArguments(args, baseDir, outDir=True)
 
     # Handle YAML and log files
-    snakemake_cmd = cf.commonYAMLandLogs(baseDir, workflowDir, defaults, args, __file__)
+    snakemake_cmd = cf.commonYAMLandLogs(
+         baseDir, workflowDir, defaults, args, __file__)
     logfile_name = cf.logAndExport(args, os.path.basename(__file__))
 
     # Run everything
     cf.runAndCleanup(args, snakemake_cmd, logfile_name)
 
-    #CreateDAG
-    cf.print_DAG(args,snakemake_cmd, __file__,defaults)
+    # CreateDAG
+    cf.print_DAG(args, snakemake_cmd, __file__, defaults)
 
 
 if __name__ == "__main__":
