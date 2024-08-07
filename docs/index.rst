@@ -20,6 +20,7 @@ Pipeline                            Description
 :ref:`ChIPSeq`                  Use the DNA mapping output and run ChIP/Input normalization and peak calling
 :ref:`ATACseq`                  Use the DNA mapping output and detect open chromatin regions for ATACseq data
 :ref:`HiC`                      HiC analysis workflow, from mapping to TAD calling
+:ref:`makePairs`                pairtools workflow, from allele-specific mapping to HiC matrices
 :ref:`ncRNAseq`                 ncRNAseq workflow : From mapping to differential expression of genes and repeat elements using DESeq2
 :ref:`mRNASeq`                  RNASeq workflow : From mapping to differential expression using DESeq2
 :ref:`scRNASeq`                 Single-cell RNA-Seq (CEL-Seq2) workflow : From mapping to differential expression
@@ -116,6 +117,7 @@ Contents:
    content/workflows/ChIPseq.rst
    content/workflows/ATACseq.rst
    content/workflows/HiC.rst
+   content/workflows/makePairs.rst
    content/workflows/preprocessing.rst
    content/workflows/mRNAseq.rst
    content/workflows/ncRNAseq.rst
