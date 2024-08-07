@@ -96,18 +96,18 @@ Structure of output directory
 -----------------------------
 
 In addition to the FASTQ module results (see :ref:`running_snakePipes`), the workflow produces the following outputs::
-    
+
     .
-    ├── bam
-    ├── FASTQ
-    ├── FastQC
-    ├── FastQC_trimmed
-    ├── FASTQ_fastp
-    ├── genome
-    ├── multiqc
-    ├── originalFASTQ
-    ├── pairs
-    └── phase_stats
+    |-- bam
+    |-- FASTQ
+    |-- FastQC
+    |-- FastQC_trimmed
+    |-- FASTQ_fastp
+    |-- genome
+    |-- multiqc
+    |-- originalFASTQ
+    |-- pairs
+    |-- phase_stats
  
 
 * **bam** folder contains the mapping results in BAM format. The files were obtained after running `bwa <https://github.com/lh3/bwa>`__ in paired-end mode.
