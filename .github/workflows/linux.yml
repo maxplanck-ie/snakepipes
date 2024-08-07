@@ -24,8 +24,8 @@ jobs:
         cache-downloads: true
     - name: Install snakePipes
       run: |
-        micromamba run -n snakePipes_CI python -m pip install .
-        micromamba run -n snakePipes_CI python -m pip install -r docs/requirements.txt
+        micromamba run -n snakePipes_CI python -m pip install .[docs]
+#        micromamba run -n snakePipes_CI python -m pip install -r docs/requirements.txt
     - name: docs
       run: |
         micromamba activate snakePipes_CI
