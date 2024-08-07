@@ -75,4 +75,5 @@ lint.select = ["E", "F", "W", "B"]
 lint.ignore = [
     "E722", # bare excepts
     "E501", # line length
+    "B006", # Do not use mutable data structures for argument defaults
 ]
