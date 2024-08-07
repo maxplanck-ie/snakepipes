@@ -17,10 +17,16 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          "clusterConfigFile": None, "maxJobs": 5,
                          "snakemakeOptions": "--use-conda", "tempDir": None,
                          "downsample": False,
-                         "trim": False, "trimmer": "cutadapt",
+                         "trim": False, "trimmer": "fastp",
                          "trimmerOptions": None, "fastqc": False,
                          "reads": ["_R1", "_R2"], "ext": ".fastq.gz",
-                         "fromBAM": False, "bamExt": ".bam"}):
+                         "fromBAM": False, "bamExt": ".bam",
+                         "aligner": "bwa",
+                         "alignerOptions": "-SPu -T0",
+                         "plotFormat": "png",
+                         "UMIDedup": False,
+                         "UMIDedupOpts": "", "bcPattern": "NNNNCCCCCCCCC",
+                         "UMIDedupSep": "_", "UMIBarcode": False}):
     """
     Parse arguments from the command line.
     """
@@ -38,7 +44,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
     # Workflow options
     optional = parser.add_argument_group('Options')
 
-    parserCommon.commonOptions(optional, defaults, bw=True)
+    parserCommon.commonOptions(optional, defaults, bw=False)
 
     optional.add_argument("--aligner",
                           help="Program used for mapping: BWA \
