@@ -33,6 +33,7 @@ Workflows available
 - ATACseq*
 - scRNAseq
 - HiC
+- makePairs*
 - Whole Genome Bisulfite Seq/WGBS
 
 **(*Also available in "allele-specific" mode)**
@@ -40,6 +41,8 @@ Workflows available
 Installation
 -------------
 
+with conda
+^^^^^^^^^^
 Snakepipes is a set of Snakemake workflows which use conda for installation and dependency resolution, so you will need to `install conda <https://conda.io/docs/user-guide/install/index.html>`__ first.
 
 Afterward, simply run the following:
@@ -65,6 +68,19 @@ found using ``snakePipes info`` command.
 
 2. **Modify the cluster.yaml file appropriately** : This yaml file contains settings for your cluster scheduler (SGE/slurm).
 Location revealed using ``snakePipes info`` command.
+
+with conda and pip
+^^^^^^^^^^^^^^^^^^
+.. code-block:: bash
+
+    # create conda env
+    conda create --name snakePipes python=3.10
+
+    # activate env
+    conda activate snakePipes
+
+    # pip install
+    pip install -e .
 
 
 Documentation
