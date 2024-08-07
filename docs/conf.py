@@ -177,7 +177,7 @@ if not on_rtd:  # only import and set the theme if we're building docs locally
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-#html_static_path = ['_static']
+# html_static_path = ['_static']
 
 # Add any extra paths that contain custom files (such as robots.txt or
 # .htaccess) here, relative to this directory. These files are copied
@@ -262,7 +262,15 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
-latex_documents = [(master_doc, 'snakePipes.tex', u'snakePipes Documentation', u'MPI-IE', 'manual'), ]
+latex_documents = [
+    (
+        master_doc,
+        'snakePipes.tex',
+        u'snakePipes Documentation',
+        u'MPI-IE',
+        'manual'
+    ),
+]
 
 # The name of an image file (relative to this directory) to place at the top of
 # the title page.
@@ -289,7 +297,15 @@ latex_documents = [(master_doc, 'snakePipes.tex', u'snakePipes Documentation', u
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [(master_doc, 'snakepipes', u'snakePipes Documentation', [author], 1)]
+man_pages = [
+    (
+        master_doc,
+        'snakepipes',
+        u'snakePipes Documentation',
+        [author],
+        1
+    )
+]
 
 # If true, show URL addresses after external links.
 # man_show_urls = False
@@ -301,7 +317,16 @@ man_pages = [(master_doc, 'snakepipes', u'snakePipes Documentation', [author], 1
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'snakePipes', u'snakePipes Documentation', author, 'snakePipes', 'One line description of project.', 'Miscellaneous'), ]
+    (
+        master_doc,
+        'snakePipes',
+        u'snakePipes Documentation',
+        author,
+        'snakePipes',
+        'One line description of project.',
+        'Miscellaneous'
+    ),
+]
 
 # Documents to append as an appendix to all manuals.
 # texinfo_appendices = []
@@ -327,8 +352,9 @@ epub_copyright = copyright
 # The basename for the epub file. It defaults to the project name.
 # epub_basename = project
 
-# The HTML theme for the epub output. Since the default themes are not optimized
-# for small screen space, using the same theme for HTML and epub output is
+# The HTML theme for the epub output.
+# Since the default themes are not optimized for small screen space,
+# using the same theme for HTML and epub output is
 # usually not wise. This defaults to 'epub', a theme designed to save visual
 # space.
 # epub_theme = 'epub'

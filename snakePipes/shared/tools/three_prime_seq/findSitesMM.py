@@ -4,6 +4,7 @@ import argparse
 import py2bit
 from deeptoolsintervals import GTF, tree
 from deeptoolsintervals.parse import openPossiblyCompressed, parseExonBounds, findRandomLabel
+import sys
 
 parser = argparse.ArgumentParser(description="Generate a blacklist file of polyX stretches of a given minimum length not within a specified distance of a TES")
 parser.add_argument("--output", "-o", help="Output file", required=True)
@@ -113,7 +114,7 @@ class TES(GTF):
         assert(line)  # This will only fail on empty files
         line = line.strip()
 
-        ftype = self.inferType(fp, line, labelColumn)
+        self.ftype = self.inferType(fp, line, labelColumn)
         self.parseBED(fp, line, 12, labelColumn)
         fp.close()
 
@@ -163,7 +164,7 @@ last =  [None, None, None]
 
 for chrom, chromLength in tb.chroms().items():
     s = tb.sequence(chrom)
-    
+
     idx = 0
     idx2 = 0
     while idx < chromLength - args.windowLength:

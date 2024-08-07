@@ -20,7 +20,7 @@ def parse_arguments():
 
     subparsers = parser.add_subparsers(title="Commands", dest="command")
 
-    infoParser = subparsers.add_parser(
+    subparsers.add_parser(
         "info", help="Print the location of the various yaml files"
     )
 
@@ -31,7 +31,7 @@ def parse_arguments():
         "option will result in ALL conda environments being recreated.",
     )
 
-    envInfoParser = subparsers.add_parser(
+    subparsers.add_parser(
         "envInfo",
         help="Prints the location in which each conda environment is actually stored.",
     )
@@ -45,7 +45,7 @@ def parse_arguments():
        "Use with caution."
     )
 
-    
+
     createEnvsParser.add_argument(
         "--only",
         nargs="+",
@@ -53,12 +53,6 @@ def parse_arguments():
         "This should typically only be done for testing purposes. The "
         "possible environments are: {}".format(cof.set_env_yamls().keys()),
     )
-
-#    createEnvsParser.add_argument(
-#        "--force",
-#        action="store_true",
-#        help="Force creation of conda environments, even if they apparently exist.",
-#    )
 
     createEnvsParser.add_argument(
         "--info",

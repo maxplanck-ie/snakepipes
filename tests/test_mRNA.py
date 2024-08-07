@@ -36,7 +36,7 @@ def createTestData(fp):
       "genes_gtf" : gtfout.as_posix(),
       "extended_coding_regions_gtf" : "",
       "blacklist_bed": "",
-      "ignoreForNormalization": "" 
+      "ignoreForNormalization": ""
     }
     # set up yaml
     yaml = YAML()
@@ -66,8 +66,8 @@ class TestmRNAseq:
           org
         ]
       )
-      assert Path('test_mrna/mRNAseq_snakePipes.done').is_file() == True
-    
+      assert Path('test_mrna/mRNAseq_snakePipes.done').is_file()
+
     def test_mrna4(self, ifs):
       org = ifs / 'org.yaml'
       clusterconfig = Path('tests') / 'data' / 'cluster_config.yaml'
@@ -83,5 +83,5 @@ class TestmRNAseq:
           org
         ]
       )
-      assert Path('test_mrna_4sample/mRNAseq_snakePipes.done').is_file() == True
+      assert Path('test_mrna_4sample/mRNAseq_snakePipes.done').is_file()
 

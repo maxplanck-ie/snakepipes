@@ -25,14 +25,13 @@ jobs:
     - name: Install snakePipes
       run: |
         micromamba run -n snakePipes_CI python -m pip install .[docs]
-#        micromamba run -n snakePipes_CI python -m pip install -r docs/requirements.txt
     - name: docs
       run: |
         micromamba activate snakePipes_CI
         snakePipes config --tempDir /tmp
         cd docs
         make html
-  flake:
+  lint:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -49,11 +48,10 @@ jobs:
     - name: Install snakePipes
       run: |
         micromamba run -n snakePipes_CI python -m pip install .[actions]
-    - name: flake
+    - name: ruff
       run: |
         micromamba activate snakePipes_CI
-        snakePipes config --tempDir /tmp
-        flake8 --ignore=E501,E722,E402 --exclude tests,docs/conf.py,build/lib/snakePipes/shared/tools/three_prime_seq,snakePipes/shared/tools/three_prime_seq .
+        ruff check .
   CI:
     runs-on: ubuntu-latest
     steps:

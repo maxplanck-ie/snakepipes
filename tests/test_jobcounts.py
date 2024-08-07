@@ -24,11 +24,10 @@ def parseSpOut(_s) -> int:
     except IndexError:
         return (0)
 
+
 def createTestData(fp, samples=9) -> None:
     yaml = YAML()
     yaml.boolean_representation = ['False', 'True']
-    #yaml.default_flow_style = False
-    #yaml.default_style = None
     # single end folder
     (fp / 'SE').mkdir()
     # paired end folder
@@ -46,7 +45,7 @@ def createTestData(fp, samples=9) -> None:
     (fp / 'allelic_bam_input' / 'deepTools_qc' / 'bamPEFragmentSize' / 'fragmentSize.metric.tsv' ).touch()
     (fp / 'allelic_bam_input' / 'Sambamba').mkdir(parents=True)
     (fp / 'allelic_bam_input' / 'bamCoverage' / 'allele_specific').mkdir(parents=True)
-    
+
     (fp / 'ref').mkdir()
     (fp / 'ref' / 'genes.gtf').touch()
     with open(fp / 'ref' / 'genome.fa', 'w') as f:
@@ -77,18 +76,18 @@ def createTestData(fp, samples=9) -> None:
         sample = s+1
         # SE
         (fp / "SE" / "sample{}_R1.fastq.gz".format(sample)).touch()
-        
+
         # PE
         (fp / "PE" / "sample{}_R1.fastq.gz".format(sample)).touch()
         (fp / "PE" / "sample{}_R2.fastq.gz".format(sample)).touch()
-        
+
         # bam_input
         (fp / "bam_input" / "sample{}.bam".format(sample)).touch()
         (fp / "bam_input" / "filtered_bam" / "sample{}.filtered.bam".format(sample)).touch()
         (fp / "bam_input" / "filtered_bam" / "sample{}.filtered.bam.bai".format(sample)).touch()
         (fp / "bam_input" / "Sambamba" / "sample{}.markdup.txt".format(sample)).touch()
         (fp / "bam_input" / "bamCoverage" / "sample{}.filtered.seq_depth_norm.bw".format(sample)).touch()
-        
+
         # allelic_bams
         (fp / "allelic_bam_input" / "sample{}.bam".format(sample)).touch()
         (fp / "allelic_bam_input" / "allelic_bams" / "sample{}.genome1.sorted.bam".format(sample)).touch()
@@ -251,7 +250,7 @@ class TestCreateindices:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 22 
+        assert parseSpOut(_p) == 22
     def test_DAG(self):
         ci = [
             'createIndices',
@@ -1575,7 +1574,7 @@ class TestmRNAseq:
     def test_allelic_count_fromBam_singlecomp(self, ifs):
         ci = [
             "mRNAseq",
-            '-i', 
+            '-i',
             ifs / 'allelic_bam_input' / 'allelic_bams',
             '-o',
             'outdir',
@@ -1654,7 +1653,7 @@ class TestmRNAseq:
             ifs / 'org.yaml',
             '--sampleSheet',
             ifs / 'sampleSheet_mc.tsv',
-            '-m', 
+            '-m',
             'allelic-mapping,deepTools_qc,alignment-free',
             '--VCFfile',
             ifs / 'allelic_input' / 'file.vcf.gz',
@@ -2057,7 +2056,7 @@ class TestATAC():
     def test_multicomp_default(self, ifs):
         ci = [
             "ATACseq",
-            '-d', 
+            '-d',
             ifs / 'bam_input',
             '--sampleSheet',
             ifs / 'sampleSheet_mc.tsv',
@@ -2072,7 +2071,7 @@ class TestATAC():
     def test_multicomp_genrich(self, ifs):
         ci = [
             "ATACseq",
-            '-d', 
+            '-d',
             ifs / 'bam_input',
             '--sampleSheet',
             ifs / 'sampleSheet_mc.tsv',
@@ -2089,7 +2088,7 @@ class TestATAC():
     def test_multicomp_HMMRATAC(self, ifs):
         ci = [
             "ATACseq",
-            '-d', 
+            '-d',
             ifs / 'bam_input',
             '--sampleSheet',
             ifs / 'sampleSheet_mc.tsv',
@@ -2156,6 +2155,7 @@ class TestHIC():
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
         assert parseSpOut(_p) == 102
+
     def test_ice(self, ifs):
         ci = [
             "HiC",
@@ -2173,6 +2173,7 @@ class TestHIC():
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
         assert parseSpOut(_p) == 111
+
     def test_trim(self, ifs):
         ci = [
             "HiC",
@@ -2189,6 +2190,7 @@ class TestHIC():
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
         assert parseSpOut(_p) == 111
+
     def test_dpnii(self, ifs):
         ci = [
             "HiC",
@@ -2206,6 +2208,7 @@ class TestHIC():
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
         assert parseSpOut(_p) == 102
+
     def test_notad(self, ifs):
         ci = [
             "HiC",
@@ -2222,6 +2225,7 @@ class TestHIC():
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
         assert parseSpOut(_p) == 93
+
     def test_bwamem2(self, ifs):
         ci = [
             "HiC",
@@ -2239,6 +2243,7 @@ class TestHIC():
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
         assert parseSpOut(_p) == 102
+
 
 class Testpreprocessing():
     def test_default(self, ifs):
@@ -2258,6 +2263,7 @@ class Testpreprocessing():
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
         assert parseSpOut(_p) == 84
+
     def test_DAG(self, ifs):
         ci = [
             "preprocessing",

@@ -56,7 +56,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                           help="Options that will be passed to Bowtie2 or bwa. You can specify things such as `--local` or "
                           "`--very-sensitive` here. The mate orientation and maximum insert size are specified "
                           "elsewhere. Read group information is set automatically. Note that you may need to escape "
-                          "the first - (e.g., '\--very-fast'). Default: '%(default)s'.",
+                          r"the first - (e.g., '\--very-fast'). Default: '%(default)s'.",
                           default=defaults["alignerOpts"])
 
     optional.add_argument("--cutntag",

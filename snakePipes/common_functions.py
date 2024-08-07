@@ -703,13 +703,13 @@ def print_DAG(args, snakemake_cmd, callingScript, defaults):
                          '{}.config.yaml'.format(workflowName)), config)
 
         DAGproc = subprocess.Popen(
-            snakemake_cmd + " --rulegraph ", 
+            snakemake_cmd + " --rulegraph ",
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             shell=True)
 
         subprocess.check_call(
-            "dot -Tpdf -o{}/{}_pipeline.pdf".format(args.outdir, workflowName), 
+            "dot -Tpdf -o{}/{}_pipeline.pdf".format(args.outdir, workflowName),
             stdin=DAGproc.stdout, shell=True)
         config['verbose'] = oldVerbose
         write_configfile(

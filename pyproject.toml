@@ -41,7 +41,7 @@ classifiers = [
 [project.optional-dependencies]
 actions = [
     "pytest",
-    "flake8",
+    "ruff",
     "ruamel.yaml"
 ]
 
@@ -66,3 +66,9 @@ preprocessing = "snakePipes.workflows.preprocessing.preprocessing:main"
 scRNAseq = "snakePipes.workflows.scRNAseq.scRNAseq:main"
 WGBS = "snakePipes.workflows.WGBS.WGBS:main"
 snakePipes = "snakePipes.snakePipes:main"
+
+[tool.ruff]
+exclude = [
+    "build"
+]
+line-length = 120

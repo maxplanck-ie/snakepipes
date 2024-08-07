@@ -10,7 +10,7 @@ Munge multiple outputs of countReadEnds into a single counts.tsv
 
 def munge(infiles, samples):
     final_df = list()
-    for fn, sample in zip(infiles, samples): 
+    for fn, sample in zip(infiles, samples, strict=False):
         df = pd.read_table(fn, header=0, index_col=None)
         df['Sample'] = sample
         df = df[['Gene', 'Counts', 'Sample']]

@@ -184,12 +184,12 @@ def main():
         if not args.sampleSheet:
             sys.exit("mode three-prime-seq requires a sampleSheet "
                      "(specified with --sampleSheet).\n")
-        aligner = "STAR"
-        alignerOptions = defaults['threePrimeAlignerOptions']
-        trimmerOptions = defaults['threePrimeTrimmerOptions']
-        trimmer = "fastp"
-        trim = True
-    
+        args.aligner = "STAR"
+        args.alignerOptions = defaults['threePrimeAlignerOptions']
+        args.trimmerOptions = defaults['threePrimeTrimmerOptions']
+        args.trimmer = "fastp"
+        args.trim = True
+
     ## End workflow-specific checks
 
     # Handle YAML and log files
