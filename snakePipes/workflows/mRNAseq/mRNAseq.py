@@ -173,7 +173,7 @@ def main():
     if args.fromBAM:
         args.aligner = "EXTERNAL_BAM"
     if "allelic-counting" in modeTemp and not args.fromBAM:
-        warnings.warn("--fromBAM is required with allelic-counting mode. Setting to True.")
+        warnings.warn("--fromBAM is required with allelic-counting mode. Setting to True.", stacklevel=2)
         args.fromBAM = True
     if "allelic-counting" in modeTemp:
         args.bamExt = ".sorted.bam"

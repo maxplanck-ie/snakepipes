@@ -403,7 +403,7 @@ def updateConfig(args):
             sys.exit("Config file not found\n")
     updatedDict = cof.merge_dicts(currentDict, d)
     cof.write_configfile(os.path.join(baseDir, "shared", "defaults.yaml"), updatedDict)
-    newDict = cof.load_configfile(
+    cof.load_configfile(
         os.path.join(baseDir, "shared", "defaults.yaml"), True, "Final Updated Config"
     )
 

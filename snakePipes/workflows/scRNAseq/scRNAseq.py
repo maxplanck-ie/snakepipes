@@ -25,7 +25,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          "filterGTF": "-v -P 'decay|pseudogene' ",
                          "bwBinSize": 10,
                          "plotFormat": "png",
-			 "mode": "STARsolo", "BCwhiteList": None, "STARsoloCoords": ["1","7","8","7"], "myKit": "CellSeq384", "skipVelocyto": False,
+                         "mode": "STARsolo", "BCwhiteList": None, "STARsoloCoords": ["1","7","8","7"], "myKit": "CellSeq384", "skipVelocyto": False,
                          "alevinLibraryType":"ISR", "prepProtocol":None, "expectCells" : None }):
     """
     Parse arguments from the command line.
@@ -47,7 +47,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                           dest="mode",
                           metavar="STR",
                           help="Analysis mode. Possible settings are 'Gruen, STARsolo and Alevin' Default: %(default)s",
-			  choices=['STARsolo','Alevin'],
+                          choices=['STARsolo','Alevin'],
                           type=str,
                           default=defaults["mode"])
 
