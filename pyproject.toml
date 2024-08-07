@@ -71,4 +71,8 @@ snakePipes = "snakePipes.snakePipes:main"
 exclude = [
     "build"
 ]
-line-length = 120
+lint.select = ["E", "F", "W", "B"]
+lint.ignore = [
+    "E722", # bare excepts
+    "E501", # line length
+]
