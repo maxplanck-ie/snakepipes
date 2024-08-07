@@ -96,6 +96,7 @@ Structure of output directory
 -----------------------------
 
 In addition to the FASTQ module results (see :ref:`running_snakePipes`), the workflow produces the following outputs::
+    
     .
     ├── bam
     ├── FASTQ
