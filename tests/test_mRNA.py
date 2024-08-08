@@ -53,7 +53,6 @@ def ifs(tmp_path_factory):
 class TestmRNAseq:
     def test_mrna(self, ifs):
       org = ifs / 'org.yaml'
-      clusterconfig = Path('tests') / 'data' / 'cluster_config.yaml'
       sp.run(
         [
           'mRNAseq',
@@ -61,8 +60,6 @@ class TestmRNAseq:
           Path('tests') / 'data' / 'mRNA_mIFNB',
           '-o',
           'test_mrna',
-          '--clusterConfig',
-          clusterconfig,
           org
         ]
       )
@@ -70,7 +67,6 @@ class TestmRNAseq:
 
     def test_mrna4(self, ifs):
       org = ifs / 'org.yaml'
-      clusterconfig = Path('tests') / 'data' / 'cluster_config.yaml'
       sp.run(
         [
           'mRNAseq',
@@ -78,8 +74,6 @@ class TestmRNAseq:
           Path('tests') / 'data' / 'mRNA_BcellPancreas',
           '-o',
           'test_mrna_4sample',
-          '--clusterConfig',
-          clusterconfig,
           org
         ]
       )
