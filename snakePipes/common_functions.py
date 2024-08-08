@@ -14,7 +14,6 @@ from thefuzz import fuzz
 import smtplib
 from email.message import EmailMessage
 from importlib.metadata import version
-import signal
 
 def set_env_yamls():
     """
@@ -633,7 +632,7 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
 
     # merge cluster config files: 1) global one, 2) workflow specific one, 3) user provided one
     cfg = load_configfile(os.path.join(baseDir, "shared", "defaults.yaml"), False, "defaults")
-    
+
     # Properly resolve snakemakeprofile
     cfg['snakemakeProfile'] = resolveSnakemakeProfile(cfg['snakemakeProfile'], baseDir)
 
@@ -720,7 +719,7 @@ def runAndCleanup(args, cmd, logfile_name):
        print("\n{}\n".format(cmd))
 
     # write log file
-    
+
     f = open(os.path.join(args.outdir, logfile_name), "w")
     f.write(" ".join(sys.argv) + "\n\n")
     f.write(cmd + "\n\n")

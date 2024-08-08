@@ -221,7 +221,7 @@ def envInfo():
 
     # Properly resolve the snakemake profile path
     profilePath = cof.resolveSnakemakeProfile(cf['snakemakeProfile'], baseDir)
-    
+
     # Find out condaEnvDir from snakemake profile
     f = open(profilePath / 'config.yaml')
     _p = yaml.load(f, Loader=yaml.FullLoader)
@@ -276,7 +276,7 @@ def createCondaEnvs(args):
     f.close()
     # Properly resolve the snakemake profile path
     profilePath = cof.resolveSnakemakeProfile(cf['snakemakeProfile'], baseDir)
-    
+
     # Find out condaEnvDir from snakemake profile
     f = open(profilePath / 'config.yaml')
     _p = yaml.load(f, Loader=yaml.FullLoader)
@@ -289,13 +289,13 @@ def createCondaEnvs(args):
         # no condaEnvDir set in profile, thus assume we can detect it
         condaEnvDir = detectCondaDir()
         _prefsource = f"Environment: $CONDA_PREFIX = {os.environ.get("CONDA_PREFIX")}"
-    
+
     # Remove trailing slashes as they screw up the hash calculation
     if condaEnvDir[-1] == '/':
         condaEnvDir = condaEnvDir[:-1]
 
     print(f"CondaEnvDir detected as: {condaEnvDir}, from {_prefsource}")
-    
+
     numberEnvs = len(cof.set_env_yamls().keys())
     envNum = 0
     for envName, env in cof.set_env_yamls().items():
@@ -331,16 +331,17 @@ def createCondaEnvs(args):
                     # Ensure an environment is fully removed on error
                     shutil.rmtree(os.path.join(condaEnvDir, h), ignore_errors=False)
                     sys.exit("There was an error when creating the environments!\n")
+            else:
+                print(f"Environment ({envNum}/{numberEnvs}) from {env} with hash {h} already exists!")
         else:
-            print(f"Would create environment ({envNum}/{numberEnvs}) from {env} with hash {h}")
+            if not os.path.exists(os.path.join(condaEnvDir, h)):
+                print(f"Would create environment ({envNum}/{numberEnvs}) from {env} with hash {h}")
+            else:
+                print(f"Environment ({envNum}/{numberEnvs}) from {env} with hash {h} already exists!")
 
         # Ignore site-packages
         if args.noSitePackages and not args.info:
-            fixSitePy(os.path.join(condaDirUse, h))
-
-    # Ignore site-packages in this env
-    if args.noSitePackages and not args.info:
-        fixSitePy(rootDir)
+            fixSitePy(os.path.join(condaEnvDir, h))
 
 def detectCondaDir():
     "Detect the default conda folder."
