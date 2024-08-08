@@ -13,12 +13,11 @@ jobs:
     - uses: actions/checkout@v4
     - uses: conda-incubator/setup-miniconda@v3
       with:
-        environment-file: .github/snakePipesEnvCI.yml
-        activate-environment: snakePipes_CI
+        environment-file: snakePipes/shared/rules/envs/rna_seq.yaml
+        activate-environment: snakepipes_RNAseq_environment_3.0
         condarc-file: .github/condarc.yml
     - name: create_starix
       run: |
-        micromamba activate rnaseqenv
         gunzip -c tests/data/genomes/genome_chr17.fa.gz > genome_chr17.fa
         gunzip -c tests/data/genomes/genes_chr17.gtf.gz > genes_chr17.gtf
         STAR --runThreadN 4 --runMode genomeGenerate --genomeDir tests/data/mRNA_STAR --genomeFastaFiles genome_chr17.fa --sjdbGTFfile genes_chr17.gtf --sjdbOverhang 100 --genomeSAindexNbases 12
