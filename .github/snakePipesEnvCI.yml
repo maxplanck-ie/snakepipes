@@ -1,5 +1,4 @@
 name: snakePipes_CI
 dependencies:
   - python >= 3.10
-  - mamba
   - graphviz
