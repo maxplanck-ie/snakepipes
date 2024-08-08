@@ -1,12 +1,9 @@
-#!/usr/bin/env python3
-
 __description__ = """
 MPI-IE workflow for RNA mapping and analysis
 
 usage example:
     RNAseq -i input-dir -o output-dir mm10
 """
-
 
 import argparse
 import os
@@ -138,7 +135,6 @@ def parse_args(defaults={"verbose": False, "configFile": None,
 
 def main():
     baseDir, workflowDir, defaults = cf.setDefaults(os.path.basename(__file__))
-
     # get command line arguments
     parser = parse_args(defaults)
     args = parser.parse_args()
@@ -201,7 +197,3 @@ def main():
 
     #CreateDAG
     cf.print_DAG(args,snakemake_cmd, __file__,defaults)
-
-
-if __name__ == "__main__":
-    main()
