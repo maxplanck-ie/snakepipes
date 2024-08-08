@@ -725,15 +725,11 @@ def runAndCleanup(args, cmd, logfile_name):
     f.write(" ".join(sys.argv) + "\n\n")
     f.write(cmd + "\n\n")
 
-    ferr = open(os.path.join(args.outdir, logfile_name.replace('log', 'err')), "w")
     # Run snakemake, stderr -> stdout is needed so readline() doesn't block
-    p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
     for _l in p.stdout:
         sys.stdout.write(_l.strip() + '\n')
         f.write(_l.strip() + '\n')
-    for _l in p.stderr:
-        sys.stderr.write(_l.strip() + '\n')
-        ferr.write(_l.strip() + '\n')
     p.wait()
 
     # Exit with an error if snakemake encountered an error
@@ -741,7 +737,6 @@ def runAndCleanup(args, cmd, logfile_name):
        if args.emailAddress:
            sendEmail(args, p.returncode)
        f.close()
-       ferr.close()
        sys.exit(p.returncode)
     else:
        Path(
@@ -750,7 +745,6 @@ def runAndCleanup(args, cmd, logfile_name):
        if os.path.exists(os.path.join(args.outdir, ".snakemake")):
            shutil.rmtree(os.path.join(args.outdir, ".snakemake"), ignore_errors=True)
     f.close()
-    ferr.close()
 
     # Send email if desired
     if args.emailAddress:
