@@ -683,7 +683,7 @@ def print_DAG(args, snakemake_cmd, callingScript, defaults):
             stderr=subprocess.PIPE,
             text=True,
             shell=True)
-        
+
         subprocess.check_call(
             "dot -Tpdf -o{}/{}_pipeline.pdf".format(args.outdir, workflowName),
             stdin=DAGproc.stdout, shell=True)
