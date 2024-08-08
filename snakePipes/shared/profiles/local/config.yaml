@@ -1,8 +1,7 @@
 cores: 2
 printshellcmds: True
 use-conda: True
-conda-prefix: /localenv/$USER/anaconda/snakepipes-envs
-conda-frontend: conda
+conda-prefix: /tmp
 default-resources:
   mem: 1G
   time: 300
