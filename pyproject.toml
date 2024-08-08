@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "snakePipes"
 description = 'Snakemake workflows and wrappers for NGS data processing from the MPI-IE'
 readme = "README.rst"
-version = "3.9.1"
+version = "4.0.0"
 keywords = [
     "DNAmapping",
     "ChIPSeq",
@@ -21,15 +21,12 @@ keywords = [
 authors = [
   {name = "Bioinfo-Core MPI-IE"}
 ]
-requires-python = ">=3.10"
+requires-python = ">= 3.10"
 dependencies = [
-    "snakemake >= 6.2.1, <7.19.0",
-    "psutil",
+    "snakemake >= 8",
     "pandas",
     "thefuzz",
-    "pyyaml >= 5.1",
-    "tabulate < 0.9",
-    "pulp == 2.7.0"
+    "pyyaml >= 5.1"
 ]
 classifiers = [
     "Intended Audience :: Bioinformaticians",
@@ -37,6 +34,9 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",   
 ]
+
+[tool.setuptools.package-data]
+snakePipes = ["**/*.yaml", "**/*.R", "**/*.Rmd", "**/*snakefile", "**/*Snakefile", "**/*sh"]
 
 [project.optional-dependencies]
 actions = [
@@ -46,11 +46,14 @@ actions = [
 ]
 
 docs = [
-    "sphinx==7.1.2",
-    "sphinx-rtd-theme==2.0.0",
-    "readthedocs-sphinx-search==0.3.2",
-    "sphinx-argparse==0.4.0",
+    "sphinx >= 7.1.2",
+    "sphinx-rtd-theme >= 2.0.0",
+    "readthedocs-sphinx-search >= 0.3.2",
+    "sphinx-argparse >= 0.4.0",
     "mock==5.1.0"
+]
+build = [
+    "build"
 ]
 
 [project.scripts]
