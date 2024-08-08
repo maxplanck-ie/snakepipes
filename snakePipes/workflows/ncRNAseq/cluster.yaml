@@ -1,8 +1,0 @@
-bamPE_fragment_size:
-    memory: 10G
-STAR:
-    memory: 6G
-DESeq2:
-    memory: 5G
-TEcounts:
-    memory: 16G
