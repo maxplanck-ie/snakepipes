@@ -16,7 +16,7 @@ jobs:
       with:
         environment-file: .github/snakePipesEnvCI.yml
         activate-environment: snakePipes_CI
-        cache-downloads: true
+        condarc-file: .github/condarc.yml
     - name: Install snakePipes
       run: |
         pip install .[docs]
@@ -33,7 +33,7 @@ jobs:
       with:
         environment-file: .github/snakePipesEnvCI.yml
         activate-environment: snakePipes_CI
-        cache-downloads: true
+        condarc-file: .github/condarc.yml
     - name: Install snakePipes
       run: |
         pip install .[actions]
@@ -48,7 +48,7 @@ jobs:
       with:
         environment-file: .github/snakePipesEnvCI.yml
         activate-environment: snakePipes_CI
-        cache-downloads: true
+        condarc-file: .github/condarc.yml
     - name: Install snakePipes
       run: |
         pip install .
@@ -90,7 +90,7 @@ jobs:
       with:
         environment-file: .github/snakePipesEnvCI.yml
         activate-environment: snakePipes_CI
-        cache-downloads: true
+        condarc-file: .github/condarc.yml
     - name: install snakePipes
       run: |
         pip install .
