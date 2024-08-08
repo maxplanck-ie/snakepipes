@@ -12,6 +12,7 @@ cluster-generic-submit-cmd:
 jobs: 20
 conda-prefix: /localenv/$USER/anaconda/snakepipes-envs
 use-conda: True
+conda-frontend: conda
 cluster-generic-cancel-cmd: "ccancel.sh"
 latency-wait: 300
 default-resources:
