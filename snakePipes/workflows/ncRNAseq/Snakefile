@@ -173,7 +173,6 @@ else:
 ### execute after  finished ####################################################
 ################################################################################
 onsuccess:
-    cf.cleanLogs(outdir, cluster_config)
     if "verbose" in config and config["verbose"]:
         print("\n--- ncRNAseq workflow finished successfully! ------------------------------------\n")
 

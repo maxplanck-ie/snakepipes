@@ -101,7 +101,6 @@ rule all:
 ### execute after  finished ####################################################
 ################################################################################
 onsuccess:
-    cf.cleanLogs(outdir, cluster_config)
     if "verbose" in config and config["verbose"]:
         print("\n--- Preprocessing workflow finished successfully! ------------------------------------\n")
 

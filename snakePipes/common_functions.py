@@ -472,24 +472,6 @@ def checkAlleleParams(args):
     return allele_mode
 
 
-def cleanLogs(d, cluster_config):
-    """
-    Remove all empty log files, both in cluster_logs/ and */logs/
-    """
-    if "snakePipes_cluster_logDir" in cluster_config:
-        path = os.path.join(d, cluster_config["snakePipes_cluster_logDir"], "*")
-        if re.search("^/", cluster_config["snakePipes_cluster_logDir"]):
-            path = os.path.join(cluster_config["snakePipes_cluster_logDir"], "*")
-        for f in glob.glob(path):
-            s = os.stat(f)
-            if s.st_size == 0:
-                os.remove(f)
-    for f in glob.glob(os.path.join(d, "*", "logs", "*")):
-        s = os.stat(f)
-        if s.st_size == 0:
-            os.remove(f)
-
-
 def check_sample_info_header(sampleSheet_file):
     """
     return True in case sample info file contains column names 'name' and 'condition'
@@ -735,43 +717,44 @@ def runAndCleanup(args, cmd, logfile_name):
     Also clean up when finished.
     """
     if args.verbose:
-        print("\n{}\n".format(cmd))
+       print("\n{}\n".format(cmd))
 
     # write log file
+    
     f = open(os.path.join(args.outdir, logfile_name), "w")
     f.write(" ".join(sys.argv) + "\n\n")
     f.write(cmd + "\n\n")
 
+    ferr = open(os.path.join(args.outdir, logfile_name.replace('log', 'err')), "w")
     # Run snakemake, stderr -> stdout is needed so readline() doesn't block
-    p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
-    # Dump stdout simultaneously to the logfile and to stdout
+    p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     for _l in p.stdout:
-        print(_l.strip())
+        sys.stdout.write(_l.strip() + '\n')
         f.write(_l.strip() + '\n')
+    for _l in p.stderr:
+        sys.stderr.write(_l.strip() + '\n')
+        ferr.write(_l.strip() + '\n')
     p.wait()
 
     # Exit with an error if snakemake encountered an error
-    if p.returncode != 0:
-        _m = f"Error: snakemake returned an error code of {p.returncode}, so processing is incomplete!\n"
-        f.write(_m)
-        sys.stderr.write(_m)
-        if args.emailAddress:
-            sendEmail(args, p.returncode)
-        f.close()
-        sys.exit(p.returncode)
-    else:
-        _m = f"Snakemake returned {p.returncode}, processing complete!\n"
-        f.write(_m)
-        Path(
-            os.path.join(args.outdir, "{}_snakePipes.done".format(logfile_name.split('_')[0]))
-        ).touch()
-        if os.path.exists(os.path.join(args.outdir, ".snakemake")):
-            shutil.rmtree(os.path.join(args.outdir, ".snakemake"), ignore_errors=True)
-    f.close()
+    #if p.returncode != 0:
+    #    if args.emailAddress:
+    #        sendEmail(args, p.returncode)
+    #    f.close()
+    #    ferr.close()
+    #    sys.exit(p.returncode)
+    #else:
+    #    Path(
+    #        os.path.join(args.outdir, "{}_snakePipes.done".format(logfile_name.split('_')[0]))
+    #    ).touch()
+    #    if os.path.exists(os.path.join(args.outdir, ".snakemake")):
+    #        shutil.rmtree(os.path.join(args.outdir, ".snakemake"), ignore_errors=True)
+    #f.close()
+    #ferr.close()
 
     # Send email if desired
-    if args.emailAddress:
-        sendEmail(args, 0)
+    #if args.emailAddress:
+    #    sendEmail(args, 0)
 
 
 def predict_chip_dict(wdir, input_pattern_str, bamExt, fromBAM=None):
