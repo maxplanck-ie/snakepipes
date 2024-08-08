@@ -737,24 +737,24 @@ def runAndCleanup(args, cmd, logfile_name):
     p.wait()
 
     # Exit with an error if snakemake encountered an error
-    #if p.returncode != 0:
-    #    if args.emailAddress:
-    #        sendEmail(args, p.returncode)
-    #    f.close()
-    #    ferr.close()
-    #    sys.exit(p.returncode)
-    #else:
-    #    Path(
-    #        os.path.join(args.outdir, "{}_snakePipes.done".format(logfile_name.split('_')[0]))
-    #    ).touch()
-    #    if os.path.exists(os.path.join(args.outdir, ".snakemake")):
-    #        shutil.rmtree(os.path.join(args.outdir, ".snakemake"), ignore_errors=True)
-    #f.close()
-    #ferr.close()
+    if p.returncode != 0:
+       if args.emailAddress:
+           sendEmail(args, p.returncode)
+       f.close()
+       ferr.close()
+       sys.exit(p.returncode)
+    else:
+       Path(
+           os.path.join(args.outdir, "{}_snakePipes.done".format(logfile_name.split('_')[0]))
+       ).touch()
+       if os.path.exists(os.path.join(args.outdir, ".snakemake")):
+           shutil.rmtree(os.path.join(args.outdir, ".snakemake"), ignore_errors=True)
+    f.close()
+    ferr.close()
 
     # Send email if desired
-    #if args.emailAddress:
-    #    sendEmail(args, 0)
+    if args.emailAddress:
+       sendEmail(args, 0)
 
 
 def predict_chip_dict(wdir, input_pattern_str, bamExt, fromBAM=None):
