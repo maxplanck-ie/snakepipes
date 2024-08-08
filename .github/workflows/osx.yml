@@ -53,5 +53,5 @@ jobs:
         run: |
           micromamba activate snakePipes_CI
           conda config --add subdirs osx-64
-          snakePipes createEnvs --autodetectCondaEnvDir --only ${{matrix.envs}}
+          snakePipes createEnvs --only ${{matrix.envs}}
      
