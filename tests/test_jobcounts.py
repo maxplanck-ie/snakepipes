@@ -8,21 +8,19 @@ GTF = "ftp://ftp.ensembl.org/pub/release-93/gtf/mus_musculus/Mus_musculus.GRCm38
 RMSK = "http://hgdownload.soe.ucsc.edu/goldenPath/dm6/database/rmsk.txt.gz"
 SPIKEINGENOME = "ftp://ftp.ensembl.org/pub/release-79/fasta/drosophila_melanogaster/dna/Drosophila_melanogaster.BDGP6.dna_sm.toplevel.fa.gz"
 SPIKEINGTF = "ftp://ftp.ensembl.org/pub/release-96/gtf/drosophila_melanogaster/Drosophila_melanogaster.BDGP6.22.96.gtf.gz"
-SMKOPTS = " --dryrun --conda-prefix /tmp -q "
-
+SMKOPTS = " --dryrun "
 
 def parseSpOut(_s) -> int:
     '''
     parse subprocess run output.
     Take stdout, split, and take the 'jobnumber' field.
+    The jobnumber field is assumed to be the list entry after 'total'
     Returns as int.
-    snakemake's last line in a quiet dryrun has:
-    totaljobs, jobcount, min threads and max threads.
     '''
-    try:
-        return (int(_s.stdout.split()[-3]))
-    except IndexError:
-        return (0)
+    for i in range(len(_s.stdout.split())-1):
+        if 'total' in _s.stdout.split()[i]:
+            return(int(_s.stdout.split()[i+1]))
+    return (0)
 
 
 def createTestData(fp, samples=9) -> None:
@@ -215,7 +213,7 @@ def ifs(tmp_path_factory):
     return fp
 
 class TestCreateindices:
-    def test_default(self):
+    def test_defaultkkkkkkkk(self):
         ci = [
             'createIndices',
             '-o',
