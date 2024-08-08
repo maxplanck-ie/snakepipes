@@ -14,7 +14,7 @@ from thefuzz import fuzz
 import smtplib
 from email.message import EmailMessage
 from importlib.metadata import version
-
+import signal
 
 def set_env_yamls():
     """
@@ -614,6 +614,25 @@ def checkCommonArguments(args, baseDir, outDir=False, createIndices=False, prepr
             sys.exit("Sorry, there is no email sender specified in defaults.yaml. Please specify one with --emailSender")
 
 
+def resolveSnakemakeProfile(profName, baseDir):
+    # if snakemakeProfile is a relative path, resolve it with baseDir
+    if Path(profName).is_absolute():
+        # Absolute path to a profile
+        assert Path(profName).is_dir()
+        return(Path(profName))
+    elif (Path(baseDir) / profName).resolve().is_dir():
+        # Profile is shipped within the repo
+        return((Path(baseDir) / profName).resolve())
+    else:
+        # relative path + not in repodir, assume it's under snakemake default locations:
+        _l = (Path('etc', 'xdg', 'snakemake') / profName)
+        if _l.is_dir():
+            return(_l)
+        _l = (Path('~/.config/snakemake') / profName).expanduser()
+        if _l.is_dir():
+            return(_l)
+    sys.exit(f"No directory found for snakemake profile {profName}")
+
 def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
     """
     Merge dictionaries, write YAML files, construct the snakemake command
@@ -632,26 +651,9 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
 
     # merge cluster config files: 1) global one, 2) workflow specific one, 3) user provided one
     cfg = load_configfile(os.path.join(baseDir, "shared", "defaults.yaml"), False, "defaults")
-    if os.path.isfile(os.path.join(baseDir, cfg['clusterConfig'])):
-        cluster_config = load_configfile(os.path.join(baseDir, cfg['clusterConfig']), False)
-    else:
-        cluster_config = load_configfile(os.path.join(cfg['clusterConfig']), False)
-    cluster_config = merge_dicts(cluster_config, load_configfile(os.path.join(workflowDir, "cluster.yaml"), False), )
-
-    if args.clusterConfigFile:
-        user_cluster_config = load_configfile(args.clusterConfigFile, False)
-        cluster_config = merge_dicts(cluster_config, user_cluster_config)  # merge/override variables from user_config.yaml
-    # Ensure the cluster log directory exists
-    if re.search("\\{snakePipes_cluster_logDir\\}", cluster_config["snakemake_cluster_cmd"]):
-        if "snakePipes_cluster_logDir" in cluster_config:
-            if re.search("^/", cluster_config["snakePipes_cluster_logDir"]):
-                os.makedirs(cluster_config["snakePipes_cluster_logDir"], exist_ok=True)
-            else:
-                os.makedirs(os.path.join(args.outdir, cluster_config["snakePipes_cluster_logDir"]), exist_ok=True)
-            cluster_config["snakemake_cluster_cmd"] = re.sub("\\{snakePipes_cluster_logDir\\}", cluster_config["snakePipes_cluster_logDir"], cluster_config["snakemake_cluster_cmd"])
-        else:
-            sys.exit("\nPlease provide a key 'snakePipes_cluster_logDir' and value in the cluster configuration file!\n")
-    write_configfile(os.path.join(args.outdir, '{}.cluster_config.yaml'.format(workflowName)), cluster_config)
+    
+    # Properly resolve snakemakeprofile
+    cfg['snakemakeProfile'] = resolveSnakemakeProfile(cfg['snakemakeProfile'], baseDir)
 
     # Save the organism YAML file as {PIPELINE}_organism.yaml
     if workflowName != "preprocessing":
@@ -668,26 +670,18 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
     if args.keepTemp:
         args.snakemakeOptions += " --notemp"
 
-    snakemake_cmd = """
-                    TMPDIR={tempDir}
-                    UTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX);
-                    XDG_CACHE_HOME=$UTEMP TMPDIR={tempDir} PYTHONNOUSERSITE=True snakemake {snakemakeOptions} --latency-wait {latency_wait} --snakefile {snakefile} --jobs {maxJobs} --directory {workingdir} --configfile {configFile} --keep-going --use-conda --conda-prefix {condaEnvDir}
-                    """.format(latency_wait=cluster_config["snakemake_latency_wait"],
-                               snakefile=os.path.join(workflowDir, "Snakefile"),
-                               maxJobs=args.maxJobs,
-                               workingdir=args.workingdir,
-                               snakemakeOptions=str(args.snakemakeOptions or ''),
-                               tempDir=cfg["tempDir"],
-                               configFile=os.path.join(args.outdir, '{}.config.yaml'.format(workflowName)),
-                               condaEnvDir=cfg["condaEnvDir"]).split()
+    snakemake_cmd = f"TMPDIR={cfg['tempDir']}; \
+                    UTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX); \
+                    PYTHONNOUSERSITE=True snakemake \
+                    {str(args.snakemakeOptions or '')} \
+                    --snakefile {Path(workflowDir) / "Snakefile"} \
+                    --directory {args.workingdir} \
+                    --configfile {os.path.join(args.outdir, '{}.config.yaml'.format(workflowName))} \
+                    --profile {cfg['snakemakeProfile']}".split(' ')
 
     if args.verbose:
         snakemake_cmd.append("--printshellcmds")
 
-    if not args.local:
-        snakemake_cmd += ["--cluster-config",
-                          os.path.join(args.outdir, '{}.cluster_config.yaml'.format(workflowName)),
-                          "--cluster", "'" + cluster_config["snakemake_cluster_cmd"], "'"]
     return " ".join(snakemake_cmd)
 
 
@@ -749,36 +743,31 @@ def runAndCleanup(args, cmd, logfile_name):
     f.write(cmd + "\n\n")
 
     # Run snakemake, stderr -> stdout is needed so readline() doesn't block
-    p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    if args.verbose:
-        print("PID:", p.pid, "\n")
-
-    while p.poll() is None:
-        stdout = p.stdout.readline(1024)
-        if stdout:
-            sys.stdout.write(stdout.decode('utf-8'))
-            f.write(stdout.decode('utf-8'))
-            sys.stdout.flush()
-            f.flush()
-    # This avoids the race condition of p.poll() exiting before we get all the output
-    stdout = p.stdout.read()
-    if stdout:
-        sys.stdout.write(stdout.decode('utf-8'))
-        f.write(stdout.decode('utf-8'))
-    f.close()
+    p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+    # Dump stdout simultaneously to the logfile and to stdout
+    for _l in p.stdout:
+        print(_l.strip())
+        f.write(_l.strip() + '\n')
+    p.wait()
 
     # Exit with an error if snakemake encountered an error
     if p.returncode != 0:
-        sys.stderr.write("Error: snakemake returned an error code of {}, so processing is incomplete!\n".format(p.returncode))
+        _m = f"Error: snakemake returned an error code of {p.returncode}, so processing is incomplete!\n"
+        f.write(_m)
+        sys.stderr.write(_m)
         if args.emailAddress:
             sendEmail(args, p.returncode)
+        f.close()
         sys.exit(p.returncode)
     else:
+        _m = f"Snakemake returned {p.returncode}, processing complete!\n"
+        f.write(_m)
         Path(
             os.path.join(args.outdir, "{}_snakePipes.done".format(logfile_name.split('_')[0]))
         ).touch()
         if os.path.exists(os.path.join(args.outdir, ".snakemake")):
             shutil.rmtree(os.path.join(args.outdir, ".snakemake"), ignore_errors=True)
+    f.close()
 
     # Send email if desired
     if args.emailAddress:

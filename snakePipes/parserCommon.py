@@ -82,23 +82,6 @@ def mainArguments(defaults, workingDir=False, createIndices=False, preprocessing
                          help="configuration file: config.yaml (default: '%(default)s')",
                          default=defaults["configFile"])
 
-    general.add_argument("--clusterConfigFile",
-                         help="configuration file for cluster usage. In absence, the default options "
-                         "specified in defaults.yaml and workflows/[workflow]/cluster.yaml would be selected (default: '%(default)s')",
-                         default=defaults["clusterConfigFile"])
-
-    general.add_argument("-j", "--jobs",
-                         dest="maxJobs",
-                         metavar="INT",
-                         help="maximum number of concurrently submitted Slurm jobs / cores if workflow is run locally (default: '%(default)s')",
-                         type=int, default=defaults["maxJobs"])
-
-    general.add_argument("--local",
-                         dest="local",
-                         action="store_true",
-                         default=False,
-                         help="run workflow locally; default: jobs are submitted to Slurm queue (default: '%(default)s')")
-
     general.add_argument("--keepTemp",
                          action="store_true",
                          help="Prevent snakemake from removing files marked as being temporary (typically intermediate files that are rarely needed by end users). This is mostly useful for debugging problems.")
