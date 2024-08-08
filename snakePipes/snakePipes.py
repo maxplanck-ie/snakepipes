@@ -219,8 +219,17 @@ def envInfo():
     cf = yaml.load(f, Loader=yaml.FullLoader)
     f.close()
 
-    condaEnvDir=cf["condaEnvDir"]
-
+    # Properly resolve the snakemake profile path
+    profilePath = cof.resolveSnakemakeProfile(cf['snakemakeProfile'], baseDir)
+    
+    # Find out condaEnvDir from snakemake profile
+    f = open(profilePath / 'config.yaml')
+    _p = yaml.load(f, Loader=yaml.FullLoader)
+    f.close()
+    if 'conda-prefix' in _p:
+        condaEnvDir = _p['conda-prefix'].replace("$USER", os.environ.get("USER"))
+    else:
+        condaEnvDir = detectCondaDir()
 
     for env in cof.set_env_yamls().values():
         # Hash the file ala snakemake
@@ -230,8 +239,7 @@ def envInfo():
         md5hash.update(f.read())
         f.close()
         h = md5hash.hexdigest()
-
-        print("{} is in:\n    {}\n".format(env, os.path.join(condaEnvDir, h)))
+        print(f"{env}: {Path(condaEnvDir, h)}")
 
 
 def fixSitePy(envPath):
