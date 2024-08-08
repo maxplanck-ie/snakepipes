@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "snakePipes"
 description = 'Snakemake workflows and wrappers for NGS data processing from the MPI-IE'
 readme = "README.rst"
-version = "4.0.0"
+version = "3.0.0"
 keywords = [
     "DNAmapping",
     "ChIPSeq",
@@ -18,16 +18,11 @@ keywords = [
     "epigenetics workflows",
     "Illumina"
 ]
+
 authors = [
   {name = "Bioinfo-Core MPI-IE"}
 ]
-requires-python = ">= 3.10"
-dependencies = [
-    "snakemake >= 8",
-    "pandas",
-    "thefuzz",
-    "pyyaml >= 5.1"
-]
+
 classifiers = [
     "Intended Audience :: Bioinformaticians",
     "Intended Audience :: Biologists",
@@ -35,8 +30,15 @@ classifiers = [
     "Programming Language :: Python :: 3",   
 ]
 
-[tool.setuptools.package-data]
-snakePipes = ["**/*.yaml", "**/*.R", "**/*.Rmd", "**/*snakefile", "**/*Snakefile", "**/*sh"]
+requires-python = ">= 3.10"
+
+dependencies = [
+    "snakemake >= 8",
+    "pandas",
+    "thefuzz",
+    "pyyaml >= 5.1",
+    "snakemake-executor-plugin-cluster-generic >= 1.0.9"
+]
 
 [project.optional-dependencies]
 actions = [
@@ -55,6 +57,9 @@ docs = [
 build = [
     "build"
 ]
+
+[tool.setuptools.package-data]
+snakePipes = ["**/*.yaml", "**/*.R", "**/*.Rmd", "**/*snakefile", "**/*Snakefile", "**/*sh"]
 
 [project.scripts]
 ATACseq = "snakePipes.workflows.ATACseq.ATACseq:main"
