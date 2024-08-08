@@ -213,7 +213,7 @@ def ifs(tmp_path_factory):
     return fp
 
 class TestCreateindices:
-    def test_defaultkkkkkkkk(self):
+    def test_default(self):
         ci = [
             'createIndices',
             '-o',
