@@ -12,22 +12,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - uses: mamba-org/setup-micromamba@main
+    - uses: conda-incubator/setup-miniconda@v3
       with:
         environment-file: .github/snakePipesEnvCI.yml
-        condarc: |
-          channels:
-            - conda-forge
-            - bioconda
-            - defaults
-          channel_priority: 'strict'
+        activate-environment: snakePipes_CI
         cache-downloads: true
     - name: Install snakePipes
       run: |
-        micromamba run -n snakePipes_CI python -m pip install .[docs]
+        pip install .[docs]
     - name: docs
       run: |
-        micromamba activate snakePipes_CI
         snakePipes config --tempDir /tmp
         cd docs
         make html
@@ -35,43 +29,31 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - uses: mamba-org/setup-micromamba@main
+    - uses: conda-incubator/setup-miniconda@v3
       with:
         environment-file: .github/snakePipesEnvCI.yml
-        condarc: |
-          channels:
-            - conda-forge
-            - bioconda
-            - defaults
-          channel_priority: 'strict'
+        activate-environment: snakePipes_CI
         cache-downloads: true
     - name: Install snakePipes
       run: |
-        micromamba run -n snakePipes_CI python -m pip install .[actions]
+        pip install .[actions]
     - name: ruff
       run: |
-        micromamba activate snakePipes_CI
         ruff check .
   CI:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - uses: mamba-org/setup-micromamba@main
+    - uses: conda-incubator/setup-miniconda@v3
       with:
         environment-file: .github/snakePipesEnvCI.yml
-        condarc: |
-          channels:
-            - conda-forge
-            - bioconda
-            - defaults
-          channel_priority: 'strict'
+        activate-environment: snakePipes_CI
         cache-downloads: true
     - name: Install snakePipes
       run: |
-        micromamba run -n snakePipes_CI python -m pip install .
+        pip install .
     - name: CI
       run: |
-        micromamba activate snakePipes_CI
         snakePipes config --tempDir /tmp
         ./.ci_stuff/test_dag.sh
   createEnvs:
@@ -103,22 +85,16 @@ jobs:
         ]
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - uses: mamba-org/setup-micromamba@main
+    - uses: actions/checkout@v4
+    - uses: conda-incubator/setup-miniconda@v3
       with:
         environment-file: .github/snakePipesEnvCI.yml
-        condarc: |
-          channels:
-            - conda-forge
-            - bioconda
-            - defaults
-          channel_priority: 'strict'
+        activate-environment: snakePipes_CI
         cache-downloads: true
     - name: install snakePipes
       run: |
-        micromamba run -n snakePipes_CI python -m pip install .
+        pip install .
     - name: createEnvs
       run: |
-        micromamba activate snakePipes_CI
         snakePipes config --tempDir /tmp
         snakePipes createEnvs --autodetectCondaEnvDir --only ${{matrix.envs}}
