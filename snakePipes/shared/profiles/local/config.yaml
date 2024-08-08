@@ -2,6 +2,7 @@ cores: 2
 printshellcmds: True
 use-conda: True
 conda-prefix: /tmp
+conda-frontend: conda
 default-resources:
   mem: 1G
   time: 300
