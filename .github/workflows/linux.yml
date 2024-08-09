@@ -97,4 +97,4 @@ jobs:
     - name: createEnvs
       run: |
         snakePipes config --tempDir /tmp
-        snakePipes createEnvs --autodetectCondaEnvDir --only ${{matrix.envs}}
+        snakePipes createEnvs --only ${{matrix.envs}}
