@@ -3,17 +3,13 @@
 Setting up snakePipes
 =====================
 
-Unlike many other pipelines, setting up snakePipes is easy! All you need is a *linux/OSX system* with *python3-mamba* installation. In past versions, snakePipes was using conda. We are now moving forward with mamba: a Python-based CLI conceived as a drop-in replacement for conda, offering higher speed and more reliable environment solutions to our snakePipes workflows thanks to the bindings over _libsolv_.
+Unlike many other pipelines, setting up snakePipes is easy! All you need is a *linux/OSX system* with a working *conda* installation.
+Note that mamba used to be a pre-requisite for snakePipes, but this requirement has been removed since libmamba is the default solver in recent conda installations.
 
-Installing conda & mamba
-------------------------
+Installing conda
+----------------
 
-Follow the instructions `here <https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html>`__ to install either miniconda or anaconda first. Once you have already installed either miniconda or anaconda, you may simply `add mamba to your base environment <https://mamba.readthedocs.io/en/latest/installation.html#existing-conda-install>`__
-
-.. code-block:: bash
-
-    $ conda install mamba -c conda-forge
-
+Follow the instructions `here <https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html>`__ to install either miniconda or anaconda first.
 After installation, check your python path and version :
 
 .. code-block:: bash
@@ -25,9 +21,6 @@ After installation, check your python path and version :
     $ Python 3.6.5 :: Anaconda, Inc.
 
 
-Now we are ready to install snakePipes latest release using ``mamba``.
-
-
 Installing snakePipes
 ---------------------
 
@@ -35,7 +28,7 @@ The easiest way to install snakePipes is via our conda channel. The following co
 
 .. code:: bash
 
-    mamba create -n snakePipes -c mpi-ie -c conda-forge -c bioconda snakePipes
+    conda create -n snakePipes -c mpi-ie -c conda-forge -c bioconda snakePipes
 
 This way, the software used within snakePipes do not conflict with the software pre-installed on your terminal or in your python environment.
 
@@ -45,27 +38,57 @@ Now, we should activate this environment:
 
     conda activate snakePipes
 
-Finally, in order to create the workflow environments, we'll need to adjust the path under ``defaults.yaml`` settings file. Please continue reading about all global options.
+Configuring snakePipes
+----------------------
 
-Modify global options
----------------------
-
-To see the location of the various YAML files so you can manually inspect them, you can use:
+Finally, at least one file (``defaults.yaml``) should be modified to match your compute infrastructure. The location of this file can be found out by executing:
 
 .. code:: bash
 
     snakePipes info
 
-This would show the locations of:
+This would return you where the global configuration file is located.
+Two fields are important to set:
 
- * **defaults.yaml** Defines default tool and file paths. See :ref:`conda`
- * **cluster.yaml** Defines execution command for the cluster. See :ref:`cluster`
- * **organisms/<organism>.yaml** : Defines genome indices and annotations for various organisms. See :ref:`organisms`
- * Workflow-specific defaults : Defines default options for our command line wrappers. See :ref:`workflowOpts`
+++++++++++++++++
+snakemakeProfile
+++++++++++++++++
+Defines a `snakemake profile <https://snakemake.readthedocs.io/en/stable/executing/cli.html#profiles>`__ to use.
+By default this translates to a pre-shipped 'local' profile (and points to a location relative package directory).
+The local profile runs all jobs without a submission system. 
 
-It is a good idea to keep a copy of your defaults.yaml, cluster.yaml and the whole organism folder in a dedicated location e.g. some folder *outside the snakePipes installation folder* named "snakePipes_configs" .
-You can configure snakePipes to use these files after a fresh installation or update with ``snakePipes config --organismsDir my_organisms_dir --clusterConfig my_cluster_config`` . This will also work if you add ``--configMode recycle``.  
+Another profile shipped within the repository is a default slurm profile (using snakemake-executor-plugin-cluster-generic). 
+In case you want to use this you can set the snakemakeProfile value to ``shared/profiles/snakepipes_genericprofile``.
+After changing the value of snakemakeProfile, you should re-run ``snakePipes info``, which will also print out the full directory of the profile used.
+If you want to use the snakepipes_genericprofile, make sure to review the following entries in the profile yaml file with respect to your infrastructure:
 
+ * ``module load slurm &&`` - could be omitted
+ * ``resources.partition`` - set to your slurm partition
+ * ``conda-prefix`` - set to your preferred location where snakePipes environments should be stored
+ * ``resources`` - make sure default resources make sense for your infrastructure
+ * ``ccancel.sh`` - refers to the ccancel.sh file the profile directory. The module command could be omitted here as before
+
+ In case you are using your own snakemake profile already, you can define them here as well. Acceptable values in snakemakeProfile are:
+ 
+ * absolute path to a snakemake profile directory
+ * a relative path to a snakemake profile (relative to the package directory)
+ * The name of a `global snakemake profile <https://snakemake.readthedocs.io/en/stable/executing/cli.html#profiles>`__ 
+
+ If you use your own profile, just make sure that at least these values are set in your profile:
+
+ * use-conda: true
+ * conda-prefix: /path/to/prefix
+ * conda-frontend: conda
+
+Additionaly, rule resources are defined in the pre-shipped profiles. 
+In case you use your own you'd want to have these set in your profile as well.
+
++++++++
+tempDir
++++++++
+The temp directory to use. Defaults to /scratch/local.
+
+After setting the defaults, the conda environments can be created. 
 
 .. _conda:
 
@@ -74,29 +97,13 @@ Create the conda environments
 
 All the tools required for running various pipelines are installed via various conda repositories
 (mainly bioconda). The following commands installs the tools and creates the respective conda environments.
+Note that the conda-prefix is defined in your profile (and defaults to /tmp). Thus make sure you have set your profile appropriately.
+It is important that the conda-prefix is a location that is accessible by your compute nodes as well.
+Finally, make sure you have a conda installation with libmamba as the solver (conda version 23.10.0 or later), as this speeds up the process.
 
 .. code:: bash
 
     snakePipes createEnvs
-
-.. note::
-
-    ``snakePipes createEnvs`` will also set the ``snakemakeOptions:`` line in the global snakePipes
-    ``defaults.yaml`` files. If you have already modified this then use the ``--keepCondaDir`` option.
-
-The place where the conda envs are created (and therefore the tools are installed) is defined in ``snakePipes/defaults.yaml``
-file on our GitHub repository. You can modify it to suite your needs.
-
-Here are the content of *defaults.yaml*::
-
-    snakemakeOptions: '--use-conda --conda-prefix /data/general/scratch/conda_envs'
-
-.. note::
-
-    Whenever you change the `snakemakeOptions:` line in `defaults.yaml`, you should run
-    `snakePipes createEnvs` to ensure that the conda environments are then created.
-
-Running ``snakePipes createEnvs`` is not strictly required, but facilitates multiple users using the same snakePipes installation.
 
 
 .. _organisms:
@@ -106,6 +113,8 @@ Configure the organisms
 
 For each organism of your choice, create a file called ``<organism>.yaml`` in the folder specified by ``organismsDir`` in **defaults.yaml** and
 fill the paths to the required files next to the corresponding yaml entry. For common organisms, the required files are downloaded and the yaml entries can be created automatically via the workflow ``createIndices``.
+
+Note that the organism yamls that come with the installation are only appropriate internally for MPI-IE, and as an external you need to create / download your own.
 
 The yaml files look like this after the setup (an example from drosophila genome ``dm3``) :
 
@@ -161,58 +170,6 @@ For the sake of convenience, we provide premade indices for the following organi
 
 To use these, simply download and extract them. You will then need to modify the provided YAML file to indicate exactly where the indices are located (i.e., replace ``/data/processing/ryan`` with whatever is appropriate).
 
-.. _cluster:
-
-Configure your cluster
-----------------------
-
-The ``cluster.yaml`` file contains both the default memory requirements as well as two options passed to snakemake that control how jobs are submitted to the cluster and files are retrieved::
-
-    snakemake_latency_wait: 300
-    snakemake_cluster_cmd: module load slurm; SlurmEasy --mem-per-cpu {cluster.memory} --threads {threads} --log {snakePipes_cluster_logDir} --name {rule}.snakemake 
-    snakePipes_cluster_logDir: cluster_logs
-    __default__:
-        memory: 8G
-    snp_split:
-        memory: 10G
-
-The location of this file must be specified by the ``clusterConfig`` value in **defaults.yaml**.
-
-You can change the default per-core memory allocation if needed here. Importantly, the ``snakemake_cluster_cmd`` 
-option must be changed to match your needs (see table below). Whatever command you specify must include 
-a ``{cluster.memory}`` option and a ``{threads}`` option. You can specify other required options here as well. 
-The ``snakemake_latency_wait`` value defines how long snakemake should wait for files to appear 
-before throwing an error. The default of 300 seconds is typically reasonable when a file system such as 
-`NFS <https://en.wikipedia.org/wiki/Network_File_System>`__ is in use. Please also note that there are additional memory 
-settings for each workflow in ``snakePipes/workflows/[workflow]/cluster.yaml`` that you might need to adjust. 
-
-``snakePipes_cluster_logDir:`` can be used like a wildcard in `snakemake_cluster_cmd` to specify the directory 
-for the stdout and stderr files from a job that is running on the cluster. This is given separate to make sure 
-the directory exists before execution. A relative path is treated relative to the ouput directory of the workflow. 
-If you want, you can also give an absolute log directory starting with /.
-
-==================== ======================================================================================
- Scheduler/Queuing        snakemake_cluster_cmd example                                                                                                    
-==================== ======================================================================================
- **slurm**            .. code:: bash                                                                                       
-                                          
-                        snakemake_cluster_cmd: module load slurm; sbatch --ntasks-per-node=1 
-                           -c {threads} -J {rule}.snakemake --mem-per-cpu={cluster.memory} 
-                           -p MYQUEUE -o {snakePipes_cluster_logDir}/{rule}.%j.out 
-                           -e {snakePipes_cluster_logDir}/{rule}.%j.err
-                        snakePipes_cluster_logDir: cluster_logs
-                        
- **PBS/Torque**       .. code:: bash                                                                                       
-                                          
-                        snakemake_cluster_cmd: qsub -N {rule}.snakemake
-                           -q MYQUEUE -l pmem={cluster.memory} 
-                           -l walltime=20:00:00 -l nodes=1:ppn={cluster.threads} 
-                           -o {snakePipes_cluster_logDir}/{rule}.\$PBS_JOBID.out 
-                           -e {snakePipes_cluster_logDir}/{rule}.\$PBS_JOBID.err
-                        snakePipes_cluster_logDir: cluster_logs        
-                        
- **SGE**              *Please send us a working example!*                
-==================== ======================================================================================
 
 
 
