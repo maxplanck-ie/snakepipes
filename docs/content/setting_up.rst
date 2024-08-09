@@ -54,7 +54,7 @@ Two fields are important to set:
 snakemakeProfile
 ++++++++++++++++
 Defines a `snakemake profile <https://snakemake.readthedocs.io/en/stable/executing/cli.html#profiles>`__ to use.
-By default this translates to a pre-shipped 'local' profile (and points to a location relative package directory).
+By default this translates to a pre-shipped 'local' profile (and points to a location relative to the snakePipes package directory).
 The local profile runs all jobs without a submission system. 
 
 Another profile shipped within the repository is a default slurm profile (using snakemake-executor-plugin-cluster-generic). 
@@ -66,7 +66,7 @@ If you want to use the snakepipes_genericprofile, make sure to review the follow
  * ``resources.partition`` - set to your slurm partition
  * ``conda-prefix`` - set to your preferred location where snakePipes environments should be stored
  * ``resources`` - make sure default resources make sense for your infrastructure
- * ``ccancel.sh`` - refers to the ccancel.sh file the profile directory. The module command could be omitted here as before
+ * ``ccancel.sh`` - refers to the ccancel.sh file inside the profile directory and contains instructions on how to kill submitted jobs (on failure / interruption of snakemake). The module command could be omitted here as before
 
  In case you are using your own snakemake profile already, you can define them here as well. Acceptable values in snakemakeProfile are:
  
