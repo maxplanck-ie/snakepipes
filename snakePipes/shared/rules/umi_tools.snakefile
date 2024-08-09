@@ -11,15 +11,12 @@ if UMIBarcode:
                 r2 = "FASTQ/{sample}"+reads[1]+".fastq.gz"
             params:
                 bcpattern = str(bcPattern)
-            log:
-                out = "FASTQ/logs/{sample}_log.out",
-                err = "FASTQ/logs/{sample}_log.err"
             conda: CONDA_SHARED_ENV
             shell:"""
                 umi_tools extract -I {input.r1} --read2-in={input.r2} \
                 --bc-pattern={params.bcpattern} --bc-pattern2={params.bcpattern}\
                 --stdout={output.r1} \
-                --read2-out={output.r2} -L {log.out} -E {log.err}
+                --read2-out={output.r2}
                 """
 
     else:
@@ -30,13 +27,10 @@ if UMIBarcode:
                 r1 = "FASTQ/{sample}"+reads[0]+".fastq.gz",
             params:
                 bcpattern = str(bcPattern)
-            log:
-                out = "FASTQ/logs/{sample}_log.out",
-                err = "FASTQ/logs/{sample}_log.err"
             conda: CONDA_SHARED_ENV
             shell: """
                 umi_tools extract -I {input.r1} --stdout={output.r1} \
-                --bc-pattern={params.bcpattern} -L {log.out} -E {log.err}
+                --bc-pattern={params.bcpattern}
                 """
 
 else:
@@ -71,13 +65,10 @@ if UMIDedup:
             umitools_options = str(UMIDedupOpts or ''),
             umitools_paired = "--paired " if pairedEnd else " ",
             umi_sep = str(UMIDedupSep),
-        log:
-            out = "filtered_bam/logs/umi_dedup.{sample}.out",
-            err = "filtered_bam/logs/umi_dedup.{sample}.err"
         conda: CONDA_SHARED_ENV
         shell: """
             umi_tools dedup -I {input.bamfile} \
-            -S {output.bamfile} -L {log.out} -E {log.err} \
+            -S {output.bamfile} \
             --umi-separator {params.umi_sep} \
             {params.umitools_paired} {params.umitools_options}
             """
@@ -108,6 +99,5 @@ if not (aligner=="bwameth" or aligner=="bwameth2"):
             "filtered_bam/{sample}.filtered.bam"
         output:
             "filtered_bam/{sample}.filtered.bam.bai"
-        log: "filtered_bam/logs/{sample}.index.log"
         conda: CONDA_SHARED_ENV
-        shell: "samtools index {input} 2> {log}"
+        shell: "samtools index {input}"

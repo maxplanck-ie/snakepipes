@@ -12,9 +12,6 @@ rule featureCounts:
         paired_opt = lambda wildcards: "-p -B " if pairedEnd else "",
         opts = config["featureCountsOptions"],
         tempDir = tempDir
-    log:
-        out = "featureCounts/logs/{sample}.out",
-        err = "featureCounts/logs/{sample}.err"
     threads: lambda wildcards: 8 if 8<max_thread else max_thread
     conda: CONDA_RNASEQ_ENV
     shell: """
@@ -27,7 +24,7 @@ rule featureCounts:
         -a {input.gtf} \
         -o {output} \
         --tmpDir $MYTEMP \
-        {input.bam} > {log.out} 2> {log.err};
+        {input.bam};
         rm -rf $MYTEMP
         """
 
@@ -36,7 +33,6 @@ rule merge_featureCounts:
         expand("featureCounts/{sample}.counts.txt", sample=samples)
     output:
         "featureCounts/counts.tsv"
-    log: "featureCounts/logs/merge_featureCounts.log"
     conda: CONDA_RNASEQ_ENV
     shell:
-        "Rscript "+os.path.join(maindir, "shared", "rscripts", "merge_featureCounts.R")+" {output} {input} 2> {log}"
+        "Rscript "+os.path.join(maindir, "shared", "rscripts", "merge_featureCounts.R")+" {output} {input}"

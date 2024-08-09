@@ -28,12 +28,11 @@ rule split_bamfiles_by_genome:
         bai = "split_bam/{sample}_{part}.bam.bai"
     params:
         region = lambda wildcards: region_dict[wildcards.part]
-    log: "split_bam/logs/{sample}_{part}.log"
     conda: CONDA_SAMBAMBA_ENV
     threads: 4
     shell: """
-        sambamba slice -o {output.bam} {input.bam} {params.region} 2> {log};
-        sambamba index -t {threads} {output.bam} 2>> {log}
+        sambamba slice -o {output.bam} {input.bam} {params.region};
+        sambamba index -t {threads} {output.bam}
         """
 
 rule multiBamSummary_input:
@@ -51,9 +50,6 @@ rule multiBamSummary_input:
         scaling_factors = "--scalingFactors split_deepTools_qc/multiBamSummary/{part}.input.scaling_factors.txt",
         binSize = lambda wildcards: " --binSize "+str(spikein_bin_size) if wildcards.part=="spikein" else "",
         spikein_region = lambda wildcards: " --region "+spikein_region if ((wildcards.part=="spikein") and (spikein_region != "")) else ""
-    log:
-        out = "split_deepTools_qc/logs/{part}.input_multiBamSummary.out",
-        err = "split_deepTools_qc/logs/{part}.input_multiBamSummary.err"
     benchmark:
         "split_deepTools_qc/.benchmark/{part}.input_multiBamSummary.benchmark"
     threads: lambda wildcards: 24 if 24<max_thread else max_thread
@@ -76,10 +72,6 @@ rule multiBamSummary_ChIP:
         scaling_factors = "--scalingFactors split_deepTools_qc/multiBamSummary/{part}.ChIP.scaling_factors.txt",
         binSize = lambda wildcards: " --binSize "+str(spikein_bin_size) if wildcards.part=="spikein" else "",
         spikein_region = lambda wildcards: " --region "+spikein_region if ((wildcards.part=="spikein") and (spikein_region != "")) else ""
-
-    log:
-        out = "split_deepTools_qc/logs/{part}.ChIP_multiBamSummary.out",
-        err = "split_deepTools_qc/logs/{part}.ChIP_multiBamSummary.err"
     benchmark:
         "split_deepTools_qc/.benchmark/{part}.ChIP_multiBamSummary.benchmark"
     threads: lambda wildcards: 24 if 24<max_thread else max_thread
@@ -102,9 +94,6 @@ rule multiBamSummary_TSS:
                          else "--extendReads {}".format(fragmentLength),
         scaling_factors = "--scalingFactors split_deepTools_qc/multiBamSummary_BED/spikein.ChIP.scaling_factors.txt",
         binSize = " --binSize 100000 "
-    log:
-        out = "split_deepTools_qc/logs/spikein.ChIP_multiBamSummary.BED.out",
-        err = "split_deepTools_qc/logs/spikein.ChIP_multiBamSummary.BED.err"
     benchmark:
         "split_deepTools_qc/.benchmark/spikein.ChIP_multiBamSummary.BED.benchmark"
     threads: lambda wildcards: 24 if 24<max_thread else max_thread
@@ -117,7 +106,6 @@ rule concatenate_scaling_factors:
         scale_factors_input = "split_deepTools_qc/multiBamSummary/{part}.input.scaling_factors.txt",
         scale_factors_chip = "split_deepTools_qc/multiBamSummary/{part}.ChIP.scaling_factors.txt"
     output: "split_deepTools_qc/multiBamSummary/{part}.concatenated.scaling_factors.txt"
-    log: "split_deepTools_qc/logs/{part}.cat.scaling_factors.log"
     shell: """
         cat {input.scale_factors_input} {input.scale_factors_chip} > {output} 2> {log}
     """
@@ -139,9 +127,6 @@ rule bamCoverage_by_part:
         blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed
                     else "",
         scaling_factors = lambda wildcards,input: "--scaleFactor {}".format(get_scaling_factor(wildcards.sample,input.scale_factors)) ## subset for the one factor needed
-    log:
-        out = "bamCoverage/logs/bamCoverage.{sample}.BY{part}.filtered.out",
-        err = "bamCoverage/logs/bamCoverage.{sample}.BY{part}.filtered.err"
     benchmark:
         "bamCoverage/.benchmark/bamCoverage.{sample}.BY{part}.filtered.benchmark"
     threads: lambda wildcards: 16 if 16<max_thread else max_thread  # 4GB per core
@@ -165,9 +150,6 @@ rule bamCoverage_by_TSS:
         blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed
                     else "",
         scaling_factors = lambda wildcards,input: "--scaleFactor {}".format(get_scaling_factor(wildcards.sample,input.scale_factors)) ## subset for the one factor needed
-    log:
-        out = "bamCoverage_TSS/logs/bamCoverage.{sample}.BYspikein.filtered.out",
-        err = "bamCoverage_TSS/logs/bamCoverage.{sample}.BYspikein.filtered.err"
     benchmark:
         "bamCoverage_TSS/.benchmark/bamCoverage.{sample}.BYspikein.filtered.benchmark"
     threads: lambda wildcards: 16 if 16<max_thread else max_thread  # 4GB per core
@@ -191,9 +173,6 @@ rule bamCoverage_by_input:
         blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed
                     else "",
         scaling_factors = lambda wildcards,input: "--scaleFactor {}".format(get_scaling_factor(get_control(wildcards.sample),input.scale_factors)) ## subset for the one factor needed
-    log:
-        out = "bamCoverage_input/logs/bamCoverage.{sample}.BYspikein.filtered.out",
-        err = "bamCoverage_input/logs/bamCoverage.{sample}.BYspikein.filtered.err"
     benchmark:
         "bamCoverage_input/.benchmark/bamCoverage.{sample}.BYspikein.filtered.benchmark"
     threads: lambda wildcards: 16 if 16<max_thread else max_thread  # 4GB per core
@@ -210,9 +189,6 @@ rule bamPE_fragment_size:
     params:
         plotcmd = lambda wildcards: "" if plotFormat == 'None' else
                 "-o split_deepTools_qc/bamPEFragmentSize/" + wildcards.part + ".fragmentSizes.{}".format(plotFormat)
-    log:
-        out = "split_deepTools_qc/logs/{part}.bamPEFragmentSize.out",
-        err = "split_deepTools_qc/logs/{part}.bamPEFragmentSize.err"
     threads: lambda wildcards: 24 if 24<max_thread else max_thread
     conda: CONDA_SHARED_ENV
     shell: bamPEFragmentSize_cmd

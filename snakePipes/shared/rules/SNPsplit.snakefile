@@ -10,14 +10,13 @@ if aligner == "Bowtie2":
             tempbam = temp("filtered_bam/{sample}.filtered.sortedByName.bam"),
             rep1 = "allelic_bams/{sample}.filtered.SNPsplit_report.yaml",
             rep2 = "allelic_bams/{sample}.filtered.SNPsplit_sort.yaml"
-        log: "allelic_bams/logs/{sample}.snp_split.log"
         params:
             pairedEnd = '--paired' if pairedEnd else '',
             outdir = "allelic_bams"
         conda: CONDA_SHARED_ENV
         shell:
             "SNPsplit {params.pairedEnd}"
-            " -o {params.outdir} --snp_file {input.snp} {input.bam} 2> {log}"
+            " -o {params.outdir} --snp_file {input.snp} {input.bam}"
 
 elif aligner == "STAR" or aligner == "EXTERNAL_BAM":
     rule snp_split:
@@ -29,14 +28,13 @@ elif aligner == "STAR" or aligner == "EXTERNAL_BAM":
             tempbam = temp(aligner+"/{sample}.sortedByName.bam"),
             rep1 = "allelic_bams/{sample}.SNPsplit_report.yaml",
             rep2 = "allelic_bams/{sample}.SNPsplit_sort.yaml"
-        log: "allelic_bams/logs/{sample}.snp_split.log"
         params:
             pairedEnd = '--paired' if pairedEnd else '',
             outdir = "allelic_bams"
         conda: CONDA_SHARED_ENV
         shell:
             "SNPsplit {params.pairedEnd}"
-            " -o {params.outdir} --snp_file {input.snp} {input.bam} 2> {log}"
+            " -o {params.outdir} --snp_file {input.snp} {input.bam}"
 
 # move the allele-specific bams to another folder
 #if aligner == "Bowtie2":
@@ -67,7 +65,6 @@ rule BAMsort_allelic:
     input: "allelic_bams/{sample}.filtered.{suffix}.bam" if aligner == "Bowtie2" else "allelic_bams/{sample}.{suffix}.bam"
     output:
         "allelic_bams/{sample}.{suffix}.sorted.bam"
-    log: "allelic_bams/logs/{sample}.{suffix}.sort.log"
     threads:
         12
     params:
@@ -76,7 +73,7 @@ rule BAMsort_allelic:
     shell: """
         TMPDIR={params.tempDir}
         MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX);
-        samtools sort -@ {threads} -T $MYTEMP -O bam -o {output} {input} 2> {log};
+        samtools sort -@ {threads} -T $MYTEMP -O bam -o {output} {input};
         rm -rf $MYTEMP
         """
 
@@ -86,6 +83,5 @@ rule BAMindex_allelic:
         "allelic_bams/{sample}.{suffix}.sorted.bam"
     output:
         "allelic_bams/{sample}.{suffix}.sorted.bam.bai"
-    log: "allelic_bams/logs/{sample}.{suffix}.index.log"
     conda: CONDA_SHARED_ENV
-    shell: "samtools index {input} 2> {log}"
+    shell: "samtools index {input}"

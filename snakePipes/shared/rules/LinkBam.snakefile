@@ -67,8 +67,7 @@ else:
                aligner + "/{sample}.bam"
            output:
                "Sambamba/{sample}.markdup.txt"
-           log: "Sambamba/logs/{sample}.flagstat.log"
            conda: CONDA_SAMBAMBA_ENV
            shell: """
-               sambamba flagstat -p {input} > {output} 2> {log}
+               sambamba flagstat -p {input} > {output}
                """

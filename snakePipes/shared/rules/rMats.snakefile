@@ -34,11 +34,10 @@ rule rMats:
         end = "paired" if pairedEnd else "single",
         libType = wrap_libType(libraryType),
         tempDir = tempDir,
-    log: "{}/rMats.log".format(get_outdir("rMats", sampleSheet))
     threads: 1
     conda: CONDA_RNASEQ_ENV
     shell:"""
         set +o pipefail;
         readLen=$(samtools view {params.s1} | awk \'{{print length($10)}}\' | head -10000 | awk \'{{ sum += $1 }} END {{ if (NR > 0) print int(sum / NR) }}\')
-        rmats.py --gtf {params.gtf} --b1 {input.b1} --b2 {input.b2} --od {params.od} --tmp {params.tempDir} -t {params.end} --libType {params.libType} --readLength $readLen --variable-read-length --nthread {threads} --tstat {threads} 2> {log}
+        rmats.py --gtf {params.gtf} --b1 {input.b1} --b2 {input.b2} --od {params.od} --tmp {params.tempDir} -t {params.end} --libType {params.libType} --readLength $readLen --variable-read-length --nthread {threads} --tstat {threads}
 """

@@ -131,11 +131,10 @@ rule annotation_bed2fasta:
         genome_fasta = genome_fasta
     output:
         "Annotation/genes.filtered.fa"
-    log: "Annotation/logs/bed2fasta.log"
     benchmark:
         "Annotation/.benchmark/annotation_bed2fasta.benchmark"
     threads: 1
     conda: CONDA_RNASEQ_ENV
     shell:
-        "bedtools getfasta -name -s -split -fi {input.genome_fasta} -bed <(cat {input.bed} | cut -f1-12) | sed 's/(.*)//g' | sed 's/:.*//g' > {output} 2> {log}"
+        "bedtools getfasta -name -s -split -fi {input.genome_fasta} -bed <(cat {input.bed} | cut -f1-12) | sed 's/(.*)//g' | sed 's/:.*//g' > {output}"
         

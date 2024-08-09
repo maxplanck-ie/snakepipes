@@ -31,16 +31,13 @@ if allele_hybrid == 'dual':
             strain1 = strains[0],
             strain2 = strains[1],
             SNPpath = os.path.abspath(VCFfile)
-        log:
-            out = "SNPsplit_createSNPgenome.out",
-            err = "SNPsplit_createSNPgenome.err"
         conda: CONDA_SHARED_ENV
         shell:
             " ( [ -d snp_genome ] || mkdir -p snp_genome ) && cd snp_genome &&"
             " SNPsplit_genome_preparation"
             " --dual_hybrid --genome_build {BASENAME}"
             " --reference_genome {input.genome} --vcf_file {params.SNPpath}"
-            " --strain {params.strain1} --strain2 {params.strain2} > {log.out} 2> {log.err}"
+            " --strain {params.strain1} --strain2 {params.strain2}"
             "&& cd ../"
 else:
     rule create_snpgenome:
@@ -56,17 +53,14 @@ else:
 
             temp_out=temp("all_SNPs_" + strains[0] + "_GRCm38.txt.gz"),
             out_bname=os.path.basename(SNPFile)
-        log:
-            out = "SNPsplit_createSNPgenome.out",
-            err = "SNPsplit_createSNPgenome.err"
         conda: CONDA_SHARED_ENV
         shell:
             " ( [ -d snp_genome ] || mkdir -p snp_genome ) && cd snp_genome &&"
             " SNPsplit_genome_preparation"
             " --genome_build {BASENAME}"
             " --reference_genome {input.genome} --vcf_file {params.SNPpath}"
-            " --strain {params.strain1} > {log.out} 2> {log.err}&& cp "
-            "{params.temp_out} {params.out_bname} >> {log.out} 2>> {log.err} "
+            " --strain {params.strain1} && cp "
+            "{params.temp_out} {params.out_bname}"
             "&& cd ../"
 
 if aligner == "STAR":
@@ -75,9 +69,6 @@ if aligner == "STAR":
             snpgenome_dir = SNPdir
         output:
             star_index_allelic
-        log:
-            out = "snp_genome/star_Nmasked/star.index.out",
-            err = "snp_genome/star_Nmasked/star.index.err"
         threads:
             10
         params:
@@ -90,7 +81,6 @@ if aligner == "STAR":
             " --genomeDir " + "snp_genome/star_Nmasked"
             " --genomeFastaFiles {input.snpgenome_dir}/*.fa"
             " --sjdbGTFfile {params.gtf}"
-            " > {log.out} 2> {log.err}"
 
 elif aligner == "Bowtie2":
     rule bowtie2_index:
@@ -98,9 +88,6 @@ elif aligner == "Bowtie2":
             snpgenome_dir = SNPdir
         output:
             bowtie2_index_allelic
-        log:
-            out = "snp_genome/bowtie2_Nmasked/bowtie2.index.out",
-            err = "snp_genome/bowtie2_Nmasked/bowtie2.index.err"
         threads: lambda wildcards: 10 if 10<max_thread else max_thread
         params:
             filelist = getref_fileList(SNPdir),
@@ -111,6 +98,5 @@ elif aligner == "Bowtie2":
             " --threads {threads}"
             " {params.filelist}"
             " {params.idxbase}"
-            " > {log.out} 2> {log.err}"
 else:
     print("Only STAR and Bowtie2 are implemented for allele-specific mapping")

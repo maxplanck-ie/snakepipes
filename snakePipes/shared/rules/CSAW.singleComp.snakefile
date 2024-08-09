@@ -91,9 +91,6 @@ rule CSAW:
         useSpikeInForNorm = useSpikeInForNorm,
         scale_factors = lambda wildcards, input: os.path.join(outdir, input.scale_factors) if input.scale_factors else "",
         externalBed = True if externalBed else False
-    log:
-        out = os.path.join(outdir, "CSAW_{}_{}/logs/CSAW.out".format(peakCaller, sample_name)),
-        err = os.path.join(outdir, "CSAW_{}_{}/logs/CSAW.err".format(peakCaller, sample_name))
     conda: CONDA_ATAC_ENV
     script: "../rscripts/CSAW.R"
 
@@ -108,16 +105,11 @@ if chip_samples_w_ctrl:
             matrix = touch("CSAW_{}_{}".format(peakCaller, sample_name)+"/CSAW.{change_dir}.log2r.matrix")
         params:
             bed_in = "CSAW_{}_{}".format(peakCaller, sample_name)+"/Filtered.results.{change_dir}.bed"
-        log:
-            out = os.path.join(outdir, "CSAW_{}_{}".format(peakCaller, sample_name) + "/logs/deeptools_matrix.log2r.{change_dir}.out"),
-            err = os.path.join(outdir, "CSAW_{}_{}".format(peakCaller, sample_name) + "/logs/deeptools_matrix.log2r.{change_dir}.err")
         threads: 8
         conda: CONDA_SHARED_ENV
         shell: """
-            touch {log.out}
-            touch {log.err}
             if [[ -s {params.bed_in} ]]; then
-                computeMatrix scale-regions -S {input.bigwigs} -R {params.bed_in} -m 1000 -b 200 -a 200 -o {output.matrix} -p {threads} > {log.out} 2> {log.err}
+                computeMatrix scale-regions -S {input.bigwigs} -R {params.bed_in} -m 1000 -b 200 -a 200 -o {output.matrix} -p {threads}
             fi
             """
 
@@ -130,13 +122,8 @@ if chip_samples_w_ctrl:
             sorted_regions = touch("CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.log2r.sortedRegions.bed")
         params:
             smpl_label=' '.join(reordered_dict.keys())
-        log:
-            out = os.path.join(outdir, "CSAW_{}_{}".format(peakCaller, sample_name) + "/logs/deeptools_heatmap.log2r.{change_dir}.out"),
-            err = os.path.join(outdir, "CSAW_{}_{}".format(peakCaller, sample_name) + "/logs/deeptools_heatmap.log2r.{change_dir}.err")
         conda: CONDA_SHARED_ENV
         shell: """
-            touch {log.out}
-            touch {log.err}
             if [[ -s {input.matrix} ]]; then
                 plotHeatmap --matrixFile {input.matrix} \
                         --outFileSortedRegions {output.sorted_regions} \
@@ -144,7 +131,7 @@ if chip_samples_w_ctrl:
                         --startLabel Start --endLabel End \
                         --legendLocation lower-center \
                         -x 'Scaled peak length' --labelRotation 90 \
-                        --samplesLabel {params.smpl_label} --colorMap "coolwarm" > {log.out} 2> {log.err}
+                        --samplesLabel {params.smpl_label} --colorMap "coolwarm"
             fi
             """
 
@@ -158,9 +145,6 @@ rule calc_matrix_cov_CSAW:
         matrix = touch("CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.cov.matrix")
     params:
         bed_in = "CSAW_{}_{}".format(peakCaller, sample_name) + "/Filtered.results.{change_dir}.bed"
-    log:
-        out = os.path.join(outdir, "CSAW_{}_{}".format(peakCaller, sample_name) + "/logs/deeptools_matrix.cov.{change_dir}.out"),
-        err = os.path.join(outdir, "CSAW_{}_{}".format(peakCaller, sample_name) + "/logs/deeptools_matrix.cov.{change_dir}.err")
     threads: 8
     conda: CONDA_SHARED_ENV
     shell: """
@@ -168,7 +152,7 @@ rule calc_matrix_cov_CSAW:
         touch {log.err}
         if [[ -s {params.bed_in} ]]; then
             computeMatrix scale-regions -S {input.bigwigs} -R {params.bed_in} \
-            -m 1000 -b 200 -a 200 -o {output.matrix} -p {threads} > {log.out} 2> {log.err}
+            -m 1000 -b 200 -a 200 -o {output.matrix} -p {threads}
         fi
         """
 
@@ -181,9 +165,6 @@ rule plot_heatmap_cov_CSAW:
         sorted_regions = touch("CSAW_{}_{}".format(peakCaller, sample_name) + "/CSAW.{change_dir}.cov.sortedRegions.bed")
     params:
         smpl_label=' '.join(reordered_dict.keys())
-    log:
-        out = os.path.join(outdir,"CSAW_{}_{}".format(peakCaller, sample_name) + "/logs/deeptools_heatmap.cov.{change_dir}.out"),
-        err = os.path.join(outdir,"CSAW_{}_{}".format(peakCaller, sample_name) + "/logs/deeptools_heatmap.cov.{change_dir}.err")
     conda: CONDA_SHARED_ENV
     shell: """
         touch {log.out}
@@ -194,7 +175,7 @@ rule plot_heatmap_cov_CSAW:
                     --outFileName {output.image} --startLabel Start \
                     --endLabel End --legendLocation lower-center \
                     -x 'Scaled peak length' --labelRotation 90 \
-                    --samplesLabel {params.smpl_label} --colorMap "coolwarm" >{log.out} 2>{log.err}
+                    --samplesLabel {params.smpl_label} --colorMap "coolwarm"
         fi
         """
 
@@ -211,8 +192,5 @@ rule CSAW_report:
         outdir=os.path.join(outdir, "CSAW_{}_{}".format(peakCaller, sample_name)),
         sampleSheet=sampleSheet,
         useSpikeInForNorm = useSpikeInForNorm
-    log:
-       out = os.path.join(outdir, "CSAW_{}_{}/logs/report.out".format(peakCaller, sample_name)),
-       err = os.path.join(outdir, "CSAW_{}_{}/logs/report.err".format(peakCaller, sample_name))
     conda: CONDA_ATAC_ENV
     script: "../rscripts/CSAW_report.Rmd"

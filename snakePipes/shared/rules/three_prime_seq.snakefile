@@ -112,17 +112,12 @@ rule filterBW:
         bed=filterbw_which_bed
     output: 
         "three_prime_seq/filtered/{sample}_direction-{direction}.bw"
-    log:
-        stdout="three_prime_seq/logs/{sample}_{direction}.stdout",
-        stderr="three_prime_seq/logs/{sample}_{direction}.stderr"
     params:
         script=(tools_dir / "three_prime_seq" / "filterBW.py")
     conda:
         CONDA_SHARED_ENV
     shell:
         "{params.script} {input} {output} "
-        "> {log.stdout} "
-        "2> {log.stderr} "
 
 
 # Associate signal with each gene (flank by some amount)

@@ -57,7 +57,6 @@ if downsample:
             output:
                 r1 = "originalFASTQ/downsample_{sample}"+reads[0]+".fastq.gz",
                 r2 = "originalFASTQ/downsample_{sample}"+reads[1]+".fastq.gz"
-            log: "originalFASTQ/logs/{sample}.FASTQdownsample.log"
             params:
                 num_reads = downsample
             benchmark:
@@ -65,9 +64,8 @@ if downsample:
             threads: lambda wildcards: 10 if 10<max_thread else max_thread
             conda: CONDA_SHARED_ENV
             shell: """
-                seqtk sample -s 100 {input.r1} {params.num_reads} | pigz -p {threads} -9 > {output.r1} 2> {log}
-                seqtk sample -s 100 {input.r2} {params.num_reads} | pigz -p {threads} -9 > {output.r2} 2>> {log}
-
+                seqtk sample -s 100 {input.r1} {params.num_reads} | pigz -p {threads} -9 > {output.r1}
+                seqtk sample -s 100 {input.r2} {params.num_reads} | pigz -p {threads} -9 > {output.r2}
                 """
     else:
         rule FASTQdownsample:
@@ -75,11 +73,10 @@ if downsample:
                 "originalFASTQ/{sample}.fastq.gz"
             output:
                 fq = "originalFASTQ/downsample_{sample}.fastq.gz"
-            log: "originalFASTQ/logs/{sample}.FASTQdownsample.log"
             threads: lambda wildcards: 12 if 12<max_thread else max_thread
             params:
                 num_reads = downsample
             conda: CONDA_SHARED_ENV
             shell: """
-                seqtk sample -s 100 {input} {params.num_reads} | pigz -p {threads} -9 > {output} 2> {log}
+                seqtk sample -s 100 {input} {params.num_reads} | pigz -p {threads} -9 > {output}
                 """

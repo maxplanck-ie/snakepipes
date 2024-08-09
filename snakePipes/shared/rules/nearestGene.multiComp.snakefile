@@ -10,11 +10,9 @@ rule get_nearest_transcript:
     params:
         genes_bed=genes_bed,
         field_offset=lambda wildcards: "18" if pipeline in ['chipseq','ATACseq'] else ""
-    log:
-        err= "AnnotatedResults_{}_{}".format(peakCaller, sample_name + ".{compGroup}")+"/logs/bedtools_closest.{change_dir}.err",
     conda: CONDA_RNASEQ_ENV
     shell: """
-            if [ -r {input.bed} ]; then bedtools closest -D b -a <( bedtools sort -i {input.bed} ) -b <( bedtools sort -i {params.genes_bed} ) | cut -f1-{params.field_offset},$(( {params.field_offset} + 1 ))-$(( {params.field_offset} + 4 )),$(( {params.field_offset} + 6 )),$(( {params.field_offset} + 13 )) > {output.annotated_bed};fi 2> {log.err}
+            if [ -r {input.bed} ]; then bedtools closest -D b -a <( bedtools sort -i {input.bed} ) -b <( bedtools sort -i {params.genes_bed} ) | cut -f1-{params.field_offset},$(( {params.field_offset} + 1 ))-$(( {params.field_offset} + 4 )),$(( {params.field_offset} + 6 )),$(( {params.field_offset} + 13 )) > {output.annotated_bed};fi
            """
 
 rule get_nearest_gene:
@@ -27,8 +25,5 @@ rule get_nearest_gene:
     params:
         pipeline=pipeline,
         wdir="AnnotatedResults_{}_{}".format(peakCaller, sample_name + ".{compGroup}")
-    log:
-        err="AnnotatedResults_{}_{}".format(peakCaller, sample_name + ".{compGroup}")+"/logs/nearestGene.{change_dir}.err",
-        out="AnnotatedResults_{}_{}".format(peakCaller, sample_name + ".{compGroup}")+"/logs/nearestGene.{change_dir}.out"
     conda: CONDA_RNASEQ_ENV
     script: "../rscripts/nearestGene.R"
