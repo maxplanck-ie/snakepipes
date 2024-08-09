@@ -76,7 +76,7 @@ bamcov_cmd = """
                 -o {output} \
                 --binSize {params.bwBinSize} \
                 -p {threads} \
-                --normalizeUsing RPGC \
+                --normalizeUsing RPKM \
                 --effectiveGenomeSize {params.genome_size} \
                 {params.ignoreForNorm} \
                 {params.blacklist} \
