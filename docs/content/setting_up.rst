@@ -38,6 +38,27 @@ Now, we should activate this environment:
 
     conda activate snakePipes
 
+
+Alternatively, snakePipes can also be installed using pip. You can clone a branch (given that it's version 3.0.0 or later) and just install with pip:
+
+.. code:: bash
+
+    pip install .
+
+Just make sure you have python 3.11 or later (cap by snakemake) in your environment.
+In case you'd like to develop snakePipes, extra dependencies for the documentation:
+
+.. code:: bash
+
+    pip install .[docs]
+
+or for the pytests:
+
+.. code:: bash
+
+    pip install .[actions]
+
+
 Configuring snakePipes
 ----------------------
 
