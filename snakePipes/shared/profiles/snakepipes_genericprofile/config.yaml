@@ -17,7 +17,7 @@ cluster-generic-cancel-cmd: "ccancel.sh"
 latency-wait: 300
 default-resources:
   mem: 1G
-  time: 300
+  time: 1440
   partition: bioinfo
 set-resources:
   annotation_bed2fasta:
