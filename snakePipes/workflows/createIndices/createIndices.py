@@ -15,7 +15,7 @@ import snakePipes.parserCommon as parserCommon
 
 
 def parse_args(defaults={"configFile": None, "clusterConfigFile": None,
-                         "maxJobs": 5, "snakemakeOptions": "--use-conda",
+                         "maxJobs": 5, "snakemakeOptions": "",
                          "tempDir": None, "verbose": False, "spikeinExt": None, "salmonIndexOptions": None, "eisaR_flank_length": None }):
     """
     Parse arguments from the command line.
