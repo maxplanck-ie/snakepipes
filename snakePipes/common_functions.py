@@ -668,10 +668,10 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
 
 
 def plot_DAG(args, snakemake_cmd, calling_script, defaults):
-    
+
     if not args.createDAG:
         return
-    
+
     workflow_name = os.path.splitext(os.path.basename(calling_script))[0]
 
     # dryrun snakemake quietly: only generate the DAG
@@ -683,9 +683,9 @@ def plot_DAG(args, snakemake_cmd, calling_script, defaults):
             stderr=subprocess.PIPE,
             text=True,
             shell=True)
-    
+
     # Read DOT data from stdout
-    dot = DAGproc.stdout.read() 
+    dot = DAGproc.stdout.read()
 
     # Use graphviz to render DAG
     graph = graphviz.Source(dot)

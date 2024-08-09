@@ -85,7 +85,7 @@ def mainArguments(defaults, workingDir=False, createIndices=False, preprocessing
                          help="Snakemake options to be passed directly to snakemake, e.g. use --snakemakeOptions='--dryrun --rerun-incomplete --unlock --forceall'. WARNING! ONLY EXPERT USERS SHOULD CHANGE THIS! THE DEFAULT VALUE WILL BE APPENDED RATHER THAN OVERWRITTEN! (default: '%(default)s')",
                          default=[defaults["snakemakeOptions"]])
 
- 
+
     general.add_argument("--version",
                          action="version",
                          version="%(prog)s {}".format(version("snakePipes")))
@@ -100,8 +100,7 @@ def mainArguments(defaults, workingDir=False, createIndices=False, preprocessing
                          action="store_true",
                          help="verbose output (default: '%(default)s')",
                          default=defaults["verbose"])
-        
-        
+
     emailArgs = parser.add_argument_group('Email Arguments')
     emailArgs.add_argument("--emailAddress",
                            help="If specified, send an email upon completion to the given email address")
