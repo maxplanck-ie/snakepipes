@@ -44,7 +44,8 @@ dependencies = [
 actions = [
     "pytest",
     "ruff",
-    "ruamel.yaml"
+    "ruamel.yaml",
+    "pytest-xdist"
 ]
 
 docs = [

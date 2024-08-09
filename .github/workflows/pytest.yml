@@ -49,4 +49,4 @@ jobs:
     - name: pytest
       run: |
         snakePipes config --tempDir /tmp --condaEnvDir ./
-        pytest --verbosity=2 -rP tests/test_jobcounts.py
+        pytest -n 4 --verbosity=2 -rP tests/test_jobcounts.py
