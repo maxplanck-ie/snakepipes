@@ -11,11 +11,6 @@ pipeline<-snakemake@params[["pipeline"]]
 
 output_bed<-snakemake@output[["annotated_bed"]]
 
-##set up a primitive log
-logfile <- file(snakemake@log[["err"]], open="wt")
-sink(logfile, type="message")
-#----------------------------
-
 flist<-list(input_bed,t2g,gene_symbol)
 size_v<-unlist(lapply(flist,function(X)file.info(X)$size))
 
@@ -39,10 +34,6 @@ if(any(is.na(size_v),sum(size_v==0)>0)){message('Some of the input files are non
 
     write.table(obed_tab,file=output_bed,row.names=FALSE,sep="\t",quote=FALSE)
 }
-
-#----------------------------
-sink(type="message")
-close(logfile)
 
 sink(file.path(snakemake@params[["wdir"]],"nearestGene.session_info.txt"))
 sessionInfo()

@@ -1,4 +1,3 @@
-sink(snakemake@log[["out"]])
 .libPaths(R.home("library"))
 
 #system(paste0('mkdir -p ',wdir)) #for debugging
@@ -29,6 +28,3 @@ expression_matrix <- Read10X(data.dir = datav)
 s = CreateSeuratObject(counts = expression_matrix)
 outfile<-file.path(wdir,basename(snakemake@output[["seurat"]]))
 saveRDS(s,file=outfile)
-
-message('done all')
-sink()

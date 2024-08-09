@@ -1,7 +1,4 @@
 .libPaths(R.home("library"))
-
-logfile = file(snakemake@log[["err"]], open="w")
-sink(logfile)
 sampleSheet = snakemake@params[['sampleSheet']]
 groups = snakemake@params[['groups']]
 blacklist = snakemake@params[['blacklist']]
@@ -37,6 +34,3 @@ d = cbind(d, m)
 colnames(d)[3:ncol(d)] = sprintf("%s_%s", ss$condition, ss$name)
 
 write.table(d, file=snakemake@output[["MetileneIN"]], sep="\t", row.names=FALSE, quote=FALSE)
-
-sink()
-close(logfile)

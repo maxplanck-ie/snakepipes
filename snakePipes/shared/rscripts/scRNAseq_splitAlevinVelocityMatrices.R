@@ -1,6 +1,4 @@
 #this is a modified copy of https://github.com/csoneson/rna_velocity_quant/blob/master/scripts/sce_helpers.R and https://github.com/csoneson/rna_velocity_quant/blob/master/scripts/summarize_spliced_unspliced_dentate_gyrus.R
-
-sink(snakemake@log[["out"]])
 .libPaths(R.home("library"))
 
 wdir<-snakemake@params[["wdir"]]
@@ -95,9 +93,6 @@ sce<- do.call(cbind, lapply(samplenames, function(s) {
       }))
 
 saveRDS(sce,outfile)  
-
-message('done all')
-sink()
 
 sink("sessionInfo.txt")
 sessionInfo()
