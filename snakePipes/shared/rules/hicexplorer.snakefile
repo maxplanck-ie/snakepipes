@@ -38,7 +38,7 @@ rule map_fastq_single_end:
     threads: lambda wildcards: 15 if 15<max_thread else max_thread
     conda: CONDA_HIC_ENV
     shell:
-        "echo 'mapping {input}' > {log.out} && "
+        "echo 'mapping {input}' && "
         "{params.aligner_cmd} -A1 -B4  -E50 -L0 "
         "-t {threads} {params.aligner_index} {input} | "
         "samtools view -Shb - > {output.out}"

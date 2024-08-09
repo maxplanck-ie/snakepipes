@@ -148,8 +148,6 @@ rule calc_matrix_cov_CSAW:
     threads: 8
     conda: CONDA_SHARED_ENV
     shell: """
-        touch {log.out}
-        touch {log.err}
         if [[ -s {params.bed_in} ]]; then
             computeMatrix scale-regions -S {input.bigwigs} -R {params.bed_in} \
             -m 1000 -b 200 -a 200 -o {output.matrix} -p {threads}
@@ -167,8 +165,6 @@ rule plot_heatmap_cov_CSAW:
         smpl_label=' '.join(reordered_dict.keys())
     conda: CONDA_SHARED_ENV
     shell: """
-        touch {log.out}
-        touch {log.err}
         if [[ -s {input.matrix} ]]; then
             plotHeatmap --matrixFile {input.matrix} \
                     --outFileSortedRegions {output.sorted_regions} \
