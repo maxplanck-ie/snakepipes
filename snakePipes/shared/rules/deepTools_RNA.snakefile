@@ -81,7 +81,7 @@ rule multiBamSummary_bed:
         blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed else ""
     benchmark:
         "deepTools_qc/.benchmark/multiBamSummary.bed.benchmark"
-    threads: 
+    threads: lambda wildcards: 40 if 40<max_thread else max_thread
     shell: multiBamSum_bed_cmd
 
 rule bamCoverage_scaleFactors:
