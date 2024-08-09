@@ -61,12 +61,6 @@ def mainArguments(defaults, workingDir=False, createIndices=False, preprocessing
                          action="help",
                          help="show this help message and exit")
 
-    general.add_argument("-v", "--verbose",
-                         dest="verbose",
-                         action="store_true",
-                         help="verbose output (default: '%(default)s')",
-                         default=defaults["verbose"])
-
     if not workingDir and not createIndices:
         general.add_argument("--ext",
                              help="Suffix used by input fastq files (default: '%(default)s').",
@@ -91,15 +85,23 @@ def mainArguments(defaults, workingDir=False, createIndices=False, preprocessing
                          help="Snakemake options to be passed directly to snakemake, e.g. use --snakemakeOptions='--dryrun --rerun-incomplete --unlock --forceall'. WARNING! ONLY EXPERT USERS SHOULD CHANGE THIS! THE DEFAULT VALUE WILL BE APPENDED RATHER THAN OVERWRITTEN! (default: '%(default)s')",
                          default=[defaults["snakemakeOptions"]])
 
-    general.add_argument("--DAG",
-                         dest="createDAG",
-                         action="store_true",
-                         help="If specified, a file ending in _pipeline.pdf is produced in the output directory that shows the rules used and their relationship to each other.")
-
+ 
     general.add_argument("--version",
                          action="version",
                          version="%(prog)s {}".format(version("snakePipes")))
 
+    exclArgs = parser.add_mutually_exclusive_group()
+    exclArgs.add_argument("--DAG",
+                         dest="createDAG",
+                         action="store_true",
+                         help="If specified, a file ending in _pipeline.pdf is produced in the output directory that shows the rules used and their relationship to each other.")
+    exclArgs.add_argument("-v", "--verbose",
+                         dest="verbose",
+                         action="store_true",
+                         help="verbose output (default: '%(default)s')",
+                         default=defaults["verbose"])
+        
+        
     emailArgs = parser.add_argument_group('Email Arguments')
     emailArgs.add_argument("--emailAddress",
                            help="If specified, send an email upon completion to the given email address")
