@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: conda-incubator/setup-miniconda@v2
+      - uses: conda-incubator/setup-miniconda@v3
         with:
           environment-file: .github/condaBuildCI.yml
           activate-environment: condaBuild_CI
@@ -23,4 +23,5 @@ jobs:
       # Builds the package using the standard configuration
       - name: buildSnakePipes
         run: |
+          conda list -n condaBuild_CI
           conda build -c conda-forge -c bioconda conda-recipe
