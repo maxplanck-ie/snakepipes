@@ -17,6 +17,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: conda-incubator/setup-miniconda@v3
         with:
+          miniconda-version: 23.5.2
           environment-file: .github/condaBuildCI.yml
           activate-environment: condaBuild_CI
           condarc-file: .github/condarc.yml
