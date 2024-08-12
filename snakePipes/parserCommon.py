@@ -66,7 +66,7 @@ def mainArguments(defaults, workingDir=False, createIndices=False, preprocessing
                          action="store_true",
                          help="verbose output (default: '%(default)s')",
                          default=defaults["verbose"])
-    
+
     if not workingDir and not createIndices:
         general.add_argument("--ext",
                              help="Suffix used by input fastq files (default: '%(default)s').",

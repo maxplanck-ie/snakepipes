@@ -253,7 +253,7 @@ class TestmakePairs():
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
         assert parseSpOut(_p) == 176
-        
+
 class TestCreateindices:
     def test_default(self, ifs):
         ci = [
