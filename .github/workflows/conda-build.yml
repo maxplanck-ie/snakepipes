@@ -18,7 +18,7 @@ jobs:
       - uses: conda-incubator/setup-miniconda@v3
         with:
           python-version: 3.9
-          miniconda-version: 23.5.2
+          miniconda-version: "23.5.2"
           environment-file: .github/condaBuildCI.yml
           activate-environment: condaBuild_CI
           condarc-file: .github/condarc.yml
