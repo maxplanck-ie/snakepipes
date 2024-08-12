@@ -675,7 +675,7 @@ def plot_DAG(args, snakemake_cmd, calling_script, defaults):
     workflow_name = os.path.splitext(os.path.basename(calling_script))[0]
 
     # dryrun snakemake quietly: only generate the DAG
-    dag_cmd = f"{snakemake_cmd} --rulegraph --dryrun --quiet"
+    dag_cmd = f"{snakemake_cmd} --rulegraph --dryrun --quiet --config verbose=False"
 
     DAGproc = subprocess.Popen(
             dag_cmd,
