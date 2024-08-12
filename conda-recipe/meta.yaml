@@ -1,6 +1,8 @@
+{% set version = "3.0.0" %}
+
 package:
   name: snakepipes
-  version: 2.9.0
+  version: {{ version }}
 
 source:
   path: ../
@@ -8,19 +10,20 @@ source:
 build:
   number: 0
   noarch: python
+  script: python -m pip install --no-deps --ignore-installed .
 
 requirements:
   host:
     - python >=3
+    - pip
   run:
-    - python >=3.10
-    - snakemake >=6.2.1, <7.19.0
-    - tabulate <0.9
+    - python >=3.11
+    - snakemake >=8
+    - snakemake-executor-plugin-cluster-generic >=1.0.9
     - pandas
     - graphviz
     - thefuzz
     - pyyaml >=5.1
-    - coreutils
 
 test:
   commands:
@@ -30,4 +33,3 @@ about:
   home: 'https://snakepipes.readthedocs.org'
   license: MIT
   summary: NGS processing pipelines from the MPI-IE
-  license_file: LICENSE
