@@ -23,5 +23,5 @@ jobs:
       # Builds the package using the standard configuration
       - name: buildSnakePipes
         run: |
-          conda list -n condaBuild_CI
+          conda list | grep conda-build
           conda build -c conda-forge -c bioconda conda-recipe
