@@ -15,8 +15,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - uses: conda-incubator/setup-miniconda@v2
+      with:
+        python-version: 3.7
       # Builds the package using the standard configuration
-      - uses: cascode-labs/build-conda-action/action.yml@v0.1.4
+      - uses: cascode-labs/build-conda-action/action.yml@v0
       - name: build-snakePipes
         run: |
           conda build -c conda-forge -c bioconda conda-recipe
