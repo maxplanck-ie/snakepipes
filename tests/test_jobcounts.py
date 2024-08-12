@@ -212,6 +212,48 @@ def ifs(tmp_path_factory):
     createTestData(fp)
     return fp
 
+class TestmakePairs():
+    def test_default(self, ifs):
+        ci = [
+            "makePairs",
+            '-i',
+            ifs / 'PE',
+            '-o',
+            ifs / 'output',
+            ifs / 'org.yaml',
+            '--VCFfile',
+            ifs / 'allelic_input' / 'file.vcf.gz',
+            '--strains',
+            'strain1,strain2',
+            '--snakemakeOptions',
+            SMKOPTS
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 176
+
+    def test_dag(self, ifs):
+        ci = [
+            "makePairs",
+            '-i',
+            ifs / 'PE',
+            '-o',
+            ifs / 'output',
+            '--DAG',
+            ifs / 'org.yaml',
+            '--VCFfile',
+            ifs / 'allelic_input' / 'file.vcf.gz',
+            '--strains',
+            'strain1,strain2',
+            '--snakemakeOptions',
+            SMKOPTS
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 176
+        
 class TestCreateindices:
     def test_default(self, ifs):
         ci = [
@@ -2241,7 +2283,6 @@ class TestHIC():
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
         assert parseSpOut(_p) == 102
-
 
 class Testpreprocessing():
     def test_default(self, ifs):
