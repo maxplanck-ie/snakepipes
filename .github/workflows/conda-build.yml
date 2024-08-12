@@ -16,8 +16,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: conda-incubator/setup-miniconda@v2
-      with:
-        python-version: 3.7
+        with:
+          python-version: 3.7
       # Builds the package using the standard configuration
       - uses: cascode-labs/build-conda-action/action.yml@v0
       - name: build-snakePipes
