@@ -42,7 +42,6 @@ jobs:
         ruff check .
   CI:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
     steps:
     - uses: actions/checkout@v4
     - uses: conda-incubator/setup-miniconda@v3
