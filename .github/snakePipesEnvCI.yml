@@ -1,4 +1,3 @@
 name: snakePipes_CI
 dependencies:
-  - python >= 3.10
-  - graphviz
+  - python >= 3.11
