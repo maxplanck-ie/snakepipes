@@ -1,4 +1,4 @@
 name: condaBuild_CI
 dependencies:
   - python >= 3.9
-  - conda-build
+  - conda-build = 3.23.3
