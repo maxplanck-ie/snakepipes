@@ -3,6 +3,9 @@ on:
     paths:
       - 'pyproject.toml'
       - 'conda-recipe/meta.yaml'
+  pull_request_target:
+    types:
+      - closed
 
 job-name: conda-build
   runs-on: 'ubuntu-latest'
@@ -10,6 +13,6 @@ job-name: conda-build
     - uses: actions/checkout@v2
     # Builds the package using the standard configuration
     - uses: cascode-labs/build-conda-action/action.yml@v0
-    - name: build snakePipes
+    - name: build-snakePipes
       run: |
         conda build -c conda-forge -c bioconda conda-recipe
