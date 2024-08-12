@@ -74,7 +74,7 @@ with conda and pip
 .. code-block:: bash
 
     # create conda env
-    conda create --name snakePipes python=3.11
+    conda create --name snakePipes python>=3.11
 
     # activate env
     conda activate snakePipes
