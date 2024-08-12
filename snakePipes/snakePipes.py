@@ -288,7 +288,7 @@ def createCondaEnvs(args):
     else:
         # no condaEnvDir set in profile, thus assume we can detect it
         condaEnvDir = detectCondaDir()
-        _prefsource = f"Environment: $CONDA_PREFIX = {os.environ.get("CONDA_PREFIX")}"
+        _prefsource = f"Environment: $CONDA_PREFIX = {os.environ.get('CONDA_PREFIX')}"
 
     # Remove trailing slashes as they screw up the hash calculation
     if condaEnvDir[-1] == '/':
