@@ -55,7 +55,7 @@ else:
             strain1 = strains[0],
             SNPpath = os.path.abspath(VCFfile),
 
-            temp_out=temp("all_SNPs_" + strains[0] + "_GRCm38.txt.gz"),
+            temp_out=temp("all_SNPs_" + strains[0] + "_" + genome_alias + ".txt.gz"),
             out_bname=os.path.basename(SNPFile)
         log:
             out = "SNPsplit_createSNPgenome.out",
@@ -66,8 +66,9 @@ else:
             " SNPsplit_genome_preparation"
             " --genome_build {BASENAME}"
             " --reference_genome {input.genome} --vcf_file {params.SNPpath}"
-            " --strain {params.strain1} > {log.out} 2> {log.err}&& cp "
-            "{params.temp_out} {params.out_bname} >> {log.out} 2>> {log.err} "
+            " --strain {params.strain1} > {log.out} 2> {log.err} "
+            #&& cp "
+            #"{params.temp_out} {params.out_bname} >> {log.out} 2>> {log.err} "
             "&& cd ../"
 
 if aligner == "STAR":
