@@ -2,8 +2,9 @@ name: condaBuild_CI
 channels:
   - uibcdf
   - conda-forge
-  - defaults
   - bioconda
 dependencies:
+  - python=3.11
   - anaconda-client
   - conda-build
+  - conda-verify

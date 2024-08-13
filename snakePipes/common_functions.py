@@ -14,7 +14,6 @@ from thefuzz import fuzz
 import smtplib
 from email.message import EmailMessage
 from importlib.metadata import version
-import graphviz
 
 def set_env_yamls():
     """
@@ -687,10 +686,17 @@ def plot_DAG(args, snakemake_cmd, calling_script, defaults):
     # Read DOT data from stdout
     dot = DAGproc.stdout.read()
 
-    # Use graphviz to render DAG
-    graph = graphviz.Source(dot)
+    # Use graphviz to render DAG, if it is available
+    # conda graphviz doesn't provide the python bindings, the pip graphviz does, but has no executable.
+    # If graphviz is not available, write out the ASCII as file.
     output_file = os.path.join(args.outdir, f"{workflow_name}_pipeline")
-    graph.render(output_file, format='png')
+    try:
+        import graphviz
+        graph = graphviz.Source(dot)
+        graph.render(output_file, format='png')
+    except ModuleNotFoundError:
+        with open(output_file + 'DAG.txt', 'w') as f:
+            f.write(dot)
 
 
 def print_DAG(args, snakemake_cmd, callingScript, defaults):

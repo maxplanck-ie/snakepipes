@@ -10,18 +10,18 @@ source:
 build:
   number: 0
   noarch: python
-  script: python -m pip install --no-deps --ignore-installed .
+  script: pip install .
 
 requirements:
   host:
     - python >=3
     - pip
+    - seaborn
   run:
     - python >=3.11
     - snakemake >=8
     - snakemake-executor-plugin-cluster-generic >=1.0.9
     - pandas
-    - graphviz
     - thefuzz
     - pyyaml >=5.1
 
