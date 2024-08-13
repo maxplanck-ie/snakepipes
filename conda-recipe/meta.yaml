@@ -24,6 +24,7 @@ requirements:
     - graphviz
     - thefuzz
     - pyyaml >=5.1
+    - graphviz
 
 test:
   commands:
