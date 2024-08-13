@@ -655,7 +655,7 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
                     UTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX); \
                     PYTHONNOUSERSITE=True snakemake \
                     {str(args.snakemakeOptions or '')} \
-                    --snakefile {Path(workflowDir) / "Snakefile"} \
+                    --snakefile {Path(workflowDir) / 'Snakefile'} \
                     --directory {args.workingdir} \
                     --configfile {os.path.join(args.outdir, '{}.config.yaml'.format(workflowName))} \
                     --profile {cfg['snakemakeProfile']}".split(' ')
@@ -664,6 +664,46 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
         snakemake_cmd.append("--printshellcmds")
 
     return " ".join(snakemake_cmd)
+
+
+def plot_DAG(args, snakemake_cmd, calling_script, defaults):
+
+    if not args.createDAG:
+        return
+
+    workflow_name = os.path.splitext(os.path.basename(calling_script))[0]
+
+    # dryrun snakemake quietly: only generate the DAG
+    dag_cmd = f"{snakemake_cmd} --rulegraph --dryrun --quiet --config verbose=False"
+
+    DAGproc = subprocess.Popen(
+            dag_cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            shell=True)
+
+    # Read DOT data from stdout
+    dot = DAGproc.stdout.read()
+
+    # Use graphviz to render DAG, if it is available
+    # conda graphviz doesn't provide the python bindings, the pip graphviz does, but has no executable.
+    # If graphviz is not available, write out the ASCII as file.
+    output_file = os.path.join(args.outdir, f"{workflow_name}_pipeline")
+    try:
+        import graphviz
+        if shutil.which('dot'):
+            graph = graphviz.Source(dot)
+            graph.render(output_file, format='png')
+            return
+        else:
+            with open(output_file + 'DAG.txt', 'w') as f:
+                f.write(dot)
+            return
+    except ModuleNotFoundError:
+        with open(output_file + 'DAG.txt', 'w') as f:
+            f.write(dot)
+        return
 
 
 def print_DAG(args, snakemake_cmd, callingScript, defaults):

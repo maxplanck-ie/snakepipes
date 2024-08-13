@@ -52,6 +52,12 @@ jobs:
     - name: Install snakePipes
       run: |
         pip install .
+    - name: print_conda_env_export
+      run: |
+        conda env export 
+    - name: print_pip_list
+      run: |
+        pip list 
     - name: CI
       run: |
         snakePipes config --tempDir /tmp

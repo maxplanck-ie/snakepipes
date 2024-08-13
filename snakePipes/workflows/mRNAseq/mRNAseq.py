@@ -196,4 +196,4 @@ def main():
     cf.runAndCleanup(args, snakemake_cmd, logfile_name)
 
     #CreateDAG
-    cf.print_DAG(args,snakemake_cmd, __file__,defaults)
+    cf.plot_DAG(args,snakemake_cmd, __file__,defaults)

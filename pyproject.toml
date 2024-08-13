@@ -37,7 +37,8 @@ dependencies = [
     "pandas",
     "thefuzz",
     "pyyaml >= 5.1",
-    "snakemake-executor-plugin-cluster-generic >= 1.0.9"
+    "snakemake-executor-plugin-cluster-generic >= 1.0.9",
+    "graphviz"
 ]
 
 [project.optional-dependencies]
