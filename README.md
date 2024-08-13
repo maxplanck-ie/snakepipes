@@ -7,7 +7,7 @@
 # SnakePipes
 
 snakePipes are flexible and powerful workflows built using [snakemake](https://github.com/snakemake/snakemake) that simplify the analysis of NGS data.
-![snakePipes](.docs/content/images/snakePipes_small.png)
+![snakePipes](docs/content/images/snakePipes_small.png)
 
 ## Workflows
 
