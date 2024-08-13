@@ -1,8 +1,4 @@
-name: condaBuild_CI
-channels:
-  - uibcdf
-  - conda-forge
-  - bioconda
+name: conda_ci
 dependencies:
   - python=3.11
   - anaconda-client

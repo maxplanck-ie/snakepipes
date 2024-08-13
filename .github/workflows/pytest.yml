@@ -23,8 +23,8 @@ jobs:
         STAR --runThreadN 4 --runMode genomeGenerate --genomeDir tests/data/mRNA_STAR --genomeFastaFiles genome_chr17.fa --sjdbGTFfile genes_chr17.gtf --sjdbOverhang 100 --genomeSAindexNbases 12
     - uses: conda-incubator/setup-miniconda@v3
       with:
-        environment-file: .github/snakePipesEnvCI.yml
-        activate-environment: snakePipes_CI
+        environment-file: .github/conda_ci.yml
+        activate-environment: conda_ci
         condarc-file: .github/condarc.yml
     - name: Install snakePipes
       run: |
@@ -40,8 +40,8 @@ jobs:
     - uses: actions/checkout@v4
     - uses: conda-incubator/setup-miniconda@v3
       with:
-        environment-file: .github/snakePipesEnvCI.yml
-        activate-environment: snakePipes_CI
+        environment-file: .github/conda_ci.yml
+        activate-environment: conda_ci
         condarc-file: .github/condarc.yml
     - name: Install snakePipes
       run: |
