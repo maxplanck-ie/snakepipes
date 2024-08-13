@@ -1,10 +1,10 @@
 #!/bin/bash
 set -ex
-if [[ ${CI:-"false"} == "true" ]]; then
-    export PATH="$HOME/miniconda/bin:$PATH"
-    hash -r
-    python -m pip install --no-deps --ignore-installed .
-fi
+# if [[ ${CI:-"false"} == "true" ]]; then
+#     export PATH="$HOME/miniconda/bin:$PATH"
+#     hash -r
+#     python -m pip install --no-deps --ignore-installed .
+# fi
 
 # Needed by DNA, HiC, mRNAseq, WGBS and scRNAseq workflows
 mkdir -p PE_input
