@@ -6,9 +6,6 @@ on:
   pull_request_target:
     types:
       - closed
-  push:
-    branches:
-      - pairtools_conda_gha
 
 jobs:
   condaBuild:
