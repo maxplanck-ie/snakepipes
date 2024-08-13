@@ -20,10 +20,10 @@ jobs:
           environment-file: .github/condaBuildCI.yml
           activate-environment: condaBuild_CI
           condarc-file: .github/condarc.yml
+          auto-update-conda: true
+          auto-activate-base: false
       # Builds the package using the standard configuration
       - name: buildSnakePipes
         run: |
-          conda init
-          conda activate condaBuild_CI
           conda list
           conda build -c conda-forge -c bioconda conda-recipe
