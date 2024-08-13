@@ -33,5 +33,4 @@ jobs:
         with:
           meta_yaml_dir: conda-recipe
           python-version: 3.11
-          platform_linux-64: true
           upload: false
