@@ -1,4 +1,9 @@
 name: condaBuild_CI
+channels:    # write here the list of channels to look for your library dependencies
+  - uibcdf
+  - conda-forge
+  - default
+
 dependencies:
-  - python >= 3.9
-  - conda-build = 3.26.0
+  - anaconda-client
+  - conda-build

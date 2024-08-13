@@ -15,13 +15,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: conda-incubator/setup-miniconda@v3
         with:
+          fetch-depth: 0
+      - name: Conda environment creation and activation
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          python-version: 3.9
           environment-file: .github/condaBuildCI.yml
-          activate-environment: condaBuild_CI
-          condarc-file: .github/condarc.yml
-          auto-update-conda: true
+          #activate-environment: condaBuild_CI
+          #condarc-file: .github/condarc.yml
+          auto-update-conda: false
           auto-activate-base: false
+          show-channel-urls: true
       # Builds the package using the standard configuration
       - name: buildSnakePipes
         run: |
