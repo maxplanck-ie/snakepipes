@@ -692,11 +692,18 @@ def plot_DAG(args, snakemake_cmd, calling_script, defaults):
     output_file = os.path.join(args.outdir, f"{workflow_name}_pipeline")
     try:
         import graphviz
-        graph = graphviz.Source(dot)
-        graph.render(output_file, format='png')
+        if shutil.which('dot'):
+            graph = graphviz.Source(dot)
+            graph.render(output_file, format='png')
+            return
+        else:
+            with open(output_file + 'DAG.txt', 'w') as f:
+                f.write(dot)
+            return
     except ModuleNotFoundError:
         with open(output_file + 'DAG.txt', 'w') as f:
             f.write(dot)
+        return
 
 
 def print_DAG(args, snakemake_cmd, callingScript, defaults):
