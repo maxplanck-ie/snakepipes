@@ -2,7 +2,8 @@ from os.path import join, dirname
 import glob
 
 GENOMEDIR = os.path.dirname(genome_fasta)
-BASENAME = genome
+genome_alias = os.path.splitext(os.path.basename(genome))[0]
+BASENAME = genome_alias
 # define snpgenome_dir
 if allele_hybrid == 'dual':
     SNPdir = "snp_genome/" + strains[0] + "_" + \
