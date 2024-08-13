@@ -1,0 +1,33 @@
+on:
+  pull_request:
+    paths:
+      - 'pyproject.toml'
+      - 'conda-recipe/meta.yaml'
+  pull_request_target:
+    types:
+      - closed
+
+jobs:
+  condaBuild:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Conda environment creation and activation
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          python-version: 3.11
+          environment-file: .github/condaBuildCI.yml
+          #activate-environment: condaBuild_CI
+          #condarc-file: .github/condarc.yml
+          auto-update-conda: false
+          auto-activate-base: false
+          show-channel-urls: true
+      # Builds the package using the standard configuration
+      - name: buildSnakePipes
+        uses: uibcdf/action-build-and-upload-conda-packages@v1.3.0
+        with:
+          meta_yaml_dir: conda-recipe
+          python-version: 3.11
+          upload: false
