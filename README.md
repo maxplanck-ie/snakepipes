@@ -1,7 +1,7 @@
 [![linux](https://github.com/maxplanck-ie/snakepipes/actions/workflows/linux.yml/badge.svg)](https://github.com/maxplanck-ie/snakepipes/actions/workflows/linux.yml)
 [![osx](https://github.com/maxplanck-ie/snakepipes/actions/workflows/osx.yml/badge.svg)](https://github.com/maxplanck-ie/snakepipes/actions/workflows/osx.yml)
 [![pytest](https://github.com/maxplanck-ie/snakepipes/actions/workflows/pytest.yml/badge.svg)](https://github.com/maxplanck-ie/snakepipes/actions/workflows/pytest.yml)
-[![readthedocs]](https://readthedocs.org/projects/snakepipes/badge/?version=latest)
+[![readthedocs](https://readthedocs.org/projects/snakepipes/badge/?version=latest)](https://snakepipes.readthedocs.io/en/latest/)
 [![citation](https://zenodo.org/badge/54579435.svg)](https://zenodo.org/badge/latestdoi/54579435)
 
 # SnakePipes
