@@ -38,8 +38,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: conda-incubator/setup-miniconda@v3
         with:
-          environment-file: .github/snakePipesEnvCI.yml
-          activate-environment: snakePipes_CI
+          environment-file: .github/conda_ci.yml
+          activate-environment: conda_ci
           condarc-file: .github/condarc.yml
       - name: install snakePipes_OSX
         run: |

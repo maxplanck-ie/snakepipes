@@ -9,10 +9,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: conda-incubator/setup-miniconda@v3
         with:
-          environment-file: .github/condaBuildCI.yml
-          auto-update-conda: false
-          auto-activate-base: false
-          show-channel-urls: true
+          environment-file: .github/conda_ci.yml
+          condarc-file: .github/condarc.yml
       - name: buildSnakePipes
         uses: uibcdf/action-build-and-upload-conda-packages@v1.3.0
         with:
