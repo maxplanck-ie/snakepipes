@@ -8,6 +8,20 @@ defaults:
 
 
 jobs:
+  pip:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.11', '3.12']
+        optdeps: [".", ".[actions]", ".[docs]"]
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: pip
+      run: |
+        pip install {{ matrix.optdeps }}
   docs:
     runs-on: ubuntu-latest
     steps:
@@ -90,8 +104,8 @@ jobs:
     - uses: actions/checkout@v4
     - uses: conda-incubator/setup-miniconda@v3
       with:
-        environment-file: .github/snakePipesEnvCI.yml
-        activate-environment: snakePipes_CI
+        environment-file: .github/conda_ci.yml
+        activate-environment: conda_ci
         condarc-file: .github/condarc.yml
     - name: install snakePipes
       run: |
