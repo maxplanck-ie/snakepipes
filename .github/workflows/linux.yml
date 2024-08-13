@@ -21,8 +21,9 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: pip
       run: |
-        pip install {{ matrix.optdeps }}
+        pip install ${{ matrix.optdeps }}
   docs:
+    needs: pip
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -38,6 +39,7 @@ jobs:
         cd docs
         make html
   lint:
+    needs: pip
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -51,6 +53,7 @@ jobs:
       run: |
         ruff check .
   CI:
+    needs: pip
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
