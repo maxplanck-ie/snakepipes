@@ -1,0 +1,10 @@
+name: condaBuild_CI
+channels:    # write here the list of channels to look for your library dependencies
+  - uibcdf
+  - conda-forge
+  - defaults
+  - bioconda
+
+dependencies:
+  - anaconda-client
+  - conda-build
