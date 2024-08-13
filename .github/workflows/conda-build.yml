@@ -20,7 +20,7 @@ jobs:
       - name: Conda environment creation and activation
         uses: conda-incubator/setup-miniconda@v3
         with:
-          python-version: 3.9
+          python-version: 3.10
           environment-file: .github/condaBuildCI.yml
           #activate-environment: condaBuild_CI
           #condarc-file: .github/condarc.yml
@@ -29,6 +29,9 @@ jobs:
           show-channel-urls: true
       # Builds the package using the standard configuration
       - name: buildSnakePipes
-        run: |
-          conda list
-          conda build -c conda-forge -c bioconda conda-recipe
+        uses: uibcdf/action-build-and-upload-conda-packages@v1.3.0
+        with:
+          meta_yaml_dir: conda-recipe
+          python-version: 3.10
+          platform_linux-64: true
+          upload: false
