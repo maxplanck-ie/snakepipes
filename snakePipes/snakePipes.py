@@ -316,9 +316,9 @@ def createCondaEnvs(args):
         numberEnvs = len(args.only)
     envNum = 0
     for envName, env in cof.set_env_yamls().items():
-        envNum += 1
         if args.only is not None and envName not in args.only:
             continue
+        envNum += 1
         # Hash the file ala snakemake
         md5hash = hashlib.md5()
         md5hash.update(condaEnvDir.encode())
