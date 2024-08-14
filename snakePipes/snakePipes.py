@@ -294,9 +294,26 @@ def createCondaEnvs(args):
     if condaEnvDir[-1] == '/':
         condaEnvDir = condaEnvDir[:-1]
 
-    print(f"CondaEnvDir detected as: {condaEnvDir}, from {_prefsource}")
+    print(f"profile used: {profilePath}")
+    print(f"CondaEnvDir detected as: {condaEnvDir}, from {_prefsource}\n")
+
+    # if mamba is not installed, conda-frontend should be set
+    if not shutil.which('mamba') and 'conda-frontend' not in _p:
+        print(
+            f"WARNING: No mamba detected in your path and conda-frontend not set. Set 'conda-fronted: conda' in {profilePath.name}"
+        )
+    if 'use-conda' not in _p:
+        print(
+            f"WARNING: Your profile ({profilePath.name}) should have 'use-conda: True' !"
+        )
+    if 'conda-prefix' not in _p:
+        print(
+            f"WARNING: Your profile ({profilePath.name}) does not have 'conda-prefix' set. Environments will go in your default envs folder."
+        )
 
     numberEnvs = len(cof.set_env_yamls().keys())
+    if args.only is not None:
+        numberEnvs = len(args.only)
     envNum = 0
     for envName, env in cof.set_env_yamls().items():
         envNum += 1
