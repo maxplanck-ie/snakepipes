@@ -14,7 +14,7 @@ if pairedEnd:
         threads: lambda wildcards: 8 if 8<max_thread else max_thread
         conda: CONDA_SHARED_ENV
         shell: """
-            cutadapt -j {threads} -e 0.1 -q 16 -O 3 --trim-n --minimum-length 25 -a AGATCGGAAGAGC -A AGATCGGAAGAGC {params.opts} \
+            cutadapt -j {threads} -e 0.1 -q 16 -O 3 --trim-n --minimum-length 25 -a CTGTCTCTTATACACATCT -A CTGTCTCTTATACACATCT {params.opts} \
                 -o "{output.r1}" -p "{output.r2}" "{input.r1}" "{input.r2}"
             """
 else:
@@ -30,7 +30,7 @@ else:
         threads: lambda wildcards: 8 if 8<max_thread else max_thread
         conda: CONDA_SHARED_ENV
         shell: """
-            cutadapt -j {threads} -e 0.1 -q 16 -O 3 --trim-n --minimum-length 25 -a AGATCGGAAGAGC {params.opts} \
+            cutadapt -j {threads} -e 0.1 -q 16 -O 3 --trim-n --minimum-length 25 -a CTGTCTCTTATACACATCT {params.opts} \
                 -o "{output}" "{input.r1}"
             """
 
