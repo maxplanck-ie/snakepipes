@@ -7,7 +7,7 @@ if aligner == "Bowtie2":
             bam = "filtered_bam/{sample}.filtered.bam"
         output:
             targetbam = expand("allelic_bams/{{sample}}.filtered.{suffix}.bam", suffix = ['allele_flagged', 'genome1', 'genome2', 'unassigned']),
-            tempbam = temp("filtered_bam/{sample}.filtered.sortedByName.bam"),
+            #tempbam = temp("filtered_bam/{sample}.filtered.sortedByName.bam"),
             rep1 = "allelic_bams/{sample}.filtered.SNPsplit_report.yaml",
             rep2 = "allelic_bams/{sample}.filtered.SNPsplit_sort.yaml"
         params:
@@ -25,7 +25,7 @@ elif aligner == "STAR" or aligner == "EXTERNAL_BAM":
             bam = aligner+"/{sample}.bam"
         output:
             targetbam = expand("allelic_bams/{{sample}}.{suffix}.bam", suffix = ['allele_flagged', 'genome1', 'genome2', 'unassigned']),
-            tempbam = temp(aligner+"/{sample}.sortedByName.bam"),
+            #tempbam = temp(aligner+"/{sample}.sortedByName.bam"),
             rep1 = "allelic_bams/{sample}.SNPsplit_report.yaml",
             rep2 = "allelic_bams/{sample}.SNPsplit_sort.yaml"
         params:
