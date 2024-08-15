@@ -4,10 +4,12 @@ Setting up snakePipes
 =====================
 
 Unlike many other pipelines, setting up snakePipes is easy! All you need is a *linux/OSX system* with a working *conda* installation.
-Note that mamba used to be a pre-requisite for snakePipes, but this requirement has been removed since libmamba is the default solver in recent conda installations.
 
 Installing conda
 ----------------
+
+.. note::
+   Latest snakePipes versions (3.0 onwards) require conda >= 23.10.0 If you have an older version of conda, please don't use it. You may try installing the extension (conda-libmamba-solver) in your base environment, and setting this as default (conda config --set solver libmamba) but this has not been tested by us, hence YMMV. Mamba used to be a pre-requisite for snakePipes (versions 2.5.3 through 2.8.1), refer to older docs in such versions.
 
 Follow the instructions `here <https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html>`__ to install either miniconda or anaconda first.
 After installation, check your python path and version :
@@ -19,7 +21,6 @@ After installation, check your python path and version :
 
     $ python --version # anything above 3.5 is ok!
     $ Python 3.6.5 :: Anaconda, Inc.
-
 
 Installing snakePipes
 ---------------------
