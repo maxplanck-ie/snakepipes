@@ -16,7 +16,7 @@ conda-frontend: conda
 cluster-generic-cancel-cmd: "ccancel.sh"
 latency-wait: 300
 default-resources:
-  mem: 1G
+  mem: 10G
   time: 1440
   partition: bioinfo
 set-resources:
