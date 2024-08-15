@@ -35,15 +35,13 @@ Quick start
 
 .. code:: bash
 
-    conda install mamba -c conda-forge && mamba create -n snakePipes -c mpi-ie -c conda-forge -c bioconda snakePipes
+    conda create -n snakePipes -c mpi-ie -c conda-forge -c bioconda snakePipes
 
 * You can update snakePipes to the latest version available on conda with:
 
 .. code:: bash
 
-    mamba update -n snakePipes -c mpi-ie -c conda-forge -c bioconda --prune snakePipes
-
-snakePipes is going to move to mamba in the future.
+    conda update -n snakePipes -c mpi-ie -c conda-forge -c bioconda --prune snakePipes
 
 * Download genome fasta and annotations for an your organism, and build indexes, Check in :ref:`createIndices`
 
@@ -53,7 +51,7 @@ snakePipes is going to move to mamba in the future.
 
     snakePipes config --help
 
-.. note:: If you have a copy of a `shared/defaults.yaml` with the necessary paths configured (i.e. from a previous installation), you can pass it to snakePipes config with `--oldConfig` and `--configMode recycle` instead of providing all the paths manually again. Config keys have to match for this to work. In the same way, you can pass your external organism yaml folder with ``--organismsDir`` or cluster config with ``--clusterConfig``.
+.. note:: If you have a copy of a `shared/defaults.yaml` with the necessary paths configured (i.e. from a previous installation), you can pass it to snakePipes config with `--oldConfig` and `--configMode recycle` instead of providing all the paths manually again. Config keys have to match for this to work. In the same way, you can pass your external organism yaml folder with ``--organismsDir``.
 
 * Download example fastq files for the human genome `here <https://zenodo.org/record/3707259>`_
 
