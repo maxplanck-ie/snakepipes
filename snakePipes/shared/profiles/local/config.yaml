@@ -1,0 +1,208 @@
+cores: 2
+use-conda: True
+conda-prefix: /tmp
+conda-frontend: conda
+printshellcmds: False
+default-resources:
+  mem: 1G
+  time: 300
+  partition: bioinfo
+set-resources:
+  annotation_bed2fasta:
+    mem: 4G
+  AlevinForVelocity:
+    mem: 10G
+  ATAC_qc:
+    mem: 2G
+  bamCoverage:
+    mem: 5G
+  bamCoverage_coverage:
+    mem: 5G
+  bamCoverage_filtered:
+    mem: 5G
+  bamCoverage_raw:
+    mem: 5G
+  bamCoverage_RPKM:
+    mem: 5G
+  bamCoverage_unique_mappings:
+    mem: 5G
+  bamPE_fragment_size:
+    mem: 10G
+  BAMsort_allelic:
+    mem: 3G
+  Bowtie2:
+    mem: 4G
+  bowtie2Index:
+    mem: 10G
+  bwa:
+    mem: 4G
+  bwaIndex:
+    mem: 8G
+  bwamem2:
+    mem: 6G
+  bwamem2Index:
+    mem: 90G
+  bwameth:
+    mem: 3G
+  bwamethIndex:
+    mem: 20G
+  bwameth2Index:
+    mem: 120G
+  build_matrix:
+    mem: 9G
+  call_tads:
+    mem: 3G
+  cellsort_bam:
+    mem: 10G
+  clumpify:
+    mem: 2G
+  CollectAlignmentSummaryMetrics:
+    mem: 2G
+  CollectInsertSizeMetrics:
+    mem: 1G
+  correct_matrix:
+    mem: 7G
+  CpG_report:
+    mem: 6G
+  CpG_stats:
+    mem: 30G
+  create_annotation_bed:
+    mem: 4G
+  createGenomeFasta:
+    mem: 20G
+  CSAW:
+    mem: 30G
+  create_snpgenome:
+    mem: 30G
+  DepthOfCov:
+    mem: 3G
+  DepthOfCovGenome:
+    mem: 3G
+  DESeq2:
+    mem: 5G
+  DESeq2_Salmon_basic:
+    mem: 3G
+  DESeq2_Salmon_allelic:
+    mem: 3G
+  diagnostic_plot:
+    mem: 2G
+  dmrseq:
+    mem: 10G
+  downloadGTF:
+    mem: 20G
+  DSS:
+    mem: 10G
+  fastaDict:
+    mem: 4G
+  FASTQdownsample:
+    mem: 4G
+  filterBW:
+    mem: 6G
+  filter_reads:
+    mem: 3G
+  filter_reads_umi:
+    mem: 10G
+  filterCoveragePerScaffolds:
+    mem: 6G
+  Genrich_peaks:
+    mem: 20G
+  HISAT2:
+    mem: 6G
+  hisat2Index:
+    mem: 2G
+  histoneHMM:
+    mem: 4G
+  MACS2:
+    mem: 8G
+  make2bit:
+    mem: 8G
+  map_fastq_single_end:
+    mem: 10G
+  markDupes:
+    mem: 3G
+  merge_bins:
+    mem: 7G
+  merge_matrices:
+    mem: 3G
+  metileneReport:
+    mem: 6G
+  namesort_bams:
+    mem: 6G
+  plot_heatmap_cov_CSAW:
+    mem: 5G
+  plotCorrelation_pearson:
+    mem: 3G
+  plotCorrelation_pearson_allelic:
+    mem: 5G
+  plotCorrelation_spearman:
+    mem: 3G
+  plotCorrelation_spearman_allelic:
+    mem: 2G
+  plotCoverage:
+    mem: 1G
+  plotEnrichment:
+    mem: 1G
+  plotFingerprint:
+    mem: 1G
+  plotPCA:
+    mem: 4G
+  plotPCA_allelic:
+    mem: 4G
+  plot_heatmap_CSAW_up:
+    mem: 10G
+  prepForMetilene:
+    mem: 3G
+  produceReport:
+    mem: 20G
+  run_eisaR:
+    mem: 30G
+  Salmon_counts:
+    mem: 5G
+  Salmon_index_joint_fa:
+    mem: 6G
+  SalmonAlevin:
+    mem: 10G
+  SalmonIndex:
+    mem: 3G
+  SalmonQuant:
+    mem: 2G
+  Salmon_TPM:
+    mem: 5G
+  sambamba_flagstat:
+    mem: 3G
+  sambamba_flagstat_sorted:
+    mem: 3G
+  sambamba_markdup:
+    mem: 4G
+  sambamaba_sort_hic_r1:
+    mem: 4G
+  sambamaba_sort_hic_r2:
+    mem: 4G
+  SEACR_peaks_lenient:
+    mem: 20G
+  SEACR_peaks_stringent:
+    mem: 10G
+  sleuth_Salmon:
+    mem: 4G
+  sleuth_SalmonAllelic:
+    mem: 10G
+  snp_split:
+    mem: 25G
+  STAR:
+    mem: 6G
+  STAR_allele:
+    mem: 30G
+  star_index:
+    mem: 15G
+  starIndex:
+    mem: 8G
+  STARsolo:
+    mem: 6G
+  STARsolo_raw_to_seurat:
+    mem: 10G
+  TEcounts:
+    mem: 16G
+  velo_to_sce:
+    mem: 30G
+  velocyto:
+    mem: 20G

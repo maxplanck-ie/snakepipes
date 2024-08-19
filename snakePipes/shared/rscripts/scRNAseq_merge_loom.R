@@ -1,4 +1,3 @@
-sink(snakemake@log[["out"]])
 .libPaths(R.home("library"))
 
 #system(paste0('mkdir -p ',wdir)) #for debugging
@@ -27,6 +26,3 @@ names(l)<-samples
 s<-MergeSeurat(x=l[[1]],y=unlist(l[[2:length(l)]]),add.cell.ids=names(l))
 outfile<-file.path(wdir,basename(snakemake@output[["seurat"]]))
 saveRDS(s,file=outfile)
-
-message('done all')
-sink()

@@ -1,5 +1,4 @@
 #this is a modification of https://github.com/csoneson/rna_velocity_quant/blob/master/scripts/generate_cdna_intron_fa_prepref.R , authored by C.Soneson
-sink(snakemake@log[["out"]])
 .libPaths(R.home("library"))
 
 wdir<-snakemake@params[["wdir"]]
@@ -89,7 +88,6 @@ write.table(t2g, file = joint_t2g,
 
 
 message('done all')
-sink()
 
 sink("sessionInfo.txt")
 sessionInfo()

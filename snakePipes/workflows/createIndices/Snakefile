@@ -168,7 +168,6 @@ rule all:
 ### execute after workflow finished ############################################
 ################################################################################
 onsuccess:
-    cf.cleanLogs(outdir, cluster_config)
     f = open(os.path.join(outdir, "genome_fasta", "effectiveSize"))
     organismDictionary['genome_size'] = int(float(f.read().strip()))
     f.close()

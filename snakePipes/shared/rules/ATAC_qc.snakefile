@@ -1,5 +1,3 @@
-
-
 rule plotFingerprint:
     input:
         bams = expand("filtered_bam/{sample}.filtered.bam", sample = samples),
@@ -15,9 +13,6 @@ rule plotFingerprint:
             else "",
         jsd = "--JSDsample filtered_bam/{}.filtered.bam".format(samples[0]) if (len(samples)>0)
             else ""
-    log:
-        out = os.path.join(deeptools_ATAC, "logs/plotFingerprint.out"),
-        err = os.path.join(deeptools_ATAC, "logs/plotFingerprint.err")
     benchmark:
         os.path.join(deeptools_ATAC, ".benchmark/plotFingerprint.benchmark")
     threads: lambda wildcards: 24 if 24<max_thread else max_thread
@@ -39,9 +34,6 @@ rule plotFingerprint_allelic:
         png = "--plotFile {}".format(os.path.join(deeptools_ATAC, "plotFingerprint", "plotFingerprint_allelic.png")) if (len(samples)<=20)
               else "",
         jsd = ""
-    log:
-        out = os.path.join(deeptools_ATAC, "logs/plotFingerprint_allelic.out"),
-        err = os.path.join(deeptools_ATAC, "logs/plotFingerprint_allelic.err")
     benchmark:
         os.path.join(deeptools_ATAC, ".benchmark/plotFingerprint_allelic.benchmark")
     threads: lambda wildcards: 24 if 24<max_thread else max_thread
@@ -58,7 +50,6 @@ rule MACS2_peak_qc:
         xls = os.path.join(outdir_MACS2, '{sample}.filtered.short.BAM_peaks.xls')
     output:
         qc = os.path.join(outdir_ATACqc, "{sample}.filtered.BAM_peaks.qc.txt")
-    log: os.path.join(outdir_ATACqc, "logs/{sample}.MACS2_peak_qc.log")
     params:
         peaks = os.path.join(outdir_MACS2, '{sample}.filtered.short.BAM_peaks.narrowPeak'),
         genome_index = genome_index
@@ -85,5 +76,5 @@ rule MACS2_peak_qc:
         genomecov=`bc -l <<< "$peak_len/$genome_size"`
 
         # write peak-based QC metrics to output file
-        printf "peak_count\tFRiP\tpeak_genome_coverage\n%d\t%5.3f\t%6.4f\n" $peak_count $frip $genomecov > {output.qc} 2> {log}
+        printf "peak_count\tFRiP\tpeak_genome_coverage\n%d\t%5.3f\t%6.4f\n" $peak_count $frip $genomecov > {output.qc}
         """

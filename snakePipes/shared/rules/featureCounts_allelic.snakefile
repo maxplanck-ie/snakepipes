@@ -14,9 +14,6 @@ rule featureCounts_allele:
         paired_opt = lambda wildcards: "-p -B " if pairedEnd else "",
         opts = config["featureCountsOptions"],
         tempDir = tempDir
-    log:
-        out = "featureCounts/logs/{sample}.out",
-        err = "featureCounts/logs/{sample}.err"
     threads: 8
     conda: CONDA_RNASEQ_ENV
     shell: """
@@ -29,7 +26,7 @@ rule featureCounts_allele:
         -a {input.gtf} \
         -o {output} \
         --tmpDir $MYTEMP \
-        {input.bam} {input.allele1} {input.allele2} > {log.out} 2> {log.err};
+        {input.bam} {input.allele1} {input.allele2};
         rm -rf $MYTEMP
         """
 
@@ -38,7 +35,6 @@ rule merge_featureCounts:
         expand("featureCounts/{sample}.allelic_counts.txt", sample=samples)
     output:
         "featureCounts/counts_allelic.tsv"
-    log: "featureCounts/logs/merge_featureCounts.log"
     conda: CONDA_RNASEQ_ENV
     shell:
-        "Rscript "+os.path.join(maindir, "shared", "rscripts", "merge_featureCounts.R")+" {output} {input} 2> {log}"
+        "Rscript "+os.path.join(maindir, "shared", "rscripts", "merge_featureCounts.R")+" {output} {input}"

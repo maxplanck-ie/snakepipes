@@ -1,4 +1,3 @@
-sink(snakemake@log[["out"]])
 .libPaths(R.home("library"))
 
 wdir<-snakemake@params[["wdir"]]
@@ -20,9 +19,6 @@ rdf <- Reduce(function(x, y, ...) merge(x, y, all = TRUE, by="Metric", sort=FALS
 
 outf<-file.path(wdir,basename(snakemake@output[["report"]]))
 write.table(rdf,outf,row.names=FALSE,quote=FALSE,sep="\t")
-
-message('done all')
-sink()
 
 sink("sessionInfo.txt")
 sessionInfo()

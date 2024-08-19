@@ -12,9 +12,6 @@ rule bamCoverage_RPKM_allelic:
         bwBinSize = config["bwBinSize"],
         blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed else "",
         ignoreForNorm = "--ignoreForNormalization {}".format(ignoreForNormalization) if ignoreForNormalization else ""
-    log:
-        out="bamCoverage/allele_specific/logs/bamCoverage_RPKM.{sample}.{suffix}.out",
-        err="bamCoverage/allele_specific/logs/bamCoverage_RPKM.{sample}.{suffix}.err",
     benchmark:
         "bamCoverage/allele_specific/.benchmark/bamCoverage_RPKM.{sample}.{suffix}.benchmark"
     threads: 8
@@ -31,9 +28,6 @@ rule bamCoverage_raw_allelic:
         CONDA_SHARED_ENV
     params:
         bwBinSize = bwBinSize
-    log:
-        out="bamCoverage/allele_specificlogs/bamCoverage_coverage.{sample}.{suffix}.out",
-        err="bamCoverage/allele_specificlogs/bamCoverage_coverage.{sample}.{suffix}.err"
     benchmark:
         "bamCoverage/allele_specific.benchmark/bamCoverage_coverage.{sample}.{suffix}.benchmark"
     threads: 8
@@ -53,9 +47,6 @@ rule plotEnrichment_allelic:
         labels = " ".join(expand('{sample}.{suffix}', sample=samples, suffix = ['genome1', 'genome2'])),
         plotcmd = "" if plotFormat == 'None' else
             "--plotFile " + "deepTools_qc/plotEnrichment/plotEnrichment_allelic." + plotFormat
-    log:
-        out="deepTools_qc/logs/plotEnrichment_allelic.out",
-        err="deepTools_qc/logs/plotEnrichment_allelic.err"
     benchmark:
         "deepTools_qc/.benchmark/plotEnrichment_allelic.benchmark"
     threads: lambda wildcards: 24 if 24<max_thread else max_thread
@@ -72,9 +63,6 @@ rule multiBigwigSummary_bed_allelic:
         CONDA_SHARED_ENV
     params:
         labels = " ".join(expand('{sample}.{suffix}', sample=samples, suffix = ['genome1', 'genome2']))
-    log:
-        out="deepTools_qc/logs/multiBigwigSummary_allelic.out",
-        err="deepTools_qc/logs/multiBigwigSummary_allelic.err"
     benchmark:
         "deepTools_qc/.benchmark/multiBigwigSummary.bed_allelic.benchmark"
     threads: 8
@@ -89,9 +77,6 @@ rule plotCorr_bed_pearson_allelic:
         "deepTools_qc/plotCorrelation/correlation.pearson.bed_coverage_allelic.tsv"
     conda:
         CONDA_SHARED_ENV
-    log:
-        out="deepTools_qc/logs/plotCorrelation_pearson_allelic.out",
-        err="deepTools_qc/logs/plotCorrelation_pearson_allelic.err"
     benchmark:
         "deepTools_qc/.benchmark/plotCorrelation_pearson_allelic.benchmark"
     params:
@@ -109,9 +94,6 @@ rule plotCorr_bed_spearman_allelic:
         "deepTools_qc/plotCorrelation/correlation.spearman.bed_coverage_allelic.tsv"
     conda:
         CONDA_SHARED_ENV
-    log:
-        out="deepTools_qc/logs/plotCorrelation_spearman_allelic.out",
-        err="deepTools_qc/logs/plotCorrelation_spearman_allelic.err"
     benchmark:
         "deepTools_qc/.benchmark/plotCorrelation_spearman_allelic.benchmark"
     params:
@@ -129,9 +111,6 @@ rule plotPCA_allelic:
         "deepTools_qc/plotPCA/PCA.bed_coverage_allelic.tsv"
     conda:
         CONDA_SHARED_ENV
-    log:
-        out="deepTools_qc/logs/plotPCA_allelic.out",
-        err="deepTools_qc/logs/plotPCA_allelic.err"
     benchmark:
         "deepTools_qc/.benchmark/plotPCA_allelic.benchmark"
     params:

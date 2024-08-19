@@ -9,9 +9,6 @@ rule Qualimap_bamqc:
     params:
         outdir = "Qualimap_qc/{sample}.filtered",
         collect_overlap_pairs = "--collect-overlap-pairs" if pairedEnd else ""
-    log:
-        out = "Qualimap_qc/logs/Qualimap_bamqc.{sample}.filtered.out",
-        err = "Qualimap_qc/logs/Qualimap_bamqc.{sample}.filtered.err"
     benchmark:
         "Qualimap_qc/.benchmark/Qualimap_bamqc.{sample}.filtered.benchmark"
     threads: lambda wildcards: 16 if 16<max_thread else max_thread
@@ -25,7 +22,6 @@ rule Qualimap_bamqc:
         "{params.collect_overlap_pairs} "
         "-nt {threads} "
         "--outdir {params.outdir} "
-        "> {log.out} 2> {log.err}"
 
 
 rule Qualimap_bamqc_symlink_txt:

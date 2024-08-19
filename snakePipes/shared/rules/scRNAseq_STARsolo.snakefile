@@ -17,7 +17,6 @@ rule STARsolo:
         raw_features = "STARsolo/{sample}/{sample}.Solo.out/Gene/raw/features.tsv",
         filtered_features = "STARsolo/{sample}/{sample}.Solo.out/Gene/filtered/features.tsv",
         summary = "STARsolo/{sample}/{sample}.Solo.out/Gene/Summary.csv"
-    log: "STARsolo/logs/{sample}.log"
     params:
         alignerOptions = str(alignerOptions or ''),
         gtf = outdir+"/Annotation/genes.filtered.gtf",
@@ -62,9 +61,9 @@ rule STARsolo:
 	    --soloBarcodeReadLength 0 \
 	    --soloCBmatchWLtype Exact \
 	    --soloStrand Forward\
-	    --soloUMIdedup Exact 2> {log}
+	    --soloUMIdedup Exact
 
-        ln -s ../{params.prefix}Aligned.sortedByCoord.out.bam {output.bam} 2>> {log}
+        ln -s ../{params.prefix}Aligned.sortedByCoord.out.bam {output.bam}
 
         rm -rf $MYTEMP
          """
@@ -77,8 +76,6 @@ rule STARsolo_report:
         wdir = outdir + "/STARsolo",
         input = lambda wildcards,input: [ os.path.join(outdir,x) for x in input ],
         samples = samples
-    log:
-        out = "STARsolo/logs/Report.out"
     conda: CONDA_seurat_ENV
     script: "../rscripts/scRNAseq_report.R"
 
@@ -90,12 +87,11 @@ rule filter_bam:
     output:
         bamfile = "filtered_bam/{sample}.filtered.bam",
         bami = "filtered_bam/{sample}.filtered.bam.bai"
-    log: "filtered_bam/logs/{sample}.log"
     threads: lambda wildcards: 8 if 8<max_thread else max_thread
     conda: CONDA_SAMBAMBA_ENV
     shell: """
-           sambamba view -F "not unmapped and [CB] !=null" -t {threads} -f bam {input.bamfile} > {output.bamfile} 2> {log};
-           sambamba index -t {threads} {output.bamfile} 2>> {log}
+           sambamba view -F "not unmapped and [CB] !=null" -t {threads} -f bam {input.bamfile} > {output.bamfile};
+           sambamba index -t {threads} {output.bamfile}
            """
 
 ##remove this rule as soon as STARsolo output has been fixed by Alex Dobin
@@ -106,10 +102,9 @@ rule STARsolo_features_to_V3:
     output:
         raw_features = "STARsolo/{sample}/{sample}.Solo.out/Gene/raw/features.v3.tsv",
         filtered_features = "STARsolo/{sample}/{sample}.Solo.out/Gene/filtered/features.v3.tsv"
-    log:"STARsolo/logs/{sample}.features_to_v3.log"
     shell: """
-        awk '{{print $1, $2, "."}}' {input.raw_features} | tr " " "\t" > {output.raw_features} 2> {log};
-        awk '{{print $1, $2, "."}}' {input.filtered_features} | tr " " "\t" > {output.filtered_features} 2>> {log}
+        awk '{{print $1, $2, "."}}' {input.raw_features} | tr " " "\t" > {output.raw_features};
+        awk '{{print $1, $2, "."}}' {input.filtered_features} | tr " " "\t" > {output.filtered_features}
     """
 
 
@@ -129,14 +124,13 @@ rule gzip_STARsolo_for_seurat:
         filtered_bc_gz = "STARsolo/{sample}/{sample}.Solo.out/Gene/filtered/barcodes.tsv.gz",
         raw_features_gz = "STARsolo/{sample}/{sample}.Solo.out/Gene/raw/features.tsv.gz",
         filtered_features_gz = "STARsolo/{sample}/{sample}.Solo.out/Gene/filtered/features.tsv.gz"
-    log: "STARsolo/logs/{sample}.gzip.log"
     shell: """
-         gzip -c {params.raw_bc} > {params.raw_bc_gz} 2> {log};
-         gzip -c {input.raw_features} > {params.raw_features_gz} 2>> {log};
-         gzip -c {params.filtered_bc} > {params.filtered_bc_gz} 2>> {log};
-         gzip -c {input.filtered_features} > {params.filtered_features_gz} 2>> {log};
-         gzip -c {input.raw_counts} > {output.raw_counts_gz} 2>> {log};
-         gzip -c {input.filtered_counts} > {output.filtered_counts_gz} 2>> {log}
+         gzip -c {params.raw_bc} > {params.raw_bc_gz};
+         gzip -c {input.raw_features} > {params.raw_features_gz};
+         gzip -c {params.filtered_bc} > {params.filtered_bc_gz};
+         gzip -c {input.filtered_features} > {params.filtered_features_gz};
+         gzip -c {input.raw_counts} > {output.raw_counts_gz};
+         gzip -c {input.filtered_counts} > {output.filtered_counts_gz} 
     """
 
 
@@ -149,8 +143,6 @@ rule STARsolo_raw_to_seurat:
         indirs = expand(outdir + "/STARsolo/{sample}/{sample}.Solo.out/Gene/raw",sample=samples),
         wdir = outdir + "/Seurat/STARsolo_raw",
         samples = samples
-    log:
-        out = "Seurat/STARsolo_raw/logs/seurat.out"
     conda: CONDA_seurat_ENV
     script: "../rscripts/scRNAseq_Seurat3.R"
 
@@ -163,8 +155,6 @@ rule STARsolo_filtered_to_seurat:
         indirs = expand(outdir +"/STARsolo/{sample}/{sample}.Solo.out/Gene/filtered",sample=samples),
         wdir = outdir +"/Seurat/STARsolo_filtered",
         samples = samples
-    log:
-        out = "Seurat/STARsolo_filtered/logs/seurat.out"
     conda: CONDA_seurat_ENV
     script: "../rscripts/scRNAseq_Seurat3.R"
 
@@ -180,8 +170,6 @@ rule remove_empty_drops:
         indirs = expand(outdir + "/STARsolo/{sample}/{sample}.Solo.out/Gene/raw",sample=samples),
         wdir = outdir + "/Seurat/STARsolo_raw_RmEmptyDrops",
         samples = samples
-    log:
-        out = "Seurat/STARsolo_raw_RmEmptyDrops/logs/seurat.out"
     conda: CONDA_seurat_ENV
     script: "../rscripts/scRNAseq_EmptyDrops.R"
 
@@ -192,7 +180,6 @@ if not skipVelocyto:
             bam = "filtered_bam/{sample}.filtered.bam"
         output:
             bam = "filtered_bam/cellsorted_{sample}.filtered.bam"
-        log: "filtered_bam/logs/{sample}.cellsort.log"
         params:
             samsort_memory="10G",
             tempDir = tempDir
@@ -201,7 +188,7 @@ if not skipVelocyto:
         shell: """
                 TMPDIR={params.tempDir}
                 MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX)
-                samtools sort -m {params.samsort_memory} -@ {threads} -T $MYTEMP/{wildcards.sample} -t CB -O bam -o {output.bam} {input.bam} 2> {log}
+                samtools sort -m {params.samsort_memory} -@ {threads} -T $MYTEMP/{wildcards.sample} -t CB -O bam -o {output.bam} {input.bam}
                 rm -rf $MYTEMP
                """
 
@@ -217,7 +204,6 @@ if not skipVelocyto:
         output:
             outdir = directory("VelocytoCounts/{sample}"),
             outdum = "VelocytoCounts/{sample}.done.txt"
-        log: "VelocytoCounts/logs/{sample}.log"
         params:
             tempdir = tempDir
         conda: CONDA_scRNASEQ_ENV
@@ -226,7 +212,7 @@ if not skipVelocyto:
                 export LANG=en_US.utf-8
                 export TMPDIR={params.tempdir}
                 MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX);
-                velocyto run --bcfile {input.bc} --outputfolder {output.outdir} --dtype uint64 {input.bam} {input.gtf} 2> {log};
+                velocyto run --bcfile {input.bc} --outputfolder {output.outdir} --dtype uint64 {input.bam} {input.gtf} ;
                 touch {output.outdum};
                 rm -rf $MYTEMP
         """
@@ -234,14 +220,13 @@ if not skipVelocyto:
     rule combine_loom:
         input: expand("VelocytoCounts/{sample}",sample=samples)
         output: "VelocytoCounts_merged/merged.loom"
-        log: "VelocytoCounts_merged/logs/combine_loom.log"
         conda: CONDA_loompy_ENV
         params:
             outfile = outdir+"/VelocytoCounts_merged/merged.loom",
             script = maindir+"/shared/tools/loompy_merge.py",
             input_fp = lambda wildcards,input: [ os.path.join(outdir,f) for f in input ]
         shell: """
-            python {params.script} -outf {params.outfile} {params.input_fp} 2> {log}
+            python {params.script} -outf {params.outfile} {params.input_fp}
               """
 
     #rule velocity_to_seurat:
@@ -252,7 +237,5 @@ if not skipVelocyto:
     #    params:
     #        wdir = outdir + "/Seurat/Velocyto",
     #        samples = samples
-    #    log:
-    #        out = "Seurat/Velocyto/logs/seurat.out"
     #    conda: CONDA_seurat3_ENV
     #    script: "../rscripts/scRNAseq_merge_loom.R"

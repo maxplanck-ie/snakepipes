@@ -13,8 +13,7 @@ from pathlib import Path
 from thefuzz import fuzz
 import smtplib
 from email.message import EmailMessage
-from snakePipes import __version__
-
+from importlib.metadata import version
 
 def set_env_yamls():
     """
@@ -35,6 +34,7 @@ def set_env_yamls():
             'CONDA_CHIPSEQ_ENV': 'envs/chip_seq.yaml',
             'CONDA_ATAC_ENV': 'envs/atac_seq.yaml',
             'CONDA_HIC_ENV': 'envs/hic.yaml',
+            'CONDA_MAKEPAIRS_ENV': 'envs/makePairs.yaml',
             'CONDA_WGBS_ENV': 'envs/wgbs.yaml',
             'CONDA_DSS_ENV': 'envs/wgbs_dss.yaml',
             'CONDA_RMD_ENV': 'envs/rmarkdown.yaml',
@@ -117,7 +117,7 @@ def config_diff(dict1, dict2):
 
 def get_version():
     # If this is sent to stdout it breaks making a DAG pdf
-    sys.stderr.write("\n---- This analysis has been done using snakePipes version {} ----\n".format(__version__))
+    sys.stderr.write("\n---- This analysis has been done using snakePipes version {} ----\n".format(version("snakePipes")))
 
 
 def load_organism_data(genome, maindir, verbose):
@@ -471,24 +471,6 @@ def checkAlleleParams(args):
     return allele_mode
 
 
-def cleanLogs(d, cluster_config):
-    """
-    Remove all empty log files, both in cluster_logs/ and */logs/
-    """
-    if "snakePipes_cluster_logDir" in cluster_config:
-        path = os.path.join(d, cluster_config["snakePipes_cluster_logDir"], "*")
-        if re.search("^/", cluster_config["snakePipes_cluster_logDir"]):
-            path = os.path.join(cluster_config["snakePipes_cluster_logDir"], "*")
-        for f in glob.glob(path):
-            s = os.stat(f)
-            if s.st_size == 0:
-                os.remove(f)
-    for f in glob.glob(os.path.join(d, "*", "logs", "*")):
-        s = os.stat(f)
-        if s.st_size == 0:
-            os.remove(f)
-
-
 def check_sample_info_header(sampleSheet_file):
     """
     return True in case sample info file contains column names 'name' and 'condition'
@@ -510,7 +492,7 @@ def setDefaults(fileName):
     """
     # Script-neutral paths
     baseDir = os.path.dirname(__file__)
-    workflowDir = os.path.join(baseDir, "workflows", fileName)
+    workflowDir = os.path.join(baseDir, "workflows", fileName.replace('.py', ''))
 
     # defaults
     defaults = load_configfile(os.path.join(workflowDir, "defaults.yaml"), False)
@@ -613,12 +595,31 @@ def checkCommonArguments(args, baseDir, outDir=False, createIndices=False, prepr
             sys.exit("Sorry, there is no email sender specified in defaults.yaml. Please specify one with --emailSender")
 
 
+def resolveSnakemakeProfile(profName, baseDir):
+    # if snakemakeProfile is a relative path, resolve it with baseDir
+    if Path(profName).is_absolute():
+        # Absolute path to a profile
+        assert Path(profName).is_dir()
+        return(Path(profName))
+    elif (Path(baseDir) / profName).resolve().is_dir():
+        # Profile is shipped within the repo
+        return((Path(baseDir) / profName).resolve())
+    else:
+        # relative path + not in repodir, assume it's under snakemake default locations:
+        _l = (Path('etc', 'xdg', 'snakemake') / profName)
+        if _l.is_dir():
+            return(_l)
+        _l = (Path('~/.config/snakemake') / profName).expanduser()
+        if _l.is_dir():
+            return(_l)
+    sys.exit(f"No directory found for snakemake profile {profName}")
+
 def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
     """
     Merge dictionaries, write YAML files, construct the snakemake command
     and create the DAG
     """
-    workflowName = os.path.basename(callingScript)
+    workflowName = os.path.basename(callingScript).replace('.py', '')
     os.makedirs(args.outdir, exist_ok=True)
 
     if isinstance(args.snakemakeOptions, list):
@@ -631,26 +632,9 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
 
     # merge cluster config files: 1) global one, 2) workflow specific one, 3) user provided one
     cfg = load_configfile(os.path.join(baseDir, "shared", "defaults.yaml"), False, "defaults")
-    if os.path.isfile(os.path.join(baseDir, cfg['clusterConfig'])):
-        cluster_config = load_configfile(os.path.join(baseDir, cfg['clusterConfig']), False)
-    else:
-        cluster_config = load_configfile(os.path.join(cfg['clusterConfig']), False)
-    cluster_config = merge_dicts(cluster_config, load_configfile(os.path.join(workflowDir, "cluster.yaml"), False), )
 
-    if args.clusterConfigFile:
-        user_cluster_config = load_configfile(args.clusterConfigFile, False)
-        cluster_config = merge_dicts(cluster_config, user_cluster_config)  # merge/override variables from user_config.yaml
-    # Ensure the cluster log directory exists
-    if re.search("\\{snakePipes_cluster_logDir\\}", cluster_config["snakemake_cluster_cmd"]):
-        if "snakePipes_cluster_logDir" in cluster_config:
-            if re.search("^/", cluster_config["snakePipes_cluster_logDir"]):
-                os.makedirs(cluster_config["snakePipes_cluster_logDir"], exist_ok=True)
-            else:
-                os.makedirs(os.path.join(args.outdir, cluster_config["snakePipes_cluster_logDir"]), exist_ok=True)
-            cluster_config["snakemake_cluster_cmd"] = re.sub("\\{snakePipes_cluster_logDir\\}", cluster_config["snakePipes_cluster_logDir"], cluster_config["snakemake_cluster_cmd"])
-        else:
-            sys.exit("\nPlease provide a key 'snakePipes_cluster_logDir' and value in the cluster configuration file!\n")
-    write_configfile(os.path.join(args.outdir, '{}.cluster_config.yaml'.format(workflowName)), cluster_config)
+    # Properly resolve snakemakeprofile
+    cfg['snakemakeProfile'] = resolveSnakemakeProfile(cfg['snakemakeProfile'], baseDir)
 
     # Save the organism YAML file as {PIPELINE}_organism.yaml
     if workflowName != "preprocessing":
@@ -667,47 +651,93 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
     if args.keepTemp:
         args.snakemakeOptions += " --notemp"
 
-    snakemake_cmd = """
-                    TMPDIR={tempDir}
-                    UTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX);
-                    XDG_CACHE_HOME=$UTEMP TMPDIR={tempDir} PYTHONNOUSERSITE=True snakemake {snakemakeOptions} --latency-wait {latency_wait} --snakefile {snakefile} --jobs {maxJobs} --directory {workingdir} --configfile {configFile} --keep-going --use-conda --conda-prefix {condaEnvDir}
-                    """.format(latency_wait=cluster_config["snakemake_latency_wait"],
-                               snakefile=os.path.join(workflowDir, "Snakefile"),
-                               maxJobs=args.maxJobs,
-                               workingdir=args.workingdir,
-                               snakemakeOptions=str(args.snakemakeOptions or ''),
-                               tempDir=cfg["tempDir"],
-                               configFile=os.path.join(args.outdir, '{}.config.yaml'.format(workflowName)),
-                               condaEnvDir=cfg["condaEnvDir"]).split()
+    snakemake_cmd = f"TMPDIR={cfg['tempDir']}; \
+                    UTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX); \
+                    PYTHONNOUSERSITE=True snakemake \
+                    {str(args.snakemakeOptions or '')} \
+                    --snakefile {Path(workflowDir) / 'Snakefile'} \
+                    --directory {args.workingdir} \
+                    --configfile {os.path.join(args.outdir, '{}.config.yaml'.format(workflowName))} \
+                    --profile {cfg['snakemakeProfile']}".split(' ')
 
     if args.verbose:
         snakemake_cmd.append("--printshellcmds")
 
-    if not args.local:
-        snakemake_cmd += ["--cluster-config",
-                          os.path.join(args.outdir, '{}.cluster_config.yaml'.format(workflowName)),
-                          "--cluster", "'" + cluster_config["snakemake_cluster_cmd"], "'"]
     return " ".join(snakemake_cmd)
+
+
+def plot_DAG(args, snakemake_cmd, calling_script, defaults):
+
+    if not args.createDAG:
+        return
+
+    workflow_name = os.path.splitext(os.path.basename(calling_script))[0]
+
+    # dryrun snakemake quietly: only generate the DAG
+    dag_cmd = f"{snakemake_cmd} --rulegraph --dryrun --quiet --config verbose=False"
+
+    DAGproc = subprocess.Popen(
+            dag_cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            shell=True)
+
+    # Read DOT data from stdout
+    dot = DAGproc.stdout.read()
+
+    # Use graphviz to render DAG, if it is available
+    # conda graphviz doesn't provide the python bindings, the pip graphviz does, but has no executable.
+    # If graphviz is not available, write out the ASCII as file.
+    output_file = os.path.join(args.outdir, f"{workflow_name}_pipeline")
+    try:
+        import graphviz
+        if shutil.which('dot'):
+            graph = graphviz.Source(dot)
+            graph.render(output_file, format='png')
+            return
+        else:
+            with open(output_file + 'DAG.txt', 'w') as f:
+                f.write(dot)
+            return
+    except ModuleNotFoundError:
+        with open(output_file + 'DAG.txt', 'w') as f:
+            f.write(dot)
+        return
 
 
 def print_DAG(args, snakemake_cmd, callingScript, defaults):
     if args.createDAG:
         config = defaults
         config.update(vars(args))
-        workflowName = os.path.basename(callingScript)
+        workflowName = os.path.basename(callingScript).replace('.py', '')
         oldVerbose = config['verbose']
         config['verbose'] = False
-        write_configfile(os.path.join(args.outdir, '{}.config.yaml'.format(workflowName)), config)
-        DAGproc = subprocess.Popen(snakemake_cmd + " --rulegraph ", stdout=subprocess.PIPE, shell=True)
-        subprocess.check_call("dot -Tpdf -o{}/{}_pipeline.pdf".format(args.outdir, workflowName), stdin=DAGproc.stdout, shell=True)
+        write_configfile(
+            os.path.join(args.outdir,
+                         '{}.config.yaml'.format(workflowName)), config)
+
+        DAGproc = subprocess.Popen(
+            snakemake_cmd + " --rulegraph -q ",
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            shell=True)
+
+        subprocess.check_call(
+            "dot -Tpdf -o{}/{}_pipeline.pdf".format(args.outdir, workflowName),
+            stdin=DAGproc.stdout, shell=True)
         config['verbose'] = oldVerbose
-        write_configfile(os.path.join(args.outdir, '{}.config.yaml'.format(workflowName)), config)
+        write_configfile(
+            os.path.join(args.outdir, '{}.config.yaml'.format(workflowName)),
+            config)
 
 
 def logAndExport(args, workflowName):
     """
     Set up logging
     """
+    workflowName = workflowName.replace('.py', '')
     # Write snakemake_cmd to log file
     fnames = glob.glob(os.path.join(args.outdir, '{}_run-[0-9]*.log'.format(workflowName)))
     if len(fnames) == 0:
@@ -727,48 +757,38 @@ def runAndCleanup(args, cmd, logfile_name):
     Also clean up when finished.
     """
     if args.verbose:
-        print("\n{}\n".format(cmd))
+       print("\n{}\n".format(cmd))
 
     # write log file
+
     f = open(os.path.join(args.outdir, logfile_name), "w")
     f.write(" ".join(sys.argv) + "\n\n")
     f.write(cmd + "\n\n")
 
     # Run snakemake, stderr -> stdout is needed so readline() doesn't block
-    p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    if args.verbose:
-        print("PID:", p.pid, "\n")
-
-    while p.poll() is None:
-        stdout = p.stdout.readline(1024)
-        if stdout:
-            sys.stdout.write(stdout.decode('utf-8'))
-            f.write(stdout.decode('utf-8'))
-            sys.stdout.flush()
-            f.flush()
-    # This avoids the race condition of p.poll() exiting before we get all the output
-    stdout = p.stdout.read()
-    if stdout:
-        sys.stdout.write(stdout.decode('utf-8'))
-        f.write(stdout.decode('utf-8'))
-    f.close()
+    p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+    for _l in p.stdout:
+        sys.stdout.write(_l.strip() + '\n')
+        f.write(_l.strip() + '\n')
+    p.wait()
 
     # Exit with an error if snakemake encountered an error
     if p.returncode != 0:
-        sys.stderr.write("Error: snakemake returned an error code of {}, so processing is incomplete!\n".format(p.returncode))
-        if args.emailAddress:
-            sendEmail(args, p.returncode)
-        sys.exit(p.returncode)
+       if args.emailAddress:
+           sendEmail(args, p.returncode)
+       f.close()
+       sys.exit(p.returncode)
     else:
-        Path(
-            os.path.join(args.outdir, "{}_snakePipes.done".format(logfile_name.split('_')[0]))
-        ).touch()
-        if os.path.exists(os.path.join(args.outdir, ".snakemake")):
-            shutil.rmtree(os.path.join(args.outdir, ".snakemake"), ignore_errors=True)
+       Path(
+           os.path.join(args.outdir, "{}_snakePipes.done".format(logfile_name.split('_')[0]))
+       ).touch()
+       if os.path.exists(os.path.join(args.outdir, ".snakemake")):
+           shutil.rmtree(os.path.join(args.outdir, ".snakemake"), ignore_errors=True)
+    f.close()
 
     # Send email if desired
     if args.emailAddress:
-        sendEmail(args, 0)
+       sendEmail(args, 0)
 
 
 def predict_chip_dict(wdir, input_pattern_str, bamExt, fromBAM=None):
@@ -793,7 +813,7 @@ def predict_chip_dict(wdir, input_pattern_str, bamExt, fromBAM=None):
     chip_dict_pred = {}
     chip_dict_pred["chip_dict"] = {}
     print("---------------------------------------------------------------------------------------")
-    print("Predict Chip-seq sample configuration")
+    print("Predict ChIPseq sample configuration")
     print("---------------------------------------------------------------------------------------")
     print("\nSearch for Input/control samples...")
 
@@ -841,7 +861,7 @@ def predict_chip_dict(wdir, input_pattern_str, bamExt, fromBAM=None):
     outfile = os.path.join(wdir, "chip_seq_sample_config.PREDICTED.yaml")
     write_configfile(outfile, chip_dict_pred)
     print("---------------------------------------------------------------------------------------")
-    print("Chip-seq sample configuration is written to file ", outfile)
+    print("ChIPseq sample configuration is written to file ", outfile)
     print("Please check and modify this file - this is just a guess! Then run the workflow with it.")
     print("---------------------------------------------------------------------------------------")
 

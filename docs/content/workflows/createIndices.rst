@@ -41,7 +41,7 @@ There is a configuration file in ``snakePipes/workflows/createIndices/defaults.y
     spikeinGtfURL:
     ## The effective genome size
     effectiveGenomeSize: 0
-    ## Regions to blacklist in the ChIP-seq and related workflows
+    ## Regions to blacklist in the ChIPseq and related workflows
     blacklist:
     spikeinBlacklist:
     ## Regions to ignore during normalization (e.g., with bamCompare)
@@ -88,6 +88,6 @@ Command line options
 
 .. argparse::
     :func: parse_args
-    :filename: ../snakePipes/workflows/createIndices/createIndices
+    :filename: ../snakePipes/workflows/createIndices/createIndices.py
     :prog: createIndices
     :nodefault:

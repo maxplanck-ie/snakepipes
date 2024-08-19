@@ -1,11 +1,8 @@
-# adapted from Andrew Rezansoff's 3' seq pipeline tools
-# /data/hilgers/group/rezansoff/3seq_pipeline_tools/
-
 from pathlib import Path
 import pandas as pd
 
 # prevent wildcards from picking up directories
-wildcard_constraints: sample="[^(\/)]+"
+wildcard_constraints: sample="[^(/)]+"
 
 # read in sampleSheet metadata to merge replicates for preprocess_cluster_pas 
 sample_metadata = pd.read_table(sampleSheet, index_col=None)
@@ -26,30 +23,7 @@ def get_outdir(folder_name,sampleSheet):
     sample_name = os.path.splitext(os.path.basename(str(sampleSheet)))[0]
     return("{}_{}".format(folder_name, sample_name))
 
-
-# TODO: 
-# 3. check why cmatrix_filtered is commented out - OK
-# 5. re-implement clusterPAS?  
-# 6. implement filtering of column 4 of the geneAssociation output - things with multiple hits (i.e. commas) should be filtered out [x]
-# possibly assign cluster to "next" gene annotation (i.e. the closest?) 
-# this would be in signal2gene.py
-# 7. assign unique IDs with _0, _1 to 4th column in clusterPAS output in 5'->3' order to create unique 
-# example is /data/hilgers/group2/rezansoff/sakshiProj/2507_3seq/polyA_annotation_polysome2K/AllSamples_clustered_strict1_fromSortedNumeric.txt -> 
-# /data/hilgers/group2/rezansoff/sakshiProj/2507_3seq/polyA_annotation_polysome2K/AllSamples_clustered_strict1_fromSortedNumeric_uniqIDs.txt
-# this will be run by countReadEnds
-# then possibly DESeq on countReadEnds output
-# understand cmatrix steps? 
-
 tools_dir = Path(maindir) / "shared" / "tools"
-
-# trimming done using STAR and fastp
-
-# rule clusterPAS:
-#     input: 
-#         "three_prime_seq/SampleAll.txt"
-#     conda:
-#         CONDA_SHARED_ENV
-    
 
 rule polyAT: 
     input: 
@@ -112,17 +86,12 @@ rule filterBW:
         bed=filterbw_which_bed
     output: 
         "three_prime_seq/filtered/{sample}_direction-{direction}.bw"
-    log:
-        stdout="three_prime_seq/logs/{sample}_{direction}.stdout",
-        stderr="three_prime_seq/logs/{sample}_{direction}.stderr"
     params:
         script=(tools_dir / "three_prime_seq" / "filterBW.py")
     conda:
         CONDA_SHARED_ENV
     shell:
         "{params.script} {input} {output} "
-        "> {log.stdout} "
-        "2> {log.stderr} "
 
 
 # Associate signal with each gene (flank by some amount)
@@ -219,7 +188,7 @@ rule count_read_ends:
     output:
         counts="three_prime_seq/{sample}_uniqcounts.txt"
     wildcard_constraints:
-        sample="[^\/]+" # no /
+        sample="[^/]+"
     conda:
         CONDA_SHARED_ENV
     params:

@@ -1,0 +1,19 @@
+name: conda-build
+
+on: [pull_request, push]
+
+jobs:
+  condaBuild:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: conda-incubator/setup-miniconda@v3
+        with:
+          environment-file: .github/conda_ci.yml
+          condarc-file: .github/condarc.yml
+      - name: buildSnakePipes
+        uses: uibcdf/action-build-and-upload-conda-packages@v1.3.0
+        with:
+          meta_yaml_dir: conda-recipe
+          python-version: 3.11
+          upload: false

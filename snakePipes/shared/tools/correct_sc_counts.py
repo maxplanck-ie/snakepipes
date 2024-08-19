@@ -35,7 +35,7 @@ for line in f:
         UMICounts[cols[0]] = [0] * (len(cols) - 2)
 
     # Add the read counts
-    readCounts[cols[0]] = [x + int(y) for x, y in zip(readCounts[cols[0]], cols[2:])]
+    readCounts[cols[0]] = [x + int(y) for x, y in zip(readCounts[cols[0]], cols[2:], strict=False)]
 
     for idx, cnt in enumerate(cols[2:]):
         if cnt == '0':

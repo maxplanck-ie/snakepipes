@@ -6,10 +6,10 @@ Running snakePipes
 Pipelines under snakePipes are designed in a way such that all workflows are configured and ran in a similar way.
 
 
-An example with ChIP-seq data
+An example with ChIPseq data
 ------------------------------
 
-A **typical ChIP-seq analysis** of human samples starts from paired-end FASTQ files in the directory ``input-dir``:
+A **typical ChIPseq analysis** of human samples starts from paired-end FASTQ files in the directory ``input-dir``:
 
 .. code:: bash
 
@@ -17,15 +17,15 @@ A **typical ChIP-seq analysis** of human samples starts from paired-end FASTQ fi
     my_H3K27ac_sample_R1.fastq.gz  my_H3K27me3_sample_R1.fastq.gz  my_Input_sample_R1.fastq.gz
     my_H3K27ac_sample_R2.fastq.gz  my_H3K27me3_sample_R2.fastq.gz  my_Input_sample_R2.fastq.gz
 
-The :ref:`ChIP-seq` workflow requires the files to be processed via the :ref:`DNA-mapping` workflow first. We therefore run the DNA-mapping workflow :
+The :ref:`ChIPseq` workflow requires the files to be processed via the :ref:`DNAmapping` workflow first. We therefore run the DNAmapping workflow :
 
 .. code:: bash
 
-    $ DNA-mapping -i /path/to/input-dir -o /path/to/output-dir --mapq 5 -j 10 --dedup hs37d5
+    $ DNAmapping -i /path/to/input-dir -o /path/to/output-dir --mapq 5 -j 10 --dedup hs37d5
 
 * ``--mapq 5`` would filter mapped reads for a minimum mapping quality of 5. This would keep only primary alignments from bowtie2, sufficient for downstream analysis.
 
-* ``--dedup`` would remove PCR duplicates (reads with matching 5' position in the genome), a typical step in ChIP-Seq analysis.
+* ``--dedup`` would remove PCR duplicates (reads with matching 5' position in the genome), a typical step in ChIPseq analysis.
 
 * ``-j 10`` defines 10 jobs to be run in parallel on the cluster (see below).
 
@@ -37,19 +37,19 @@ All individual jobs of the workflow will be submitted to the Grid engine using t
 
 **For single-end FASTQ files**, Note that single end data still needs a valid suffix (e.g. sample1_R1.fastq.gz). With a proper suffix, single end mode is detected by default. When executing some workflows with the ``--fromBAM`` flag, it is still necessary to set ``--singleEnd``.
 
-Once the DNA-mapping run is finished sucessfully. We can run the ChIP-seq analysis in the same directory.
+Once the DNAmapping run is finished sucessfully. We can run the ChIPseq analysis in the same directory.
 
 .. code:: bash
 
-    $  ChIP-seq -d /path/to/dna-mapping-output/ hs37d5 chip-samples.yaml
+    $  ChIPseq -d /path/to/dnamapping-output/ hs37d5 chip-samples.yaml
 
-* ``-d`` specifies the directory where the output of DNA-mapping workflow lies. The ChIP-seq workflow would also write it's output there.
+* ``-d`` specifies the directory where the output of DNAmapping workflow lies. The ChIPseq workflow would also write it's output there.
 
 * ``hs37d5`` is the name of the genome (keyword for the yaml).
 
-* ``chip-samples.yaml`` is a yaml file that defines for each ChIP sample, the corresponding control (input) sample and the type of mark (broad/sharp). See :ref:`ChIP-seq` for more details on how to setup this yaml file.
+* ``chip-samples.yaml`` is a yaml file that defines for each ChIP sample, the corresponding control (input) sample and the type of mark (broad/sharp). See :ref:`ChIPseq` for more details on how to setup this yaml file.
 
-The ChIP-seq workflow would follow up from the DNA-mapping outputs and perform peak calling, create ChIP-input normalized coverage files and also perform differential (control-test) analysis if a sample information file is provided (see below).
+The ChIPseq workflow would follow up from the DNAmapping outputs and perform peak calling, create ChIP-input normalized coverage files and also perform differential (control-test) analysis if a sample information file is provided (see below).
 
 .. _sampleinfo:
 
@@ -57,8 +57,8 @@ The sample sheet
 ----------------
 
 Most of the workflows allow users to perform grouped operations as an option, for example
-differential expression analysis in mRNA-seq workflow, differential binding analysis in
-ChIP-Seq workflow, differential open-chromatin analysis in ATAC-seq workflow or merging of
+differential expression analysis in mRNAseq workflow, differential binding analysis in
+ChIPseq workflow, differential open-chromatin analysis in ATACseq workflow or merging of
 groups in Hi-C workflow. For all this analysis, snakePipes needs a ``sampleSheet.tsv`` file (file name is not important, but it has to be tab-separated) that contains sample grouping information. In most cases users would want to groups samples by replicates. The format of the file is as follows:
 
 ::
@@ -89,7 +89,7 @@ All of the snakePipes workflows that begin with a FASTQ file, perform the same p
 
 * **Linking/downsampling the FASTQ file** : The FASTQ rule in the workflows links the input FASTQ file into the FASTQ folder in the output directory. If ``downsampling`` is specified, the FASTQ folder would contain the downsampled FASTQ file.
 
-.. note:: The DNA-mapping and RNA-mapping pipelines can take either single, or paired-end FASTQ files. For paired-end data, the reads ``R1`` and ``R2`` are expected to have the suffix ``_R1`` and ``_R2`` respectively, which can be modified in the ``defaults.yaml`` file using the ``reads`` key, to your needs. For example, files downloaded from NCBI would normally have the extention ``.1.fastq.gz`` and ``.2.fastq.gz``. Also, please check the ``ext`` key in the configuration file if you wish to modify the read extension (default is ``.fastq.gz``).
+.. note:: The DNAmapping and RNA-mapping pipelines can take either single, or paired-end FASTQ files. For paired-end data, the reads ``R1`` and ``R2`` are expected to have the suffix ``_R1`` and ``_R2`` respectively, which can be modified in the ``defaults.yaml`` file using the ``reads`` key, to your needs. For example, files downloaded from NCBI would normally have the extention ``.1.fastq.gz`` and ``.2.fastq.gz``. Also, please check the ``ext`` key in the configuration file if you wish to modify the read extension (default is ``.fastq.gz``).
 
 
 * **Quality/adapter trimming** (optional): If ``--trim`` is selected, the ``trimming`` rule would run the selected program (either `Trimgalore <https://www.bioinformatics.babraham.ac.uk/projects/trim_galore/>`__, or `Cutadapt <https://journal.embnet.org/index.php/embnetjournal/article/view/200/479>`__) on the files in the FASTQ folder, and would produce another folder with name ``FASTQ_<program>``, where <program> is either ``Cutadapt`` or ``Trimgalore``.

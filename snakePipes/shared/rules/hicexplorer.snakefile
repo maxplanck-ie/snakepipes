@@ -22,12 +22,9 @@ rule get_restrictionSite:
         enzyme + ".bed"
     params:
         res_seq = get_restriction_seq(enzyme)
-    log:
-        out = "log/get_restrictionSite.out",
-        err = "log/get_restrictionSite.err"
     conda: CONDA_HIC_ENV
     shell:
-        "hicFindRestSite -f {input} --searchPattern {params.res_seq} -o {output} > {log.out} 2> {log.err}"
+        "hicFindRestSite -f {input} --searchPattern {params.res_seq} -o {output}"
 
 
 # Map
@@ -38,16 +35,13 @@ rule map_fastq_single_end:
     params:
         aligner_cmd = getAlignerCmd(aligner),
         aligner_index = getAlignerIndex(aligner)
-    log:
-        out = aligner+"/logs/{sample}{read}.out",
-        err = aligner+"/logs/{sample}{read}.err"
     threads: lambda wildcards: 15 if 15<max_thread else max_thread
     conda: CONDA_HIC_ENV
     shell:
-        "echo 'mapping {input}' > {log.out} && "
+        "echo 'mapping {input}' && "
         "{params.aligner_cmd} -A1 -B4  -E50 -L0 "
-        "-t {threads} {params.aligner_index} {input}  2> {log.err} | "
-        "samtools view -Shb - > {output.out}  2>> {log.err}"
+        "-t {threads} {params.aligner_index} {input} | "
+        "samtools view -Shb - > {output.out}"
 
 ## Make HiC Matrix
 if(RFResolution is True):
@@ -66,9 +60,6 @@ if(RFResolution is True):
              region = lambda wildcards: "--region " + str(restrictRegion) if restrictRegion else "",
              min_dist = MIN_RS_DISTANCE,
              max_dist = MAX_RS_DISTANCE
-        log:
-            out = "HiC_matrices/logs/{sample}_"+matrixFile_suffix+".out",
-            err = "HiC_matrices/logs/{sample}_"+matrixFile_suffix+".err"
         threads: lambda wildcards: 10 if 10<max_thread else max_thread
         conda: CONDA_HIC_ENV
         shell:
@@ -81,7 +72,7 @@ if(RFResolution is True):
             "--QCfolder {params.QCfolder} "
             "--threads {threads} "
             "{params.region} "
-            "-o {output.matrix} > {log.out} 2> {log.err} &&"
+            "-o {output.matrix} &&"
             " rm {params.QCfolder}"+"QC_table.txt"
 else:
     rule build_matrix:
@@ -101,9 +92,6 @@ else:
             region = lambda wildcards: "--region " + str(restrictRegion) if restrictRegion else "",
             min_dist = MIN_RS_DISTANCE,
             max_dist = MAX_RS_DISTANCE
-        log:
-            out = "HiC_matrices/logs/{sample}_"+matrixFile_suffix+".out",
-            err = "HiC_matrices/logs/{sample}_"+matrixFile_suffix+".err"
         threads: lambda wildcards: 10 if 10<max_thread else max_thread
         conda: CONDA_HIC_ENV
         shell:
@@ -117,7 +105,7 @@ else:
             "--QCfolder {params.QCfolder} "
             "--threads {threads} "
             "{params.region} "
-            "-o {output.matrix} > {log.out} 2> {log.err} &&"
+            "-o {output.matrix} &&"
             " rm {params.QCfolder}"+"QC_table.txt"
 
 ## Merge the samples if asked
@@ -126,12 +114,9 @@ rule merge_matrices:
           lambda wildcards: expand("HiC_matrices/{sample}_"+matrixFile_suffix+matrix_format, sample = sample_dict[wildcards.group])
       output:
           matrix = "HiC_matrices/mergedSamples_{group}_"+matrixFile_suffix+matrix_format
-      log:
-         out = "HiC_matrices/logs/hicSumMatrices_{group}_"+matrixFile_suffix+".out",
-         err = "HiC_matrices/logs/hicSumMatrices_{group}_"+matrixFile_suffix+".err"
       conda: CONDA_HIC_ENV
       shell:
-          "hicSumMatrices -m {input} -o {output.matrix} > {log.out} 2> {log.err}"
+          "hicSumMatrices -m {input} -o {output.matrix}"
 
 ## Merge the bins if asked
 rule merge_bins:
@@ -141,12 +126,9 @@ rule merge_bins:
          matrix = "HiC_matrices/{sample}_Mbins" + str(nBinsToMerge) + "_" + matrixFile_suffix+matrix_format
      params:
          num_bins=nBinsToMerge
-     log:
-         out = "HiC_matrices/logs/{sample}_Mbins" + str(nBinsToMerge) + "_" + matrixFile_suffix+".out",
-         err = "HiC_matrices/logs/{sample}_Mbins" + str(nBinsToMerge) + "_" + matrixFile_suffix+".err"
      conda: CONDA_HIC_ENV
      shell:
-         "hicMergeMatrixBins -m {input} -nb {params.num_bins} -o {output.matrix} >{log.out} 2>{log.err} "
+         "hicMergeMatrixBins -m {input} -nb {params.num_bins} -o {output.matrix} "
 
 ## diagnostic plots
 rule diagnostic_plot:
@@ -198,12 +180,10 @@ else:
              "HiC_matrices_corrected/{sample}_"+matrixFile_suffix+".corrected"+matrix_format
          params:
              chr = lambda wildcards: " --chromosomes " + chromosomes if chromosomes else ""
-         log:
-             out = "HiC_matrices_corrected/logs/{sample}_correctoMatrix.out"
          conda: CONDA_HIC_ENV
          shell:
              "hicCorrectMatrix correct --correctionMethod KR "
-             " {params.chr} -m {input.matrix} -o {output} 2> {log.out}"
+             " {params.chr} -m {input.matrix} -o {output}"
 
 ## Call TADs
 rule call_tads:
@@ -215,9 +195,6 @@ rule call_tads:
         prefix="TADs/{sample}_"+matrixFile_suffix,
         parameters=lambda wildcards: findTADParams if findTADParams else ""
     threads: lambda wildcards: 10 if 10<max_thread else max_thread
-    log:
-        out = "TADs/logs/{sample}_findTADs.out",
-        err = "TADs/logs/{sample}_findTADs.err"
     conda:
         CONDA_HIC_ENV
     shell:
@@ -225,7 +202,7 @@ rule call_tads:
         "{params.parameters} "
         "--correctForMultipleTesting bonferroni "
         "-p {threads} "
-        "--outPrefix {params.prefix} > {log.out} 2> {log.err}"
+        "--outPrefix {params.prefix}"
 
 ##compare matrices using hicPlotDistVsCounts
 rule distvscounts:
@@ -235,11 +212,7 @@ rule distvscounts:
         "dist_vs_counts.png"
    params:
         function_params = lambda wildcards: distVsCountParams if distVsCountParams else " "
-   log:
-        out = "HiC_matrices_corrected/logs/dist_vs_counts.out",
-        err = "HiC_matrices_corrected/logs/dist_vs_counts.err"
-
    conda:
        CONDA_HIC_ENV
    shell:
-       "hicPlotDistVsCounts -m  {input.matrices} -o {output} {params.function_params} > {log.out} 2> {log.err}"
+       "hicPlotDistVsCounts -m  {input.matrices} -o {output} {params.function_params}"

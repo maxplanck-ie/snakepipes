@@ -12,15 +12,12 @@
 #        "Salmon/.benchmark/Salmon.index.benchmark"
 #    params:
 #        salmonIndexOptions = salmonIndexOptions
-#    log:
-#        out = "Salmon/SalmonIndex/SalmonIndex.out",
-#        err = "Salmon/SalmonIndex/SalmonIndex.err",
 #    threads: lambda wildcards: 16 if 16<max_thread else max_thread
 #    conda: CONDA_RNASEQ_ENV
 #    shell: """
 #        grep "^>" {input[1]} | cut -d " " -f 1 | tr -d ">" > {output[0]}
 #        cat {input[0]} {input[1]} > {output[1]}
-#        salmon index -p {threads} -t {output[1]} -d {output[0]} -i Salmon/SalmonIndex {params.salmonIndexOptions} > {log.out} 2> {log.err}
+#        salmon index -p {threads} -t {output[1]} -d {output[0]} -i Salmon/SalmonIndex {params.salmonIndexOptions}
 #        """
 
 
@@ -52,7 +49,6 @@ if pairedEnd:
             r2 = fastq_dir+"/{sample}"+reads[1]+".fastq.gz"
         output:
             quant = "Salmon/{sample}/quant.sf"
-        log: "Salmon/logs/{sample}.quant.log"
         benchmark:
             "Salmon/.benchmark/SalmonQuant.{sample}.benchmark"
         params:
@@ -63,7 +59,7 @@ if pairedEnd:
         threads: 8
         conda: CONDA_RNASEQ_ENV
         shell: """
-            salmon quant -p {threads} --softclipOverhangs --validateMappings --numBootstraps 50 -i {params.index} -l {params.lib_type} -1 {input.r1} -2 {input.r2} -o {params.outdir} 2> {log}
+            salmon quant -p {threads} --softclipOverhangs --validateMappings --numBootstraps 50 -i {params.index} -l {params.lib_type} -1 {input.r1} -2 {input.r2} -o {params.outdir}
             """
 else:
     rule SalmonQuant:
@@ -71,7 +67,6 @@ else:
             fastq = fastq_dir+"/{sample}"+reads[0]+".fastq.gz"
         output:
             quant = "Salmon/{sample}/quant.sf"
-        log: "Salmon/logs/{sample}.quant.log"
         benchmark:
             "Salmon/.benchmark/SalmonQuant.{sample}.benchmark"
         params:
@@ -82,7 +77,7 @@ else:
         threads: 8
         conda: CONDA_SALMON_ENV
         shell: """
-            salmon quant -p {threads} --softclipOverhangs --validateMappings --numBootstraps 50 -i {params.index} -l {params.lib_type} -r {input.fastq} -o {params.outdir} 2> {log}
+            salmon quant -p {threads} --softclipOverhangs --validateMappings --numBootstraps 50 -i {params.index} -l {params.lib_type} -r {input.fastq} -o {params.outdir}
             """
 
 
@@ -103,8 +98,6 @@ rule Salmon_TPM:
         "Salmon/TPM.transcripts.tsv"
     benchmark:
         "Salmon/.benchmark/Salmon_TPM.benchmark"
-    log:
-        "Salmon/logs/Salmon_TPM.log"
     conda: CONDA_RNASEQ_ENV
     shell:
         "Rscript "+os.path.join(maindir, "shared", "rscripts", "merge_count_tables.R")+" Name TPM {output} {input} "
@@ -117,8 +110,6 @@ rule Salmon_counts:
         "Salmon/counts.transcripts.tsv"
     benchmark:
         "Salmon/.benchmark/Salmon_counts.benchmark"
-    log:
-        "Salmon/logs/Salmon_counts.log"
     conda: CONDA_RNASEQ_ENV
     shell:
         "Rscript "+os.path.join(maindir, "shared", "rscripts", "merge_count_tables.R")+" Name NumReads {output} {input} "
@@ -130,9 +121,8 @@ rule Salmon_wasabi:
         "Salmon/{sample}.quant.sf"
     output:
         "Salmon/{sample}/abundance.h5"
-    log: "Salmon/logs/{sample}.wasabi.log"
     params:
         "Salmon/{sample}/"
     conda: CONDA_RNASEQ_ENV
     shell:
-        "Rscript "+os.path.join(maindir, "shared", "rscripts", "wasabi.R")+" {params} 2> {log}"
+        "Rscript "+os.path.join(maindir, "shared", "rscripts", "wasabi.R")+" {params}"

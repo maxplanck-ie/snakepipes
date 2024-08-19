@@ -1,0 +1,125 @@
+# Snakemake workflow for phased mapping with pairtools
+# based on https://github.com/caballero/snakemake-pairtools-phased/tree/df410ff
+# Juan Caballero
+# (C) 2024
+
+import os
+import snakePipes.common_functions as cf
+
+### snakemake_workflows initialization ########################################
+maindir = os.path.dirname(os.path.dirname(workflow.basedir))
+
+# load conda ENVs (path is relative to "shared/rules" directory)
+globals().update(cf.set_env_yamls())
+
+# load config file
+globals().update(
+    cf.load_configfile(workflow.overwrite_configfiles[0], config["verbose"])
+)
+# load organism-specific data, i.e. genome indices, annotation, etc.
+globals().update(cf.load_organism_data(genome, maindir, config["verbose"]))
+# return the pipeline version in the log
+cf.get_version()
+
+
+# do workflow specific stuff now
+include: os.path.join(workflow.basedir, "internals.snakefile")
+# FASTQ: either downsample FASTQ files or create symlinks to input files
+include: os.path.join(maindir, "shared", "rules", "FASTQ.snakefile")
+
+
+# FastQC
+if fastqc:
+
+    include: os.path.join(maindir, "shared", "rules", "FastQC.snakefile")
+
+
+# trimming
+if trim:
+
+    include: os.path.join(maindir, "shared", "rules", "trimming.snakefile")
+
+
+# umi_tools: needed for FASTQ handling
+include: os.path.join(maindir, "shared", "rules", "umi_tools.snakefile")
+# diploid_genome: concatenation and indexing
+include: os.path.join(maindir, "shared", "rules", "diploid_genome.snakefile")
+# pairtools: bwa mapping (without sorting),  pairtools rules & multiqc
+include: os.path.join(maindir, "shared", "rules", "pairtools.snakefile")
+
+
+def run_FastQC(fastqc):
+    if fastqc:
+        return expand("FastQC/{sample}{read}_fastqc.html", sample=samples, read=reads)
+    else:
+        return []
+
+
+def run_Trimming(trim, fastqc):
+    if trim and fastqc:
+        return expand(
+            fastq_dir + "/{sample}{read}.fastq.gz", sample=samples, read=reads
+        ) + expand(
+            "FastQC_trimmed/{sample}{read}_fastqc.html", sample=samples, read=reads
+        )
+    elif trim:
+        return expand(
+            fastq_dir + "/{sample}{read}.fastq.gz", sample=samples, read=reads
+        )
+    else:
+        return []
+
+
+### execute before workflow starts #############################################
+# does NOT seem to execute "onstart"
+################################################################################
+onstart:
+    if "verbose" in config and config["verbose"]:
+        print(
+            "--- Workflow parameters --------------------------------------------------------"
+        )
+        print("samples:", samples)
+        print("reads:", reads)
+        print("fastq dir:", fastq_dir)
+        print("-" * 80, "\n")
+
+        print(
+            "--- Environment ----------------------------------------------------------------"
+        )
+        print("$TMPDIR: ", os.getenv("TMPDIR", ""))
+        print("$HOSTNAME: ", os.getenv("HOSTNAME", ""))
+        print("-" * 80, "\n")
+
+    if toolsVersion:
+        usedEnvs = [CONDA_SHARED_ENV, CONDA_MAKEPAIRS_ENV]
+        cf.writeTools(usedEnvs, outdir, "makePairs", maindir)
+
+    if sampleSheet:
+        cf.copySampleSheet(sampleSheet, outdir)
+
+
+### main rule ##################################################################
+################################################################################
+
+
+rule all:
+    input:
+        # set soft-links
+        expand("originalFASTQ/{sample}{read}.fastq.gz", sample=samples, read=reads),
+        run_FastQC(fastqc),
+        run_Trimming(trim, fastqc),
+        "genome/diploid_genome.chromsizes",
+        "multiqc/multiqc_report.html",
+
+
+### execute after workflow finished ############################################
+################################################################################
+onsuccess:
+    if "verbose" in config and config["verbose"]:
+        print(
+            "\n--- makePairs finished successfully! --------------------------------\n"
+        )
+
+
+onerror:
+    print("\n !!! ERROR in makePairs workflow! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")

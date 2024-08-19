@@ -25,7 +25,7 @@ def cluster_pas(args):
             gene = entry[4]
             annotation = entry[7]
 
-            if count > minReads: 
+            if count > minReads:
                 if gene not in clusters:
                     clusters[gene] = {}
                     #cluster start, cluster end, max count, gene, annotation, summit
@@ -34,7 +34,7 @@ def cluster_pas(args):
                     newCluster = True
                     for c in clusters[gene]:
                         if pas > clusters[gene][c][0] - window and pas < clusters[gene][c][1] + window:
-                            clusters[gene][c][0] = min(pas, clusters[gene][c][0]) 
+                            clusters[gene][c][0] = min(pas, clusters[gene][c][0])
                             clusters[gene][c][1] = max(pas + 1, clusters[gene][c][1])
                             clusters[gene][c][2] += count
                             if count > clusters[gene][c][2]:
@@ -46,7 +46,7 @@ def cluster_pas(args):
 
                     #not close to any existing cluster => new cluster
                     if newCluster:
-                        clusters[gene][pas] = [pas, pas + 1, count, gene, annotation, pas, strand, chrom]            
+                        clusters[gene][pas] = [pas, pas + 1, count, gene, annotation, pas, strand, chrom]
 
             line = In.readline()
 

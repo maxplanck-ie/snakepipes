@@ -8,13 +8,10 @@ rule GContamination_featureCounts:
     output:
         txt = temp("GenomicContamination/{sample}.featurecounts.txt"),
         summary = "GenomicContamination/{sample}.featurecounts.txt.summary"
-    log:
-        out = "GenomicContamination/{sample}.featurecounts.out",
-        err = "GenomicContamination/{sample}.featurecounts.err"
     threads: 8
     conda: CONDA_RNASEQ_ENV
     shell:
-        "featureCounts -T {threads} -a {input.gtf} -t transcript -o {output.txt} {input.bams} > {log.out} 2> {log.err}"
+        "featureCounts -T {threads} -a {input.gtf} -t transcript -o {output.txt} {input.bams}"
 
 rule GContamination_featurecount_report:
     input:
@@ -23,9 +20,8 @@ rule GContamination_featurecount_report:
         finaloutput = "GenomicContamination/{sample}.Gcontamination_report.tsv",
         temp = temp("GenomicContamination/{sample}.temp"),
         temp1 = temp("GenomicContamination/{sample}.temp1")
-    log: "GenomicContamination/logs/{sample}.report.log"
     shell:
-        "SUM=$(cut -f2 {input} | tr '\n' '\t'| cut -f2,4,5 | awk '{{num = $1 + $2 + $3}} END {{print num}}');NUM=$(cut -f2 {input} | tr '\n' '\t'| cut -f5 | awk '{{num = $1}} END {{print num}}'); bc -l <<< $NUM/$SUM > {output.temp}; cut -f2 {input} | tr '\n' '\t'|cut -f2 | sed 's/^/{wildcards.sample}\t/' > {output.temp1}; paste -d'\t' {output.temp1} {output.temp} > {output.finaloutput} 2> {log}"
+        "SUM=$(cut -f2 {input} | tr '\n' '\t'| cut -f2,4,5 | awk '{{num = $1 + $2 + $3}} END {{print num}}');NUM=$(cut -f2 {input} | tr '\n' '\t'| cut -f5 | awk '{{num = $1}} END {{print num}}'); bc -l <<< $NUM/$SUM > {output.temp}; cut -f2 {input} | tr '\n' '\t'|cut -f2 | sed 's/^/{wildcards.sample}\t/' > {output.temp1}; paste -d'\t' {output.temp1} {output.temp} > {output.finaloutput}"
 
 ##
 rule GContamination_featurecount_all_report:

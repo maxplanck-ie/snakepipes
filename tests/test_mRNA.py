@@ -36,7 +36,7 @@ def createTestData(fp):
       "genes_gtf" : gtfout.as_posix(),
       "extended_coding_regions_gtf" : "",
       "blacklist_bed": "",
-      "ignoreForNormalization": "" 
+      "ignoreForNormalization": ""
     }
     # set up yaml
     yaml = YAML()
@@ -53,35 +53,29 @@ def ifs(tmp_path_factory):
 class TestmRNAseq:
     def test_mrna(self, ifs):
       org = ifs / 'org.yaml'
-      clusterconfig = Path('tests') / 'data' / 'cluster_config.yaml'
       sp.run(
         [
-          'mRNA-seq',
+          'mRNAseq',
           '-i',
           Path('tests') / 'data' / 'mRNA_mIFNB',
           '-o',
           'test_mrna',
-          '--clusterConfig',
-          clusterconfig,
           org
         ]
       )
-      assert Path('test_mrna/mRNA-seq_snakePipes.done').is_file() == True
-    
+      assert Path('test_mrna/mRNAseq_snakePipes.done').is_file()
+
     def test_mrna4(self, ifs):
       org = ifs / 'org.yaml'
-      clusterconfig = Path('tests') / 'data' / 'cluster_config.yaml'
       sp.run(
         [
-          'mRNA-seq',
+          'mRNAseq',
           '-i',
           Path('tests') / 'data' / 'mRNA_BcellPancreas',
           '-o',
           'test_mrna_4sample',
-          '--clusterConfig',
-          clusterconfig,
           org
         ]
       )
-      assert Path('test_mrna_4sample/mRNA-seq_snakePipes.done').is_file() == True
+      assert Path('test_mrna_4sample/mRNAseq_snakePipes.done').is_file()
 

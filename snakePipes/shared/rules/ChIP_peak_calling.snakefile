@@ -34,9 +34,6 @@ if pairedEnd:
             peakCaller_options = lambda wildcards: str(peakCallerOptions or '') if not cutntag else " -p 1e-5 ",
             bampe_options = lambda wildcards: str(BAMPEPeaks or '')if not cutntag else " ",
             bam_options = lambda wildcards: str(BAMPeaks or '') if not cutntag else " "
-        log:
-            out = "MACS2/logs/MACS2.{chip_sample}.filtered.out",
-            err = "MACS2/logs/MACS2.{chip_sample}.filtered.err"
         benchmark:
             "MACS2/.benchmark/MACS2.{chip_sample}.filtered.benchmark"
         conda: CONDA_CHIPSEQ_ENV
@@ -50,7 +47,7 @@ if pairedEnd:
                 --outdir MACS2 \
                 --name {wildcards.chip_sample}.filtered.BAM \
                 {params.peakCaller_options} \
-                {params.broad_calling} > {log.out} 2> {log.err}
+                {params.broad_calling}
 
             # also run MACS2 in paired-end mode BAMPE for comparison with single-end mode
             macs2 callpeak -t {input.chip} \
@@ -59,7 +56,7 @@ if pairedEnd:
                 {params.peakCaller_options} \
                 -g {params.genome_size} --keep-dup all \
                 --outdir MACS2 --name {wildcards.chip_sample}.filtered.BAMPE \
-                {params.broad_calling} > {log.out}.BAMPE 2> {log.err}.BAMPE
+                {params.broad_calling}
             """
 else:
     rule MACS2:
@@ -81,9 +78,6 @@ else:
             frag_size=fragmentLength,
             peakCaller_options = str(peakCallerOptions or ''),
             bam_options = str(BAMPeaks or '')
-        log:
-            out = "MACS2/logs/MACS2.{chip_sample}.filtered.out",
-            err = "MACS2/logs/MACS2.{chip_sample}.filtered.err"
         benchmark:
             "MACS2/.benchmark/MACS2.{chip_sample}.filtered.benchmark"
         conda: CONDA_CHIPSEQ_ENV
@@ -91,7 +85,7 @@ else:
             macs2 callpeak -t {input.chip} {params.control_param} -f BAM -g {params.genome_size} \
             {params.peakCaller_options} --keep-dup all --outdir MACS2 \
             --name {wildcards.chip_sample}.filtered.BAM {params.bam_options} --extsize {params.frag_size} \
-            {params.broad_calling} > {log.out} 2> {log.err}
+            {params.broad_calling}
             """
 
 
@@ -142,8 +136,6 @@ rule namesort_bams:
         bam = "filtered_bam/{sample}.filtered.bam"
     output:
         bam = temp("filtered_bam/{sample}.namesorted.bam")
-    log:
-        "filtered_bam/logs/{sample}.namesort.err"
     params:
         tempDir = tempDir
     threads: 4
@@ -151,7 +143,7 @@ rule namesort_bams:
     shell: """
         TMPDIR={params.tempDir}
         MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX)
-        sambamba sort -t {threads} -o {output.bam} --tmpdir=$MYTEMP -n {input.bam} 2> {log}
+        sambamba sort -t {threads} -o {output.bam} --tmpdir=$MYTEMP -n {input.bam}
         rm -rf $MYTEMP
          """
 
@@ -165,7 +157,6 @@ if not isMultipleComparison:
                 control = lambda wildcards: ["filtered_bam/"+get_control(x)+".namesorted.bam" for x in genrichDict[wildcards.group]] if chip_samples_w_ctrl else []
             output:
                 "Genrich/{group}.narrowPeak"
-            log: "Genrich/logs/{group}.log"
             params:
                 bams = lambda wildcards: ",".join(expand(os.path.join("filtered_bam", "{sample}.namesorted.bam"), sample=genrichDict[wildcards.group])),
                 blacklist = "-E {}".format(blacklist_bed) if blacklist_bed else "",
@@ -174,7 +165,7 @@ if not isMultipleComparison:
                 ignoreForNorm = "-e " + ','.join(ignoreForNormalization) if ignoreForNormalization else ""
             conda: CONDA_CHIPSEQ_ENV
             shell: """
-                Genrich -t {params.bams} {params.control_pfx} {params.control} -o {output} -r {params.blacklist} {params.ignoreForNorm} -y 2> {log}
+                Genrich -t {params.bams} {params.control_pfx} {params.control} -o {output} -r {params.blacklist} {params.ignoreForNorm} -y
                 """
     else:
         rule Genrich_peaks:
@@ -183,7 +174,6 @@ if not isMultipleComparison:
                 control = lambda wildcards: ["filtered_bam/"+get_control(x)+".namesorted.bam" for x in genrichDict[wildcards.group] ] if chip_samples_w_ctrl else []
             output:
                 "Genrich/{group}.narrowPeak"
-            log: "Genrich/logs/{group}.log"
             params:
                 bams = lambda wildcards: ",".join(expand(os.path.join("filtered_bam", "{sample}.namesorted.bam"), sample=genrichDict[wildcards.group])),
                 blacklist = "-E {}".format(blacklist_bed) if blacklist_bed else "",
@@ -193,7 +183,7 @@ if not isMultipleComparison:
                 ignoreForNorm = "-e " + ','.join(ignoreForNormalization) if ignoreForNormalization else ""
             conda: CONDA_CHIPSEQ_ENV
             shell: """
-                Genrich -t {params.bams} {params.control_pfx} {params.control} -o {output} -r {params.blacklist} {params.ignoreForNorm} -w {params.frag_size} 2> {log}
+                Genrich -t {params.bams} {params.control_pfx} {params.control} -o {output} -r {params.blacklist} {params.ignoreForNorm} -w {params.frag_size}
                 """
 else:
     if pairedEnd:
@@ -203,7 +193,6 @@ else:
                 control = lambda wildcards: ["filtered_bam/"+get_control(x)+".namesorted.bam" for x in genrichDict[wildcards.compGroup][wildcards.group]] if chip_samples_w_ctrl else []
             output:
                 "Genrich/{group}.{compGroup}.narrowPeak"
-            log: "Genrich/logs/{group}.{compGroup}.log"
             params:
                 bams = lambda wildcards: ",".join(expand(os.path.join("filtered_bam", "{sample}.namesorted.bam"), sample=genrichDict[wildcards.compGroup][wildcards.group])),
                 blacklist = "-E {}".format(blacklist_bed) if blacklist_bed else "",
@@ -212,7 +201,7 @@ else:
                 ignoreForNorm = "-e " + ','.join(ignoreForNormalization) if ignoreForNormalization else ""
             conda: CONDA_CHIPSEQ_ENV
             shell: """
-                Genrich -t {params.bams} {params.control_pfx} {params.control} -o {output} -r {params.blacklist} {params.ignoreForNorm} -y 2> {log}
+                Genrich -t {params.bams} {params.control_pfx} {params.control} -o {output} -r {params.blacklist} {params.ignoreForNorm} -y
                 """
     else:
         rule Genrich_peaks:
@@ -221,7 +210,6 @@ else:
                 control = lambda wildcards: ["filtered_bam/"+get_control(x)+".namesorted.bam" for x in genrichDict[wildcards.compGroup][wildcards.group] ] if chip_samples_w_ctrl else []
             output:
                 "Genrich/{group}.{compGroup}.narrowPeak"
-            log: "Genrich/logs/{group}.{compGroup}.log"
             params:
                 bams = lambda wildcards: ",".join(expand(os.path.join("filtered_bam", "{sample}.namesorted.bam"), sample=genrichDict[wildcards.compGroup][wildcards.group])),
                 blacklist = "-E {}".format(blacklist_bed) if blacklist_bed else "",
@@ -231,14 +219,13 @@ else:
                 ignoreForNorm = "-e " + ','.join(ignoreForNormalization) if ignoreForNormalization else ""
             conda: CONDA_CHIPSEQ_ENV
             shell: """
-                Genrich -t {params.bams} {params.control_pfx} {params.control} -o {output} -r {params.blacklist} {params.ignoreForNorm} -w {params.frag_size} 2> {log}
+                Genrich -t {params.bams} {params.control_pfx} {params.control} -o {output} -r {params.blacklist} {params.ignoreForNorm} -w {params.frag_size}
                 """
 
 
 rule prep_bedgraph:
     input: "filtered_bam/{sample}.namesorted.bam"
     output: temp("filtered_bedgraph/{sample}.fragments.bedgraph")
-    log: "filtered_bedgraph/log/{sample}.log"
     params:
         sample = lambda wildcards: wildcards.sample,
         genome = genome_index
@@ -255,14 +242,13 @@ rule SEACR_peaks_stringent:
                  else []
     output:
         "SEACR/{chip_sample}.filtered.stringent.bed"
-    log: "SEACR/logs/{chip_sample}_stringent.log"
     params:
         fdr = lambda wildcards,input: fdr if not input.control else "",
         prefix = os.path.join(outdir,"SEACR/{chip_sample}.filtered"),
         script=os.path.join(maindir, "shared","tools/SEACR-1.3/SEACR_1.3.sh")
     conda: CONDA_SEACR_ENV
     shell: """
-        bash {params.script} {input.chip} {input.control} {params.fdr} "norm" "stringent" {params.prefix} 2>{log}
+        bash {params.script} {input.chip} {input.control} {params.fdr} "norm" "stringent" {params.prefix}
         """
 
 rule SEACR_peaks_relaxed:
@@ -272,14 +258,13 @@ rule SEACR_peaks_relaxed:
                  else []
     output:
         "SEACR/{chip_sample}.filtered.relaxed.bed"
-    log: "SEACR/logs/{chip_sample}_relaxed.log"
     params:
         fdr = lambda wildcards,input: fdr if not input.control else "",
         prefix = os.path.join(outdir,"SEACR/{chip_sample}.filtered"),
         script=os.path.join(maindir, "shared","tools/SEACR-1.3/SEACR_1.3.sh")
     conda: CONDA_SEACR_ENV
     shell: """
-        bash {params.script} {input.chip} {input.control} {params.fdr} "norm" "relaxed" {params.prefix} 2>{log}
+        bash {params.script} {input.chip} {input.control} {params.fdr} "norm" "relaxed" {params.prefix}
         """
 
 rule SEACR_peak_stringent_qc:

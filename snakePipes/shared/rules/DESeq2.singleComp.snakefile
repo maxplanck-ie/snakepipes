@@ -26,9 +26,6 @@ rule DESeq2:
         formula = config["formula"],
         counts_table = lambda wildcards,input: os.path.join(outdir,input.counts_table),
         symbol_file = lambda wildcards,input: os.path.join(outdir,input.symbol_file)
-    log:
-        out = "{}/logs/DESeq2.out".format(get_outdir("DESeq2",sampleSheet)),
-        err = "{}/logs/DESeq2.err".format(get_outdir("DESeq2",sampleSheet))
     conda: CONDA_RNASEQ_ENV
     script: "{params.script}"
 
@@ -41,9 +38,6 @@ rule DESeq2_Salmon_basic:
         symbol_file = "Annotation/genes.filtered.symbol" #get_symbol_file
     output:
         "{}/DESeq2.session_info.txt".format(get_outdir("DESeq2_Salmon",sampleSheet))
-    log:
-        out = "{}/logs/DESeq2.out".format(get_outdir("DESeq2_Salmon",sampleSheet)),
-        err = "{}/logs/DESeq2.err".format(get_outdir("DESeq2_Salmon",sampleSheet))
     benchmark:
         "{}/.benchmark/DESeq2.Salmon.benchmark".format(get_outdir("DESeq2_Salmon",sampleSheet))
     params:
@@ -69,9 +63,6 @@ rule DESeq2_Salmon_allelic:
         symbol_file = "Annotation/genes.filtered.symbol" #get_symbol_file
     output:
         "{}/DESeq2.session_info.txt".format(get_outdir("DESeq2_SalmonAllelic",sampleSheet))
-    log:
-        out = "{}/logs/DESeq2.out".format(get_outdir("DESeq2_SalmonAllelic",sampleSheet)),
-        err = "{}/logs/DESeq2.err".format(get_outdir("DESeq2_SalmonAllelic",sampleSheet))
     benchmark:
         "{}/.benchmark/DESeq2.SalmonAllelic.benchmark".format(get_outdir("DESeq2_SalmonAllelic",sampleSheet))
     params:

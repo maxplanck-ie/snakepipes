@@ -8,71 +8,71 @@ defaults:
 
 
 jobs:
+  pip:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.11', '3.12']
+        optdeps: [".", ".[actions]", ".[docs]"]
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: pip
+      run: |
+        pip install ${{ matrix.optdeps }}
   docs:
+    needs: pip
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - uses: mamba-org/setup-micromamba@main
+    - uses: actions/setup-python@v5
       with:
-        environment-file: .github/snakePipesEnvCI.yml
-        condarc: |
-          channels:
-            - conda-forge
-            - bioconda
-            - defaults
-          channel_priority: 'strict'
-        cache-downloads: true
+        python-version: 3.11
     - name: Install snakePipes
       run: |
-        micromamba run -n snakePipes_CI python -m pip install . --no-deps --ignore-installed -vvv
+        pip install .[docs]
     - name: docs
       run: |
-        micromamba activate snakePipes_CI
         snakePipes config --tempDir /tmp
         cd docs
         make html
-  flake:
+  lint:
+    needs: pip
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - uses: mamba-org/setup-micromamba@main
+    - uses: actions/setup-python@v5
       with:
-        environment-file: .github/snakePipesEnvCI.yml
-        condarc: |
-          channels:
-            - conda-forge
-            - bioconda
-            - defaults
-          channel_priority: 'strict'
-        cache-downloads: true
+        python-version: 3.11
     - name: Install snakePipes
       run: |
-        micromamba run -n snakePipes_CI python -m pip install . --no-deps --ignore-installed -vvv
-    - name: flake
+        pip install .[actions]
+    - name: ruff
       run: |
-        micromamba activate snakePipes_CI
-        snakePipes config --tempDir /tmp
-        flake8 --ignore=E501,E722,E402 --exclude tests,docs/conf.py,build/lib/snakePipes/shared/tools/three_prime_seq,snakePipes/shared/tools/three_prime_seq .
+        ruff check .
   CI:
+    needs: pip
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - uses: mamba-org/setup-micromamba@main
+    - uses: conda-incubator/setup-miniconda@v3
       with:
-        environment-file: .github/snakePipesEnvCI.yml
-        condarc: |
-          channels:
-            - conda-forge
-            - bioconda
-            - defaults
-          channel_priority: 'strict'
-        cache-downloads: true
+        environment-file: .github/conda_ci.yml
+        activate-environment: conda_ci
+        condarc-file: .github/condarc.yml
     - name: Install snakePipes
       run: |
-        micromamba run -n snakePipes_CI python -m pip install . --no-deps --ignore-installed -vvv
+        pip install .
+    - name: print_conda_env_export
+      run: |
+        conda env export 
+    - name: print_pip_list
+      run: |
+        pip list 
     - name: CI
       run: |
-        micromamba activate snakePipes_CI
         snakePipes config --tempDir /tmp
         ./.ci_stuff/test_dag.sh
   createEnvs:
@@ -104,22 +104,16 @@ jobs:
         ]
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - uses: mamba-org/setup-micromamba@main
+    - uses: actions/checkout@v4
+    - uses: conda-incubator/setup-miniconda@v3
       with:
-        environment-file: .github/snakePipesEnvCI.yml
-        condarc: |
-          channels:
-            - conda-forge
-            - bioconda
-            - defaults
-          channel_priority: 'strict'
-        cache-downloads: true
+        environment-file: .github/conda_ci.yml
+        activate-environment: conda_ci
+        condarc-file: .github/condarc.yml
     - name: install snakePipes
       run: |
-        micromamba run -n snakePipes_CI python -m pip install . --no-deps --ignore-installed -vvv
+        pip install .
     - name: createEnvs
       run: |
-        micromamba activate snakePipes_CI
         snakePipes config --tempDir /tmp
-        snakePipes createEnvs --autodetectCondaEnvDir --only ${{matrix.envs}}
+        snakePipes createEnvs --only ${{matrix.envs}}

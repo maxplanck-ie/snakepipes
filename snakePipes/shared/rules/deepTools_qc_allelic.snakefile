@@ -15,9 +15,6 @@ rule bamCoverage_allelic:
                          else "--extendReads " + str(fragmentLength),
         blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed
                     else "",
-    log:
-        out = "bamCoverage/allele_specific/logs/bamCoverage.{sample}.{suffix}.out",
-        err = "bamCoverage/allele_specific/logs/bamCoverage.{sample}.{suffix}.err"
     benchmark:
         "bamCoverage/allele_specific/.benchmark/bamCoverage.{sample}.{suffix}.benchmark"
     threads: lambda wildcards: 16 if 16<max_thread else max_thread
@@ -36,9 +33,6 @@ rule plotCoverage_allelic:
         labels = " ".join(expand('{sample}.{suffix}', sample=samples, suffix = ['genome1', 'genome2'])),
         read_extension = "--extendReads" if pairedEnd
                          else "--extendReads " + str(fragmentLength)
-    log:
-        out = "deepTools_qc/logs/plotCoverage_allelic.out",
-        err = "deepTools_qc/logs/plotCoverage_allelic.err"
     benchmark:
         "deepTools_qc/.benchmark/plotCoverage_allelic.benchmark"
     threads: lambda wildcards: 24 if 24<max_thread else max_thread
@@ -62,9 +56,6 @@ rule multiBamSummary_allelic:
         scaling_factors = "",
         binSize = "",
         spikein_region = ""
-    log:
-        out = "deepTools_qc/logs/multiBamSummary_allelic.out",
-        err = "deepTools_qc/logs/multiBamSummary_allelic.err"
     benchmark:
         "deepTools_qc/.benchmark/multiBamSummary_allelic.benchmark"
     threads: lambda wildcards: 24 if 24<max_thread else max_thread
@@ -83,9 +74,6 @@ rule plotCorrelation_pearson_allelic:
         plotcmd = "" if plotFormat == 'None' else
             "--plotFile " + "deepTools_qc/plotCorrelation/correlation.pearson.read_coverage_allelic.heatmap." + plotFormat,
         title='fragment'
-    log:
-        out = "deepTools_qc/logs/plotCorrelation_pearson_allelic.out",
-        err = "deepTools_qc/logs/plotCorrelation_pearson_allelic.err"
     benchmark:
         "deepTools_qc/.benchmark/plotCorrelation_pearson_allelic.benchmark"
     conda: CONDA_SHARED_ENV
@@ -101,9 +89,6 @@ rule plotCorrelation_spearman_allelic:
         plotcmd = "" if plotFormat == 'None' else
             "--plotFile " + "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage_allelic.heatmap." + plotFormat,
         title = 'fragment'
-    log:
-        out = "deepTools_qc/logs/plotCorrelation_spearman_allelic.out",
-        err = "deepTools_qc/logs/plotCorrelation_spearman_allelic.err"
     benchmark:
         "deepTools_qc/.benchmark/plotCorrelation_spearman_allelic.benchmark"
     conda: CONDA_SHARED_ENV
@@ -119,9 +104,6 @@ rule plotPCA_allelic:
         plotcmd = "" if plotFormat == 'None' else
                 "--plotFile " + "deepTools_qc/plotPCA/PCA.read_coverage_allelic." + plotFormat,
         title='fragment'
-    log:
-        out = "deepTools_qc/logs/plotPCA_allelic.out",
-        err = "deepTools_qc/logs/plotPCA_allelic.err"
     benchmark:
         "deepTools_qc/.benchmark/plotPCA_allelic.benchmark"
     conda: CONDA_SHARED_ENV

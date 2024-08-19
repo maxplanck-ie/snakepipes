@@ -1,4 +1,3 @@
-sink(snakemake@log[["out"]])
 .libPaths(R.home("library"))
 
 #system(paste0('mkdir -p ',wdir)) #for debugging
@@ -88,9 +87,6 @@ if(length(in_dirs)>1){
 
 outfile<-file.path(wdir,basename(snakemake@output[["seurat"]]))
 saveRDS(s,file=outfile)
-
-message('done all')
-sink()
 
 sink("sessionInfo.txt")
 sessionInfo()

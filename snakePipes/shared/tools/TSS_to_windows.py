@@ -16,10 +16,10 @@ bamf = args.bam
 size = args.size
 
 bam = pysam.AlignmentFile(bamf)
-chroms_sizes = dict(zip(bam.references, bam.lengths))
+chroms_sizes = dict(zip(bam.references, bam.lengths, strict=False))
 
 with open(inf) as f, open(outf, 'w') as of:
-    for idx, line in enumerate(f):
+    for line in f:
         linesplit = line.split('\t')
         chr = linesplit[0]
         if chr in chroms_sizes.keys():
