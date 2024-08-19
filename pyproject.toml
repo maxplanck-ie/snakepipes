@@ -1,0 +1,89 @@
+[build-system]
+requires = ["setuptools >= 61.0", "setuptools_scm>=8"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "snakePipes"
+description = 'Snakemake workflows and wrappers for NGS data processing from the MPI-IE'
+readme = "README.md"
+version = "3.0.0"
+keywords = [
+    "DNAmapping",
+    "ChIPSeq",
+    "mRNAseq",
+    "ncRNAseq",
+    "ATACseq",
+    "scRNAseq",
+    "WGBS / Bisulfite seq",
+    "epigenetics workflows",
+    "Illumina"
+]
+
+authors = [
+  {name = "Bioinfo-Core MPI-IE"}
+]
+
+classifiers = [
+    "Intended Audience :: Bioinformaticians",
+    "Intended Audience :: Biologists",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",   
+]
+
+requires-python = ">= 3.11"
+
+dependencies = [
+    "snakemake >= 8",
+    "pandas",
+    "thefuzz",
+    "pyyaml >= 5.1",
+    "snakemake-executor-plugin-cluster-generic >= 1.0.9",
+    "graphviz"
+]
+
+[project.optional-dependencies]
+actions = [
+    "pytest",
+    "ruff",
+    "ruamel.yaml",
+    "pytest-xdist"
+]
+
+docs = [
+    "sphinx >= 7.1.2",
+    "sphinx-rtd-theme >= 2.0.0",
+    "readthedocs-sphinx-search >= 0.3.2",
+    "sphinx-argparse >= 0.4.0",
+    "mock==5.1.0"
+]
+build = [
+    "build"
+]
+
+[tool.setuptools.package-data]
+snakePipes = ["**/*.yaml", "**/*.R", "**/*.Rmd", "**/*snakefile", "**/*Snakefile", "**/*sh"]
+
+[project.scripts]
+ATACseq = "snakePipes.workflows.ATACseq.ATACseq:main"
+ChIPseq = "snakePipes.workflows.ChIPseq.ChIPseq:main"
+createIndices = "snakePipes.workflows.createIndices.createIndices:main"
+DNAmapping = "snakePipes.workflows.DNAmapping.DNAmapping:main"
+HiC = "snakePipes.workflows.HiC.HiC:main"
+makePairs = "snakePipes.workflows.makePairs.makePairs:main"
+mRNAseq = "snakePipes.workflows.mRNAseq.mRNAseq:main"
+ncRNAseq = "snakePipes.workflows.ncRNAseq.ncRNAseq:main"
+preprocessing = "snakePipes.workflows.preprocessing.preprocessing:main"
+scRNAseq = "snakePipes.workflows.scRNAseq.scRNAseq:main"
+WGBS = "snakePipes.workflows.WGBS.WGBS:main"
+snakePipes = "snakePipes.snakePipes:main"
+
+[tool.ruff]
+exclude = [
+    "build"
+]
+lint.select = ["E", "F", "W", "B"]
+lint.ignore = [
+    "E722", # bare excepts
+    "E501", # line length
+    "B006", # Do not use mutable data structures for argument defaults
+]

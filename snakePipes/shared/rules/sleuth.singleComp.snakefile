@@ -17,17 +17,13 @@ rule sleuth_Salmon:
         outdir = os.path.join(outdir,"sleuth_Salmon_{}".format(sample_name)),
         fdr = 0.05
     threads: 6
-    log:
-        out = "sleuth_Salmon_{}/logs/sleuth.out".format(sample_name),
-        err = "sleuth_Salmon_{}/logs/sleuth.err".format(sample_name)
     conda: CONDA_SLEUTH_ENV
     shell:
         "Rscript {params.script} "
         "{input.sampleSheet} "
         "{params.indir} "
         "{params.outdir} "
-        "{params.fdr} " + os.path.join(outdir,"{input.t2g}") +
-        " >{log.out} 2>{log.err}"
+        "{params.fdr} " + os.path.join(outdir,"{input.t2g}")
 
 rule sleuth_SalmonAllelic:
     input:
@@ -44,14 +40,10 @@ rule sleuth_SalmonAllelic:
         outdir = os.path.join(outdir,"sleuth_SalmonAllelic_{}".format(sample_name)),
         fdr = 0.05
     threads: 6
-    log:
-        out = "sleuth_SalmonAllelic_{}/logs/sleuth.out".format(sample_name),
-        err = "sleuth_SalmonAllelic_{}/logs/sleuth.err".format(sample_name)
     conda: CONDA_SLEUTH_ENV
     shell:
         "Rscript {params.script} "
         "{input.sampleSheet} "
         "{params.indir} "
         "{params.outdir} "
-        "{params.fdr} " + os.path.join(outdir,"{input.t2g}") +
-        " >{log.out} 2>{log.err}"
+        "{params.fdr} " + os.path.join(outdir,"{input.t2g}")

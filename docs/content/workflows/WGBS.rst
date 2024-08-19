@@ -146,6 +146,6 @@ Command line options
 
 .. argparse::
     :func: parse_args
-    :filename: ../snakePipes/workflows/WGBS/WGBS
+    :filename: ../snakePipes/workflows/WGBS/WGBS.py
     :prog: WGBS
     :nodefault:

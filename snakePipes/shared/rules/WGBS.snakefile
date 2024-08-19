@@ -11,10 +11,9 @@ rule conversionRate:
         "QC_metrics/{sample}.CHH.Mbias.txt"
     output:
         "QC_metrics/{sample}.conv.rate.txt"
-    log: "QC_metrics/logs/{sample}.conversionRate.log"
     threads: 1
     shell: """
-        awk '{{if(NR>1) {{M+=$4; UM+=$5}}}}END{{printf("{wildcards.sample}\\t%f\\n", 100*(1.0-M/(M+UM)))}}' {input} > {output} 2> {log}
+        awk '{{if(NR>1) {{M+=$4; UM+=$5}}}}END{{printf("{wildcards.sample}\\t%f\\n", 100*(1.0-M/(M+UM)))}}' {input} > {output}
         """
 
 
@@ -26,9 +25,6 @@ if pairedEnd and not fromBAM:
             r2=fastq_dir + "/{sample}" + reads[1] + ".fastq.gz"
         output:
             sbam=temp(aligner+"/{sample}.bam")
-        log:
-            err=aligner+"/logs/{sample}.map_reads.err",
-            out=aligner+"/logs/{sample}.map_reads.out"
         params:
             bwameth_index=bwameth_index if aligner=="bwameth" else bwameth2_index,
             tempDir = tempDir
@@ -37,8 +33,8 @@ if pairedEnd and not fromBAM:
         shell: """
             TMPDIR={params.tempDir}
             MYTEMP=$(mktemp -d "${{TMPDIR:-/tmp}}"/snakepipes.XXXXXXXXXX)
-            bwameth.py --threads {threads} --reference "{params.bwameth_index}" "{input.r1}" "{input.r2}" 2> {log.err} | \
-	        samtools sort -T "$MYTEMP"/{wildcards.sample} -m 3G -@ 4 -o "{output.sbam}" 2>> {log.err}
+            bwameth.py --threads {threads} --reference "{params.bwameth_index}" "{input.r1}" "{input.r2}" | \
+	        samtools sort -T "$MYTEMP"/{wildcards.sample} -m 3G -@ 4 -o "{output.sbam}"
             rm -rf "$MYTEMP"
             """
 
@@ -48,9 +44,6 @@ elif not pairedEnd and not fromBAM:
             r1=fastq_dir + "/{sample}" + reads[0] + ".fastq.gz",
         output:
             sbam=temp(aligner+"/{sample}.bam")
-        log:
-            err=aligner+"/logs/{sample}.map_reads.err",
-            out=aligner+"/logs/{sample}.map_reads.out"
         params:
             bwameth_index=bwameth_index if aligner=="bwameth" else bwameth2_index,
             tempDir = tempDir
@@ -59,8 +52,8 @@ elif not pairedEnd and not fromBAM:
         shell: """
             TMPDIR={params.tempDir}
             MYTEMP=$(mktemp -d "${{TMPDIR:-/tmp}}"/snakepipes.XXXXXXXXXX)
-            bwameth.py --threads {threads} --reference "{params.bwameth_index}" "{input.r1}" 2> {log.err} | \
-	        samtools sort -T "$MYTEMP/{wildcards.sample}" -m 3G -@ 4 -o "{output.sbam}" 2>> {log.err}
+            bwameth.py --threads {threads} --reference "{params.bwameth_index}" "{input.r1}" | \
+	        samtools sort -T "$MYTEMP/{wildcards.sample}" -m 3G -@ 4 -o "{output.sbam}"
             rm -rf "$MYTEMP"
             """
 
@@ -70,12 +63,9 @@ if not fromBAM:
             aligner+"/{sample}.bam"
         output:
             temp(aligner+"/{sample}.bam.bai")
-        log:
-            err=aligner+"/logs/{sample}.index_bam.err",
-            out=aligner+"/logs/{sample}.index_bam.out"
         conda: CONDA_SHARED_ENV
         shell: """
-            samtools index "{input}" > {log.out} 2> {log.err}
+            samtools index "{input}"
             """
 
 if not skipBamQC:
@@ -85,9 +75,6 @@ if not skipBamQC:
             aligner+"/{sample}.bam.bai"
         output:
             "Sambamba/{sample}.markdup.bam"
-        log:
-            err="Sambamba/logs/{sample}.rm_dupes.err",
-            out="Sambamba/logs/{sample}.rm_dupes.out"
         threads: lambda wildcards: 10 if 10<max_thread else max_thread
         params:
             tempDir = tempDir
@@ -95,7 +82,7 @@ if not skipBamQC:
         shell: """
             TMPDIR={params.tempDir}
             MYTEMP=$(mktemp -d "${{TMPDIR:-/tmp}}"/snakepipes.XXXXXXXXXX)
-            sambamba markdup --overflow-list-size 600000 -t {threads} --tmpdir "$MYTEMP/{wildcards.sample}" "{input[0]}" "{output}" >> {log.out} 2> {log.err}
+            sambamba markdup --overflow-list-size 600000 -t {threads} --tmpdir "$MYTEMP/{wildcards.sample}" "{input[0]}" "{output}"
             rm -rf "$MYTEMP"
             """
 
@@ -106,13 +93,10 @@ if not skipBamQC:
         output:
             "Sambamba/{sample}.markdup.bam.bai"
         params:
-        log:
-            err="Sambamba/logs/{sample}.indexMarkDupes.err",
-            out="Sambamba/logs/{sample}.indexMarkDupes.out"
         threads: 1
         conda: CONDA_SHARED_ENV
         shell: """
-            samtools index "{input}" 1> {log.out} 2> {log.err}
+            samtools index "{input}"
             """
 
     rule link_deduped_bam:
@@ -187,12 +171,10 @@ rule calc_Mbias:
         "QC_metrics/{sample}.Mbias.txt"
     params:
         genome=genome_fasta
-    log:
-        out="QC_metrics/logs/{sample}.calc_Mbias.out"
     threads: lambda wildcards: 10 if 10<max_thread else max_thread
     conda: CONDA_WGBS_ENV
     shell: """
-        MethylDackel mbias -@ {threads} {params.genome} {input[0]} QC_metrics/{wildcards.sample} 2> {output} > {log.out}
+        MethylDackel mbias -@ {threads} {params.genome} {input[0]} QC_metrics/{wildcards.sample}
         """
 
 
@@ -204,12 +186,10 @@ rule calcCHHbias:
         temp("QC_metrics/{sample}.CHH.Mbias.txt")
     params:
         genome=genome_fasta
-    log:
-        err="QC_metrics/logs/{sample}.calcCHHbias.err"
     threads: lambda wildcards: 10 if 10<max_thread else max_thread
     conda: CONDA_WGBS_ENV
     shell: """
-        MethylDackel mbias -@ {threads} --CHH --noCpG --noSVG {params.genome} {input[0]} QC_metrics/{wildcards.sample} > {output} 2> {log.err}
+        MethylDackel mbias -@ {threads} --CHH --noCpG --noSVG {params.genome} {input[0]} QC_metrics/{wildcards.sample}
         """
 
 
@@ -223,8 +203,6 @@ rule calc_GCbias:
     params:
         genomeSize=genome_size,
         twobitpath=genome_2bit
-    log:
-        out="QC_metrics/logs/calc_GCbias.out"
     threads: lambda wildcards: 20 if 20<max_thread else max_thread
     conda: CONDA_SHARED_ENV
     shell: """
@@ -245,12 +223,10 @@ rule DepthOfCov:
         options="--minMappingQuality 10 --smartLabels --samFlagExclude 256",
         thresholds="-ct 0 -ct 1 -ct 2 -ct 5 -ct 10 -ct 15 -ct 20 -ct 30 -ct 50"
     threads: lambda wildcards: 20 if 20<max_thread else max_thread
-    log:
-        err="QC_metrics/logs/DepthOfCov.err"
     conda: CONDA_SHARED_ENV
     shell: """
         plotCoverage -b {input.BAMS} -p {threads} --outCoverageMetrics {output[2]} --BED {input.BED} \
-            {params.thresholds} {params.options} -o {output[1]} > {output[0]} 2> {log.err}
+            {params.thresholds} {params.options} -o {output[1]} > {output[0]}
         """
 
 
@@ -266,11 +242,9 @@ rule DepthOfCovGenome:
         options="--minMappingQuality 10 --smartLabels --samFlagExclude 256",
         thresholds="-ct 0 -ct 1 -ct 2 -ct 5 -ct 10 -ct 15 -ct 20 -ct 30 -ct 50"
     threads: lambda wildcards: 20 if 20<max_thread else max_thread
-    log:
-        err="QC_metrics/logs/DepthOfCovGenome.err"
     conda: CONDA_SHARED_ENV
     shell: """
-        plotCoverage -b {input.BAMS} -p {threads} {params.thresholds} {params.options} --outCoverageMetrics {output[2]} -o {output[1]} > {output[0]} 2> {log.err}
+        plotCoverage -b {input.BAMS} -p {threads} {params.thresholds} {params.options} --outCoverageMetrics {output[2]} -o {output[1]} > {output[0]}
         """
 
 
@@ -279,11 +253,9 @@ rule get_flagstat:
         "filtered_bam/{sample}.filtered.bam"
     output:
         "QC_metrics/{sample}.flagstat"
-    log:
-        err="QC_metrics/logs/{sample}.get_flagstat.err"
     threads: 1
     conda: CONDA_SHARED_ENV
-    shell: "samtools flagstat {input} > {output} 2> {log.err}"
+    shell: "samtools flagstat {input} > {output}"
 
 
 rule produceReport:
@@ -313,14 +285,11 @@ if not noAutoMethylationBias:
         params:
             genome=genome_fasta,
             MethylDackelOptions=MethylDackelOptions
-        log:
-            err="MethylDackel/logs/{sample}.methyl_extract.err",
-            out="MethylDackel/logs/{sample}.methyl_extract.out"
         threads: lambda wildcards: 10 if 10<max_thread else max_thread
         conda: CONDA_WGBS_ENV
         shell: """
             mi=$(cat {input[2]} | sed 's/Suggested inclusion options: //' )
-            MethylDackel extract -o MethylDackel/{wildcards.sample} {params.MethylDackelOptions} $mi -@ {threads} {params.genome} {input[0]} 1> {log.out} 2> {log.err}
+            MethylDackel extract -o MethylDackel/{wildcards.sample} {params.MethylDackelOptions} $mi -@ {threads} {params.genome} {input[0]}
             """
 else:
     rule methyl_extract:
@@ -332,13 +301,10 @@ else:
         params:
             genome=genome_fasta,
             MethylDackelOptions=MethylDackelOptions
-        log:
-            err="MethylDackel/logs/{sample}.methyl_extract.err",
-            out="MethylDackel/logs/{sample}.methyl_extract.out"
         threads: lambda wildcards: 10 if 10<max_thread else max_thread
         conda: CONDA_WGBS_ENV
         shell: """
-            MethylDackel extract -o MethylDackel/{wildcards.sample} {params.MethylDackelOptions} -@ {threads} {params.genome} {input[0]} 1> {log.out} 2> {log.err}
+            MethylDackel extract -o MethylDackel/{wildcards.sample} {params.MethylDackelOptions} -@ {threads} {params.genome} {input[0]}
             """
 
 
@@ -352,8 +318,6 @@ rule prepForMetilene:
         groups=metileneGroups,
         minCoverage=minCoverage,
         blacklist=blacklist
-    log:
-        err='{}/logs/prep_for_stats.err'.format(get_outdir("metilene", targetRegions, minCoverage)),
     threads: lambda wildcards: 10 if 10<max_thread else max_thread
     conda: CONDA_WGBS_ENV
     script: "../rscripts/WGBS_mergeStats.R"
@@ -416,8 +380,6 @@ rule run_metilene:
         FDR=FDR,
         regionlist='-f 2 -B ' + targetRegions if targetRegions else '',
         opts = metileneOptions if metileneOptions else ''
-    log:
-        err="{}/logs/run_metilene.err".format(get_outdir("metilene", targetRegions, minCoverage))
     threads: lambda wildcards: 10 if 10<max_thread else max_thread
     benchmark: '{}/.benchmark/run_metilene.benchmark'.format(get_outdir("metilene", targetRegions, minCoverage))
     conda: CONDA_WGBS_ENV
@@ -431,7 +393,7 @@ rule run_metilene:
                  --threads {threads} \
                  {params.regionlist} \
                  {params.opts} \
-                 {input.MetIN} 2>{log.err} \
+                 {input.MetIN} \
             | sort -k 1,1 -k2,2n >> {output.MetBed}
         """
 
@@ -462,8 +424,6 @@ rule bedGraphToBigWig:
     output:
         "MethylDackel/{sample}_CpG.methylation.bw",
         "MethylDackel/{sample}_CpG.coverage.bw"
-    log:
-        err='MethylDackel/logs/{sample}_bedGraphToBigWig.stderr'
     threads: 1
     conda: CONDA_SHARED_ENV
-    shell: os.path.join(workflow_tools, "bedGraphToBigwig") + " {input[0]} {input[1]} {output[0]} {output[1]} 2> {log.err}"
+    shell: os.path.join(workflow_tools, "bedGraphToBigwig") + " {input[0]} {input[1]} {output[0]} {output[1]}"

@@ -32,7 +32,6 @@ if aligner.upper().find("HISAT2") >=0:
                 bam = temp(aligner+"/{sample}.sorted.bam"),
                 splice = aligner+"/{sample}/splice_sites.txt",
                 met = aligner+"/{sample}/metrics.txt"
-            log: aligner+"/logs/{sample}.sort.log"
             params:
                 lib_type = getHISAT_libtype(pairedEnd, libraryType),
                 input_splice = known_splicesites,
@@ -53,7 +52,7 @@ if aligner.upper().find("HISAT2") >=0:
                     -1 {input.r1} -2 {input.r2} \
                     --novel-splicesite-outfile {output.splice} \
                     --met-file {output.met} 2> {output.align_summary} \
-                | samtools sort -m {params.samsort_memory} -T $MYTEMP/{wildcards.sample} -@ {threads} -O bam -o {output.bam} - 2> {log};
+                | samtools sort -m {params.samsort_memory} -T $MYTEMP/{wildcards.sample} -@ {threads} -O bam -o {output.bam} -;
                 rm -rf $MYTEMP
                 """
     else:
@@ -65,7 +64,6 @@ if aligner.upper().find("HISAT2") >=0:
                 bam = temp(aligner+"/{sample}.sorted.bam"),
                 splice = aligner+"/{sample}/splice_sites.txt",
                 met = aligner+"/{sample}/metrics.txt"
-            log: aligner+"/logs/{sample}.sort.log"
             params:
                 lib_type = getHISAT_libtype(pairedEnd, libraryType),
                 input_splice = known_splicesites,
@@ -86,7 +84,7 @@ if aligner.upper().find("HISAT2") >=0:
                     -U {input[0]} \
                     --novel-splicesite-outfile {output.splice} \
                     --met-file {output.met} 2> {output.align_summary} \
-                | samtools sort -m {params.samsort_memory} -T $MYTEMP/{wildcards.sample} -@ {threads} -O bam -o {output.bam} - 2> {log}
+                | samtools sort -m {params.samsort_memory} -T $MYTEMP/{wildcards.sample} -@ {threads} -O bam -o {output.bam} -
                 rm -rf $MYTEMP
                 """
 elif aligner.upper().find("STAR") >=0:
@@ -97,7 +95,6 @@ elif aligner.upper().find("STAR") >=0:
                 r2 = fastq_dir+"/{sample}"+reads[1]+".fastq.gz"
             output:
                 bam = temp(aligner+"/{sample}.sorted.bam")
-            log: aligner+"/logs/{sample}.sort.log"
             params:
                 alignerOptions = str(alignerOptions or ''),
                 gtf = genes_gtf,
@@ -126,7 +123,7 @@ elif aligner.upper().find("STAR") >=0:
                     --readFilesIn  {input.r1} {input.r2} \
                     --readFilesCommand 'gunzip -c' \
                     --outFileNamePrefix {params.prefix} \
-                | samtools sort -m {params.samsort_memory} -T $MYTEMP/{wildcards.sample} -@ {params.samtools_threads} -O bam -o {output.bam} - 2> {log}
+                | samtools sort -m {params.samsort_memory} -T $MYTEMP/{wildcards.sample} -@ {params.samtools_threads} -O bam -o {output.bam} -
                 rm -rf $MYTEMP
                 """
     else:
@@ -135,7 +132,6 @@ elif aligner.upper().find("STAR") >=0:
                 fastq_dir+"/{sample}"+reads[0]+".fastq.gz"
             output:
                 bam = temp(aligner+"/{sample}.sorted.bam")
-            log: aligner+"/logs/{sample}.sort.log"
             params:
                 alignerOptions = str(alignerOptions or ''),
                 gtf = genes_gtf,
@@ -164,6 +160,6 @@ elif aligner.upper().find("STAR") >=0:
                     --readFilesIn {input} \
                     --readFilesCommand 'gunzip -c' \
                     --outFileNamePrefix {params.prefix} \
-                | samtools sort -m {params.samsort_memory} -T $MYTEMP/{wildcards.sample} -@ {params.samtools_threads} -O bam -o {output.bam} - 2> {log}
+                | samtools sort -m {params.samsort_memory} -T $MYTEMP/{wildcards.sample} -@ {params.samtools_threads} -O bam -o {output.bam} -
                 rm -rf $MYTEMP
                 """

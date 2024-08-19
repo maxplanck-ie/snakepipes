@@ -7,7 +7,6 @@ if pairedEnd:
         output:
             align_summary = "Bowtie2/{sample}.Bowtie2_summary.txt",
             bam = temp("Bowtie2/{sample}.sorted.bam")# removing since we keep the sambamba output (dupmarked)
-        log: "Bowtie2/logs/{sample}.sort.log"
         params:
             bowtie2_index=bowtie2_index,
             alignerOpts = str(alignerOpts or ' ') if not cutntag else "  --local --very-sensitive-local "\
@@ -31,7 +30,7 @@ if pairedEnd:
             -p {threads} \
             2> {output.align_summary} | \
             samtools view -Sb - | \
-            samtools sort -m 2G -T $MYTEMP/{wildcards.sample} -@ 2 -O bam - > {output.bam} 2> {log};
+            samtools sort -m 2G -T $MYTEMP/{wildcards.sample} -@ 2 -O bam - > {output.bam};
             rm -rf $MYTEMP
             """
 else:
@@ -41,7 +40,6 @@ else:
         output:
             align_summary = "Bowtie2/{sample}.Bowtie2_summary.txt",
             bam = temp("Bowtie2/{sample}.sorted.bam")
-        log: "Bowtie2/logs/{sample}.sort.log"
         params:
             bowtie2_index=bowtie2_index,
             alignerOpts = str(alignerOpts or ''),
@@ -61,6 +59,6 @@ else:
             -p {threads} \
             2> {output.align_summary} | \
             samtools view -Sbu - | \
-            samtools sort -m 2G -T $MYTEMP/{wildcards.sample} -@ 2 -O bam - > {output.bam} 2> {log};
+            samtools sort -m 2G -T $MYTEMP/{wildcards.sample} -@ 2 -O bam - > {output.bam};
             rm -rf $MYTEMP
             """

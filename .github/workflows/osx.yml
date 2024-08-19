@@ -35,22 +35,17 @@ jobs:
         ]
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: mamba-org/setup-micromamba@main
+      - uses: actions/checkout@v4
+      - uses: conda-incubator/setup-miniconda@v3
         with:
-          environment-file: .github/snakePipesEnvCI.yml
-          condarc: |
-            channels:
-              - conda-forge
-              - bioconda
-              - defaults
-            channel_priority: 'strict'
-          cache-downloads: true
+          environment-file: .github/conda_ci.yml
+          activate-environment: conda_ci
+          condarc-file: .github/condarc.yml
       - name: install snakePipes_OSX
         run: |
-          micromamba run -n snakePipes_CI python -m pip install . --no-deps --ignore-installed -vvv
+          pip install .
       - name: createEnvsOSX
         run: |
-          micromamba activate snakePipes_CI
-          snakePipes createEnvs --autodetectCondaEnvDir --only ${{matrix.envs}}
+          conda config --add subdirs osx-64
+          snakePipes createEnvs --only ${{matrix.envs}}
      

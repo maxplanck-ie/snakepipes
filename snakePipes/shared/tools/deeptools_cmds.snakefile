@@ -13,7 +13,7 @@ bamcompare_log2_cmd = """
                --binSize {params.bwBinSize} \
                -p {threads} \
                {params.read_extension} \
-               {params.blacklist} > {log.out} 2> {log.err}
+               {params.blacklist}
     """
 
 # bamcompare subtract
@@ -27,7 +27,7 @@ bamcompare_subtract_cmd = """
                --binSize {params.bwBinSize} \
                -p {threads} \
                {params.read_extension} \
-               {params.blacklist} > {log.out} 2> {log.err}
+               {params.blacklist}
     """
 
 # bamCoverage RAW
@@ -35,7 +35,7 @@ bamcov_raw_cmd = """
     bamCoverage -b {input.bam} \
                 -o {output} \
                 --binSize {params.bwBinSize} \
-                -p {threads} > {log.out} 2> {log.err}
+                -p {threads}
     """
 
 # bamCoverage RPKM
@@ -43,7 +43,7 @@ bamcov_RPKM_cmd = """
     bamCoverage -b {input.bam} \
         -o {output} --binSize {params.bwBinSize} \
         -p {threads} --normalizeUsing RPKM {params.ignoreForNorm} \
-        {params.blacklist}  > {log.out} 2> {log.err}
+        {params.blacklist}
     """
 
 # bamCoverage three-prime-seq non-unique, strand-specific mappings
@@ -53,7 +53,7 @@ bamcov_3pseq_cmd = """
     bamCoverage -b {input.bam} \
         -o {output.bw_fwd} --binSize {params.bwBinSize} \
         --Offset 1 --samFlagExclude 128 --filterRNAstrand {params.direction} \
-        -p {threads} --skipNAs > {log.out} 2> {log.err}
+        -p {threads} --skipNAs
     """
 
 
@@ -62,11 +62,11 @@ bamcov_unique_cmd = """
     bamCoverage -b {input.bam} \
         -o {output.bw_fwd} --binSize {params.bwBinSize} \
         --minMappingQuality 10 --samFlagExclude 2304 --filterRNAstrand forward \
-        -p {threads} > {log.out} 2> {log.err}
+        -p {threads}
     bamCoverage -b {input.bam} \
         -o {output.bw_rev} --binSize {params.bwBinSize} \
         --minMappingQuality 10 --samFlagExclude 2304 --filterRNAstrand reverse \
-        -p {threads} >> {log.out} 2>> {log.err}
+        -p {threads}
     """
 
 
@@ -76,11 +76,11 @@ bamcov_cmd = """
                 -o {output} \
                 --binSize {params.bwBinSize} \
                 -p {threads} \
-                --normalizeUsing RPGC \
+                --normalizeUsing RPKM \
                 --effectiveGenomeSize {params.genome_size} \
                 {params.ignoreForNorm} \
                 {params.blacklist} \
-                {params.read_extension} > {log.out} 2> {log.err}
+                {params.read_extension}
 """
 
 bamcov_spikein_cmd = """
@@ -93,7 +93,7 @@ bamcov_spikein_cmd = """
                 {params.ignoreForNorm} \
                 {params.blacklist} \
                 {params.scaling_factors} \
-                {params.read_extension} > {log.out} 2> {log.err}
+                {params.read_extension}
     """
 
 ## computeGC bias (DNA), requires params.median_fragment_length
@@ -106,7 +106,7 @@ gcbias_cmd = """
                 {params.median_fragment_length}  \
                 --sampleSize {params.sampleSize} \
                 {params.blacklist} \
-                -p {threads} > {log.out} 2> {log.err}
+                -p {threads}
     """
 
 # plot Enrichment (RNAseq)
@@ -118,7 +118,7 @@ plotEnrich_cmd = """
                    --labels {params.labels} \
                    --plotTitle 'Fraction of reads in regions' \
                    --outRawCounts {output} \
-                   --variableScales > {log.out} 2> {log.err}
+                   --variableScales
     """
 
 # plot Enrichment (ChIPSeq)
@@ -134,10 +134,10 @@ plotEnrich_chip_cmd = """
         {params.blacklist} \
         -p {threads} \
         {params.read_extension} \
-        --ignoreDuplicates > {log.out} 2> {log.err}
+        --ignoreDuplicates
     """
 
-#plot fingerprint (ChIP-seq)
+#plot fingerprint (ChIPseq)
 plotFingerprint_cmd = """
     plotFingerprint \
             -b {input.bams} \
@@ -149,7 +149,7 @@ plotFingerprint_cmd = """
             {params.blacklist} \
             {params.png} \
             {params.read_extension} \
-            {params.jsd} > {log.out} 2> {log.err}
+            {params.jsd}
     """
 
 
@@ -164,7 +164,7 @@ multiBamSummary_cmd = """
                     {params.binSize} \
                     {params.spikein_region} \
                     -p {threads} \
-                    {params.read_extension} > {log.out} 2> {log.err}
+                    {params.read_extension}
     """
 
 # multiBAMsum ChIP with spikein
@@ -178,7 +178,7 @@ multiBamSummary_spikein_cmd = """
                     {params.scaling_factors} \
                     {params.binSize} \
                     -p {threads} \
-                    {params.read_extension} > {log.out} 2> {log.err}
+                    {params.read_extension}
     """
 
 # multiBWsum RNA
@@ -189,7 +189,7 @@ multiBWsum_bed_cmd = """
                 -o {output} \
                 --labels {params.labels} \
                 --binSize 1000 \
-                -p {threads} > {log.out} 2> {log.err}
+                -p {threads}
     """
 
 # multiBamSum RNA
@@ -202,7 +202,7 @@ multiBamSum_bed_cmd = """
                 --binSize 100 \
                 --scalingFactors {output.scalingFactors} \
                 {params.blacklist} \
-                -p {threads} > {log.out} 2> {log.err}
+                -p {threads}
     """
 
 ## plot Corr (both), requires params.label
@@ -216,7 +216,7 @@ plotCorr_cmd = """
                 --plotTitle 'Pearson correlation of {params.title} coverage' \
                 --outFileCorMatrix {output} \
                 --colorMap PuBuGn \
-                --plotNumbers > {log.out} 2> {log.err}
+                --plotNumbers
     """
 
 ## plot Corr Spearman (both), requires params.label
@@ -230,7 +230,7 @@ plotCorrSP_cmd = """
         --plotTitle 'Spearman correlation of {params.title} coverage' \
         --outFileCorMatrix {output} \
         --colorMap PuBuGn \
-        --plotNumbers > {log.out} 2> {log.err}
+        --plotNumbers
     """
 
 # plot PCA (both), requires params.label
@@ -240,7 +240,7 @@ plotPCA_cmd = """
             --transpose \
             --outFileNameData {output} \
             --plotWidth 10 \
-            -T 'PCA of {params.title} coverage' > {log.out} 2> {log.err}
+            -T 'PCA of {params.title} coverage'
     """
 
 # plot Coverage
@@ -252,13 +252,13 @@ plotCoverage_cmd = """
                  --plotTitle 'Genome fragment coverage without duplicates' \
                  -p {threads} \
                  {params.read_extension} \
-                 --ignoreDuplicates > {log.out} 2> {log.err}
+                 --ignoreDuplicates
     """
 
 #EstimateReadFiltering
 estimateReadFiltering_cmd = """
     estimateReadFiltering -b {input.bam} \
-        -o {output} > {log.out} 2> {log.err}
+        -o {output}
     """
 
 #bamPEFragmentSize
@@ -267,5 +267,5 @@ bamPEFragmentSize_cmd = """
         --bamfiles {input.bams} \
         --binSize 1000000 \
         {params.plotcmd} \
-        --table {output} -p {threads} > {log.out} 2> {log.err}
+        --table {output} -p {threads}
     """

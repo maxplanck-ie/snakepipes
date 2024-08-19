@@ -18,9 +18,6 @@ rule bamCompare_log2_genome1:
         blacklist = "--blackListFileName " + blacklist_bed if blacklist_bed
                     else "",
         scaleFactors = " --scaleFactorsMethod readCount "
-    log:
-        out = "deepTools_ChIP/logs/bamCompare.log2ratio.{chip_sample}.{control_name}.genome1.out",
-        err = "deepTools_ChIP/logs/bamCompare.log2ratio.{chip_sample}.{control_name}.genome1.err"
     benchmark:
         "deepTools_ChIP/.benchmark/bamCompare.log2ratio.{chip_sample}.{control_name}.genome1.benchmark"
     threads: lambda wildcards: 16 if 16<max_thread else max_thread
@@ -43,9 +40,6 @@ rule bamCompare_log2_genome2:
         blacklist = "--blackListFileName " + blacklist_bed if blacklist_bed
                     else "",
         scaleFactors = " --scaleFactorsMethod readCount "
-    log:
-        out = "deepTools_ChIP/logs/bamCompare.log2ratio.{chip_sample}.{control_name}.genome2.out",
-        err = "deepTools_ChIP/logs/bamCompare.log2ratio.{chip_sample}.{control_name}.genome2.err"
     benchmark:
         "deepTools_ChIP/.benchmark/bamCompare.log2ratio.{chip_sample}.{control_name}.genome2.benchmark"
     threads: lambda wildcards: 16 if 16<max_thread else max_thread
@@ -68,9 +62,6 @@ rule plotEnrichment_allelic:
                     else "",
         read_extension = "--extendReads" if pairedEnd
                          else "--extendReads " + str(fragmentLength)
-    log:
-        out = "deepTools_ChIP/logs/plotEnrichment_allelic.out",
-        err = "deepTools_ChIP/logs/plotEnrichment_allelic.err"
     benchmark:
         "deepTools_ChIP/.benchmark/plotEnrichment_allelic.benchmark"
     threads: lambda wildcards: 24 if 24<max_thread else max_thread
@@ -95,9 +86,6 @@ rule plotFingerprint_allelic:
         png = "--plotFile deepTools_ChIP/plotFingerprint/plotFingerprint_allelic.png" if (len(all_samples)<=20)
               else "",
         jsd = ""
-    log:
-        out = "deepTools_ChIP/logs/plotFingerprint_allelic.out",
-        err = "deepTools_ChIP/logs/plotFingerprint_allelic.err"
     benchmark:
         "deepTools_ChIP/.benchmark/plotFingerprint_allelic.benchmark"
     threads: lambda wildcards: 24 if 24<max_thread else max_thread

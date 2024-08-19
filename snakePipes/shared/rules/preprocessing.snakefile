@@ -11,10 +11,9 @@ if sampleSheet:
             output:
                 r1="mergedFASTQ/{sample}" + reads[0] + ext,
                 r2="mergedFASTQ/{sample}" + reads[1] + ext
-            log: "mergedFASTQ/logs/{sample}.mergeFastq.log"
             shell: """
-                cat {input.r1} > {output.r1} 2> {log}
-                cat {input.r2} > {output.r2} 2>> {log}
+                cat {input.r1} > {output.r1}
+                cat {input.r2} > {output.r2}
                 """
     else:
         rule mergeFastq:
@@ -22,9 +21,8 @@ if sampleSheet:
                 r1=lambda wildcards: expand(initialIndir + "/{sample}", sample=sampleDict[wildcards.sample][0])
             output:
                 r1="mergedFASTQ/{sample}" + reads[0] + ext
-            log: "mergedFASTQ/logs/{sample}.mergeFastq.log"
             shell: """
-                cat {input.r1} > {output.r1} 2> {log}
+                cat {input.r1} > {output.r1}
                 """
 else:
     if pairedEnd:
@@ -68,9 +66,6 @@ if optDedupDist > 0:
                 mem=clumpifyMemory,
                 optDedupDist=optDedupDist,
                 clumpifyOptions=clumpifyOptions
-            log:
-                stdout="deduplicatedFASTQ/logs/{sample}.stdout",
-                stderr="deduplicatedFASTQ/logs/{sample}.stderr"
             benchmark: "deduplicatedFASTQ/.benchmarks/{sample}"
             threads: lambda wildcards: 20 if 20<max_thread else max_thread
             conda: CONDA_PREPROCESSING_ENV
@@ -81,11 +76,11 @@ if optDedupDist > 0:
                             in2={input.r2} \
                             out={output.tempOut} \
                             dupedist={params.optDedupDist} \
-                            threads={threads} > {log.stdout} 2> {log.stderr}
+                            threads={threads}
 
                 splitFastq --pigzThreads 4 --R1 {params.R1} --R2 {params.R2} --extension {params.extension} \
                            {output.tempOut} \
-                           deduplicatedFASTQ/{wildcards.sample} > {output.metrics} 2>> {log.stderr}
+                           deduplicatedFASTQ/{wildcards.sample} > {output.metrics}
                 """
     else:
         rule clumpify:
@@ -101,9 +96,6 @@ if optDedupDist > 0:
                 mem=clumpifyMemory,
                 optDedupDist=optDedupDist,
                 clumpifyOptions=clumpifyOptions
-            log:
-                stdout="deduplicatedFASTQ/logs/{sample}.stdout",
-                stderr="deduplicatedFASTQ/logs/{sample}.stderr"
             benchmark: "deduplicatedFASTQ/.benchmarks/{sample}"
             threads: lambda wildcards: 20 if 20<max_thread else max_thread
             conda: CONDA_PREPROCESSING_ENV
@@ -113,11 +105,11 @@ if optDedupDist > 0:
                             in={input.r1} \
                             out={output.tempOut} \
                             dupedist={params.optDedupDist} \
-                            threads={threads} > {log.stdout} 2> {log.stderr}
+                            threads={threads}
 
                 splitFastq --SE --pigzThreads 4 --R1 {params.R1} --extension {params.extension} \
                            {output.tempOut} \
-                           deduplicatedFASTQ/{wildcards.sample} > {output.metrics} 2>> {log.stderr}
+                           deduplicatedFASTQ/{wildcards.sample} > {output.metrics}
                 """
 else:
     if pairedEnd:

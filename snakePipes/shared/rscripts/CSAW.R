@@ -22,15 +22,9 @@ external_bed<-as.logical(snakemake@params[["externalBed"]])
 bam_pfx<-ifelse(useSpikeInForNorm,"_host",".filtered")
 bam_folder<-ifelse(useSpikeInForNorm,"split_bam","filtered_bam")
 
-##set up a primitive log
-logfile <- file(snakemake@log[["err"]], open="w+")
-sink(logfile, type="message")
-
-
 ## create output directory
 
 # include functions
-#sink("CSAW/CSAW.log", append=TRUE)
 source(paste(snakemake@config[["baseDir"]], snakemake@params[["importfunc"]], sep="/"))
 suppressPackageStartupMessages(library(GenomicRanges))
 ## fix default FDR significance threshold
@@ -106,7 +100,7 @@ if (! external_bed) {
     if(snakemake@params[['peakCaller']] == "MACS2") {
         allpeaks <- lapply(fnames, function(x) {
             narrow <- paste0("../MACS2/",x,bam_pfx,".BAM_peaks.narrowPeak") #bam_pfx
-            if(snakemake@params[["pipeline"]] %in% "ATAC-seq"){
+            if(snakemake@params[["pipeline"]] %in% "ATACseq"){
                 narrow <- paste0("../MACS2/",x,".filtered.short.BAM_peaks.narrowPeak")
             }
             broad <- paste0("../MACS2/",x,bam_pfx,".BAM_peaks.broadPeak") #bam_pfx
@@ -128,9 +122,10 @@ if (! external_bed) {
             bed.gr = GRanges(seqnames = bed$V1, ranges = IRanges(start = bed$V2, end = bed$V3), name = bed$V4)
             return(bed.gr)
         })
+    }
     # merge
     allpeaks <- Reduce(function(x,y) GenomicRanges::union(x,y), allpeaks)
-    }
+    
     } else {
         bed = read.delim(snakemake@input[['peaks']],header=FALSE)
         bed.gr = GRanges(seqnames = bed$V1, ranges = IRanges(start = bed$V2, end = bed$V3), name = bed$V4)
@@ -166,11 +161,8 @@ writeOutput_chip(chip_results, outfile_prefix = "DiffBinding", fdrcutoff = fdr,l
 
 ## save data
 message("Saving data")
-#sink()
 save(chip_object, chip_results, file = "DiffBinding_analysis.Rdata")
 
-sink(type="message")
-close(logfile)
 #### SESSION INFO
 
 sink("CSAW.session_info.txt")

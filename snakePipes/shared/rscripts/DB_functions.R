@@ -1,7 +1,7 @@
 #### ~~~~ Functions to Run CSAW as part of SNAKEMAKE pipeline ~~~~ ####
 ### (c) Vivek Bhardwaj (bhardwaj@ie-freiburg.mpg.de)
 
-#' Read the Files and Count windows for ChIP-Seq Samples
+#' Read the Files and Count windows for ChIPseq Samples
 #'
 #' @param sampleSheet tsvfile with sample information
 #' @param fragmentLength fragment length of sequencing

@@ -65,6 +65,6 @@ Command line options
 
 .. argparse::
     :func: parse_args
-    :filename: ../snakePipes/workflows/preprocessing/preprocessing
+    :filename: ../snakePipes/workflows/preprocessing/preprocessing.py
     :prog: Preprocessing
     :nodefault:

@@ -19,14 +19,10 @@ rule sleuth_Salmon:
         sampleSheet = lambda wildcards,input: os.path.join(outdir,str(input.sampleSheet)),
         fdr = 0.05
     threads: 6
-    log:
-        out = "sleuth_Salmon_{}/logs/sleuth.out".format(os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}"),
-        err = "sleuth_Salmon_{}/logs/sleuth.err".format(os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}")
     conda: CONDA_SLEUTH_ENV
     shell:
         "Rscript {params.script} "
         "{params.sampleSheet} "
         "{params.indir} "
         "{params.outdir} "
-        "{params.fdr} " + os.path.join(outdir,"{input.t2g}") +
-        " >{log.out} 2>{log.err}"
+        "{params.fdr} " + os.path.join(outdir,"{input.t2g}")

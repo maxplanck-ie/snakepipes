@@ -35,9 +35,6 @@ if bigWigType == "subtract" or bigWigType == "both":
             read_extension = "--extendReads" if pairedEnd else "--extendReads {}".format(fragmentLength),
             blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed else "",
             scaleFactors = lambda wildcards,input: " --scaleFactors {}:{} ".format(get_scaling_factor(wildcards.chip_sample,input.scale_factors),get_scaling_factor(wildcards.control_name,input.scale_factors))
-        log:
-            out = "split_deepTools_ChIP/logs/bamCompare.subtract.{chip_sample}.subtract.{control_name}.scaledBY{part}.out",
-            err = "split_deepTools_ChIP/logs/bamCompare.subtract.{chip_sample}.subtract.{control_name}.scaledBY{part}.err"
         benchmark:
             "split_deepTools_ChIP/.benchmark/bamCompare.subtract.{chip_sample}.subtract.{control_name}.scaledBY{part}.benchmark"
         threads: lambda wildcards: 16 if 16<max_thread else max_thread
@@ -61,9 +58,6 @@ if bigWigType == "log2ratio" or bigWigType == "both":
             read_extension = "--extendReads" if pairedEnd else "--extendReads {}".format(fragmentLength),
             blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed else "",
             scaleFactors = lambda wildcards,input: " --scaleFactors {}:{} ".format(get_scaling_factor(wildcards.chip_sample,input.scale_factors),get_scaling_factor(wildcards.control_name,input.scale_factors))
-        log:
-            out = "split_deepTools_ChIP/logs/bamCompare.log2ratio.{chip_sample}.{control_name}.scaledBY{part}.out",
-            err = "split_deepTools_ChIP/logs/bamCompare.log2ratio.{chip_sample}.{control_name}.scaledBY{part}.err"
         benchmark:
             "split_deepTools_ChIP/.benchmark/bamCompare.log2ratio.{chip_sample}.{control_name}.scaledBY{part}.benchmark"
         threads: lambda wildcards: 16 if 16<max_thread else max_thread
@@ -85,9 +79,6 @@ rule plotEnrichment:
         labels = " --labels " + " ".join(all_samples),
         blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed else "",
         read_extension = "--extendReads" if pairedEnd else "--extendReads {}".format(fragmentLength)
-    log:
-        out = "split_deepTools_ChIP/logs/plotEnrichment.out",
-        err = "split_deepTools_ChIP/logs/plotEnrichment.err"
     benchmark:
         "split_deepTools_ChIP/.benchmark/plotEnrichment.benchmark"
     threads: lambda wildcards: 24 if 24<max_thread else max_thread
@@ -111,9 +102,6 @@ rule plotFingerprint:
               else "",
         jsd = "--JSDsample split_bam/{}_host.bam".format(control_samples[0]) if (len(control_samples)>0)
             else ""
-    log:
-        out = "split_deepTools_ChIP/logs/plotFingerprint.out",
-        err = "split_deepTools_ChIP/logs/plotFingerprint.err"
     benchmark:
         "split_deepTools_ChIP/.benchmark/plotFingerprint.benchmark"
     threads: lambda wildcards: 24 if 24<max_thread else max_thread

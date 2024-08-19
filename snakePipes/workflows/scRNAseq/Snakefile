@@ -90,7 +90,7 @@ onstart:
         print("Read extension:", reads)
         print("Genome:", genome)
         print("Downsample:", downsample)
-	print("Mode:", mode)
+        print("Mode:", mode)
         print("Input directory for mapping:", fastq_dir)
         print("BigWig bin size:", bwBinSize)
 
@@ -138,7 +138,6 @@ elif mode=="Alevin":
 ### execute after workflow finished ############################################
 ################################################################################
 onsuccess:
-    cf.cleanLogs(outdir, cluster_config)
     if "verbose" in config and config["verbose"]:
         print("\n--- scRNAseq workflow finished successfully! --------------------------------\n")
 

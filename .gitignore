@@ -30,3 +30,7 @@ snakePipes.egg-info
 
 # misc
 .vscode/
+
+# tests
+*fa
+*gtf

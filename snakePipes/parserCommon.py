@@ -1,7 +1,7 @@
 import argparse
 import os.path
 import glob
-from snakePipes import __version__
+from importlib.metadata import version
 
 
 def ListGenomes():
@@ -43,7 +43,7 @@ def mainArguments(defaults, workingDir=False, createIndices=False, preprocessing
     if workingDir:
         required.add_argument("-d", "--working-dir",
                               dest="workingdir",
-                              help="working directory is output directory and must contain DNA-mapping pipeline output files",
+                              help="working directory is output directory and must contain DNAmapping pipeline output files",
                               required=True)
     else:
         if not createIndices:
@@ -82,23 +82,6 @@ def mainArguments(defaults, workingDir=False, createIndices=False, preprocessing
                          help="configuration file: config.yaml (default: '%(default)s')",
                          default=defaults["configFile"])
 
-    general.add_argument("--clusterConfigFile",
-                         help="configuration file for cluster usage. In absence, the default options "
-                         "specified in defaults.yaml and workflows/[workflow]/cluster.yaml would be selected (default: '%(default)s')",
-                         default=defaults["clusterConfigFile"])
-
-    general.add_argument("-j", "--jobs",
-                         dest="maxJobs",
-                         metavar="INT",
-                         help="maximum number of concurrently submitted Slurm jobs / cores if workflow is run locally (default: '%(default)s')",
-                         type=int, default=defaults["maxJobs"])
-
-    general.add_argument("--local",
-                         dest="local",
-                         action="store_true",
-                         default=False,
-                         help="run workflow locally; default: jobs are submitted to Slurm queue (default: '%(default)s')")
-
     general.add_argument("--keepTemp",
                          action="store_true",
                          help="Prevent snakemake from removing files marked as being temporary (typically intermediate files that are rarely needed by end users). This is mostly useful for debugging problems.")
@@ -115,7 +98,7 @@ def mainArguments(defaults, workingDir=False, createIndices=False, preprocessing
 
     general.add_argument("--version",
                          action="version",
-                         version="%(prog)s {}".format(__version__))
+                         version="%(prog)s {}".format(version("snakePipes")))
 
     emailArgs = parser.add_argument_group('Email Arguments')
     emailArgs.add_argument("--emailAddress",
@@ -174,7 +157,7 @@ def snpArguments(defaults):
     return parser
 
 
-# DNA-mapping options added
+# DNAmapping options added
 def commonOptions(grp, defaults, bw=True, plots=True, preprocessing=False):
     """
     Common options found in many workflows

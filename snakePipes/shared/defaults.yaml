@@ -1,17 +1,12 @@
 ################################################################################
 # This file should hold values that should be present in ALL workflows
-#
-# Note that tempDir MUST end with a "/"!
-#
 # Note that due to limitations in yaml.dump, only very basic structures are
 # permitted here.
 ################################################################################
-#
-condaEnvDir: '/package/mamba/envs/snakepipesenvs/2.8.2'
 snakemakeOptions: ''
 organismsDir: 'shared/organisms'
-clusterConfig: 'shared/cluster.yaml'
-tempDir: /data/extended/
+snakemakeProfile: 'shared/profiles/local'
+tempDir: /scratch/local
 # The following are only needed if you use the --emailAddress option
 smtpServer:
 smtpPort: 0

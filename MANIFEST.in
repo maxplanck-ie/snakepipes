@@ -1,3 +1,0 @@
-include *.yaml
-recursive-include snakePipes/shared *
-recursive-include snakePipes/workflows *

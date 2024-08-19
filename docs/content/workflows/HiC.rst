@@ -153,6 +153,6 @@ Command line options
 
 .. argparse::
     :func: parse_args
-    :filename: ../snakePipes/workflows/HiC/HiC
+    :filename: ../snakePipes/workflows/HiC/HiC.py
     :prog: HiC
     :nodefault:

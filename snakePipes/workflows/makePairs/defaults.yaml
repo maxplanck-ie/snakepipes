@@ -1,0 +1,39 @@
+pipeline: makePairs
+outdir:
+configFile:
+clusterConfigFile:
+local: False
+maxJobs: 5
+## directory with fastq files
+indir:
+## preconfigured target genomes (mm9,mm10,dm3,...) , see /path/to/snakemake_workflows/shared/organisms/
+## Value can be also path to your own genome config file!
+genome:
+## FASTQ file extension (default: ".fastq.gz")
+ext: '.fastq.gz'
+## paired-end read name extension (default: ["_R1", "_R2"])
+reads: ["_R1","_R2"]
+## assume paired end reads
+pairedEnd: True
+## Number of reads to downsample from each FASTQ file
+downsample:
+## Options for trimming
+trim: True
+trimmer: fastp
+trimmerOptions:
+
+verbose: False
+fastqc: True
+UMIBarcode: False
+bcPattern: "NNNNCCCCCCCCC"
+UMIDedup: False
+UMIDedupSep: "_"
+UMIDedupOpts: "_"
+plotFormat: png
+bwBinSize: 1000
+aligner: 'bwa'
+alignerOptions: '-SPu -T0'
+alignerThreads: 30
+
+fromBAM: False
+sampleSheet:

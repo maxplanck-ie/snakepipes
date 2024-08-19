@@ -134,10 +134,8 @@ rule TSS_to_windows:
         outfile = outdir+"/Annotation_spikein/TSS.filtered.bed",
         script = maindir+"/shared/tools/TSS_to_windows.py",
         size = 5000
-    log:
-        "Annotation_spikein/logs/TSS_to_windows.err"
     conda: CONDA_pysam_ENV
     shell: """
-            python {params.script} -inf {input.bed} -outf {output.TSS_bed} -size {params.size} -bam {input.bam} 2> {log}
+            python {params.script} -inf {input.bed} -outf {output.TSS_bed} -size {params.size} -bam {input.bam}
               """
         

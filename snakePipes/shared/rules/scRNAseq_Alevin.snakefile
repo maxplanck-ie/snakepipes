@@ -35,14 +35,11 @@ rule SalmonAlevin:
             outdir = "Alevin/{sample}"
         output:
             quantmat = "Alevin/{sample}/alevin/quants_mat.gz",
-        log:
-            out =  "Alevin/logs/alevin.{sample}.out",
-            err = "Alevin/logs/alevin.{sample}.err"
         #Use RNAseq env because Salmon already installed there (no need for duplication).
-        conda: CONDA_RNASEQ_ENV
+        conda: CONDA_SALMON_ENV
         threads: 8
         shell:"""
-            salmon alevin -l {params.libtype} -1 {input.R1} -2 {input.R2} {params.protocol} -i {params.index} -p {threads} -o {params.outdir} --tgMap {input.tgMap} --dumpFeatures --dumpMtx --numCellBootstraps 100 > {log.out} 2> {log.err}
+            salmon alevin -l {params.libtype} -1 {input.R1} -2 {input.R2} {params.protocol} -i {params.index} -p {threads} -o {params.outdir} --tgMap {input.tgMap} --dumpFeatures --dumpMtx --numCellBootstraps 100
             """
 
 rule AlevinQC:
@@ -77,8 +74,6 @@ rule AlevinQC:
 #        gtf = lambda wildcards,input: os.path.join(outdir, input.gtf),
 #        joint_fasta = lambda wildcards,output: os.path.join(outdir,output.joint_fasta),
 #        joint_t2g = lambda wildcards,output: os.path.join(outdir,output.joint_t2g)
-#    log:
-#        out = "Annotation/logs/eisaR.out"
 #    conda: CONDA_eisaR_ENV
 #    script: "../rscripts/scRNAseq_eisaR.R"
 
@@ -96,14 +91,11 @@ rule AlevinQC:
 #        velo_index = "Salmon/SalmonIndex_RNAVelocity/seq.bin"
 #    params:
 #        salmonIndexOptions = salmonIndexOptions
-#    log:
-#        err = "Salmon/SalmonIndex_RNAVelocity/logs/SalmonIndex.err",
-#        out = "Salmon/SalmonIndex_RNAVelocity/logs/SalmonIndex.out"
 #    threads: lambda wildcards: 16 if 16<max_thread else max_thread
 #    conda: CONDA_RNASEQ_ENV
 #    shell:"""
 #        cat {input.joint_fasta} {input.genome_fasta} > {output.seq_fa}
-#        salmon index -p {threads} -t {output.seq_fa} -d {input.decoys} -i Salmon/SalmonIndex_RNAVelocity {params.salmonIndexOptions} > {log.out} 2> {log.err}
+#        salmon index -p {threads} -t {output.seq_fa} -d {input.decoys} -i Salmon/SalmonIndex_RNAVelocity {params.salmonIndexOptions}
 #        """
 
 rule AlevinForVelocity:
@@ -120,14 +112,11 @@ rule AlevinForVelocity:
             outdir = "AlevinForVelocity/{sample}"
         output:
             quantmat = "AlevinForVelocity/{sample}/alevin/quants_mat.gz"
-        log:
-            out =  "AlevinForVelocity/logs/alevin.{sample}.out",
-            err = "AlevinForVelocity/logs/alevin.{sample}.err"
         #Use RNAseq env because Salmon already installed there (no need for duplication).
-        conda: CONDA_RNASEQ_ENV
+        conda: CONDA_SALMON_ENV
         threads: 8
         shell:"""
-            salmon alevin -l {params.libtype} -1 {input.R1} -2 {input.R2} {params.protocol} -i {params.velo_index} -p {threads} -o {params.outdir} --tgMap {params.tgMap} --dumpFeatures --dumpMtx --numCellBootstraps 100 > {log.out} 2> {log.err}
+            salmon alevin -l {params.libtype} -1 {input.R1} -2 {input.R2} {params.protocol} -i {params.velo_index} -p {threads} -o {params.outdir} --tgMap {params.tgMap} --dumpFeatures --dumpMtx --numCellBootstraps 100
             """
 
 rule velo_to_sce:
@@ -144,7 +133,5 @@ rule velo_to_sce:
         t2g = lambda wildcards,input: os.path.join(outdir, input.t2g),
         g2s = lambda wildcards,input: os.path.join(outdir, input.g2s),
         outfile = lambda wildcards,output: os.path.join(outdir, output.merged)
-    log:
-        out = "SingleCellExperiment/AlevinForVelocity/logs/alevin2sce.out"
     conda: CONDA_eisaR_ENV
     script: "../rscripts/scRNAseq_splitAlevinVelocityMatrices.R"

@@ -34,7 +34,7 @@ importfunc <- snakemake@params[["importfunc"]]
 allelic_info <- as.logical(snakemake@params[["allele_info"]])
 tx2gene_file <- snakemake@params[["tx2gene_file"]]
 rmdTemplate <- snakemake@params[["rmdTemplate"]]
-formulaInput <- snakemake@params[["formula"]]
+formulaInput <- as.character(snakemake@params[["formula"]])
 wdir <- snakemake@params[["outdir"]]
 
 setwd(wdir)
@@ -129,7 +129,7 @@ if(length(unique(sampleInfo$condition))>1){
 
 ## Run allele-sepecific DESeq wrapper (if asked for)
 if (isTRUE(allelic_info)) {
-    seqout_allelic <- DESeq_allelic(countdata, coldata = sampleInfo, fdr = fdr, from_salmon=tximport)
+    seqout_allelic <- DESeq_allelic(countdata, coldata = sampleInfo, fdr = fdr, from_salmon=tximport, customFormula = NA)
 
     DESeq_writeOutput(DEseqout = seqout_allelic,
                  fdr = fdr, outprefix = "DEseq_allelic",
