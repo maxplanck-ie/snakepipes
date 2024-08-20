@@ -54,15 +54,16 @@ include: os.path.join(maindir, "shared", "rules", "multiQC.snakefile")
 
 ## Allele-specific JOBs
 if "allelic-mapping" in mode:
+    genome_alias = os.path.splitext(os.path.basename(genome))[0]
     # Updated global vars if mode = "allelic-mapping"
     if allele_mode == 'create_and_map':
         bowtie2_index_allelic = 'snp_genome/bowtie2_Nmasked/Genome.1.bt2'
         if len(strains) == 1:
             allele_hybrid = 'single'
-            SNPFile = "snp_genome/all_SNPs_" + strains[0] + "_" + genome + ".txt.gz"
+            SNPFile = "snp_genome/all_SNPs_" + strains[0] + "_" + genome_alias + ".txt.gz"
         elif len(strains) == 2:
             allele_hybrid = 'dual'
-            SNPFile = "snp_genome/all_" + strains[1] + "_SNPs_" + strains[0] + "_reference.based_on_" + genome + ".txt"
+            SNPFile = SNPFile = "snp_genome/all_" + strains[1] + "_SNPs_" + strains[0] + "_reference.based_on_" + genome_alias + ".txt"
 
         include: os.path.join(maindir, "shared", "rules", "masked_genomeIndex.snakefile")
     elif allele_mode == 'map_only':
