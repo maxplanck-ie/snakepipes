@@ -474,7 +474,7 @@ class TestDNAmapping():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 143
+        assert parseSpOut(_p) == 152
     def test_bwa2(self, ifs):
         ci = [
             "DNAmapping",
@@ -493,7 +493,7 @@ class TestDNAmapping():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 143
+        assert parseSpOut(_p) == 152
     def test_se(self, ifs):
         ci = [
             "DNAmapping",
