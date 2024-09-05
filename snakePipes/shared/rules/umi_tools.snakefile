@@ -73,7 +73,7 @@ if UMIDedup:
             {params.umitools_paired} {params.umitools_options}
             """
 else:
-    if aligner == "Bowtie2":
+    if aligner == "Bowtie2" or aligner == "bwa" or aligner == "bwa-mem2":
         rule filter_reads:
             input:
                 bamfile = "filtered_bam/{sample}.filtered.tmp.bam"
@@ -83,10 +83,10 @@ else:
                    mv {input.bamfile} {output.bamfile}
                    """
 
-    elif not (aligner=="bwameth" or aligner=="bwameth2") :
+    elif aligner == "STAR" or aligner == "HISAT2" :
         rule filter_reads:
             input:
-                bamfile = "filtered_bam/{sample}.filtered.tmp.bam"
+                bamfile = aligner + "/{sample}.bam"
             output:
                 bamfile = "filtered_bam/{sample}.filtered.bam"
             shell: """
