@@ -63,7 +63,7 @@ if "allelic-mapping" in mode:
             SNPFile = "snp_genome/all_SNPs_" + strains[0] + "_" + genome_alias + ".txt.gz"
         elif len(strains) == 2:
             allele_hybrid = 'dual'
-            SNPFile = SNPFile = "snp_genome/all_" + strains[1] + "_SNPs_" + strains[0] + "_reference.based_on_" + genome_alias + ".txt"
+            SNPFile = "snp_genome/all_" + strains[1] + "_SNPs_" + strains[0] + "_reference.based_on_" + genome_alias + ".txt"
 
         include: os.path.join(maindir, "shared", "rules", "masked_genomeIndex.snakefile")
     elif allele_mode == 'map_only':
