@@ -104,6 +104,12 @@ def parse_arguments():
     )
 
     configParser.add_argument(
+        "--snakemakeProfile",
+        help="Path to custom snakemake profile file.",
+        default=defaults["snakemakeProfile"]
+    )
+
+    configParser.add_argument(
         "--organismsDir",
         help="The directory where global organism YAML files are to be stored. Both "
         "absolute and relative paths are supported. In the latter case the "
