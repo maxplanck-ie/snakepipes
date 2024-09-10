@@ -63,7 +63,7 @@ or for the pytests:
 Configuring snakePipes
 ----------------------
 
-Finally, at least one file (``defaults.yaml``) should be modified to match your compute infrastructure. The location of this file can be found out by executing:
+Finally, config files ``defaults.yaml`` and snakemake profile should be modified to match your compute infrastructure. The location of this file can be found out by executing:
 
 .. code:: bash
 
@@ -86,7 +86,7 @@ If you want to use the snakepipes_genericprofile, make sure to review the follow
 
  * ``module load slurm &&`` - could be omitted
  * ``resources.partition`` - set to your slurm partition
- * ``conda-prefix`` - set to your preferred location where snakePipes environments should be stored
+ * ``conda-prefix`` - set to your preferred location where snakePipes environments should be stored. You can set this value by running `snakePipes config --condaEnvDir` and providing the respective path.
  * ``resources`` - make sure default resources make sense for your infrastructure
  * ``ccancel.sh`` - refers to the ccancel.sh file inside the profile directory and contains instructions on how to kill submitted jobs (on failure / interruption of snakemake). The module command could be omitted here as before
 
