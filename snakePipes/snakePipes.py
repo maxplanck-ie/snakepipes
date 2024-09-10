@@ -104,6 +104,12 @@ def parse_arguments():
     )
 
     configParser.add_argument(
+        "--snakemakeProfile",
+        help="Path to custom snakemake profile file.",
+        default=defaults["snakemakeProfile"]
+    )
+
+    configParser.add_argument(
         "--organismsDir",
         help="The directory where global organism YAML files are to be stored. Both "
         "absolute and relative paths are supported. In the latter case the "
@@ -381,6 +387,7 @@ def updateConfig(args):
     if args.configMode == "manual":
         d = {
             "snakemakeOptions": args.snakemakeOptions,
+            "snakemakeProfile": args.snakemakeProfile,
             "condaEnvDir": args.condaEnvDir,
             "organismsDir": args.organismsDir,
             "tempDir": args.tempDir,
@@ -407,6 +414,16 @@ def updateConfig(args):
             sys.exit("Config file not found\n")
     updatedDict = cof.merge_dicts(currentDict, d)
     cof.write_configfile(os.path.join(baseDir, "shared", "defaults.yaml"), updatedDict)
+
+    #update conda-prefix in snakemakeProfile
+    if args.condaEnvDir:
+        profilePath = cof.resolveSnakemakeProfile(d['snakemakeProfile'], baseDir)
+        f = open(profilePath / 'config.yaml')
+        pf = yaml.load(f, Loader=yaml.FullLoader)
+        pf['conda-prefix'] = args.condaEnvDir
+        cof.write_configfile(os.path.join(profilePath, "config.yaml"), pf)
+        f.close()
+
     cof.load_configfile(
         os.path.join(baseDir, "shared", "defaults.yaml"), True, "Final Updated Config"
     )
