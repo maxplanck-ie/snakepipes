@@ -107,7 +107,7 @@ rule concatenate_scaling_factors:
         scale_factors_chip = "split_deepTools_qc/multiBamSummary/{part}.ChIP.scaling_factors.txt"
     output: "split_deepTools_qc/multiBamSummary/{part}.concatenated.scaling_factors.txt"
     shell: """
-        cat {input.scale_factors_input} {input.scale_factors_chip} > {output} 2> {log}
+        cat {input.scale_factors_input} {input.scale_factors_chip} > {output}
     """
 
 
