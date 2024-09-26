@@ -7,16 +7,18 @@ rule sambamba_markdup:
        input:
            aligner+"/{sample}.sorted.bam"
        output:
-           aligner+"/{sample}.bam"# duplicate marked
+           bam=aligner+"/{sample}.bam"# duplicate marked
+           log="Sambamba/{sample}.sorted.markdup.txt"
        threads: lambda wildcards: 10 if 10<max_thread else max_thread
        benchmark: aligner + "/.benchmark/sambamba_markdup.{sample}.benchmark"
        params:
            tempDir = tempDir
+           buffer = "--sort-buffer-size=6000 --overflow-list-size 600000"
        conda: CONDA_SAMBAMBA_ENV
        shell: """
            TMPDIR={params.tempDir}
            MYTEMP=$(mktemp -d "${{TMPDIR:-/tmp}}"/snakepipes.XXXXXXXXXX)
-           sambamba markdup -t {threads} --sort-buffer-size=6000 --overflow-list-size 600000 --tmpdir $MYTEMP {input} {output}
+           sambamba markdup -t {threads} {params.buffer} --tmpdir $MYTEMP {input} {output.bam} > {output.log}
            rm -rf "$MYTEMP"
            """
 
@@ -25,7 +27,7 @@ rule sambamba_flagstat_sorted:
        input:
            aligner+"/{sample}.sorted.bam"
        output:
-           "Sambamba/{sample}.sorted.markdup.txt"
+           "Sambamba/{sample}.sorted.flagstat.txt"
        conda: CONDA_SAMBAMBA_ENV
        threads: lambda wildcards: 10 if 10<max_thread else max_thread
        shell: """
@@ -36,7 +38,7 @@ rule sambamba_flagstat:
        input:
            aligner+"/{sample}.bam"
        output:
-           "Sambamba/{sample}.markdup.txt"
+           "Sambamba/{sample}.flagstat.txt"
        conda: CONDA_SAMBAMBA_ENV
        threads: lambda wildcards: 10 if 10<max_thread else max_thread
        shell: """
