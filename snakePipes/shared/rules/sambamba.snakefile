@@ -7,12 +7,12 @@ rule sambamba_markdup:
        input:
            aligner+"/{sample}.sorted.bam"
        output:
-           bam=aligner+"/{sample}.bam"# duplicate marked
+           bam=aligner+"/{sample}.bam",
            log="Sambamba/{sample}.sorted.markdup.txt"
        threads: lambda wildcards: 10 if 10<max_thread else max_thread
        benchmark: aligner + "/.benchmark/sambamba_markdup.{sample}.benchmark"
        params:
-           tempDir = tempDir
+           tempDir = tempDir,
            buffer = "--sort-buffer-size=6000 --overflow-list-size 600000"
        conda: CONDA_SAMBAMBA_ENV
        shell: """
