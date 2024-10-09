@@ -15,7 +15,6 @@
 import sys
 import os
 from importlib.metadata import version as importlibversion
-import sphinx_rtd_theme
 
 # to allow readthedocs to compile without installing some dependencies
 import mock
