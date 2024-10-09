@@ -1,6 +1,20 @@
 snakePipes News
 ===============
 
+snakePipes 3.0.1
+________________
+
+ * installation test for python 3.13
+ * bulk mode in makePairs wf
+
+snakePipes 3.0.0
+________________
+
+* clusteryaml omitted for profiles
+* All workflows have '-' removed from their name
+* toml file installation
+* makePairs mode introduced
+
 snakePipes 2.9.0
 ________________
 
