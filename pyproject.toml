@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "snakePipes"
 description = 'Snakemake workflows and wrappers for NGS data processing from the MPI-IE'
 readme = "README.md"
-version = "3.0.0"
+version = "3.0.1"
 keywords = [
     "DNAmapping",
     "ChIPSeq",
