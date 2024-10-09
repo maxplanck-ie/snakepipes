@@ -32,7 +32,7 @@ UMIDedupOpts: "_"
 plotFormat: png
 bwBinSize: 1000
 aligner: 'bwa'
-alignerOptions: '-SPu -T0'
+alignerOptions: 
 alignerThreads: 30
 
 fromBAM: False
