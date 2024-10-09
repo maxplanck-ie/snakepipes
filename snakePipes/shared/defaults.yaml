@@ -5,7 +5,7 @@
 ################################################################################
 snakemakeOptions: ''
 organismsDir: 'shared/organisms'
-snakemakeProfile: 'shared/profiles/local'
+snakemakeProfile: 'shared/profiles/snakepipes_genericprofile'
 tempDir: /scratch/local
 # The following are only needed if you use the --emailAddress option
 smtpServer:
