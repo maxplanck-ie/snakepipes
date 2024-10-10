@@ -24,8 +24,7 @@ authors = [
 ]
 
 classifiers = [
-    "Intended Audience :: Bioinformaticians",
-    "Intended Audience :: Biologists",
+    "Intended Audience :: Science/Research",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",   
 ]
