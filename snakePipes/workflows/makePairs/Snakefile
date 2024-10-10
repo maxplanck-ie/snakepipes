@@ -89,15 +89,6 @@ def run_Trimming(trim, fastqc):
         return []
 
 
-def run_Pairtools(ALLELICMODE):
-    if ALLELICMODE:
-        return([
-            "genome/diploid_genome.chromsizes",
-            "multiqc/multiqc_report.html"
-        ])
-    else:
-        return  expand("pairs/{sample}.pairs.dedup.gz", sample=samples)
-
 ### execute before workflow starts #############################################
 # does NOT seem to execute "onstart"
 ################################################################################
@@ -136,7 +127,7 @@ rule all:
         expand("originalFASTQ/{sample}{read}.fastq.gz", sample=samples, read=reads),
         run_FastQC(fastqc),
         run_Trimming(trim, fastqc),
-        "multiqc/multiqc_report.html"
+        "multiQC/multiqc_report.html"
 
 
 ### execute after workflow finished ############################################

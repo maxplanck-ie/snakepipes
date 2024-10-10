@@ -148,11 +148,11 @@ rule multiqc:
             'cooler/{sample}.5000.mcool', sample=samples
         )
     output:
-        html="multiqc/multiqc_report.html",
+        html="multiQC/multiqc_report.html",
     params:
-        odir="multiqc",
+        odir="multiQC",
     benchmark:
-        "multiqc/.benchmark/multiqc.benchmark"
+        "multiQC/.benchmark/multiqc.benchmark"
     threads: 1
     conda:
         CONDA_MAKEPAIRS_ENV
