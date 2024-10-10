@@ -2,9 +2,9 @@ name: pairtools_phased
 channels:
   - conda-forge
   - bioconda
-  - defaults
 dependencies:
   - bwa
+  - cooler
   - samtools
   - tabix
   - bcftools

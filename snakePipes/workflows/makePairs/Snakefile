@@ -30,22 +30,41 @@ include: os.path.join(maindir, "shared", "rules", "FASTQ.snakefile")
 
 # FastQC
 if fastqc:
-
     include: os.path.join(maindir, "shared", "rules", "FastQC.snakefile")
 
 
 # trimming
 if trim:
-
     include: os.path.join(maindir, "shared", "rules", "trimming.snakefile")
 
 
 # umi_tools: needed for FASTQ handling
 include: os.path.join(maindir, "shared", "rules", "umi_tools.snakefile")
-# diploid_genome: concatenation and indexing
-include: os.path.join(maindir, "shared", "rules", "diploid_genome.snakefile")
-# pairtools: bwa mapping (without sorting),  pairtools rules & multiqc
-include: os.path.join(maindir, "shared", "rules", "pairtools.snakefile")
+
+
+
+# Decision to run allelic mode or not is made on the VCFfile arguments + strains argument
+ALLELICMODE = False
+if config['VCFfile']:
+    # VCFfile set, assert strains are there:
+    if config['strains']:
+        ALLELICMODE = True
+        # If no alignerOpts are set, set default for Xb parsing:
+        if not config['alignerOptions']:
+            config['alignerOptions'] = '-SPu -T0'
+        # Generation of diploid genome (bwa)
+        include: os.path.join(maindir, "shared", "rules", "diploid_genome.snakefile")
+        # pairtools: bwa mapping (without sorting),  pairtools rules & multiqc
+        include: os.path.join(maindir, "shared", "rules", "pairtools_allelic.snakefile")
+    else:
+        if not config['alignerOptions']:
+            config['alignerOptions'] = '-SP -T0'
+        include: os.path.join(maindir, "shared", "rules", "pairtools.snakefile")
+else:
+    if not config['alignerOptions']:
+        config['alignerOptions'] = '-SP -T0'
+    include: os.path.join(maindir, "shared", "rules", "pairtools.snakefile")
+
 
 
 def run_FastQC(fastqc):
@@ -108,8 +127,7 @@ rule all:
         expand("originalFASTQ/{sample}{read}.fastq.gz", sample=samples, read=reads),
         run_FastQC(fastqc),
         run_Trimming(trim, fastqc),
-        "genome/diploid_genome.chromsizes",
-        "multiqc/multiqc_report.html",
+        "multiQC/multiqc_report.html"
 
 
 ### execute after workflow finished ############################################

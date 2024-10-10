@@ -139,7 +139,7 @@ def snpArguments(defaults):
     snpargs = parser.add_argument_group('Allele-specific mapping arguments')
     snpargs.add_argument("--VCFfile",
                          default='',
-                         help="VCF file to create N-masked genomes (default: 'None')")
+                         help="VCF file to create N-masked genomes (default: 'None'). Note that for the makePairs workflow this file is assumed to be gzipped and indexed (with tabix).")
 
     snpargs.add_argument("--strains",
                          default='',

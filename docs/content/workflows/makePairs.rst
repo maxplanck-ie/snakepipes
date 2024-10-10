@@ -6,8 +6,8 @@ makePairs
 What it does
 ------------
 
-The snakePipes makePairs workflow allows users to process their HiC data from raw fastq files to HiC matrices in
-an allele-specific manner. The workflow utilized mapping by bwa, followed by analysis
+The snakePipes makePairs workflow allows users to process their HiC/uC data from raw fastq files to HiC matrices (in
+an allele-specific manner). The workflow utilizes mapping by bwa, followed by analysis
 using `pairtools <https://www.ncbi.nlm.nih.gov/pmc/articles/PMC9949071/>`__ . The workflow follows the `example workflow described in the documentation of pairtools <https://pairtools.readthedocs.io/en/latest/examples/pairtools_phase_walkthrough.html>`__ , 
 which explains each step in detail and would be useful for new users to have a look at. 
 Currently the output matrices are produced in the `.pairs <https://pairtools.readthedocs.io/en/latest/formats.html>`__ format.

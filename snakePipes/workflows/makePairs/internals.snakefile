@@ -14,7 +14,6 @@ if trim:
 
 
 ## genome names for allele-sp mapping
-strains = list(map(str.strip, re.split(",|;", config["strains"])))
 
 
 infiles = sorted(glob.glob(os.path.join(str(indir or ""), "*" + ext)))
@@ -28,13 +27,15 @@ del infiles
 REFERENCES = ["diploid_genome"]
 
 # possible phasetypes of contacts
-PHASETYPES = [strains[0], strains[1], "unphased", "trans"]
+if config['strains']:
+    strains = list(map(str.strip, re.split(",|;", config["strains"])))
+    PHASETYPES = [strains[0], strains[1], "unphased", "trans"]
 
-PHASEFILTER = [
-    '(phase1=="0") and (phase2=="0")',
-    '(phase1=="1") and (phase2=="1")',
-    '(phase1==".") or (phase2==".")',
-    '(phase1!=phase2) and (phase1!=".") and (phase2!=".") and (phase1!="!") and (phase2!="!")',
-]
+    PHASEFILTER = [
+        '(phase1=="0") and (phase2=="0")',
+        '(phase1=="1") and (phase2=="1")',
+        '(phase1==".") or (phase2==".")',
+        '(phase1!=phase2) and (phase1!=".") and (phase2!=".") and (phase1!="!") and (phase2!="!")',
+    ]
 
-PHASEDIC = dict(map(lambda i, j: (i, j), PHASETYPES, PHASEFILTER))
+    PHASEDIC = dict(map(lambda i, j: (i, j), PHASETYPES, PHASEFILTER))

@@ -46,6 +46,6 @@ jobs:
           pip install .
       - name: createEnvsOSX
         run: |
-          conda config --add subdirs osx-64
+          conda config --set subdir osx-64
           snakePipes createEnvs --only ${{matrix.envs}}
      
