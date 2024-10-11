@@ -1,7 +1,7 @@
 snakePipes News
 ===============
 
-snakePipes 3.0.1
+snakePipes 3.1.0
 ________________
 
  * installation test for python 3.13
