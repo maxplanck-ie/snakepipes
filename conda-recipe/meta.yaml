@@ -1,4 +1,4 @@
-{% set version = "3.0.0" %}
+{% set version = "3.1.0" %}
 
 package:
   name: snakepipes
@@ -14,9 +14,10 @@ build:
 
 requirements:
   host:
-    - python >=3
+    - python >=3, < 3.13
     - pip
     - seaborn
+    - setuptools
   run:
     - python >=3.11
     - snakemake >=8
