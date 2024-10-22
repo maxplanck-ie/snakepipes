@@ -2,7 +2,8 @@ from os.path import join, dirname
 import glob
 
 GENOMEDIR = os.path.dirname(genome_fasta)
-BASENAME = genome
+genome_alias = os.path.splitext(os.path.basename(genome))[0]
+BASENAME = genome_alias
 # define snpgenome_dir
 if allele_hybrid == 'dual':
     SNPdir = "snp_genome/" + strains[0] + "_" + \
@@ -50,8 +51,7 @@ else:
         params:
             strain1 = strains[0],
             SNPpath = os.path.abspath(VCFfile),
-
-            temp_out=temp("all_SNPs_" + strains[0] + "_GRCm38.txt.gz"),
+            temp_out=temp("all_SNPs_" + strains[0] + "_" + genome_alias + ".txt.gz"),
             out_bname=os.path.basename(SNPFile)
         conda: CONDA_SHARED_ENV
         shell:
@@ -59,8 +59,7 @@ else:
             " SNPsplit_genome_preparation"
             " --genome_build {BASENAME}"
             " --reference_genome {input.genome} --vcf_file {params.SNPpath}"
-            " --strain {params.strain1} && cp "
-            "{params.temp_out} {params.out_bname}"
+            " --strain {params.strain1}"
             "&& cd ../"
 
 if aligner == "STAR":

@@ -45,7 +45,8 @@ Quick start
 
 * Download genome fasta and annotations for an your organism, and build indexes, Check in :ref:`createIndices`
 
-* Configure snakePipes with paths to organism and cluster configs on your system using snakePipes config. For detailed information, run:
+* Configure snakePipes with paths to organism and snakemake configs on your system using snakePipes config. Importantly, take care to set `--condaEnvDir` parameter, which defaults to `/tmp`. 
+  For detailed information, run:
 
 .. code:: bash
 

@@ -31,7 +31,8 @@ jobs:
           'CONDA_PREPROCESSING_ENV',
           'CONDA_NONCODING_RNASEQ_ENV',
           'CONDA_SAMBAMBA_ENV',
-          'CONDA_pysam_ENV'
+          'CONDA_pysam_ENV',
+          'CONDA_FQLINT_ENV'
         ]
     runs-on: macos-latest
     steps:
@@ -46,6 +47,6 @@ jobs:
           pip install .
       - name: createEnvsOSX
         run: |
-          conda config --add subdirs osx-64
+          conda config --set subdir osx-64
           snakePipes createEnvs --only ${{matrix.envs}}
      

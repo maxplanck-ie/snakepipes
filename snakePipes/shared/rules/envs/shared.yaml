@@ -12,9 +12,8 @@ dependencies:
  - fastqc = 0.12.1
  - cutadapt = 4.6
  - trim-galore = 0.6.10
- - multiqc = 1.19
+ - multiqc = 1.23
  - fastp = 0.23.4
  - umi_tools = 1.1.4
- - fq = 0.11.0
  - pybigwig = 0.3.22
  
