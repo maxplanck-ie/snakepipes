@@ -31,7 +31,8 @@ jobs:
           'CONDA_PREPROCESSING_ENV',
           'CONDA_NONCODING_RNASEQ_ENV',
           'CONDA_SAMBAMBA_ENV',
-          'CONDA_pysam_ENV'
+          'CONDA_pysam_ENV',
+          'CONDA_FQLINT_ENV'
         ]
     runs-on: macos-latest
     steps:

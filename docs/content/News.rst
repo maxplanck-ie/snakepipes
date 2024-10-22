@@ -6,6 +6,7 @@ ________________
 
  * installation test for python 3.13
  * bulk mode in makePairs wf
+ * Removal of --user flag in createIndices. Organism yamls are by default written to both installation folder and output folder.
 
 snakePipes 3.0.0
 ________________
