@@ -86,7 +86,7 @@ else:
     elif aligner == "STAR" or aligner == "HISAT2" :
         rule filter_reads:
             input:
-                bamfile = aligner + "/{sample}.bam"
+                bamfile = "filtered_bam/{sample}.filtered.tmp.bam"
             output:
                 bamfile = "filtered_bam/{sample}.filtered.bam"
             shell: """
