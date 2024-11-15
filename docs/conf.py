@@ -15,7 +15,6 @@
 import sys
 import os
 from importlib.metadata import version as importlibversion
-import sphinx_rtd_theme
 
 # to allow readthedocs to compile without installing some dependencies
 import mock
@@ -150,7 +149,7 @@ todo_include_todos = True
 
 # import them both locally and on rtd
 html_theme = 'sphinx_rtd_theme'  # 'alabaster' 'sphinx_rtd_theme'
-html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
+# html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the

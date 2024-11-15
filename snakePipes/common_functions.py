@@ -42,7 +42,9 @@ def set_env_yamls():
             'CONDA_NONCODING_RNASEQ_ENV': 'envs/noncoding.yaml',
             'CONDA_SAMBAMBA_ENV': 'envs/sambamba.yaml',
             'CONDA_pysam_ENV': 'envs/pysam.yaml',
-            'CONDA_SEACR_ENV': 'envs/chip_seacr.yaml'}
+            'CONDA_SEACR_ENV': 'envs/chip_seacr.yaml',
+            'CONDA_FQLINT_ENV': 'envs/fqlint.yaml'
+            }
 
 
 def merge_dicts(x, y):

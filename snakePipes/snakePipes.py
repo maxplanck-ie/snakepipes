@@ -347,6 +347,7 @@ def createCondaEnvs(args):
         if not args.info:
             if not os.path.exists(os.path.join(condaEnvDir, h)):
                 print(f"Creating environment ({envNum}/{numberEnvs}) from {env} with hash {h}")
+                print(f"Actual command: {' '.join(cmd)}")
                 try:
                     os.makedirs(os.path.join(condaEnvDir, h), exist_ok=True)
                     subprocess.check_call(cmd)

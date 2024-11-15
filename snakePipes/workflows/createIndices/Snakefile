@@ -171,12 +171,15 @@ onsuccess:
     f = open(os.path.join(outdir, "genome_fasta", "effectiveSize"))
     organismDictionary['genome_size'] = int(float(f.read().strip()))
     f.close()
-    if not userYAML:
-        yamlPath = os.path.join(maindir, organismsDir, "{}.yaml".format(genome))
-    else:
-        yamlPath = os.path.join(outdir, "{}.yaml".format(genome))
-    print("Storing the organism YAML file in {}".format(yamlPath))
-    cf.write_configfile(yamlPath, organismDictionary)
+    orgDir_yamlPath = os.path.join(maindir, organismsDir, f"{genome}.yaml")
+    outDir_yamlPath = os.path.join(outdir, f"{genome}.yaml")
+    try:
+        cf.write_configfile(orgDir_yamlPath, organismDictionary)
+        print(f"{genome} yaml written to {orgDir_yamlPath}")
+    except (PermissionError, FileNotFoundError) as e:
+        print(f"Error writing in the organism dir {e}")
+    cf.write_configfile(outDir_yamlPath, organismDictionary)
+    print(f"{genome} yaml written to {outDir_yamlPath}")
     if "verbose" in config and config["verbose"]:
         print("\n--- index creation workflow finished successfully! --------------------------------\n")
 

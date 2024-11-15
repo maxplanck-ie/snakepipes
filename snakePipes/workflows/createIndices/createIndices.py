@@ -77,10 +77,6 @@ def parse_args(defaults={"configFile": None, "clusterConfigFile": None,
     optional.add_argument("--rmskURL",
                           help="URL or local path to where the repeat masker output file is located. This is only required if you plan to run the ncRNAseq workflow.")
 
-    optional.add_argument("--userYAML",
-                          action="store_true",
-                          help="By default, this workflow creates an organism YAML file where snakePipes will look for it by default. If this isn't desired (e.g., you don't want the organism to be selectable by default or you don't have write permissions to the snakePipes installation) you can specify this option and the YAML file will instead be created in the location specified by the `-o` option.")
-
     optional.add_argument("--salmonIndexOptions",
                           help="Options to pass to salmon for index creation.",
                           default=defaults["salmonIndexOptions"])

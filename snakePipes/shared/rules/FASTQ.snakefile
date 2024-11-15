@@ -5,7 +5,7 @@ if pairedEnd or pipeline=="scrnaseq":
             r2 = indir+"/{sample}"+reads[1]+ext
         output:
             temp("originalFASTQ/{sample}.valid")
-        conda: CONDA_SHARED_ENV
+        conda: CONDA_FQLINT_ENV
         shell:"""
             fq lint {input.r1} {input.r2}
             touch {output}
@@ -16,7 +16,7 @@ else:
             r1 = indir+"/{sample}"+reads[0]+ext
         output:
             temp("originalFASTQ/{sample}.valid")
-        conda: CONDA_SHARED_ENV
+        conda: CONDA_FQLINT_ENV
         shell:"""
             fq lint {input.r1}
             touch {output}
