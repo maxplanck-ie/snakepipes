@@ -48,7 +48,7 @@ rule samtools_index:
     input:
         aligner+"/{sample}.markdup.bam"
     output:
-        aligner+"/{sample}.bam.bai"
+        aligner+"/{sample}.markdup.bam.bai"
     conda: CONDA_SHARED_ENV
     shell: "samtools index {input}"
 
