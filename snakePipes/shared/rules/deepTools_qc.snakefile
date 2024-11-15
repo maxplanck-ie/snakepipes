@@ -3,8 +3,8 @@
 
 rule bamCoverage:
     input:
-        bam = aligner+"/{sample}.bam",
-        bai = aligner+"/{sample}.bam.bai"
+        bam = aligner+"/{sample}.markdup.bam",
+        bai = aligner+"/{sample}.markdup.bam.bai"
     output:
         "bamCoverage/{sample}.seq_depth_norm.bw"
     params:
