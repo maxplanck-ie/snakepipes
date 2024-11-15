@@ -146,7 +146,7 @@ def run_deepTools_allelic():
 def run_CSAW():
     if sampleSheet and cf.check_replicates(sampleSheet):
         if not isMultipleComparison:
-            file_list=["CSAW_{}_{}/CSAW.session_info.txt".format(peakCaller, sample_name)]
+            file_list=["CSAW_{}_{}/CSAW.session_info.txt".format(peakCaller, sample_name),"CSAW_{}_{}/Full.results.bed".format(peakCaller, sample_name)]
             if not allele_info :
                 file_list.append(["Annotation/genes.filtered.symbol","Annotation/genes.filtered.t2g","CSAW_{}_{}/CSAW.Stats_report.html".format(peakCaller, sample_name)])
                 file_list.append([os.path.join("CSAW_{}_{}".format(peakCaller, sample_name), x) for x in list(itertools.chain.from_iterable([expand("CSAW.{change_dir}.cov.matrix",change_dir=change_direction),expand("CSAW.{change_dir}.cov.heatmap.png",change_dir=change_direction)]))])
@@ -155,6 +155,7 @@ def run_CSAW():
                     file_list.append([os.path.join("CSAW_{}_{}".format(peakCaller, sample_name), x) for x in list(itertools.chain.from_iterable([expand("CSAW.{change_dir}.log2r.matrix",change_dir=change_direction),expand("CSAW.{change_dir}.log2r.heatmap.png",change_dir=change_direction)]))])
         else:
             file_list=expand("CSAW_{}_{}/CSAW.session_info.txt".format(peakCaller, sample_name + ".{compGroup}"),compGroup=cf.returnComparisonGroups(sampleSheet))
+            file_list.append(expand("CSAW_{}_{}/Full.results.bed".format(peakCaller, sample_name + ".{compGroup}"),compGroup=cf.returnComparisonGroups(sampleSheet)))
             if not allele_info :
                 file_list.append(["Annotation/genes.filtered.symbol","Annotation/genes.filtered.t2g",expand("CSAW_{}_{}/CSAW.Stats_report.html".format(peakCaller, sample_name + ".{compGroup}"),compGroup=cf.returnComparisonGroups(sampleSheet))])
                 file_list.append([expand("CSAW_{}_{}".format(peakCaller, sample_name + ".{compGroup}") + "/CSAW.{change_dir}.cov.matrix",change_dir=change_direction,compGroup=cf.returnComparisonGroups(sampleSheet)),
