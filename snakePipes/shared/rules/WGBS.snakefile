@@ -24,7 +24,7 @@ if pairedEnd and not fromBAM:
             r1=fastq_dir + "/{sample}" + reads[0] + ".fastq.gz",
             r2=fastq_dir + "/{sample}" + reads[1] + ".fastq.gz"
         output:
-            sbam=temp(aligner+"/{sample}.bam")
+            sbam=temp(aligner+"/{sample}.sorted.bam")
         params:
             bwameth_index=bwameth_index if aligner=="bwameth" else bwameth2_index,
             tempDir = tempDir
@@ -43,7 +43,7 @@ elif not pairedEnd and not fromBAM:
         input:
             r1=fastq_dir + "/{sample}" + reads[0] + ".fastq.gz",
         output:
-            sbam=temp(aligner+"/{sample}.bam")
+            sbam=temp(aligner+"/{sample}.sorted.bam")
         params:
             bwameth_index=bwameth_index if aligner=="bwameth" else bwameth2_index,
             tempDir = tempDir
@@ -60,9 +60,9 @@ elif not pairedEnd and not fromBAM:
 if not fromBAM:
     rule index_bam:
         input:
-            aligner+"/{sample}.bam"
+            aligner+"/{sample}.sorted.bam"
         output:
-            temp(aligner+"/{sample}.bam.bai")
+            temp(aligner+"/{sample}.sorted.bam.bai")
         conda: CONDA_SHARED_ENV
         shell: """
             samtools index "{input}"
@@ -71,8 +71,8 @@ if not fromBAM:
 if not skipBamQC:
     rule markDupes:
         input:
-            aligner+"/{sample}.bam",
-            aligner+"/{sample}.bam.bai"
+            aligner+"/{sample}.sorted.bam",
+            aligner+"/{sample}.sorted.bam.bai"
         output:
             "Sambamba/{sample}.markdup.bam"
         threads: lambda wildcards: 10 if 10<max_thread else max_thread
