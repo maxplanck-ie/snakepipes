@@ -32,6 +32,7 @@ if trim:
 #set dedup to false
 dedup = False
 properPairs = False
+mapq = 0
 
 ### Initialization #############################################################
 if not fromBAM:
