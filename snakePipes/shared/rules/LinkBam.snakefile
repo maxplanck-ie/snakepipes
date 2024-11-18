@@ -29,10 +29,10 @@ else:
         input:
             indir + "/{sample}" + bamExt
         output:
-            aligner + "/{sample}.unsorted.bam" if pipeline=="ncRNAseq" else aligner + "/{sample}.bam"
+            aligner + "/{sample}.unsorted.bam" if pipeline=="ncRNAseq" else aligner + "/{sample}.markdup.bam"
         params:
             input_bai = indir + "/{sample}" + bamExt + ".bai",
-            output_bai = aligner + "/{sample}.unsorted.bam.bai" if pipeline=="ncRNAseq" else aligner + "/{sample}.bam.bai"
+            output_bai = aligner + "/{sample}.unsorted.bam.bai" if pipeline=="ncRNAseq" else aligner + "/{sample}markdup.bam.bai"
         run:
             if os.path.exists(params.input_bai) and not os.path.exists(os.path.join(outdir,params.output_bai)):
                 os.symlink(params.input_bai,os.path.join(outdir,params.output_bai))
@@ -42,17 +42,17 @@ else:
     if not pipeline=="ncRNAseq":
         rule samtools_index_external:
             input:
-                aligner + "/{sample}.bam"
+                aligner + "/{sample}.markdup.bam"
             output:
-                aligner + "/{sample}.bam.bai"
+                aligner + "/{sample}.markdup.bam.bai"
             conda: CONDA_SHARED_ENV
             shell: "if [[ ! -f {output[0]} ]]; then samtools index {input[0]}; fi"
 
         if not pipeline=="WGBS" or pipeline=="WGBS" and skipBamQC:
             rule link_bam_bai_external:
                 input:
-                    bam = aligner + "/{sample}.bam",
-                    bai = aligner + "/{sample}.bam.bai"
+                    bam = aligner + "/{sample}.markdup.bam",
+                    bai = aligner + "/{sample}.markdup.bam.bai"
                 output:
                     bam_out = "filtered_bam/{sample}.filtered.bam",
                     bai_out = "filtered_bam/{sample}.filtered.bam.bai",
@@ -64,7 +64,7 @@ else:
 
         rule sambamba_flagstat:
            input:
-               aligner + "/{sample}.bam"
+               aligner + "/{sample}.markdup.bam"
            output:
                "Sambamba/{sample}.markdup.txt"
            conda: CONDA_SAMBAMBA_ENV
