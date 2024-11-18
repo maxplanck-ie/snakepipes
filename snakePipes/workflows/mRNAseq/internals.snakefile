@@ -31,6 +31,7 @@ if trim:
 
 #set dedup to false
 dedup = False
+properPairs = False
 
 ### Initialization #############################################################
 if not fromBAM:
