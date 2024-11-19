@@ -22,7 +22,7 @@ elif aligner == "STAR" or aligner == "EXTERNAL_BAM":
     rule snp_split:
         input:
             snp = SNPFile,
-            bam = aligner+"/{sample}.bam"
+            bam = aligner+"/{sample}.markdup.bam"
         output:
             targetbam = expand("allelic_bams/{{sample}}.{suffix}.bam", suffix = ['allele_flagged', 'genome1', 'genome2', 'unassigned']),
             #tempbam = temp(aligner+"/{sample}.sortedByName.bam"),
