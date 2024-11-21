@@ -24,7 +24,7 @@ elif aligner == "STAR" or aligner == "EXTERNAL_BAM":
             snp = SNPFile,
             bam = aligner+"/{sample}.markdup.bam"
         output:
-            targetbam = expand("allelic_bams/{{sample}}.{suffix}.bam", suffix = ['allele_flagged', 'genome1', 'genome2', 'unassigned']),
+            targetbam = expand("allelic_bams/{{sample}}.markdup.{suffix}.bam", suffix = ['allele_flagged', 'genome1', 'genome2', 'unassigned']),
             #tempbam = temp(aligner+"/{sample}.sortedByName.bam"),
             rep1 = "allelic_bams/{sample}.SNPsplit_report.yaml",
             rep2 = "allelic_bams/{sample}.SNPsplit_sort.yaml"
