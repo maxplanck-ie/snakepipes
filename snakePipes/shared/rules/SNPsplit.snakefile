@@ -62,7 +62,7 @@ elif aligner == "STAR" or aligner == "EXTERNAL_BAM":
 
 # sort them
 rule BAMsort_allelic:
-    input: "allelic_bams/{sample}.filtered.{suffix}.bam" if aligner == "Bowtie2" else "allelic_bams/{sample}.{suffix}.bam"
+    input: "allelic_bams/{sample}.filtered.{suffix}.bam" if aligner == "Bowtie2" else "allelic_bams/{sample}.markdup.{suffix}.bam"
     output:
         "allelic_bams/{sample}.{suffix}.sorted.bam"
     threads:
