@@ -73,31 +73,19 @@ if UMIDedup:
             {params.umitools_paired} {params.umitools_options}
             """
 else:
-    if aligner == "Bowtie2" or aligner == "bwa" or aligner == "bwa-mem2":
-        rule filter_reads:
-            input:
-                bamfile = "filtered_bam/{sample}.filtered.tmp.bam"
-            output:
-                bamfile = "filtered_bam/{sample}.filtered.bam"
-            shell: """
-                   mv {input.bamfile} {output.bamfile}
-                   """
-
-    elif aligner == "STAR" or aligner == "HISAT2" :
-        rule filter_reads:
-            input:
-                bamfile = "filtered_bam/{sample}.filtered.tmp.bam"
-            output:
-                bamfile = "filtered_bam/{sample}.filtered.bam"
-            shell: """
-                ln -s ../{input} {output}
+    rule filter_reads:
+        input:
+            bamfile = "filtered_bam/{sample}.filtered.tmp.bam"
+        output:
+            bamfile = "filtered_bam/{sample}.filtered.bam"
+        shell: """
+            ln -s ../{input} {output}
           """
 
-if not (aligner=="bwameth" or aligner=="bwameth2"):
-    rule samtools_index_filtered:
-        input:
-            "filtered_bam/{sample}.filtered.bam"
-        output:
-            "filtered_bam/{sample}.filtered.bam.bai"
-        conda: CONDA_SHARED_ENV
-        shell: "samtools index {input}"
+rule samtools_index_filtered:
+    input:
+        "filtered_bam/{sample}.filtered.bam"
+    output:
+        "filtered_bam/{sample}.filtered.bam.bai"
+    conda: CONDA_SHARED_ENV
+    shell: "samtools index {input}"
