@@ -3,7 +3,9 @@ import os
 import sys
 
 ## Main variables ##############################################################
-
+dedup=True
+properPairs = False
+mapq=0
 
 ### Functions ##################################################################
 
