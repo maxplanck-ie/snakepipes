@@ -26,8 +26,8 @@ elif aligner == "STAR" or aligner == "EXTERNAL_BAM":
         output:
             targetbam = expand("allelic_bams/{{sample}}.markdup.{suffix}.bam", suffix = ['allele_flagged', 'genome1', 'genome2', 'unassigned']),
             #tempbam = temp(aligner+"/{sample}.sortedByName.bam"),
-            rep1 = "allelic_bams/{sample}.SNPsplit_report.yaml",
-            rep2 = "allelic_bams/{sample}.SNPsplit_sort.yaml"
+            rep1 = "allelic_bams/{sample}.markdup.SNPsplit_report.yaml",
+            rep2 = "allelic_bams/{sample}.markdup.SNPsplit_sort.yaml"
         params:
             pairedEnd = '--paired' if pairedEnd else '',
             outdir = "allelic_bams"
