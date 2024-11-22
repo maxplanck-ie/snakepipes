@@ -59,8 +59,8 @@ def bamcov_filter_opts(wc):
 
 rule three_prime_seq_bam_cov:
     input:
-        bam=aligner + "/{sample}.sorted.bam",
-        bai=aligner + "/{sample}.sorted.bam.bai"
+        bam="filtered_bam/{sample}.filtered.bam",
+        bai="filtered_bam/{sample}.filtered.bam.bai"
     output: 
         "three_prime_seq/raw/{sample}_direction-{direction}.bw"
     params:
