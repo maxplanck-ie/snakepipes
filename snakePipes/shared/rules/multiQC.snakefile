@@ -78,8 +78,8 @@ def multiqc_input_check(return_value):
             infiles.append( expand("featureCounts/{sample}.allelic_counts.txt", sample = samples) )
             indir += aligner + " featureCounts "
         if "allelic-mapping" in mode:
-            infiles.append( expand("allelic_bams/{sample}.SNPsplit_report.yaml", sample = samples) )
-            infiles.append( expand("allelic_bams/{sample}.SNPsplit_sort.yaml", sample = samples) )
+            infiles.append( expand("allelic_bams/{sample}.markdup.SNPsplit_report.yaml", sample = samples) )
+            infiles.append( expand("allelic_bams/{sample}.markdup.SNPsplit_sort.yaml", sample = samples) )
             indir += "allelic_bams"
         if "alignment-free" in mode:
             if "allelic-mapping" in mode:
