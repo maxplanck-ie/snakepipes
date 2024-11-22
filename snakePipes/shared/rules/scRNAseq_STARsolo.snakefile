@@ -80,6 +80,14 @@ rule STARsolo_report:
     script: "../rscripts/scRNAseq_report.R"
 
 
+rule index_bam:
+    input: aligner+"/{sample}.sorted.bam"
+    output: aligner+"/{sample}.sorted.bam.bai"
+    conda: CONDA_SAMBAMBA_ENV
+    shell: """
+        sambamba index {input}
+        """
+
 rule filter_bam:
     input:
         bamfile = aligner+"/{sample}.sorted.bam",

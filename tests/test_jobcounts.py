@@ -1381,7 +1381,7 @@ class TestmRNAseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 158
+        assert parseSpOut(_p) == 167
     def test_SEalfreemode(self, ifs):
         ci = [
             "mRNAseq",
@@ -1543,7 +1543,7 @@ class TestmRNAseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 254
+        assert parseSpOut(_p) == 263
     def test_allelicDE_SNPfile(self, ifs):
         ci = [
             "mRNAseq",
@@ -1566,7 +1566,7 @@ class TestmRNAseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 252
+        assert parseSpOut(_p) == 261
     def test_allelicDEsinglestrain(self, ifs):
         ci = [
             "mRNAseq",
@@ -1612,7 +1612,7 @@ class TestmRNAseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 330
+        assert parseSpOut(_p) == 339
     def test_allelic_count_fromBam_singlecomp(self, ifs):
         ci = [
             "mRNAseq",
@@ -1705,7 +1705,7 @@ class TestmRNAseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 331
+        assert parseSpOut(_p) == 340
 
 class TestncRNAseq():
     def test_default(self, ifs):
