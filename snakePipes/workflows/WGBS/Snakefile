@@ -133,14 +133,15 @@ if not fromBAM:
     include: os.path.join(maindir, "shared", "rules", "umi_tools.snakefile")
     # FASTQ: either downsample FASTQ files or create symlinks to input files
     include: os.path.join(maindir, "shared", "rules", "FASTQ.snakefile")
+    # sambamba
+    include: os.path.join(maindir, "shared", "rules", "sambamba.snakefile")
+
 else:
     include: os.path.join(maindir, "shared", "rules", "LinkBam.snakefile")
 
 # WGBS
 include: os.path.join(maindir, "shared", "rules", "WGBS.snakefile")
 
-# sambamba
-include: os.path.join(maindir, "shared", "rules", "sambamba.snakefile")
 
 #bam_filtering
 include: os.path.join(maindir, "shared", "rules", "bam_filtering.snakefile")
