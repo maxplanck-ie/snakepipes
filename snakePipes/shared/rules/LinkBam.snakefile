@@ -49,7 +49,7 @@ else:
             shell: "if [[ ! -f {output[0]} ]]; then samtools index {input[0]}; fi"
 
 
-        if not pipeline=="WGBS" and skipBamQC:
+        if pipeline=="WGBS" and skipBamQC:
             rule link_bam_bai_external:
                 input:
                     bam = aligner + "/{sample}.bam",
