@@ -1954,7 +1954,7 @@ class TestWGBS():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 110
+        assert parseSpOut(_p) == 92
     def test_frombamfqc(self, ifs):
         ci = [
             "WGBS",
@@ -1974,7 +1974,7 @@ class TestWGBS():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 110
+        assert parseSpOut(_p) == 92
     def test_frombamskipqc(self, ifs):
         ci = [
             "WGBS",
