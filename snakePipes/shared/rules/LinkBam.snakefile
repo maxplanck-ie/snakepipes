@@ -39,6 +39,7 @@ else:
             if not os.path.exists(os.path.join(outdir,output[0])):
                 os.symlink(os.path.join(outdir,input[0]),os.path.join(outdir,output[0]))
 
+
     if not pipeline=="ncRNAseq":
         rule samtools_index_external:
             input:
@@ -48,18 +49,16 @@ else:
             conda: CONDA_SHARED_ENV
             shell: "if [[ ! -f {output[0]} ]]; then samtools index {input[0]}; fi"
 
-
-        if pipeline=="WGBS" and skipBamQC:
-            rule link_bam_bai_external:
-                input:
-                    bam = aligner + "/{sample}.bam",
-                    bai = aligner + "/{sample}.bam.bai"
-                output:
-                    bam_out = "filtered_bam/{sample}.filtered.bam",
-                    bai_out = "filtered_bam/{sample}.filtered.bam.bai",
-                shell: """
-                    ln -s ../{input.bam} {output.bam_out};
-                    ln -s ../{input.bai} {output.bai_out}
+        rule link_bam_bai_external:
+            input:
+                bam = aligner + "/{sample}.markdup.bam",
+                bai = aligner + "/{sample}.markdup.bam.bai"
+            output:
+                bam_out = "filtered_bam/{sample}.filtered.bam",
+                bai_out = "filtered_bam/{sample}.filtered.bam.bai",
+            shell: """
+                ln -s ../{input.bam} {output.bam_out};
+                ln -s ../{input.bai} {output.bai_out}
                 """
 
 
