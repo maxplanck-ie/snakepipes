@@ -57,8 +57,8 @@ else:
 if UMIDedup:
     rule filter_reads_umi:
         input:
-            bamfile = "filtered_bam/{sample}.filtered.tmp.bam" if aligner == "Bowtie2" else aligner+"/{sample}.markdup.bam",
-            indexfile = "filtered_bam/{sample}.filtered.tmp.bam.bai" if aligner == "Bowtie2" else aligner+"/{sample}.markdup.bam.bai"
+            bamfile = "filtered_bam/{sample}.filtered.tmp.bam",
+            indexfile = "filtered_bam/{sample}.filtered.tmp.bam.bai"
         output:
             bamfile = "filtered_bam/{sample}.filtered.bam"
         params:

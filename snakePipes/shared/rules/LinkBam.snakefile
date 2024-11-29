@@ -32,7 +32,7 @@ else:
             aligner + "/{sample}.unsorted.bam" if pipeline=="ncRNAseq" else aligner + "/{sample}.markdup.bam"
         params:
             input_bai = indir + "/{sample}" + bamExt + ".bai",
-            output_bai = aligner + "/{sample}.unsorted.bam.bai" if pipeline=="ncRNAseq" else aligner + "/{sample}markdup.bam.bai"
+            output_bai = aligner + "/{sample}.unsorted.bam.bai" if pipeline=="ncRNAseq" else aligner + "/{sample}.markdup.bam.bai"
         run:
             if os.path.exists(params.input_bai) and not os.path.exists(os.path.join(outdir,params.output_bai)):
                 os.symlink(params.input_bai,os.path.join(outdir,params.output_bai))
