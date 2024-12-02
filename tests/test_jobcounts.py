@@ -529,6 +529,25 @@ class TestDNAmapping():
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
         assert parseSpOut(_p) == 134
+    def test_allelic_2strains(self,ifs):
+        ci = [
+            "DNAmapping",
+            '-i',
+            ifs / 'PE',
+            '-o',
+            ifs / 'outdir',
+            '--VCFfile',
+            ifs / 'allelic_input' / 'file.vcf.gz',
+            '--strains',
+            'strain1,strain2',
+            '--snakemakeOptions',
+            SMKOPTS,
+            ifs / 'org.yaml',
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 134
 
 class TestChIPseq:
     def test_default(self, ifs):
