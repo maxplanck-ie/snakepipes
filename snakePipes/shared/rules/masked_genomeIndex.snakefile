@@ -85,7 +85,7 @@ elif aligner == "Bowtie2":
     rule bowtie2_index:
         input:
             snpgenome_dir = SNPdir,
-            filelist = lambda wildcards: getref_fileList(SNPdir)
+            filelist = lambda wildcards: getref_fileList(checkpoints.create_snpgenome.get().output.snpgenome_dir)
         output:
             bowtie2_index_allelic
         threads: lambda wildcards: 10 if 10<max_thread else max_thread

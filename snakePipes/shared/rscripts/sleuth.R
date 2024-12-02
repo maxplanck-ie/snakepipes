@@ -24,13 +24,20 @@ sample_info = read.table(sample_info_file, header=T)#[,1:2]
 cnames.sub<-unique(colnames(sample_info)[2:which(colnames(sample_info) %in% "condition")])
 d<-as.formula(noquote(paste0("~",paste(cnames.sub,collapse="+"))))
 colnames(sample_info)[colnames(sample_info) %in% "name"] ="sample"
+
+#check if sample names are pure numbers
+numbers_only <- function(x) !grepl("\\D", x)
+if(numbers_only(sample_info$sample)){sample_info$sample<-paste0("X",sample_info$sample)}
+
 print(sample_info)
 sample_info$sample
 
 sample_id = list.dirs(file.path(indir), recursive=F, full.names=F)
 sample_id = sort(sample_id[grep('[^benchmark][^SalmonIndex]', sample_id, invert=F)])
+if(numbers_only(sample_id)){sample_id<-paste0("X",sample_id)}
 #sample_id = intersect(sample_info$sample, sample_id) # get only those sample that are defined in the sampleInfo!
 sample_id<-sample_id[match(sample_info$sample,sample_id)]
+if(any(is.na(sample_id))){stop("Sample names from sample sheet and from Salmon output are not matching each other.")}
 print(sample_id)
 
 salmon_dirs = sapply(sample_id, function(id) file.path(indir, id))
