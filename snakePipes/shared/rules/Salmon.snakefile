@@ -57,7 +57,7 @@ if pairedEnd:
             gtf = genes_gtf,
             lib_type = getSalmon_libtype(pairedEnd, libraryType)
         threads: 8
-        conda: CONDA_RNASEQ_ENV
+        conda: CONDA_SALMON_ENV
         shell: """
             salmon quant -p {threads} --softclipOverhangs --validateMappings --numBootstraps 50 -i {params.index} -l {params.lib_type} -1 {input.r1} -2 {input.r2} -o {params.outdir}
             """

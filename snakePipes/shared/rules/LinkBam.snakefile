@@ -49,6 +49,7 @@ else:
             conda: CONDA_SHARED_ENV
             shell: "if [[ ! -f {output[0]} ]]; then samtools index {input[0]}; fi"
 
+
         rule link_bam_bai_external:
             input:
                 bam = aligner + "/{sample}.markdup.bam",
