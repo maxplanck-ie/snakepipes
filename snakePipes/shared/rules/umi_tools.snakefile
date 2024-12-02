@@ -79,7 +79,7 @@ else:
         output:
             bamfile = "filtered_bam/{sample}.filtered.bam"
         shell: """
-            mv -v ../{input} {output}
+            mv -v {input} {output}
           """
 
 rule samtools_index_filtered:
