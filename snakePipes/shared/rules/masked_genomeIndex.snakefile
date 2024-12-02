@@ -20,7 +20,7 @@ def getref_fileList(dir):
 
 ## Create masked genome
 if allele_hybrid == 'dual':
-    rule create_snpgenome:
+    checkpoint create_snpgenome:
         input:
             genome = GENOMEDIR
         output:
@@ -41,7 +41,7 @@ if allele_hybrid == 'dual':
             " --strain {params.strain1} --strain2 {params.strain2}"
             "&& cd ../"
 else:
-    rule create_snpgenome:
+    checkpoint create_snpgenome:
         input:
             genome = GENOMEDIR
         output:
