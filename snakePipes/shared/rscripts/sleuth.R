@@ -46,21 +46,19 @@ sample_info$sample
 #salmon_dirs = sapply(sample_id, function(id) file.path(indir, id))
 #print(salmon_dirs)
 ######
-get_last_dir<-function(X){
-  Y<-gtools::split_path(dirname(X))
-  return(Y[1])
-  }
-sample_id<- dir(file.path(indir),recursive=F,full.names=TRUE)
-names(sample_id)<-get_last_dir(sample_id)
+sample_id<- dir(file.path(indir),recursive=FALSE,full.names=TRUE)
+sample_id<-sample_id[grep("*quant.sf",sample_id)]
+sample_id<-sub(".quant.sf","",sample_id)
+names(sample_id)<-basename(sample_id)
+print(sample_id)
 
-sample_id<-sample_id[grep('[^benchmark][^SalmonIndex]', names(sample_id), invert=F)]
 if(any(numbers_only(names(sample_id)))){names(sample_id)[numbers_only(names(sample_id))]<-paste0("X",names(sample_id)[numbers_only(names(sample_id))])}
 
 sample_id<-sample_id[match(sample_info$sample,names(sample_id))]
 print(sample_id)
 if(any(is.na(names(sample_id)))){stop("Sample names from sample sheet and from Salmon output are not matching each other.")}
 
-salmon_dirs = sapply(sample_id, function(id) file.path(indir, id))
+salmon_dirs = sample_id
 print(salmon_dirs)
 ##########
 
