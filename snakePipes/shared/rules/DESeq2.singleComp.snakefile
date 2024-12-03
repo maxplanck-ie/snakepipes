@@ -42,6 +42,7 @@ rule DESeq2_Salmon_basic:
         "{}/.benchmark/DESeq2.Salmon.benchmark".format(get_outdir("DESeq2_Salmon",sampleSheet))
     params:
         script=os.path.join(maindir, "shared", "rscripts", "DESeq2.R"),
+        sampleSheet = lambda wildcards,input: input.sampleSheet,
         outdir = get_outdir("DESeq2_Salmon",sampleSheet),
         fdr = fdr,
         importfunc = os.path.join(maindir, "shared", "rscripts", "DE_functions.R"),
@@ -67,6 +68,7 @@ rule DESeq2_Salmon_allelic:
         "{}/.benchmark/DESeq2.SalmonAllelic.benchmark".format(get_outdir("DESeq2_SalmonAllelic",sampleSheet))
     params:
         script=os.path.join(maindir, "shared", "rscripts", "DESeq2.R"),
+        sampleSheet = lambda wildcards,input: input.sampleSheet,
         outdir = get_outdir("DESeq2_SalmonAllelic",sampleSheet),
         fdr = fdr,
         importfunc = os.path.join(maindir, "shared", "rscripts", "DE_functions.R"),
