@@ -174,7 +174,7 @@ rule calc_Mbias:
     threads: lambda wildcards: 10 if 10<max_thread else max_thread
     conda: CONDA_WGBS_ENV
     shell: """
-        MethylDackel mbias -@ {threads} {params.genome} {input[0]} QC_metrics/{wildcards.sample}
+        MethylDackel mbias -@ {threads} {params.genome} {input[0]} QC_metrics/{wildcards.sample} 2> {output}
         """
 
 
@@ -189,7 +189,7 @@ rule calcCHHbias:
     threads: lambda wildcards: 10 if 10<max_thread else max_thread
     conda: CONDA_WGBS_ENV
     shell: """
-        MethylDackel mbias -@ {threads} --CHH --noCpG --noSVG {params.genome} {input[0]} QC_metrics/{wildcards.sample}
+        MethylDackel mbias -@ {threads} --CHH --noCpG --noSVG {params.genome} {input[0]} QC_metrics/{wildcards.sample} 2> {output}
         """
 
 
