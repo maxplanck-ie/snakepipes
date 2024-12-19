@@ -84,8 +84,8 @@ if aligner == "STAR":
 elif aligner == "Bowtie2":
     rule bowtie2_index:
         input:
-            snpgenome_dir = SNPdir,
-            filelist = lambda wildcards: getref_fileList(checkpoints.create_snpgenome.get().output.snpgenome_dir)
+            snpgenome_dir = SNPdir#,
+#            filelist = lambda wildcards: getref_fileList(checkpoints.create_snpgenome.get().output.snpgenome_dir)
         output:
             bowtie2_index_allelic
         threads: lambda wildcards: 10 if 10<max_thread else max_thread
@@ -95,7 +95,7 @@ elif aligner == "Bowtie2":
         shell:
             "bowtie2-build"
             " --threads {threads}"
-            " {input.filelist}"
+            " {input.snpgenome_dir}/*.fa"
             " {params.idxbase}"
 else:
     print("Only STAR and Bowtie2 are implemented for allele-specific mapping")
