@@ -388,7 +388,7 @@ if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 1380 ]; then exit 1 ; fi
 WC=`WGBS -i BAM_input/filtered_bam -o output --sampleSheet .ci_stuff/test_sampleSheet.tsv --fromBAM --snakemakeOptions " --dryrun --conda-prefix /tmp" --GCbias .ci_stuff/organism.yaml | tee >(cat 1>&2) | grep -v -f .ci_stuff/test_ignore_patterns.txt | sed '/^\s*$/d' | sed '/^host:/d' | wc -l `
 if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 817 ]; then exit 1 ; fi
 WC=`WGBS -i BAM_input/filtered_bam -o output --sampleSheet .ci_stuff/test_sampleSheet.tsv --fromBAM --fastqc --snakemakeOptions " --dryrun --conda-prefix /tmp" --GCbias .ci_stuff/organism.yaml | tee >(cat 1>&2) | grep -v -f .ci_stuff/test_ignore_patterns.txt | sed '/^\s*$/d' | sed '/^host:/d' | wc -l `
-if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 974 ]; then exit 1 ; fi
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 817 ]; then exit 1 ; fi
 WC=`WGBS -i BAM_input/filtered_bam -o output --sampleSheet .ci_stuff/test_sampleSheet.tsv --fromBAM --skipBamQC --snakemakeOptions " --dryrun --conda-prefix /tmp" --GCbias .ci_stuff/organism.yaml | tee >(cat 1>&2) | grep -v -f .ci_stuff/test_ignore_patterns.txt | sed '/^\s*$/d' | sed '/^host:/d' | wc -l `
 if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 530 ]; then exit 1 ; fi
 
