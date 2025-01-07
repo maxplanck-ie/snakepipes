@@ -5,7 +5,7 @@ rule whatshap_haplotag:
             bam = "filtered_bam/{sample}.filtered.bam",
             bai = "filtered_bam/{sample}.filtered.bam.bai"
         output:
-            hbam = "allelic_bams/{sample}.filtered.allele_flagged.bam",
+            hbam = "allelic_bams/{sample}.filtered.allele_flagged.sorted.bam",
             hlist = "allelic_bams/{sample}.filtered_haplotype_list.tsv"
         benchmark:
             "allelic_bams/.benchmark/whatshap_haplotag.{sample}.benchmark"
@@ -17,12 +17,12 @@ rule whatshap_haplotag:
 
 rule whatshap_split:
         input:
-            hbam = "allelic_bams/{sample}.filtered.allele_flagged.bam",
+            hbam = "allelic_bams/{sample}.filtered.allele_flagged.sorted.bam",
             hlist = "allelic_bams/{sample}.filtered_haplotype_list.tsv"
         output:
-            h1bam = "allelic_bams/{sample}.filtered.genome1.bam",
-            h2bam = "allelic_bams/{sample}.filtered.genome2.bam",
-            unbam = "allelic_bams/{sample}.filtered.unassigned.bam"
+            h1bam = "allelic_bams/{sample}.filtered.genome1.sorted.bam",
+            h2bam = "allelic_bams/{sample}.filtered.genome2.sorted.bam",
+            unbam = "allelic_bams/{sample}.filtered.unassigned.sorted.bam"
         benchmark:
             "allelic_bams/.benchmark/whatshap_split.{sample}.benchmark"
         conda: CONDA_WHATSHAP_ENV
