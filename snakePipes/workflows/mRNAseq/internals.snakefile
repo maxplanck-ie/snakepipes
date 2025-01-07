@@ -50,7 +50,7 @@ if "allelic-whatshap" in mode:
     if not pvcf:
         print("Please provide a phased vcf file as input for whatshap!")
         exit(1)
-    if not os.path.exists(pvcf):
+    if not os.path.exists(os.path.abspath(pvcf)):
         print("Phased vcf file " + str(pvcf) + " not found!")
         exit(1)
     
