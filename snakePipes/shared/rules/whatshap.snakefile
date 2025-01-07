@@ -2,8 +2,8 @@ rule whatshap_haplotag:
         input:
             ref = genome_fasta,
             pvcf = pvcf,
-            bam = filtered_bam/{sample}.filtered.bam,
-            bai = filtered_bam/{sample}.filtered.bam.bai
+            bam = "filtered_bam/{sample}.filtered.bam",
+            bai = "filtered_bam/{sample}.filtered.bam.bai"
         output:
             hbam = "allelic_bams/{sample}.filtered.allele_flagged.bam",
             hlist = "allelic_bams/{sample}.filtered_haplotype_list.tsv"
