@@ -155,6 +155,8 @@ def main():
     # check for Allele-specific mapping mode
     args.allele_mode = cf.checkAlleleParams(args)
     # convert file path to abspath
+    if args.pvcf:
+        args.pvcf = os.path.abspath(args.pvcf)
     if args.allele_mode == "create_and_map":
         args.VCFfile = os.path.abspath(args.VCFfile)
     elif args.allele_mode == "map_only":
