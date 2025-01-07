@@ -43,7 +43,8 @@ def set_env_yamls():
             'CONDA_SAMBAMBA_ENV': 'envs/sambamba.yaml',
             'CONDA_pysam_ENV': 'envs/pysam.yaml',
             'CONDA_SEACR_ENV': 'envs/chip_seacr.yaml',
-            'CONDA_FQLINT_ENV': 'envs/fqlint.yaml'
+            'CONDA_FQLINT_ENV': 'envs/fqlint.yaml',
+            'CONDA_WHATSHAP_ENV': 'envs/whatshap.yaml'
             }
 
 

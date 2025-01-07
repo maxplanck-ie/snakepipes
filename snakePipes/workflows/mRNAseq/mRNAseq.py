@@ -49,7 +49,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
     # Workflow options
     optional = parser.add_argument_group('Options')
     optional.add_argument("-m", "--mode",
-                          help="workflow running modes (available: 'alignment-free, alignment, allelic-mapping, allelic-counting, deepTools_qc, three-prime-seq')"
+                          help="workflow running modes (available: 'alignment-free, alignment, allelic-mapping, allelic-counting, allelic-whatshap, deepTools_qc, three-prime-seq')"
                           " (default: '%(default)s')",
                           default=defaults["mode"])
 
@@ -94,6 +94,11 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                           dest="formula",
                           help="Design formula to use in linear model fit (default: '%(default)s')",
                           default=defaults["formula"])
+
+    optional.add_argument("--phased-vcf",
+                          dest="pvcf",
+                          help="Phased vcf required for whatshap haplotagging. (default: '%(default)s')",
+                          default=defaults["pvcf"])
 
 
     optional.add_argument("--dnaContam",

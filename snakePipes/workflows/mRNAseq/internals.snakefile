@@ -46,6 +46,14 @@ else:
     else:
         samples = cf.get_sample_names_bam(infiles, bamExt)
 
+if "allelic-whatshap" in mode:
+    if not pvcf:
+        print("Please provide a phased vcf file as input for whatshap!")
+        exit(1)
+    if not os.path.exists(pvcf):
+        print("Phased vcf file " + str(pvcf) + " not found!")
+        exit(1)
+    
 if formula and not sampleSheet:
     print("In order to apply custom formula, please provide a sample sheet!")
     exit(1)
