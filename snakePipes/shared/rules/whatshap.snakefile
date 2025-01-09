@@ -39,7 +39,7 @@ def collect_split_bams(wildcards):
       checkpoint_output_b = checkpoints.whatshap_split.get(**wildcards).output
       checkpoint_output = checkpoint_output_a + checkpoint_output_b
       return ("allelic_bams/{sample}.{suffix}.sorted.bam",
-                  suffix=glob_wildcards("allelic_bams/{sample}.{suffix}.sorted.bam")).suffix)
+                  suffix=glob_wildcards("allelic_bams/{sample}.{suffix}.sorted.bam").suffix)
 
 rule BAMindex_allelic:
     input:
