@@ -46,8 +46,8 @@ rule whatshap_split:
 
 rule BAMindex_allelic:
     input:
-        expand("allelic_bams/{sample}.{suffix}.sorted.bam",sample=samples,suffix=suffix)
+        expand("allelic_bams/{sample}.{suffix}.sorted.bam",sample=samples,suffix=['allele_flagged', 'genome1', 'genome2', 'unassigned'])
     output:
-        expand("allelic_bams/{sample}.{suffix}.sorted.bam.bai",sample=samples,suffix=suffix)
+        expand("allelic_bams/{sample}.{suffix}.sorted.bam.bai",sample=samples,suffix=['allele_flagged', 'genome1', 'genome2', 'unassigned'])
     conda: CONDA_SHARED_ENV
     shell: "samtools index {input}"
