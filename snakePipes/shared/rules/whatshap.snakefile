@@ -30,6 +30,10 @@ rule whatshap_split:
             whatshap split  --output-h1 {output.h1bam} --output-h2 {output.h2bam} --output-untagged {output.unbam} {input.hbam} {input.hlist}
             """
 
+wildcard_constraints:
+    suffix = ['allele_flagged', 'genome1', 'genome2', 'unassigned']
+
+
 rule BAMindex_allelic:
     input:
         "allelic_bams/{sample}.{suffix}.sorted.bam"
