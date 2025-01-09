@@ -1,4 +1,4 @@
-checkpoint whatshap_haplotag:
+rule whatshap_haplotag:
         input:
             ref = genome_fasta,
             pvcf = pvcf,
@@ -15,7 +15,7 @@ checkpoint whatshap_haplotag:
             whatshap haplotag --ignore-read-groups -o {output.hbam} --reference {input.ref} --output-threads={threads} --output-haplotag-list={output.hlist} {input.pvcf} {input.bam}
             """
 
-checkpoint whatshap_split:
+rule whatshap_split:
         input:
             hbam = "allelic_bams/{sample}.allele_flagged.sorted.bam",
             hlist = "allelic_bams/{sample}_haplotype_list.tsv"
@@ -34,18 +34,20 @@ checkpoint whatshap_split:
 #    suffix = ['allele_flagged', 'genome1', 'genome2', 'unassigned']
 
 
-def collect_split_bams(wildcards):
-      checkpoint_output_a = checkpoints.whatshap_haplotag.get(**wildcards).output["hbam"]
-      checkpoint_output_b = checkpoints.whatshap_split.get(**wildcards).output
-      checkpoint_output = checkpoint_output_a + checkpoint_output_b
-      return expand("allelic_bams/{{sample}}.{suffix}.sorted.bam",
-                  suffix = glob_wildcards("allelic_bams/{sample}.{suffix}.sorted.bam").suffix)
+#def collect_split_bams(wildcards):
+#      checkpoint_output_a = checkpoints.whatshap_haplotag.get(**wildcards).output["hbam"]
+#      checkpoint_output_b = checkpoints.whatshap_split.get(**wildcards).output
+#      checkpoint_output = checkpoint_output_a + checkpoint_output_b
+#      return expand("allelic_bams/{{sample}}.{suffix}.sorted.bam",
+#                  suffix = glob_wildcards("allelic_bams/{sample}.{suffix}.sorted.bam").suffix)
+
+#_ , suffix = glob_wildcards("allelic_bams/{sample}.{suffix}.sorted.bam")
+
 
 rule BAMindex_allelic:
     input:
-#        "allelic_bams/{sample}.{suffix}.sorted.bam"
-        collect_split_bams
+        expand("allelic_bams/{sample}.{suffix}.sorted.bam",sample=samples,suffix=suffix)
     output:
-        "allelic_bams/{sample}.{suffix}.sorted.bam.bai"
+        expand("allelic_bams/{sample}.{suffix}.sorted.bam.bai",sample=samples,suffix=suffix)
     conda: CONDA_SHARED_ENV
     shell: "samtools index {input}"
