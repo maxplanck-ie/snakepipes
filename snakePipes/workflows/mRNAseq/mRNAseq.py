@@ -31,7 +31,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          "UMIDedup": False,
                          "UMIDedupOpts": "", "bcPattern": "NNNNCCCCCCCCC",
                          "UMIDedupSep": "_", "UMIBarcode": False, "rMats": False,
-                         "fdr": 0.05}):
+                         "fdr": 0.05, "pvcf": None}):
     """
     Parse arguments from the command line.
     """
