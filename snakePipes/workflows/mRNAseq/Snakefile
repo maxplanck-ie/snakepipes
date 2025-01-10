@@ -115,7 +115,9 @@ else:
     elif "allelic-counting" in mode:
         allele_mode = "from_split_bam"
         include: os.path.join(maindir, "shared", "rules", "deepTools_RNA_allelic.snakefile")
-
+    elif "allelic-whatshap" in mode:
+        include: os.path.join(maindir, "shared", "rules", "whatshap.snakefile")
+        include: os.path.join(maindir, "shared", "rules", "deepTools_RNA_allelic.snakefile")
     include: os.path.join(maindir, "shared", "rules", "LinkBam.snakefile")
 
 
