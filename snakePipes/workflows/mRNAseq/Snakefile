@@ -119,7 +119,7 @@ else:
     include: os.path.join(maindir, "shared", "rules", "LinkBam.snakefile")
 
 
-if "allelic-mapping" in mode or "allelic-counting" in mode or "allelic-whatshap" in mode:
+if "allelic" in mode:
     ## featureCounts_allelic
     include: os.path.join(maindir, "shared", "rules", "featureCounts_allelic.snakefile")
 else:
@@ -254,7 +254,7 @@ def make_nmasked_genome():
         return([])
 
 def run_allelesp_mapping():
-    if "allelic-mapping" in mode or "allelic-counting" in mode or "allelic-whatshap" in mode:
+    if "allelic" in mode:
         allele_suffix = ['allele_flagged', 'genome1', 'genome2', 'unassigned']
         file_list = [
         expand("allelic_bams/{sample}.{suffix}.sorted.bam", sample = samples,
