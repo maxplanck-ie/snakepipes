@@ -118,7 +118,7 @@ else:
     include: os.path.join(maindir, "shared", "rules", "LinkBam.snakefile")
 
 
-if "allelic-mapping" in mode or "allelic-counting" in mode:
+if "allelic-mapping" in mode or "allelic-counting" in mode or "allelic-whatshap" in mode:
     ## featureCounts_allelic
     include: os.path.join(maindir, "shared", "rules", "featureCounts_allelic.snakefile")
 else:
