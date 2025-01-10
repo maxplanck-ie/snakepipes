@@ -39,6 +39,14 @@ elif pipeline=="rnaseq" and "allelic-whatshap" in mode:
             if not os.path.exists(os.path.join(outdir,output[0])):
                 os.symlink(os.path.join(outdir,input[0]),os.path.join(outdir,output[0]))
 
+    rule samtools_index_external:
+        input:
+            "filtered_bam/{sample}.filtered.bam"
+        output:
+            filtered_bam/{sample}.filtered.bam.bai"
+        conda: CONDA_SHARED_ENV
+        shell: "if [[ ! -f {output[0]} ]]; then samtools index {input[0]}; fi"
+
 else:
     rule link_bam:
         input:
