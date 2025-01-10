@@ -43,7 +43,7 @@ elif pipeline=="rnaseq" and "allelic-whatshap" in mode:
         input:
             "filtered_bam/{sample}.filtered.bam"
         output:
-            filtered_bam/{sample}.filtered.bam.bai"
+            "filtered_bam/{sample}.filtered.bam.bai"
         conda: CONDA_SHARED_ENV
         shell: "if [[ ! -f {output[0]} ]]; then samtools index {input[0]}; fi"
 
