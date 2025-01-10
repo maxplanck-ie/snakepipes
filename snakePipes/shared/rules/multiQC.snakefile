@@ -74,7 +74,7 @@ def multiqc_input_check(return_value):
             indir += aligner + " featureCounts "
             indir += " Sambamba "
             indir += " deepTools_qc "
-        if "allelic" in mode:
+        if "allelic-mapping" in mode or "allelic-counting" in mode or "allelic-whatshap" in mode:
             infiles.append( expand("featureCounts/{sample}.allelic_counts.txt", sample = samples) )
             indir += aligner + " featureCounts "
         if "allelic-mapping" in mode:

@@ -27,7 +27,7 @@ include: os.path.join(maindir, "shared", "tools" , "deeptools_cmds.snakefile")
 ## filtered annotation (GTF)
 include: os.path.join(maindir, "shared", "rules", "filterGTF.snakefile")
 
-if not "allelic" in mode:
+if not "allelic-mapping" in mode and not "allelic-counting" in mode and not "allelic-whatshap" in mode:
     ## bamCoverage_RPKM
     include: os.path.join(maindir, "shared", "rules", "deepTools_RNA.snakefile")
 
@@ -119,7 +119,7 @@ else:
     include: os.path.join(maindir, "shared", "rules", "LinkBam.snakefile")
 
 
-if "allelic" in mode:
+if "allelic-mapping" in mode or "allelic-counting" in mode or "allelic-whatshap" in mode:
     ## featureCounts_allelic
     include: os.path.join(maindir, "shared", "rules", "featureCounts_allelic.snakefile")
 else:
@@ -254,7 +254,7 @@ def make_nmasked_genome():
         return([])
 
 def run_allelesp_mapping():
-    if "allelic" in mode:
+    if "allelic-mapping" in mode or "allelic-counting" in mode or "allelic-whatshap" in mode:
         allele_suffix = ['allele_flagged', 'genome1', 'genome2', 'unassigned']
         file_list = [
         expand("allelic_bams/{sample}.{suffix}.sorted.bam", sample = samples,
