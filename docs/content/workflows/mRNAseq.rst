@@ -206,7 +206,7 @@ Allele-specific, gene-level differential expression analysis is then performed u
 
 
 "allelic-whatshap"
-~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
 
 **allelic-whatshap** mode applies a standard alignment to a nonmasked genome with STAR, followed by allele-specific splitting
 of mapped files with whatshap, requiring a phased vcf file as input ( ``--phased-vcf`` ). Gene-level quantification is performed for each allele using **featureCounts**.
