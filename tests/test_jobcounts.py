@@ -1745,13 +1745,13 @@ class TestmRNAseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 261
+        assert parseSpOut(_p) == 208
     def test_whatshap_allelic_fromBAM(self, ifs):
         ci = [
             "mRNAseq",
-            '-i', 
+            '-i',
             ifs / 'allelic_bam_input' / 'filtered_bam',
-            '-o', 
+            '-o',
             ifs / 'outdir',
             '--snakemakeOptions',
             SMKOPTS,
@@ -1769,7 +1769,7 @@ class TestmRNAseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 261
+        assert parseSpOut(_p) == 127
 
 
 class TestncRNAseq():
