@@ -54,7 +54,7 @@ else:
         params:
             spikeinExt = spikeinExt
         shell: """
-            sed '/^>/ s/$/{spikeinExt}/' {input} > {output}
+            sed '/\s+/$/{spikeinExt} /' {input} > {output}
         """
 
     rule createGenomeFasta:
