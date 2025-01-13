@@ -1,6 +1,12 @@
 snakePipes News
 ===============
 
+snakePipes 3.1.1
+________________
+
+* added whatshap-allelic mode to mRNA seq
+
+
 snakePipes 3.1.0
 ________________
 
