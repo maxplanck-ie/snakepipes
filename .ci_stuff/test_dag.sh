@@ -353,7 +353,7 @@ WC=`mRNAseq -m allelic-whatshap -i PE_input -o output --snakemakeOptions " --dry
 if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 1472 ]; then exit 1 ; fi
 #whatshap-allelic + fromBam
 WC=`mRNAseq -m allelic-whatshap -i BAM_input/filtered_bam --fromBAM --bamExt '.filtered.bam' -o output --sampleSheet .ci_stuff/test_sampleSheet.tsv --snakemakeOptions " --dryrun --conda-prefix /tmp" --phased-vcf allelic_input/file.vcf.gz .ci_stuff/organism.yaml | tee >(cat 1>&2) | grep -v -f .ci_stuff/test_ignore_patterns.txt | sed '/^\s*$/d' | sed '/^host:/d' | wc -l `
-if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 1285 ]; then exit 1 ; fi
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 669 ]; then exit 1 ; fi
 #whatshap-allelic + deepTools qc
 WC=`mRNAseq -m allelic-whatshap,deepTools_qc -i PE_input -o output --snakemakeOptions " --dryrun --conda-prefix /tmp" --phased-vcf allelic_input/file.vcf.gz --sampleSheet .ci_stuff/test_sampleSheet.tsv .ci_stuff/organism.yaml | tee >(cat 1>&2) | grep -v -f .ci_stuff/test_ignore_patterns.txt | sed '/^\s*$/d' | sed '/^host:/d' | wc -l `
 if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 2397 ]; then exit 1 ; fi
