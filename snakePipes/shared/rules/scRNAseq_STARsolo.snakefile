@@ -3,6 +3,7 @@
 ###currently having CB and UB tags output in the bam requires --outSAMtype SortedByCoordinate !!
 import numpy
 import os
+import loompy
 
 rule STARsolo:
     input:
@@ -225,16 +226,19 @@ if not skipVelocyto:
                 rm -rf $MYTEMP
         """
 
+    def aggregate_input(wildcards):
+        checkpoint_output = checkpoints.velocyto.get(sample=wildcards.sample).output["outdir"]
+        return expand("VelocytoCounts/{sample}/{i}.loom",
+                  i=glob_wildcards(os.path.join(checkpoint_output, "{i}.loom")).i)
+
     rule combine_loom:
-        input: expand("VelocytoCounts/{sample}",sample=samples)
+        input: aggregate_input
         output: "VelocytoCounts_merged/merged.loom"
         conda: CONDA_loompy_ENV
         params:
-            outfile = outdir+"/VelocytoCounts_merged/merged.loom",
-            script = maindir+"/shared/tools/loompy_merge.py",
-            input_fp = lambda wildcards,input: [ os.path.join(outdir,f) for f in input ]
-        shell: """
-            python {params.script} -outf {params.outfile} {params.input_fp}
+            outfile = outdir+"/VelocytoCounts_merged/merged.loom"
+        run: """
+            loompy.combine(files={input}, output_file={params.outfile}, key="Accession")
               """
 
     #rule velocity_to_seurat:
