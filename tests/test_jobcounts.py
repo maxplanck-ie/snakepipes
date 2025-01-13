@@ -1725,6 +1725,52 @@ class TestmRNAseq:
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
         assert parseSpOut(_p) == 340
+    def test_whatshap_allelic(self, ifs):
+        ci = [
+            "mRNAseq",
+            '-i',
+            ifs / 'PE',
+            '-o',
+            ifs / 'outdir',
+            '--snakemakeOptions',
+            SMKOPTS,
+            ifs / 'org.yaml',
+            '--sampleSheet',
+            ifs / 'sampleSheet.tsv',
+            '-m',
+            'allelic-whatshap,deepTools_qc',
+            '--phased-vcf',
+            ifs / 'allelic_input' / 'file.vcf.gz'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 261
+    def test_whatshap_allelic_fromBAM(self, ifs):
+        ci = [
+            "mRNAseq",
+            '-i', 
+            ifs / 'allelic_bam_input' / 'filtered_bam',
+            '-o', 
+            ifs / 'outdir',
+            '--snakemakeOptions',
+            SMKOPTS,
+            '--fromBAM',
+            '--bamExt',
+            '.filtered.bam',
+            ifs / 'org.yaml',
+            '--sampleSheet',
+            ifs / 'sampleSheet.tsv',
+            '-m',
+            'allelic-whatshap,deepTools_qc',
+            '--phased-vcf',
+            ifs / 'allelic_input' / 'file.vcf.gz'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 261
+
 
 class TestncRNAseq():
     def test_default(self, ifs):
