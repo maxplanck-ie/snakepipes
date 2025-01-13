@@ -37,7 +37,8 @@ dependencies = [
     "thefuzz",
     "pyyaml >= 5.1",
     "snakemake-executor-plugin-cluster-generic >= 1.0.9",
-    "graphviz"
+    "graphviz",
+    "loompy"
 ]
 
 [project.optional-dependencies]
