@@ -37,4 +37,4 @@ rule BAMindex_allelic:
     output:
         expand("allelic_bams/{sample}.{suffix}.sorted.bam.bai",sample=samples,suffix=['allele_flagged', 'genome1', 'genome2', 'unassigned'])
     conda: CONDA_SHARED_ENV
-    shell: "samtools index {input}"
+    shell: "samtools index -M {input}"
