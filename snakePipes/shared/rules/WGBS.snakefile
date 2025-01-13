@@ -7,8 +7,8 @@ import tempfile
 
 rule conversionRate:
     input:
-        bam = filtered_bam/{sample}.filtered.bam,
-        bai = filtered_bam/{sample}.filtered.bam.bai,
+        bam = "filtered_bam/{sample}.filtered.bam",
+        bai = "filtered_bam/{sample}.filtered.bam.bai",
         ref = genome_fasta
     output:
         "QC_metrics/{sample}.rrbs_summary_metrics"
