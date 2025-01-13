@@ -3,7 +3,6 @@
 ###currently having CB and UB tags output in the bam requires --outSAMtype SortedByCoordinate !!
 import numpy
 import os
-import loompy
 
 rule STARsolo:
     input:
@@ -226,28 +225,21 @@ if not skipVelocyto:
                 rm -rf $MYTEMP
         """
 
-    def aggregate_input(wildcards):
-        checkpoint_output = checkpoints.velocyto.get(sample=wildcards.sample).output["outdir"]
-        return expand("VelocytoCounts/{sample}/{i}.loom",
-                  i=glob_wildcards(os.path.join(checkpoint_output, "{i}.loom")).i)
 
-    rule combine_loom:
-        input: aggregate_input
-        output: "VelocytoCounts_merged/merged.loom"
-        conda: CONDA_loompy_ENV
-        params:
-            outfile = outdir+"/VelocytoCounts_merged/merged.loom"
-        run: """
-            loompy.combine(files={input}, output_file={params.outfile}, key="Accession")
-              """
+#deprecate loom combination by loompy - > Seurat4 should be handling it in R
 
-    #rule velocity_to_seurat:
-    #    input:
-    #        indirs = expand("VelocytoCounts/{sample}",sample=samples)
-    #    output:
-    #        seurat = "Seurat/Velocyto/merged_samples.RDS"
-    #    params:
-    #        wdir = outdir + "/Seurat/Velocyto",
-    #        samples = samples
-    #    conda: CONDA_seurat3_ENV
-    #    script: "../rscripts/scRNAseq_merge_loom.R"
+#    def aggregate_input(wildcards):
+#        checkpoint_output = checkpoints.velocyto.get(sample=wildcards.sample).output["outdir"]
+#        return expand("VelocytoCounts/{sample}/{i}.loom",
+#                  i=glob_wildcards(os.path.join(checkpoint_output, "{i}.loom")).i)
+
+#    rule combine_loom:
+#        input: aggregate_input
+#        output: "VelocytoCounts_merged/merged.loom"
+#        conda: CONDA_loompy_ENV
+#        params:
+#            outfile = outdir+"/VelocytoCounts_merged/merged.loom"
+#        run: """
+#            loompy.combine(files={input}, output_file={params.outfile}, key="Accession")
+#              """
+
