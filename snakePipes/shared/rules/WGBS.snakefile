@@ -5,15 +5,22 @@ import tempfile
 
 ###bam symlinking is taken care of by LinkBam
 
-# TODO: Make optional
 rule conversionRate:
     input:
-        "QC_metrics/{sample}.CHH.Mbias.txt"
+        bam = filtered_bam/{sample}.filtered.bam,
+        bai = filtered_bam/{sample}.filtered.bam.bai,
+        ref = genome_fasta
     output:
-        "QC_metrics/{sample}.conv.rate.txt"
+        "QC_metrics/{sample}.rrbs_summary_metrics"
+    params:
+        prefix = "QC_metrics/{sample}"
+    conda: CONDA_PICARD_ENV
     threads: 1
     shell: """
-        awk '{{if(NR>1) {{M+=$4; UM+=$5}}}}END{{printf("{wildcards.sample}\\t%f\\n", 100*(1.0-M/(M+UM)))}}' {input} > {output}
+        java -jar picard.jar CollectRrbsMetrics \
+        R={input.ref} \
+        I={input.bam} \
+        M={params.prefix}
         """
 
 
@@ -56,60 +63,6 @@ elif not pairedEnd and not fromBAM:
 	        samtools sort -T "$MYTEMP/{wildcards.sample}" -m 3G -@ 4 -o "{output.sbam}"
             rm -rf "$MYTEMP"
             """
-
-#if not fromBAM:
-#    rule index_bam:
-#        input:
-#            aligner+"/{sample}.sorted.bam"
-#        output:
-#            temp(aligner+"/{sample}.sorted.bam.bai")
-#        conda: CONDA_SHARED_ENV
-#        shell: """
-#            samtools index "{input}"
-#            """
-
-#if not skipBamQC:
-#    rule markDupes:
-#        input:
-#            aligner+"/{sample}.sorted.bam",
-#            aligner+"/{sample}.sorted.bam.bai"
-#        output:
-#            "Sambamba/{sample}.markdup.bam"
-#        threads: lambda wildcards: 10 if 10<max_thread else max_thread
-#        params:
-#            tempDir = tempDir
-#        conda: CONDA_SAMBAMBA_ENV
-#        shell: """
-#            TMPDIR={params.tempDir}
-#            MYTEMP=$(mktemp -d "${{TMPDIR:-/tmp}}"/snakepipes.XXXXXXXXXX)
-#            sambamba markdup --overflow-list-size 600000 -t {threads} --tmpdir "$MYTEMP/{wildcards.sample}" "{input[0]}" "{output}"
-#            rm -rf "$MYTEMP"
-#            """
-
-
-#    rule indexMarkDupes:
-#        input:
-#            "Sambamba/{sample}.markdup.bam"
-#        output:
-#            "Sambamba/{sample}.markdup.bam.bai"
-#        params:
-#        threads: 1
-#        conda: CONDA_SHARED_ENV
-#        shell: """
-#            samtools index "{input}"
-#            """
-
-#    rule link_deduped_bam:
-#        input:
-#            bam="Sambamba/{sample}.markdup.bam",
-#            bai="Sambamba/{sample}.markdup.bam.bai"
-#        output:
-#            bam = "filtered_bam/{sample}.filtered.bam",
-#            bai = "filtered_bam/{sample}.filtered.bam.bai"
-#        shell: """
-#            ln -s ../{input.bam} {output.bam}
-#            ln -s ../{input.bai} {output.bai}
-#        """
 
 
 rule getRandomCpGs:
@@ -263,7 +216,7 @@ rule produceReport:
         bedGraphs=expand("MethylDackel/{sample}_CpG.bedGraph", sample=samples),
         Coverage=calc_doc(skipDOC),
         ConversionRate=expand("QC_metrics/{sample}.conv.rate.txt", sample=samples),
-        mbiasTXT=expand("QC_metrics/{sample}.Mbias.txt", sample=samples),
+        mbiasTXT=expand("QC_metrics/{sample}.rrbs_summary_metrics", sample=samples),
         fstat=expand("QC_metrics/{sample}.flagstat", sample=samples)
     output:
         QCrep='QC_metrics/QC_report.html'

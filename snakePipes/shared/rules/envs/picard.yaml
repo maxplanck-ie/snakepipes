@@ -1,0 +1,6 @@
+name: snakepipes_picard_environment_1.0
+channels:
+ - conda-forge
+ - bioconda
+dependencies:
+ - picard = 3.3.0
