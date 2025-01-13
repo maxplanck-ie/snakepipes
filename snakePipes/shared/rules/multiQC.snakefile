@@ -74,7 +74,7 @@ def multiqc_input_check(return_value):
             indir += aligner + " featureCounts "
             indir += " Sambamba "
             indir += " deepTools_qc "
-        if "allelic-whatshap" in mode:
+        if "allelic-whatshap" in mode and not fromBAM:
             infiles.append( expand(aligner+"/{sample}.markdup.bam", sample = samples) +
                     expand("Sambamba/{sample}.markdup.txt", sample = samples) +
                     expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample=samples))
