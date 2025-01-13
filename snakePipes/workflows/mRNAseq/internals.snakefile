@@ -53,6 +53,10 @@ if "allelic-whatshap" in mode:
     if not os.path.exists(pvcf):
         print("Phased vcf file " + str(pvcf) + " not found!")
         exit(1)
+    if pvcf and os.path.splitext(pvcf)[1] == ".gz":
+        if not os.path.exists(pvcf + ".tbi"):
+            print("A gzipped vcf file was provided but the index is missing. Please index the vcf.gz file with tabix.")
+            exit(1)
     
 if formula and not sampleSheet:
     print("In order to apply custom formula, please provide a sample sheet!")

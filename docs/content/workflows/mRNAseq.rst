@@ -9,7 +9,7 @@ What it does
 The snakePipes mRNAseq workflow allows users to process their single or paired-end
 mRNAseq fastq files upto the point of gene/transcript-counts and differential expression.
 It also allows full allele-specific mRNAseq analysis (up to allele-specific
-differential expression) using the *allelic-mapping* mode.
+differential expression) using the *allelic-mapping* or *allelic-whatshap* mode.
 
 .. image:: ../images/RNAseq_pipeline.png
 
@@ -209,7 +209,7 @@ Allele-specific, gene-level differential expression analysis is then performed u
 ~~~~~~~~~~~~~~~~~~
 
 **allelic-whatshap** mode applies a standard alignment to a nonmasked genome with STAR, followed by allele-specific splitting
-of mapped files with whatshap, requiring a phased vcf file as input ( ``--phased-vcf`` ). Gene-level quantification is performed for each allele using **featureCounts**.
+of mapped files with whatshap, requiring a phased vcf file as input ( ``--phased-vcf`` ). The file must be bzip-compressed and tabix-indexed as well. Gene-level quantification is performed for each allele using **featureCounts**.
 Allele-specific, gene-level differential expression analysis is then performed using **DESeq2**.
 
 
