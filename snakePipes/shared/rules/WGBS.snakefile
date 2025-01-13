@@ -215,8 +215,8 @@ rule produceReport:
     input:
         bedGraphs=expand("MethylDackel/{sample}_CpG.bedGraph", sample=samples),
         Coverage=calc_doc(skipDOC),
-        ConversionRate=expand("QC_metrics/{sample}.conv.rate.txt", sample=samples),
-        mbiasTXT=expand("QC_metrics/{sample}.rrbs_summary_metrics", sample=samples),
+        ConversionRate=expand("QC_metrics/{sample}.rrbs_summary_metrics", sample=samples),
+        mbiasTXT=expand("QC_metrics/{sample}.Mbias.txt", sample=samples),
         fstat=expand("QC_metrics/{sample}.flagstat", sample=samples)
     output:
         QCrep='QC_metrics/QC_report.html'
