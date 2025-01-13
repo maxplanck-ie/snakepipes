@@ -149,7 +149,7 @@ mkdir -p output
 touch /tmp/genes.gtf /tmp/genome.fa /tmp/genome.fa.fai /tmp/rmsk.txt /tmp/genes.bed /tmp/spikein_genes.gtf /tmp/genome.2bit
 mkdir -p allelic_input
 mkdir -p allelic_input/Ngenome
-touch allelic_input/file.vcf.gz allelic_input/snpfile.txt
+touch allelic_input/file.vcf.gz allelic_input/file.vcf.gz.tbi allelic_input/snpfile.txt
 cp .ci_stuff/genome.fa .ci_stuff/genome.fa.fai /tmp/
 mkdir -p /tmp/SalmonIndex /tmp/annotation
 touch /tmp/SalmonIndex/decoys.txt
