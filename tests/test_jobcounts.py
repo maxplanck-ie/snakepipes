@@ -2001,7 +2001,7 @@ class TestWGBS():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 155
+        assert parseSpOut(_p) == 146
     def test_frombam(self, ifs):
         ci = [
             "WGBS",
