@@ -78,16 +78,24 @@ def multiqc_input_check(return_value):
             infiles.append( expand(aligner+"/{sample}.markdup.bam", sample = samples) +
                     expand("Sambamba/{sample}.markdup.txt", sample = samples) +
                     expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample=samples))
+            infiles.append( expand("allelic_bams/{sample}.{suffix}.sorted.bam", sample = samples,suffix = allelic_suffix) )
             indir += aligner
             indir += " Sambamba "
             indir += " deepTools_qc "
-        if "allelic-mapping" in mode or "allelic-counting" in mode or "allelic-whatshap" in mode:
+            indir += " allelic_bams "
+        if "allelic-whatshap" in mode and fromBAM:
+            infiles.append( expand("filtered_bam/{sample}.filtered.bam.txt", sample = samples) )
+            infiles.append( expand("allelic_bams/{sample}.{suffix}.sorted.bam", sample = samples,suffix = allelic_suffix) )
+            infiles.append( expand("featureCounts/{sample}.allelic_counts.txt", sample = samples) )
+            indir += " filtered_bam " + " featureCounts "
+            indir += " allelic_bams "
+        if "allelic-mapping" in mode or "allelic-counting" in mode in mode:
             infiles.append( expand("featureCounts/{sample}.allelic_counts.txt", sample = samples) )
             indir += aligner + " featureCounts "
         if "allelic-mapping" in mode:
             infiles.append( expand("allelic_bams/{sample}.markdup.SNPsplit_report.yaml", sample = samples) )
             infiles.append( expand("allelic_bams/{sample}.markdup.SNPsplit_sort.yaml", sample = samples) )
-            indir += "allelic_bams"
+            indir += " allelic_bams "
         if "alignment-free" in mode:
             if "allelic-mapping" in mode:
                 infiles.append( expand("SalmonAllelic/{sample}.{allelic_suffix}/quant.sf", sample = samples,allelic_suffix=allelic_suffix) )
