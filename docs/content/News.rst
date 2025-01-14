@@ -4,7 +4,13 @@ snakePipes News
 snakePipes 3.2.0
 ________________
 
-* added whatshap-allelic mode to mRNA seq
+* added allelic-whatshap mode to mRNA seq
+* fixes #1085
+* fixes #1083
+* fixes #1082
+* fixes #1063
+* fixes #1058
+* fixes minor issues with mRNAseq allelic-whatshap mode
 
 
 snakePipes 3.1.0
