@@ -67,6 +67,7 @@ def createTestData(fp, samples=9) -> None:
 
     (fp / 'allelic_input'/ 'Ngenome').mkdir(parents=True)
     (fp / 'allelic_input'/ 'file.vcf.gz').touch()
+    (fp / 'allelic_input'/ 'file.vcf.gz.tbi').touch()
     (fp / 'allelic_input'/ 'snpfile.txt').touch()
 
     # samples
