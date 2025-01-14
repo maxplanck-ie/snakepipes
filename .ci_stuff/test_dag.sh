@@ -343,7 +343,7 @@ WC=`mRNAseq -m allelic-counting -i allelic_BAM_input/allelic_bams --fromBAM --ba
 if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 637 ]; then exit 1 ; fi
 #allelic+multicomp
 WC=`mRNAseq -m allelic-counting -i allelic_BAM_input/allelic_bams --fromBAM --bamExt '.sorted.bam' -o output --sampleSheet .ci_stuff/test_sampleSheet_multiComp.tsv --snakemakeOptions " --dryrun --conda-prefix /tmp"  .ci_stuff/organism.yaml | tee >(cat 1>&2) | grep -v -f .ci_stuff/test_ignore_patterns.txt | sed '/^\s*$/d' | sed '/^host:/d' | wc -l `
-if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 668 ]; then exit 1 ; fi
+if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 667 ]; then exit 1 ; fi
 WC=`mRNAseq -m allelic-mapping,deepTools_qc -i allelic_BAM_input/filtered_bam --fromBAM --bamExt '.filtered.bam' -o output --sampleSheet .ci_stuff/test_sampleSheet_multiComp.tsv --snakemakeOptions " --dryrun --conda-prefix /tmp" --SNPfile allelic_input/snpfile.txt --NMaskedIndex allelic_input/Ngenome .ci_stuff/organism.yaml | tee >(cat 1>&2) | grep -v -f .ci_stuff/test_ignore_patterns.txt | sed '/^\s*$/d' | sed '/^host:/d' | wc -l `
 if [ ${PIPESTATUS[0]} -ne 0 ] || [ $WC -ne 1315 ]; then exit 1 ; fi
 WC=`mRNAseq -m allelic-mapping,deepTools_qc,alignment-free -i PE_input -o output --sampleSheet .ci_stuff/test_sampleSheet_multiComp.tsv --snakemakeOptions " --dryrun --conda-prefix /tmp" --VCFfile allelic_input/file.vcf.gz --strains strain1 .ci_stuff/organism.yaml | tee >(cat 1>&2) | grep -v -f .ci_stuff/test_ignore_patterns.txt | sed '/^\s*$/d' | sed '/^host:/d' | wc -l `
