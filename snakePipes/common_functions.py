@@ -856,11 +856,11 @@ def predict_chip_dict(wdir, input_pattern_str, bamExt, fromBAM=None):
             print("No control sample found!")
 
         chip_dict_pred["chip_dict"][i] = {}
-        chip_dict_pred["chip_dict"][i]['control'] = tmp
+        chip_dict_pred["chip_dict"][i]['Control'] = tmp if tmp != "" else None
         if re.match(".*(H3K4me1|H3K36me3|H3K9me3|H3K27me3).*", i, re.IGNORECASE):
-            chip_dict_pred["chip_dict"][i]['broad'] = True
+            chip_dict_pred["chip_dict"][i]['Broad'] = True
         else:
-            chip_dict_pred["chip_dict"][i]['broad'] = False
+            chip_dict_pred["chip_dict"][i]['Broad'] = False
 
     outfile = os.path.join(wdir, "chip_seq_sample_config.PREDICTED.yaml")
     write_configfile(outfile, chip_dict_pred)
