@@ -75,6 +75,7 @@ def multiqc_input_check(return_value):
             indir += " Sambamba "
             indir += " deepTools_qc "
         if "allelic-whatshap" in mode and not fromBAM:
+            allele_suffix = ['allele_flagged', 'genome1', 'genome2', 'unassigned']
             infiles.append( expand(aligner+"/{sample}.markdup.bam", sample = samples) +
                     expand("Sambamba/{sample}.markdup.txt", sample = samples) +
                     expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample=samples))
@@ -84,6 +85,7 @@ def multiqc_input_check(return_value):
             indir += " deepTools_qc "
             indir += " allelic_bams "
         if "allelic-whatshap" in mode and fromBAM:
+            allele_suffix = ['allele_flagged', 'genome1', 'genome2', 'unassigned']
             infiles.append( expand("filtered_bam/{sample}.filtered.bam.txt", sample = samples) )
             infiles.append( expand("allelic_bams/{sample}.{suffix}.sorted.bam", sample = samples,suffix = allelic_suffix) )
             infiles.append( expand("featureCounts/{sample}.allelic_counts.txt", sample = samples) )
