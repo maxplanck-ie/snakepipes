@@ -10,6 +10,7 @@ ________________
 * fixes #1082
 * fixes #1063
 * fixes #1058
+* fixes #1024
 * fixes minor issues with mRNAseq allelic-whatshap mode
 
 
