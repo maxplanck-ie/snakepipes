@@ -104,7 +104,7 @@ with open(samples_config, "r") as f:
         exit(1)
     del chip_dict_tmp
 
-cf.write_configfile(os.path.join("chip_samples.yaml"), chip_dict)
+cf.write_configfile(os.path.join("chip_samples.yaml"), chip_dict, trafo=None)
 
 # create unique sets of control samples, ChIP samples with and without control
 control_samples = set()

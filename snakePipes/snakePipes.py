@@ -414,7 +414,7 @@ def updateConfig(args):
         else:
             sys.exit("Config file not found\n")
     updatedDict = cof.merge_dicts(currentDict, d)
-    cof.write_configfile(os.path.join(baseDir, "shared", "defaults.yaml"), updatedDict)
+    cof.write_configfile(os.path.join(baseDir, "shared", "defaults.yaml"), updatedDict, trafo=None)
 
     #update conda-prefix in snakemakeProfile
     if args.condaEnvDir:
@@ -422,7 +422,7 @@ def updateConfig(args):
         f = open(profilePath / 'config.yaml')
         pf = yaml.load(f, Loader=yaml.FullLoader)
         pf['conda-prefix'] = args.condaEnvDir
-        cof.write_configfile(os.path.join(profilePath, "config.yaml"), pf)
+        cof.write_configfile(os.path.join(profilePath, "config.yaml"), pf, trafo=None)
         f.close()
 
     cof.load_configfile(
