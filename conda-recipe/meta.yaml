@@ -24,7 +24,7 @@ requirements:
     - snakemake-executor-plugin-cluster-generic >=1.0.9
     - pandas
     - thefuzz
-    - pyyaml >=5.1
+    - ruamel.yaml
 
 test:
   commands:
