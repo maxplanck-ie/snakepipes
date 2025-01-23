@@ -17,7 +17,7 @@ rule conversionRate:
     conda: CONDA_PICARD_ENV
     threads: 1
     shell: """
-        java -jar picard.jar CollectRrbsMetrics \
+        picard CollectRrbsMetrics \
         R={input.ref} \
         I={input.bam} \
         M={params.prefix}
