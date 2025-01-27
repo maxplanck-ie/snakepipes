@@ -61,7 +61,7 @@ build = [
 ]
 
 [tool.setuptools.package-data]
-snakePipes = ["**/*.yaml", "**/*.R", "**/*.Rmd", "**/*snakefile", "**/*Snakefile", "**/*sh", "**/*jar"]
+snakePipes = ["**/*.yaml", "**/*.R", "**/*.Rmd", "**/*snakefile", "**/*Snakefile", "**/*sh"]
 
 [project.scripts]
 ATACseq = "snakePipes.workflows.ATACseq.ATACseq:main"
