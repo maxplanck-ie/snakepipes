@@ -13,14 +13,15 @@ rule conversionRate:
     output:
         "QC_metrics/{sample}.rrbs_summary_metrics"
     params:
-        prefix = "QC_metrics/{sample}"
+        prefix = "QC_metrics/{sample}",
+        picard = os.path.join(maindir, "shared", "tools", "picard.jar")
     conda: CONDA_PICARD_ENV
     threads: 1
     shell: """
-        picard CollectRrbsMetrics \
-        R={input.ref} \
-        I={input.bam} \
-        M={params.prefix}
+        java -Xmx4g -jar {params.picard} CollectRrbsMetrics \
+        -R {input.ref} \
+        -I {input.bam} \
+        -M {params.prefix}
         """
 
 

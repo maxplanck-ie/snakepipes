@@ -73,7 +73,7 @@ set-resources:
   CollectInsertSizeMetrics:
     mem: 1G
   conversionRate:
-    mem: 3G
+    mem: 4G
   correct_matrix:
     mem: 7G
   CpG_report:
