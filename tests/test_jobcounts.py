@@ -1948,7 +1948,7 @@ class TestWGBS():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 145
+        assert parseSpOut(_p) == 146
     def test_no_sampleSheet(self, ifs):
         ci = [
             "WGBS",
@@ -1963,7 +1963,7 @@ class TestWGBS():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 141
+        assert parseSpOut(_p) == 142
     def test_bwameth2(self, ifs):
         ci = [
             "WGBS",
@@ -1982,7 +1982,7 @@ class TestWGBS():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 145
+        assert parseSpOut(_p) == 146
     def test_trimgcbias(self, ifs):
         ci = [
             "WGBS",
@@ -2001,7 +2001,7 @@ class TestWGBS():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 146
+        assert parseSpOut(_p) == 147
     def test_frombam(self, ifs):
         ci = [
             "WGBS",
@@ -2020,7 +2020,7 @@ class TestWGBS():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 83
+        assert parseSpOut(_p) == 84
     def test_frombamfqc(self, ifs):
         ci = [
             "WGBS",
@@ -2040,7 +2040,7 @@ class TestWGBS():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 83
+        assert parseSpOut(_p) == 84
     def test_frombamskipqc(self, ifs):
         ci = [
             "WGBS",
