@@ -219,6 +219,12 @@ def run_seacr():
     return ([])
 
 
+def run_chipqc():
+    file_list = "{}_chipqc/sessionInfo.txt".format(peakCaller)
+    return(file_list)
+
+
+
 ### execute before workflow starts #############################################
 ################################################################################
 onstart:
@@ -271,7 +277,8 @@ rule all:
         run_deepTools_allelic(),
         ## run csaw if asked for
         run_CSAW(),
-        "QC_report/QC_report_all.tsv"
+        "QC_report/QC_report_all.tsv",
+        run_chipqc()
 
 
 ### execute after workflow finished ############################################
