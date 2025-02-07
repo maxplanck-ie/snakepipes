@@ -351,14 +351,14 @@ rule chipqc:
     input:
         bams = expand("filtered_bam/{sample}.filtered.bam",sample=samples),
         peaks = collectPeaks(caller=peakCaller),
-        sampleSheet = sampleSheet if sampleSheet else "NA"
+        sampleSheet = sampleSheet if sampleSheet else ''
     output:
         "{}_chipqc/sessionInfo.txt".format(peakCaller)
     params:
         genome = genome,
         outdir = "{}_chipqc".format(peakCaller),
         samples = samples,
-        blacklist = blacklist_bed
+        blacklist = blacklist_bed,
     benchmark:
         "{}_chipqc/.benchmark/chipqc.benchmark".format(peakCaller)
     conda: CONDA_CHIPQC_ENV
