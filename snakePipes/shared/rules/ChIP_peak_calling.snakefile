@@ -358,7 +358,7 @@ rule chipqc:
         genome = genome,
         outdir = "{}_chipqc".format(peakCaller),
         samples = samples,
-        blacklist = blacklist
+        blacklist = blacklist_bed
     benchmark:
         "{}_chipqc/.benchmark/chipqc.benchmark".format(peakCaller)
     conda: CONDA_CHIPQC_ENV
