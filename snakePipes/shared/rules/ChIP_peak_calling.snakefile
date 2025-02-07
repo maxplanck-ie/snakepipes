@@ -333,3 +333,33 @@ rule SEACR_peak_relaxed_qc:
         # write peak-based QC metrics to output file
         printf "peak_count\tFRiP\tpeak_genome_coverage\n%d\t%5.3f\t%6.4f\n" $peak_count $frip $genomecov > {output.qc}
         """
+
+
+def collectPeaks(caller):
+    if caller == "SEACR":
+        return expand("SEACR/{sample}.filtered.relaxed.bed", sample=samples)
+    elif caller == "MACS2":
+        return expand("MACS2/{sample}.filtered.BAM_peaks.xls",sample=samples)
+    elif caller == "histoneHMM":
+        return expand("histoneHMM/{sample}.filtered.histoneHMM-regions.gff",sample=samples)
+    elif caller == "Genrich":
+        return expand("Genrich/{group}.narrowPeak",group=genrichDict.keys())
+
+
+
+rule chipqc:
+    input:
+        bams = expand("filtered_bam/{sample}.filtered.bam",sample=samples),
+        peaks = collectPeaks(caller=peakCaller),
+        sampleSheet = sampleSheet if sampleSheet else "NA"
+    output:
+        "{}_chipqc/sessionInfo.txt".format(peakCaller)
+    params:
+        genome = organism,
+        outdir = "{}_chipqc".format(peakCaller),
+        samples = samples,
+        blacklist = blacklist
+    benchmark:
+        "{}_chipqc/.benchmark/chipqc.benchmark".format(peakCaller)
+    conda: CONDA_CHIPQC_ENV
+    script: "../rscripts/chipqc.R"
