@@ -355,7 +355,7 @@ rule chipqc:
     output:
         "{}_chipqc/sessionInfo.txt".format(peakCaller)
     params:
-        genome = organism,
+        genome = genome,
         outdir = "{}_chipqc".format(peakCaller),
         samples = samples,
         blacklist = blacklist
