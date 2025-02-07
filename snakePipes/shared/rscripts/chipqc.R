@@ -49,3 +49,6 @@ blist<-ifelse(file.exists(blacklist),blacklist,NULL)
 QC<-ChIPQC(sampledat,annotation=annotation,mapQCth=3,blacklist=blist)
 ChIPQCreport(QC,reportFolder=wdir,facet=FALSE,colourBy="Factor")
 
+sink("sessionInfo.txt")
+sessionInfo()
+sink()
