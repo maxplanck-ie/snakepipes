@@ -28,7 +28,7 @@ markv<-names(b)
 #if sample sheet is a file path: get condition and replicate information
 #the check that the sample sheet file exists is taken care of by the python wrapper
 if (sampleSheet == "" || is.null(sampleSheet)){
-    sampledat<-data.frame("SampleID"=samples,"Condition"=rep("All",length(samples)),"Factor"=markv,"Replicate"=rep("All",length(samples))}
+    sampledat<-data.frame("SampleID"=samples,"Condition"=rep("All",length(samples)),"Factor"=markv,"Replicate"=rep("All",length(samples)))}
 
 #skipped: check if samples,bamdir and peakdir are in the same ordera!
     
