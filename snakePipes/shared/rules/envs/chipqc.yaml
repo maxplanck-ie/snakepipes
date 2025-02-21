@@ -6,3 +6,5 @@ dependencies:
  - bioconductor-genomicranges
  - bioconductor-rtracklayer
  - bioconductor-chipqc
+ - r-yaml
+ - r-stringr

@@ -19,7 +19,8 @@ if pairedEnd:
             frag_size = "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv"
         output:
             peaks = "MACS2/{chip_sample}.filtered.BAM_peaks.xls",
-            peaksPE = "MACS2/{chip_sample}.filtered.BAMPE_peaks.xls"
+            peaksPE = "MACS2/{chip_sample}.filtered.BAMPE_peaks.xls",
+            narrowPeak = "MACS2/{chip_sample}.filtered.BAM_peaks.narrowPeak"
         params:
             broad_calling =
                 lambda wildcards: "--broad " if is_broad(wildcards.chip_sample) else "",
@@ -67,6 +68,7 @@ else:
                 else []
         output:
             peaks = "MACS2/{chip_sample}.filtered.BAM_peaks.xls",
+            narrowPeak = "MACS2/{chip_sample}.filtered.BAM_peaks.narrowPeak"
         params:
             genome_size = str(genome_size),
             broad_calling =
@@ -337,11 +339,12 @@ rule SEACR_peak_relaxed_qc:
 
 def collectPeaks(caller):
     if caller == "SEACR":
-        return expand("SEACR/{sample}.filtered.relaxed.bed", sample=samples)
+        return expand("SEACR/{chip_sample}.filtered.relaxed.bed", chip_sample=chip_samples)
     elif caller == "MACS2":
-        return expand("MACS2/{sample}.filtered.BAM_peaks.xls",sample=samples)
+        narrowlist = expand("MACS2/{chip_sample}.filtered.BAM_peaks.narrowPeak",chip_sample=narrow_chip_samples)
+        return narrowlist.append(expand("MACS2/{chip_sample}.filtered.BAM_peaks.broadPeak",chip_sample=broad_chip_samples))
     elif caller == "histoneHMM":
-        return expand("histoneHMM/{sample}.filtered.histoneHMM-regions.gff",sample=samples)
+        return expand("histoneHMM/{chip_sample}.filtered.histoneHMM-regions.gff",chip_sample=chip_samples)
     elif caller == "Genrich":
         return expand("Genrich/{group}.narrowPeak",group=genrichDict.keys())
 
@@ -349,16 +352,18 @@ def collectPeaks(caller):
 
 rule chipqc:
     input:
-        bams = expand("filtered_bam/{sample}.filtered.bam",sample=samples),
+        bams = expand("filtered_bam/{chip_sample}.filtered.bam",chip_sample=chip_samples),
         peaks = collectPeaks(caller=peakCaller),
-        sampleSheet = sampleSheet if sampleSheet else []
+        sampleSheet = sampleSheet if sampleSheet else [],
+        chipdict = os.path.join(outdir,"chip_samples.yaml")
     output:
         "{}_chipqc/sessionInfo.txt".format(peakCaller)
     params:
         genome = genome,
         outdir = "{}_chipqc".format(peakCaller),
-        samples = samples,
-        blacklist = blacklist_bed
+        blacklist = blacklist_bed,
+        bams = lambda wildcards,input: [os.path.join(outdir,x) for x in input.bams],
+        peaks = lambda wildcards,input: [os.path.join(outdir,x) for x in input.peaks]
     benchmark:
         "{}_chipqc/.benchmark/chipqc.benchmark".format(peakCaller)
     conda: CONDA_CHIPQC_ENV

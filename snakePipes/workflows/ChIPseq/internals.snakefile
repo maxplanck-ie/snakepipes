@@ -111,6 +111,8 @@ cf.write_configfile(os.path.join("chip_samples.yaml"), chip_dict, trafo=None)
 control_samples = set()
 chip_samples_w_ctrl = set()
 chip_samples_wo_ctrl = set()
+broad_samples = set()
+narrow_samples = set()
 for chip_sample, value in chip_dict.items():
     # set control to False if not specified or set to False
     if 'control' not in chip_dict[chip_sample] or value['control'] is None:
@@ -122,6 +124,15 @@ for chip_sample, value in chip_dict.items():
     # set broad to False if not specified or set to False
     if 'broad' not in chip_dict[chip_sample] or not value['broad']:
         chip_dict[chip_sample]['broad'] = False
+        narrow_samples.add(chip_sample)
+    else:
+        broad_samples.add(chip_samples)
+
+
+broad_samples = list(sorted(broad_samples))
+broad_samples = list(filter(None, broad_samples))
+narrow_samples = list(sorted(narrow_samples))
+narrow_samples = list(filter(None, narrow_samples))
 
 
 control_samples = list(sorted(control_samples))
