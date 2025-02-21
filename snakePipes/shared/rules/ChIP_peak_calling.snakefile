@@ -341,8 +341,10 @@ def collectPeaks(caller):
     if caller == "SEACR":
         return expand("SEACR/{chip_sample}.filtered.relaxed.bed", chip_sample=chip_samples)
     elif caller == "MACS2":
-        narrowlist = expand("MACS2/{chip_sample}.filtered.BAM_peaks.narrowPeak",chip_sample=narrow_chip_samples)
-        return narrowlist.append(expand("MACS2/{chip_sample}.filtered.BAM_peaks.broadPeak",chip_sample=broad_chip_samples))
+        retlist = expand("MACS2/{chip_sample}.filtered.BAM_peaks.narrowPeak",chip_sample=narrow_samples)
+        if broad_samples:
+            retlist.append(expand("MACS2/{chip_sample}.filtered.BAM_peaks.broadPeak",chip_sample=broad_samples))
+        return retlist
     elif caller == "histoneHMM":
         return expand("histoneHMM/{chip_sample}.filtered.histoneHMM-regions.gff",chip_sample=chip_samples)
     elif caller == "Genrich":

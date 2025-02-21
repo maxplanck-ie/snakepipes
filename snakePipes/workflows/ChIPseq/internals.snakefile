@@ -126,13 +126,15 @@ for chip_sample, value in chip_dict.items():
         chip_dict[chip_sample]['broad'] = False
         narrow_samples.add(chip_sample)
     else:
-        broad_samples.add(chip_samples)
+        broad_samples.add(chip_sample)
 
 
 broad_samples = list(sorted(broad_samples))
 broad_samples = list(filter(None, broad_samples))
+warnings.warn("broad samples " + ' '.join(broad_samples))
 narrow_samples = list(sorted(narrow_samples))
 narrow_samples = list(filter(None, narrow_samples))
+warnings.warn("narrow samples " + ' '.join(narrow_samples))
 
 
 control_samples = list(sorted(control_samples))
