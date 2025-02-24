@@ -60,7 +60,13 @@ sampledat<-data.frame("SampleID"=samples,"Condition"=condv,"Factor"=markv,"Repli
     
 sampledat$bamReads<-bamdir[match(samples,sub("\\.filtered.bam","",basename(bamdir)))]
 message(sprintf("Provided peak files: %s", unlist(peakdir)))
+##for MACS2, modify input peak files: .xls -> .narrowPeak, .broadPeak
 sampledat$Peaks<-peakdir[match(samples,sub("\\.filtered.+","",basename(peakdir)))]
+if(all(grepl("MACS2",sampledat$Peaks))){
+        #samples should be in the same order
+        sampledat$Peaks[ydat$broad==TRUE]<-gsub(".filtered.BAM_peaks.xls",".filtered.BAM_peaks.broadPeak",sampledat$Peaks[ydat$broad==TRUE])
+        sampledat$Peaks[ydat$broad==FALSE]<-gsub(".filtered.BAM_peaks.xls",".filtered.BAM_peaks.narrowPeak",sampledat$Peaks[ydat$broad==FALSE])
+}
 
 ##annotation -> check for supported genome versions
 message(paste0("Provided genome: ",genome))

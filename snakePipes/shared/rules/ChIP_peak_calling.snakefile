@@ -19,8 +19,7 @@ if pairedEnd:
             frag_size = "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv"
         output:
             peaks = "MACS2/{chip_sample}.filtered.BAM_peaks.xls",
-            peaksPE = "MACS2/{chip_sample}.filtered.BAMPE_peaks.xls",
-            narrowPeak = "MACS2/{chip_sample}.filtered.BAM_peaks.narrowPeak"
+            peaksPE = "MACS2/{chip_sample}.filtered.BAMPE_peaks.xls"
         params:
             broad_calling =
                 lambda wildcards: "--broad " if is_broad(wildcards.chip_sample) else "",
@@ -67,8 +66,7 @@ else:
                 lambda wildcards: "filtered_bam/"+get_control(wildcards.chip_sample)+".filtered.bam" if get_control(wildcards.chip_sample)
                 else []
         output:
-            peaks = "MACS2/{chip_sample}.filtered.BAM_peaks.xls",
-            narrowPeak = "MACS2/{chip_sample}.filtered.BAM_peaks.narrowPeak"
+            peaks = "MACS2/{chip_sample}.filtered.BAM_peaks.xls"
         params:
             genome_size = str(genome_size),
             broad_calling =
@@ -341,10 +339,7 @@ def collectPeaks(caller):
     if caller == "SEACR":
         return expand("SEACR/{chip_sample}.filtered.relaxed.bed", chip_sample=chip_samples)
     elif caller == "MACS2":
-        retlist = expand("MACS2/{chip_sample}.filtered.BAM_peaks.narrowPeak",chip_sample=narrow_samples)
-        if broad_samples:
-            retlist.append(expand("MACS2/{chip_sample}.filtered.BAM_peaks.broadPeak",chip_sample=broad_samples))
-        return retlist
+        return expand("MACS2/{chip_sample}.filtered.BAM_peaks.xls",chip_sample=chip_samples)
     elif caller == "histoneHMM":
         return expand("histoneHMM/{chip_sample}.filtered.histoneHMM-regions.gff",chip_sample=chip_samples)
     elif caller == "Genrich":
