@@ -81,7 +81,7 @@ if( genome %in% supported_annotations){
 
 blist<-ifelse(file.exists(blacklist),blacklist,NULL)
 QC<-ChIPQC(sampledat,annotation=annotation,mapQCth=3,blacklist=blist)
-ChIPQCreport(QC,reportFolder=wdir,facet=FALSE,colourBy="Factor")
+ChIPQCreport(QC,reportFolder=".",facet=FALSE,colourBy="Factor")
 
 sink("sessionInfo.txt")
 sessionInfo()
