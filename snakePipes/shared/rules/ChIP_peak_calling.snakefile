@@ -88,47 +88,6 @@ else:
             {params.broad_calling}
             """
 
-
-
-### MACS2 peak quality control #################################################
-
-rule MACS2_peak_qc:
-    input:
-        bam = "filtered_bam/{sample}.filtered.bam",
-        xls = "MACS2/{sample}.filtered.BAM_peaks.xls"
-    output:
-        qc = "MACS2/{sample}.filtered.BAM_peaks.qc.txt"
-    params:
-        peaks =
-            lambda wildcards: "MACS2/{}.filtered.BAM_peaks.broadPeak".format(wildcards.sample) if is_broad(wildcards.sample)
-                              else "MACS2/{}.filtered.BAM_peaks.narrowPeak".format(wildcards.sample),
-        genome_index = genome_index
-    benchmark:
-        "MACS2/.benchmark/MACS2_peak_qc.{sample}.filtered.benchmark"
-    conda: CONDA_SHARED_ENV
-    shell: """
-        # get the number of peaks
-        peak_count=`wc -l < {params.peaks}`
-
-        # get the number of mapped reads
-        mapped_reads=`samtools view -c -F 4 {input.bam}`
-
-        # calculate the number of alignments overlapping the peaks
-        # exclude reads flagged as unmapped (unmapped reads will be reported when using -L)
-        reads_in_peaks=`samtools view -c -F 4 -L {params.peaks} {input.bam}`
-
-        # calculate Fraction of Reads In Peaks
-        frip=`bc -l <<< "$reads_in_peaks/$mapped_reads"`
-
-        # compute peak genome coverage
-        peak_len=`awk '{{total+=$3-$2}}END{{print total}}' {params.peaks}`
-        genome_size=`awk '{{total+=$3-$2}}END{{printf( "%14d",total) }}' {params.genome_index}`
-        genomecov=`bc -l <<< "$peak_len/$genome_size"`
-
-        # write peak-based QC metrics to output file
-        printf "peak_count\tFRiP\tpeak_genome_coverage\n%d\t%5.3f\t%6.4f\n" $peak_count $frip $genomecov > {output.qc}
-        """
-
 # TODO
 # add joined deepTools plotEnrichment call for all peaks and samples in one plot
 rule namesort_bams:
