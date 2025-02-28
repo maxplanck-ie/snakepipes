@@ -121,7 +121,7 @@ if not isMultipleComparison:
                 blacklist = "-E {}".format(blacklist_bed) if blacklist_bed else "",
                 control_pfx=lambda wildcards,input: "-c" if input.control else "",
                 control=lambda wildcards,input: ",".join(input.control) if input.control else "",
-                ignoreForNorm = "-e " + ','.join(ignoreForNormalization) if ignoreForNormalization else ""
+                ignoreForNorm = "-e " + ','.join(ignoreForNormalization.split()) if ignoreForNormalization else ""
             conda: CONDA_CHIPSEQ_ENV
             shell: """
                 Genrich -t {params.bams} {params.control_pfx} {params.control} -o {output} -r {params.blacklist} {params.ignoreForNorm} -y
@@ -139,7 +139,7 @@ if not isMultipleComparison:
                 control_pfx=lambda wildcards,input: "-c" if input.control else "",
                 control=lambda wildcards,input: ",".join(input.control) if input.control else "",
                 frag_size=fragmentLength,
-                ignoreForNorm = "-e " + ','.join(ignoreForNormalization) if ignoreForNormalization else ""
+                ignoreForNorm = "-e " + ','.join(ignoreForNormalization.split()) if ignoreForNormalization else ""
             conda: CONDA_CHIPSEQ_ENV
             shell: """
                 Genrich -t {params.bams} {params.control_pfx} {params.control} -o {output} -r {params.blacklist} {params.ignoreForNorm} -w {params.frag_size}
@@ -157,7 +157,7 @@ else:
                 blacklist = "-E {}".format(blacklist_bed) if blacklist_bed else "",
                 control_pfx=lambda wildcards,input: "-c" if input.control else "",
                 control=lambda wildcards,input: ",".join(input.control) if input.control else "",
-                ignoreForNorm = "-e " + ','.join(ignoreForNormalization) if ignoreForNormalization else ""
+                ignoreForNorm = "-e " + ','.join(ignoreForNormalization.split()) if ignoreForNormalization else ""
             conda: CONDA_CHIPSEQ_ENV
             shell: """
                 Genrich -t {params.bams} {params.control_pfx} {params.control} -o {output} -r {params.blacklist} {params.ignoreForNorm} -y
@@ -175,7 +175,7 @@ else:
                 control_pfx=lambda wildcards,input: "-c" if input.control else "",
                 control=lambda wildcards,input: ",".join(input.control) if input.control else "",
                 frag_size=fragmentLength,
-                ignoreForNorm = "-e " + ','.join(ignoreForNormalization) if ignoreForNormalization else ""
+                ignoreForNorm = "-e " + ','.join(ignoreForNormalization.split()) if ignoreForNormalization else ""
             conda: CONDA_CHIPSEQ_ENV
             shell: """
                 Genrich -t {params.bams} {params.control_pfx} {params.control} -o {output} -r {params.blacklist} {params.ignoreForNorm} -w {params.frag_size}
