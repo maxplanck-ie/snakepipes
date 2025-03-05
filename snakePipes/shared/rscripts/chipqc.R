@@ -6,6 +6,11 @@ library(ChIPQC)
 library(yaml)
 library(stringr)
 
+
+#options(MulticoreParam=MulticoreParam(workers=8))
+register(MulticoreParam(8))
+message(registered())
+
 bamdir<-unlist(snakemake@params[["bams"]])
 peakdir<-unlist(snakemake@params[["peaks"]])
 genome<-gsub("_.+","",snakemake@params[["genome"]])

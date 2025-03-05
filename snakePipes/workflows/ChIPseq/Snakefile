@@ -213,13 +213,13 @@ def run_seacr():
             file_list.append(expand("SEACR/{chip_sample}_host.{mode}_peaks.qc.txt",chip_sample=chip_samples,mode=["stringent","relaxed"]))
         else:
             file_list = expand("SEACR/{chip_sample}.filtered.{mode}.bed", chip_sample = chip_samples,mode=["stringent"])
-            file_list.append(expand("SEACR/{chip_sample}.filtered.{mode}_peaks.qc.txt",chip_sample=chip_samples,mode=["stringent"]))
+            #file_list.append(expand("SEACR/{chip_sample}.filtered.{mode}_peaks.qc.txt",chip_sample=chip_samples,mode=["stringent"]))
         return (file_list)
     return ([])
 
 
 def run_chipqc():
-    file_list = "{}_chipqc/sessionInfo.txt".format(peakCaller)
+    file_list = "{}_chipqc/sessionInfo.txt".format(peakCaller) if not peakCaller == "Genrich" else []
     return(file_list)
 
 
