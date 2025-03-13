@@ -34,7 +34,7 @@ samples<-ydat$sample
 
 
 #list of supported factors
-markv<-c("H3K4me1","H3K4me2","H3K4me3","H3K27ac","H3K27me3","H3K9me3","H3K36me3","H4K16ac","RAD21","CTCF","MSL2")
+markv<-c("H3K4me1","H3K4me2","H3K4me3","H3K27ac","H3K27me3","H3K9me3","H3K36me3","H4K16ac","RAD21","CTCF","MSL2","BMAL1","CLOCK")
 a<-sapply(markv,function(X)grep(X,samples,ignore.case=TRUE),simplify=TRUE)
 a<-a[!lapply(a,length)<1]
 b<-unlist(a)
@@ -80,13 +80,18 @@ if(all(grepl("MACS2",sampledat$Peaks))){
 ##annotation -> check for supported genome versions
 message(paste0("Provided genome: ",genome))
 supported_annotations<-c("hg19","hg18","mm10","mm9","ce6","dm3")
+extended_annotations<-c("GRCh38","GRCh37","GRCm38","GRCm37","ce6","dm3")
 #modify genome string
 if( genome %in% supported_annotations){
 
     annotation<-genome
 
 
-   } else {stop("No matching annotation was found.")}
+} else if (genome %in% extended_annotations){
+ 
+    annotation<-supported_annotations[grep(genome,extended_annotations)]
+    
+}else {stop("No matching annotation was found.")}
 
 blist<-ifelse(file.exists(blacklist),blacklist,NULL)
 QC<-ChIPQC(sampledat,annotation=annotation,mapQCth=3,blacklist=blist)
