@@ -5,11 +5,12 @@ library(rtracklayer)
 library(ChIPQC)
 library(yaml)
 library(stringr)
+library(purrr)
 
 
 #options(MulticoreParam=MulticoreParam(workers=8))
 register(MulticoreParam(8))
-message(registered())
+registered()$MulticoreParam
 
 bamdir<-unlist(snakemake@params[["bams"]])
 peakdir<-unlist(snakemake@params[["peaks"]])
@@ -23,14 +24,17 @@ setwd(wdir)
 sampleSheet<-snakemake@input[["sampleSheet"]]
 
 #take samples,marks,replicates from chipdict
+
 yaml<-read_yaml(chipdict,as.named.list=TRUE)
-ydat<-as.data.frame(do.call(rbind,lapply(yaml,as.data.frame)))
+ydat<-as.data.frame(t(map_df(transpose(yaml), ~map_chr(.,~ifelse(is.null(.),NA,.)))))
+colnames(ydat)<-c("control","broad")
+ydat$broad[is.na(ydat$broad)]<-FALSE
 ydat$sample<-rownames(ydat)
 samples<-ydat$sample
 
 
 #list of supported factors
-markv<-c("H3K4me1","H3K4me2","H3K4me3","H3K27ac","H3K27me3","H3K9me3","H3K36me3","H4K16ac","RAD21","CTCF")
+markv<-c("H3K4me1","H3K4me2","H3K4me3","H3K27ac","H3K27me3","H3K9me3","H3K36me3","H4K16ac","RAD21","CTCF","MSL2")
 a<-sapply(markv,function(X)grep(X,samples,ignore.case=TRUE),simplify=TRUE)
 a<-a[!lapply(a,length)<1]
 b<-unlist(a)

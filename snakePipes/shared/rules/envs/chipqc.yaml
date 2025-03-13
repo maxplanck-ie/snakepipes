@@ -8,3 +8,4 @@ dependencies:
  - bioconductor-chipqc
  - r-yaml
  - r-stringr
+ - r-purrr
