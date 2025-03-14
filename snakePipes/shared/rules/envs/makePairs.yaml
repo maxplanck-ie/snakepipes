@@ -3,12 +3,14 @@ channels:
   - conda-forge
   - bioconda
 dependencies:
-  - bwa
-  - cooler
-  - samtools
-  - tabix
-  - bcftools
-  - pairtools==1.1
-  - pip
-  - pip:
-      - git+https://github.com/open2c/MultiQC.git
+  - bwa == 0.7.18
+  - samtools == 1.20
+  - tabix == 1.20
+  - bcftools == 1.20
+  - fastp == 0.23.4
+  - pairtools == 1.1
+  - cooler == 0.10.2
+  - cooltools == 0.7.0
+  - hicexplorer == 3.7.5
+  - python >= 3.10
+  - multiqc >= 1.24
