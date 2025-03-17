@@ -199,7 +199,7 @@ def run_macs2():
     if peakCaller == "MACS2":
         if useSpikeInForNorm:
             file_list = expand("MACS2/{chip_sample}_host.BAM_peaks.xls", chip_sample = chip_samples)
-            file_list.extend(expand("MACS2/{chip_sample}_host.BAM_peaks.qc.txt", chip_sample = chip_samples))
+            #file_list.extend(expand("MACS2/{chip_sample}_host.BAM_peaks.qc.txt", chip_sample = chip_samples))
         else:
             file_list = expand("MACS2/{chip_sample}.filtered.BAM_peaks.xls", chip_sample = chip_samples)
         return (file_list)
@@ -209,11 +209,10 @@ def run_macs2():
 def run_seacr():
     if (peakCaller == "SEACR"):
         if useSpikeInForNorm:
-            file_list = expand("SEACR/{chip_sample}_host.{mode}.bed", chip_sample = chip_samples,mode=["stringent","relaxed"])
-            file_list.append(expand("SEACR/{chip_sample}_host.{mode}_peaks.qc.txt",chip_sample=chip_samples,mode=["stringent","relaxed"]))
+            file_list = expand("SEACR/{chip_sample}_host.{mode}.bed", chip_sample = chip_samples,mode=["stringent"])
+            #file_list.append(expand("SEACR/{chip_sample}_host.{mode}_peaks.qc.txt",chip_sample=chip_samples,mode=["stringent"]))
         else:
             file_list = expand("SEACR/{chip_sample}.filtered.{mode}.bed", chip_sample = chip_samples,mode=["stringent"])
-            #file_list.append(expand("SEACR/{chip_sample}.filtered.{mode}_peaks.qc.txt",chip_sample=chip_samples,mode=["stringent"]))
         return (file_list)
     return ([])
 
