@@ -217,8 +217,8 @@ def collectPeaks(caller):
         return expand("SEACR/{chip_sample}.filtered.stringent.bed", chip_sample=chip_samples)
     elif caller == "MACS2":
         return expand("MACS2/{chip_sample}.filtered.BAM_peaks.xls",chip_sample=chip_samples)
-    elif caller == "histoneHMM":
-        return expand("histoneHMM/{chip_sample}.filtered.histoneHMM-regions.gff",chip_sample=chip_samples)
+    #elif caller == "histoneHMM":
+    #    return expand("histoneHMM/{chip_sample}.filtered.histoneHMM-regions.gff",chip_sample=chip_samples)
     elif caller == "Genrich":
         return expand("Genrich/{group}.narrowPeak",group=genrichDict.keys())
 
@@ -241,5 +241,26 @@ rule chipqc:
     threads: 8
     benchmark:
         "{}_chipqc/.benchmark/chipqc.benchmark".format(peakCaller)
+    conda: CONDA_CHIPQC_ENV
+    script: "../rscripts/chipqc.R"
+
+
+rule histoneHMM_chipqc:
+    input:
+        bams = expand("filtered_bam/{broad_sample}.filtered.bam",broad_sample=broad_samples),
+        peaks = expand("histoneHMM/{broad_sample}.filtered.histoneHMM-regions.gff",broad_sample=broad_samples),
+        sampleSheet = sampleSheet if sampleSheet else [],
+        chipdict = os.path.join(outdir,"chip_samples.yaml")
+    output:
+        "histoneHMM_chipqc/sessionInfo.txt"
+    params:
+        genome = genome,
+        outdir = "histoneHMM_chipqc",
+        blacklist = blacklist_bed,
+        bams = lambda wildcards,input: [os.path.join(outdir,x) for x in input.bams],
+        peaks = lambda wildcards,input: [os.path.join(outdir,x) for x in input.peaks]
+    threads: 8
+    benchmark:
+        "histoneHMM_chipqc/.benchmark/chipqc.benchmark"
     conda: CONDA_CHIPQC_ENV
     script: "../rscripts/chipqc.R"
