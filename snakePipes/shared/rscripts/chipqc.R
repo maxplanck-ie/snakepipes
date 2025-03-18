@@ -77,6 +77,7 @@ if(all(grepl("MACS2",sampledat$Peaks))){
         sampledat$Peaks[ydat$broad==FALSE]<-gsub(".filtered.BAM_peaks.xls",".filtered.BAM_peaks.narrowPeak",sampledat$Peaks[ydat$broad==FALSE])
 }
 
+
 ##annotation -> check for supported genome versions
 message(paste0("Provided genome: ",genome))
 supported_annotations<-c("hg19","hg18","mm10","mm9","ce6","dm3")

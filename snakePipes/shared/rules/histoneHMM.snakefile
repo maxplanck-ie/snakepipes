@@ -54,6 +54,38 @@ rule format_HMM_output:
         format_HMM_output(input.txt,output.txt)
 
 
+rule cleanup_histoneHMM:
+    input:
+        peaks = "histoneHMM/{sample}.filtered.histoneHMM-regions.gff"
+    output:
+        peaks = "histoneHMM/{sample}_avgp0.5.gff"
+    params:
+        outdir= "histoneHMM"
+    conda: CONDA_CHIPQC_ENV
+    script: "../rscripts/clean_histoneHMM_result.R"
+
+
+rule histoneHMM_chipqc:
+    input:
+        bams = expand("filtered_bam/{broad_sample}.filtered.bam",broad_sample=broad_samples),
+        peaks = expand("histoneHMM/{broad_sample}_avgp0.5.gff",broad_sample=broad_samples),
+        sampleSheet = sampleSheet if sampleSheet else [],
+        chipdict = os.path.join(outdir,"chip_samples.yaml")
+    output:
+        "histoneHMM_chipqc/sessionInfo.txt"
+    params:
+        genome = genome,
+        outdir = "histoneHMM_chipqc",
+        blacklist = blacklist_bed,
+        bams = lambda wildcards,input: [os.path.join(outdir,x) for x in input.bams],
+        peaks = lambda wildcards,input: [os.path.join(outdir,x) for x in input.peaks]
+    threads: 8
+    benchmark:
+        "histoneHMM_chipqc/.benchmark/chipqc.benchmark"
+    conda: CONDA_CHIPQC_ENV
+    script: "../rscripts/chipqc.R"
+
+
 ### compress and index GFF result file from histoneHMM for usage with IGV ######
 ### compress txt result files to save space ####################################
 rule histoneHMM_out_gz:

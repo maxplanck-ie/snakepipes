@@ -76,6 +76,7 @@ def run_histoneHMM(allele_info): # TODO what is a good practice for broad peaks 
     if not allele_info:
         ## run histoneHMM broad enrichment calling only for samples annotated as *broad*
         file_list = expand("histoneHMM/{chip_sample}.filtered.histoneHMM-regions.gff.gz", chip_sample = [s for s in chip_samples if is_broad(s)])
+        file_list.append("histoneHMM_chipqc/sessionInfo.txt")
     else:
         file_list = []
     return(file_list)
