@@ -21,6 +21,11 @@ chipdict<-snakemake@input[["chipdict"]]
 
 setwd(wdir)
 
+spikein<-toupper(snakemake@params[["useSpikeinForNorm"]])
+if(spikein){
+    ms<-"filtered"}else{ms<-"host"}
+
+
 sampleSheet<-snakemake@input[["sampleSheet"]]
 
 #take samples,marks,replicates from the union of narrow samples and broad samples
@@ -69,7 +74,7 @@ sampledat<-data.frame("SampleID"=samples,"Condition"=condv,"Factor"=markv,"Repli
 
 #ensure that samples,bamdir and peakdir are in the same order!
     
-sampledat$bamReads<-bamdir[match(samples,sub("\\.filtered.bam","",basename(bamdir)))]
+sampledat$bamReads<-bamdir[match(samples,sub(paste0("\\.",ms,".bam"),"",basename(bamdir)))]
 message(sprintf("Provided peak files: %s", unlist(peakdir)))
 ##for MACS2, modify input peak files: .xls -> .narrowPeak, .broadPeak
 if(all(grepl("histoneHMM",peakdir))){
@@ -81,8 +86,8 @@ sampledat$PeakFormat<-"bed"
 if(all(grepl("MACS2",sampledat$Peaks))){
         
         #samples should be in the same order
-        sampledat$Peaks[ydat$broad==TRUE]<-gsub(".filtered.BAM_peaks.xls",".filtered.BAM_peaks.broadPeak",sampledat$Peaks[ydat$broad==TRUE])
-        sampledat$Peaks[ydat$broad==FALSE]<-gsub(".filtered.BAM_peaks.xls",".filtered.BAM_peaks.narrowPeak",sampledat$Peaks[ydat$broad==FALSE])
+        sampledat$Peaks[ydat$broad==TRUE]<-gsub(paste0(".",ms,".BAM_peaks.xls"),paste0(".",ms,".BAM_peaks.broadPeak"),sampledat$Peaks[ydat$broad==TRUE])
+        sampledat$Peaks[ydat$broad==FALSE]<-gsub(paste0(".",ms,".BAM_peaks.xls"),paste0(".",ms,".BAM_peaks.narrowPeak"),sampledat$Peaks[ydat$broad==FALSE])
         sampledat$PeakFormat[ydat$broad==FALSE]<-"narrow"
         sampledat$PeakCaller[ydat$broad==FALSE]<-"narrow"
 }

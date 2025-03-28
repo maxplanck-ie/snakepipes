@@ -239,7 +239,8 @@ rule chipqc:
         bams = lambda wildcards,input: [os.path.join(outdir,x) for x in input.bams],
         peaks = lambda wildcards,input: [os.path.join(outdir,x) for x in input.peaks],
         narrow_samples = narrow_samples,
-        broad_samples = broad_samples
+        broad_samples = broad_samples,
+        useSpikeinForNorm = useSpikeinForNorm
     threads: 8
     benchmark:
         "{}_chipqc/.benchmark/chipqc.benchmark".format(peakCaller)
