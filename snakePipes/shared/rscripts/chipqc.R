@@ -23,15 +23,16 @@ setwd(wdir)
 
 sampleSheet<-snakemake@input[["sampleSheet"]]
 
-#take samples,marks,replicates from chipdict
+#take samples,marks,replicates from the union of narrow samples and broad samples
 
-yaml<-read_yaml(chipdict,as.named.list=TRUE)
-ydat<-as.data.frame(t(map_df(transpose(yaml), ~map_chr(.,~ifelse(is.null(.),NA,.)))))
-colnames(ydat)<-c("control","broad")
-ydat$broad[is.na(ydat$broad)]<-FALSE
-ydat$sample<-rownames(ydat)
-samples<-ydat$sample
+#yaml<-read_yaml(chipdict,as.named.list=TRUE) #not used due to buggy conversion of yaml -> list with NULL entries -> data.frame: all-NULL entries are dropped entirely
+narrow_samples<-unlist(snakemake@params[["narrow_samples"]])
+broad_samples<-unlist(snakemake@params[["broad_samples"]])
+samples<-c(narrow_samples,broad_samples)
+ydat<-data.frame("sample"=samples,"broad"=c(rep(FALSE,length(narrow_samples)),rep(TRUE,length(broad_samples))))
+rownames(ydat)<-ydat$sample
 
+ydat
 
 #list of supported factors
 markv<-c("H3K4me1","H3K4me2","H3K4me3","H3K27ac","H3K27me3","H3K9me3","H3K36me3","H4K16ac","RAD21","CTCF","MSL2","BMAL1","CLOCK")
@@ -63,6 +64,7 @@ if (!is.null(sampleSheet)){
   condv<-rep("All",length(samples))
 }
 
+
 sampledat<-data.frame("SampleID"=samples,"Condition"=condv,"Factor"=markv,"Replicate"=repv)
 
 #ensure that samples,bamdir and peakdir are in the same order!
@@ -70,13 +72,22 @@ sampledat<-data.frame("SampleID"=samples,"Condition"=condv,"Factor"=markv,"Repli
 sampledat$bamReads<-bamdir[match(samples,sub("\\.filtered.bam","",basename(bamdir)))]
 message(sprintf("Provided peak files: %s", unlist(peakdir)))
 ##for MACS2, modify input peak files: .xls -> .narrowPeak, .broadPeak
-sampledat$Peaks<-peakdir[match(samples,sub("\\.filtered.+","",basename(peakdir)))]
+if(all(grepl("histoneHMM",peakdir))){
+sampledat$Peaks<-peakdir[match(samples,sub("_avgp0.5.gff","",basename(peakdir)))]
+}else{sampledat$Peaks<-peakdir[match(samples,sub("\\.filtered.+","",basename(peakdir)))]}
+
+sampledat$PeakCaller<-"bed"
+sampledat$PeakFormat<-"bed"	
 if(all(grepl("MACS2",sampledat$Peaks))){
+        
         #samples should be in the same order
         sampledat$Peaks[ydat$broad==TRUE]<-gsub(".filtered.BAM_peaks.xls",".filtered.BAM_peaks.broadPeak",sampledat$Peaks[ydat$broad==TRUE])
         sampledat$Peaks[ydat$broad==FALSE]<-gsub(".filtered.BAM_peaks.xls",".filtered.BAM_peaks.narrowPeak",sampledat$Peaks[ydat$broad==FALSE])
+        sampledat$PeakFormat[ydat$broad==FALSE]<-"narrow"
+        sampledat$PeakCaller[ydat$broad==FALSE]<-"narrow"
 }
 
+sampledat
 
 ##annotation -> check for supported genome versions
 message(paste0("Provided genome: ",genome))
@@ -86,15 +97,16 @@ extended_annotations<-c("GRCh38","GRCh37","GRCm38","GRCm37","ce6","dm3")
 if( genome %in% supported_annotations){
 
     annotation<-genome
-
-
 } else if (genome %in% extended_annotations){
  
     annotation<-supported_annotations[grep(genome,extended_annotations)]
     
 }else {stop("No matching annotation was found.")}
 
-blist<-ifelse(file.exists(blacklist),blacklist,NULL)
+if(file.exists(blacklist)){
+    blist<-blacklist}else{blist<-NULL}
+
+message(paste0("Using blacklist: ",blist))
 QC<-ChIPQC(sampledat,annotation=annotation,mapQCth=3,blacklist=blist)
 ChIPQCreport(QC,reportFolder=".",facet=FALSE,colourBy="Factor")
 

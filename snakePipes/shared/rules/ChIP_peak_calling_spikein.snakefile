@@ -358,7 +358,9 @@ rule chipqc:
         outdir = "{}_chipqc".format(peakCaller),
         blacklist = blacklist_bed,
         bams = lambda wildcards,input: [os.path.join(outdir,x) for x in input.bams],
-        peaks = lambda wildcards,input: [os.path.join(outdir,x) for x in input.peaks]
+        peaks = lambda wildcards,input: [os.path.join(outdir,x) for x in input.peaks],
+        narrow_samples = narrow_samples,
+        broad_samples = broad_samples
     threads: 8
     benchmark:
         "{}_chipqc/.benchmark/chipqc.benchmark".format(peakCaller)

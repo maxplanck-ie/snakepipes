@@ -3,7 +3,7 @@ library(GenomicRanges)
 wdir <- snakemake@params[["outdir"]]
 setwd(wdir)
 
-input_peaks <- snakemake@input[["peaks"]]
+input_peaks <- snakemake@params[["input_peaks"]]
 
 reslist<-lapply(input_peaks,function(X)rtracklayer::import.gff(X))
 names(reslist)<-gsub(".filtered.histoneHMM-regions.gff","",basename(input_peaks))
