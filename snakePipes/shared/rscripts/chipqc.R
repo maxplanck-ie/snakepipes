@@ -22,8 +22,9 @@ chipdict<-snakemake@input[["chipdict"]]
 setwd(wdir)
 
 spikein<-toupper(snakemake@params[["useSpikeinForNorm"]])
+message(paste0("useSpikeinForNorm is set to: ",spikein))
 if(spikein){
-    ms<-"filtered"}else{ms<-"host"}
+    ms<-"host"}else{ms<-"filtered"}
 
 
 sampleSheet<-snakemake@input[["sampleSheet"]]
@@ -78,7 +79,7 @@ sampledat$bamReads<-bamdir[match(samples,sub(paste0("\\.",ms,".bam"),"",basename
 message(sprintf("Provided peak files: %s", unlist(peakdir)))
 ##for MACS2, modify input peak files: .xls -> .narrowPeak, .broadPeak
 if(all(grepl("histoneHMM",peakdir))){
-sampledat$Peaks<-peakdir[match(samples,sub("_avgp0.5.gff","",basename(peakdir)))]
+sampledat$Peaks<-peakdir[match(samples,sub("_avgp0.5.bed","",basename(peakdir)))]
 }else{sampledat$Peaks<-peakdir[match(samples,sub("\\.filtered.+","",basename(peakdir)))]}
 
 sampledat$PeakCaller<-"bed"

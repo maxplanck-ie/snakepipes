@@ -82,7 +82,8 @@ rule histoneHMM_chipqc:
         bams = lambda wildcards,input: [os.path.join(outdir,x) for x in input.bams],
         peaks = lambda wildcards,input: [os.path.join(outdir,x) for x in input.peaks],
         narrow_samples = [],
-        broad_samples = broad_samples
+        broad_samples = broad_samples,
+        useSpikeinForNorm = useSpikeInForNorm
     threads: 8
     benchmark:
         "histoneHMM_chipqc/.benchmark/chipqc.benchmark"
