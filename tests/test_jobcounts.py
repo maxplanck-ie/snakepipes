@@ -566,7 +566,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 59
+        assert parseSpOut(_p) == 55
     def test_nosamplesheet(self, ifs):
         ci = [
             "ChIPseq",
@@ -580,7 +580,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 37
+        assert parseSpOut(_p) == 33
     def test_nosamplesheet_genrich(self, ifs):
         ci = [
             "ChIPseq",
@@ -596,7 +596,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 35
+        assert parseSpOut(_p) == 36
     def test_broad(self, ifs):
         ci = [
             "ChIPseq",
@@ -612,7 +612,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 77
+        assert parseSpOut(_p) == 79
     def test_genrich(self, ifs):
         ci = [
             "ChIPseq",
@@ -630,7 +630,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 56
+        assert parseSpOut(_p) == 57
     def test_seacr(self, ifs):
         ci = [
             "ChIPseq",
@@ -648,7 +648,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 89
+        assert parseSpOut(_p) == 73
     def test_seacr_spikein(self, ifs):
         ci = [
             "ChIPseq",
@@ -667,7 +667,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 130
+        assert parseSpOut(_p) == 114
     def test_SE(self, ifs):
         ci = [
             "ChIPseq",
@@ -684,7 +684,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 59
+        assert parseSpOut(_p) == 55
     def test_l2ratio(self, ifs):
         ci = [
             "ChIPseq",
@@ -702,7 +702,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 53
+        assert parseSpOut(_p) == 49
     def test_default_noInput(self, ifs):
         ci = [
             "ChIPseq",
@@ -718,7 +718,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 38
+        assert parseSpOut(_p) == 34
     def test_genrich_noInput(self, ifs):
         ci = [
             "ChIPseq",
@@ -736,7 +736,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 32
+        assert parseSpOut(_p) == 33
     def test_seacr_noInput(self, ifs):
         ci = [
             "ChIPseq",
@@ -754,7 +754,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 62
+        assert parseSpOut(_p) == 46
     def test_seacr_spikein_noInput(self, ifs):
         ci = [
             "ChIPseq",
@@ -773,7 +773,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 83
+        assert parseSpOut(_p) == 67
     def test_frombam(self, ifs):
         ci = [
             "ChIPseq",
@@ -791,7 +791,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 119
+        assert parseSpOut(_p) == 115
     def test_frombam_noInput(self, ifs):
         ci = [
             "ChIPseq",
@@ -809,7 +809,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 80
+        assert parseSpOut(_p) == 76
     def test_spikein(self, ifs):
         ci = [
             "ChIPseq",
@@ -826,7 +826,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 106
+        assert parseSpOut(_p) == 102
     def test_spikein_noInput(self, ifs):
         ci = [
             "ChIPseq",
@@ -843,7 +843,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 65
+        assert parseSpOut(_p) == 61
     def test_spikeinfrombam(self, ifs):
         ci = [
             "ChIPseq",
@@ -862,7 +862,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 142
+        assert parseSpOut(_p) == 138
     def test_spikeinfrombamTSSnorm(self, ifs):
         ci = [
             "ChIPseq",
@@ -883,7 +883,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 118
+        assert parseSpOut(_p) == 114
     def test_spikeinfrombaminputnorm(self, ifs):
         ci = [
             "ChIPseq",
@@ -904,7 +904,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 115
+        assert parseSpOut(_p) == 111
     def test_allelic(self, ifs):
         ci = [
             "ChIPseq",
@@ -920,7 +920,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 37
+        assert parseSpOut(_p) == 34
     def test_multicomp(self, ifs):
         ci = [
             "ChIPseq",
@@ -936,7 +936,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 81
+        assert parseSpOut(_p) == 77
     def test_multicomp_genrich(self, ifs):
         ci = [
             "ChIPseq",
@@ -954,7 +954,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 82
+        assert parseSpOut(_p) == 83
     def test_multicomp_broad(self, ifs):
         ci = [
             "ChIPseq",
@@ -970,7 +970,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 99
+        assert parseSpOut(_p) == 101
     def test_multicomp_fromBam(self, ifs):
         ci = [
             "ChIPseq",
@@ -988,7 +988,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 141
+        assert parseSpOut(_p) == 137
     def test_multicomp_fromBam_Genrich(self, ifs):
         ci = [
             "ChIPseq",
@@ -1008,7 +1008,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 142
+        assert parseSpOut(_p) == 143
     def test_multicomp_spikein(self, ifs):
         ci = [
             "ChIPseq",
@@ -1025,7 +1025,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 126
+        assert parseSpOut(_p) == 122
     def test_multicomp_spikein_genrich(self, ifs):
         ci = [
             "ChIPseq",
@@ -1044,7 +1044,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 127
+        assert parseSpOut(_p) == 128
     def test_multicomp_spikein_noInput(self, ifs):
         ci = [
             "ChIPseq",
@@ -1061,7 +1061,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 81
+        assert parseSpOut(_p) == 77
     def test_multicomp_spikein_noInput_Genrich(self, ifs):
         ci = [
             "ChIPseq",
@@ -1080,7 +1080,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 79
+        assert parseSpOut(_p) == 80
     def test_multicomp_spikein_fromBam(self, ifs):
         ci = [
             "ChIPseq",
@@ -1099,7 +1099,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 162
+        assert parseSpOut(_p) == 158
     def test_multicomp_spikein_fromBam_genrich(self, ifs):
         ci = [
             "ChIPseq",
@@ -1120,7 +1120,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 163
+        assert parseSpOut(_p) == 164
     def test_multicomp_spikein_fromBam_noInput(self, ifs):
         ci = [
             "ChIPseq",
@@ -1139,7 +1139,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 105
+        assert parseSpOut(_p) == 101
     def test_multicomp_spikein_fromBam_noInput_genrich(self, ifs):
         ci = [
             "ChIPseq",
@@ -1160,7 +1160,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 103
+        assert parseSpOut(_p) == 104
     def test_multicomp_fromBam_noInput_SEACR(self, ifs):
         ci = [
             "ChIPseq",
@@ -1180,7 +1180,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 120
+        assert parseSpOut(_p) == 104
 
 class TestmRNAseq:
     def test_default(self, ifs):
