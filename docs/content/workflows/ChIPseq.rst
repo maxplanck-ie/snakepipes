@@ -163,41 +163,28 @@ Understanding the outputs
 The ChIPseq pipeline will generate additional output as follows::
 
     .
+    ├── AnnotatedResults_MACS2_diffChIP_k4me3
+    ├── Annotation
+    ├── bamCoverage
+    ├── CSAW_MACS2_diffChIP_k4me3
     ├── deepTools_ChIP
     │   ├── bamCompare
-    │   │   ├── sample1.filtered.log2ratio.over_SRR6761502.bw
-    │   │   ├── sample1.filtered.subtract.SRR6761502.bw
-    │   │   ├── sample2.filtered.log2ratio.over_SRR6761502.bw
-    │   │   └── sample2.filtered.subtract.SRR6761502.bw
     │   └── plotFingerprint
-    │       ├── plotFingerprint.metrics.txt
-    │       └── plotFingerprint.png
+    ├── deepTools_qc
+    │   ├── bamPEFragmentSize
+    │   ├── estimateReadFiltering
+    │   ├── multiBamSummary
+    │   ├── plotCorrelation
+    │   ├── plotCoverage
+    │   └── plotPCA
+    ├── filtered_bam
     ├── histoneHMM
-    │   ├── sample2.filtered.histoneHMM-em-posterior.txt.gz
-    │   ├── sample2.filtered.histoneHMM-regions.gff.gz
-    │   ├── sample2.filtered.histoneHMM-regions.gff.gz.tbi
-    │   ├── sample2.filtered.histoneHMM.txt.gz
-    │   ├── sample2.filtered.histoneHMM-zinba-emfit.pdf
-    │   ├── sample2.filtered.histoneHMM-zinba-params-em.RData
-    │   └── sample2.filtered.histoneHMM-zinba-params-em.txt
-    ├── Genrich
-    │   └── sample2.narrowPeak
-    └── MACS2
-        ├── sample1.filtered.BAM_peaks.narrowPeak
-        ├── sample1.filtered.BAM_peaks.qc.txt
-        ├── sample1.filtered.BAM_peaks.xls
-        ├── sample1.filtered.BAMPE_peaks.narrowPeak
-        ├── sample1.filtered.BAMPE_peaks.xls
-        ├── sample1.filtered.BAMPE_summits.bed
-        ├── sample1.filtered.BAM_summits.bed
-        ├── sample2.filtered.BAM_peaks.broadPeak
-        ├── sample2.filtered.BAM_peaks.gappedPeak
-        ├── sample2.filtered.BAM_peaks.qc.txt
-        ├── sample2.filtered.BAM_peaks.xls
-        ├── sample2.filtered.BAMPE_peaks.broadPeak
-        ├── sample2.filtered.BAMPE_peaks.gappedPeak
-        └── sample2.filtered.BAMPE_peaks.xls
-    
+    ├── histoneHMM_chipqc
+    ├── logs
+    ├── MACS2
+    ├── MACS2_chipqc
+    ├── QC_report
+    ├── Sambamba
 
 
 Following up on the DNAmapping module results (see :doc:`DNAmapping`), the workflow produces the following output directories :
@@ -206,12 +193,16 @@ Following up on the DNAmapping module results (see :doc:`DNAmapping`), the workf
 
 * **Genrich**: This folder contains the output of `Genrich <https://github.com/jsh58/Genrich>`__. This will only exist IF you specified ``--peakCaller Genrich`` and you have samples with non-broad peaks. The output is in narrowPeak format, like that from MACS2.
 
-* **MACS2**: This folder contains the output of `MACS2 <https://github.com/taoliu/MACS>`__ on the ChIP samples, MACS2 would perform either a **narrow** or **broad** peak calling on the samples, as indicated by the ChIP sample configuration file (see :ref:`ChIPconfig`). The outputs files would contain the respective tags (**narrowPeak** or **broadPeak**). This folder will only exist if you have non-broad marks and use MACS2 for peak calling
+* **MACS2**: This folder contains the output of `MACS2 <https://github.com/taoliu/MACS>`__ on the ChIP samples, MACS2 would perform either a **narrow** or **broad** peak calling on the samples, as indicated by the ChIP sample configuration file (see :ref:`ChIPconfig`). The outputs files would contain the respective tags (**narrowPeak** or **broadPeak**). This folder will only exist if you have non-broad marks and use MACS2 for peak calling (default).
+
+* **MACS2_chipqc**: This folder contains the output of `ChIPQC <https://bioconductor.org/packages/release/bioc/vignettes/ChIPQC/inst/doc/ChIPQC.pdf>`__ analysis of the peaks called by MACS2. If you used a different peak caller, a chipqc output folder with the peak caller in its name will be listed.
 
 * **histoneHMM**: This folder contains the output of `histoneHMM <https://github.com/matthiasheinig/histoneHMM>`__. This folder will only exist if you have broad marks.
 
-* **CSAW_sampleSheet**: This folder is created optionally, if you provide a sample sheet for differential binding analysis. (see :ref:`diffBinding`) CSAW will be run using peaks called by the chosen peak caller, and the output folder will be named accordingly.
-* **AnnotatedResults_sampleSheet**: This folder is created optionally, if you provide a sample sheet for differential binding analysis. (see :ref:`diffBinding`). Differentially bound regions annotated with distance to nearest gene are stored here.
+* **histoneHMM_chipqc**: This folder contains the output of `ChIPQC <https://bioconductor.org/packages/release/bioc/vignettes/ChIPQC/inst/doc/ChIPQC.pdf>`__ analysis of the peaks called by histoneHMM. This folder will only exist if you have broad marks.
+
+* **CSAW_peakCaller_sampleSheet**: This folder is created optionally, if you provide a sample sheet for differential binding analysis. (see :ref:`diffBinding`) CSAW will be run using peaks called by the chosen peak caller, and the output folder will be named accordingly.
+* **AnnotatedResults_peakCaller_sampleSheet**: This folder is created optionally, if you provide a sample sheet for differential binding analysis. (see :ref:`diffBinding`). Differentially bound regions annotated with distance to nearest gene are stored here.
 
 .. note:: Although in case of broad marks, we also perform the MACS2 `broadpeak` analysis (output available as ``MACS2/<sample>.filtered.BAM_peaks.broadPeak``), we would recommend using the histoneHMM outputs in these cases, since histoneHMM produces better results than MACS2 for broad peaks.
 
