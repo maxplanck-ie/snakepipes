@@ -217,8 +217,6 @@ def collectPeaks(caller):
         return expand("SEACR/{chip_sample}.filtered.stringent.bed", chip_sample=chip_samples)
     elif caller == "MACS2":
         return expand("MACS2/{chip_sample}.filtered.BAM_peaks.xls",chip_sample=chip_samples)
-    #elif caller == "histoneHMM":
-    #    return expand("histoneHMM/{chip_sample}.filtered.histoneHMM-regions.gff",chip_sample=chip_samples)
     elif caller == "Genrich":
         return expand("Genrich/{group}.narrowPeak",group=genrichDict.keys())
 
