@@ -7,7 +7,7 @@ def get_outdir(folder_name,sampleSheet):
 ## DESeq2 (on featureCounts)
 rule DESeq2:
     input:
-        counts_table = lambda wildcards : "featureCounts/counts_allelic.tsv" if 'allelic-mapping' in mode or "allelic-counting" in mode else "featureCounts/counts.tsv",
+        counts_table = lambda wildcards : "featureCounts/counts_allelic.tsv" if 'allelic-mapping' in mode or 'allelic-counting' in mode or 'allelic-whatshap' in mode else "featureCounts/counts.tsv",
         sampleSheet = sampleSheet,
         symbol_file = "Annotation/genes.filtered.symbol" #get_symbol_file
     output:
@@ -20,7 +20,7 @@ rule DESeq2:
         outdir = get_outdir("DESeq2",sampleSheet),
         fdr = fdr,
         importfunc = os.path.join(maindir, "shared", "rscripts", "DE_functions.R"),
-        allele_info = lambda wildcards : 'TRUE' if 'allelic-mapping' in mode or "allelic-counting" in mode else 'FALSE',
+        allele_info = lambda wildcards : 'TRUE' if 'allelic-mapping' in mode or 'allelic-counting' in mode or 'allelic-whatshap' in mode else 'FALSE',
         tx2gene_file = 'NA',
         rmdTemplate = os.path.join(maindir, "shared", "rscripts", "DESeq2Report.Rmd"),
         formula = config["formula"],
@@ -42,6 +42,7 @@ rule DESeq2_Salmon_basic:
         "{}/.benchmark/DESeq2.Salmon.benchmark".format(get_outdir("DESeq2_Salmon",sampleSheet))
     params:
         script=os.path.join(maindir, "shared", "rscripts", "DESeq2.R"),
+        sampleSheet = lambda wildcards,input: input.sampleSheet,
         outdir = get_outdir("DESeq2_Salmon",sampleSheet),
         fdr = fdr,
         importfunc = os.path.join(maindir, "shared", "rscripts", "DE_functions.R"),
@@ -67,6 +68,7 @@ rule DESeq2_Salmon_allelic:
         "{}/.benchmark/DESeq2.SalmonAllelic.benchmark".format(get_outdir("DESeq2_SalmonAllelic",sampleSheet))
     params:
         script=os.path.join(maindir, "shared", "rscripts", "DESeq2.R"),
+        sampleSheet = lambda wildcards,input: input.sampleSheet,
         outdir = get_outdir("DESeq2_SalmonAllelic",sampleSheet),
         fdr = fdr,
         importfunc = os.path.join(maindir, "shared", "rscripts", "DE_functions.R"),

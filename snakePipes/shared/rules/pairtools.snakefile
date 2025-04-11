@@ -159,6 +159,7 @@ rule multiqc:
     shell:
         """
         multiqc \
+            -f \
             --module pairtools \
             --module fastqc \
             --module fastp \

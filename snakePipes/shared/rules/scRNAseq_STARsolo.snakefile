@@ -80,6 +80,14 @@ rule STARsolo_report:
     script: "../rscripts/scRNAseq_report.R"
 
 
+rule index_bam:
+    input: aligner+"/{sample}.sorted.bam"
+    output: aligner+"/{sample}.sorted.bam.bai"
+    conda: CONDA_SAMBAMBA_ENV
+    shell: """
+        sambamba index {input}
+        """
+
 rule filter_bam:
     input:
         bamfile = aligner+"/{sample}.sorted.bam",
@@ -217,25 +225,21 @@ if not skipVelocyto:
                 rm -rf $MYTEMP
         """
 
-    rule combine_loom:
-        input: expand("VelocytoCounts/{sample}",sample=samples)
-        output: "VelocytoCounts_merged/merged.loom"
-        conda: CONDA_loompy_ENV
-        params:
-            outfile = outdir+"/VelocytoCounts_merged/merged.loom",
-            script = maindir+"/shared/tools/loompy_merge.py",
-            input_fp = lambda wildcards,input: [ os.path.join(outdir,f) for f in input ]
-        shell: """
-            python {params.script} -outf {params.outfile} {params.input_fp}
-              """
 
-    #rule velocity_to_seurat:
-    #    input:
-    #        indirs = expand("VelocytoCounts/{sample}",sample=samples)
-    #    output:
-    #        seurat = "Seurat/Velocyto/merged_samples.RDS"
-    #    params:
-    #        wdir = outdir + "/Seurat/Velocyto",
-    #        samples = samples
-    #    conda: CONDA_seurat3_ENV
-    #    script: "../rscripts/scRNAseq_merge_loom.R"
+#deprecate loom combination by loompy - > Seurat4 should be handling it in R
+
+#    def aggregate_input(wildcards):
+#        checkpoint_output = checkpoints.velocyto.get(sample=wildcards.sample).output["outdir"]
+#        return expand("VelocytoCounts/{sample}/{i}.loom",
+#                  i=glob_wildcards(os.path.join(checkpoint_output, "{i}.loom")).i)
+
+#    rule combine_loom:
+#        input: aggregate_input
+#        output: "VelocytoCounts_merged/merged.loom"
+#        conda: CONDA_loompy_ENV
+#        params:
+#            outfile = outdir+"/VelocytoCounts_merged/merged.loom"
+#        run: """
+#            loompy.combine(files={input}, output_file={params.outfile}, key="Accession")
+#              """
+

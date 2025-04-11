@@ -7,7 +7,7 @@ bam_filter_string = "{} {} {}".format("-F 1024" if dedup else "", "-f 2" if prop
 
 rule samtools_filter:
     input:
-        aligner+"/{sample}.bam"
+        aligner+"/{sample}.markdup.bam"
     output:
         bam = temp("filtered_bam/{sample}.filtered.tmp.bam")
     params:

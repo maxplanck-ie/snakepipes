@@ -47,6 +47,9 @@ if not fromBAM:
     ## sambamba
     include:os.path.join(maindir, "shared", "rules", "sambamba.snakefile")
 
+    ## bam filtering
+    include: os.path.join(maindir, "shared", "rules", "bam_filtering.snakefile")
+    
     #umi_tools
     include: os.path.join(maindir, "shared", "rules", "umi_tools.snakefile")
 
@@ -77,6 +80,13 @@ if not fromBAM:
             include: os.path.join(maindir, "shared", "rules", "Salmon_allelic.snakefile")
             include: os.path.join(maindir, "shared", "rules", "sleuth.singleComp.snakefile")
 #            include: os.path.join(maindir, "shared", "rules", "DESeq2.singleComp.snakefile")
+    elif "allelic-whatshap" in mode:
+        include: os.path.join(maindir, "shared", "rules", "RNA_mapping.snakefile")
+        include: os.path.join(maindir, "shared", "rules", "whatshap.snakefile")
+        include: os.path.join(maindir, "shared", "rules", "deepTools_RNA_allelic.snakefile")
+        if "alignment-free" in mode:
+            include: os.path.join(maindir, "shared", "rules", "Salmon_allelic.snakefile")
+            include: os.path.join(maindir, "shared", "rules", "sleuth.singleComp.snakefile")            
     else:
         # HISAT2/STAR
         include: os.path.join(maindir, "shared", "rules", "RNA_mapping.snakefile")
@@ -105,11 +115,13 @@ else:
     elif "allelic-counting" in mode:
         allele_mode = "from_split_bam"
         include: os.path.join(maindir, "shared", "rules", "deepTools_RNA_allelic.snakefile")
-
+    elif "allelic-whatshap" in mode:
+        include: os.path.join(maindir, "shared", "rules", "whatshap.snakefile")
+        include: os.path.join(maindir, "shared", "rules", "deepTools_RNA_allelic.snakefile")
     include: os.path.join(maindir, "shared", "rules", "LinkBam.snakefile")
 
 
-if "allelic-mapping" in mode or "allelic-counting" in mode:
+if "allelic-mapping" in mode or "allelic-counting" in mode or "allelic-whatshap" in mode:
     ## featureCounts_allelic
     include: os.path.join(maindir, "shared", "rules", "featureCounts_allelic.snakefile")
 else:
@@ -167,7 +179,7 @@ def run_Trimming(trim, fastqc):
 
 def run_alignment_free():
     if "alignment-free" in mode:
-        if not "allelic-mapping" in mode:
+        if not "allelic-mapping" in mode and not "allelic-whatshap" in mode:
             file_list = [
             expand("Salmon/{sample}.quant.sf", sample=samples),
             "Salmon/TPM.transcripts.tsv",
@@ -244,7 +256,7 @@ def make_nmasked_genome():
         return([])
 
 def run_allelesp_mapping():
-    if "allelic-mapping" in mode or "allelic-counting" in mode:
+    if "allelic-mapping" in mode or "allelic-counting" in mode or "allelic-whatshap" in mode:
         allele_suffix = ['allele_flagged', 'genome1', 'genome2', 'unassigned']
         file_list = [
         expand("allelic_bams/{sample}.{suffix}.sorted.bam", sample = samples,
@@ -286,7 +298,7 @@ def run_deepTools_qc():
                               "deepTools_qc/plotCorrelation/correlation.pearson.bed_coverage.tsv",
                               "deepTools_qc/plotCorrelation/correlation.spearman.bed_coverage.tsv",
                               "deepTools_qc/plotPCA/PCA.bed_coverage.tsv"] )
-        if 'allelic-mapping' in mode:
+        if 'allelic-mapping' in mode or 'allelic-whatshap' in mode:
             file_list.append(["deepTools_qc/plotEnrichment/plotEnrichment_allelic.tsv"])
             if len(samples)>1:
                 file_list.append( ["deepTools_qc/multiBigwigSummary/coverage_allelic.bed.npz",

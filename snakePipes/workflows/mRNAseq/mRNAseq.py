@@ -31,7 +31,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          "UMIDedup": False,
                          "UMIDedupOpts": "", "bcPattern": "NNNNCCCCCCCCC",
                          "UMIDedupSep": "_", "UMIBarcode": False, "rMats": False,
-                         "fdr": 0.05}):
+                         "fdr": 0.05, "pvcf": None}):
     """
     Parse arguments from the command line.
     """
@@ -49,7 +49,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
     # Workflow options
     optional = parser.add_argument_group('Options')
     optional.add_argument("-m", "--mode",
-                          help="workflow running modes (available: 'alignment-free, alignment, allelic-mapping, allelic-counting, deepTools_qc, three-prime-seq')"
+                          help="workflow running modes (available: 'alignment-free, alignment, allelic-mapping, allelic-counting, allelic-whatshap, deepTools_qc, three-prime-seq')"
                           " (default: '%(default)s')",
                           default=defaults["mode"])
 
@@ -94,6 +94,11 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                           dest="formula",
                           help="Design formula to use in linear model fit (default: '%(default)s')",
                           default=defaults["formula"])
+
+    optional.add_argument("--phased-vcf",
+                          dest="pvcf",
+                          help="Phased vcf required for whatshap haplotagging. (default: '%(default)s')",
+                          default=defaults["pvcf"])
 
 
     optional.add_argument("--dnaContam",
@@ -150,13 +155,15 @@ def main():
     # check for Allele-specific mapping mode
     args.allele_mode = cf.checkAlleleParams(args)
     # convert file path to abspath
+    if args.pvcf:
+        args.pvcf = os.path.abspath(args.pvcf)
     if args.allele_mode == "create_and_map":
         args.VCFfile = os.path.abspath(args.VCFfile)
     elif args.allele_mode == "map_only":
         args.SNPfile = os.path.abspath(args.SNPfile)
         args.NMaskedIndex = os.path.abspath(args.NMaskedIndex)
     modeTemp = args.mode.split(",")
-    validModes = set(["alignment", "alignment-free", "deepTools_qc", "allelic-mapping", "allelic-counting", "three-prime-seq"])
+    validModes = set(["alignment", "alignment-free", "deepTools_qc", "allelic-mapping", "allelic-counting", "allelic-whatshap", "three-prime-seq"])
     for mode in modeTemp:
         if mode not in validModes:
             sys.exit("{} is not a valid mode!\n".format(mode))

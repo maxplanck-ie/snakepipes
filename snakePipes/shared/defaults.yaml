@@ -3,7 +3,7 @@
 # Note that due to limitations in yaml.dump, only very basic structures are
 # permitted here.
 ################################################################################
-snakemakeOptions: ''
+snakemakeOptions: ' --keep-going '
 organismsDir: 'shared/organisms'
 snakemakeProfile: 'shared/profiles/local'
 tempDir: /scratch/local

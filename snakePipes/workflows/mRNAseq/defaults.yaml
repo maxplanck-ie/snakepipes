@@ -81,6 +81,8 @@ plotFormat: png
 # for allele-spcific mapping
 SNPFile:
 NMaskedIndex:
+# for allelic-whatshap
+pvcf: 
 #### Flag to control the pipeline entry point
 fromBAM: False
 bamExt: '.bam'

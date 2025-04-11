@@ -2,7 +2,7 @@ import glob
 import os
 import subprocess
 import re
-import yaml
+from ruamel.yaml import YAML
 import sys
 import pandas as pd
 import warnings
@@ -96,7 +96,8 @@ else:
 
 chip_dict = {}
 with open(samples_config, "r") as f:
-    chip_dict_tmp = yaml.load(f, Loader=yaml.FullLoader)
+    yaml=YAML(typ='safe')
+    chip_dict_tmp = yaml.load(f)
     if "chip_dict" in chip_dict_tmp and chip_dict_tmp["chip_dict"] :
         chip_dict = chip_dict_tmp["chip_dict"]
     else:
@@ -104,7 +105,7 @@ with open(samples_config, "r") as f:
         exit(1)
     del chip_dict_tmp
 
-cf.write_configfile(os.path.join("chip_samples.yaml"), chip_dict)
+cf.write_configfile(os.path.join("chip_samples.yaml"), chip_dict, trafo=None)
 
 # create unique sets of control samples, ChIP samples with and without control
 control_samples = set()

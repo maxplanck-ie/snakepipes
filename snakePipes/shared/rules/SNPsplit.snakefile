@@ -22,12 +22,12 @@ elif aligner == "STAR" or aligner == "EXTERNAL_BAM":
     rule snp_split:
         input:
             snp = SNPFile,
-            bam = aligner+"/{sample}.bam"
+            bam = aligner+"/{sample}.markdup.bam"
         output:
-            targetbam = expand("allelic_bams/{{sample}}.{suffix}.bam", suffix = ['allele_flagged', 'genome1', 'genome2', 'unassigned']),
+            targetbam = expand("allelic_bams/{{sample}}.markdup.{suffix}.bam", suffix = ['allele_flagged', 'genome1', 'genome2', 'unassigned']),
             #tempbam = temp(aligner+"/{sample}.sortedByName.bam"),
-            rep1 = "allelic_bams/{sample}.SNPsplit_report.yaml",
-            rep2 = "allelic_bams/{sample}.SNPsplit_sort.yaml"
+            rep1 = "allelic_bams/{sample}.markdup.SNPsplit_report.yaml",
+            rep2 = "allelic_bams/{sample}.markdup.SNPsplit_sort.yaml"
         params:
             pairedEnd = '--paired' if pairedEnd else '',
             outdir = "allelic_bams"
@@ -62,7 +62,7 @@ elif aligner == "STAR" or aligner == "EXTERNAL_BAM":
 
 # sort them
 rule BAMsort_allelic:
-    input: "allelic_bams/{sample}.filtered.{suffix}.bam" if aligner == "Bowtie2" else "allelic_bams/{sample}.{suffix}.bam"
+    input: "allelic_bams/{sample}.filtered.{suffix}.bam" if aligner == "Bowtie2" else "allelic_bams/{sample}.markdup.{suffix}.bam"
     output:
         "allelic_bams/{sample}.{suffix}.sorted.bam"
     threads:
