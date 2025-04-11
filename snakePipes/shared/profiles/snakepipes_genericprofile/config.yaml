@@ -6,7 +6,7 @@ cluster-generic-submit-cmd:
     --cpus-per-task={threads} \
     --mem-per-cpu={resources.mem} \
     --job-name=snakePipes_{rule}-{wildcards} \
-    --output=logs/{rule}/{rule}-{wildcards}-%j.out \
+    --output=logs/{rule}/{rule}-{wildcards}-%j-%N.out \
     --time={resources.time} \
     --parsable"
 jobs: 20
