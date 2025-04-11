@@ -7,6 +7,7 @@ ________________
 
 * QC in the ChIPseq workflow is now performed with the ChIPQC R package
 * added allelic-whatshap mode to mRNA seq
+* fixes #1048
 * fixes #1085
 * fixes #1083
 * fixes #1082
