@@ -1,0 +1,22 @@
+name: snakeMake_TEsmall
+channels:
+ - conda-forge
+ - bioconda
+dependencies:
+  - python=3.7.6
+  - numpy
+  - scipy
+  - pandas
+  - matplotlib
+  - seaborn
+  - bokeh
+  - samtools
+  - pysam
+  - bedtools
+  - pybedtools
+  - cutadapt
+  - bowtie
+  - tbb=2020.2
+  - pip
+  - pip:
+    - -e /home/navandar/Software/TEsmall

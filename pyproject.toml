@@ -38,7 +38,10 @@ dependencies = [
     "thefuzz",
     "pyyaml >= 5.1",
     "snakemake-executor-plugin-cluster-generic >= 1.0.9",
-    "graphviz"
+    "graphviz",
+    "matplotlib",
+    "numpy",
+    "seaborn"
 ]
 
 [project.optional-dependencies]

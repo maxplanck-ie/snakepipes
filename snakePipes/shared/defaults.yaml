@@ -1,22 +1,15 @@
-################################################################################
-# This file should hold values that should be present in ALL workflows
-# Note that due to limitations in yaml.dump, only very basic structures are
-# permitted here.
-################################################################################
-snakemakeOptions: ''
-organismsDir: 'shared/organisms'
-snakemakeProfile: 'shared/profiles/local'
-tempDir: /scratch/local
-# The following are only needed if you use the --emailAddress option
-smtpServer:
-smtpPort: 0
-onlySSL: False
-emailSender:
-smtpUsername:
-smtpPassword:
-# maximum number of threads to be used
-max_thread: 25
-#print tools versions
-toolsVersion: True
-oldConfig:
+condaEnvDir: /localenv/navandar/SnakePipes/
 configMode: manual
+emailSender: null
+max_thread: 25
+oldConfig: null
+onlySSL: false
+organismsDir: shared/organisms
+smtpPassword: null
+smtpPort: 0
+smtpServer: null
+smtpUsername: null
+snakemakeOptions: ''
+snakemakeProfile: shared/profiles/snakepipes_genericprofile
+tempDir: /scratch/local
+toolsVersion: true
