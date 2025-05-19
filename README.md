@@ -18,7 +18,8 @@ snakePipes are flexible and powerful workflows built using [snakemake](https://g
 - ATACseq*  
 - scRNAseq  
 - HiC  
-- makePairs*  
+- makePairs*
+- smRNAseq
 - Whole Genome Bisulfite Seq/WGBS  
 
 (* also available in allele-specific mode)
