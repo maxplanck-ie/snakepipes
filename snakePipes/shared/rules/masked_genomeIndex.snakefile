@@ -84,18 +84,18 @@ if aligner == "STAR":
 elif aligner == "Bowtie2":
     rule bowtie2_index:
         input:
-            snpgenome_dir = SNPdir#,
-#            filelist = lambda wildcards: getref_fileList(checkpoints.create_snpgenome.get().output.snpgenome_dir)
+            snpgenome_dir = SNPdir
         output:
-            bowtie2_index_allelic
+            btix = bowtie2_index_allelic,
+            tmpfna = temp("snp_genome/concat.fna")
         threads: lambda wildcards: 10 if 10<max_thread else max_thread
         params:
             idxbase = "snp_genome/bowtie2_Nmasked/Genome"
         conda: CONDA_DNA_MAPPING_ENV
-        shell:
-            "bowtie2-build"
-            " --threads {threads}"
-            " {input.snpgenome_dir}/*.fa"
-            " {params.idxbase}"
+        shell:'''                                                                                                                            
+        cat {input.snpgenome_dir}/*.fa > {output.tmpfna}
+        bowtie2-build --threads {threads} \
+           {output.tmpfna} {params.idxbase}
+        ''' 
 else:
     print("Only STAR and Bowtie2 are implemented for allele-specific mapping")
