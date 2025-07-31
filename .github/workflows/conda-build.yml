@@ -12,7 +12,7 @@ jobs:
           environment-file: .github/conda_ci.yml
           condarc-file: .github/condarc.yml
       - name: buildSnakePipes
-        uses: uibcdf/action-build-and-upload-conda-packages@2.0.0
+        uses: uibcdf/action-build-and-upload-conda-packages@v2.0.0
         with:
           meta_yaml_dir: conda-recipe
           python-version: 3.13
