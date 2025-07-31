@@ -1215,6 +1215,24 @@ class TestmRNAseq:
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
         assert parseSpOut(_p) == 177
+    def test_DE_LRT(self, ifs):
+        ci = [
+            "mRNAseq",
+            '-i',
+            ifs / 'PE',
+            '-o',
+            ifs / 'outdir',
+            '--sampleSheet',
+            ifs / 'sampleSheet.tsv',
+            '--snakemakeOptions',
+            SMKOPTS,
+            '--LRT',
+            ifs / 'org.yaml'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 177
     def test_rMats(self, ifs):
         ci = [
             "mRNAseq",
@@ -1288,7 +1306,7 @@ class TestmRNAseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 197
+        assert parseSpOut(_p) == 195
     def test_bcExtract(self, ifs):
         ci = [
             "mRNAseq",
@@ -1328,7 +1346,7 @@ class TestmRNAseq:
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
         assert parseSpOut(_p) == 186
-    def test_multicomp(self, ifs):
+    def test_multicomp_alignment(self, ifs):
         ci = [
             "mRNAseq",
             '-i',
@@ -1341,13 +1359,33 @@ class TestmRNAseq:
             SMKOPTS,
             ifs / 'org.yaml',
             '-m',
-            'alignment,alignment-free',
+            'alignment',
             '--rMats',
         ]
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 174
+        assert parseSpOut(_p) == 141
+    def test_multicomp_alfree(self, ifs):
+        ci = [
+            "mRNAseq",
+            '-i',
+            ifs / 'PE',
+            '-o',
+            ifs / 'outdir',
+            '--sampleSheet',
+            ifs / 'sampleSheet_mc.tsv',
+            '--snakemakeOptions',
+            SMKOPTS,
+            ifs / 'org.yaml',
+            '-m',
+            'alignment-free',
+            '--rMats',
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 133
     def test_SE(self, ifs):
         ci = [
             "mRNAseq",
@@ -1420,7 +1458,7 @@ class TestmRNAseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 178
+        assert parseSpOut(_p) == 176
 
     def test_SEfastqc(self, ifs):
         ci = [
@@ -2310,6 +2348,25 @@ class TestHIC():
             SMKOPTS,
             '--enzyme',
             'DpnII',
+            ifs / 'org.yaml'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 102
+    def test_two_enzymes(self, ifs):
+        ci = [
+            "HiC",
+            '-i',
+            ifs / 'PE',
+            '-o',
+            ifs / 'output',
+            '--snakemakeOptions',
+            SMKOPTS,
+            '--enzyme',
+            'MseI',
+            '--enzyme',
+            'CviQI',
             ifs / 'org.yaml'
         ]
         print(' '.join([str(i) for i in ci]))

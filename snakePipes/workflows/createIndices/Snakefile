@@ -174,11 +174,11 @@ onsuccess:
     orgDir_yamlPath = os.path.join(maindir, organismsDir, f"{genome}.yaml")
     outDir_yamlPath = os.path.join(outdir, f"{genome}.yaml")
     try:
-        cf.write_configfile(orgDir_yamlPath, organismDictionary)
+        cf.write_configfile(orgDir_yamlPath, organismDictionary,trafo=None)
         print(f"{genome} yaml written to {orgDir_yamlPath}")
     except (PermissionError, FileNotFoundError) as e:
         print(f"Error writing in the organism dir {e}")
-    cf.write_configfile(outDir_yamlPath, organismDictionary)
+    cf.write_configfile(outDir_yamlPath, organismDictionary,trafo=None)
     print(f"{genome} yaml written to {outDir_yamlPath}")
     if "verbose" in config and config["verbose"]:
         print("\n--- index creation workflow finished successfully! --------------------------------\n")

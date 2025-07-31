@@ -1,5 +1,6 @@
 import os
 import snakePipes.common_functions as cf
+import warnings
 
 
 ### snakemake_workflows initialization ########################################
@@ -189,14 +190,14 @@ def run_alignment_free():
             if sampleSheet:
                 sample_name = os.path.splitext(os.path.basename(sampleSheet))[0]
                 if not isMultipleComparison:
-                    file_list.append( ["DESeq2_Salmon_{}/DESeq2.session_info.txt".format(sample_name)])
+                    file_list.append( ["DESeq2_Salmon_{}/DESeq2.session_info.txt".format(sample_name)]) if not LRT else file_list.append( ["DESeq2_Salmon_{}_LRT/DESeq2.session_info.txt".format(sample_name)])
                     if cf.check_replicates(sampleSheet):
                         file_list.append( ["sleuth_Salmon_{}/so.rds".format(sample_name)] )
                     if rMats:
                         file_list.append( ["rMats_{}/RI.MATS.JCEC.txt".format(sample_name)] )
                         file_list.append( ["rMats_{}/b2.csv".format(sample_name)] )
                 else:
-                    file_list.append(expand("DESeq2_Salmon_{}".format(sample_name) + ".{compGroup}/DESeq2.session_info.txt",compGroup=cf.returnComparisonGroups(sampleSheet)))
+                    file_list.append(expand("DESeq2_Salmon_{}".format(sample_name) + ".{compGroup}/DESeq2.session_info.txt",compGroup=cf.returnComparisonGroups(sampleSheet))) if not LRT else file_list.append(expand("DESeq2_Salmon_{}".format(sample_name) + ".{compGroup}_LRT/DESeq2.session_info.txt",compGroup=cf.returnComparisonGroups(sampleSheet)))
                     file_list.append(expand("sleuth_Salmon_{}".format(sample_name) + ".{compGroup}/so.rds",compGroup=cf.returnComparisonGroups(sampleSheet)))
                     if rMats:
                         file_list.append(expand("rMats_{}".format(sample_name) + ".{compGroup}/RI.MATS.JCEC.txt",compGroup=cf.returnComparisonGroups(sampleSheet)))
@@ -210,7 +211,7 @@ def run_alignment_free():
             if sampleSheet:
                 sample_name = os.path.splitext(os.path.basename(sampleSheet))[0]
                 if not isMultipleComparison:
-                    file_list.append( ["DESeq2_SalmonAllelic_{}/DESeq2.session_info.txt".format(sample_name)])
+                    file_list.append( ["DESeq2_SalmonAllelic_{}/DESeq2.session_info.txt".format(sample_name)]) if not LRT else file_list.append( ["DESeq2_SalmonAllelic_{}_LRT/DESeq2.session_info.txt".format(sample_name)])
                     file_list.append( ["sleuth_SalmonAllelic_{}/so.rds".format(sample_name)] )
         return(file_list)
     else:
@@ -228,14 +229,23 @@ def run_alignment():
         "QC_report/QC_report_all.tsv"
         ]
         if sampleSheet:
+            #warnings.warn("LRT value is set to " + str(LRT))
             sample_name = os.path.splitext(os.path.basename(sampleSheet))[0]
             if not isMultipleComparison:
-                file_list.append( ["DESeq2_{}/DESeq2.session_info.txt".format(sample_name)] )
+                if LRT:
+                    #warnings.warn("LRT value is set to " + str(LRT) + "\n Appending " + "DESeq2_{}_LRT/DESeq2.session_info.txt to file list".format(sample_name))
+                    file_list.append( ["DESeq2_{}_LRT/DESeq2.session_info.txt".format(sample_name)] )
+                else:
+                    #warnings.warn("LRT value is set to " + str(LRT) + "\n Appending " + "DESeq2_{}/DESeq2.session_info.txt to file list".format(sample_name))
+                    file_list.append( ["DESeq2_{}/DESeq2.session_info.txt".format(sample_name)] )
                 if rMats:
                     file_list.append( ["rMats_{}/RI.MATS.JCEC.txt".format(sample_name)] )
                     file_list.append( ["rMats_{}/b2.csv".format(sample_name)] )
             else:
-                file_list.append(expand("DESeq2_{}".format(sample_name) + ".{compGroup}/DESeq2.session_info.txt",compGroup=cf.returnComparisonGroups(sampleSheet)))
+                if LRT:
+                    file_list.append(expand("DESeq2_{}".format(sample_name) + ".{compGroup}_LRT/DESeq2.session_info.txt",compGroup=cf.returnComparisonGroups(sampleSheet)))
+                else:
+                    file_list.append(expand("DESeq2_{}".format(sample_name) + ".{compGroup}/DESeq2.session_info.txt",compGroup=cf.returnComparisonGroups(sampleSheet)))
                 if  rMats:
                     file_list.append(expand("rMats_{}".format(sample_name) + ".{compGroup}/RI.MATS.JCEC.txt",compGroup=cf.returnComparisonGroups(sampleSheet)))
                     file_list.append(expand("rMats_{}".format(sample_name) + ".{compGroup}/b2.csv",compGroup=cf.returnComparisonGroups(sampleSheet)))
@@ -271,12 +281,12 @@ def run_allelesp_mapping():
         if sampleSheet:
             sample_name = os.path.splitext(os.path.basename(sampleSheet))[0]
             if not isMultipleComparison:
-                file_list.append( ["DESeq2_{}/DESeq2.session_info.txt".format(sample_name)] )
+                file_list.append( ["DESeq2_{}/DESeq2.session_info.txt".format(sample_name)] ) if not LRT else file_list.append( ["DESeq2_{}_LRT/DESeq2.session_info.txt".format(sample_name)] )
                 #if rMats:
                     #file_list.append( ["rMats_{}/RI.MATS.JCEC.txt".format(sample_name)] )
                     #file_list.append( ["rMats_{}/b2.csv".format(sample_name)] )
             else:
-                file_list.append(expand("DESeq2_{}".format(sample_name) + ".{compGroup}/DESeq2.session_info.txt",compGroup=cf.returnComparisonGroups(sampleSheet)))
+                file_list.append(expand("DESeq2_{}".format(sample_name) + ".{compGroup}/DESeq2.session_info.txt",compGroup=cf.returnComparisonGroups(sampleSheet))) if not LRT else file_list.append(expand("DESeq2_{}".format(sample_name) + ".{compGroup}_LRT/DESeq2.session_info.txt",compGroup=cf.returnComparisonGroups(sampleSheet)))
         return(file_list)
     else:
         return([])
@@ -319,7 +329,7 @@ def run_threePrimeSeq():
             "three_prime_seq/counts.tsv",
             "featureCounts/counts.tsv"
         ]
-    if sampleSheet:
+        if sampleSheet:
             sample_name = os.path.splitext(os.path.basename(sampleSheet))[0]
             if not isMultipleComparison:
                 file_list.append( ["DESeq2_{}/DESeq2.session_info.txt".format(sample_name)] )

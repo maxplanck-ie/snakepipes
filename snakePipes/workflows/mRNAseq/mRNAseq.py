@@ -31,7 +31,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          "UMIDedup": False,
                          "UMIDedupOpts": "", "bcPattern": "NNNNCCCCCCCCC",
                          "UMIDedupSep": "_", "UMIBarcode": False, "rMats": False,
-                         "fdr": 0.05, "pvcf": None}):
+                         "fdr": 0.05, "LRT": False, "pvcf": None}):
     """
     Parse arguments from the command line.
     """
@@ -94,6 +94,14 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                           dest="formula",
                           help="Design formula to use in linear model fit (default: '%(default)s')",
                           default=defaults["formula"])
+
+    optional.add_argument("--LRT",
+                          dest="LRT",
+                          action="store_true",
+                          help="Make DESeq2 run an LRT test instead of the default Wald test."
+                               "Relevant for e.g. time-course analyses ; default: '%(default)s')",
+                          default=defaults["LRT"])
+
 
     optional.add_argument("--phased-vcf",
                           dest="pvcf",

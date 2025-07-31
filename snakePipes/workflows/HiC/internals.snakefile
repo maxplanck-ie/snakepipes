@@ -31,7 +31,9 @@ matrixFile_suffix = get_matrixFile_suffix()
 ## seq dict for restriction enzymes
 seq_dict = {
            'DpnII' : ['GATC', 'GATC'],
-           'HindIII' : ['AAGCTT', 'AGCTT']
+           'HindIII' : ['AAGCTT', 'AGCTT'],
+           'MseI': ['TTAA', 'TAA'],
+           'CviQI': ['GTAC', 'TAC']
            }
 
 ## get sequences for restriction enzymes

@@ -92,7 +92,7 @@ checktable <- function(countdata = NA, sampleSheet = NA, alleleSpecific = FALSE,
 #'
 #'
 
-DESeq_basic <- function(countdata, coldata, fdr, alleleSpecific = FALSE, from_salmon = FALSE, size_factors=NA, customFormula=NA) {
+DESeq_basic <- function(countdata, coldata, fdr, alleleSpecific = FALSE, from_salmon = FALSE, size_factors=NA, customFormula=NA, lrt = FALSE) {
     cnames.sub<-unique(colnames(coldata)[2:which(colnames(coldata) %in% "condition")])
     
     if(is.na(customFormula)|customFormula==""){
@@ -127,11 +127,20 @@ DESeq_basic <- function(countdata, coldata, fdr, alleleSpecific = FALSE, from_sa
         print(size_factors)
         sizeFactors(dds) = size_factors
     }
-    dds <- DESeq2::DESeq(dds)
-    ddr <- DESeq2::results(dds, alpha = fdr)
-    a <- DESeq2::resultsNames(dds)
-    auto_coef <- a[length(a)]
-    ddr_shrunk <- DESeq2::lfcShrink(dds,coef=auto_coef,type="apeglm",res=ddr)
+    if(lrt){
+      reduced_formula<-as.formula("~1")
+      if(grepl("+",fixed=TRUE,paste0(as.character(d),collapse=""))){
+        reduced_formula<-formula(paste(sub("\\+.+$","",as.character(d)),collapse=" "))}
+      message(paste0("Running LRT with reduced formula: ",paste(reduced_formula,collapse="")))
+      dds<-DESeq2::DESeq(dds,test="LRT",reduced = reduced_formula) #reduced formula removes the last coefficient from the full design
+    }else{
+      dds <- DESeq2::DESeq(dds)}
+      ddr <- DESeq2::results(dds, alpha = fdr)
+      a <- DESeq2::resultsNames(dds)
+      message(paste0("Available result names: ", a))
+      auto_coef <- a[length(a)]
+      message(paste0("Returning log fold changes for coefficient: ", auto_coef))
+      ddr_shrunk <- DESeq2::lfcShrink(dds,coef=auto_coef,type="apeglm",res=ddr)
     output <- list(dds = dds, ddr = ddr, ddr_shrunk = ddr_shrunk)
     return(output)
 
@@ -150,7 +159,7 @@ DESeq_basic <- function(countdata, coldata, fdr, alleleSpecific = FALSE, from_sa
 #'
 #'
 
-DESeq_allelic <- function(countdata, coldata, fdr, from_salmon=FALSE, customFormula=NA) {
+DESeq_allelic <- function(countdata, coldata, fdr, from_salmon=FALSE, customFormula=NA, lrt=FALSE) {
 
     # AlleleSpecific DEseq
     print("Performing Allele-specific DESeq using Interaction design : Genome2 vs Genome1")
@@ -186,11 +195,22 @@ DESeq_allelic <- function(countdata, coldata, fdr, from_salmon=FALSE, customForm
     # Run DESeq
     if(length(unique(coldata_allelic$condition))>1){
       DESeq2::design(dds) <- formula(~allele + condition + allele:condition)
-      dds <- DESeq2::DESeq(dds,betaPrior = FALSE)
-      ddr <- DESeq2::results(dds, name=paste0("allelegenome2.condition",unique(coldata$condition)[2]))
-      ddr_shrunk <- DESeq2::lfcShrink(dds,coef=paste0("allelegenome2.condition",unique(coldata$condition)[2]),type="apeglm",res=ddr)
+      if(lrt){
+        message("Running allelic DESeq2 with LRT test")
+        dds <- DESeq2::DESeq(dds,betaPrior = FALSE,test="LRT",reduced = as.formula("~allele+condition"))
+        ddr<- DESeq2::results(dds)
+        a <- DESeq2::resultsNames(dds)
+        message(paste0("Available result names: ", a))
+        auto_coef <- a[length(a)]
+        message(paste0("Returning log fold changes for coefficient: ", auto_coef))
+        ddr_shrunk <- DESeq2::lfcShrink(dds,type="apeglm",res=ddr,coef=auto_coef)
+      }else{
+          message("Running allelic DESeq2 with Wald test")
+          dds <- DESeq2::DESeq(dds,betaPrior = FALSE)
+          ddr<- DESeq2::results(dds, name=paste0("allelegenome2.condition",unique(coldata$condition)[2]))
+          ddr_shrunk <- DESeq2::lfcShrink(dds,coef=paste0("allelegenome2.condition",unique(coldata$condition)[2]),type="apeglm",res=ddr)}
     } else {
-        DESeq2::design(dds) <- formula(~allele)
+        DESeq2::design(dds) <- formula(~allele) #in this case, LRT doesn't necessarily make sense; disable
         dds <- DESeq2::DESeq(dds,betaPrior = FALSE)
         ddr <- DESeq2::results(dds, name="allele_genome2_vs_genome1")
         ddr_shrunk <- DESeq2::lfcShrink(dds,coef="allele_genome2_vs_genome1",type="apeglm",res=ddr)
