@@ -52,7 +52,7 @@ properPairs: false
 mateOrientation: --fr
 ## other Bowtie2 stuff
 insertSizeMax: 1000
-alignerOpts:
+alignerOpts: ' --local '
 cutntag: False
 plotFormat: png
 UMIBarcode: False
