@@ -19,7 +19,7 @@ if aligner == "Bowtie2":
                 align_summary = aligner+"/{sample}.Bowtie2_summary.txt",
                 bam = temp(aligner+"/{sample}.sorted.bam")
             params:
-                alignerOpts = str(alignerOpts or ''),
+                alignerOpts = str(alignerOpts or ' --local '),
                 mateOrientation = mateOrientation,
                 insertSizeMax = insertSizeMax,
                 idxbase = getbw_idxbase(bowtie2_index_allelic),
@@ -52,7 +52,7 @@ if aligner == "Bowtie2":
                 align_summary = aligner+"/{sample}.Bowtie2_summary.txt",
                 bam = temp(aligner+"/{sample}.sorted.bam")
             params:
-                alignerOpts = str(alignerOpts or ''),
+                alignerOpts = str(alignerOpts or ' --local '),
                 idxbase = getbw_idxbase(bowtie2_index_allelic),
                 tempDir = tempDir
             benchmark:
