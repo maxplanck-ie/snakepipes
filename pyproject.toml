@@ -33,7 +33,7 @@ requires-python = ">= 3.11"
 
 dependencies = [
     "snakemake >= 8",
-    "coincbc",
+    "cbcpy",
     "pandas",
     "thefuzz",
 #    "pyyaml >= 5.1",
