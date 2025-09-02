@@ -6,6 +6,7 @@ snakePipes 3.3.0
 
 * fixes #1097
 * fixes #1093
+* fixes #1118
 
 
 
