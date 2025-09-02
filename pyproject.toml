@@ -32,7 +32,7 @@ classifiers = [
 requires-python = ">= 3.11"
 
 dependencies = [
-    "snakemake >= 8,<9.10.1",
+    "snakemake >= 8,<9.10.0",
     "pandas",
     "thefuzz",
 #    "pyyaml >= 5.1",
