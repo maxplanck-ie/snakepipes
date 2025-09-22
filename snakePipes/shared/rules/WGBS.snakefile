@@ -80,7 +80,7 @@ elif not pairedEnd and not fromBAM:
 rule getRandomCpGs:
     output:
         temp("QC_metrics/randomCpG.bed")
-    params:
+    input:
         genome_fasta=genome_fasta
     run:
         import random
@@ -100,32 +100,32 @@ rule getRandomCpGs:
                 x = random.randint(0, n)
                 if x < maxLen:
                     B[x] = (tid, pos)
-
-        for line in open(params['genome_fasta']):
-            line = line.strip().split()[0]
-            if line.startswith(">"):
-                chroms.append(line[1:])
-                lastChar = 'N'
-                position = 0
-                continue
-            for c in line:
-                if (lastChar == 'C' or lastChar == 'c') and (c == 'G' or c == 'g'):
-                    addPosition(buf, len(chroms) - 1, position - 1, chars)
+        
+        with open(input['genome_fasta'],'r') as f:
+            for line f:
+                line = line.strip().split()[0]
+                if line.startswith(">"):
+                    chroms.append(line[1:])
                     lastChar = 'N'
-                    chars += 1
-                else:
-                    lastChar = c
-                position += 1
+                    position = 0
+                    continue
+                for c in line:
+                    if (lastChar == 'C' or lastChar == 'c') and (c == 'G' or c == 'g'):
+                        addPosition(buf, len(chroms) - 1, position - 1, chars)
+                        lastChar = 'N'
+                        chars += 1
+                    else:
+                        lastChar = c
+                    position += 1
 
-        # Sort
-        buf.sort()
+            # Sort
+            buf.sort()
 
-        # write output
-        if len(buf):
-            o = open(output[0], "w")
-            for tid, pos in buf:
-                o.write("{}\t{}\t{}\n".format(chroms[tid], pos, pos + 2))
-            o.close()
+            # write output
+            if len(buf):
+                with open(output[0], "w") as o:
+                    for tid, pos in buf:
+                        o.write("{}\t{}\t{}\n".format(chroms[tid], pos, pos + 2))
 
 
 rule calc_Mbias:
