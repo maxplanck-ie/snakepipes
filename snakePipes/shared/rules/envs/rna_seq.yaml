@@ -6,7 +6,7 @@ dependencies:
 # - python >= 3
  - bedtools = 2.30.0
  - samtools = 1.15.1
- - subread = 2.0.1
+ - subread = 2.1.1
  - hisat2 = 2.2.1
  - star = 2.7.10b
 # - salmon = 1.10.1
