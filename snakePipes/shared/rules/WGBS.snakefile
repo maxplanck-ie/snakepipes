@@ -102,9 +102,9 @@ rule getRandomCpGs:
                     B[x] = (tid, pos)
         
         with open(input['genome_fasta'],'r') as f:
-            for line f:
-                line = line.strip().split()[0]
+            for line in f:
                 if line.startswith(">"):
+                    line = line.strip().split()[0]
                     chroms.append(line[1:])
                     lastChar = 'N'
                     position = 0

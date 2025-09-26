@@ -27,10 +27,10 @@ Bisulfite conversion rate is calculated on cytosines in a CHH context.
 if (length(snakemake@input[["ConversionRate"]] > 0)) {
     d = sapply(snakemake@input[["ConversionRate"]], function(x) read.table(x, header=FALSE, sep="\t", quote="", as.is=TRUE))
     d = as.data.frame(t(d), stringsAsFactors=FALSE)
-    rownames(d) = d$V1
-    colnames(d) = c("Sample", "Conversion Rate (%)")
-    d = d[, 2, drop=FALSE]
-    pander(d, style='simple')
+    samples = as.character(sapply(snakemake@input[["ConversionRate"]], function(x)gsub(".rrbs_summary_metrics","",basename(x)) ))
+    stats<-data.frame("Sample"=samples,"Convertion Rate (%)"=as.numeric(sapply(d$V4,function(X)as.numeric(X[2])*100)))
+    rownames(stats) = stats$Sample
+    pander(stats, style='simple')
 } else {
     message('No conversion rate output files found!')
 }
