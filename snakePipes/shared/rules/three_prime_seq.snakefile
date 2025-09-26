@@ -41,7 +41,7 @@ rule polyAT:
     conda:
         CONDA_SHARED_ENV
     shell:
-        "{params.script} -o {output} "
+        "python {params.script} -o {output} "
         "--tb {input.two_bit} "
         "--bed {input.bed} "
         "--minLength {params.minlength} "
@@ -91,7 +91,7 @@ rule filterBW:
     conda:
         CONDA_SHARED_ENV
     shell:
-        "{params.script} {input} {output} "
+        "python {params.script} {input} {output} "
 
 
 # Associate signal with each gene (flank by some amount)
@@ -108,7 +108,7 @@ rule geneAssociation:
     conda:
         CONDA_SHARED_ENV
     shell: 
-        "{params.script} --extend {params.extension} "
+        "python {params.script} --extend {params.extension} "
         "--threads {threads} "
         "{input} {params.gtf} {output} "
 

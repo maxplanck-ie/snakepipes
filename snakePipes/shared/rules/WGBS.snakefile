@@ -391,4 +391,4 @@ rule bedGraphToBigWig:
         "MethylDackel/{sample}_CpG.coverage.bw"
     threads: 1
     conda: CONDA_SHARED_ENV
-    shell: os.path.join(workflow_tools, "bedGraphToBigwig.py") + " {input[0]} {input[1]} {output[0]} {output[1]}"
+    shell: "python " + os.path.join(workflow_tools, "bedGraphToBigwig.py") + " {input[0]} {input[1]} {output[0]} {output[1]}"
