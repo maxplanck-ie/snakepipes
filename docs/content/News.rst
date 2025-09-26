@@ -13,6 +13,8 @@ snakePipes 3.3.0
 * fixes #1102
 * fixes #1125
 * fixes #1122
+* fixes #1124
+* fixes #1078
 
 
 
