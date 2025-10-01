@@ -40,16 +40,11 @@ rownames(ydat)<-ydat$sample
 
 ydat
 
-#list of supported factors
-markv<-c("H3K4me1","H3K4me2","H3K4me3","H3K27ac","H3K27me3","H3K9me3","H3K36me3","H4K16ac","RAD21","CTCF","MSL2","BMAL1","CLOCK")
-a<-sapply(markv,function(X)grep(X,samples,ignore.case=TRUE),simplify=TRUE)
-a<-a[!lapply(a,length)<1]
-b<-unlist(a)
-names(b)<-sub("[0-9]$","",names(b))
-markv<-names(sort(b))
-if(all(is.na(markv))){
-  markv<-rep("All",length(samples))
-}
+a<-str_extract(samples,regex("[Hh][1-4]K\\d{1,2}[A-Za-z]{1,2}\\d?"))
+a[is.na(a)]<-"TF"
+markv<-a
+length(markv)
+
 
 if(all(grepl("rep",samples))){
   #regres<-regexpr("rep[0-9]?",samples)
@@ -69,7 +64,6 @@ if (!is.null(sampleSheet)){
 }else{
   condv<-rep("All",length(samples))
 }
-
 
 sampledat<-data.frame("SampleID"=samples,"Condition"=condv,"Factor"=markv,"Replicate"=repv)
 
