@@ -7,6 +7,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Set up Python (>=3.11)
+        uses: actions/setup-python@v5
+        with:
+          python-version: '>=3.11'
       - uses: conda-incubator/setup-miniconda@v3
         with:
           environment-file: .github/conda_ci.yml
@@ -15,5 +19,5 @@ jobs:
         uses: uibcdf/action-build-and-upload-conda-packages@v1.4.0
         with:
           meta_yaml_dir: conda-recipe
-          python-version: '>=3.11'
+          #python-version: '>=3.11'
           upload: false
