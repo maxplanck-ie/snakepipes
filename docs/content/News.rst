@@ -1,6 +1,12 @@
 snakePipes News
 ===============
 
+snakePipes 3.4.0
+----------------
+
+* fixes #1136
+
+
 snakePipes 3.3.0
 -----------------
 

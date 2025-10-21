@@ -197,14 +197,14 @@ Following up on the DNAmapping module results (see :doc:`DNAmapping`), the workf
 
 * **MACS2_chipqc**: This folder contains the output of `ChIPQC <https://bioconductor.org/packages/release/bioc/vignettes/ChIPQC/inst/doc/ChIPQC.pdf>`__ analysis of the peaks called by MACS2. If you used a different peak caller, a chipqc output folder with the peak caller in its name will be listed.
 
-* **histoneHMM**: This folder contains the output of `histoneHMM <https://github.com/matthiasheinig/histoneHMM>`__. This folder will only exist if you have broad marks.
+* **histoneHMM**: This folder contains the output of `histoneHMM <https://github.com/matthiasheinig/histoneHMM>`__. This folder will only exist if you have broad marks and you have specified histoneHMM as peak caller.
 
-* **histoneHMM_chipqc**: This folder contains the output of `ChIPQC <https://bioconductor.org/packages/release/bioc/vignettes/ChIPQC/inst/doc/ChIPQC.pdf>`__ analysis of the peaks called by histoneHMM. This folder will only exist if you have broad marks.
+* **histoneHMM_chipqc**: This folder contains the output of `ChIPQC <https://bioconductor.org/packages/release/bioc/vignettes/ChIPQC/inst/doc/ChIPQC.pdf>`__ analysis of the peaks called by histoneHMM. This folder will only exist if you have broad marks and you have specified histoneHMM as peak caller.
 
 * **CSAW_peakCaller_sampleSheet**: This folder is created optionally, if you provide a sample sheet for differential binding analysis. (see :ref:`diffBinding`) CSAW will be run using peaks called by the chosen peak caller, and the output folder will be named accordingly.
 * **AnnotatedResults_peakCaller_sampleSheet**: This folder is created optionally, if you provide a sample sheet for differential binding analysis. (see :ref:`diffBinding`). Differentially bound regions annotated with distance to nearest gene are stored here.
 
-.. note:: Although in case of broad marks, we also perform the MACS2 `broadpeak` analysis (output available as ``MACS2/<sample>.filtered.BAM_peaks.broadPeak``), we would recommend using the histoneHMM outputs in these cases, since histoneHMM produces better results than MACS2 for broad peaks.
+.. note:: Although in case of broad marks, we also perform the MACS2 `broadpeak` analysis (output available as ``MACS2/<sample>.filtered.BAM_peaks.broadPeak``), we would recommend using the histoneHMM outputs in these cases, since histoneHMM produces better results than MACS2 for broad peaks. In order to produced domain calls by histoneHMM, specify histoneHMM as peak caller by passing it to --peakCaller.
 
 .. note:: For narrow marks, the user may choose the peak caller from MACS2 (default), Genrich or `SEACR <https://github.com/FredHutch/SEACR>`__. By deafult, SEACR is run in the stringent mode, applying normalization to counts over bed files. If invoked together with ``--useSpikeInForNorm``, SEACR will be run in stringent mode, using spikein-normalized counts. FDR can be set by the user (default 0.05).
 
