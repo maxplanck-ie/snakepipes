@@ -136,6 +136,9 @@ narrow_samples = list(sorted(narrow_samples))
 narrow_samples = list(filter(None, narrow_samples))
 warnings.warn("narrow samples " + ' '.join(narrow_samples))
 
+if peakCaller=="histoneHMM" and not broad_samples:
+    print("HistoneHMM selected as peakCaller but no broad samples were found.")
+    exit(1)
 
 control_samples = list(sorted(control_samples))
 # get a list of corresp control_names for chip samples
