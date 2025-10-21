@@ -612,7 +612,25 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 79
+        assert parseSpOut(_p) == 54
+    def test_broad_histoneHMM(self, ifs):
+        ci = [
+            "ChIPseq",
+            '--peakCaller',
+            'histoneHMM',
+            '-d',
+            ifs / 'bam_input',
+            '--sampleSheet',
+            ifs / 'sampleSheet.tsv',
+            '--snakemakeOptions',
+            SMKOPTS,
+            ifs / 'org.yaml',
+            ifs / 'chipdict_broad.yaml'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 54
     def test_genrich(self, ifs):
         ci = [
             "ChIPseq",
@@ -970,7 +988,25 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 101
+        assert parseSpOut(_p) == 76
+    def test_multicomp_broad_histoneHMM(self, ifs):
+        ci = [
+            "ChIPseq",
+            '--peakCaller',
+            'histoneHMM',
+            '-d',
+            ifs / 'bam_input',
+            '--sampleSheet',
+            ifs / 'sampleSheet_mc.tsv',
+            '--snakemakeOptions',
+            SMKOPTS,
+            ifs / 'org.yaml',
+            ifs / 'chipdict_broad.yaml'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 76
     def test_multicomp_fromBam(self, ifs):
         ci = [
             "ChIPseq",
