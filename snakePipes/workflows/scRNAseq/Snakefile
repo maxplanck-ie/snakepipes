@@ -70,7 +70,7 @@ def run_velocyto(skipVelocyto):
 #            expand("VelocytoCounts/{sample}.done.txt",sample=samples)#,
 #            "VelocytoCounts_merged/merged.loom"
 #            ]
-        return([])
+            return([])
         elif mode == "Alevin":
             file_list = [expand("AlevinForVelocity/{sample}/alevin/quants_mat.gz",sample=samples),
             "SingleCellExperiment/AlevinForVelocity/merged_samples.RDS"]
