@@ -182,48 +182,48 @@ rule remove_empty_drops:
     script: "../rscripts/scRNAseq_EmptyDrops.R"
 
 
-if not skipVelocyto:
-    rule cellsort_bam:
-        input:
-            bam = "filtered_bam/{sample}.filtered.bam"
-        output:
-            bam = "filtered_bam/cellsorted_{sample}.filtered.bam"
-        params:
-            samsort_memory="10G",
-            tempDir = tempDir
-        threads: lambda wildcards: 4 if 4<max_thread else max_thread
-        conda: CONDA_scRNASEQ_ENV
-        shell: """
-                TMPDIR={params.tempDir}
-                MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX)
-                samtools sort -m {params.samsort_memory} -@ {threads} -T $MYTEMP/{wildcards.sample} -t CB -O bam -o {output.bam} {input.bam}
-                rm -rf $MYTEMP
-               """
+#if not skipVelocyto:
+#    rule cellsort_bam:
+#        input:
+#            bam = "filtered_bam/{sample}.filtered.bam"
+#        output:
+#            bam = "filtered_bam/cellsorted_{sample}.filtered.bam"
+#        params:
+#            samsort_memory="10G",
+#            tempDir = tempDir
+#        threads: lambda wildcards: 4 if 4<max_thread else max_thread
+#        conda: CONDA_scRNASEQ_ENV
+#        shell: """
+#                TMPDIR={params.tempDir}
+#                MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX)
+#                samtools sort -m {params.samsort_memory} -@ {threads} -T $MYTEMP/{wildcards.sample} -t CB -O bam -o {output.bam} {input.bam}
+#                rm -rf $MYTEMP
+#               """
 
     #the barcode whitelist is currently taken from STARsolo filtered output, this is required to reduce runtime!
     #no metadata table is provided
 
-    checkpoint velocyto:
-        input:
-            gtf = "Annotation/genes.filtered.gtf",
-            bam = "filtered_bam/{sample}.filtered.bam",
-            csbam="filtered_bam/cellsorted_{sample}.filtered.bam",
-            bc = "STARsolo/{sample}/{sample}.Solo.out/Gene/filtered/barcodes.tsv"
-        output:
-            outdir = directory("VelocytoCounts/{sample}"),
-            outdum = "VelocytoCounts/{sample}.done.txt"
-        params:
-            tempdir = tempDir
-        conda: CONDA_scRNASEQ_ENV
-        shell: """
-                export LC_ALL=en_US.utf-8
-                export LANG=en_US.utf-8
-                export TMPDIR={params.tempdir}
-                MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX);
-                velocyto run --bcfile {input.bc} --outputfolder {output.outdir} --dtype uint64 {input.bam} {input.gtf} ;
-                touch {output.outdum};
-                rm -rf $MYTEMP
-        """
+#    checkpoint velocyto:
+#        input:
+#            gtf = "Annotation/genes.filtered.gtf",
+#            bam = "filtered_bam/{sample}.filtered.bam",
+#            csbam="filtered_bam/cellsorted_{sample}.filtered.bam",
+#            bc = "STARsolo/{sample}/{sample}.Solo.out/Gene/filtered/barcodes.tsv"
+#        output:
+#            outdir = directory("VelocytoCounts/{sample}"),
+#            outdum = "VelocytoCounts/{sample}.done.txt"
+#        params:
+#            tempdir = tempDir
+#        conda: CONDA_scRNASEQ_ENV
+#        shell: """
+#                export LC_ALL=en_US.utf-8
+#                export LANG=en_US.utf-8
+#                export TMPDIR={params.tempdir}
+#                MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX);
+#                velocyto run --bcfile {input.bc} --outputfolder {output.outdir} --dtype uint64 {input.bam} {input.gtf} ;
+#                touch {output.outdum};
+#                rm -rf $MYTEMP
+#        """
 
 
 #deprecate loom combination by loompy - > Seurat4 should be handling it in R
