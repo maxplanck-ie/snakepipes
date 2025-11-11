@@ -24,6 +24,8 @@ def getInputPeaks(peakCaller, chip_samples, genrichDict,comp_group):
             return expand("SEACR/{chip_sample}.filtered.stringent.bed",chip_sample=chip_samples)
     elif peakCaller == "Genrich":
         return expand("Genrich/{genrichGroup}.{{compGroup}}.narrowPeak", genrichGroup = genrichDict[comp_group].keys())
+    elif peakCaller == "histoneHMM":
+        return expand("histoneHMM/{broad_sample}_avgp0.5.bed", broad_sample=broad_samples)
     elif externalBed:
         return externalBed
 

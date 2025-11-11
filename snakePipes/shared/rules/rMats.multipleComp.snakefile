@@ -12,7 +12,7 @@ def wrap_libType(libType):
 
 def generate_b1_b2(sampleSheet,which_b):
     if os.path.isfile(sampleSheet):
-        rMatsConds = cf.sampleSheetGroups(sampleSheet)
+        rMatsConds = cf.sampleSheetGroups(sampleSheet,False)
         if which_b == "b1":
             return ",".join(["filtered_bam/" + s for s in [s + ".filtered.bam" for s in rMatsConds[list(rMatsConds)[0]]]])
         else:
@@ -22,7 +22,7 @@ def generate_b1_b2(sampleSheet,which_b):
 
 def get_s1(sampleSheet):
     if os.path.isfile(sampleSheet):
-        rMatsConds = cf.sampleSheetGroups(sampleSheet,isMultipleComparison)
+        rMatsConds = cf.sampleSheetGroups(sampleSheet,False)
         return ["filtered_bam/" + s for s in [s + ".filtered.bam" for s in rMatsConds[list(rMatsConds)[0]]]][0]
     else:
         return ""

@@ -72,8 +72,8 @@ if sampleSheet and cf.check_replicates(sampleSheet):
         #downsample = False
         #include: os.path.join(maindir, "shared", "rules", "deepTools_qc.snakefile")
 
-def run_histoneHMM(allele_info): # TODO what is a good practice for broad peaks of cutntag?
-    if not allele_info and broad_samples:
+def run_histoneHMM(allele_info,peakCaller): # TODO what is a good practice for broad peaks of cutntag?
+    if not allele_info and peakCaller=="histoneHMM":
         ## run histoneHMM broad enrichment calling only for samples annotated as *broad*
         file_list = expand("histoneHMM/{sample}.filtered.histoneHMM-regions.gff.gz", sample=broad_samples)
         file_list.append(expand("histoneHMM/{sample}_avgp0.5.bed", sample=broad_samples))
@@ -270,7 +270,7 @@ rule all:
         run_genrich(),
         run_seacr(),
         # run histoneHMM if allelic_bams are absent (since it gives index error without allele_specific index)
-        run_histoneHMM(allele_info),
+        run_histoneHMM(allele_info,peakCaller),
         ## run deeptools-allelic only if dir "allelic_bams" present and non empty
         run_deepTools_allelic(),
         ## run csaw if asked for
