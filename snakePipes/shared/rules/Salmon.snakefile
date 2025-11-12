@@ -1,26 +1,3 @@
-## Salmon Index
-
-#rule SalmonIndex:
-#    input:
-#        "Annotation/genes.filtered.fa",
-#        genome_fasta
-#    output:
-#        "Salmon/SalmonIndex/decoys.txt",
-#        temp("Salmon/SalmonIndex/seq.fa"),
-#        "Salmon/SalmonIndex/seq.bin"
-#    benchmark:
-#        "Salmon/.benchmark/Salmon.index.benchmark"
-#    params:
-#        salmonIndexOptions = salmonIndexOptions
-#    threads: lambda wildcards: 16 if 16<max_thread else max_thread
-#    conda: CONDA_RNASEQ_ENV
-#    shell: """
-#        grep "^>" {input[1]} | cut -d " " -f 1 | tr -d ">" > {output[0]}
-#        cat {input[0]} {input[1]} > {output[1]}
-#        salmon index -p {threads} -t {output[1]} -d {output[0]} -i Salmon/SalmonIndex {params.salmonIndexOptions}
-#        """
-
-
 def getSalmon_libtype(pairedEnd, libraryType):
     """
     Convert from a featureCounts library type to a HISAT2 option string

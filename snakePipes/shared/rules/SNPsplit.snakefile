@@ -36,30 +36,6 @@ elif aligner == "STAR" or aligner == "EXTERNAL_BAM":
             "SNPsplit {params.pairedEnd}"
             " -o {params.outdir} --snp_file {input.snp} {input.bam}"
 
-# move the allele-specific bams to another folder
-#if aligner == "Bowtie2":
-#    rule movebams:
-#        input:
-#            "allelic_bams/{sample}.filtered.{suffix}.bam"
-#        params:
-#            otherFile = "filtered_bam/{sample}.filtered.sortedByName.bam"
-#        output:
-#            temp("allelic_bams/{sample}.{suffix}.unsorted.bam")
-#        shell:
-#            "mv {input} {output} && \
-#            if [ -e {params.otherFile} ]; then rm {params.otherFile}; fi"
-#else:
-#    rule movebams:
-#        input:
-#            "allelic_bams/{sample}.{suffix}.bam"
-#        params:
-#            otherFile = aligner+"/{sample}.sortedByName.bam"
-#        output:
-#            temp("allelic_bams/{sample}.{suffix}.unsorted.bam")
-#        shell:
-#            "mv {input} {output} && \
-#            if [ -e {params.otherFile} ]; then rm {params.otherFile}; fi"
-
 # sort them
 rule BAMsort_allelic:
     input: "allelic_bams/{sample}.filtered.{suffix}.bam" if aligner == "Bowtie2" else "allelic_bams/{sample}.markdup.{suffix}.bam"

@@ -129,19 +129,6 @@ rule renameSpikeinChromsGTF:
     """
 
 
-# Default memory allocation: 1G
-#rule gtf2BED:
-#    input: genes_gtf
-#    output: genes_bed
-#    conda: CONDA_CREATE_INDEX_ENV
-#    shell: """
-#        awk '{{if ($3 != "gene") print $0;}}' {input} \
-#            | grep -v "^#" \
-#            | gtfToGenePred /dev/stdin /dev/stdout \
-#            | genePredToBed stdin {output}
-#        """
-
-
 rule gtf_to_files:
     input:
         gtf = genes_gtf
