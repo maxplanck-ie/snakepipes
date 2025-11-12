@@ -5,7 +5,6 @@
 import subprocess
 import os
 import re
-#import yaml
 from ruamel.yaml import YAML
 import glob
 import sys
