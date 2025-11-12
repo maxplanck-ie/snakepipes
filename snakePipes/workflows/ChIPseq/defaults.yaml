@@ -57,15 +57,3 @@ filterGTF:
 ##parameters to filter DB regions on
 fdr: 0.05
 absBestLFC: 1
-################################################################################
-# Call snakemake directly, i.e. without using the wrapper script:
-#
-# Please save a copy of this config yaml file and provide an adjusted config
-# via '--configFile' parameter!
-# example call:
-#
-# snakemake --snakefile /path/to/snakemake_workflows/workflows/ChIPseq/Snakefile
-#           --configFile /path/to/snakemake_workflows/workflows/ChIPseq/defaults.yaml
-#           --directory /path/to/outputdir
-#           --cores 32
-################################################################################

@@ -45,8 +45,6 @@ else:
 # QC report for all samples
 include: os.path.join(maindir, "shared", "rules", "ChiP-seq_qc_report.snakefile")
 
-# sambamba
-#include: os.path.join(maindir, "shared", "rules", "sambamba.snakefile")
 
 # deeptools for allelic bams (if present)
 
@@ -66,11 +64,6 @@ if sampleSheet and cf.check_replicates(sampleSheet):
         include: os.path.join(maindir, "shared", "rules", "CSAW.multiComp.snakefile")
         include: os.path.join(maindir, "shared", "rules", "nearestGene.multiComp.snakefile")
     include: os.path.join(maindir, "shared", "rules", "filterGTF.snakefile")
-    #if not fromBAM and not useSpikeInForNorm:
-        # These are needed for the snakefile to be imported
-        #aligner = "Bowtie2"
-        #downsample = False
-        #include: os.path.join(maindir, "shared", "rules", "deepTools_qc.snakefile")
 
 def run_histoneHMM(allele_info,peakCaller): # TODO what is a good practice for broad peaks of cutntag?
     if not allele_info and peakCaller=="histoneHMM":
@@ -175,10 +168,6 @@ def run_CSAW():
 
 def run_genrich():
     if (peakCaller == "Genrich"):
-#        if cutntag:
-#            warnings.warn("--cutntag only works with macs2, your setting for using Genrich will be ignored. "
-#                          "Remove --cutntag if interested in Genrich.")
-#            return ([])
         file_list = ["Genrich/all_samples.narrowPeak"]
         if sampleSheet:
             if not isMultipleComparison:
@@ -228,7 +217,6 @@ def run_chipqc():
 onstart:
     if "verbose" in config and config["verbose"]:
         print("--- Workflow parameter ---------------------------------------------------------")
-        #print("All samples:", all_samples)
         print("control samples:", control_samples)
         print("ChIP samples w ctrl:", chip_samples_w_ctrl)
         print("ChIP samples wo ctrl:", chip_samples_wo_ctrl)
@@ -289,7 +277,3 @@ onerror:
     print("\n !!! ERROR in ChIPseq workflow! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
 
 
-## benchmark ###################################################################
-## rule benchmark:
-##     output: "benchmark/benchmark.tsv"
-##for f in $(find . -name "*.benchmark" -type f); do seconds=$(cat $f | awk 'NR==2' | cut -f1); bname=$(basename $f | sed 's/.benchmark//'); echo -e "$bname\t$seconds" ; done

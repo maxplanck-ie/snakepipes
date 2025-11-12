@@ -42,15 +42,3 @@ bcPattern: NNNNCCCCCCCCC #default: 4 base umi barcode, 9 base cell barcode (eg. 
 UMIDedup: False
 UMIDedupSep: "_"
 UMIDedupOpts: --paired
-################################################################################
-# Call snakemake directly, i.e. without using the wrapper script:
-#
-# Please save a copy of this config yaml file and provide an adjusted config
-# via '--configFile' parameter!
-# example call:
-#
-# snakemake --snakefile /path/to/snakemake_workflows/workflows/preprocessing/Snakefile
-#           --configFile /path/to/snakemake_workflows/workflows/preprocessing/defaults.yaml
-#           --directory /path/to/outputdir
-#           --cores 32
-################################################################################

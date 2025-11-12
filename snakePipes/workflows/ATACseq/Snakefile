@@ -64,11 +64,6 @@ if sampleSheet:
         include: os.path.join(maindir, "shared", "rules", "CSAW.multiComp.snakefile")
         include: os.path.join(maindir, "shared", "rules", "nearestGene.multiComp.snakefile")
     include: os.path.join(maindir, "shared", "rules", "filterGTF.snakefile")
-#    if not fromBAM:
-        # These are needed for the snakefile to be imported
-#        aligner = "Bowtie2"
-#        downsample = False
-#        include: os.path.join(maindir, "shared", "rules", "deepTools_qc.snakefile")
 
 ## add outputs as asked
 def run_deepTools_allelic():
@@ -183,7 +178,6 @@ onstart:
 ################################################################################
 rule all:
     input:
-        #expand(os.path.join(outdir_MACS2, "{sample}.short.bam"), sample = samples),
         expand(os.path.join(outdir_MACS2, "{sample}.filtered.short.BAM_peaks.xls"), sample = samples),
         expand(os.path.join(outdir_ATACqc,"{sample}.filtered.BAM_peaks.qc.txt"), sample = samples),
         os.path.join(deeptools_ATAC, "plotFingerprint/plotFingerprint.metrics.txt"),
@@ -199,7 +193,6 @@ rule all:
         run_deepTools_qc(fromBAM),
         expand(os.path.join(short_bams, "{sample}.short.cleaned.bam"),sample=samples),
         expand(os.path.join(short_bams, "{sample}.short.cleaned.bam.bai"),sample=samples)
-        #"Filtering_metrics/Filtering_report.html"
 
 ### execute after workflow finished ############################################
 ################################################################################

@@ -66,10 +66,6 @@ def run_deeptools_qc():
 def run_velocyto(skipVelocyto):
     if not skipVelocyto :
         if mode == "STARsolo":
-#            file_list = [
-#            expand("VelocytoCounts/{sample}.done.txt",sample=samples)#,
-#            "VelocytoCounts_merged/merged.loom"
-#            ]
             return([])
         elif mode == "Alevin":
             file_list = [expand("AlevinForVelocity/{sample}/alevin/quants_mat.gz",sample=samples),
