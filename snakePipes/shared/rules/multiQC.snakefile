@@ -117,7 +117,7 @@ def multiqc_input_check(return_value):
             indir += aligner
             indir += " Sambamba "
             indir += " deepTools_qc "
-        elif mode == "STARsolo":
+        if mode == "STARsolo":
             infiles.append( expand(fastq_dir+"/{sample}"+reads[0]+".fastq.gz", sample = samples) )
             infiles.append( expand(aligner+"/{sample}.markdup.bam", sample = samples) +
             expand("Sambamba/{sample}.markdup.txt", sample = samples) +
