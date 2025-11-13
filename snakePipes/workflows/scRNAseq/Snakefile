@@ -40,9 +40,6 @@ elif mode=="Alevin":
 pairedEnd = True
 include: os.path.join(maindir, "shared", "rules", "FastQC.snakefile")
 pairedEnd = False
-#include: os.path.join(maindir, "shared", "rules", "sambamba.snakefile")
-#include: os.path.join(maindir, "shared", "tools" , "deeptools_cmds.snakefile")
-#include: os.path.join(maindir, "shared", "rules", "deepTools_RNA.snakefile")
 include: os.path.join(maindir, "shared", "rules", "multiQC.snakefile")
 
 
