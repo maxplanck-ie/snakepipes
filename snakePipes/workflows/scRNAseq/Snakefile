@@ -40,7 +40,6 @@ pairedEnd = True
 include: os.path.join(maindir, "shared", "rules", "FastQC.snakefile")
 pairedEnd = False
 include: os.path.join(maindir, "shared", "rules", "sambamba.snakefile")
-include: os.path.join(maindir, "shared", "rules", "RNA-seq_qc_report.snakefile")
 include: os.path.join(maindir, "shared", "tools" , "deeptools_cmds.snakefile")
 include: os.path.join(maindir, "shared", "rules", "deepTools_RNA.snakefile")
 include: os.path.join(maindir, "shared", "rules", "multiQC.snakefile")
@@ -110,7 +109,6 @@ if mode=="STARsolo":
         input:
             expand("STARsolo/{sample}.sorted.bam",sample = samples),
             "STARsolo/Report.tsv",
-            "Sambamba/flagstat_report_all.tsv",
             run_deeptools_qc(),
             "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv",
             expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample = samples),
