@@ -18,6 +18,7 @@ Input requirements
 ------------------
 
 The only requirement is a directory of gzipped fastq files. Files could be single or paired end, and the read extensions could be modified using the keys in the ``defaults.yaml`` file below.
+Alternatively, bam files can be used as input. The input folder containing the bam files can be passed to `-i` and `--fromBAM` must be specified as well. Bam file extention can be specified with `--bamExt`.
 
 .. _ncRNAconfig:
 

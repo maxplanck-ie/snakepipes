@@ -74,21 +74,6 @@ All files needed to be modified in order to extend/modify a workflow, are availa
     * **cluster.yaml** and **defaults.yaml** : contains workflow-specific options for the cluster, and for the wrappers. Modify them to suite your needs.
 
 
-Calling snakemake directly using the snakefiles
-------------------------------------------------
-
-It's possible to directly run ``snakemake`` using the ``Snakefile`` provided in each workflow, therefore surpassing the command-line wrappers. 
-In order to do that, you can begin with a copy of ``<workflow_name>.defaults.yaml`` file that you will find in your output folder after running the workflow with --snakemakeOptions ' --dryrun ' and add or adjust further options in that file. This file will contained a merged dictionary from the workflow defaults as well as from the global (cross-workflows) defaults.
-
-Finally, provide an adjusted config via ``--configfile`` parameter to snakemake!
-
-example call::
-
-    snakemake --snakefile /path/to/snakemake_workflows/workflows/ATACseq/Snakefile
-              --configfile /path/to/(snakemake_workflows/workflows/ATACseq/)defaults.yaml
-              --directory /path/to/outputdir
-              --cores 32
-
 
 Executing the Rscript wrappers outside snakePipes
 --------------------------------------------------

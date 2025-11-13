@@ -10,7 +10,7 @@ The ATACseq pipeline takes one or more BAM files and attempts to find accessible
 
 .. image:: ../images/ATACseq_pipeline.png
 
-.. note:: The **CSAW** step will be skipped if there is no ``sample_info`` tsv file (see :ref:`running_snakePipes`).
+.. note:: The **CSAW** step will be skipped if there is no ``sampleSheet`` tsv file (see :ref:`running_snakePipes`).
 
 Input requirements
 ------------------
@@ -21,6 +21,9 @@ When running the ATACseq pipeline, please specify the output directory of DNAmap
 * **filtered_bam** directory contains the input BAM files (either filtered or unfiltered, however you prefer).
 
 * **sampleSheet.tsv** (OPTIONAL) is only needed to test for differential binding.
+
+
+Alternatively, ATACseq workflow can be run with bam files as input. The folder containing the input bam files can be passed  to `--fromBAM` . Bam file extention can be specified with `--bamExt` . Working directory specified with `-d` will be used as output folder.
 
 .. _diffOpenChrom:
 
@@ -51,7 +54,6 @@ This merged set of regions are provided as an output inside the **CSAW_MACS2_sam
 All differentially bound regions are available in 'CSAW/DiffBinding_significant.bed' . 
 Two thresholds are applied to produce ``Filtered.results.bed`` : FDR (default ``0.05`` ) as well as absolute log fold change (``1``). These can be specified either in the defaults.yaml dictionary or via commandline parameters '--FDR' and '--LFC'. Additionally, filtered results are split into up to 3 bed files, representing direction change (UP, DOWN, or MIXED).
 
-.. note:: In order to include or exclude peaks from selected samples in the union of peaks used in the differential binding analysis, the user may provide an additional column named 'UseRegions' and set it to True or False, accordingly. This column must supersede the 'condition' column in the column order. 
 
 Merged regions from filtered results with any direction change are further used to produce deepTools heatmaps, using depth-normalized coverage. For this purpose, the regions are rescaled to 1kb, and extended by 0.2kb on each side.
 

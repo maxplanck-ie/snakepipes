@@ -12,14 +12,12 @@ There are currently two analysis modes available:
 - "STARsolo" which uses STAR solo for mapping and quantitation.
 - "Alevin" based on Salmon for generating the count matrix.
 
-.. note:: Mode "Gruen" has been deprecated.
 
 The general procedure for mode "STARsolo" involves:
 
 1. moving cell barcodes and UMIs from read 1 into the CB and UMI tags of read 2 during mapping (STARsolo),
 2. quantification of genic read counts at the single cell level (STARsolo),
-3. quantification of reads supporting spliced and unspliced transcripts in each cell (velocyto) - unless this has been disabled with --skipVelocyto
-4. generation of seurat objects for genic counts.
+3. generation of seurat objects for genic counts.
 
 UMIs in the read headers are used to avoid counting PCR duplicates. A number of bigWig and QC plots (e.g., from ``plotEnrichment``) are generated as well.
 
@@ -46,10 +44,6 @@ In the STARsolo folder, bam files are stored, along with 10x-format count matric
 Bam files have the UB and CB tags set.
 
 Deeptools QC is run on these bam files.
-
-Before running velocyto, bam files from STARsolo are filtered to remove unmapped reads as well as reads with an empty CB tag and then cell-sorted by the CB tag.
-In the VelocytoCounts folder, loom files with counts of spliced, unspliced and ambiguous reads are stored. A merged loom file containing counts for all samples together can be found in the VelocytoCounts_merged folder. As Velocyto tends to consume a lot of memory and result in long runtimes with cell numbers in ~10^5, it can be disabled with --skipVelocyto.
-
 
 Input requirements
 ------------------
@@ -170,8 +164,6 @@ The following will be produced in the output directory when the workflow is run 
     ├── scRNAseq.config.yaml
     └── scRNAseq_organism.yaml
 
- - The **VelocytoCounts** directory contains loom files in sample subdirectories.
- - The **VelocytoCounts_merged** directory containes one loom file with all samples merged.
  - The **STARsolo** directory contains bam files and 10X-format cell count matrices produced by STARsolo.
  - The **Annotation** directory contains a filtered version of your original GTF file, with pseudogenes removed by default.
  - The **bamCoverage** directory contains a bigwig track for each sample (not per cell!). This can be used eg. in IGV to check where your reads map in general.
