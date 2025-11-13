@@ -239,7 +239,7 @@ Test data for the various workflows is available at the following locations:
 
  - `DNAmapping <https://zenodo.org/record/3707259>`__
  - `ChIPseq <https://zenodo.org/record/2624281>`__
- - `ATACseq <https://zenodo.org/record/3707666>`__
+ - `ATACseq <https://zenodo.org/record/17600196>`__
  - `mRNAseq <https://zenodo.org/record/3707602>`__
  - `ncRNAseq <https://zenodo.org/deposit/3707749>`__
  - `HiC <https://zenodo.org/record/3707714>`__

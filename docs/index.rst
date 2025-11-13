@@ -122,6 +122,7 @@ Contents:
    content/workflows/ncRNAseq.rst
    content/workflows/scRNAseq.rst
    content/workflows/WGBS.rst
+   content/cookbook.rst
    content/News.rst
 
 
