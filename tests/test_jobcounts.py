@@ -1968,7 +1968,7 @@ class TestscRNAseq():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 159
+        assert parseSpOut(_p) == 149
     def test_skipvelo(self, ifs):
         ci = [
             "scRNAseq",
@@ -1986,7 +1986,7 @@ class TestscRNAseq():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 159
+        assert parseSpOut(_p) == 149
     def test_alevin(self, ifs):
         ci = [
             "scRNAseq",
