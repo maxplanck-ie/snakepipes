@@ -136,8 +136,6 @@ if "three-prime-seq" in mode:
 ##Genomic_contamination
 include: os.path.join(maindir, "shared", "rules", "GenomicContamination.snakefile")
 
-## QC report
-include:os.path.join(maindir, "shared", "rules", "RNA-seq_qc_report.snakefile")
 
 ## DESeq2
 if sampleSheet and not "three-prime-seq" in mode:
@@ -225,8 +223,7 @@ def run_alignment():
         expand("filtered_bam/{sample}.filtered.bam", sample = samples),
         expand("filtered_bam/{sample}.filtered.bam.bai", sample = samples),
         expand("featureCounts/{sample}.counts.txt", sample=samples),
-        "featureCounts/counts.tsv",
-        "QC_report/QC_report_all.tsv"
+        "featureCounts/counts.tsv"
         ]
         if sampleSheet:
             #warnings.warn("LRT value is set to " + str(LRT))
