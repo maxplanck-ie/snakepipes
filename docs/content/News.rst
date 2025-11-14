@@ -4,9 +4,12 @@ snakePipes News
 snakePipes 3.4.0
 ----------------
 
-* fixes #1136
-* fixes #1094
-* fixes #1134
+* HistoneHMM was moved to peakCaller and will only be run if invoked. Differential binding for histoneHMM was added.
+* rMats multicomp is fixed.
+* Chipqc was fixed.
+* A cookbook section was added to documentation.
+* Velocyto was deprecated from scRNAseq workflow in mode STARsolo.
+* Cell barcodes for pre-calculated scRNAseq kits are now included with installation.
 
 
 snakePipes 3.3.0
