@@ -78,7 +78,6 @@ allele_info=is_allelic(workingdir)
 # TODO: catch exception if ChIPseq samples are not unique
 # read ChIPseq dictionary from config.yaml:
 # { ChIP1: { control: Input1, broad: True }, ChIP2: { control: Input2, broad: false }
-#config["chip_dict"] = {}
 
 if not os.path.isfile(samples_config):
     print("ERROR: Cannot find samples file ("+samples_config+")")

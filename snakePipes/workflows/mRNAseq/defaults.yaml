@@ -95,15 +95,3 @@ UMIDedupSep: "_"
 UMIDedupOpts: --paired
 ##DEG
 fdr: 0.05
-################################################################################
-# Call snakemake directly, i.e. without using the wrapper script:
-#
-# Please save a copy of this config yaml file and provide an adjusted config
-# via '--configFile' parameter!
-# example call:
-#
-# snakemake --snakefile /path/to/snakemake_workflows/workflows/RNA-seq/Snakefile
-#           --configFile /path/to/snakemake_workflows/workflows/RNA-seq/defaults.yaml
-#           --directory /path/to/outputdir
-#           --cores 32
-################################################################################

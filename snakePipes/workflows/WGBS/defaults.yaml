@@ -70,15 +70,3 @@ UMIDedup: False
 UMIDedupSep: "_"
 UMIDedupOpts: --paired
 aligner: bwameth
-################################################################################
-# Call snakemake directly, i.e. without using the wrapper script:
-#
-# Please save a copy of this config yaml file and provide an adjusted config
-# via '--configFile' parameter!
-# example call:
-#
-# snakemake --snakefile /path/to/snakemake_workflows/workflows/WGBS/Snakefile
-#           --configFile /path/to/snakemake_workflows/workflows/WGBS/defaults.yaml
-#           --directory /path/to/outputdir
-#           --cores 32
-################################################################################

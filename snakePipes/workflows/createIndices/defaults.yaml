@@ -39,15 +39,3 @@ rmsk_file:
 ## Salmon Index Options
 salmonIndexOptions: --type puff -k 31
 eisaR_flank_length: 80
-################################################################################
-# Call snakemake directly, i.e. without using the wrapper script:
-#
-# Please save a copy of this config yaml file and provide an adjusted config
-# via '--configFile' parameter!
-# example call:
-#
-# snakemake --snakefile /path/to/snakemake_workflows/workflows/createIndices/Snakefile
-#           --configFile /path/to/snakemake_workflows/workflows/createIndices/defaults.yaml
-#           --directory /path/to/outputdir
-#           --cores 32
-################################################################################
