@@ -179,8 +179,8 @@ def main():
         sys.exit("UMIDedup is only valid for \"alignment\" mode!\n")
     if "allelic-counting" in modeTemp and "deepTools_qc" in modeTemp:
         sys.exit("Mode deepTools_qc is not compatible with mode allelic-counting.")
-    if args.fromBAM and ("alignment-free" in modeTemp ):
-        sys.exit("\n--fromBAM can only be used with modes \'alignment\' , \'allelic-mapping\' , \'allelic-counting\'  or \'deepTools_qc\' - use one of these modes or provide fastq files!\n")
+    if args.fromBAM and ("alignment-free" in modeTemp ) and not ("allelic-whatshap" in modeTemp): 
+        sys.exit("\n--fromBAM can only be used with modes \'alignment\' , \'allelic-mapping\' , \'allelic-counting\', \'allelic-whatshap\' with \'alignment-free\' or  \'deepTools_qc\' - use one of these modes or provide fastq files!\n")
     if args.fromBAM:
         args.aligner = "EXTERNAL_BAM"
     if "allelic-counting" in modeTemp and not args.fromBAM:
