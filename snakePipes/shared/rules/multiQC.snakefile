@@ -91,7 +91,7 @@ def multiqc_input_check(return_value):
             infiles.append( expand("allelic_bams/{sample}.markdup.SNPsplit_sort.yaml", sample = samples) )
             indir += " allelic_bams "
         if "alignment-free" in mode:
-            if "allelic-mapping" in mode:
+            if "allelic-mapping" in mode or "allelic-whatshap" in mode:
                 infiles.append( expand("SalmonAllelic/{sample}.{allelic_suffix}/quant.sf", sample = samples,allelic_suffix=allelic_suffix) )
                 indir += " SalmonAllelic "
             else:
