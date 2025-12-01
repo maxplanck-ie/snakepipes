@@ -27,6 +27,15 @@ if trim:
 
 ### Initialization #############################################################
 
+if "allelic-whatshap" in mode:
+    if "allelic-mapping" in mode:
+        sys.exit("Allelic-mapping and allelic-whatshap modes are not compatible. Please choose one or another.")
+    if not pvcf:
+        sys.exit("Allelic-whatshap mode was specified but no phased vcf file was provided. Please provided the path to a phased vcf file.")
+    if not os.path.isfile(pvcf):
+        sys.exit(f"File {pvcf} doesn't exist.")
+
+
 infiles = sorted(glob.glob(os.path.join(str(indir or ''), '*'+ext)))
 if infiles == []:
     sys.exit("Error! Samples extnesion in {} are not {}. "
@@ -71,3 +80,4 @@ else:
     f = open(filter_rules, "w")
     f.write(filt)
     f.close()
+

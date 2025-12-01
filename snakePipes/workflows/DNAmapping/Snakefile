@@ -84,6 +84,10 @@ else:
     elif aligner == "bwa-mem2":
         include: os.path.join(maindir, "shared", "rules", "bwa-mem2.snakefile")
 
+if "allelic-whatshap" in mode:
+    include: os.path.join(maindir, "shared", "rules", "whatshap.snakefile")
+    include: os.path.join(maindir, "shared", "rules", "deepTools_qc_allelic.snakefile")
+
 ### conditional/optional rules #################################################
 ################################################################################
 
@@ -126,12 +130,6 @@ def run_deepTools_qc():
     file_list.append(expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample = samples))
     return (file_list)
 
-def run_Qualimap():
-    file_list = []
-    if qualimap:
-        file_list += expand("Qualimap_qc/{sample}.filtered.bamqc_report.html", sample = samples)
-        file_list += expand("Qualimap_qc/{sample}.filtered.bamqc_results.txt", sample = samples)
-    return (file_list)
 # allele specific
 def make_nmasked_genome():
     if allele_mode == 'create_and_map':
@@ -147,6 +145,21 @@ def make_nmasked_genome():
 
 def run_allelesp_mapping():
     if "allelic-mapping" in mode:
+        allele_suffix = ['allele_flagged', 'genome1', 'genome2', 'unassigned']
+        file_list = [
+        expand("allelic_bams/{sample}.{suffix}.sorted.bam", sample = samples,
+                        suffix = allele_suffix),
+        expand("allelic_bams/{sample}.{suffix}.sorted.bam.bai", sample = samples,
+                        suffix = allele_suffix),
+        expand("bamCoverage/allele_specific/{sample}.{suffix}.seq_depth_norm.bw", sample = samples,
+                        suffix = ['genome1', 'genome2'])
+        ]
+        return(file_list)
+    else:
+        return([])
+
+def run_whatshap():
+    if "allelic-whatshap" in mode:
         allele_suffix = ['allele_flagged', 'genome1', 'genome2', 'unassigned']
         file_list = [
         expand("allelic_bams/{sample}.{suffix}.sorted.bam", sample = samples,
@@ -196,9 +209,9 @@ rule all:
         expand("bamCoverage/{sample}.filtered.seq_depth_norm.bw", sample = samples),
         run_computeGCBias(GCBias),
         run_deepTools_qc(),
-        run_Qualimap(),
         make_nmasked_genome(),
         run_allelesp_mapping(),
+        run_whatshap(),
         "multiQC/multiqc_report.html"
 
 ### execute after workflow finished ############################################

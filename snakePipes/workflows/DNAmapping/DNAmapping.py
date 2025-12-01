@@ -26,7 +26,8 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          "alignerOpts": "", "mateOrientation": "--fr",
                          "UMIDedup": False, "UMIDedupOpts": "",
                          "UMIDedupSep": "_", "UMIBarcode": False, "cutntag": False,
-                         "bcPattern": "NNNNCCCCCCCC", "aligner":"Bowtie2"}):
+                         "bcPattern": "NNNNCCCCCCCC", "aligner":"Bowtie2",
+                         "pvcf": None}):
     """
     Parse arguments from the command line.
     """
@@ -47,7 +48,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
     optional.add_argument("-m", "--mode",
                           dest="mode",
                           help="workflow running modes (available: 'mapping,"
-                          "allelic-mapping')(default: '%(default)s')",
+                          "allelic-mapping, allelic-whatshap')(default: '%(default)s')",
                           default=defaults["mode"])
 
     parserCommon.commonOptions(optional, defaults)
@@ -112,6 +113,11 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                           help="Program used for mapping: Bowtie2 or bwa (default: '%(default)s').",
                           choices=["Bowtie2","bwa","bwa-mem2"],
                           default=defaults["aligner"])
+
+    optional.add_argument("--phasedVcf",
+                          dest="pvcf",
+                          help="Phased vcf required for whatshap haplotagging. (default: '%(default)s')",
+                          default=defaults["pvcf"])
 
     return parser
 

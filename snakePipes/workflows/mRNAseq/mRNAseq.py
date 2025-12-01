@@ -103,7 +103,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                           default=defaults["LRT"])
 
 
-    optional.add_argument("--phased-vcf",
+    optional.add_argument("--phasedVcf",
                           dest="pvcf",
                           help="Phased vcf required for whatshap haplotagging. (default: '%(default)s')",
                           default=defaults["pvcf"])

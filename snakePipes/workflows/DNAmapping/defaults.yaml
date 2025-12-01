@@ -64,3 +64,5 @@ UMIDedupOpts:
 fragmentLength: 200
 qualimap: false
 verbose: false
+#phased vcf
+pvcf:

@@ -1,6 +1,13 @@
 snakePipes News
 ===============
 
+snakePipes 3.5.0
+----------------
+
+* Allelic-whatshap mode was added to DNAmapping. Requires --phasedVcf.
+* Allelic-whatshap mode now works with alignment-free mode and fromBAM in the mRNAseq workflow.
+
+
 snakePipes 3.4.0
 ----------------
 
