@@ -559,8 +559,6 @@ class TestDNAmapping():
             '--snakemakeOptions',
             SMKOPTS,
             ifs / 'org.yaml',
-            '--sampleSheet',
-            ifs / 'sampleSheet.tsv',
             '-m',
             'allelic-whatshap',
             '--phasedVcf',
