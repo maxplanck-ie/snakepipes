@@ -549,6 +549,27 @@ class TestDNAmapping():
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
         assert parseSpOut(_p) == 143
+    def test_whatshap_allelic(self, ifs):
+        ci = [
+            "DNAmapping",
+            '-i',
+            ifs / 'PE',
+            '-o',
+            ifs / 'outdir',
+            '--snakemakeOptions',
+            SMKOPTS,
+            ifs / 'org.yaml',
+            '--sampleSheet',
+            ifs / 'sampleSheet.tsv',
+            '-m',
+            'allelic-whatshap',
+            '--phasedVcf',
+            ifs / 'allelic_input' / 'file.vcf.gz'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 208
 
 class TestChIPseq:
     def test_default(self, ifs):
@@ -1832,7 +1853,7 @@ class TestmRNAseq:
             ifs / 'sampleSheet.tsv',
             '-m',
             'allelic-whatshap,deepTools_qc',
-            '--phased-vcf',
+            '--phasedVcf',
             ifs / 'allelic_input' / 'file.vcf.gz'
         ]
         print(' '.join([str(i) for i in ci]))
@@ -1856,7 +1877,7 @@ class TestmRNAseq:
             ifs / 'sampleSheet.tsv',
             '-m',
             'allelic-whatshap,deepTools_qc',
-            '--phased-vcf',
+            '--phasedVcf',
             ifs / 'allelic_input' / 'file.vcf.gz'
         ]
         print(' '.join([str(i) for i in ci]))
