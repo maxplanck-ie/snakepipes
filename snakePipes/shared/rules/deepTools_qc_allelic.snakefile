@@ -53,7 +53,7 @@ rule multiBamSummary_allelic:
                     else "",
         read_extension = "--extendReads" if pairedEnd
                          else "--extendReads " + str(fragmentLength),
-        scaling_factors = "",
+        scaling_factors = "--scalingFactors deepTools_qc/multiBamSummary/allelic.scaling_factors.txt",
         binSize = "",
         spikein_region = ""
     benchmark:
