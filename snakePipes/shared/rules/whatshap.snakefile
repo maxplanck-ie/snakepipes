@@ -1,9 +1,15 @@
+def collect_bam():
+    bam = "filtered_bam/{sample}.filtered.bam"
+    if pipeline == "dnamapping" and splitHybridGenome:
+        bam = "split_bam/{sample}_host.bam"
+    return(bam)
+
 rule whatshap_haplotag:
         input:
             ref = genome_fasta,
             pvcf = pvcf,
-            bam = "filtered_bam/{sample}.filtered.bam",
-            bai = "filtered_bam/{sample}.filtered.bam.bai"
+            bam = collect_bam(),
+            bai = lambda wildcards,input: input.bam + ".bai"
         output:
             hbam = "allelic_bams/{sample}.allele_flagged.sorted.bam",
             hlist = "allelic_bams/{sample}_haplotype_list.tsv"
