@@ -9,7 +9,7 @@ rule whatshap_haplotag:
             ref = genome_fasta,
             pvcf = pvcf,
             bam = collect_bam(),
-            bai = lambda wildcards,input: input.bam + ".bai"
+            bai = lambda wildcards: f"{collect_bam()}.bai"
         output:
             hbam = "allelic_bams/{sample}.allele_flagged.sorted.bam",
             hlist = "allelic_bams/{sample}_haplotype_list.tsv"
