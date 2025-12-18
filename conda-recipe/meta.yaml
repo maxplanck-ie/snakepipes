@@ -14,12 +14,12 @@ build:
 
 requirements:
   host:
-    - python >=3.11,<3.13
+    - python >=3.12,<3.13
     - pip
     - seaborn
     - setuptools
   run:
-    - python >=3.11,<3.13
+    - python >=3.12,<3.13
     - snakemake >=8
     - snakemake-executor-plugin-cluster-generic >=1.0.9
     - pandas
