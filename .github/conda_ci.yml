@@ -2,5 +2,5 @@ name: conda_ci
 dependencies:
   - python>=3.12,<3.13
   - anaconda-client
-  - conda-build
+  - conda-build=3.27
   - conda-verify
