@@ -568,6 +568,22 @@ class TestDNAmapping():
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
         assert parseSpOut(_p) == 180
+    def test_spikein(self, ifs):
+        ci = [
+            "DNAmapping",
+            '-i',
+            ifs / 'PE',
+            '-o',
+            ifs / 'outdir',
+            '--snakemakeOptions',
+            SMKOPTS,
+            ifs / 'org.yaml',
+            '--splitHybridGenome'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 180
 
 class TestChIPseq:
     def test_default(self, ifs):
