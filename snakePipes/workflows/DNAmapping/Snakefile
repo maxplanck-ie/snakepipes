@@ -46,8 +46,8 @@ include: os.path.join(maindir, "shared", "tools" , "deeptools_cmds.snakefile")
 # deepTools QC
 include: os.path.join(maindir, "shared", "rules", "deepTools_qc.snakefile")
 
-# Qualimap BAM QC
-include: os.path.join(maindir, "shared", "rules", "Qualimap_bamqc.snakefile")
+if splitHybridGenome:
+    include: os.path.join(maindir, "shared", "rules", "split_bam_ops_DNA_spikein.snakefile")
 
 ## MultiQC
 include: os.path.join(maindir, "shared", "rules", "multiQC.snakefile")
@@ -113,6 +113,18 @@ def run_computeGCBias(GCBias):
             file_list = expand("deepTools_qc/computeGCBias/{sample}.filtered.GCBias.png", sample = samples)
     return(file_list)
 
+def run_splitBam_ops():
+    if splitHybridGenome:
+        file_list = expand("split_bam/{sample}_{part}.bam",sample=samples,part=part)
+        file_list.append(
+            [expand("split_deepTools_qc/multiBamSummary/{part}.scaling_factors.txt",part=part),
+            expand("bamCoverage/{sample}.host_scaled.BY{part}.bw",sample=samples,part=part),
+            expand("split_deepTools_qc/bamPEFragmentSize/{part}.fragmentSize.metric.tsv",part=part)]
+            )
+    else:
+        file_list = []
+    return(file_list)
+
 def run_deepTools_qc():
     file_list = ["deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv"]
     if len(samples) <= 20:
@@ -122,7 +134,7 @@ def run_deepTools_qc():
             "deepTools_qc/plotCorrelation/correlation.pearson.read_coverage.tsv",
             "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage.tsv",
             "deepTools_qc/plotPCA/PCA.read_coverage.tsv" ])
-        if 'allelic-mapping' in mode:
+        if 'allelic-mapping' in mode or 'allelic-whatshap' in mode:
             file_list.append( [
                 "deepTools_qc/plotCorrelation/correlation.pearson.read_coverage_allelic.tsv",
                 "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage_allelic.tsv",
@@ -209,6 +221,7 @@ rule all:
         expand("bamCoverage/{sample}.filtered.seq_depth_norm.bw", sample = samples),
         run_computeGCBias(GCBias),
         run_deepTools_qc(),
+        run_splitBam_ops(),
         make_nmasked_genome(),
         run_allelesp_mapping(),
         run_whatshap(),
