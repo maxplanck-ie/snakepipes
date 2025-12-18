@@ -5,6 +5,7 @@ snakePipes 3.5.0
 ----------------
 
 * Allelic-whatshap mode was added to DNAmapping. Requires --phasedVcf.
+* --splitHybridGenome sption to split bam files by host and spikein genome was added to DNAmapping.
 * Allelic-whatshap mode now works with alignment-free mode and fromBAM in the mRNAseq workflow.
 
 

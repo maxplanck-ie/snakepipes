@@ -24,7 +24,7 @@ Process and analyze Cut&Tag data for chromatin binding. Fastq files are mapped t
 
 .. code-block:: bash
 
-   DNAmapping --cutntag --trim --trimmerOptions ' -a nexteraF=CTGTCTCTTATA -A nexteraR=CTGTCTCTTATA ' --fastqc --dedup --mapq 3 -i $input_folder -o analysis_dedup customIndices/GRch38_dm6/GRCh38_g31_dm6.yaml
+   DNAmapping --cutntag --trim --trimmerOptions ' -a nexteraF=CTGTCTCTTATA -A nexteraR=CTGTCTCTTATA ' --fastqc --dedup --splitHybridGenome --mapq 3 -i $input_folder -o analysis_dedup customIndices/GRch38_dm6/GRCh38_g31_dm6.yaml
 
 .. code-block:: bash
 
