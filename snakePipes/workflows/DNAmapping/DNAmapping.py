@@ -126,7 +126,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
 
     optional.add_argument("--spikeinExt",
                           dest="spikeinExt",
-                          help="Extention of spikein chromosome names in the hybrid genome. Ignored if useSpikeInForNorm is False (default: '%(default)s') .",
+                          help="Extention of spikein chromosome names in the hybrid genome. Ignored if splitHybridGenome is False (default: '%(default)s') .",
                           default=defaults["spikeinExt"])
 
     return parser
