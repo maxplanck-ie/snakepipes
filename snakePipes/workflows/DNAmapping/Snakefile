@@ -87,6 +87,8 @@ else:
 if "allelic-whatshap" in mode:
     include: os.path.join(maindir, "shared", "rules", "whatshap.snakefile")
     include: os.path.join(maindir, "shared", "rules", "deepTools_qc_allelic.snakefile")
+    if splitHybridGenome:
+        include: os.path.join(maindir, "shared", "rules", "deepTools_qc_allelic_spikein.snakefile")
 
 ### conditional/optional rules #################################################
 ################################################################################
@@ -121,6 +123,12 @@ def run_splitBam_ops():
             expand("bamCoverage/{sample}.host_scaled.BY{part}.bw",sample=samples,part=part),
             expand("split_deepTools_qc/bamPEFragmentSize/{part}.fragmentSize.metric.tsv",part=part)]
             )
+        if "allelic-whatshap" in mode:
+            allele_suffix = ['genome1', 'genome2']
+            file_list.append(
+                ["sizeFactor_product/allelicXspikein.scaling_factors.txt",
+                expand("bamCoverage/allele_specific/{sample}.{suffix}.host_scaled.BYspikein.bw",sample=samples,suffix=allele_suffix)]
+)
     else:
         file_list = []
     return(file_list)
