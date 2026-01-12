@@ -38,7 +38,7 @@ def _read_table(path: str, sep: str) -> pd.DataFrame:
     try:
         df = pd.read_csv(path, sep=sep, dtype=str, keep_default_na=False, na_values=[""])
     except Exception as e:
-        raise RuntimeError(f"Failed to read '{path}': {e}")
+        raise RuntimeError(f"Failed to read '{path}': {e}") from e
     _strip_colnames(df)
     return df
 
@@ -234,3 +234,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
