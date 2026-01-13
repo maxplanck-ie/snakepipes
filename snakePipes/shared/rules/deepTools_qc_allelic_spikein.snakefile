@@ -22,7 +22,7 @@ rule multiply_size_factors:
     output:
         "sizeFactor_product/allelicXspikein.scaling_factors.txt"
     params:
-        script = script=os.path.join(maindir, "shared","tools/merge_and_multiply_and_write_fixed.py"),
+        script = os.path.join(maindir, "shared","tools/merge_and_multiply_and_write_fixed.py"),
         suffixes = ".genome1,.genome2",
         a_id = "sample",
         a_val = "scalingFactor",
