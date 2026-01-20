@@ -14,7 +14,7 @@ Options (examples):
 """
 from typing import Sequence, Optional, Tuple, List
 import re
-import argparse
+#import argparse
 import sys
 import pandas as pd
 
@@ -196,36 +196,49 @@ def merge_and_write(
 
 
 def main():
-    p = argparse.ArgumentParser(description="Merge fileA and fileB and write sample/product output.")
-    p.add_argument("file_a", help="Path to file A (sample ids with suffixes).")
-    p.add_argument("file_b", help="Path to file B (base sample ids).")
-    p.add_argument("output_file", help="Path to write the two-column output (sample, product).")
-    p.add_argument("--sep", default="\t", help="Separator for input/output files (default: tab).")
-    p.add_argument("--a-id", default="sample", dest="a_id", help="ID column name in file A (default: sample).")
-    p.add_argument("--a-val", default="value", dest="a_val", help="Numeric value column name in file A (default: value).")
-    p.add_argument("--b-id", default="sample", dest="b_id", help="ID column name in file B (default: sample).")
-    p.add_argument("--b-val", default="value", dest="b_val", help="Numeric value column name in file B (default: value).")
-    p.add_argument("--suffixes", default=".genome1,.genome2", help="Comma-separated suffixes to strip from A ids (default: .genome1,.genome2).")
-    p.add_argument("--float-format", default=None, help='Optional float format for output values, e.g. ".6f" (no percent sign).')
-    p.add_argument("--how", default="left", choices=("left", "inner"), help="Merge type (left or inner).")
-    p.add_argument("--print-all", action="store_true", help="Print the full merged DataFrame instead of only head().")
-    args = p.parse_args()
+    #p = argparse.ArgumentParser(description="Merge fileA and fileB and write sample/product output.")
+    #p.add_argument("file_a", help="Path to file A (sample ids with suffixes).")
+    #p.add_argument("file_b", help="Path to file B (base sample ids).")
+    #p.add_argument("output_file", help="Path to write the two-column output (sample, product).")
+    #p.add_argument("--sep", default="\t", help="Separator for input/output files (default: tab).")
+    #p.add_argument("--a-id", default="sample", dest="a_id", help="ID column name in file A (default: sample).")
+    #p.add_argument("--a-val", default="value", dest="a_val", help="Numeric value column name in file A (default: value).")
+    #p.add_argument("--b-id", default="sample", dest="b_id", help="ID column name in file B (default: sample).")
+    #p.add_argument("--b-val", default="value", dest="b_val", help="Numeric value column name in file B (default: value).")
+    #p.add_argument("--suffixes", default=".genome1,.genome2", help="Comma-separated suffixes to strip from A ids (default: .genome1,.genome2).")
+    #p.add_argument("--float-format", default=None, help='Optional float format for output values, e.g. ".6f" (no percent sign).')
+    #p.add_argument("--how", default="left", choices=("left", "inner"), help="Merge type (left or inner).")
+    #p.add_argument("--print-all", action="store_true", help="Print the full merged DataFrame instead of only head().#")
+    #args = p.parse_args()
+    ori_suffixes = ".genome1,.genome2"
+    suffixes = _parse_suffixes(ori_suffixes)
+    file_a = snakemake.input["allelic_sf"]
+    file_b = snakemake.input["spikein_sf"]
+    output_file = snakemake.output[0]
+    a_id_col = "sample"
+    a_val_col = "scalingFactor"
+    b_id_col = "sample"
+    b_val_col = "scalingFactor"
+    sep = "\t"
+    how = "left"
+    float_format = ".6f"
+    print_all = False
 
-    suffixes = _parse_suffixes(args.suffixes)
+
     try:
         merge_and_write(
-            args.file_a,
-            args.file_b,
-            args.output_file,
-            a_id_col=args.a_id,
-            a_val_col=args.a_val,
-            b_id_col=args.b_id,
-            b_val_col=args.b_val,
-            suffixes=suffixes,
-            sep=args.sep,
-            how=args.how,
-            float_format=args.float_format,
-            print_all=args.print_all,
+            file_a,
+            file_b,
+            output_file#,
+            #a_id_col,
+            #a_val_col,
+            #b_id_col,
+            #b_val_col,
+            #suffixes,
+            #sep,
+            #how,
+            #float_format,
+            #print_all
         )
     except Exception as e:
         print(f"ERROR: {e}", file=sys.stderr)

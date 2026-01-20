@@ -46,7 +46,7 @@ include: os.path.join(maindir, "shared", "tools" , "deeptools_cmds.snakefile")
 # deepTools QC
 include: os.path.join(maindir, "shared", "rules", "deepTools_qc.snakefile")
 
-if splitHybridGenome:
+if useSpikeinForNorm:
     include: os.path.join(maindir, "shared", "rules", "split_bam_ops_DNA_spikein.snakefile")
 
 ## MultiQC
@@ -87,7 +87,7 @@ else:
 if "allelic-whatshap" in mode:
     include: os.path.join(maindir, "shared", "rules", "whatshap.snakefile")
     include: os.path.join(maindir, "shared", "rules", "deepTools_qc_allelic.snakefile")
-    if splitHybridGenome:
+    if useSpikeinForNorm:
         include: os.path.join(maindir, "shared", "rules", "deepTools_qc_allelic_spikein.snakefile")
 
 ### conditional/optional rules #################################################
@@ -116,7 +116,7 @@ def run_computeGCBias(GCBias):
     return(file_list)
 
 def run_splitBam_ops():
-    if splitHybridGenome:
+    if useSpikeinForNorm:
         file_list = expand("split_bam/{sample}_{part}.bam",sample=samples,part=part)
         file_list.append(
             [expand("split_deepTools_qc/multiBamSummary/{part}.scaling_factors.txt",part=part),
@@ -126,8 +126,8 @@ def run_splitBam_ops():
         if "allelic-whatshap" in mode:
             allele_suffix = ['genome1', 'genome2']
             file_list.append(
-                ["sizeFactor_product/allelicXspikein.scaling_factors.txt",
-                expand("bamCoverage/allele_specific/{sample}.{suffix}.host_scaled.BYspikein.bw",sample=samples,suffix=allele_suffix)]
+                #"sizeFactor_product/allelicXspikein.scaling_factors.txt",
+                [expand("bamCoverage/allele_specific/{sample}.{suffix}.host_scaled.BYspikein.bw",sample=samples,suffix=allele_suffix)]
 )
     else:
         file_list = []

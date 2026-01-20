@@ -594,7 +594,7 @@ class TestDNAmapping():
             '--snakemakeOptions',
             SMKOPTS,
             ifs / 'org.yaml',
-            '--splitHybridGenome',
+            '--useSpikeinForNorm',
             '-m',
             'allelic-whatshap',
             '--phasedVcf',

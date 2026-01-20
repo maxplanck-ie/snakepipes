@@ -27,7 +27,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          "UMIDedup": False, "UMIDedupOpts": "",
                          "UMIDedupSep": "_", "UMIBarcode": False, "cutntag": False,
                          "bcPattern": "NNNNCCCCCCCC", "aligner":"Bowtie2",
-                         "pvcf": None, "splitHybridGenome": False, "spikeinExt": None}):
+                         "pvcf": None, "useSpikeinForNorm": False, "spikeinExt": None}):
     """
     Parse arguments from the command line.
     """
@@ -119,10 +119,10 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                           help="Phased vcf required for whatshap haplotagging. (default: '%(default)s')",
                           default=defaults["pvcf"])
 
-    optional.add_argument("--splitHybridGenome",
-                          dest="splitHybridGenome",
+    optional.add_argument("--useSpikeinForNorm",
+                          dest="useSpikeinForNorm",
                           action="store_true",
-                          help="Split bam files by host and spikein genome.")
+                          help="Split bam files by host and spikein genome, then scale bam coverage results by spikein-derived size factors.")
 
     optional.add_argument("--spikeinExt",
                           dest="spikeinExt",

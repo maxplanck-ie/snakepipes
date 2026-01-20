@@ -67,6 +67,6 @@ verbose: false
 #phased vcf
 pvcf:
 #arguments related to hybrid genome alignment
-splitHybridGenome: False
+useSpikeinForNorm: False
 spikeinExt: "_spikein"
 spikein_bin_size: 1000
