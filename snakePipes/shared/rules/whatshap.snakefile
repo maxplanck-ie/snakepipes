@@ -1,6 +1,6 @@
 def collect_bam():
     bam = "filtered_bam/{sample}.filtered.bam"
-    if pipeline == "dnamapping" and splitHybridGenome:
+    if pipeline == "dnamapping" and useSpikeinForNorm:
         bam = "split_bam/{sample}_host.bam"
     return(bam)
 
