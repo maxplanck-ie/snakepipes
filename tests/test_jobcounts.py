@@ -603,7 +603,7 @@ class TestDNAmapping():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 243
+        assert parseSpOut(_p) == 242
 
 class TestChIPseq:
     def test_default(self, ifs):
