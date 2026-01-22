@@ -18,22 +18,6 @@ def get_scaling_factor(sample,input):
         return float(1)
 
 
-#rule multiply_size_factors:
-#    input:
-#        allelic_sf = "deepTools_qc/multiBamSummary/allelic.scaling_factors.txt",
-#        spikein_sf = "split_deepTools_qc/multiBamSummary/spikein.scaling_factors.txt"
-#    output:
-#        "sizeFactor_product/allelicXspikein.scaling_factors.txt"
-#    params:
-#        script = (tools_dir / "merge_and_multiply_and_write_sizeFactors.py"),
-#        suffixes = ".genome1,.genome2",
-#        a_id = "sample",
-#        a_val = "scalingFactor",
-#        b_id = "sample",
-#        b_val = "scalingFactor",
-#        float_format = ".6f"
-#    script: "{params.script}"
-
 rule bamCoverage_spikein:
     input:
         bam = "allelic_bams/{sample}.{suffix}.sorted.bam" ,

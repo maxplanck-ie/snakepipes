@@ -126,7 +126,6 @@ def run_splitBam_ops():
         if "allelic-whatshap" in mode:
             allele_suffix = ['genome1', 'genome2']
             file_list.append(
-                #"sizeFactor_product/allelicXspikein.scaling_factors.txt",
                 [expand("bamCoverage/allele_specific/{sample}.{suffix}.host_scaled.BYspikein.bw",sample=samples,suffix=allele_suffix)]
 )
     else:
