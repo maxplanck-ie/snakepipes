@@ -578,7 +578,7 @@ class TestDNAmapping():
             '--snakemakeOptions',
             SMKOPTS,
             ifs / 'org.yaml',
-            '--useSpikeInForNorm'
+            '--useSpikeinForNorm'
         ]
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
