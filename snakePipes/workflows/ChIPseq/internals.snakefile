@@ -6,6 +6,7 @@ from ruamel.yaml import YAML
 import sys
 import pandas as pd
 import warnings
+from itertools import chain
 
 ### Functions ##################################################################
 
@@ -230,6 +231,7 @@ if sampleSheet:
         filtered_dict = filter_dict(sampleSheet,dict(zip(chip_samples_w_ctrl, [ get_control_name(x) for x in chip_samples_w_ctrl ])))
     else:
         filtered_dict = filter_dict(sampleSheet,dict(zip(chip_samples_wo_ctrl, [None]*len(chip_samples_wo_ctrl))))
+    print(filtered_dict)
     genrichDict = cf.sampleSheetGroups(sampleSheet,isMultipleComparison)
     if not isMultipleComparison:
         for k in genrichDict.keys():
@@ -238,10 +240,18 @@ if sampleSheet:
     else:
         print(genrichDict)
         reordered_dict = {}
-        for g in genrichDict.keys():
-            for k in genrichDict[g].keys():
-                genrichDict[g][k]=[item for item in genrichDict[g][k] if item in chip_samples]
-                reordered_dict[g] = {k: filtered_dict[k] for k in [item for sublist in genrichDict[g].values() for item in sublist]}
+        #for g in genrichDict.keys():
+        #    for k in genrichDict[g].keys():
+        #        genrichDict[g][k]=[item for item in genrichDict[g][k] if item in chip_samples]
+        #        reordered_dict[g] = {k: filtered_dict[k] for k in [item for sublist in genrichDict[g].values() for item in sublist]}
+        for g in genrichDict:
+            # filter each condition list to only chip samples
+            for k in genrichDict[g]:
+                genrichDict[g][k] = [item for item in genrichDict[g][k] if item in chip_samples]
+
+            # flatten the lists and build mapping, skipping missing keys just in case
+            flattened = chain.from_iterable(genrichDict[g].values())
+            reordered_dict[g] = {fk: filtered_dict[fk] for fk in flattened if fk in filtered_dict}
 else:
     genrichDict = {"all_samples": chip_samples}
 
