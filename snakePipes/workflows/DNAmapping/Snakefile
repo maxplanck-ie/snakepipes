@@ -46,7 +46,7 @@ include: os.path.join(maindir, "shared", "tools" , "deeptools_cmds.snakefile")
 # deepTools QC
 include: os.path.join(maindir, "shared", "rules", "deepTools_qc.snakefile")
 
-if useSpikeinForNorm:
+if useSpikeInForNorm:
     include: os.path.join(maindir, "shared", "rules", "split_bam_ops_DNA_spikein.snakefile")
 
 ## MultiQC
@@ -116,7 +116,7 @@ def run_computeGCBias(GCBias):
     return(file_list)
 
 def run_splitBam_ops():
-    if useSpikeinForNorm:
+    if useSpikeInForNorm:
         file_list = expand("split_bam/{sample}_{part}.bam",sample=samples,part=part)
         file_list.append(
             [expand("split_deepTools_qc/multiBamSummary/{part}.scaling_factors.txt",part=part),

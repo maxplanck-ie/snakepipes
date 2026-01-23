@@ -1,6 +1,6 @@
 def collect_bam():
     bam = "filtered_bam/{sample}.filtered.bam"
-    if pipeline == "dnamapping" and useSpikeinForNorm:
+    if pipeline == "dnamapping" and useSpikeInForNorm:
         bam = "split_bam/{sample}_host.bam"
     return(bam)
 

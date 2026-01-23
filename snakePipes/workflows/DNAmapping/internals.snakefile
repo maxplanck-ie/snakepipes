@@ -117,7 +117,7 @@ def get_host_and_spikein_chromosomes(genome_index, spikeinEx):
                 continue
     return([hostl,spikeinl])
 
-if useSpikeinForNorm:
+if useSpikeInForNorm:
     part=['host','spikein']
     spikein_detected=check_if_spikein_genome(genome_index,spikeinExt)
     if spikein_detected:
@@ -127,5 +127,5 @@ if useSpikeinForNorm:
             k, v = next(iter(spikein_chr.items()))
             spikein_region = ":0:".join([str(k),str(v)])
     else:
-        print("\n useSpikeinForNorm was specified but no spikein genome was detected - no spikeIn chromosomes found with extention " + spikeinExt + " .\n\n")
+        print("\n useSpikeInForNorm was specified but no spikein genome was detected - no spikeIn chromosomes found with extention " + spikeinExt + " .\n\n")
         exit(1)

@@ -578,7 +578,7 @@ class TestDNAmapping():
             '--snakemakeOptions',
             SMKOPTS,
             ifs / 'org.yaml',
-            '--useSpikeinForNorm'
+            '--useSpikeInForNorm'
         ]
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
@@ -594,7 +594,7 @@ class TestDNAmapping():
             '--snakemakeOptions',
             SMKOPTS,
             ifs / 'org.yaml',
-            '--useSpikeinForNorm',
+            '--useSpikeInForNorm',
             '-m',
             'allelic-whatshap',
             '--phasedVcf',
