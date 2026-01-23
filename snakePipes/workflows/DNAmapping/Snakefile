@@ -87,7 +87,7 @@ else:
 if "allelic-whatshap" in mode:
     include: os.path.join(maindir, "shared", "rules", "whatshap.snakefile")
     include: os.path.join(maindir, "shared", "rules", "deepTools_qc_allelic.snakefile")
-    if useSpikeinForNorm:
+    if useSpikeInForNorm:
         include: os.path.join(maindir, "shared", "rules", "deepTools_qc_allelic_spikein.snakefile")
 
 ### conditional/optional rules #################################################
