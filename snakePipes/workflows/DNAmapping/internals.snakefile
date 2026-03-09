@@ -1,6 +1,7 @@
 import glob
 import os
 import subprocess
+import warnings
 
 ## Main variables ##############################################################
 
@@ -34,6 +35,7 @@ if "allelic-whatshap" in mode:
         sys.exit("Allelic-whatshap mode was specified but no phased vcf file was provided. Please provided the path to a phased vcf file.")
     if not os.path.isfile(pvcf):
         sys.exit(f"File {pvcf} doesn't exist.")
+
 
 
 infiles = sorted(glob.glob(os.path.join(str(indir or ''), '*'+ext)))
@@ -81,3 +83,49 @@ else:
     f.write(filt)
     f.close()
 
+
+#################### functions and checks for using a spiked-in genome for normalization ########################################
+def check_if_spikein_genome(genome_index,spikeinExt):
+    resl=[]
+    if os.path.isfile(genome_index):
+        with open(genome_index) as ifile:
+            for line in ifile:
+                resl.append(re.search(spikeinExt, line))
+        if any(resl):
+            warnings.warn("\n Spikein genome detected - at least one spikeIn chromosome found with extention " + spikeinExt + " .\n\n")
+            return True
+        else:
+            return False
+    else:
+        print("\n  Error! Genome index file "+ genome_index +" not found!!!\n\n")
+        exit(1)
+
+def get_host_and_spikein_chromosomes(genome_index, spikeinEx):
+    hostl=dict()
+    spikeinl=dict()
+    with open(genome_index) as ifile:
+        for line in ifile:
+            try:
+                entry = line.split('\t')[0]
+                length = line.split('\t')[1]
+                if re.search(spikeinExt, entry):
+                    spikeinl[entry] = length
+                else:
+                    hostl[entry] = length
+            except:
+                warnings.warn("check for empty lines in the index file!")
+                continue
+    return([hostl,spikeinl])
+
+if useSpikeInForNorm:
+    part=['host','spikein']
+    spikein_detected=check_if_spikein_genome(genome_index,spikeinExt)
+    if spikein_detected:
+        host_chr, spikein_chr =get_host_and_spikein_chromosomes(genome_index,spikeinExt)
+        spikein_region = ""
+        if len(spikein_chr.items()) == 1:
+            k, v = next(iter(spikein_chr.items()))
+            spikein_region = ":0:".join([str(k),str(v)])
+    else:
+        print("\n useSpikeInForNorm was specified but no spikein genome was detected - no spikeIn chromosomes found with extention " + spikeinExt + " .\n\n")
+        exit(1)

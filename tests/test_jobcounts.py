@@ -567,7 +567,43 @@ class TestDNAmapping():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 180
+        assert parseSpOut(_p) == 184
+    def test_spikein(self, ifs):
+        ci = [
+            "DNAmapping",
+            '-i',
+            ifs / 'PE',
+            '-o',
+            ifs / 'outdir',
+            '--snakemakeOptions',
+            SMKOPTS,
+            ifs / 'org.yaml',
+            '--useSpikeInForNorm'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 183
+    def test_whatshap_allelic_spikein(self, ifs):
+        ci = [
+            "DNAmapping",
+            '-i',
+            ifs / 'PE',
+            '-o',
+            ifs / 'outdir',
+            '--snakemakeOptions',
+            SMKOPTS,
+            ifs / 'org.yaml',
+            '--useSpikeInForNorm',
+            '-m',
+            'allelic-whatshap',
+            '--phasedVcf',
+            ifs / 'allelic_input' / 'file.vcf.gz'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 242
 
 class TestChIPseq:
     def test_default(self, ifs):
