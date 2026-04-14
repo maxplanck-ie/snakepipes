@@ -39,7 +39,9 @@ message(paste("FDR:", fdr, "\n"))
 message(paste("LFC:", lfc, "\n"))
 message(paste("paired-end? :", pairedEnd, "\n"))
 message(paste("allele-specific? :", allelic_info, "\n"))
+message(paste("spikein normalization requested :", useSpikeInForNorm, "\n"))
 message(paste("External bed? ;", external_bed, "\n"))
+
 
 ## sampleInfo (setup of the experiment)
 sampleInfo <- read.table(sampleInfoFilePath, header = TRUE, colClasses = c("character", "character"))
@@ -128,6 +130,9 @@ if (! external_bed) {
         })
     }
     # merge
+    all_levels<-unique(unlist(lapply(allpeaks,function(X)seqlevels(X))))
+    allpeaks<-lapply(allpeaks,function(X){seqlevels(X)<-all_levels
+                                          return(X)})
     allpeaks <- Reduce(function(x,y) GenomicRanges::union(x,y), allpeaks)
     
     } else {
