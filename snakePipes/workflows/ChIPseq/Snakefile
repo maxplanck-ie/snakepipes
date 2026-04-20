@@ -89,14 +89,8 @@ def run_deepTools_qc(fromBAM,useSpikeInForNorm):
         file_list.append(expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample = samples))
     elif useSpikeInForNorm:
         file_list=expand("split_deepTools_qc/bamPEFragmentSize/{part}.fragmentSize.metric.tsv",part=part)
-        if getSizeFactorsFrom=="genome":
-            file_list=(expand("split_deepTools_qc/multiBamSummary/{part}.ChIP_read_coverage.bins.npz",part=part))
-            file_list.append(expand("bamCoverage/{sample}.host_scaled.BY{part}.bw",sample=chip_samples,part=part))
-        elif getSizeFactorsFrom=="TSS":
-            file_list.append(expand("bamCoverage_TSS/{sample}.host_scaled.BYspikein.bw",sample=chip_samples))
-        elif getSizeFactorsFrom=="input" and chip_samples_w_ctrl:
-            file_list.append(expand("bamCoverage_input/{sample}.host_scaled.BYspikein.bw",sample=chip_samples_w_ctrl))
-            file_list.append(expand("split_deepTools_qc/multiBamSummary/{part}.input_read_coverage.bins.npz",part=part))
+        file_list=(expand("split_deepTools_qc/multiBamSummary/{part}.ChIP_read_coverage.bins.npz",part=part))
+        file_list.append(expand("bamCoverage/{sample}.host_scaled.BY{part}.bw",sample=chip_samples,part=part))
     else:
         file_list = []
     return(file_list)
@@ -136,6 +130,11 @@ def run_deepTools_allelic():
         "deepTools_ChIP/plotEnrichment/plotEnrichment.gene_features_allelic.tsv",
         "deepTools_ChIP/plotFingerprint/plotFingerprint.metrics_allelic.txt"
          ] )
+    if useSpikeinForNorm:
+        file_list.append([
+        "deepTools_ChIP/bamCompare/allele_specific/"+chip_sample+".genome1.log2ratio.over_"+control_name+".scaledBYspikein.bw",
+        "deepTools_ChIP/bamCompare/allele_specific/"+chip_sample+".genome2.log2ratio.over_"+control_name+".scaledBYspikein.bw"
+])
     return(file_list)
 
 def run_CSAW():

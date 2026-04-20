@@ -70,12 +70,6 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                           action="store_true",
                           help="Use the spikeIn chromosomes of the hybrid genome for normalization.")
 
-    optional.add_argument("--getSizeFactorsFrom",
-                          dest="getSizeFactorsFrom",
-                          action="store",
-                          choices=["genome", "TSS", "input"],
-                          help="Which part of the spikein genome to use to calculate sizeFactors from.",
-                          default=defaults['getSizeFactorsFrom'])
 
     optional.add_argument("--spikeinExt",
                           dest="spikeinExt",
@@ -154,6 +148,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                           help="FDR threshold to apply for filtering DB regions"
                                "(default: '%(default)s')",
                           default=defaults["fdr"])
+
     optional.add_argument("--LFC",
                           dest="absBestLFC",
                           help="Log fold change threshold to apply for filtering DB regions"
