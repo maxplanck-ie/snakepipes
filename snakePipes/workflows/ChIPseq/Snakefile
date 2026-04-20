@@ -32,7 +32,7 @@ if fromBAM:
         include: os.path.join(maindir, "shared", "rules", "deepTools_qc.snakefile")
 
 if useSpikeInForNorm:
-        include: os.path.join(maindir, "shared", "rules", "split_bam_ops_ChIP_spikein.snakefile")
+        #include: os.path.join(maindir, "shared", "rules", "split_bam_ops_ChIP_spikein.snakefile")
         include: os.path.join(maindir, "shared", "rules", "deepTools_ChIP_spikein.snakefile")
         include: os.path.join(maindir, "shared", "rules", "ChIP_peak_calling_spikein.snakefile")
         include: os.path.join(maindir, "shared", "rules", "filterGTF_spikein.snakefile")
@@ -114,7 +114,7 @@ def run_deepTools_ChIP():
                     file_list.append(["deepTools_ChIP/bamCompare/"+chip_sample+".filtered.subtract."+control_name+".bw"])
                 if bigWigType == "log2ratio" or bigWigType == "both":
                     file_list.append(["deepTools_ChIP/bamCompare/"+chip_sample+".filtered.log2ratio.over_"+control_name+".bw"])
-            elif useSpikeInForNorm and getSizeFactorsFrom == "genome":
+            elif useSpikeInForNorm:
                 # get bigwigtype
                 if bigWigType == "subtract" or bigWigType == "both":
                     file_list.append(expand("split_deepTools_ChIP/bamCompare/"+chip_sample+".subtract."+control_name+".scaledBY{part}.bw",part=part))
