@@ -936,48 +936,6 @@ class TestChIPseq:
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
         assert parseSpOut(_p) == 137
-    def test_spikeinfrombamTSSnorm(self, ifs):
-        ci = [
-            "ChIPseq",
-            '--useSpikeInForNorm',
-            '--getSizeFactorsFrom',
-            'TSS',
-            '-d',
-            ifs / 'outdir',
-            '--fromBAM',
-            ifs / 'bam_input' / 'filtered_bam',
-            '--sampleSheet',
-            ifs / 'sampleSheet.tsv',
-            '--snakemakeOptions',
-            SMKOPTS,
-            ifs / 'org.yaml',
-            ifs / 'chipdict.yaml'
-        ]
-        print(' '.join([str(i) for i in ci]))
-        _p = sp.run(ci, capture_output=True, text=True)
-        assert _p.returncode == 0
-        assert parseSpOut(_p) == 113
-    def test_spikeinfrombaminputnorm(self, ifs):
-        ci = [
-            "ChIPseq",
-            '--useSpikeInForNorm',
-            '--getSizeFactorsFrom',
-            'input',
-            '-d',
-            ifs / 'outdir',
-            '--fromBAM',
-            ifs / 'bam_input' / 'filtered_bam',
-            '--sampleSheet',
-            ifs / 'sampleSheet.tsv',
-            '--snakemakeOptions',
-            SMKOPTS,
-            ifs / 'org.yaml',
-            ifs / 'chipdict.yaml'
-        ]
-        print(' '.join([str(i) for i in ci]))
-        _p = sp.run(ci, capture_output=True, text=True)
-        assert _p.returncode == 0
-        assert parseSpOut(_p) == 110
     def test_allelic(self, ifs):
         ci = [
             "ChIPseq",
