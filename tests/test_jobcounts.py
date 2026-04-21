@@ -933,6 +933,8 @@ class TestChIPseq:
             ifs / 'bam_input' / 'filtered_bam',
             '--sampleSheet',
             ifs / 'sampleSheet.tsv',
+            '--spikeinSizeFactorsFile',
+            ifs / 'bam_input'  / 'spikein_size_factors.txt',
             '--snakemakeOptions',
             SMKOPTS,
             ifs / 'org.yaml',
