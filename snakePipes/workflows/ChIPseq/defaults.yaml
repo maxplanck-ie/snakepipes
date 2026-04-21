@@ -24,7 +24,7 @@ workingdir:
 genome:
 ## use spikein genome for normalization?
 useSpikeInForNorm: false
-getSizeFactorsFrom: genome
+spikeinSizeFactorsFile: 
 spikeinExt: _spikein
 spikein_bin_size: 1000
 ## Which peak caller to use?
