@@ -166,6 +166,10 @@ if not fromBAM:
         if not os.path.isfile(os.path.join(workingdir, "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv")):
             sys.exit('ERROR: {} is required but not present\n'.format(os.path.join(workingdir, "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv")))
 
+    if useSpikeInForNorm:
+        if not os.path.isfile(os.path.join(workingdir, "split_deepTools_qc/multiBamSummary/spikein.scaling_factors.txt")):
+            sys.exit('ERROR: {} is required but not present\n'.format(os.path.join(workingdir, "split_deepTools_qc/multiBamSummary/spikein.scaling_factors.txt")))
+
     # consistency check whether all required files exist for all samples
     for sample in all_samples:
         req_files = [
@@ -195,6 +199,10 @@ else:
     for sample in all_samples:
         if sample not in bamDict:
             sys.exit("No bam file found for chip sample {}!".format(sample))
+
+    if useSpikeInForNorm:
+        if not spikeinSizeFactorsFile or not os.path.isfile(spikeInSizeFactorsFile):
+            sys.exit('ERROR: spikeInSizeFactorsFile is required but not present\n')
     aligner = "EXTERNAL_BAM"
     indir = fromBAM
     downsample = None

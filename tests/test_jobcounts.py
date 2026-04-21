@@ -36,11 +36,15 @@ def createTestData(fp, samples=9) -> None:
     (fp / 'bam_input' / 'deepTools_qc' / 'bamPEFragmentSize').mkdir(parents=True)
     (fp / 'bam_input' / 'deepTools_qc' / 'bamPEFragmentSize' / 'fragmentSize.metric.tsv' ).touch()
     (fp / 'bam_input' / 'bamCoverage').mkdir(parents=True)
+    (fp / 'bam_input' / 'split_deepTools_qc' / 'multiBamSummary').mkdir(parents=True)
+    (fp / 'bam_input' / 'split_deepTools_qc' / 'multiBamSummary' / 'spikein.scaling_factors.txt' ).touch()
     # allelic bam input folder
     (fp / 'allelic_bam_input' / 'filtered_bam').mkdir(parents=True)
     (fp / 'allelic_bam_input' / 'allelic_bams').mkdir(parents=True)
     (fp / 'allelic_bam_input' / 'deepTools_qc' / 'bamPEFragmentSize').mkdir(parents=True)
     (fp / 'allelic_bam_input' / 'deepTools_qc' / 'bamPEFragmentSize' / 'fragmentSize.metric.tsv' ).touch()
+    (fp / 'allelic_bam_input' / 'split_deepTools_qc' / 'multiBamSummary').mkdir(parents=True)
+    (fp / 'allelic_bam_input' / 'split_deepTools_qc' / 'multiBamSummary' / 'spikein.scaling_factors.txt' ).touch()
     (fp / 'allelic_bam_input' / 'Sambamba').mkdir(parents=True)
     (fp / 'allelic_bam_input' / 'bamCoverage' / 'allele_specific').mkdir(parents=True)
 
