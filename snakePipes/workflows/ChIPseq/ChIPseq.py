@@ -22,6 +22,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          "externalBed": "",
                          "plotFormat": "png", "bamExt": ".filtered.bam", "fdr": 0.05,
                          "absBestLFC": 1, "useSpikeinForNorm": False, "spikeinExt": "_spikein",
+                         "spikeinSizeFactorsFile": None,
                          "peakCallerOptions": "--qvalue 0.001","cutntag": False,
                          "getSizeFactorsFrom": "genome"}):
 
@@ -69,12 +70,11 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                           action="store_true",
                           help="Use the spikeIn chromosomes of the hybrid genome for normalization.")
 
-    optional.add_argument("--getSizeFactorsFrom",
-                          dest="getSizeFactorsFrom",
-                          action="store",
-                          choices=["genome", "TSS", "input"],
-                          help="Which part of the spikein genome to use to calculate sizeFactors from.",
-                          default=defaults['getSizeFactorsFrom'])
+
+    optional.add_argument("--spikeinSizeFactorsFile",
+                          help="A txt file with spikein size factors per sample e.g. from multiBamSummary. Required if fromBAM and useSpikeInForNorm are specified (default: '%(default)s')",
+                          default=defaults["spikeinSizeFactorsFile"])
+
 
     optional.add_argument("--spikeinExt",
                           dest="spikeinExt",
