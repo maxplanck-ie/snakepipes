@@ -960,6 +960,23 @@ class TestChIPseq:
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
         assert parseSpOut(_p) == 34
+    def test_allelic_spikein(self, ifs):
+        ci = [
+            "ChIPseq",
+            '--useSpikeInForNorm',
+            '-d',
+            ifs / 'allelic_bam_input',
+            '--sampleSheet',
+            ifs / 'sampleSheet.tsv',
+            '--snakemakeOptions',
+            SMKOPTS,
+            ifs / 'org.yaml',
+            ifs / 'chipdict_simple.yaml'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 69
     def test_multicomp(self, ifs):
         ci = [
             "ChIPseq",

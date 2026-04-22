@@ -24,7 +24,7 @@ setwd(wdir)
 spikein<-toupper(snakemake@params[["useSpikeinForNorm"]])
 message(paste0("useSpikeinForNorm is set to: ",spikein))
 if(spikein){
-    ms<-"host"}else{ms<-"filtered"}
+    ms<-"_host"}else{ms<-".filtered"}
 
 
 sampleSheet<-snakemake@input[["sampleSheet"]]
@@ -48,8 +48,8 @@ length(markv)
 
 if(all(grepl("rep",samples))){
   #regres<-regexpr("rep[0-9]?",samples)
-  repv<-str_extract(samples,"rep[0-9]+")
-  repv<-as.numeric(gsub("rep","",repv))
+  repv<-str_extract(samples,"[r,R]ep[0-9]+")
+  repv<-as.numeric(gsub("[r,R]ep","",repv))
 }else{
   repv<-rep(1,length(samples))
 }
@@ -68,21 +68,22 @@ if (!is.null(sampleSheet)){
 sampledat<-data.frame("SampleID"=samples,"Condition"=condv,"Factor"=markv,"Replicate"=repv)
 
 #ensure that samples,bamdir and peakdir are in the same order!
-    
-sampledat$bamReads<-bamdir[match(samples,sub(paste0("\\.",ms,".bam"),"",basename(bamdir)))]
+
+message(sprintf("Provided bam files: %s", unlist(bamdir)))    
+sampledat$bamReads<-bamdir[match(samples,sub(paste0(ms,".bam"),"",basename(bamdir)))]
 message(sprintf("Provided peak files: %s", unlist(peakdir)))
 ##for MACS2, modify input peak files: .xls -> .narrowPeak, .broadPeak
 if(all(grepl("histoneHMM",peakdir))){
 sampledat$Peaks<-peakdir[match(samples,sub("_avgp0.5.bed","",basename(peakdir)))]
-}else{sampledat$Peaks<-peakdir[match(samples,sub("\\.filtered.+","",basename(peakdir)))]}
+}else{sampledat$Peaks<-peakdir[match(samples,sub(paste0(ms,".+"),"",basename(peakdir)))]}
 
 sampledat$PeakCaller<-"bed"
 sampledat$PeakFormat<-"bed"	
 if(all(grepl("MACS2",sampledat$Peaks))){
         
         #samples should be in the same order
-        sampledat$Peaks[ydat$broad==TRUE]<-gsub(paste0(".",ms,".BAM_peaks.xls"),paste0(".",ms,".BAM_peaks.broadPeak"),sampledat$Peaks[ydat$broad==TRUE])
-        sampledat$Peaks[ydat$broad==FALSE]<-gsub(paste0(".",ms,".BAM_peaks.xls"),paste0(".",ms,".BAM_peaks.narrowPeak"),sampledat$Peaks[ydat$broad==FALSE])
+        sampledat$Peaks[ydat$broad==TRUE]<-gsub(paste0(ms,".BAM_peaks.xls"),paste0(ms,".BAM_peaks.broadPeak"),sampledat$Peaks[ydat$broad==TRUE])
+        sampledat$Peaks[ydat$broad==FALSE]<-gsub(paste0(ms,".BAM_peaks.xls"),paste0(ms,".BAM_peaks.narrowPeak"),sampledat$Peaks[ydat$broad==FALSE])
         sampledat$PeakFormat[ydat$broad==FALSE]<-"narrow"
         sampledat$PeakCaller[ydat$broad==FALSE]<-"narrow"
 }
@@ -93,7 +94,7 @@ sampledat
 message(paste0("Provided genome: ",genome))
 supported_annotations<-c("hg19","hg18","mm10","mm9","ce6","dm3")
 extended_annotations<-c("GRCh38","GRCh37","GRCm38","GRCm37","ce6","dm3")
-#modify genome string
+#modify genome stringfor
 if( genome %in% supported_annotations){
 
     annotation<-genome

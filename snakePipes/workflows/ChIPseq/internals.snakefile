@@ -199,10 +199,9 @@ else:
     for sample in all_samples:
         if sample not in bamDict:
             sys.exit("No bam file found for chip sample {}!".format(sample))
-
     if useSpikeInForNorm:
         if not spikeinSizeFactorsFile or not os.path.isfile(spikeinSizeFactorsFile):
-            sys.exit('ERROR: spikeinSizeFactorsFile is required but not present\n')
+            sys.exit('ERROR: A spikein size factors file is required but not present\n')
     aligner = "EXTERNAL_BAM"
     indir = fromBAM
     downsample = None
