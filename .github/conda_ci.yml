@@ -3,5 +3,5 @@ dependencies:
   - python>=3.12, <3.13
   - python_abi
   - anaconda-client
-  - conda-build
+  - conda-build <26
   - conda-verify
