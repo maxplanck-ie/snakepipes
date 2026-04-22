@@ -25,9 +25,9 @@ if bigWigType == "subtract" or bigWigType == "both":
             chip_bai = "split_bam/{chip_sample}_host.bam.bai",
             control_bam = "split_bam/{control_name}_host.bam",
             control_bai = "split_bam/{control_name}_host.bam.bai",
-            scale_factors = "split_deepTools_qc/multiBamSummary/{part}.scaling_factors.txt" or spikeinSizeFactorFile
+            scale_factors = "split_deepTools_qc/multiBamSummary/spikein.scaling_factors.txt" or spikeinSizeFactorFile
         output:
-            "split_deepTools_ChIP/bamCompare/{chip_sample}.subtract.{control_name}.scaledBY{part}.bw"
+            "split_deepTools_ChIP/bamCompare/{chip_sample}.subtract.{control_name}.scaledBYspikein.bw"
         params:
             bwBinSize = bwBinSize,
             genome_size = genome_size,
@@ -36,7 +36,7 @@ if bigWigType == "subtract" or bigWigType == "both":
             blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed else "",
             scaleFactors = lambda wildcards,input: " --scaleFactors {}:{} ".format(get_scaling_factor(wildcards.chip_sample,input.scale_factors),get_scaling_factor(wildcards.control_name,input.scale_factors))
         benchmark:
-            "split_deepTools_ChIP/.benchmark/bamCompare.subtract.{chip_sample}.subtract.{control_name}.scaledBY{part}.benchmark"
+            "split_deepTools_ChIP/.benchmark/bamCompare.subtract.{chip_sample}.subtract.{control_name}.scaledBYspikein.benchmark"
         threads: lambda wildcards: 16 if 16<max_thread else max_thread
         conda: CONDA_SHARED_ENV
         shell: bamcompare_subtract_cmd
@@ -49,9 +49,9 @@ if bigWigType == "log2ratio" or bigWigType == "both":
             chip_bai = "split_bam/{chip_sample}_host.bam.bai",
             control_bam = "split_bam/{control_name}_host.bam",
             control_bai = "split_bam/{control_name}_host.bam.bai",
-            scale_factors = "split_deepTools_qc/multiBamSummary/{part}.scaling_factors.txt" or spikeinSizeFactorsFile
+            scale_factors = "split_deepTools_qc/multiBamSummary/spikein.scaling_factors.txt" or spikeinSizeFactorsFile
         output:
-            "split_deepTools_ChIP/bamCompare/{chip_sample}.log2ratio.over_{control_name}.scaledBY{part}.bw"
+            "split_deepTools_ChIP/bamCompare/{chip_sample}.log2ratio.over_{control_name}.scaledBYspikein.bw"
         params:
             bwBinSize = bwBinSize,
             ignoreForNorm = "--ignoreForNormalization {}".format(ignoreForNormalization) if ignoreForNormalization else "",
@@ -59,7 +59,7 @@ if bigWigType == "log2ratio" or bigWigType == "both":
             blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed else "",
             scaleFactors = lambda wildcards,input: " --scaleFactors {}:{} ".format(get_scaling_factor(wildcards.chip_sample,input.scale_factors),get_scaling_factor(wildcards.control_name,input.scale_factors))
         benchmark:
-            "split_deepTools_ChIP/.benchmark/bamCompare.log2ratio.{chip_sample}.{control_name}.scaledBY{part}.benchmark"
+            "split_deepTools_ChIP/.benchmark/bamCompare.log2ratio.{chip_sample}.{control_name}.scaledBYspikein.benchmark"
         threads: lambda wildcards: 16 if 16<max_thread else max_thread
         conda: CONDA_SHARED_ENV
         shell: bamcompare_log2_cmd
