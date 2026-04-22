@@ -36,11 +36,15 @@ def createTestData(fp, samples=9) -> None:
     (fp / 'bam_input' / 'deepTools_qc' / 'bamPEFragmentSize').mkdir(parents=True)
     (fp / 'bam_input' / 'deepTools_qc' / 'bamPEFragmentSize' / 'fragmentSize.metric.tsv' ).touch()
     (fp / 'bam_input' / 'bamCoverage').mkdir(parents=True)
+    (fp / 'bam_input' / 'split_deepTools_qc' / 'multiBamSummary').mkdir(parents=True)
+    (fp / 'bam_input' / 'split_deepTools_qc' / 'multiBamSummary' / 'spikein.scaling_factors.txt' ).touch()
     # allelic bam input folder
     (fp / 'allelic_bam_input' / 'filtered_bam').mkdir(parents=True)
     (fp / 'allelic_bam_input' / 'allelic_bams').mkdir(parents=True)
     (fp / 'allelic_bam_input' / 'deepTools_qc' / 'bamPEFragmentSize').mkdir(parents=True)
     (fp / 'allelic_bam_input' / 'deepTools_qc' / 'bamPEFragmentSize' / 'fragmentSize.metric.tsv' ).touch()
+    (fp / 'allelic_bam_input' / 'split_deepTools_qc' / 'multiBamSummary').mkdir(parents=True)
+    (fp / 'allelic_bam_input' / 'split_deepTools_qc' / 'multiBamSummary' / 'spikein.scaling_factors.txt' ).touch()
     (fp / 'allelic_bam_input' / 'Sambamba').mkdir(parents=True)
     (fp / 'allelic_bam_input' / 'bamCoverage' / 'allele_specific').mkdir(parents=True)
 
@@ -69,6 +73,8 @@ def createTestData(fp, samples=9) -> None:
     (fp / 'allelic_input'/ 'file.vcf.gz').touch()
     (fp / 'allelic_input'/ 'file.vcf.gz.tbi').touch()
     (fp / 'allelic_input'/ 'snpfile.txt').touch()
+
+    (fp / 'bam_input'/ 'spikein_size_factors.txt').touch()
 
     # samples
     for s in range(samples):
@@ -740,7 +746,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 113
+        assert parseSpOut(_p) == 114
     def test_SE(self, ifs):
         ci = [
             "ChIPseq",
@@ -846,7 +852,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 66
+        assert parseSpOut(_p) == 67
     def test_frombam(self, ifs):
         ci = [
             "ChIPseq",
@@ -899,7 +905,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 101
+        assert parseSpOut(_p) == 102
     def test_spikein_noInput(self, ifs):
         ci = [
             "ChIPseq",
@@ -916,7 +922,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 60
+        assert parseSpOut(_p) == 61
     def test_spikeinfrombam(self, ifs):
         ci = [
             "ChIPseq",
@@ -927,6 +933,8 @@ class TestChIPseq:
             ifs / 'bam_input' / 'filtered_bam',
             '--sampleSheet',
             ifs / 'sampleSheet.tsv',
+            '--spikeinSizeFactorsFile',
+            ifs / 'bam_input'  / 'spikein_size_factors.txt',
             '--snakemakeOptions',
             SMKOPTS,
             ifs / 'org.yaml',
@@ -935,7 +943,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 137
+        assert parseSpOut(_p) == 138
     def test_allelic(self, ifs):
         ci = [
             "ChIPseq",
@@ -1091,7 +1099,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 121
+        assert parseSpOut(_p) == 122
     def test_multicomp_spikein_genrich(self, ifs):
         ci = [
             "ChIPseq",
@@ -1110,7 +1118,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 127
+        assert parseSpOut(_p) == 128
     def test_multicomp_spikein_noInput(self, ifs):
         ci = [
             "ChIPseq",
@@ -1127,7 +1135,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 76
+        assert parseSpOut(_p) == 77
     def test_multicomp_spikein_noInput_Genrich(self, ifs):
         ci = [
             "ChIPseq",
@@ -1146,7 +1154,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 79
+        assert parseSpOut(_p) == 80
     def test_multicomp_spikein_fromBam(self, ifs):
         ci = [
             "ChIPseq",
@@ -1156,6 +1164,8 @@ class TestChIPseq:
             ifs / 'bam_input' / 'filtered_bam',
             '--sampleSheet',
             ifs / 'sampleSheet_mc.tsv',
+            '--spikeinSizeFactorsFile',
+            ifs / 'bam_input'  / 'spikein_size_factors.txt',
             '--useSpikeInForNorm',
             '--snakemakeOptions',
             SMKOPTS,
@@ -1165,7 +1175,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 157
+        assert parseSpOut(_p) == 158
     def test_multicomp_spikein_fromBam_genrich(self, ifs):
         ci = [
             "ChIPseq",
@@ -1175,6 +1185,8 @@ class TestChIPseq:
             ifs / 'bam_input' / 'filtered_bam',
             '--sampleSheet',
             ifs / 'sampleSheet_mc.tsv',
+            '--spikeinSizeFactorsFile',
+            ifs / 'bam_input'  / 'spikein_size_factors.txt',
             '--useSpikeInForNorm',
             '--snakemakeOptions',
             SMKOPTS,
@@ -1186,7 +1198,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 163
+        assert parseSpOut(_p) == 164
     def test_multicomp_spikein_fromBam_noInput(self, ifs):
         ci = [
             "ChIPseq",
@@ -1196,6 +1208,8 @@ class TestChIPseq:
             ifs / 'bam_input' / 'filtered_bam',
             '--sampleSheet',
             ifs / 'sampleSheet_mc.tsv',
+            '--spikeinSizeFactorsFile',
+            ifs / 'bam_input'  / 'spikein_size_factors.txt',
             '--useSpikeInForNorm',
             '--snakemakeOptions',
             SMKOPTS,
@@ -1205,7 +1219,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 100
+        assert parseSpOut(_p) == 101
     def test_multicomp_spikein_fromBam_noInput_genrich(self, ifs):
         ci = [
             "ChIPseq",
@@ -1215,6 +1229,8 @@ class TestChIPseq:
             ifs / 'bam_input' / 'filtered_bam',
             '--sampleSheet',
             ifs / 'sampleSheet_mc.tsv',
+            '--spikeinSizeFactorsFile',
+            ifs / 'bam_input'  / 'spikein_size_factors.txt',
             '--useSpikeInForNorm',
             '--snakemakeOptions',
             SMKOPTS,
@@ -1226,7 +1242,7 @@ class TestChIPseq:
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 103
+        assert parseSpOut(_p) == 104
     def test_multicomp_fromBam_noInput_SEACR(self, ifs):
         ci = [
             "ChIPseq",

@@ -170,7 +170,6 @@ if not fromBAM:
         if not os.path.isfile(os.path.join(workingdir, "split_deepTools_qc/multiBamSummary/spikein.scaling_factors.txt")):
             sys.exit('ERROR: {} is required but not present\n'.format(os.path.join(workingdir, "split_deepTools_qc/multiBamSummary/spikein.scaling_factors.txt")))
 
-
     # consistency check whether all required files exist for all samples
     for sample in all_samples:
         req_files = [
