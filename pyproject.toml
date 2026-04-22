@@ -29,7 +29,7 @@ classifiers = [
     "Programming Language :: Python :: 3",   
 ]
 
-requires-python = ">= 3.11"
+requires-python = ">= 3.11, <3.13"
 
 dependencies = [
     "snakemake >= 8,<9.10.0",
