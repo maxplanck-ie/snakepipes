@@ -136,7 +136,7 @@ def run_deepTools_allelic():
         "deepTools_ChIP/plotEnrichment/plotEnrichment.gene_features_allelic.tsv",
         "deepTools_ChIP/plotFingerprint/plotFingerprint.metrics_allelic.txt"
          ] )
-    if useSpikeinForNorm:
+    if useSpikeInForNorm:
         file_list.append([
         "deepTools_ChIP/bamCompare/allele_specific/"+chip_sample+".genome1.log2ratio.over_"+control_name+".scaledBYspikein.bw",
         "deepTools_ChIP/bamCompare/allele_specific/"+chip_sample+".genome2.log2ratio.over_"+control_name+".scaledBYspikein.bw"
