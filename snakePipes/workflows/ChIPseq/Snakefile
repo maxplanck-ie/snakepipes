@@ -137,9 +137,11 @@ def run_deepTools_allelic():
         "deepTools_ChIP/plotFingerprint/plotFingerprint.metrics_allelic.txt"
          ] )
     if useSpikeInForNorm:
-        file_list.append([
-        "deepTools_ChIP/bamCompare/allele_specific/"+chip_sample+".genome1.log2ratio.over_"+control_name+".scaledBYspikein.bw",
-        "deepTools_ChIP/bamCompare/allele_specific/"+chip_sample+".genome2.log2ratio.over_"+control_name+".scaledBYspikein.bw"
+        for chip_sample in chip_samples_w_ctrl:
+            control_name = get_control_name(chip_sample)
+            file_list.append([
+            "deepTools_ChIP/bamCompare/allele_specific/"+chip_sample+".genome1.log2ratio.over_"+control_name+".scaledBYspikein.bw",
+            "deepTools_ChIP/bamCompare/allele_specific/"+chip_sample+".genome2.log2ratio.over_"+control_name+".scaledBYspikein.bw"
 ])
     return(file_list)
 
