@@ -1,6 +1,6 @@
 name: conda_ci
 dependencies:
   - python = 3.11
-  - anaconda-client >=1.12.0
-  - conda-build =25.9.0
-  - conda-verify = 4.4.0
+  - anaconda-client
+  - conda-build
+  - conda-verify
