@@ -40,24 +40,10 @@ def getSizeMetrics():
         return []
 
 def getScaleFactors():
-    if getSizeFactorsFrom=="genome":
-        return "split_deepTools_qc/multiBamSummary/spikein.ChIP.scaling_factors.txt"
-    elif getSizeFactorsFrom=="TSS":
-        return "split_deepTools_qc/multiBamSummary_BED/spikein.ChIP.scaling_factors.txt"
-    elif getSizeFactorsFrom=="input":
-        return "split_deepTools_qc/multiBamSummary/spikein.input.scaling_factors.txt"
-    else:
-        return []
+    return "split_deepTools_qc/multiBamSummary/spikein.ChIP.scaling_factors.txt"
 
 def getBamCoverage(comp_group):
-    if getSizeFactorsFrom=="genome":
-        return expand("bamCoverage/{chip_sample}.host_scaled.BYspikein.bw", chip_sample=reordered_dict[comp_group].keys())
-    elif getSizeFactorsFrom=="TSS":
-        return expand("bamCoverage_TSS/{chip_sample}.host_scaled.BYspikein.bw", chip_sample=reordered_dict[comp_group].keys())
-    elif getSizeFactorsFrom=="input":
-        return expand("bamCoverage_input/{chip_sample}.host_scaled.BYspikein.bw", chip_sample=reordered_dict[comp_group].keys())
-    else:
-        return []
+    return expand("bamCoverage/{chip_sample}.host_scaled.BYspikein.bw", chip_sample=reordered_dict[comp_group].keys())
 
 def getHeatmapInput():
     if pipeline in 'ATACseq':
