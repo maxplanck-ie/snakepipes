@@ -32,6 +32,7 @@ def createTestData(fp, samples=9) -> None:
     (fp / 'PE').mkdir()
     # bam input folder
     (fp / 'bam_input' / 'filtered_bam').mkdir(parents=True)
+    (fp / 'bam_input' / 'split_bam').mkdir(parents=True)
     (fp / 'bam_input' / 'Sambamba').mkdir(parents=True)
     (fp / 'bam_input' / 'deepTools_qc' / 'bamPEFragmentSize').mkdir(parents=True)
     (fp / 'bam_input' / 'deepTools_qc' / 'bamPEFragmentSize' / 'fragmentSize.metric.tsv' ).touch()
@@ -92,6 +93,8 @@ def createTestData(fp, samples=9) -> None:
         (fp / "bam_input" / "filtered_bam" / "sample{}.filtered.bam.bai".format(sample)).touch()
         (fp / "bam_input" / "Sambamba" / "sample{}.markdup.txt".format(sample)).touch()
         (fp / "bam_input" / "bamCoverage" / "sample{}.filtered.seq_depth_norm.bw".format(sample)).touch()
+        (fp / "bam_input" / "split_bam" / "sample{}_host.bam".format(sample)).touch()
+        (fp / "bam_input" / "split_bam" / "sample{}_host.bam.bai".format(sample)).touch()
 
         # allelic_bams
         (fp / "allelic_bam_input" / "sample{}.bam".format(sample)).touch()
