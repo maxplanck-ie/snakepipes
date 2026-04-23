@@ -51,7 +51,7 @@ rule bamCompare_log2_genome1_spikein:
         chip_bam = "allelic_bams/{chip_sample}.genome1.sorted.bam",
         chip_bai = "allelic_bams/{chip_sample}.genome1.sorted.bam.bai",
         control_bam = lambda wildcards: "allelic_bams/"+get_control(wildcards.chip_sample)+".genome1.sorted.bam",
-        control_bai = lambda wildcards: "allelic_bams/"+get_control(wildcards.chip_sample)+".genome1.sorted.bam.bai"
+        control_bai = lambda wildcards: "allelic_bams/"+get_control(wildcards.chip_sample)+".genome1.sorted.bam.bai",
         scale_factors = "split_deepTools_qc/multiBamSummary/{part}.scaling_factors.txt" or spikeinSizeFactorsFile
     output:
         "split_deepTools_ChIP/bamCompare/allele_specific/{chip_sample}.genome1.log2ratio.over_{control_name}.scaledBYspikein.bw"
