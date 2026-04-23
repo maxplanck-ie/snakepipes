@@ -77,7 +77,7 @@ def createTestData(fp, samples=9) -> None:
     (fp / 'allelic_input'/ 'file.vcf.gz.tbi').touch()
     (fp / 'allelic_input'/ 'snpfile.txt').touch()
 
-    (fp / 'bam_input'/ 'spikein_size_factors.txt').touch()
+    #(fp / 'bam_input'/ 'spikein_size_factors.txt').touch()
 
     # samples
     for s in range(samples):
@@ -167,6 +167,23 @@ def createTestData(fp, samples=9) -> None:
         ],
         columns = ['name', 'condition', 'group']
     ).to_csv(fp / 'sampleSheet_mc.tsv', sep='\t', index=False)
+
+    # create size factors file
+    pd.DataFrame(
+        [
+            ['sample1', '1'],
+            ['sample2', '1'],
+            ['sample3', '1'],
+            ['sample4', '1'],
+            ['sample5', '1'],
+            ['sample6', '1'],
+            ['sample7', '1'],
+            ['sample8', '1'],
+            ['sample9', '1']
+        ],
+        columns = ['sample', 'scaleFactor']
+    ).to_csv(fp / 'bam_input'/ 'spikein_size_factors.txt', sep='\t', index=False)
+
     # ChIP sample_config
     chip_dict ={
         'chip_dict': {
@@ -936,7 +953,9 @@ class TestChIPseq:
             '-d',
             ifs / 'outdir',
             '--fromBAM',
-            ifs / 'bam_input' / 'filtered_bam',
+            ifs / 'bam_input' / 'split_bam',
+            '--bamExt',
+            '_host.bam',
             '--sampleSheet',
             ifs / 'sampleSheet.tsv',
             '--spikeinSizeFactorsFile',

@@ -52,7 +52,7 @@ elif pipeline=="chipseq" and fromBAM and useSpikeInForNorm:
         input:
             indir + "/{sample}" + bamExt
         output:
-             "split_bams/{sample}_host.bam"
+             "split_bam/{sample}_host.bam"
         params:
             input_bai = indir + "/{sample}" + bamExt + ".bai",
             output_bai = "split_bam/{sample}_host.bam.bai"
