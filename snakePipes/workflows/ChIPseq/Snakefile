@@ -89,7 +89,6 @@ def run_deepTools_qc(fromBAM,useSpikeInForNorm):
         file_list.append(expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample = samples))
     elif useSpikeInForNorm:
         file_list=expand("split_deepTools_qc/bamPEFragmentSize/host.fragmentSize.metric.tsv")
-        file_list.append(expand("split_deepTools_qc/multiBamSummary/host.ChIP_read_coverage.bins.npz",part=part))
         file_list.append(expand("bamCoverage/{sample}.host_scaled.BYspikein.bw",sample=chip_samples,part=part))
     else:
         file_list = []
