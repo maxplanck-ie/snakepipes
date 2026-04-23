@@ -39,6 +39,7 @@ def createTestData(fp, samples=9) -> None:
     (fp / 'bam_input' / 'bamCoverage').mkdir(parents=True)
     (fp / 'bam_input' / 'split_deepTools_qc' / 'multiBamSummary').mkdir(parents=True)
     (fp / 'bam_input' / 'split_deepTools_qc' / 'multiBamSummary' / 'spikein.scaling_factors.txt' ).touch()
+    (fp / 'bam_input' / 'split_deepTools_qc' / 'bamPEFragmentSize' / 'host.fragmentSize.metric.tsv' ).touch()
     # allelic bam input folder
     (fp / 'allelic_bam_input' / 'filtered_bam').mkdir(parents=True)
     (fp / 'allelic_bam_input' / 'allelic_bams').mkdir(parents=True)
