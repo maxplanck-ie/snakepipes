@@ -95,6 +95,7 @@ def createTestData(fp, samples=9) -> None:
         (fp / "bam_input" / "filtered_bam" / "sample{}.filtered.bam.bai".format(sample)).touch()
         (fp / "bam_input" / "Sambamba" / "sample{}.markdup.txt".format(sample)).touch()
         (fp / "bam_input" / "bamCoverage" / "sample{}.filtered.seq_depth_norm.bw".format(sample)).touch()
+        (fp / "bam_input" / "bamCoverage" / "sample{}.host_scaledBYspikein.bw".format(sample)).touch()
         (fp / "bam_input" / "split_bam" / "sample{}_host.bam".format(sample)).touch()
         (fp / "bam_input" / "split_bam" / "sample{}_host.bam.bai".format(sample)).touch()
 
