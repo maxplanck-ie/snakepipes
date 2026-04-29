@@ -167,8 +167,9 @@ if not fromBAM:
             sys.exit('ERROR: {} is required but not present\n'.format(os.path.join(workingdir, "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv")))
 
     if useSpikeInForNorm:
-        if not os.path.isfile(os.path.join(workingdir, "split_deepTools_qc/multiBamSummary/spikein.scaling_factors.txt")):
-            sys.exit('ERROR: {} is required but not present\n'.format(os.path.join(workingdir, "split_deepTools_qc/multiBamSummary/spikein.scaling_factors.txt")))
+        spikeinSizeFactorsFile=os.path.join(workingdir, "split_deepTools_qc/multiBamSummary/spikein.scaling_factors.txt")
+        if not os.path.isfile(spikeinSizeFactorsFile):
+            sys.exit('ERROR: {} is required but not present\n'.format(spikeinSizeFactorsFile))
 
     # consistency check whether all required files exist for all samples
     for sample in all_samples:

@@ -38,7 +38,6 @@ def createTestData(fp, samples=9) -> None:
     (fp / 'bam_input' / 'deepTools_qc' / 'bamPEFragmentSize' / 'fragmentSize.metric.tsv' ).touch()
     (fp / 'bam_input' / 'bamCoverage').mkdir(parents=True)
     (fp / 'bam_input' / 'split_deepTools_qc' / 'multiBamSummary').mkdir(parents=True)
-    (fp / 'bam_input' / 'split_deepTools_qc' / 'multiBamSummary' / 'spikein.scaling_factors.txt' ).touch()
     (fp / 'bam_input' / 'split_deepTools_qc' / 'bamPEFragmentSize').mkdir(parents=True)
     (fp / 'bam_input' / 'split_deepTools_qc' / 'bamPEFragmentSize' / 'host.fragmentSize.metric.tsv' ).touch()
     # allelic bam input folder
@@ -168,7 +167,7 @@ def createTestData(fp, samples=9) -> None:
         columns = ['name', 'condition', 'group']
     ).to_csv(fp / 'sampleSheet_mc.tsv', sep='\t', index=False)
 
-    # create size factors file
+    # create size factors file for --fromBAM usage
     pd.DataFrame(
         [
             ['sample1', '1'],
@@ -183,6 +182,22 @@ def createTestData(fp, samples=9) -> None:
         ],
         columns = ['sample', 'scaleFactor']
     ).to_csv(fp / 'bam_input'/ 'spikein_size_factors.txt', sep='\t', index=False)
+
+    #create size factors file for -d usage
+    pd.DataFrame(
+        [
+            ['sample1', '1'],
+            ['sample2', '1'],
+            ['sample3', '1'],
+            ['sample4', '1'],
+            ['sample5', '1'],
+            ['sample6', '1'],
+            ['sample7', '1'],
+            ['sample8', '1'],
+            ['sample9', '1']
+        ],
+        columns = ['sample', 'scaleFactor']
+    ).to_csv(fp / 'bam_input'/'split_deepTools_qc' / 'multiBamSummary' /'spikein_size_factors.txt', sep='\t', index=False)
 
     # ChIP sample_config
     chip_dict ={

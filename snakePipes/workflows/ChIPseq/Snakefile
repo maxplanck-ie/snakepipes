@@ -213,7 +213,9 @@ def run_seacr():
 
 
 def run_chipqc():
-    file_list = "{}_chipqc/sessionInfo.txt".format(peakCaller) if not peakCaller == "Genrich" else []
+    file_list=[]
+    if not peakCaller == "Genrich" and not externalBed:
+        file_list = "{}_chipqc/sessionInfo.txt".format(peakCaller)
     return(file_list)
 
 
