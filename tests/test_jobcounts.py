@@ -197,7 +197,7 @@ def createTestData(fp, samples=9) -> None:
             ['sample9', '1']
         ],
         columns = ['sample', 'scaleFactor']
-    ).to_csv(fp / 'bam_input'/'split_deepTools_qc' / 'multiBamSummary' /'spikein_size_factors.txt', sep='\t', index=False)
+    ).to_csv(fp / 'bam_input'/'split_deepTools_qc' / 'multiBamSummary' /'spikein.scaling_factors.txt', sep='\t', index=False)
 
     # ChIP sample_config
     chip_dict ={
