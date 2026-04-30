@@ -25,7 +25,7 @@ if bigWigType == "subtract" or bigWigType == "both":
             chip_bai = "split_bam/{chip_sample}_host.bam.bai",
             control_bam = "split_bam/{control_name}_host.bam",
             control_bai = "split_bam/{control_name}_host.bam.bai",
-            scale_factors = "split_deepTools_qc/multiBamSummary/spikein.scaling_factors.txt" if not fromBAM else spikeinSizeFactorFile
+            scale_factors = "split_deepTools_qc/multiBamSummary/spikein.scaling_factors.txt" if not fromBAM else spikeinSizeFactorsFile
         output:
             "split_deepTools_ChIP/bamCompare/{chip_sample}.subtract.{control_name}.scaledBYspikein.bw"
         params:
@@ -49,7 +49,7 @@ if bigWigType == "log2ratio" or bigWigType == "both":
             chip_bai = "split_bam/{chip_sample}_host.bam.bai",
             control_bam = "split_bam/{control_name}_host.bam",
             control_bai = "split_bam/{control_name}_host.bam.bai",
-            scale_factors = "split_deepTools_qc/multiBamSummary/spikein.scaling_factors.txt" or spikeinSizeFactorsFile
+            scale_factors = "split_deepTools_qc/multiBamSummary/spikein.scaling_factors.txt" if not fromBAM else spikeinSizeFactorsFile
         output:
             "split_deepTools_ChIP/bamCompare/{chip_sample}.log2ratio.over_{control_name}.scaledBYspikein.bw"
         params:

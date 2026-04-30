@@ -43,6 +43,7 @@ def createTestData(fp, samples=9) -> None:
     # allelic bam input folder
     (fp / 'allelic_bam_input' / 'filtered_bam').mkdir(parents=True)
     (fp / 'allelic_bam_input' / 'allelic_bams').mkdir(parents=True)
+    (fp / 'allelic_bam_input' / 'split_bam').mkdir(parents=True)
     (fp / 'allelic_bam_input' / 'deepTools_qc' / 'bamPEFragmentSize').mkdir(parents=True)
     (fp / 'allelic_bam_input' / 'deepTools_qc' / 'bamPEFragmentSize' / 'fragmentSize.metric.tsv' ).touch()
     (fp / 'allelic_bam_input' / 'split_deepTools_qc' / 'multiBamSummary').mkdir(parents=True)
@@ -110,6 +111,8 @@ def createTestData(fp, samples=9) -> None:
         (fp / "allelic_bam_input" / "allelic_bams" / "sample{}.unassigned.sorted.bam.bai".format(sample)).touch()
         (fp / "allelic_bam_input" / "filtered_bam" / "sample{}.filtered.bam".format(sample)).touch()
         (fp / "allelic_bam_input" / "filtered_bam" / "sample{}.filtered.bam.bai".format(sample)).touch()
+        (fp / "allelic_bam_input" / "split_bam" / "sample{}_host.bam".format(sample)).touch()
+        (fp / "allelic_bam_input" / "split_bam" / "sample{}_host.bam.bai".format(sample)).touch()
         (fp / "allelic_bam_input" / "Sambamba" / "sample{}.markdup.txt".format(sample)).touch()
         (fp / "allelic_bam_input" / "bamCoverage" / "allele_specific" / "sample{}.genome1.seq_depth_norm.bw".format(sample)).touch()
 
