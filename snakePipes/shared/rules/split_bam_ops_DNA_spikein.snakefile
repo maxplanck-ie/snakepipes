@@ -36,26 +36,26 @@ if not fromBAM:
             sambamba index -t {threads} {output.bam}
             """
 
-rule multiBamSummary_by_part:
-    input:
-        bams = lambda wildcards: expand("split_bam/{sample}_{part}.bam", sample=samples,part=wildcards.part),
-        bais = lambda wildcards: expand("split_bam/{sample}_{part}.bam.bai", sample=samples,part=wildcards.part)
-    output:
-        npz = "split_deepTools_qc/multiBamSummary/{part}_read_coverage.bins.npz",
-        scale_factors = "split_deepTools_qc/multiBamSummary/{part}.scaling_factors.txt"
-    params:
-        labels = " ".join(samples),
-        blacklist = lambda wildcards: "--blackListFileName {}".format(blacklist_dict[wildcards.part]) if blacklist_dict[wildcards.part]  else "",
-        read_extension = "--extendReads" if pairedEnd
+    rule multiBamSummary_by_part:
+        input:
+            bams = lambda wildcards: expand("split_bam/{sample}_{part}.bam", sample=samples,part=wildcards.part),
+            bais = lambda wildcards: expand("split_bam/{sample}_{part}.bam.bai", sample=samples,part=wildcards.part)
+        output:
+            npz = "split_deepTools_qc/multiBamSummary/{part}_read_coverage.bins.npz",
+            scale_factors = "split_deepTools_qc/multiBamSummary/{part}.scaling_factors.txt"
+        params:
+            labels = " ".join(samples),
+            blacklist = lambda wildcards: "--blackListFileName {}".format(blacklist_dict[wildcards.part]) if blacklist_dict[wildcards.part]  else "",
+            read_extension = "--extendReads" if pairedEnd
                          else "--extendReads {}".format(fragmentLength),
-        scaling_factors = "--scalingFactors split_deepTools_qc/multiBamSummary/{part}.scaling_factors.txt",
-        binSize = lambda wildcards: " --binSize "+str(spikein_bin_size) if wildcards.part=="spikein" else "",
-        spikein_region = lambda wildcards: " --region "+spikein_region if ((wildcards.part=="spikein") and (spikein_region != "")) else ""
-    benchmark:
-        "split_deepTools_qc/.benchmark/{part}_multiBamSummary.benchmark"
-    threads: lambda wildcards: 24 if 24<max_thread else max_thread
-    conda: CONDA_SHARED_ENV
-    shell: multiBamSummary_cmd
+            scaling_factors = "--scalingFactors split_deepTools_qc/multiBamSummary/{part}.scaling_factors.txt",
+            binSize = lambda wildcards: " --binSize "+str(spikein_bin_size) if wildcards.part=="spikein" else "",
+            spikein_region = lambda wildcards: " --region "+spikein_region if ((wildcards.part=="spikein") and (spikein_region != "")) else ""
+        benchmark:
+            "split_deepTools_qc/.benchmark/{part}_multiBamSummary.benchmark"
+        threads: lambda wildcards: 24 if 24<max_thread else max_thread
+        conda: CONDA_SHARED_ENV
+        shell: multiBamSummary_cmd
 
 
 rule bamCoverage_by_part:
