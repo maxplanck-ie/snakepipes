@@ -19,22 +19,22 @@ def get_scaling_factor(sample,input):
     else:
         return float(1)
 
-
-rule split_bamfiles_by_genome:
-    input:
-        bam = "filtered_bam/{sample}.filtered.bam",
-        bai = "filtered_bam/{sample}.filtered.bam.bai"
-    output:
-        bam = "split_bam/{sample}_{part}.bam",
-        bai = "split_bam/{sample}_{part}.bam.bai"
-    params:
-        region = lambda wildcards: region_dict[wildcards.part]
-    conda: CONDA_SAMBAMBA_ENV
-    threads: 4
-    shell: """
-        sambamba slice -o {output.bam} {input.bam} {params.region};
-        sambamba index -t {threads} {output.bam}
-        """
+if not fromBAM:
+    rule split_bamfiles_by_genome:
+        input:
+            bam = "filtered_bam/{sample}.filtered.bam",
+            bai = "filtered_bam/{sample}.filtered.bam.bai"
+        output:
+            bam = "split_bam/{sample}_{part}.bam",
+            bai = "split_bam/{sample}_{part}.bam.bai"
+        params:
+            region = lambda wildcards: region_dict[wildcards.part]
+        conda: CONDA_SAMBAMBA_ENV
+        threads: 4
+        shell: """
+            sambamba slice -o {output.bam} {input.bam} {params.region};
+            sambamba index -t {threads} {output.bam}
+            """
 
 rule multiBamSummary_by_part:
     input:
