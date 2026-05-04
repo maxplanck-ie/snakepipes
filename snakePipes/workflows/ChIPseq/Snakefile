@@ -78,20 +78,21 @@ def run_histoneHMM(allele_info,peakCaller): # TODO what is a good practice for b
     return(file_list)
 
 def run_deepTools_qc(fromBAM,useSpikeInForNorm):
-    if fromBAM and not useSpikeInForNorm:
-        file_list = ["deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv"]
-        file_list.append([expand("bamCoverage/{sample}.filtered.seq_depth_norm.bw", sample = samples)])
-        if len(samples) <= 20:
-            file_list.append( ["deepTools_qc/plotCoverage/read_coverage.tsv"] )
-        if len(samples)>1 and len(samples)<=20:
-            file_list.append( [
-                "deepTools_qc/plotCorrelation/correlation.pearson.read_coverage.tsv",
-                "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage.tsv",
-                "deepTools_qc/plotPCA/PCA.read_coverage.tsv" ])
-        file_list.append(expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample = samples))
-    elif useSpikeInForNorm:
-        file_list=expand("split_deepTools_qc/bamPEFragmentSize/host.fragmentSize.metric.tsv")
-        file_list.append(expand("bamCoverage/{sample}.host_scaled.BY{part}.bw",sample=chip_samples,part=["spikein"]))
+    if fromBAM:
+        if not not useSpikeInForNorm:
+            file_list = ["deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv"]
+            file_list.append([expand("bamCoverage/{sample}.filtered.seq_depth_norm.bw", sample = samples)])
+            if len(samples) <= 20:
+                file_list.append( ["deepTools_qc/plotCoverage/read_coverage.tsv"] )
+            if len(samples)>1 and len(samples)<=20:
+                file_list.append( [
+                    "deepTools_qc/plotCorrelation/correlation.pearson.read_coverage.tsv",
+                    "deepTools_qc/plotCorrelation/correlation.spearman.read_coverage.tsv",
+                    "deepTools_qc/plotPCA/PCA.read_coverage.tsv" ])
+            file_list.append(expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample = samples))
+        else:
+            file_list=expand("split_deepTools_qc/bamPEFragmentSize/host.fragmentSize.metric.tsv")
+            file_list.append(expand("bamCoverage/{sample}.host_scaled.BY{part}.bw",sample=samples,part=part))
     else:
         file_list = []
     return(file_list)
