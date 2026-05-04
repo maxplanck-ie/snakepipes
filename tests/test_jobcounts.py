@@ -204,6 +204,22 @@ def createTestData(fp, samples=9) -> None:
         columns = ['sample', 'scaleFactor']
     ).to_csv(fp / 'bam_input'/'split_deepTools_qc' / 'multiBamSummary' /'spikein.scaling_factors.txt', sep='\t', index=False)
 
+    #create size factors file for -d usage with allelic_bam_input
+    pd.DataFrame(
+        [
+            ['sample1', '1'],
+            ['sample2', '1'],
+            ['sample3', '1'],
+            ['sample4', '1'],
+            ['sample5', '1'],
+            ['sample6', '1'],
+            ['sample7', '1'],
+            ['sample8', '1'],
+            ['sample9', '1']
+        ],
+        columns = ['sample', 'scaleFactor']
+    ).to_csv(fp / 'allelic_bam_input'/'split_deepTools_qc' / 'multiBamSummary' /'spikein.scaling_factors.txt', sep='\t', index=False)
+
     # ChIP sample_config
     chip_dict ={
         'chip_dict': {
@@ -1206,7 +1222,9 @@ class TestChIPseq:
             '-d',
             ifs / 'outdir',
             '--fromBAM',
-            ifs / 'bam_input' / 'filtered_bam',
+            ifs / 'bam_input' / 'split_bam',
+            '--bamExt',
+            '_host.bam',
             '--sampleSheet',
             ifs / 'sampleSheet_mc.tsv',
             '--spikeinSizeFactorsFile',
@@ -1227,7 +1245,9 @@ class TestChIPseq:
             '-d',
             ifs / 'outdir',
             '--fromBAM',
-            ifs / 'bam_input' / 'filtered_bam',
+            ifs / 'bam_input' / 'split_bam',
+            '--bamExt',
+            '_host.bam',
             '--sampleSheet',
             ifs / 'sampleSheet_mc.tsv',
             '--spikeinSizeFactorsFile',
@@ -1250,7 +1270,9 @@ class TestChIPseq:
             '-d',
             ifs / 'outdir',
             '--fromBAM',
-            ifs / 'bam_input' / 'filtered_bam',
+            ifs / 'bam_input' / 'split_bam',
+            '--bamExt',
+            '_host.bam',
             '--sampleSheet',
             ifs / 'sampleSheet_mc.tsv',
             '--spikeinSizeFactorsFile',
@@ -1271,7 +1293,9 @@ class TestChIPseq:
             '-d',
             ifs / 'outdir',
             '--fromBAM',
-            ifs / 'bam_input' / 'filtered_bam',
+            ifs / 'bam_input' / 'split_bam',
+            '--bamExt',
+            '_host.bam',
             '--sampleSheet',
             ifs / 'sampleSheet_mc.tsv',
             '--spikeinSizeFactorsFile',
