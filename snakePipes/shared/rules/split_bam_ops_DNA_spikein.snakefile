@@ -19,7 +19,7 @@ def get_scaling_factor(sample,input):
     else:
         return float(1)
 
-if not fromBAM:
+if pipeline=="dnamapping":
     rule split_bamfiles_by_genome:
         input:
             bam = "filtered_bam/{sample}.filtered.bam",
