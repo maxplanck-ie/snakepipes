@@ -64,7 +64,7 @@ rule bamCoverage_by_part:
         bai = "split_bam/{sample}_host.bam.bai",
         scale_factors = "split_deepTools_qc/multiBamSummary/spikein.scaling_factors.txt"
     output:
-        "bamCoverage/{sample}.host_scaled.BYspikein.bw"
+        "bamCoverage/{sample}.host_scaled.BYspikein.bw" if pipeline=="chipseq" else "bamCoverage/{sample}.host_scaled.BY{part}.bw"
     params:
         bwBinSize = bwBinSize,
         genome_size = int(genome_size),
@@ -75,7 +75,7 @@ rule bamCoverage_by_part:
                     else "",
         scaling_factors = lambda wildcards,input: "--scaleFactor {}".format(get_scaling_factor(wildcards.sample,input.scale_factors)) ## subset for the one factor needed
     benchmark:
-        "bamCoverage/.benchmark/bamCoverage.{sample}.BYspikein.filtered.benchmark"
+        "bamCoverage/.benchmark/bamCoverage.{sample}.BYspikein.filtered.benchmark" if pipeline=="chipseq" else "bamCoverage/.benchmark/bamCoverage.{sample}.BY{part}.filtered.benchmark"
     threads: lambda wildcards: 16 if 16<max_thread else max_thread  # 4GB per core
     conda: CONDA_SHARED_ENV
     shell: bamcov_spikein_cmd
