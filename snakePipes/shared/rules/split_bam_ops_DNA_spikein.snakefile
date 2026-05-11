@@ -62,7 +62,7 @@ rule bamCoverage_by_part:
     input:
         bam = "split_bam/{sample}_host.bam" ,
         bai = "split_bam/{sample}_host.bam.bai",
-        scale_factors = "split_deepTools_qc/multiBamSummary/spikein.scaling_factors.txt" if pipeline=="dnamapping" or pipeline=="chipseq' and not fromBAM else spikeinSizeFactorsFile
+        scale_factors = "split_deepTools_qc/multiBamSummary/spikein.scaling_factors.txt" if pipeline=="dnamapping" or pipeline=="chipseq" and not fromBAM else spikeinSizeFactorsFile
     output:
         "bamCoverage/{sample}.host_scaled.BYspikein.bw" if pipeline=="chipseq" else "bamCoverage/{sample}.host_scaled.BY{part}.bw"
     params:
