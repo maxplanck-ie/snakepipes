@@ -34,7 +34,7 @@ def getSizeMetrics():
         return []
 
 def getScaleFactors():
-    return "split_deepTools_qc/multiBamSummary/spikein.scaling_factors.txt"
+    return "split_deepTools_qc/multiBamSummary/spikein.scaling_factors.txt" if not fromBAM else spikeinSizeFactorsFile
 
 def getBamCoverage():
     return expand("bamCoverage/{chip_sample}.host_scaled.BYspikein.bw", chip_sample=reordered_dict.keys())
