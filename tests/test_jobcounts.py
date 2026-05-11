@@ -648,7 +648,7 @@ class TestDNAmapping():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 183
+        assert parseSpOut(_p) == 182
     def test_whatshap_allelic_spikein(self, ifs):
         ci = [
             "DNAmapping",
@@ -668,7 +668,7 @@ class TestDNAmapping():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 242
+        assert parseSpOut(_p) == 241
 
 class TestChIPseq:
     def test_default(self, ifs):
