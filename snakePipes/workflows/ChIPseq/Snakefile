@@ -45,7 +45,8 @@ else:
     include: os.path.join(maindir, "shared", "rules", "ChIP_peak_calling.snakefile")
 
 # QC report for all samples
-include: os.path.join(maindir, "shared", "rules", "ChiP-seq_qc_report.snakefile")
+if not fromBAM and not useSpikeInForNorm:
+    include: os.path.join(maindir, "shared", "rules", "ChiP-seq_qc_report.snakefile")
 
 
 # deeptools for allelic bams (if present)
@@ -274,7 +275,7 @@ rule all:
         run_deepTools_allelic(),
         ## run csaw if asked for
         run_CSAW(),
-        "QC_report/QC_report_all.tsv",
+        "QC_report/QC_report_all.tsv" if not fromBAM and not useSpikeInForNorm,
         run_chipqc()
 
 
