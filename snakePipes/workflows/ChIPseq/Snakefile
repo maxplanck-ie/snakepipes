@@ -275,7 +275,7 @@ rule all:
         run_deepTools_allelic(),
         ## run csaw if asked for
         run_CSAW(),
-        "QC_report/QC_report_all.tsv" if not fromBAM and not useSpikeInForNorm,
+        "QC_report/QC_report_all.tsv" if not fromBAM and not useSpikeInForNorm else [],
         run_chipqc()
 
 
