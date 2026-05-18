@@ -11,6 +11,12 @@ jobs:
         with:
           environment-file: .github/conda_ci.yml
           condarc-file: .github/condarc.yml
+          auto-activate-base: true
+      - name: Activate conda and verify conda-build
+        shell: bash -l {0}
+        run: |
+          conda activate conda_ci
+          conda build --version
       - name: buildSnakePipes
         uses: uibcdf/action-build-and-upload-conda-packages@v1.4.0
         with:
