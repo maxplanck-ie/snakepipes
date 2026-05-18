@@ -15,7 +15,7 @@ jobs:
       - name: Activate conda and verify conda-build
         shell: bash -l {0}
         run: |
-          conda activate conda_ci
+          conda activate base
           conda build --version
       - name: buildSnakePipes
         uses: uibcdf/action-build-and-upload-conda-packages@v1.4.0
