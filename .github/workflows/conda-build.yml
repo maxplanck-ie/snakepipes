@@ -11,9 +11,12 @@ jobs:
         with:
           environment-file: .github/conda_ci.yml
           condarc-file: .github/condarc.yml
+          auto-activate-base: true
+      - name: Install conda-build in base environment
+        run: conda install -n base -c conda-forge conda-build
       - name: buildSnakePipes
         uses: uibcdf/action-build-and-upload-conda-packages@v1.4.0
         with:
           meta_yaml_dir: conda-recipe
-          python-version: 3.12
+          python-version: 3.11
           upload: false

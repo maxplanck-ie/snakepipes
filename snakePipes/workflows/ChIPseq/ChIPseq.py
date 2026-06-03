@@ -22,6 +22,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          "externalBed": "",
                          "plotFormat": "png", "bamExt": ".filtered.bam", "fdr": 0.05,
                          "absBestLFC": 1, "useSpikeinForNorm": False, "spikeinExt": "_spikein",
+                         "spikeinSizeFactorsFile": None,
                          "peakCallerOptions": "--qvalue 0.001","cutntag": False,
                          "getSizeFactorsFrom": "genome"}):
 
@@ -69,17 +70,17 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                           action="store_true",
                           help="Use the spikeIn chromosomes of the hybrid genome for normalization.")
 
-    optional.add_argument("--getSizeFactorsFrom",
-                          dest="getSizeFactorsFrom",
-                          action="store",
-                          choices=["genome", "TSS", "input"],
-                          help="Which part of the spikein genome to use to calculate sizeFactors from.",
-                          default=defaults['getSizeFactorsFrom'])
 
     optional.add_argument("--spikeinExt",
                           dest="spikeinExt",
                           help="Extention of spikein chromosome names in the hybrid genome. Ignored if useSpikeInForNorm is False (default: '%(default)s') .",
                           default=defaults["spikeinExt"])
+
+    optional.add_argument("--spikeinSizeFactorsFile",
+                          dest="spikeinSizeFactorsFile",
+                          help="Path to the text file with spikein size factors generated e.g. by multiBamSummary. Required if useSpikeinForNorm is called with fromBAM (default: '%(default)s') .",
+                          default=defaults["spikeinSizeFactorsFile"])
+
 
     optional.add_argument("--bigWigType",
                           help="Type of bigWig file to create. Options are: 'subtract' (control-subtracted ChIP coverage), 'log2ratio' (for log2 ratio of ChIP over control) or 'both' (create both set of bed files). Note that the allele-specific mode currently only produces 'log2ratio' bigwigs. (default: '%(default)s')",
@@ -147,6 +148,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                           help="FDR threshold to apply for filtering DB regions"
                                "(default: '%(default)s')",
                           default=defaults["fdr"])
+
     optional.add_argument("--LFC",
                           dest="absBestLFC",
                           help="Log fold change threshold to apply for filtering DB regions"

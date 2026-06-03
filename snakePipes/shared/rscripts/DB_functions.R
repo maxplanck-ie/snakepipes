@@ -121,7 +121,6 @@ makeQCplots_chip_PE <- function(bam.file, outplot, pe.param){
     }
     collected <- plotwc(bam.file)
     xranged <- as.integer(names(collected))
-
     ## plot
     message("Plotting")
     pdf(outplot)
@@ -136,12 +135,13 @@ makeQCplots_chip_PE <- function(bam.file, outplot, pe.param){
 
     # cross correlation
     plot(0:max.delay, CCF, type = "l", ylab = "CCF", xlab = "Delay (bp)", main = "PE-Cross-correlation")
-
+        print(str(collected))
+    if( any(is.null(collected)) | any(is.na(collected))){message("Skipping plotting cross correlation.")}else{
     # coverage in windows
     plot(xranged, collected, type = "l", col = "blue", xlim = c(-1000, 1000), lwd = 2,
-         xlab = "Distance (bp)", ylab = "Relative coverage per base")
+           xlab = "Distance (bp)", ylab = "Relative coverage per base")
     abline(v = c(-150,200), col = "dodgerblue", lty = 2)
-    legend("topright", col = "dodgerblue", legend = "specified window size")
+    legend("topright", col = "dodgerblue", legend = "specified window size")}
 
     dev.off()
 
@@ -204,7 +204,11 @@ tmmNormalize_chip <- function(chipCountObject, binsize, plotfile){
     wider <- csaw::windowCounts(bam.files, bin = TRUE, width = binsize, param = chipCountObject$pe.param)
     if(useSpikeInForNorm){
         tab<-read.table(scale_factors,sep="\t",header=TRUE,as.is=TRUE,quote="")
-        normfacs<-1/(tab$scalingFactor[match(colnames(chipCountObject$windowCounts),tab$sample)]) }else{
+        if(! allelic_info){
+            normfacs<-1/(tab$scalingFactor[match(colnames(chipCountObject$windowCounts),tab$sample)])}else{
+            normfacs<-1/(tab$scalingFactor[match(gsub(".genome[1-2]","",colnames(chipCountObject$windowCounts)),tab$sample)])
+            }
+     }else{
         normfacs <- csaw::normFactors(wider, se.out=FALSE)}
 
     chipCountObject$normFactors <- normfacs

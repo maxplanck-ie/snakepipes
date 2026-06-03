@@ -121,7 +121,7 @@ def run_splitBam_ops():
         file_list.append(
             [expand("split_deepTools_qc/multiBamSummary/{part}.scaling_factors.txt",part=part),
             expand("bamCoverage/{sample}.host_scaled.BY{part}.bw",sample=samples,part=part),
-            expand("split_deepTools_qc/bamPEFragmentSize/{part}.fragmentSize.metric.tsv",part=part)]
+            "split_deepTools_qc/bamPEFragmentSize/host.fragmentSize.metric.tsv"]
             )
         if "allelic-whatshap" in mode:
             allele_suffix = ['genome1', 'genome2']

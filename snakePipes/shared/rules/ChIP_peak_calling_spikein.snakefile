@@ -185,7 +185,7 @@ else:
 
 
 rule prep_bedgraph:
-    input: "bamCoverage/{sample}.host_scaled.BYhost.bw"
+    input: "bamCoverage/{sample}.host_scaled.BYspikein.bw"
     output: temp("filtered_bedgraph/{sample}_host.fragments.bedgraph")
     conda: CONDA_SEACR_ENV
     shell: """
