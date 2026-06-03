@@ -16,9 +16,9 @@ Input requirements
 ------------------
 
 The DNA mapping pipeline generates output that is fully compatible with the ChIPseq pipeline input requirements!
-When running the ChIPseq pipeline, please specify the output directory of DNAmapping pipeline as the working directory (``-w``).
+When running the ChIPseq pipeline, please specify the output directory of DNAmapping pipeline as the working directory (``-d``).
 
-Alternatively, bam files can be used as input to the ChIPseq worklow. The folder containing bam files can be passed with the `--fromBAM` parameter. Bam file extention can be specified with `--bamExt`. Working directory specified with `-w` will be used as output folder.
+Alternatively, bam files can be used as input to the ChIPseq worklow. The folder containing bam files can be passed with the `--fromBAM` parameter. Bam file extention can be specified with `--bamExt`. Working directory specified with `-d` will be used as output folder. Running the ChiPseq workflow in 'allelic-whatshap' mode only works with passing the full output of the DNAmapping pipeline with `-d` and not with `--fromBAM`.
 
 
 Sample configuration
@@ -50,7 +50,7 @@ As you can see above, the same control can be used for multiple samples.
 Spikein Normalization
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If chromatin from an external organism was spikein in, it is possible to obtain spikein-derived scaling factors for the ChIP (and input) samples with the flag ``--useSpikeInForNorm``. This requires providing a hybrid bam file, with reads aligned to a hybrid genome of host and spikein chromosomes. Spikein chromosome extention can be specified with `--spikeinExt`. Scale factors can be obtained either from whole spikein genome in the ChIP samples, from windows centered on TSS in the spikein genome in the ChIP samples, or from whole spikein genome in the input samples . The default scale factors from whole spikein genome in the ChIP samples can be changed to something else with ``--getSizeFactorsFrom``.
+If chromatin from an external organism was spikein in, it is possible to obtain spikein-derived scaling factors for the ChIP (and input) samples with the flag ``--useSpikeInForNorm``. This requires providing either the output of a DNAmapping workflow run involving mapping to a hybrid genome and calling ``--useSpikeInForNorm`` to the ChIPseq workflow with ``-d`` or passing host bam files to the ChIPseq workflow with ``--fromBAM`` together with the spikein size factor file with ``--spikeinSizeFactorsFile``. See coobook section for example usage.
 
 DESeq2-style scaling factors produced with deepTools multiBamSummary will then be used to create bam coverage tracks and passed to CSAW as size Factors if sample sheet is provided.
 
