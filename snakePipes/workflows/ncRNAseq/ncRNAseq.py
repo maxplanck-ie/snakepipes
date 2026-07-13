@@ -84,6 +84,12 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                           action="store_false",
                           help="input data is single-end, not paired-end. This is only used if --fromBAM is specified.")
 
+
+    optional.add_argument("--libraryType",
+                          help="user provided library type strand specificity. featureCounts style: 0, 1, 2 (Illumina TruSeq); default: '%(default)s')",
+                          type=int,
+                          default=defaults["libraryType"])
+
     return parser
 
 
