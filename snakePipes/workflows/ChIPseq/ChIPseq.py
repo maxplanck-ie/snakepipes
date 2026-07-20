@@ -24,7 +24,8 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          "absBestLFC": 1, "useSpikeinForNorm": False, "spikeinExt": "_spikein",
                          "spikeinSizeFactorsFile": None,
                          "peakCallerOptions": "--qvalue 0.001","cutntag": False,
-                         "getSizeFactorsFrom": "genome"}):
+                         "getSizeFactorsFrom": "genome",
+                         "repQuant": False }):
 
     """
     Parse arguments from the command line.
@@ -154,6 +155,12 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                           help="Log fold change threshold to apply for filtering DB regions"
                                "(default: '%(default)s')",
                           default=defaults["absBestLFC"])
+
+    optional.add_argument("--repQuant",
+                          help="if set, repeat binding quantification according to Pal et al. 2023 is performed."
+                          "Setting this option requiers rmsk_file set in the organism yaml. "
+                          " Default is '%(default)s'.",
+                          action="store_true")
 
 
     return parser

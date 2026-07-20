@@ -57,3 +57,5 @@ filterGTF:
 ##parameters to filter DB regions on
 fdr: 0.05
 absBestLFC: 1
+##repeat quantification
+repQuant: false
