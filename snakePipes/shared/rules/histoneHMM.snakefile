@@ -54,6 +54,43 @@ rule format_HMM_output:
         format_HMM_output(input.txt,output.txt)
 
 
+rule cleanup_histoneHMM:
+    input:
+        peaks = "histoneHMM/{sample}.filtered.histoneHMM-regions.gff"
+    output:
+        peaks_gff = "histoneHMM/{sample}_avgp0.5.gff",
+        peaks_bed = "histoneHMM/{sample}_avgp0.5.bed"
+    params:
+        outdir = "histoneHMM",
+        input_peaks = "../histoneHMM/{sample}.filtered.histoneHMM-regions.gff"
+    conda: CONDA_CHIPQC_ENV
+    script: "../rscripts/clean_histoneHMM_result.R"
+
+
+rule histoneHMM_chipqc:
+    input:
+        bams = expand("filtered_bam/{broad_sample}.filtered.bam",broad_sample=broad_samples),
+        peaks = expand("histoneHMM/{broad_sample}_avgp0.5.bed",broad_sample=broad_samples),
+        sampleSheet = sampleSheet if sampleSheet else [],
+        chipdict = os.path.join(outdir,"chip_samples.yaml")
+    output:
+        "histoneHMM_chipqc/sessionInfo.txt"
+    params:
+        genome = os.path.basename(genome),
+        outdir = "histoneHMM_chipqc",
+        blacklist = blacklist_bed,
+        bams = lambda wildcards,input: [os.path.join(outdir,x) for x in input.bams],
+        peaks = lambda wildcards,input: [os.path.join(outdir,x) for x in input.peaks],
+        narrow_samples = [],
+        broad_samples = broad_samples,
+        useSpikeinForNorm = useSpikeInForNorm
+    threads: 8
+    benchmark:
+        "histoneHMM_chipqc/.benchmark/chipqc.benchmark"
+    conda: CONDA_CHIPQC_ENV
+    script: "../rscripts/chipqc.R"
+
+
 ### compress and index GFF result file from histoneHMM for usage with IGV ######
 ### compress txt result files to save space ####################################
 rule histoneHMM_out_gz:
@@ -72,8 +109,8 @@ rule histoneHMM_out_gz:
     threads: 2
     conda: CONDA_SHARED_ENV
     shell: """
-        grep -v ^\"#\" {input.gff} | sort -k1,1 -k4,4n | bgzip > {output.gff}
-        tabix -p gff {output.gff}
-        gzip {input.post}
-        gzip {input.txt}
+        grep -v ^\"#\" {input.gff} | sort -k1,1 -k4,4n | bgzip -f  > {output.gff}
+        tabix -f -p gff {output.gff}
+        gzip -f {input.post}
+        gzip -f {input.txt}
         """

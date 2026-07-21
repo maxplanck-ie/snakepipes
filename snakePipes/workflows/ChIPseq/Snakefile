@@ -45,8 +45,6 @@ else:
 # QC report for all samples
 include: os.path.join(maindir, "shared", "rules", "ChiP-seq_qc_report.snakefile")
 
-# sambamba
-#include: os.path.join(maindir, "shared", "rules", "sambamba.snakefile")
 
 # deeptools for allelic bams (if present)
 
@@ -66,16 +64,13 @@ if sampleSheet and cf.check_replicates(sampleSheet):
         include: os.path.join(maindir, "shared", "rules", "CSAW.multiComp.snakefile")
         include: os.path.join(maindir, "shared", "rules", "nearestGene.multiComp.snakefile")
     include: os.path.join(maindir, "shared", "rules", "filterGTF.snakefile")
-    #if not fromBAM and not useSpikeInForNorm:
-        # These are needed for the snakefile to be imported
-        #aligner = "Bowtie2"
-        #downsample = False
-        #include: os.path.join(maindir, "shared", "rules", "deepTools_qc.snakefile")
 
-def run_histoneHMM(allele_info): # TODO what is a good practice for broad peaks of cutntag?
-    if not allele_info:
+def run_histoneHMM(allele_info,peakCaller): # TODO what is a good practice for broad peaks of cutntag?
+    if not allele_info and peakCaller=="histoneHMM":
         ## run histoneHMM broad enrichment calling only for samples annotated as *broad*
-        file_list = expand("histoneHMM/{chip_sample}.filtered.histoneHMM-regions.gff.gz", chip_sample = [s for s in chip_samples if is_broad(s)])
+        file_list = expand("histoneHMM/{sample}.filtered.histoneHMM-regions.gff.gz", sample=broad_samples)
+        file_list.append(expand("histoneHMM/{sample}_avgp0.5.bed", sample=broad_samples))
+        file_list.append("histoneHMM_chipqc/sessionInfo.txt")
     else:
         file_list = []
     return(file_list)
@@ -146,7 +141,7 @@ def run_deepTools_allelic():
 def run_CSAW():
     if sampleSheet and cf.check_replicates(sampleSheet):
         if not isMultipleComparison:
-            file_list=["CSAW_{}_{}/CSAW.session_info.txt".format(peakCaller, sample_name)]
+            file_list=["CSAW_{}_{}/CSAW.session_info.txt".format(peakCaller, sample_name),"CSAW_{}_{}/Full.results.bed".format(peakCaller, sample_name)]
             if not allele_info :
                 file_list.append(["Annotation/genes.filtered.symbol","Annotation/genes.filtered.t2g","CSAW_{}_{}/CSAW.Stats_report.html".format(peakCaller, sample_name)])
                 file_list.append([os.path.join("CSAW_{}_{}".format(peakCaller, sample_name), x) for x in list(itertools.chain.from_iterable([expand("CSAW.{change_dir}.cov.matrix",change_dir=change_direction),expand("CSAW.{change_dir}.cov.heatmap.png",change_dir=change_direction)]))])
@@ -155,6 +150,7 @@ def run_CSAW():
                     file_list.append([os.path.join("CSAW_{}_{}".format(peakCaller, sample_name), x) for x in list(itertools.chain.from_iterable([expand("CSAW.{change_dir}.log2r.matrix",change_dir=change_direction),expand("CSAW.{change_dir}.log2r.heatmap.png",change_dir=change_direction)]))])
         else:
             file_list=expand("CSAW_{}_{}/CSAW.session_info.txt".format(peakCaller, sample_name + ".{compGroup}"),compGroup=cf.returnComparisonGroups(sampleSheet))
+            file_list.append(expand("CSAW_{}_{}/Full.results.bed".format(peakCaller, sample_name + ".{compGroup}"),compGroup=cf.returnComparisonGroups(sampleSheet)))
             if not allele_info :
                 file_list.append(["Annotation/genes.filtered.symbol","Annotation/genes.filtered.t2g",expand("CSAW_{}_{}/CSAW.Stats_report.html".format(peakCaller, sample_name + ".{compGroup}"),compGroup=cf.returnComparisonGroups(sampleSheet))])
                 file_list.append([expand("CSAW_{}_{}".format(peakCaller, sample_name + ".{compGroup}") + "/CSAW.{change_dir}.cov.matrix",change_dir=change_direction,compGroup=cf.returnComparisonGroups(sampleSheet)),
@@ -172,10 +168,6 @@ def run_CSAW():
 
 def run_genrich():
     if (peakCaller == "Genrich"):
-#        if cutntag:
-#            warnings.warn("--cutntag only works with macs2, your setting for using Genrich will be ignored. "
-#                          "Remove --cutntag if interested in Genrich.")
-#            return ([])
         file_list = ["Genrich/all_samples.narrowPeak"]
         if sampleSheet:
             if not isMultipleComparison:
@@ -198,10 +190,8 @@ def run_macs2():
     if peakCaller == "MACS2":
         if useSpikeInForNorm:
             file_list = expand("MACS2/{chip_sample}_host.BAM_peaks.xls", chip_sample = chip_samples)
-            file_list.extend(expand("MACS2/{chip_sample}_host.BAM_peaks.qc.txt", chip_sample = chip_samples))
         else:
             file_list = expand("MACS2/{chip_sample}.filtered.BAM_peaks.xls", chip_sample = chip_samples)
-            file_list.extend(expand("MACS2/{chip_sample}.filtered.BAM_peaks.qc.txt", chip_sample = chip_samples))
         return (file_list)
     return ([])
 
@@ -209,13 +199,17 @@ def run_macs2():
 def run_seacr():
     if (peakCaller == "SEACR"):
         if useSpikeInForNorm:
-            file_list = expand("SEACR/{chip_sample}_host.{mode}.bed", chip_sample = chip_samples,mode=["stringent","relaxed"])
-            file_list.append(expand("SEACR/{chip_sample}_host.{mode}_peaks.qc.txt",chip_sample=chip_samples,mode=["stringent","relaxed"]))
+            file_list = expand("SEACR/{chip_sample}_host.{mode}.bed", chip_sample = chip_samples,mode=["stringent"])
         else:
-            file_list = expand("SEACR/{chip_sample}.filtered.{mode}.bed", chip_sample = chip_samples,mode=["stringent","relaxed"])
-            file_list.append(expand("SEACR/{chip_sample}.filtered.{mode}_peaks.qc.txt",chip_sample=chip_samples,mode=["stringent","relaxed"]))
+            file_list = expand("SEACR/{chip_sample}.filtered.{mode}.bed", chip_sample = chip_samples,mode=["stringent"])
         return (file_list)
     return ([])
+
+
+def run_chipqc():
+    file_list = "{}_chipqc/sessionInfo.txt".format(peakCaller) if not peakCaller == "Genrich" else []
+    return(file_list)
+
 
 
 ### execute before workflow starts #############################################
@@ -223,7 +217,6 @@ def run_seacr():
 onstart:
     if "verbose" in config and config["verbose"]:
         print("--- Workflow parameter ---------------------------------------------------------")
-        #print("All samples:", all_samples)
         print("control samples:", control_samples)
         print("ChIP samples w ctrl:", chip_samples_w_ctrl)
         print("ChIP samples wo ctrl:", chip_samples_wo_ctrl)
@@ -265,12 +258,13 @@ rule all:
         run_genrich(),
         run_seacr(),
         # run histoneHMM if allelic_bams are absent (since it gives index error without allele_specific index)
-        run_histoneHMM(allele_info),
+        run_histoneHMM(allele_info,peakCaller),
         ## run deeptools-allelic only if dir "allelic_bams" present and non empty
         run_deepTools_allelic(),
         ## run csaw if asked for
         run_CSAW(),
-        "QC_report/QC_report_all.tsv"
+        "QC_report/QC_report_all.tsv",
+        run_chipqc()
 
 
 ### execute after workflow finished ############################################
@@ -283,7 +277,3 @@ onerror:
     print("\n !!! ERROR in ChIPseq workflow! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
 
 
-## benchmark ###################################################################
-## rule benchmark:
-##     output: "benchmark/benchmark.tsv"
-##for f in $(find . -name "*.benchmark" -type f); do seconds=$(cat $f | awk 'NR==2' | cut -f1); bname=$(basename $f | sed 's/.benchmark//'); echo -e "$bname\t$seconds" ; done

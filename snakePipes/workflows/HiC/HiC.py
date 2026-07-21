@@ -24,7 +24,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          "fastqc": False, "aligner": None, "binSize": 10000,
                          "noTAD": False,
                          "RFResolution": False, "correctionMethod": "KR",
-                         "enzyme": "HindIII", "restrictRegion": None,
+                         "enzymes": ["HindIII"], "restrictRegion": None,
                          "mergeSamples": False, "nBinsToMerge": 0,
                          "findTADParams": '--thresholdComparisons 0.01',
                          "reads": ["_R1", "_R2"], "ext": ".fastq.gz",
@@ -65,10 +65,12 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                           default=defaults["RFResolution"])
 
     optional.add_argument("--enzyme",
-                          choices=['DpnII', 'HindIII'],
+                          choices=['DpnII', 'HindIII', 'MseI', 'CviQI'],
+                          nargs=1,
+                          action="append",
                           help="Which enzyme was used to create Hi-C "
-                               "library (default: '%(default)s')",
-                          default=defaults["enzyme"])
+                               "library. Invoke multiple times if more than one enzyme was used (default: '%(default)s')",
+                          default=defaults["enzymes"])
 
     optional.add_argument("--binSize",
                           type=int,

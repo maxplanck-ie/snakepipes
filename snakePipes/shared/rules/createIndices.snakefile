@@ -54,7 +54,7 @@ else:
         params:
             spikeinExt = spikeinExt
         shell: """
-            sed '/^>/ s/$/{spikeinExt}/' {input} > {output}
+            sed 's/\s\+/{params.spikeinExt} /' {input} > {output}
         """
 
     rule createGenomeFasta:
@@ -127,19 +127,6 @@ rule renameSpikeinChromsGTF:
     shell: """
         awk -v FS='\\t' -v OFS='\\t' '{{ if($1 !~ /^#/){{$1=$1\"{params.spikeinExt}\"; print $0 }} else{{print $0}} }}' {input} > {output}
     """
-
-
-# Default memory allocation: 1G
-#rule gtf2BED:
-#    input: genes_gtf
-#    output: genes_bed
-#    conda: CONDA_CREATE_INDEX_ENV
-#    shell: """
-#        awk '{{if ($3 != "gene") print $0;}}' {input} \
-#            | grep -v "^#" \
-#            | gtfToGenePred /dev/stdin /dev/stdout \
-#            | genePredToBed stdin {output}
-#        """
 
 
 rule gtf_to_files:

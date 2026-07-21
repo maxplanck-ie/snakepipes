@@ -29,7 +29,7 @@ The easiest way to install snakePipes is via our conda channel. The following co
 
 .. code:: bash
 
-    conda create -n snakePipes -c mpi-ie -c conda-forge -c bioconda snakePipes
+    conda create -n snakePipes -c conda-forge -c bioconda -c mpi-ie snakePipes
 
 This way, the software used within snakePipes do not conflict with the software pre-installed on your terminal or in your python environment.
 
@@ -80,17 +80,17 @@ By default this translates to a pre-shipped 'local' profile (and points to a loc
 The local profile runs all jobs without a submission system. 
 
 Another profile shipped within the repository is a default slurm profile (using snakemake-executor-plugin-cluster-generic). 
-In case you want to use this you can set the snakemakeProfile value to ``shared/profiles/snakepipes_genericprofile``.
+In case you want to use this you can set the snakemakeProfile value to ``shared/profiles/snakepipes_genericprofile`` by running `snakePipes config --snakemakeProfile shared/profiles/snakepipes_genericprofile`.
 After changing the value of snakemakeProfile, you should re-run ``snakePipes info``, which will also print out the full directory of the profile used.
 If you want to use the snakepipes_genericprofile, make sure to review the following entries in the profile yaml file with respect to your infrastructure:
 
  * ``module load slurm &&`` - could be omitted
  * ``resources.partition`` - set to your slurm partition
- * ``conda-prefix`` - set to your preferred location where snakePipes environments should be stored. You can set this value by running `snakePipes config --condaEnvDir` and providing the respective path.
+ * ``conda-prefix`` - set to your preferred location where snakePipes environments should be stored. You can set this value by running `snakePipes config --condaEnvDir` after setting the snakemakeProfile value and providing the respective path.
  * ``resources`` - make sure default resources make sense for your infrastructure
  * ``ccancel.sh`` - refers to the ccancel.sh file inside the profile directory and contains instructions on how to kill submitted jobs (on failure / interruption of snakemake). The module command could be omitted here as before
 
- In case you are using your own snakemake profile already, you can define them here as well. Acceptable values in snakemakeProfile are:
+ In case you are using your own snakemake profile already, you can define them here as well by passing it to `snakePipes config --snakemakeProfile`. Acceptable values in snakemakeProfile are:
  
  * absolute path to a snakemake profile directory
  * a relative path to a snakemake profile (relative to the package directory)
@@ -109,6 +109,8 @@ In case you use your own you'd want to have these set in your profile as well.
 tempDir
 +++++++
 The temp directory to use. Defaults to /scratch/local.
+You can change its value by passing the corresponding path to `snakePipes config --tempDir` .
+
 
 After setting the defaults, the conda environments can be created. 
 
@@ -190,8 +192,7 @@ For the sake of convenience, we provide premade indices for the following organi
  - `Mouse (GRCm37/mm9, Gencode release 1) <https://zenodo.org/record/4478284>`__
  - `Fruit fly (dm6, Ensembl release 94) <https://zenodo.org/record/4478414>`__
 
-To use these, simply download and extract them. You will then need to modify the provided YAML file to indicate exactly where the indices are located (i.e., replace ``/data/processing/ryan`` with whatever is appropriate).
-
+To use these, simply download and extract them. You will then need to modify the provided YAML file to indicate exactly where the indices are located by providing full paths to the respective files.
 
 
 
@@ -238,7 +239,7 @@ Test data for the various workflows is available at the following locations:
 
  - `DNAmapping <https://zenodo.org/record/3707259>`__
  - `ChIPseq <https://zenodo.org/record/2624281>`__
- - `ATACseq <https://zenodo.org/record/3707666>`__
+ - `ATACseq <https://zenodo.org/record/17600196>`__
  - `mRNAseq <https://zenodo.org/record/3707602>`__
  - `ncRNAseq <https://zenodo.org/deposit/3707749>`__
  - `HiC <https://zenodo.org/record/3707714>`__

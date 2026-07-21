@@ -35,13 +35,13 @@ Quick start
 
 .. code:: bash
 
-    conda create -n snakePipes -c mpi-ie -c conda-forge -c bioconda snakePipes
+    conda create -n snakePipes -c conda-forge -c bioconda -c mpi-ie snakePipes
 
 * You can update snakePipes to the latest version available on conda with:
 
 .. code:: bash
 
-    conda update -n snakePipes -c mpi-ie -c conda-forge -c bioconda --prune snakePipes
+    conda update -n snakePipes -c conda-forge -c bioconda -c mpi-ie --prune snakePipes
 
 * Download genome fasta and annotations for an your organism, and build indexes, Check in :ref:`createIndices`
 
@@ -122,6 +122,7 @@ Contents:
    content/workflows/ncRNAseq.rst
    content/workflows/scRNAseq.rst
    content/workflows/WGBS.rst
+   content/cookbook.rst
    content/News.rst
 
 

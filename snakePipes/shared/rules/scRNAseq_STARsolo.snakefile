@@ -80,6 +80,14 @@ rule STARsolo_report:
     script: "../rscripts/scRNAseq_report.R"
 
 
+rule index_bam:
+    input: aligner+"/{sample}.sorted.bam"
+    output: aligner+"/{sample}.sorted.bam.bai"
+    conda: CONDA_SAMBAMBA_ENV
+    shell: """
+        sambamba index {input}
+        """
+
 rule filter_bam:
     input:
         bamfile = aligner+"/{sample}.sorted.bam",
@@ -174,68 +182,3 @@ rule remove_empty_drops:
     script: "../rscripts/scRNAseq_EmptyDrops.R"
 
 
-if not skipVelocyto:
-    rule cellsort_bam:
-        input:
-            bam = "filtered_bam/{sample}.filtered.bam"
-        output:
-            bam = "filtered_bam/cellsorted_{sample}.filtered.bam"
-        params:
-            samsort_memory="10G",
-            tempDir = tempDir
-        threads: lambda wildcards: 4 if 4<max_thread else max_thread
-        conda: CONDA_scRNASEQ_ENV
-        shell: """
-                TMPDIR={params.tempDir}
-                MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX)
-                samtools sort -m {params.samsort_memory} -@ {threads} -T $MYTEMP/{wildcards.sample} -t CB -O bam -o {output.bam} {input.bam}
-                rm -rf $MYTEMP
-               """
-
-    #the barcode whitelist is currently taken from STARsolo filtered output, this is required to reduce runtime!
-    #no metadata table is provided
-
-    checkpoint velocyto:
-        input:
-            gtf = "Annotation/genes.filtered.gtf",
-            bam = "filtered_bam/{sample}.filtered.bam",
-            csbam="filtered_bam/cellsorted_{sample}.filtered.bam",
-            bc = "STARsolo/{sample}/{sample}.Solo.out/Gene/filtered/barcodes.tsv"
-        output:
-            outdir = directory("VelocytoCounts/{sample}"),
-            outdum = "VelocytoCounts/{sample}.done.txt"
-        params:
-            tempdir = tempDir
-        conda: CONDA_scRNASEQ_ENV
-        shell: """
-                export LC_ALL=en_US.utf-8
-                export LANG=en_US.utf-8
-                export TMPDIR={params.tempdir}
-                MYTEMP=$(mktemp -d ${{TMPDIR:-/tmp}}/snakepipes.XXXXXXXXXX);
-                velocyto run --bcfile {input.bc} --outputfolder {output.outdir} --dtype uint64 {input.bam} {input.gtf} ;
-                touch {output.outdum};
-                rm -rf $MYTEMP
-        """
-
-    rule combine_loom:
-        input: expand("VelocytoCounts/{sample}",sample=samples)
-        output: "VelocytoCounts_merged/merged.loom"
-        conda: CONDA_loompy_ENV
-        params:
-            outfile = outdir+"/VelocytoCounts_merged/merged.loom",
-            script = maindir+"/shared/tools/loompy_merge.py",
-            input_fp = lambda wildcards,input: [ os.path.join(outdir,f) for f in input ]
-        shell: """
-            python {params.script} -outf {params.outfile} {params.input_fp}
-              """
-
-    #rule velocity_to_seurat:
-    #    input:
-    #        indirs = expand("VelocytoCounts/{sample}",sample=samples)
-    #    output:
-    #        seurat = "Seurat/Velocyto/merged_samples.RDS"
-    #    params:
-    #        wdir = outdir + "/Seurat/Velocyto",
-    #        samples = samples
-    #    conda: CONDA_seurat3_ENV
-    #    script: "../rscripts/scRNAseq_merge_loom.R"

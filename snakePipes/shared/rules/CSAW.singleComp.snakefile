@@ -18,6 +18,8 @@ def getInputPeaks(peakCaller, chip_samples, genrichDict):
             return expand("SEACR/{chip_sample}.filtered.stringent.bed",chip_sample=chip_samples)
     elif peakCaller == "Genrich":
         return expand("Genrich/{genrichGroup}.narrowPeak", genrichGroup = genrichDict.keys())
+    elif peakCaller == "histoneHMM":
+        return expand("histoneHMM/{broad_sample}_avgp0.5.bed", broad_sample=broad_samples)
     elif externalBed:
         return externalBed
 
@@ -71,7 +73,8 @@ rule CSAW:
     output:
         "CSAW_{}_{}/CSAW.session_info.txt".format(peakCaller, sample_name),
         "CSAW_{}_{}/DiffBinding_analysis.Rdata".format(peakCaller, sample_name),
-        expand("CSAW_{}_{}".format(peakCaller, sample_name) + "/Filtered.results.{change_dir}.bed", change_dir=change_direction)
+        expand("CSAW_{}_{}".format(peakCaller, sample_name) + "/Filtered.results.{change_dir}.bed", change_dir=change_direction),
+        "CSAW_{}_{}".format(peakCaller, sample_name) + "/Full.results.bed"
     benchmark:
         "CSAW_{}_{}/.benchmark/CSAW.benchmark".format(peakCaller, sample_name)
     params:

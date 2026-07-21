@@ -36,6 +36,7 @@ tx2gene_file <- snakemake@params[["tx2gene_file"]]
 rmdTemplate <- snakemake@params[["rmdTemplate"]]
 formulaInput <- as.character(snakemake@params[["formula"]])
 wdir <- snakemake@params[["outdir"]]
+lrt <- toupper(snakemake@params[["lrt"]])
 
 setwd(wdir)
 
@@ -68,6 +69,7 @@ cat(paste("Working dir:", getwd(), "\n"))
 cat(paste("Sample info CSV:", sampleInfoFilePath, "\n"))
 cat(paste("Count file:", countFilePath, "\n"))
 cat(paste("FDR:", fdr, "\n"))
+cat(paste("LRT:", lrt, "\n"))
 cat(paste("Custom formula:",formulaInput,"\n"))
 cat(paste("Gene names:", geneNamesFilePath, "\n"))
 cat(paste("Number of top N genes:", topN, "\n"))
@@ -116,7 +118,7 @@ if(length(unique(sampleInfo$condition))>1){
     if(tximport & allelic_info){
         message("Detected allelic Salmon counts. Skipping DESeq_basic.")
     }else{
-        seqout <- DESeq_basic(countdata, coldata = sampleInfo, fdr = fdr, alleleSpecific = allelic_info, from_salmon = tximport, customFormula = formulaInput)
+        seqout <- DESeq_basic(countdata, coldata = sampleInfo, fdr = fdr, alleleSpecific = allelic_info, from_salmon = tximport, customFormula = formulaInput, lrt = lrt)
 
         DESeq_writeOutput(DEseqout = seqout,
                 fdr = fdr, outprefix = "DEseq_basic",
@@ -129,7 +131,7 @@ if(length(unique(sampleInfo$condition))>1){
 
 ## Run allele-sepecific DESeq wrapper (if asked for)
 if (isTRUE(allelic_info)) {
-    seqout_allelic <- DESeq_allelic(countdata, coldata = sampleInfo, fdr = fdr, from_salmon=tximport, customFormula = NA)
+    seqout_allelic <- DESeq_allelic(countdata, coldata = sampleInfo, fdr = fdr, from_salmon=tximport, customFormula = NA, lrt = lrt)
 
     DESeq_writeOutput(DEseqout = seqout_allelic,
                  fdr = fdr, outprefix = "DEseq_allelic",

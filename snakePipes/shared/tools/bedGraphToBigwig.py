@@ -2,7 +2,6 @@
 '''Convert a bedGraph file from MethylDackel to two bigWig files'''
 import pyBigWig
 import sys
-import os
 
 fai = open(sys.argv[2])
 hdr = []

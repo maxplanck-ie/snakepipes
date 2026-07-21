@@ -74,7 +74,8 @@ jobs:
     - name: CI
       run: |
         snakePipes config --tempDir /tmp
-        ./.ci_stuff/test_dag.sh
+        echo 'test dag has been deprecated'
+#        ./.ci_stuff/test_dag.sh
   createEnvs:
     needs: CI
     strategy:

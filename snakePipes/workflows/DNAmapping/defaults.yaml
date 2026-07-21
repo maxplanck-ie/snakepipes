@@ -52,7 +52,7 @@ properPairs: false
 mateOrientation: --fr
 ## other Bowtie2 stuff
 insertSizeMax: 1000
-alignerOpts:
+alignerOpts: ''
 cutntag: False
 plotFormat: png
 UMIBarcode: False
@@ -64,15 +64,3 @@ UMIDedupOpts:
 fragmentLength: 200
 qualimap: false
 verbose: false
-################################################################################
-# Call snakemake directly, i.e. without using the wrapper script:
-#
-# Please save a copy of this config yaml file and provide an adjusted config
-# via '--configFile' parameter!
-# example call:
-#
-# snakemake --snakefile /path/to/snakemake_workflows/workflows/DNAmapping/Snakefile
-#           --configFile /path/to/snakemake_workflows/workflows/DNAmapping/defaults.yaml
-#           --directory /path/to/outputdir
-#           --cores 32
-################################################################################

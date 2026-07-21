@@ -20,7 +20,7 @@ def getref_fileList(dir):
 
 ## Create masked genome
 if allele_hybrid == 'dual':
-    rule create_snpgenome:
+    checkpoint create_snpgenome:
         input:
             genome = GENOMEDIR
         output:
@@ -41,7 +41,7 @@ if allele_hybrid == 'dual':
             " --strain {params.strain1} --strain2 {params.strain2}"
             "&& cd ../"
 else:
-    rule create_snpgenome:
+    checkpoint create_snpgenome:
         input:
             genome = GENOMEDIR
         output:
@@ -86,16 +86,16 @@ elif aligner == "Bowtie2":
         input:
             snpgenome_dir = SNPdir
         output:
-            bowtie2_index_allelic
+            btix = bowtie2_index_allelic,
+            tmpfna = temp("snp_genome/concat.fna")
         threads: lambda wildcards: 10 if 10<max_thread else max_thread
         params:
-            filelist = getref_fileList(SNPdir),
             idxbase = "snp_genome/bowtie2_Nmasked/Genome"
         conda: CONDA_DNA_MAPPING_ENV
-        shell:
-            "bowtie2-build"
-            " --threads {threads}"
-            " {params.filelist}"
-            " {params.idxbase}"
+        shell:'''                                                                                                                            
+        cat {input.snpgenome_dir}/*.fa > {output.tmpfna}
+        bowtie2-build --threads {threads} \
+           {output.tmpfna} {params.idxbase}
+        ''' 
 else:
     print("Only STAR and Bowtie2 are implemented for allele-specific mapping")

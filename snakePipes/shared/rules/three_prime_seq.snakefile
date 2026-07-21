@@ -41,7 +41,7 @@ rule polyAT:
     conda:
         CONDA_SHARED_ENV
     shell:
-        "{params.script} -o {output} "
+        "python {params.script} -o {output} "
         "--tb {input.two_bit} "
         "--bed {input.bed} "
         "--minLength {params.minlength} "
@@ -59,8 +59,8 @@ def bamcov_filter_opts(wc):
 
 rule three_prime_seq_bam_cov:
     input:
-        bam=aligner + "/{sample}.sorted.bam",
-        bai=aligner + "/{sample}.sorted.bam.bai"
+        bam="filtered_bam/{sample}.filtered.bam",
+        bai="filtered_bam/{sample}.filtered.bam.bai"
     output: 
         "three_prime_seq/raw/{sample}_direction-{direction}.bw"
     params:
@@ -91,7 +91,7 @@ rule filterBW:
     conda:
         CONDA_SHARED_ENV
     shell:
-        "{params.script} {input} {output} "
+        "python {params.script} {input} {output} "
 
 
 # Associate signal with each gene (flank by some amount)
@@ -108,7 +108,7 @@ rule geneAssociation:
     conda:
         CONDA_SHARED_ENV
     shell: 
-        "{params.script} --extend {params.extension} "
+        "python {params.script} --extend {params.extension} "
         "--threads {threads} "
         "{input} {params.gtf} {output} "
 

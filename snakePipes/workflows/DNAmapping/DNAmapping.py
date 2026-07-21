@@ -71,11 +71,6 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                           help="The --fr, --ff, or --rf option for bowtie2 (default: '%(default)s')",
                           default=defaults["mateOrientation"])
 
-    optional.add_argument("--qualimap",
-                          dest="qualimap",
-                          action="store_true",
-                          help="activate Qualimap (default: '%(default)s')",
-                          default=defaults["qualimap"])
 
     optional.add_argument("--dedup",
                           dest="dedup",

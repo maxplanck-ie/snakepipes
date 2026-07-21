@@ -57,8 +57,8 @@ else:
 if UMIDedup:
     rule filter_reads_umi:
         input:
-            bamfile = "filtered_bam/{sample}.filtered.tmp.bam" if aligner == "Bowtie2" else aligner+"/{sample}.bam",
-            indexfile = "filtered_bam/{sample}.filtered.tmp.bam.bai" if aligner == "Bowtie2" else aligner+"/{sample}.bam.bai"
+            bamfile = "filtered_bam/{sample}.filtered.tmp.bam",
+            indexfile = "filtered_bam/{sample}.filtered.tmp.bam.bai"
         output:
             bamfile = "filtered_bam/{sample}.filtered.bam"
         params:
@@ -73,31 +73,19 @@ if UMIDedup:
             {params.umitools_paired} {params.umitools_options}
             """
 else:
-    if aligner == "Bowtie2" or aligner == "bwa" or aligner == "bwa-mem2":
-        rule filter_reads:
-            input:
-                bamfile = "filtered_bam/{sample}.filtered.tmp.bam"
-            output:
-                bamfile = "filtered_bam/{sample}.filtered.bam"
-            shell: """
-                   mv {input.bamfile} {output.bamfile}
-                   """
-
-    elif aligner == "STAR" or aligner == "HISAT2" :
-        rule filter_reads:
-            input:
-                bamfile = aligner + "/{sample}.bam"
-            output:
-                bamfile = "filtered_bam/{sample}.filtered.bam"
-            shell: """
-                ln -s ../{input} {output}
+    rule filter_reads:
+        input:
+            bamfile = "filtered_bam/{sample}.filtered.tmp.bam"
+        output:
+            bamfile = "filtered_bam/{sample}.filtered.bam"
+        shell: """
+            mv -v {input} {output}
           """
 
-if not (aligner=="bwameth" or aligner=="bwameth2"):
-    rule samtools_index_filtered:
-        input:
-            "filtered_bam/{sample}.filtered.bam"
-        output:
-            "filtered_bam/{sample}.filtered.bam.bai"
-        conda: CONDA_SHARED_ENV
-        shell: "samtools index {input}"
+rule samtools_index_filtered:
+    input:
+        "filtered_bam/{sample}.filtered.bam"
+    output:
+        "filtered_bam/{sample}.filtered.bam.bai"
+    conda: CONDA_SHARED_ENV
+    shell: "samtools index {input}"

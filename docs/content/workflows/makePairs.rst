@@ -76,21 +76,6 @@ the config file description for the makePairs workflow :
         sampleSheet:
 
  
-      ################################################################################
-      # Call snakemake directly, i.e. without using the wrapper script:
-      #
-      # Please save a copy of this config yaml file and provide an adjusted config
-      # via '--configFile' parameter!
-      # example call:
-      #
-      # snakemake --snakefile /path/to/snakemake_workflows/workflows/makePairs/Snakefile
-      #           --configFile /path/to/snakemake_workflows/workflows/makePairs/defaults.yaml
-      #           --directory /path/to/outputdir
-      #           --VCFfile /path/to/vcf_file
-      #           --strains strain1_name,strain2_name
-      #           --cores 32
-      ################################################################################
-
 
 Structure of output directory
 -----------------------------

@@ -9,7 +9,7 @@ if pairedEnd:
             bam = temp("Bowtie2/{sample}.sorted.bam")# removing since we keep the sambamba output (dupmarked)
         params:
             bowtie2_index=bowtie2_index,
-            alignerOpts = str(alignerOpts or ' ') if not cutntag else "  --local --very-sensitive-local "\
+            alignerOpts = str(alignerOpts or ' --local ') if not cutntag else "  --local --very-sensitive-local "\
             "--no-mixed --no-discordant --phred33 -I 10 ",
             mateOrientation = mateOrientation,
             insertSizeMax = str(insertSizeMax or ' ') if not cutntag else " 700 ",
@@ -42,7 +42,7 @@ else:
             bam = temp("Bowtie2/{sample}.sorted.bam")
         params:
             bowtie2_index=bowtie2_index,
-            alignerOpts = str(alignerOpts or ''),
+            alignerOpts = str(alignerOpts or ' --local '),
             tempDir = tempDir
         benchmark:
             "Bowtie2/.benchmark/Bowtie2.{sample}.benchmark"

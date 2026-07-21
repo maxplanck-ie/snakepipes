@@ -70,7 +70,7 @@ the config file description for the HiC workflow :
       ## is the Matrix RF resolution?
       RFResolution: false
       # which restriction enzyme was used
-      enzyme: HindIII
+      enzymes: HindIII
       # bin size in base pairs, if RF resolution is not required
       binSize: 10000
       # build matrix only for a given region chr:start-end

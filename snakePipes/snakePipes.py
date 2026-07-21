@@ -4,7 +4,7 @@ import argparse
 import subprocess
 import snakePipes
 import os
-import yaml
+from ruamel.yaml import YAML
 import glob
 import hashlib
 import shutil
@@ -222,7 +222,9 @@ def envInfo():
     baseDir = os.path.dirname(snakePipes.__file__)
 
     f = open(os.path.join(baseDir, "shared/defaults.yaml"))
-    cf = yaml.load(f, Loader=yaml.FullLoader)
+    #cf = yaml.load(f, Loader=yaml.FullLoader)
+    yaml=YAML(typ='safe')
+    cf = yaml.load(f)
     f.close()
 
     # Properly resolve the snakemake profile path
@@ -230,7 +232,8 @@ def envInfo():
 
     # Find out condaEnvDir from snakemake profile
     f = open(profilePath / 'config.yaml')
-    _p = yaml.load(f, Loader=yaml.FullLoader)
+    #_p = yaml.load(f, Loader=yaml.FullLoader)
+    _p = yaml.load(f)
     f.close()
     if 'conda-prefix' in _p:
         condaEnvDir = _p['conda-prefix'].replace("$USER", os.environ.get("USER"))
@@ -278,14 +281,17 @@ def createCondaEnvs(args):
     baseDir = os.path.dirname(snakePipes.__file__)
 
     f = open(os.path.join(baseDir, "shared/defaults.yaml"))
-    cf = yaml.load(f, Loader=yaml.FullLoader)
+    #cf = yaml.load(f, Loader=yaml.FullLoader)
+    yaml=YAML(typ='safe')
+    cf = yaml.load(f)
     f.close()
     # Properly resolve the snakemake profile path
     profilePath = cof.resolveSnakemakeProfile(cf['snakemakeProfile'], baseDir)
 
     # Find out condaEnvDir from snakemake profile
     f = open(profilePath / 'config.yaml')
-    _p = yaml.load(f, Loader=yaml.FullLoader)
+    #_p = yaml.load(f, Loader=yaml.FullLoader)
+    _p = yaml.load(f)
     f.close()
     if 'conda-prefix' in _p:
         # For now $USER can be set in this path, resolve this explicitely.
@@ -414,15 +420,17 @@ def updateConfig(args):
         else:
             sys.exit("Config file not found\n")
     updatedDict = cof.merge_dicts(currentDict, d)
-    cof.write_configfile(os.path.join(baseDir, "shared", "defaults.yaml"), updatedDict)
+    cof.write_configfile(os.path.join(baseDir, "shared", "defaults.yaml"), updatedDict, trafo=None)
 
     #update conda-prefix in snakemakeProfile
     if args.condaEnvDir:
         profilePath = cof.resolveSnakemakeProfile(d['snakemakeProfile'], baseDir)
         f = open(profilePath / 'config.yaml')
-        pf = yaml.load(f, Loader=yaml.FullLoader)
+        #pf = yaml.load(f, Loader=yaml.FullLoader)
+        yaml=YAML(typ='safe')
+        pf = yaml.load(f)
         pf['conda-prefix'] = args.condaEnvDir
-        cof.write_configfile(os.path.join(profilePath, "config.yaml"), pf)
+        cof.write_configfile(os.path.join(profilePath, "config.yaml"), pf, trafo=None)
         f.close()
 
     cof.load_configfile(

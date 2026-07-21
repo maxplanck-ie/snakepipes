@@ -24,6 +24,8 @@ def getInputPeaks(peakCaller, chip_samples, genrichDict,comp_group):
             return expand("SEACR/{chip_sample}.filtered.stringent.bed",chip_sample=chip_samples)
     elif peakCaller == "Genrich":
         return expand("Genrich/{genrichGroup}.{{compGroup}}.narrowPeak", genrichGroup = genrichDict[comp_group].keys())
+    elif peakCaller == "histoneHMM":
+        return expand("histoneHMM/{broad_sample}_avgp0.5.bed", broad_sample=broad_samples)
     elif externalBed:
         return externalBed
 
@@ -87,7 +89,8 @@ rule CSAW:
     output:
         "{}/CSAW.session_info.txt".format(get_outdir(peakCaller,os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv")),
         "{}/DiffBinding_analysis.Rdata".format(get_outdir(peakCaller,os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv")),
-        expand("{}".format(get_outdir(peakCaller,os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{{compGroup}}.tsv")) + "/Filtered.results.{change_dir}.bed", change_dir=change_direction)
+        expand("{}".format(get_outdir(peakCaller,os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{{compGroup}}.tsv")) + "/Filtered.results.{change_dir}.bed", change_dir=change_direction),
+        "{}".format(get_outdir(peakCaller,os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv")) + "/Full.results.bed"
     benchmark:
         "{}/.benchmark/CSAW.benchmark".format(get_outdir(peakCaller,os.path.splitext(os.path.basename(str(sampleSheet)))[0]+".{compGroup}.tsv"))
     params:

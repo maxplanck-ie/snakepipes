@@ -12,8 +12,6 @@ MIN_RS_DISTANCE = 150
 # This number should be related to the higher end of fragment length distribution.
 MAX_RS_DISTANCE = 1000
 # this is to identify so called dangling ends. Option are 'AAGCTT' or 'GATC'
-#fastq_dir = 'fastq'
-#samples = ['SRR2240738', 'SRR2240739', 'SRR2240740']
 
 ### Functions ##################################################################
 # define matrix format (filename suffix)
@@ -31,7 +29,9 @@ matrixFile_suffix = get_matrixFile_suffix()
 ## seq dict for restriction enzymes
 seq_dict = {
            'DpnII' : ['GATC', 'GATC'],
-           'HindIII' : ['AAGCTT', 'AGCTT']
+           'HindIII' : ['AAGCTT', 'AGCTT'],
+           'MseI': ['TTAA', 'TAA'],
+           'CviQI': ['GTAC', 'TAC']
            }
 
 ## get sequences for restriction enzymes

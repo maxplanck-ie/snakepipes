@@ -1,0 +1,6 @@
+name: snakepipes_whatshap_environment_1.0
+channels:
+ - conda-forge
+ - bioconda
+dependencies:
+ - whatshap = 2.3

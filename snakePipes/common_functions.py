@@ -5,7 +5,7 @@
 import subprocess
 import os
 import re
-import yaml
+from ruamel.yaml import YAML
 import glob
 import sys
 import shutil
@@ -44,7 +44,10 @@ def set_env_yamls():
             'CONDA_SAMBAMBA_ENV': 'envs/sambamba.yaml',
             'CONDA_pysam_ENV': 'envs/pysam.yaml',
             'CONDA_SEACR_ENV': 'envs/chip_seacr.yaml',
-            'CONDA_FQLINT_ENV': 'envs/fqlint.yaml'
+            'CONDA_FQLINT_ENV': 'envs/fqlint.yaml',
+            'CONDA_WHATSHAP_ENV': 'envs/whatshap.yaml',
+            'CONDA_PICARD_ENV': 'envs/picard.yaml',
+            'CONDA_CHIPQC_ENV': 'envs/chipqc.yaml'
             }
 
 
@@ -87,8 +90,10 @@ def namesOKinR(sampleNames):
 
 
 def load_configfile(configFiles, verbose, info='Config'):
+    yaml=YAML(typ='safe')
     with open(configFiles, "r") as f:
-        config = yaml.load(f, Loader=yaml.FullLoader)
+        #config = yaml.load(f, Loader=yaml.FullLoader)
+        config = yaml.load(f)
 
     config = sanity_dict_clean(config)
 
@@ -101,9 +106,15 @@ def load_configfile(configFiles, verbose, info='Config'):
     return config
 
 
-def write_configfile(configFile, config):
+def write_configfile(configFile, config, trafo):
+    yaml=YAML(typ='safe')
+    yaml.default_flow_style = False
     with open(configFile, 'w') as f:
-        yaml.dump(config, f, default_flow_style=False)
+        #yaml.dump(config, f, default_flow_style=False)
+        if trafo:
+            yaml.dump(config, f, transform=trafo)
+        else:
+            yaml.dump(config, f)
 
 
 # returns all key-value pairs that are different from dict1 to dict2
@@ -631,7 +642,7 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
     # save to configs.yaml in outdir
     config = defaults
     config.update(vars(args))  # This allows modifications of args after handling a user config file to still make it to the YAML given to snakemake!
-    write_configfile(os.path.join(args.outdir, '{}.config.yaml'.format(workflowName)), config)
+    write_configfile(os.path.join(args.outdir, '{}.config.yaml'.format(workflowName)), config, trafo=None)
 
     # merge cluster config files: 1) global one, 2) workflow specific one, 3) user provided one
     cfg = load_configfile(os.path.join(baseDir, "shared", "defaults.yaml"), False, "defaults")
@@ -718,7 +729,7 @@ def print_DAG(args, snakemake_cmd, callingScript, defaults):
         config['verbose'] = False
         write_configfile(
             os.path.join(args.outdir,
-                         '{}.config.yaml'.format(workflowName)), config)
+                         '{}.config.yaml'.format(workflowName)), config, trafo=None)
 
         DAGproc = subprocess.Popen(
             snakemake_cmd + " --rulegraph -q ",
@@ -733,7 +744,7 @@ def print_DAG(args, snakemake_cmd, callingScript, defaults):
         config['verbose'] = oldVerbose
         write_configfile(
             os.path.join(args.outdir, '{}.config.yaml'.format(workflowName)),
-            config)
+            config, trafo=None)
 
 
 def logAndExport(args, workflowName):
@@ -773,6 +784,8 @@ def runAndCleanup(args, cmd, logfile_name):
     for _l in p.stdout:
         sys.stdout.write(_l.strip() + '\n')
         f.write(_l.strip() + '\n')
+        sys.stdout.flush()
+        f.flush()
     p.wait()
 
     # Exit with an error if snakemake encountered an error
@@ -792,6 +805,9 @@ def runAndCleanup(args, cmd, logfile_name):
     # Send email if desired
     if args.emailAddress:
        sendEmail(args, 0)
+
+def tr(s):
+    return s.replace('null', 'None')
 
 
 def predict_chip_dict(wdir, input_pattern_str, bamExt, fromBAM=None):
@@ -855,14 +871,14 @@ def predict_chip_dict(wdir, input_pattern_str, bamExt, fromBAM=None):
             print("No control sample found!")
 
         chip_dict_pred["chip_dict"][i] = {}
-        chip_dict_pred["chip_dict"][i]['control'] = tmp
+        chip_dict_pred["chip_dict"][i]['control'] = tmp if tmp !=  "" else None
         if re.match(".*(H3K4me1|H3K36me3|H3K9me3|H3K27me3).*", i, re.IGNORECASE):
             chip_dict_pred["chip_dict"][i]['broad'] = True
         else:
             chip_dict_pred["chip_dict"][i]['broad'] = False
 
     outfile = os.path.join(wdir, "chip_seq_sample_config.PREDICTED.yaml")
-    write_configfile(outfile, chip_dict_pred)
+    write_configfile(outfile, chip_dict_pred,trafo=tr)
     print("---------------------------------------------------------------------------------------")
     print("ChIPseq sample configuration is written to file ", outfile)
     print("Please check and modify this file - this is just a guess! Then run the workflow with it.")

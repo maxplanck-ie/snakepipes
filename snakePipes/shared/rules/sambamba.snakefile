@@ -7,7 +7,7 @@ rule sambamba_markdup:
        input:
            aligner+"/{sample}.sorted.bam"
        output:
-           aligner+"/{sample}.bam"# duplicate marked
+           aligner+"/{sample}.markdup.bam"# duplicate marked
        threads: lambda wildcards: 10 if 10<max_thread else max_thread
        benchmark: aligner + "/.benchmark/sambamba_markdup.{sample}.benchmark"
        params:
@@ -34,7 +34,7 @@ rule sambamba_flagstat_sorted:
 
 rule sambamba_flagstat:
        input:
-           aligner+"/{sample}.bam"
+           aligner+"/{sample}.markdup.bam"
        output:
            "Sambamba/{sample}.markdup.txt"
        conda: CONDA_SAMBAMBA_ENV
@@ -46,9 +46,9 @@ rule sambamba_flagstat:
 ## index the duplicate marked folder
 rule samtools_index:
     input:
-        aligner+"/{sample}.bam"
+        aligner+"/{sample}.markdup.bam"
     output:
-        aligner+"/{sample}.bam.bai"
+        aligner+"/{sample}.markdup.bam.bai"
     conda: CONDA_SHARED_ENV
     shell: "samtools index {input}"
 

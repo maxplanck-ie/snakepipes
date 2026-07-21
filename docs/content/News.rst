@@ -1,6 +1,50 @@
 snakePipes News
 ===============
 
+snakePipes 3.4.0
+----------------
+
+* HistoneHMM was moved to peakCaller and will only be run if invoked. Differential binding for histoneHMM was added.
+* rMats multicomp is fixed.
+* Chipqc was fixed.
+* A cookbook section was added to documentation.
+* Velocyto was deprecated from scRNAseq workflow in mode STARsolo.
+* Cell barcodes for pre-calculated scRNAseq kits are now included with installation.
+
+
+snakePipes 3.3.0
+-----------------
+
+* fixes #1097
+* fixes #1093
+* fixes #1118
+* fixes #1113
+* fixes #1109
+* fixes #1103
+* fixes #1102
+* fixes #1125
+* fixes #1122
+* fixes #1124
+* fixes #1078
+
+
+
+snakePipes 3.2.0
+________________
+
+
+* QC in the ChIPseq workflow is now performed with the ChIPQC R package
+* added allelic-whatshap mode to mRNA seq
+* fixes #1048
+* fixes #1085
+* fixes #1083
+* fixes #1082
+* fixes #1063
+* fixes #1058
+* fixes #1024
+* fixes minor issues with mRNAseq allelic-whatshap mode
+
+
 snakePipes 3.1.0
 ________________
 

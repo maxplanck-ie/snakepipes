@@ -66,7 +66,7 @@ else:
                 lambda wildcards: "filtered_bam/"+get_control(wildcards.chip_sample)+".filtered.bam" if get_control(wildcards.chip_sample)
                 else []
         output:
-            peaks = "MACS2/{chip_sample}.filtered.BAM_peaks.xls",
+            peaks = "MACS2/{chip_sample}.filtered.BAM_peaks.xls"
         params:
             genome_size = str(genome_size),
             broad_calling =
@@ -87,47 +87,6 @@ else:
             --name {wildcards.chip_sample}.filtered.BAM {params.bam_options} --extsize {params.frag_size} \
             {params.broad_calling}
             """
-
-
-
-### MACS2 peak quality control #################################################
-
-rule MACS2_peak_qc:
-    input:
-        bam = "filtered_bam/{sample}.filtered.bam",
-        xls = "MACS2/{sample}.filtered.BAM_peaks.xls"
-    output:
-        qc = "MACS2/{sample}.filtered.BAM_peaks.qc.txt"
-    params:
-        peaks =
-            lambda wildcards: "MACS2/{}.filtered.BAM_peaks.broadPeak".format(wildcards.sample) if is_broad(wildcards.sample)
-                              else "MACS2/{}.filtered.BAM_peaks.narrowPeak".format(wildcards.sample),
-        genome_index = genome_index
-    benchmark:
-        "MACS2/.benchmark/MACS2_peak_qc.{sample}.filtered.benchmark"
-    conda: CONDA_SHARED_ENV
-    shell: """
-        # get the number of peaks
-        peak_count=`wc -l < {params.peaks}`
-
-        # get the number of mapped reads
-        mapped_reads=`samtools view -c -F 4 {input.bam}`
-
-        # calculate the number of alignments overlapping the peaks
-        # exclude reads flagged as unmapped (unmapped reads will be reported when using -L)
-        reads_in_peaks=`samtools view -c -F 4 -L {params.peaks} {input.bam}`
-
-        # calculate Fraction of Reads In Peaks
-        frip=`bc -l <<< "$reads_in_peaks/$mapped_reads"`
-
-        # compute peak genome coverage
-        peak_len=`awk '{{total+=$3-$2}}END{{print total}}' {params.peaks}`
-        genome_size=`awk '{{total+=$3-$2}}END{{printf( "%14d",total) }}' {params.genome_index}`
-        genomecov=`bc -l <<< "$peak_len/$genome_size"`
-
-        # write peak-based QC metrics to output file
-        printf "peak_count\tFRiP\tpeak_genome_coverage\n%d\t%5.3f\t%6.4f\n" $peak_count $frip $genomecov > {output.qc}
-        """
 
 # TODO
 # add joined deepTools plotEnrichment call for all peaks and samples in one plot
@@ -162,7 +121,7 @@ if not isMultipleComparison:
                 blacklist = "-E {}".format(blacklist_bed) if blacklist_bed else "",
                 control_pfx=lambda wildcards,input: "-c" if input.control else "",
                 control=lambda wildcards,input: ",".join(input.control) if input.control else "",
-                ignoreForNorm = "-e " + ','.join(ignoreForNormalization) if ignoreForNormalization else ""
+                ignoreForNorm = "-e " + ','.join(ignoreForNormalization.split()) if ignoreForNormalization else ""
             conda: CONDA_CHIPSEQ_ENV
             shell: """
                 Genrich -t {params.bams} {params.control_pfx} {params.control} -o {output} -r {params.blacklist} {params.ignoreForNorm} -y
@@ -180,7 +139,7 @@ if not isMultipleComparison:
                 control_pfx=lambda wildcards,input: "-c" if input.control else "",
                 control=lambda wildcards,input: ",".join(input.control) if input.control else "",
                 frag_size=fragmentLength,
-                ignoreForNorm = "-e " + ','.join(ignoreForNormalization) if ignoreForNormalization else ""
+                ignoreForNorm = "-e " + ','.join(ignoreForNormalization.split()) if ignoreForNormalization else ""
             conda: CONDA_CHIPSEQ_ENV
             shell: """
                 Genrich -t {params.bams} {params.control_pfx} {params.control} -o {output} -r {params.blacklist} {params.ignoreForNorm} -w {params.frag_size}
@@ -198,7 +157,7 @@ else:
                 blacklist = "-E {}".format(blacklist_bed) if blacklist_bed else "",
                 control_pfx=lambda wildcards,input: "-c" if input.control else "",
                 control=lambda wildcards,input: ",".join(input.control) if input.control else "",
-                ignoreForNorm = "-e " + ','.join(ignoreForNormalization) if ignoreForNormalization else ""
+                ignoreForNorm = "-e " + ','.join(ignoreForNormalization.split()) if ignoreForNormalization else ""
             conda: CONDA_CHIPSEQ_ENV
             shell: """
                 Genrich -t {params.bams} {params.control_pfx} {params.control} -o {output} -r {params.blacklist} {params.ignoreForNorm} -y
@@ -216,7 +175,7 @@ else:
                 control_pfx=lambda wildcards,input: "-c" if input.control else "",
                 control=lambda wildcards,input: ",".join(input.control) if input.control else "",
                 frag_size=fragmentLength,
-                ignoreForNorm = "-e " + ','.join(ignoreForNormalization) if ignoreForNormalization else ""
+                ignoreForNorm = "-e " + ','.join(ignoreForNormalization.split()) if ignoreForNormalization else ""
             conda: CONDA_CHIPSEQ_ENV
             shell: """
                 Genrich -t {params.bams} {params.control_pfx} {params.control} -o {output} -r {params.blacklist} {params.ignoreForNorm} -w {params.frag_size}
@@ -235,6 +194,7 @@ rule prep_bedgraph:
         bedtools genomecov -bg -i filtered_bedgraph/{params.sample}.fragments.bed -g {params.genome} > {output}
         """
 
+
 rule SEACR_peaks_stringent:
     input:
         chip = "filtered_bedgraph/{chip_sample}.fragments.bedgraph",
@@ -251,85 +211,36 @@ rule SEACR_peaks_stringent:
         bash {params.script} {input.chip} {input.control} {params.fdr} "norm" "stringent" {params.prefix}
         """
 
-rule SEACR_peaks_relaxed:
-    input:
-        chip = "filtered_bedgraph/{chip_sample}.fragments.bedgraph",
-        control = lambda wildcards: "filtered_bedgraph/"+get_control(wildcards.chip_sample)+".fragments.bedgraph" if get_control(wildcards.chip_sample)
-                 else []
-    output:
-        "SEACR/{chip_sample}.filtered.relaxed.bed"
-    params:
-        fdr = lambda wildcards,input: fdr if not input.control else "",
-        prefix = os.path.join(outdir,"SEACR/{chip_sample}.filtered"),
-        script=os.path.join(maindir, "shared","tools/SEACR-1.3/SEACR_1.3.sh")
-    conda: CONDA_SEACR_ENV
-    shell: """
-        bash {params.script} {input.chip} {input.control} {params.fdr} "norm" "relaxed" {params.prefix}
-        """
 
-rule SEACR_peak_stringent_qc:
-    input:
-        bam = "filtered_bam/{sample}.filtered.bam",
-        peaks = "SEACR/{sample}.filtered.stringent.bed"
-    output:
-        qc = "SEACR/{sample}.filtered.stringent_peaks.qc.txt"
-    params:
-        genome_index = genome_index
-    benchmark:
-        "SEACR/.benchmark/SEACR_peak_stringent_qc.{sample}.filtered.benchmark"
-    conda: CONDA_SHARED_ENV
-    shell: """
-        # get the number of peaks
-        peak_count=`wc -l < {input.peaks}`
-        
-        # get the number of mapped reads
-        mapped_reads=`samtools view -c -F 4 {input.bam}`
-        
-        #calculate the number of alignments overlapping the peaks
-        # exclude reads flagged as unmapped (unmapped reads will be reported when using -L)
-        reads_in_peaks=`samtools view -c -F 4 -L {input.peaks} {input.bam}`
-        
-        # calculate Fraction of Reads In Peaks
-        frip=`bc -l <<< "$reads_in_peaks/$mapped_reads"`
-        # compute peak genome coverage
-        peak_len=`awk '{{total+=$3-$2}}END{{print total}}' {input.peaks}`
-        genome_size=`awk '{{total+=$3-$2}}END{{print total}}' {params.genome_index}`
-        genomecov=`bc -l <<< "$peak_len/$genome_size"`
-        
-        # write peak-based QC metrics to output file
-        printf "peak_count\tFRiP\tpeak_genome_coverage\n%d\t%5.3f\t%6.4f\n" $peak_count $frip $genomecov > {output.qc}
-        """
+def collectPeaks(caller):
+    if caller == "SEACR":
+        return expand("SEACR/{chip_sample}.filtered.stringent.bed", chip_sample=chip_samples)
+    elif caller == "MACS2":
+        return expand("MACS2/{chip_sample}.filtered.BAM_peaks.xls",chip_sample=chip_samples)
+    elif caller == "Genrich":
+        return expand("Genrich/{group}.narrowPeak",group=genrichDict.keys())
 
+if not peakCaller == "histoneHMM":
+    rule chipqc:
+        input:
+            bams = expand("filtered_bam/{chip_sample}.filtered.bam",chip_sample=chip_samples),
+            peaks = collectPeaks(caller=peakCaller),
+            sampleSheet = sampleSheet if sampleSheet else [],
+            chipdict = os.path.join(outdir,"chip_samples.yaml") #placeholder
+        output:
+            "{}_chipqc/sessionInfo.txt".format(peakCaller)
+        params:
+            genome = os.path.basename(genome),
+            outdir = "{}_chipqc".format(peakCaller),
+            blacklist = blacklist_bed,
+            bams = lambda wildcards,input: [os.path.join(outdir,x) for x in input.bams],
+            peaks = lambda wildcards,input: [os.path.join(outdir,x) for x in input.peaks],
+            narrow_samples = narrow_samples,
+            broad_samples = broad_samples,
+            useSpikeinForNorm = useSpikeInForNorm
+        threads: 8
+        benchmark:
+            "{}_chipqc/.benchmark/chipqc.benchmark".format(peakCaller)
+        conda: CONDA_CHIPQC_ENV
+        script: "../rscripts/chipqc.R"
 
-rule SEACR_peak_relaxed_qc:
-    input:
-        bam = "filtered_bam/{sample}.filtered.bam",
-        peaks = "SEACR/{sample}.filtered.relaxed.bed"
-    output:
-        qc = "SEACR/{sample}.filtered.relaxed_peaks.qc.txt"
-    params:
-        genome_index = genome_index
-    benchmark:
-        "SEACR/.benchmark/SEACR_peak_relaxed_qc.{sample}.filtered.benchmark"
-    conda: CONDA_SHARED_ENV
-    shell: """
-        # get the number of peaks
-        peak_count=`wc -l < {input.peaks}`
-        
-        # get the number of mapped reads
-        mapped_reads=`samtools view -c -F 4 {input.bam}`
-        
-        #calculate the number of alignments overlapping the peaks
-        # exclude reads flagged as unmapped (unmapped reads will be reported when using -L)
-        reads_in_peaks=`samtools view -c -F 4 -L {input.peaks} {input.bam}`
-        
-        # calculate Fraction of Reads In Peaks
-        frip=`bc -l <<< "$reads_in_peaks/$mapped_reads"`
-        # compute peak genome coverage
-        peak_len=`awk '{{total+=$3-$2}}END{{print total}}' {input.peaks}`
-        genome_size=`awk '{{total+=$3-$2}}END{{print total}}' {params.genome_index}`
-        genomecov=`bc -l <<< "$peak_len/$genome_size"`
-        
-        # write peak-based QC metrics to output file
-        printf "peak_count\tFRiP\tpeak_genome_coverage\n%d\t%5.3f\t%6.4f\n" $peak_count $frip $genomecov > {output.qc}
-        """

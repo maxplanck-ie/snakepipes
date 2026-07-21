@@ -1,0 +1,11 @@
+name: snakepipes_chipqc_environment_1.0
+channels:
+ - conda-forge
+ - bioconda
+dependencies:
+ - bioconductor-genomicranges
+ - bioconductor-rtracklayer
+ - bioconductor-chipqc
+ - r-yaml
+ - r-stringr
+ - r-purrr

@@ -73,7 +73,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'snakePipes'
-copyright = u'2018, MPI-IE'
+copyright = u'2018-2025, MPI-IE'
 author = u'MPI-IE'
 
 # The version info for the project you're documenting, acts as replacement for

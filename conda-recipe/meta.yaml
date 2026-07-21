@@ -1,4 +1,4 @@
-{% set version = "3.1.0" %}
+{% set version = "3.4.0" %}
 
 package:
   name: snakepipes
@@ -14,17 +14,17 @@ build:
 
 requirements:
   host:
-    - python >=3, < 3.13
+    - python >=3.11,<3.13
     - pip
     - seaborn
     - setuptools
   run:
-    - python >=3.11
+    - python >=3.11,<3.13
     - snakemake >=8
     - snakemake-executor-plugin-cluster-generic >=1.0.9
     - pandas
     - thefuzz
-    - pyyaml >=5.1
+    - ruamel.yaml
 
 test:
   commands:

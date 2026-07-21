@@ -1,5 +1,6 @@
 import os
 import snakePipes.common_functions as cf
+import warnings
 
 
 ### snakemake_workflows initialization ########################################
@@ -47,6 +48,9 @@ if not fromBAM:
     ## sambamba
     include:os.path.join(maindir, "shared", "rules", "sambamba.snakefile")
 
+    ## bam filtering
+    include: os.path.join(maindir, "shared", "rules", "bam_filtering.snakefile")
+    
     #umi_tools
     include: os.path.join(maindir, "shared", "rules", "umi_tools.snakefile")
 
@@ -77,6 +81,13 @@ if not fromBAM:
             include: os.path.join(maindir, "shared", "rules", "Salmon_allelic.snakefile")
             include: os.path.join(maindir, "shared", "rules", "sleuth.singleComp.snakefile")
 #            include: os.path.join(maindir, "shared", "rules", "DESeq2.singleComp.snakefile")
+    elif "allelic-whatshap" in mode:
+        include: os.path.join(maindir, "shared", "rules", "RNA_mapping.snakefile")
+        include: os.path.join(maindir, "shared", "rules", "whatshap.snakefile")
+        include: os.path.join(maindir, "shared", "rules", "deepTools_RNA_allelic.snakefile")
+        if "alignment-free" in mode:
+            include: os.path.join(maindir, "shared", "rules", "Salmon_allelic.snakefile")
+            include: os.path.join(maindir, "shared", "rules", "sleuth.singleComp.snakefile")            
     else:
         # HISAT2/STAR
         include: os.path.join(maindir, "shared", "rules", "RNA_mapping.snakefile")
@@ -105,11 +116,13 @@ else:
     elif "allelic-counting" in mode:
         allele_mode = "from_split_bam"
         include: os.path.join(maindir, "shared", "rules", "deepTools_RNA_allelic.snakefile")
-
+    elif "allelic-whatshap" in mode:
+        include: os.path.join(maindir, "shared", "rules", "whatshap.snakefile")
+        include: os.path.join(maindir, "shared", "rules", "deepTools_RNA_allelic.snakefile")
     include: os.path.join(maindir, "shared", "rules", "LinkBam.snakefile")
 
 
-if "allelic-mapping" in mode or "allelic-counting" in mode:
+if "allelic-mapping" in mode or "allelic-counting" in mode or "allelic-whatshap" in mode:
     ## featureCounts_allelic
     include: os.path.join(maindir, "shared", "rules", "featureCounts_allelic.snakefile")
 else:
@@ -123,8 +136,6 @@ if "three-prime-seq" in mode:
 ##Genomic_contamination
 include: os.path.join(maindir, "shared", "rules", "GenomicContamination.snakefile")
 
-## QC report
-include:os.path.join(maindir, "shared", "rules", "RNA-seq_qc_report.snakefile")
 
 ## DESeq2
 if sampleSheet and not "three-prime-seq" in mode:
@@ -167,7 +178,7 @@ def run_Trimming(trim, fastqc):
 
 def run_alignment_free():
     if "alignment-free" in mode:
-        if not "allelic-mapping" in mode:
+        if not "allelic-mapping" in mode and not "allelic-whatshap" in mode:
             file_list = [
             expand("Salmon/{sample}.quant.sf", sample=samples),
             "Salmon/TPM.transcripts.tsv",
@@ -177,14 +188,14 @@ def run_alignment_free():
             if sampleSheet:
                 sample_name = os.path.splitext(os.path.basename(sampleSheet))[0]
                 if not isMultipleComparison:
-                    file_list.append( ["DESeq2_Salmon_{}/DESeq2.session_info.txt".format(sample_name)])
+                    file_list.append( ["DESeq2_Salmon_{}/DESeq2.session_info.txt".format(sample_name)]) if not LRT else file_list.append( ["DESeq2_Salmon_{}_LRT/DESeq2.session_info.txt".format(sample_name)])
                     if cf.check_replicates(sampleSheet):
                         file_list.append( ["sleuth_Salmon_{}/so.rds".format(sample_name)] )
                     if rMats:
                         file_list.append( ["rMats_{}/RI.MATS.JCEC.txt".format(sample_name)] )
                         file_list.append( ["rMats_{}/b2.csv".format(sample_name)] )
                 else:
-                    file_list.append(expand("DESeq2_Salmon_{}".format(sample_name) + ".{compGroup}/DESeq2.session_info.txt",compGroup=cf.returnComparisonGroups(sampleSheet)))
+                    file_list.append(expand("DESeq2_Salmon_{}".format(sample_name) + ".{compGroup}/DESeq2.session_info.txt",compGroup=cf.returnComparisonGroups(sampleSheet))) if not LRT else file_list.append(expand("DESeq2_Salmon_{}".format(sample_name) + ".{compGroup}_LRT/DESeq2.session_info.txt",compGroup=cf.returnComparisonGroups(sampleSheet)))
                     file_list.append(expand("sleuth_Salmon_{}".format(sample_name) + ".{compGroup}/so.rds",compGroup=cf.returnComparisonGroups(sampleSheet)))
                     if rMats:
                         file_list.append(expand("rMats_{}".format(sample_name) + ".{compGroup}/RI.MATS.JCEC.txt",compGroup=cf.returnComparisonGroups(sampleSheet)))
@@ -198,7 +209,7 @@ def run_alignment_free():
             if sampleSheet:
                 sample_name = os.path.splitext(os.path.basename(sampleSheet))[0]
                 if not isMultipleComparison:
-                    file_list.append( ["DESeq2_SalmonAllelic_{}/DESeq2.session_info.txt".format(sample_name)])
+                    file_list.append( ["DESeq2_SalmonAllelic_{}/DESeq2.session_info.txt".format(sample_name)]) if not LRT else file_list.append( ["DESeq2_SalmonAllelic_{}_LRT/DESeq2.session_info.txt".format(sample_name)])
                     file_list.append( ["sleuth_SalmonAllelic_{}/so.rds".format(sample_name)] )
         return(file_list)
     else:
@@ -208,22 +219,29 @@ def run_alignment_free():
 def run_alignment():
     if "alignment" in mode:
         file_list = [
-        "Sambamba/flagstat_report_all.tsv",
         expand("filtered_bam/{sample}.filtered.bam", sample = samples),
         expand("filtered_bam/{sample}.filtered.bam.bai", sample = samples),
         expand("featureCounts/{sample}.counts.txt", sample=samples),
-        "featureCounts/counts.tsv",
-        "QC_report/QC_report_all.tsv"
+        "featureCounts/counts.tsv"
         ]
         if sampleSheet:
+            #warnings.warn("LRT value is set to " + str(LRT))
             sample_name = os.path.splitext(os.path.basename(sampleSheet))[0]
             if not isMultipleComparison:
-                file_list.append( ["DESeq2_{}/DESeq2.session_info.txt".format(sample_name)] )
+                if LRT:
+                    #warnings.warn("LRT value is set to " + str(LRT) + "\n Appending " + "DESeq2_{}_LRT/DESeq2.session_info.txt to file list".format(sample_name))
+                    file_list.append( ["DESeq2_{}_LRT/DESeq2.session_info.txt".format(sample_name)] )
+                else:
+                    #warnings.warn("LRT value is set to " + str(LRT) + "\n Appending " + "DESeq2_{}/DESeq2.session_info.txt to file list".format(sample_name))
+                    file_list.append( ["DESeq2_{}/DESeq2.session_info.txt".format(sample_name)] )
                 if rMats:
                     file_list.append( ["rMats_{}/RI.MATS.JCEC.txt".format(sample_name)] )
                     file_list.append( ["rMats_{}/b2.csv".format(sample_name)] )
             else:
-                file_list.append(expand("DESeq2_{}".format(sample_name) + ".{compGroup}/DESeq2.session_info.txt",compGroup=cf.returnComparisonGroups(sampleSheet)))
+                if LRT:
+                    file_list.append(expand("DESeq2_{}".format(sample_name) + ".{compGroup}_LRT/DESeq2.session_info.txt",compGroup=cf.returnComparisonGroups(sampleSheet)))
+                else:
+                    file_list.append(expand("DESeq2_{}".format(sample_name) + ".{compGroup}/DESeq2.session_info.txt",compGroup=cf.returnComparisonGroups(sampleSheet)))
                 if  rMats:
                     file_list.append(expand("rMats_{}".format(sample_name) + ".{compGroup}/RI.MATS.JCEC.txt",compGroup=cf.returnComparisonGroups(sampleSheet)))
                     file_list.append(expand("rMats_{}".format(sample_name) + ".{compGroup}/b2.csv",compGroup=cf.returnComparisonGroups(sampleSheet)))
@@ -244,7 +262,7 @@ def make_nmasked_genome():
         return([])
 
 def run_allelesp_mapping():
-    if "allelic-mapping" in mode or "allelic-counting" in mode:
+    if "allelic-mapping" in mode or "allelic-counting" in mode or "allelic-whatshap" in mode:
         allele_suffix = ['allele_flagged', 'genome1', 'genome2', 'unassigned']
         file_list = [
         expand("allelic_bams/{sample}.{suffix}.sorted.bam", sample = samples,
@@ -259,12 +277,12 @@ def run_allelesp_mapping():
         if sampleSheet:
             sample_name = os.path.splitext(os.path.basename(sampleSheet))[0]
             if not isMultipleComparison:
-                file_list.append( ["DESeq2_{}/DESeq2.session_info.txt".format(sample_name)] )
+                file_list.append( ["DESeq2_{}/DESeq2.session_info.txt".format(sample_name)] ) if not LRT else file_list.append( ["DESeq2_{}_LRT/DESeq2.session_info.txt".format(sample_name)] )
                 #if rMats:
                     #file_list.append( ["rMats_{}/RI.MATS.JCEC.txt".format(sample_name)] )
                     #file_list.append( ["rMats_{}/b2.csv".format(sample_name)] )
             else:
-                file_list.append(expand("DESeq2_{}".format(sample_name) + ".{compGroup}/DESeq2.session_info.txt",compGroup=cf.returnComparisonGroups(sampleSheet)))
+                file_list.append(expand("DESeq2_{}".format(sample_name) + ".{compGroup}/DESeq2.session_info.txt",compGroup=cf.returnComparisonGroups(sampleSheet))) if not LRT else file_list.append(expand("DESeq2_{}".format(sample_name) + ".{compGroup}_LRT/DESeq2.session_info.txt",compGroup=cf.returnComparisonGroups(sampleSheet)))
         return(file_list)
     else:
         return([])
@@ -286,7 +304,7 @@ def run_deepTools_qc():
                               "deepTools_qc/plotCorrelation/correlation.pearson.bed_coverage.tsv",
                               "deepTools_qc/plotCorrelation/correlation.spearman.bed_coverage.tsv",
                               "deepTools_qc/plotPCA/PCA.bed_coverage.tsv"] )
-        if 'allelic-mapping' in mode:
+        if 'allelic-mapping' in mode or 'allelic-whatshap' in mode:
             file_list.append(["deepTools_qc/plotEnrichment/plotEnrichment_allelic.tsv"])
             if len(samples)>1:
                 file_list.append( ["deepTools_qc/multiBigwigSummary/coverage_allelic.bed.npz",
@@ -307,7 +325,7 @@ def run_threePrimeSeq():
             "three_prime_seq/counts.tsv",
             "featureCounts/counts.tsv"
         ]
-    if sampleSheet:
+        if sampleSheet:
             sample_name = os.path.splitext(os.path.basename(sampleSheet))[0]
             if not isMultipleComparison:
                 file_list.append( ["DESeq2_{}/DESeq2.session_info.txt".format(sample_name)] )

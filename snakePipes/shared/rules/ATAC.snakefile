@@ -1,32 +1,3 @@
-#rule filterFragments:
-#    input:
-#        "filtered_bam/{sample}.filtered.bam"
-#    output:
-#        shortBAM = temp(os.path.join(short_bams, "{sample}.short.bam")),
-#        metrics = os.path.join(short_bams, "{sample}.short.metrics")
-#    params:
-#        maxFragmentSize=maxFragmentSize,
-#        minFragmentSize=minFragmentSize
-#    threads: 6
-#    conda: CONDA_SHARED_ENV
-#    shell: """
-#        alignmentSieve --bam {input} \
-#        --outFile {output.shortBAM} -p {threads} \
-#        --filterMetrics {output.metrics} \
-#        --maxFragmentLength {params.maxFragmentSize} \
-#        --minFragmentLength {params.minFragmentSize} \
-#        """
-
-
-#rule filterMetricsToHtml:
-#    input:
-#        expand(os.path.join(short_bams, "{sample}.short.metrics"), sample=samples)
-#    output:
-#        QCrep='Filtering_metrics/Filtering_report.html'
-#    conda: CONDA_RMD_ENV
-#    threads: 1
-#    script: "../rscripts/ATACseq_QC_report_template.Rmd"
-
 rule filterFragments:
     input:
         "filtered_bam/{sample}.filtered.bam"

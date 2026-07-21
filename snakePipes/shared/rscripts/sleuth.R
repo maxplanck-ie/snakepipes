@@ -24,17 +24,43 @@ sample_info = read.table(sample_info_file, header=T)#[,1:2]
 cnames.sub<-unique(colnames(sample_info)[2:which(colnames(sample_info) %in% "condition")])
 d<-as.formula(noquote(paste0("~",paste(cnames.sub,collapse="+"))))
 colnames(sample_info)[colnames(sample_info) %in% "name"] ="sample"
+
+#check if sample names are pure numbers
+numbers_only <- function(x) !grepl("\\D", x)
+if(any(numbers_only(sample_info$sample))){sample_info$sample[numbers_only(sample_info$sample)]<-paste0("X",sample_info$sample[numbers_only(sample_info$sample)])}
+rownames(sample_info)<-sample_info$sample
+
 print(sample_info)
 sample_info$sample
 
-sample_id = list.dirs(file.path(indir), recursive=F, full.names=F)
-sample_id = sort(sample_id[grep('[^benchmark][^SalmonIndex]', sample_id, invert=F)])
+
+###MODIFY THIS PART
+#sample_id = list.dirs(file.path(indir), recursive=F, full.names=F)
+#sample_id = sort(sample_id[grep('[^benchmark][^SalmonIndex]', sample_id, invert=F)])
+#if(any(numbers_only(sample_id))){sample_id[numbers_only(sample_id)]<-paste0("X",sample_id[numbers_only(sample_id)])}
 #sample_id = intersect(sample_info$sample, sample_id) # get only those sample that are defined in the sampleInfo!
-sample_id<-sample_id[match(sample_info$sample,sample_id)]
+#sample_id<-sample_id[match(sample_info$sample,sample_id)]
+#print(sample_id)
+#if(any(is.na(sample_id))){stop("Sample names from sample sheet and from Salmon output are not matching each other.")}
+
+#salmon_dirs = sapply(sample_id, function(id) file.path(indir, id))
+#print(salmon_dirs)
+######
+sample_id<- dir(file.path(indir),recursive=FALSE,full.names=TRUE)
+sample_id<-sample_id[grep("*quant.sf",sample_id)]
+sample_id<-sub(".quant.sf","",sample_id)
+names(sample_id)<-basename(sample_id)
 print(sample_id)
 
-salmon_dirs = sapply(sample_id, function(id) file.path(indir, id))
+if(any(numbers_only(names(sample_id)))){names(sample_id)[numbers_only(names(sample_id))]<-paste0("X",names(sample_id)[numbers_only(names(sample_id))])}
+
+sample_id<-sample_id[match(sample_info$sample,names(sample_id))]
+print(sample_id)
+if(any(is.na(names(sample_id)))){stop("Sample names from sample sheet and from Salmon output are not matching each other.")}
+
+salmon_dirs = sample_id
 print(salmon_dirs)
+##########
 
 s2c = mutate(sample_info, path=salmon_dirs)
 ## reorder conditions (for Wald test later on: order of comparison important for fold change)

@@ -118,9 +118,13 @@ if (! external_bed) {
         })
     } else {
         allpeaks = lapply(snakemake@input[['peaks']], function(x) {
-            bed = read.delim(paste0("../", x), header=FALSE)
-            bed.gr = GRanges(seqnames = bed$V1, ranges = IRanges(start = bed$V2, end = bed$V3), name = bed$V4)
-            return(bed.gr)
+            peakfile<-paste0("../", x)
+            if(file.exists(peakfile) & file.info(peakfile)$size > 0){
+                bed = read.delim(peakfile, header=FALSE)
+                bed.gr = GRanges(seqnames = bed$V1, ranges = IRanges(start = bed$V2, end = bed$V3), name = bed$V4)
+                }else{message(paste0("Skipping peakfile ",peakfile))
+                      bed.gr=GRanges(c(seqnames=NULL,ranges=NULL,strand=NULL,name=NULL))}
+                return(bed.gr)
         })
     }
     # merge

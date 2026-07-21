@@ -2,7 +2,7 @@ import glob
 import os
 import subprocess
 import re
-import yaml
+from ruamel.yaml import YAML
 import sys
 import pandas as pd
 import warnings
@@ -78,7 +78,6 @@ allele_info=is_allelic(workingdir)
 # TODO: catch exception if ChIPseq samples are not unique
 # read ChIPseq dictionary from config.yaml:
 # { ChIP1: { control: Input1, broad: True }, ChIP2: { control: Input2, broad: false }
-#config["chip_dict"] = {}
 
 if not os.path.isfile(samples_config):
     print("ERROR: Cannot find samples file ("+samples_config+")")
@@ -96,7 +95,8 @@ else:
 
 chip_dict = {}
 with open(samples_config, "r") as f:
-    chip_dict_tmp = yaml.load(f, Loader=yaml.FullLoader)
+    yaml=YAML(typ='safe')
+    chip_dict_tmp = yaml.load(f)
     if "chip_dict" in chip_dict_tmp and chip_dict_tmp["chip_dict"] :
         chip_dict = chip_dict_tmp["chip_dict"]
     else:
@@ -104,12 +104,14 @@ with open(samples_config, "r") as f:
         exit(1)
     del chip_dict_tmp
 
-cf.write_configfile(os.path.join("chip_samples.yaml"), chip_dict)
+cf.write_configfile(os.path.join("chip_samples.yaml"), chip_dict, trafo=None)
 
 # create unique sets of control samples, ChIP samples with and without control
 control_samples = set()
 chip_samples_w_ctrl = set()
 chip_samples_wo_ctrl = set()
+broad_samples = set()
+narrow_samples = set()
 for chip_sample, value in chip_dict.items():
     # set control to False if not specified or set to False
     if 'control' not in chip_dict[chip_sample] or value['control'] is None:
@@ -121,7 +123,21 @@ for chip_sample, value in chip_dict.items():
     # set broad to False if not specified or set to False
     if 'broad' not in chip_dict[chip_sample] or not value['broad']:
         chip_dict[chip_sample]['broad'] = False
+        narrow_samples.add(chip_sample)
+    else:
+        broad_samples.add(chip_sample)
 
+
+broad_samples = list(sorted(broad_samples))
+broad_samples = list(filter(None, broad_samples))
+warnings.warn("broad samples " + ' '.join(broad_samples))
+narrow_samples = list(sorted(narrow_samples))
+narrow_samples = list(filter(None, narrow_samples))
+warnings.warn("narrow samples " + ' '.join(narrow_samples))
+
+if peakCaller=="histoneHMM" and not broad_samples:
+    print("HistoneHMM selected as peakCaller but no broad samples were found.")
+    exit(1)
 
 control_samples = list(sorted(control_samples))
 # get a list of corresp control_names for chip samples

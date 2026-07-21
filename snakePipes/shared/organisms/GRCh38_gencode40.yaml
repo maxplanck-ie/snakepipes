@@ -91,6 +91,5 @@ ignoreForNormalization: chrX chrY chrM GL000008.2 GL000009.2 GL000194.1 GL000195
   KI270748.1 KI270749.1 KI270750.1 KI270751.1 KI270752.1 KI270753.1 KI270754.1 KI270755.1
   KI270756.1 KI270757.1
 known_splicesites: /data/repository/organisms/GRCh38_gencode_40/gencode/release-40/HISAT2/genome.ss
-rmsk_file: ''
 star_index: /data/repository/organisms/GRCh38_gencode_40/Indices/STAR_2.7.10
 rmsk_file: /data/repository/organisms/GRCh38_gencode_40/repeatMasker/genome.fa.tbl

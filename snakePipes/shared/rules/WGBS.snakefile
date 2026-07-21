@@ -5,15 +5,34 @@ import tempfile
 
 ###bam symlinking is taken care of by LinkBam
 
-# TODO: Make optional
+rule download_picard:
+    output:
+        "resources/picard.jar"
+    shell:
+        """
+        wget -O {output} https://github.com/broadinstitute/picard/releases/download/3.3.0/picard.jar
+        """
+
+
 rule conversionRate:
     input:
-        "QC_metrics/{sample}.CHH.Mbias.txt"
+        bam = "filtered_bam/{sample}.filtered.bam",
+        bai = "filtered_bam/{sample}.filtered.bam.bai",
+        ref = genome_fasta,
+        picard = "resources/picard.jar"
     output:
-        "QC_metrics/{sample}.conv.rate.txt"
+        "QC_metrics/{sample}.rrbs_summary_metrics"
+    params:
+        prefix = "QC_metrics/{sample}"
+    conda: CONDA_PICARD_ENV
     threads: 1
+    resources:
+        mem=50000,
     shell: """
-        awk '{{if(NR>1) {{M+=$4; UM+=$5}}}}END{{printf("{wildcards.sample}\\t%f\\n", 100*(1.0-M/(M+UM)))}}' {input} > {output}
+        java -Xmx50g -jar {input.picard} CollectRrbsMetrics \
+        -R {input.ref} \
+        -I {input.bam} \
+        -M {params.prefix}
         """
 
 
@@ -24,7 +43,7 @@ if pairedEnd and not fromBAM:
             r1=fastq_dir + "/{sample}" + reads[0] + ".fastq.gz",
             r2=fastq_dir + "/{sample}" + reads[1] + ".fastq.gz"
         output:
-            sbam=temp(aligner+"/{sample}.bam")
+            sbam=temp(aligner+"/{sample}.sorted.bam")
         params:
             bwameth_index=bwameth_index if aligner=="bwameth" else bwameth2_index,
             tempDir = tempDir
@@ -43,7 +62,7 @@ elif not pairedEnd and not fromBAM:
         input:
             r1=fastq_dir + "/{sample}" + reads[0] + ".fastq.gz",
         output:
-            sbam=temp(aligner+"/{sample}.bam")
+            sbam=temp(aligner+"/{sample}.sorted.bam")
         params:
             bwameth_index=bwameth_index if aligner=="bwameth" else bwameth2_index,
             tempDir = tempDir
@@ -57,65 +76,11 @@ elif not pairedEnd and not fromBAM:
             rm -rf "$MYTEMP"
             """
 
-if not fromBAM:
-    rule index_bam:
-        input:
-            aligner+"/{sample}.bam"
-        output:
-            temp(aligner+"/{sample}.bam.bai")
-        conda: CONDA_SHARED_ENV
-        shell: """
-            samtools index "{input}"
-            """
-
-if not skipBamQC:
-    rule markDupes:
-        input:
-            aligner+"/{sample}.bam",
-            aligner+"/{sample}.bam.bai"
-        output:
-            "Sambamba/{sample}.markdup.bam"
-        threads: lambda wildcards: 10 if 10<max_thread else max_thread
-        params:
-            tempDir = tempDir
-        conda: CONDA_SAMBAMBA_ENV
-        shell: """
-            TMPDIR={params.tempDir}
-            MYTEMP=$(mktemp -d "${{TMPDIR:-/tmp}}"/snakepipes.XXXXXXXXXX)
-            sambamba markdup --overflow-list-size 600000 -t {threads} --tmpdir "$MYTEMP/{wildcards.sample}" "{input[0]}" "{output}"
-            rm -rf "$MYTEMP"
-            """
-
-
-    rule indexMarkDupes:
-        input:
-            "Sambamba/{sample}.markdup.bam"
-        output:
-            "Sambamba/{sample}.markdup.bam.bai"
-        params:
-        threads: 1
-        conda: CONDA_SHARED_ENV
-        shell: """
-            samtools index "{input}"
-            """
-
-    rule link_deduped_bam:
-        input:
-            bam="Sambamba/{sample}.markdup.bam",
-            bai="Sambamba/{sample}.markdup.bam.bai"
-        output:
-            bam = "filtered_bam/{sample}.filtered.bam",
-            bai = "filtered_bam/{sample}.filtered.bam.bai"
-        shell: """
-            ln -s ../{input.bam} {output.bam}
-            ln -s ../{input.bai} {output.bai}
-        """
-
 
 rule getRandomCpGs:
     output:
         temp("QC_metrics/randomCpG.bed")
-    params:
+    input:
         genome_fasta=genome_fasta
     run:
         import random
@@ -135,32 +100,32 @@ rule getRandomCpGs:
                 x = random.randint(0, n)
                 if x < maxLen:
                     B[x] = (tid, pos)
-
-        for line in open(params['genome_fasta']):
-            line = line.strip().split()[0]
-            if line.startswith(">"):
-                chroms.append(line[1:])
-                lastChar = 'N'
-                position = 0
-                continue
-            for c in line:
-                if (lastChar == 'C' or lastChar == 'c') and (c == 'G' or c == 'g'):
-                    addPosition(buf, len(chroms) - 1, position - 1, chars)
+        
+        with open(input['genome_fasta'],'r') as f:
+            for line in f:
+                if line.startswith(">"):
+                    line = line.strip().split()[0]
+                    chroms.append(line[1:])
                     lastChar = 'N'
-                    chars += 1
-                else:
-                    lastChar = c
-                position += 1
+                    position = 0
+                    continue
+                for c in line:
+                    if (lastChar == 'C' or lastChar == 'c') and (c == 'G' or c == 'g'):
+                        addPosition(buf, len(chroms) - 1, position - 1, chars)
+                        lastChar = 'N'
+                        chars += 1
+                    else:
+                        lastChar = c
+                    position += 1
 
-        # Sort
-        buf.sort()
+            # Sort
+            buf.sort()
 
-        # write output
-        if len(buf):
-            o = open(output[0], "w")
-            for tid, pos in buf:
-                o.write("{}\t{}\t{}\n".format(chroms[tid], pos, pos + 2))
-            o.close()
+            # write output
+            if len(buf):
+                with open(output[0], "w") as o:
+                    for tid, pos in buf:
+                        o.write("{}\t{}\t{}\n".format(chroms[tid], pos, pos + 2))
 
 
 rule calc_Mbias:
@@ -174,7 +139,7 @@ rule calc_Mbias:
     threads: lambda wildcards: 10 if 10<max_thread else max_thread
     conda: CONDA_WGBS_ENV
     shell: """
-        MethylDackel mbias -@ {threads} {params.genome} {input[0]} QC_metrics/{wildcards.sample}
+        MethylDackel mbias -@ {threads} {params.genome} {input[0]} QC_metrics/{wildcards.sample} 2> {output}
         """
 
 
@@ -189,7 +154,7 @@ rule calcCHHbias:
     threads: lambda wildcards: 10 if 10<max_thread else max_thread
     conda: CONDA_WGBS_ENV
     shell: """
-        MethylDackel mbias -@ {threads} --CHH --noCpG --noSVG {params.genome} {input[0]} QC_metrics/{wildcards.sample}
+        MethylDackel mbias -@ {threads} --CHH --noCpG --noSVG {params.genome} {input[0]} QC_metrics/{wildcards.sample} 2> {output}
         """
 
 
@@ -262,7 +227,7 @@ rule produceReport:
     input:
         bedGraphs=expand("MethylDackel/{sample}_CpG.bedGraph", sample=samples),
         Coverage=calc_doc(skipDOC),
-        ConversionRate=expand("QC_metrics/{sample}.conv.rate.txt", sample=samples),
+        ConversionRate=expand("QC_metrics/{sample}.rrbs_summary_metrics", sample=samples),
         mbiasTXT=expand("QC_metrics/{sample}.Mbias.txt", sample=samples),
         fstat=expand("QC_metrics/{sample}.flagstat", sample=samples)
     output:
@@ -426,4 +391,4 @@ rule bedGraphToBigWig:
         "MethylDackel/{sample}_CpG.coverage.bw"
     threads: 1
     conda: CONDA_SHARED_ENV
-    shell: os.path.join(workflow_tools, "bedGraphToBigwig") + " {input[0]} {input[1]} {output[0]} {output[1]}"
+    shell: "python " + os.path.join(workflow_tools, "bedGraphToBigwig.py") + " {input[0]} {input[1]} {output[0]} {output[1]}"

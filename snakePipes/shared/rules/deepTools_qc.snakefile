@@ -3,8 +3,8 @@
 
 rule bamCoverage:
     input:
-        bam = aligner+"/{sample}.bam",
-        bai = aligner+"/{sample}.bam.bai"
+        bam = aligner+"/{sample}.markdup.bam",
+        bai = aligner+"/{sample}.markdup.bam.bai"
     output:
         "bamCoverage/{sample}.seq_depth_norm.bw"
     params:
@@ -143,8 +143,8 @@ rule plotPCA:
 
 rule estimate_read_filtering:
     input:
-        bam = aligner+"/{sample}.bam",
-        bai = aligner+"/{sample}.bam.bai"
+        bam = aligner+"/{sample}.markdup.bam",
+        bai = aligner+"/{sample}.markdup.bam.bai"
     output:
         "deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt"
     conda: CONDA_SHARED_ENV

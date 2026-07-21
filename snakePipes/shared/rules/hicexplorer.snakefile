@@ -19,9 +19,9 @@ rule get_restrictionSite:
     input:
         genome_fasta
     output:
-        enzyme + ".bed"
+        "restrictionSites/{renzyme}.bed"
     params:
-        res_seq = get_restriction_seq(enzyme)
+        res_seq = lambda wildcards: get_restriction_seq(wildcards.renzyme)
     conda: CONDA_HIC_ENV
     shell:
         "hicFindRestSite -f {input} --searchPattern {params.res_seq} -o {output}"
@@ -49,14 +49,14 @@ if(RFResolution is True):
         input:
             R1 = aligner+"/{sample}"+reads[0]+".bam",
             R2 = aligner+"/{sample}"+reads[1]+".bam",
-            bed = enzyme + ".bed"
+            bed = expand("restrictionSites/{renzyme}.bed",renzyme=enzymes)
         output:
              matrix ="HiC_matrices/{sample}_"+matrixFile_suffix+matrix_format,
              qc = "HiC_matrices/QCplots/{sample}_QC/QC.log"
         params:
              QCfolder="HiC_matrices/QCplots/{sample}_QC/",
-             res_seq = get_restriction_seq(enzyme),
-             dang_seq = get_dangling_seq(enzyme),
+             res_seq = " ".join([get_restriction_seq(x) for x in enzymes]),
+             dang_seq = " ".join([get_dangling_seq(x) for x in enzymes]),
              region = lambda wildcards: "--region " + str(restrictRegion) if restrictRegion else "",
              min_dist = MIN_RS_DISTANCE,
              max_dist = MAX_RS_DISTANCE
@@ -79,7 +79,7 @@ else:
         input:
             R1 = aligner+"/{sample}"+reads[0]+".bam",
             R2 = aligner+"/{sample}"+reads[1]+".bam",
-            bed = enzyme + ".bed"
+            bed = expand("restrictionSites/{renzyme}.bed",renzyme=enzymes)
         output:
             matrix = "HiC_matrices/{sample}_"+matrixFile_suffix+matrix_format,
             qc = "HiC_matrices/QCplots/{sample}_QC/QC.log"
@@ -87,8 +87,8 @@ else:
         params:
             QCfolder="HiC_matrices/QCplots/{sample}_QC/",
             bin_size = binSize,
-            res_seq = get_restriction_seq(enzyme),
-            dang_seq = get_dangling_seq(enzyme),
+            res_seq = " ".join([get_restriction_seq(x) for x in enzymes]),
+            dang_seq = " ".join([get_dangling_seq(x) for x in enzymes]),
             region = lambda wildcards: "--region " + str(restrictRegion) if restrictRegion else "",
             min_dist = MIN_RS_DISTANCE,
             max_dist = MAX_RS_DISTANCE

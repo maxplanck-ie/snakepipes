@@ -1,6 +1,5 @@
 channels:
   - conda-forge
   - bioconda
-  - defaults
 channel_priority: 'strict'
 show_channel_urls: True
