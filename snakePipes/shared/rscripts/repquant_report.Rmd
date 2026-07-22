@@ -1,0 +1,206 @@
+---
+output:
+  BiocStyle::html_document:
+    toc: true
+    toc_float: true
+    code_folding: hide
+  html_document:
+    toc: true
+    toc_float: true
+    code_folding: hide
+    theme: spacelab
+  pdf_document:
+      toc: true
+  knitrBootstrap::bootstrap_document:
+    theme.chooser: TRUE
+    highlight.chooser: TRUE
+---
+
+```{r setup}
+#### Libraries needed
+.libPaths(R.home('library'))
+
+suppressPackageStartupMessages(library('ggplot2'))
+suppressPackageStartupMessages(library('reshape2'))
+suppressPackageStartupMessages(library('rtracklayer'))
+suppressPackageStartupMessages(library('genomation'))
+suppressPackageStartupMessages(library('scales'))
+suppressPackageStartupMessages(library('GenomicRanges'))
+
+## Preset variables
+
+device = "png"
+outputIsHTML = TRUE
+theme = theme_bw()
+digits = 2
+tmpdir <- getwd()
+theCall = NULL
+startTime <- Sys.time()
+```
+
+## Calculate observed and reference repeat counts
+
+In this section, observed recovered repeat counts intersecting peaks are summarized.
+
+```{r obs}
+rmsk_annotated_peaks<-snakemake@params[["rmsk_annotated_peaks"]]
+obslist<-lapply(rmsk_annotated_peaks,import.gff)
+names(obslist)<-sub("_rmsk.bed","",basename(rmsk_annotated_peaks))
+
+tablist<-lapply(obslist,function(X){
+  a<-strsplit(mcols(X)$gene_id,"/")
+  b<-lapply(a,function(Y)Y[[1]])
+  table(unlist(b))
+})
+
+```
+
+Now we calculate the reference repeat counts from the repeat masker file.
+
+```{r ref}
+rmsk_gtf<-snakemake@params[["rmsk_gtf"]]
+ref<-import.gff(rmsk_gtf)
+r1<-strsplit(mcols(ref)$gene_id,"/")
+r2<-lapply(r1,function(Y)Y[[1]])
+reftab<-table(unlist(r2))
+
+```
+
+Now, we combine the observe and the reference counts.
+
+
+```{r comb}
+tablist$Genome<-reftab
+
+tablistt<-vector("list",length(tablist))
+names(tablistt)<-names(tablist)
+  for(i in 1:length(tablist)){X<-as.data.frame(t(t(tablist[[i]])))
+          X<-X[,-c(2)]
+          colnames(X)<-c("Repeat",names(tablist)[i])
+  tablistt[[i]]<-X        
+  }
+#put ref and obs counts in a table, calculate recovered percentages
+tabdat<-Reduce(function(dtf1, dtf2) merge(dtf1, dtf2, by = "Repeat", all = TRUE),tablistt)
+tabdatNorm<-apply(tabdat[,!colnames(tabdat) %in% c("Repeat","Genome")],2,function(X)X/tabdat$Genome)
+rownames(tabdatNorm)<-tabdat$Repeat
+```
+
+Now, we save the calculated table and produce a plot of percentage recovered repeat instances.
+
+```{r melt and plot recovered}
+plotdat<-as.data.frame(tabdatNorm)
+plotdat$Repeat<-rownames(tabdatNorm)
+plotdat2<-melt(plotdat,id.var="Repeat",value.name="FractionRecovered",variable.name="Experiment")
+write.table(plotdat2,"FractionRecoveredRepeats.tsv",sep="\t",row.names=FALSE,quote=FALSE)
+
+#select a number of repeat names for plotting
+plotdatsub<-plotdat2[plotdat2$Repeat %in% c("Alu","ERV1","ERVK","ERVL","ERVL-MaLR","hAT-Charlie","L1","L2","MIR","TcMar-Tigger"),]
+ggplot(data=plotdatsub)+geom_bar(position="stack",aes(x=Experiment,y=FractionRecovered,fill=Repeat),stat="identity")+theme(axis.text.x=element_text(angle=90))
+ggsave("FractionRecoveredRepeats_by_Experiment.png")
+
+```
+
+## Calculate repeat counts expected by chance
+
+In this section, we're going to calculate repeat counts expected by chance after peak interval randomization, and compare the observed counts to the expected counts.
+
+
+```{r exp}
+rmsk_annotated_randomized_peaks<-snakemake@params[["rmsk_annotated_randomized_peaks"]]
+randlist2<-lapply(rmsk_annotated_randomized_peaks,import.gff)
+names(randlist2)<-sub("_rmsk.bed","",basename(rmsk_annotated_randomized_peaks))
+
+randlist3<-lapply(randlist2,function(X){
+  a<-strsplit(mcols(X)$gene_id,"/")
+  b<-lapply(a,function(Y)Y[[1]])
+  table(unlist(b))
+})
+
+
+randlist3$Genome<-reftab
+
+randlist3t<-vector("list",length(randlist3))
+names(randlist3t)<-names(randlist3)
+  for(i in 1:length(randlist3)){X<-as.data.frame(t(t(randlist3[[i]])))
+          X<-X[,-c(2)]
+          colnames(X)<-c("Repeat",names(randlist3)[i])
+  randlist3t[[i]]<-X        
+  }
+
+```
+
+
+Now, we're going to put refence and expected counts in a table, then calculate percentages of repeat counts recovered by chance.
+
+```{r ref_exp}
+randdat<-Reduce(function(dtf1, dtf2) merge(dtf1, dtf2, by = "Repeat", all = TRUE),randlist3t)
+randdatNorm<-apply(randdat[,!colnames(randdat) %in% c("Repeat","Genome")],2,function(X)X/randdat$Genome)
+rownames(randdatNorm)<-randdat$Repeat
+
+```
+
+Now, we're going to put together observed and expected repeat counts.
+
+```{r obs_exp}
+all(as.character(tabdat$Repeat)==as.character(randdat$Repeat)) #FALSE
+tabdat$Repeat<-as.character(tabdat$Repeat)
+randdat$Repeat<-as.character(randdat$Repeat)
+randdat<-randdat[match(tabdat$Repeat,randdat$Repeat),]
+randdat_clean<-randdat[!is.na(randdat$Repeat),]
+tabdat_clean<-tabdat[!is.na(randdat$Repeat),]
+OEdat<-as.matrix(tabdat_clean[,!colnames(tabdat_clean) %in% c("Repeat","Genome")])/as.matrix(randdat_clean[,!colnames(randdat_clean)%in% c("Repeat","Genome")])
+rownames(OEdat)<-tabdat_clean$Repeat
+
+l2OEdat<-log2(OEdat)
+rownames(l2OEdat)<-rownames(OEdat)
+
+```
+
+Now, we're going to reshape the data, write to a table and plot.
+
+```{r melt and plot obs to exp}
+oeplotdat<-OEdat[rownames(OEdat) %in% c("Alu","L1","L2","LTR"),,drop=FALSE]
+l2oeplotdat<-l2OEdat[rownames(l2OEdat) %in% c("Alu","L1","L2","LTR"),,drop=FALSE]
+
+l2oeplotdat2<-as.data.frame(l2oeplotdat)
+l2oeplotdat2$Repeat<-rownames(l2oeplotdat)
+l2oeplotdat3<-melt(l2oeplotdat2,id.var="Repeat",value.name="Log2ObsVsExp",variable.name="Experiment")
+write.table(l2oeplotdat3,"Log2Observed_v_Expected.tsv",,sep="\t",row.names=FALSE,quote=FALSE)
+
+ggplot(data=l2oeplotdat3)+geom_dotplot(aes(x=Repeat,y=Experiment,fill=Log2ObsVsExp),position="identity")+scale_fill_gradient2(
+  high = muted("red"),
+  mid = "white",
+  low = muted("blue"),
+  midpoint = 0,
+  space = "Lab",
+  na.value = "grey50",
+  transform = "identity",
+  guide = "colourbar",
+  aesthetics = "fill"
+)
+
+ggsave("Log2ObservedVsExpectedRepeats_by_Experiment.png")
+```
+
+## Reproducibility
+
+```{r reproducibility1, echo=FALSE}
+## Date the report was generated
+Sys.time()
+```
+
+Wallclock time spent generating the report.
+
+```{r reproducibility2, echo=FALSE}
+## Processing time in seconds
+totalTime <- diff(c(startTime, Sys.time()))
+round(totalTime, digits=3)
+```
+
+`R` session information.
+
+```{r reproducibility3, echo=FALSE}
+## Session info
+options(width = 120)
+sessionInfo()
+```

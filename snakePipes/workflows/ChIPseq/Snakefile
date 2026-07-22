@@ -230,7 +230,9 @@ def run_repquant(repQuant):
     if repQuant and peakCaller == "SEACR":
         file_list=expand("SEACR_merged_peaks/{merge_group}_peak_intersect_f0.5.bed",merge_group=merge_dict.keys())
         file_list.append(expand("SEACR_annotated_peaks/{merge_group}_rmsk.bed",merge_group=merge_dict.keys()))
-        file_list=expand("SEACR_randomized_peaks/{merge_group}_randomized_peaks.bed",merge_group=merge_dict.keys())
+        file_list.append(expand("SEACR_randomized_peaks/{merge_group}_randomized_peaks.bed",merge_group=merge_dict.keys()))
+        file_list.append(expand("SEACR_randomized_peaks/{merge_group}_rmsk.bed",merge_group=merge_dict.keys()))
+        file_list.append("RepQuant/report.html")
     return(file_list)
 
 

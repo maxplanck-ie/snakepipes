@@ -81,3 +81,32 @@ rule randomize_peaks:
         merged_peaks = lambda wildcards,input: os.path.join(outdir,input.merged_peaks)
     conda: CONDA_REPQUANT_ENV
     script: "{params.script}"
+
+
+rule intersect_randomized_peaks_rmsk:
+    input:
+        rmsk_gtf="Annotation/rmsk.gtf",
+        randomized_peaks = "SEACR_randomized_peaks/{merge_group}_randomized_peaks.bed"
+    output:
+        rmsk_annotated_peaks = "SEACR_randomized_peaks/{merge_group}_rmsk.bed"
+    conda: CONDA_SEACR_ENV
+    shell: """
+           bedtools intersect -wa -u -a <( bedtools sort -i {input.rmsk_gtf} ) -b <( bedtools sort -i {input.randomized_peaks} ) > {output.rmsk_annotated_peaks}
+           """
+
+
+rule generate_repquant_report:
+    input:
+        rmsk_annotated_peaks = expand("SEACR_annotated_peaks/{merge_group}_rmsk.bed",merge_group=merge_dict.keys()),
+        rmsk_annotated_randomized_peaks = expand("SEACR_randomized_peaks/{merge_group}_rmsk.bed",merge_group=merge_dict.keys()),
+        rmsk_gtf="Annotation/rmsk.gtf"
+    output:
+        report_html = "RepQuant/report.html"
+    params:
+        script = os.path.join(maindir, "shared", "rscripts","repquant_report.Rmd"),
+        outdir = "RepQuant",
+        rmsk_annotated_peaks = lambda wildcards,input: [os.path.join(outdir,x) for x in input.rmsk_annotated_peaks],
+        rmsk_annotated_randomized_peaks = lambda wildcards,input: [os.path.join(outdir,x) for x in input.rmsk_annotated_randomized_peaks],
+        rmsk_gtf=lambda wildcards,input: os.path.join(outdir,input.rmsk_gtf)
+    conda: CONDA_REPQUANT_ENV
+    script: "{params.script}"

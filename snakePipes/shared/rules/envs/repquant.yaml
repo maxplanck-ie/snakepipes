@@ -7,6 +7,10 @@ dependencies:
   - bioconductor-genomation
   - bioconductor-rtracklayer
   - bioconductor-genomicranges
+  - bioconductor-biocstyle
   - r-ggplot2
   - r-reshape2
   - r-scales
+  - r-rmarkdown
+  - r-knitr
+  - pandoc
