@@ -1,9 +1,11 @@
 import os
+import sys
 import snakePipes.common_functions as cf
 
 ### snakemake_workflows initialization ########################################
 maindir = os.path.dirname(os.path.dirname(workflow.basedir))
 workflow_rscripts=os.path.join(maindir, "shared", "rscripts")
+workflow_tools=os.path.join(maindir, "shared", "tools")
 
 # load conda ENVs (path is relative to "shared/rules" directory)
 globals().update(cf.set_env_yamls())
@@ -12,6 +14,22 @@ globals().update(cf.set_env_yamls())
 globals().update(cf.load_configfile(workflow.overwrite_configfiles[0], config["verbose"]))
 # return the pipeline version in the log
 cf.get_version()
+
+# smallrna_pipeline_snakemake's stage modules, vendored under shared/tools/smallrna/.
+# Only needed for the --tesmall path, so only import when it's actually requested.
+if config.get("tesmall"):
+    import shutil
+    from snakemake.io import multiext, unpack, touch
+    sys.path.insert(0, os.path.join(workflow_tools, "smallrna"))
+    from common import ensure_dir, normalize_genome, download_or_raise, UCSC_BASE, TE_CLASSES
+    from link_genome import link_genome_fasta
+    from fetch_rmsk import fetch_rmsk_txt
+    from build_gene_features import (
+        write_raw_exon_bed, write_raw_intron_bed, write_raw_structural_rna, extract_te_from_rmsk,
+    )
+    from extract_trna_rrna import filter_bed_by_prefix, fix_trna_headers
+    from fetch_smallrna_annotation import download_smallrna_raw
+    from build_bowtie_index import build_bowtie_index
 
 ### include modules of other snakefiles ########################################
 ################################################################################
@@ -41,7 +59,8 @@ organismDictionary = {'genome_size': 0,
                       'blacklist_bed': '',
                       'spikein_blacklist_bed': '',
                       'ignoreForNormalization': '',
-                      'rmsk_file': ''}
+                      'rmsk_file': '',
+                      'tesmall_genome': False}
 
 targets = [os.path.join(outdir, x) for x in ["genome_fasta/genome.fa",
                                              "genome_fasta/genome.fa.fai",
@@ -117,6 +136,17 @@ if blacklist:
 if spikeinBlacklist:
     targets.append(os.path.join(outdir, "annotation/spikein_blacklist.bed"))
     organismDictionary['spikein_blacklist_bed'] = os.path.join(outdir, "annotation/spikein_blacklist.bed")
+    
+if tesmall:
+    # Not directory(...): individual files inside TEsmall/ (hairpin.bed, TE.bed,
+    # etc.) are each their own tracked rule output, and Snakemake disallows a
+    # directory()-type output from having other rules' outputs nested inside it
+    # (ChildIOException). create_tesmall's own output is a plain sentinel file.
+    # Layout: TEsmall/genomes/<tesmallGenome>/{annotation,sequence}/... -- nested
+    # under the build name (see createIndices.snakefile) so tesmall_genome
+    # points straight at the directory TEsmall's --dbfolder expects.
+    targets.append(os.path.join(outdir, "TEsmall", "genomes", tesmallGenome, ".tesmall_done"))
+    organismDictionary['tesmall_genome'] = os.path.join(outdir, "TEsmall", "genomes", tesmallGenome)
 
 ignore = []
 if ignoreForNormalization:

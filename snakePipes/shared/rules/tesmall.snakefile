@@ -7,7 +7,8 @@ import numpy as np
 import seaborn as sns
 import textwrap
 
-Adapterseq = "/data/manke/processing1/navandar/Softwares/snakepipes/snakePipes/workflows/smRNAseq/reads_adapters_set.fasta"
+Adapterseq = "../../workflows/smRNAseq/reads_adapters_set.fasta"
+
 Organisms = {
 
     'mm10_gencodeM19':'mm10',
@@ -55,12 +56,11 @@ def justify_text(text, line_width):
     return "\n".join(justified_lines)
 
 def Plotting(OutFile):
-    # Plotting the count summary:
     countFile = os.path.join(outdir, 'TEsmallOut', 'count_summary.txt')
     df = pd.read_csv(countFile, sep='\t')
     samples = df.columns[2:]
     
-    # Initialize an empty list to collect the sample data
+
     result_list = []
 
     for sample in samples:
@@ -77,23 +77,17 @@ def Plotting(OutFile):
         }
         result_list.append(sample_data)
 
-    # Convert the list of sample data into a DataFrame
     result = pd.DataFrame(result_list)
 
-    # Set the Sample column as index
     result.set_index('Sample', inplace=True)
 
-    # Calculate total for each sample
     total = result.sum(axis=1)
 
-    # Calculate fractions
     fraction_df = result.div(total, axis=0)
 
-    # Plotting
     plt.figure(figsize=(12, 8))
     ax = fraction_df.plot(kind='bar', stacked=True, figsize=(12, 8))
 
-    # Add totals on top of each bar
     for index, value in enumerate(total):
         ax.text(index, 1.02, f'{value/1e6:.1f}M', ha='center', va='bottom')
     
@@ -104,13 +98,11 @@ def Plotting(OutFile):
 
     ax.set_ylabel('Fraction', fontsize=14)
     ax.set_xlabel('Sample', fontsize=14)
-    ax.set_ylim(0, 1.2)  # Adjust the y-limit to fit the totals on top
+    ax.set_ylim(0, 1.2)
 
     ax.legend(title='Categories', bbox_to_anchor=(1.05, 1), loc='upper left', fontsize=12)
     plt.xticks(rotation=0, ha='center', fontsize=12)
     plt.tight_layout()
-
-    # Save the plot
     plt.savefig(OutFile)
 
 if pairedEnd:
@@ -150,7 +142,6 @@ else:
 
 rule Tesmall_run:
     input:
-        #fqIn = expand("FASTQ_fastp/{sample}"+".fastq.gz", sample=samples)
         fqIn = expand(os.path.join(outdir,"FASTQ_fastp","{sample}.fastq.gz"), sample=samples)
     output:
         os.path.join(outdir,'TEsmallOut','TEsmall.done')

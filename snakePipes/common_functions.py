@@ -21,6 +21,7 @@ def set_env_yamls():
     """
     return {'CONDA_SHARED_ENV': 'envs/shared.yaml',
             'CONDA_CREATE_INDEX_ENV': 'envs/createIndices.yaml',
+            'CONDA_CREATE_TEsmall_ENV': 'envs/createindices_tesmall.yaml',
             'CONDA_RNASEQ_ENV': 'envs/rna_seq.yaml',
             'CONDA_SALMON_ENV': 'envs/salmon.yaml',
             'CONDA_SLEUTH_ENV': 'envs/sleuth.yaml',

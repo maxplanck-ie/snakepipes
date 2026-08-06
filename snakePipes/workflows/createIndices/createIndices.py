@@ -85,6 +85,18 @@ def parse_args(defaults={"configFile": None, "clusterConfigFile": None,
                           help="Length by which to extend intronic regions with eisaR.",
                           default=defaults["eisaR_flank_length"])
 
+    optional.add_argument("--tesmall",
+                          action="store_true",
+                          help="Create TEsmall compatable genomes and annotation formats")
+
+    optional.add_argument("--tesmallGenome",
+                          default=None,
+                          help="UCSC/Ensembl genome build to use for TEsmall's RepeatMasker/miRBase/piRNAdb "
+                               "lookups (e.g. mm10, hg38, mm39, dm6). Only used with --tesmall. Defaults to "
+                               "the GENOME argument, but GENOME is just a free-form label for naming the "
+                               "resulting organism YAML -- if it isn't itself a recognized build (e.g. you "
+                               "named it 'GRCm38_release93'), set this explicitly.")
+
     return parser
 
 
@@ -111,6 +123,21 @@ def main():
     if args.blacklist:
         if os.path.exists(args.blacklist):
             args.blacklist = os.path.abspath(args.blacklist)
+
+    if args.tesmall:
+        if not args.gtfURL:
+            sys.exit("--tesmall also needs --gtfURL: it builds exon/intron/structural-RNA "
+                      "annotation from the GTF, so there's nothing to build without one.\n")
+        if not args.tesmallGenome:
+            args.tesmallGenome = args.genome
+        sys.path.insert(0, os.path.join(baseDir, "shared", "tools", "smallrna"))
+        from common import normalize_genome
+        try:
+            normalize_genome(args.tesmallGenome)
+        except RuntimeError:
+            sys.exit(f"--tesmall needs a recognized genome build to look up RepeatMasker/miRBase/piRNAdb "
+                      f"data for -- '{args.tesmallGenome}' isn't one. Pass a supported build (e.g. mm10, "
+                      f"hg38, mm39, dm6) via --tesmallGenome.\n")
     ###
 
     # Handle YAML and log files
