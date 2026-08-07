@@ -19,4 +19,4 @@ dependencies:
   - tbb=2020.2
   - pip
   - pip:
-    - -e /home/navandar/Software/TEsmall
+    - git+https://github.com/mhammell-laboratory/TEsmall.git

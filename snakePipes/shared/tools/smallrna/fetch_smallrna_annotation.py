@@ -8,7 +8,7 @@ import tempfile
 
 from common import (
     log, ensure_dir, download_or_raise, liftover,
-    normalize_genome, get_species, parse_gff3_attributes,
+    normalize_genome, get_species, parse_gff3_attributes, to_ensembl_chrom,
     MIRBASE_URLS, PIRNADB_URLS,
 )
 
@@ -26,6 +26,13 @@ def parse_genome_build_header(path, source):
 
 
 def mirbase_gff_to_bed(gff, feature, outfile):
+    """Writes bare Ensembl-style chrom names ('1', not 'chr1') even though
+    miRBase's own GFF3 ships 'chr'-prefixed names for human/mouse -- every
+    other file in the reference (genome.fa, exon/intron/TE/structural_RNA.bed)
+    is Ensembl-style, and there's no separate normalization pass downstream
+    for the case where source and target build already match (only the
+    liftOver path round-trips through/back from UCSC-style), so this has to
+    be correct at the point of writing."""
     with open(gff) as inp, open(outfile, "w") as out:
         for line in inp:
             if line.startswith("#"):
@@ -35,10 +42,12 @@ def mirbase_gff_to_bed(gff, feature, outfile):
                 continue
             attr = parse_gff3_attributes(f[8])
             name = attr.get("Name") or attr.get("ID") or "miRNA"
-            out.write(f"{f[0]}\t{int(f[3]) - 1}\t{f[4]}\t{name}\t1\t{f[6]}\n")
+            chrom = to_ensembl_chrom(f[0])
+            out.write(f"{chrom}\t{int(f[3]) - 1}\t{f[4]}\t{name}\t0\t{f[6]}\n")
 
 
 def pirnadb_gtf_to_bed(gtf, outfile):
+    """See mirbase_gff_to_bed: normalizes to bare Ensembl-style chrom names."""
     with open(gtf) as inp, open(outfile, "w") as out:
         for line in inp:
             if line.startswith("#"):
@@ -48,7 +57,8 @@ def pirnadb_gtf_to_bed(gtf, outfile):
                 continue
             m = re.search(r'piRNA_code "([^"]+)"', f[8])
             name = m.group(1) if m else "piRNA"
-            out.write(f"{f[0]}\t{int(f[3]) - 1}\t{f[4]}\t{name}\t1\t{f[6]}\n")
+            chrom = to_ensembl_chrom(f[0])
+            out.write(f"{chrom}\t{int(f[3]) - 1}\t{f[4]}\t{name}\t0\t{f[6]}\n")
 
 
 def download_smallrna_source(source, species, tmp):

@@ -9,20 +9,9 @@ import textwrap
 
 Adapterseq = "../../workflows/smRNAseq/reads_adapters_set.fasta"
 
-Organisms = {
-
-    'mm10_gencodeM19':'mm10',
-    'dm6':'dm6',
-    'mm39_ens106':'mm39',
-    'hg38':'hg38',
-    'GRCz11':'GRCz11'
-}
-
-org = next((value for key, value in Organisms.items() if key == genome), genome)
-
-def get_organism(organism):
-    DB_selection = tesmall_db
-    return DB_selection
+# tesmall_db (--dbfolder) and tesmall_genome (-g) both come straight from the
+# organism YAML createIndices wrote (see workflows/createIndices/Snakefile) --
+# no need to guess the build from the --genome label here.
 
 def get_samples(Samples):
     all_fastq = []
@@ -147,13 +136,14 @@ rule Tesmall_run:
         os.path.join(outdir,'TEsmallOut','TEsmall.done')
     threads: 16
     params:
-        db = get_organism(organism = org),
+        db = tesmall_db,
+        genome_version = tesmall_genome,
         outputdir = os.path.join(outdir, 'TEsmallOut')
     conda: CONDA_SMRNA_ENV
     shell:'''
         cd {params.outputdir}
-        echo "TEsmall -f {input.fqIn} --dbfolder {params.db} -g {org} -p {threads}"
-        TEsmall -f {input.fqIn} --dbfolder {params.db} -g {org} -p {threads}
+        echo "TEsmall -f {input.fqIn} --dbfolder {params.db} -g {params.genome_version} -p {threads}"
+        TEsmall -f {input.fqIn} --dbfolder {params.db} -g {params.genome_version} -p {threads}
         touch {output}
     '''
 

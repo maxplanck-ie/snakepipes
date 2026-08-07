@@ -132,7 +132,13 @@ def extract_structural_rna_from_gtf(gtf, outfile):
 
             counts[(rna_class, gene_id)] += 1
             copy_n = counts[(rna_class, gene_id)]
-            name = f"sncRNA:{rna_class}:{gene_id}:{transcript_id}_copy{copy_n}"
+            # No colon between gene_id/transcript_id: tRNA entries here end up
+            # as tDNA.fa FASTA headers (via bedtools -name + fix_trna_headers),
+            # and TEsmall's own coordinate-fixup code assumes exactly
+            # 'name:chrom:start-end:strand' (4 colon-fields) -- an extra colon
+            # in the name shifts every field and crashes (or silently
+            # miscomputes coordinates) downstream.
+            name = f"sncRNA:{rna_class}:{gene_id}_{transcript_id}_copy{copy_n}"
             out.write(f"{chrom}\t{start}\t{end}\t{name}\t0\t{strand}\n")
 
     log(f"GTF structural RNA entries: {sum(counts.values())}")
@@ -168,7 +174,9 @@ def extract_structural_rna_from_rmsk(rmsk_txt, outfile):
 
             counts[(rna_type, rep_name)] += 1
             copy_n = counts[(rna_type, rep_name)]
-            name = f"sncRNA:{rna_type}:{rep_name}:{rep_name}_copy{copy_n}"
+            # See the matching comment in extract_structural_rna_from_gtf --
+            # no colon before the copy suffix, same reason.
+            name = f"sncRNA:{rna_type}:{rep_name}_copy{copy_n}"
             out.write(f"{chrom}\t{start}\t{end}\t{name}\t0\t{strand}\n")
 
     log(f"RMSK structural RNA entries: {sum(counts.values())}")

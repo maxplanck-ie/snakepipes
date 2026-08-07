@@ -173,7 +173,7 @@ def _rewrite_chrom_column(src, dst, convert):
             fout.write("\t".join(fields) + "\n")
 
 
-def _to_ucsc_chrom(chrom):
+def to_ucsc_chrom(chrom):
     if chrom.startswith("chr"):
         return chrom
     if chrom in ("MT", "mt", "M"):
@@ -181,7 +181,7 @@ def _to_ucsc_chrom(chrom):
     return "chr" + chrom
 
 
-def _to_ensembl_chrom(chrom):
+def to_ensembl_chrom(chrom):
     if not chrom.startswith("chr"):
         return chrom
     chrom = chrom[3:]
@@ -205,7 +205,7 @@ def liftover(infile, source, target, outfile):
         lift_input = infile
         if not input_has_chr_prefix:
             lift_input = os.path.join(tmp, "input.chr.bed")
-            _rewrite_chrom_column(infile, lift_input, _to_ucsc_chrom)
+            _rewrite_chrom_column(infile, lift_input, to_ucsc_chrom)
 
         lift_output = outfile if input_has_chr_prefix else os.path.join(tmp, "lifted.chr.bed")
         unmapped = lift_output + ".unmapped"
@@ -220,7 +220,7 @@ def liftover(infile, source, target, outfile):
             os.remove(unmapped)
 
         if not input_has_chr_prefix:
-            _rewrite_chrom_column(lift_output, outfile, _to_ensembl_chrom)
+            _rewrite_chrom_column(lift_output, outfile, to_ensembl_chrom)
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
 
