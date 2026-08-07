@@ -26,7 +26,9 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          "reads": ["_R1", "_R2"], "ext": ".fastq.gz",
                          "bwBinSize": 25, "plotFormat": "png",
                          "pairedEnd": True,
-                         "fdr": 0.05}):
+                         "fdr": 0.05,
+                         "tesmallMinLen": 16, "tesmallMaxLen": 36,
+                         "tesmallOptions": None}):
                          
     """
     Parse arguments from the command line.
@@ -87,6 +89,27 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                                "(default: '%(default)s')",
                           default=defaults["fdr"])
 
+    optional.add_argument("--tesmallMinLen",
+                          type=int,
+                          help="Passed to TEsmall as -m/--minlen: discard trimmed reads shorter "
+                               "than this (reads too short even before adapter removal are also "
+                               "discarded). (default: %(default)s)",
+                          default=defaults["tesmallMinLen"])
+
+    optional.add_argument("--tesmallMaxLen",
+                          type=int,
+                          help="Passed to TEsmall as -M/--maxlen: discard trimmed reads longer "
+                               "than this (reads too long even before adapter removal are also "
+                               "discarded). (default: %(default)s)",
+                          default=defaults["tesmallMaxLen"])
+
+    optional.add_argument("--tesmallOptions",
+                          help="Additional TEsmall option string, appended as-is to the TEsmall "
+                               "call, e.g.: '--maxaln 200 --mismatch 1'. Use this for any TEsmall "
+                               "argument not already covered by its own snakePipes flag (see "
+                               "'TEsmall --help' for the full list). (default: '%(default)s')",
+                          default=defaults["tesmallOptions"])
+
     return parser
 
 
@@ -109,6 +132,10 @@ def main():
     for mode in modeTemp:
         if mode not in validModes:
             sys.exit("{} is not a valid mode!\n".format(mode))
+
+    if args.tesmallMinLen >= args.tesmallMaxLen:
+        sys.exit("--tesmallMinLen ({}) must be smaller than --tesmallMaxLen ({})!\n".format(
+            args.tesmallMinLen, args.tesmallMaxLen))
 
     ## End workflow-specific checks
 

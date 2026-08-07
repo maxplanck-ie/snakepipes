@@ -46,8 +46,6 @@ if not fromBAM:
 ################################################################################
 def run_FastQC(fastqc):
     readsUse = reads
-    print(fastqc)
-    print("Reads to use:" + str(reads))
     if not pairedEnd:
         readsUse = [reads[0]]
     if fastqc:

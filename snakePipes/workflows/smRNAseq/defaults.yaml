@@ -67,6 +67,11 @@ UMIDedupSep: "_"
 UMIDedupOpts: --paired
 ##DEG
 fdr: 0.05
+## TEsmall read-length filtering (-m/-M)
+tesmallMinLen: 16
+tesmallMaxLen: 36
+## Any other TEsmall option string, e.g. '--maxaln 200 --mismatch 1'
+tesmallOptions:
 ################################################################################
 # Call snakemake directly, i.e. without using the wrapper script:
 #

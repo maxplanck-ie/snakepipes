@@ -1,11 +1,41 @@
 import os
 import glob
+import shutil
 import pandas as pd
 import matplotlib.pyplot as plt
 import re
 import numpy as np
 import seaborn as sns
 import textwrap
+
+# TEsmall writes ~20 files per sample straight into TEsmallOut/ with no
+# subdirectories -- this sorts them by type after a run so the directory is
+# actually readable. Final deliverables (count_summary*, report.html,
+# TEsmall.done) are left at the top level; everything else is per-sample
+# intermediate/diagnostic output.
+TESMALL_OUTPUT_CATEGORIES = {
+    "log": (".log",),
+    "bam": (".bam",),
+    "anno": (".anno", ".anno.rlen.info"),
+    "rinfo": (".rinfo",),
+    "bedgraph": (".bedgraph",),
+    "cca_fa": ("_cca.fa", ".unaligned.cca.fa"),
+    "fastq": (".fastq",),
+}
+
+
+def organize_tesmall_output(teout_dir):
+    for category in TESMALL_OUTPUT_CATEGORIES:
+        os.makedirs(os.path.join(teout_dir, category), exist_ok=True)
+
+    for fname in os.listdir(teout_dir):
+        fpath = os.path.join(teout_dir, fname)
+        if not os.path.isfile(fpath):
+            continue
+        for category, suffixes in TESMALL_OUTPUT_CATEGORIES.items():
+            if fname.endswith(suffixes):
+                shutil.move(fpath, os.path.join(teout_dir, category, fname))
+                break
 
 Adapterseq = "../../workflows/smRNAseq/reads_adapters_set.fasta"
 
@@ -138,12 +168,15 @@ rule Tesmall_run:
     params:
         db = tesmall_db,
         genome_version = tesmall_genome,
+        minlen = tesmallMinLen,
+        maxlen = tesmallMaxLen,
+        extra_opts = str(tesmallOptions or ''),
         outputdir = os.path.join(outdir, 'TEsmallOut')
     conda: CONDA_SMRNA_ENV
     shell:'''
         cd {params.outputdir}
-        echo "TEsmall -f {input.fqIn} --dbfolder {params.db} -g {params.genome_version} -p {threads}"
-        TEsmall -f {input.fqIn} --dbfolder {params.db} -g {params.genome_version} -p {threads}
+        echo "TEsmall -f {input.fqIn} --dbfolder {params.db} -g {params.genome_version} -m {params.minlen} -M {params.maxlen} -p {threads} {params.extra_opts}"
+        TEsmall -f {input.fqIn} --dbfolder {params.db} -g {params.genome_version} -m {params.minlen} -M {params.maxlen} -p {threads} {params.extra_opts}
         touch {output}
     '''
 
@@ -154,3 +187,4 @@ rule Plot_smRNA_stats:
         os.path.join(outdir,'TEsmallOut','count_summary_plot.pdf')
     run:
         Plotting(output[0])
+        organize_tesmall_output(os.path.join(outdir, 'TEsmallOut'))
