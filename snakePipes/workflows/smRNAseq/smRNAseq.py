@@ -11,7 +11,6 @@ import sys
 import textwrap
 import snakePipes.common_functions as cf
 import snakePipes.parserCommon as parserCommon
-import warnings
 
 
 def parse_args(defaults={"verbose": False, "configFile": None,
@@ -29,7 +28,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          "fdr": 0.05,
                          "tesmallMinLen": 16, "tesmallMaxLen": 36,
                          "tesmallOptions": None}):
-                         
+
     """
     Parse arguments from the command line.
     """

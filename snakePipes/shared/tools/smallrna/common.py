@@ -109,7 +109,7 @@ def download_or_raise(url, outfile):
     try:
         urllib.request.urlretrieve(url, outfile)
     except urllib.error.HTTPError as e:
-        raise RuntimeError(f"Download failed ({e.code}): {url}")
+        raise RuntimeError(f"Download failed ({e.code}): {url}") from e
 
 
 def download_or_warn(url, dest):
@@ -145,11 +145,11 @@ def download_chain(source, target, tmp):
     outfile = os.path.join(tmp, chain)
     try:
         download_or_raise(url, outfile)
-    except Exception:
+    except Exception as e:
         raise RuntimeError(
             f"No UCSC chain available: {source} -> {target}. "
             "Cannot automatically convert coordinates."
-        )
+        ) from e
     return outfile
 
 
@@ -213,7 +213,7 @@ def liftover(infile, source, target, outfile):
         run(["liftOver", lift_input, chain, lift_output, unmapped])
 
         if os.path.exists(unmapped):
-            n_unmapped = sum(1 for l in open(unmapped) if l.strip() and not l.startswith("#"))
+            n_unmapped = sum(1 for line in open(unmapped) if line.strip() and not line.startswith("#"))
             if n_unmapped:
                 warn(f"liftOver ({source} -> {target}): {n_unmapped} interval(s) could not be "
                      f"mapped and were dropped from {os.path.basename(outfile)}")
