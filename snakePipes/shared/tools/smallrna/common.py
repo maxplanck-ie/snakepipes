@@ -280,6 +280,5 @@ def collapse_bed(raw, output):
         for line in fin:
             chrom, start, end, strand, names = line.rstrip().split("\t")
             fout.write(f"{chrom}\t{start}\t{end}\t{names}\t0\t{strand}\n")
-
     os.remove(sorted_bed)
     os.remove(grouped_bed)
