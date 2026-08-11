@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "snakePipes"
 description = 'Snakemake workflows and wrappers for NGS data processing from the MPI-IE'
 readme = "README.md"
-version = "3.4.0"
+version = "3.5.0"
 keywords = [
     "DNAmapping",
     "ChIPSeq",
@@ -30,7 +30,7 @@ classifiers = [
     "Programming Language :: Python :: 3",   
 ]
 
-requires-python = ">= 3.11"
+requires-python = ">= 3.11, <3.12"
 
 dependencies = [
     "snakemake >= 8,<9.10.0",
@@ -65,7 +65,7 @@ build = [
 ]
 
 [tool.setuptools.package-data]
-snakePipes = ["**/*.yaml", "**/*.R", "**/*.Rmd", "**/*snakefile", "**/*Snakefile", "**/*sh", "**/*txt"]
+snakePipes = ["**/*.yaml", "**/*.R","**/*.py", "**/*.Rmd", "**/*snakefile", "**/*Snakefile", "**/*sh", "**/*txt"]
 
 [project.scripts]
 ATACseq = "snakePipes.workflows.ATACseq.ATACseq:main"

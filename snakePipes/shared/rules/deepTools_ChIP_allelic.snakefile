@@ -45,6 +45,51 @@ rule bamCompare_log2_genome2:
     threads: lambda wildcards: 16 if 16<max_thread else max_thread
     shell: bamcompare_log2_cmd
 
+### deepTools bamCompare log2ratio #######################################################
+rule bamCompare_log2_genome1_spikein:
+    input:
+        chip_bam = "allelic_bams/{chip_sample}.genome1.sorted.bam",
+        chip_bai = "allelic_bams/{chip_sample}.genome1.sorted.bam.bai",
+        control_bam = lambda wildcards: "allelic_bams/"+get_control(wildcards.chip_sample)+".genome1.sorted.bam",
+        control_bai = lambda wildcards: "allelic_bams/"+get_control(wildcards.chip_sample)+".genome1.sorted.bam.bai",
+        scale_factors = "split_deepTools_qc/multiBamSummary/{part}.scaling_factors.txt" or spikeinSizeFactorsFile
+    output:
+        "split_deepTools_ChIP/bamCompare/allele_specific/{chip_sample}.genome1.log2ratio.over_{control_name}.scaledBYspikein.bw"
+    params:
+        bwBinSize = bwBinSize,
+        ignoreForNorm = "--ignoreForNormalization {}".format(ignoreForNormalization) if ignoreForNormalization else "",
+        read_extension = "--extendReads" if pairedEnd else "--extendReads {}".format(fragmentLength),
+        blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed else "",
+        scaleFactors = lambda wildcards,input: " --scaleFactors {}:{} ".format(get_scaling_factor(wildcards.chip_sample,input.scale_factors),get_scaling_factor(wildcards.control_name,input.scale_factors))
+    benchmark:
+        "split_deepTools_ChIP/.benchmark/bamCompare.log2ratio.{chip_sample}.{control_name}.genome1.scaledBYspikein.benchmark"
+    threads: lambda wildcards: 16 if 16<max_thread else max_thread
+    conda: CONDA_SHARED_ENV
+    shell: bamcompare_log2_cmd
+
+
+rule bamCompare_log2_genome2_spikein:
+    input:
+        chip_bam = "allelic_bams/{chip_sample}.genome2.sorted.bam",
+        chip_bai = "allelic_bams/{chip_sample}.genome2.sorted.bam.bai",
+        control_bam = lambda wildcards: "allelic_bams/"+get_control(wildcards.chip_sample)+".genome2.sorted.bam",
+        control_bai = lambda wildcards: "allelic_bams/"+get_control(wildcards.chip_sample)+".genome2.sorted.bam.bai",
+        scale_factors = "split_deepTools_qc/multiBamSummary/{part}.scaling_factors.txt" or spikeinSizeFactorsFile
+    output:
+        "split_deepTools_ChIP/bamCompare/allele_specific/{chip_sample}.genome2.log2ratio.over_{control_name}.scaledBYspikein.bw"
+    params:
+        bwBinSize = bwBinSize,
+        ignoreForNorm = "--ignoreForNormalization {}".format(ignoreForNormalization) if ignoreForNormalization else "",
+        read_extension = "--extendReads" if pairedEnd else "--extendReads {}".format(fragmentLength),
+        blacklist = "--blackListFileName {}".format(blacklist_bed) if blacklist_bed else "",
+        scaleFactors = lambda wildcards,input: " --scaleFactors {}:{} ".format(get_scaling_factor(wildcards.chip_sample,input.scale_factors),get_scaling_factor(wildcards.control_name,input.scale_factors))
+    benchmark:
+        "split_deepTools_ChIP/.benchmark/bamCompare.log2ratio.{chip_sample}.{control_name}.genome2.scaledBYspikein.benchmark"
+    threads: lambda wildcards: 16 if 16<max_thread else max_thread
+    conda: CONDA_SHARED_ENV
+    shell: bamcompare_log2_cmd
+
+
 ### deepTools plotEnrichment ###################################################
 
 rule plotEnrichment_allelic:

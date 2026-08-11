@@ -26,7 +26,8 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          "alignerOpts": "", "mateOrientation": "--fr",
                          "UMIDedup": False, "UMIDedupOpts": "",
                          "UMIDedupSep": "_", "UMIBarcode": False, "cutntag": False,
-                         "bcPattern": "NNNNCCCCCCCC", "aligner":"Bowtie2"}):
+                         "bcPattern": "NNNNCCCCCCCC", "aligner":"Bowtie2",
+                         "pvcf": None, "useSpikeInForNorm": False, "spikeinExt": None}):
     """
     Parse arguments from the command line.
     """
@@ -47,7 +48,7 @@ def parse_args(defaults={"verbose": False, "configFile": None,
     optional.add_argument("-m", "--mode",
                           dest="mode",
                           help="workflow running modes (available: 'mapping,"
-                          "allelic-mapping')(default: '%(default)s')",
+                          "allelic-mapping, allelic-whatshap')(default: '%(default)s')",
                           default=defaults["mode"])
 
     parserCommon.commonOptions(optional, defaults)
@@ -112,6 +113,21 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                           help="Program used for mapping: Bowtie2 or bwa (default: '%(default)s').",
                           choices=["Bowtie2","bwa","bwa-mem2"],
                           default=defaults["aligner"])
+
+    optional.add_argument("--phasedVcf",
+                          dest="pvcf",
+                          help="Phased vcf required for whatshap haplotagging. (default: '%(default)s')",
+                          default=defaults["pvcf"])
+
+    optional.add_argument("--useSpikeInForNorm",
+                          dest="useSpikeInForNorm",
+                          action="store_true",
+                          help="Split bam files by host and spikein genome, then scale bam coverage results by spikein-derived size factors.")
+
+    optional.add_argument("--spikeinExt",
+                          dest="spikeinExt",
+                          help="Extention of spikein chromosome names in the hybrid genome. Ignored if useSpikeInForNorm is False (default: '%(default)s') .",
+                          default=defaults["spikeinExt"])
 
     return parser
 

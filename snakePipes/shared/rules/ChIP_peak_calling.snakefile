@@ -220,7 +220,7 @@ def collectPeaks(caller):
     elif caller == "Genrich":
         return expand("Genrich/{group}.narrowPeak",group=genrichDict.keys())
 
-if not peakCaller == "histoneHMM":
+if not peakCaller == "histoneHMM" and not externalBed:
     rule chipqc:
         input:
             bams = expand("filtered_bam/{chip_sample}.filtered.bam",chip_sample=chip_samples),

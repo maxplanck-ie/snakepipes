@@ -119,6 +119,9 @@ else:
     elif "allelic-whatshap" in mode:
         include: os.path.join(maindir, "shared", "rules", "whatshap.snakefile")
         include: os.path.join(maindir, "shared", "rules", "deepTools_RNA_allelic.snakefile")
+        if "alignment-free" in mode:
+            include: os.path.join(maindir, "shared", "rules", "Salmon_allelic.snakefile")
+            include: os.path.join(maindir, "shared", "rules", "sleuth.singleComp.snakefile")
     include: os.path.join(maindir, "shared", "rules", "LinkBam.snakefile")
 
 

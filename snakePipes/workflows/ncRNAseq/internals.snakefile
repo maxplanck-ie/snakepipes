@@ -3,6 +3,7 @@ import os
 import subprocess
 import re
 import sys
+import warnings
 
 
 ## Main variables ##############################################################
@@ -46,3 +47,11 @@ if sampleSheet and not cf.check_replicates(sampleSheet):
 if not samples:
     print("\n  Error! NO samples found in dir "+str(indir or '')+"!!!\n\n")
     exit(1)
+
+#################### 
+# Translate library type to TEcounts strandedness
+stranded_dict={"0":"no",
+               "1": "forward",
+               "2": "reverse"}
+stranded_opt=stranded_dict[str(libraryType)]
+warnings.warn("Detected library strandedness: " + stranded_opt)

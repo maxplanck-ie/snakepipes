@@ -47,6 +47,29 @@ elif pipeline=="rnaseq" and "allelic-whatshap" in mode:
         conda: CONDA_SHARED_ENV
         shell: "if [[ ! -f {output[0]} ]]; then samtools index {input[0]}; fi"
 
+elif pipeline=="chipseq" and fromBAM and useSpikeInForNorm:
+    rule link_bam:
+        input:
+            indir + "/{sample}" + bamExt
+        output:
+             "split_bam/{sample}_host.bam"
+        params:
+            input_bai = indir + "/{sample}" + bamExt + ".bai",
+            output_bai = "split_bam/{sample}_host.bam.bai"
+        run:
+            if os.path.exists(params.input_bai) and not os.path.exists(os.path.join(outdir,params.output_bai)):
+                os.symlink(params.input_bai,os.path.join(outdir,params.output_bai))
+            if not os.path.exists(os.path.join(outdir,output[0])):
+                os.symlink(os.path.join(outdir,input[0]),os.path.join(outdir,output[0]))
+
+    rule samtools_index_external:
+        input:
+            "split_bam/{sample}_host.bam"
+        output:
+            "split_bam/{sample}_host.bam.bai"
+        conda: CONDA_SHARED_ENV
+        shell: "if [[ ! -f {output[0]} ]]; then samtools index {input[0]}; fi"
+
 else:
     rule link_bam:
         input:

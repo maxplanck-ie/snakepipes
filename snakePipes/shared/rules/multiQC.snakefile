@@ -58,6 +58,9 @@ def multiqc_input_check(return_value):
             infiles.append( expand("allelic_bams/{sample}.filtered.SNPsplit_report.yaml", sample = samples) )
             infiles.append( expand("allelic_bams/{sample}.filtered.SNPsplit_sort.yaml", sample = samples) )
             indir += "allelic_bams"
+        if "allelic-whatshap" in mode:
+            infiles.append( expand("allelic_bams/{sample}.{suffix}.sorted.bam",sample=samples,suffix=['allele_flagged', 'genome1', 'genome2', 'unassigned']))
+            indir += "allelic_bams"
     elif pipeline=="rnaseq":
         # must be RNA-mapping, add files as per the mode
         if ( "alignment" in mode or "deepTools_qc" in mode or "three-prime-seq" in mode ) and not "allelic-mapping" in mode and not "allelic-counting" in mode and not "allelic-whatshap" in mode:
@@ -91,7 +94,7 @@ def multiqc_input_check(return_value):
             infiles.append( expand("allelic_bams/{sample}.markdup.SNPsplit_sort.yaml", sample = samples) )
             indir += " allelic_bams "
         if "alignment-free" in mode:
-            if "allelic-mapping" in mode:
+            if "allelic-mapping" in mode or "allelic-whatshap" in mode:
                 infiles.append( expand("SalmonAllelic/{sample}.{allelic_suffix}/quant.sf", sample = samples,allelic_suffix=allelic_suffix) )
                 indir += " SalmonAllelic "
             else:

@@ -1,6 +1,17 @@
 snakePipes News
 ===============
 
+snakePipes 3.5.0
+----------------
+
+* Allelic-whatshap mode was added to DNAmapping. Requires --phasedVcf.
+* --useSpikeinForNorm sption to split bam files by host and spikein genome, and to generate spikein-normalized bamCoverage tracks, was added to DNAmapping.
+* Splitting of bam files mapped to a hybrid genome into host and spikein was moved from ChIPseq to DNAmapping.
+* Spikein size factor normalization was enabled in allele-specific CSAW in the ChIPseq workflow.
+* Allelic-whatshap mode now works with alignment-free mode and fromBAM in the mRNAseq workflow.
+* ncRNAseq workflow now accepts the --libraryType parameter which is passed to the TEcounts tool.
+
+
 snakePipes 3.4.0
 ----------------
 
