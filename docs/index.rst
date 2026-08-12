@@ -23,6 +23,7 @@ Pipeline                            Description
 :ref:`makePairs`                pairtools workflow, from allele-specific mapping to HiC matrices
 :ref:`ncRNAseq`                 ncRNAseq workflow : From mapping to differential expression of genes and repeat elements using DESeq2
 :ref:`mRNASeq`                  RNASeq workflow : From mapping to differential expression using DESeq2
+:ref:`smRNAseq`                 Small-RNA-Seq workflow : Adapter trimming and miRNA/piRNA/TE classification and quantification with TEsmall
 :ref:`scRNASeq`                 Single-cell RNA-Seq (CEL-Seq2) workflow : From mapping to differential expression
 :ref:`WGBS`                     Whole-genome Bisulfite-Seq analysis workflow, from mapping to DMR calling and differential methylation analysis
 :ref:`preprocessing`            Merging technical replicates (e.g., across lanes), removing optical duplicates, running FastQC
@@ -120,6 +121,7 @@ Contents:
    content/workflows/preprocessing.rst
    content/workflows/mRNAseq.rst
    content/workflows/ncRNAseq.rst
+   content/workflows/smRNAseq.rst
    content/workflows/scRNAseq.rst
    content/workflows/WGBS.rst
    content/cookbook.rst

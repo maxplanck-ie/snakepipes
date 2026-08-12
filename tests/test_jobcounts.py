@@ -143,7 +143,9 @@ def createTestData(fp, samples=9) -> None:
         'blacklist_bed': (fp / 'ref' / 'rar.bed').as_posix(),
         'spikein_blacklist_bed': "",
         'ignoreForNormalization': "MT X Y",
-        'rmsk_file': (fp / 'ref' / 'rmsk.txt').as_posix()
+        'rmsk_file': (fp / 'ref' / 'rmsk.txt').as_posix(),
+        'tesmall_db': (fp / 'ref' / 'TEsmall').as_posix(),
+        'tesmall_genome': "mm10"
     }
     with open(fp / 'org.yaml', 'w') as of:
         yaml.dump(orgyaml, of)
@@ -401,6 +403,47 @@ class TestCreateindices:
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
         assert parseSpOut(_p) == 27
+    def test_tesmall(self, ifs):
+        ci = [
+            'createIndices',
+            '-o',
+            ifs / 'outdir',
+            '--snakemakeOptions',
+            SMKOPTS,
+            '--genome',
+            GENOME,
+            '--gtf',
+            GTF,
+            'genome',
+            '--tesmall',
+            '--tesmallGenome',
+            'mm10'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 45
+    def test_tesmall_DAG(self, ifs):
+        ci = [
+            'createIndices',
+            '-o',
+            ifs / 'outdir',
+            '--snakemakeOptions',
+            SMKOPTS,
+            '--genome',
+            GENOME,
+            '--gtf',
+            GTF,
+            'genome',
+            '--tesmall',
+            '--tesmallGenome',
+            'mm10',
+            '--DAG'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 45
 
 class TestDNAmapping():
     def test_default(self, ifs):
@@ -2065,6 +2108,54 @@ class TestncRNAseq():
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
         assert parseSpOut(_p) == 142
+
+class TestSmRNAseq():
+    def test_default(self, ifs):
+        ci = [
+            "smRNAseq",
+            '-i',
+            ifs / 'PE',
+            '-o',
+            ifs / 'outdir',
+            '--snakemakeOptions',
+            SMKOPTS,
+            ifs / 'org.yaml'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 148
+    def test_SE(self, ifs):
+        ci = [
+            "smRNAseq",
+            '-i',
+            ifs / 'SE',
+            '-o',
+            ifs / 'outdir',
+            '--snakemakeOptions',
+            SMKOPTS,
+            ifs / 'org.yaml'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 120
+    def test_DAG(self, ifs):
+        ci = [
+            "smRNAseq",
+            '-i',
+            ifs / 'PE',
+            '-o',
+            ifs / 'outdir',
+            '--DAG',
+            '--snakemakeOptions',
+            SMKOPTS,
+            ifs / 'org.yaml'
+        ]
+        print(' '.join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 148
 
 class TestscRNAseq():
     def test_default(self, ifs):
