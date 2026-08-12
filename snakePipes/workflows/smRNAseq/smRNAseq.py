@@ -27,7 +27,8 @@ def parse_args(defaults={"verbose": False, "configFile": None,
                          "pairedEnd": True,
                          "fdr": 0.05,
                          "tesmallMinLen": 16, "tesmallMaxLen": 36,
-                         "tesmallOptions": None}):
+                         "tesmallOptions": None,
+                         "fromBAM": False}):
 
     """
     Parse arguments from the command line.

@@ -184,7 +184,26 @@ rule Plot_smRNA_stats:
     input:
         os.path.join(outdir, 'TEsmallOut', 'TEsmall.done')
     output:
-        os.path.join(outdir,'TEsmallOut','count_summary_plot.pdf')
+        plot = os.path.join(outdir, 'TEsmallOut', 'count_summary_plot.pdf'),
+        # organize_tesmall_output (below) sorts TEsmall's raw per-sample output into
+        # TEsmallOut/bam/ by moving files there -- declared here so downstream rules
+        # (deepTools QC) can depend on the genome-aligned bam without a checkpoint.
+        genome_bam = expand(os.path.join(outdir, 'TEsmallOut', 'bam', '{sample}.genome.bam'), sample=samples)
     run:
-        Plotting(output[0])
+        Plotting(output.plot)
         organize_tesmall_output(os.path.join(outdir, 'TEsmallOut'))
+
+# TEsmall's own genome bam isn't sorted -- deepTools needs it sorted, and the shared
+# deepTools_RNA.snakefile rules all read from filtered_bam/{sample}.filtered.bam, the
+# convention every other workflow's aligner output is normalized to. Indexing is
+# handled by the generic samtools_index_filtered rule (umi_tools.snakefile).
+rule tesmall_genome_bam_filtered:
+    input:
+        bam = os.path.join(outdir, 'TEsmallOut', 'bam', '{sample}.genome.bam')
+    output:
+        bam = "filtered_bam/{sample}.filtered.bam"
+    benchmark:
+        "filtered_bam/.benchmark/tesmall_genome_bam_filtered.{sample}.benchmark"
+    threads: lambda wildcards: 4 if 4<max_thread else max_thread
+    conda: CONDA_SHARED_ENV
+    shell: "samtools sort -@ {threads} -o {output.bam} {input.bam}"

@@ -8,7 +8,7 @@ def multiqc_input_check(return_value):
     if pairedEnd:
         readsIdx = 2
 
-    if not pipeline=="scrnaseq" and ("fromBAM" not in globals() or not fromBAM):
+    if pipeline not in ("scrnaseq", "smrnaseq") and ("fromBAM" not in globals() or not fromBAM):
         if pairedEnd:
             if trim and fastqc:
                 infiles.append( expand("FastQC_trimmed/{sample}{read}_fastqc.html", sample = samples, read = reads) )
@@ -103,6 +103,17 @@ def multiqc_input_check(return_value):
     elif pipeline == "ncRNAseq":
         infiles.append(expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample=samples))
         indir += " STAR deepTools_qc "
+    elif pipeline == "smrnaseq":
+        # fastp merges paired reads into a single {sample}.fastq.gz (no {read} split, no
+        # post-trim FastQC step), unlike the generic RNA-seq trimming assumed above.
+        if fastqc:
+            infiles.append( expand("FastQC/{sample}{read}_fastqc.html", sample = samples, read = reads if pairedEnd else [reads[0]]) )
+            indir += " FastQC "
+        if trim:
+            infiles.append( expand(path.join(outdir, fastq_dir, "{sample}.fastq.gz"), sample = samples) )
+            indir += " " + fastq_dir + " "
+        infiles.append(expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample=samples))
+        indir += " TEsmallOut deepTools_qc "
     elif pipeline == "hic":
         infiles.append(expand("HiC_matrices/QCplots/{sample}_QC/QC.log", sample = samples))
         indir += " " + aligner + " " 

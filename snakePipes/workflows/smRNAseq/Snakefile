@@ -26,6 +26,9 @@ include: os.path.join(maindir, "shared", "tools" , "deeptools_cmds.snakefile")
 
 include: os.path.join(maindir, "shared", "rules", "deepTools_RNA.snakefile")
 
+# Annotation/genes.filtered.{gtf,bed} -- read by deepTools_RNA.snakefile's
+# plotEnrichment/multiBamSummary_bed/multiBigwigSummary_bed rules.
+include: os.path.join(maindir, "shared", "rules", "filterGTF.snakefile")
 
 
 if not fromBAM:
@@ -40,6 +43,9 @@ if not fromBAM:
     ## Trim
     if trim:
         include: os.path.join(maindir, "shared", "rules", "tesmall.snakefile")
+
+## MultiQC
+include: os.path.join(maindir, "shared", "rules", "multiQC.snakefile")
 
 
 ### conditional/optional rules #################################################
@@ -64,6 +70,27 @@ def run_Trimming(trim, fastqc):
         return( expand(os.path.join(outdir,"FASTQ_fastp","{sample}.fastq.gz"), sample = samples )+
                 expand(os.path.join(outdir,'TEsmallOut','TEsmall.done')) +
                 expand(os.path.join(outdir,'TEsmallOut','count_summary_plot.pdf')) )
+    else:
+        return([])
+
+def run_deepTools_qc():
+    if "deepTools_qc" in mode:
+        file_list = [
+        expand("bamCoverage/{sample}.RPKM.bw", sample = samples),
+        expand("bamCoverage/{sample}.scaleFactors.bw",sample = samples),
+        expand("bamCoverage/{sample}.coverage.bw", sample = samples),
+        expand("bamCoverage/{sample}.uniqueMappings.fwd.bw", sample = samples),
+        expand("bamCoverage/{sample}.uniqueMappings.rev.bw", sample = samples),
+        "deepTools_qc/plotEnrichment/plotEnrichment.tsv",
+        expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample = samples)]
+        if pairedEnd:
+            file_list.append("deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv")
+        if len(samples)>1:
+            file_list.append( ["deepTools_qc/multiBigwigSummary/coverage.bed.npz",
+                              "deepTools_qc/plotCorrelation/correlation.pearson.bed_coverage.tsv",
+                              "deepTools_qc/plotCorrelation/correlation.spearman.bed_coverage.tsv",
+                              "deepTools_qc/plotPCA/PCA.bed_coverage.tsv"] )
+        return(file_list)
     else:
         return([])
 
@@ -111,9 +138,11 @@ onstart:
 if not fromBAM:
     rule all:
         input:
-            expand("originalFASTQ/{sample}{read}.fastq.gz",sample=samples, read=reads),
+            expand("originalFASTQ/{sample}{read}.fastq.gz", sample=samples, read=reads if pairedEnd else [reads[0]]),
             run_FastQC(fastqc),
-            run_Trimming(trim, fastqc = False)
+            run_Trimming(trim, fastqc = False),
+            run_deepTools_qc(),
+            "multiQC/multiqc_report.html"
 
 else:
     rule all:
