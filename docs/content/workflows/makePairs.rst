@@ -18,7 +18,7 @@ Input requirements and outputs
 ------------------------------
 
 This pipeline requires paired-end reads fastq files as input in order to build allele-specific contact matrices.
-The input fastq files will be trimmed (with fastp) and be mapped against a diploid reference genome (with bwa).
+The input fastq files will be trimmed (with cutadapt) and be mapped against a diploid reference genome (with bwa).
 
 Prior to building the matrix, the pipeline generates two reference genomes (from a reference genome and a VCF file) that contains the information
 on haplotypes. The Haplotypes are set using the `--strains` flag. The two reference genomes are then merged to yield one reference genome
@@ -56,7 +56,7 @@ the config file description for the makePairs workflow :
         downsample:
         ## Options for trimming
         trim: True
-        trimmer: fastp
+        trimmer: cutadapt
         trimmerOptions:
 
         verbose: False
@@ -87,7 +87,7 @@ In addition to the FASTQ module results (see :ref:`running_snakePipes`), the wor
     |-- FASTQ
     |-- FastQC
     |-- FastQC_trimmed
-    |-- FASTQ_fastp
+    |-- FASTQ_Cutadapt
     |-- genome
     |-- multiqc
     |-- originalFASTQ
@@ -101,13 +101,13 @@ In addition to the FASTQ module results (see :ref:`running_snakePipes`), the wor
 
 * **FASTQ** links to **originalFASTQ** if no further filters are specified
 
-* **FASTQ_fastp**: trimmed FASTQ files output by fastp
+* **FASTQ_Cutadapt**: trimmed FASTQ files output by cutadapt
 
 * **FastQC** FASTQC report on FASTQ directory 
 
 * **genome** folder contains the diploid_genome.fa.gz that was constructed from 2 strain-specific genomes with rule diploid_genome.  Chromosome sizes and indices (bwa) can also be found in this directory
 
-* **multiqc** folder contains  the final QC report generated with MultiQC (including fastqc, fastp, and pairtools modules)
+* **multiqc** folder contains  the final QC report generated with MultiQC (including fastqc, cutadapt, and pairtools modules)
 
 .. note:: For the pairtools modules to work we used `MultiQC from open2c <https://github.com/open2c/MultiQC.git>`__ as specified for the makePiars environment
 
