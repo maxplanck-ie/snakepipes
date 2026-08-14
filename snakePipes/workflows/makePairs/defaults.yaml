@@ -19,7 +19,7 @@ pairedEnd: True
 downsample:
 ## Options for trimming
 trim: True
-trimmer: fastp
+trimmer: cutadapt
 trimmerOptions:
 
 verbose: False

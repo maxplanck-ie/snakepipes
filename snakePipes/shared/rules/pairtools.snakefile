@@ -10,8 +10,8 @@ rule generate_chromsizes:
 
 rule bwa_mapping:
     input:
-        fq1="FASTQ_fastp/{sample}_R1.fastq.gz",
-        fq2="FASTQ_fastp/{sample}_R2.fastq.gz"
+        fq1=fastq_dir + "/{sample}_R1.fastq.gz",
+        fq2=fastq_dir + "/{sample}_R2.fastq.gz"
     output:
         bam="bam/{sample}.bam",
     threads: 30
