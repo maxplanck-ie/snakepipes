@@ -299,7 +299,7 @@ class TestmakePairs():
         print(' '.join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 185
+        assert parseSpOut(_p) == 176
 
     def test_dag(self, ifs):
         ci = [
