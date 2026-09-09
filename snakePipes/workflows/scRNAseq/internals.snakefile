@@ -13,7 +13,7 @@ import sys
 ### Variable defaults ##########################################################
 
 ## set trimming related dirs correctly
-## we trim only R2 with transfered barcode info under "FASTQ_barcoded"
+## we trim only R2 with transferred barcode info under "FASTQ_barcoded"
 ## only cutadapt is supported right now due to poly-A trimming 
 
 if mode == "STARsolo":

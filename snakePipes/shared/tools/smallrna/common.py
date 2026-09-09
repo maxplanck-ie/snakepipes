@@ -15,7 +15,7 @@ from pathlib import Path
 UCSC_BASE = "https://hgdownload.soe.ucsc.edu/goldenPath"
 
 MIRBASE_URLS = {
-    "human": "https://www.mirbase.org/download/hsa.gff3",
+    "human": "https://www.mirbase.org/download/has.gff3",
     "mouse": "https://www.mirbase.org/download/mmu.gff3",
     "drosophila": "https://www.mirbase.org/download/dme.gff3",
 }
@@ -28,13 +28,20 @@ PIRNADB_URLS = {
 
 # alias -> canonical UCSC assembly name (also used directly for rmsk/chain downloads)
 GENOME_ALIASES = {
-    "hg19": "hg19", "GRCh37": "hg19",
-    "hg38": "hg38", "GRCh38": "hg38",
-    "mm9": "mm9", "NCBI37": "mm9",
-    "mm10": "mm10", "GRCm38": "mm10",
-    "mm39": "mm39", "GRCm39": "mm39",
-    "dm3": "dm3", "Release_5": "dm3",
-    "dm6": "dm6", "Release_6": "dm6",
+    "hg19": "hg19",
+    "GRCh37": "hg19",
+    "hg38": "hg38",
+    "GRCh38": "hg38",
+    "mm9": "mm9",
+    "NCBI37": "mm9",
+    "mm10": "mm10",
+    "GRCm38": "mm10",
+    "mm39": "mm39",
+    "GRCm39": "mm39",
+    "dm3": "dm3",
+    "Release_5": "dm3",
+    "dm6": "dm6",
+    "Release_6": "dm6",
 }
 
 SPECIES_BY_GENOME = {
@@ -59,10 +66,21 @@ STRUCTURAL_RNA_FROM_RMSK = {
 
 # repClass values that count as TEs for TE.bed -- Simple_repeat/Low_complexity/
 # etc are left out on purpose
-TE_CLASSES = ["DNA", "LINE", "LTR", "RC", "Retroposon", "RNA", "Satellite", "SINE", "Unknown"]
+TE_CLASSES = [
+    "DNA",
+    "LINE",
+    "LTR",
+    "RC",
+    "Retroposon",
+    "RNA",
+    "Satellite",
+    "SINE",
+    "Unknown",
+]
 
 
 # --- logging + subprocess ---
+
 
 def log(msg):
     print(f"[INFO] {msg}", flush=True)
@@ -74,12 +92,15 @@ def warn(msg):
 
 def err(msg):
     import sys
+
     print(f"[ERROR] {msg}", file=sys.stderr, flush=True)
 
 
 def run(cmd, check=True):
     log("RUN: " + " ".join(cmd))
-    result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    result = subprocess.run(
+        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
+    )
     if check and result.returncode != 0:
         err(result.stderr.strip())
         raise RuntimeError(f"Command failed: {' '.join(cmd)}")
@@ -103,6 +124,7 @@ def write_empty_bed6(path):
 
 # --- downloads ---
 
+
 def download_or_raise(url, outfile):
     """Raises on failure -- for files the pipeline can't proceed without (miRBase/piRNAdb, chains)."""
     log(f"Downloading {url}")
@@ -125,6 +147,7 @@ def download_or_warn(url, dest):
 
 
 # --- genome build / liftover ---
+
 
 def normalize_genome(genome):
     if genome not in GENOME_ALIASES:
@@ -207,16 +230,24 @@ def liftover(infile, source, target, outfile):
             lift_input = os.path.join(tmp, "input.chr.bed")
             _rewrite_chrom_column(infile, lift_input, to_ucsc_chrom)
 
-        lift_output = outfile if input_has_chr_prefix else os.path.join(tmp, "lifted.chr.bed")
+        lift_output = (
+            outfile if input_has_chr_prefix else os.path.join(tmp, "lifted.chr.bed")
+        )
         unmapped = lift_output + ".unmapped"
 
         run(["liftOver", lift_input, chain, lift_output, unmapped])
 
         if os.path.exists(unmapped):
-            n_unmapped = sum(1 for line in open(unmapped) if line.strip() and not line.startswith("#"))
+            n_unmapped = sum(
+                1
+                for line in open(unmapped)
+                if line.strip() and not line.startswith("#")
+            )
             if n_unmapped:
-                warn(f"liftOver ({source} -> {target}): {n_unmapped} interval(s) could not be "
-                     f"mapped and were dropped from {os.path.basename(outfile)}")
+                warn(
+                    f"liftOver ({source} -> {target}): {n_unmapped} interval(s) could not be "
+                    f"mapped and were dropped from {os.path.basename(outfile)}"
+                )
             os.remove(unmapped)
 
         if not input_has_chr_prefix:
@@ -226,6 +257,7 @@ def liftover(infile, source, target, outfile):
 
 
 # --- gtf/gff3 attribute parsing ---
+
 
 def parse_gff3_attributes(text):
     """key=value;key=value style, used by miRBase GFF3."""
@@ -244,7 +276,7 @@ def parse_gtf_attributes(attr):
         item = item.strip()
         if not item:
             continue
-        match = re.match(r'(\S+)\s+(.+)', item)
+        match = re.match(r"(\S+)\s+(.+)", item)
         if match:
             attrs[match.group(1)] = match.group(2).strip().strip('"')
     return attrs
@@ -259,6 +291,7 @@ def sanitize_repeat_name(name):
 
 # --- bed helpers ---
 
+
 def write_bed(records, outfile):
     with open(outfile, "w") as out:
         for r in records:
@@ -270,10 +303,24 @@ def collapse_bed(raw, output):
     sorted_bed = raw + ".sorted"
     grouped_bed = raw + ".grouped"
 
-    subprocess.run(["bedtools", "sort", "-i", raw], stdout=open(sorted_bed, "w"), check=True)
     subprocess.run(
-        ["bedtools", "groupby", "-i", sorted_bed, "-g", "1,2,3,6", "-c", "4", "-o", "collapse"],
-        stdout=open(grouped_bed, "w"), check=True,
+        ["bedtools", "sort", "-i", raw], stdout=open(sorted_bed, "w"), check=True
+    )
+    subprocess.run(
+        [
+            "bedtools",
+            "groupby",
+            "-i",
+            sorted_bed,
+            "-g",
+            "1,2,3,6",
+            "-c",
+            "4",
+            "-o",
+            "collapse",
+        ],
+        stdout=open(grouped_bed, "w"),
+        check=True,
     )
 
     with open(grouped_bed) as fin, open(output, "w") as fout:

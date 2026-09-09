@@ -55,7 +55,7 @@ All files needed to be modified in order to extend/modify a workflow, are availa
 
     * **organisms**: This folder contains yaml files corresponding to each organism (see :doc:`setting_up` for details)
 
-    * **rscripts**: Contains the R wrappers that are invoked via the rules. You would find the Rscripts for DESeq, CSAW and other R pakages here.
+    * **rscripts**: Contains the R wrappers that are invoked via the rules. You would find the Rscripts for DESeq, CSAW and other R packages here.
 
     * **rules**: These are the snakemake rules which are invoked during execution of a workflow. Depending upon the global parameters passed on from the wrappers, a rule may/may not be included in a workflow (controlled by various ``if`` conditionals).
 

@@ -41,7 +41,7 @@ if(length(Mapdir>0)){
     require(pander)
     pander(bamReptab, style='simple', caption="PCR duplication rate.")
 } else {
-    message('No information on PCR duplicate removal found. If you started the pipeline from bam files, this is expected outcome. Otherwise, an error might have occured.')
+    message('No information on PCR duplicate removal found. If you started the pipeline from bam files, this is expected outcome. Otherwise, an error might have occurred.')
 }
 ```
 

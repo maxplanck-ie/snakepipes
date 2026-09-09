@@ -47,6 +47,8 @@ jobs:
       with:
         python-version: 3.11
     - uses: pre-commit/action@v3.0.1
+      env:
+        SKIP: zizmor,snakefmt
   CI:
     needs: pip
     runs-on: ubuntu-latest

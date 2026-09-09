@@ -53,7 +53,7 @@ seqlevels(g, pruning.mode="tidy") = intersect(seqlevels(g), seqlevels(gr))
 ################################
 # Annotated DMRs
 ################################
-# Annotate with the nearest gene and its distnace
+# Annotate with the nearest gene and its distance
 og = distanceToNearest(gr, g, ignore.strand=FALSE, select="all")
 d = t(sapply(split(og, queryHits(og)), function(x) {
       idx = queryHits(x)[1]
@@ -96,7 +96,7 @@ FactoMineR::plot.PCA(x1,choix="var")
 
 # Distribution of methylation values per group
 
-Averge methylation values for candidate DMRs in each of the groups are plotted below and stored in **`r outputDiffMethyl`**. In general, the starkness of the difference in the distributions should correlate to the number of candiate DMRs.
+Average methylation values for candidate DMRs in each of the groups are plotted below and stored in **`r outputDiffMethyl`**. In general, the starkness of the difference in the distributions should correlate to the number of candidate DMRs.
 
 ```{r echo=FALSE, warning=FALSE, message=FALSE}
 # Select the mean* columns, strip "mean" and make long

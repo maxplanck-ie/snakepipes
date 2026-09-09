@@ -37,7 +37,7 @@ All individual jobs of the workflow will be submitted to the Grid engine using t
 
 **For single-end FASTQ files**, Note that single end data still needs a valid suffix (e.g. sample1_R1.fastq.gz). With a proper suffix, single end mode is detected by default. When executing some workflows with the ``--fromBAM`` flag, it is still necessary to set ``--singleEnd``.
 
-Once the DNAmapping run is finished sucessfully. We can run the ChIPseq analysis in the same directory.
+Once the DNAmapping run is finished successfully. We can run the ChIPseq analysis in the same directory.
 
 .. code:: bash
 
@@ -69,7 +69,7 @@ groups in Hi-C workflow. For all this analysis, snakePipes needs a ``sampleSheet
     sample2    test
     sample2    test
 
-The name section referes to sample names (without the read suffix), while the condition
+The name section refers to sample names (without the read suffix), while the condition
 section refers to sample group (control/test, male/female, normal/diseased etc..)
 
 Using BAM input
@@ -89,7 +89,7 @@ All of the snakePipes workflows that begin with a FASTQ file, perform the same p
 
 * **Linking/downsampling the FASTQ file** : The FASTQ rule in the workflows links the input FASTQ file into the FASTQ folder in the output directory. If ``downsampling`` is specified, the FASTQ folder would contain the downsampled FASTQ file.
 
-.. note:: The DNAmapping and RNA-mapping pipelines can take either single, or paired-end FASTQ files. For paired-end data, the reads ``R1`` and ``R2`` are expected to have the suffix ``_R1`` and ``_R2`` respectively, which can be modified in the ``defaults.yaml`` file using the ``reads`` key, to your needs. For example, files downloaded from NCBI would normally have the extention ``.1.fastq.gz`` and ``.2.fastq.gz``. Also, please check the ``ext`` key in the configuration file if you wish to modify the read extension (default is ``.fastq.gz``).
+.. note:: The DNAmapping and RNA-mapping pipelines can take either single, or paired-end FASTQ files. For paired-end data, the reads ``R1`` and ``R2`` are expected to have the suffix ``_R1`` and ``_R2`` respectively, which can be modified in the ``defaults.yaml`` file using the ``reads`` key, to your needs. For example, files downloaded from NCBI would normally have the extension ``.1.fastq.gz`` and ``.2.fastq.gz``. Also, please check the ``ext`` key in the configuration file if you wish to modify the read extension (default is ``.fastq.gz``).
 
 
 * **Quality/adapter trimming** (optional): If ``--trim`` is selected, the ``trimming`` rule would run the selected program (either `Trimgalore <https://www.bioinformatics.babraham.ac.uk/projects/trim_galore/>`__, or `Cutadapt <https://journal.embnet.org/index.php/embnetjournal/article/view/200/479>`__) on the files in the FASTQ folder, and would produce another folder with name ``FASTQ_<program>``, where <program> is either ``Cutadapt`` or ``Trimgalore``.
@@ -104,13 +104,13 @@ All of the snakePipes workflows that begin with a FASTQ file, perform the same p
 
 * **--bwBinSize**: This option is available for most workflows, and refers to the bin size used to create the coverage files. `BigWig files <https://genome.ucsc.edu/goldenpath/help/bigWig.html>`__ are created by most workflows in order to allow downstream analysis and visualization of outputs. This argument controls the size of the bins in which the genome is divided for creating this file. The default is sufficient for most analysis.
 
-* **Temporary directory/files**: Some tools need additonal space during runtime (eg. ``samtools sort -T [DIR] ...``). SnakePipes uses the core tool ``mktemp`` to create temporary directories in some rules. On Linux-based systems the global env variabale ``$TMPDIR`` is honored.
+* **Temporary directory/files**: Some tools need additional space during runtime (eg. ``samtools sort -T [DIR] ...``). SnakePipes uses the core tool ``mktemp`` to create temporary directories in some rules. On Linux-based systems the global env variabale ``$TMPDIR`` is honored.
   On Mac OS and if $TMPDIR is empty, we fallback to `/tmp/` as the parent temporary directory. For performance reasons, it is recommended that the $TMPDIR points to a local drive (and not eg. an NFS share). Please make sure there is enough space! 
 
 Logging of outputs
 ~~~~~~~~~~~~~~~~~~~
 
-snakePipes produces logs at three diferrent levels.
+snakePipes produces logs at three different levels.
 
 * **<workflow>.log**: This file would be generated on the working directory, and contains everything printed on the screen via snakemake and python wrappers.
 
@@ -127,8 +127,8 @@ Quality-Checks
 
 All workflows under snakePipes employ various quality-checks (QC) to inform users of the data quality.
 
-* **MultiQC** : All workflows in snakePipes output a ``MultiQC`` folder, which summerizes the QC metrics obtained from various tools in the workflow via `MultiQC <https://multiqc.info/>`__, in an interactive HTML report. This output is quite useful to compare samples and get an overview of the data quality from all samples.
+* **MultiQC** : All workflows in snakePipes output a ``MultiQC`` folder, which summarizes the QC metrics obtained from various tools in the workflow via `MultiQC <https://multiqc.info/>`__, in an interactive HTML report. This output is quite useful to compare samples and get an overview of the data quality from all samples.
 
 * **deepTools**: `deepTools <deeptools.readthedocs.io>`__ are a popular set of tools that perform QC, normalization and visualization of NGS data. In snakePipes, most workflows (except HiC and scRNAseq) contain outputs from various deepTools modules on the samples. The coverage files (bigWigs), are also generated by deepTools (bamCoverage and bamCompare modules). Therefore, it's useful to look at the deepTools documentation before inspecting these results.
 
-.. note:: We strongly encourage users to understand these quality matrices and inspect the results from QC, before making biological conclusions or preceeding to downstream analysis.
+.. note:: We strongly encourage users to understand these quality matrices and inspect the results from QC, before making biological conclusions or preceding to downstream analysis.

@@ -4,6 +4,7 @@ import pyBigWig
 import argparse
 import os
 
+
 def filterOverlaps(chrom, interval, BED):
     """
     Remove portions of an interval overlapping a BED file, returning a list of
@@ -50,7 +51,7 @@ bw = pyBigWig.open(args.bigWig)
 BED = GTF(args.BED)
 o = pyBigWig.open(args.output, "w")
 filteredBases = 0
-totalBases = bw.header()['nBasesCovered']
+totalBases = bw.header()["nBasesCovered"]
 
 # write the header
 hdr = [(k, v) for k, v in bw.chroms().items()]
@@ -71,9 +72,16 @@ for chrom, _ in hdr:
             filteredEnds.append(e)
             filteredValues.append(v)
     if len(filteredStarts):
-        o.addEntries([chrom] * len(filteredStarts), filteredStarts, ends=filteredEnds, values=filteredValues)
+        o.addEntries(
+            [chrom] * len(filteredStarts),
+            filteredStarts,
+            ends=filteredEnds,
+            values=filteredValues,
+        )
 bw.close()
 o.close()
 
 print("Sample\tFilteredBases\tTotalBases")
-print("{}\t{}\t{}".format(os.path.basename(args.bigWig)[:-3], filteredBases, totalBases))
+print(
+    "{}\t{}\t{}".format(os.path.basename(args.bigWig)[:-3], filteredBases, totalBases)
+)

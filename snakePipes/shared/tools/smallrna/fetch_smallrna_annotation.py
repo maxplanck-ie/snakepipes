@@ -7,9 +7,16 @@ import zipfile
 import tempfile
 
 from common import (
-    log, ensure_dir, download_or_raise, liftover,
-    normalize_genome, get_species, parse_gff3_attributes, to_ensembl_chrom,
-    MIRBASE_URLS, PIRNADB_URLS,
+    log,
+    ensure_dir,
+    download_or_raise,
+    liftover,
+    normalize_genome,
+    get_species,
+    parse_gff3_attributes,
+    to_ensembl_chrom,
+    MIRBASE_URLS,
+    PIRNADB_URLS,
 )
 
 
@@ -89,25 +96,37 @@ def download_smallrna_raw(source, genome, outdir, build_info_name="build_info.tx
 
         if source == "mirbase":
             annotation = archive
-            source_build = normalize_genome(parse_genome_build_header(annotation, source))
-            mirbase_gff_to_bed(annotation, "miRNA_primary_transcript",
-                                os.path.join(outdir, "hairpin.raw.bed"))
-            mirbase_gff_to_bed(annotation, "miRNA",
-                                os.path.join(outdir, "miRNA.raw.bed"))
+            source_build = normalize_genome(
+                parse_genome_build_header(annotation, source)
+            )
+            mirbase_gff_to_bed(
+                annotation,
+                "miRNA_primary_transcript",
+                os.path.join(outdir, "hairpin.raw.bed"),
+            )
+            mirbase_gff_to_bed(
+                annotation, "miRNA", os.path.join(outdir, "miRNA.raw.bed")
+            )
 
         else:  # pirnadb
             with zipfile.ZipFile(archive) as z:
                 gtf_name = [x for x in z.namelist() if x.endswith(".gtf")][0]
                 z.extract(gtf_name, tmp)
             annotation = os.path.join(tmp, gtf_name)
-            source_build = normalize_genome(parse_genome_build_header(annotation, source))
-            pirnadb_gtf_to_bed(annotation, os.path.join(outdir, "piRNA_cluster.raw.bed"))
+            source_build = normalize_genome(
+                parse_genome_build_header(annotation, source)
+            )
+            pirnadb_gtf_to_bed(
+                annotation, os.path.join(outdir, "piRNA_cluster.raw.bed")
+            )
 
         with open(os.path.join(outdir, build_info_name), "w") as fh:
             fh.write(f"{source_build}\t{target_build}\n")
 
         if source_build != target_build:
-            log(f"{source}: source build {source_build} != target {target_build}; liftOver needed")
+            log(
+                f"{source}: source build {source_build} != target {target_build}; liftOver needed"
+            )
         else:
             log(f"{source}: source build matches target ({source_build})")
 

@@ -18,7 +18,7 @@ Input requirements
 The DNA mapping pipeline generates output that is fully compatible with the ChIPseq pipeline input requirements!
 When running the ChIPseq pipeline, please specify the output directory of DNAmapping pipeline as the working directory (``-d``).
 
-Alternatively, bam files can be used as input to the ChIPseq worklow. The folder containing bam files can be passed with the `--fromBAM` parameter. Bam file extention can be specified with `--bamExt`. Working directory specified with `-d` will be used as output folder. Running the ChiPseq workflow in 'allelic-whatshap' mode only works with passing the full output of the DNAmapping pipeline with `-d` and not with `--fromBAM`.
+Alternatively, bam files can be used as input to the ChIPseq worklow. The folder containing bam files can be passed with the `--fromBAM` parameter. Bam file extension can be specified with `--bamExt`. Working directory specified with `-d` will be used as output folder. Running the ChiPseq workflow in 'allelic-whatshap' mode only works with passing the full output of the DNAmapping pipeline with `-d` and not with `--fromBAM`.
 
 
 Sample configuration
@@ -179,7 +179,7 @@ Following up on the DNAmapping module results (see :doc:`DNAmapping`), the workf
 
 .. note:: Although in case of broad marks, we also perform the MACS2 `broadpeak` analysis (output available as ``MACS2/<sample>.filtered.BAM_peaks.broadPeak``), we would recommend using the histoneHMM outputs in these cases, since histoneHMM produces better results than MACS2 for broad peaks. In order to produced domain calls by histoneHMM, specify histoneHMM as peak caller by passing it to --peakCaller.
 
-.. note:: For narrow marks, the user may choose the peak caller from MACS2 (default), Genrich or `SEACR <https://github.com/FredHutch/SEACR>`__. By deafult, SEACR is run in the stringent mode, applying normalization to counts over bed files. If invoked together with ``--useSpikeInForNorm``, SEACR will be run in stringent mode, using spikein-normalized counts. FDR can be set by the user (default 0.05).
+.. note:: For narrow marks, the user may choose the peak caller from MACS2 (default), Genrich or `SEACR <https://github.com/FredHutch/SEACR>`__. By default, SEACR is run in the stringent mode, applying normalization to counts over bed files. If invoked together with ``--useSpikeInForNorm``, SEACR will be run in stringent mode, using spikein-normalized counts. FDR can be set by the user (default 0.05).
 
 .. note:: The ``_sampleSheet`` suffix for the ``CSAW_sampleSheet`` is drawn from the name of the sample sheet you use. So if you instead named the sample sheet ``mySampleSheet.txt`` then the folder would be named ``CSAW_mySampleSheet``. This facilitates using multiple sample sheets.
 

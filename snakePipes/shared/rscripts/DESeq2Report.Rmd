@@ -281,7 +281,7 @@ plotMA(res, alpha = metadata(res)$alpha / 5,
     main = paste('MA plot with alpha =', metadata(res)$alpha / 2))
 ```
 
-This second MA plot uses `alpha` = `r metadata(res)$alpha / 2` and can be used agains the first MA plot to identify which features have adjusted p-values between `r metadata(res)$alpha / 2` and `r metadata(res)$alpha`.
+This second MA plot uses `alpha` = `r metadata(res)$alpha / 2` and can be used against the first MA plot to identify which features have adjusted p-values between `r metadata(res)$alpha / 2` and `r metadata(res)$alpha`.
 
 ```{r 'MAplotalpha-nBest'}
 ## MA plot with alpha corresponding to the one that gives the nBest features
@@ -316,7 +316,7 @@ The third and final MA plot uses an alpha such that the top `r nBest.actual` fea
     )
 ```
 
-[Volcano plots](https://en.wikipedia.org/wiki/Volcano_plot_(statistics)) are another (sometimes preferred) way of visulizing the DE results. It clearly identifies the highest changing genes from the results.
+[Volcano plots](https://en.wikipedia.org/wiki/Volcano_plot_(statistics)) are another (sometimes preferred) way of visualizing the DE results. It clearly identifies the highest changing genes from the results.
 
 
 # Bar plot
