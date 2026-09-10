@@ -144,7 +144,7 @@ def main():
     validModes = set(["alignment", "deepTools_qc"])
     for mode in modeTemp:
         if mode not in validModes:
-            sys.exit("{} is not a valid mode!\n".format(mode))
+            sys.exit(f"{mode} is not a valid mode!\n")
     if "alignment" not in modeTemp and args.UMIDedup:
         sys.exit('UMIDedup is only valid for "alignment" mode!\n')
     if args.fromBAM:

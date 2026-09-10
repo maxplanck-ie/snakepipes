@@ -236,7 +236,7 @@ def main():
     )
     for mode in modeTemp:
         if mode not in validModes:
-            sys.exit("{} is not a valid mode!\n".format(mode))
+            sys.exit(f"{mode} is not a valid mode!\n")
     if "alignment" not in modeTemp and args.UMIDedup:
         sys.exit('UMIDedup is only valid for "alignment" mode!\n')
     if "allelic-counting" in modeTemp and "deepTools_qc" in modeTemp:

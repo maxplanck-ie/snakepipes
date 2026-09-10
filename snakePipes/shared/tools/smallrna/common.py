@@ -98,9 +98,7 @@ def err(msg):
 
 def run(cmd, check=True):
     log("RUN: " + " ".join(cmd))
-    result = subprocess.run(
-        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
-    )
+    result = subprocess.run(cmd, capture_output=True, text=True)
     if check and result.returncode != 0:
         err(result.stderr.strip())
         raise RuntimeError(f"Command failed: {' '.join(cmd)}")

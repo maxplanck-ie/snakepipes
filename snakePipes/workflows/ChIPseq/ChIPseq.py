@@ -240,9 +240,7 @@ def main():
         args.samples_config = os.path.abspath(args.samples_config)
     else:
         sys.exit(
-            "\nError! Sample config file not found! ({})\n Either create one or call the workflow with --predictChIPDict!\n".format(
-                args.samples_config
-            )
+            f"\nError! Sample config file not found! ({args.samples_config})\n Either create one or call the workflow with --predictChIPDict!\n"
         )
 
     # Handle YAML and log files

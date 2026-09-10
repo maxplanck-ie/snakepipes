@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # snakePipes documentation build configuration file, created by
 # sphinx-quickstart on Thu Oct 26 11:10:13 2017.
@@ -17,7 +16,7 @@ import os
 from importlib.metadata import version as importlibversion
 
 # to allow readthedocs to compile without installing some dependencies
-import mock
+from unittest import mock
 
 MOCK_MODULES = ["yaml", "thefuzz[speedup]"]
 
