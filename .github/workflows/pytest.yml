@@ -2,6 +2,9 @@ name: pytest
 
 on: [pull_request, push]
 
+permissions:
+  contents: read
+
 defaults:
   run:
       shell: bash -l {0}
@@ -10,8 +13,10 @@ jobs:
   test_mRNA:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - uses: conda-incubator/setup-miniconda@v3
+    - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      with:
+        persist-credentials: false
+    - uses: conda-incubator/setup-miniconda@fc2d68f6413eb2d87b895e92f8584b5b94a10167 # v3.3.0
       with:
         environment-file: snakePipes/shared/rules/envs/rna_seq.yaml
         activate-environment: snakepipes_RNAseq_environment_3.0
@@ -21,7 +26,7 @@ jobs:
         gunzip -c tests/data/genomes/genome_chr17.fa.gz > genome_chr17.fa
         gunzip -c tests/data/genomes/genes_chr17.gtf.gz > genes_chr17.gtf
         STAR --runThreadN 4 --runMode genomeGenerate --genomeDir tests/data/mRNA_STAR --genomeFastaFiles genome_chr17.fa --sjdbGTFfile genes_chr17.gtf --sjdbOverhang 100 --genomeSAindexNbases 12
-    - uses: conda-incubator/setup-miniconda@v3
+    - uses: conda-incubator/setup-miniconda@fc2d68f6413eb2d87b895e92f8584b5b94a10167 # v3.3.0
       with:
         environment-file: .github/conda_ci.yml
         activate-environment: conda_ci
@@ -37,8 +42,10 @@ jobs:
   CI_jobcounts:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - uses: conda-incubator/setup-miniconda@v3
+    - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      with:
+        persist-credentials: false
+    - uses: conda-incubator/setup-miniconda@fc2d68f6413eb2d87b895e92f8584b5b94a10167 # v3.3.0
       with:
         environment-file: .github/conda_ci.yml
         activate-environment: conda_ci

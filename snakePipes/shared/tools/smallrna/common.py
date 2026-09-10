@@ -15,7 +15,7 @@ from pathlib import Path
 UCSC_BASE = "https://hgdownload.soe.ucsc.edu/goldenPath"
 
 MIRBASE_URLS = {
-    "human": "https://www.mirbase.org/download/has.gff3",
+    "human": "https://www.mirbase.org/download/hsa.gff3",
     "mouse": "https://www.mirbase.org/download/mmu.gff3",
     "drosophila": "https://www.mirbase.org/download/dme.gff3",
 }

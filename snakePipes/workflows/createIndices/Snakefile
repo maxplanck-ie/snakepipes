@@ -4,14 +4,16 @@ import snakePipes.common_functions as cf
 
 ### snakemake_workflows initialization ########################################
 maindir = os.path.dirname(os.path.dirname(workflow.basedir))
-workflow_rscripts=os.path.join(maindir, "shared", "rscripts")
-workflow_tools=os.path.join(maindir, "shared", "tools")
+workflow_rscripts = os.path.join(maindir, "shared", "rscripts")
+workflow_tools = os.path.join(maindir, "shared", "tools")
 
 # load conda ENVs (path is relative to "shared/rules" directory)
 globals().update(cf.set_env_yamls())
 
 # load config file
-globals().update(cf.load_configfile(workflow.overwrite_configfiles[0], config["verbose"]))
+globals().update(
+    cf.load_configfile(workflow.overwrite_configfiles[0], config["verbose"])
+)
 # return the pipeline version in the log
 cf.get_version()
 
@@ -20,12 +22,22 @@ cf.get_version()
 if config.get("tesmall"):
     import shutil
     from snakemake.io import multiext, unpack, touch
+
     sys.path.insert(0, os.path.join(workflow_tools, "smallrna"))
-    from common import ensure_dir, normalize_genome, download_or_raise, UCSC_BASE, TE_CLASSES
+    from common import (
+        ensure_dir,
+        normalize_genome,
+        download_or_raise,
+        UCSC_BASE,
+        TE_CLASSES,
+    )
     from link_genome import link_genome_fasta
     from fetch_rmsk import fetch_rmsk_txt
     from build_gene_features import (
-        write_raw_exon_bed, write_raw_intron_bed, write_raw_structural_rna, extract_te_from_rmsk,
+        write_raw_exon_bed,
+        write_raw_intron_bed,
+        write_raw_structural_rna,
+        extract_te_from_rmsk,
     )
     from extract_trna_rrna import filter_bed_by_prefix, fix_trna_headers
     from fetch_smallrna_annotation import download_smallrna_raw
@@ -35,115 +47,149 @@ if config.get("tesmall"):
 ################################################################################
 
 # This will eventually be written as a yaml file
-organismDictionary = {'genome_size': 0,
-                      'genome_fasta': '',
-                      'genome_index': '',
-                      'genome_2bit': '',
-                      'genome_dict': '',
-                      'bowtie2_index': '',
-                      'hisat2_index': '',
-                      'bwa_index': '',
-                      'bwa_mem2_index': '',
-                      'bwameth_index': '',
-                      'bwameth2_index': '',
-                      'known_splicesites': '',
-                      'star_index': '',
-                      'salmon_index': '',
-                      'salmon_velocity_index': '',
-                      't2g_velocity': '',
-                      'genes_bed': '',
-                      'genes_gtf': '',
-                      'genes_t2g': '',
-                      'spikein_genes_gtf': '',
-                      'extended_coding_regions_gtf': '',
-                      'blacklist_bed': '',
-                      'spikein_blacklist_bed': '',
-                      'ignoreForNormalization': '',
-                      'rmsk_file': '',
-                      # tesmall_db is TEsmall's --dbfolder value: the TEsmall root,
-                      # NOT including genomes/<build> -- TEsmall looks for a
-                      # genomes/ dir inside --dbfolder itself. tesmall_genome is the
-                      # -g value: the actual build the db was prepared for (see
-                      # --tesmallGenome), read straight back out of this YAML at
-                      # smRNAseq/analysis time instead of re-guessed there.
-                      'tesmall_db': False,
-                      'tesmall_genome': False}
+organismDictionary = {
+    "genome_size": 0,
+    "genome_fasta": "",
+    "genome_index": "",
+    "genome_2bit": "",
+    "genome_dict": "",
+    "bowtie2_index": "",
+    "hisat2_index": "",
+    "bwa_index": "",
+    "bwa_mem2_index": "",
+    "bwameth_index": "",
+    "bwameth2_index": "",
+    "known_splicesites": "",
+    "star_index": "",
+    "salmon_index": "",
+    "salmon_velocity_index": "",
+    "t2g_velocity": "",
+    "genes_bed": "",
+    "genes_gtf": "",
+    "genes_t2g": "",
+    "spikein_genes_gtf": "",
+    "extended_coding_regions_gtf": "",
+    "blacklist_bed": "",
+    "spikein_blacklist_bed": "",
+    "ignoreForNormalization": "",
+    "rmsk_file": "",
+    # tesmall_db is TEsmall's --dbfolder value: the TEsmall root,
+    # NOT including genomes/<build> -- TEsmall looks for a
+    # genomes/ dir inside --dbfolder itself. tesmall_genome is the
+    # -g value: the actual build the db was prepared for (see
+    # --tesmallGenome), read straight back out of this YAML at
+    # smRNAseq/analysis time instead of re-guessed there.
+    "tesmall_db": False,
+    "tesmall_genome": False,
+}
 
-targets = [os.path.join(outdir, x) for x in ["genome_fasta/genome.fa",
-                                             "genome_fasta/genome.fa.fai",
-                                             "genome_fasta/genome.dict",
-                                             "genome_fasta/genome.2bit"]]
+targets = [
+    os.path.join(outdir, x)
+    for x in [
+        "genome_fasta/genome.fa",
+        "genome_fasta/genome.fa.fai",
+        "genome_fasta/genome.dict",
+        "genome_fasta/genome.2bit",
+    ]
+]
 
-organismDictionary['genome_fasta'] = os.path.join(outdir, "genome_fasta/genome.fa")
-organismDictionary['genome_index'] = os.path.join(outdir, "genome_fasta/genome.fa.fai")
-organismDictionary['genome_2bit'] = os.path.join(outdir, "genome_fasta/genome.2bit")
-organismDictionary['genome_dict'] = os.path.join(outdir, "genome_fasta/genome.dict")
+organismDictionary["genome_fasta"] = os.path.join(outdir, "genome_fasta/genome.fa")
+organismDictionary["genome_index"] = os.path.join(outdir, "genome_fasta/genome.fa.fai")
+organismDictionary["genome_2bit"] = os.path.join(outdir, "genome_fasta/genome.2bit")
+organismDictionary["genome_dict"] = os.path.join(outdir, "genome_fasta/genome.dict")
 
 if gtfURL:
-    targets.extend([os.path.join(outdir, x) for x in ["annotation/genes.gtf",
-                                                      "annotation/genes.bed",
-                                                      "annotation/genes.t2g",
-                                                      "annotation/genes.slop.gtf"]])
-    organismDictionary['genes_gtf'] = os.path.join(outdir, "annotation/genes.gtf")
-    organismDictionary['genes_bed'] = os.path.join(outdir, "annotation/genes.bed")
-    organismDictionary['genes_t2g'] = os.path.join(outdir, "annotation/genes.t2g")
-    organismDictionary['extended_coding_regions_gtf'] = os.path.join(outdir, "annotation/genes.slop.gtf")
+    targets.extend(
+        [
+            os.path.join(outdir, x)
+            for x in [
+                "annotation/genes.gtf",
+                "annotation/genes.bed",
+                "annotation/genes.t2g",
+                "annotation/genes.slop.gtf",
+            ]
+        ]
+    )
+    organismDictionary["genes_gtf"] = os.path.join(outdir, "annotation/genes.gtf")
+    organismDictionary["genes_bed"] = os.path.join(outdir, "annotation/genes.bed")
+    organismDictionary["genes_t2g"] = os.path.join(outdir, "annotation/genes.t2g")
+    organismDictionary["extended_coding_regions_gtf"] = os.path.join(
+        outdir, "annotation/genes.slop.gtf"
+    )
 
 if spikeinGtfURL:
     targets.extend([os.path.join(outdir, x) for x in ["annotation/spikein_genes.gtf"]])
-    organismDictionary['spikein_genes_gtf'] = os.path.join(outdir, "annotation/spikein_genes.gtf")
+    organismDictionary["spikein_genes_gtf"] = os.path.join(
+        outdir, "annotation/spikein_genes.gtf"
+    )
 
 if rmskURL:
     targets.extend([os.path.join(outdir, x) for x in ["annotation/rmsk.txt"]])
-    organismDictionary['rmsk_file'] = os.path.join(outdir, "annotation/rmsk.txt")
+    organismDictionary["rmsk_file"] = os.path.join(outdir, "annotation/rmsk.txt")
 
-if 'all' in tools or 'bowtie2' in tools:
+if "all" in tools or "bowtie2" in tools:
     targets.append(os.path.join(outdir, "BowtieIndex/genome.rev.2.bt2"))
-    organismDictionary['bowtie2_index'] = os.path.join(outdir, "BowtieIndex/genome")
+    organismDictionary["bowtie2_index"] = os.path.join(outdir, "BowtieIndex/genome")
 
-if 'all' in tools or 'hisat2' in tools:
+if "all" in tools or "hisat2" in tools:
     targets.append(os.path.join(outdir, "HISAT2Index/genome.6.ht2"))
-    organismDictionary['hisat2_index'] = os.path.join(outdir, "HISAT2Index/genome")
+    organismDictionary["hisat2_index"] = os.path.join(outdir, "HISAT2Index/genome")
     if gtfURL:
         targets.append(os.path.join(outdir, "HISAT2Index/splice_sites.txt"))
-        organismDictionary['known_splicesites'] = os.path.join(outdir, "HISAT2Index/splice_sites.txt")
+        organismDictionary["known_splicesites"] = os.path.join(
+            outdir, "HISAT2Index/splice_sites.txt"
+        )
 
-if 'all' in tools or 'star' in tools:
+if "all" in tools or "star" in tools:
     targets.append(os.path.join(outdir, "STARIndex/SAindex"))
-    organismDictionary['star_index'] = os.path.join(outdir, "STARIndex/")
+    organismDictionary["star_index"] = os.path.join(outdir, "STARIndex/")
 
-if 'all' in tools or 'salmon' in tools:
+if "all" in tools or "salmon" in tools:
     targets.append(os.path.join(outdir, "SalmonIndex/seq.bin"))
-    organismDictionary['salmon_index'] = os.path.join(outdir, "SalmonIndex/")
+    organismDictionary["salmon_index"] = os.path.join(outdir, "SalmonIndex/")
     targets.append(os.path.join(outdir, "SalmonIndex_RNAVelocity/seq.bin"))
-    organismDictionary['salmon_velocity_index'] = os.path.join(outdir, "SalmonIndex_RNAVelocity/")
+    organismDictionary["salmon_velocity_index"] = os.path.join(
+        outdir, "SalmonIndex_RNAVelocity/"
+    )
     targets.append(os.path.join(outdir, "annotation/cDNA_introns.joint.t2g"))
-    organismDictionary['t2g_velocity'] = os.path.join(outdir, "annotation/cDNA_introns.joint.t2g")
+    organismDictionary["t2g_velocity"] = os.path.join(
+        outdir, "annotation/cDNA_introns.joint.t2g"
+    )
 
-if 'all' in tools or 'bwa' in tools:
+if "all" in tools or "bwa" in tools:
     targets.append(os.path.join(outdir, "BWAIndex/genome.fa.sa"))
-    organismDictionary['bwa_index'] = os.path.join(outdir, "BWAIndex/genome.fa")
+    organismDictionary["bwa_index"] = os.path.join(outdir, "BWAIndex/genome.fa")
 
-if 'all' in tools or 'bwa-mem2' in tools:
+if "all" in tools or "bwa-mem2" in tools:
     targets.append(os.path.join(outdir, "BWA-MEM2Index/genome.fa.bwt.2bit.64"))
-    organismDictionary['bwa_mem2_index'] = os.path.join(outdir, "BWA-MEM2Index/genome.fa")
+    organismDictionary["bwa_mem2_index"] = os.path.join(
+        outdir, "BWA-MEM2Index/genome.fa"
+    )
 
-if 'all' in tools or 'bwameth' in tools:
+if "all" in tools or "bwameth" in tools:
     targets.append(os.path.join(outdir, "BWAmethIndex/genome.fa.bwameth.c2t.sa"))
-    organismDictionary['bwameth_index'] = os.path.join(outdir, "BWAmethIndex/genome.fa")
+    organismDictionary["bwameth_index"] = os.path.join(outdir, "BWAmethIndex/genome.fa")
 
-if 'all' in tools or 'bwameth2' in tools:
-    targets.append(os.path.join(outdir, "BWAmeth2Index/genome.fa.bwameth.c2t.bwt.2bit.64"))
-    organismDictionary['bwameth2_index'] = os.path.join(outdir, "BWAmeth2Index/genome.fa")
+if "all" in tools or "bwameth2" in tools:
+    targets.append(
+        os.path.join(outdir, "BWAmeth2Index/genome.fa.bwameth.c2t.bwt.2bit.64")
+    )
+    organismDictionary["bwameth2_index"] = os.path.join(
+        outdir, "BWAmeth2Index/genome.fa"
+    )
 
 if blacklist:
     targets.append(os.path.join(outdir, "annotation/blacklist.bed"))
-    organismDictionary['blacklist_bed'] = os.path.join(outdir, "annotation/blacklist.bed")
+    organismDictionary["blacklist_bed"] = os.path.join(
+        outdir, "annotation/blacklist.bed"
+    )
 
 if spikeinBlacklist:
     targets.append(os.path.join(outdir, "annotation/spikein_blacklist.bed"))
-    organismDictionary['spikein_blacklist_bed'] = os.path.join(outdir, "annotation/spikein_blacklist.bed")
-    
+    organismDictionary["spikein_blacklist_bed"] = os.path.join(
+        outdir, "annotation/spikein_blacklist.bed"
+    )
+
 if tesmall:
     # Not directory(...): individual files inside TEsmall/ (hairpin.bed, TE.bed,
     # etc.) are each their own tracked rule output, and Snakemake disallows a
@@ -151,18 +197,20 @@ if tesmall:
     # (ChildIOException). create_tesmall's own output is a plain sentinel file.
     # Layout: TEsmall/genomes/<tesmallGenome>/{annotation,sequence}/... -- nested
     # under the build name (see createIndices.snakefile).
-    targets.append(os.path.join(outdir, "TEsmall", "genomes", tesmallGenome, ".tesmall_done"))
+    targets.append(
+        os.path.join(outdir, "TEsmall", "genomes", tesmallGenome, ".tesmall_done")
+    )
     # tesmall_db is the TEsmall root (--dbfolder), NOT the genomes/<build>
     # subdir -- TEsmall itself looks for a genomes/ dir inside --dbfolder.
-    organismDictionary['tesmall_db'] = os.path.join(outdir, "TEsmall")
-    organismDictionary['tesmall_genome'] = tesmallGenome
+    organismDictionary["tesmall_db"] = os.path.join(outdir, "TEsmall")
+    organismDictionary["tesmall_genome"] = tesmallGenome
 
 ignore = []
 if ignoreForNormalization:
     f = open(ignoreForNormalization)
     ignore = [line.strip() for line in f]
     f.close()
-    organismDictionary['ignoreForNormalization'] = " ".join(ignore)
+    organismDictionary["ignoreForNormalization"] = " ".join(ignore)
 
 if effectiveGenomeSize and effectiveGenomeSize > 0:
     os.makedirs(os.path.join(outdir, "genome_fasta"), exist_ok=True)
@@ -173,13 +221,18 @@ else:
     targets.append(os.path.join(outdir, "genome_fasta", "effectiveSize"))
 
 globals().update(organismDictionary)
+
+
 include: os.path.join(maindir, "shared", "rules", "createIndices.snakefile")
+
 
 ### execute before workflow starts #############################################
 ################################################################################
 onstart:
     if "verbose" in config and config["verbose"]:
-        print("--- Workflow parameters --------------------------------------------------------")
+        print(
+            "--- Workflow parameters --------------------------------------------------------"
+        )
         print("output directory: ", outdir)
         print("genome name: ", genome)
         print("genome URL/path: ", genomeURL)
@@ -190,37 +243,45 @@ onstart:
         print("ignore for normalization: ", " ".join(ignore))
         print("-" * 80, "\n")
 
-        print("--- Environment ----------------------------------------------------------------")
-        print("$TMPDIR: ",os.getenv('TMPDIR', ""))
-        print("$HOSTNAME: ",os.getenv('HOSTNAME', ""))
+        print(
+            "--- Environment ----------------------------------------------------------------"
+        )
+        print("$TMPDIR: ", os.getenv("TMPDIR", ""))
+        print("$HOSTNAME: ", os.getenv("HOSTNAME", ""))
         print("-" * 80, "\n")
 
     if toolsVersion:
         usedEnvs = [CONDA_SHARED_ENV, CONDA_CREATE_INDEX_ENV]
         cf.writeTools(usedEnvs, outdir, "createIndices", maindir)
 
+
 ### main rule ##################################################################
 ################################################################################
 rule all:
-    input: targets
+    input:
+        targets,
+
 
 ### execute after workflow finished ############################################
 ################################################################################
 onsuccess:
     f = open(os.path.join(outdir, "genome_fasta", "effectiveSize"))
-    organismDictionary['genome_size'] = int(float(f.read().strip()))
+    organismDictionary["genome_size"] = int(float(f.read().strip()))
     f.close()
     orgDir_yamlPath = os.path.join(maindir, organismsDir, f"{genome}.yaml")
     outDir_yamlPath = os.path.join(outdir, f"{genome}.yaml")
     try:
-        cf.write_configfile(orgDir_yamlPath, organismDictionary,trafo=None)
+        cf.write_configfile(orgDir_yamlPath, organismDictionary, trafo=None)
         print(f"{genome} yaml written to {orgDir_yamlPath}")
     except (PermissionError, FileNotFoundError) as e:
         print(f"Error writing in the organism dir {e}")
-    cf.write_configfile(outDir_yamlPath, organismDictionary,trafo=None)
+    cf.write_configfile(outDir_yamlPath, organismDictionary, trafo=None)
     print(f"{genome} yaml written to {outDir_yamlPath}")
     if "verbose" in config and config["verbose"]:
-        print("\n--- index creation workflow finished successfully! --------------------------------\n")
+        print(
+            "\n--- index creation workflow finished successfully! --------------------------------\n"
+        )
+
 
 onerror:
     print("\n !!! ERROR in index creation workflow! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
