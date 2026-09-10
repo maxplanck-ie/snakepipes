@@ -102,7 +102,7 @@ If you want to use the snakepipes_genericprofile, make sure to review the follow
  * conda-prefix: /path/to/prefix
  * conda-frontend: conda
 
-Additionaly, rule resources are defined in the pre-shipped profiles. 
+Additionally, rule resources are defined in the pre-shipped profiles. 
 In case you use your own you'd want to have these set in your profile as well.
 
 +++++++

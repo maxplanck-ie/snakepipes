@@ -69,7 +69,7 @@ table(full_res.filt$direction)
 
 ### Visualizing the results
 
-Deeptools matrices were computed for the filtered lists of merged regions showing different change directions and visualized as heatmaps with summary profiles. For this purpose, merged regions were all scaled to 1kb, and an extention of 0.2kb was added on each side.
+Deeptools matrices were computed for the filtered lists of merged regions showing different change directions and visualized as heatmaps with summary profiles. For this purpose, merged regions were all scaled to 1kb, and an extension of 0.2kb was added on each side.
 
 Heatmaps obtained using log2 ratio of ChIP signal over input were as follows:
 

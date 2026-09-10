@@ -40,7 +40,7 @@ if "allelic-whatshap" in mode:
 
 infiles = sorted(glob.glob(os.path.join(str(indir or ''), '*'+ext)))
 if infiles == []:
-    sys.exit("Error! Samples extnesion in {} are not {}. "
+    sys.exit("Error! Samples extension in {} are not {}. "
              "Please change the extensions to it or update the config.yaml file "
              "with your desired extension.".format(indir,ext))
 samples = cf.get_sample_names(infiles,ext,reads)
@@ -92,7 +92,7 @@ def check_if_spikein_genome(genome_index,spikeinExt):
             for line in ifile:
                 resl.append(re.search(spikeinExt, line))
         if any(resl):
-            warnings.warn("\n Spikein genome detected - at least one spikeIn chromosome found with extention " + spikeinExt + " .\n\n")
+            warnings.warn("\n Spikein genome detected - at least one spikeIn chromosome found with extension " + spikeinExt + " .\n\n")
             return True
         else:
             return False
@@ -127,5 +127,5 @@ if useSpikeInForNorm:
             k, v = next(iter(spikein_chr.items()))
             spikein_region = ":0:".join([str(k),str(v)])
     else:
-        print("\n useSpikeInForNorm was specified but no spikein genome was detected - no spikeIn chromosomes found with extention " + spikeinExt + " .\n\n")
+        print("\n useSpikeInForNorm was specified but no spikein genome was detected - no spikeIn chromosomes found with extension " + spikeinExt + " .\n\n")
         exit(1)

@@ -23,7 +23,7 @@ When running the ATACseq pipeline, please specify the output directory of DNAmap
 * **sampleSheet.tsv** (OPTIONAL) is only needed to test for differential binding.
 
 
-Alternatively, ATACseq workflow can be run with bam files as input. The folder containing the input bam files can be passed  to `--fromBAM` . Bam file extention can be specified with `--bamExt` . Working directory specified with `-d` will be used as output folder.
+Alternatively, ATACseq workflow can be run with bam files as input. The folder containing the input bam files can be passed  to `--fromBAM` . Bam file extension can be specified with `--bamExt` . Working directory specified with `-d` will be used as output folder.
 
 .. _diffOpenChrom:
 
@@ -185,8 +185,8 @@ For more information on the contents of the **CSAW_MACS2_sampleSheet** folder, s
 Where to find final bam files and biwgwigs
 ------------------------------------------
 
-Bam files with the extention filtered.bam are only filtered for PCR duplicates. The final bam files filtered additionally for fragment size and used as direct input to MACS2 are found in the short_bams folder with the exention ``.short.cleaned.bam``.
-Bigwig files calculated from these bam files are found under deepTools_ATAC/bamCompare with the extention ``.filtered.bw``.
+Bam files with the extension filtered.bam are only filtered for PCR duplicates. The final bam files filtered additionally for fragment size and used as direct input to MACS2 are found in the short_bams folder with the exention ``.short.cleaned.bam``.
+Bigwig files calculated from these bam files are found under deepTools_ATAC/bamCompare with the extension ``.filtered.bw``.
 
 
 Command line options

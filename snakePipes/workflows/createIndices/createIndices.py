@@ -14,9 +14,19 @@ import snakePipes.common_functions as cf
 import snakePipes.parserCommon as parserCommon
 
 
-def parse_args(defaults={"configFile": None, "clusterConfigFile": None,
-                         "maxJobs": 5, "snakemakeOptions": "",
-                         "tempDir": None, "verbose": False, "spikeinExt": None, "salmonIndexOptions": None, "eisaR_flank_length": None }):
+def parse_args(
+    defaults={
+        "configFile": None,
+        "clusterConfigFile": None,
+        "maxJobs": 5,
+        "snakemakeOptions": "",
+        "tempDir": None,
+        "verbose": False,
+        "spikeinExt": None,
+        "salmonIndexOptions": None,
+        "eisaR_flank_length": None,
+    },
+):
     """
     Parse arguments from the command line.
     """
@@ -27,75 +37,122 @@ def parse_args(defaults={"configFile": None, "clusterConfigFile": None,
         formatter_class=argparse.RawDescriptionHelpFormatter,
         description=textwrap.dedent(__description__),
         parents=[mainArgs],
-        add_help=False
+        add_help=False,
     )
 
-    parser.add_argument("genome", metavar="GENOME", help="The name to save this genome as. No spaces or special characters! Specifying an organism that already exists will cause the old information to be overwritten. See also the --userYAML option.")
+    parser.add_argument(
+        "genome",
+        metavar="GENOME",
+        help="The name to save this genome as. No spaces or special characters! Specifying an organism that already exists will cause the old information to be overwritten. See also the --userYAML option.",
+    )
 
     # Required arguments, which already exists as an argument group
-    required = [grp for grp in parser._action_groups if grp.title == 'Required Arguments'][0]
-    required.add_argument("--genomeURL",
-                          required=True,
-                          help="URL or local path to where the genome fasta file is located. The file may optionally be gzipped.")
+    required = [
+        grp for grp in parser._action_groups if grp.title == "Required Arguments"
+    ][0]
+    required.add_argument(
+        "--genomeURL",
+        required=True,
+        help="URL or local path to where the genome fasta file is located. The file may optionally be gzipped.",
+    )
 
-    required.add_argument("--gtfURL",
-                          help="URL or local path to where the genome annotation in GTF format is located. GFF is NOT supported. The file may optionally be gzipped. If this file is not specified, then RNAseq related tools will NOT be usable.")
+    required.add_argument(
+        "--gtfURL",
+        help="URL or local path to where the genome annotation in GTF format is located. GFF is NOT supported. The file may optionally be gzipped. If this file is not specified, then RNAseq related tools will NOT be usable.",
+    )
 
     # Workflow options
-    optional = parser.add_argument_group('Options')
+    optional = parser.add_argument_group("Options")
 
-    optional.add_argument("--spikeinGenomeURL",
-                          help="URL or local path to where the spikein genome fasta file is located. The file may optionally be gzipped.")
+    optional.add_argument(
+        "--spikeinGenomeURL",
+        help="URL or local path to where the spikein genome fasta file is located. The file may optionally be gzipped.",
+    )
 
-    optional.add_argument("--spikeinGtfURL",
-                          help="URL or local path to where the spikein genome annotation in GTF format is located. GFF is NOT supported. The file may optionally be gzipped.")
+    optional.add_argument(
+        "--spikeinGtfURL",
+        help="URL or local path to where the spikein genome annotation in GTF format is located. GFF is NOT supported. The file may optionally be gzipped.",
+    )
 
-    optional.add_argument("--spikeinExt",
-                          dest="spikeinExt",
-                          help="Extention of spikein chromosome names in the hybrid genome. (default: '%(default)s') .",
-                          default=defaults["spikeinExt"])
+    optional.add_argument(
+        "--spikeinExt",
+        dest="spikeinExt",
+        help="Extension of spikein chromosome names in the hybrid genome. (default: '%(default)s') .",
+        default=defaults["spikeinExt"],
+    )
 
-    optional.add_argument("--tools",
-                          help="Only produce indices for the following tools (by default, all indices will be created). The default is 'all'. 'none' will create everything except aligner indices.",
-                          default="all",
-                          nargs="+",
-                          choices=['all', 'bowtie2', 'hisat2', 'bwa', 'bwa-mem2', 'bwameth', 'bwameth2', 'salmon', 'star', 'none'])
+    optional.add_argument(
+        "--tools",
+        help="Only produce indices for the following tools (by default, all indices will be created). The default is 'all'. 'none' will create everything except aligner indices.",
+        default="all",
+        nargs="+",
+        choices=[
+            "all",
+            "bowtie2",
+            "hisat2",
+            "bwa",
+            "bwa-mem2",
+            "bwameth",
+            "bwameth2",
+            "salmon",
+            "star",
+            "none",
+        ],
+    )
 
-    optional.add_argument("--effectiveGenomeSize",
-                          type=int,
-                          help="The effective genome size. If you don't specify a value then the number of non-N bases will be used.")
+    optional.add_argument(
+        "--effectiveGenomeSize",
+        type=int,
+        help="The effective genome size. If you don't specify a value then the number of non-N bases will be used.",
+    )
 
-    optional.add_argument("--spikeinBlacklist",
-                          help="An optional URL or local path to a file to use to blacklist spikein organism regions (such as that provided by the ENCODE consortium).")
+    optional.add_argument(
+        "--spikeinBlacklist",
+        help="An optional URL or local path to a file to use to blacklist spikein organism regions (such as that provided by the ENCODE consortium).",
+    )
 
-    optional.add_argument("--blacklist",
-                          help="An optional URL or local path to a file to use to blacklist regions (such as that provided by the ENCODE consortium).")
+    optional.add_argument(
+        "--blacklist",
+        help="An optional URL or local path to a file to use to blacklist regions (such as that provided by the ENCODE consortium).",
+    )
 
-    optional.add_argument("--ignoreForNormalization",
-                          help="An optional file list, with one entry per line, the chromosomes to ignore during normalization. These are typically sex chromosomes, mitochondrial DNA, and unplaced contigs.")
+    optional.add_argument(
+        "--ignoreForNormalization",
+        help="An optional file list, with one entry per line, the chromosomes to ignore during normalization. These are typically sex chromosomes, mitochondrial DNA, and unplaced contigs.",
+    )
 
-    optional.add_argument("--rmskURL",
-                          help="URL or local path to where the repeat masker output file is located. This is only required if you plan to run the ncRNAseq workflow.")
+    optional.add_argument(
+        "--rmskURL",
+        help="URL or local path to where the repeat masker output file is located. This is only required if you plan to run the ncRNAseq workflow.",
+    )
 
-    optional.add_argument("--salmonIndexOptions",
-                          help="Options to pass to salmon for index creation.",
-                          default=defaults["salmonIndexOptions"])
+    optional.add_argument(
+        "--salmonIndexOptions",
+        help="Options to pass to salmon for index creation.",
+        default=defaults["salmonIndexOptions"],
+    )
 
-    optional.add_argument("--eisaR_flank_length",
-                          help="Length by which to extend intronic regions with eisaR.",
-                          default=defaults["eisaR_flank_length"])
+    optional.add_argument(
+        "--eisaR_flank_length",
+        help="Length by which to extend intronic regions with eisaR.",
+        default=defaults["eisaR_flank_length"],
+    )
 
-    optional.add_argument("--tesmall",
-                          action="store_true",
-                          help="Create TEsmall compatable genomes and annotation formats")
+    optional.add_argument(
+        "--tesmall",
+        action="store_true",
+        help="Create TEsmall compatible genomes and annotation formats",
+    )
 
-    optional.add_argument("--tesmallGenome",
-                          default=None,
-                          help="UCSC/Ensembl genome build to use for TEsmall's RepeatMasker/miRBase/piRNAdb "
-                               "lookups (e.g. mm10, hg38, mm39, dm6). Only used with --tesmall. Defaults to "
-                               "the GENOME argument, but GENOME is just a free-form label for naming the "
-                               "resulting organism YAML -- if it isn't itself a recognized build (e.g. you "
-                               "named it 'GRCm38_release93'), set this explicitly.")
+    optional.add_argument(
+        "--tesmallGenome",
+        default=None,
+        help="UCSC/Ensembl genome build to use for TEsmall's RepeatMasker/miRBase/piRNAdb "
+        "lookups (e.g. mm10, hg38, mm39, dm6). Only used with --tesmall. Defaults to "
+        "the GENOME argument, but GENOME is just a free-form label for naming the "
+        "resulting organism YAML -- if it isn't itself a recognized build (e.g. you "
+        "named it 'GRCm38_release93'), set this explicitly.",
+    )
 
     return parser
 
@@ -114,41 +171,47 @@ def main():
     # Common arguments
     cf.checkCommonArguments(args, baseDir, outDir=True, createIndices=True)
 
-
     ### Workflow-specific arguments
     if args.ignoreForNormalization:
         args.ignoreForNormalization = os.path.abspath(args.ignoreForNormalization)
         if not os.path.exists(args.ignoreForNormalization):
-            sys.exit("The file specified by `--ignoreForNormalization` does not exist!\n")
+            sys.exit(
+                "The file specified by `--ignoreForNormalization` does not exist!\n"
+            )
     if args.blacklist:
         if os.path.exists(args.blacklist):
             args.blacklist = os.path.abspath(args.blacklist)
 
     if args.tesmall:
         if not args.gtfURL:
-            sys.exit("--tesmall also needs --gtfURL: it builds exon/intron/structural-RNA "
-                      "annotation from the GTF, so there's nothing to build without one.\n")
+            sys.exit(
+                "--tesmall also needs --gtfURL: it builds exon/intron/structural-RNA "
+                "annotation from the GTF, so there's nothing to build without one.\n"
+            )
         if not args.tesmallGenome:
             args.tesmallGenome = args.genome
         sys.path.insert(0, os.path.join(baseDir, "shared", "tools", "smallrna"))
         from common import normalize_genome
+
         try:
             normalize_genome(args.tesmallGenome)
         except RuntimeError:
-            sys.exit(f"--tesmall needs a recognized genome build to look up RepeatMasker/miRBase/piRNAdb "
-                      f"data for -- '{args.tesmallGenome}' isn't one. Pass a supported build (e.g. mm10, "
-                      f"hg38, mm39, dm6) via --tesmallGenome.\n")
+            sys.exit(
+                f"--tesmall needs a recognized genome build to look up RepeatMasker/miRBase/piRNAdb "
+                f"data for -- '{args.tesmallGenome}' isn't one. Pass a supported build (e.g. mm10, "
+                f"hg38, mm39, dm6) via --tesmallGenome.\n"
+            )
     ###
 
     # Handle YAML and log files
     snakemake_cmd = cf.commonYAMLandLogs(baseDir, workflowDir, defaults, args, __file__)
     logfile_name = cf.logAndExport(args, os.path.basename(__file__))
 
-        # Run everything
+    # Run everything
     cf.runAndCleanup(args, snakemake_cmd, logfile_name)
 
-    #CreateDAG
-    cf.plot_DAG(args,snakemake_cmd, __file__,defaults)
+    # CreateDAG
+    cf.plot_DAG(args, snakemake_cmd, __file__, defaults)
 
 
 if __name__ == "__main__":

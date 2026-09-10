@@ -197,7 +197,7 @@ The following output structure will be produced when running in Alevin mode::
 Understanding the outputs: mode STARsolo
 ----------------------------------------
 
-- **Main result:** output folders with 10x-format count matrices can be found in sample subfolders under ``STARsolo``. The ouput consists of three files: barcodes.tsv, features.tsv, matrix.mtx. Their gzipped versions are stored in the same folder. Seurat objects from merged samples are available in the ``Seurat`` folder.
+- **Main result:** output folders with 10x-format count matrices can be found in sample subfolders under ``STARsolo``. The output consists of three files: barcodes.tsv, features.tsv, matrix.mtx. Their gzipped versions are stored in the same folder. Seurat objects from merged samples are available in the ``Seurat`` folder.
 
 - Corresponding annotation files are: ``Annotation/genes.filtered.bed`` and ``Annotation/genes.filtered.gtf``, respectively.
 
@@ -209,7 +209,7 @@ Understanding the outputs: mode STARsolo
 Understanding the outputs: mode Alevin
 --------------------------------------
 
-- **Main result:** output folders containing the raw and boostrapped count matrices are found under the sample subfolders under ``Alevin``. The sample specific Alevin folders contain the matrices, as well as column data (barcodes) and row data (genes). Alevin spliced/unspliced counts for RNA velocity are stored as alevin matrices in the sample subfolders under ``AlevinForVelocity`` and as "SingleCellExperiment" class R objects under ``SingleCellExperiment``.
+- **Main result:** output folders containing the raw and bootstrapped count matrices are found under the sample subfolders under ``Alevin``. The sample specific Alevin folders contain the matrices, as well as column data (barcodes) and row data (genes). Alevin spliced/unspliced counts for RNA velocity are stored as alevin matrices in the sample subfolders under ``AlevinForVelocity`` and as "SingleCellExperiment" class R objects under ``SingleCellExperiment``.
 
 - Corresponding annotation files are: ``Annotation/genes.filtered.bed`` and ``Annotation/genes.filtered.gtf``, respectively.
 

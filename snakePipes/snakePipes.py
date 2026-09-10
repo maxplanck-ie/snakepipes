@@ -12,6 +12,7 @@ import snakePipes.common_functions as cof
 from importlib.metadata import version
 from pathlib import Path
 
+
 def parse_arguments():
     parser = argparse.ArgumentParser(
         description="Setup and information script for snakePipes",
@@ -20,13 +21,11 @@ def parse_arguments():
 
     subparsers = parser.add_subparsers(title="Commands", dest="command")
 
-    subparsers.add_parser(
-        "info", help="Print the location of the various yaml files"
-    )
+    subparsers.add_parser("info", help="Print the location of the various yaml files")
 
     createEnvsParser = subparsers.add_parser(
         "createEnvs",
-        help="Create or update conda enviroments according to the "
+        help="Create or update conda environments according to the "
         "workflow-specific yaml files. Note that changing the snakemakeOptions: "
         "option will result in ALL conda environments being recreated.",
     )
@@ -106,7 +105,7 @@ def parse_arguments():
     configParser.add_argument(
         "--snakemakeProfile",
         help="Path to custom snakemake profile file.",
-        default=defaults["snakemakeProfile"]
+        default=defaults["snakemakeProfile"],
     )
 
     configParser.add_argument(
@@ -189,20 +188,24 @@ def info():
     """
     Print the locations of EVERY yaml file. Break these up a bit so it's clear what they actually belong to. Print path to tempDir and check that it exists.
     """
-    print(25*"-" + " Info " + 25*"-" + "\n")
+    print(25 * "-" + " Info " + 25 * "-" + "\n")
     baseDir = os.path.dirname(snakePipes.__file__)
     cfg = cof.load_configfile(
         os.path.join(baseDir, "shared", "defaults.yaml"), False, "defaults"
     )
 
     # defaults.yaml under shared
-    print(f"The global configuration file is:\n    {Path(baseDir) / 'shared' / 'defaults.yaml'}")
+    print(
+        f"The global configuration file is:\n    {Path(baseDir) / 'shared' / 'defaults.yaml'}"
+    )
 
     # tempDir
     tempDir = cfg["tempDir"]
     print(f"    --> tempDir in the global configuration = {tempDir}")
     snakemakeProfile = cfg["snakemakeProfile"]
-    print(f"    --> The snakemake profile used =  {cof.resolveSnakemakeProfile(snakemakeProfile, baseDir)}\n")
+    print(
+        f"    --> The snakemake profile used =  {cof.resolveSnakemakeProfile(snakemakeProfile, baseDir)}\n"
+    )
 
     # Organism yaml files
     print("Organism YAML files:")
@@ -213,8 +216,6 @@ def info():
         print("    {}".format(f))
 
 
-
-
 def envInfo():
     """
     For each environment yaml file print where its conda env is actually located
@@ -222,21 +223,21 @@ def envInfo():
     baseDir = os.path.dirname(snakePipes.__file__)
 
     f = open(os.path.join(baseDir, "shared/defaults.yaml"))
-    #cf = yaml.load(f, Loader=yaml.FullLoader)
-    yaml=YAML(typ='safe')
+    # cf = yaml.load(f, Loader=yaml.FullLoader)
+    yaml = YAML(typ="safe")
     cf = yaml.load(f)
     f.close()
 
     # Properly resolve the snakemake profile path
-    profilePath = cof.resolveSnakemakeProfile(cf['snakemakeProfile'], baseDir)
+    profilePath = cof.resolveSnakemakeProfile(cf["snakemakeProfile"], baseDir)
 
     # Find out condaEnvDir from snakemake profile
-    f = open(profilePath / 'config.yaml')
-    #_p = yaml.load(f, Loader=yaml.FullLoader)
+    f = open(profilePath / "config.yaml")
+    # _p = yaml.load(f, Loader=yaml.FullLoader)
     _p = yaml.load(f)
     f.close()
-    if 'conda-prefix' in _p:
-        condaEnvDir = _p['conda-prefix'].replace("$USER", os.environ.get("USER"))
+    if "conda-prefix" in _p:
+        condaEnvDir = _p["conda-prefix"].replace("$USER", os.environ.get("USER"))
     else:
         condaEnvDir = detectCondaDir()
 
@@ -276,26 +277,26 @@ def createCondaEnvs(args):
     """
     Create all of the conda environments
     """
-    print(25*"-" + " createEnvs " + 25*"-" + "\n")
+    print(25 * "-" + " createEnvs " + 25 * "-" + "\n")
 
     baseDir = os.path.dirname(snakePipes.__file__)
 
     f = open(os.path.join(baseDir, "shared/defaults.yaml"))
-    #cf = yaml.load(f, Loader=yaml.FullLoader)
-    yaml=YAML(typ='safe')
+    # cf = yaml.load(f, Loader=yaml.FullLoader)
+    yaml = YAML(typ="safe")
     cf = yaml.load(f)
     f.close()
     # Properly resolve the snakemake profile path
-    profilePath = cof.resolveSnakemakeProfile(cf['snakemakeProfile'], baseDir)
+    profilePath = cof.resolveSnakemakeProfile(cf["snakemakeProfile"], baseDir)
 
     # Find out condaEnvDir from snakemake profile
-    f = open(profilePath / 'config.yaml')
-    #_p = yaml.load(f, Loader=yaml.FullLoader)
+    f = open(profilePath / "config.yaml")
+    # _p = yaml.load(f, Loader=yaml.FullLoader)
     _p = yaml.load(f)
     f.close()
-    if 'conda-prefix' in _p:
-        # For now $USER can be set in this path, resolve this explicitely.
-        condaEnvDir = _p['conda-prefix'].replace("$USER", os.environ.get("USER"))
+    if "conda-prefix" in _p:
+        # For now $USER can be set in this path, resolve this explicitly.
+        condaEnvDir = _p["conda-prefix"].replace("$USER", os.environ.get("USER"))
         _prefsource = f"Snakemakeprofile: {profilePath.name}"
     else:
         # no condaEnvDir set in profile, thus assume we can detect it
@@ -303,22 +304,22 @@ def createCondaEnvs(args):
         _prefsource = f"Environment: $CONDA_PREFIX = {os.environ.get('CONDA_PREFIX')}"
 
     # Remove trailing slashes as they screw up the hash calculation
-    if condaEnvDir[-1] == '/':
+    if condaEnvDir[-1] == "/":
         condaEnvDir = condaEnvDir[:-1]
 
     print(f"profile used: {profilePath}")
     print(f"CondaEnvDir detected as: {condaEnvDir}, from {_prefsource}\n")
 
     # if mamba is not installed, conda-frontend should be set
-    if not shutil.which('mamba') and 'conda-frontend' not in _p:
+    if not shutil.which("mamba") and "conda-frontend" not in _p:
         print(
             f"WARNING: No mamba detected in your path and conda-frontend not set. Set 'conda-fronted: conda' in {profilePath.name}"
         )
-    if 'use-conda' not in _p:
+    if "use-conda" not in _p:
         print(
             f"WARNING: Your profile ({profilePath.name}) should have 'use-conda: True' !"
         )
-    if 'conda-prefix' not in _p:
+    if "conda-prefix" not in _p:
         print(
             f"WARNING: Your profile ({profilePath.name}) does not have 'conda-prefix' set. Environments will go in your default envs folder."
         )
@@ -343,7 +344,7 @@ def createCondaEnvs(args):
             "conda",
             "env",
             "create",
-            '-q',
+            "-q",
             "--file",
             os.path.join(baseDir, "shared/rules", env),
         ]
@@ -352,7 +353,9 @@ def createCondaEnvs(args):
         # Don't actually create the env if either --info is set
         if not args.info:
             if not os.path.exists(os.path.join(condaEnvDir, h)):
-                print(f"Creating environment ({envNum}/{numberEnvs}) from {env} with hash {h}")
+                print(
+                    f"Creating environment ({envNum}/{numberEnvs}) from {env} with hash {h}"
+                )
                 print(f"Actual command: {' '.join(cmd)}")
                 try:
                     os.makedirs(os.path.join(condaEnvDir, h), exist_ok=True)
@@ -362,16 +365,23 @@ def createCondaEnvs(args):
                     shutil.rmtree(os.path.join(condaEnvDir, h), ignore_errors=False)
                     sys.exit("There was an error when creating the environments!\n")
             else:
-                print(f"Environment ({envNum}/{numberEnvs}) from {env} with hash {h} already exists!")
+                print(
+                    f"Environment ({envNum}/{numberEnvs}) from {env} with hash {h} already exists!"
+                )
         else:
             if not os.path.exists(os.path.join(condaEnvDir, h)):
-                print(f"Would create environment ({envNum}/{numberEnvs}) from {env} with hash {h}")
+                print(
+                    f"Would create environment ({envNum}/{numberEnvs}) from {env} with hash {h}"
+                )
             else:
-                print(f"Environment ({envNum}/{numberEnvs}) from {env} with hash {h} already exists!")
+                print(
+                    f"Environment ({envNum}/{numberEnvs}) from {env} with hash {h} already exists!"
+                )
 
         # Ignore site-packages
         if args.noSitePackages and not args.info:
             fixSitePy(os.path.join(condaEnvDir, h))
+
 
 def detectCondaDir():
     "Detect the default conda folder."
@@ -380,7 +390,7 @@ def detectCondaDir():
         condaDir = os.path.dirname(condaDir)
     else:
         condaDir = os.path.join(condaDir, "envs")
-    return(condaDir)
+    return condaDir
 
 
 def updateConfig(args):
@@ -420,22 +430,25 @@ def updateConfig(args):
         else:
             sys.exit("Config file not found\n")
     updatedDict = cof.merge_dicts(currentDict, d)
-    cof.write_configfile(os.path.join(baseDir, "shared", "defaults.yaml"), updatedDict, trafo=None)
+    cof.write_configfile(
+        os.path.join(baseDir, "shared", "defaults.yaml"), updatedDict, trafo=None
+    )
 
-    #update conda-prefix in snakemakeProfile
+    # update conda-prefix in snakemakeProfile
     if args.condaEnvDir:
-        profilePath = cof.resolveSnakemakeProfile(d['snakemakeProfile'], baseDir)
-        f = open(profilePath / 'config.yaml')
-        #pf = yaml.load(f, Loader=yaml.FullLoader)
-        yaml=YAML(typ='safe')
+        profilePath = cof.resolveSnakemakeProfile(d["snakemakeProfile"], baseDir)
+        f = open(profilePath / "config.yaml")
+        # pf = yaml.load(f, Loader=yaml.FullLoader)
+        yaml = YAML(typ="safe")
         pf = yaml.load(f)
-        pf['conda-prefix'] = args.condaEnvDir
+        pf["conda-prefix"] = args.condaEnvDir
         cof.write_configfile(os.path.join(profilePath, "config.yaml"), pf, trafo=None)
         f.close()
 
     cof.load_configfile(
         os.path.join(baseDir, "shared", "defaults.yaml"), True, "Final Updated Config"
     )
+
 
 def main():
     if len(sys.argv) == 1:

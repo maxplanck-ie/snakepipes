@@ -12,7 +12,7 @@ part=['host','spikein']
 if pairedEnd:
     rule writeFragmentSize:
         input: "split_deepTools_qc/bamPEFragmentSize/host.fragmentSize.metric.tsv"
-        output: "MACS2/fragmentSize.metrix.tsv"
+        output: "MACS2/fragmentSize.metric.tsv"
 
 
     rule MACS2:

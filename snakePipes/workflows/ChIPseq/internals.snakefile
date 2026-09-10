@@ -273,7 +273,7 @@ def check_if_spikein_genome(genome_index,spikeinExt):
             for line in ifile:
                 resl.append(re.search(spikeinExt, line))
         if any(resl):
-            warnings.warn("\n Spikein genome detected - at least one spikeIn chromosome found with extention " + spikeinExt + " .\n\n")
+            warnings.warn("\n Spikein genome detected - at least one spikeIn chromosome found with extension " + spikeinExt + " .\n\n")
             return True
         else:
             return False
@@ -308,7 +308,7 @@ if useSpikeInForNorm:
             k, v = next(iter(spikein_chr.items()))
             spikein_region = ":0:".join([str(k),str(v)])
     else:
-        print("\n No spikein genome detected - no spikeIn chromosomes found with extention " + spikeinExt + " .\n\n")
+        print("\n No spikein genome detected - no spikeIn chromosomes found with extension " + spikeinExt + " .\n\n")
         exit(1)
 
 if externalBed:

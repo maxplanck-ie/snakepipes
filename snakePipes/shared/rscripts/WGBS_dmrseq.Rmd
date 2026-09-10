@@ -66,7 +66,7 @@ write.table(regions, file=odmrs, quote=FALSE, sep="\t", row.names=FALSE)
 save.image(file=ordata)
 ```
 
-Using a minimum methylation difference of `r minMethDiff` and FDR of `r FDR` there are a total of `r length(regions)` DMRs. The distribution of the methylation changes at these is shown below. Note that assymmetric changes in the distribution indicate global shifts in methylation between the groups.
+Using a minimum methylation difference of `r minMethDiff` and FDR of `r FDR` there are a total of `r length(regions)` DMRs. The distribution of the methylation changes at these is shown below. Note that asymmetric changes in the distribution indicate global shifts in methylation between the groups.
 
 ```{r warning=FALSE, message=FALSE}
 if (length(regions) > 0) {

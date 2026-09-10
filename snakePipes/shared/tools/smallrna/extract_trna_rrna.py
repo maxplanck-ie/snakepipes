@@ -41,7 +41,9 @@ def fix_trna_headers(in_fa, out_fa):
         out.writelines(fixed_lines)
 
 
-def extract_named_sequences_from_bed(genome_fa, source_bed, pattern, out_fa, rename_trna=False):
+def extract_named_sequences_from_bed(
+    genome_fa, source_bed, pattern, out_fa, rename_trna=False
+):
     """Extract intervals whose BED column-4 name matches pattern."""
     tmp_bed = out_fa + ".tmp.bed"
     selected = 0
@@ -63,7 +65,20 @@ def extract_named_sequences_from_bed(genome_fa, source_bed, pattern, out_fa, ren
         log(f"No matching intervals for {out_fa}; wrote empty FASTA")
         return 0
 
-    run(["bedtools", "getfasta", "-s", "-name", "-fi", genome_fa, "-bed", tmp_bed, "-fo", out_fa])
+    run(
+        [
+            "bedtools",
+            "getfasta",
+            "-s",
+            "-name",
+            "-fi",
+            genome_fa,
+            "-bed",
+            tmp_bed,
+            "-fo",
+            out_fa,
+        ]
+    )
 
     if rename_trna:
         fixed_lines = []

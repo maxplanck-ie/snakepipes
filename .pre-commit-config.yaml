@@ -5,10 +5,10 @@ ci:
   autoupdate_branch: "master"
   autoupdate_commit_msg: "pre-commit.ci autoupdate"
   autoupdate_schedule: monthly
-  # Hooks below are new to this repo; skipping them in CI for now so this
-  # doesn't trigger a repo-wide autofix/reformat. Lift the skips once a
-  # dedicated formatting pass has been done.
-  skip: [trailing-whitespace, end-of-file-fixer, codespell, ruff-check, ruff-format, zizmor, snakefmt]
+  # zizmor needs a workflow permissions/pinning pass; snakefmt crashes on
+  # snakePipes/workflows/preprocessing/Snakefile (two include: statements
+  # under one if: block confuse its block parser). Skipping both until fixed.
+  skip: [zizmor, snakefmt]
   submodules: false
 
 repos:
@@ -25,7 +25,7 @@ repos:
     rev: v2.4.1
     hooks:
       - id: codespell
-        args: [--write-changes]
+        args: [--write-changes, --ignore-words=.codespell-ignore.txt]
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.12.7

@@ -6,7 +6,7 @@
 bam=$1		## read mapping for all cells in one library 
 gtf=$2		## gene annotation
 bc_file=$3		## celSeq cell barcode file
-sample_name=$4	## sample name, used for featureCounts as ouput name, NOT a directory or path
+sample_name=$4	## sample name, used for featureCounts as output name, NOT a directory or path
 lib_type=$5 ## 1 for CelSeq2 
 tmp=$6	    ## used as output dir for featureCounts due to -R, should be "thread" safe, best created before with mktemp 
 threads=$7	## used threads for for featureCounts
@@ -49,7 +49,7 @@ if ($4 in MAP) print $0,MAP[$4]; else print $0,"NA","NA"; # MAP[$4] contains tab
 ## SN7001180:281:C99CMACXX:2:1211:18877:23349:SC:GACAAC:37:UMI:TGTCCG:35:27:38	Unassigned_Ambiguity	*	Number_Of_Overlapped_Genes=2	NA	NA
 ##
 ## now we can count by getting the cell barcode and UMI from readname
-## put all in big matrix in awk and write to stdout to caputure this later
+## put all in big matrix in awk and write to stdout to capture this later
 ## summary stats are printed to stderr
 ##
 awk -v map_f=$bc_file -v sample=$sample_name ' \

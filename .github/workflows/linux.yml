@@ -46,12 +46,9 @@ jobs:
     - uses: actions/setup-python@v5
       with:
         python-version: 3.11
-    - name: Install snakePipes
-      run: |
-        pip install .[actions]
-    - name: ruff
-      run: |
-        ruff check .
+    - uses: pre-commit/action@v3.0.1
+      env:
+        SKIP: zizmor,snakefmt
   CI:
     needs: pip
     runs-on: ubuntu-latest

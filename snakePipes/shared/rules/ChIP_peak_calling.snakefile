@@ -10,7 +10,7 @@ import subprocess
 if pairedEnd:
     rule writeFragmentSize:
         input: "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv"
-        output: "MACS2/fragmentSize.metrix.tsv"
+        output: "MACS2/fragmentSize.metric.tsv"
 
 
     rule MACS2:

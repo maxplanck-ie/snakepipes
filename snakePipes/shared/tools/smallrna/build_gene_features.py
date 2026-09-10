@@ -5,13 +5,19 @@ import shutil
 from collections import defaultdict
 
 from common import (
-    log, write_bed, collapse_bed,
-    parse_gtf_attributes, sanitize_repeat_name,
-    STRUCTURAL_RNA_FROM_GTF, STRUCTURAL_RNA_FROM_RMSK, TE_CLASSES,
+    log,
+    write_bed,
+    collapse_bed,
+    parse_gtf_attributes,
+    sanitize_repeat_name,
+    STRUCTURAL_RNA_FROM_GTF,
+    STRUCTURAL_RNA_FROM_RMSK,
+    TE_CLASSES,
 )
 
 
 # --- exon / intron ---
+
 
 def read_exons(gtf):
     """Read exon entries -> (flat BED6 records, transcript_id -> exon list)."""
@@ -97,6 +103,7 @@ def make_intron_bed(gtf, outfile):
 
 # --- structural RNA ---
 
+
 def extract_structural_rna_from_gtf(gtf, outfile):
     """rRNA/tRNA/snRNA transcript-level entries from an Ensembl GTF.
     Name: sncRNA:<class>:<gene_id>:<transcript_id>_copy<N>."""
@@ -119,8 +126,10 @@ def extract_structural_rna_from_gtf(gtf, outfile):
                 continue
 
             biotypes = [
-                attrs.get("gene_type"), attrs.get("gene_biotype"),
-                attrs.get("transcript_type"), attrs.get("transcript_biotype"),
+                attrs.get("gene_type"),
+                attrs.get("gene_biotype"),
+                attrs.get("transcript_type"),
+                attrs.get("transcript_biotype"),
             ]
             rna_class = None
             for bt in biotypes:
@@ -208,9 +217,9 @@ def extract_te_from_rmsk(rmsk_txt, outfile, te_classes=TE_CLASSES):
             start = int(fields[6])
             end = int(fields[7])
             strand = fields[9]
-            rep_name = sanitize_repeat_name(fields[10])      # subfamily
-            rep_class = sanitize_repeat_name(fields[11])      # class
-            rep_family = sanitize_repeat_name(fields[12])     # family
+            rep_name = sanitize_repeat_name(fields[10])  # subfamily
+            rep_class = sanitize_repeat_name(fields[11])  # class
+            rep_family = sanitize_repeat_name(fields[12])  # family
 
             if strand == "C":
                 strand = "-"
