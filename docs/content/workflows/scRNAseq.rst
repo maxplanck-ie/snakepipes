@@ -27,7 +27,7 @@ Mode "Alevin" involves:
 2. Mapping and generation of a readcount matrix.
 3. Estimation of uncertainty of gene counts using bootstrap method implemented in Salmon Alevin.
 4. General QC of the Alevin run using the AlevinQC R package.
-5. Quantification of "spliced" and "unspliced" read counts in each cell with Alevin - unless this has been disabled with --skipVelocyto . This analysis is derived from the code underlying Soneson et al.  2020, bioRxiv https://doi.org/10.1101/2020.03.13.990069. 
+5. Quantification of "spliced" and "unspliced" read counts in each cell with Alevin - unless this has been disabled with --skipVelocyto . This analysis is derived from the code underlying Soneson et al.  2020, bioRxiv https://doi.org/10.1101/2020.03.13.990069.
 
 .. image:: ../images/scRNAseq_pipeline.png
 
@@ -35,7 +35,7 @@ Mode "Alevin" involves:
 Mode STARsolo
 -------------
 
-With current settings, this mode should work with any UMI-based protocol that stores UMI and CB in read 1, each in one chunk. 
+With current settings, this mode should work with any UMI-based protocol that stores UMI and CB in read 1, each in one chunk.
 The mode comes with four presets that can be passed to the ' --myKit ' argument: CellSeq192, CellSeq384, 10xV2, 10xV3. Choosing a preset will select a corresponding barcode whitelist file as well as cell barcode and umi length and positions to be used. Choosing the Custom preset allows the user to run the workflow providing own barcode whitelist and CB/UMI positions and lengths. CellSeq384 is the current default preset.
 
 In this mode, STARsolo is used to map, UMI-deduplicate and count reads. Importantly, read 1 is expected to carry the UMI and the cell barcode, while read 2 is expected to carry the cDNA sequence. Default positions of UMI and CB in read 1 are specified, as well as their respective lengths. If your setup is different from the available presets, change it via the --STARsoloCoords commandline argument or in the defaults.yaml dictionary, in addition to providing --myKit Custom argument.
@@ -100,7 +100,7 @@ The default configuration file is listed below and can be found in ``snakePipes/
     ##mode Alevin options
     alevinLibraryType: "ISR"
     prepProtocol: "chromiumV3"
-    expectCells: 
+    expectCells:
     readLengthFrx: 0.2
     #generic options
     libraryType: 1

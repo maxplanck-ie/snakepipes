@@ -105,7 +105,7 @@ All of the snakePipes workflows that begin with a FASTQ file, perform the same p
 * **--bwBinSize**: This option is available for most workflows, and refers to the bin size used to create the coverage files. `BigWig files <https://genome.ucsc.edu/goldenpath/help/bigWig.html>`__ are created by most workflows in order to allow downstream analysis and visualization of outputs. This argument controls the size of the bins in which the genome is divided for creating this file. The default is sufficient for most analysis.
 
 * **Temporary directory/files**: Some tools need additional space during runtime (eg. ``samtools sort -T [DIR] ...``). SnakePipes uses the core tool ``mktemp`` to create temporary directories in some rules. On Linux-based systems the global env variabale ``$TMPDIR`` is honored.
-  On Mac OS and if $TMPDIR is empty, we fallback to `/tmp/` as the parent temporary directory. For performance reasons, it is recommended that the $TMPDIR points to a local drive (and not eg. an NFS share). Please make sure there is enough space! 
+  On Mac OS and if $TMPDIR is empty, we fallback to `/tmp/` as the parent temporary directory. For performance reasons, it is recommended that the $TMPDIR points to a local drive (and not eg. an NFS share). Please make sure there is enough space!
 
 Logging of outputs
 ~~~~~~~~~~~~~~~~~~~

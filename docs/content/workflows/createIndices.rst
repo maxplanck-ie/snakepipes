@@ -91,7 +91,7 @@ ex. piRNAdb's mouse annotation is pinned to ``mm10``: preparing an ``mm39`` geno
 automatic ``mm10`` -> ``mm39`` liftOver of the piRNA annotation, while its miRNA/hairpin annotation
 (miRBase) may already ship against ``mm39`` and require no lift at all. Preparing an ``mm10`` genome,
 conversely, needs no liftOver for piRNAdb but may still need one for miRBase, depending on which
-build miRBase currently publishes. 
+build miRBase currently publishes.
 
 When ``--tesmall`` is used, the DAG gains the following branch (shown here for a run with
 ``--tesmall --tesmallGenome mm10``; the ``createGenomeFasta``/``downloadGTF`` side of the DAG is

@@ -55,14 +55,14 @@ def justify_text(text, line_width):
     words = text.split( )
     lines = textwrap.wrap(text, width=line_width)
     justified_lines = []
-    
+
     for line in lines:
         words_in_line = line.split()
         if len(words_in_line) > 1:
             spaces_needed = line_width - sum(len(w) for w in words_in_line)
             space_between = spaces_needed // (len(words_in_line) - 1)
             extra_spaces = spaces_needed % (len(words_in_line) - 1)
-            
+
             justified_line = ""
             for i, word in enumerate(words_in_line):
                 justified_line += word
@@ -71,14 +71,14 @@ def justify_text(text, line_width):
             justified_lines.append(justified_line)
         else:
             justified_lines.append(line)
-    
+
     return "\n".join(justified_lines)
 
 def Plotting(OutFile):
     countFile = os.path.join(outdir, 'TEsmallOut', 'count_summary.txt')
     df = pd.read_csv(countFile, sep='\t')
     samples = df.columns[2:]
-    
+
 
     result_list = []
 
@@ -89,7 +89,7 @@ def Plotting(OutFile):
             'exon': df[df['ftype'] == 'exon'][sample].sum(),
             'hairpin': df[df['ftype'] == 'hairpin'][sample].sum(),
             'intron': df[df['ftype'] == 'intron'][sample].sum(),
-            'miRNA': df[df['ftype'] == 'miRNA'][sample].sum(), 
+            'miRNA': df[df['ftype'] == 'miRNA'][sample].sum(),
             'piRNA_cluster': df[df['ftype'] == 'piRNA_cluster'][sample].sum(),
             'sense_TE': df[df['ftype'] == 'sense_TE'][sample].sum(),
             'structural_RNA': df[df['ftype'] == 'structural_RNA'][sample].sum(),
@@ -109,10 +109,10 @@ def Plotting(OutFile):
 
     for index, value in enumerate(total):
         ax.text(index, 1.02, f'{value/1e6:.1f}M', ha='center', va='bottom')
-    
+
     x_labels = ax.get_xticklabels()
     wrapped_labels = [textwrap.fill(label.get_text(), width=15) for label in x_labels]
-    
+
     ax.set_xticklabels(wrapped_labels)
 
     ax.set_ylabel('Fraction', fontsize=14)
@@ -150,7 +150,7 @@ else:
             #"FASTQ_fastp/{sample}"+".fastq.gz",
             "FASTQ_fastp/{sample}fastp.json",
             "FASTQ_fastp/{sample}fastp.html"
-            
+
         benchmark:
             "FASTQ_fastp/.benchmark/fastp.{sample}.benchmark"
         threads: lambda wildcards: 8 if 8<max_thread else max_thread

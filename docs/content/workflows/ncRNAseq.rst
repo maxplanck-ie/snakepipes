@@ -76,7 +76,7 @@ There is a configuration file in ``snakePipes/workflows/ncRNAseq/defaults.yaml``
 
 Apart from the common workflow options (see :ref:`running_snakePipes`), the following parameters are useful to consider:
 
-* **aligner**: The only choice at the moment is `STAR <https://github.com/alexdobin/STAR>`__. 
+* **aligner**: The only choice at the moment is `STAR <https://github.com/alexdobin/STAR>`__.
 
 * **alignerOptions**: Options to pass on to your chosen aligner. Note that library type and junction definitions don't have to be passed to the aligners as options, as they are handled either automatically, or via other parameters.
 

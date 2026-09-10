@@ -12,9 +12,7 @@ repos:
     rev: v5.0.0
     hooks:
       - id: trailing-whitespace
-        types: [python]
       - id: end-of-file-fixer
-        types: [python]
       - id: check-merge-conflict
 
   - repo: https://github.com/codespell-project/codespell

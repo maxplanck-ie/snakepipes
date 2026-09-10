@@ -100,7 +100,7 @@ Average methylation values for candidate DMRs in each of the groups are plotted 
 
 ```{r echo=FALSE, warning=FALSE, message=FALSE}
 # Select the mean* columns, strip "mean" and make long
-d = as.data.frame(elementMetadata(gr,stringsAsFactor=FALSE)) %>% select(starts_with("mean", ignore.case=FALSE)) %>% 
+d = as.data.frame(elementMetadata(gr,stringsAsFactor=FALSE)) %>% select(starts_with("mean", ignore.case=FALSE)) %>%
   rename_all(funs(gsub("^mean_", "", .))) %>% gather("Group", "MeanMethylation")
 
 g = ggplot(d, aes(x=MeanMethylation, fill=Group, color=Group, group=Group)) + geom_density(alpha=0.3)

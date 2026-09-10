@@ -14,7 +14,7 @@ import sys
 
 ## set trimming related dirs correctly
 ## we trim only R2 with transferred barcode info under "FASTQ_barcoded"
-## only cutadapt is supported right now due to poly-A trimming 
+## only cutadapt is supported right now due to poly-A trimming
 
 if mode == "STARsolo":
     fastq_indir_trim = None
@@ -57,11 +57,10 @@ if mode == "STARsolo":
             print("Provided barcode whitelist file doesn't exist! Exit...\n")
             exit(1)
         STARsoloCoords = STARsoloCoords.split(',')
-  
+
 ## After barcode transfer to R2 we have only single end data / R2
 ## but we need to keep "reads" for rule fastq_barcode
 pairedEnd = False
 ## we swap read extensions as we continue in SE mode but with R2
 ##some rules use a hardcoded reads[0] for SE
 reads = reads[::-1]
-

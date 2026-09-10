@@ -134,7 +134,7 @@ if (! external_bed) {
     allpeaks<-lapply(allpeaks,function(X){seqlevels(X)<-all_levels
                                           return(X)})
     allpeaks <- Reduce(function(x,y) GenomicRanges::union(x,y), allpeaks)
-    
+
     } else {
         bed = read.delim(snakemake@input[['peaks']],header=FALSE)
         bed.gr = GRanges(seqnames = bed$V1, ranges = IRanges(start = bed$V2, end = bed$V3), name = bed$V4)
@@ -177,4 +177,3 @@ save(chip_object, chip_results, file = "DiffBinding_analysis.Rdata")
 sink("CSAW.session_info.txt")
 sessionInfo()
 sink()
-

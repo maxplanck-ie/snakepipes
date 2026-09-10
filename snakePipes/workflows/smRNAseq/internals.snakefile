@@ -48,5 +48,3 @@ if sampleSheet and not cf.check_replicates(sampleSheet):
 if not samples:
     print("\n  Error! NO samples found in dir "+str(indir or '')+"!!!\n\n")
     exit(1)
-
-

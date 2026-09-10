@@ -10,7 +10,7 @@ dependencies:
  - hisat2 = 2.2.1
  - star = 2.7.10b
 # - salmon = 1.10.1
- - r-base 
+ - r-base
  - r-wasabi
  - r-dplyr
  - r-ggplot2

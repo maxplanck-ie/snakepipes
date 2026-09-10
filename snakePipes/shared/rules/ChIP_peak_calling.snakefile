@@ -243,4 +243,3 @@ if not peakCaller == "histoneHMM" and not externalBed:
             "{}_chipqc/.benchmark/chipqc.benchmark".format(peakCaller)
         conda: CONDA_CHIPQC_ENV
         script: "../rscripts/chipqc.R"
-

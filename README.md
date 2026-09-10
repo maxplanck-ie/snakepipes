@@ -11,16 +11,16 @@ snakePipes are flexible and powerful workflows built using [snakemake](https://g
 
 ## Workflows
 
-- DNAmapping*  
-- ChIPseq*  
-- mRNAseq*  
-- ncRNAseq*  
-- ATACseq*  
-- scRNAseq  
-- HiC  
+- DNAmapping*
+- ChIPseq*
+- mRNAseq*
+- ncRNAseq*
+- ATACseq*
+- scRNAseq
+- HiC
 - makePairs*
 - smRNAseq
-- Whole Genome Bisulfite Seq/WGBS  
+- Whole Genome Bisulfite Seq/WGBS
 
 (* also available in allele-specific mode)
 
@@ -34,7 +34,7 @@ Afterwards you can create a snakePipes environment containing the installation b
 
 In case you'd like a development version, you can install snakePipes directly from github using pip:
 
- > git clone git@github.com:maxplanck-ie/snakepipes.git  
+ > git clone git@github.com:maxplanck-ie/snakepipes.git
  > cd snakepipes
  > pip install .
 

@@ -54,4 +54,3 @@ jobs:
         run: |
           conda config --set subdir osx-64
           snakePipes createEnvs --only ${{matrix.envs}}
-     

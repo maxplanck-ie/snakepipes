@@ -116,7 +116,7 @@ def multiqc_input_check(return_value):
         indir += " TEsmallOut deepTools_qc "
     elif pipeline == "hic":
         infiles.append(expand("HiC_matrices/QCplots/{sample}_QC/QC.log", sample = samples))
-        indir += " " + aligner + " " 
+        indir += " " + aligner + " "
         indir += " ".join(expand("HiC_matrices/QCplots/{sample}_QC ", sample = samples))
     elif pipeline == "scrnaseq":
         if trim:
