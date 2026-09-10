@@ -7,22 +7,22 @@ dir_in=$(readlink -m $dir_in)
 
 mkdir -p $dir_out/data
 
-if test -z "$(find $dir_in/ -maxdepth 1 -name '*.featureCounts_summary.txt')"; then 
+if test -z "$(find $dir_in/ -maxdepth 1 -name '*.featureCounts_summary.txt')"; then
 
-  for i in  $dir_in/*.{umis,reads}.txt; do 
+  for i in  $dir_in/*.{umis,reads}.txt; do
 #        type=$(echo $i | sed 's/.*\///' | sed 's/.*\.\(cout.\)\.csv$/\1/'); ## type = "coutc" or "coutb"
 #        sample=$(echo $i | sed 's/.*\///' | sed 's/\.cout.\.csv$//'); ## sample name without ending
         type=$(echo $i | sed 's/.*\///' | sed 's/.*\.\([^.]*\)\.txt$/\1/'); ## type = "coutc" or "coutb"
         sample=$(echo $i | sed 's/.*\///' | sed 's/\.[^.]*\.txt$//'); ## sample name without ending
 	echo $sample 1>&2;
 	cat $i | awk -v sample=$sample -v type=$type '{
-		if (NR==1) {cells = NF-1; next;}; 
+		if (NR==1) {cells = NF-1; next;};
 		for (i=2;i<=NF;i++) COUNTS[i-1]+=$i;
 	 }
  	END{
 		#match(sample,"([^[:space:]\\.]+)\\.([^[:space:]\\.]+).csv",name)
-		if (type~"reads") print "sample\tcell_idx\tREADS_UNIQFEAT"; 
-		else 	print "sample\tcell_idx\tUMI"; 	
+		if (type~"reads") print "sample\tcell_idx\tREADS_UNIQFEAT";
+		else 	print "sample\tcell_idx\tUMI";
 		for (i=1;i<=cells;i++) {
 			OFS="\t";print sample,i,COUNTS[i];
 		}
@@ -34,10 +34,10 @@ if test -z "$(find $dir_in/ -maxdepth 1 -name '*.featureCounts_summary.txt')"; t
 	echo "coutb:"$coutb
 	echo "sample:"$sample
   	paste $i $coutb | cut -f1-3,6 > $dir_out/data/$sample.cellsum;
-  done 
+  done
   rm $dir_out/data/*.{reads,umis}.cellsum;
 
-else 
+else
   for i in $dir_in/*.featureCounts_summary.txt; do
     out=$(echo $i | sed 's/.*\///' | sed 's/\.featureCounts_summary.txt//');
     cat $i | sed -n -e '/sample.cell_idx.READS/,/#LIB/{{/#LIB/d;p}}' > $dir_out/data/$out.cellsum;
@@ -46,12 +46,11 @@ else
 fi
 
 
-#for i in  $dir_in/*cout{b,c}.csv; do 
-# out=$(echo $i | sed 's/.*\///'); 
+#for i in  $dir_in/*cout{b,c}.csv; do
+# out=$(echo $i | sed 's/.*\///');
 # out2=$(echo $out | sed 's/\.csv$//');
 #	echo $out 1>&2;
 # cat $i | awk -v file=$out '{if (NR==1) {next;}; for (i=2;i<=NF;i++) COUNTS[i-1]+=$i;} \
 #  END{for (i=1;i<=192;i++){if (i<=96) sum1+=COUNTS[i];else sum2+=COUNTS[i];} if (sum1>sum2) offset=1; else offset=97; \
 #      for (i=offset;i<offset+96;i++) {OFS="\t";print file,i,COUNTS[i];sum+=COUNTS[i];}}' >$dir_out/data/$out.cellsum;
 #done
-

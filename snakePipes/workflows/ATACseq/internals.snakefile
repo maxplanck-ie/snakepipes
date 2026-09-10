@@ -64,7 +64,7 @@ def filter_dict(sampleSheet):
             if len(cols) - 1 == nCols:
                 nameCol += 1
         if not len(line.strip()) == 0:
-            names_sub.append(line.split('\t')[nameCol])      
+            names_sub.append(line.split('\t')[nameCol])
     f.close()
     output_dict = dict(zip(names_sub, [""]*len(names_sub)))
     return(output_dict)

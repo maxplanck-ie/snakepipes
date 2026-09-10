@@ -40,7 +40,7 @@ def parse_arguments():
         nargs="+",
         help="If specified, a space-separated list of environments to create. "
         "This should typically only be done for testing purposes. The "
-        "possible environments are: {}".format(cof.set_env_yamls().keys()),
+        f"possible environments are: {cof.set_env_yamls().keys()}",
     )
 
     createEnvsParser.add_argument(
@@ -213,7 +213,7 @@ def info():
     if not os.path.exists(orgDir):
         orgDir = os.path.join(baseDir, orgDir)
     for f in glob.glob(os.path.join(orgDir, "*.yaml")):
-        print("    {}".format(f))
+        print(f"    {f}")
 
 
 def envInfo():
@@ -256,7 +256,7 @@ def fixSitePy(envPath):
     """
     We would really like to prevent any snakePipes environment from using the user site packages.
     """
-    for fname in glob.glob("{}/lib/python*/site.py".format(envPath)):
+    for fname in glob.glob(f"{envPath}/lib/python*/site.py"):
         f = open(fname).read()
         lines = f.split("\n")
         lines = [

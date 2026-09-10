@@ -4,7 +4,7 @@ import pandas as pd
 # prevent wildcards from picking up directories
 wildcard_constraints: sample="[^(/)]+"
 
-# read in sampleSheet metadata to merge replicates for preprocess_cluster_pas 
+# read in sampleSheet metadata to merge replicates for preprocess_cluster_pas
 sample_metadata = pd.read_table(sampleSheet, index_col=None)
 
 # given a condition, return a list of all samples associated with it
@@ -25,11 +25,11 @@ def get_outdir(folder_name,sampleSheet):
 
 tools_dir = Path(maindir) / "shared" / "tools"
 
-rule polyAT: 
-    input: 
+rule polyAT:
+    input:
         two_bit=genome_2bit,
         bed=genes_bed
-    output: 
+    output:
         "three_prime_seq/poly{base}.bed"
     params:
         script=(tools_dir / "three_prime_seq" / "findSitesMM.py"),
@@ -61,15 +61,15 @@ rule three_prime_seq_bam_cov:
     input:
         bam="filtered_bam/{sample}.filtered.bam",
         bai="filtered_bam/{sample}.filtered.bam.bai"
-    output: 
+    output:
         "three_prime_seq/raw/{sample}_direction-{direction}.bw"
     params:
         filterOpt=bamcov_filter_opts
-    threads: 
+    threads:
         16
     conda:
         CONDA_SHARED_ENV
-    shell: 
+    shell:
         "bamCoverage -b {input.bam} "
         "-p {threads} "
         "-o {output} "
@@ -77,14 +77,14 @@ rule three_prime_seq_bam_cov:
 
 
 def filterbw_which_bed(wc):
-    return ("three_prime_seq/polyA.bed" if wc.direction == "forward" 
+    return ("three_prime_seq/polyA.bed" if wc.direction == "forward"
             else "three_prime_seq/polyT.bed")
 
 rule filterBW:
     input:
         bigwig="three_prime_seq/raw/{sample}_direction-{direction}.bw",
         bed=filterbw_which_bed
-    output: 
+    output:
         "three_prime_seq/filtered/{sample}_direction-{direction}.bw"
     params:
         script=(tools_dir / "three_prime_seq" / "filterBW.py")
@@ -107,7 +107,7 @@ rule geneAssociation:
         script=(tools_dir / "three_prime_seq" / "signal2gene.py")
     conda:
         CONDA_SHARED_ENV
-    shell: 
+    shell:
         "python {params.script} --extend {params.extension} "
         "--threads {threads} "
         "{input} {params.gtf} {output} "
@@ -117,29 +117,29 @@ rule geneAssociation:
 #     _samples = samples_from_condition(str(wc.condition))
 #     return expand("three_prime_seq/{sample}_polyA_annotation.txt", sample=_samples)
 
-# here we need to merge all replicates of geneAssociation -> see 
+# here we need to merge all replicates of geneAssociation -> see
 # /data/hilgers/group2/rezansoff/sakshiProj/2507_3seq/polyA_annotation_polysome2K/combined_cluster_andGrep_commands
 # also sort by start position
 rule preprocess_cluster_pas:
-    input: 
+    input:
         expand("three_prime_seq/{sample}_polyA_annotation.txt", sample=samples)
-    output: 
+    output:
         temp("three_prime_seq/tmp/geneassociation_merged_preprocessed.txt")
-    shell:        
+    shell:
         "cat {input} | "
-        "sed '/^[ ]*Chrom/ d' | " 
-        "sort -k1,1 -k2,2n " 
+        "sed '/^[ ]*Chrom/ d' | "
+        "sort -k1,1 -k2,2n "
         "> {output} "
 
-rule clusterPAS: 
+rule clusterPAS:
     # input is preprocessed output from geneAssoc
-    input: 
+    input:
         "three_prime_seq/tmp/geneassociation_merged_preprocessed.txt"
-    output: 
+    output:
         temp("three_prime_seq/tmp/clusterPAS_tmpdb.txt")
     conda:
         CONDA_SHARED_ENV
-    params: 
+    params:
         script=(tools_dir / "three_prime_seq" / "clusterPAS.py"),
         windowsize=config["clusterPAS"]["window"], # 15
     shell:
@@ -147,14 +147,14 @@ rule clusterPAS:
 
 
 # awk command: remove entries with multiple genes in 4th column (must be unambiguous)
-# python script: add "_1", "_2", to each cluster label (4th column) to make each 
+# python script: add "_1", "_2", to each cluster label (4th column) to make each
 # unique for each genomic position
 # TODO possibly make filtering of CDS/exons optional
 # TODO possibly keep only those that intersect an annotated 3' UTR
 rule postprocess_cluster_pas:
-    input: 
+    input:
         "three_prime_seq/tmp/clusterPAS_tmpdb.txt"
-    output: 
+    output:
         "three_prime_seq/db/clusterPAS_db.txt"
     conda:
         CONDA_SHARED_ENV
@@ -177,12 +177,12 @@ rule postprocess_cluster_pas:
 #             .format(condition=condition))
 
 
-# previously done by hand 
+# previously done by hand
 # e.g. /data/hilgers/group2/rezansoff/sakshiProj/2507_3seq/countReadEnds_commands_real.txt
-# each line of output of clusterPAS must be unique'd 
+# each line of output of clusterPAS must be unique'd
 rule count_read_ends:
-    input: 
-        bws=expand("three_prime_seq/filtered/{{sample}}_direction-{direction}.bw", 
+    input:
+        bws=expand("three_prime_seq/filtered/{{sample}}_direction-{direction}.bw",
                    direction=["forward", "reverse"]),
         bed="three_prime_seq/db/clusterPAS_db.txt", # this is the "database" of PAS sites
     output:
@@ -200,7 +200,7 @@ rule count_read_ends:
 rule merge_read_ends:
     input:
         expand("three_prime_seq/{sample}_uniqcounts.txt", sample=samples)
-    output: 
+    output:
         "three_prime_seq/counts.tsv"
     conda:
         CONDA_SHARED_ENV
@@ -212,11 +212,11 @@ rule merge_read_ends:
 
 
 rule cmatrix_raw:
-    input: 
+    input:
         expand("three_prime_seq/raw/{sample}_direction-{{direction}}.bw", sample=samples)
-    output: 
+    output:
         temp("three_prime_seq/cmatrix_raw_direction-{direction}.mat.gz")
-    threads: 
+    threads:
         16
     conda:
         CONDA_SHARED_ENV
@@ -225,7 +225,7 @@ rule cmatrix_raw:
         downstream=config["cmatrix_raw"]["downstream"], #500
         labels=samples,
         bed=genes_bed,
-    shell: 
+    shell:
         "computeMatrix scale-regions "
         "-S {input} "
         "-R {params.bed} "
@@ -240,16 +240,16 @@ rule cmatrix_raw:
 
 
 rule cmatrix_filtered:
-    input: 
+    input:
         "three_prime_seq/cmatrix_raw_direction-{direction}.mat.gz"
-    output: 
+    output:
         temp("three_prime_seq/cmatrix_filtered_direction-{direction}.mat.gz")
     threads: 8
     params:
         strand=lambda wc: "+" if wc.direction == "forward" else "-"
-    conda: 
+    conda:
         CONDA_SHARED_ENV
-    shell: 
+    shell:
         "computeMatrixOperations filterStrand "
         "-m {input} "
         "-o {output} "
@@ -260,12 +260,12 @@ rule merge_matrix:
     input:
         expand("three_prime_seq/cmatrix_filtered_direction-{direction}.mat.gz",
                direction=["forward", "reverse"])
-    output: 
+    output:
         "three_prime_seq/combined_polyA.mat.gz"
     threads: 8
-    conda: 
+    conda:
         CONDA_SHARED_ENV
-    shell: 
+    shell:
         "computeMatrixOperations rbind "
         "-m {input} "
         "-o {output} "
@@ -273,9 +273,9 @@ rule merge_matrix:
 rule heatmap:
     input: "three_prime_seq/combined_polyA.mat.gz"
     output: "three_prime_seq/combined_polyA.png"
-    conda: 
+    conda:
         CONDA_SHARED_ENV
-    shell: 
+    shell:
         "plotProfile -m {input} -o {output}"
 
 if sampleSheet:

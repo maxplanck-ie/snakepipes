@@ -232,7 +232,7 @@ This plot shows how samples are clustered based on their euclidean distance usin
         ylab(paste0("PC2: ", percentVar[2], "% variance")) +
         #theme_bw(base_size = 14) +
         ggtitle("PCA\n")
-    ) 
+    )
 
 ```
 

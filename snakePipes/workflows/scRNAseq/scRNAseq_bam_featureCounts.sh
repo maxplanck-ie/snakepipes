@@ -3,12 +3,12 @@
 ## example call:
 ## scRNAseq_bam_featureCounts.sh test.sorted.bam genes.filtered.gtf celseq_barcodes.192.txt test.txt /package/subread-1.5.0-p1/bin/ tmp_fc 5 1>MySample.cout.csv 2>MySample.cout_summary.txt
 
-bam=$1		## read mapping for all cells in one library 
+bam=$1		## read mapping for all cells in one library
 gtf=$2		## gene annotation
 bc_file=$3		## celSeq cell barcode file
 sample_name=$4	## sample name, used for featureCounts as output name, NOT a directory or path
-lib_type=$5 ## 1 for CelSeq2 
-tmp=$6	    ## used as output dir for featureCounts due to -R, should be "thread" safe, best created before with mktemp 
+lib_type=$5 ## 1 for CelSeq2
+tmp=$6	    ## used as output dir for featureCounts due to -R, should be "thread" safe, best created before with mktemp
 threads=$7	## used threads for for featureCounts
 
 ## gtf is expected in this format, we use only gene_id and gene_name
@@ -30,8 +30,8 @@ cat ${tmp_path}/${sample_name}.bam.featureCounts | awk -v map_f=$gtf_path \
 	while (getline < map_f) {
 		match($0,"gene_id[[:space:]\";]+([^[:space:]\";]+)",gid)
 		match($0,"gene_name[[:space:]\";]+([^[:space:]\";]+)",gna)
-		MAP[gid[1]]=gna[1]"\t"gna[1]"__chr"$1; 
-	} 
+		MAP[gid[1]]=gna[1]"\t"gna[1]"__chr"$1;
+	}
 }
 {OFS="\t";
 if ($4 in MAP) print $0,MAP[$4]; else print $0,"NA","NA"; # MAP[$4] contains tab!
@@ -62,7 +62,7 @@ BEGIN{
 }
 {
 	if ($1 in READS_SEEN) next;
-	
+
 	pos=match($1,":SC:");                       ## get barcode startpos (":SC:"") from readname
 	split(substr($1,pos+1),BC,":");             ## split on ":" to separate all info and stor in array "BC"
 
@@ -72,17 +72,17 @@ BEGIN{
 			ALL[$6][BC[5]][CELL[BC[2]]] += 1;         ##
 			cell_uniqfeat[CELL[BC[2]]] += 1; }        ## only stats
 		else if ($2~"NoFeatures") cell_nofeat[CELL[BC[2]]] += 1;
-		else if ($2~"MultiMapping") cell_multimap[CELL[BC[2]]] += 1;			
+		else if ($2~"MultiMapping") cell_multimap[CELL[BC[2]]] += 1;
 		else if ($2~"Unassigned_Ambiguity") cell_multifeat[CELL[BC[2]]] +=1;
 		else if ($2~"Unassigned_Unmapped") cell_unmap[CELL[BC[2]]] +=1 ;
-	} else if ($2~"Unassigned_Unmapped") nocell_unmap+=1; 
+	} else if ($2~"Unassigned_Unmapped") nocell_unmap+=1;
 	else nocell_map+=1;
 
-	if ($2!~"Unassigned_Unmapped") READS_SEEN[$1];	## only for unmapped reads it is safe to ignore this check 
+	if ($2!~"Unassigned_Unmapped") READS_SEEN[$1];	## only for unmapped reads it is safe to ignore this check
 }
 END{
 	printf "GENEID\tRBAR";                        ## mimic Dominics output format
-	for (n=1;n<=num_cells;n++)                    ## header line  
+	for (n=1;n<=num_cells;n++)                    ## header line
 		printf "\t"n;
 	printf "\n";
 	for (i in ALL) {                              ## iterate over all genes
@@ -126,7 +126,7 @@ END{
 	sum = sum"#LIBREADS_UNIQFEAT\t"ALLcell_uniqfeat"\t"(ALLcell_uniqfeat/sum_reads*100)"\n";
 	sum = sum"#LIBREADS_MULTIMAP\t"ALLcell_multimap"\t"(ALLcell_multimap/sum_reads*100)"\n";
 	sum = sum"#LIBREADS_MULTIFEAT\t"ALLcell_multifeat"\t"(ALLcell_multifeat/sum_reads*100)"\n";
-	sum = sum"#LIBREADS_NOUMI\t"ALLcell_noumi"\t"(ALLcell_noumi/sum_reads*100)"\n";	
+	sum = sum"#LIBREADS_NOUMI\t"ALLcell_noumi"\t"(ALLcell_noumi/sum_reads*100)"\n";
 	sum = sum"#LIBREADS_NOFEAT\t"ALLcell_nofeat"\t"(ALLcell_nofeat/sum_reads*100)"\n";
 	sum = sum"#LIBREADS_NOCELL\t"nocell_map"\t"(nocell_map/sum_reads*100)"\n";
 	sum = sum"#LIBREADS_MAPTOTAL\t"sum_reads"\t100.0\n";
@@ -134,7 +134,6 @@ END{
 	sum = sum"#LIBREADS_UNMAP\t"nocell_unmap"\t"(nocell_unmap/sum_reads_all*100)"\n";
 	sum = sum"#LIBREADS_TOTAL\t"sum_reads_all"\t100.0";
 	print sum > "/dev/stderr";                  ## prints stats to stderr
-}' 
+}'
 
 #2> >(tee >(grep "^#" | tr -d "#" > test_sum.txt) >(grep -v "^#" > test_cell.txt))
-

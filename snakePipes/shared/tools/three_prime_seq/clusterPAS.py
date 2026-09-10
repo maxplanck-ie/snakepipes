@@ -12,7 +12,7 @@ def cluster_pas(args):
 
     clusters = {}
 
-    with open(args.infile, "r") as In:
+    with open(args.infile) as In:
         # line = In.readline()
         line = In.readline()
         while line:
@@ -106,16 +106,7 @@ def main():
     for chrom in clusters:
         for clust in clusters[chrom]:
             o.write(
-                "{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n".format(
-                    clusters[chrom][clust][7],
-                    clusters[chrom][clust][0],
-                    clusters[chrom][clust][1],
-                    clusters[chrom][clust][3],
-                    clusters[chrom][clust][2],
-                    clusters[chrom][clust][6],
-                    clusters[chrom][clust][4],
-                    clusters[chrom][clust][5],
-                )
+                f"{clusters[chrom][clust][7]}\t{clusters[chrom][clust][0]}\t{clusters[chrom][clust][1]}\t{clusters[chrom][clust][3]}\t{clusters[chrom][clust][2]}\t{clusters[chrom][clust][6]}\t{clusters[chrom][clust][4]}\t{clusters[chrom][clust][5]}\n"
             )
     o.close()
 

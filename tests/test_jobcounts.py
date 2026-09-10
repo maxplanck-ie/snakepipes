@@ -122,124 +122,102 @@ def createTestData(fp, samples=9) -> None:
     for s in range(samples):
         sample = s + 1
         # SE
-        (fp / "SE" / "sample{}_R1.fastq.gz".format(sample)).touch()
+        (fp / "SE" / f"sample{sample}_R1.fastq.gz").touch()
 
         # PE
-        (fp / "PE" / "sample{}_R1.fastq.gz".format(sample)).touch()
-        (fp / "PE" / "sample{}_R2.fastq.gz".format(sample)).touch()
+        (fp / "PE" / f"sample{sample}_R1.fastq.gz").touch()
+        (fp / "PE" / f"sample{sample}_R2.fastq.gz").touch()
 
         # bam_input
-        (fp / "bam_input" / "sample{}.bam".format(sample)).touch()
-        (
-            fp / "bam_input" / "filtered_bam" / "sample{}.filtered.bam".format(sample)
-        ).touch()
-        (
-            fp
-            / "bam_input"
-            / "filtered_bam"
-            / "sample{}.filtered.bam.bai".format(sample)
-        ).touch()
-        (fp / "bam_input" / "Sambamba" / "sample{}.flagstat.txt".format(sample)).touch()
+        (fp / "bam_input" / f"sample{sample}.bam").touch()
+        (fp / "bam_input" / "filtered_bam" / f"sample{sample}.filtered.bam").touch()
+        (fp / "bam_input" / "filtered_bam" / f"sample{sample}.filtered.bam.bai").touch()
+        (fp / "bam_input" / "Sambamba" / f"sample{sample}.flagstat.txt").touch()
         (
             fp
             / "bam_input"
             / "bamCoverage"
-            / "sample{}.filtered.seq_depth_norm.bw".format(sample)
+            / f"sample{sample}.filtered.seq_depth_norm.bw"
         ).touch()
         (
             fp
             / "bam_input"
             / "bamCoverage"
-            / "sample{}.host_scaled.BYspikein.bw".format(sample)
+            / f"sample{sample}.host_scaled.BYspikein.bw"
         ).touch()
-        (fp / "bam_input" / "split_bam" / "sample{}_host.bam".format(sample)).touch()
-        (
-            fp / "bam_input" / "split_bam" / "sample{}_host.bam.bai".format(sample)
-        ).touch()
+        (fp / "bam_input" / "split_bam" / f"sample{sample}_host.bam").touch()
+        (fp / "bam_input" / "split_bam" / f"sample{sample}_host.bam.bai").touch()
 
         # allelic_bams
-        (fp / "allelic_bam_input" / "sample{}.bam".format(sample)).touch()
+        (fp / "allelic_bam_input" / f"sample{sample}.bam").touch()
         (
             fp
             / "allelic_bam_input"
             / "allelic_bams"
-            / "sample{}.genome1.sorted.bam".format(sample)
+            / f"sample{sample}.genome1.sorted.bam"
         ).touch()
         (
             fp
             / "allelic_bam_input"
             / "allelic_bams"
-            / "sample{}.genome1.sorted.bam.bai".format(sample)
+            / f"sample{sample}.genome1.sorted.bam.bai"
         ).touch()
         (
             fp
             / "allelic_bam_input"
             / "allelic_bams"
-            / "sample{}.genome2.sorted.bam".format(sample)
+            / f"sample{sample}.genome2.sorted.bam"
         ).touch()
         (
             fp
             / "allelic_bam_input"
             / "allelic_bams"
-            / "sample{}.genome2.sorted.bam.bai".format(sample)
+            / f"sample{sample}.genome2.sorted.bam.bai"
         ).touch()
         (
             fp
             / "allelic_bam_input"
             / "allelic_bams"
-            / "sample{}.allele_flagged.sorted.bam".format(sample)
+            / f"sample{sample}.allele_flagged.sorted.bam"
         ).touch()
         (
             fp
             / "allelic_bam_input"
             / "allelic_bams"
-            / "sample{}.allele_flagged.sorted.bam.bai".format(sample)
+            / f"sample{sample}.allele_flagged.sorted.bam.bai"
         ).touch()
         (
             fp
             / "allelic_bam_input"
             / "allelic_bams"
-            / "sample{}.unassigned.sorted.bam".format(sample)
+            / f"sample{sample}.unassigned.sorted.bam"
         ).touch()
         (
             fp
             / "allelic_bam_input"
             / "allelic_bams"
-            / "sample{}.unassigned.sorted.bam.bai".format(sample)
+            / f"sample{sample}.unassigned.sorted.bam.bai"
+        ).touch()
+        (
+            fp / "allelic_bam_input" / "filtered_bam" / f"sample{sample}.filtered.bam"
         ).touch()
         (
             fp
             / "allelic_bam_input"
             / "filtered_bam"
-            / "sample{}.filtered.bam".format(sample)
+            / f"sample{sample}.filtered.bam.bai"
         ).touch()
+        (fp / "allelic_bam_input" / "split_bam" / f"sample{sample}_host.bam").touch()
         (
-            fp
-            / "allelic_bam_input"
-            / "filtered_bam"
-            / "sample{}.filtered.bam.bai".format(sample)
+            fp / "allelic_bam_input" / "split_bam" / f"sample{sample}_host.bam.bai"
         ).touch()
-        (
-            fp / "allelic_bam_input" / "split_bam" / "sample{}_host.bam".format(sample)
-        ).touch()
-        (
-            fp
-            / "allelic_bam_input"
-            / "split_bam"
-            / "sample{}_host.bam.bai".format(sample)
-        ).touch()
-        (
-            fp
-            / "allelic_bam_input"
-            / "Sambamba"
-            / "sample{}.flagstat.txt".format(sample)
-        ).touch()
+        (fp / "allelic_bam_input" / "Sambamba" / f"sample{sample}.flagstat.txt").touch()
         (
             fp
             / "allelic_bam_input"
             / "bamCoverage"
             / "allele_specific"
-            / "sample{}.genome1.seq_depth_norm.bw".format(sample)
+            / f"sample{sample}.genome1.seq_depth_norm.bw"
         ).touch()
 
     # Create organism.yaml

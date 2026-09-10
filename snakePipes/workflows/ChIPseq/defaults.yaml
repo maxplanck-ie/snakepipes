@@ -25,7 +25,7 @@ genome:
 ## use spikein genome for normalization?
 useSpikeInForNorm: false
 spikeinExt: _spikein
-spikeinSizeFactorsFile: 
+spikeinSizeFactorsFile:
 spikein_bin_size: 1000
 ## Which peak caller to use?
 peakCaller: 'MACS2'

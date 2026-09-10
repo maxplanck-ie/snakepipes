@@ -63,14 +63,7 @@ def main():
     o.write("Chromosome\tStart\tEnd\tGene\tCounts\tStrand\n")
     for region in readCounts:
         o.write(
-            "{}\t{}\t{}\t{}\t{}\t{}\n".format(
-                readCounts[region][0],
-                readCounts[region][1],
-                readCounts[region][2],
-                readCounts[region][3],
-                int(readCounts[region][4]),
-                readCounts[region][5],
-            )
+            f"{readCounts[region][0]}\t{readCounts[region][1]}\t{readCounts[region][2]}\t{readCounts[region][3]}\t{int(readCounts[region][4])}\t{readCounts[region][5]}\n"
         )
     o.close()
 

@@ -82,6 +82,4 @@ bw.close()
 o.close()
 
 print("Sample\tFilteredBases\tTotalBases")
-print(
-    "{}\t{}\t{}".format(os.path.basename(args.bigWig)[:-3], filteredBases, totalBases)
-)
+print(f"{os.path.basename(args.bigWig)[:-3]}\t{filteredBases}\t{totalBases}")

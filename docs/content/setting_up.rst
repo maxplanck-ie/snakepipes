@@ -77,9 +77,9 @@ snakemakeProfile
 ++++++++++++++++
 Defines a `snakemake profile <https://snakemake.readthedocs.io/en/stable/executing/cli.html#profiles>`__ to use.
 By default this translates to a pre-shipped 'local' profile (and points to a location relative to the snakePipes package directory).
-The local profile runs all jobs without a submission system. 
+The local profile runs all jobs without a submission system.
 
-Another profile shipped within the repository is a default slurm profile (using snakemake-executor-plugin-cluster-generic). 
+Another profile shipped within the repository is a default slurm profile (using snakemake-executor-plugin-cluster-generic).
 In case you want to use this you can set the snakemakeProfile value to ``shared/profiles/snakepipes_genericprofile`` by running `snakePipes config --snakemakeProfile shared/profiles/snakepipes_genericprofile`.
 After changing the value of snakemakeProfile, you should re-run ``snakePipes info``, which will also print out the full directory of the profile used.
 If you want to use the snakepipes_genericprofile, make sure to review the following entries in the profile yaml file with respect to your infrastructure:
@@ -91,10 +91,10 @@ If you want to use the snakepipes_genericprofile, make sure to review the follow
  * ``ccancel.sh`` - refers to the ccancel.sh file inside the profile directory and contains instructions on how to kill submitted jobs (on failure / interruption of snakemake). The module command could be omitted here as before
 
  In case you are using your own snakemake profile already, you can define them here as well by passing it to `snakePipes config --snakemakeProfile`. Acceptable values in snakemakeProfile are:
- 
+
  * absolute path to a snakemake profile directory
  * a relative path to a snakemake profile (relative to the package directory)
- * The name of a `global snakemake profile <https://snakemake.readthedocs.io/en/stable/executing/cli.html#profiles>`__ 
+ * The name of a `global snakemake profile <https://snakemake.readthedocs.io/en/stable/executing/cli.html#profiles>`__
 
  If you use your own profile, just make sure that at least these values are set in your profile:
 
@@ -102,7 +102,7 @@ If you want to use the snakepipes_genericprofile, make sure to review the follow
  * conda-prefix: /path/to/prefix
  * conda-frontend: conda
 
-Additionally, rule resources are defined in the pre-shipped profiles. 
+Additionally, rule resources are defined in the pre-shipped profiles.
 In case you use your own you'd want to have these set in your profile as well.
 
 +++++++
@@ -112,7 +112,7 @@ The temp directory to use. Defaults to /scratch/local.
 You can change its value by passing the corresponding path to `snakePipes config --tempDir` .
 
 
-After setting the defaults, the conda environments can be created. 
+After setting the defaults, the conda environments can be created.
 
 .. _conda:
 

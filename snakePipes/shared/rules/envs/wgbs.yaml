@@ -6,7 +6,7 @@ channels:
 dependencies:
   - bwameth = 0.2.5
   - bwa-mem2 = 2.2.1
-  - samtools 
+  - samtools
   - methyldackel = 0.6.1
   - metilene = 0.2.8
   - bedtools = 2.30.0

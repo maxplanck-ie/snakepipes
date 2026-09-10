@@ -29,7 +29,7 @@ Pipeline                            Description
 :ref:`preprocessing`            Merging technical replicates (e.g., across lanes), removing optical duplicates, running FastQC
 =============================== ===============================================================================================================
 
-Quick start 
+Quick start
 -----------
 
 * Assuming you have *python3* with *conda*, install the latest version of snakePipes with:
@@ -46,7 +46,7 @@ Quick start
 
 * Download genome fasta and annotations for an your organism, and build indexes, Check in :ref:`createIndices`
 
-* Configure snakePipes with paths to organism and snakemake configs on your system using snakePipes config. Importantly, take care to set `--condaEnvDir` parameter, which defaults to `/tmp`. 
+* Configure snakePipes with paths to organism and snakemake configs on your system using snakePipes config. Importantly, take care to set `--condaEnvDir` parameter, which defaults to `/tmp`.
   For detailed information, run:
 
 .. code:: bash

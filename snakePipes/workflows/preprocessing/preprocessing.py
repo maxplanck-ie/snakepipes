@@ -127,9 +127,9 @@ def generateSampleSheet(indir, reads, ext, outdir):
         readDesignator = sampleName[-2]
         sampleName = "_".join(sampleName[:-4])
         if readDesignator == "R1":
-            of.write("{}\t{}\t{}\n".format(fname, reads[0], sampleName))
+            of.write(f"{fname}\t{reads[0]}\t{sampleName}\n")
         else:
-            of.write("{}\t{}\t{}\n".format(fname, reads[1], sampleName))
+            of.write(f"{fname}\t{reads[1]}\t{sampleName}\n")
     of.close()
     return ofile
 

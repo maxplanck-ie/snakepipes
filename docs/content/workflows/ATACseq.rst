@@ -46,12 +46,12 @@ An example is below::
 
 For comparison between two conditions, the name you assign to "condition" is not relevant, but rather the order is. The group mentioned first (in the above case "wild-type") would be used as a "control" and the group mentioned later would be used as "test".
 
-If the user provides additional columns between 'name' and 'condition' in the sample sheet, the variables stored there will be used as blocking factors in the order they appear in the sample sheet. Condition will be the final column and it will be used for any statistical inference. 
+If the user provides additional columns between 'name' and 'condition' in the sample sheet, the variables stored there will be used as blocking factors in the order they appear in the sample sheet. Condition will be the final column and it will be used for any statistical inference.
 
 The differential binding module utilizes the R package `CSAW <https://bioconductor.org/packages/release/bioc/html/csaw.html>`__ to detect significantly different peaks between two conditions.
-The analysis is performed on a union of peaks from all samples mentioned in the sample sheet. 
-This merged set of regions are provided as an output inside the **CSAW_MACS2_sampleSheet** folder as the file 'DiffBinding_allregions.bed'. 
-All differentially bound regions are available in 'CSAW/DiffBinding_significant.bed' . 
+The analysis is performed on a union of peaks from all samples mentioned in the sample sheet.
+This merged set of regions are provided as an output inside the **CSAW_MACS2_sampleSheet** folder as the file 'DiffBinding_allregions.bed'.
+All differentially bound regions are available in 'CSAW/DiffBinding_significant.bed' .
 Two thresholds are applied to produce ``Filtered.results.bed`` : FDR (default ``0.05`` ) as well as absolute log fold change (``1``). These can be specified either in the defaults.yaml dictionary or via commandline parameters '--FDR' and '--LFC'. Additionally, filtered results are split into up to 3 bed files, representing direction change (UP, DOWN, or MIXED).
 
 
@@ -93,13 +93,13 @@ There is a configuration file in ``snakePipes/workflows/ATACseq/defaults.yaml``:
     fragmentCountThreshold: 1
     #### Flag to control the pipeline entry point
     bamExt: '.filtered.bam'
-    fromBAM: 
+    fromBAM:
     ## Bin size of output files in bigWig format
     bwBinSize: 25
     pairedEnd: True
     plotFormat: png
     ## Median/mean fragment length, only relevant for single-end data (default: 200)
-    fragmentLength: 
+    fragmentLength:
     trim:
     fastqc:
     qval: 0.001
@@ -109,7 +109,7 @@ There is a configuration file in ``snakePipes/workflows/ATACseq/defaults.yaml``:
     fdr: 0.05
     absBestLFC: 1
 
-Useful parameters are ``maxFragmentSize``, ``minFragmentSize`` and ``windowSize``, also available from commandline.  
+Useful parameters are ``maxFragmentSize``, ``minFragmentSize`` and ``windowSize``, also available from commandline.
 
 * **windowSize**: is the size of windows to test differential binding using CSAW. The default small window size is sufficient for most analysis, since an ATACseq peak is sharp.
 

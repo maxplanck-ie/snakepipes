@@ -48,7 +48,7 @@ if not samples:
     print("\n  Error! NO samples found in dir "+str(indir or '')+"!!!\n\n")
     exit(1)
 
-#################### 
+####################
 # Translate library type to TEcounts strandedness
 stranded_dict={"0":"no",
                "1": "forward",

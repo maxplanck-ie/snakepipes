@@ -73,9 +73,9 @@ class extendedGTF(GTF):
 
                 if cols[2].lower() == self.transcriptID.lower():
                     if cols[6] == "-":
-                        cols[3] = "{}".format(max(1, int(cols[3]) - self.extend))
+                        cols[3] = f"{max(1, int(cols[3]) - self.extend)}"
                     else:
-                        cols[4] = "{}".format(int(cols[4]) + self.extend)
+                        cols[4] = f"{int(cols[4]) + self.extend}"
                     self.parseGTFtranscript(cols, file_label)
 
                     # Add transcript_id -> gene_id mapping
@@ -102,11 +102,11 @@ def o2attribs(chrom, pos, o):
         if o[5] == "-":
             if pos < o[4][0][0]:
                 tag = "downstream"
-                transPos = "+{}".format(o[4][0][0] - pos)
+                transPos = f"+{o[4][0][0] - pos}"
         else:
             if pos >= o[4][-1][1]:
                 tag = "downstream"
-                transPos = "+{}".format(pos - o[4][-1][1])
+                transPos = f"+{pos - o[4][-1][1]}"
 
     # Add UTR and CDS tags
     if tag == "exonic":
@@ -179,7 +179,7 @@ def mapStrand(bw, chrom, start, end, strand, args):
                     continue  # intronic
                 genes.add(geneID)
                 transcripts.append(transcriptID)
-                transPos.append("{}".format(tPos))
+                transPos.append(f"{tPos}")
                 tags.append(tag)
 
             if len(genes):

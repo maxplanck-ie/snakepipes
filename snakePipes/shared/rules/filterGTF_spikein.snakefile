@@ -18,7 +18,7 @@ rule filter_gtf_spikein:
 
 
 # Given a GTF file, optionally filter it and produce the following files:
-# 
+#
 # Annotation/genes.filtered.bed
 #	A BED version of the filtered GTF with transcript entries. This is used by
 #	deepTools
@@ -48,7 +48,7 @@ rule spikein_gtf_to_files:
             if line.startswith("#"):
                 continue
             cols = line.strip().split("\t")
-            annos = re.split(''';(?=(?:[^'"]|'[^']*'|"[^"]*")*$)''', cols[8]) 
+            annos = re.split(''';(?=(?:[^'"]|'[^']*'|"[^"]*")*$)''', cols[8])
             if cols[2] == "gene":
                 # get the gene_name and gene_id values
                 gene_id = None
@@ -138,4 +138,3 @@ rule TSS_to_windows:
     shell: """
             python {params.script} -inf {input.bed} -outf {output.TSS_bed} -size {params.size} -bam {input.bam}
               """
-        

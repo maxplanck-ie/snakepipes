@@ -29,4 +29,4 @@ with open(inf) as f, open(outf, "w") as of:
         if chr in chroms_sizes.keys():
             start = max(1, int(linesplit[1]) - size)
             end = min(int(chroms_sizes[chr]), int(linesplit[1]) + size)
-            of.write("{}\t{}\t{}\n".format(chr, str(start), str(end)))
+            of.write(f"{chr}\t{str(start)}\t{str(end)}\n")

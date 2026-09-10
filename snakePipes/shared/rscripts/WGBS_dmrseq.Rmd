@@ -84,7 +84,7 @@ Similarly, the test statistic, which is used to compute the p-value, is shown be
 if (length(regions) > 0) {
   g = ggplot(as.data.frame(regions,stringsAsFactors=FALSE), aes(x=stat)) + geom_histogram() + labs(x="Methylation Difference Statistic")
   g
-} else { 
+} else {
   message('No DMRs found.')
 }
 ```

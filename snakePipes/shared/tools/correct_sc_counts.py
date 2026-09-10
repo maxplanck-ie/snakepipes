@@ -69,21 +69,17 @@ for f in [ReadCountsFile, UMICountsFile, CorrectedCountsFile]:
 sortedFeatures = sorted(readCounts.keys())
 for feature in sortedFeatures:
     ReadCountsFile.write(
-        "{}\t{}\n".format(
-            feature, "\t".join(["{}".format(x) for x in readCounts[feature]])
-        )
+        "{}\t{}\n".format(feature, "\t".join([f"{x}" for x in readCounts[feature]]))
     )
     UMICountsFile.write(
-        "{}\t{}\n".format(
-            feature, "\t".join(["{}".format(x) for x in UMICounts[feature]])
-        )
+        "{}\t{}\n".format(feature, "\t".join([f"{x}" for x in UMICounts[feature]]))
     )
-    CorrectedCountsFile.write("{}".format(feature))
+    CorrectedCountsFile.write(f"{feature}")
     for cnt in UMICounts[feature]:
         if cnt >= maxUMIs:
             maxUMIs -= 0.5
         CorrectedCountsFile.write(
-            "\t{}".format(abs(-math.log(1.0 - float(cnt) / float(maxUMIs)) * maxUMIs))
+            f"\t{abs(-math.log(1.0 - float(cnt) / float(maxUMIs)) * maxUMIs)}"
         )  # The abs() prevents -0.0
     CorrectedCountsFile.write("\n")
 for f in [ReadCountsFile, UMICountsFile, CorrectedCountsFile]:

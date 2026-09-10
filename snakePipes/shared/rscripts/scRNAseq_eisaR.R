@@ -36,7 +36,7 @@ print("sourcing extractTxSeqs.R ..")
 source(file.path(scriptdir, "extractTxSeqs.R"))
 print("..done")
 
-## Extract intronic sequences flanked by L-1 bases 
+## Extract intronic sequences flanked by L-1 bases
 ## of exonic sequences where L is the biological read length
 print("loading genome ..")
 genome <- Biostrings::readDNAStringSet(genome_fasta)
@@ -48,7 +48,7 @@ print("..done")
 
 ## Extract transcript and intron sequences
 tx <- extractTxSeqs(gtf = gtf, genome = genome, type = "spliced")
-intr <- extractIntronSeqs(gtf = gtf, genome = genome, type = isoform_action, 
+intr <- extractIntronSeqs(gtf = gtf, genome = genome, type = isoform_action,
                           flanklength = flanklength,
                           joinOverlappingIntrons = FALSE)
 
@@ -77,11 +77,11 @@ colnames(t2gin) <- colnames(t2gtx)
 t2g <- rbind(t2gtx, t2gin)
 
 Biostrings::writeXStringSet(c(tx, intr), joint_fasta,  compress = FALSE)
-write.table(names(tx), file = file.path(wdir, "cDNA_tx_to_capture.txt"), 
+write.table(names(tx), file = file.path(wdir, "cDNA_tx_to_capture.txt"),
             row.names = FALSE, col.names = FALSE, quote = FALSE, sep = "\t")
-write.table(names(intr), file = file.path(wdir, "introns_tx_to_capture.txt"), 
+write.table(names(intr), file = file.path(wdir, "introns_tx_to_capture.txt"),
             row.names = FALSE, col.names = FALSE, quote = FALSE, sep = "\t")
-write.table(t2g, file = joint_t2g, 
+write.table(t2g, file = joint_t2g,
             row.names = FALSE, col.names = FALSE, quote = FALSE, sep = "\t")
 
 
@@ -92,5 +92,3 @@ message('done all')
 sink("sessionInfo.txt")
 sessionInfo()
 sink()
-
-

@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.11']
+        python-version: ['3.11', '3.12', '3.13']
         optdeps: [".", ".[actions]", ".[docs]"]
     steps:
     - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
@@ -73,15 +73,13 @@ jobs:
         pip install .
     - name: print_conda_env_export
       run: |
-        conda env export 
+        conda env export
     - name: print_pip_list
       run: |
-        pip list 
+        pip list
     - name: CI
       run: |
         snakePipes config --tempDir /tmp
-        echo 'test dag has been deprecated'
-#        ./.ci_stuff/test_dag.sh
   createEnvs:
     needs: CI
     strategy:

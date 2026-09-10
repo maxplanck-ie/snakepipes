@@ -162,13 +162,11 @@ def main():
     validModes = set(["deepTools_qc"])
     for mode in modeTemp:
         if mode not in validModes:
-            sys.exit("{} is not a valid mode!\n".format(mode))
+            sys.exit(f"{mode} is not a valid mode!\n")
 
     if args.tesmallMinLen >= args.tesmallMaxLen:
         sys.exit(
-            "--tesmallMinLen ({}) must be smaller than --tesmallMaxLen ({})!\n".format(
-                args.tesmallMinLen, args.tesmallMaxLen
-            )
+            f"--tesmallMinLen ({args.tesmallMinLen}) must be smaller than --tesmallMaxLen ({args.tesmallMaxLen})!\n"
         )
 
     ## End workflow-specific checks
