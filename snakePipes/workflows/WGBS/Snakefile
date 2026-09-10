@@ -8,21 +8,25 @@ import snakePipes.common_functions as cf
 
 ### snakemake_workflows initialization ########################################
 maindir = os.path.dirname(os.path.dirname(workflow.basedir))
-workflow_tools=os.path.join(maindir, "shared", "tools")
-workflow_rscripts=os.path.join(maindir, "shared", "rscripts")
+workflow_tools = os.path.join(maindir, "shared", "tools")
+workflow_rscripts = os.path.join(maindir, "shared", "rscripts")
 
 # load conda ENVs (path is relative to "shared/rules" directory)
 globals().update(cf.set_env_yamls())
 
 # load config file
-globals().update(cf.load_configfile(workflow.overwrite_configfiles[0], config["verbose"]))
+globals().update(
+    cf.load_configfile(workflow.overwrite_configfiles[0], config["verbose"])
+)
 # load organism-specific data, i.e. genome indices, annotation, etc.
 globals().update(cf.load_organism_data(genome, maindir, config["verbose"]))
 # return the pipeline version in the log
 cf.get_version()
 
+
 # do workflow specific stuff now
 include: os.path.join(workflow.basedir, "internals.snakefile")
+
 
 ### include modules of other snakefiles ########################################
 ################################################################################
@@ -34,14 +38,18 @@ if sampleSheet:
 
 # FastQC
 if fastqc:
+
     include: os.path.join(maindir, "shared", "rules", "FastQC.snakefile")
+
 
 # trimming
 if trim:
+
     include: os.path.join(maindir, "shared", "rules", "trimming.snakefile")
 
+
 ### conditional/optional rules #################################################
-#some of those definitions are used to generate output strings for some of the rules
+# some of those definitions are used to generate output strings for some of the rules
 ################################################################################
 
 pipeline = "WGBS"
@@ -53,25 +61,31 @@ else:
 
 # TODO: Still needed?
 idxRange = 2 if pairedEnd else 1
+
+
 def calc_doc(skipDOC):
     if not skipDOC and not skipBamQC:
-        return (["QC_metrics/genomeCoverage.txt",
-                 "QC_metrics/genomeCoverage.png",
-                 "QC_metrics/genomeCoverage.coverageMetrics.txt",
-                 "QC_metrics/CpGCoverage.txt",
-                 "QC_metrics/CpGCoverage.png",
-                 "QC_metrics/CpGCoverage.coverageMetrics.txt"])
+        return [
+            "QC_metrics/genomeCoverage.txt",
+            "QC_metrics/genomeCoverage.png",
+            "QC_metrics/genomeCoverage.coverageMetrics.txt",
+            "QC_metrics/CpGCoverage.txt",
+            "QC_metrics/CpGCoverage.png",
+            "QC_metrics/CpGCoverage.coverageMetrics.txt",
+        ]
     else:
-        return ([])
+        return []
 
 
 def run_FastQC(fastqc):
     if fastqc and not fromBAM:
-        return( expand("FastQC/{sample}{read}_fastqc.html", sample = samples, read = reads[:idxRange]) )
+        return expand(
+            "FastQC/{sample}{read}_fastqc.html", sample=samples, read=reads[:idxRange]
+        )
     elif fastqc and fromBAM:
-        return( expand("FastQC/{sample}_fastqc.html", sample = samples) )
+        return expand("FastQC/{sample}_fastqc.html", sample=samples)
     else:
-        return([])
+        return []
 
 
 def get_outdir(folder_name, target_regions, minCoverage):
@@ -89,7 +103,9 @@ def get_outdir(folder_name, target_regions, minCoverage):
             region_name = region_name[:idx]
     else:
         region_name = "genome"
-    return("{}_{}_{}_minCoverage{}".format(folder_name, sample_name, region_name, minCoverage))
+    return "{}_{}_{}_minCoverage{}".format(
+        folder_name, sample_name, region_name, minCoverage
+    )
 
 
 def run_DMRs(sampleSheet, targetRegions, minCoverage, DMRprograms):
@@ -97,11 +113,17 @@ def run_DMRs(sampleSheet, targetRegions, minCoverage, DMRprograms):
     if not sampleSheet:
         return output
     if "DSS" in DMRprograms:
-        output.append('{}/Stats_report.html'.format(get_outdir("DSS", None, minCoverage)))
+        output.append("{}/Stats_report.html".format(get_outdir("DSS", None, minCoverage)))
     if "metilene" in DMRprograms:
-        output.append('{}/Stats_report.html'.format(get_outdir("metilene", targetRegions, minCoverage)))
+        output.append(
+            "{}/Stats_report.html".format(
+                get_outdir("metilene", targetRegions, minCoverage)
+            )
+        )
     if "dmrseq" in DMRprograms:
-        output.append('{}/Stats_report.html'.format(get_outdir("dmrseq", None, minCoverage)))
+        output.append(
+            "{}/Stats_report.html".format(get_outdir("dmrseq", None, minCoverage))
+        )
     return output
 
 
@@ -109,27 +131,30 @@ def run_deeptools(GCbias):
     if skipBamQC:
         GCbias = False
     if GCbias:
-        return ["QC_metrics/GCbias.freq.txt","QC_metrics/GCbias.png"]
+        return ["QC_metrics/GCbias.freq.txt", "QC_metrics/GCbias.png"]
     else:
-        return ([])
+        return []
+
 
 def run_misc_QC(skipBamQC):
     if not skipBamQC:
-        return ( expand("filtered_bam/{sample}.filtered.bam", sample = samples), 
-                 calc_doc(skipDOC),
-                 'QC_metrics/QC_report.html',
-                 run_deeptools(GCbias),
-                 'multiQC/multiqc_report.html'
-                )
+        return (
+            expand("filtered_bam/{sample}.filtered.bam", sample=samples),
+            calc_doc(skipDOC),
+            "QC_metrics/QC_report.html",
+            run_deeptools(GCbias),
+            "multiQC/multiqc_report.html",
+        )
     else:
-        return ([])
+        return []
 
 
 ### include modules of other snakefiles ########################################
 ##some rules depend on the definitions above
 ################################################################################
 if not fromBAM:
-    #umi_tools
+
+    # umi_tools
     include: os.path.join(maindir, "shared", "rules", "umi_tools.snakefile")
     # FASTQ: either downsample FASTQ files or create symlinks to input files
     include: os.path.join(maindir, "shared", "rules", "FASTQ.snakefile")
@@ -137,31 +162,35 @@ if not fromBAM:
     include: os.path.join(maindir, "shared", "rules", "sambamba.snakefile")
 
 else:
+
     include: os.path.join(maindir, "shared", "rules", "LinkBam.snakefile")
+
 
 # WGBS
 include: os.path.join(maindir, "shared", "rules", "WGBS.snakefile")
-
-
-#bam_filtering
+# bam_filtering
 include: os.path.join(maindir, "shared", "rules", "bam_filtering.snakefile")
-
 # MultiQC
 include: os.path.join(maindir, "shared", "rules", "multiQC.snakefile")
+
 
 ### execute before workflow starts #############################################
 ################################################################################
 onstart:
     if "verbose" in config and config["verbose"]:
-        print("--- Workflow parameters --------------------------------------------------------")
-        print("samples:"+ str(samples))
-        print("input dir:"+ indir)
-        print("-" * 80)#, "\n"
+        print(
+            "--- Workflow parameters --------------------------------------------------------"
+        )
+        print("samples:" + str(samples))
+        print("input dir:" + indir)
+        print("-" * 80)  # , "\n"
 
-        print("--- Environment ----------------------------------------------------------------")
-        print("$TMPDIR: "+os.getenv('TMPDIR', ""))
-        print("$HOSTNAME: "+os.getenv('HOSTNAME', ""))
-        print("-" * 80)#, "\n"
+        print(
+            "--- Environment ----------------------------------------------------------------"
+        )
+        print("$TMPDIR: " + os.getenv("TMPDIR", ""))
+        print("$HOSTNAME: " + os.getenv("HOSTNAME", ""))
+        print("-" * 80)  # , "\n"
 
     if toolsVersion:
         usedEnvs = [CONDA_SHARED_ENV, CONDA_WGBS_ENV]
@@ -169,9 +198,11 @@ onstart:
     if sampleSheet:
         cf.copySampleSheet(sampleSheet, outdir)
 
+
 ### main rule ##################################################################
 ################################################################################
-localrules: download_picard
+localrules:
+    download_picard,
 
 
 rule all:
@@ -182,14 +213,17 @@ rule all:
         expand("MethylDackel/{sample}_CpG.bedGraph", sample=samples),
         expand("MethylDackel/{sample}_CpG.methylation.bw", sample=samples),
         expand("MethylDackel/{sample}_CpG.coverage.bw", sample=samples),
-        run_DMRs(sampleSheet, targetRegions, minCoverage, DMRprograms)        
+        run_DMRs(sampleSheet, targetRegions, minCoverage, DMRprograms),
 
 
 ### execute after workflow finished ############################################
 ################################################################################
 onsuccess:
     if "verbose" in config and config["verbose"]:
-        print("--- WGBS workflow finished successfully! --------------------------------")#\n \n
+        print(
+            "--- WGBS workflow finished successfully! --------------------------------"
+        )  # \n \n
+
 
 onerror:
     print("\n !!! ERROR in WGBS workflow! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")

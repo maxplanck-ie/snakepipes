@@ -5,10 +5,6 @@ ci:
   autoupdate_branch: "master"
   autoupdate_commit_msg: "pre-commit.ci autoupdate"
   autoupdate_schedule: monthly
-  # zizmor needs a workflow permissions/pinning pass; snakefmt crashes on
-  # snakePipes/workflows/preprocessing/Snakefile (two include: statements
-  # under one if: block confuse its block parser). Skipping both until fixed.
-  skip: [zizmor, snakefmt]
   submodules: false
 
 repos:
