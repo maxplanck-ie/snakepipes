@@ -64,7 +64,7 @@ readfiles_chip <- function(sampleSheet, fragmentLength, window_size, alleleSpeci
         bam.files <- list.files(paste0("../",bam_folder),
                                 pattern = paste0(sampleSheet$name,bam_pfx,".bam$", collapse = "|"),
                                 full.names = TRUE )
-        
+
     }
 
     message("bam files used: ")
@@ -170,7 +170,7 @@ makeQCplots_chip_SE <- function(bam.file, outplot, pe.param){
     ## plot
     message("Plotting")
     pdf(outplot)
-    
+
     # cross correlation
     plot(0:max.delay, CCF, type = "l", ylab = "CCF", xlab = "Delay (bp)", main = "SE-Cross-correlation")
 
@@ -341,7 +341,7 @@ writeOutput_chip <- function(chipResultObject, outfile_prefix, fdrcutoff,lfccuto
     print(head(tabcom))
     tabx<-as.data.frame(merged$region,stringsAsFactors=FALSE)
     tabx$name<-rownames(tabx)
-    full_res<-as.data.frame(merge(x=tabx,y=tabcom,by.x="name",by.y="name"),stringsAsFactors=FALSE) 
+    full_res<-as.data.frame(merge(x=tabx,y=tabcom,by.x="name",by.y="name"),stringsAsFactors=FALSE)
     full_res<-full_res[,c(2:ncol(full_res),1)]
     print(sprintf("Colnames of result file are %s",colnames(full_res)))
     full_res[,2]<-full_res[,2]-1

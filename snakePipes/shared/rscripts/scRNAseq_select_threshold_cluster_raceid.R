@@ -95,12 +95,10 @@ for(i in seq_along(unique(top2$Cluster))){
     png(paste0("Top2nd.clu",clu,".featurePlot.png"),bg="white")
     plotexpmap(sc,g=rownames(subdat)[2],n=rownames(subdat)[2],logsc=TRUE,fr=FALSE)
     dev.off()}
-    
-    
+
+
 }
 
 sink("sessionInfo.txt")
 print(sessionInfo())
 sink()
-
-

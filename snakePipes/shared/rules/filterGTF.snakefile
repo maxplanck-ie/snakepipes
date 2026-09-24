@@ -18,7 +18,7 @@ rule filter_gtf:
 
 
 # Given a GTF file, optionally filter it and produce the following files:
-# 
+#
 # Annotation/genes.filtered.bed
 #	A BED version of the filtered GTF with transcript entries. This is used by
 #	deepTools
@@ -48,7 +48,7 @@ rule gtf_to_files:
             if line.startswith("#"):
                 continue
             cols = line.strip().split("\t")
-            annos = re.split(''';(?=(?:[^'"]|'[^']*'|"[^"]*")*$)''', cols[8]) 
+            annos = re.split(''';(?=(?:[^'"]|'[^']*'|"[^"]*")*$)''', cols[8])
             if cols[2] == "gene":
                 # get the gene_name and gene_id values
                 gene_id = None
@@ -124,7 +124,7 @@ rule gtf_to_files:
 ## make standard annotation
 
 ## creates fasta sequence file for the filtered transcripts
-## used to create the salmon index in alignment-free mode 
+## used to create the salmon index in alignment-free mode
 rule annotation_bed2fasta:
     input:
         bed = "Annotation/genes.filtered.bed",
@@ -137,4 +137,3 @@ rule annotation_bed2fasta:
     conda: CONDA_RNASEQ_ENV
     shell:
         "bedtools getfasta -name -s -split -fi {input.genome_fasta} -bed <(cat {input.bed} | cut -f1-12) | sed 's/(.*)//g' | sed 's/:.*//g' > {output}"
-        

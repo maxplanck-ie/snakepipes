@@ -19,7 +19,7 @@ pairedEnd: True
 downsample:
 ## Options for trimming
 trim: True
-trimmer: fastp
+trimmer: cutadapt
 trimmerOptions:
 
 verbose: False
@@ -32,7 +32,7 @@ UMIDedupOpts: "_"
 plotFormat: png
 bwBinSize: 1000
 aligner: 'bwa'
-alignerOptions: 
+alignerOptions:
 alignerThreads: 30
 
 fromBAM: False

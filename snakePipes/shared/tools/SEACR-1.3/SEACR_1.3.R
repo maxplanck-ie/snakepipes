@@ -2,24 +2,24 @@
 
 ## Collect arguments
 args <- commandArgs(TRUE)
- 
+
 ## Default setting when no arguments passed
 if(length(args) < 4) {
   args <- c("--help")
 }
- 
+
 ## Help section
 if("--help" %in% args) {
   cat("
-     Calculate area under the curve threshold for CUT&RUN peaks 
- 
+     Calculate area under the curve threshold for CUT&RUN peaks
+
       Arguments:
 			--exp=someValue   - Input AUC values from experiment CUT&RUN
 			--ctrl=someValue   - Input AUC values from control CUT&RUN
 			--norm=[yes|no]     - Whether to normalize control and experimental files
 			--output=someValue   - Output prefix
 ")
- 
+
   q(save="no")
 }
 
@@ -28,21 +28,21 @@ parseArgs <- function(x) strsplit(sub("^--", "", x), "=")
 argsDF <- as.data.frame(do.call("rbind", parseArgs(args)))
 argsL <- as.list(as.character(argsDF$V2))
 names(argsL) <- argsDF$V1
-invis <- gc(verbose=FALSE) 
+invis <- gc(verbose=FALSE)
 
 ## Arg1 default
 #if(is.null(args[1])){
 if(is.null(argsL$exp) | is.null(argsL$ctrl) | is.null(argsL$output) | is.null(argsL$norm)) {
   stop("Argument is missing!
-     Calculate area under the curve threshold for CUT&RUN peaks 
- 
+     Calculate area under the curve threshold for CUT&RUN peaks
+
       Arguments:
 			--exp=someValue   - Input AUC values from experiment CUT&RUN
 			--ctrl=someValue   - Input AUC values from control CUT&RUN
 			--norm=[yes|no]     - Whether to normalize control and experimental files
 			--output=someValue   - Output prefix
 ")
- 
+
   q(save="no")
 }
 exp<-read.table(argsL$exp)
@@ -95,9 +95,9 @@ if(is.na(numtest)){ ## If 2nd field is a bedgraph, calculate empirical threshold
 	}else{  ## Added 7/15/19 to avoid omitting z when x0==z2
 		z0<-x0  ## Added 7/15/19 to avoid omitting z when x0==z2
 	}  ## Added 7/15/19 to avoid omitting z when x0==z2
-	
+
 	## The following code segment was added to avoid spurious high thresholding when the peak of a lower threshold is within 95% of the peak of the maximum threshold
-	
+
 	frame<-data.frame(thresh=x[1:(length(x)-1)], pct=pctremain(x[1:(length(x)-1)]), diff=abs(diff(pctremain(x))))
 	frame<-na.omit(frame)
 	i<-2

@@ -6,11 +6,11 @@
 #' @param genome A \code{DNAStringSet} object with the genome sequence
 #' @param type Either 'collapse' or 'separate'
 #' @param flanklength The length of the exonic flanking sequence
-#' @param joinOverlappingIntrons Whether overlapping intron sequences (after adding 
+#' @param joinOverlappingIntrons Whether overlapping intron sequences (after adding
 #'   the flanking sequence) should be joined into a single intron
 #'
 #' @return A \code{DNAStringSet} object with intronic sequences
-#' 
+#'
 extractIntronSeqs <- function(gtf, genome, type = "collapse", flanklength = 90,
                               joinOverlappingIntrons = FALSE) {
   ## Construct TxDb from gtf file
@@ -42,12 +42,12 @@ extractIntronSeqs <- function(gtf, genome, type = "collapse", flanklength = 90,
     ## If two (introns + flanklength) overlap, join them
     grl <- GenomicRanges::reduce(grl)
   }
-  
+
   gr <- unlist(grl)
 
   ## Add -I{X} to names
   names(gr) <- gsub("\\-I\\.", "-I", make.unique(paste0(names(gr), "-I")))
-  
+
   # Calculate chromosome lengths
   chromLens <- setNames(width(genome), names(genome))
 
@@ -63,10 +63,10 @@ extractIntronSeqs <- function(gtf, genome, type = "collapse", flanklength = 90,
 
   ## Get sequence
   gs <- BSgenome::getSeq(x = genome, names = gr)
-  
+
   ## Manually set names of extracted sequences
   stopifnot(all(width(gs) == width(gr)))
   names(gs) <- names(gr)
-  
+
   return(gs)
 }

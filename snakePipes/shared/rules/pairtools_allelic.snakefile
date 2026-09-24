@@ -15,8 +15,8 @@ def ret_pair(wildcards):
 # consider making this optional in bwa.snakefile
 rule bwa_mapping:
     input:
-        fq1="FASTQ_fastp/{sample}_R1.fastq.gz",
-        fq2="FASTQ_fastp/{sample}_R2.fastq.gz",
+        fq1=fastq_dir + "/{sample}_R1.fastq.gz",
+        fq2=fastq_dir + "/{sample}_R2.fastq.gz",
         ix="genome/{ref}.fa.gz.bwt",
     output:
         bam="bam/{sample}.{ref}.bam",

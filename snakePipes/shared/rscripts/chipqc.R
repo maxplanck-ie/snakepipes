@@ -69,7 +69,7 @@ sampledat<-data.frame("SampleID"=samples,"Condition"=condv,"Factor"=markv,"Repli
 
 #ensure that samples,bamdir and peakdir are in the same order!
 
-message(sprintf("Provided bam files: %s", unlist(bamdir)))    
+message(sprintf("Provided bam files: %s", unlist(bamdir)))
 sampledat$bamReads<-bamdir[match(samples,sub(paste0(ms,".bam"),"",basename(bamdir)))]
 message(sprintf("Provided peak files: %s", unlist(peakdir)))
 ##for MACS2, modify input peak files: .xls -> .narrowPeak, .broadPeak
@@ -78,9 +78,9 @@ sampledat$Peaks<-peakdir[match(samples,sub("_avgp0.5.bed","",basename(peakdir)))
 }else{sampledat$Peaks<-peakdir[match(samples,sub(paste0(ms,".+"),"",basename(peakdir)))]}
 
 sampledat$PeakCaller<-"bed"
-sampledat$PeakFormat<-"bed"	
+sampledat$PeakFormat<-"bed"
 if(all(grepl("MACS2",sampledat$Peaks))){
-        
+
         #samples should be in the same order
         sampledat$Peaks[ydat$broad==TRUE]<-gsub(paste0(ms,".BAM_peaks.xls"),paste0(ms,".BAM_peaks.broadPeak"),sampledat$Peaks[ydat$broad==TRUE])
         sampledat$Peaks[ydat$broad==FALSE]<-gsub(paste0(ms,".BAM_peaks.xls"),paste0(ms,".BAM_peaks.narrowPeak"),sampledat$Peaks[ydat$broad==FALSE])
@@ -99,9 +99,9 @@ if( genome %in% supported_annotations){
 
     annotation<-genome
 } else if (genome %in% extended_annotations){
- 
+
     annotation<-supported_annotations[grep(genome,extended_annotations)]
-    
+
 }else {
         #stop("No matching annotation was found.")
         annotation<-NULL

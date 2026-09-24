@@ -18,7 +18,7 @@ Input requirements
 The DNA mapping pipeline generates output that is fully compatible with the ChIPseq pipeline input requirements!
 When running the ChIPseq pipeline, please specify the output directory of DNAmapping pipeline as the working directory (``-d``).
 
-Alternatively, bam files can be used as input to the ChIPseq worklow. The folder containing bam files can be passed with the `--fromBAM` parameter. Bam file extention can be specified with `--bamExt`. Working directory specified with `-d` will be used as output folder. Running the ChiPseq workflow in 'allelic-whatshap' mode only works with passing the full output of the DNAmapping pipeline with `-d` and not with `--fromBAM`.
+Alternatively, bam files can be used as input to the ChIPseq worklow. The folder containing bam files can be passed with the `--fromBAM` parameter. Bam file extension can be specified with `--bamExt`. Working directory specified with `-d` will be used as output folder. Running the ChiPseq workflow in 'allelic-whatshap' mode only works with passing the full output of the DNAmapping pipeline with `-d` and not with `--fromBAM`.
 
 
 Sample configuration
@@ -80,7 +80,7 @@ For comparison between two conditions, the name you assign to "condition" is not
 The differential binding module utilizes the R package `CSAW <https://bioconductor.org/packages/release/bioc/html/csaw.html>`__ to detect significantly different peaks between two conditions. The analysis is performed on a "union" of peaks from all samples mentioned in the sample sheet. This merged set of regions are provided as an output inside the **CSAW** folder as the file 'DiffBinding_allregions.bed'. All differentially bound regions are available in 'CSAW/DiffBinding_significant.bed'. Two thresholds are applied to produce ``Filtered.results.bed`` : FDR (default ``0.05`` ) as well as absolute log fold change (``1``). These can be specified either in the defaults.yaml dictionary or via commandline parameters '--FDR' and '--LFC'. Additionally, filtered results are split into up to 3 bed files, representing direction change (UP, DOWN, or MIXED).
 
 
-If the user provides additional columns between 'name' and 'condition' in the sample sheet, the variables stored there will be used as blocking factors in the order they appear in the sample sheet. Condition will be the final column and it will be used for any statistical inference. 
+If the user provides additional columns between 'name' and 'condition' in the sample sheet, the variables stored there will be used as blocking factors in the order they appear in the sample sheet. Condition will be the final column and it will be used for any statistical inference.
 
 
 Merged regions from filtered results with any direction change are further used to produce deepTools heatmaps, using log2 ratio of chip signal to input or depth-normalized coverage. For this purpose, the regions are rescaled to 1kb, and extended by 0.2kb on each side.
@@ -179,7 +179,7 @@ Following up on the DNAmapping module results (see :doc:`DNAmapping`), the workf
 
 .. note:: Although in case of broad marks, we also perform the MACS2 `broadpeak` analysis (output available as ``MACS2/<sample>.filtered.BAM_peaks.broadPeak``), we would recommend using the histoneHMM outputs in these cases, since histoneHMM produces better results than MACS2 for broad peaks. In order to produced domain calls by histoneHMM, specify histoneHMM as peak caller by passing it to --peakCaller.
 
-.. note:: For narrow marks, the user may choose the peak caller from MACS2 (default), Genrich or `SEACR <https://github.com/FredHutch/SEACR>`__. By deafult, SEACR is run in the stringent mode, applying normalization to counts over bed files. If invoked together with ``--useSpikeInForNorm``, SEACR will be run in stringent mode, using spikein-normalized counts. FDR can be set by the user (default 0.05).
+.. note:: For narrow marks, the user may choose the peak caller from MACS2 (default), Genrich or `SEACR <https://github.com/FredHutch/SEACR>`__. By default, SEACR is run in the stringent mode, applying normalization to counts over bed files. If invoked together with ``--useSpikeInForNorm``, SEACR will be run in stringent mode, using spikein-normalized counts. FDR can be set by the user (default 0.05).
 
 .. note:: The ``_sampleSheet`` suffix for the ``CSAW_sampleSheet`` is drawn from the name of the sample sheet you use. So if you instead named the sample sheet ``mySampleSheet.txt`` then the folder would be named ``CSAW_mySampleSheet``. This facilitates using multiple sample sheets.
 

@@ -1,7 +1,7 @@
 #############convert sambamba report format########
 rule convert_flagstat_output:
     input:
-        "Sambamba/{sample}.markdup.txt"
+        "Sambamba/{sample}.flagstat.txt"
     output:
         temp("Sambamba/{sample}.dup.converted.tsv")
     shell: """

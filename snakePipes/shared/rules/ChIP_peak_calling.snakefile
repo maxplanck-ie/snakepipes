@@ -10,7 +10,7 @@ import subprocess
 if pairedEnd:
     rule writeFragmentSize:
         input: "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv"
-        output: "MACS2/fragmentSize.metrix.tsv"
+        output: "MACS2/fragmentSize.metric.tsv"
 
 
     rule MACS2:
@@ -243,4 +243,3 @@ if not peakCaller == "histoneHMM" and not externalBed:
             "{}_chipqc/.benchmark/chipqc.benchmark".format(peakCaller)
         conda: CONDA_CHIPQC_ENV
         script: "../rscripts/chipqc.R"
-

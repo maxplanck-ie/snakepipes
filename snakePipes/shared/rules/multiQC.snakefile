@@ -8,7 +8,7 @@ def multiqc_input_check(return_value):
     if pairedEnd:
         readsIdx = 2
 
-    if not pipeline=="scrnaseq" and ("fromBAM" not in globals() or not fromBAM):
+    if pipeline not in ("scrnaseq", "smrnaseq") and ("fromBAM" not in globals() or not fromBAM):
         if pairedEnd:
             if trim and fastqc:
                 infiles.append( expand("FastQC_trimmed/{sample}{read}_fastqc.html", sample = samples, read = reads) )
@@ -32,7 +32,7 @@ def multiqc_input_check(return_value):
         if aligner=="Bowtie2":
             infiles.append("deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv")
             infiles.append(expand("Bowtie2/{sample}.Bowtie2_summary.txt", sample = samples) +
-                    expand("Sambamba/{sample}.markdup.txt", sample = samples) +
+                    expand("Sambamba/{sample}.flagstat.txt", sample = samples) +
                     expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample=samples))
             indir += " Sambamba "
             indir += " Bowtie2 "
@@ -42,14 +42,14 @@ def multiqc_input_check(return_value):
                 indir += " Qualimap_qc "
         elif aligner=="bwa":
             infiles.append( expand("bwa/{sample}.bwa_summary.txt", sample = samples) +
-                            expand("Sambamba/{sample}.markdup.txt", sample = samples) +
+                            expand("Sambamba/{sample}.flagstat.txt", sample = samples) +
                             expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample=samples))
             indir += " Sambamba "
             indir += " bwa "
             indir += " deepTools_qc "
         elif aligner=="bwa-mem2":
             infiles.append( expand("bwa-mem2/{sample}.bwa-mem2_summary.txt", sample = samples) +
-                            expand("Sambamba/{sample}.markdup.txt", sample = samples) +
+                            expand("Sambamba/{sample}.flagstat.txt", sample = samples) +
                             expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample=samples))
             indir += " Sambamba "
             indir += " bwa-mem2 "
@@ -65,7 +65,7 @@ def multiqc_input_check(return_value):
         # must be RNA-mapping, add files as per the mode
         if ( "alignment" in mode or "deepTools_qc" in mode or "three-prime-seq" in mode ) and not "allelic-mapping" in mode and not "allelic-counting" in mode and not "allelic-whatshap" in mode:
             infiles.append( expand(aligner+"/{sample}.markdup.bam", sample = samples) +
-                    expand("Sambamba/{sample}.markdup.txt", sample = samples) +
+                    expand("Sambamba/{sample}.flagstat.txt", sample = samples) +
                     expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample=samples)+
                     expand("featureCounts/{sample}.counts.txt", sample = samples))
             indir += aligner + " featureCounts "
@@ -73,7 +73,7 @@ def multiqc_input_check(return_value):
             indir += " deepTools_qc "
         if "allelic-whatshap" in mode and not fromBAM:
             infiles.append( expand(aligner+"/{sample}.markdup.bam", sample = samples) +
-                    expand("Sambamba/{sample}.markdup.txt", sample = samples) +
+                    expand("Sambamba/{sample}.flagstat.txt", sample = samples) +
                     expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample=samples))
             infiles.append( expand("allelic_bams/{sample}.{suffix}.sorted.bam", sample = samples,suffix = ['allele_flagged', 'genome1', 'genome2', 'unassigned']) )
             indir += aligner
@@ -103,9 +103,20 @@ def multiqc_input_check(return_value):
     elif pipeline == "ncRNAseq":
         infiles.append(expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample=samples))
         indir += " STAR deepTools_qc "
+    elif pipeline == "smrnaseq":
+        # fastp merges paired reads into a single {sample}.fastq.gz (no {read} split, no
+        # post-trim FastQC step), unlike the generic RNA-seq trimming assumed above.
+        if fastqc:
+            infiles.append( expand("FastQC/{sample}{read}_fastqc.html", sample = samples, read = reads if pairedEnd else [reads[0]]) )
+            indir += " FastQC "
+        if trim:
+            infiles.append( expand(path.join(outdir, fastq_dir, "{sample}.fastq.gz"), sample = samples) )
+            indir += " " + fastq_dir + " "
+        infiles.append(expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt",sample=samples))
+        indir += " TEsmallOut deepTools_qc "
     elif pipeline == "hic":
         infiles.append(expand("HiC_matrices/QCplots/{sample}_QC/QC.log", sample = samples))
-        indir += " " + aligner + " " 
+        indir += " " + aligner + " "
         indir += " ".join(expand("HiC_matrices/QCplots/{sample}_QC ", sample = samples))
     elif pipeline == "scrnaseq":
         if trim:
@@ -117,7 +128,7 @@ def multiqc_input_check(return_value):
         if mode == "STARsolo":
             infiles.append( expand(fastq_dir+"/{sample}"+reads[0]+".fastq.gz", sample = samples) )
             infiles.append( expand(aligner+"/{sample}.markdup.bam", sample = samples) +
-            expand("Sambamba/{sample}.markdup.txt", sample = samples) +
+            expand("Sambamba/{sample}.flagstat.txt", sample = samples) +
             expand("deepTools_qc/estimateReadFiltering/{sample}_filtering_estimation.txt", sample=samples))
             indir += aligner
             indir += " Sambamba "

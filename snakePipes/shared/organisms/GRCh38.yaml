@@ -1,0 +1,27 @@
+genome_size: 2913022398
+genome_fasta: "/data/manke/processing/navandar/createOrgsIndex/genome_fasta/genome.fa"
+genome_index: "/data/manke/processing/navandar/createOrgsIndex/genome_fasta/genome.fa.fai"
+genome_2bit: "/data/manke/processing/navandar/createOrgsIndex/genome_fasta/genome.2bit"
+genome_dict: "/data/manke/processing/navandar/createOrgsIndex/genome_fasta/genome.dict"
+bowtie2_index: "/data/manke/processing/navandar/createOrgsIndex/BowtieIndex/genome"
+hisat2_index: "/data/manke/processing/navandar/createOrgsIndex/HISAT2Index/genome"
+bwa_index: "/data/manke/processing/navandar/createOrgsIndex/BWAIndex/genome.fa"
+bwa_mem2_index: "/data/manke/processing/navandar/createOrgsIndex/BWA-MEM2Index/genome.fa"
+bwameth_index: "/data/manke/processing/navandar/createOrgsIndex/BWAmethIndex/genome.fa"
+bwameth2_index: "/data/manke/processing/navandar/createOrgsIndex/BWAmeth2Index/genome.fa"
+known_splicesites: "/data/manke/processing/navandar/createOrgsIndex/HISAT2Index/splice_sites.txt"
+star_index: "/data/manke/processing/navandar/createOrgsIndex/STARIndex/"
+salmon_index: "/data/manke/processing/navandar/createOrgsIndex/SalmonIndex/"
+salmon_velocity_index:
+t2g_velocity:
+genes_bed: "/data/manke/processing/navandar/createOrgsIndex/annotation/genes.bed"
+genes_gtf: "/data/manke/processing/navandar/createOrgsIndex/annotation/genes.gtf"
+genes_t2g: "/data/manke/processing/navandar/createOrgsIndex/annotation/genes.t2g"
+spikein_genes_gtf:
+extended_coding_regions_gtf: "/data/manke/processing/navandar/createOrgsIndex/annotation/genes.slop.gtf"
+blacklist_bed: "/data/manke/processing/navandar/createOrgsIndex/annotation/blacklist.bed"
+spikein_blacklist_bed:
+ignoreForNormalization:
+rmsk_file:
+tesmall_db: "/data/manke/processing/navandar/createOrgsIndex/TEsmall"
+tesmall_genome: "hg38"

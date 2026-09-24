@@ -100,7 +100,7 @@ rule getRandomCpGs:
                 x = random.randint(0, n)
                 if x < maxLen:
                     B[x] = (tid, pos)
-        
+
         with open(input['genome_fasta'],'r') as f:
             for line in f:
                 if line.startswith(">"):

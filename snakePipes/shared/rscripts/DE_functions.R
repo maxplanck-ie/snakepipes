@@ -94,14 +94,14 @@ checktable <- function(countdata = NA, sampleSheet = NA, alleleSpecific = FALSE,
 
 DESeq_basic <- function(countdata, coldata, fdr, alleleSpecific = FALSE, from_salmon = FALSE, size_factors=NA, customFormula=NA, lrt = FALSE) {
     cnames.sub<-unique(colnames(coldata)[2:which(colnames(coldata) %in% "condition")])
-    
+
     if(is.na(customFormula)|customFormula==""){
       d<-as.formula(noquote(paste0("~",paste(cnames.sub,collapse="+"))))
     } else {
 
       d<-as.formula(paste0("~",customFormula))
     }
-    
+
 
     # Normal DESeq
     print("Performing basic DESeq: test vs control")
@@ -109,7 +109,7 @@ DESeq_basic <- function(countdata, coldata, fdr, alleleSpecific = FALSE, from_sa
       print("Using input from tximport")
         dds <- DESeq2::DESeqDataSetFromTximport(countdata,
                                   colData = coldata, design =d)
-                
+
       } else {
           if(isTRUE(alleleSpecific)) {
             rnasamp <- dplyr::select(countdata, dplyr::ends_with("_all"))
@@ -191,7 +191,7 @@ DESeq_allelic <- function(countdata, coldata, fdr, from_salmon=FALSE, customForm
     rownames(dds) <- rownames(rnasamp)
 
     }
-    
+
     # Run DESeq
     if(length(unique(coldata_allelic$condition))>1){
       DESeq2::design(dds) <- formula(~allele + condition + allele:condition)

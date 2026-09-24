@@ -2,12 +2,17 @@ name: conda-build
 
 on: [pull_request, push]
 
+permissions:
+  contents: read
+
 jobs:
   condaBuild:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: conda-incubator/setup-miniconda@v3
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+      - uses: conda-incubator/setup-miniconda@fc2d68f6413eb2d87b895e92f8584b5b94a10167 # v3.3.0
         with:
           environment-file: .github/conda_ci.yml
           condarc-file: .github/condarc.yml
@@ -15,7 +20,7 @@ jobs:
       - name: Install conda-build in base environment
         run: conda install -n base -c conda-forge conda-build
       - name: buildSnakePipes
-        uses: uibcdf/action-build-and-upload-conda-packages@v1.4.0
+        uses: uibcdf/action-build-and-upload-conda-packages@b06165145a25b9c8bcb2d2b24682ad0d8e494ce7 # v1.4.0
         with:
           meta_yaml_dir: conda-recipe
           python-version: 3.11

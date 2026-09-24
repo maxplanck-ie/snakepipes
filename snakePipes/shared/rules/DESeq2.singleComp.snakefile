@@ -13,7 +13,7 @@ rule DESeq2:
         sampleSheet = sampleSheet,
         symbol_file = "Annotation/genes.filtered.symbol" #get_symbol_file
     output:
-        "{}/DESeq2.session_info.txt".format(get_outdir("DESeq2",sampleSheet,LRT)) 
+        "{}/DESeq2.session_info.txt".format(get_outdir("DESeq2",sampleSheet,LRT))
     benchmark:
         "{}/.benchmark/DESeq2.featureCounts.benchmark".format(get_outdir("DESeq2",sampleSheet,LRT))
     params:

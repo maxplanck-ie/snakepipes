@@ -9,7 +9,7 @@ Cookbook
 Create Hybrid Genome with Spike-in Sequences (:ref:`createIndices`)
 --------------------------------------------------------------------
 
-Generate a reference genome including both the native organism (referred to as host)  and spike-in control sequences.   
+Generate a reference genome including both the native organism (referred to as host)  and spike-in control sequences.
 
 .. code-block:: bash
 
@@ -20,7 +20,7 @@ Generate a reference genome including both the native organism (referred to as h
 Cut&Tag Data Analysis (:ref:`DNAmapping` and :ref:`ChIPseq`)
 -------------------------------------------------------------
 
-Process and analyze Cut&Tag data for chromatin binding. Fastq files are mapped to a host-spikein hybrid genome and spikein sequences are used for normalization of bam coverage tracks.   
+Process and analyze Cut&Tag data for chromatin binding. Fastq files are mapped to a host-spikein hybrid genome and spikein sequences are used for normalization of bam coverage tracks.
 
 .. code-block:: bash
 
@@ -51,7 +51,7 @@ Investigate temporal changes in transcript levels across multiple time points by
 
 .. code-block:: bash
 
-   mRNAseq -i RNAseq -o analysis --sampleSheet sampleSheet.csv  --LRT mm10_gencodeM19 
+   mRNAseq -i RNAseq -o analysis --sampleSheet sampleSheet.csv  --LRT mm10_gencodeM19
 
 
 -----------------------------------------------------------------------------
@@ -96,4 +96,3 @@ Quantify and compare transcript expression between different conditions.
 .. code-block:: bash
 
    mRNAseq -i RNAseq -o analysis -m alignment-free --sampleSheet sampleSheet.csv mm10_gencodeM19
-
