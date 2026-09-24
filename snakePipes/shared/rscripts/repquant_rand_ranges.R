@@ -17,8 +17,6 @@ suppressPackageStartupMessages(library(GenomicRanges))
 
 peaktable<-read.table(merged_peaks)
 peaksGR<-GRanges(seqnames=peaktable$V1,ranges=IRanges(start = peaktable$V2,end=peaktable$V3,))
-  
+
 peakran<-randomizeFeature(reduce(peaksGR),stranded=TRUE,keep.strand.prop=TRUE,keep.chrom=TRUE,seed=123)
 rtracklayer::export(peakran,con=sub("_peak_intersect_f0.5.bed","_randomized_peaks.bed",basename(merged_peaks)))
-
-

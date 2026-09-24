@@ -41,10 +41,9 @@ def parse_args(
         "peakCallerOptions": "--qvalue 0.001",
         "cutntag": False,
         "getSizeFactorsFrom": "genome",
-        "repQuant": False 
+        "repQuant": False,
     },
 ):
-
     """
     Parse arguments from the command line.
     """
@@ -132,11 +131,13 @@ def parse_args(
         default=defaults["fragmentLength"],
     )
 
-    optional.add_argument("--repQuant",
-                          help="if set, repeat binding quantification according to Pal et al. 2023 is performed."
-                          "Setting this option requiers rmsk_file set in the organism yaml. "
-                          " Default is '%(default)s'.",
-                          action="store_true")
+    optional.add_argument(
+        "--repQuant",
+        help="if set, repeat binding quantification according to Pal et al. 2023 is performed."
+        "Setting this option requires rmsk_file set in the organism yaml. "
+        " Default is '%(default)s'.",
+        action="store_true",
+    )
 
     optional.add_argument(
         "--bwBinSize",

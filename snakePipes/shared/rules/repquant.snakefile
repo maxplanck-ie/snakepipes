@@ -68,7 +68,7 @@ rule intersect_peaks_rmsk:
     conda: CONDA_SEACR_ENV
     shell: """
            bedtools intersect -wa -u -a <( bedtools sort -i {input.rmsk_gtf} ) -b <( bedtools sort -i {input.merged_peaks} ) > {output.rmsk_annotated_peaks}
-           """        
+           """
 
 rule randomize_peaks:
     input:
