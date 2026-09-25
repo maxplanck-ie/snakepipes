@@ -9,6 +9,7 @@ dependencies:
   - bioconductor-genomicranges
   - bioconductor-biocstyle
   - r-ggplot2
+  - r-rcolorbrewer
   - r-reshape2
   - r-scales
   - r-rmarkdown

@@ -10,6 +10,13 @@ else:
 merge_dict=df.groupby(groupby_col)["name"].apply(list).to_dict()
 
 
+def get_repquant_outdir(folder_name,sampleSheet):
+    sample_name = os.path.splitext(os.path.basename(str(sampleSheet)))[0]
+    output_folder_name = "{}_{}".format(folder_name, sample_name)
+    return(output_folder_name)
+
+
+
 rule merge_peaks:
     input:
         peaks=lambda wildcards: expand("SEACR/{chip_sample}.filtered.stringent.bed", chip_sample=merge_dict[wildcards.merge_group]),
@@ -17,7 +24,7 @@ rule merge_peaks:
     output:
         merged_peaks = "SEACR_merged_peaks/{merge_group}_peak_intersect_f0.5.bed"
     params:
-        b = lambda wildcards,input: " ".join(f"-b {sfile}" for sfile in input.peaks[1:])
+        b = lambda wildcards,input: " ".join(f"-b {sfile}" for sfile in input.peaks[1:]) if len(input.peaks)>1 else f"-b {input.peaks[0]}"
     conda: CONDA_SEACR_ENV
     shell: """
             bedtools intersect -a {input.peaks[0]} {params.b} -f 0.5 > {output}
@@ -101,10 +108,10 @@ rule generate_repquant_report:
         rmsk_annotated_randomized_peaks = expand("SEACR_randomized_peaks/{merge_group}_rmsk.bed",merge_group=merge_dict.keys()),
         rmsk_gtf="Annotation/rmsk.gtf"
     output:
-        report_html = "RepQuant/report.html"
+        report_html = "{}/report.html".format(get_repquant_outdir("RepQuant",sampleSheet))
     params:
         script = os.path.join(maindir, "shared", "rscripts","repquant_report.Rmd"),
-        outdir = "RepQuant",
+        outdir = get_repquant_outdir("RepQuant",sampleSheet),
         rmsk_annotated_peaks = lambda wildcards,input: [os.path.join(outdir,x) for x in input.rmsk_annotated_peaks],
         rmsk_annotated_randomized_peaks = lambda wildcards,input: [os.path.join(outdir,x) for x in input.rmsk_annotated_randomized_peaks],
         rmsk_gtf=lambda wildcards,input: os.path.join(outdir,input.rmsk_gtf)

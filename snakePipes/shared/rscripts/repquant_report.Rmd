@@ -21,6 +21,7 @@ output:
 .libPaths(R.home('library'))
 
 suppressPackageStartupMessages(library('ggplot2'))
+suppressPackageStartupMessages(library('RColorBrewer'))
 suppressPackageStartupMessages(library('reshape2'))
 suppressPackageStartupMessages(library('rtracklayer'))
 suppressPackageStartupMessages(library('genomation'))
@@ -48,9 +49,10 @@ obslist<-lapply(rmsk_annotated_peaks,import.gff)
 names(obslist)<-sub("_rmsk.bed","",basename(rmsk_annotated_peaks))
 
 tablist<-lapply(obslist,function(X){
-  a<-strsplit(mcols(X)$gene_id,"/")
-  b<-lapply(a,function(Y)Y[[1]])
-  table(unlist(b))
+  #a<-strsplit(mcols(X)$gene_id,"/")
+  #b<-lapply(a,function(Y)Y[[1]])
+  b<-mcols(X)$family_id
+  table(b)
 })
 
 ```
@@ -60,9 +62,10 @@ Now we calculate the reference repeat counts from the repeat masker file.
 ```{r ref}
 rmsk_gtf<-snakemake@params[["rmsk_gtf"]]
 ref<-import.gff(rmsk_gtf)
-r1<-strsplit(mcols(ref)$gene_id,"/")
-r2<-lapply(r1,function(Y)Y[[1]])
-reftab<-table(unlist(r2))
+#r1<-strsplit(mcols(ref)$gene_id,"/")
+#r2<-lapply(r1,function(Y)Y[[1]])
+r2<-mcols(ref)$family_id
+reftab<-table(r2)
 
 ```
 
@@ -95,7 +98,9 @@ write.table(plotdat2,"FractionRecoveredRepeats.tsv",sep="\t",row.names=FALSE,quo
 
 #select a number of repeat names for plotting
 plotdatsub<-plotdat2[plotdat2$Repeat %in% c("Alu","ERV1","ERVK","ERVL","ERVL-MaLR","hAT-Charlie","L1","L2","MIR","TcMar-Tigger"),]
-ggplot(data=plotdatsub)+geom_bar(position="stack",aes(x=Experiment,y=FractionRecovered,fill=Repeat),stat="identity")+theme(axis.text.x=element_text(angle=90))
+custom_palette <- colorRampPalette(brewer.pal(9, "Set2"))(10)
+
+ggplot(data=plotdatsub)+geom_bar(position="stack",aes(x=Experiment,y=FractionRecovered,fill=Repeat),stat="identity")+theme(axis.text.x=element_text(angle=90))+scale_fill_manual(values=custom_palette,drop=FALSE)
 ggsave("FractionRecoveredRepeats_by_Experiment.png")
 
 ```
@@ -111,9 +116,10 @@ randlist2<-lapply(rmsk_annotated_randomized_peaks,import.gff)
 names(randlist2)<-sub("_rmsk.bed","",basename(rmsk_annotated_randomized_peaks))
 
 randlist3<-lapply(randlist2,function(X){
-  a<-strsplit(mcols(X)$gene_id,"/")
-  b<-lapply(a,function(Y)Y[[1]])
-  table(unlist(b))
+  #a<-strsplit(mcols(X)$gene_id,"/")
+  #b<-lapply(a,function(Y)Y[[1]])
+  b<-mcols(X)$family_id
+  table(b)
 })
 
 
@@ -142,7 +148,7 @@ rownames(randdatNorm)<-randdat$Repeat
 Now, we're going to put together observed and expected repeat counts.
 
 ```{r obs_exp}
-all(as.character(tabdat$Repeat)==as.character(randdat$Repeat)) #FALSE
+all(as.character(tabdat$Repeat)==as.character(randdat$Repeat)) #TRUE
 tabdat$Repeat<-as.character(tabdat$Repeat)
 randdat$Repeat<-as.character(randdat$Repeat)
 randdat<-randdat[match(tabdat$Repeat,randdat$Repeat),]
