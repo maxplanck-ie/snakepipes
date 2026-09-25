@@ -1,0 +1,17 @@
+name: repquant-env-1.0
+channels:
+  - mpi-ie
+  - conda-forge
+  - bioconda
+dependencies:
+  - bioconductor-genomation
+  - bioconductor-rtracklayer
+  - bioconductor-genomicranges
+  - bioconductor-biocstyle
+  - r-ggplot2
+  - r-rcolorbrewer
+  - r-reshape2
+  - r-scales
+  - r-rmarkdown
+  - r-knitr
+  - pandoc

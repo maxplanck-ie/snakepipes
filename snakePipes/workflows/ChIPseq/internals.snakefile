@@ -316,3 +316,9 @@ if externalBed:
         peakCaller = os.path.splitext(os.path.basename(externalBed))[0]
     else:
         warnings.warn("{} file not found.".format(externalBed))
+
+
+if repQuant:
+    if not rmsk_file or not os.path.isfile(rmsk_file):
+        print("repQuant was set but no repeat masker file was provided in the organism yaml.")
+        exit(1)
