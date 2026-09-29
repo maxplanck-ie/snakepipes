@@ -882,7 +882,7 @@ class TestChIPseq:
             SMKOPTS,
             "--peakCaller",
             "SEACR",
-            "--repQuant"
+            "--repQuant",
             ifs / "org.yaml",
             ifs / "chipdict.yaml",
         ]
