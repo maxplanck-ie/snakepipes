@@ -11,6 +11,8 @@ snakePipes 3.5.0
 * Allelic-whatshap mode now works with alignment-free mode and fromBAM in the mRNAseq workflow.
 * ncRNAseq workflow now accepts the --libraryType parameter which is passed to the TEcounts tool.
 * --repQuant was added to the ChIPseq workflow that allows for repeat binding quantification after Pal et al., NSMB, 2023 https://doi.org/10.1038/s41594-023-01016-5
+* A smRNAseq workflow was added for small-RNA-seq data. Reads are adapter-trimmed with fastp, and small RNAs (miRNAs, piRNAs and structural RNAs) are quantified with TEsmall, followed by deepTools QC and a MultiQC report.
+* createIndices now builds the TEsmall-compatible genome, annotation and bowtie indices required by the smRNAseq workflow when run with the --tesmall and --tesmallGenome options. These options add ``tesmall_db`` and ``tesmall_genome`` entries to the organism YAML file.
 
 
 snakePipes 3.4.0
