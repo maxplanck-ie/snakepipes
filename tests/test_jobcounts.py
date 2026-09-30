@@ -871,6 +871,26 @@ class TestChIPseq:
         assert _p.returncode == 0
         assert parseSpOut(_p) == 54
 
+    def test_repquant_samplesheet_seacr(self, ifs):
+        ci = [
+            "ChIPseq",
+            "-d",
+            ifs / "bam_input",
+            "--sampleSheet",
+            ifs / "sampleSheet.tsv",
+            "--snakemakeOptions",
+            SMKOPTS,
+            "--peakCaller",
+            "SEACR",
+            "--repQuant",
+            ifs / "org.yaml",
+            ifs / "chipdict.yaml",
+        ]
+        print(" ".join([str(i) for i in ci]))
+        _p = sp.run(ci, capture_output=True, text=True)
+        assert _p.returncode == 0
+        assert parseSpOut(_p) == 82
+
     def test_nosamplesheet(self, ifs):
         ci = [
             "ChIPseq",

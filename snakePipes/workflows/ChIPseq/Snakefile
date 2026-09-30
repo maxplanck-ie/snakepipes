@@ -64,6 +64,11 @@ if not fromBAM and not useSpikeInForNorm:
     include: os.path.join(maindir, "shared", "rules", "ChiP-seq_qc_report.snakefile")
 
 
+if repQuant:
+
+    include: os.path.join(maindir, "shared", "rules", "repquant.snakefile")
+
+
 # deeptools for allelic bams (if present)
 
 
@@ -490,6 +495,37 @@ def run_chipqc():
     return file_list
 
 
+def run_repquant(repQuant):
+    file_list = []
+    if repQuant and peakCaller == "SEACR":
+        file_list = expand(
+            "SEACR_merged_peaks/{merge_group}_peak_intersect_f0.5.bed",
+            merge_group=merge_dict.keys(),
+        )
+        file_list.append(
+            expand(
+                "SEACR_annotated_peaks/{merge_group}_rmsk.bed",
+                merge_group=merge_dict.keys(),
+            )
+        )
+        file_list.append(
+            expand(
+                "SEACR_randomized_peaks/{merge_group}_randomized_peaks.bed",
+                merge_group=merge_dict.keys(),
+            )
+        )
+        file_list.append(
+            expand(
+                "SEACR_randomized_peaks/{merge_group}_rmsk.bed",
+                merge_group=merge_dict.keys(),
+            )
+        )
+        file_list.append(
+            "{}/report.html".format(get_repquant_outdir("RepQuant", sampleSheet))
+        )
+    return file_list
+
+
 ### execute before workflow starts #############################################
 ################################################################################
 onstart:
@@ -549,6 +585,7 @@ rule all:
         run_CSAW(),
         "QC_report/QC_report_all.tsv" if not fromBAM and not useSpikeInForNorm else [],
         run_chipqc(),
+        run_repquant(repQuant),
 
 
 ### execute after workflow finished ############################################

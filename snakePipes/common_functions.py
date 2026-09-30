@@ -20,10 +20,10 @@ def set_env_yamls():
     """
     This defines the global variables describing where the conda env yaml files are
     """
+
     return {
         "CONDA_SHARED_ENV": "envs/shared.yaml",
         "CONDA_CREATE_INDEX_ENV": "envs/createIndices.yaml",
-        "CONDA_CREATE_TEsmall_ENV": "envs/createindices_tesmall.yaml",
         "CONDA_RNASEQ_ENV": "envs/rna_seq.yaml",
         "CONDA_SALMON_ENV": "envs/salmon.yaml",
         "CONDA_SLEUTH_ENV": "envs/sleuth.yaml",
@@ -43,7 +43,6 @@ def set_env_yamls():
         "CONDA_RMD_ENV": "envs/rmarkdown.yaml",
         "CONDA_PREPROCESSING_ENV": "envs/preprocessing.yaml",
         "CONDA_NONCODING_RNASEQ_ENV": "envs/noncoding.yaml",
-        "CONDA_SMRNA_ENV": "envs/smrna.yaml",
         "CONDA_SAMBAMBA_ENV": "envs/sambamba.yaml",
         "CONDA_pysam_ENV": "envs/pysam.yaml",
         "CONDA_SEACR_ENV": "envs/chip_seacr.yaml",
@@ -51,6 +50,9 @@ def set_env_yamls():
         "CONDA_WHATSHAP_ENV": "envs/whatshap.yaml",
         "CONDA_PICARD_ENV": "envs/picard.yaml",
         "CONDA_CHIPQC_ENV": "envs/chipqc.yaml",
+        "CONDA_CREATE_TEsmall_ENV": "envs/createindices_tesmall.yaml",
+        "CONDA_SMRNA_ENV": "envs/smrna.yaml",
+        "CONDA_REPQUANT_ENV": "envs/repquant.yaml",
     }
 
 

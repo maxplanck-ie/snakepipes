@@ -316,3 +316,15 @@ if externalBed:
         peakCaller = os.path.splitext(os.path.basename(externalBed))[0]
     else:
         warnings.warn("{} file not found.".format(externalBed))
+
+
+if repQuant:
+    if not rmsk_file or not os.path.isfile(rmsk_file):
+        print("repQuant was set but no repeat masker file was provided in the organism yaml.")
+        exit(1)
+    if not sampleSheet or not os.path.isfile(sampleSheet):
+        print("repQuant currently requires a sampleSheet but none was set or the file doesn't exist.")
+        exit(1)
+    if not peakCaller=="SEACR":
+        print("repQuant is currently set to work with the peak caller SEACR but another peak caller was specified")
+        exit(1)

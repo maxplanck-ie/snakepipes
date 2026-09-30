@@ -10,6 +10,7 @@ snakePipes 3.5.0
 * Spikein size factor normalization was enabled in allele-specific CSAW in the ChIPseq workflow.
 * Allelic-whatshap mode now works with alignment-free mode and fromBAM in the mRNAseq workflow.
 * ncRNAseq workflow now accepts the --libraryType parameter which is passed to the TEcounts tool.
+* --repQuant was added to the ChIPseq workflow that allows for repeat binding quantification after Pal et al., NSMB, 2023 https://doi.org/10.1038/s41594-023-01016-5
 
 
 snakePipes 3.4.0

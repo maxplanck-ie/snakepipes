@@ -56,6 +56,13 @@ DESeq2-style scaling factors produced with deepTools multiBamSummary will then b
 
 A hybrid genome can be obtained with createIndices workflow and can be passed to the DNAmapping workflow without any particular arguments.
 
+.. _repquant:
+
+Repeat Binding Analysis
+~~~~~~~~~~~~~~~~~~~~~~~
+
+If ``--repQuant`` is specified alongside a sample sheet, repeat binding will be quantified as described in Pal et al., NSMB 2023 https://doi.org/10.1038/s41594-023-01016-5 . The resulting html report file will be output in a repQuant folder named after the peakCaller. Requires an entry for the repeat masker file in the organism.yaml, and a sampleSheet. Currently supported only for peak caller SEACR.
+
 
 .. _diffBinding:
 
