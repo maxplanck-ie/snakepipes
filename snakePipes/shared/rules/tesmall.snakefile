@@ -37,7 +37,7 @@ def organize_tesmall_output(teout_dir):
                 shutil.move(fpath, os.path.join(teout_dir, category, fname))
                 break
 
-Adapterseq = "../../workflows/smRNAseq/reads_adapters_set.fasta"
+Adapterseq = os.path.join(maindir, "workflows", "smRNAseq", "reads_adapters_set.fasta")
 
 # tesmall_db (--dbfolder) and tesmall_genome (-g) both come straight from the
 # organism YAML createIndices wrote (see workflows/createIndices/Snakefile) --

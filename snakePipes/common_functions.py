@@ -807,6 +807,12 @@ def commonYAMLandLogs(baseDir, workflowDir, defaults, args, callingScript):
     return " ".join(snakemake_cmd)
 
 
+def _dot_only(out):
+    # snakemake prints "Building DAG of jobs..." on stdout even with --quiet,
+    # which dot rejects as a syntax error
+    return out[out.index("digraph") :] if "digraph" in out else out
+
+
 def plot_DAG(args, snakemake_cmd, calling_script, defaults):
     if not args.createDAG:
         return
@@ -821,7 +827,7 @@ def plot_DAG(args, snakemake_cmd, calling_script, defaults):
     )
 
     # Read DOT data from stdout
-    dot = DAGproc.stdout.read()
+    dot = _dot_only(DAGproc.stdout.read())
 
     # Use graphviz to render DAG, if it is available
     # conda graphviz doesn't provide the python bindings, the pip graphviz does, but has no executable.
@@ -857,18 +863,19 @@ def print_DAG(args, snakemake_cmd, callingScript, defaults):
             trafo=None,
         )
 
-        DAGproc = subprocess.Popen(
+        DAGproc = subprocess.run(
             snakemake_cmd + " --rulegraph -q ",
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
+            capture_output=True,
             text=True,
             shell=True,
         )
 
-        subprocess.check_call(
+        subprocess.run(
             f"dot -Tpdf -o{args.outdir}/{workflowName}_pipeline.pdf",
-            stdin=DAGproc.stdout,
+            input=_dot_only(DAGproc.stdout),
+            text=True,
             shell=True,
+            check=True,
         )
         config["verbose"] = oldVerbose
         write_configfile(
