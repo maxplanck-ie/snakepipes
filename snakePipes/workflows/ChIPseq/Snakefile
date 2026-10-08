@@ -233,21 +233,6 @@ def run_deepTools_allelic():
                         + ".bw",
                     ]
                 )
-            else:
-                file_list.append(
-                    [
-                        "deepTools_ChIP/bamCompare/allele_specific/"
-                        + chip_sample
-                        + ".genome1.log2ratio.over_"
-                        + control_name
-                        + ".scaledBYspikein.bw",
-                        "deepTools_ChIP/bamCompare/allele_specific/"
-                        + chip_sample
-                        + ".genome2.log2ratio.over_"
-                        + control_name
-                        + "scaledBYspikein.bw",
-                    ]
-                )
         file_list.append(
             [
                 "deepTools_ChIP/plotEnrichment/plotEnrichment.gene_features_allelic.png",
@@ -260,12 +245,12 @@ def run_deepTools_allelic():
                 control_name = get_control_name(chip_sample)
                 file_list.append(
                     [
-                        "deepTools_ChIP/bamCompare/allele_specific/"
+                        "split_deepTools_ChIP/bamCompare/allele_specific/"
                         + chip_sample
                         + ".genome1.log2ratio.over_"
                         + control_name
                         + ".scaledBYspikein.bw",
-                        "deepTools_ChIP/bamCompare/allele_specific/"
+                        "split_deepTools_ChIP/bamCompare/allele_specific/"
                         + chip_sample
                         + ".genome2.log2ratio.over_"
                         + control_name
