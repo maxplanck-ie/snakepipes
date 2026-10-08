@@ -2,6 +2,9 @@ name: osx
 
 on: [pull_request, push]
 
+permissions:
+  contents: read
+
 defaults:
   run:
       shell: bash -l {0}
@@ -17,7 +20,6 @@ jobs:
           'CONDA_RNASEQ_ENV',
           'CONDA_RMATS_ENV',
           'CONDA_scRNASEQ_ENV',
-          'CONDA_seurat3_ENV',
           'CONDA_loompy_ENV',
           'CONDA_alevinqc_ENV',
           'CONDA_eisaR_ENV',
@@ -32,12 +34,15 @@ jobs:
           'CONDA_NONCODING_RNASEQ_ENV',
           'CONDA_SAMBAMBA_ENV',
           'CONDA_pysam_ENV',
-          'CONDA_FQLINT_ENV'
+          'CONDA_FQLINT_ENV',
+          'CONDA_CREATE_TEsmall_ENV'
         ]
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: conda-incubator/setup-miniconda@v3
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+      - uses: conda-incubator/setup-miniconda@fc2d68f6413eb2d87b895e92f8584b5b94a10167 # v3.3.0
         with:
           environment-file: .github/conda_ci.yml
           activate-environment: conda_ci
@@ -49,4 +54,3 @@ jobs:
         run: |
           conda config --set subdir osx-64
           snakePipes createEnvs --only ${{matrix.envs}}
-     

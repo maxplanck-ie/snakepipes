@@ -42,7 +42,7 @@ skipVelocyto: False
 ##mode Alevin options
 alevinLibraryType: "ISR"
 prepProtocol: "chromiumV3"
-expectCells: 
+expectCells:
 #generic options
 libraryType: 1
 bwBinSize: 10

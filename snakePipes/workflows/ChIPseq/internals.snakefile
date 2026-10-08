@@ -6,6 +6,7 @@ from ruamel.yaml import YAML
 import sys
 import pandas as pd
 import warnings
+from itertools import chain
 
 ### Functions ##################################################################
 
@@ -165,6 +166,11 @@ if not fromBAM:
         if not os.path.isfile(os.path.join(workingdir, "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv")):
             sys.exit('ERROR: {} is required but not present\n'.format(os.path.join(workingdir, "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv")))
 
+    if useSpikeInForNorm:
+        spikeinSizeFactorsFile=os.path.join(workingdir, "split_deepTools_qc/multiBamSummary/spikein.scaling_factors.txt")
+        if not os.path.isfile(spikeinSizeFactorsFile):
+            sys.exit('ERROR: {} is required but not present\n'.format(spikeinSizeFactorsFile))
+
     # consistency check whether all required files exist for all samples
     for sample in all_samples:
         req_files = [
@@ -194,6 +200,9 @@ else:
     for sample in all_samples:
         if sample not in bamDict:
             sys.exit("No bam file found for chip sample {}!".format(sample))
+    if useSpikeInForNorm:
+        if not spikeinSizeFactorsFile or not os.path.isfile(spikeinSizeFactorsFile):
+            sys.exit('ERROR: A spikein size factors file is required but not present\n')
     aligner = "EXTERNAL_BAM"
     indir = fromBAM
     downsample = None
@@ -230,18 +239,27 @@ if sampleSheet:
         filtered_dict = filter_dict(sampleSheet,dict(zip(chip_samples_w_ctrl, [ get_control_name(x) for x in chip_samples_w_ctrl ])))
     else:
         filtered_dict = filter_dict(sampleSheet,dict(zip(chip_samples_wo_ctrl, [None]*len(chip_samples_wo_ctrl))))
+    print(filtered_dict)
     genrichDict = cf.sampleSheetGroups(sampleSheet,isMultipleComparison)
     if not isMultipleComparison:
         for k in genrichDict.keys():
             genrichDict[k]=[item for item in genrichDict[k] if item in chip_samples]
         reordered_dict = {k: filtered_dict[k] for k in [item for sublist in genrichDict.values() for item in sublist]}
     else:
-        #print(genrichDict)
+        print(genrichDict)
         reordered_dict = {}
-        for g in genrichDict.keys():
-            for k in genrichDict[g].keys():
-                genrichDict[g][k]=[item for item in genrichDict[g][k] if item in chip_samples]
-                reordered_dict[g] = {k: filtered_dict[k] for k in [item for sublist in genrichDict[g].values() for item in sublist]}
+        #for g in genrichDict.keys():
+        #    for k in genrichDict[g].keys():
+        #        genrichDict[g][k]=[item for item in genrichDict[g][k] if item in chip_samples]
+        #        reordered_dict[g] = {k: filtered_dict[k] for k in [item for sublist in genrichDict[g].values() for item in sublist]}
+        for g in genrichDict:
+            # filter each condition list to only chip samples
+            for k in genrichDict[g]:
+                genrichDict[g][k] = [item for item in genrichDict[g][k] if item in chip_samples]
+
+            # flatten the lists and build mapping, skipping missing keys just in case
+            flattened = chain.from_iterable(genrichDict[g].values())
+            reordered_dict[g] = {fk: filtered_dict[fk] for fk in flattened if fk in filtered_dict}
 else:
     genrichDict = {"all_samples": chip_samples}
 
@@ -255,7 +273,7 @@ def check_if_spikein_genome(genome_index,spikeinExt):
             for line in ifile:
                 resl.append(re.search(spikeinExt, line))
         if any(resl):
-            warnings.warn("\n Spikein genome detected - at least one spikeIn chromosome found with extention " + spikeinExt + " .\n\n")
+            warnings.warn("\n Spikein genome detected - at least one spikeIn chromosome found with extension " + spikeinExt + " .\n\n")
             return True
         else:
             return False
@@ -290,7 +308,7 @@ if useSpikeInForNorm:
             k, v = next(iter(spikein_chr.items()))
             spikein_region = ":0:".join([str(k),str(v)])
     else:
-        print("\n No spikein genome detected - no spikeIn chromosomes found with extention " + spikeinExt + " .\n\n")
+        print("\n No spikein genome detected - no spikeIn chromosomes found with extension " + spikeinExt + " .\n\n")
         exit(1)
 
 if externalBed:
@@ -298,3 +316,15 @@ if externalBed:
         peakCaller = os.path.splitext(os.path.basename(externalBed))[0]
     else:
         warnings.warn("{} file not found.".format(externalBed))
+
+
+if repQuant:
+    if not rmsk_file or not os.path.isfile(rmsk_file):
+        print("repQuant was set but no repeat masker file was provided in the organism yaml.")
+        exit(1)
+    if not sampleSheet or not os.path.isfile(sampleSheet):
+        print("repQuant currently requires a sampleSheet but none was set or the file doesn't exist.")
+        exit(1)
+    if not peakCaller=="SEACR":
+        print("repQuant is currently set to work with the peak caller SEACR but another peak caller was specified")
+        exit(1)

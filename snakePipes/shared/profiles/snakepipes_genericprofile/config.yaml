@@ -216,6 +216,8 @@ set-resources:
     mem: 10G
   TEcounts:
     mem: 16G
+  Tesmall_run:
+    mem: 30G
   velo_to_sce:
     mem: 30G
   velocyto:

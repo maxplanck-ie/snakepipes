@@ -35,7 +35,7 @@ filter_empty_cells<-function(folder,sample){
 
     abline(h=metadata(br.out)$knee, col="dodgerblue", lty=2)
     abline(h=metadata(br.out)$inflection, col="forestgreen", lty=2)
-    legend("bottomleft", lty=2, col=c("dodgerblue", "forestgreen"), 
+    legend("bottomleft", lty=2, col=c("dodgerblue", "forestgreen"),
         legend=c("knee", "inflection"))
     dev.off()
 
@@ -45,7 +45,7 @@ filter_empty_cells<-function(folder,sample){
     e.out
 
     is.cell <- e.out$FDR <= 0.01
-    sum(is.cell, na.rm=TRUE) 
+    sum(is.cell, na.rm=TRUE)
 
     table(Limited=e.out$Limited, Significant=is.cell)
 
@@ -91,4 +91,3 @@ saveRDS(s,file=outfile)
 sink("sessionInfo.txt")
 sessionInfo()
 sink()
-

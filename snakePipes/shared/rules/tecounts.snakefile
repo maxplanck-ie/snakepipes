@@ -101,13 +101,14 @@ rule TEcounts:
     output:
         "TEcount/{sample}.cntTable"
     params:
-        gtf = genes_gtf
+        gtf = genes_gtf,
+        stranded = stranded_opt
     benchmark:
         "TEcount/.benchmark/{sample}.benchmark"
     threads: 1
     conda: CONDA_NONCODING_RNASEQ_ENV
     shell: """
-        TEcount --format BAM --mode multi -b {input.bam} --GTF {params.gtf} --TE {input.repeatGTF} --project TEcount/{wildcards.sample}
+        TEcount --format BAM --mode multi --stranded {params.stranded} -b {input.bam} --GTF {params.gtf} --TE {input.repeatGTF} --project TEcount/{wildcards.sample}
         """
 
 

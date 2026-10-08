@@ -138,7 +138,7 @@ rule gzip_STARsolo_for_seurat:
          gzip -c {params.filtered_bc} > {params.filtered_bc_gz};
          gzip -c {input.filtered_features} > {params.filtered_features_gz};
          gzip -c {input.raw_counts} > {output.raw_counts_gz};
-         gzip -c {input.filtered_counts} > {output.filtered_counts_gz} 
+         gzip -c {input.filtered_counts} > {output.filtered_counts_gz}
     """
 
 
@@ -180,5 +180,3 @@ rule remove_empty_drops:
         samples = samples
     conda: CONDA_seurat_ENV
     script: "../rscripts/scRNAseq_EmptyDrops.R"
-
-

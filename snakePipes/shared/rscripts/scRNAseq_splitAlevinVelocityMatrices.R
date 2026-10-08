@@ -20,29 +20,29 @@ suppressPackageStartupMessages({
 sce_from_scounts_ucounts <- function(scounts, ucounts) {
   ss <- sum(scounts)
   su <- sum(ucounts)
-  
+
   allgenes <- union(rownames(scounts), rownames(ucounts))
   allcells <- union(colnames(scounts), colnames(ucounts))
 
   scounts <- as.matrix(scounts)
-  scounts <- scounts[match(allgenes, rownames(scounts)), 
+  scounts <- scounts[match(allgenes, rownames(scounts)),
                      match(allcells, colnames(scounts))]
   scounts[is.na(scounts)] <- 0
   rownames(scounts) <- allgenes
   colnames(scounts) <- allcells
-    
+
   ucounts <- as.matrix(ucounts)
-  ucounts <- ucounts[match(allgenes, rownames(ucounts)), 
+  ucounts <- ucounts[match(allgenes, rownames(ucounts)),
                      match(allcells, colnames(ucounts))]
   ucounts[is.na(ucounts)] <- 0
   rownames(ucounts) <- allgenes
   colnames(ucounts) <- allcells
-  
+
   stopifnot(all(rownames(ucounts) == rownames(scounts)))
   stopifnot(all(colnames(ucounts) == colnames(scounts)))
   stopifnot(sum(scounts) == ss)
   stopifnot(sum(ucounts) == su)
-  
+
   SingleCellExperiment(
     assays = list(counts = as(scounts, "dgCMatrix"),
                   spliced = as(scounts, "dgCMatrix"),
@@ -86,16 +86,14 @@ colnames(tx2gene)<-c("transcript_id","gene_id")
 gene2symbol<- read.table(g2s,header=FALSE,sep="\t",quote="",as.is=TRUE)
 tx2gene$gene_name<-gene2symbol$V2[match(tx2gene$gene_id,gene2symbol$V1)]
 
-sce<- do.call(cbind, lapply(samplenames, function(s) { 
+sce<- do.call(cbind, lapply(samplenames, function(s) {
         tmp <- read_alevin_cdna_introns(alevindir = alevindir,sampleid = s, tx2gene = tx2gene)
         colnames(tmp) <- paste0(s, "__", colnames(tmp))
         tmp
       }))
 
-saveRDS(sce,outfile)  
+saveRDS(sce,outfile)
 
 sink("sessionInfo.txt")
 sessionInfo()
 sink()
-
-

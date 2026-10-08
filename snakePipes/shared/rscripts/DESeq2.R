@@ -113,7 +113,7 @@ if(isTRUE(tximport)) {
 }
 
 ## ~~~~~~~ 3. run DESeq wrapper ~~~~~~~~
-#in case of the allelic-specific workflow, allow for 1 condition and skip deseq2 basic in this case 
+#in case of the allelic-specific workflow, allow for 1 condition and skip deseq2 basic in this case
 if(length(unique(sampleInfo$condition))>1){
     if(tximport & allelic_info){
         message("Detected allelic Salmon counts. Skipping DESeq_basic.")

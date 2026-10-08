@@ -1,0 +1,39 @@
+ci:
+  autofix_commit_msg: |
+    [pre-commit] fixes from hooks
+  autofix_prs: true
+  autoupdate_branch: "master"
+  autoupdate_commit_msg: "pre-commit.ci autoupdate"
+  autoupdate_schedule: monthly
+  submodules: false
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-merge-conflict
+
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.4.1
+    hooks:
+      - id: codespell
+        args: [--write-changes, --ignore-words=.codespell-ignore.txt]
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.12.7
+    hooks:
+      - id: ruff-check
+        args: [ --fix ]
+      - id: ruff-format
+
+  - repo: https://github.com/zizmorcore/zizmor-pre-commit
+    rev: v1.27.0
+    hooks:
+      - id: zizmor
+
+  - repo: https://github.com/snakemake/snakefmt
+    rev: v0.11.0
+    hooks:
+      - id: snakefmt

@@ -1,6 +1,20 @@
 snakePipes News
 ===============
 
+snakePipes 3.5.0
+----------------
+
+* Allelic-whatshap mode was added to DNAmapping. Requires --phasedVcf.
+* --useSpikeinForNorm sption to split bam files by host and spikein genome, and to generate spikein-normalized bamCoverage tracks, was added to DNAmapping.
+* Splitting of bam files mapped to a hybrid genome into host and spikein was moved from ChIPseq to DNAmapping.
+* Spikein size factor normalization was enabled in allele-specific CSAW in the ChIPseq workflow.
+* Allelic-whatshap mode now works with alignment-free mode and fromBAM in the mRNAseq workflow.
+* ncRNAseq workflow now accepts the --libraryType parameter which is passed to the TEcounts tool.
+* --repQuant was added to the ChIPseq workflow that allows for repeat binding quantification after Pal et al., NSMB, 2023 https://doi.org/10.1038/s41594-023-01016-5
+* A smRNAseq workflow was added for small-RNA-seq data. Reads are adapter-trimmed with fastp, and small RNAs (miRNAs, piRNAs and structural RNAs) are quantified with TEsmall, followed by deepTools QC and a MultiQC report.
+* createIndices now builds the TEsmall-compatible genome, annotation and bowtie indices required by the smRNAseq workflow when run with the --tesmall and --tesmallGenome options. These options add ``tesmall_db`` and ``tesmall_genome`` entries to the organism YAML file.
+
+
 snakePipes 3.4.0
 ----------------
 
@@ -86,7 +100,7 @@ snakePipes 2.8.1
 snakePipes 2.8.0
 ----------------
 * Moved SalmonIndex creation from mRNAseq and scRNAseq to createIndices.
-* Changed the behaviour of snakePipes createEnvs - it is no longer possible to set condaEnvDir with this function. It is required to set it with snakePipes config beforhand, instead. To ingore what's in the defaults.yaml and overwrite the condaEnvDir value with default system conda prefix, use '--autodetectCondaEnvDir'.
+* Changed the behaviour of snakePipes createEnvs - it is no longer possible to set condaEnvDir with this function. It is required to set it with snakePipes config beforehand, instead. To ignore what's in the defaults.yaml and overwrite the condaEnvDir value with default system conda prefix, use '--autodetectCondaEnvDir'.
 * Snakemake options in the defaults.yaml are now an empty string. The required arguments '--use-conda --conda-prefix' have been directly added to the command string. condaEnvDir is parsed from defaults.yaml, requiring running snakePipes config first.
 * Added a 'three-prime-seq' mode to mRNAseq (David Koppstein and Katarzyna Sikora).
 * Added DESeq2 run on PAS clusters to the 'three-prime-seq' mode of mRNAseq.
@@ -141,7 +155,7 @@ snakePipes 2.6.0
 * Updated software versions in environment yamls.
 * Updated organism yamls.
 * Updated CSAW output.
-* Fixed a couple of issues in the ATAC-seq workflow after sofware versions update.
+* Fixed a couple of issues in the ATAC-seq workflow after software versions update.
 * Fixed genome size conversion to string.
 
 
@@ -200,7 +214,7 @@ snakePipes 2.4.3
 snakePipes 2.4.2
 ----------------
 
-* Deeptools coverage RPKM in mRNA-seq and noncoding-RNA-seq worflows now respects blacklist and ingoreForNorm arguments.
+* Deeptools coverage RPKM in mRNA-seq and noncoding-RNA-seq workflows now respects blacklist and ingoreForNorm arguments.
 * In mRNA-seq and noncoding-RNA-seq workflow, deeptools qc will now also output DESeq2 size factor-normalized bigwig files.
 * Fixed conda env for WGBS.
 * Fixed control group ordering in split sample sheets in mRNA-seq and other workflows.
@@ -447,7 +461,7 @@ snakePipes 1.1.0
 
  * scRNAseq:
 
-   * An extention to the pipeline now takes the processed csv file from Results folder as input and runs cell filtering with a range of total transcript thresholds using monocle and subsequently runs clustering, produces tsne visualizations, calculates top 2 and top10 markers per cluster and produces heatmap visualizations for these using monocle/seurat. If the skipRaceID flag is set to False (default), all of the above are also executed using RaceID.
+   * An extension to the pipeline now takes the processed csv file from Results folder as input and runs cell filtering with a range of total transcript thresholds using monocle and subsequently runs clustering, produces tsne visualizations, calculates top 2 and top10 markers per cluster and produces heatmap visualizations for these using monocle/seurat. If the skipRaceID flag is set to False (default), all of the above are also executed using RaceID.
    * Stats reports were implemented for RaceID and Monocle/Seurat so that folders Filtered_cells_RaceID and Filtered_cells_monocle now contain a Stats_report.html.
    * User can select a metric to maximize during cell filtering (cellFilterMetric, default: gene_universe).
    * For calculating median GPC, RaceID counts are multiplied by the TPC threshold applied (similar to 'downscaling' in RaceID2).
@@ -465,4 +479,4 @@ First stable version of snakePipes has been released with various feature improv
 snakePipes preprint released
 ----------------------------
 
-We relased the preprint of snakePipes describing the implementation and usefullness of this tool in integrative epigenomics analysis. `Read the preprint on bioRxiv <https://www.biorxiv.org/content/early/2018/09/04/407312>`__
+We released the preprint of snakePipes describing the implementation and usefulness of this tool in integrative epigenomics analysis. `Read the preprint on bioRxiv <https://www.biorxiv.org/content/early/2018/09/04/407312>`__

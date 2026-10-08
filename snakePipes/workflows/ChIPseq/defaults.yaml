@@ -24,8 +24,8 @@ workingdir:
 genome:
 ## use spikein genome for normalization?
 useSpikeInForNorm: false
-getSizeFactorsFrom: genome
 spikeinExt: _spikein
+spikeinSizeFactorsFile:
 spikein_bin_size: 1000
 ## Which peak caller to use?
 peakCaller: 'MACS2'
@@ -57,3 +57,5 @@ filterGTF:
 ##parameters to filter DB regions on
 fdr: 0.05
 absBestLFC: 1
+##repeat quantification
+repQuant: false

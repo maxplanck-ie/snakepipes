@@ -1,0 +1,12 @@
+name: TEsmall_genome
+
+channels:
+  - conda-forge
+  - bioconda
+
+dependencies:
+  - python=3.14
+  - ucsc-liftover
+  - bedtools
+  - bowtie
+  - samtools

@@ -1,7 +1,7 @@
 ---
 author: "`r Sys.info()[length(Sys.info())-1]`"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
-output: 
+output:
     html_document:
         fig_caption: yes
 params:
@@ -11,11 +11,11 @@ params:
 title: "RaceID stats report"
 ---
 
-This report summarizes statistical analyses of your single cell data stored in `r params$outdir`.    
+This report summarizes statistical analyses of your single cell data stored in `r params$outdir`.
 
 ###Cell filtering
 
-The distribution of total transcript counts per cell (TPC) in unnormalized data was plotted.   
+The distribution of total transcript counts per cell (TPC) in unnormalized data was plotted.
 
 ```{r}
 .libPaths(R.home("library"))
@@ -23,9 +23,9 @@ The distribution of total transcript counts per cell (TPC) in unnormalized data 
 knitr::include_graphics(file.path(params$outdir,"Expdata.ColumnSums.png"))
 ```
 
-Cell filtering thresholds from 1000 through 5000 by 500 TPC were used to filter cells and count genes expressed in at least 4 cells at at least 2 counts (genes per cell, GPC). The total number of genes in the cell population was counted as number of rows in the filtered dataset.   
+Cell filtering thresholds from 1000 through 5000 by 500 TPC were used to filter cells and count genes expressed in at least 4 cells at at least 2 counts (genes per cell, GPC). The total number of genes in the cell population was counted as number of rows in the filtered dataset.
 
-The resulting counts were summarized for every threshold.   
+The resulting counts were summarized for every threshold.
 
 ```{r}
 load(file.path(params$outdir,"metrics.tab.RData"))
@@ -44,7 +44,7 @@ Cell filtering threshold is selected such that the (first) maximum `r params$met
 
 ###Cell clustering
 
-Cell-cell distances were calculated using the logpearson metric and selecting most highly variable genes (FSelect=TRUE). Clustering was performed with the default settings. 
+Cell-cell distances were calculated using the logpearson metric and selecting most highly variable genes (FSelect=TRUE). Clustering was performed with the default settings.
 
 Jaccard metrics of the resulting clusters were plotted.
 

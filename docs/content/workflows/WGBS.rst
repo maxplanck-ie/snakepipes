@@ -122,7 +122,7 @@ The workflow produces the following outputs:
 
 - **FASTQ_fastp**: The trimmed reads and QC metrics from FastP.
 
-- **MethylDackel**: BigWig coverage and methylation files as well as the bedGraph files produced by MethylDackel. 
+- **MethylDackel**: BigWig coverage and methylation files as well as the bedGraph files produced by MethylDackel.
 
 - **metilene_sampleSheet_minCoverage<X>**: contains output files from metilene in DMRs.txt. DMRs.annotated.txt is an annotated version of that, wherein DMRs are annotated with the nearest gene and the distance to it. There is additionally a QC report (Stats_report.html) that summarizes various properties of the DMRs.
 

@@ -40,7 +40,7 @@ g2 = which(ss$condition == groups[2])
 
 # Overview
 
-This report summarizes the differentially methylated loci (DML) and regions (DMR) called using DSS of hte samples specified in **`r snakemake@params[["sampleSheet"]]`**.
+This report summarizes the differentially methylated loci (DML) and regions (DMR) called using DSS of the samples specified in **`r snakemake@params[["sampleSheet"]]`**.
 
 # DMLs and QC
 
@@ -77,7 +77,7 @@ if(is.null(dmrs)) {
 }
 ```
 
-Using a minimum methylation difference of `r minMethDiff` and FDR of `r FDR` there are a total of `r nrow(dmls)` DMLs. The DMLs are saved in `r odmls`. The distribution of the methylation changes at these is show below. Note that assymmetric changes in the distribution indicate global shifts in methylation between the groups.
+Using a minimum methylation difference of `r minMethDiff` and FDR of `r FDR` there are a total of `r nrow(dmls)` DMLs. The DMLs are saved in `r odmls`. The distribution of the methylation changes at these is show below. Note that asymmetric changes in the distribution indicate global shifts in methylation between the groups.
 
 ```{r echo=FALSE, warning=FALSE, message=FALSE}
 if(!is.null(dmls) && !is.list(dmls) && nrow(dmls) > 0) {
@@ -131,7 +131,7 @@ if(!is.null(dmrs) && nrow(dmrs) > 0) {
 }
 ```
 
-As with DMLs, there can often be an assymmetry in the distribution of methylation changes in DMRs. Such assymmetries indicate a global shift in methylation changes.
+As with DMLs, there can often be an asymmetry in the distribution of methylation changes in DMRs. Such asymmetries indicate a global shift in methylation changes.
 
 ```{r echo=FALSE, warning=FALSE, message=FALSE}
 if(!is.null(dmrs) && nrow(dmrs) > 0) {

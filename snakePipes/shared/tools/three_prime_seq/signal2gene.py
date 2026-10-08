@@ -7,6 +7,7 @@ from deeptools.mapReduce import mapReduce
 import pyBigWig
 import csv
 
+
 class extendedGTF(GTF):
     def __init__(self, fname, extend=500):
         self.fname = []
@@ -31,7 +32,7 @@ class extendedGTF(GTF):
         self.filename = fname
         fp = openPossiblyCompressed(fname)
         line, labelColumn = self.firstNonComment(fp)
-        assert(line)
+        assert line
         line = line.strip()
 
         self.parseGTF(fp, line)
@@ -42,7 +43,7 @@ class extendedGTF(GTF):
         """
         Return the gene_id and transcript_id from the attributes
         """
-        s = next(csv.reader([attribs], delimiter=' '))
+        s = next(csv.reader([attribs], delimiter=" "))
         tid = s[s.index(self.transcript_id_designator) + 1].rstrip(";")
         gid = s[s.index(self.gene_id_designator) + 1].rstrip(";")
         return gid, tid
@@ -64,17 +65,17 @@ class extendedGTF(GTF):
         # Handle the remaining lines
         for line in fp:
             if not isinstance(line, str):
-                line = line.decode('ascii')
-            if not line.startswith('#'):
+                line = line.decode("ascii")
+            if not line.startswith("#"):
                 cols = line.split("\t")
                 if len(cols) == 0:
                     continue
 
                 if cols[2].lower() == self.transcriptID.lower():
                     if cols[6] == "-":
-                        cols[3] = "{}".format(max(1, int(cols[3]) - self.extend))
+                        cols[3] = f"{max(1, int(cols[3]) - self.extend)}"
                     else:
-                        cols[4] = "{}".format(int(cols[4]) + self.extend)
+                        cols[4] = f"{int(cols[4]) + self.extend}"
                     self.parseGTFtranscript(cols, file_label)
 
                     # Add transcript_id -> gene_id mapping
@@ -85,6 +86,7 @@ class extendedGTF(GTF):
 
         # Reset self.labelIdx
         self.labelIdx = len(self.labels)
+
 
 def o2attribs(chrom, pos, o):
     tid = o[2]
@@ -100,11 +102,11 @@ def o2attribs(chrom, pos, o):
         if o[5] == "-":
             if pos < o[4][0][0]:
                 tag = "downstream"
-                transPos = "+{}".format(o[4][0][0] - pos)
+                transPos = f"+{o[4][0][0] - pos}"
         else:
             if pos >= o[4][-1][1]:
                 tag = "downstream"
-                transPos = "+{}".format(pos - o[4][-1][1])
+                transPos = f"+{pos - o[4][-1][1]}"
 
     # Add UTR and CDS tags
     if tag == "exonic":
@@ -164,7 +166,9 @@ def mapStrand(bw, chrom, start, end, strand, args):
         if interval[0] < start:
             continue
         for pos in range(interval[0], interval[1]):
-            o = exonsTree.findOverlaps(chrom, pos, pos + 1, strand=strand, strandType=3, includeStrand=True)
+            o = exonsTree.findOverlaps(
+                chrom, pos, pos + 1, strand=strand, strandType=3, includeStrand=True
+            )
             genes = set()
             transcripts = []
             transPos = []
@@ -175,11 +179,22 @@ def mapStrand(bw, chrom, start, end, strand, args):
                     continue  # intronic
                 genes.add(geneID)
                 transcripts.append(transcriptID)
-                transPos.append("{}".format(tPos))
+                transPos.append(f"{tPos}")
                 tags.append(tag)
 
             if len(genes):
-                res.append([chrom, pos, strand, interval[2], genes, transcripts, transPos, tags])
+                res.append(
+                    [
+                        chrom,
+                        pos,
+                        strand,
+                        interval[2],
+                        genes,
+                        transcripts,
+                        transPos,
+                        tags,
+                    ]
+                )
 
     return res
 
@@ -203,14 +218,28 @@ def mapValues_worker(chrom, start, end, args):
 
 
 def parseArgs():
-    parser = argparse.ArgumentParser(description="Associate signal with position on a gene or genes.")
-    parser.add_argument("forward_bigWig", help="Input BigWig file for the forward strand.")
-    parser.add_argument("reverse_bigWig", help="Input BigWig file for the reverse strand.")
+    parser = argparse.ArgumentParser(
+        description="Associate signal with position on a gene or genes."
+    )
+    parser.add_argument(
+        "forward_bigWig", help="Input BigWig file for the forward strand."
+    )
+    parser.add_argument(
+        "reverse_bigWig", help="Input BigWig file for the reverse strand."
+    )
     parser.add_argument("GTF", help="Input GTF file.")
     parser.add_argument("output", help="Output file.")
-    parser.add_argument("--extend", help="Number of bases to extend each gene in the 3' direction (default: 100).", default=100, type=int)
-    parser.add_argument("--threads", help="Number of threads (default: 1).", default=1, type=int)
+    parser.add_argument(
+        "--extend",
+        help="Number of bases to extend each gene in the 3' direction (default: 100).",
+        default=100,
+        type=int,
+    )
+    parser.add_argument(
+        "--threads", help="Number of threads (default: 1).", default=1, type=int
+    )
     return parser
+
 
 # Load GTF as normal
 # Use transcript -> gene mapping
@@ -224,16 +253,36 @@ def main():
 
     global exonsTree, CDS
     CDS = GTF(args.GTF, keepExons=True, exonID="CDS")
-    exonsTree = extendedGTF(args.GTF, extend=args.extend)  # Adds exonsTree.transcriptID2Gene and 3'UTR extension
-    res = mapReduce([args], mapValuesWrapper, chromList, genomeChunkLength=1000000, numberOfProcessors=args.threads)
+    exonsTree = extendedGTF(
+        args.GTF, extend=args.extend
+    )  # Adds exonsTree.transcriptID2Gene and 3'UTR extension
+    res = mapReduce(
+        [args],
+        mapValuesWrapper,
+        chromList,
+        genomeChunkLength=1000000,
+        numberOfProcessors=args.threads,
+    )
 
     o = open(args.output, "w")
-    o.write("Chromosome\tPosition\tStrand\tCounts\tGenes\tTranscripts\tTranscriptPositions\tTags\n")
+    o.write(
+        "Chromosome\tPosition\tStrand\tCounts\tGenes\tTranscripts\tTranscriptPositions\tTags\n"
+    )
     for block in res:
         for r in block:
-            line = [r[0], r[1], r[2], r[3], ",".join(list(r[4])), ",".join(r[5]), ",".join(r[6]), ",".join(r[7])]
+            line = [
+                r[0],
+                r[1],
+                r[2],
+                r[3],
+                ",".join(list(r[4])),
+                ",".join(r[5]),
+                ",".join(r[6]),
+                ",".join(r[7]),
+            ]
             o.write("{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n".format(*line))
     o.close()
+
 
 if __name__ == "__main__":
     main()

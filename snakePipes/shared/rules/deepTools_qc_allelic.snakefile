@@ -46,14 +46,15 @@ rule multiBamSummary_allelic:
         bams = expand("allelic_bams/{sample}.{suffix}.sorted.bam", sample=samples, suffix = ['genome1', 'genome2']),
         bais = expand("allelic_bams/{sample}.{suffix}.sorted.bam.bai", sample=samples, suffix = ['genome1', 'genome2'])
     output:
-        npz = "deepTools_qc/multiBamSummary/read_coverage_allelic.bins.npz"
+        npz = "deepTools_qc/multiBamSummary/read_coverage_allelic.bins.npz",
+        sf = "deepTools_qc/multiBamSummary/allelic.scaling_factors.txt"
     params:
         labels = " ".join(expand('{sample}.{suffix}', sample=samples, suffix = ['genome1', 'genome2'])),
         blacklist = "--blackListFileName "+blacklist_bed if blacklist_bed
                     else "",
         read_extension = "--extendReads" if pairedEnd
                          else "--extendReads " + str(fragmentLength),
-        scaling_factors = "",
+        scaling_factors = "--scalingFactors deepTools_qc/multiBamSummary/allelic.scaling_factors.txt",
         binSize = "",
         spikein_region = ""
     benchmark:
