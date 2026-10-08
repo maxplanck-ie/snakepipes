@@ -91,7 +91,7 @@ jobs:
           'CONDA_RNASEQ_ENV',
           'CONDA_RMATS_ENV',
           'CONDA_scRNASEQ_ENV',
-          'CONDA_seurat3_ENV',
+          'CONDA_seurat_ENV',
           'CONDA_loompy_ENV',
           'CONDA_alevinqc_ENV',
           'CONDA_eisaR_ENV',
@@ -106,7 +106,10 @@ jobs:
           'CONDA_NONCODING_RNASEQ_ENV',
           'CONDA_SAMBAMBA_ENV',
           'CONDA_pysam_ENV',
-          'CONDA_FQLINT_ENV'
+          'CONDA_FQLINT_ENV',
+          'CONDA_SMRNA_ENV',
+          'CONDA_CREATE_TEsmall_ENV',
+          'CONDA_REPQUANT_ENV'
         ]
     runs-on: ubuntu-latest
     steps:
