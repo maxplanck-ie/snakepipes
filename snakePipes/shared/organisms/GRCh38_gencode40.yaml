@@ -93,3 +93,5 @@ ignoreForNormalization: chrX chrY chrM GL000008.2 GL000009.2 GL000194.1 GL000195
 known_splicesites: /data/repository/organisms/GRCh38_gencode_40/gencode/release-40/HISAT2/genome.ss
 star_index: /data/repository/organisms/GRCh38_gencode_40/Indices/STAR_2.7.10
 rmsk_file: /data/repository/organisms/GRCh38_gencode_40/repeatMasker/genome.fa.tbl
+tesmall_db: ""
+tesmall_genome: ""
