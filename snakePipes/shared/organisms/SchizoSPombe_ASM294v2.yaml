@@ -16,3 +16,5 @@ extended_coding_regions_gtf: "/data/repository/organisms/SchizoSPombe_ASM294v2_e
 blacklist_bed:
 ignoreForNormalization:
 rmsk_file: '/data/repository/organisms/SchizoSPombe_ASM294v2_ensembl/UCSC/mm9/rmsk.txt'
+tesmall_db: ""
+tesmall_genome: ""
