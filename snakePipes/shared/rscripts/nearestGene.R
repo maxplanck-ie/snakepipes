@@ -3,8 +3,8 @@
 .libPaths(R.home("library"))
 
 
-input_bed <- snakemake@input[["bed"]]  
-t2g <- snakemake@input[["t2g"]] 
+input_bed <- snakemake@input[["bed"]]
+t2g <- snakemake@input[["t2g"]]
 gene_symbol <- snakemake@input[["gene_symbol"]]
 
 pipeline<-snakemake@params[["pipeline"]]
@@ -40,5 +40,3 @@ sessionInfo()
 sink()
 
 print("DONE..!")
-
-

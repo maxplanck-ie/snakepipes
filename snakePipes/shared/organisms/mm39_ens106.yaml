@@ -21,3 +21,5 @@ ignoreForNormalization: MT X Y JH584299.1 GL456233.2 JH584301.1 GL456211.1 GL456
 known_splicesites: /data/repository/organisms/GRCm39_ensembl_106/ensembl/release-106/HISAT2/genome.ss
 rmsk_file: /data/repository/organisms/GRCm39_ensembl_106/repeatMasker/genome.fa.tbl
 star_index: /data/repository/organisms/GRCm39_ensembl_106/Indices/STAR_2.7.10
+tesmall_db: ""
+tesmall_genome: ""

@@ -18,7 +18,7 @@ Input requirements
 ------------------
 
 The only requirement is a directory of gzipped fastq files. Files could be single or paired end, and the read extensions could be modified using the keys in the ``defaults.yaml`` file below.
-Alternatively, bam files can be used as input. The input folder containing the bam files can be passed to `-i` and `--fromBAM` must be specified as well. Bam file extention can be specified with `--bamExt`.
+Alternatively, bam files can be used as input. The input folder containing the bam files can be passed to `-i` and `--fromBAM` must be specified as well. Bam file extension can be specified with `--bamExt`.
 
 .. _ncRNAconfig:
 
@@ -76,9 +76,9 @@ There is a configuration file in ``snakePipes/workflows/ncRNAseq/defaults.yaml``
 
 Apart from the common workflow options (see :ref:`running_snakePipes`), the following parameters are useful to consider:
 
-* **aligner**: The only choice at the moment is `STAR <https://github.com/alexdobin/STAR>`__. 
+* **aligner**: The only choice at the moment is `STAR <https://github.com/alexdobin/STAR>`__.
 
-* **alignerOptions**: Options to pass on to your chosen aligner. Note that library type and junction definitions don't have to be passed to the aligners as options, as they are handeled either automatically, or via other parameters.
+* **alignerOptions**: Options to pass on to your chosen aligner. Note that library type and junction definitions don't have to be passed to the aligners as options, as they are handled either automatically, or via other parameters.
 
 * **plotFormat**: You can switch the type of plot produced by all deeptools modules using this option. Possible choices : png, pdf, svg, eps, plotly
 
@@ -142,7 +142,7 @@ using the **deepTools_qc** mode. It's a very useful add-on with any of the other
 Understanding the outputs
 -------------------------
 
-Assuming the pipline was run with ``--mode 'alignment,deepTools_qc'`` on a set of FASTQ files, the structure of the output directory would look like this (files are shown only for one sample) ::
+Assuming the pipeline was run with ``--mode 'alignment,deepTools_qc'`` on a set of FASTQ files, the structure of the output directory would look like this (files are shown only for one sample) ::
 
     ├── bamCoverage
     │   ├── sample1.coverage.bw

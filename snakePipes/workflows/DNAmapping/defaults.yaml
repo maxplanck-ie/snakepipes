@@ -64,3 +64,9 @@ UMIDedupOpts:
 fragmentLength: 200
 qualimap: false
 verbose: false
+#phased vcf
+pvcf:
+#arguments related to hybrid genome alignment
+useSpikeInForNorm: False
+spikeinExt: "_spikein"
+spikein_bin_size: 1000

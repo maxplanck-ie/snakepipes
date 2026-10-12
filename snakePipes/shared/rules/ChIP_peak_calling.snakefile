@@ -10,7 +10,7 @@ import subprocess
 if pairedEnd:
     rule writeFragmentSize:
         input: "deepTools_qc/bamPEFragmentSize/fragmentSize.metric.tsv"
-        output: "MACS2/fragmentSize.metrix.tsv"
+        output: "MACS2/fragmentSize.metric.tsv"
 
 
     rule MACS2:
@@ -220,7 +220,7 @@ def collectPeaks(caller):
     elif caller == "Genrich":
         return expand("Genrich/{group}.narrowPeak",group=genrichDict.keys())
 
-if not peakCaller == "histoneHMM":
+if not peakCaller == "histoneHMM" and not externalBed:
     rule chipqc:
         input:
             bams = expand("filtered_bam/{chip_sample}.filtered.bam",chip_sample=chip_samples),
@@ -243,4 +243,3 @@ if not peakCaller == "histoneHMM":
             "{}_chipqc/.benchmark/chipqc.benchmark".format(peakCaller)
         conda: CONDA_CHIPQC_ENV
         script: "../rscripts/chipqc.R"
-

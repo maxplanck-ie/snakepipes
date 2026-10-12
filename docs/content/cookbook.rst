@@ -9,7 +9,7 @@ Cookbook
 Create Hybrid Genome with Spike-in Sequences (:ref:`createIndices`)
 --------------------------------------------------------------------
 
-Generate a reference genome including both the native organism (referred to as host)  and spike-in control sequences.   
+Generate a reference genome including both the native organism (referred to as host)  and spike-in control sequences.
 
 .. code-block:: bash
 
@@ -20,15 +20,15 @@ Generate a reference genome including both the native organism (referred to as h
 Cut&Tag Data Analysis (:ref:`DNAmapping` and :ref:`ChIPseq`)
 -------------------------------------------------------------
 
-Process and analyze Cut&Tag data for chromatin binding. Fastq files are mapped to a host-spikein hybrid genome and spikein sequences are used for normalization of bam coverage tracks.   
+Process and analyze Cut&Tag data for chromatin binding. Fastq files are mapped to a host-spikein hybrid genome and spikein sequences are used for normalization of bam coverage tracks.
 
 .. code-block:: bash
 
-   DNAmapping --cutntag --trim --trimmerOptions ' -a nexteraF=CTGTCTCTTATA -A nexteraR=CTGTCTCTTATA ' --fastqc --dedup --mapq 3 -i $input_folder -o analysis_dedup customIndices/GRch38_dm6/GRCh38_g31_dm6.yaml
+   DNAmapping --cutntag --trim --trimmerOptions ' -a nexteraF=CTGTCTCTTATA -A nexteraR=CTGTCTCTTATA ' --fastqc --dedup --useSpikeInForNorm --mapq 3 -i $input_folder -o analysis_dedup customIndices/GRch38_dm6/GRCh38_g31_dm6.yaml
 
 .. code-block:: bash
 
-   ChIPseq -d analysis_ChIPseq --fromBAM analysis_dedup/filtered_bam --bamExt .filtered.bam --cutntag customIndices/GRch38_dm6/GRCh38_g31_dm6.yaml chip_seq_sample_config.yaml
+   ChIPseq -d analysis_ChIPseq --fromBAM analysis_dedup/split_bam --bamExt _host.bam --useSpikeInForNorm --cutntag customIndices/GRch38_dm6/GRCh38_g31_dm6.yaml chip_seq_sample_config.yaml
 
 
 --------------------------------------------------------
@@ -51,7 +51,7 @@ Investigate temporal changes in transcript levels across multiple time points by
 
 .. code-block:: bash
 
-   mRNAseq -i RNAseq -o analysis --sampleSheet sampleSheet.csv  --LRT mm10_gencodeM19 
+   mRNAseq -i RNAseq -o analysis --sampleSheet sampleSheet.csv  --LRT mm10_gencodeM19
 
 
 -----------------------------------------------------------------------------
@@ -96,4 +96,3 @@ Quantify and compare transcript expression between different conditions.
 .. code-block:: bash
 
    mRNAseq -i RNAseq -o analysis -m alignment-free --sampleSheet sampleSheet.csv mm10_gencodeM19
-

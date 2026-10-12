@@ -92,10 +92,10 @@ elif aligner == "Bowtie2":
         params:
             idxbase = "snp_genome/bowtie2_Nmasked/Genome"
         conda: CONDA_DNA_MAPPING_ENV
-        shell:'''                                                                                                                            
+        shell:'''
         cat {input.snpgenome_dir}/*.fa > {output.tmpfna}
         bowtie2-build --threads {threads} \
            {output.tmpfna} {params.idxbase}
-        ''' 
+        '''
 else:
     print("Only STAR and Bowtie2 are implemented for allele-specific mapping")
