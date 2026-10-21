@@ -469,3 +469,338 @@ rule computeEffectiveGenomeSize:
     shell: """
         seqtk comp {input} | awk '{{tot += $3 + $4 + $5 + $6}}END{{print tot}}' > {output}
         """
+
+if tesmall:
+    # Ported from smallrna_pipeline_snakemake/Snakefile rather than shelling out to
+    # its standalone build_smallrna_reference.py script, so it plugs into this DAG
+    # (reuses genome_fasta/genes_gtf, participates in -n/--dag, etc) instead of being
+    # an opaque black-box step. The stage-module functions it calls are vendored at
+    # shared/tools/smallrna/ (imported up in workflows/createIndices/Snakefile).
+    #
+    # tesmallGenome (defaults to `genome`, overridable via --tesmallGenome) drives
+    # RepeatMasker/miRBase/piRNAdb lookups. It's validated against common.py's
+    # normalize_genome() up in createIndices.py before snakemake even starts, since
+    # `genome` here is just a free-form label for the output YAML's filename, not
+    # necessarily a real build code.
+    #
+    # rmsk.txt is fetched fresh here rather than reusing rmsk_file (from --rmskURL):
+    # rmsk_file is whatever raw format the user's URL happens to serve, while
+    # extract_te_from_rmsk/extract_structural_rna_from_rmsk require the specific
+    # Ensembl-coordinate conversion fetch_rmsk_txt() does (UCSC download, 'chr'
+    # stripped, 1-based start). Reusing rmsk_file directly would silently give
+    # wrong coordinates whenever its format doesn't happen to match that.
+
+    # TEsmall/genomes/<tesmallGenome>/{annotation,sequence} -- nested under the
+    # build name so multiple genome versions can eventually coexist under one
+    # TEsmall/ root without collisions (each build gets its own rmsk.txt,
+    # .chains/, .build_info/, sequence/, annotation/).
+    TESMALL_GENOME = tesmallGenome
+    TESMALL_RMSK_ASSEMBLY = normalize_genome(TESMALL_GENOME)
+
+    TESMALL_OUT = os.path.join(outdir, "TEsmall")
+    TESMALL_GENOME_DIR = os.path.join(TESMALL_OUT, "genomes", TESMALL_GENOME)
+    TESMALL_SEQ_DIR = os.path.join(TESMALL_GENOME_DIR, "sequence")
+    TESMALL_ANNOTATION_DIR = os.path.join(TESMALL_GENOME_DIR, "annotation")
+    TESMALL_CHAIN_DIR = os.path.join(TESMALL_GENOME_DIR, ".chains")
+    TESMALL_BUILD_INFO_DIR = os.path.join(TESMALL_GENOME_DIR, ".build_info")
+
+    TESMALL_RMSK_TXT = os.path.join(TESMALL_ANNOTATION_DIR, "rmsk.txt")
+    TESMALL_EXON_BED = os.path.join(TESMALL_ANNOTATION_DIR, "exon.bed")
+    TESMALL_INTRON_BED = os.path.join(TESMALL_ANNOTATION_DIR, "intron.bed")
+    TESMALL_STRUCTURAL_BED = os.path.join(TESMALL_ANNOTATION_DIR, "structural_RNA.bed")
+    TESMALL_TE_BED = os.path.join(TESMALL_ANNOTATION_DIR, "TE.bed")
+    TESMALL_TDNA_FA = os.path.join(TESMALL_SEQ_DIR, "tDNA.fa")
+    TESMALL_RDNA_FA = os.path.join(TESMALL_SEQ_DIR, "rDNA.fa")
+    TESMALL_GENOME_FA = os.path.join(TESMALL_SEQ_DIR, "genome.fa")
+    TESMALL_HAIRPIN_BED = os.path.join(TESMALL_ANNOTATION_DIR, "hairpin.bed")
+    TESMALL_MATURE_BED = os.path.join(TESMALL_ANNOTATION_DIR, "miRNA.bed")
+    TESMALL_PIRNA_BED = os.path.join(TESMALL_ANNOTATION_DIR, "piRNA_cluster.bed")
+    TESMALL_BOWTIE_DIR = os.path.join(TESMALL_SEQ_DIR, "bowtie_index")
+    TESMALL_PREFIX_FOR_NAME = {"tDNA": "sncRNA:tRNA:", "rDNA": "sncRNA:rRNA:"}
+    # TEsmall (the analysis tool) expects bowtie1 indexes of genome/tDNA/rDNA inside
+    # its --dbfolder, so unlike smallrna_pipeline_snakemake's own build_bowtie
+    # config toggle, these are always built here -- there's no point in a
+    # --tesmall run that doesn't produce something TEsmall can actually load.
+    TESMALL_FASTA_FOR_BOWTIE = {"genome": TESMALL_GENOME_FA, "tDNA": TESMALL_TDNA_FA, "rDNA": TESMALL_RDNA_FA}
+
+    rule tesmall_link_genome:
+        input:
+            fa=genome_fasta,
+            fai=genome_index,
+        output:
+            fa=TESMALL_GENOME_FA,
+            fai=TESMALL_GENOME_FA + ".fai",
+        run:
+            link_genome_fasta(os.path.join(outdir, "genome_fasta"), TESMALL_SEQ_DIR)
+
+    rule tesmall_fetch_rmsk:
+        output:
+            TESMALL_RMSK_TXT,
+        run:
+            ok = fetch_rmsk_txt(TESMALL_RMSK_ASSEMBLY, output[0])
+            if not ok:
+                raise RuntimeError(f"Failed to download RepeatMasker table for {TESMALL_RMSK_ASSEMBLY}")
+
+    rule tesmall_exon_intron_raw:
+        input:
+            gtf=genes_gtf,
+        output:
+            exon=os.path.join(TESMALL_ANNOTATION_DIR, "exon.raw.bed"),
+            intron=os.path.join(TESMALL_ANNOTATION_DIR, "intron.raw.bed"),
+        run:
+            write_raw_exon_bed(input.gtf, output.exon)
+            write_raw_intron_bed(input.gtf, output.intron)
+
+    rule tesmall_structural_rna_raw:
+        input:
+            gtf=genes_gtf,
+            rmsk=TESMALL_RMSK_TXT,
+        output:
+            os.path.join(TESMALL_ANNOTATION_DIR, "structural_RNA.raw.bed"),
+        run:
+            write_raw_structural_rna(input.gtf, input.rmsk, output[0])
+
+    rule tesmall_te_bed:
+        input:
+            rmsk=TESMALL_RMSK_TXT,
+        output:
+            TESMALL_TE_BED,
+        run:
+            extract_te_from_rmsk(input.rmsk, output[0])
+
+    rule tesmall_collapse_bed:
+        input:
+            raw=os.path.join(TESMALL_ANNOTATION_DIR, "{name}.raw.bed"),
+        output:
+            os.path.join(TESMALL_ANNOTATION_DIR, "{name}.bed"),
+        wildcard_constraints:
+            name="exon|intron|structural_RNA",
+        conda: CONDA_CREATE_TEsmall_ENV
+        shell:
+            r"""
+            bedtools sort -i {input.raw} | \
+            bedtools groupby -g 1,2,3,6 -c 4 -o collapse | \
+            awk -F'\t' -v OFS='\t' '{{print $1,$2,$3,$5,0,$4}}' > {output}
+            rm -f {input.raw}
+            """
+
+    rule tesmall_select_structural_subset:
+        input:
+            bed=TESMALL_STRUCTURAL_BED,
+        output:
+            os.path.join(TESMALL_SEQ_DIR, "{name}.selected.bed"),
+        wildcard_constraints:
+            name="tDNA|rDNA",
+        params:
+            prefix=lambda wc: TESMALL_PREFIX_FOR_NAME[wc.name],
+        run:
+            filter_bed_by_prefix(input.bed, params.prefix, output[0])
+
+    rule tesmall_extract_fasta:
+        input:
+            genome_fa=TESMALL_GENOME_FA,
+            bed=os.path.join(TESMALL_SEQ_DIR, "{name}.selected.bed"),
+        output:
+            os.path.join(TESMALL_SEQ_DIR, "{name}.raw.fa"),
+        wildcard_constraints:
+            name="tDNA|rDNA",
+        conda: CONDA_CREATE_TEsmall_ENV
+        shell:
+            r"""
+            if [ -s {input.bed} ]; then
+                bedtools getfasta -s -name -fi {input.genome_fa} -bed {input.bed} -fo {output}
+            else
+                : > {output}
+            fi
+            rm -f {input.bed}
+            """
+
+    rule tesmall_finalize_fasta:
+        input:
+            raw=os.path.join(TESMALL_SEQ_DIR, "{name}.raw.fa"),
+        output:
+            os.path.join(TESMALL_SEQ_DIR, "{name}.fa"),
+        wildcard_constraints:
+            name="tDNA|rDNA",
+        run:
+            if wildcards.name == "tDNA":
+                fix_trna_headers(input.raw, output[0])
+            else:
+                shutil.copyfile(input.raw, output[0])
+            os.remove(input.raw)
+
+    rule tesmall_faidx:
+        input:
+            fa=os.path.join(TESMALL_SEQ_DIR, "{name}.fa"),
+        output:
+            os.path.join(TESMALL_SEQ_DIR, "{name}.fa.fai"),
+        wildcard_constraints:
+            name="tDNA|rDNA",
+        conda: CONDA_CREATE_TEsmall_ENV
+        shell:
+            r"""
+            if [ -s {input.fa} ]; then
+                samtools faidx {input.fa}
+            else
+                : > {output}
+            fi
+            """
+
+    checkpoint tesmall_mirna_raw:
+        output:
+            hairpin=os.path.join(TESMALL_ANNOTATION_DIR, "hairpin.raw.bed"),
+            mature=os.path.join(TESMALL_ANNOTATION_DIR, "miRNA.raw.bed"),
+            build_info=os.path.join(TESMALL_BUILD_INFO_DIR, "mirna_build_info.txt"),
+        run:
+            ensure_dir(TESMALL_BUILD_INFO_DIR)
+            download_smallrna_raw("mirbase", TESMALL_GENOME, TESMALL_ANNOTATION_DIR, build_info_name="mirna_build_info.txt")
+            shutil.move(os.path.join(TESMALL_ANNOTATION_DIR, "mirna_build_info.txt"), output.build_info)
+
+    checkpoint tesmall_pirna_raw:
+        output:
+            pirna=os.path.join(TESMALL_ANNOTATION_DIR, "piRNA_cluster.raw.bed"),
+            build_info=os.path.join(TESMALL_BUILD_INFO_DIR, "pirna_build_info.txt"),
+        run:
+            ensure_dir(TESMALL_BUILD_INFO_DIR)
+            download_smallrna_raw("pirnadb", TESMALL_GENOME, TESMALL_ANNOTATION_DIR, build_info_name="pirna_build_info.txt")
+            shutil.move(os.path.join(TESMALL_ANNOTATION_DIR, "pirna_build_info.txt"), output.build_info)
+
+    def _tesmall_read_build_info(path):
+        src, tgt = open(path).read().split()
+        return src, tgt
+
+    def tesmall_mirna_finalize_input(wildcards):
+        build_info = checkpoints.tesmall_mirna_raw.get().output.build_info
+        src, tgt = _tesmall_read_build_info(build_info)
+        suffix = "raw" if src == tgt else "lifted"
+        return {
+            "hairpin": os.path.join(TESMALL_ANNOTATION_DIR, f"hairpin.{suffix}.bed"),
+            "mature": os.path.join(TESMALL_ANNOTATION_DIR, f"miRNA.{suffix}.bed"),
+        }
+
+    def tesmall_pirna_finalize_input(wildcards):
+        build_info = checkpoints.tesmall_pirna_raw.get().output.build_info
+        src, tgt = _tesmall_read_build_info(build_info)
+        suffix = "raw" if src == tgt else "lifted"
+        return {"pirna": os.path.join(TESMALL_ANNOTATION_DIR, f"piRNA_cluster.{suffix}.bed")}
+
+    rule tesmall_mirna_finalize:
+        input:
+            unpack(tesmall_mirna_finalize_input),
+        output:
+            hairpin=TESMALL_HAIRPIN_BED,
+            mature=TESMALL_MATURE_BED,
+        run:
+            shutil.copyfile(input.hairpin, output.hairpin)
+            shutil.copyfile(input.mature, output.mature)
+            for f in (input.hairpin, input.mature):
+                if os.path.exists(f):
+                    os.remove(f)
+            raw = checkpoints.tesmall_mirna_raw.get().output
+            for f in (raw.hairpin, raw.mature):
+                if os.path.exists(f):
+                    os.remove(f)
+
+    rule tesmall_pirna_finalize:
+        input:
+            unpack(tesmall_pirna_finalize_input),
+        output:
+            TESMALL_PIRNA_BED,
+        run:
+            shutil.copyfile(input.pirna, output[0])
+            if os.path.exists(input.pirna):
+                os.remove(input.pirna)
+            raw = checkpoints.tesmall_pirna_raw.get().output.pirna
+            if os.path.exists(raw):
+                os.remove(raw)
+
+    _TESMALL_MIRNA_NAMES = {"hairpin", "miRNA"}
+
+    def tesmall_chain_for(wildcards):
+        if wildcards.name in _TESMALL_MIRNA_NAMES:
+            build_info = checkpoints.tesmall_mirna_raw.get().output.build_info
+        else:
+            build_info = checkpoints.tesmall_pirna_raw.get().output.build_info
+        src, tgt = _tesmall_read_build_info(build_info)
+        chain_name = f"{src}To{tgt[0].upper()}{tgt[1:]}.over.chain.gz"
+        return os.path.join(TESMALL_CHAIN_DIR, chain_name)
+
+    rule tesmall_download_chain:
+        output:
+            os.path.join(TESMALL_CHAIN_DIR, "{src}To{tgt_cap}.over.chain.gz"),
+        run:
+            ensure_dir(TESMALL_CHAIN_DIR)
+            url = f"{UCSC_BASE}/{wildcards.src}/liftOver/{wildcards.src}To{wildcards.tgt_cap}.over.chain.gz"
+            download_or_raise(url, output[0])
+
+    rule tesmall_liftover_bed:
+        input:
+            raw=os.path.join(TESMALL_ANNOTATION_DIR, "{name}.raw.bed"),
+            chain=tesmall_chain_for,
+        output:
+            os.path.join(TESMALL_ANNOTATION_DIR, "{name}.lifted.bed"),
+        wildcard_constraints:
+            name="hairpin|miRNA|piRNA_cluster",
+        conda: CONDA_CREATE_TEsmall_ENV
+        shell:
+            r"""
+            awk -F'\t' -v OFS='\t' '{{
+                c=$1
+                if (c !~ /^chr/) {{ if (c=="MT" || c=="mt") c="chrM"; else c="chr" c }}
+                $1=c; print
+            }}' {input.raw} > {input.raw}.chr.bed
+
+            liftOver {input.raw}.chr.bed {input.chain} {output}.chr.lifted {output}.unmapped
+
+            n=$(grep -vc '^#' {output}.unmapped 2>/dev/null || true)
+            if [ -n "$n" ] && [ "$n" -gt 0 ]; then
+                echo "[WARN] liftOver {wildcards.name}: $n interval(s) dropped" >&2
+            fi
+
+            awk -F'\t' -v OFS='\t' '{{
+                c=$1
+                if (c ~ /^chr/) {{ c=substr(c,4); if (c=="M") c="MT" }}
+                $1=c; print
+            }}' {output}.chr.lifted > {output}
+
+            rm -f {input.raw}.chr.bed {output}.chr.lifted {output}.unmapped
+            """
+
+    rule tesmall_bowtie_index:
+        input:
+            fasta=lambda wc: TESMALL_FASTA_FOR_BOWTIE[wc.name],
+        output:
+            multiext(os.path.join(TESMALL_BOWTIE_DIR, "{name}"),
+                      ".1.ebwt", ".2.ebwt", ".3.ebwt", ".4.ebwt",
+                      ".rev.1.ebwt", ".rev.2.ebwt"),
+        wildcard_constraints:
+            name="genome|tDNA|rDNA",
+        params:
+            prefix=lambda wc: os.path.join(TESMALL_BOWTIE_DIR, wc.name),
+        threads: lambda wildcards: 4 if 4 < max_thread else max_thread
+        conda: CONDA_CREATE_TEsmall_ENV
+        shell:
+            "bowtie-build --threads {threads} {input.fasta} {params.prefix}"
+
+    rule create_tesmall:
+        input:
+            TESMALL_EXON_BED, TESMALL_INTRON_BED, TESMALL_STRUCTURAL_BED, TESMALL_TE_BED,
+            TESMALL_HAIRPIN_BED, TESMALL_MATURE_BED, TESMALL_PIRNA_BED,
+            os.path.join(TESMALL_SEQ_DIR, "tDNA.fa.fai"), os.path.join(TESMALL_SEQ_DIR, "rDNA.fa.fai"),
+            TESMALL_GENOME_FA + ".fai",
+            [multiext(os.path.join(TESMALL_BOWTIE_DIR, name),
+                      ".1.ebwt", ".2.ebwt", ".3.ebwt", ".4.ebwt", ".rev.1.ebwt", ".rev.2.ebwt")
+             for name in TESMALL_FASTA_FOR_BOWTIE],
+        output: touch(os.path.join(TESMALL_GENOME_DIR, ".tesmall_done"))
+        run:
+            # rmsk.txt is a pure intermediate for structural_RNA.bed/TE.bed above;
+            # remove it now that both have consumed it. .chains/ is likewise only
+            # needed transiently by liftover_bed. .build_info/ is NOT touched here
+            # -- deleting a checkpoint's own output risks Snakemake silently
+            # rerunning the whole checkpoint (re-downloading from miRBase/piRNAdb)
+            # the next time something re-resolves it (snakemake#609), so it just
+            # stays in its own hidden dir instead of ever needing to be cleaned up.
+            if os.path.exists(TESMALL_RMSK_TXT):
+                os.remove(TESMALL_RMSK_TXT)
+            if os.path.isdir(TESMALL_CHAIN_DIR):
+                shutil.rmtree(TESMALL_CHAIN_DIR)

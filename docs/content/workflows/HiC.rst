@@ -87,7 +87,7 @@ the config file description for the HiC workflow :
       distVsCountParams:
       #Terminate the pipeline before calling TADs
       noTAD: false
-      #Terminate the pipeline before correting the matrices with a certain cutoff value
+      #Terminate the pipeline before correcting the matrices with a certain cutoff value
       noCorrect: false
       # Method to balance a matrix
       correctionMethod: KR

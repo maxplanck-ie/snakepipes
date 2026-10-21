@@ -57,7 +57,7 @@ if "allelic-whatshap" in mode:
         if not os.path.exists(pvcf + ".tbi"):
             print("A gzipped vcf file was provided but the index is missing. Please index the vcf.gz file with tabix.")
             exit(1)
-    
+
 if formula and not sampleSheet:
     print("In order to apply custom formula, please provide a sample sheet!")
     exit(1)
@@ -72,5 +72,3 @@ if sampleSheet and not cf.check_replicates(sampleSheet):
 if not samples:
     print("\n  Error! NO samples found in dir "+str(indir or '')+"!!!\n\n")
     exit(1)
-
-

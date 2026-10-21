@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-'''Convert a bedGraph file from MethylDackel to two bigWig files'''
+"""Convert a bedGraph file from MethylDackel to two bigWig files"""
+
 import pyBigWig
 import sys
 

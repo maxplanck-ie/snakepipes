@@ -66,7 +66,7 @@ write.table(top10,paste0("minT",minTi,".Top10markers.txt"),sep="\t",row.names=FA
 DoHeatmap(object = seuset,genes.use = top10$gene,slim.col.label = TRUE,remove.key = TRUE)
 ggsave(paste0("minT",minTi,".Top10markers.heatmap.png"))
 
-seuset <- FindVariableGenes(object = seuset,mean.function = ExpMean,dispersion.function = LogVMR,x.low.cutoff = 0.0125,x.high.cutoff = 3,y.cutoff = 0.5,do.plot=FALSE) 
+seuset <- FindVariableGenes(object = seuset,mean.function = ExpMean,dispersion.function = LogVMR,x.low.cutoff = 0.0125,x.high.cutoff = 3,y.cutoff = 0.5,do.plot=FALSE)
 seuset <- RunPCA(object = seuset,pc.genes = seuset@var.genes,do.print = TRUE,pcs.print = 1:5,genes.print = 5)
 seuset <- RunTSNE(object = seuset,dims.use = 1:5,do.fast = TRUE) ##just to initiate the slot correctly
 seuset@dr$tsne@cell.embeddings<-t(mono.set@reducedDimA)

@@ -45,7 +45,7 @@ threePrimeAlignerOptions: --limitBAMsortRAM 60000000000 --alignIntronMax 1
 polyAT:
   minlength: 6
   mindistance: 25 # recommendation for Drosophila; for other genomes might be different
-  extend: 3 # recommendation from Andrew 
+  extend: 3 # recommendation from Andrew
   windowlength: 10
   percbase: 0.7
 
@@ -83,7 +83,7 @@ plotFormat: png
 SNPFile:
 NMaskedIndex:
 # for allelic-whatshap
-pvcf: 
+pvcf:
 #### Flag to control the pipeline entry point
 fromBAM: False
 bamExt: '.bam'

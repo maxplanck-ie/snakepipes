@@ -12,7 +12,7 @@ part=['host','spikein']
 if pairedEnd:
     rule writeFragmentSize:
         input: "split_deepTools_qc/bamPEFragmentSize/host.fragmentSize.metric.tsv"
-        output: "MACS2/fragmentSize.metrix.tsv"
+        output: "MACS2/fragmentSize.metric.tsv"
 
 
     rule MACS2:
@@ -185,7 +185,7 @@ else:
 
 
 rule prep_bedgraph:
-    input: "bamCoverage/{sample}.host_scaled.BYhost.bw"
+    input: "bamCoverage/{sample}.host_scaled.BYspikein.bw"
     output: temp("filtered_bedgraph/{sample}_host.fragments.bedgraph")
     conda: CONDA_SEACR_ENV
     shell: """

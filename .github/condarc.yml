@@ -3,3 +3,4 @@ channels:
   - bioconda
 channel_priority: 'strict'
 show_channel_urls: True
+build_prefix: /tmp/conda-build
