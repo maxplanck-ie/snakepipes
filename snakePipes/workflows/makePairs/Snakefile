@@ -106,18 +106,15 @@ onstart:
         print("reads:", reads)
         print("fastq dir:", fastq_dir)
         print("-" * 80, "\n")
-
         print(
             "--- Environment ----------------------------------------------------------------"
         )
         print("$TMPDIR: ", os.getenv("TMPDIR", ""))
         print("$HOSTNAME: ", os.getenv("HOSTNAME", ""))
         print("-" * 80, "\n")
-
     if toolsVersion:
         usedEnvs = [CONDA_SHARED_ENV, CONDA_MAKEPAIRS_ENV]
         cf.writeTools(usedEnvs, outdir, "makePairs", maindir)
-
     if sampleSheet:
         cf.copySampleSheet(sampleSheet, outdir)
 

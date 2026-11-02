@@ -2,7 +2,6 @@ import os
 import snakePipes.common_functions as cf
 import itertools
 
-
 ### snakemake_workflows initialization ########################################
 maindir = os.path.dirname(os.path.dirname(workflow.basedir))
 workflow_rscripts = os.path.join(maindir, "shared", "rscripts")
@@ -251,16 +250,16 @@ onstart:
             "--- Workflow parameters --------------------------------------------------------"
         )
         print("samples:", samples)
-        print("ATAC fragment cutoff: {}-{}".format(minFragmentSize, maxFragmentSize))
+        print(
+            "ATAC fragment cutoff: {}-{}".format(minFragmentSize, maxFragmentSize)
+        )
         print("-" * 80, "\n")
-
         print(
             "--- Environment ----------------------------------------------------------------"
         )
         print("$TMPDIR: ", os.getenv("TMPDIR", ""))
         print("$HOSTNAME: ", os.getenv("HOSTNAME", ""))
         print("-" * 80, "\n")
-
         print(
             "--- Genome ---------------------------------------------------------------------"
         )
@@ -275,7 +274,6 @@ onstart:
         print("Blacklist regions BED:", blacklist_bed)
         print("Ignore for normalization (bigwigs):", ignoreForNormalization)
         print("-" * 80, "\n")
-
     if toolsVersion:
         usedEnvs = [CONDA_SHARED_ENV, CONDA_ATAC_ENV, CONDA_RMD_ENV]
         cf.writeTools(usedEnvs, workingdir, "ATACseq", maindir)

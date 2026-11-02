@@ -1,7 +1,6 @@
 import os
 import snakePipes.common_functions as cf
 
-
 ### snakemake_workflows initialization ########################################
 maindir = os.path.dirname(os.path.dirname(workflow.basedir))
 
@@ -63,9 +62,13 @@ def run_Trimming(trim, fastqc):
     if trim and fastqc:
         return expand(
             fastq_dir + "/{sample}{read}.fastq.gz", sample=samples, read=reads
-        ) + expand("FastQC_trimmed/{sample}{read}_fastqc.html", sample=samples, read=reads)
+        ) + expand(
+            "FastQC_trimmed/{sample}{read}_fastqc.html", sample=samples, read=reads
+        )
     elif trim:
-        return expand(fastq_dir + "/{sample}{read}.fastq.gz", sample=samples, read=reads)
+        return expand(
+            fastq_dir + "/{sample}{read}.fastq.gz", sample=samples, read=reads
+        )
     else:
         return []
 
@@ -127,7 +130,9 @@ def run_build_matrices():
         suffix = "_Mbins" + str(nBinsToMerge) + "_" + matrixFile_suffix
         file_list.append(
             [
-                expand("HiC_matrices/{sample}" + suffix + matrix_format, sample=samples),
+                expand(
+                    "HiC_matrices/{sample}" + suffix + matrix_format, sample=samples
+                ),
                 expand(
                     "HiC_matrices/QCplots/{sample}" + suffix + "_diagnostic_plot.pdf",
                     sample=samples,
@@ -157,7 +162,9 @@ def run_build_matrices():
         suffix = "_" + matrixFile_suffix
         file_list.append(
             [
-                expand("HiC_matrices/{sample}" + suffix + matrix_format, sample=samples),
+                expand(
+                    "HiC_matrices/{sample}" + suffix + matrix_format, sample=samples
+                ),
                 expand(
                     "HiC_matrices/QCplots/{sample}" + suffix + "_diagnostic_plot.pdf",
                     sample=samples,
@@ -203,7 +210,6 @@ onstart:
         print("samples:", samples)
         print("fastq dir:", fastq_dir)
         print("-" * 80, "\n")
-
         print(
             "--- Environment ----------------------------------------------------------------"
         )
@@ -211,7 +217,6 @@ onstart:
         print("$HOSTNAME: ", os.getenv("HOSTNAME", ""))
         print("-" * 80, "\n")
         print(sample_dict)
-
     if toolsVersion:
         usedEnvs = [CONDA_SHARED_ENV, CONDA_HIC_ENV]
         cf.writeTools(usedEnvs, outdir, "HiC", maindir)
