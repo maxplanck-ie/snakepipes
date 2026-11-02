@@ -1,7 +1,6 @@
 import os
 import snakePipes.common_functions as cf
 
-
 ### snakemake_workflows initialization ########################################
 maindir = os.path.dirname(os.path.dirname(workflow.basedir))
 
@@ -61,7 +60,9 @@ def run_FastQC(fastqc):
     if not pairedEnd:
         readsUse = [reads[0]]
     if fastqc:
-        return expand("FastQC/{sample}{read}_fastqc.html", sample=samples, read=readsUse)
+        return expand(
+            "FastQC/{sample}{read}_fastqc.html", sample=samples, read=readsUse
+        )
     else:
         return []
 
@@ -76,7 +77,9 @@ def run_Trimming(trim, fastqc):
         )
     elif trim:
         return (
-            expand(os.path.join(outdir, "FASTQ_fastp", "{sample}.fastq.gz"), sample=samples)
+            expand(
+                os.path.join(outdir, "FASTQ_fastp", "{sample}.fastq.gz"), sample=samples
+            )
             + expand(os.path.join(outdir, "TEsmallOut", "TEsmall.done"))
             + expand(os.path.join(outdir, "TEsmallOut", "count_summary_plot.pdf"))
         )
@@ -131,14 +134,12 @@ onstart:
         print("Sample sheet:", sampleSheet)
         print("TEsmall: ", tesmall_db)
         print("-" * 80, "\n")
-
         print(
             "--- Environment ----------------------------------------------------------------"
         )
         print("$TMPDIR: ", os.getenv("TMPDIR", ""))
         print("$HOSTNAME: ", os.getenv("HOSTNAME", ""))
         print("-" * 80, "\n")
-
     elif "verbose" in config and config["verbose"] and fromBAM:
         print(
             "--- Workflow parameters --------------------------------------------------------"
@@ -147,7 +148,6 @@ onstart:
         print("input dir:" + indir)
         print("paired:", pairedEnd)
         print("-" * 80)  # , "\n"
-
         print(
             "--- Environment ----------------------------------------------------------------"
         )
@@ -156,7 +156,6 @@ onstart:
         print(
             "-" * 80,
         )
-
     if toolsVersion:
         usedEnvs = [CONDA_SHARED_ENV, CONDA_RNASEQ_ENV]
         cf.writeTools(usedEnvs, outdir, "smRNAseq", maindir)
@@ -195,7 +194,6 @@ onsuccess:
         print(
             "\n--- smRNA-seq workflow finished successfully! ------------------------------------\n"
         )
-
 
 
 onerror:

@@ -1,7 +1,6 @@
 import os
 import snakePipes.common_functions as cf
 
-
 ### snakemake_workflows initialization ########################################
 maindir = os.path.dirname(os.path.dirname(workflow.basedir))
 
@@ -99,14 +98,12 @@ onstart:
         print("fastq dir:", indir)
         print("Sample sheet:", sampleSheet)
         print("-" * 80, "\n")
-
         print(
             "--- Environment ----------------------------------------------------------------"
         )
         print("$TMPDIR: ", os.getenv("TMPDIR", ""))
         print("$HOSTNAME: ", os.getenv("HOSTNAME", ""))
         print("-" * 80, "\n")
-
     if toolsVersion:
         usedEnvs = [CONDA_SHARED_ENV, CONDA_PREPROCESSING_ENV]
         cf.writeTools(usedEnvs, outdir, "preprocessing", maindir)

@@ -90,7 +90,9 @@ def run_velocyto(skipVelocyto):
             return []
         elif mode == "Alevin":
             file_list = [
-                expand("AlevinForVelocity/{sample}/alevin/quants_mat.gz", sample=samples),
+                expand(
+                    "AlevinForVelocity/{sample}/alevin/quants_mat.gz", sample=samples
+                ),
                 "SingleCellExperiment/AlevinForVelocity/merged_samples.RDS",
             ]
             return file_list
@@ -116,16 +118,13 @@ onstart:
         print("Mode:", mode)
         print("Input directory for mapping:", fastq_dir)
         print("BigWig bin size:", bwBinSize)
-
         print("-" * 80, "\n")
-
         print(
             "--- Environment ----------------------------------------------------------------"
         )
         print("$TMPDIR: ", os.getenv("TMPDIR", ""))
         print("$HOSTNAME: ", os.getenv("HOSTNAME", ""))
         print("-" * 80, "\n")
-
     if toolsVersion:
         usedEnvs = [CONDA_SHARED_ENV, CONDA_scRNASEQ_ENV]
         cf.writeTools(usedEnvs, outdir, "scRNAseq", maindir)
@@ -179,7 +178,6 @@ onsuccess:
         print(
             "\n--- scRNAseq workflow finished successfully! --------------------------------\n"
         )
-
 
 
 onerror:
