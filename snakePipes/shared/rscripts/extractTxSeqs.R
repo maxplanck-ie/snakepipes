@@ -10,7 +10,7 @@
 #'
 extractTxSeqs <- function(gtf, genome, type = "spliced") {
   ## Construct TxDb from gtf file.
-  txdb <- GenomicFeatures::makeTxDbFromGFF(gtf, format = "gtf")
+  txdb <- txdbmaker::makeTxDbFromGFF(gtf, format = "gtf")
 
   ## Group exons by transcript. When using exonsBy with by = "tx",
   ## the returned exons are ordered by ascending rank for each transcript,
