@@ -1,6 +1,12 @@
 snakePipes News
 ===============
 
+snakePipes 3.5.1
+----------------
+
+* rule eisaR in createIndices workflow as well as the corresponding conda environment file were updated.
+
+
 snakePipes 3.5.0
 ----------------
 
