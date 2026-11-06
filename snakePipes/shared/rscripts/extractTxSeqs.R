@@ -16,7 +16,7 @@ extractTxSeqs <- function(gtf, genome, type = "spliced") {
   ## the returned exons are ordered by ascending rank for each transcript,
   ## that is, by their position in the transcript.
   grl <- GenomicFeatures::exonsBy(txdb, by = "tx", use.names = TRUE)
-  
+
   common_chromosomes <- intersect(seqlevels(grl), seqlevels(genome))
   grl <- keepSeqlevels(grl, common_chromosomes, pruning.mode = "coarse")
   ## Extract transcript sequences.
