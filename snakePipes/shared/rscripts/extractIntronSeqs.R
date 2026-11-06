@@ -14,7 +14,7 @@
 extractIntronSeqs <- function(gtf, genome, type = "collapse", flanklength = 90,
                               joinOverlappingIntrons = FALSE) {
   ## Construct TxDb from gtf file
-  txdb <- GenomicFeatures::makeTxDbFromGFF(gtf, format = "gtf")
+  txdb <- txdbmaker::makeTxDbFromGFF(gtf, format = "gtf")
 
   if (type == "separate") {
     ## Group exons by transcript

@@ -11,9 +11,11 @@ dependencies:
  - bioconductor-bsgenome
  - bioconductor-genomicranges
  - bioconductor-tximeta
+ - bioconductor-txdbmaker
  - bioconductor-summarizedexperiment
  - bioconductor-singlecellexperiment
  - bioconductor-scater
  - bioconductor-biocparallel
  - bioconductor-biocsingular
  - bioconductor-fishpond
+ - bioconductor-genomeinfodb
