@@ -18,3 +18,4 @@ dependencies:
  - bioconductor-biocparallel
  - bioconductor-biocsingular
  - bioconductor-fishpond
+ - bioconductor-genomeinfodb
