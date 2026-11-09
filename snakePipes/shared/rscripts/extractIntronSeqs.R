@@ -24,7 +24,7 @@ extractIntronSeqs <- function(gtf, genome, type = "collapse", flanklength = 90,
     grl <- GenomicFeatures::exonsBy(txdb, by = "gene")
 
     ## Collapse the exons of each gene
-    grl <- GenomicRanges::reduce(grl)
+    grl <- GenomicRanges::reduce(GenomicRanges::trim(grl))
   } else {
     stop("Unknown 'type' argument")
   }
