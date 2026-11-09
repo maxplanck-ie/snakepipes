@@ -15,6 +15,7 @@ extractIntronSeqs <- function(gtf, genome, type = "collapse", flanklength = 90,
                               joinOverlappingIntrons = FALSE) {
   ## Construct TxDb from gtf file
   txdb <- txdbmaker::makeTxDbFromGFF(gtf, format = "gtf")
+  
 
   if (type == "separate") {
     ## Group exons by transcript
@@ -28,6 +29,9 @@ extractIntronSeqs <- function(gtf, genome, type = "collapse", flanklength = 90,
   } else {
     stop("Unknown 'type' argument")
   }
+  common_chromosomes <- intersect(seqlevels(grl), seqlevels(genome))
+  grl <- GenomeInfoDb::keepSeqlevels(grl, common_chromosomes, pruning.mode = "coarse")
+  genome <- genome[names(genome) %in% common_chromosomes]
 
   ## Get introns as the set difference between the range and the exons,
   ## for each transcript/gene
