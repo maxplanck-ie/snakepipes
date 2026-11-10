@@ -322,7 +322,7 @@ rule genes_bed2fasta:
     threads: 1
     conda: CONDA_CREATE_INDEX_ENV
     shell:
-        "bedtools getfasta -name -s -split -fi {input.genome_fasta} -bed <(cat {input.bed} | cut -f1-12) | sed 's/(.*)//g' | sed 's/:.*//g' > {output}"
+        "bedtools getfasta -name -s -split -fi {input.genome_fasta} -bed <(cat {input.bed} | cut -f1-12) | cut -d':' -f1  > {output}"
 
 
 rule salmonIndex:
