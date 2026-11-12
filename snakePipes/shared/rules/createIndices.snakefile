@@ -436,13 +436,30 @@ rule bwameth2Index:
         bwameth.py index-mem2 {params.genome}
         """
 
-# Default memory allocation: 1G
-rule copyBlacklist:
-    output: os.path.join(outdir, "annotation/blacklist.bed")
+
+
+rule prep_blacklist:
+    input:
+        gtf = os.path.join(outdir,"annotation/genes.gtf")
+    output:
+        path = os.path.join(outdir,"annotation/blacklist.bed")
     params:
-        url = blacklist
-    run:
-        downloadFile(params.url, output)
+        wdir = os.path.join(outdir,"annotation"),
+        url = blacklist,
+        script = os.path.join(maindir, "shared", "rscripts", "prep_blacklist.R"),
+    conda:
+        CONDA_REPQUANT_ENV
+    script:
+        "{params.script}"
+
+#else:
+#    # Default memory allocation: 1G
+#    rule copyBlacklist:
+#        output: os.path.join(outdir, "annotation/blacklist.bed")
+#        params:
+#            url = blacklist
+#        run:
+#            downloadFile(params.url, output)
 
 rule copySpikeinBlacklist:
     output: temp(os.path.join(outdir, "annotation/spikein.blacklist_ori.bed"))
