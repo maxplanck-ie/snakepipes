@@ -115,11 +115,11 @@ if rmsk_file:
                             # Custom trailing columns typically hold repClass and repFamily
                             repName = fields[0]
                             strand = fields[2]
-                        
+
                             # Adjust these indices if your bigBed uses a custom .as schema
                             repClass = fields[9] if len(fields) > 9 else "Unknown"
                             repFamily = fields[10] if len(fields) > 10 else "Unknown"
-                        
+
                             yield chrom, str(start), str(end), strand, repName, repClass, repFamily
 
                     bb.close()
@@ -133,7 +133,7 @@ if rmsk_file:
                             (bin_id, swScore, milliDiv, milliDel, milliIns,
                             genoName, genoStart, genoEnd, genoLeft, strand,
                             repName, repClass, repFamily, repStart, repEnd, repLeft, id_val) = line.strip().split("\t")
-                        
+
                             yield genoName, genoStart, genoEnd, strand, repName, repClass, repFamily
 
             # Main GTF generation loop
