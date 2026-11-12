@@ -3,6 +3,7 @@ def downloadFile(url, output):
     import gzip
     import bz2
     import os.path
+    import pyBigWig
 
     if os.path.exists(url):
         url = "file://{}".format(urllib.request.pathname2url(url))
@@ -92,6 +93,77 @@ if rmsk_file:
             url = rmskURL
         run:
             downloadFile(params.url, output)
+
+    rule makeRMSKGTF:
+        input:
+            rmsk_file
+        output:
+            "annotation/rmsk.gtf"
+        run:
+
+            def iter_rmsk(filepath):
+                # Case 1: bigBed format
+                if filepath.endswith((".bb", ".bigBed")):
+                    bb = pyBigWig.open(filepath)
+                    for chrom in bb.chroms():
+                        entries = bb.entries(chrom, 0, bb.chroms(chrom))
+                        if not entries:
+                            continue
+                        for start, end, rest in entries:
+                            fields = rest.split("\t")
+                            # UCSC rmsk bigBed standard layout:
+                            # fields[0] = name (repName), fields[2] = strand
+                            # Custom trailing columns typically hold repClass and repFamily
+                            repName = fields[0]
+                            strand = fields[2]
+                        
+                            # Adjust these indices if your bigBed uses a custom .as schema
+                            repClass = fields[9] if len(fields) > 9 else "Unknown"
+                            repFamily = fields[10] if len(fields) > 10 else "Unknown"
+                        
+                            yield chrom, str(start), str(end), strand, repName, repClass, repFamily
+
+                    bb.close()
+
+                # Case 2: Standard UCSC rmsk text table
+                else:
+                    with open(filepath) as f:
+                        for line in f:
+                            if line.startswith("#"):
+                                continue
+                            (bin_id, swScore, milliDiv, milliDel, milliIns,
+                            genoName, genoStart, genoEnd, genoLeft, strand,
+                            repName, repClass, repFamily, repStart, repEnd, repLeft, id_val) = line.strip().split("\t")
+                        
+                            yield genoName, genoStart, genoEnd, strand, repName, repClass, repFamily
+
+            # Main GTF generation loop
+            found = {}
+            with open(output[0], "w") as of:
+                for genoName, genoStart, genoEnd, strand, repName, repClass, repFamily in iter_rmsk(input[0]):
+                    if repName not in found:
+                        found[repName] = 0
+                        tid = repName
+                    else:
+                        found[repName] += 1
+                        tid = f"{repName}_dup{found[repName]}"
+
+                    meta = {
+                        "genoName": genoName,
+                        "genoStart": genoStart,
+                        "genoEnd": genoEnd,
+                        "strand": strand,
+                        "repName": repName,
+                        "repClass": repClass,
+                        "repFamily": repFamily,
+                        "tid": tid
+                    }
+
+                    of.write(
+                        '{genoName}\trmsk\texon\t{genoStart}\t{genoEnd}\t.\t{strand}\t.\t'
+                        'gene_id "{repName}"; transcript_id "{tid}"; family_id "{repFamily}"; class_id "{repClass}";\n'.format(**meta)
+                    )
+
 
 # Default memory allocation: 8G
 rule make2bit:
@@ -437,7 +509,6 @@ rule bwameth2Index:
         """
 
 
-
 rule prep_blacklist:
     input:
         gtf = os.path.join(outdir,"annotation/genes.gtf")
@@ -452,14 +523,6 @@ rule prep_blacklist:
     script:
         "{params.script}"
 
-#else:
-#    # Default memory allocation: 1G
-#    rule copyBlacklist:
-#        output: os.path.join(outdir, "annotation/blacklist.bed")
-#        params:
-#            url = blacklist
-#        run:
-#            downloadFile(params.url, output)
 
 rule copySpikeinBlacklist:
     output: temp(os.path.join(outdir, "annotation/spikein.blacklist_ori.bed"))
