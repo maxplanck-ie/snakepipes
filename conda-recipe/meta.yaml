@@ -25,6 +25,7 @@ requirements:
     - pandas
     - thefuzz
     - ruamel.yaml
+    - pybigwig
 
 test:
   commands:

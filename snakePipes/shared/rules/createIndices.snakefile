@@ -3,7 +3,6 @@ def downloadFile(url, output):
     import gzip
     import bz2
     import os.path
-    import pyBigWig
 
     if os.path.exists(url):
         url = "file://{}".format(urllib.request.pathname2url(url))
@@ -100,7 +99,7 @@ if rmsk_file:
         output:
             os.path.join(outdir,"annotation/rmsk.gtf")
         run:
-
+            import pyBigWig
             def iter_rmsk(filepath):
                 # Case 1: bigBed format
                 if filepath.endswith((".bb", ".bigBed")):
