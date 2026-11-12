@@ -98,7 +98,7 @@ if rmsk_file:
         input:
             rmsk_file
         output:
-            "annotation/rmsk.gtf"
+            os.path.join(outdir,"annotation/rmsk.gtf")
         run:
 
             def iter_rmsk(filepath):
