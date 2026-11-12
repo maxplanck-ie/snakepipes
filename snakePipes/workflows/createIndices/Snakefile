@@ -73,6 +73,7 @@ organismDictionary = {
     "spikein_blacklist_bed": "",
     "ignoreForNormalization": "",
     "rmsk_file": "",
+    "rmsk_gtf": "",
     # tesmall_db is TEsmall's --dbfolder value: the TEsmall root,
     # NOT including genomes/<build> -- TEsmall looks for a
     # genomes/ dir inside --dbfolder itself. tesmall_genome is the
@@ -125,7 +126,9 @@ if spikeinGtfURL:
 
 if rmskURL:
     targets.extend([os.path.join(outdir, x) for x in ["annotation/rmsk.txt"]])
+    targets.extend([os.path.join(outdir, x) for x in ["annotation/rmsk.gtf"]])
     organismDictionary["rmsk_file"] = os.path.join(outdir, "annotation/rmsk.txt")
+    organismDictionary["rmsk_gtf"] = os.path.join(outdir, "annotation/rmsk.gtf")
 
 if "all" in tools or "bowtie2" in tools:
     targets.append(os.path.join(outdir, "BowtieIndex/genome.rev.2.bt2"))
