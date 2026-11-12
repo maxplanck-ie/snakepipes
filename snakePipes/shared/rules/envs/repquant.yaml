@@ -8,6 +8,7 @@ dependencies:
   - bioconductor-rtracklayer
   - bioconductor-genomicranges
   - bioconductor-biocstyle
+  - bioconductor-genomeinfodb
   - r-ggplot2
   - r-rcolorbrewer
   - r-reshape2
