@@ -1,7 +1,6 @@
 import os
 import snakePipes.common_functions as cf
 
-
 ### snakemake_workflows initialization ########################################
 maindir = os.path.dirname(os.path.dirname(workflow.basedir))
 
@@ -69,7 +68,9 @@ def run_FastQC(fastqc):
     if not pairedEnd:
         readsUse = [reads[0]]
     if fastqc:
-        return expand("FastQC/{sample}{read}_fastqc.html", sample=samples, read=readsUse)
+        return expand(
+            "FastQC/{sample}{read}_fastqc.html", sample=samples, read=readsUse
+        )
     else:
         return []
 
@@ -85,7 +86,9 @@ def run_Trimming(trim, fastqc):
             "FastQC_trimmed/{sample}{read}_fastqc.html", sample=samples, read=readsUse
         )
     elif trim:
-        return expand(fastq_dir + "/{sample}{read}.fastq.gz", sample=samples, read=readsUse)
+        return expand(
+            fastq_dir + "/{sample}{read}.fastq.gz", sample=samples, read=readsUse
+        )
     else:
         return []
 
@@ -125,7 +128,8 @@ def run_deseq2():
         sample_name = os.path.splitext(os.path.basename(sampleSheet))[0]
         if isMultipleComparison:
             file_list = expand(
-                "DESeq2_{}".format(sample_name) + ".{compGroup}/DESeq2.session_info.txt",
+                "DESeq2_{}".format(sample_name)
+                + ".{compGroup}/DESeq2.session_info.txt",
                 compGroup=cf.returnComparisonGroups(sampleSheet),
             )
         else:
@@ -149,14 +153,12 @@ onstart:
         print("fastq dir:", fastq_dir)
         print("Sample sheet:", sampleSheet)
         print("-" * 80, "\n")
-
         print(
             "--- Environment ----------------------------------------------------------------"
         )
         print("$TMPDIR: ", os.getenv("TMPDIR", ""))
         print("$HOSTNAME: ", os.getenv("HOSTNAME", ""))
         print("-" * 80, "\n")
-
     elif "verbose" in config and config["verbose"] and fromBAM:
         print(
             "--- Workflow parameters --------------------------------------------------------"
@@ -165,7 +167,6 @@ onstart:
         print("input dir:" + indir)
         print("paired:", pairedEnd)
         print("-" * 80)  # , "\n"
-
         print(
             "--- Environment ----------------------------------------------------------------"
         )
@@ -174,7 +175,6 @@ onstart:
         print(
             "-" * 80,
         )
-
     if toolsVersion:
         usedEnvs = [CONDA_SHARED_ENV, CONDA_NONCODING_RNASEQ_ENV]
         cf.writeTools(usedEnvs, outdir, "ncRNAseq", maindir)
@@ -213,7 +213,6 @@ onsuccess:
         print(
             "\n--- ncRNAseq workflow finished successfully! ------------------------------------\n"
         )
-
 
 
 onerror:

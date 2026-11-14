@@ -139,7 +139,9 @@ def run_FastQC(fastqc):
 def run_Trimming(trim, fastqc):
     if trim and fastqc:
         return expand(
-            fastq_dir + "/{sample}{read}.fastq.gz", sample=samples, read=reads[:idxRange]
+            fastq_dir + "/{sample}{read}.fastq.gz",
+            sample=samples,
+            read=reads[:idxRange],
         ) + expand(
             "FastQC_trimmed/{sample}{read}_fastqc.html",
             sample=samples,
@@ -147,7 +149,9 @@ def run_Trimming(trim, fastqc):
         )
     elif trim:
         return expand(
-            fastq_dir + "/{sample}{read}.fastq.gz", sample=samples, read=reads[:idxRange]
+            fastq_dir + "/{sample}{read}.fastq.gz",
+            sample=samples,
+            read=reads[:idxRange],
         )
     else:
         return []
@@ -158,7 +162,8 @@ def run_computeGCBias(GCBias):
     if GCBias:
         if not downsample:
             file_list = expand(
-                "deepTools_qc/computeGCBias/{sample}.filtered.GCBias.png", sample=samples
+                "deepTools_qc/computeGCBias/{sample}.filtered.GCBias.png",
+                sample=samples,
             )
     return file_list
 
@@ -298,14 +303,12 @@ onstart:
         print("fastq dir:", fastq_dir)
         print("maximum insert size (Bowtie2 -X):", insertSizeMax)
         print("-" * 80, "\n")
-
         print(
             "--- Environment ----------------------------------------------------------------"
         )
         print("$TMPDIR: ", os.getenv("TMPDIR", ""))
         print("$HOSTNAME: ", os.getenv("HOSTNAME", ""))
         print("-" * 80, "\n")
-
     if toolsVersion:
         usedEnvs = [CONDA_SHARED_ENV, CONDA_DNA_MAPPING_ENV]
         cf.writeTools(usedEnvs, outdir, "DNAmapping", maindir)

@@ -242,14 +242,12 @@ onstart:
         print("blacklist file: ", blacklist)
         print("ignore for normalization: ", " ".join(ignore))
         print("-" * 80, "\n")
-
         print(
             "--- Environment ----------------------------------------------------------------"
         )
         print("$TMPDIR: ", os.getenv("TMPDIR", ""))
         print("$HOSTNAME: ", os.getenv("HOSTNAME", ""))
         print("-" * 80, "\n")
-
     if toolsVersion:
         usedEnvs = [CONDA_SHARED_ENV, CONDA_CREATE_INDEX_ENV]
         cf.writeTools(usedEnvs, outdir, "createIndices", maindir)
