@@ -39,50 +39,17 @@ def bounded01(x):
     return x
 
 
-def parse_args(
-    defaults={
-        "verbose": False,
-        "configFile": None,
-        "clusterConfigFile": None,
-        "maxJobs": 12,
-        "snakemakeOptions": "--use-conda",
-        "tempDir": None,
-        "downsample": None,
-        "aligner": None,
-        "trim": True,
-        "trimmer": "fastp",
-        "trimmerOptions": "-q 5 -l 30 -M 5",
-        "maxDist": 300,
-        "minCpGs": 10,
-        "minMethDiff": 0.1,
-        "FDR": 0.1,
-        "MethylDackelOptions": "--mergeContext --maxVariantFrac 0.25 --minDepth 4",
-        "fastqc": False,
-        "bwBinSize": 25,
-        "plotFormat": "png",
-        "bamExt": ".bam",
-        "reads": ["_R1", "_R2"],
-        "ext": ".fastq.gz",
-        "DMRprograms": "metilene,dmrseq",
-        "minCoverage": 5,
-        "blacklist": None,
-        "sampleSheet": None,
-        "noAutoMethylationBias": False,
-        "fromBAM": False,
-        "skipDOC": False,
-        "UMIDedup": False,
-        "UMIDedupOpts": "",
-        "bcPattern": "",
-        "UMIDedupSep": "_",
-        "UMIBarcode": False,
-        "targetRegions": None,
-        "metileneOptions": None,
-        "skipBamQC": False,
-    },
-):
+def parse_args(defaults=None):
     """
     Parse arguments from the command line.
+
+    When called without defaults (e.g. by sphinx-argparse during the docs
+    build), the defaults are loaded from the workflow's defaults.yaml merged
+    with the shared defaults.
     """
+    if defaults is None:
+        _, _, defaults = cf.setDefaults(os.path.basename("WGBS.py")) # Use Workflowname here as __file__ will be different during sphinx rendering
+
     mainArgs = parserCommon.mainArguments(defaults)
 
     parser = argparse.ArgumentParser(
