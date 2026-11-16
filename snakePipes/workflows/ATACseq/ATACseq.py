@@ -13,35 +13,17 @@ import snakePipes.common_functions as cf
 import snakePipes.parserCommon as parserCommon
 
 
-def parse_args(
-    defaults={
-        "verbose": False,
-        "configFile": None,
-        "clusterConfigFile": None,
-        "maxJobs": 5,
-        "snakemakeOptions": "--use-conda",
-        "tempDir": None,
-        "reads": ["_R1", "_R2"],
-        "maxFragmentSize": 150,
-        "minFragmentSize": 0,
-        "fromBAM": False,
-        "qval": 0.001,
-        "sampleSheet": None,
-        "externalBed": None,
-        "bamExt": "filtered.bam",
-        "fdr": 0.05,
-        "absBestLFC": 1,
-        "UMIDedup": False,
-        "UMIDedupOpts": "",
-        "UMIDedupSep": "_",
-        "peakCaller": "MACS2",
-        "UMIBarcode": False,
-        "bcPattern": "",
-    },
-):
+def parse_args(defaults=None):
     """
     Parse arguments from the command line.
+
+    When called without defaults (e.g. by sphinx-argparse during the docs
+    build), the defaults are loaded from the workflow's defaults.yaml merged
+    with the shared defaults.
     """
+    if defaults is None:
+        _, _, defaults = cf.setDefaults(os.path.basename("ATACseq.py")) # Use Workflowname here as __file__ will be different during sphinx rendering
+
     mainArgs = parserCommon.mainArguments(defaults, workingDir=True)
 
     parser = argparse.ArgumentParser(

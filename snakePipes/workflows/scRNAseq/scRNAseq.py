@@ -16,35 +16,17 @@ import snakePipes.common_functions as cf
 import snakePipes.parserCommon as parserCommon
 
 
-def parse_args(
-    defaults={
-        "verbose": False,
-        "configFile": None,
-        "clusterConfigFile": None,
-        "maxJobs": 5,
-        "snakemakeOptions": "--use-conda",
-        "tempdir": None,
-        "downsample": False,
-        "trim": False,
-        "reads": ["_R1", "_R2"],
-        "ext": ".fastq.gz",
-        "alignerOptions": "--outBAMsortingBinsN 30 --twopassMode Basic",
-        "filterGTF": "-v -P 'decay|pseudogene' ",
-        "bwBinSize": 10,
-        "plotFormat": "png",
-        "mode": "STARsolo",
-        "BCwhiteList": None,
-        "STARsoloCoords": ["1", "7", "8", "7"],
-        "myKit": "CellSeq384",
-        "skipVelocyto": False,
-        "alevinLibraryType": "ISR",
-        "prepProtocol": None,
-        "expectCells": None,
-    },
-):
+def parse_args(defaults=None):
     """
     Parse arguments from the command line.
+
+    When called without defaults (e.g. by sphinx-argparse during the docs
+    build), the defaults are loaded from the workflow's defaults.yaml merged
+    with the shared defaults.
     """
+    if defaults is None:
+        _, _, defaults = cf.setDefaults(os.path.basename("scRNAseq.py")) # Use Workflowname here as __file__ will be different during sphinx rendering
+
     mainArgs = parserCommon.mainArguments(defaults, workingDir=False)
 
     parser = argparse.ArgumentParser(
