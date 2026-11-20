@@ -592,11 +592,17 @@ rule prep_blacklist:
 
 
 rule copySpikeinBlacklist:
+    input:
+        gtf = os.path.join(outdir,"annotation/genes.gtf")
     output: temp(os.path.join(outdir, "annotation/spikein.blacklist_ori.bed"))
     params:
-        url = spikeinBlacklist
-    run:
-        downloadFile(params.url, output)
+        url = spikeinBlacklist,
+        wdir = os.path.join(outdir,"annotation"),
+        script = os.path.join(maindir, "shared", "rscripts", "prep_blacklist.R")
+    conda:
+        CONDA_REPQUANT_ENV
+    script:
+        "{params.script}"
 
 rule renameSpikeinChromsBlacklist:
     input:  os.path.join(outdir,"annotation/spikein.blacklist_ori.bed")
