@@ -86,82 +86,150 @@ rule fastaDict:
         """
 
 if rmsk_file:
+    #rule fetchRMSK:
+        #output: rmsk_file
+        #params:
+            #url = rmskURL
+        #run:
+            #downloadFile(params.url, output)
+
     rule fetchRMSK:
-        output: rmsk_file
+        input:
+            fasta = genome_fasta
+        output:
+            rmsk_file
         params:
             url = rmskURL
         run:
-            downloadFile(params.url, output)
+            import os
+            import urllib.request
+
+            out_path = output[0]
+
+            # 1. Check whether genome_fasta uses the "chr" prefix
+            fasta_has_chr = False
+            with open(input.fasta, "r") as fa:
+                for line in fa:
+                    if line.startswith(">"):
+                        first_chrom = line[1:].strip().split()[0]
+                        fasta_has_chr = first_chrom.startswith("chr")
+                        break
+
+            def fix_chrom(chrom):
+                if fasta_has_chr and not chrom.startswith("chr"):
+                    return "chr" + chrom
+                if not fasta_has_chr and chrom.startswith("chr"):
+                    return chrom[3:]
+                return chrom
+
+            def is_bigbed(url):
+                clean = url.split("?")[0].split("#")[0]
+                return clean.lower().endswith((".bb", ".bigbed"))
+
+            with open(out_path, "w") as out_f:
+
+                if is_bigbed(params.url):
+                    import pyBigWig
+                    # pyBigWig handles remote URLs directly via libcurl
+                    bb = pyBigWig.open(params.url)
+                    for chrom, size in bb.chroms().items():
+                        entries = bb.entries(chrom, 0, size)
+                        if not entries:
+                            continue
+                        norm_chrom = fix_chrom(chrom)
+                        for start, end, rest in entries:
+                            out_f.write(f"{norm_chrom}\t{start}\t{end}\t{rest}\n")
+                    bb.close()
+
+                else:
+                    with urllib.request.urlopen(params.url) as resp:
+                        for raw_line in resp:
+                            line = raw_line.decode("latin-1")
+                            if line.startswith("#") or not line.strip():
+                                out_f.write(line)
+                                continue
+                            cols = line.rstrip("\n").split("\t")
+                            chrom_idx = 5 if len(cols) == 17 else 0
+                            cols[chrom_idx] = fix_chrom(cols[chrom_idx])
+                            out_f.write("\t".join(cols) + "\n")
+
 
     rule makeRMSKGTF:
         input:
             rmsk_file
         output:
-            os.path.join(outdir,"annotation/rmsk.gtf")
+            rmsk_gtf
         run:
-            import pyBigWig
-            def iter_rmsk(filepath):
-                # Case 1: bigBed format
-                if filepath.endswith((".bb", ".bigBed")):
-                    bb = pyBigWig.open(filepath)
-                    for chrom in bb.chroms():
-                        entries = bb.entries(chrom, 0, bb.chroms(chrom))
-                        if not entries:
-                            continue
-                        for start, end, rest in entries:
-                            fields = rest.split("\t")
-                            # UCSC rmsk bigBed standard layout:
-                            # fields[0] = name (repName), fields[2] = strand
-                            # Custom trailing columns typically hold repClass and repFamily
-                            repName = fields[0]
-                            strand = fields[2]
-
-                            # Adjust these indices if your bigBed uses a custom .as schema
-                            repClass = fields[9] if len(fields) > 9 else "Unknown"
-                            repFamily = fields[10] if len(fields) > 10 else "Unknown"
-
-                            yield chrom, str(start), str(end), strand, repName, repClass, repFamily
-
-                    bb.close()
-
-                # Case 2: Standard UCSC rmsk text table
-                else:
-                    with open(filepath) as f:
-                        for line in f:
-                            if line.startswith("#"):
-                                continue
-                            (bin_id, swScore, milliDiv, milliDel, milliIns,
-                            genoName, genoStart, genoEnd, genoLeft, strand,
-                            repName, repClass, repFamily, repStart, repEnd, repLeft, id_val) = line.strip().split("\t")
-
-                            yield genoName, genoStart, genoEnd, strand, repName, repClass, repFamily
-
-            # Main GTF generation loop
             found = {}
-            with open(output[0], "w") as of:
-                for genoName, genoStart, genoEnd, strand, repName, repClass, repFamily in iter_rmsk(input[0]):
-                    if repName not in found:
-                        found[repName] = 0
-                        tid = repName
-                    else:
-                        found[repName] += 1
-                        tid = f"{repName}_dup{found[repName]}"
 
-                    meta = {
-                        "genoName": genoName,
-                        "genoStart": genoStart,
-                        "genoEnd": genoEnd,
-                        "strand": strand,
-                        "repName": repName,
-                        "repClass": repClass,
-                        "repFamily": repFamily,
-                        "tid": tid
-                    }
+            def make_tid(repName):
+                if repName not in found:
+                    found[repName] = 0
+                    return repName
+                found[repName] += 1
+                return "{}_dup{}".format(repName, found[repName])
 
-                    of.write(
-                        '{genoName}\trmsk\texon\t{genoStart}\t{genoEnd}\t.\t{strand}\t.\t'
-                        'gene_id "{repName}"; transcript_id "{tid}"; family_id "{repFamily}"; class_id "{repClass}";\n'.format(**meta)
+            def write_entry(of, genoName, genoStart, genoEnd, strand,
+                        repName, repClass, repFamily):
+               tid = make_tid(repName)
+               of.write(
+                    '{}\trmsk\texon\t{}\t{}\t.\t{}\t.\t'
+                    'gene_id "{}"; transcript_id "{}"; '
+                    'family_id "{}"; class_id "{}";\n'.format(
+                        genoName, genoStart, genoEnd, strand,
+                        repName, tid, repFamily, repClass
                     )
+                )
+
+            with open(input[0], "r") as f, open(output[0], "w") as of:
+                for line in f:
+                    if line.startswith("#") or not line.strip():
+                        continue
+
+                    cols = line.strip().split("\t")
+
+                    # Case 1: Standard 17-column UCSC rmsk.txt dump (starts with 'bin')
+                    if len(cols) == 17:
+                        (bin_id, swScore, milliDiv, milliDel, milliIns,
+                         genoName, genoStart, genoEnd, genoLeft, strand,
+                         repName, repClass, repFamily,
+                         repStart, repEnd, repLeft, id_val) = cols
+
+                    # Case 2: 16-column converted bigBed .txt (starts with 'chrom')
+                    elif len(cols) == 16:
+                        (genoName, genoStart, genoEnd, name, swScore, strand,
+                         milliDiv, milliDel, milliIns, genoLeft,
+                         repName, repClass, repFamily,
+                         repStart, repEnd, repLeft) = cols
+
+                    # Case 3: 14-column BED12 from BigBed extraction
+                    elif len(cols) == 14:
+                        genoName  = cols[0]
+                        genoStart = cols[1]
+                        genoEnd   = cols[2]
+                        name      = cols[3]   # e.g. "(ACCCTA)n#Simple_repeat" or "AluSx#SINE/Alu"
+                        strand    = cols[5]
+
+                        # Parse repName, repClass, repFamily out of the name field
+                        if "#" in name:
+                            repName, class_family = name.split("#", 1)
+                            if "/" in class_family:
+                                repClass, repFamily = class_family.split("/", 1)
+                            else:
+                                repClass = repFamily = class_family
+                        else:
+                            repName  = name
+                            repClass = repFamily = "Unknown"
+
+                    else:
+                        raise ValueError(
+                            f"Unexpected column count ({len(cols)}) in {input[0]}: {line[:80]}"
+                        )
+
+                    write_entry(of, genoName, genoStart, genoEnd, strand,
+                                repName, repClass, repFamily)
+
+
 
 
 # Default memory allocation: 8G

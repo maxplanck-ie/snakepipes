@@ -125,8 +125,7 @@ if spikeinGtfURL:
     )
 
 if rmskURL:
-    targets.extend([os.path.join(outdir, x) for x in ["annotation/rmsk.txt"]])
-    targets.extend([os.path.join(outdir, x) for x in ["annotation/rmsk.gtf"]])
+    targets.extend([os.path.join(outdir, x) for x in ["annotation/rmsk.txt","annotation/rmsk.gtf"]])
     organismDictionary["rmsk_file"] = os.path.join(outdir, "annotation/rmsk.txt")
     organismDictionary["rmsk_gtf"] = os.path.join(outdir, "annotation/rmsk.gtf")
 
