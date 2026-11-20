@@ -42,7 +42,8 @@ dependencies = [
     "graphviz",
     "matplotlib",
     "numpy",
-    "seaborn"
+    "seaborn",
+    "pybigwig"
 ]
 
 [project.optional-dependencies]

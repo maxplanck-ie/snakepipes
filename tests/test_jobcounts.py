@@ -479,7 +479,7 @@ class TestCreateindices:
         print(" ".join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 22
+        assert parseSpOut(_p) == 23
 
     def test_DAG(self, ifs):
         ci = [
@@ -500,7 +500,7 @@ class TestCreateindices:
         print(" ".join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 22
+        assert parseSpOut(_p) == 23
 
     def test_spikein(self, ifs):
         ci = [
@@ -525,7 +525,7 @@ class TestCreateindices:
         print(" ".join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 27
+        assert parseSpOut(_p) == 28
 
     def test_tesmall(self, ifs):
         ci = [

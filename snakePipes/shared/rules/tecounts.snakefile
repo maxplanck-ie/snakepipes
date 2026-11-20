@@ -60,44 +60,44 @@ else:
             """
 
 
-rule makeRMSKGTF:
-    input: rmsk_file
-    output: temp("rmsk.gtf")
-    run:
-        f = open(input[0])
-        of = open(output[0], "w")
-        found = dict()
+#rule makeRMSKGTF:
+#    input: rmsk_file
+#    output: temp("rmsk.gtf")
+#    run:
+#        f = open(input[0])
+#        of = open(output[0], "w")
+#        found = dict()
 
-        for line in f:
-            if line.startswith("#"):
-                continue
-            bin, swScore, milliDiv, milliDel, milliIns,  genoName, genoStart, genoEnd, genoLeft, strand, repName, repClass, repFamily, repStart, repEnd, repLeft, id = line.strip().split("\t")
-            if repName not in found:
-                found[repName] = 0
-                tid = repName
-            else:
-                found[repName] += 1
-                tid = "{}_dup{}".format(repName, found[repName])
+#        for line in f:
+#            if line.startswith("#"):
+#                continue
+#            bin, swScore, milliDiv, milliDel, milliIns,  genoName, genoStart, genoEnd, genoLeft, strand, repName, repClass, repFamily, repStart, repEnd, repLeft, id = line.strip().split("\t")
+#            if repName not in found:
+#                found[repName] = 0
+#                tid = repName
+#            else:
+#                found[repName] += 1
+#                tid = "{}_dup{}".format(repName, found[repName])
+#
+#            meta = {"genoName": genoName,
+#                    "genoStart": genoStart,
+#                    "genoEnd": genoEnd,
+#                    "strand": strand,
+#                    "repName": repName,
+#                    "repClass": repClass,
+#                    "repFamily": repFamily,
+#                    "tid": tid}
 
-            meta = {"genoName": genoName,
-                    "genoStart": genoStart,
-                    "genoEnd": genoEnd,
-                    "strand": strand,
-                    "repName": repName,
-                    "repClass": repClass,
-                    "repFamily": repFamily,
-                    "tid": tid}
-
-            of.write("{genoName}\trmsk\texon\t{genoStart}\t{genoEnd}\t.\t{strand}\t.\tgene_id \"{repName}\"; transcript_id \"{tid}\"; family_id \"{repFamily}\"; class_id \"{repClass}\";\n".format(**meta))
-        f.close()
-        of.close()
+#            of.write("{genoName}\trmsk\texon\t{genoStart}\t{genoEnd}\t.\t{strand}\t.\tgene_id \"{repName}\"; transcript_id \"{tid}\"; family_id \"{repFamily}\"; class_id \"{repClass}\";\n".format(**meta))
+#        f.close()
+#        of.close()
 
 
 # Run TE Counts single core, 30GB
 rule TEcounts:
     input:
         bam = aligner + "/{sample}.unsorted.bam",
-        repeatGTF = "rmsk.gtf"
+        repeatGTF = rmsk_gtf
     output:
         "TEcount/{sample}.cntTable"
     params:
