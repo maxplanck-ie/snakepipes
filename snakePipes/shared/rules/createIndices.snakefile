@@ -102,6 +102,8 @@ if rmsk_file:
             url = rmskURL
         run:
             import os
+            import io
+            import gzip
             import urllib.request
 
             out_path = output[0]
@@ -143,15 +145,21 @@ if rmsk_file:
 
                 else:
                     with urllib.request.urlopen(params.url) as resp:
-                        for raw_line in resp:
-                            line = raw_line.decode("latin-1")
-                            if line.startswith("#") or not line.strip():
-                                out_f.write(line)
-                                continue
-                            cols = line.rstrip("\n").split("\t")
-                            chrom_idx = 5 if len(cols) == 17 else 0
-                            cols[chrom_idx] = fix_chrom(cols[chrom_idx])
-                            out_f.write("\t".join(cols) + "\n")
+                        raw = resp.read()
+
+                    # Check gzip magic number (0x1F 0x8B)
+                    if raw[:2] == b"\x1f\x8b":
+                        raw = gzip.decompress(raw)
+
+                    for raw_line in io.BytesIO(raw):
+                        line = raw_line.decode("latin-1")
+                        if line.startswith("#") or not line.strip():
+                            out_f.write(line)
+                            continue
+                        cols = line.rstrip("\n").split("\t")
+                        chrom_idx = 5 if len(cols) == 17 else 0
+                        cols[chrom_idx] = fix_chrom(cols[chrom_idx])
+                        out_f.write("\t".join(cols) + "\n")
 
 
     rule makeRMSKGTF:
@@ -594,7 +602,8 @@ rule prep_blacklist:
 rule copySpikeinBlacklist:
     input:
         gtf = os.path.join(outdir,"annotation/genes.gtf")
-    output: temp(os.path.join(outdir, "annotation/spikein.blacklist_ori.bed"))
+    output: 
+        path = temp(os.path.join(outdir, "annotation/spikein.blacklist_ori.bed"))
     params:
         url = spikeinBlacklist,
         wdir = os.path.join(outdir,"annotation"),
