@@ -602,7 +602,7 @@ rule prep_blacklist:
 rule copySpikeinBlacklist:
     input:
         gtf = os.path.join(outdir,"annotation/genes.gtf")
-    output: 
+    output:
         path = temp(os.path.join(outdir, "annotation/spikein.blacklist_ori.bed"))
     params:
         url = spikeinBlacklist,
