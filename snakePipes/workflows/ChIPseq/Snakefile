@@ -39,7 +39,6 @@ if fromBAM:
         include: os.path.join(maindir, "shared", "rules", "deepTools_qc.snakefile")
 
     else:
-
         include: os.path.join(maindir, "shared", "rules", "split_bam_ops_DNA_spikein.snakefile")
 
 
@@ -147,7 +146,7 @@ def run_deepTools_qc(fromBAM, useSpikeInForNorm):
                 "split_deepTools_qc/bamPEFragmentSize/host.fragmentSize.metric.tsv"
             )
             file_list.append(
-                expand("bamCoverage/{sample}.host_scaled.BYspikein.bw", sample=samples)
+                expand("bamCoverage/{sample}.host_scaled.BYspikein.bw", sample=chip_samples)
             )
     else:
         file_list = []

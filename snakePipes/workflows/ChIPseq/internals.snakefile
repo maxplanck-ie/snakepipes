@@ -298,7 +298,7 @@ def get_host_and_spikein_chromosomes(genome_index, spikeinEx):
                 continue
     return([hostl,spikeinl])
 
-if useSpikeInForNorm:
+if useSpikeInForNorm and not spikeinSizeFactorsFile:
     part=['host','spikein']
     spikein_detected=check_if_spikein_genome(genome_index,spikeinExt)
     if spikein_detected:
