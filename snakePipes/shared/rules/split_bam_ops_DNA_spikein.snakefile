@@ -1,6 +1,7 @@
 part=['host','spikein']
 blacklist_dict={"host": blacklist_bed,"spikein": spikein_blacklist_bed }
-region_dict={"host": " ".join(host_chr.keys()),"spikein": " ".join(spikein_chr.keys())}
+if not spikeinSizeFactorsFile:
+    region_dict={"host": " ".join(host_chr.keys()),"spikein": " ".join(spikein_chr.keys())}
 
 
 def get_scaling_factor(sample,input):
