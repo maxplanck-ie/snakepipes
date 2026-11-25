@@ -39,6 +39,7 @@ if fromBAM:
         include: os.path.join(maindir, "shared", "rules", "deepTools_qc.snakefile")
 
     else:
+
         include: os.path.join(maindir, "shared", "rules", "split_bam_ops_DNA_spikein.snakefile")
 
 
