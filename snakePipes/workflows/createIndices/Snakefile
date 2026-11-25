@@ -139,7 +139,7 @@ if "all" in tools or "bowtie2" in tools:
     organismDictionary["bowtie2_index"] = os.path.join(outdir, "BowtieIndex/genome")
 
 if "all" in tools or "hisat2" in tools:
-    targets.append(os.path.join(outdir, "HISAT2Index/genome.6.ht2"))
+    targets.append(os.path.join(outdir, "HISAT2Index/index.done"))
     organismDictionary["hisat2_index"] = os.path.join(outdir, "HISAT2Index/genome")
     if gtfURL:
         targets.append(os.path.join(outdir, "HISAT2Index/splice_sites.txt"))

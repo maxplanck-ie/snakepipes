@@ -189,54 +189,89 @@ if rmsk_file:
                     )
                 )
 
-            with open(input[0], "r") as f, open(output[0], "w") as of:
-                for line in f:
-                    if line.startswith("#") or not line.strip():
+            with open(input[0], "rb") as fh:
+               raw = fh.read()
+
+            if raw[:2] == b"\x1f\x8b":
+                import gzip
+                raw = gzip.decompress(raw)
+
+            lines = raw.decode("latin-1").splitlines()
+
+            # Detect format from first non-empty line
+            first = next((l for l in lines if l.strip()), "")
+            is_out_format = first.lstrip().startswith("SW")
+
+            with open(output[0], "w") as of:
+                for line in lines:
+                    if not line.strip():
                         continue
 
-                    cols = line.strip().split("\t")
+                    if is_out_format:
+                    # Skip the two header lines
+                        if line.lstrip().startswith("SW") or line.lstrip().startswith("score"):
+                            continue
 
-                    # Case 1: Standard 17-column UCSC rmsk.txt dump (starts with 'bin')
-                    if len(cols) == 17:
-                        (bin_id, swScore, milliDiv, milliDel, milliIns,
-                         genoName, genoStart, genoEnd, genoLeft, strand,
-                         repName, repClass, repFamily,
-                         repStart, repEnd, repLeft, id_val) = cols
+                        cols = line.split()
+                        if len(cols) < 15:
+                            continue
 
-                    # Case 2: 16-column converted bigBed .txt (starts with 'chrom')
-                    elif len(cols) == 16:
-                        (genoName, genoStart, genoEnd, name, swScore, strand,
-                         milliDiv, milliDel, milliIns, genoLeft,
-                         repName, repClass, repFamily,
-                         repStart, repEnd, repLeft) = cols
-
-                    # Case 3: 14-column BED12 from BigBed extraction
-                    elif len(cols) == 14:
-                        genoName  = cols[0]
-                        genoStart = cols[1]
-                        genoEnd   = cols[2]
-                        name      = cols[3]   # e.g. "(ACCCTA)n#Simple_repeat" or "AluSx#SINE/Alu"
-                        strand    = cols[5]
-
-                        # Parse repName, repClass, repFamily out of the name field
-                        if "#" in name:
-                            repName, class_family = name.split("#", 1)
-                            if "/" in class_family:
-                                repClass, repFamily = class_family.split("/", 1)
-                            else:
-                                repClass = repFamily = class_family
+                        # .out columns:
+                        # 0:score 1:div 2:del 3:ins 4:genoName 5:genoStart 6:genoEnd
+                        # 7:(genoLeft) 8:strand(+/C) 9:repName 10:repClass/repFamily
+                        # 11:repStart 12:repEnd 13:(repLeft) 14:id
+                        genoName  = cols[4]
+                        genoStart = cols[5]   # 1-based in .out format
+                        genoEnd   = cols[6]
+                        strand    = "+" if cols[8] == "+" else "-"
+                        repName   = cols[9]
+                        class_family = cols[10]
+                        if "/" in class_family:
+                            repClass, repFamily = class_family.split("/", 1)
                         else:
-                            repName  = name
-                            repClass = repFamily = "Unknown"
+                            repClass = repFamily = class_family
 
                     else:
-                        raise ValueError(
-                            f"Unexpected column count ({len(cols)}) in {input[0]}: {line[:80]}"
-                        )
+                        if line.startswith("#"):
+                            continue
+
+                        cols = line.rstrip("\n").split("\t")
+
+                        if len(cols) == 17:
+                            (bin_id, swScore, milliDiv, milliDel, milliIns,
+                             genoName, genoStart, genoEnd, genoLeft, strand,
+                             repName, repClass, repFamily,
+                             repStart, repEnd, repLeft, id_val) = cols
+
+                        elif len(cols) == 16:
+                            (genoName, genoStart, genoEnd, name, swScore, strand,
+                             milliDiv, milliDel, milliIns, genoLeft,
+                             repName, repClass, repFamily,
+                             repStart, repEnd, repLeft) = cols
+
+                        elif len(cols) == 14:
+                            genoName  = cols[0]
+                            genoStart = cols[1]
+                            genoEnd   = cols[2]
+                            strand    = cols[5]
+                            name      = cols[3]
+                            if "#" in name:
+                                repName, class_family = name.split("#", 1)
+                                if "/" in class_family:
+                                    repClass, repFamily = class_family.split("/", 1)
+                                else:
+                                    repClass = repFamily = class_family
+                            else:
+                                repName  = name
+                                repClass = repFamily = "Unknown"
+
+                        else:
+                            raise ValueError(
+                                f"Unexpected column count ({len(cols)}) in {input[0]}: {line[:80]}"
+                            )
 
                     write_entry(of, genoName, genoStart, genoEnd, strand,
-                                repName, repClass, repFamily)
-
+                        repName, repClass, repFamily)
 
 
 
@@ -423,7 +458,7 @@ rule bowtie2Index:
 # Default memory allocation: 20G
 rule hisat2Index:
     input: genome_fasta
-    output: os.path.join(outdir, "HISAT2Index/genome.6.ht2")
+    output: os.path.join(outdir, "HISAT2Index/index.done")
     params:
       basedir = os.path.join(outdir, "HISAT2Index")
     threads: lambda wildcards: 10 if 10<max_thread else max_thread
@@ -431,6 +466,7 @@ rule hisat2Index:
     shell: """
         ln -s {input} {params.basedir}/genome.fa
         hisat2-build -q -p {threads} {params.basedir}/genome.fa {params.basedir}/genome
+        && touch {output}
         """
 
 
