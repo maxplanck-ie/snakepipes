@@ -8,7 +8,7 @@ dependencies:
   - samtools
   - tabix
   - bcftools
-  - pairtools==1.1
+  - pairtools==1.1.3
   - pip
   - pip:
       - git+https://github.com/open2c/MultiQC.git
