@@ -70,3 +70,4 @@ pvcf:
 useSpikeInForNorm: False
 spikeinExt: "_spikein"
 spikein_bin_size: 1000
+spikeinSizeFactorsFile:
