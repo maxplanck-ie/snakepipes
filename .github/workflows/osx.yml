@@ -37,7 +37,7 @@ jobs:
           'CONDA_FQLINT_ENV',
           'CONDA_CREATE_TEsmall_ENV'
         ]
-    runs-on: macos-latest
+    runs-on: macos-13
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
