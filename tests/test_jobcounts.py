@@ -101,6 +101,7 @@ def createTestData(fp, samples=9) -> None:
         f.write("1\5\n")
         f.write("2_spikein\t5\n")
     (fp / "ref" / "rmsk.txt").touch()
+    (fp / "ref" / "rmsk.gtf").touch()
     (fp / "ref" / "genes.bed").touch()
     (fp / "ref" / "genes.slop.gtf").touch()
     (fp / "ref" / "spikein_genes.gtf").touch()
@@ -246,6 +247,7 @@ def createTestData(fp, samples=9) -> None:
         "spikein_blacklist_bed": "",
         "ignoreForNormalization": "MT X Y",
         "rmsk_file": (fp / "ref" / "rmsk.txt").as_posix(),
+        "rmsk_gtf": (fp / "ref" / "rmsk.gtf").as_posix(),
         "tesmall_db": (fp / "ref" / "TEsmall").as_posix(),
         "tesmall_genome": "mm10",
     }
