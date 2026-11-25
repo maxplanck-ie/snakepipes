@@ -4,7 +4,7 @@ channels:
  - bioconda
 dependencies:
  - python = 3.10.13
- - deeptools = 3.5.4
+ - deeptools = 3.5.6
  - seqtk = 1.4
  - pigz = 2.8
  - snpsplit = 0.6.0
