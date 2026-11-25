@@ -37,7 +37,7 @@ jobs:
           'CONDA_FQLINT_ENV',
           'CONDA_CREATE_TEsmall_ENV'
         ]
-    runs-on: macos-13
+    runs-on: macos-26-intel
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
@@ -52,5 +52,5 @@ jobs:
           pip install .
       - name: createEnvsOSX
         run: |
-          #conda config --set subdir osx-64
+          conda config --set subdir osx-64
           snakePipes createEnvs --only ${{matrix.envs}}
