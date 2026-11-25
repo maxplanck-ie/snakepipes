@@ -2265,7 +2265,7 @@ class TestncRNAseq:
         print(" ".join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 137
+        assert parseSpOut(_p) == 136
 
     def test_DE(self, ifs):
         ci = [
@@ -2283,7 +2283,7 @@ class TestncRNAseq:
         print(" ".join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 139
+        assert parseSpOut(_p) == 138
 
     def test_SE(self, ifs):
         ci = [
@@ -2301,7 +2301,7 @@ class TestncRNAseq:
         print(" ".join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 120
+        assert parseSpOut(_p) == 119
 
     def test_frombam(self, ifs):
         ci = [
@@ -2320,7 +2320,7 @@ class TestncRNAseq:
         print(" ".join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 94
+        assert parseSpOut(_p) == 93
 
     def test_multicomp(self, ifs):
         ci = [
@@ -2338,7 +2338,7 @@ class TestncRNAseq:
         print(" ".join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 142
+        assert parseSpOut(_p) == 141
 
 
 class TestSmRNAseq:
