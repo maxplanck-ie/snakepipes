@@ -466,7 +466,7 @@ rule hisat2Index:
     shell: """
         ln -s {input} {params.basedir}/genome.fa
         hisat2-build -q -p {threads} {params.basedir}/genome.fa {params.basedir}/genome
-        && touch {output}
+        touch {output}
         """
 
 
