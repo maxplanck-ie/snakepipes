@@ -101,6 +101,7 @@ def createTestData(fp, samples=9) -> None:
         f.write("1\5\n")
         f.write("2_spikein\t5\n")
     (fp / "ref" / "rmsk.txt").touch()
+    (fp / "ref" / "rmsk.gtf").touch()
     (fp / "ref" / "genes.bed").touch()
     (fp / "ref" / "genes.slop.gtf").touch()
     (fp / "ref" / "spikein_genes.gtf").touch()
@@ -246,6 +247,7 @@ def createTestData(fp, samples=9) -> None:
         "spikein_blacklist_bed": "",
         "ignoreForNormalization": "MT X Y",
         "rmsk_file": (fp / "ref" / "rmsk.txt").as_posix(),
+        "rmsk_gtf": (fp / "ref" / "rmsk.gtf").as_posix(),
         "tesmall_db": (fp / "ref" / "TEsmall").as_posix(),
         "tesmall_genome": "mm10",
     }
@@ -479,7 +481,7 @@ class TestCreateindices:
         print(" ".join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 22
+        assert parseSpOut(_p) == 23
 
     def test_DAG(self, ifs):
         ci = [
@@ -500,7 +502,7 @@ class TestCreateindices:
         print(" ".join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 22
+        assert parseSpOut(_p) == 23
 
     def test_spikein(self, ifs):
         ci = [
@@ -525,7 +527,7 @@ class TestCreateindices:
         print(" ".join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 27
+        assert parseSpOut(_p) == 28
 
     def test_tesmall(self, ifs):
         ci = [
@@ -2263,7 +2265,7 @@ class TestncRNAseq:
         print(" ".join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 137
+        assert parseSpOut(_p) == 136
 
     def test_DE(self, ifs):
         ci = [
@@ -2281,7 +2283,7 @@ class TestncRNAseq:
         print(" ".join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 139
+        assert parseSpOut(_p) == 138
 
     def test_SE(self, ifs):
         ci = [
@@ -2299,7 +2301,7 @@ class TestncRNAseq:
         print(" ".join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 120
+        assert parseSpOut(_p) == 119
 
     def test_frombam(self, ifs):
         ci = [
@@ -2318,7 +2320,7 @@ class TestncRNAseq:
         print(" ".join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 94
+        assert parseSpOut(_p) == 93
 
     def test_multicomp(self, ifs):
         ci = [
@@ -2336,7 +2338,7 @@ class TestncRNAseq:
         print(" ".join([str(i) for i in ci]))
         _p = sp.run(ci, capture_output=True, text=True)
         assert _p.returncode == 0
-        assert parseSpOut(_p) == 142
+        assert parseSpOut(_p) == 141
 
 
 class TestSmRNAseq:

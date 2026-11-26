@@ -86,12 +86,194 @@ rule fastaDict:
         """
 
 if rmsk_file:
+    #rule fetchRMSK:
+        #output: rmsk_file
+        #params:
+            #url = rmskURL
+        #run:
+            #downloadFile(params.url, output)
+
     rule fetchRMSK:
-        output: rmsk_file
+        input:
+            fasta = genome_fasta
+        output:
+            rmsk_file
         params:
             url = rmskURL
         run:
-            downloadFile(params.url, output)
+            import os
+            import io
+            import gzip
+            import urllib.request
+
+            out_path = output[0]
+
+            # 1. Check whether genome_fasta uses the "chr" prefix
+            fasta_has_chr = False
+            with open(input.fasta, "r") as fa:
+                for line in fa:
+                    if line.startswith(">"):
+                        first_chrom = line[1:].strip().split()[0]
+                        fasta_has_chr = first_chrom.startswith("chr")
+                        break
+
+            def fix_chrom(chrom):
+                if fasta_has_chr and not chrom.startswith("chr"):
+                    return "chr" + chrom
+                if not fasta_has_chr and chrom.startswith("chr"):
+                    return chrom[3:]
+                return chrom
+
+            def is_bigbed(url):
+                clean = url.split("?")[0].split("#")[0]
+                return clean.lower().endswith((".bb", ".bigbed"))
+
+            with open(out_path, "w") as out_f:
+
+                if is_bigbed(params.url):
+                    import pyBigWig
+                    # pyBigWig handles remote URLs directly via libcurl
+                    bb = pyBigWig.open(params.url)
+                    for chrom, size in bb.chroms().items():
+                        entries = bb.entries(chrom, 0, size)
+                        if not entries:
+                            continue
+                        norm_chrom = fix_chrom(chrom)
+                        for start, end, rest in entries:
+                            out_f.write(f"{norm_chrom}\t{start}\t{end}\t{rest}\n")
+                    bb.close()
+
+                else:
+                    with urllib.request.urlopen(params.url) as resp:
+                        raw = resp.read()
+
+                    # Check gzip magic number (0x1F 0x8B)
+                    if raw[:2] == b"\x1f\x8b":
+                        raw = gzip.decompress(raw)
+
+                    for raw_line in io.BytesIO(raw):
+                        line = raw_line.decode("latin-1")
+                        if line.startswith("#") or not line.strip():
+                            out_f.write(line)
+                            continue
+                        cols = line.rstrip("\n").split("\t")
+                        chrom_idx = 5 if len(cols) == 17 else 0
+                        cols[chrom_idx] = fix_chrom(cols[chrom_idx])
+                        out_f.write("\t".join(cols) + "\n")
+
+
+    rule makeRMSKGTF:
+        input:
+            rmsk_file
+        output:
+            rmsk_gtf
+        run:
+            found = {}
+
+            def make_tid(repName):
+                if repName not in found:
+                    found[repName] = 0
+                    return repName
+                found[repName] += 1
+                return "{}_dup{}".format(repName, found[repName])
+
+            def write_entry(of, genoName, genoStart, genoEnd, strand,
+                        repName, repClass, repFamily):
+               tid = make_tid(repName)
+               of.write(
+                    '{}\trmsk\texon\t{}\t{}\t.\t{}\t.\t'
+                    'gene_id "{}"; transcript_id "{}"; '
+                    'family_id "{}"; class_id "{}";\n'.format(
+                        genoName, genoStart, genoEnd, strand,
+                        repName, tid, repFamily, repClass
+                    )
+                )
+
+            with open(input[0], "rb") as fh:
+               raw = fh.read()
+
+            if raw[:2] == b"\x1f\x8b":
+                import gzip
+                raw = gzip.decompress(raw)
+
+            lines = raw.decode("latin-1").splitlines()
+
+            # Detect format from first non-empty line
+            first = next((l for l in lines if l.strip()), "")
+            is_out_format = first.lstrip().startswith("SW")
+
+            with open(output[0], "w") as of:
+                for line in lines:
+                    if not line.strip():
+                        continue
+
+                    if is_out_format:
+                    # Skip the two header lines
+                        if line.lstrip().startswith("SW") or line.lstrip().startswith("score"):
+                            continue
+
+                        cols = line.split()
+                        if len(cols) < 15:
+                            continue
+
+                        # .out columns:
+                        # 0:score 1:div 2:del 3:ins 4:genoName 5:genoStart 6:genoEnd
+                        # 7:(genoLeft) 8:strand(+/C) 9:repName 10:repClass/repFamily
+                        # 11:repStart 12:repEnd 13:(repLeft) 14:id
+                        genoName  = cols[4]
+                        genoStart = cols[5]   # 1-based in .out format
+                        genoEnd   = cols[6]
+                        strand    = "+" if cols[8] == "+" else "-"
+                        repName   = cols[9]
+                        class_family = cols[10]
+                        if "/" in class_family:
+                            repClass, repFamily = class_family.split("/", 1)
+                        else:
+                            repClass = repFamily = class_family
+
+                    else:
+                        if line.startswith("#"):
+                            continue
+
+                        cols = line.rstrip("\n").split("\t")
+
+                        if len(cols) == 17:
+                            (bin_id, swScore, milliDiv, milliDel, milliIns,
+                             genoName, genoStart, genoEnd, genoLeft, strand,
+                             repName, repClass, repFamily,
+                             repStart, repEnd, repLeft, id_val) = cols
+
+                        elif len(cols) == 16:
+                            (genoName, genoStart, genoEnd, name, swScore, strand,
+                             milliDiv, milliDel, milliIns, genoLeft,
+                             repName, repClass, repFamily,
+                             repStart, repEnd, repLeft) = cols
+
+                        elif len(cols) == 14:
+                            genoName  = cols[0]
+                            genoStart = cols[1]
+                            genoEnd   = cols[2]
+                            strand    = cols[5]
+                            name      = cols[3]
+                            if "#" in name:
+                                repName, class_family = name.split("#", 1)
+                                if "/" in class_family:
+                                    repClass, repFamily = class_family.split("/", 1)
+                                else:
+                                    repClass = repFamily = class_family
+                            else:
+                                repName  = name
+                                repClass = repFamily = "Unknown"
+
+                        else:
+                            raise ValueError(
+                                f"Unexpected column count ({len(cols)}) in {input[0]}: {line[:80]}"
+                            )
+
+                    write_entry(of, genoName, genoStart, genoEnd, strand,
+                        repName, repClass, repFamily)
+
+
 
 # Default memory allocation: 8G
 rule make2bit:
@@ -276,7 +458,7 @@ rule bowtie2Index:
 # Default memory allocation: 20G
 rule hisat2Index:
     input: genome_fasta
-    output: os.path.join(outdir, "HISAT2Index/genome.6.ht2")
+    output: os.path.join(outdir, "HISAT2Index/index.done")
     params:
       basedir = os.path.join(outdir, "HISAT2Index")
     threads: lambda wildcards: 10 if 10<max_thread else max_thread
@@ -284,6 +466,7 @@ rule hisat2Index:
     shell: """
         ln -s {input} {params.basedir}/genome.fa
         hisat2-build -q -p {threads} {params.basedir}/genome.fa {params.basedir}/genome
+        touch {output}
         """
 
 
@@ -436,20 +619,35 @@ rule bwameth2Index:
         bwameth.py index-mem2 {params.genome}
         """
 
-# Default memory allocation: 1G
-rule copyBlacklist:
-    output: os.path.join(outdir, "annotation/blacklist.bed")
+
+rule prep_blacklist:
+    input:
+        gtf = os.path.join(outdir,"annotation/genes.gtf")
+    output:
+        path = os.path.join(outdir,"annotation/blacklist.bed")
     params:
-        url = blacklist
-    run:
-        downloadFile(params.url, output)
+        wdir = os.path.join(outdir,"annotation"),
+        url = blacklist,
+        script = os.path.join(maindir, "shared", "rscripts", "prep_blacklist.R"),
+    conda:
+        CONDA_REPQUANT_ENV
+    script:
+        "{params.script}"
+
 
 rule copySpikeinBlacklist:
-    output: temp(os.path.join(outdir, "annotation/spikein.blacklist_ori.bed"))
+    input:
+        gtf = os.path.join(outdir,"annotation/genes.gtf")
+    output:
+        path = temp(os.path.join(outdir, "annotation/spikein.blacklist_ori.bed"))
     params:
-        url = spikeinBlacklist
-    run:
-        downloadFile(params.url, output)
+        url = spikeinBlacklist,
+        wdir = os.path.join(outdir,"annotation"),
+        script = os.path.join(maindir, "shared", "rscripts", "prep_blacklist.R")
+    conda:
+        CONDA_REPQUANT_ENV
+    script:
+        "{params.script}"
 
 rule renameSpikeinChromsBlacklist:
     input:  os.path.join(outdir,"annotation/spikein.blacklist_ori.bed")
