@@ -13,40 +13,17 @@ import snakePipes.common_functions as cf
 import snakePipes.parserCommon as parserCommon
 
 
-def parse_args(
-    defaults={
-        "verbose": False,
-        "configFile": None,
-        "clusterConfigFile": None,
-        "maxJobs": 5,
-        "snakemakeOptions": "--use-conda",
-        "tempDir": None,
-        "pairedEnd": True,
-        "fragmentLength": 200,
-        "bwBinSize": 25,
-        "windowSize": 150,
-        "predictChIPDict": None,
-        "fromBAM": False,
-        "bigWigType": "both",
-        "peakCaller": "MACS2",
-        "sampleSheet": "",
-        "externalBed": "",
-        "plotFormat": "png",
-        "bamExt": ".filtered.bam",
-        "fdr": 0.05,
-        "absBestLFC": 1,
-        "useSpikeinForNorm": False,
-        "spikeinExt": "_spikein",
-        "spikeinSizeFactorsFile": None,
-        "peakCallerOptions": "--qvalue 0.001",
-        "cutntag": False,
-        "getSizeFactorsFrom": "genome",
-        "repQuant": False,
-    },
-):
+def parse_args(defaults=None):
     """
     Parse arguments from the command line.
+
+    When called without defaults (e.g. by sphinx-argparse during the docs
+    build), the defaults are loaded from the workflow's defaults.yaml merged
+    with the shared defaults.
     """
+    if defaults is None:
+        _, _, defaults = cf.setDefaults(os.path.basename("ChIPseq.py")) # Use Workflowname here as __file__ will be different during sphinx rendering
+
     mainArgs = parserCommon.mainArguments(defaults, workingDir=True)
 
     parser = argparse.ArgumentParser(

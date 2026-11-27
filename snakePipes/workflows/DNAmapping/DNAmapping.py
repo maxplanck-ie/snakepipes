@@ -14,47 +14,17 @@ import snakePipes.common_functions as cf
 import snakePipes.parserCommon as parserCommon
 
 
-def parse_args(
-    defaults={
-        "verbose": False,
-        "configFile": None,
-        "clusterConfigFile": None,
-        "maxJobs": 5,
-        "snakemakeOptions": "--use-conda",
-        "tempDir": None,
-        "mode": "mapping",
-        "downsample": False,
-        "trim": False,
-        "trimmer": "cutadapt",
-        "trimmerOptions": "",
-        "fastqc": False,
-        "qualimap": False,
-        "dedup": False,
-        "ext": ".fastq.gz",
-        "properPairs": False,
-        "insertSizeMax": 1000,
-        "GCBias": False,
-        "reads": ["_R1", "_R2"],
-        "bwBinSize": 25,
-        "mapq": 0,
-        "plotFormat": "png",
-        "alignerOpts": "",
-        "mateOrientation": "--fr",
-        "UMIDedup": False,
-        "UMIDedupOpts": "",
-        "UMIDedupSep": "_",
-        "UMIBarcode": False,
-        "cutntag": False,
-        "bcPattern": "NNNNCCCCCCCC",
-        "aligner": "Bowtie2",
-        "pvcf": None,
-        "useSpikeInForNorm": False,
-        "spikeinExt": None,
-    },
-):
+def parse_args(defaults=None):
     """
     Parse arguments from the command line.
+
+    When called without defaults (e.g. by sphinx-argparse during the docs
+    build), the defaults are loaded from the workflow's defaults.yaml merged
+    with the shared defaults.
     """
+    if defaults is None:
+        _, _, defaults = cf.setDefaults(os.path.basename("DNAmapping.py")) # Use Workflowname here as __file__ will be different during sphinx rendering
+
     mainArgs = parserCommon.mainArguments(defaults)
     snpArgs = parserCommon.snpArguments(defaults)
 

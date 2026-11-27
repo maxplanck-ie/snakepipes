@@ -14,22 +14,17 @@ import snakePipes.common_functions as cf
 import snakePipes.parserCommon as parserCommon
 
 
-def parse_args(
-    defaults={
-        "configFile": None,
-        "clusterConfigFile": None,
-        "maxJobs": 5,
-        "snakemakeOptions": "",
-        "tempDir": None,
-        "verbose": False,
-        "spikeinExt": None,
-        "salmonIndexOptions": None,
-        "eisaR_flank_length": None,
-    },
-):
+def parse_args(defaults=None):
     """
     Parse arguments from the command line.
+
+    When called without defaults (e.g. by sphinx-argparse during the docs
+    build), the defaults are loaded from the workflow's defaults.yaml merged
+    with the shared defaults.
     """
+    if defaults is None:
+        _, _, defaults = cf.setDefaults(os.path.basename("createIndices.py")) # Use Workflowname here as __file__ will be different during sphinx rendering
+
     mainArgs = parserCommon.mainArguments(defaults, createIndices=True)
 
     parser = argparse.ArgumentParser(

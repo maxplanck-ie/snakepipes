@@ -14,49 +14,17 @@ import snakePipes.parserCommon as parserCommon
 import warnings
 
 
-def parse_args(
-    defaults={
-        "verbose": False,
-        "configFile": None,
-        "clusterConfigFile": None,
-        "maxJobs": 5,
-        "snakemakeOptions": "--use-conda",
-        "tempDir": None,
-        "mode": "alignment,deepTools_qc",
-        "downsample": False,
-        "trim": False,
-        "trimmer": "cutadapt",
-        "trimmerOptions": None,
-        "fastqc": False,
-        "libraryType": 2,
-        "aligner": "STAR",
-        "alignerOptions": None,
-        "featureCountsOptions": "-C -Q 10 --primary",
-        "filterGTF": None,
-        "sampleSheet": None,
-        "formula": "",
-        "reads": ["_R1", "_R2"],
-        "ext": ".fastq.gz",
-        "bwBinSize": 25,
-        "dnaContam": False,
-        "plotFormat": "png",
-        "fromBAM": False,
-        "bamExt": ".bam",
-        "pairedEnd": True,
-        "UMIDedup": False,
-        "UMIDedupOpts": "",
-        "bcPattern": "NNNNCCCCCCCCC",
-        "UMIDedupSep": "_",
-        "UMIBarcode": False,
-        "rMats": False,
-        "fdr": 0.05,
-        "LRT": False,
-        "pvcf": None,
-    },
-):
+def parse_args(defaults=None):
     """
     Parse arguments from the command line.
+
+    When called without defaults (e.g. by sphinx-argparse during the docs
+    build), the defaults are loaded from the workflow's defaults.yaml merged
+    with the shared defaults.
     """
+    if defaults is None:
+        _, _, defaults = cf.setDefaults(os.path.basename("mRNAseq.py")) # Use Workflowname here as __file__ will be different during sphinx rendering
+      
     mainArgs = parserCommon.mainArguments(defaults, workingDir=False)
     snpArgs = parserCommon.snpArguments(defaults)
 
